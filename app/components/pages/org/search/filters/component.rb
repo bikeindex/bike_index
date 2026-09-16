@@ -4,9 +4,9 @@ module Pages
   module Org
     module Search
       module Filters
-        # The quick-filter chip row under the search fields, and the settings panel the gear
-        # opens. Every label comes from Pages::Org::Search::Settings, which the table reads
-        # its column names out of too.
+        # The row under the search fields - the gear, the date range, and what the search is
+        # filtered to - and the settings panel the gear opens. Every label comes from
+        # Pages::Org::Search::Settings, which the table reads its column names out of too.
         #
         # It renders beside the search form rather than inside it: the custom date range is a
         # form of its own, which can't nest. The radios reach the search with form:.

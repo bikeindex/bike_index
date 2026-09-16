@@ -4,8 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'exportLink', 'notesField', 'notesCheckbox', 'chartFrame',
-    'filterSummary']
+  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'filterSummary']
 
   connect () {
     this.chartSearch = window.location.search
@@ -21,7 +20,6 @@ export default class extends Controller {
   // looks after itself - ui--collapse reconnects with it - but the chart is outside them.
   handleFrameRender = (event) => {
     if (this.hasChartFrameTarget && event.target === this.chartFrameTarget) return
-    this.updateExportLink()
     this.reloadChart()
   }
 
@@ -71,13 +69,6 @@ export default class extends Controller {
     url.searchParams.set('per_page', this.perPageTarget.value)
     url.searchParams.set('search_no_js', 'true')
     window.location = url.toString()
-  }
-
-  updateExportLink () {
-    if (!this.hasExportLinkTarget) return
-    const url = new URL(window.location)
-    url.searchParams.set('create_export', 'true')
-    this.exportLinkTarget.href = url.toString()
   }
 
   // The card sits outside the results frame, so a search leaves it answering the previous

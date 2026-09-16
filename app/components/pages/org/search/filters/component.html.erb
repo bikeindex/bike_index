@@ -21,9 +21,10 @@
       frame, so a search doesn't bring a fresh one back from the server
     %>
 
-    <%= tag.em(safe_join(active_search_filter_descriptions, " · "),
-      class: "less-strong tw:text-sm", hidden: active_search_filter_descriptions.none?,
-      data: {"org--search-target": "filterSummary"}) %>
+    <% descriptions = active_search_filter_descriptions %>
+
+    <%= tag.em(safe_join(descriptions, " · "), class: "less-strong tw:text-sm",
+      hidden: descriptions.none?, data: {"org--search-target": "filterSummary"}) %>
   </div>
 
   <div

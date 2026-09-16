@@ -66,7 +66,6 @@ module Pages
               search_status: @search_status,
               search_unregisteredness: @search_unregisteredness,
               search_parking_notification: @search_parking_notification,
-              bike_sticker: @bike_sticker,
               search_all: @search_all,
               toggle_button: !@search_page
             )

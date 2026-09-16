@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module OrgServices
-  # The counts behind the org registrations at-a-glance card: each metric over the window,
+  # The counts behind the org registrations chart card: each metric over the window,
   # and over the window of the same length before it, which the card renders as a delta.
   module RegistrationStats
     extend Functionable

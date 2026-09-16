@@ -37,15 +37,27 @@ module Pages
 
           ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
 
-          FILTER_DESCRIPTION_KEYS = {
-            search_stickers: {with: ".filter_with_stickers_html", none: ".filter_no_sticker_html"},
-            search_address: {with_street: ".filter_with_address_html", without_street: ".filter_no_address_html"},
-            search_status: {not_impounded: ".filter_not_impounded_html", impounded: ".filter_impounded_html",
-                            with_owner: ".filter_not_stolen_or_impounded_html", stolen: ".filter_stolen_html"},
-            search_unregisteredness: {only_unregistered: ".filter_only_unregistered_html",
-                                      only_registered: ".filter_not_unregistered_html"},
-            search_parking_notification: {with: ".filter_with_parking_notification_html",
-                                          none: ".filter_no_parking_notification_html"}
+          # Each filter's values and their labels, once — `filter_groups` lays them out and
+          # `active_search_filter_descriptions` names the ones in force. feature gates the
+          # whole row, value_feature an individual option; blank is the row's "not filtering".
+          FILTER_GROUPS = {
+            search_stickers: {label: ".stickers", feature: "bike_stickers",
+                              values: {with: ".filter_with_stickers_html", none: ".filter_no_sticker_html"}},
+            search_address: {label: ".address", feature: "reg_address",
+                             values: {with_street: ".filter_with_address_html",
+                                      without_street: ".filter_no_address_html"}},
+            search_status: {label: ".status", blank: "all",
+                            value_feature: {not_impounded: "impound_bikes", impounded: "impound_bikes"},
+                            values: {not_impounded: ".filter_not_impounded_html",
+                                     impounded: ".filter_impounded_html",
+                                     with_owner: ".filter_not_stolen_or_impounded_html",
+                                     stolen: ".filter_stolen_html"}},
+            search_unregisteredness: {label: ".unregistered",
+                                      values: {only_unregistered: ".filter_only_unregistered_html",
+                                               only_registered: ".filter_not_unregistered_html"}},
+            search_parking_notification: {label: ".parking_notifications", feature: "parking_notifications",
+                                          values: {with: ".filter_with_parking_notification_html",
+                                                   none: ".filter_no_parking_notification_html"}}
           }.freeze
 
           attr_reader :organization
@@ -60,7 +72,6 @@ module Pages
             search_status: "all",
             search_unregisteredness: nil,
             search_parking_notification: nil,
-            bike_sticker: nil,
             search_all: false,
             toggle_button: true
           )
@@ -68,28 +79,30 @@ module Pages
             @interpreted_params = interpreted_params
             @sortable_search_params = sortable_search_params
             @params = params
-            @search_stickers = search_stickers
-            @search_address = search_address
-            @search_status = search_status
-            @search_unregisteredness = search_unregisteredness
-            @search_parking_notification = search_parking_notification
-            @bike_sticker = bike_sticker
+            @filter_values = {search_stickers:, search_address:, search_status:,
+                              search_unregisteredness:, search_parking_notification:}
             @search_all = search_all
             # The registrations search opens this panel from its results-card header instead
             @toggle_button = toggle_button
           end
 
           def active_search_filter_descriptions
-            FILTER_DESCRIPTION_KEYS.filter_map do |param, mapping|
-              value = filter_values[param]
-              key = mapping[value.to_sym] if value.is_a?(String)
+            FILTER_GROUPS.filter_map do |name, group|
+              value = @filter_values[name]
+              key = group[:values][value.to_sym] if value.is_a?(String)
               translation(key) if key
             end
           end
 
           def filter_groups
-            [sticker_group, address_group, status_group, unregisteredness_group,
-              parking_notification_group].compact
+            FILTER_GROUPS.filter_map do |name, group|
+              next unless enabled_filter?(group[:feature])
+
+              blank = group[:blank] || ""
+              {name:, label: translation(group[:label]),
+               selected: @filter_values[name].presence || blank,
+               entries: [{value: blank, label: translation(".all")}] + group_entries(group)}
+            end
           end
 
           def notes_search_label = translation(".show_notes_search")
@@ -162,62 +175,16 @@ module Pages
             organization_registrations_path(search_params.merge(create_export: true))
           end
 
-          def filter_values
-            {search_stickers: @search_stickers, search_address: @search_address,
-             search_status: @search_status, search_unregisteredness: @search_unregisteredness,
-             search_parking_notification: @search_parking_notification}
+          def enabled_filter?(feature)
+            feature.nil? || @organization.enabled?(feature)
           end
 
-          def group(name, label_key, selected, entries)
-            {name:, label: translation(label_key), selected: selected.presence || "", entries:}
-          end
+          def group_entries(group)
+            group[:values].filter_map do |value, key|
+              next unless enabled_filter?(group[:value_feature]&.dig(value))
 
-          def sticker_group
-            return nil unless @organization.enabled?("bike_stickers")
-
-            group(:search_stickers, ".stickers", @search_stickers,
-              [{value: "", label: translation(".all")},
-                {value: "with", label: translation(".filter_with_stickers_html")},
-                {value: "none", label: translation(".filter_no_sticker_html")}])
-          end
-
-          def address_group
-            return nil unless @organization.enabled?("reg_address")
-
-            group(:search_address, ".address", @search_address,
-              [{value: "", label: translation(".all")},
-                {value: "with_street", label: translation(".filter_with_address_html")},
-                {value: "without_street", label: translation(".filter_no_address_html")}])
-          end
-
-          def status_group
-            entries = [{value: "all", label: translation(".all")}]
-            if @organization.enabled?("impound_bikes")
-              entries << {value: "not_impounded", label: translation(".filter_not_impounded_html")}
-              entries << {value: "impounded", label: translation(".filter_impounded_html")}
+              {value: value.to_s, label: translation(key)}
             end
-            entries << {value: "with_owner", label: translation(".filter_not_stolen_or_impounded_html")}
-            entries << {value: "stolen", label: translation(".filter_stolen_html")}
-
-            group(:search_status, ".status", @search_status, entries)
-          end
-
-          # A bike an organization's parking notification created for a vehicle nobody had
-          # registered - its own status, rather than a question about the notices on it
-          def unregisteredness_group
-            group(:search_unregisteredness, ".unregistered", @search_unregisteredness,
-              [{value: "", label: translation(".all")},
-                {value: "only_unregistered", label: translation(".filter_only_unregistered_html")},
-                {value: "only_registered", label: translation(".filter_not_unregistered_html")}])
-          end
-
-          def parking_notification_group
-            return nil unless @organization.enabled?("parking_notifications")
-
-            group(:search_parking_notification, ".parking_notifications", @search_parking_notification,
-              [{value: "", label: translation(".all")},
-                {value: "with", label: translation(".filter_with_parking_notification_html")},
-                {value: "none", label: translation(".filter_no_parking_notification_html")}])
           end
         end
       end

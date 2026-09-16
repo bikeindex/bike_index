@@ -28,7 +28,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response.body).to_not include("fbevents.js")
       expect(assigns(:current_organization)).to eq current_organization
-      expect(assigns(:search_query_present)).to be_truthy
       expect(assigns(:bikes).pluck(:id)).to eq([])
       expect(assigns(:search_stickers)).to eq false
       # create_export fails if the org doesn't have have csv_exports
@@ -39,7 +38,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       get base_url, params: {search_no_js: true, search_address: "without_street"}
       expect(response.status).to eq(200)
-      expect(assigns(:search_query_present)).to be_falsey
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
     context "member_no_bike_edit" do
@@ -49,7 +47,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: query_params
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
-        expect(assigns(:search_query_present)).to be_truthy
         expect(assigns(:bikes).pluck(:id)).to eq([])
       end
     end
@@ -213,7 +210,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "chart_only" do
-      it "renders the at-a-glance frame with the searched counts" do
+      it "renders the chart frame with the searched counts" do
         get base_url, params: {chart_only: "1"}
         expect(response.status).to eq(200)
         expect(response.body).to include('id="registrations_chart_frame"')
@@ -261,7 +258,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {search_no_js: true}
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
-        expect(assigns(:search_query_present)).to be_falsey
         expect(assigns(:search_stickers)).to eq false
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
         expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})

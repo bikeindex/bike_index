@@ -15,15 +15,20 @@ module UI
       TRACK_CLASSES = "tw:inline-flex tw:gap-0.5 tw:rounded-lg tw:border tw:border-gray-200 " \
         "tw:bg-gray-100 tw:p-0.5 tw:dark:border-gray-700 tw:dark:bg-gray-800"
 
-      # Resting is the unselected segment; is-active raises the selected one out of the track
-      SEGMENT_CLASSES = "tw:inline-flex tw:cursor-pointer tw:items-center tw:rounded-md tw:px-3 tw:py-1 " \
-        "tw:text-2xs tw:font-extrabold tw:whitespace-nowrap tw:no-underline tw:hover:no-underline " \
-        "tw:text-gray-400 tw:transition-colors " \
-        "tw:not-disabled:not-aria-disabled:hover:text-gray-900 tw:disabled:opacity-50 " \
-        "tw:disabled:cursor-not-allowed tw:aria-disabled:opacity-50 tw:aria-disabled:cursor-not-allowed " \
-        "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-purple-500/40 " \
-        "tw:is-active:bg-white tw:is-active:text-gray-900 tw:is-active:shadow-sm " \
+      # Only the segment's own look: the focus, disabled and hover-guard halves come from
+      # UI::Button, whose rationales for each shouldn't need a second copy here.
+      # Resting is the unselected segment; is-active raises the selected one out of the track.
+      SEGMENT_CLASSES = [
+        "tw:inline-flex tw:items-center tw:cursor-pointer tw:transition-colors tw:rounded-md",
+        "tw:px-3 tw:py-1 tw:text-2xs tw:font-extrabold tw:whitespace-nowrap",
+        "tw:no-underline tw:hover:no-underline tw:text-gray-400",
+        "tw:not-disabled:not-aria-disabled:hover:text-gray-900",
+        "tw:focus:ring-purple-500/40",
+        UI::Button::Component::FOCUS_CLASSES,
+        UI::Button::Component::DISABLED_CLASSES,
+        "tw:is-active:bg-white tw:is-active:text-gray-900 tw:is-active:shadow-sm",
         "tw:dark:is-active:bg-gray-900 tw:dark:is-active:text-gray-100"
+      ].join(" ").freeze
 
       # full_width lays the chips out as equal columns that wrap, staying the same width
       # on every line — flex would size each line independently. auto-fit needs a

@@ -7,12 +7,12 @@ module Pages
         class ComponentPreview < ApplicationComponentPreview
           def default
             render(Pages::Org::Search::ChartCard::Component.new(scope: "search", scope_paths:,
-              chart: chart, stats:))
+              chart:, stats:))
           end
 
           def year_scope
             render(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
-              chart: chart, stats:))
+              chart:, stats:))
           end
 
           # What the card shows until the lazy frame answers

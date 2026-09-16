@@ -22,7 +22,6 @@ module Organized
         @search_all = Binxtils::InputNormalizer.boolean(params[:search_all])
         @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
-        @search_query_present = permitted_org_registration_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
         @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
         @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
         @per_page = permitted_per_page(default: 10)
@@ -193,43 +192,20 @@ module Organized
     # NOTE: Make sure to add any custom search params to no_org_search_params?
     def search_organization_bikes
       org = current_organization || passive_organization
+      set_search_filter_params
       bikes = (@search_all || org.blank?) ? Bike.search(@interpreted_params) : org.bikes.search(@interpreted_params)
       bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
       bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
-      if params[:search_stickers].present?
-        @search_stickers = (params[:search_stickers] == "none") ? "none" : "with"
-        bikes = (@search_stickers == "none") ? bikes.no_bike_sticker : bikes.bike_sticker
-      else
-        @search_stickers = false
-      end
-      if %w[none with with_street without_street].include?(params[:search_address])
-        @search_address = params[:search_address]
-        # Currently removed none and with - instead using street - I think that reflects people's expectations
-        bikes = case @search_address
-        when "none" then bikes.without_location
-        when "without_street" then bikes.without_street
-        when "with_street" then bikes.with_street
-        when "with" then bikes.with_location
-        end
-      else
-        @search_address = false
-      end
-      if search_status != "all"
-        bikes = if search_status == "not_impounded"
-          bikes.where.not(status: "status_impounded")
-        else
-          bikes.where(status: "status_#{search_status}")
-        end
-      end
+      bikes = sticker_scoped(bikes)
+      bikes = address_scoped(bikes)
+      bikes = status_scoped(bikes)
+      bikes = unregisteredness_scoped(bikes)
+      bikes = parking_notification_scoped(bikes)
       if params[:search_model_audit_id].present?
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
-      @search_unregisteredness = permitted_unregisteredness
-      bikes = unregisteredness_scoped(bikes)
-      @search_parking_notification = permitted_parking_notification_filter
-      bikes = parking_notification_scoped(bikes)
-      # The at-a-glance card counts an earlier window too, so it needs the search without a period
+      # The chart card counts an earlier window too, so it needs the search without a period
       @searched_bikes = bikes
       @available_bikes = @searched_bikes.where(created_at: @time_range)
       return if chart_only?
@@ -237,7 +213,8 @@ module Organized
       @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
     end
 
-    # Set filter params for settings component on initial (non-turbo) page load
+    # Every filter normalizes here and applies in its own *_scoped, so the shell render (which
+    # only needs the values, to draw the settings panel) and the search can't drift apart
     def set_search_filter_params
       @search_stickers = if params[:search_stickers].present?
         (params[:search_stickers] == "none") ? "none" : "with"
@@ -245,31 +222,49 @@ module Organized
         false
       end
       @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
-      @search_unregisteredness = permitted_unregisteredness
-      @search_parking_notification = permitted_parking_notification_filter
+      @search_unregisteredness = permitted_filter(:search_unregisteredness, %w[only_unregistered only_registered])
+      @search_parking_notification = current_organization.enabled?("parking_notifications") &&
+        permitted_filter(:search_parking_notification, %w[with none])
       search_status
     end
 
-    def permitted_unregisteredness
-      %w[only_unregistered only_registered].include?(params[:search_unregisteredness]) ? params[:search_unregisteredness] : false
+    def permitted_filter(param, values)
+      values.include?(params[param]) ? params[param] : false
     end
 
-    # unregistered_parking_notification is a bike's own status, so this filters the records
-    # a notification created for an unregistered vehicle rather than the notices on a bike
-    def unregisteredness_scoped(bikes)
-      return bikes unless @search_unregisteredness
+    def sticker_scoped(bikes)
+      return bikes unless @search_stickers
 
-      if @search_unregisteredness == "only_unregistered"
-        bikes.where(status: "unregistered_parking_notification")
-      else
-        bikes.where.not(status: "unregistered_parking_notification")
+      (@search_stickers == "none") ? bikes.no_bike_sticker : bikes.bike_sticker
+    end
+
+    # none and with are removed in favour of street - it reflects people's expectations better
+    def address_scoped(bikes)
+      case @search_address
+      when "none" then bikes.without_location
+      when "without_street" then bikes.without_street
+      when "with_street" then bikes.with_street
+      when "with" then bikes.with_location
+      else bikes
       end
     end
 
-    def permitted_parking_notification_filter
-      return false unless current_organization.enabled?("parking_notifications")
+    def status_scoped(bikes)
+      case search_status
+      when "all" then bikes
+      when "not_impounded" then bikes.where.not(status: "status_impounded")
+      else bikes.where(status: "status_#{search_status}")
+      end
+    end
 
-      %w[with none].include?(params[:search_parking_notification]) ? params[:search_parking_notification] : false
+    # A question about the bike's own status, not the notices on it - and the same column
+    # search_status filters, so setting both to named statuses matches nothing
+    def unregisteredness_scoped(bikes)
+      case @search_unregisteredness
+      when "only_unregistered" then bikes.unregistered_parking_notification
+      when "only_registered" then bikes.not_unregistered_parking_notification
+      else bikes
+      end
     end
 
     # Scoped to the organization's own notices unless the search has widened past them

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ComponentStructs
-  # One row of the org registrations at-a-glance card. previous_count is nil over `all`,
+  # One row of the org registrations chart card. previous_count is nil over `all`,
   # where there's no earlier window to compare against, and the row renders without a delta.
   RegistrationStat = Data.define(:key, :count, :previous_count) do
     def initialize(key:, count:, previous_count: nil)
