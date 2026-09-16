@@ -2235,6 +2235,8 @@ nb:
           organization_signed_in: Du er logget inn
         skip_if_signed_in:
           already_signed_in: Du er allerede logget på!
+        turnstile_verified:
+          verify_not_a_robot: Vennligst bekreft at du ikke er en robot
     feedbacks:
       block_the_spam:
         please_sign_in: Logg på for å sende den meldingen

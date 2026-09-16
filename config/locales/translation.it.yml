@@ -2286,6 +2286,8 @@ it:
           organization_signed_in: Hai effettuato l'accesso
         skip_if_signed_in:
           already_signed_in: Hai già effettuato l'accesso!
+        turnstile_verified:
+          verify_not_a_robot: Conferma di non essere un robot
     feedbacks:
       block_the_spam:
         please_sign_in: Accedi per inviare il messaggio.

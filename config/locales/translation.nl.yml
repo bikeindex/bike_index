@@ -2130,6 +2130,8 @@ nl:
           organization_signed_in: Je bent ingelogd.
         skip_if_signed_in:
           already_signed_in: Je bent al ingelogd!
+        turnstile_verified:
+          verify_not_a_robot: Bevestig alstublieft dat u geen robot bent.
     oauth:
       applications:
         ensure_app_owner!:
