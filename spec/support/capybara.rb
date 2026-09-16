@@ -77,20 +77,27 @@ RSpec.configure do |config|
         playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
       end
 
-      # A nil current_path means Capybara saw an `about:` URL, which a page reaches by
-      # traversing to the about:blank it started on or by being replaced by a new one --
-      # these say which, for a failure nobody has reproduced outside CI. tmp/capybara is
-      # what CI uploads with the failure screenshots.
+      # A nil current_path is Capybara reporting an `about:` URL -- reached by traversing
+      # to the about:blank every example starts on, or by the page being replaced. These
+      # say which, with the main-frame trail leading to it. Nothing is written unless one
+      # fires, and tmp/capybara is the directory CI uploads with the failure screenshots.
       log_path = Rails.root.join("tmp/capybara/browser_events.log")
+      trail = []
       record = lambda do |message|
         FileUtils.mkdir_p(log_path.dirname)
-        File.open(log_path, "a") { |file| file.puts("#{Time.current.iso8601(3)} #{example.full_description}: #{message}") }
+        File.open(log_path, "a") do |file|
+          file.puts("#{Time.current.iso8601(3)} #{example.full_description}: #{message}")
+          file.puts("  main frame: #{trail.last(8).join(" -> ")}")
+        end
       end
 
       playwright_page.on("crash", ->(_page) { record.call("page crashed") })
       playwright_page.context.on("page", ->(new_page) { record.call("context opened #{new_page.url}") })
       playwright_page.on("framenavigated", lambda { |frame|
-        record.call("main frame navigated to #{frame.url}") if frame.parent_frame.nil? && frame.url.start_with?("about:")
+        next unless frame.parent_frame.nil?
+
+        trail << frame.url
+        record.call("main frame navigated to #{frame.url}") if frame.url.start_with?("about:")
       })
     end
   end

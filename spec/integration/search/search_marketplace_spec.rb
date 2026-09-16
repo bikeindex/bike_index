@@ -288,8 +288,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     visit_marketplace_via_nav
     # First 12 on the unfiltered page (the 2 members sort first)
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
-    # Drop history accumulated by earlier examples so go_back/go_forward operate on
-    # this example's own short stack, not a stale foreign entry.
+    # Drop the entries made getting here, so go_back/go_forward operate on the filters
+    # below alone.
     reset_browser_history
 
     # Filter by "Mountain biking" (6 listings), then "Road cycling" (9 listings).

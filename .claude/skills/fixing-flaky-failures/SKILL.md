@@ -232,9 +232,11 @@ section. Same class of thing: an unmigrated test DB, a stale VCR cassette.
 in a Redis DB shared across `:js` examples and survives 600s, and `load_all`
 never invalidates it — so a stale entry from an earlier spec changes what a
 combobox returns. The fix is `Autocomplete::Loader.clear_redis` in `before`,
-not a retry. Browser history is the same shape: `reset_browser_history`
-(`spec/support/integration_spec_helpers.rb`) drops entries earlier examples left, so
-`go_back`/`go_forward` walk this example's own stack.
+not a retry. Browser history is **not** the same shape, though it reads like it: the
+driver closes the browser context between examples, so no entry outlives one. What
+`reset_browser_history` (`spec/support/integration_spec_helpers.rb`) drops is the
+example's *own* earlier entries, including the about:blank it started on — which a
+traversal lands on as a nil `current_path`.
 
 **Interacting with a page whose controllers haven't connected.** `application.js`
 lazy loads every Stimulus controller, so a freshly rendered page answers to none of
