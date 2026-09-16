@@ -20,7 +20,7 @@ module UserJobs
 
     # admin truncates this to 100 characters, so lead with the score
     def ban_description(user, estimate)
-      matches = SpamEstimator::Text.seo_spam_matches(SpamEstimator::User.scannable_text(user))
+      matches = SpamEstimator::User.seo_spam_matches(user)
         .map { |term, count| (count > 1) ? "#{term} (#{count})" : term }
 
       ["Estimate #{estimate.round}", matches.any? ? "matched: #{matches.join(", ")}" : nil]

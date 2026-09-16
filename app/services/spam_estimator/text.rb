@@ -78,6 +78,13 @@ module SpamEstimator
       str.match?(MALICIOUS_REGEX)
     end
 
+    # a verdict rather than a score — a caller weighting estimate down dilutes it to nothing
+    def certain_spam?(str)
+      return false if str.blank?
+
+      looks_malicious?(str) || PHARMACY_REGEX.match?(str)
+    end
+
     # matched terms and their counts, recorded on the ban so false positives are auditable.
     # Vietnamese spam appears both with and without diacritics, so strip them first —
     # I18n.transliterate can't (it renders Vietnamese vowels as "?")
@@ -91,12 +98,11 @@ module SpamEstimator
     # Currently, doing a weird vowel count thing
     def estimate(str)
       return 0 if str.blank?
-      return 100 if looks_malicious?(str)
+      # pharmacy spam is well-formed prose, so the shape checks below score it 0
+      return 100 if certain_spam?(str)
 
       str_length ||= str.length.to_f
       return 10 if str_length == 1
-      # pharmacy spam is well-formed prose, so the shape checks below score it 0
-      return 100 if PHARMACY_REGEX.match?(str)
 
       str_downlate ||= downcase_transliterate(str)
 

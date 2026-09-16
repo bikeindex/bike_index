@@ -1,10 +1,6 @@
 require "rails_helper"
 
 RSpec.describe SpamEstimator::User do
-  def spam_matches(user)
-    SpamEstimator::Text.seo_spam_matches(described_class.scannable_text(user))
-  end
-
   describe "estimate" do
     let(:user) { User.new(show_bikes: true, name:, description:) }
     let(:name) { "Rider Person" }
@@ -89,7 +85,7 @@ RSpec.describe SpamEstimator::User do
         ["Pre-arranged and prepaid funeral options across Adelaide.",
           "Prepaid travel SIM cards and eSIMs, so you stay connected overseas."]
           .each do |description|
-            expect(spam_matches(User.new(show_bikes: true, description:)))
+            expect(described_class.seo_spam_matches(User.new(show_bikes: true, description:)))
               .to eq({"prepaid" => 1})
           end
       end
@@ -104,7 +100,7 @@ RSpec.describe SpamEstimator::User do
       end
 
       it "stays below the threshold" do
-        expect(spam_matches(user).values.sum).to eq 1
+        expect(described_class.seo_spam_matches(user).values.sum).to eq 1
         expect(described_class.estimate(user)).to be < SpamEstimator::User::MARK_SPAM_PERCENT
       end
     end
@@ -184,13 +180,13 @@ RSpec.describe SpamEstimator::User do
     end
   end
 
-  describe "scannable_text" do
-    let(:user) { User.new(title: "Nhà cái uy tín", twitter: "casinovip") }
+  describe "seo_spam_matches" do
+    let(:user) { User.new(title: "Nhà cái uy tín", twitter: "casino-vip") }
 
-    it "includes the link fields and handles" do
-      expect(described_class.scannable_text(user)).to eq "Nhà cái uy tín casinovip"
-      expect(described_class.scannable_text(nil)).to eq ""
-      expect(described_class.scannable_text(User.new)).to eq ""
+    it "scans the link fields and handles" do
+      expect(described_class.seo_spam_matches(user)).to eq({"nha cai" => 1, "uy tin" => 1, "casino" => 1})
+      expect(described_class.seo_spam_matches(nil)).to eq({})
+      expect(described_class.seo_spam_matches(User.new)).to eq({})
     end
   end
 end

@@ -14,20 +14,23 @@ module SpamEstimator
       (score - bike_ownership_reduction(user)).clamp(0, 100)
     end
 
-    # includes link URLs and handles, where terms show up even when the prose is clean
-    def scannable_text(user)
-      return "" if user.blank?
-
-      [user.name, user.title, user.description, user.username, user.mb_link_title,
-        user.mb_link_target, user.twitter, user.instagram].select(&:present?).join(" ")
-    end
+    # matched terms and their counts, recorded on the ban so false positives are auditable
+    def seo_spam_matches(user) = Text.seo_spam_matches(scannable_text(user))
 
     #
     # private below here
     #
 
     def seo_spam_reference_count(user)
-      Text.seo_spam_matches(scannable_text(user)).values.sum
+      seo_spam_matches(user).values.sum
+    end
+
+    # includes link URLs and handles, where terms show up even when the prose is clean
+    def scannable_text(user)
+      return "" if user.blank?
+
+      [user.name, user.title, user.description, user.username, user.mb_link_title,
+        user.mb_link_target, user.twitter, user.instagram].select(&:present?).join(" ")
     end
 
     # description and title are the SEO-spam payload; weight them far above name/username
@@ -55,7 +58,7 @@ module SpamEstimator
       end
     end
 
-    conceal :seo_spam_reference_count, :spammy_text_estimate, :promotional_link_estimate,
-      :bike_ownership_reduction
+    conceal :seo_spam_reference_count, :scannable_text, :spammy_text_estimate,
+      :promotional_link_estimate, :bike_ownership_reduction
   end
 end
