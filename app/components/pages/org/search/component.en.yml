@@ -33,7 +33,6 @@ en:
             all: all
             avery_cell: Avery Exportable
             bike: registration
-            close: close
             color_cell: Color
             created_at_cell: Registered
             creation_description_cell: Source
