@@ -149,6 +149,16 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       expect(page).to have_text("Know something about this bike?")
     end
 
+    # The org's own registrations carry the owner's contact in the table beside this
+    context "registered with the viewing organization" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, status: :status_abandoned, user: owner).reload }
+
+      it "renders no message action" do
+        expect(bike.organized?(organization)).to be_truthy
+        expect(action_panels).to_not include("message")
+      end
+    end
+
     # Written because previewing the org rendered no action: a superuser is a member of
     # no organization, so asking their memberships answered for none of them
     context "previewed by a superuser" do

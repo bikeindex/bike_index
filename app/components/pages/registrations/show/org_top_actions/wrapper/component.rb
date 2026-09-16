@@ -79,20 +79,22 @@ module Pages
             # The owner can be messaged (via a stolen/unstolen notification) when the
             # bike is stolen, or when the org can send unstolen notifications. An
             # impounded or abandoned vehicle is neither stolen nor with its owner, so it
-            # reaches whoever has it through the allowance instead - though not on the
-            # org's own impound, which the update action below is for
+            # reaches whoever has it through the allowance instead
             def contactable?
               return @contactable if defined?(@contactable)
 
               @contactable = @bike.current_stolen_record.present? ||
                 (@bike.status_with_owner? && @organization.enabled?("unstolen_notifications")) ||
-                (staff? && !impounded_by_organization? && away_from_owner_contactable?)
+                (staff? && away_from_owner_contactable?)
             end
 
-            # The allowance of the org being viewed as, not of the viewer - a superuser
-            # previewing an org belongs to none of them
+            # Only a registration that isn't the org's own - theirs carries the owner's
+            # contact already, and on their own impound the update action is what they
+            # act through. The allowance of the org being viewed as, not of the viewer:
+            # a superuser previewing an organization is a member of none
             def away_from_owner_contactable?
-              @bike.status_abandoned_or_impounded? && @organization.contact_impounded?
+              @bike.status_abandoned_or_impounded? && !impounded_by_organization? &&
+                !@bike.organized?(@organization) && @organization.contact_impounded?
             end
 
             def show_impound?
