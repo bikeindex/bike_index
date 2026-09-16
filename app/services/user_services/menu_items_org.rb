@@ -13,8 +13,10 @@ module UserServices
     def for(organization:, current_user:, old_register_view: false)
       return [] if organization.nil? || current_user.nil?
 
+      # The labels are translated, and Rails.cache.fetch gets none of the locale that
+      # ApplicationComponentHelper#cache adds to every fragment
       Rails.cache.fetch(["menu_items_org_v1", organization, current_user,
-        old_register_view]) do
+        old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
     end
