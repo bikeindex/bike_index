@@ -15,12 +15,12 @@
 /* A card that meets the page's own gutter rather than sitting inset inside it twice over,
  * once the .twwiderow holding it has dropped to one column. Keyed to the row rather than the
  * viewport so it can't disagree with the column count - 672px is where .twwiderow's second
- * 320px column stops fitting, and a container query can't read that from a var(). A utility,
- * not a class in the layer below, so it outranks the card's own tw:border. */
+ * 320px column stops fitting, and a container query can't read that from a var(). */
 @utility twfullbleed {
   @container twwiderow (width < 672px) {
-    /* Forced: both lose to the card's own tw:p-4 and tw:rounded-* otherwise */
-    @apply tw:border-x-0 tw:border-t-0 tw:px-0! tw:rounded-none!;
+    /* All forced: tailwind emits this utility ahead of the card's own tw:border, tw:p-4 and
+     * tw:rounded-*, so unforced every one of them wins */
+    @apply tw:border-x-0! tw:border-t-0! tw:px-0! tw:rounded-none!;
   }
 }
 
