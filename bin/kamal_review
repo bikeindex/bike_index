@@ -24,9 +24,10 @@
 #   destroy — purge the PR's ActiveStorage objects from the shared R2 bucket, kamal
 #             app remove, drop the per-PR databases + role, flush its redis db
 #             (unless a still-running PR shares it), remove its containers + volumes
-#   reload_database — reset the app's data in place (containers, image and role are
-#             left alone): purge its R2 objects, flush its redis db, drop both
-#             databases, then db:prepare (create, load schema, seed) in the app
+#   reload_database — reset the app's data in place (image and role are left alone):
+#             stop the worker + cron containers, purge its R2 objects, flush its
+#             redis db, drop both databases, then db:prepare (create, load schema,
+#             seed) in the web container, and restart worker + cron
 # deploy and destroy are per-PR; reload_database also takes `--app sandbox`.
 # deploy is idempotent — same path on first and subsequent deploys;
 # bin/docker-entrypoint creates the per-PR Postgres role on first boot and
@@ -238,6 +239,28 @@ purge_r2_objects() {
     "bin/rails runner 'ActiveStorage::Blob.find_each { |blob| blob.service.delete(blob.key) }'" || true
 }
 
+# Stopped for a reload so nothing they run between the drop and the end of the seed
+# raises NoDatabaseError into Honeybadger; web stays up, since db:prepare runs
+# inside it. Not `kamal app stop/boot --roles`: boot with no --version resolves to
+# the `latest` tag, which on this shared host belongs to whichever app deployed
+# last. Restart by tracked id, not by re-filtering the labels — kamal leaves
+# earlier deploys' containers under the same ones.
+stop_job_containers() {
+  job_containers="$(kamal server exec --raw \
+    "docker ps -q --filter label=service=${appname} --filter label=role=worker; \
+     docker ps -q --filter label=service=${appname} --filter label=role=cron" | tr '\n' ' ')"
+  [[ -n "$job_containers" ]] || return 0
+  echo "==> Stopping ${slug}'s worker and cron containers"
+  kamal server exec "docker stop ${job_containers}"
+}
+
+# Best-effort, and a no-op when there was nothing to stop.
+start_job_containers() {
+  [[ -n "$job_containers" ]] || return 0
+  echo "==> Restarting ${slug}'s worker and cron containers"
+  kamal server exec "docker start ${job_containers}" || true
+}
+
 case "$mode" in
   deploy)
     : "${version:?deploy requires an image tag (--version <tag> or IMAGE_TAG env)}"
@@ -299,6 +322,13 @@ case "$mode" in
   reload_database)
     redis_shared_with="$(redis_db_shared_with)" || review_host_unreachable
 
+    # Before the FLUSHDB below, so nothing enqueues past it. Trapped so a failed
+    # reload still restores them, then disarmed on the way out so the restart lands
+    # before the "Done" line rather than after it.
+    job_containers=""
+    trap start_job_containers EXIT
+    stop_job_containers
+
     # Both run before the drop: the blob keys only exist in the database we're about
     # to drop, and the FLUSHDB would otherwise wipe the search autocomplete the seeds
     # load into that same logical redis DB.
@@ -315,6 +345,9 @@ case "$mode" in
     # were just created. Slow — the seed imports the manufacturer spreadsheets.
     echo "==> Creating, migrating and seeding"
     kamal app exec --reuse --roles web "bin/rails db:prepare"
+
+    trap - EXIT
+    start_job_containers
 
     echo "==> Done. URL: https://${slug}.review.bikeindex.org"
     ;;

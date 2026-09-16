@@ -93,7 +93,11 @@ Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 buc
 
 ### Reloading the database
 
-`reload_database` resets a running app's data to a freshly seeded state without redeploying — for when seeds change, or a demo leaves the data in a mess. Containers, image, volumes and the Postgres role are untouched; only the two databases are rebuilt, by `bin/kamal_review reload_database --app <pr>` (which also purges the app's R2 objects and flushes its redis DB first — see the comments there for why the order matters). It runs the same `db:prepare` the entrypoint runs at boot, so it's as slow as a first deploy, and the app serves partly-seeded data while it runs.
+`reload_database` resets a running app's data to a freshly seeded state without redeploying — for when seeds change, or a demo leaves the data in a mess. The image, volumes and the Postgres role are untouched; only the two databases are rebuilt, by `bin/kamal_review reload_database --app <pr>` (which also purges the app's R2 objects and flushes its redis DB first — see the comments there for why the order matters). It runs the same `db:prepare` the entrypoint runs at boot, so it's as slow as a first deploy, and the app serves partly-seeded data while it runs.
+
+The `worker` and `cron` containers are stopped for the duration and started again afterwards, whether or not the reload succeeded — otherwise every scheduled job firing while the databases are gone raises `ActiveRecord::NoDatabaseError`. Those land in the *production* Honeybadger project, which review apps report to only because `HONEYBADGER_API_KEY` is a value on the `Kamal/BikeIndex Review` 1Password item; a project of their own is a value swap, not a code change.
+
+`web` stays up, since `db:prepare` runs inside it — so a request that touches the database during the window still raises. That's opportunistic traffic where `cron` was a per-minute timer, and the only lever that would block it is the kamal-proxy every other app on the host shares.
 
 It's the one action that also takes `--app sandbox` / `pr_number: sandbox` ([above](#sandbox-persistent-main-deploy)), and it runs against sandbox nightly on a `schedule` trigger. With no PR behind it, the workflow skips everything PR-side — labels, the deployment link, the failure comment — so a sandbox failure shows up only in the run.
 
