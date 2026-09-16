@@ -19,8 +19,8 @@
  * not a class in the layer below, so it outranks the card's own tw:border. */
 @utility twfullbleed {
   @container twwiderow (width < 672px) {
-    /* px-0 forced: the card's own tw:p-4 is the padding shorthand, which wins outright */
-    @apply tw:border-x-0 tw:border-t-0 tw:px-0!;
+    /* Forced: both lose to the card's own tw:p-4 and tw:rounded-* otherwise */
+    @apply tw:border-x-0 tw:border-t-0 tw:px-0! tw:rounded-none!;
   }
 }
 
