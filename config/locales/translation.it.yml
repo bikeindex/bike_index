@@ -5741,6 +5741,8 @@ it:
           uploading: caricamento
         group:
           optional: opzionale
+        turnstile:
+          enable_javascript: La verifica di questo indirizzo email richiede JavaScript. Attivalo e invia di nuovo, oppure usa un altro indirizzo email.
       alerts:
         base:
           error: Errore

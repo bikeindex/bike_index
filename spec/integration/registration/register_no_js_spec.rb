@@ -171,6 +171,34 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
     end
   end
 
+  # Turnstile's widget is drawn by api.js, so scripting off can never answer the challenge -
+  # the step comes back with an error whose only way out is turning JavaScript on
+  context "a risky email, with the challenge configured" do
+    let(:owner_email) { "rider@yahoo.com" }
+    before do
+      stub_const("Integrations::Turnstile::ENABLED", true)
+      stub_const("Integrations::Turnstile::SITE_KEY", "1x00000000000000000000AA")
+    end
+
+    it "hands back the step with an alert to enable JavaScript" do
+      visit "/register/new"
+
+      # Nothing has named a risky address yet, so the alert rides the reveal the widget does
+      expect(page).to have_no_content("requires JavaScript")
+
+      fill_in "b_param[manufacturer_id]", with: "Surly"
+      fill_in "b_param[owner_email]", with: owner_email
+      click_button "Next"
+
+      expect(page).to have_content("Register your vehicle!")
+      expect(page).to have_content("Please confirm you're not a robot")
+      expect(page).to have_content("Verifying this email address requires JavaScript")
+      # Step 1 saves what it was given either way - it's the link out that's withheld
+      expect(BParam.last.owner_email).to eq owner_email
+      expect(ActionMailer::Base.deliveries.count).to eq 0
+    end
+  end
+
   # The browser's own validation is what makes the fallback a control rather than
   # decoration - and what a required combobox hidden behind it would break outright
   it "holds the step until the fallback is filled, then lets it through" do
