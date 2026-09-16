@@ -87,12 +87,6 @@ module Pages
             [sticker_group, address_group, status_group, parking_notification_group].compact
           end
 
-          # org--search#toggleQuickFilter moves the matching filter_group radio rather than
-          # submitting a second field of the same name
-          def quick_filter_entries
-            [motorized_chip, no_sticker_chip, parking_notification_chip].compact
-          end
-
           def notes_search_label = translation(".show_notes_search")
 
           def initially_checked_columns
@@ -166,30 +160,6 @@ module Pages
           def filter_values
             {search_stickers: @search_stickers, search_address: @search_address,
              search_status: @search_status, search_parking_notification: @search_parking_notification}
-          end
-
-          def chip(label_key, name, value, active)
-            ComponentStructs::Shapes.entry(translation(label_key), active:,
-              data: {action: "click->org--search#toggleQuickFilter",
-                     "quick-filter-name": name, "quick-filter-value": value})
-          end
-
-          def motorized_chip
-            chip(".quick_filter_motorized", :propulsion_type, "motorized",
-              @interpreted_params[:propulsion_type].to_s == "motorized")
-          end
-
-          def no_sticker_chip
-            return nil unless @organization.enabled?("bike_stickers")
-
-            chip(".quick_filter_no_sticker", :search_stickers, "none", @search_stickers.to_s == "none")
-          end
-
-          def parking_notification_chip
-            return nil unless @organization.enabled?("parking_notifications")
-
-            chip(".quick_filter_parking_notification", :search_parking_notification, "with",
-              @search_parking_notification.to_s == "with")
           end
 
           def group(name, label_key, selected, entries)

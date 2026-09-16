@@ -81,31 +81,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     end
   end
 
-  context "with search_stickers filter active" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
-    let(:search_stickers) { "with" }
-
-    it "displays active filter description" do
-      expect(component).to have_text("with stickers")
-    end
-  end
-
-  context "with search_address filter active" do
-    let(:search_address) { "without_street" }
-
-    it "displays active filter description" do
-      expect(component).to have_text("no address")
-    end
-  end
-
-  context "with search_status filter active" do
-    let(:search_status) { "stolen" }
-
-    it "displays active filter description" do
-      expect(component).to have_text("only stolen")
-    end
-  end
-
   context "when bike is user_hidden and org cannot edit" do
     let(:current_user) { FactoryBot.create(:organization_role_claimed, organization:).user }
     let(:options) do

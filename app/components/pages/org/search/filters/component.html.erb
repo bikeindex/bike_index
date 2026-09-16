@@ -3,32 +3,24 @@
   data-ui--collapse-storage-key-value="orgRegistrationFiltersOpen"
 >
   <div class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-    <span
-      class="
-        tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400
-        tw:uppercase
-      "
-    >
-      <%= translation(".quick_filters") %>
-    </span>
-
-    <%= render(UI::ButtonGroup::Component.new(entries: quick_filter_entries)) %>
-
-    <%# The gear opens what the date range opens, so it stays on the same line as it %>
-    <div class="tw:flex tw:items-center tw:gap-2">
-      <%= render(UI::Button::Component.new(size: :sm, data: {action: "click->ui--collapse#toggle"})) do %>
-        <%= translation(".date_range") %>
-        <span class="tw:font-bold"><%= period_label %></span>
-        <%= render(UI::IconChevron::Component.new(direction: :down)) %>
-      <% end %>
-
-      <%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},
+    <%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},
       title: translation(".search_settings"),
       data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
-        <%= helpers.inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", aria: {hidden: true} %>
-        <span class="tw:sr-only"><%= translation(".search_settings") %></span>
-      <% end %>
-    </div>
+      <%= helpers.inline_svg_tag "icons/gear.svg", class: "tw:inline tw:h-4 tw:w-4", aria: {hidden: true} %>
+      <span class="tw:sr-only"><%= translation(".search_settings") %></span>
+    <% end %>
+
+    <%= render(UI::Button::Component.new(size: :sm, data: {action: "click->ui--collapse#toggle"})) do %>
+      <%= translation(".date_range") %>
+      <span class="tw:font-bold"><%= period_label %></span>
+      <%= render(UI::IconChevron::Component.new(direction: :down)) %>
+    <% end %>
+
+    <% if active_search_filter_descriptions.any? %>
+      <em class="less-strong tw:text-sm">
+        <%= safe_join(active_search_filter_descriptions, " · ") %>
+      </em>
+    <% end %>
   </div>
 
   <div

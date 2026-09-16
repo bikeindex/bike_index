@@ -19,7 +19,6 @@ en:
           filters:
             date_range: 'Date range:'
             done: Done
-            quick_filters: Quick filters
             search_settings: Search settings
           form:
             doesnt_look_like_serial: >-
@@ -62,9 +61,6 @@ en:
             owner_name_cell: Owner name
             parking_notifications: 'Parking notif:'
             propulsion_type_cell: E-vehicle (propulsion)
-            quick_filter_motorized: E-vehicle only
-            quick_filter_no_sticker: Without sticker
-            quick_filter_parking_notification: Parking notification
             reg_address_cell: Address
             reg_extra_registration_number_cell: Secondary#
             reg_organization_affiliation_cell: Affiliation

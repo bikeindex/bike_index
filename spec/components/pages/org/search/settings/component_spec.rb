@@ -172,19 +172,6 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
     end
   end
 
-  describe "quick_filter_entries" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers parking_notifications] }
-    let(:search_stickers) { "none" }
-
-    it "marks the chip whose filter the search is using" do
-      entries = instance.quick_filter_entries
-      expect(entries.map { it[:label] })
-        .to eq ["E-vehicle only", "Without sticker", "Parking notification"]
-      expect(entries.map { it[:active] }).to eq [false, true, false]
-      expect(entries.second[:data][:"quick-filter-name"]).to eq :search_stickers
-    end
-  end
-
   describe "render_export?" do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 

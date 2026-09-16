@@ -9,8 +9,7 @@ module Pages
         # carries the row of actions across the top, and renders inside the results
         # turbo-frame, so every search brings the whole card back.
         class Component < ApplicationComponent
-          delegate :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
-            :render_export?, to: :settings_component
+          delegate :initially_checked_columns, :cycle_type, :render_export?, to: :settings_component
 
           def initialize(
             organization:,

@@ -24,35 +24,6 @@ export default class extends Controller {
     this.reloadChart()
   }
 
-  // Moves the matching radio in the settings panel rather than submitting a second field of
-  // the same name. A hidden field (propulsion_type) has no group, so it clears instead.
-  //
-  // The chip's own state is set here too: the form renders outside the results frame, so a
-  // frame search never brings back a fresh one to carry it.
-  toggleQuickFilter (event) {
-    const chip = event.currentTarget
-    const { quickFilterName: name, quickFilterValue: value } = chip.dataset
-    const radios = [...document.querySelectorAll(`input[type=radio][name="${name}"]`)]
-    let active
-
-    if (radios.length) {
-      const target = radios.find(radio => radio.value === value)
-      if (!target) return
-      const reset = radios.find(radio => radio.value === '' || radio.value === 'all') || target
-      active = !target.checked
-      ;(active ? target : reset).checked = true
-    } else {
-      const input = document.querySelector(`#Search_Form input[name="${name}"]`)
-      if (!input) return
-      active = input.value !== value
-      input.value = active ? value : ''
-    }
-
-    chip.dataset.active = active ? 'true' : ''
-    chip.setAttribute('aria-pressed', String(active))
-    this.filterChanged()
-  }
-
   initNotesSearch () {
     if (!this.hasNotesFieldTarget) return
     const input = this.notesFieldTarget.querySelector('input')

@@ -18,10 +18,8 @@ RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
     {settings_component:, period: "week", start_time: Time.current - 1.week, end_time: Time.current}
   end
 
-  it "renders the chip row and the collapsed settings panel" do
-    expect(component).to have_text("Quick filters")
-    expect(component).to have_button("E-vehicle only")
-    expect(component).to have_button("Without sticker")
+  it "renders the settings trigger, the period, and the collapsed panel" do
+    expect(component).to have_button("Search settings")
     expect(component).to have_text("past 7 days")
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
   end
@@ -34,8 +32,8 @@ RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
   context "with the sticker filter on" do
     let(:search_stickers) { "none" }
 
-    it "marks the chip active" do
-      expect(component).to have_css("button[data-quick-filter-value='none'][data-active]")
+    it "says what the search is filtered to" do
+      expect(component).to have_text("only no sticker")
     end
   end
 

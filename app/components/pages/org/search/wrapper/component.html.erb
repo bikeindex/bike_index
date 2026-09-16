@@ -17,10 +17,6 @@
             org_name: @organization.short_name) %>
       <% end %>
 
-      <% if active_search_filter_descriptions.any? %>
-        <em>— <%= safe_join(active_search_filter_descriptions, " · ") %></em>
-      <% end %>
-
       <em><%= @humanized_time_range %></em>
     </p>
 
