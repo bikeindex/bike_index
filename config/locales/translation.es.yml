@@ -2836,18 +2836,11 @@ es:
         de que otras personas también la utilizaban como medio de transporte. Aporta
         un amplio conocimiento del mundo del ciclismo y se encarga de que todo funcione
         correctamente entre bastidores en Bike Index.\n"
-      jan_pecnik_bio_html: "<strong>Jan Pecnik</strong> se enamoró de las bicicletas
-        mientras cursaba su máster en los Países Bajos, centrado en el emprendimiento
-        social. Tras un par de años recorriendo la ciudad en solitario, ahora ayuda
-        a Bike Index a expandirse por Europa y otros continentes.\n"
       merging_the_services: 'Al fusionar ambos servicios, Seth y Bryan crearon el
         servicio universal de registro de bicicletas con el que ambos soñaban: una
         base de datos utilizada y consultada por particulares, tiendas de bicicletas,
         departamentos de policía y otras aplicaciones. Un registro de bicicletas que
         permite a todos registrar y recuperar sus bicicletas.'
-      mike_oleon_bio_html: "<strong>Mike Oleon</strong> se encarga del diseño gráfico
-        y las ilustraciones del Índice. Si algo luce bien, probablemente sea culpa
-        suya.\n"
       nonprofit_status: Organización sin fines de lucro 501(c)(3)
       seth_built: Seth creó Bike Index cuando era mecánico de bicicletas porque quería
         poder registrar las bicicletas de sus clientes. Bryan desarrolló y dirigió
@@ -2863,6 +2856,12 @@ es:
       widely_used: Es el servicio de registro de bicicletas más utilizado y exitoso
         del mundo, con más de %{bikes_count} bicicletas catalogadas, %{partners_count}
         socios comunitarios y decenas de miles de búsquedas diarias.
+      kelsey_graywill_bio_html: "<strong>Kelsey Graywill</strong> se encarga del diseño
+        gráfico, la ilustración y el material de marketing para Bike Index. Defensora
+        incansable de la movilidad activa, que nunca ha aprendido a conducir, comenzó
+        su trayectoria en la promoción del ciclismo enseñando a niños a montar en
+        bicicleta en escuelas primarias públicas, para luego dedicarse a la comunicación
+        en una coalición ciclista antes de unirse a Bike Index.\n"
     lightspeed:
       a_few_things_to_note: 'Algunos puntos a tener en cuenta:'
       a_listing_on_bike_index_will_be_created: Una vez que conectes tu cuenta de Lightspeed
@@ -6259,6 +6258,9 @@ es:
               where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos
                 contactas por un anuncio que encontraste en línea, incluye un enlace
                 en el campo a continuación."
+              know_who_has_this_bike_type: "¿Sabes quién tiene este %{bike_type}?"
+              what_do_you_need_to_ask: "¿Qué necesitas preguntar sobre esto %{bike_type}?
+                Incluye un enlace en el campo de abajo si hay alguno que te ayude."
             parking_notification_form:
               address_or_intersection: Dirección o intersección
               create_parking_notification: Crear una nueva notificación de estacionamiento
