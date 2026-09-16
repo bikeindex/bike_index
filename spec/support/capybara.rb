@@ -45,7 +45,6 @@ BLOCKED_EXTERNAL_HOSTS = %w[
   fonts.gstatic.com
   www.googletagmanager.com
   www.google-analytics.com
-  challenges.cloudflare.com
 ].freeze
 
 # Point BASE_URL at Capybara's server for `:js` specs, so `*_url` helpers rendered

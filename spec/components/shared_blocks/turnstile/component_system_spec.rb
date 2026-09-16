@@ -4,10 +4,11 @@ require "rails_helper"
 
 RSpec.describe SharedBlocks::Turnstile::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/shared_blocks/turnstile/component/" }
-  # CI has no keys - the widget's markup is ours, so it renders from these alone
+  # Cloudflare's dummy sitekey, which issues a token to an automated browser where a
+  # real one fails bot detection - so the whole client-side flow runs here
   before do
     stub_const("Integrations::Turnstile::ENABLED", true)
-    stub_const("Integrations::Turnstile::SITE_KEY", "site-key")
+    stub_const("Integrations::Turnstile::SITE_KEY", "1x00000000000000000000AA")
   end
 
   it "reveals the widget once the address typed in is one Turnstile asks" do
@@ -30,10 +31,13 @@ RSpec.describe SharedBlocks::Turnstile::Component, :js, type: :system do
     expect(page).to have_no_css(".cf-turnstile")
   end
 
-  it "renders the widget shown when the address was already submitted" do
+  it "renders the widget shown when the address was already submitted, and it issues a token" do
     visit("#{base_path}already_risky")
 
     expect(page).to have_css(".cf-turnstile")
+    # The token the form posts back, which turnstile_verified? checks against siteverify
+    expect(page).to have_field(Integrations::Turnstile::RESPONSE_PARAM, type: "hidden",
+      with: "XXXX.DUMMY.TOKEN.XXXX", visible: :all, wait: 10)
   end
 
   context "switched off" do
