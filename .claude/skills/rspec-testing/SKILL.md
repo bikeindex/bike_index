@@ -19,6 +19,10 @@ Pass the files or directories you changed — `bundle exec rspec spec/components
 
 When something fails outside the files you changed, re-run that spec file on its own before treating it as yours. Failing alone means it's real, and a real failure gets fixed, never excused as pre-existing. Passing alone means the full run was order-dependent or flaky — that's the [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) skill, and its first rule is that you can't reach for a retry, a looser matcher, or a deleted assertion to make it green.
 
+## `puts` from a spec doesn't reach you
+
+rtk's rspec wrapper reports a summary and drops the run's stdout, so a `puts` added to a scratch spec to inspect a value vanishes and the run reads as an ordinary pass. Redirect it — `bundle exec rspec spec/foo_spec.rb > tmp/probe.log 2>&1` — or write to a file from inside the example, as [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) does for browser-side values. `--format documentation` does not rescue it.
+
 ## What to test (and what not to)
 
 - Tests should either: help make the code correct now, or prevent bugs in the future. Don't add tests that don't do one of those things.

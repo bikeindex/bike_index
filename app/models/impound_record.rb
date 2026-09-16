@@ -155,14 +155,6 @@ class ImpoundRecord < ApplicationRecord
     end
   end
 
-  # Messaging whoever holds the vehicle, rather than opening a claim against it, is for
-  # the organizations we already trust with unstolen registrations
-  def contactable_without_claiming?(passed_user = nil)
-    return false if passed_user.blank?
-
-    passed_user.organizations.contact_impounded.limit(1).any?
-  end
-
   def find_or_build_address_record(country_id: nil)
     return address_record if address_record?
 
