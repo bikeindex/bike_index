@@ -31,9 +31,13 @@ RSpec.describe SharedBlocks::Turnstile::Component, :js, type: :system do
     expect(page).to have_css(".cf-turnstile")
   end
 
-  it "renders nothing without keys" do
-    visit("#{base_path}without_keys")
+  context "switched off" do
+    before { stub_const("Integrations::Turnstile::ENABLED", false) }
 
-    expect(page).to have_no_css(".cf-turnstile", visible: :all)
+    it "renders nothing" do
+      visit("#{base_path}already_risky")
+
+      expect(page).to have_no_css(".cf-turnstile", visible: :all)
+    end
   end
 end

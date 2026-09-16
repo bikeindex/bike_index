@@ -5,5 +5,5 @@
       action: "input->shared-blocks--turnstile#update"}}) do |f| %>
   <%= f.email_field :email, placeholder: "you@example.com", class: "twinput tw:w-full" %>
 
-  <%= render(SharedBlocks::Turnstile::Component.new(site_key: SharedBlocks::Turnstile::ComponentPreview::SITE_KEY)) %>
+  <%= render(SharedBlocks::Turnstile::Component.new) %>
 <% end %>

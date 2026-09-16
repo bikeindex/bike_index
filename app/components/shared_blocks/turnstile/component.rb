@@ -3,12 +3,11 @@
 module SharedBlocks
   module Turnstile
     class Component < ApplicationComponent
-      def initialize(email: nil, site_key: Integrations::Turnstile.site_key)
+      def initialize(email: nil)
         @email = email
-        @site_key = site_key
       end
 
-      def render? = @site_key.present?
+      def render? = Integrations::Turnstile::ENABLED
 
       def call
         safe_join([tag.div(widget, class: wrapper_class, data: {"shared-blocks--turnstile-target": "widget"}),
@@ -26,7 +25,7 @@ module SharedBlocks
       end
 
       def widget
-        tag.div(class: "cf-turnstile", data: {sitekey: @site_key, theme: "auto"})
+        tag.div(class: "cf-turnstile", data: {sitekey: Integrations::Turnstile::SITE_KEY, theme: "auto"})
       end
 
       # api.js renders every .cf-turnstile it finds on load, so shipping it to everyone

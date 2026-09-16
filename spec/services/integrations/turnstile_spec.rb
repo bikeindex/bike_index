@@ -2,20 +2,19 @@ require "rails_helper"
 
 RSpec.describe Integrations::Turnstile do
   describe "challenge?" do
-    context "configured" do
-      before { stub_const("Integrations::Turnstile::ENABLED", true) }
-
-      it "asks the domains the spam complaints come from, and nobody else" do
-        expect(described_class.challenge?("rider@yahoo.com")).to be_truthy
-        expect(described_class.challenge?("rider@hotmail.com")).to be_truthy
-        expect(described_class.challenge?("rider@gmail.com")).to be_falsey
-        expect(described_class.challenge?(nil)).to be_falsey
-      end
+    it "asks the domains the spam complaints come from, and nobody else" do
+      expect(described_class.challenge?("rider@yahoo.com")).to be_truthy
+      expect(described_class.challenge?("rider@hotmail.com")).to be_truthy
+      expect(described_class.challenge?("rider@gmail.com")).to be_falsey
+      expect(described_class.challenge?(nil)).to be_falsey
     end
 
-    it "asks nobody while it's unconfigured" do
-      expect(described_class.challenge?("rider@yahoo.com")).to be_falsey
-      expect(Integrations::Turnstile::ENABLED).to be_falsey
+    context "switched off" do
+      before { stub_const("Integrations::Turnstile::ENABLED", false) }
+
+      it "asks nobody" do
+        expect(described_class.challenge?("rider@yahoo.com")).to be_falsey
+      end
     end
   end
 
