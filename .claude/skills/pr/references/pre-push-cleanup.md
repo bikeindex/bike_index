@@ -6,7 +6,7 @@ The cleanup and migration halves of SKILL.md's **Prepare the branch**, in full. 
 
 Invoke the `/simplify` command to review the changed code for reuse, simplification, and efficiency cleanups and apply them. It's quality-only — it won't touch correctness — so it's safe to run unattended; if it reports nothing to clean up, move on.
 
-Skip it when the diff has no code in it — a docs-, skill- or config-only branch gives it nothing to review, and it fans out subagents to find that out.
+Skip it when the diff has no code in it — a docs- or skill-only branch gives it nothing to review, and it fans out subagents to find that out. Config by file extension isn't the test: a `.github/workflows/*.yml` with a `run:` block is a shell script, and reviewing one is how the nightly-reseed branch found its only cleanup.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
