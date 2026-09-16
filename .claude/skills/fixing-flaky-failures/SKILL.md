@@ -38,8 +38,7 @@ All of these are reducing coverage, and none of them is a fix:
 
 A flaky test is a *reporting* problem — the suite is telling you something real
 and telling you unreliably. Every item above changes the reporting and leaves
-the underlying behaviour untested, which is strictly worse than the flake: a
-flake wastes your time, silently-missing coverage wastes an incident.
+the underlying behaviour untested.
 
 If the only fix you can see requires giving up coverage, that is a decision for
 the user — describe what you'd have to give up and ask. Do not make that trade
@@ -65,9 +64,9 @@ What "earn them" means in practice:
   a retry over a findable cause just makes it intermittent for longer.
 - Leave a comment saying what you found and why the retry stands in for a fix —
   the harness artifact, the contention, the thing you ruled out. The existing
-  `flaky: 4` on `search_registrations_spec` is the pattern: it names WebDriver's
-  unreliable `go_forward` onto a `turbo-action: advance` entry and explains why
-  more retries than the default. A bare `flaky: true` with no comment tells the
+  `flaky: 4` on `search_registrations_spec` is the pattern: it names the click
+  landing on `about:blank`, lists what it ruled out, and says it went
+  unreproduced under local CPU throttling. A bare `flaky: true` with no comment tells the
   next person nothing and will outlive the problem.
 - Say plainly in your summary that you papered over it rather than fixed it, so
   the user can decide whether that's good enough.
@@ -138,9 +137,10 @@ Keep that loop on the one spec file — escalating it to `bin/ci` costs minutes 
 parallel workers and browsers per iteration, and answers the same question no better.
 
 Green locally three times doesn't mean "not reproducible, add a retry". It
-narrows the cause to something CI has and you don't: **contention** (CI runs 5
-parallel shards on one runner) or **ordering** (a different seed, or state left
-by another example). Reason about which, then look for the mechanism.
+narrows the cause to something CI has and you don't: **contention** (browser,
+Rails and Postgres sharing one runner) or **ordering** (a different seed,
+knapsack handing this shard a different set of files, or state left by another
+example). Reason about which, then look for the mechanism.
 
 For contention, slow the renderer rather than the machine — CPU hogs slow the Ruby
 side too, so a loop of runs takes minutes and the extra load is spent where the race
@@ -224,9 +224,9 @@ them, and several look like timing but aren't.
 
 **Not actually flaky — the environment is wrong.** A missing
 `app/assets/builds/tailwind.css` makes `tw:hidden` silently not apply, so
-visibility assertions fail in ways that read as flakes. See the
-[`integration-testing`](../integration-testing/SKILL.md) skill's Tailwind
-section. Same class of thing: an unmigrated test DB, a stale VCR cassette.
+visibility assertions fail in ways that read as flakes. The
+[`sandbox-test-setup`](../sandbox-test-setup/SKILL.md) skill has the build
+command per environment. Same class of thing: an unmigrated test DB, a stale VCR cassette.
 
 **Shared state across examples.** The autocomplete cache (`autc:test:*`) lives
 in a Redis DB shared across `:js` examples and survives 600s, and `load_all`
@@ -300,15 +300,8 @@ genuinely unreliable. Prefer not to chain a real navigation onto the tail of a
 back/forward sequence. If a spec must, expect to need the settle-then-click
 pattern above.
 
-**A wait that starts before the work does.** Occasionally a bump is honest: if
-the assertion begins before the request is even sent (a held route released, a
-job enqueued) and the response is expensive, the budget was simply wrong. Say
-so in a comment naming what the wait covers — that's what distinguishes it from
-papering over a race.
-
 ## What a finished fix looks like
 
-- Every assertion that existed before still exists.
 - The change names a mechanism ("the frame reloads on `turbo:load` and detaches
   the link"), not a symptom ("this is flaky on CI").
 - You can explain why the fix addresses that mechanism, even though you probably
@@ -318,14 +311,13 @@ papering over a race.
   ruled out, so the next person starts where you stopped.
 - Comments describing the flake are corrected if your diagnosis contradicts
   them — a wrong comment sends the next person down the same wrong path.
-- You say plainly that CI is the only real verification, rather than implying
-  local green proves it.
+- CI is the only real verification; local green doesn't prove it.
 
 ## Working on an already-tagged spec
 
 `flaky:` retries only run on CI (`RETRY_FLAKY`, see `spec/rails_helper.rb`).
-`flaky: true` retries twice; `flaky: <n>` overrides the count. So local runs
-don't retry, and a `flaky:`-tagged spec failing once locally is not
+`flaky: true` retries twice; `flaky: <n>` overrides the count. So a plain
+`bundle exec rspec` doesn't retry (`bin/ci` sets `RETRY_FLAKY`), and a `flaky:`-tagged spec failing once locally is not
 automatically "the known flake" — it may be a plain reproducible failure that
 the tag has been hiding on CI.
 
