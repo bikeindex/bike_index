@@ -8,12 +8,12 @@ module Email
 
       notifications = user_email.notifications.additional_email_confirmation
         .where("created_at > ?", Time.current - 1.minute)
-      return if notifications.delivery_success.any?
+      return if notifications.settled.any?
 
       notification = notifications.last ||
         Notification.create(kind: "additional_email_confirmation", notifiable: user_email)
 
-      notification.track_email_delivery(is_new_email_address: true) do
+      Notifications::Deliver.track_email(notification, is_new_email_address: true) do
         CustomerMailer.additional_email_confirmation(user_email).deliver_now
       end
     end

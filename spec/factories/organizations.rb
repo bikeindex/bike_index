@@ -42,7 +42,7 @@ FactoryBot.define do
       end
     end
 
-    trait :paid do
+    trait :with_invoice do
       transient do
         enabled_feature_slugs { nil }
         organization_feature { nil }
@@ -57,7 +57,7 @@ FactoryBot.define do
       end
     end
 
-    # TODO: Figure out how to use the :paid trait rather than duplicating the logic
+    # TODO: Figure out how to use the :with_invoice trait rather than duplicating the logic
     trait :organization_features do
       transient do
         enabled_feature_slugs { ["csv_export"] }

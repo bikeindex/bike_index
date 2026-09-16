@@ -551,4 +551,437 @@ RSpec.describe "BikesController#update", type: :request do
       expect(flash[:error]).to match(/not found/)
     end
   end
+
+  context "user not allowed to edit" do
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    it "does not update and redirects" do
+      patch base_url, params: {bike: {serial_number: "69"}}
+      expect(response).to redirect_to bike_url(bike)
+      expect(flash[:error]).to be_present
+      expect(bike.reload.serial_number).to_not eq "69"
+    end
+  end
+
+  context "example bike" do
+    let(:organization) { FactoryBot.create(:organization) }
+    before { bike.update(example: true, bike_organization_ids: [organization.id]) }
+
+    it "updates, and leaves bike_organization_ids alone when they aren't passed" do
+      expect(bike.reload.bike_organization_ids).to eq([organization.id])
+      patch base_url, params: {bike: {description: "69"}}
+      expect(response).to redirect_to edit_bike_url(bike)
+      bike.reload
+      expect(bike.description).to eq("69")
+      expect(bike.bike_organization_ids).to eq([organization.id])
+    end
+  end
+
+  context "marked_user_unhidden" do
+    before { bike.update(marked_user_hidden: "1") }
+    it "marks the bike unhidden" do
+      expect(bike.reload.user_hidden).to be_truthy
+      patch base_url, params: {bike: {marked_user_unhidden: "true"}}
+      expect(bike.reload.user_hidden?).to be_falsey
+    end
+  end
+
+  context "components" do
+    let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:bike, :with_address_record)) }
+    let!(:component1) { FactoryBot.create(:component, bike:) }
+    let(:component2_attrs) do
+      {
+        _destroy: "0",
+        ctype_id: component1.ctype_id,
+        description: "sdfsdfsdf",
+        manufacturer_id: bike.manufacturer_id.to_s,
+        manufacturer_other: "stuffffffff",
+        component_model: "asdfasdf",
+        year: "1995",
+        serial_number: "simple_serial"
+      }
+    end
+    let(:bike_attrs) do
+      {
+        description: "69",
+        handlebar_type: "other",
+        owner_email: "  #{bike.owner_email.upcase}",
+        organization_affiliation: "something weird",
+        address_record_attributes: {city: "Rotterdam", postal_code: "3035",
+                                    country_id: Country.netherlands.id, id: bike.address_record_id},
+        components_attributes: {
+          "0" => {"_destroy" => "1", :id => component1.id.to_s},
+          Time.current.to_i.to_s => component2_attrs
+        }
+      }
+    end
+
+    it "replaces the component and updates the bike, without transferring ownership" do
+      address_record = bike.address_record
+      expect {
+        patch base_url, params: {bike: bike_attrs}
+      }.to change(Ownership, :count).by(0)
+        .and change(AddressRecord, :count).by(0)
+
+      expect(flash.to_h).to have_key("success")
+      expect(response).to redirect_to edit_bike_url(bike)
+      expect(assigns(:bike)).to be_present
+      bike.reload
+      expect(bike).to have_attributes(description: "69", handlebar_type: "other", user_hidden: false,
+        organization_affiliation: "something weird", address_record_id: address_record.id)
+
+      expect(address_record.reload).to have_attributes(postal_code: "3035", city: "Rotterdam")
+      expect(address_record.country&.name).to eq(Country.netherlands.name)
+
+      expect(bike.components.count).to eq 1
+      expect(bike.components.where(id: component1.id).any?).to be_falsey
+      component2_attrs.except(:_destroy).each do |key, value|
+        expect(bike.components.first.send(key).to_s).to eq value.to_s
+      end
+    end
+  end
+
+  context "bike_sticker" do
+    let(:bike_attrs) { {description: "42", handlebar_type: "drop_bar"} }
+    let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "a00100") }
+
+    it "updates and claims the sticker from a scanned URL" do
+      expect(bike.bike_stickers.count).to eq 0
+      patch base_url, params: {bike: bike_attrs, bike_sticker: "https://bikeindex.org/bikes/scanned/A100?organization_id=europe"}
+      expect(flash[:success]).to match(bike_sticker.pretty_code)
+      bike.reload
+      expect(bike).to have_attributes(description: "42", handlebar_type: "drop_bar")
+      expect(bike.bike_stickers.count).to eq 1
+      expect(bike_sticker.reload).to have_attributes(claimed?: true, bike:, user: current_user)
+    end
+
+    context "bike already has a sticker" do
+      let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker_claimed, bike:, user: current_user) }
+
+      it "claims another sticker without removing the existing one" do
+        expect(bike.bike_stickers.count).to eq 1
+        expect {
+          patch base_url, params: {bike: bike_attrs, bike_sticker: "A 100"}
+        }.to change(BikeStickerUpdate, :count).by 1
+        expect(BikeStickerUpdate.last.kind).to eq "initial_claim"
+        expect(flash[:success]).to match(bike_sticker.pretty_code)
+        bike.reload
+        expect(bike).to have_attributes(description: "42", handlebar_type: "drop_bar")
+        expect(bike.bike_stickers.count).to eq 2
+        expect(bike_sticker.reload).to have_attributes(claimed?: true, bike:, user: bike.creator)
+      end
+
+      context "over the unorganized claim limit" do
+        before { stub_const("BikeSticker::MAX_UNORGANIZED", 1) }
+        let!(:bike_sticker_update) { FactoryBot.create(:bike_sticker_update, user: current_user) }
+
+        it "records a failed claim and renders an error" do
+          expect(bike_sticker.claimable_by?(current_user)).to be_falsey
+          expect {
+            patch base_url, params: {bike: bike_attrs, bike_sticker: "A 100"}
+          }.to change(BikeStickerUpdate, :count).by 1
+          expect(BikeStickerUpdate.last).to have_attributes(kind: "failed_claim", organization_kind: "no_organization",
+            user_id: current_user.id, bike_id: bike.id, bike_sticker_id: bike_sticker.id)
+          expect(bike_sticker.reload.claimed?).to be_falsey
+
+          expect(flash[:error]).to be_present
+          bike.reload
+          expect(bike).to have_attributes(description: "42", handlebar_type: "drop_bar")
+          expect(bike.bike_stickers.count).to eq 1
+        end
+      end
+    end
+
+    context "sticker not found" do
+      it "renders an error, still updating the bike" do
+        expect(bike.bike_stickers.count).to eq 0
+        patch base_url, params: {bike: bike_attrs, bike_sticker: "A 150"}
+        expect(flash[:error]).to be_present
+        bike.reload
+        expect(bike).to have_attributes(description: "42", handlebar_type: "drop_bar")
+        expect(bike.bike_stickers.count).to eq 0
+      end
+    end
+  end
+
+  context "owner email changes" do
+    let(:email) { "originalemail@example.com" }
+    let(:new_email) { "new@email.com" }
+    let(:current_user) { FactoryBot.create(:user_confirmed, email:) }
+    let(:ownership) { FactoryBot.create(:ownership, creator: current_user, owner_email: "otheroriginal@email.com") }
+
+    def expect_bike_transferred_but_unclaimed
+      bike.reload
+      ownership.reload
+      expect(ownership.current?).to be_falsey
+      expect(bike).to have_attributes(owner_email: new_email, user: nil, claimed?: false, owner: current_user)
+      expect(bike.current_ownership.id).to_not eq ownership.id
+      expect(bike.current_ownership).to have_attributes(creator_id: current_user.id, owner_email: new_email, user: nil)
+      expect(bike.authorized?(current_user)).to be_truthy
+
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.subject).to eq("Confirm your Bike Index registration")
+      expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.to).to eq([new_email])
+    end
+
+    before do
+      bike.reload
+      ActionMailer::Base.deliveries = []
+      Sidekiq::Job.clear_all
+    end
+
+    it "creates a new ownership and emails the new owner" do
+      expect(bike.claimed?).to be_falsey
+      expect(bike.authorized?(current_user)).to be_truthy
+      expect {
+        patch base_url, params: {bike: {owner_email: new_email}}
+      }.to change(Ownership, :count).by(1)
+      Email::OwnershipInvitationJob.drain
+      expect_bike_transferred_but_unclaimed
+    end
+
+    context "claimed ownership" do
+      let(:ownership) { FactoryBot.create(:ownership_claimed, user: current_user, owner_email: email) }
+
+      it "creates a new ownership and emails the new owner" do
+        expect(bike.owner_email).to eq email
+        expect(bike.claimed?).to be_truthy
+        expect(bike.user).to eq current_user
+        expect {
+          patch base_url, params: {bike: {owner_email: "#{new_email.upcase} "}}
+        }.to change(Ownership, :count).by(1)
+        Email::OwnershipInvitationJob.drain
+        expect_bike_transferred_but_unclaimed
+      end
+    end
+  end
+
+  context "with a return_to" do
+    let(:return_to) { "/about" }
+
+    it "redirects to it" do
+      patch base_url, params: {return_to:, bike: {description: "69", marked_user_hidden: "0"}}
+      expect(bike.reload.description).to eq("69")
+      expect(response).to redirect_to return_to
+      expect(session[:return_to]).to be_nil
+    end
+
+    context "an off-site url" do
+      let(:return_to) { "http://testhost.com/bad_place" }
+      it "ignores it" do
+        patch base_url, params: {return_to:, bike: {description: "69", marked_user_hidden: "0"}}
+        expect(bike.reload.description).to eq("69")
+        expect(session[:return_to]).to be_nil
+        expect(response).to redirect_to edit_bike_url(bike)
+      end
+    end
+  end
+
+  context "stolen update through stolen_records_attributes" do
+    include_context :geocoder_real
+    let!(:state) { FactoryBot.create(:state_illinois) }
+    let(:country) { Country.united_states }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:, city: "party") }
+    let(:target_time) { 1454925600 }
+    let(:stolen_attrs) do
+      {
+        date_stolen: "2016-02-08 04:00:00",
+        timezone: "America/Chicago",
+        phone: "9999999999",
+        # the trailing commas and spaces are what real submissions paste in
+        street: "66666666 foo street ,",
+        country_id: country.id,
+        city: "Chicago ",
+        postal_code: "60647 , ",
+        region_record_id: state.id,
+        locking_description: "Some description",
+        lock_defeat_description: "It was cuttttt",
+        theft_description: "Someone stole it and stuff",
+        police_report_number: "#444444",
+        police_report_department: "department of party",
+        secondary_phone: "8888888888",
+        proof_of_ownership: 1,
+        receive_notifications: 0,
+        estimated_value: "1200"
+      }
+    end
+    let(:bike_attrs) { {date_stolen: Time.current.to_i, stolen_records_attributes: {"0" => stolen_attrs}} }
+    let(:skipped_attrs) { %i[street city postal_code proof_of_ownership receive_notifications timezone date_stolen estimated_value] }
+
+    it "updates and returns to the edit_template" do
+      VCR.use_cassette("bikes_controller-create-stolen", match_requests_on: [:path]) do
+        expect(stolen_record).to have_attributes(receive_notifications: true, no_notify: false)
+        expect(stolen_record.proof_of_ownership).to be_falsey
+        bike.reload
+        expect(bike.current_stolen_record).to eq stolen_record
+        expect(bike.status).to eq "status_stolen"
+
+        patch base_url, params: {bike: bike_attrs, edit_template: "fancy_template"}
+        expect(flash[:error]).to_not be_present
+        expect(response).to redirect_to edit_bike_url(bike, edit_template: "fancy_template")
+        bike.reload
+        expect(bike.status).to eq "status_stolen"
+        expect(bike.stolen_records.count).to eq 1
+        expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
+
+        current_stolen_record = bike.fetch_current_stolen_record
+        expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
+        expect(current_stolen_record).to have_attributes(proof_of_ownership: true, receive_notifications?: false,
+          no_notify?: true, estimated_value: 1200, city: "Chicago", postal_code: "60647", street: "66666666 foo street")
+        stolen_attrs.except(*skipped_attrs).each do |key, value|
+          expect(current_stolen_record.send(key)).to eq value
+        end
+      end
+    end
+
+    context "canadian stolen record" do
+      let!(:canada) { Country.canada }
+      let(:stolen_attrs) do
+        super().merge(street: "2222 Cambridge St.,", country_id: canada.id, city: "Vancouver\n, ",
+          postal_code: "v5l1E6", locking_description: "I locked it up!", lock_defeat_description: "",
+          theft_description: "I deeply care about this bike, nefariousness!", police_report_number: "#666",
+          police_report_department: "Vancouver", estimated_value: "5200")
+      end
+
+      it "updates, ignoring the passed state" do
+        VCR.use_cassette("bikes_controller-create-stolen-canada", match_requests_on: [:path]) do
+          expect(bike.reload.fetch_current_stolen_record).to eq stolen_record
+          patch base_url, params: {bike: bike_attrs, edit_template: "fancy_template"}
+          expect(flash[:error]).to_not be_present
+          expect(response).to redirect_to edit_bike_url(bike, edit_template: "fancy_template")
+          bike.reload
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.stolen_records.count).to eq 1
+          expect(bike.fetch_current_stolen_record.id).to eq stolen_record.id
+
+          current_stolen_record = bike.fetch_current_stolen_record
+          expect(current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
+          expect(current_stolen_record).to have_attributes(proof_of_ownership: true, receive_notifications: false,
+            estimated_value: 5200, region_record_id: nil, country_id: Country.canada.id,
+            city: "Vancouver", postal_code: "V5L 1E6", street: "2222 Cambridge St.")
+          expect(current_stolen_record.latitude).to be_within(0.001).of(49.1573)
+          expect(current_stolen_record.longitude).to be_within(0.001).of(-123.9664322)
+          stolen_attrs.except(:region_record_id, *skipped_attrs).each do |key, value|
+            expect(current_stolen_record.send(key)).to eq value
+          end
+        end
+      end
+    end
+  end
+
+  context "owner present, bike organizations" do
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    let(:bike) { FactoryBot.create(:bike_organized, owner_email: current_user.email) }
+    let(:ownership) { bike.ownerships.first }
+    let(:organization) { bike.organizations.first }
+    let(:organization2) { FactoryBot.create(:organization) }
+    let(:color) { Color.black }
+    let(:allowed_attributes) do
+      {
+        description: "69 description",
+        marked_user_hidden: "0",
+        primary_frame_color_id: color.id,
+        secondary_frame_color_id: color.id,
+        tertiary_frame_color_id: color.id,
+        handlebar_type: "other",
+        coaster_brake: true,
+        belt_drive: true,
+        front_gear_type_id: FactoryBot.create(:front_gear_type).id,
+        rear_gear_type_id: FactoryBot.create(:rear_gear_type).id,
+        owner_email: "new_email@stuff.com",
+        year: 1993,
+        frame_model: "A sweet model named things",
+        frame_size: "56cm",
+        name: "a sweet name for a bike",
+        extra_registration_number: "some weird other number",
+        bike_organization_ids: "#{organization2.id}, #{organization.id}"
+      }
+    end
+    let(:target_attributes) { allowed_attributes.except(:marked_user_hidden, :bike_organization_ids) }
+    before { ownership.mark_claimed }
+
+    it "updates with the allowed attributes, and organization_ids_can_edit_claimed picks the editors" do
+      expect(ownership.reload.owner).to eq current_user
+      patch base_url, params: {bike: allowed_attributes, organization_ids_can_edit_claimed: [organization2.id]}
+      expect(response).to redirect_to edit_bike_url(bike)
+      expect(assigns(:bike)).to be_present
+      bike.reload
+      expect(bike.user_hidden).to be_falsey
+      expect(bike).to have_attributes target_attributes
+      expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
+      expect(bike.send(:editable_organization_ids)).to eq([organization2.id])
+
+      # _present without any ids is how the form says "none of them"
+      patch base_url, params: {bike: allowed_attributes, organization_ids_can_edit_claimed_present: "1"}
+      expect(response).to redirect_to edit_bike_url(bike)
+      bike.reload
+      expect(bike).to have_attributes target_attributes
+      expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
+      expect(bike.send(:editable_organization_ids)).to eq([])
+    end
+
+    context "only the new organization passed" do
+      it "replaces the creation organization" do
+        expect(bike.reload.bike_organization_ids).to eq([organization.id])
+        expect(bike.creation_organization_id).to eq organization.id
+        patch base_url, params: {edit_template: "groups", organization_ids_can_edit_claimed: "true",
+                                 bike: {bike_organization_ids: organization2.id.to_s}}
+        expect(response).to redirect_to edit_bike_url(bike, edit_template: "groups")
+        bike.reload
+        expect(bike.creation_organization_id).to eq organization.id
+        expect(bike.bike_organization_ids).to match_array([organization2.id])
+        # A newly added organization starts out unable to edit
+        expect(bike.send(:editable_organization_ids)).to eq([])
+      end
+    end
+  end
+
+  context "organized bike, member present" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:can_edit_claimed) { false }
+    let(:claimed) { false }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization, can_edit_claimed:, claimed:) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+
+    it "updates the bike" do
+      bike.reload
+      expect(bike.owner).to_not eq(current_user)
+      expect(bike.send(:editable_organization_ids)).to eq([organization.id])
+      expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
+      patch base_url, params: {bike: {description: "new description", handlebar_type: "forward",
+                                      frame_size: "50cm", frame_size_number: 54, frame_size_unit: "cm"}}
+      expect(response).to redirect_to edit_bike_url(bike)
+      bike.reload
+      expect(bike).to have_attributes(user_hidden: false, description: "new description", handlebar_type: "forward",
+        frame_size_unit: "cm", frame_size_number: 54, frame_size: "54cm")
+      expect(bike.send(:editable_organization_ids)).to eq([organization.id])
+    end
+
+    context "bike is claimed" do
+      let(:claimed) { true }
+      it "fails to update" do
+        bike.reload
+        expect(bike.send(:editable_organization_ids)).to eq([])
+        expect(bike.authorized_by_organization?(u: current_user)).to be_falsey
+        patch base_url, params: {bike: {description: "new description", handlebar_type: "forward"}}
+        expect(flash[:error]).to be_present
+        expect(bike.reload.description).to_not eq "new description"
+      end
+
+      context "can_edit_claimed true" do
+        let(:can_edit_claimed) { true }
+        it "updates the bike" do
+          bike.reload
+          expect(bike.send(:editable_organization_ids)).to eq([organization.id])
+          expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
+          patch base_url, params: {bike: {description: "new description", handlebar_type: "forward"}}
+          expect(response).to redirect_to edit_bike_url(bike)
+          bike.reload
+          expect(bike).to have_attributes(user_hidden: false, description: "new description", handlebar_type: "forward")
+        end
+      end
+    end
+  end
 end

@@ -16,10 +16,17 @@ RSpec.describe Bikes::RecoveryController, type: :request do
       end
     end
     context "matching recovery token" do
-      it "renders" do
+      # bikes#show reads it, and raises ReadOnlyError creating it under set_reading_role
+      before { RearGearType.fixed }
+
+      it "renders, and the bike page spends the token on a mark-recovered modal" do
         get "#{base_url}/edit?token=#{recovery_link_token}"
         expect(response).to redirect_to bike_path(bike)
         expect(session[:recovery_link_token]).to eq recovery_link_token
+
+        follow_redirect!
+        expect(response.body).to match(recovery_link_token)
+        expect(session[:recovery_link_token]).to be_nil
       end
     end
     context "already recovered bike" do

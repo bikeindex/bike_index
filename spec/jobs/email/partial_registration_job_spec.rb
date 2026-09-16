@@ -20,6 +20,17 @@ RSpec.describe Email::PartialRegistrationJob, type: :job do
     expect(notification.message_channel_target).to eq b_param.email
   end
 
+  # The register steps flag it, but an organization's incompletes list can re-send this one
+  context "a registration the honeypot flagged" do
+    let!(:b_param) { FactoryBot.create(:b_param, owner_email:, params: {bike: {likely_spam: true}}.as_json) }
+
+    it "sends nothing" do
+      ActionMailer::Base.deliveries = []
+      expect { Email::PartialRegistrationJob.new.perform(b_param.id) }.to_not change(Notification, :count)
+      expect(ActionMailer::Base.deliveries.count).to eq 0
+    end
+  end
+
   context "partial_register_confirmation" do
     let!(:b_param) do
       BParam.create(origin: "register_flow", params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)

@@ -643,7 +643,6 @@ it:
         deleted_at: Eliminato il
         enabled_feature_slugs: Slug delle funzionalità abilitate
         invoices: Fatture
-        is_paid: È pagato
         kind: Tipo
         locations: Luoghi
         lock_show_on_map: Blocco visualizzato sulla mappa
@@ -661,6 +660,7 @@ it:
         users: Utenti
         website: Sito web
         organization_roles: Iscrizioni
+        is_invoiced: Viene fatturato
       organization_feature:
         amount_cents: Importo in centesimi
         description: Descrizione
@@ -3920,7 +3920,6 @@ it:
         automaticamente ogni bicicletta venduta. La configurazione richiede circa
         10 minuti.
     bike_shop_packages:
-      additional: Ulteriori
       bike_index_for_bike_shops: Indice dei negozi di biciclette
       choose_a_package_size: Scegli la dimensione della confezione
       compare_plans_and_features: Confronta piani e caratteristiche
@@ -5350,6 +5349,8 @@ it:
       stolen_hot_sheet: Foglio informativo sui furti di biciclette
       stolen_message: Messaggio di furto
       in_super_admin: "%{org_name} in super amministratore"
+      registrations_index: Registrazioni delle organizzazioni
+      search_all_registrations: Cerca tutte le registrazioni
   stolen:
     index:
       ambassador: ambasciatore

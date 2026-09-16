@@ -8,16 +8,15 @@ RSpec.describe Pages::Admin::RegistrationSequence::DiscardDraft::Component, type
   it "deletes the draft, behind a confirm" do
     rendered = render_inline(described_class.new(registration_sequence:))
 
-    expect(page).to have_css("form[action='/admin/registration_sequences/#{registration_sequence.id}'] button",
+    expect(page).to have_css("a[href='/admin/registration_sequences/#{registration_sequence.id}'][data-turbo-method='delete']",
       text: "Discard draft")
-    expect(page).to have_css("form input[name='_method'][value='delete']", visible: :all)
     expect(rendered.to_html).to include("confirm('Discard this draft and its pages?")
   end
 
   it "renders for the template's draft too" do
     render_inline(described_class.new(registration_sequence: FactoryBot.create(:registration_sequence_template)))
 
-    expect(page).to have_button("Discard draft")
+    expect(page).to have_link("Discard draft")
   end
 
   context "activated sequence" do

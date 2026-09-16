@@ -55,11 +55,8 @@ module Pages
             end
           end
 
-          def pie_chart_opts(colors, data)
-            legend = (data.size > 4) ? false : {position: "bottom"}
-            opts = {thousands: ",", library: {plugins: {legend:}}}
-            opts[:colors] = colors if colors
-            opts
+          def pie_legend(data)
+            (data.size > 4) ? false : {position: "bottom"}
           end
 
           def status_bar_colors

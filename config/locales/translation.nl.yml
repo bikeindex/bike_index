@@ -625,7 +625,6 @@ nl:
         creation_states: Creatie staten
         deleted_at: Verwijderd om
         invoices: Facturen
-        is_paid: Is betaald
         kind: Soort
         locations: Locaties
         lock_show_on_map: Show op kaart vergrendelen
@@ -645,6 +644,7 @@ nl:
         bike_stickers: Fietscodes
         enabled_feature_slugs: Ingeschakelde functie naaktslakken
         organization_roles: lidmaatschappen
+        is_invoiced: Wordt gefactureerd
       ownership:
         claimed: beweerde
         current: Stroom
@@ -3518,7 +3518,6 @@ nl:
         Index!
       security_link_text: POS-integratie FAQ
     bike_shop_packages:
-      additional: Extra
       bike_index_for_bike_shops: 'Bike Index voor fietsenwinkels '
       choose_a_package_size: 'Kies een pakketgrootte '
       compare_plans_and_features: Vergelijk Plannen en Functies
@@ -4528,6 +4527,8 @@ nl:
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_message: Gestolen bericht
       in_super_admin: "%{org_name} in superbeheerder"
+      registrations_index: Organisatieregistraties
+      search_all_registrations: Zoek alle registraties
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>

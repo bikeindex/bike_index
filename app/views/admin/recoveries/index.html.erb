@@ -33,7 +33,7 @@
 
 <% if @render_chart %>
   <% rendered_chart = capture do %>
-    <%= column_chart time_range_counts(collection: available_recoveries, column: @time_range_column), stacked: true, thousands: "," %>
+    <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_recoveries, column: @time_range_column), time_range: @time_range, stacked: true)) %>
 
     <div class="row mt-4 mb-4">
       <div class="col-sm-6 offset-sm-3">

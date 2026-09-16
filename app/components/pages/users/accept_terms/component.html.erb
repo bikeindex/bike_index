@@ -1,0 +1,18 @@
+<section class="content">
+  <div class="receptacle">
+    <div class="inner-recep legal-content"><%= content %></div>
+  </div>
+</section>
+
+<div
+  class="
+    tw:sticky tw:bottom-0 tw:z-10 tw:mt-8 tw:border-t tw:border-gray-200
+    tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-900
+  "
+>
+  <%= form_for @user, url: user_path(@user), method: :patch, html: {class: "tw:flex tw:flex-col tw:items-center tw:gap-3"} do |f| %>
+    <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: @attribute, label: @label, required: true)) %>
+
+    <%= render(UI::Button::Component.new(text: @submit_text, color: :primary, size: :lg, type: "submit")) %>
+  <% end %>
+</div>

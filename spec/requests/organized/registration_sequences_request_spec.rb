@@ -28,8 +28,8 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
           expect(response.body).to_not include("data-controller=\"sortable\"")
           expect(response.body).to include(">Edit<")
           expect(response.body).to include("Discard draft")
-          # Turbo Drive is off app-wide, so the confirm has to be the form's own
-          expect(response.body).to include("onsubmit=\"return confirm(")
+          # Turbo Drive is off app-wide, so the confirm is an onclick on the link
+          expect(response.body).to include("onclick=\"return confirm(")
         end
       end
 

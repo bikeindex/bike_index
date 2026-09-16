@@ -1,12 +1,12 @@
 # Pre-push cleanup
 
-The cleanup and migration halves of SKILL.md's **Prepare the branch**, in full. Everything here runs against committed work and diffs `origin/main...HEAD` — substitute the base branch from **Orient**, since shell state doesn't carry between commands.
+The cleanup and migration halves of SKILL.md's **Prepare the branch**, in full. Everything here runs against committed work and diffs `origin/main...HEAD` — substitute the base branch from **Orient**, since shell state doesn't carry between commands. The audits inherit that: run them after committing, or pair them with a pass over `rtk proxy git diff HEAD`, or a comment you razored in the working tree still reads as present.
 
 ## Simplify, lint, and conform to CLAUDE.md
 
 Invoke the `/simplify` command to review the changed code for reuse, simplification, and efficiency cleanups and apply them. It's quality-only — it won't touch correctness — so it's safe to run unattended; if it reports nothing to clean up, move on.
 
-Skip it when the diff has no code in it — a docs-, skill- or config-only branch gives it nothing to review, and it fans out subagents to find that out.
+Skip it when the diff has no code in it — a docs- or skill-only branch gives it nothing to review, and it fans out subagents to find that out. Config by file extension isn't the test: a `.github/workflows/*.yml` with a `run:` block is a shell script, and reviewing one is how the nightly-reseed branch found its only cleanup.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
@@ -22,7 +22,7 @@ Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just c
 
 `xargs` rather than `bin/lint $(…)`, because zsh doesn't word-split an unquoted command substitution — the interpolated form hands the whole list over as one argument and reports `Not found:` followed by every file. `rtk proxy` for the same reason the greps below need it: the hook rewrites these into a stat whose trailing `Changes:` line then arrives as a filename.
 
-**Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` ran immediately above — so its edits are uncommitted, and a file it touched that the branch hadn't committed yet (a shared controller it reached into, say) is invisible to that range and goes unlinted. The second `git diff HEAD` picks up the working tree. Same union applies to the spec scoping below.
+**Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` ran immediately above — so its edits are uncommitted, and a file it touched that the branch hadn't committed yet (a shared controller it reached into, say) is invisible to that range and goes unlinted. The second `git diff HEAD` picks up the working tree. Same union applies to the spec scoping and to both audits below — they run before the commit too, so the bare `origin/main...HEAD` greps as written read none of what `/simplify` and the CLAUDE.md pass just changed.
 
 **Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (`bin/lint:64` falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
 
@@ -69,6 +69,20 @@ animation drives" (it doesn't — measured 346px → 0), and "the homepage can s
 migration (`migration_error = :page_load` raises for every request; the real cause was the file watcher's
 race). Both read as obvious. Also check what the edit *moved* — a rule relocated into a skill is a rule
 that only loads when that skill triggers.
+
+### The churn audit
+
+**Required.** Read the branch's own diff and ask of each hunk what it changes about what the code does. A moved argument, a re-ordered hash, a re-wrapped line: revert it rather than defending it in review.
+
+```bash
+rtk proxy git diff origin/main...HEAD --stat
+```
+
+Smallest files first — one at `+1 -1` is either the point of the branch or pure churn, and telling which takes a moment. `git checkout origin/main -- <file>` when the whole file is churn; when it rides along inside a real change, put the surrounding lines back so the diff shows only what moved.
+
+**What `bin/lint` wrote is not churn** and stays, including in files the branch otherwise didn't touch — see the rule at the top of `CLAUDE.md`.
+
+Sweeping mechanical edits are where this collects, since the script that made them had one shape and the file had another. One branch here reverted 17 files whose only change was a moved keyword argument.
 
 ### The comment audit
 

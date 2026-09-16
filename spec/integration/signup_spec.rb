@@ -69,7 +69,7 @@ RSpec.describe "Signup", :js, type: :system do
     visit new_user_path
 
     # A rider can't see or reach the honeypot, so only a bot fills it in
-    honeypot = find_field("Additional", visible: :hidden)
+    honeypot = find_field("Additional information", visible: :hidden)
     expect(honeypot[:tabindex]).to eq "-1"
     page.execute_script("arguments[0].value = 'http://spam.example.com'", honeypot)
 
@@ -90,7 +90,7 @@ RSpec.describe "Signup", :js, type: :system do
     expect(user.reload.confirmed?).to be_falsey
   end
 
-  it "signs in with a magic link, then confirms an additional email" do
+  it "signs in with a magic link, then confirms an additional email and removes it" do
     user = sign_up_and_confirm
     additional_email = "newrider@umich.edu"
 
@@ -124,5 +124,15 @@ RSpec.describe "Signup", :js, type: :system do
 
     expect(page).to have_content("has been confirmed and added to your account", wait: 10)
     expect(user_email.reload.confirmed?).to be_truthy
+
+    # Confirming lands back on the account form, where the remove link is a Turbo DELETE
+    # guarded by an onclick
+    expect(dismiss_confirm { click_link "Remove email" }).to match(/remove #{additional_email}/)
+    expect(user.user_emails.pluck(:email)).to include(additional_email)
+
+    accept_confirm { click_link "Remove email" }
+
+    expect(page).to have_content("#{additional_email} removed")
+    expect(user.user_emails.pluck(:email)).to_not include(additional_email)
   end
 end

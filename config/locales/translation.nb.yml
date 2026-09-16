@@ -638,7 +638,6 @@ nb:
         deleted_at: Slettet kl
         enabled_feature_slugs: Aktiverte funksjonssnegler
         invoices: Fakturaer
-        is_paid: Er betalt
         kind: Snill
         locations: Steder
         lock_show_on_map: Lås vis på kartet
@@ -656,6 +655,7 @@ nb:
         users: Brukere
         website: Nettsted
         organization_roles: Medlemskap
+        is_invoiced: Er fakturert
       organization_feature:
         amount_cents: Beløp cent
         description: Beskrivelse
@@ -3729,7 +3729,6 @@ nb:
         nye Ascend-salgsintegrering tillate deg å registrere hver sykkel du selger
         automatisk. Oppsettet tar omtrent 10 minutter.
     bike_shop_packages:
-      additional: Ytterligere
       bike_index_for_bike_shops: Sykkelindeks for sykkelbutikker
       choose_a_package_size: Velg en pakkestørrelse
       compare_plans_and_features: Sammenlign planer og funksjoner
@@ -5093,6 +5092,8 @@ nb:
       stolen_hot_sheet: Stjålet Bike Hot Sheet
       stolen_message: Stjålet melding
       in_super_admin: "%{org_name} i superadministrator"
+      registrations_index: Organisasjonsregistreringer
+      search_all_registrations: Søk i alle registreringer
   stolen:
     index:
       ambassador: ambassadør

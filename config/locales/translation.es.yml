@@ -646,7 +646,6 @@ es:
         deleted_at: Eliminado en
         enabled_feature_slugs: Identificadores de funciones habilitadas
         invoices: Facturas
-        is_paid: Se paga
         kind: Amable
         locations: Ubicaciones
         lock_show_on_map: Bloquear mostrar en el mapa
@@ -664,6 +663,7 @@ es:
         users: Usuarios
         website: Sitio web
         organization_roles: Membresías
+        is_invoiced: Se factura
       organization_feature:
         amount_cents: Cantidad en centavos
         description: Descripción
@@ -3905,7 +3905,6 @@ es:
         de venta, nuestra nueva integración con Ascend te permitirá registrar automáticamente
         cada bicicleta que vendas. La configuración tarda aproximadamente 10 minutos.
     bike_shop_packages:
-      additional: Adicional
       bike_index_for_bike_shops: Índice de bicicletas para tiendas de bicicletas
       choose_a_package_size: Seleccione un tamaño de paquete
       compare_plans_and_features: Compara planes y características
@@ -5336,6 +5335,8 @@ es:
       stolen_hot_sheet: Lista de bicicletas robadas
       stolen_message: Mensaje robado
       in_super_admin: "%{org_name} en superadministrador"
+      registrations_index: Registro de organizaciones
+      search_all_registrations: Buscar en todos los registros
   stolen:
     index:
       ambassador: embajador

@@ -79,10 +79,10 @@
         <%= check_mark if bug_report.is_member %>
       <% end %>
 
-      <% table.column(label: "Paid org") do |bug_report| %>
-        <%= check_mark if bug_report.is_paid_organization %>
+      <% table.column(label: "Invoiced org") do |bug_report| %>
+        <%= check_mark if bug_report.is_invoiced_organization %>
 
-        <% if bug_report.is_paid_organization_staff %>
+        <% if bug_report.is_invoiced_organization_staff %>
           <small>staff</small>
         <% end %>
       <% end %>

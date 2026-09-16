@@ -81,16 +81,16 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
   end
 
-  describe "paid_functionality" do
+  describe "invoice_functionality" do
     it "renders nothing to configure" do
-      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "paid_functionality"}
+      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "invoice_functionality"}
       expect(response.status).to eq(200)
-      expect(response.body).to include("no paid functionality to configure")
+      expect(response.body).to include("no invoice functionality to configure")
     end
-    context "paid" do
+    context "with an invoice" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "reg_address") }
       it "renders the email label and placeholder fields" do
-        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "paid_functionality"}
+        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "invoice_functionality"}
         expect(response.status).to eq(200)
         expect(response.body).to include('name="reg_label-owner_email"')
         expect(response.body).to include('name="reg_label-email_placeholder"')
@@ -99,7 +99,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     context "saml_sso enabled" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
       it "renders the permitted domain, which the SSO tab doesn't own" do
-        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "paid_functionality"}
+        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "invoice_functionality"}
         expect(response.status).to eq(200)
         expect(response.body).to include("permitted domain for SAML SSO")
         expect(response.body).to include('name="organization[user_email_domain]"')
@@ -315,13 +315,13 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     # A tab that renders no organization[...] field still has to save - the reg labels are
     # top-level params, and a location-less locations tab posts nothing but the template
     context "submitted from a tab with nothing under organization" do
-      context "paid_functionality, whose only fields are the reg labels" do
+      context "invoice_functionality, whose only fields are the reg labels" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "reg_address") }
 
         it "saves the labels" do
-          put "#{base_url}/#{organization.to_param}", params: {:tab => "paid_functionality",
+          put "#{base_url}/#{organization.to_param}", params: {:tab => "invoice_functionality",
                                                                "reg_label-owner_email" => "Your email"}
-          expect(response).to redirect_to(edit_admin_organization_url(organization, tab: "paid_functionality"))
+          expect(response).to redirect_to(edit_admin_organization_url(organization, tab: "invoice_functionality"))
           expect(organization.reload.registration_field_labels).to eq({"owner_email" => "Your email"})
         end
       end

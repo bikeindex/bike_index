@@ -23,7 +23,7 @@ module Email
         bike_id: contact.bike_id,
         kind: contact.kind)
 
-      notification.track_email_delivery { email.deliver_now }
+      Notifications::Deliver.track_email(notification) { email.deliver_now }
     end
   end
 end

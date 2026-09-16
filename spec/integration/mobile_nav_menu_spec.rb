@@ -147,7 +147,7 @@ RSpec.describe "Navbar", :js, type: :system do
         # Clicking the group that was already open has to leave it open, not toggle it shut
         registrations.click
 
-        expect(page).to have_link("Search Registrations")
+        expect(page).to have_link("Organization Registrations")
         expect(registrations["aria-expanded"]).to eq "true"
 
         find("[data-shared-blocks--org-sidebar-target='collapseToggle']").click

@@ -68,7 +68,7 @@ class GraduatedNotification < ApplicationRecord
   scope :email_success, -> {
     left_outer_joins(:notifications)
       .pre_notification_integration
-      .or(left_outer_joins(:notifications).merge(Notification.delivery_success))
+      .or(left_outer_joins(:notifications).merge(Notification.delivered))
       .distinct
   }
 
@@ -168,7 +168,7 @@ class GraduatedNotification < ApplicationRecord
   def email_success?
     return true if pre_notification_integration?
 
-    notifications.delivery_success.exists?
+    notifications.delivered.exists?
   end
 
   # Get it unscoped, because we delete it
@@ -357,7 +357,7 @@ class GraduatedNotification < ApplicationRecord
     notification = notifications.first ||
       Notification.create(kind: "graduated_notification", notifiable: self,
         user_id:, message_channel_target: email, bike_id:)
-    notification.track_email_delivery do
+    Notifications::Deliver.track_email(notification) do
       OrganizedMailer.graduated_notification(self).deliver_now
     end
   end

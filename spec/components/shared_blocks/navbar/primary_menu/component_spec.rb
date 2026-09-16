@@ -41,6 +41,31 @@ RSpec.describe SharedBlocks::Navbar::PrimaryMenu::Component, type: :component do
       .to eq(["/news/**"])
   end
 
+  context "with a passive_organization that searches its own registrations" do
+    let(:organization) do
+      FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["bike_search"])
+    end
+    let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+    before { vc_test_controller.session[:passive_organization_id] = organization.id }
+
+    it "points search at the organization's registrations" do
+      expect(links_named("Search").map { |link| link["href"] })
+        .to eq(["/o/#{organization.to_param}/registrations"] * 2)
+    end
+
+    context "law enforcement" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, kind: "law_enforcement",
+          enabled_feature_slugs: ["bike_search"])
+      end
+
+      it "points search at every registration" do
+        expect(links_named("Search").map { |link| link["href"] })
+          .to eq(["/search/registrations?stolenness=all"] * 2)
+      end
+    end
+  end
+
   context "with a current_user" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
 

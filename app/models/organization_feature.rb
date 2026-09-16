@@ -118,7 +118,7 @@ class OrganizationFeature < ApplicationRecord
       REG_FIELDS
     end
 
-    # Customizable by any paid organization, unlike the reg fields
+    # Customizable by any organization with an invoice, unlike the reg fields
     def email_customizable_labels
       %w[owner_email email_placeholder]
     end

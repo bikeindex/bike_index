@@ -36,6 +36,7 @@ If 1–3 turn up nothing and the branch clearly builds on another feature branch
 ## Bring a branch up to date
 
 - `git fetch origin`, then `git merge --no-edit origin/<base>` (the base resolved above, not reflexively `main`).
+- **Read what the merge brought in from the merge itself, not from an earlier ahead/behind count** — `git log --oneline <pre-merge-HEAD>..<merge-commit>^2`. Conductor worktrees share one `.git`, so `refs/remotes/origin/*` is shared too: another session's `git fetch` advances your base mid-conversation, and a count taken before the merge under-reports it. Telling the user "1 commit behind" and then merging 2 is how that surfaces.
 - **Merge, never rebase.** Rebasing rewrites the branch's history; if the branch is already pushed, republishing it needs a force-push, and we never force-push. A merge commit keeps the real history and is always safe to push on top of.
 - If uncommitted work blocks the merge, commit that work first (it belongs to the branch anyway), then merge.
 - Already up to date → nothing to do.
@@ -70,6 +71,7 @@ When git leaves `<<<<<<<` / `=======` / `>>>>>>>` markers:
 - **Ask when it isn't clear-cut.** If you can't confidently tell which side should win, or the two changes are semantically entangled, stop and ask the user rather than guessing. A wrong silent resolution is worse than a question.
 - **Both sides added at the same spot? Order matters.** Keeping both isn't enough when either block has side effects. If the incoming block ends by reloading the page, anything of yours that depends on unsaved state has to come *after* it — concatenated the other way it still passes while testing nothing.
 - **Don't blanket-replace a renamed string.** Two call sites that shared a string can have legitimately diverged; `sed`-ing the whole file changes the one that shouldn't move.
+- **A conflicted `schema_migrations` list takes both versions.** Each side appended its own migration, so keep both lines in descending order — in `db/structure.sql` and `db/primary_replica_structure.sql` alike — then `bin/rails db:migrate` to re-dump. Never hand-edit the structure files.
 - **A conflicted `MARKUP_DIGEST` has no side to pick.** Both branches bumped it because both edited the cached markup, so neither literal describes the merge. Take either, then run `bin/update_component_digests` and commit what it writes. Expect these on any component with a digest, and on components whose digest covers a tree the other side edited — the constant that conflicts is often not in a file you touched.
 - After resolving, verify the result actually makes sense — the merged code should reflect both intents, not just parse. Run the relevant tests if the conflict touched logic.
 

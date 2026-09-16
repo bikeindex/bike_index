@@ -6,7 +6,7 @@ RSpec.describe SharedBlocks::LawEnforcementDonation::Component, type: :component
   let(:user) { FactoryBot.create(:user_confirmed, name: "Officer Friendly") }
   let(:component) { render_inline(described_class.new(current_user: user)) }
 
-  it "opens on load, naming the user and their unpaid organization" do
+  it "opens on load, naming the user and their organization without an invoice" do
     FactoryBot.create(:organization_role_claimed, user:,
       organization: FactoryBot.create(:organization, kind: "law_enforcement", name: "Gotham PD"))
 
@@ -18,7 +18,7 @@ RSpec.describe SharedBlocks::LawEnforcementDonation::Component, type: :component
     expect(modal.css("a[href^='mailto:']").text).to eq "support@bikeindex.org"
   end
 
-  it "falls back when there's no unpaid law enforcement organization" do
+  it "falls back when there's no law enforcement organization without an invoice" do
     expect(component.text).to include "agencies like your organization donate"
   end
 end

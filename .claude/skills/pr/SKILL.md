@@ -54,9 +54,9 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to CLAUDE.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required spec and comment audits, and the cycle-type translation check. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required churn, spec and comment audits, and the cycle-type translation check. Commit everything it produces before re-dating migrations.
 
-Both audits are required every run, not just when the diff looks messy. The spec one asks of every example the branch adds: *what bug does this fail on?* — and deletes the ones that only restate the code.
+All three audits are required every run, not just when the diff looks messy. The churn one asks what each hunk changes about what the code does, and reverts the ones with no answer; the spec one asks of every example the branch adds *what bug does this fail on?*, and deletes the ones that only restate the code.
 
 ### Freshen stale migration timestamps
 
@@ -93,6 +93,8 @@ The diff is frontend if a changed path matches one of these **and** renders a pa
 - `*.scss`, `*.css`, `*.coffee`, `*.js`, `*.ts`
 
 Excluded despite matching: mailer views (`app/views/*_mailer/**`, `app/views/user_emails/**`), API and JSON views (`app/views/api/**`, `*.json*`, `*.jbuilder`), and build config (`app/assets/config/manifest.js`, `esbuild.config.js`). A diff that only changes comments or non-rendering config isn't frontend either.
+
+Markup a reviewer can't see is also excluded — a `tw:hidden` field, a `data-` attribute, an `aria-` or `meta` change. It renders, so the paths above match it, but before and after are the same image, and the `## Screenshots` comment it produces is two identical captures. Ask what the shot would *show*, not whether a template changed. #4222 and #4262 (the register honeypot, added to each step) are the pattern; neither posted screenshots.
 
 Record this as frontend true/false — it's what **Screenshots** gates on.
 

@@ -38,6 +38,9 @@ get back local PNG paths.
   moved — so a passing curl can be followed by `ActiveRecord::PendingMigrationError` on every page.
   `bundle exec rails db:migrate`, and read `log/development.log` before blaming the capture.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
+- **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
+  back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the
+  per-workspace throwaway DB), or capture previews.
 
 ## Sign in (with the PII gate)
 
@@ -97,9 +100,9 @@ If the returned content height is **less than the viewport height**, `browser_re
 
 **An org-sidebar page taller than the viewport needs that resize upward instead.** The sidebar is `position: fixed`, so `fullPage` stitching leaves it at viewport height over the same near-black background — resize up to the content height before the shot.
 
-**The sidebar scrolls inside itself, so `body.scrollHeight` doesn't say whether its lower rows are in the shot.** At 1440×900 its own scroller overflows, and a row near the bottom captures as absent. Measure the row you're there for and resize the viewport height past its `getBoundingClientRect().bottom`. On mobile the sidebar is behind `button[aria-label="Menu"]` — open it, and run the same open-the-menu step on the base branch so the pair compares like for like. That state is an overlay taller than the viewport over a much longer page, which is the one case to capture `fullPage: false`.
+**The sidebar scrolls inside itself, so `body.scrollHeight` doesn't say whether its lower rows are in the shot.** At 1440×900 its own scroller overflows, and a row near the bottom captures as absent. Measure the row you're there for and resize the viewport height past its `getBoundingClientRect().bottom`. On mobile the sidebar is behind `button[aria-label="Menu"]` — open it, and run the same open-the-menu step on the base branch so the pair compares like for like. That state is an overlay taller than the viewport over a much longer page, which is one of the two cases to capture `fullPage: false` — the other is below.
 
-**Viewport-only is the caller's call, never yours.** When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page. Absent that, full page is the default at both sizes: a tall page, a sliver in a PR table cell, or a page whose change sits above the fold are none of them reasons to crop on your own.
+**Viewport-only is the caller's call, never yours — except when the diff's subject is a `position: fixed` or `sticky` element.** `fullPage` paints it once, where it sits at scroll 0, and nowhere else: on the 10,007px `/accept_vendor_terms` its bottom bar landed at y=798 with the remaining 9,100px of that column bare. Capture those at `fullPage: false`, scrolled to where the element pins. When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page. Absent that, full page is the default at both sizes: a tall page, a sliver in a PR table cell, or a page whose change sits above the fold are none of them reasons to crop on your own.
 
 Element-only crops (`target:`) still slice context off — don't use them for page captures.
 
