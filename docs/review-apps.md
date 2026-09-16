@@ -93,7 +93,9 @@ Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 buc
 
 ### Reloading the database
 
-`reload_database` resets a running app's data to a freshly seeded state without redeploying — for when seeds change, or a demo leaves the data in a mess. Containers, image, volumes and the Postgres role are untouched; only the two databases are rebuilt, by `bin/kamal_review reload_database --app <pr>` (which also purges the app's R2 objects and flushes its redis DB first — see the comments there for why the order matters). It runs the same `db:prepare` the entrypoint runs at boot, so it's as slow as a first deploy, and the app serves partly-seeded data while it runs.
+`reload_database` resets a running app's data to a freshly seeded state without redeploying — for when seeds change, or a demo leaves the data in a mess. The image, volumes and the Postgres role are untouched; only the two databases are rebuilt, by `bin/kamal_review reload_database --app <pr>` (which also purges the app's R2 objects and flushes its redis DB first — see the comments there for why the order matters). It runs the same `db:prepare` the entrypoint runs at boot, so it's as slow as a first deploy, and the app serves partly-seeded data while it runs.
+
+`worker` and `cron` stop for the duration and start again afterwards, succeed or fail — otherwise every job firing while the databases are gone raises `ActiveRecord::NoDatabaseError` into the *production* Honeybadger project, which review apps report to because `HONEYBADGER_API_KEY` is a value on the `Kamal/BikeIndex Review` 1Password item; their own project is a value swap, not a code change. `web` stays up (`db:prepare` runs inside it), so a request during the window still raises — the only lever there is the kamal-proxy every app on the host shares.
 
 It's the one action that also takes `--app sandbox` / `pr_number: sandbox` ([above](#sandbox-persistent-main-deploy)), and it runs against sandbox nightly on a `schedule` trigger. With no PR behind it, the workflow skips everything PR-side — labels, the deployment link, the failure comment — so a sandbox failure shows up only in the run.
 
