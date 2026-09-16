@@ -3,10 +3,7 @@ require "rails_helper"
 RSpec.describe Integrations::Turnstile do
   describe "challenge?" do
     context "configured" do
-      before do
-        stub_const("Integrations::Turnstile::SITE_KEY", "site-key")
-        stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
-      end
+      before { stub_const("Integrations::Turnstile::ENABLED", true) }
 
       it "asks the domains the spam complaints come from, and nobody else" do
         expect(described_class.challenge?("rider@yahoo.com")).to be_truthy
@@ -18,7 +15,7 @@ RSpec.describe Integrations::Turnstile do
 
     it "asks nobody while it's unconfigured" do
       expect(described_class.challenge?("rider@yahoo.com")).to be_falsey
-      expect(described_class.site_key).to be_blank
+      expect(Integrations::Turnstile::ENABLED).to be_falsey
     end
   end
 

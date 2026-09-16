@@ -7,15 +7,15 @@ module Integrations
     RESPONSE_PARAM = "cf-turnstile-response"
     TIMEOUT_SECONDS = 5
     SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js"
+    # Both keys, since half-configured renders a widget nothing verifies - and an env
+    # to switch the challenge off without pulling them
+    ENABLED = (SITE_KEY.present? && SECRET_KEY.present? &&
+      ENV["TURNSTILE_DISABLE"] != "true").freeze
 
-    def enabled? = SITE_KEY.present? && SECRET_KEY.present?
+    def site_key = (SITE_KEY if ENABLED)
 
-    # Half-configured renders a widget nothing verifies, so the key is only worth
-    # rendering with once the secret is there to check it against
-    def site_key = (SITE_KEY if enabled?)
-
-    # Unconfigured is unchallenged, so a missing key can't lock anyone out of registering
-    def challenge?(email) = enabled? && EmailDomain.risky_email?(email)
+    # Unchallenged while it's off, so a missing key can't lock anyone out of registering
+    def challenge?(email) = ENABLED && EmailDomain.risky_email?(email)
 
     # The token is single use, so a re-rendered form has to mint a fresh one
     def verified?(token, remote_ip: nil)

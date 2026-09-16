@@ -94,6 +94,7 @@ RSpec.describe UsersController, type: :request do
     context "a risky email, with the challenge configured" do
       let(:email) { "rider@hotmail.com" }
       before do
+        stub_const("Integrations::Turnstile::ENABLED", true)
         stub_const("Integrations::Turnstile::SITE_KEY", "site-key")
         stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
       end
