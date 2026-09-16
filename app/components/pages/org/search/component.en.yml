@@ -35,11 +35,11 @@ en:
             bike: registration
             close: close
             color_cell: Color
-            create_export_of_vehicles: Create export of searched %{cycle_type}
             created_at_cell: Registered
             creation_description_cell: Source
             cycle_type_cell: Vehicle type
             default: default
+            export_csv: Export CSV
             filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address
             filter_no_parking_notification_html: only <strong>not</strong> notified
@@ -88,7 +88,6 @@ en:
             column_settings: Column settings
             e_vehicle_propulsion: E-vehicle (propulsion)
             e_vehicles_for_audit: 'E-Vehicles for audit:'
-            export_csv: Export CSV
             link: Link
             matching_html: "%{count} matching %{cycle_type}"
             mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>

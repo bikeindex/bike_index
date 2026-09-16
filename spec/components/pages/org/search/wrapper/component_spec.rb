@@ -75,7 +75,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
     it "drops the export, which would reach past the organization" do
       expect(component).not_to have_link("Export CSV", visible: :all)
-      expect(component).not_to have_link(text: /Create export/, visible: :all)
     end
   end
 
@@ -101,9 +100,8 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   context "with csv_exports enabled" do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
-    it "renders export link" do
+    it "renders the export, in the column panel" do
       expect(component).to have_link("Export CSV", visible: :all)
-      expect(component).to have_link(text: /Create export/, visible: :all)
     end
   end
 

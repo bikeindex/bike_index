@@ -203,7 +203,7 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
       let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
       it "renders export link" do
-        expect(component).to have_link(text: /Create export/, visible: :all)
+        expect(component).to have_link("Export CSV", visible: :all)
       end
     end
   end

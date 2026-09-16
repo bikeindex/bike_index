@@ -9,7 +9,7 @@ module Pages
         # carries the row of actions across the top, and renders inside the results
         # turbo-frame, so every search brings the whole card back.
         class Component < ApplicationComponent
-          delegate :initially_checked_columns, :cycle_type, :render_export?, to: :settings_component
+          delegate :initially_checked_columns, :cycle_type, to: :settings_component
 
           def initialize(
             organization:,
@@ -70,12 +70,6 @@ module Pages
               search_all: @search_all,
               toggle_button: !@search_page
             )
-          end
-
-          # Built here rather than on the settings component, which route helpers can't reach
-          # until it's rendered itself
-          def export_path
-            organization_registrations_path(settings_component.search_params.merge(create_export: true))
           end
 
           def add_bike_path

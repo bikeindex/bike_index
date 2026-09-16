@@ -57,9 +57,8 @@
           tw:dark:border-gray-700
         "
       >
-        <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
-          export_path,
-          class: "gray-link", data: {turbo_frame: "_top", "org--search-target": "exportLink"} %>
+        <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
+          color: :purple, size: :sm, data: {turbo_frame: "_top", "org--search-target": "exportLink"})) %>
       </div>
     <% end %>
   </div>

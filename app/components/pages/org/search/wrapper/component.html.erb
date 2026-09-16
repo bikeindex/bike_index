@@ -39,11 +39,6 @@
           </span>
         <% end %>
 
-        <% if render_export? %>
-          <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
-            color: :purple, size: :sm, data: {turbo_frame: "_top", "org--search-target": "exportLink"})) %>
-        <% end %>
-
         <%= render(UI::ButtonLink::Component.new(text: t("shared.menu_items_org.add_a_bike"), href: add_bike_path,
           color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
       </div>

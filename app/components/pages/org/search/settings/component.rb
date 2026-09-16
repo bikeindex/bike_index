@@ -152,11 +152,11 @@ module Pages
             end
           end
 
+          private
+
           def search_params
             @search_params ||= (@sortable_search_params || {}).merge((@interpreted_params || {}).merge(organization_id: @organization.to_param))
           end
-
-          private
 
           def export_path
             organization_registrations_path(search_params.merge(create_export: true))
