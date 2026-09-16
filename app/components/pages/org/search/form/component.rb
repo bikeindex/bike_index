@@ -40,10 +40,6 @@ module Pages
           def render_notes_field?
             @settings&.organization&.enabled?("registration_notes")
           end
-
-          def settings_component
-            @settings_component ||= Pages::Org::Search::Settings::Component.new(settings: @settings)
-          end
         end
       end
     end

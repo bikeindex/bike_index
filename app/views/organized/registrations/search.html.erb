@@ -18,12 +18,8 @@
   search_notes: params[:search_notes]
 ).compact %>
 
-<div
-  class="org-search-component"
-  data-controller="org--search org--search-column-toggle"
-  data-org--search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
-  data-org--search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
->
+<%= tag.div(class: "org-search-component", data: settings.column_toggle_data_attributes
+  .merge("org--search-column-toggle-assign-bike-sticker-value": @bike_sticker.present?)) do %>
   <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
   <% unless turbo_frame_request? %>
     <div class="mb-4">
@@ -51,6 +47,6 @@
         data: {turbo_action: "advance"} %>
     </div>
 
-    <%= render partial: "results" %>
+    <%= render partial: "results", locals: {settings:} %>
   <% end %>
-</div>
+<% end %>

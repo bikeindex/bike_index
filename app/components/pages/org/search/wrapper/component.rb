@@ -24,6 +24,7 @@ module Pages
             stolenness: "all",
             bike_sticker: nil,
             model_audit: nil,
+            settings: nil,
             skip_search_and_filters: false,
             skip_settings: false,
             skip_count: false
@@ -44,6 +45,7 @@ module Pages
             @stolenness = stolenness
             @bike_sticker = bike_sticker
             @model_audit = model_audit
+            @settings = settings
             @skip_search_and_filters = skip_search_and_filters
             @skip_settings = skip_settings
             @skip_count = skip_count

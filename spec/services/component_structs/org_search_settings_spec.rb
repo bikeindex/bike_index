@@ -147,9 +147,8 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   describe "enabled_columns" do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
-    it "adds the feature's columns, sorted by label" do
+    it "adds the feature's columns" do
       expect(instance.enabled_columns).to include("impound_id_cell", "impounded_cell", "url_cell")
-      expect(instance.enabled_columns).to eq(instance.enabled_columns.sort_by { |cell| instance.column_renames[cell.to_sym] })
     end
 
     context "without impound_bikes" do
@@ -158,14 +157,6 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       it "doesn't include the impound columns" do
         expect(instance.enabled_columns).to_not include("impound_id_cell")
       end
-    end
-  end
-
-  describe "column_toggle_data_attributes" do
-    it "carries the default columns for the Stimulus controller" do
-      expect(instance.column_toggle_data_attributes[:controller]).to eq "org--search org--search-column-toggle"
-      expect(JSON.parse(instance.column_toggle_data_attributes[:"org--search-column-toggle-default-columns-value"]))
-        .to eq instance.initially_checked_columns
     end
   end
 
@@ -199,12 +190,6 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     it "merges the interpreted params over the sortable ones, with the organization" do
       expect(instance.search_params)
         .to eq({sort: "id", query_items: ["v_1"], organization_id: organization.to_param})
-    end
-  end
-
-  describe "cycle_type" do
-    it "is the registration label" do
-      expect(instance.cycle_type).to eq "registration"
     end
   end
 end

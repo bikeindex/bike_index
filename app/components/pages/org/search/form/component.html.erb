@@ -91,6 +91,4 @@
   <% end %>
 </div>
 
-<% if @settings %>
-  <%= render(settings_component) %>
-<% end %>
+<%= render(Pages::Org::Search::Settings::Component.new(settings: @settings)) if @settings %>

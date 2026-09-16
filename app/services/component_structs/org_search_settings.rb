@@ -2,8 +2,8 @@
 
 module ComponentStructs
   # The column set, its labels and the active filters of an organization's registration
-  # search — read by the wrappers, the bikes table and the column-toggle Stimulus controller
-  # around the panel Pages::Org::Search::Settings renders, so it's built once and passed whole.
+  # search. Everything around the panel Pages::Org::Search::Settings renders reads the same
+  # values, so it's built once and passed whole.
   #
   # The labels stay in that component's translation scope; moving them would strand the four
   # translation.*.yml.
@@ -57,8 +57,8 @@ module ComponentStructs
     def initialize(organization:, interpreted_params: {}, sortable_search_params: {}, params: {},
       search_stickers: nil, search_address: nil, search_status: "all")
       @organization = organization
-      @interpreted_params = interpreted_params || {}
-      @sortable_search_params = sortable_search_params || {}
+      @interpreted_params = interpreted_params
+      @sortable_search_params = sortable_search_params
       @params = params
       @search_stickers = search_stickers
       @search_address = search_address
@@ -66,22 +66,21 @@ module ComponentStructs
     end
 
     def active_search_filter_descriptions
-      values = {search_stickers: @search_stickers, search_address: @search_address, search_status: @search_status}
-
-      FILTER_DESCRIPTION_KEYS.filter_map do |param, mapping|
-        value = values[param]
+      @active_search_filter_descriptions ||= FILTER_DESCRIPTION_KEYS.filter_map do |param, mapping|
+        value = public_send(param)
         key = mapping[value.to_sym] if value.is_a?(String)
         translation(key) if key
       end
     end
 
     def initially_checked_columns
-      @initially_checked_columns ||= DEFAULT_COLUMNS +
-        (@organization.enabled?("bike_stickers") ? ["sticker_cell"] : []) +
-        ((@params[:search_impoundedness] == "impounded") ? ["impounded_cell"] : [])
+      @initially_checked_columns ||= [
+        *DEFAULT_COLUMNS,
+        ("sticker_cell" if @organization.enabled?("bike_stickers")),
+        ("impounded_cell" if @params[:search_impoundedness] == "impounded")
+      ].compact
     end
 
-    # Stimulus wiring for the column-toggle panel, shared by every caller that renders it
     def column_toggle_data_attributes
       {controller: "org--search org--search-column-toggle",
        "org--search-column-toggle-default-columns-value": initially_checked_columns.to_json}
@@ -96,14 +95,14 @@ module ComponentStructs
     end
 
     def enabled_columns
-      @enabled_columns ||= begin
-        cols = initially_checked_columns + ALWAYS_ENABLED_COLUMNS +
-          additional_registration_fields.map { |field| "#{field}_cell" } +
-          (@organization.enabled?("registration_notes") ? ["notes_cell"] : []) +
-          (@organization.enabled?("impound_bikes") ? %w[impound_id_cell impounded_cell] : []) +
-          (@organization.enabled?("avery_export") ? ["avery_cell"] : [])
-        cols.uniq.sort_by { |cell| column_renames[cell.to_sym] }
-      end
+      @enabled_columns ||= [
+        *initially_checked_columns,
+        *ALWAYS_ENABLED_COLUMNS,
+        *additional_registration_fields.map { |field| "#{field}_cell" },
+        ("notes_cell" if @organization.enabled?("registration_notes")),
+        *(%w[impound_id_cell impounded_cell] if @organization.enabled?("impound_bikes")),
+        ("avery_cell" if @organization.enabled?("avery_export"))
+      ].compact.uniq.sort_by { |cell| column_renames[cell.to_sym] }
     end
 
     def additional_registration_fields
@@ -111,11 +110,9 @@ module ComponentStructs
     end
 
     def cycle_type
-      @cycle_type ||= if BikeServices::Displayer.vehicle_search?(@params.merge(@interpreted_params))
-        translation(:vehicle)
-      else
-        translation(:bike)
-      end
+      @cycle_type ||= translation(
+        BikeServices::Displayer.vehicle_search?(@params.merge(@interpreted_params)) ? :vehicle : :bike
+      )
     end
 
     def default_open?

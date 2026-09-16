@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
-  let(:instance) { described_class.new(settings: ComponentStructs::OrgSearchSettings.new(**settings_options)) }
+  let(:instance) { described_class.new(settings: ComponentStructs::OrgSearchSettings.new(**settings_options), skip_search_and_filters:) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
       render_inline(instance)
@@ -13,6 +13,7 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
   let(:enabled_feature_slugs) { %w[bike_search] }
   let(:search_stickers) { nil }
   let(:settings_options) { {organization:, search_stickers:} }
+  let(:skip_search_and_filters) { false }
 
   it "renders settings panel with columns and settings button" do
     expect(component).to have_css("[data-org--search-target='settings']", visible: :all)
@@ -57,9 +58,7 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
 
   context "with skip_search_and_filters" do
     let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
-    let(:instance) do
-      described_class.new(settings: ComponentStructs::OrgSearchSettings.new(**settings_options), skip_search_and_filters: true)
-    end
+    let(:skip_search_and_filters) { true }
 
     it "renders the columns without the filters" do
       expect(component).to have_css("input[type='checkbox']", visible: :all)
