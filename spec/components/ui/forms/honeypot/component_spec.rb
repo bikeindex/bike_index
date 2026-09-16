@@ -4,7 +4,7 @@ require "rails_helper"
 
 # Every public form that mails an address or creates a record renders this; a missing
 # trap is invisible until the spam complaints arrive
-RSpec.describe SharedBlocks::Honeypot::Component, type: :component do
+RSpec.describe UI::Forms::Honeypot::Component, type: :component do
   let(:component) { render_inline(described_class.new) }
 
   it "hides the field from people, so only a bot fills it in" do

@@ -18,7 +18,7 @@
     <%# So the organization survives a submission that has to build a registration %>
     <%= hidden_field_tag :organization_id, organization.id if organization.present? %>
 
-    <%= render SharedBlocks::Honeypot::Component.new %>
+    <%= render UI::Forms::Honeypot::Component.new %>
 
     <%= render Pages::Register::SectionLabel::Component.new(text: translation(".bike_info_html", cycle_type: cycle_type_tag)) %>
 
@@ -73,6 +73,8 @@
       <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :owner_email, required: true,
           html_options: {value: @b_param.owner_email, placeholder: email_placeholder}) %>
     <% end %>
+
+    <%= render UI::Forms::Turnstile::Component.new(email: @b_param.owner_email) %>
 
     <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
         type: "submit", spinner: true, **button_options) %>
