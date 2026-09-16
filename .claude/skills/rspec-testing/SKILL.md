@@ -15,9 +15,11 @@ This project uses RSpec. All business logic should be tested.
 
 ## Run only the specs your change touches
 
-Pass the files or directories you changed — `bundle exec rspec spec/components/ui/table spec/requests/bikes/show_request_spec.rb`. Never run a bare `bundle exec rspec`, `spec/`, or a whole top-level directory like `spec/components` or `spec/requests`: those take many minutes and sweep in `:flaky`-tagged system specs. CI runs the full suite.
+AGENTS.md has the rule. When something fails outside the files you changed, re-run that spec file on its own first: failing alone means it's real and gets fixed, never excused as pre-existing; passing alone is the [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) skill, whose first rule is that you can't reach for a retry, a looser matcher, or a deleted assertion to make it green.
 
-When something fails outside the files you changed, re-run that spec file on its own before treating it as yours. Failing alone means it's real, and a real failure gets fixed, never excused as pre-existing. Passing alone means the full run was order-dependent or flaky — that's the [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) skill, and its first rule is that you can't reach for a retry, a looser matcher, or a deleted assertion to make it green.
+## `puts` from a spec doesn't reach you
+
+rtk's rspec wrapper reports a summary and drops the run's stdout, so a `puts` added to a scratch spec to inspect a value vanishes and the run reads as an ordinary pass. Redirect it — `bundle exec rspec spec/foo_spec.rb > tmp/probe.log 2>&1` — or write to a file from inside the example, as [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) does for browser-side values. `--format documentation` does not rescue it.
 
 ## What to test (and what not to)
 
@@ -61,7 +63,7 @@ A component having no spec yet isn't a reason to put it in the request spec inst
 
 ## `render_in_view_context` takes its subjects as method arguments
 
-A component needing a `form_builder` renders inside `render_in_view_context { form_for … }`, which `instance_exec`s its block in the view context — so `let` values aren't in scope and a bare `organization` raises `NameError`. Wrap it in a `def rendered_component(organization, current_user)` and call that from the `let(:component)`; the block closes over the method's locals. `spec/components/pages/admin/organizations/form/wrapper/component_spec.rb` is the pattern.
+A component needing a `form_builder` renders inside `render_in_view_context { form_for … }`, which `instance_exec`s its block in the view context — so `let` values aren't in scope and a bare `organization` raises `NameError`. Wrap it in a `def rendered_component(organization)` and call that from the `let(:component)`; the block closes over the method's locals. `spec/components/pages/admin/organizations/form/wrapper/component_spec.rb` is the pattern.
 
 ## `display_dev_info?` is false in test, so nothing it gates is verifiable
 
@@ -120,13 +122,7 @@ Fix every failing test, even ones that were already failing on `main`. Confirmin
 
 ## Don't weaken assertions to make a failing test pass
 
-When a test goes red, the correct move is **investigate why**, not edit the assertion to match the new output. Watch for these tempting "fixes" that are actually erasing signal:
-
-- Changing an expected value to whatever the page/chart/response now happens to render (e.g. `0` → `null`, an exact count → a range, a specific string → a substring/regex).
-- Loosening `eq` to `include`, dropping `count:` constraints, or replacing `expect(...).to ...` with `expect(...).not_to be_nil`.
-- Deleting the assertion entirely with a "looks unrelated" handwave.
-
-The right loop: reproduce the failure, figure out *what* changed and *why*, then decide intentionally — fix the code if the original assertion captured the right behavior, or update the assertion (with a comment) if the behavior intentionally changed. If you're about to change a test "to make it easier", stop and explain why the new expectation is correct, not just convenient.
+Reproduce the failure and find out what changed before touching the expectation. Changing an expected value to whatever now renders, loosening `eq` to `include`, dropping a `count:`, or deleting the assertion with a "looks unrelated" handwave all erase signal rather than fix anything. Fix the code if the original assertion was right; update it — with a comment — if the behaviour intentionally changed. The [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) skill has the same rule for the intermittent case, where it is absolute.
 
 ## Match a target attributes hash, not one attribute at a time
 
@@ -158,8 +154,6 @@ expect(logo_url).to be_present
 expect(logo_url).not_to include("blank.png")
 expect(logo_url).to eq(organization.avatar_url)
 ```
-
-The bad version spreads one logical assertion across many lines, mixes weak presence checks with the real expected value, and produces noisier failure output.
 
 ## Structuring with `context` and `let`
 
@@ -274,5 +268,3 @@ context "superuser" do
   end
 end
 ```
-
-This only merges blocks whose setup is identical. Different setup still means separate examples, each in its own `context` with the `let`/`before` that differs — that's the section above, not a contradiction of it.
