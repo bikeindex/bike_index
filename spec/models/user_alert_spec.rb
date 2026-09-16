@@ -236,4 +236,15 @@ RSpec.describe UserAlert, type: :model do
       end
     end
   end
+
+  describe "email_subject" do
+    let(:bike) { FactoryBot.create(:stolen_bike, cycle_type: "personal-mobility") }
+
+    it "names the cycle type rather than its slug" do
+      %w[theft_alert_without_photo stolen_bike_without_location].each do |kind|
+        subject = FactoryBot.build(:user_alert, kind:, bike:).email_subject
+        expect(subject).to start_with "Your stolen e-personal mobility device"
+      end
+    end
+  end
 end

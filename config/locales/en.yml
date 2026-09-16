@@ -2158,8 +2158,8 @@ en:
       html:
         marked_recovered_by: 'Marked recovered by:'
         note_if_you_didnt_recover_html: >-
-          <strong>Note:</strong> If you didn't recover your bike, or marked it recovered
-          accidentally, reply to this email and let us know!
+          <strong>Note:</strong> If you didn't recover your %{bike_type}, or marked
+          it recovered accidentally, reply to this email and let us know!
         the_description_of_the_recovery_was: 'The description of the recovery was:'
         were_so_glad_you_got_your_bike_type_back: We're so glad you got your %{bike_type}
           back!
@@ -2172,7 +2172,7 @@ en:
         area: area
         improve_your_chances_of_recovery_by_doing: Improve your chances of recovery
           by doing all these things!
-        stolen_bike_alerter: 'a Bike Index stolen bike alerter:'
+        stolen_bike_alerter: 'a Bike Index stolen %{bike_type} alerter:'
         this_email_is_about_the_stolen_bike: This email is about the stolen %{bike_type}
           registered on Bike Index on %{date}
         we_sent_out_this_tweet_from: We sent out this tweet from
@@ -2184,8 +2184,9 @@ en:
           Give us a heads up when you do!
         make: 'Make:'
         serial: 'Serial:'
-        we_sent_out_this_tweet_from: 'We sent out this tweet from %{twitter_handle},
-          a Bike Index stolen bike alerter:'
+        we_sent_out_this_tweet_from: >-
+          We sent out this tweet from %{twitter_handle}, a Bike Index stolen %{bike_type}
+          alerter:
         were_spreading_the_word_about_your_stolen: We are spreading the word about
           your stolen %{bike_type}!
     stolen_notification_email:
@@ -2196,7 +2197,7 @@ en:
         no_one_should_be_extorted: >-
           If you think this person is extorting you or abusing the system, email us
           and let us know - you should never be forced to 'reward' or 'repay' someone
-          for your stolen bike
+          for your stolen %{bike_type}
         please_help_sender_html: >-
           Please help %{sender_name} contact the owner of this %{link}, they believe
           it is <span class='stolen-color'>stolen</span>!
@@ -2208,15 +2209,15 @@ en:
           registered on Bike Index on %{date}
         update_organization_direct_message_html: >-
           Update the "Stolen emails" setting in %{link} on Bike Index to have these
-          emails sent directly to the owner of the bike, without having to forward
-          them.
+          emails sent directly to the owner of the %{bike_type}, without having to
+          forward them.
         you_can_just_forward_this_message_to: >-
           You can just forward this message to the owner's email address: %{bikeowner_email}
         you_registered_this_bike_type_on: >-
           You registered this %{bike_type} on %{date}. The owner hasn't claimed it
           yet and it isn't marked stolen, so you have received this email to authorize
           contacting them.
-      subject: Stolen bike contact
+      subject: Stolen %{bike_type} contact
     updated_terms_email:
       html:
         as_always_thanks_for_helping_register_bik: As always, thanks for helping register

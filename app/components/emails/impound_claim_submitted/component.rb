@@ -9,6 +9,9 @@ module Emails
 
       private
 
+      # Labels a row whose bike may be absent, where the table still renders the row
+      def type_label(bike) = bike&.type_titleize || "Bike"
+
       def organization
         @impound_claim.organization
       end

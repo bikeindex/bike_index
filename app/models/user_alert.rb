@@ -257,9 +257,9 @@ class UserAlert < ApplicationRecord
 
   def email_subject
     if kind == "theft_alert_without_photo"
-      "Your stolen #{bike.cycle_type} needs a photo"
+      "Your stolen #{bike.type} needs a photo"
     elsif kind == "stolen_bike_without_location"
-      "Your stolen #{bike.cycle_type} is missing its location"
+      "Your stolen #{bike.type} is missing its location"
     else
       kind_humanized
     end

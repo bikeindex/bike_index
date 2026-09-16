@@ -69,7 +69,7 @@ class AdminMailer < ApplicationMailer
       @recovered = true
       msg_subject = "RECOVERED Promoted Alert: #{@theft_alert.id}"
     end
-    @message = "#{notification_type.upcase} - a Promoted Alert bike was just #{notification_type}"
+    @message = "#{notification_type.upcase} - a Promoted Alert #{@bike.type} was just #{notification_type}"
 
     mail(to: "stolenbikealerts@bikeindex.org", subject: msg_subject)
   end

@@ -32,7 +32,7 @@
 
     <% if bike_submitting.present? %>
       <tr>
-        <td>Bike</td>
+        <td><%= bike_submitting.type_titleize %></td>
 
         <td>
           <%= link_to helpers.organized_bike_text(bike_submitting), bike_url(bike_submitting, organization_id: organization.to_param) %>
@@ -41,7 +41,7 @@
     <% end %>
 
     <tr>
-      <td>Bike registered</td>
+      <td><%= type_label(bike_submitting) %> registered</td>
 
       <td>
         <% if bike_submitting.present? %>
@@ -78,7 +78,7 @@
         <% end %>
 
         <tr>
-          <td>Bike</td>
+          <td><%= type_label(bike_claimed) %></td>
 
           <td>
             <% if bike_claimed.present? %>
