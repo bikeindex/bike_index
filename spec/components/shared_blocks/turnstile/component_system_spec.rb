@@ -4,6 +4,11 @@ require "rails_helper"
 
 RSpec.describe SharedBlocks::Turnstile::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/shared_blocks/turnstile/component/" }
+  # CI has no keys - the widget's markup is ours, so it renders from these alone
+  before do
+    stub_const("Integrations::Turnstile::ENABLED", true)
+    stub_const("Integrations::Turnstile::SITE_KEY", "site-key")
+  end
 
   it "reveals the widget once the address typed in is one Turnstile asks" do
     visit("#{base_path}in_a_form")
