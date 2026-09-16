@@ -505,6 +505,12 @@ RSpec.describe "Register flow", :js, type: :system do
 
         # Fetching it is the actual proof the browser's PUT landed - and that the bucket serves it
         response = Faraday.get(public_image.image_url)
+        # R2 answers 500, not 404, for a key its edge has not caught up with yet
+        10.times do
+          break if response.status == 200
+          sleep 0.5
+          response = Faraday.get(public_image.image_url)
+        end
         expect(response.status).to eq 200
         expect(response.body.bytesize).to eq File.size(image_path)
       end
