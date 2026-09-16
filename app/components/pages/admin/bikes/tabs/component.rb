@@ -22,7 +22,7 @@ module Pages
           private
 
           def title
-            safe_join([helpers.bike_status_span(@bike), @bike.title_string].reject(&:blank?), " ")
+            safe_join([render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :sm)), @bike.title_string].reject(&:blank?), " ")
           end
 
           def tabs

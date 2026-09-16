@@ -124,7 +124,12 @@ module IntegrationSpecHelpers
     end
   end
 
-  def open_settings_menu = find("button[aria-label='Settings']").click
+  # The gear toggles the submenu through shared-blocks--navbar, which Stimulus lazy loads -
+  # a click landing before it connects is swallowed with nothing on the page to say so
+  def open_settings_menu
+    wait_for_stimulus
+    find("button[aria-label='Settings']").click
+  end
 
   def sign_out
     open_settings_menu

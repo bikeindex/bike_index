@@ -50,7 +50,7 @@
   .row
     .col-md-8
       %h1.bike-title
-        = bike_status_span(@bike, override_to_for_sale: @show_for_sale)
+        = render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_to_for_sale: @show_for_sale, skip_with_owner: true, size: :sm))
         %span.uncap= bike_title_html(@bike)
         - if @bike.example?
           %small.text-warning.uncap= t(".test_registration")
@@ -65,7 +65,7 @@
 
       - if @bike.status_stolen? && @stolen_record.present? || @bike.status_impounded? && @bike.current_impound_record.present?
         %p
-          %strong= @bike.status_humanized_translated.titleize
+          = render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :xs))
           %span.localizeTime.preciseTime
             - time = @stolen_record.present? ? @stolen_record.date_stolen : @bike.current_impound_record.impounded_at
             = l time, format: :convert_time

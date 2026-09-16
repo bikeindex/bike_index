@@ -95,7 +95,7 @@
     <% end %>
 
     <% table.column(label: translation(".status_cell"), classes: "hideableColumn status_cell tw:text-xs") do |bike| %>
-      <%= helpers.status_display(bike.status_humanized_no_with_owner) %>
+      <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
     <% end %>
 
     <% if organization.enabled?("registration_notes") %>
