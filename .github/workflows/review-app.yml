@@ -11,6 +11,7 @@ name: Review App
 #                           ci.yml dispatches a deploy on push when the PR has
 #                           the 'review-app' label (ci.yml's `dispatch` job)
 #   - pull_request closed : auto-destroy, whether or not the label is set
+#   - schedule            : nightly sandbox reload_database
 #
 # There is deliberately NO `pull_request: synchronize` trigger — label-gating it
 # leaves skipped check runs on every push to every unlabeled PR. ci.yml's
@@ -39,6 +40,9 @@ on:
         options: [deploy, destroy, reload_database]
   pull_request:
     types: [closed]
+  schedule:
+    # Nightly sandbox reseed — 3am PDT, 2am PST (cron is UTC-only).
+    - cron: "0 10 * * *"
 
 permissions:
   contents: read
@@ -83,9 +87,11 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
-            pr="$INPUT_PR"
-            action="$INPUT_ACTION"
+          # A `schedule` event carries no inputs, so both default — the nightly run is
+          # the sandbox reseed, down to the same validation a dispatch of it gets.
+          if [[ "$EVENT_NAME" == "workflow_dispatch" || "$EVENT_NAME" == "schedule" ]]; then
+            pr="${INPUT_PR:-sandbox}"
+            action="${INPUT_ACTION:-reload_database}"
             proceed=true
             if [[ "$pr" == "sandbox" ]]; then
               if [[ "$action" != "reload_database" ]]; then
