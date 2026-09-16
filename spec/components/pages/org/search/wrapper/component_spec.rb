@@ -30,7 +30,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       search_address:,
       search_status:,
       search_page:,
-      stolenness: "all",
       humanized_time_range: "in the past year"
     }
   end
@@ -39,7 +38,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(component).to have_css("table")
     expect(component).to have_css("tbody tr", count: 1)
     # the column panel ships collapsed, opened from the header button
-    expect(component).to have_css("[data-org--search-target='columns'].tw\\:hidden\\!", visible: :all)
+    expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
     expect(component).to have_button("Column settings", visible: :all)
     expect(component).to have_link("Add a bike", visible: :all)

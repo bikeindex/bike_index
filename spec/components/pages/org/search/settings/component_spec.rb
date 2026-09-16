@@ -179,7 +179,7 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
     it "marks the chip whose filter the search is using" do
       entries = instance.quick_filter_entries
       expect(entries.map { it[:label] })
-        .to eq ["E-bike only", "Without sticker", "Parking notification"]
+        .to eq ["E-vehicle only", "Without sticker", "Parking notification"]
       expect(entries.map { it[:active] }).to eq [false, true, false]
       expect(entries.second[:data][:"quick-filter-name"]).to eq :search_stickers
     end
@@ -188,22 +188,15 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
   describe "render_export?" do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
-    it "is true" do
+    it "is false once the search reaches past the organization" do
       expect(instance.render_export?).to be true
-    end
-
-    context "with search_all" do
-      let(:options) { super().merge(search_all: true) }
-
-      it "is false - an export would reach past the organization" do
-        expect(instance.render_export?).to be false
-      end
+      expect(described_class.new(**options.merge(search_all: true)).render_export?).to be false
     end
   end
 
   describe "rendering" do
     it "renders the column panel and its toggle button" do
-      expect(component).to have_css("[data-org--search-target='columns']", visible: :all)
+      expect(component).to have_css("[data-ui--collapse-target='content']", visible: :all)
       expect(component).to have_css("input[type='checkbox']", visible: :all)
       expect(component).to have_button("settings", visible: :all)
     end
@@ -212,7 +205,7 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
       let(:options) { super().merge(toggle_button: false) }
 
       it "leaves the button to the caller" do
-        expect(component).to have_css("[data-org--search-target='columns']", visible: :all)
+        expect(component).to have_css("[data-ui--collapse-target='content']", visible: :all)
         expect(component).not_to have_button("settings", visible: :all)
       end
     end

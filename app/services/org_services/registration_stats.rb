@@ -24,7 +24,7 @@ module OrgServices
     end
 
     def previous_range(time_range)
-      (time_range.first - (time_range.last - time_range.first))..time_range.first
+      (time_range.first - UI::Chart::Component.time_range_length(time_range))..time_range.first
     end
 
     conceal :counts, :previous_range

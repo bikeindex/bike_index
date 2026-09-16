@@ -7,13 +7,13 @@ en:
           at_a_glance:
             caption_search: At a glance · current search
             caption_year: At a glance · last 12 months
-            chart_motorized: E-bike
+            chart_motorized: E-vehicle
             chart_registrations: Registrations
             chart_stolen: Stolen
             loading: Loading chart...
             scope_search: Current search
             scope_year: Last year
-            stat_motorized: E-bike registrations
+            stat_motorized: E-vehicle registrations
             stat_registrations: Total registrations
             stat_stolen: Reported stolen
           filters:
@@ -62,7 +62,7 @@ en:
             owner_name_cell: Owner name
             parking_notifications: 'Parking notif:'
             propulsion_type_cell: E-vehicle (propulsion)
-            quick_filter_motorized: E-bike only
+            quick_filter_motorized: E-vehicle only
             quick_filter_no_sticker: Without sticker
             quick_filter_parking_notification: Parking notification
             reg_address_cell: Address
@@ -83,7 +83,6 @@ en:
             vehicle: registration
             visible_columns: Visible columns
           wrapper:
-            add_a_bike: Add a bike
             affiliation: Affiliation
             avery_exportable: Avery Exportable
             bike: registration
@@ -104,4 +103,4 @@ en:
             view_as: View as
             view_matching_any_audit: view matching any audit
             view_spreadsheet: Spreadsheet
-            view_thumbnail: Bike Thumbnail
+            view_thumbnail: Thumbnail

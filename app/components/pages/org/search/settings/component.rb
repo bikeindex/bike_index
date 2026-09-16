@@ -4,11 +4,9 @@ module Pages
   module Org
     module Search
       module Settings
-        # The column-visibility panel, and the registry every other part of the org search
-        # reads its labels out of - the table's column names, the filter chips'
-        # (Pages::Org::Search::Filters renders those), and the word for what's being
-        # searched. Keeping them here is what makes a column's name in the toggle panel and
-        # in the table header the same string.
+        # The column-visibility panel, and the registry the rest of the org search reads its
+        # labels out of - which is what keeps a column's name in this panel and in the table
+        # header the same string.
         class Component < ApplicationComponent
           COLUMN_RENAME_KEYS = %i[
             created_at_cell
@@ -85,15 +83,12 @@ module Pages
             end
           end
 
-          # The radio groups Pages::Org::Search::Filters lays out, each already carrying the
-          # value the current search picked
           def filter_groups
             [sticker_group, address_group, status_group, parking_notification_group].compact
           end
 
-          # The chips above the panel, each a shortcut to one value of one filter_group.
-          # org--search#toggleQuickFilter moves the group's radio rather than submitting a
-          # second field of the same name.
+          # org--search#toggleQuickFilter moves the matching filter_group radio rather than
+          # submitting a second field of the same name
           def quick_filter_entries
             [motorized_chip, no_sticker_chip, parking_notification_chip].compact
           end
@@ -108,6 +103,13 @@ module Pages
               cols += ["impounded_cell"] if @params[:search_impoundedness] == "impounded"
               cols
             end
+          end
+
+          # Nothing when the caller holds the button, and so the collapse element, itself
+          def collapse_data_attributes
+            return {} unless @toggle_button
+
+            {controller: "ui--collapse", "ui--collapse-storage-key-value": "orgRegistrationColumnsOpen"}
           end
 
           # Stimulus wiring for the column-toggle panel, shared by every caller that renders it
@@ -135,8 +137,6 @@ module Pages
             end
           end
 
-          # An export reaches every matched bike, so it's only offered while the search is
-          # scoped to the organization's own registrations
           def render_export?
             @organization.enabled?("csv_exports") && !@search_all
           end

@@ -11,18 +11,19 @@ module Pages
         # It renders beside the search form rather than inside it: the custom date range is a
         # form of its own, which can't nest. The radios reach the search with form:.
         class Component < ApplicationComponent
-          FORM_ID = "Search_Form"
+          delegate :filter_groups, :quick_filter_entries, :notes_search_label, :organization,
+            to: :@settings_component
 
-          delegate :filter_groups, :quick_filter_entries, :notes_search_label, to: :@settings_component
-
-          def initialize(settings_component:, period:, start_time:, end_time:,
-            sortable_search_params: {}, notes_search: false)
+          def initialize(settings_component:, period:, start_time:, end_time:, sortable_search_params: {})
             @settings_component = settings_component
             @period = period
             @start_time = start_time
             @end_time = end_time
             @sortable_search_params = sortable_search_params
-            @notes_search = notes_search
+          end
+
+          def notes_search?
+            organization.enabled?("registration_notes")
           end
 
           private
@@ -36,7 +37,7 @@ module Pages
               name: group[:name],
               selected: group[:selected],
               entries: group[:entries],
-              form: FORM_ID,
+              form: "Search_Form",
               data: {action: "change->org--search#filterChanged"}
             )
           end

@@ -20,10 +20,10 @@ RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
 
   it "renders the chip row and the collapsed settings panel" do
     expect(component).to have_text("Quick filters")
-    expect(component).to have_button("E-bike only")
+    expect(component).to have_button("E-vehicle only")
     expect(component).to have_button("Without sticker")
     expect(component).to have_text("past 7 days")
-    expect(component).to have_css("[data-org--search-target='filters'].tw\\:hidden\\!", visible: :all)
+    expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
   end
 
   it "renders each filter group's radios against the search form" do
@@ -45,8 +45,8 @@ RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
     end
   end
 
-  context "with notes_search" do
-    let(:options) { super().merge(notes_search: true) }
+  context "with registration_notes enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
 
     it "renders the notes toggle" do
       expect(component).to have_text("show notes search")

@@ -7,16 +7,22 @@ module Pages
         # The chart and headline counts beside the org registrations search.
         #
         # Everything lives inside the turbo-frame, header included, so a scope switch or a
-        # new search brings the caption and the numbers back in step in one response. The
-        # card renders with `src` on the page itself and with `chart`/`stats` in the frame's
-        # own response — the same two modes as UI::ChartAsyncFrame, which it wraps.
+        # new search brings the caption and the numbers back in step in one response — which
+        # is why this renders its own frame rather than UI::ChartAsyncFrame's, whose wrapper
+        # holds only the chart. `src` renders the placeholder, `chart`/`stats` the response.
         class Component < ApplicationComponent
           FRAME_ID = :registrations_chart_frame
 
-          SCOPES = {search: "search", year: "year"}.freeze
+          SCOPES = %w[search year].freeze
+
+          # The controller builds the series from the hex, so a color change moves the bar
+          # and its stat row's swatch together
+          BANDS = {registrations: {hex: "#2563eb", swatch: "tw:bg-blue-600"},
+                   motorized: {hex: "#a855f7", swatch: "tw:bg-purple-500"},
+                   stolen: {hex: "#dc2626", swatch: "tw:bg-red-600"}}.freeze
 
           def self.permitted_scope(scope)
-            SCOPES.fetch(scope.to_s.to_sym, SCOPES[:search])
+            SCOPES.include?(scope.to_s) ? scope.to_s : SCOPES.first
           end
 
           def initialize(src: nil, scope: nil, scope_paths: {}, chart: nil, stats: [])
@@ -34,20 +40,15 @@ module Pages
           end
 
           def scope_entries
-            SCOPES.keys.map do |key|
-              ComponentStructs::Shapes.entry(translation(".scope_#{key}"), href: @scope_paths[key],
-                active: @scope == SCOPES[key], data: {turbo_frame: FRAME_ID})
+            SCOPES.map do |scope|
+              ComponentStructs::Shapes.entry(translation(".scope_#{scope}"), href: @scope_paths[scope.to_sym],
+                active: @scope == scope, data: {turbo_frame: FRAME_ID})
             end
           end
 
-          def stat_color(key)
-            {registrations: "tw:bg-blue-600", motorized: "tw:bg-purple-500", stolen: "tw:bg-red-600"}[key]
-          end
-
-          def delta_classes(stat)
-            base = "tw:rounded-full tw:px-2 tw:py-0.5 tw:text-2xs tw:font-bold"
-            tone = stat.positive? ? "tw:bg-green-50 tw:text-green-700" : "tw:bg-red-50 tw:text-red-700"
-            "#{base} #{tone}"
+          def delta_badge(stat)
+            UI::Badge::Component.new(text: stat.delta_display, size: :xs,
+              color: stat.positive? ? :success : :error)
           end
         end
       end

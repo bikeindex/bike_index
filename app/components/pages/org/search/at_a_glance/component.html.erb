@@ -1,9 +1,9 @@
 <%= helpers.turbo_frame_tag(FRAME_ID, src: @src, loading: (:lazy if @src),
-  class: "tw:block tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800",
+  class: "tw:block tw:p-4 tw:rounded-xl #{UI::Card::Component::BASE_CLASSES}",
   data: {"org--search-target": "chartFrame"}) do %>
   <% if @src %>
-    <div class="tw:flex tw:min-h-[260px] tw:items-center tw:justify-center">
-      <%= render UI::LoadingSpinner::Component.new(text: translation(".loading")) %>
+    <div class="<%= UI::ChartAsyncFrame::Component::WRAPPER_CLASSES %>">
+      <%= render UI::LoadingSpinner::Component.new(text: t("components.ui.chart_async_frame.loading_chart")) %>
     </div>
   <% else %>
     <div
@@ -35,7 +35,7 @@
       >
         <% @stats.each do |stat| %>
           <div class="tw:flex tw:items-center tw:gap-2">
-            <span class="tw:h-2.5 tw:w-2.5 tw:shrink-0 tw:rounded-sm <%= stat_color(stat.key) %>"></span>
+            <span class="tw:h-2.5 tw:w-2.5 tw:shrink-0 tw:rounded-sm <%= BANDS.dig(stat.key, :swatch) %>"></span>
 
             <dt class="tw:min-w-0 tw:flex-1 tw:truncate tw:text-sm tw:font-medium">
               <%= translation(".stat_#{stat.key}") %>
@@ -46,7 +46,7 @@
             </dd>
 
             <% if stat.delta_display %>
-              <span class="<%= delta_classes(stat) %>"><%= stat.delta_display %></span>
+              <%= render(delta_badge(stat)) %>
             <% end %>
           </div>
         <% end %>

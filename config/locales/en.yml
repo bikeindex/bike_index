@@ -4608,8 +4608,8 @@ en:
         resolved: Resolved
     registrations:
       search:
-        find_a_bike: Find a bike
-        search_all_bikes_html: Search all bikes <span class="less-strong">(not just
+        find_a_registration_html: Find a %{cycle_type}
+        search_all_html: Search all %{cycle_type} <span class="less-strong">(not just
           %{org_name})</span>
         search_registrations: Search registrations
     stickers:

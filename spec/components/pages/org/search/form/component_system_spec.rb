@@ -39,6 +39,31 @@ RSpec.describe Pages::Org::Search::Form::Component, :js, type: :system do
     end
   end
 
+  describe "card preview" do
+    let(:preview_path) { "/rails/view_components/pages/org/search/form/component/card" }
+    let!(:organization) { FactoryBot.create(:organization_brakebills) }
+    let(:panel) { "[data-ui--collapse-target='content']" }
+
+    it "opens the search settings from the gear, and keeps it open across a reload" do
+      visit(preview_path)
+      expect(page).to have_css("form#Search_Form", wait: 5)
+      page.execute_script("localStorage.removeItem('orgRegistrationFiltersOpen')")
+      visit(preview_path)
+
+      expect(page).not_to have_css(panel, visible: true, wait: 2)
+
+      click_button "Search settings"
+      expect(page).to have_css(panel, visible: true, wait: 5)
+      expect(page).to have_text("Status:")
+
+      page.refresh
+      expect(page).to have_css(panel, visible: true, wait: 5)
+
+      click_button "Done"
+      expect(page).not_to have_css(panel, visible: true, wait: 5)
+    end
+  end
+
   describe "with_serial_value preview" do
     let(:preview_path) { "/rails/view_components/pages/org/search/form/component/with_serial_value" }
 

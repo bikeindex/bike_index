@@ -123,8 +123,8 @@ module Organized
       SORTABLE_COLUMNS
     end
 
-    # The at-a-glance card loads with every search now, so the frame asking is enough - there's
-    # no render_chart toggle in front of it the way the other org indexes still have
+    # The card loads with every search now, so the frame asking is enough - unlike the other
+    # org indexes, there's no render_chart toggle in front of it
     def chart_only?
       Binxtils::InputNormalizer.boolean(params[:chart_only])
     end
@@ -135,43 +135,44 @@ module Organized
     end
 
     def chart_scope_paths
-      @chart_scope_paths ||= Pages::Org::Search::AtAGlance::Component::SCOPES.transform_values do |scope|
+      @chart_scope_paths ||= Pages::Org::Search::AtAGlance::Component::SCOPES.index_with do |scope|
         organization_registrations_path(helpers.sortable_search_params.merge(
           organization_id: current_organization.to_param, chart_only: "1", chart_scope: scope
         ))
-      end
+      end.symbolize_keys
     end
 
-    # `year` steps outside the search entirely, so the card can answer how the organization
-    # is doing when the search in front of it has narrowed to a handful of bikes
+    # `year` ignores the search, so the card still answers when the search has narrowed to
+    # a handful of bikes
+    def chart_scope_year?
+      @chart_scope == "year"
+    end
+
     def chart_bikes
-      (@chart_scope == "year") ? organization_bikes.unscope(:order) : @searched_bikes.unscope(:order)
+      @chart_bikes ||= (chart_scope_year? ? organization_bikes : @searched_bikes).unscope(:order)
     end
 
     def chart_time_range
-      (@chart_scope == "year") ? ((Time.current.beginning_of_day - 1.year)..Time.current) : @time_range
-    end
-
-    def compare_periods?
-      @chart_scope == "year" || @period != "all"
+      @chart_time_range ||= chart_scope_year? ? ((Time.current.beginning_of_day - 1.year)..Time.current) : @time_range
     end
 
     def registrations_stats
-      OrgServices::RegistrationStats.for_range(chart_bikes, chart_time_range, compare: compare_periods?)
+      OrgServices::RegistrationStats.for_range(chart_bikes, chart_time_range,
+        compare: chart_scope_year? || @period != "all")
     end
 
-    # The bands partition the total: an e-bike reported stolen is counted once, under stolen.
-    # They're named out of the card's own scope, beside the stat rows they line up with.
+    # The bands partition the total: an e-vehicle reported stolen is counted once, as stolen
     def registrations_chart
       in_range = chart_bikes.where(created_at: chart_time_range)
-      stolen = in_range.where(status: "status_stolen")
-      motorized = in_range.motorized.where.not(status: "status_stolen")
-      bands = {registrations: in_range.where.not(id: stolen).where.not(id: motorized), motorized:, stolen:}
+      not_stolen = in_range.where.not(status: "status_stolen")
+      scopes = {registrations: not_stolen.where.not(propulsion_type: PropulsionType::MOTORIZED),
+                motorized: not_stolen.motorized,
+                stolen: in_range.where(status: "status_stolen")}
 
       UI::Chart::Component.new(
-        series: bands.map { |key, scope| {name: t("components.pages.org.search.at_a_glance.chart_#{key}"), data: chart_counts(scope)} },
+        series: scopes.map { |key, scope| {name: t("components.pages.org.search.at_a_glance.chart_#{key}"), data: chart_counts(scope)} },
         time_range: chart_time_range,
-        colors: %w[#2563eb #a855f7 #dc2626],
+        colors: Pages::Org::Search::AtAGlance::Component::BANDS.values.map { it[:hex] },
         height: "180px",
         stacked: true
       )
@@ -228,7 +229,7 @@ module Organized
       bikes = parking_notification_scoped(bikes)
       # The at-a-glance card counts an earlier window too, so it needs the search without a period
       @searched_bikes = bikes
-      @available_bikes = bikes.where(created_at: @time_range)
+      @available_bikes = @searched_bikes.where(created_at: @time_range)
       return if chart_only?
 
       @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
@@ -256,7 +257,7 @@ module Organized
     def parking_notification_scoped(bikes)
       return bikes unless @search_parking_notification
 
-      notified = ParkingNotification.select(:bike_id)
+      notified = ParkingNotification.where.not(bike_id: nil).select(:bike_id)
       notified = notified.where(organization_id: current_organization.id) unless @search_all
 
       (@search_parking_notification == "with") ? bikes.where(id: notified) : bikes.where.not(id: notified)

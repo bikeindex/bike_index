@@ -16,7 +16,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, :js, type: :system do
 
   it "toggles column panel visibility" do
     expect_axe_clean
-    settings_selector = "[data-org--search-target='columns']"
+    settings_selector = "[data-ui--collapse-target='content']"
     expect(page).not_to have_css(settings_selector, visible: true, wait: 2)
 
     click_button "settings"

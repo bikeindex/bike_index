@@ -1,17 +1,13 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
 
 /* global localStorage */
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['filters', 'filtersButton', 'columns', 'columnsButton', 'perPage',
-    'exportLink', 'notesField', 'notesCheckbox', 'chartFrame']
-
-  static PANELS = ['filters', 'columns']
+  static targets = ['perPage', 'exportLink', 'notesField', 'notesCheckbox', 'chartFrame']
 
   connect () {
-    this.restorePanels()
+    this.chartSearch = window.location.search
     this.initNotesSearch()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
@@ -20,64 +16,12 @@ export default class extends Controller {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
   }
 
-  // null wherever the page renders one panel but not the other - the multi-search and the
-  // bike page both show the column toggle with no search filters beside it
-  panel (name) {
-    const present = name === 'filters' ? this.hasFiltersTarget : this.hasColumnsTarget
-    if (!present) return null
-
-    return {
-      key: `orgRegistration${name === 'filters' ? 'Filters' : 'Columns'}Open`,
-      element: name === 'filters' ? this.filtersTarget : this.columnsTarget,
-      button: this.panelButton(name)
-    }
-  }
-
-  panelButton (name) {
-    if (name === 'filters') return this.hasFiltersButtonTarget ? this.filtersButtonTarget : null
-    return this.hasColumnsButtonTarget ? this.columnsButtonTarget : null
-  }
-
-  // The column panel and the chart both render inside frames the search replaces, so their
-  // state has to be put back on every response rather than only on connect
+  // The column panel and the chart render inside frames the search replaces. The panel
+  // looks after itself - ui--collapse reconnects with it - but the chart is outside them.
   handleFrameRender = (event) => {
     if (this.hasChartFrameTarget && event.target === this.chartFrameTarget) return
     this.updateExportLink()
-    this.restorePanels()
     this.reloadChart()
-  }
-
-  toggleFilters () {
-    this.togglePanel('filters')
-  }
-
-  toggleColumns () {
-    this.togglePanel('columns')
-  }
-
-  restorePanels () {
-    this.constructor.PANELS.map(name => this.panel(name)).filter(Boolean).forEach(panel => {
-      const open = localStorage.getItem(panel.key) === 'true'
-      if (open) collapse('show', panel.element, 0)
-      this.setButtonState(panel, open)
-    })
-  }
-
-  togglePanel (name) {
-    const panel = this.panel(name)
-    if (!panel) return
-    const wasHidden = panel.element.classList.contains('tw:hidden!') ||
-      panel.element.classList.contains('tw:hidden')
-    collapse('toggle', panel.element)
-    localStorage.setItem(panel.key, wasHidden ? 'true' : 'false')
-    this.setButtonState(panel, wasHidden)
-  }
-
-  // data-active drives UI::Button's active styling, aria-expanded the disclosure semantics
-  setButtonState (panel, open) {
-    if (!panel.button) return
-    panel.button.dataset.active = String(open)
-    panel.button.setAttribute('aria-expanded', String(open))
   }
 
   // Moves the matching radio in the settings panel rather than submitting a second field of
@@ -151,11 +95,13 @@ export default class extends Controller {
   }
 
   // The card sits outside the results frame, so a search leaves it answering the previous
-  // one. Its own scope survives: the frame's src is the only place that's recorded.
+  // one. Gated on the address bar having moved, or the first results render would refetch
+  // the chart the frame is already fetching. The src is the only record of the scope.
   reloadChart () {
-    if (!this.hasChartFrameTarget) return
+    if (!this.hasChartFrameTarget || window.location.search === this.chartSearch) return
     const current = this.chartFrameTarget.getAttribute('src')
     if (!current) return
+    this.chartSearch = window.location.search
     const scope = new URL(current, window.location.origin).searchParams.get('chart_scope')
     const url = new URL(window.location)
     url.searchParams.set('chart_only', '1')

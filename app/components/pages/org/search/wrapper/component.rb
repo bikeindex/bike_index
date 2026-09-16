@@ -28,10 +28,8 @@ module Pages
             search_query_present: false,
             search_all: false,
             humanized_time_range: nil,
-            stolenness: "all",
             bike_sticker: nil,
             model_audit: nil,
-            skip_count: false,
             search_page: false
           )
             @organization = organization
@@ -49,10 +47,8 @@ module Pages
             @search_query_present = search_query_present
             @search_all = search_all
             @humanized_time_range = humanized_time_range
-            @stolenness = stolenness
             @bike_sticker = bike_sticker
             @model_audit = model_audit
-            @skip_count = skip_count
             # The search page brings its own Stimulus controllers and opens the column panel
             # from this card's header; everywhere else the card is on its own
             @search_page = search_page
@@ -76,8 +72,7 @@ module Pages
             )
           end
 
-          # search_all is in here because the other sentence names the organization, which a
-          # search reaching past its own registrations isn't limited to
+          # search_all counts, because the other sentence names the organization
           def show_search_query_summary?
             @search_query_present || @search_all || @params[:search_stickers].present? ||
               @params[:search_address].present? || @model_audit.present?
@@ -102,8 +97,14 @@ module Pages
             @pagy.pages > 1
           end
 
+          # The search page declares org--search itself, on a div spanning the form and the
+          # chart as well as this card
           def card_data_attributes
-            @search_page ? {} : settings_component.column_toggle_data_attributes
+            collapse = {controller: "ui--collapse", "ui--collapse-storage-key-value": "orgRegistrationColumnsOpen"}
+            return collapse if @search_page
+
+            attributes = settings_component.column_toggle_data_attributes
+            attributes.merge(collapse) { |_key, mine, theirs| "#{mine} #{theirs}" }
           end
         end
       end

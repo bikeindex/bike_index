@@ -35,16 +35,14 @@
           target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
           target_frame: :organized_bikes_results_frame,
           interpreted_params: form_interpreted_params,
-          notes_search: current_organization.enabled?("registration_notes"),
-          heading: t(".find_a_bike"),
+          heading: t(".find_a_registration_html", cycle_type: settings_component.cycle_type),
           submit_text: t(".search_registrations"),
           filters_component: Pages::Org::Search::Filters::Component.new(
             settings_component:,
             period: @period,
             start_time: @start_time,
             end_time: @end_time,
-            sortable_search_params:,
-            notes_search: current_organization.enabled?("registration_notes")
+            sortable_search_params:
           )
         )) do |form| %>
           <% if @bike_sticker.present? %>
@@ -61,7 +59,8 @@
               <%= check_box_tag :search_all, "true", @search_all, form: "Search_Form",
                 data: {action: "change->org--search#filterChanged"} %>
 
-              <%= t(".search_all_bikes_html", org_name: current_organization.short_name) %>
+              <%= t(".search_all_html", cycle_type: settings_component.cycle_type.pluralize(2),
+                org_name: current_organization.short_name) %>
             </label>
           <% end %>
         <% end %>

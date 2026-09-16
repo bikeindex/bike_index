@@ -10,15 +10,13 @@ module Pages
           renders_one :below_submit
 
           def initialize(target_search_path:, interpreted_params:, target_frame: nil, skip_serial_field: false,
-            filters_component: nil, notes_search: false, heading: nil, submit_text: nil)
+            filters_component: nil, heading: nil, submit_text: nil)
             @target_search_path = target_search_path
             @interpreted_params = interpreted_params
             @target_frame = target_frame
             @skip_serial_field = skip_serial_field
             @filters_component = filters_component
-            @notes_search = notes_search
-            # heading turns the form into a card, with the submit spanning it rather than
-            # sitting in the fields row as an icon
+            # A heading turns the form into a card, submit spanning it rather than an icon
             @heading = heading
             @submit_text = submit_text
             @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
@@ -52,11 +50,11 @@ module Pages
           end
 
           def render_notes_field?
-            @notes_search
+            @filters_component&.notes_search?
           end
 
           def card_classes
-            "tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800"
+            "tw:rounded-xl tw:p-4 #{UI::Card::Component::BASE_CLASSES}"
           end
         end
       end
