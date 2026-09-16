@@ -240,11 +240,10 @@ purge_r2_objects() {
 }
 
 # Stopped for a reload so nothing they run between the drop and the end of the seed
-# raises NoDatabaseError into Honeybadger; web stays up, since db:prepare runs
-# inside it. Not `kamal app stop/boot --roles`: boot with no --version resolves to
-# the `latest` tag, which on this shared host belongs to whichever app deployed
-# last. Restart by tracked id, not by re-filtering the labels — kamal leaves
-# earlier deploys' containers under the same ones.
+# raises NoDatabaseError into Honeybadger; web stays up, db:prepare runs inside it.
+# Not kamal's own verbs: `app boot` with no --version resolves to the `latest` tag,
+# which on this shared host belongs to whichever app deployed last. Restart by
+# tracked id — kamal leaves earlier deploys' containers under the same labels.
 stop_job_containers() {
   job_containers="$(kamal server exec --raw \
     "docker ps -q --filter label=service=${appname} --filter label=role=worker; \
@@ -254,7 +253,7 @@ stop_job_containers() {
   kamal server exec "docker stop ${job_containers}"
 }
 
-# Best-effort, and a no-op when there was nothing to stop.
+# Best-effort, so a failed restart doesn't mask the reload error it's unwinding.
 start_job_containers() {
   [[ -n "$job_containers" ]] || return 0
   echo "==> Restarting ${slug}'s worker and cron containers"
@@ -323,8 +322,8 @@ case "$mode" in
     redis_shared_with="$(redis_db_shared_with)" || review_host_unreachable
 
     # Before the FLUSHDB below, so nothing enqueues past it. Trapped so a failed
-    # reload still restores them, then disarmed on the way out so the restart lands
-    # before the "Done" line rather than after it.
+    # reload still restores them, and disarmed at the end so the restart prints
+    # before "Done" rather than after it.
     job_containers=""
     trap start_job_containers EXIT
     stop_job_containers
