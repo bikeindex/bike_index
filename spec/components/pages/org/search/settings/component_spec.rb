@@ -15,6 +15,15 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
   let(:settings_options) { {organization:, search_stickers:} }
   let(:skip_search_and_filters) { false }
 
+  describe ".column_toggle_data_attributes" do
+    let(:settings) { ComponentStructs::OrgSearchSettings.new(**settings_options) }
+
+    it "runs a caller's own controller alongside its two" do
+      attributes = described_class.column_toggle_data_attributes(settings, controllers: "org--multi-search")
+      expect(attributes[:controller]).to eq "org--multi-search org--search org--search-column-toggle"
+    end
+  end
+
   it "renders settings panel with columns and settings button" do
     expect(component).to have_css("[data-org--search-target='settings']", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)

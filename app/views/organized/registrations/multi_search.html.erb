@@ -15,22 +15,23 @@
   <% end %>
 <% end %>
 
-<div
-  data-controller="org--multi-search org--search org--search-column-toggle"
-  data-org--multi-search-url-value="<%= multi_search_response_organization_registrations_path(organization_id: current_organization.to_param) %>"
-  data-org--multi-search-search-kind-value="<%= search_kind %>"
-  data-org--multi-search-serials-placeholder-value="<%= placeholders["serials"] %>"
-  data-org--multi-search-stickers-placeholder-value="<%= placeholders["stickers"] %>"
-  data-org--multi-search-serials-button-value="<%= button_texts["serials"] %>"
-  data-org--multi-search-stickers-button-value="<%= button_texts["stickers"] %>"
-  data-org--multi-search-empty-class-value="<%= UI::Badge::Component.badge_classes(color: :empty, size: :md) %>"
-  data-org--multi-search-success-class-value="<%= UI::Badge::Component.badge_classes(color: :success, size: :md) %>"
-  data-org--multi-search-gray-class-value="<%= UI::Badge::Component.badge_classes(color: :gray, size: :md) %>"
-  data-org--multi-search-error-class-value="<%= UI::Badge::Component.badge_classes(color: :error, size: :md, cursor: "tw:cursor-help") %>"
-  data-org--multi-search-error-tooltip-value="<%= ERB::Util.html_escape(error_tooltip_template.to_str) %>"
-  data-org--multi-search-spinner-value="<%= ERB::Util.html_escape(render(UI::LoadingSpinner::Component.new(size: :sm)).to_str) %>"
-  data-org--search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
->
+<%# to_str on the two markup values: a SafeBuffer would land raw in the attribute %>
+<%= tag.div(data: Pages::Org::Search::Settings::Component
+  .column_toggle_data_attributes(settings, controllers: "org--multi-search")
+  .merge(
+    "org--multi-search-url-value": multi_search_response_organization_registrations_path(organization_id: current_organization.to_param),
+    "org--multi-search-search-kind-value": search_kind,
+    "org--multi-search-serials-placeholder-value": placeholders["serials"],
+    "org--multi-search-stickers-placeholder-value": placeholders["stickers"],
+    "org--multi-search-serials-button-value": button_texts["serials"],
+    "org--multi-search-stickers-button-value": button_texts["stickers"],
+    "org--multi-search-empty-class-value": UI::Badge::Component.badge_classes(color: :empty, size: :md),
+    "org--multi-search-success-class-value": UI::Badge::Component.badge_classes(color: :success, size: :md),
+    "org--multi-search-gray-class-value": UI::Badge::Component.badge_classes(color: :gray, size: :md),
+    "org--multi-search-error-class-value": UI::Badge::Component.badge_classes(color: :error, size: :md, cursor: "tw:cursor-help"),
+    "org--multi-search-error-tooltip-value": error_tooltip_template.to_str,
+    "org--multi-search-spinner-value": render(UI::LoadingSpinner::Component.new(size: :sm)).to_str
+  )) do %>
   <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
     <%= render(UI::Header::Component.new(text: "Multi Search", tag: :h3, html_class: "uncap tw:mb-4!")) %>
 
@@ -94,4 +95,4 @@
   <%= render Pages::Org::Search::Settings::Component.new(settings:, skip_search_and_filters: true) %>
 
   <div id="multi_serial_results" data-org--multi-search-target="results"></div>
-</div>
+<% end %>

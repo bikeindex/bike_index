@@ -7,8 +7,8 @@ module Pages
         class Component < ApplicationComponent
           # Goes on the element wrapping this panel, which the caller renders — so class-level,
           # not an instance built only to read off
-          def self.column_toggle_data_attributes(settings)
-            {controller: "org--search org--search-column-toggle",
+          def self.column_toggle_data_attributes(settings, controllers: nil)
+            {controller: [controllers, "org--search org--search-column-toggle"].compact.join(" "),
              "org--search-column-toggle-default-columns-value": settings.initially_checked_columns.to_json}
           end
 
