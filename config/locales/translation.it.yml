@@ -2852,6 +2852,13 @@ it:
         maggior successo al mondo, con oltre %{bikes_count} biciclette catalogate,
         %{partners_count} partner della comunità e decine di migliaia di ricerche
         giornaliere.
+      kelsey_graywill_bio_html: "<strong>Kelsey Graywill</strong> si occupa di grafica,
+        illustrazioni e materiale di marketing per Bike Index. Appassionata sostenitrice
+        della mobilità attiva, pur non avendo mai preso la patente, ha iniziato la
+        sua carriera nell'ambito della promozione della bicicletta insegnando ai bambini
+        ad andare in bici nelle scuole elementari pubbliche, per poi passare al settore
+        della comunicazione presso una coalizione ciclistica prima di unirsi a Bike
+        Index.\n"
     lightspeed:
       a_few_things_to_note: 'Alcuni punti da tenere a mente:'
       a_listing_on_bike_index_will_be_created: Una volta collegato il tuo account
