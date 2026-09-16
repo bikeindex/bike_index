@@ -17,6 +17,7 @@ module Email
       return if b_param.blank?
       # confirm_email! spends the token, so a blank one means there's no link left to send
       return if kind == "partial_register_confirmation" && b_param.email_confirmation_token.blank?
+      return if b_param.likely_spam?
 
       if EmailDomain::VERIFICATION_ENABLED
         email_domain = EmailDomain.find_or_create_for(b_param.owner_email)
@@ -26,7 +27,7 @@ module Email
       end
 
       notification = Notification.create(kind:, message_channel: "email", notifiable: b_param)
-      Notification.track_email_delivery(notification) { OrganizedMailer.public_send(kind, b_param).deliver_now }
+      Notifications::Deliver.track_email(notification) { OrganizedMailer.public_send(kind, b_param).deliver_now }
     end
   end
 end

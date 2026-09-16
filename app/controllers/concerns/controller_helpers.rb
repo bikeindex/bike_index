@@ -9,6 +9,10 @@ module ControllerHelpers
   # matching the session store key pattern in config/initializers/session_store.rb
   AUTH_COOKIE_KEY = Rails.env.development? ? :"auth_#{ENV.fetch("DEV_PORT", 3042)}" : :auth
 
+  # The BikeHub app and BikeHub dev app, whose registered domains we'll hand a signed-in
+  # partner back to. Named rather than inline so specs can stub it.
+  PARTNER_DOORKEEPER_APP_IDS = [264, 356].freeze
+
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :current_organization, :passive_organization, :current_location,
@@ -478,9 +482,7 @@ module ControllerHelpers
     redirect_site = Addressable::URI.parse(redirect_redirect_uri)&.site&.downcase
     return nil if redirect_site.blank?
 
-    # redirect_site = Addressable::URI.parse(redirect_redirect_uri)&
-    # Get redirect uris from BikeHub app and BikeHub dev app (by their ids)
-    valid_redirect_urls = Doorkeeper::Application.where(id: [264, 356]).pluck(:redirect_uri)
+    valid_redirect_urls = Doorkeeper::Application.where(id: PARTNER_DOORKEEPER_APP_IDS).pluck(:redirect_uri)
       .map { |u| u.downcase.split("\s") }.flatten.map(&:strip)
     (valid_redirect_urls.any? { |u| u.start_with?(redirect_site) }) ? redirect_site : nil
   end

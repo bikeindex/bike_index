@@ -12,7 +12,7 @@ module Email
 
       def users_to_send(mail_snippet_id)
         User.confirmed.valid_only.where(notification_newsletters: true)
-          .where.not(id: Notification.delivery_success.newsletter.where(notifiable_id: mail_snippet_id).select(:user_id))
+          .where.not(id: Notification.settled.newsletter.where(notifiable_id: mail_snippet_id).select(:user_id))
       end
     end
 
@@ -27,14 +27,14 @@ module Email
         notifications = user.notifications.newsletter.where(notifiable_id: mail_snippet_id)
 
         # If we sent already, don't send again
-        return false if notifications.delivery_success.any?
+        return false if notifications.settled.any?
 
         notification = notifications.last
       end
 
       notification ||= Notification.create(user_id: user.id, kind: :newsletter, notifiable: mail_snippet)
 
-      Notification.track_email_delivery(notification) do
+      Notifications::Deliver.track_email(notification) do
         CustomerMailer.newsletter(user:, mail_snippet:).deliver_now
       end
     end

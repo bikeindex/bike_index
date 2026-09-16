@@ -12,6 +12,13 @@ RSpec.shared_context :register_flow_steps do
     Autocomplete::Loader.load_all(%w[Manufacturer])
   end
 
+  # A rider can't see or reach the honeypot, so only a bot fills it in
+  def fill_honeypot
+    honeypot = find_field("Additional information", visible: :hidden)
+    expect(honeypot[:tabindex]).to eq "-1"
+    page.execute_script("arguments[0].value = 'http://spam.example.com'", honeypot)
+  end
+
   def submit_step_1
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
