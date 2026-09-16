@@ -4,13 +4,6 @@ en:
     pages:
       org:
         search_results:
-          bikes_table:
-            assign_bike_sticker: Assign sticker
-            email_hidden: email hidden
-            hidden_not_registered: hidden, not registered with %{org_name}
-            link_sticker: link sticker
-          multi_result_chip:
-            no_results: no matches
           multi_results:
             first_n_shown_html: "— first %{limit} shown,"
             no_exact_matches: 'No exact matches. Close serials:'

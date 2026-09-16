@@ -51,6 +51,31 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
+  context "with every column's feature enabled" do
+    let(:enabled_feature_slugs) do
+      %w[bike_search avery_export bike_stickers impound_bikes registration_notes
+        reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
+    end
+    let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
+    let(:options) { super().merge(settings:) }
+    let(:panel) do
+      with_request_url("/o/#{organization.to_param}/registrations") do
+        render_inline(Pages::Org::Search::Settings::Component.new(settings:, skip_search_and_filters: true))
+      end
+    end
+
+    # org--search-column-toggle hides any hideableColumn whose cell class isn't a
+    # checked checkbox name, so a header with no checkbox can never be shown
+    it "gives every hideable column a checkbox to toggle it" do
+      headers = component.css("th.hideableColumn")
+        .map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
+      checkboxes = panel.css("input[type=checkbox]").map { |input| input["name"] }
+
+      expect(headers).to match_array(headers.uniq)
+      expect(headers - checkboxes).to eq []
+    end
+  end
+
   # The settings panel's checkboxes read the same column_renames, so this pins both
   context "with avery_export and registration_notes enabled" do
     let(:enabled_feature_slugs) { %w[bike_search avery_export registration_notes] }
@@ -80,7 +105,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   context "when a bike does not belong to the organization" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_phone] }
+    let(:enabled_feature_slugs) { %w[bike_search reg_phone reg_extra_registration_number] }
     let(:other_org) { FactoryBot.create(:organization) }
     let(:bike) do
       FactoryBot.create(:bike_organized,
@@ -90,15 +115,16 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
         phone: "555-555-1212")
     end
 
-    it "redacts private fields and leaves non-private columns visible" do
+    it "redacts every registration field, leaving public columns visible" do
       expect(component).to have_css("tbody tr", count: 1)
       expect(component).to have_text(bike.mnfg_name)
       expect(component).not_to have_text("stranger@example.com")
       expect(component).not_to have_text("555-555-1212")
+      expect(component).not_to have_text("SECRET-EXTRA")
       hidden_text = "hidden, not registered with #{organization.short_name}"
       expect(component).to have_css(".owner_email_cell em.less-strong", text: hidden_text)
       expect(component).to have_css(".reg_phone_cell em.less-strong", text: hidden_text)
-      expect(component).to have_text("SECRET-EXTRA")
+      expect(component).to have_css(".reg_extra_registration_number_cell em.less-strong", text: hidden_text)
     end
   end
 end

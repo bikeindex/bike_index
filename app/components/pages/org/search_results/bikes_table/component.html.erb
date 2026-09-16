@@ -107,8 +107,6 @@
     <% end %>
 
     <% settings.additional_registration_fields.each do |reg_field| %>
-      <% next if reg_field == "extra_registration_number" %>
-
       <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
         <% if bike.organized?(organization) %>
           <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
@@ -129,10 +127,6 @@
           <%= hidden_html %>
         <% end %>
       <% end %>
-    <% end %>
-
-    <% table.column(label: settings.column_renames[:reg_extra_registration_number_cell], classes: "hideableColumn extra_registration_number_cell") do |bike| %>
-      <%= bike.extra_registration_number %>
     <% end %>
 
     <% if organization.enabled?("impound_bikes") %>
