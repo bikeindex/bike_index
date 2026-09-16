@@ -36,7 +36,11 @@ module Pages
               @message_notification ||= StolenNotification.new(bike: @bike)
             end
 
+            # The impound allowance is permission to send a message, not to reach whoever
+            # holds it directly
             def owner_phone
+              return if impounded?
+
               @bike.phone if @bike.phoneable_by?(@current_user)
             end
           end

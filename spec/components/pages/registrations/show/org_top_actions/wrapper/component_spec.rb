@@ -92,7 +92,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       expect(action_panels).to include("message")
       expect(page).to have_button("Message Owner")
       expect(page).to have_text("Know who has this bike?")
-      expect(page).to have_link("718-391-4410", href: "tel:718-391-4410")
+      # Permission to send a message, not to reach them directly
+      expect(page).to_not have_text("Or call")
     end
 
     context "and limited" do
@@ -113,12 +114,12 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       end
     end
 
-    # The owner's opt-out still wins — the allowance widens who may ask, not the answer
-    context "whose owner declined unstolen notifications" do
+    # The allowance sits above the opt-out, which covers their own registrations
+    context "whose holder declined unstolen notifications" do
       let(:finder) { FactoryBot.create(:user_confirmed, notification_unstolen: false) }
 
-      it "renders no message action" do
-        expect(action_panels).to_not include("message")
+      it "still renders the message action" do
+        expect(action_panels).to include("message")
       end
     end
   end
