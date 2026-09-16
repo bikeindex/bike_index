@@ -21,7 +21,7 @@ module SharedBlocks
 
         # A row inside a group, indented past its parent's icon
         CHILD = "tw:mx-2 tw:block tw:rounded-[10px] tw:py-2 tw:pr-3 tw:pl-11 tw:text-[13.5px] " \
-          "tw:font-bold tw:whitespace-nowrap tw:max-[760px]:py-3.5"
+          "tw:font-bold tw:leading-tight tw:max-[760px]:py-3.5"
         CHILD_RESTING = "tw:text-purple-500 tw:dark:text-purple-300"
 
         # The tracked-out gray ADMIN PANEL caption, beside the logo and above the org's name
