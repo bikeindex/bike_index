@@ -259,7 +259,7 @@ module IntegrationSpecHelpers
 
   # The registration's emailed link, once its job has run
   def confirmation_link
-    Email::PartialRegistrationJob.drain
+    EmailJobs::PartialRegistrationJob.drain
     emailed_path("/register/confirm")
   end
 

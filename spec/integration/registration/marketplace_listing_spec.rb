@@ -130,7 +130,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
     fill_in "Email", with: buyer_email
     fill_in "Name", with: "Bianca Buyer"
     check "user_terms_of_service"
-    expect { click_button "Sign up" }.to change(Email::ConfirmationJob.jobs, :count).by(1)
+    expect { click_button "Sign up" }.to change(EmailJobs::ConfirmationJob.jobs, :count).by(1)
 
     # Signing up leaves them unconfirmed, which is its own gate ahead of the message
     expect(page).to have_content("Follow the link in the email to finish signing up")
@@ -138,7 +138,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
     expect(buyer.confirmed?).to be_falsey
 
     # Confirming spends the return_to stored when they clicked "contact the owner"
-    Email::ConfirmationJob.drain
+    EmailJobs::ConfirmationJob.drain
     visit emailed_path("/users/confirm")
     click_button "Sign in"
 
@@ -158,7 +158,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
 
     # Delivering touches the seller, expiring the cached "no messages" that hides their
     # menu item
-    expect { Email::MarketplaceMessageJob.drain }.to change(ActionMailer::Base.deliveries, :count).by(1)
+    expect { EmailJobs::MarketplaceMessageJob.drain }.to change(ActionMailer::Base.deliveries, :count).by(1)
     expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])
 
     sign_out

@@ -168,7 +168,7 @@ RSpec.describe BikeServices::Creator do
             expect {
               instance.create_bike(b_param)
             }.to change(BikeOrganization, :count).by 1
-            Email::OwnershipInvitationJob.drain
+            EmailJobs::OwnershipInvitationJob.drain
             # CRITICAL - this needs to not deliver email, or else we're spamming people
             expect(ActionMailer::Base.deliveries.count).to eq 0
 

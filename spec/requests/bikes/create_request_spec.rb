@@ -604,7 +604,7 @@ RSpec.describe "BikesController#create", type: :request do
         expect {
           post base_url, params: {bike: bike_params}
         }.to change(Ownership, :count).by 1
-        Email::OwnershipInvitationJob.drain
+        EmailJobs::OwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         bike = Bike.reorder(:created_at).last
         expect(bike.address_record.country.name).to eq("United States")

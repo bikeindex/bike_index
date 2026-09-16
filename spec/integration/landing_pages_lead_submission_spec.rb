@@ -42,11 +42,11 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       expect {
         click_button "Let's chat"
         expect(page).to have_content("Thank", wait: 5)
-      }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
+      }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
 
       expect(Feedback.last).to have_attributes(target_attributes)
 
-      Email::FeedbackNotificationJob.drain
+      EmailJobs::FeedbackNotificationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
       mail = ActionMailer::Base.deliveries.last
       expect(mail.subject).to eq "New School lead: Test University"
@@ -75,11 +75,11 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       expect {
         fill_in_and_submit_demo_form(name_label: "City", name_value: "Portland")
         expect(page).to have_content("Thank", wait: 5)
-      }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
+      }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
 
       expect(Feedback.last).to have_attributes(target_attributes)
 
-      Email::FeedbackNotificationJob.drain
+      EmailJobs::FeedbackNotificationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
       mail = ActionMailer::Base.deliveries.last
       expect(mail.subject).to eq "New City lead: Portland"

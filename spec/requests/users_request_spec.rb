@@ -104,7 +104,7 @@ RSpec.describe UsersController, type: :request do
         expect {
           post base_url, params: {locale: "nl", user: user_attributes},
             headers: {"HTTP_CF_CONNECTING_IP" => "99.99.99.9"}
-        }.to change(Email::ConfirmationJob.jobs, :count).by 1
+        }.to change(EmailJobs::ConfirmationJob.jobs, :count).by 1
         expect(flash).to_not be_present
         expect(response).to redirect_to(please_confirm_email_users_path)
 
@@ -115,7 +115,7 @@ RSpec.describe UsersController, type: :request do
         expect(user.last_login_at).to be_within(3.seconds).of Time.current
 
         ActionMailer::Base.deliveries = []
-        expect { Email::ConfirmationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+        expect { EmailJobs::ConfirmationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to eq("Bevestig uw e-mail met Bike Index!")
         expect(mail.to).to eq([user.email])
@@ -136,7 +136,7 @@ RSpec.describe UsersController, type: :request do
         Sidekiq::Job.clear_all
         expect {
           post base_url, params: {user: user_attributes}, headers: {"HTTP_CF_CONNECTING_IP" => "99.99.99.9"}
-        }.to change(Email::WelcomeJob.jobs, :count)
+        }.to change(EmailJobs::WelcomeJob.jobs, :count)
 
         user = User.where(email:).first
         expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
@@ -164,11 +164,11 @@ RSpec.describe UsersController, type: :request do
         expect {
           post base_url, params: {user: user_attributes, partner: "bikehub"},
             headers: {"HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9"}
-        }.to change(Email::WelcomeJob.jobs, :count).by 1
+        }.to change(EmailJobs::WelcomeJob.jobs, :count).by 1
 
         expect(response).to redirect_to("https://parkit.bikehub.com/account?reauthenticate_bike_index=true")
         user = User.find_by_email(email)
-        expect(Email::WelcomeJob.jobs.last["args"]).to eq([user.id])
+        expect(EmailJobs::WelcomeJob.jobs.last["args"]).to eq([user.id])
         expect(signed_auth_cookie).to eq [user.id, user.auth_token]
         expect(user).to have_attributes(partner_sign_up: "bikehub", email:, preferred_language: "nl")
         expect(user.last_login_at).to be_within(2.seconds).of Time.current
@@ -209,7 +209,7 @@ RSpec.describe UsersController, type: :request do
         expect {
           post base_url, params: {user: user_attributes}, headers: {"HTTP_CF_CONNECTING_IP" => "169.99.69.2"}
         }.to change(User, :count).by 1
-        Email::ConfirmationJob.drain
+        EmailJobs::ConfirmationJob.drain
 
         user = User.where(email:).first
         expect(flash).to_not be_present
@@ -236,7 +236,7 @@ RSpec.describe UsersController, type: :request do
         expect {
           expect {
             post base_url, params: {user: user_attributes}
-          }.to_not change(Email::WelcomeJob.jobs, :count)
+          }.to_not change(EmailJobs::WelcomeJob.jobs, :count)
         }.to_not change(User, :count)
       end
 
@@ -260,7 +260,7 @@ RSpec.describe UsersController, type: :request do
         expect(user.email_bans.last.reason).to eq "honeypot"
         # The ban blocks the confirmation email, so the account can't be activated
         expect {
-          Email::ConfirmationJob.new.perform(user.id)
+          EmailJobs::ConfirmationJob.new.perform(user.id)
         }.to_not change(ActionMailer::Base.deliveries, :count)
       end
     end
@@ -619,7 +619,7 @@ RSpec.describe UsersController, type: :request do
       ActionMailer::Base.deliveries = []
       expect {
         post "#{base_url}/resend_confirmation_email", params: {email: "stuff@stuff.com"}
-      }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
+      }.to_not change(EmailJobs::ConfirmationJob, :jobs) # Because it's done inline
       expect(response).to redirect_to please_confirm_email_users_path
       expect(flash[:error]).to be_present
       expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -635,7 +635,7 @@ RSpec.describe UsersController, type: :request do
         ActionMailer::Base.deliveries = []
         expect {
           post "#{base_url}/resend_confirmation_email", params: {email: "blah blah blah"}
-        }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
+        }.to_not change(EmailJobs::ConfirmationJob, :jobs) # Because it's done inline
         expect(response).to redirect_to please_confirm_email_users_path
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -658,7 +658,7 @@ RSpec.describe UsersController, type: :request do
         ActionMailer::Base.deliveries = []
         expect {
           post "#{base_url}/resend_confirmation_email", params: {email: "test@stuff.com"}
-        }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
+        }.to_not change(EmailJobs::ConfirmationJob, :jobs) # Because it's done inline
         expect(response).to redirect_to please_confirm_email_users_path
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -678,7 +678,7 @@ RSpec.describe UsersController, type: :request do
           ActionMailer::Base.deliveries = []
           expect {
             post "#{base_url}/resend_confirmation_email", params: {email: "test@stuff.com"}
-          }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
+          }.to_not change(EmailJobs::ConfirmationJob, :jobs) # Because it's done inline
           expect(response).to redirect_to please_confirm_email_users_path
           expect(flash[:error]).to be_present
           expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -745,7 +745,7 @@ RSpec.describe UsersController, type: :request do
       it "hands the reset off to the IdP rather than minting a token" do
         expect {
           post "#{base_url}/send_password_reset_email", params: {email: user.email}
-        }.to_not change(Email::ResetPasswordJob.jobs, :size)
+        }.to_not change(EmailJobs::ResetPasswordJob.jobs, :size)
         expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
         expect(user.reload.token_for_password_reset).to be_blank
       end
@@ -754,7 +754,7 @@ RSpec.describe UsersController, type: :request do
       it "redirects back and flash errors if unable to find user" do
         expect {
           post "#{base_url}/send_password_reset_email", params: {email: "some-crazy-email@stuff.com"}
-        }.to_not change(Email::ResetPasswordJob.jobs, :size)
+        }.to_not change(EmailJobs::ResetPasswordJob.jobs, :size)
         expect(flash[:error]).to match(/email/)
         expect(response).to redirect_to request_password_reset_form_users_path
       end
@@ -767,8 +767,8 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
-        }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
-        expect(Email::ResetPasswordJob).to have_enqueued_sidekiq_job(user.id, nil)
+        }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(1)
+        expect(EmailJobs::ResetPasswordJob).to have_enqueued_sidekiq_job(user.id, nil)
         user.reload
         expect(user.token_for_password_reset).to be_present
       end
@@ -782,7 +782,7 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
-        }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
+        }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(1)
         user.reload
         expect(user.token_for_password_reset).to be_present
         expect(user.confirmed?).to be_falsey
@@ -798,7 +798,7 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
-        }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
+        }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(1)
         user.reload
         expect(user.token_for_password_reset).to be_present
       end
@@ -812,7 +812,7 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_present
-        }.to_not change(Email::ResetPasswordJob.jobs, :size)
+        }.to_not change(EmailJobs::ResetPasswordJob.jobs, :size)
         user.reload
         expect(user.token_for_password_reset).to eq og_token
       end
@@ -826,7 +826,7 @@ RSpec.describe UsersController, type: :request do
             expect(response.code).to eq("200")
             expect(response).to render_template(:send_password_reset_email)
             expect(flash).to be_blank
-          }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
+          }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(1)
           user.reload
           expect(user.token_for_password_reset).to_not eq og_token
         end
