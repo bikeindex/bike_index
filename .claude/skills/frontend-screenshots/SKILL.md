@@ -118,6 +118,10 @@ Sanity-check each PNG: under ~5 KB usually means the page errored. Pull `browser
 
 **A 429 mid-capture is rack-attack, not a broken page.** `requests/ip` allows a burst per 20 seconds (`config/initializers/rack_attack.rb`), which a loop of `fetch`es from `browser_evaluate` blows through — navigate the pages you're capturing rather than probing them in bulk, and wait the window out rather than retrying.
 
+## Mailer previews (email components)
+
+An email renders at `$BASE_URL/rails/mailers/<mailer>/<action>`, but that route is preview chrome around an iframe — append `&part=text%2Fhtml` for the email body alone, which is what to capture. Every `OrganizedMailerPreview` action takes a record id (`?bike_id=75&part=text%2Fhtml`); `spec/mailers/previews/` is the list of actions and their params. Pick the record for the state you need — `finished_registration` renders a different email for a claimed ownership than an unclaimed one.
+
 ## Component previews (when no page shows the state)
 
 Some components only render in a context you can't reproduce on a normal dev page — gated by an env var (e.g. the review-app banner needs `REVIEW_APP`), a feature flag, or a hard-to-reach error/empty state. When a component has a ViewComponent/Lookbook preview, screenshot the **preview URL** instead of hunting for a page that happens to render it:
