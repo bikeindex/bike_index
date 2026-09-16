@@ -227,6 +227,51 @@ RSpec.describe "RegistrationsController#show", type: :request do
     end
   end
 
+  context "organization_id & sign_in_if_not" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { nil }
+    let(:organization) { FactoryBot.create(:organization) }
+
+    it "redirects to sign in, with or without an organization that resolves" do
+      get "#{base_url}/#{bike.to_param}?organization_id=#{organization.to_param}&sign_in_if_not=true"
+      expect(response).to redirect_to new_session_path
+      expect(flash[:notice]).to be_present
+      expect(session[:return_to]).to eq registration_path(bike.to_param, sign_in_if_not: true, organization_id: organization.to_param)
+
+      get "#{base_url}/#{bike.to_param}?organization_id=not-an-actual-organization&sign_in_if_not=true"
+      expect(response).to redirect_to new_session_path
+      expect(flash[:notice]).to be_present
+    end
+
+    context "no organization" do
+      it "redirects to sign in" do
+        get "#{base_url}/#{bike.to_param}?sign_in_if_not=1"
+        expect(response).to redirect_to new_session_path
+        expect(flash[:notice]).to be_present
+        expect(session[:return_to]).to eq "#{base_url}/#{bike.to_param}?sign_in_if_not=1"
+      end
+    end
+
+    context "organization with passwordless_users" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
+      it "redirects to magic link" do
+        get "#{base_url}/#{bike.to_param}?organization_id=#{organization.to_param}&sign_in_if_not=1"
+        expect(response).to redirect_to(magic_link_session_path)
+        expect(flash[:notice]).to be_present
+        expect(session[:return_to]).to eq registration_path(bike.to_param, sign_in_if_not: 1, organization_id: organization.to_param)
+      end
+    end
+
+    context "signed in" do
+      let(:current_user) { bike.reload.user }
+      it "renders" do
+        get "#{base_url}/#{bike.to_param}?sign_in_if_not=1"
+        expect(response.status).to eq(200)
+        expect(whitespace_normalized_body_text).to match("Your bike")
+      end
+    end
+  end
+
   context "likely_spam bike" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
     let(:current_user) { bike.reload.user }
