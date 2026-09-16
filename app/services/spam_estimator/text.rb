@@ -33,6 +33,7 @@ module SpamEstimator
         belbien | belbein | zopiclone | eszopiclone | restoril | carisoprodol | fioricet | butalbital | pregabalin |
         gabapentin | phentermine | adipex | meridia | sibutramine | reductil | ozempic | semaglutide | cytotec | misoprostol
       )\b |
+      # spam usernames run it into digits (pills4cure), so a word boundary won't match
       (?<![a-z])pills?(?![a-z])
     )/xi
 

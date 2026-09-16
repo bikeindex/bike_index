@@ -7,7 +7,7 @@ module SpamEstimator
     # crypto, gambling, adult, gift-card and pharmacy terms that SEO-spam profiles exist to promote.
     # Word boundaries matter: usernames are auto-generated random strings, so
     # unanchored substrings ("Judith", "Hagen", "Sloth", "Donohue") would ban real people.
-    SEO_SPAM_REGEX = Regexp.union(/(?:
+    SEO_SPAM_REGEX = /(?:
       \b(?:
         bitcoin | btc | ethereum | crypto(?:currency|\s?wallet)? | blockchain | binance |
         coinbase | dogecoin | altcoin | memecoin | defi | web3 | metamask | airdrop |
@@ -21,7 +21,7 @@ module SpamEstimator
         nap\s+tien | dang\s+nhap | truc\s+tuyen | khuyen\s+mai | uy\s+tin |
         game\s+bai | co\s+bac | song\s+bac | xo\s+so | lo\s+de |
         link\s+truy\s+cap | clip\s+(?:hot|nong) |
-        # generic medical words stay out of Text::PHARMACY_REGEX, which also flags bike models ("Omega Pharma")
+        # PHARMACY_REGEX is matched against frame models ("Omega Pharma"), so generic terms stay here
         pharmacists? | pharma | drugstore | prescriptions? | medications? | medicines? | meds | painkillers? |
         opioids? | impotence |
         # "MG Road" is a common street name in India
@@ -35,8 +35,9 @@ module SpamEstimator
       (?:card|gift)\s?balance | balance\s?(?:check|inquiry|inquiries) |
       check\s?(?:my|your|the)?\s?balance | reward\s?cards? |
       card\s?activation | activate\s+(?:my\s|your\s|the\s)?(?:gift\s?)?card |
-      redeem\s+(?:code|card)
-    )/xi, SpamEstimator::Text::PHARMACY_REGEX)
+      redeem\s+(?:code|card) |
+      #{SpamEstimator::Text::PHARMACY_REGEX}
+    )/xi
 
     def estimate(user)
       return 0 if user.blank?
