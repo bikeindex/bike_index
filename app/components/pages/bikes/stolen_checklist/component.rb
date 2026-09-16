@@ -30,12 +30,6 @@ module Pages
 
         private
 
-        # The copy stays under bikes.stolen_checklist rather than moving to this component -
-        # it's translated into four other locales there, which a rename would orphan
-        def translation(key, **kwargs)
-          super(key, scope: [:bikes, :stolen_checklist], **kwargs)
-        end
-
         def item_classes(completed)
           return ITEM_CLASSES unless completed
 
