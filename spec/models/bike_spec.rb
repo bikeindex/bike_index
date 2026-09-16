@@ -682,10 +682,11 @@ RSpec.describe Bike, type: :model do
     # paid_money is a wider allowance than the feature - an organization can be paid
     # without having bought unstolen_notifications
     context "organization is paid" do
-      before { contactable_organization.update_attribute :paid_money, true }
+      before { FactoryBot.create(:invoice_with_payment, organization: contactable_organization) }
 
       it "is true, without the unstolen_notifications feature" do
-        expect(contactable_organization.reload.enabled?("unstolen_notifications")).to be_falsey
+        expect(contactable_organization.reload.paid_money?).to be_truthy
+        expect(contactable_organization.enabled?("unstolen_notifications")).to be_falsey
         expect(bike.reload.contactable_without_claiming?(contactable_user.reload)).to be_truthy
       end
     end
