@@ -77,6 +77,7 @@ module UI
             if @bike_status.present?
               translation(:address_or_intersection)
             else
+              # i18n-tasks-use translation(".address_school")
               translation(@organization&.school? ? :address_school : :address)
             end
           end

@@ -42,6 +42,7 @@ module Atoms
       def serial_block
         return content_tag(:span, serial, class: ["serial-span", @html_class]) unless placeholder?
 
+        # i18n-tasks-use translation(".hidden"), translation(".made_without_serial"), translation(".unknown")
         content_tag(:span, translation(".#{serial.downcase.tr(" ", "_")}"), class: ["less-strong", @html_class])
       end
 

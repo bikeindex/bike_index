@@ -41,6 +41,7 @@ module Pages
             end
 
             def resolve_button_text
+              # i18n-tasks-use translation(".mark_graduated_resolved"), translation(".mark_parking_resolved")
               key = graduated? ? ".mark_graduated_resolved" : ".mark_parking_resolved"
               translation(key, bike_type: @bike.type)
             end

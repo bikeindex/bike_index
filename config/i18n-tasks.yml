@@ -164,8 +164,8 @@ ignore_unused:
   - "simple_form.{error_notification,required}.:"
   - "activerecord.errors.*"
   - "activerecord.models.*"
-  - "components.*" # our translation helper component blocks detection
   - "controllers.*" # our translation helper component blocks detection
+  - "components.pages.org.search.settings.*" # used dynamically by ComponentStructs::OrgSearchSettings
   - "shared.menu_items_account.*" # used dynamically by UserServices::MenuItemsAccount
   - "shared.menu_items_org.*" # used dynamically by UserServices::MenuItemsOrg
   - "shared.register_flow.*" # used dynamically by BikeServices::Register

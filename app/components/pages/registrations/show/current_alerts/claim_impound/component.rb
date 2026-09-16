@@ -56,6 +56,7 @@ module Pages
             end
 
             def claim_button_text
+              # i18n-tasks-use translation(".claim_found_bike"), translation(".claim_impounded_bike")
               translation(@bike.status_found? ? ".claim_found_bike" : ".claim_impounded_bike",
                 bike_type: @bike.type)
             end

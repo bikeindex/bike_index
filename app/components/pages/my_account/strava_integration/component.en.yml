@@ -18,7 +18,6 @@ en:
             your riding activities.
           strava_bikes_connected: Strava bikes connected to Bike Index bikes
           strava_connected_pending: Connected to Strava. Sync will begin shortly.
-          strava_integration: Strava Integration
           sync_error: Sync error
           sync_error_description: >-
             There was an error syncing your Strava activities. Please try disconnecting

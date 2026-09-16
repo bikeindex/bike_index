@@ -36,6 +36,7 @@ module Pages
           def heading
             return translation(".org_impound_record", org_name: @organization.short_name) if org_record?
 
+            # i18n-tasks-use translation(".found_details"), translation(".impound_details")
             translation(found? ? ".found_details" : ".impound_details")
           end
 

@@ -3,9 +3,6 @@ en:
   components:
     emails:
       finished_registration:
-        a_correctly_locked_bike: >-
-          A correctly locked bike. The frame is locked to the bike rack and both wheels
-          are secured.
         a_donation_will_prioritize_prefix: A donation will
         a_donation_will_prioritize_suffix: >-
           and help us get your bike back to you. We're a 501(c)(3) nonprofit and depend

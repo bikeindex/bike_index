@@ -28,6 +28,7 @@
   <% end %>
 
   <% if user_banned? || user_deleted? %>
+    <%# i18n-tasks-use translation(".banned_message") %>
     <%= render(UI::Alerts::Base::Component.new(kind: :warning, text: translation(user_banned? ? :banned_message : :removed_message), margin_classes: "tw:my-8")) %>
   <% elsif @can_send_message %>
     <%# matches Pages::Messages::ThreadShowMessage::Component#margin_class for sender %>

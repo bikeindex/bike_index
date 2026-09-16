@@ -4,7 +4,6 @@ en:
     pages:
       search_results:
         bike_box:
-          deleted: Deleted
           ended_at: Ended
           location: Location
           not_applicable: N/A

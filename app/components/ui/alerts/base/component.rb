@@ -31,6 +31,7 @@ module UI
         # What a screen reader reads in place of the icon. :purple names a color rather
         # than a meaning, so it announces the meaning it actually carries
         def announcement
+          # i18n-tasks-use translation(".error"), translation(".info"), translation(".notice"), translation(".success"), translation(".warning")
           translation((@kind == :purple) ? ".info" : ".#{@kind}")
         end
 

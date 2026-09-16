@@ -5,6 +5,7 @@
   data-has-results="<%= displayed_bikes.present? %>"
 >
   <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
+    <%# i18n-tasks-use translation(".serial_label"), translation(".sticker_label") %>
     <%= translation(sticker_search? ? ".sticker_label" : ".serial_label") %>
     <%= render(query_atom) %>
 
