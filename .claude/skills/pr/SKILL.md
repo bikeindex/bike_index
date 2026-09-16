@@ -94,6 +94,8 @@ The diff is frontend if a changed path matches one of these **and** renders a pa
 
 Excluded despite matching: mailer views (`app/views/*_mailer/**`, `app/views/user_emails/**`), API and JSON views (`app/views/api/**`, `*.json*`, `*.jbuilder`), and build config (`app/assets/config/manifest.js`, `esbuild.config.js`). A diff that only changes comments or non-rendering config isn't frontend either.
 
+Markup a reviewer can't see is also excluded — a `tw:hidden` field, a `data-` attribute, an `aria-` or `meta` change. It renders, so the paths above match it, but before and after are the same image, and the `## Screenshots` comment it produces is two identical captures. Ask what the shot would *show*, not whether a template changed. #4222 and #4262 (the register honeypot, added to each step) are the pattern; neither posted screenshots.
+
 Record this as frontend true/false — it's what **Screenshots** gates on.
 
 ### Write the summary body
