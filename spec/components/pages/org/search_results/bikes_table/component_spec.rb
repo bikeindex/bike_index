@@ -56,29 +56,16 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       %w[bike_search avery_export bike_stickers impound_bikes registration_notes
         reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
     end
+    # The panel builds a checkbox per enabled_columns entry, and org--search-column-toggle
+    # only ever reveals a column whose cell class matches a checked one
     let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
-    let(:options) { super().merge(settings:) }
-    let(:panel) do
-      with_request_url("/o/#{organization.to_param}/registrations") do
-        render_inline(Pages::Org::Search::Settings::Component.new(settings:, skip_search_and_filters: true))
-      end
-    end
 
-    # org--search-column-toggle hides any hideableColumn whose cell class isn't a
-    # checked checkbox name, so a header with no checkbox can never be shown
-    it "gives every hideable column a checkbox to toggle it" do
+    it "heads one column per settings checkbox, and no others" do
       headers = component.css("th.hideableColumn")
         .map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
-      checkboxes = panel.css("input[type=checkbox]").map { |input| input["name"] }
 
-      expect(headers).to match_array(headers.uniq)
-      expect(headers - checkboxes).to eq []
+      expect(headers).to match_array(settings.enabled_columns)
     end
-  end
-
-  # The settings panel's checkboxes read the same column_renames, so this pins both
-  context "with avery_export and registration_notes enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search avery_export registration_notes] }
 
     it "heads the columns with the shared labels" do
       expect(component).to have_css("th.avery_cell", normalize_ws: true, exact_text: "Avery Exportable")
