@@ -636,24 +636,24 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "contactable_without_claiming?" do
+  describe "contactable_away_from_owner?" do
     let(:bike) { FactoryBot.create(:bike, :impounded) }
     let(:organization_role) { FactoryBot.create(:organization_role_claimed) }
     let(:contactable_user) { organization_role.user }
     let(:contactable_organization) { organization_role.organization }
 
     it "is false without a user, and for a user whose organization qualifies on nothing" do
-      expect(bike.reload.contactable_without_claiming?).to be_falsey
-      expect(bike.contactable_without_claiming?(FactoryBot.create(:user_confirmed))).to be_falsey
+      expect(bike.reload.send(:contactable_away_from_owner?)).to be_falsey
+      expect(bike.send(:contactable_away_from_owner?, FactoryBot.create(:user_confirmed))).to be_falsey
       expect(contactable_organization.reload.paid_money?).to be_falsey
-      expect(bike.contactable_without_claiming?(contactable_user)).to be_falsey
+      expect(bike.send(:contactable_away_from_owner?, contactable_user)).to be_falsey
     end
 
     context "organization has unstolen_notifications" do
       before { contactable_organization.update_attribute :enabled_feature_slugs, ["unstolen_notifications"] }
 
       it "is true" do
-        expect(bike.reload.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+        expect(bike.reload.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
       end
 
       # Nothing is away from its owner, so the allowance has nobody to reach
@@ -662,7 +662,7 @@ RSpec.describe Bike, type: :model do
 
         it "is false" do
           expect(bike.reload.status_with_owner?).to be_truthy
-          expect(bike.contactable_without_claiming?(contactable_user.reload)).to be_falsey
+          expect(bike.send(:contactable_away_from_owner?, contactable_user.reload)).to be_falsey
         end
       end
 
@@ -673,7 +673,7 @@ RSpec.describe Bike, type: :model do
 
         it "is true" do
           expect(bike.reload.current_impound_record).to be_blank
-          expect(bike.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+          expect(bike.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
           expect(bike.contact_owner?(contactable_user)).to be_truthy
         end
       end
@@ -687,7 +687,7 @@ RSpec.describe Bike, type: :model do
       it "is true, without the unstolen_notifications feature" do
         expect(contactable_organization.reload.paid_money?).to be_truthy
         expect(contactable_organization.enabled?("unstolen_notifications")).to be_falsey
-        expect(bike.reload.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+        expect(bike.reload.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
       end
     end
 
@@ -695,7 +695,7 @@ RSpec.describe Bike, type: :model do
       before { contactable_organization.update_attribute :kind, "ambassador" }
 
       it "is true" do
-        expect(bike.reload.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+        expect(bike.reload.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
       end
     end
 
@@ -709,8 +709,8 @@ RSpec.describe Bike, type: :model do
 
       it "is false, and the phone stays hidden" do
         expect(bike.reload.organized?(contactable_organization)).to be_truthy
-        expect(bike.contactable_without_claiming?(contactable_user.reload)).to be_truthy
-        expect(bike.contactable_without_claiming?(contactable_user, contactable_organization)).to be_falsey
+        expect(bike.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
+        expect(bike.send(:contactable_away_from_owner?, contactable_user, contactable_organization)).to be_falsey
 
         expect(bike.phoneable_by?(contactable_user)).to be_truthy
         expect(bike.phoneable_by?(contactable_user, contactable_organization)).to be_falsey
@@ -724,7 +724,7 @@ RSpec.describe Bike, type: :model do
 
       it "is true, and overrides the opt-out" do
         expect(superuser.organizations).to be_empty
-        expect(bike.reload.contactable_without_claiming?(superuser)).to be_truthy
+        expect(bike.reload.send(:contactable_away_from_owner?, superuser)).to be_truthy
 
         bike.owner&.update(notification_unstolen: false)
 

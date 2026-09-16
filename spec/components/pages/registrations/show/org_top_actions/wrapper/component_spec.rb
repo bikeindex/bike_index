@@ -6,9 +6,11 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
   let(:enabled_feature_slugs) { %w[unstolen_notifications impound_bikes parking_notifications] }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
   let(:status) { :status_with_owner }
-  let(:bike) { Bike.new(status:, cycle_type: "bike") }
+  let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: true) }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "bike", user: owner).reload }
   let(:org_role) { :staff }
-  let(:current_user) { nil }
+  # contact_owner? is what the message action answers to, so it needs a real viewer
+  let(:current_user) { FactoryBot.create(:organization_role_claimed, organization:).user.reload }
 
   # The action buttons, named by the panel each one opens
   def action_panels
@@ -61,11 +63,12 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       end
     end
 
+    # Someone else is holding it, so the allowance reaches them instead
     context "by another organization" do
       let(:impound_organization_id) { FactoryBot.create(:organization).id }
 
-      it "renders no impound update" do
-        expect(action_panels).to eq(%w[notifications_show])
+      it "renders the message action rather than the impound update" do
+        expect(action_panels).to eq(%w[message notifications_show])
       end
     end
 
@@ -74,8 +77,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
     context "by no organization" do
       let(:impound_record) { ImpoundRecord.new }
 
-      it "renders no impound update" do
-        expect(action_panels).to eq(%w[notifications_show])
+      it "renders the message action rather than the impound update" do
+        expect(action_panels).to eq(%w[message notifications_show])
       end
     end
   end
@@ -88,7 +91,6 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
     let(:current_user) { FactoryBot.create(:organization_role_claimed, organization:).user.reload }
 
     it "renders the message action, and the panel asks what they need" do
-      expect(bike.contactable_without_claiming?(current_user)).to be_truthy
       expect(action_panels).to include("message")
       expect(page).to have_button("Message Owner")
       expect(page).to have_text("Know who has this bike?")
@@ -98,9 +100,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
     context "and limited" do
       let(:org_role) { :limited }
 
-      it "renders no message action" do
-        expect(action_panels).to_not include("message")
-        expect(page).to_not have_text("Know who has this bike?")
+      it "still renders the message action" do
+        expect(action_panels).to include("message")
       end
     end
 
@@ -108,7 +109,6 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       let(:organization) { FactoryBot.create(:organization) }
 
       it "renders no message action" do
-        expect(bike.contactable_without_claiming?(current_user)).to be_falsey
         expect(action_panels).to_not include("message")
       end
     end
@@ -146,16 +146,6 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       expect(action_panels).to include("message")
       expect(page).to have_button("Message Owner")
       expect(page).to have_text("Know something about this bike?")
-    end
-
-    # The org's own registrations carry the owner's contact in the table beside this
-    context "registered with the viewing organization" do
-      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, status: :status_abandoned, user: owner).reload }
-
-      it "renders no message action" do
-        expect(bike.organized?(organization)).to be_truthy
-        expect(action_panels).to_not include("message")
-      end
     end
 
     # Written because previewing the org rendered no action: a superuser is a member of

@@ -610,21 +610,11 @@ class Bike < ApplicationRecord
   def contact_owner?(u = nil, organization = nil)
     return false unless u.present?
     return true if status_stolen? && current_stolen_record.present?
-    return true if contactable_without_claiming?(u, organization)
+    return true if contactable_away_from_owner?(u, organization)
     return false unless owner&.notification_unstolen
     return u.enabled?("unstolen_notifications") unless organization.present? # Passed organization overrides user setting to speed stuff up
 
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
-  end
-
-  # Messaging whoever has the vehicle, rather than opening a claim against it, is for
-  # the organizations we already trust with unstolen registrations - and never for a
-  # registration of the passed organization's own, which they reach the ordinary way
-  def contactable_without_claiming?(u = nil, organization = nil)
-    return false unless u.present?
-    return false if organization.present? && organized?(organization)
-
-    status_abandoned_or_impounded? && u.contact_impounded?
   end
 
   def contact_owner_user?(u = nil, organization = nil)
@@ -821,6 +811,17 @@ class Bike < ApplicationRecord
   end
 
   private
+
+  # Messaging whoever has the vehicle, rather than opening a claim against it, is for the
+  # organizations we already trust with unstolen registrations - never for a registration
+  # of their own, which they reach the ordinary way. Passed organization overrides the
+  # user's own trust, like the unstolen branch it sits above
+  def contactable_away_from_owner?(u = nil, organization = nil)
+    return false unless u.present? && status_abandoned_or_impounded?
+    return u.contact_impounded? unless organization.present?
+
+    !organized?(organization) && organization.contact_impounded? && u.member_of?(organization)
+  end
 
   def validated_organization_id(organization_id)
     return nil unless organization_id.present?
