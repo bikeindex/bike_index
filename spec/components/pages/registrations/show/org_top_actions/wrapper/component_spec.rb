@@ -61,11 +61,12 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       end
     end
 
+    # Someone else is holding it, so the allowance reaches them instead
     context "by another organization" do
       let(:impound_organization_id) { FactoryBot.create(:organization).id }
 
-      it "renders no impound update" do
-        expect(action_panels).to eq(%w[notifications_show])
+      it "renders the message action rather than the impound update" do
+        expect(action_panels).to eq(%w[message notifications_show])
       end
     end
 
@@ -75,7 +76,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       let(:impound_record) { ImpoundRecord.new }
 
       it "renders no impound update" do
-        expect(action_panels).to eq(%w[notifications_show])
+        expect(action_panels).to eq(%w[message notifications_show])
       end
     end
   end
@@ -146,6 +147,25 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       expect(action_panels).to include("message")
       expect(page).to have_button("Message Owner")
       expect(page).to have_text("Know something about this bike?")
+    end
+
+    # Written because previewing the org rendered no action: a superuser is a member of
+    # no organization, so asking their memberships answered for none of them
+    context "previewed by a superuser" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+
+      it "renders the message action the previewed organization would see" do
+        expect(current_user.organizations).to be_empty
+        expect(action_panels).to include("message")
+      end
+
+      context "of an organization trusted with nothing" do
+        let(:organization) { FactoryBot.create(:organization) }
+
+        it "renders no message action" do
+          expect(action_panels).to_not include("message")
+        end
+      end
     end
   end
 

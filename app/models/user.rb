@@ -408,6 +408,8 @@ class User < ApplicationRecord
   end
 
   def contact_impounded?
+    return true if superuser?
+
     organizations.contact_impounded.limit(1).any?
   end
 

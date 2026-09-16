@@ -697,6 +697,21 @@ RSpec.describe Bike, type: :model do
         expect(bike.reload.contactable_without_claiming?(contactable_user.reload)).to be_truthy
       end
     end
+
+    # Matching enabled?, so the submit is accepted for the panel a superuser is shown
+    # when previewing an organization - they're a member of none
+    context "superuser" do
+      let(:superuser) { FactoryBot.create(:superuser) }
+
+      it "is true, and overrides the opt-out" do
+        expect(superuser.organizations).to be_empty
+        expect(bike.reload.contactable_without_claiming?(superuser)).to be_truthy
+
+        bike.owner&.update(notification_unstolen: false)
+
+        expect(bike.reload.contact_owner?(superuser)).to be_truthy
+      end
+    end
   end
 
   describe "owner" do

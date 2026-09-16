@@ -622,7 +622,7 @@ class Bike < ApplicationRecord
   def contactable_without_claiming?(passed_user = nil)
     return false if passed_user.blank?
 
-    (status_abandoned? || status_impounded?) && passed_user.contact_impounded?
+    status_abandoned_or_impounded? && passed_user.contact_impounded?
   end
 
   def contact_owner_user?(u = nil, organization = nil)
