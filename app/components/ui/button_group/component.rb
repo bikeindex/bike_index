@@ -16,15 +16,15 @@ module UI
       TRACK_CLASSES = "tw:inline-flex tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
         "tw:bg-gray-100 tw:p-[3px] tw:dark:border-gray-700 tw:dark:bg-gray-800"
 
-      # Only the segment's own look — focus, disabled and the hover guard come from UI::Button
+      # Only what the segment doesn't share with a button — the rest is UI::Button's
       SEGMENT_CLASSES = [
-        "tw:inline-flex tw:items-center tw:cursor-pointer tw:transition-colors tw:rounded-lg",
+        UI::Button::Component::BASE_CLASSES,
+        UI::Button::Component::FOCUS_CLASSES,
+        UI::Button::Component::DISABLED_CLASSES,
         "tw:px-3 tw:py-[5px] tw:text-[11.5px] tw:font-extrabold tw:whitespace-nowrap",
         "tw:no-underline tw:hover:no-underline tw:text-gray-400",
         "tw:not-disabled:not-aria-disabled:hover:text-gray-900",
         "tw:focus:ring-purple-500/40",
-        UI::Button::Component::FOCUS_CLASSES,
-        UI::Button::Component::DISABLED_CLASSES,
         "tw:is-active:bg-white tw:is-active:text-gray-900 tw:is-active:shadow-sm",
         "tw:is-active:dark:bg-gray-900 tw:is-active:dark:text-gray-100"
       ].join(" ").freeze
