@@ -164,6 +164,12 @@ class Organization < ApplicationRecord
   scope :with_stolen_message, -> { left_joins(:organization_stolen_message).where.not(organization_stolen_message: {body: nil}) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("enabled_feature_slugs ?| array[:keys]", keys: %w[unstolen_notifications parking_notifications impound_bikes]) }
+  # Named rather than chained so the `or`s compose onto an association - built off the class
+  # so they don't inherit whatever relation this is called on
+  scope :contact_impounded, -> {
+    where(id: Organization.with_enabled_feature_slugs("unstolen_notifications")
+      .or(Organization.paid_money).or(Organization.ambassador))
+  }
   # Regional orgs have to have the organization feature slug AND the search location set
   scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("enabled_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
 
@@ -546,6 +552,11 @@ class Organization < ApplicationRecord
   # Done multiple places, so consolidating. Might be worth optimizing
   def any_enabled?(features)
     features.detect { |f| enabled?(f) }.present?
+  end
+
+  # Trusted to message whoever holds an impounded vehicle rather than having to claim it
+  def contact_impounded?
+    enabled?("unstolen_notifications") || paid_money? || ambassador?
   end
 
   def set_calculated_attributes
