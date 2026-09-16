@@ -621,9 +621,8 @@ class Bike < ApplicationRecord
   # the organizations we already trust with unstolen registrations
   def contactable_without_claiming?(passed_user = nil)
     return false if passed_user.blank?
-    return false unless status_abandoned? || current_impound_record.present?
 
-    passed_user.organizations.contact_impounded.limit(1).any?
+    (status_abandoned? || status_impounded?) && passed_user.contact_impounded?
   end
 
   def contact_owner_user?(u = nil, organization = nil)

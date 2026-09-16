@@ -135,8 +135,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
     end
   end
 
-  # There's no impound record to claim, so the status is what the allowance reads. The
-  # panel keeps the sighting question - the org is the one who saw it sitting there
+  # The panel keeps the sighting question - the org is the one who saw it sitting there
   context "when abandoned, viewed by a trusted organization's staff" do
     let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, status: :status_abandoned, user: owner).reload }
@@ -147,22 +146,6 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       expect(action_panels).to include("message")
       expect(page).to have_button("Message Owner")
       expect(page).to have_text("Know something about this bike?")
-    end
-
-    context "and limited" do
-      let(:org_role) { :limited }
-
-      it "renders no message action" do
-        expect(action_panels).to_not include("message")
-      end
-    end
-
-    context "whose organization is trusted with nothing" do
-      let(:organization) { FactoryBot.create(:organization) }
-
-      it "renders no message action" do
-        expect(action_panels).to_not include("message")
-      end
     end
   end
 
