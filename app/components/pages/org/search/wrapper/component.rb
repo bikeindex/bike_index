@@ -24,7 +24,6 @@ module Pages
             search_address: nil,
             search_status: "all",
             search_parking_notification: nil,
-            search_query_present: false,
             search_all: false,
             humanized_time_range: nil,
             bike_sticker: nil,
@@ -43,7 +42,6 @@ module Pages
             @search_address = search_address
             @search_status = search_status
             @search_parking_notification = search_parking_notification
-            @search_query_present = search_query_present
             @search_all = search_all
             @humanized_time_range = humanized_time_range
             @bike_sticker = bike_sticker
@@ -69,12 +67,6 @@ module Pages
               search_all: @search_all,
               toggle_button: !@search_page
             )
-          end
-
-          # search_all counts, because the other sentence names the organization
-          def show_search_query_summary?
-            @search_query_present || @search_all || @params[:search_stickers].present? ||
-              @params[:search_address].present? || @model_audit.present?
           end
 
           # Built here rather than on the settings component, which route helpers can't reach

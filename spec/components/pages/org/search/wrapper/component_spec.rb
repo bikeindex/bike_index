@@ -76,8 +76,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     it "drops the export, which would reach past the organization" do
       expect(component).not_to have_link("Export CSV", visible: :all)
       expect(component).not_to have_link(text: /Create export/, visible: :all)
-      # the count sentence stops naming the organization
-      expect(component).not_to have_text("matching for #{organization.short_name}")
     end
   end
 

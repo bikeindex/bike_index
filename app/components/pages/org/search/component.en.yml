@@ -87,12 +87,11 @@ en:
             e_vehicles_for_audit: 'E-Vehicles for audit:'
             export_csv: Export CSV
             link: Link
-            matching_bikes_html: "%{count} %{cycle_type} matching"
+            matching_html: "%{count} matching %{cycle_type}"
             mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
             per_page: Results per page
             phone: Phone
             reg_address: Address
-            registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
             showing_html: showing %{from}–%{to} of %{count}
             student_id: Student ID
             vehicle: registration

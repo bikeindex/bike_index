@@ -6,16 +6,8 @@
     "
   >
     <p class="tw:mb-0">
-      <% bikes_count = number_display(@pagy.count) %>
-
-      <% if show_search_query_summary? %>
-        <%= translation(".matching_bikes_html",
-            count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count)) %>
-      <% else %>
-        <%= translation(".registered_bikes_html",
-            count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count),
-            org_name: @organization.short_name) %>
-      <% end %>
+      <%= translation(".matching_html", count: number_display(@pagy.count),
+        cycle_type: cycle_type.pluralize(@pagy.count)) %>
 
       <em><%= @humanized_time_range %></em>
     </p>
