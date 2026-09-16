@@ -225,6 +225,8 @@ module Organized
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
+      @search_unregisteredness = permitted_unregisteredness
+      bikes = unregisteredness_scoped(bikes)
       @search_parking_notification = permitted_parking_notification_filter
       bikes = parking_notification_scoped(bikes)
       # The at-a-glance card counts an earlier window too, so it needs the search without a period
@@ -243,8 +245,25 @@ module Organized
         false
       end
       @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
+      @search_unregisteredness = permitted_unregisteredness
       @search_parking_notification = permitted_parking_notification_filter
       search_status
+    end
+
+    def permitted_unregisteredness
+      %w[only_unregistered only_registered].include?(params[:search_unregisteredness]) ? params[:search_unregisteredness] : false
+    end
+
+    # unregistered_parking_notification is a bike's own status, so this filters the records
+    # a notification created for an unregistered vehicle rather than the notices on a bike
+    def unregisteredness_scoped(bikes)
+      return bikes unless @search_unregisteredness
+
+      if @search_unregisteredness == "only_unregistered"
+        bikes.where(status: "unregistered_parking_notification")
+      else
+        bikes.where.not(status: "unregistered_parking_notification")
+      end
     end
 
     def permitted_parking_notification_filter
@@ -309,7 +328,7 @@ module Organized
       return false if params[:search_stickers].present? && params[:search_stickers] != "all"
 
       params.slice(:search_address, :search_email, :search_model_audit_id, :search_notes, :search_status,
-        :search_parking_notification).values.reject(&:blank?).none?
+        :search_unregisteredness, :search_parking_notification).values.reject(&:blank?).none?
     end
 
     def no_interpreted_params?

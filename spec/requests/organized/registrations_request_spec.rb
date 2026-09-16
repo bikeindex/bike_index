@@ -162,6 +162,28 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
+    context "with search_unregisteredness" do
+      let!(:unregistered_bike) do
+        FactoryBot.create(:bike_organized, creation_organization: current_organization,
+          status: "unregistered_parking_notification")
+      end
+
+      it "filters on the bike's own status" do
+        get base_url, params: {search_no_js: true, search_unregisteredness: "only_unregistered"}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_unregisteredness)).to eq "only_unregistered"
+        expect(assigns(:bikes).pluck(:id)).to eq([unregistered_bike.id])
+
+        get base_url, params: {search_no_js: true, search_unregisteredness: "only_registered"}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        # and an unrecognized value doesn't filter
+        get base_url, params: {search_no_js: true, search_unregisteredness: "whatever"}
+        expect(assigns(:search_unregisteredness)).to eq false
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, unregistered_bike.id])
+      end
+    end
+
     context "with search_parking_notification" do
       let(:enabled_feature_slugs) { %w[bike_search parking_notifications] }
       let!(:notified_bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }

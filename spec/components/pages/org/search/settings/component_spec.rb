@@ -157,7 +157,8 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
     it "returns a group per enabled filter, carrying the searched value" do
       groups = instance.filter_groups
       expect(groups.map { it[:name] })
-        .to eq(%i[search_stickers search_address search_status search_parking_notification])
+        .to eq(%i[search_stickers search_address search_status search_unregisteredness
+          search_parking_notification])
       expect(groups.find { it[:name] == :search_status }[:selected]).to eq "impounded"
       expect(groups.find { it[:name] == :search_stickers }[:entries].map { it[:value] })
         .to eq ["", "with", "none"]
@@ -166,8 +167,9 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
     context "with no optional features" do
       let(:enabled_feature_slugs) { %w[bike_search] }
 
-      it "returns only status" do
-        expect(instance.filter_groups.map { it[:name] }).to eq [:search_status]
+      it "returns only the ungated ones" do
+        expect(instance.filter_groups.map { it[:name] })
+          .to eq %i[search_status search_unregisteredness]
       end
     end
   end

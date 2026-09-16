@@ -42,6 +42,8 @@ module Pages
             search_address: {with_street: ".filter_with_address_html", without_street: ".filter_no_address_html"},
             search_status: {not_impounded: ".filter_not_impounded_html", impounded: ".filter_impounded_html",
                             with_owner: ".filter_not_stolen_or_impounded_html", stolen: ".filter_stolen_html"},
+            search_unregisteredness: {only_unregistered: ".filter_only_unregistered_html",
+                                      only_registered: ".filter_not_unregistered_html"},
             search_parking_notification: {with: ".filter_with_parking_notification_html",
                                           none: ".filter_no_parking_notification_html"}
           }.freeze
@@ -56,6 +58,7 @@ module Pages
             search_stickers: nil,
             search_address: nil,
             search_status: "all",
+            search_unregisteredness: nil,
             search_parking_notification: nil,
             bike_sticker: nil,
             search_all: false,
@@ -68,6 +71,7 @@ module Pages
             @search_stickers = search_stickers
             @search_address = search_address
             @search_status = search_status
+            @search_unregisteredness = search_unregisteredness
             @search_parking_notification = search_parking_notification
             @bike_sticker = bike_sticker
             @search_all = search_all
@@ -84,7 +88,8 @@ module Pages
           end
 
           def filter_groups
-            [sticker_group, address_group, status_group, parking_notification_group].compact
+            [sticker_group, address_group, status_group, unregisteredness_group,
+              parking_notification_group].compact
           end
 
           def notes_search_label = translation(".show_notes_search")
@@ -159,7 +164,8 @@ module Pages
 
           def filter_values
             {search_stickers: @search_stickers, search_address: @search_address,
-             search_status: @search_status, search_parking_notification: @search_parking_notification}
+             search_status: @search_status, search_unregisteredness: @search_unregisteredness,
+             search_parking_notification: @search_parking_notification}
           end
 
           def group(name, label_key, selected, entries)
@@ -194,6 +200,15 @@ module Pages
             entries << {value: "stolen", label: translation(".filter_stolen_html")}
 
             group(:search_status, ".status", @search_status, entries)
+          end
+
+          # A bike an organization's parking notification created for a vehicle nobody had
+          # registered - its own status, rather than a question about the notices on it
+          def unregisteredness_group
+            group(:search_unregisteredness, ".unregistered", @search_unregisteredness,
+              [{value: "", label: translation(".all")},
+                {value: "only_unregistered", label: translation(".filter_only_unregistered_html")},
+                {value: "only_registered", label: translation(".filter_not_unregistered_html")}])
           end
 
           def parking_notification_group

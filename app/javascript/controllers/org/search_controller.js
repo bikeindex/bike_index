@@ -4,7 +4,8 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'exportLink', 'notesField', 'notesCheckbox', 'chartFrame']
+  static targets = ['perPage', 'exportLink', 'notesField', 'notesCheckbox', 'chartFrame',
+    'filterSummary']
 
   connect () {
     this.chartSearch = window.location.search
@@ -45,10 +46,24 @@ export default class extends Controller {
   }
 
   filterChanged () {
+    this.syncFilterSummary()
     const form = document.getElementById('Search_Form')
     if (form) {
       form.requestSubmit()
     }
+  }
+
+  // Reads the chips' own markup rather than rebuilding their wording, so the summary can't
+  // drift from the labels. An empty value (or `all`) is a group that isn't filtering.
+  syncFilterSummary () {
+    if (!this.hasFilterSummaryTarget) return
+    const active = [...document.querySelectorAll('input[type=radio][form="Search_Form"]:checked')]
+      .filter(radio => radio.value !== '' && radio.value !== 'all')
+      .map(radio => radio.closest('label')?.querySelector('span')?.innerHTML)
+      .filter(Boolean)
+
+    this.filterSummaryTarget.innerHTML = active.join(' · ')
+    this.filterSummaryTarget.hidden = active.length === 0
   }
 
   perPageChanged () {

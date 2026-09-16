@@ -23,6 +23,7 @@ module Pages
             search_stickers: nil,
             search_address: nil,
             search_status: "all",
+            search_unregisteredness: nil,
             search_parking_notification: nil,
             search_all: false,
             humanized_time_range: nil,
@@ -41,6 +42,7 @@ module Pages
             @search_stickers = search_stickers
             @search_address = search_address
             @search_status = search_status
+            @search_unregisteredness = search_unregisteredness
             @search_parking_notification = search_parking_notification
             @search_all = search_all
             @humanized_time_range = humanized_time_range
@@ -62,6 +64,7 @@ module Pages
               search_stickers: @search_stickers,
               search_address: @search_address,
               search_status: @search_status,
+              search_unregisteredness: @search_unregisteredness,
               search_parking_notification: @search_parking_notification,
               bike_sticker: @bike_sticker,
               search_all: @search_all,

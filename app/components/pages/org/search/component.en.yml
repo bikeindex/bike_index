@@ -46,6 +46,8 @@ en:
             filter_no_sticker_html: only <strong>no</strong> sticker
             filter_not_impounded_html: only <strong>not</strong> impounded
             filter_not_stolen_or_impounded_html: not stolen or impounded
+            filter_not_unregistered_html: "<strong>not</strong> unregistered"
+            filter_only_unregistered_html: only <strong>unregistered</strong>
             filter_stolen_html: only stolen
             filter_with_address_html: only <strong>with</strong> address
             filter_with_parking_notification_html: only <strong>notified</strong>
@@ -74,6 +76,7 @@ en:
             sticker_cell: Sticker
             stickers: 'Stickers:'
             stolen_cell: Stolen
+            unregistered: 'Unregistered parking notif:'
             updated_at_cell: Updated
             url_cell: URL
             vehicle: registration
