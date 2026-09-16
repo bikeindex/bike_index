@@ -363,7 +363,7 @@ class Ownership < ApplicationRecord
   end
 
   def spam_risky_email?
-    return false unless Integrations::Turnstile.risky_email?(owner_email)
+    return false unless EmailDomain.risky_email?(owner_email)
     return true if pos?
 
     embed? && organization&.spam_registrations?

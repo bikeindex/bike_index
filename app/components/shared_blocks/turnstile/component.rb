@@ -19,7 +19,7 @@ module SharedBlocks
 
       # The address a challenged submission came back with - a browser that never ran the
       # reveal gets the widget from here rather than posting without a token forever
-      def already_risky? = Integrations::Turnstile.risky_email?(@email)
+      def already_risky? = EmailDomain.risky_email?(@email)
 
       def wrapper_class
         class_names("tw:my-4", "tw:hidden" => !already_risky?)

@@ -1,18 +1,6 @@
 require "rails_helper"
 
 RSpec.describe Integrations::Turnstile do
-  describe "risky_email?" do
-    # Ownership#spam_risky_email? reads this with the challenge switched off
-    it "matches the domains, configured or not" do
-      expect(described_class.risky_email?("rider@yahoo.com")).to be_truthy
-      expect(described_class.risky_email?("rider@hotmail.co.uk")).to be_truthy
-      # users_controller asks before the record is saved, so before EmailNormalizer runs
-      expect(described_class.risky_email?("Rider@Yahoo.com")).to be_truthy
-      expect(described_class.risky_email?("rider@gmail.com")).to be_falsey
-      expect(described_class.enabled?).to be_falsey
-    end
-  end
-
   describe "challenge?" do
     context "configured" do
       before do
