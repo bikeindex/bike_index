@@ -80,10 +80,11 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   context "with avery_export and registration_notes enabled" do
     let(:enabled_feature_slugs) { %w[bike_search avery_export registration_notes] }
 
-    it "labels the columns the way the table always has" do
-      expect(component).to have_css("th.avery_cell", normalize_ws: true, exact_text: "Avery?")
-      expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "Propulsion")
-      expect(component).to have_css("th.notes_cell", normalize_ws: true, exact_text: "Registration Notes")
+    it "heads the columns with the shared labels" do
+      expect(component).to have_css("th.avery_cell", normalize_ws: true, exact_text: "Avery Exportable")
+      expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "E-vehicle (propulsion)")
+      expect(component).to have_css("th.notes_cell", normalize_ws: true,
+        exact_text: "#{organization.short_name} Registration Notes")
     end
   end
 

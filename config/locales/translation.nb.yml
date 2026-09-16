@@ -5031,7 +5031,7 @@ nb:
       your_bikes: Syklene dine
       your_preferences: Dine preferanser
     org_search_columns:
-      avery_cell: Avery?
+      avery_cell: Avery eksporterbar
       color_cell: Farge
       created_at_cell: Registrert
       creation_description_cell: Kilde
@@ -5043,7 +5043,7 @@ nb:
       notes_cell: Notater
       owner_email_cell: Sendt til
       owner_name_cell: Eiers navn
-      propulsion_type_cell: Fremdrift
+      propulsion_type_cell: Elbil (fremdrift)
       reg_address_cell: Adresse
       reg_extra_registration_number_cell: Sekundærnr.
       reg_organization_affiliation_cell: Tilknytning

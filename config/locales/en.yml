@@ -5085,7 +5085,7 @@ en:
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_message: Stolen Message
     org_search_columns:
-      avery_cell: Avery?
+      avery_cell: Avery Exportable
       color_cell: Color
       created_at_cell: Registered
       creation_description_cell: Source
@@ -5097,7 +5097,7 @@ en:
       notes_cell: Registration Notes
       owner_email_cell: Sent to
       owner_name_cell: Owner name
-      propulsion_type_cell: Propulsion
+      propulsion_type_cell: E-vehicle (propulsion)
       reg_address_cell: Address
       reg_extra_registration_number_cell: Secondary#
       reg_organization_affiliation_cell: Affiliation
