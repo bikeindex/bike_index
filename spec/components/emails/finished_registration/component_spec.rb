@@ -46,6 +46,23 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
     end
   end
 
+  context "non-bike cycle type" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "personal-mobility") }
+    let(:ownership) { bike.current_ownership }
+
+    it "names the cycle type rather than bike" do
+      expect(bike.type).to eq "e-personal mobility device"
+      expect(component).to have_content("Congrats on registering your e-personal mobility device with Bike Index")
+      expect(component).to have_content("Your e-personal mobility device is now part of the world's most effective bike registry")
+      expect(component).to have_content("You are protecting your e-personal mobility device and helping prevent theft in your community")
+      expect(component).to have_content("e-Personal Mobility Device details")
+      expect(component).to have_content("Protect your e-personal mobility device by following these locking guidelines")
+      expect(component).to have_content("What if my e-personal mobility device gets stolen?")
+      expect(component.css("a.binx-button").map { |a| a.text.strip })
+        .to eq(["View your e-personal mobility device", "View your e-personal mobility device"])
+    end
+  end
+
   context "stolen bike" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
     let(:ownership) { bike.current_ownership }
