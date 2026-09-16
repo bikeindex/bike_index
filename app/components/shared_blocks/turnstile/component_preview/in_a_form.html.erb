@@ -1,9 +1,0 @@
-<%= form_with(url: "#", builder: BikeIndexFormBuilder, html: {data: {
-      controller: "shared-blocks--turnstile",
-      "shared-blocks--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
-      "shared-blocks--turnstile-script-url-value": Integrations::Turnstile::SCRIPT_URL,
-      action: "input->shared-blocks--turnstile#update"}}) do |f| %>
-  <%= f.email_field :email, placeholder: "you@example.com", class: "twinput tw:w-full" %>
-
-  <%= render(SharedBlocks::Turnstile::Component.new) %>
-<% end %>

@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='shared-blocks--turnstile'
+// Connects to data-controller='ui--forms--turnstile'
 //
 // Which addresses get asked, not whether they answer - the server re-checks the token.
 export default class extends Controller {

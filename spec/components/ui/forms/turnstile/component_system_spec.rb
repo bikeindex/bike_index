@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe SharedBlocks::Turnstile::Component, :js, type: :system do
-  let(:base_path) { "/rails/view_components/shared_blocks/turnstile/component/" }
+RSpec.describe UI::Forms::Turnstile::Component, :js, type: :system do
+  let(:base_path) { "/rails/view_components/ui/forms/turnstile/component/" }
   # Cloudflare's dummy sitekey, which issues a token to an automated browser where a
   # real one fails bot detection - so the whole client-side flow runs here
   before do

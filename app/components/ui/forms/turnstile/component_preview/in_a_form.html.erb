@@ -1,0 +1,9 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder, html: {data: {
+      controller: "ui--forms--turnstile",
+      "ui--forms--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
+      "ui--forms--turnstile-script-url-value": Integrations::Turnstile::SCRIPT_URL,
+      action: "input->ui--forms--turnstile#update"}}) do |f| %>
+  <%= f.email_field :email, placeholder: "you@example.com", class: "twinput tw:w-full" %>
+
+  <%= render(UI::Forms::Turnstile::Component.new) %>
+<% end %>
