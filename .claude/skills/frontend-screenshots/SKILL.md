@@ -130,6 +130,8 @@ $BASE_URL/rails/view_components/<preview_path>/<scenario>
 
 Use this bare route, not Lookbook's `/lookbook/inspect/...`, which wraps the component in its own browser chrome. `/lookbook/preview/...` is the one route that puts a whole `@!group` on a single page — `/lookbook/preview/ui/tooltip/variants` for `UI::Tooltip::ComponentPreview`'s `# @!group Variants`. Reach for it when the shot needs several scenarios side by side; the component's system spec usually already visits it. **It takes a group, not a scenario** — `/lookbook/preview/<preview_path>/<scenario>` 404s, which reads as a wrong preview path rather than a wrong route.
 
+**Both Lookbook routes miss a preview method added since `bin/dev` booted** — its registry doesn't reload, so the group page renders every *other* scenario and `/lookbook/inspect/…/<new_scenario>` 404s, which reads as a broken preview rather than a stale registry. The bare `/rails/view_components/…` route resolves the method live, so capture the new scenario there.
+
 The preview page loads Tailwind and renders the component standalone (no site chrome), so a preview that fits the viewport captures at `fullPage: false`; a small ViewComponent render-timing line at the bottom is harmless. **A preview taller than the viewport still captures `fullPage: true`** — page-sized components (a whole registration step, a long form) put the changed field below 900px, and cropping it out is the one thing the shot exists to show. Measure before choosing:
 
 ```js
