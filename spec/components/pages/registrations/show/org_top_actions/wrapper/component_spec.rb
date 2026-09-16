@@ -92,8 +92,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       expect(action_panels).to include("message")
       expect(page).to have_button("Message Owner")
       expect(page).to have_text("Know who has this bike?")
-      # Permission to send a message, not to reach them directly
-      expect(page).to_not have_text("Or call")
+      expect(page).to have_link("718-391-4410", href: "tel:718-391-4410")
     end
 
     context "and limited" do
