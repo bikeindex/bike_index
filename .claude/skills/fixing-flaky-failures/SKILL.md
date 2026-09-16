@@ -65,9 +65,9 @@ What "earn them" means in practice:
   a retry over a findable cause just makes it intermittent for longer.
 - Leave a comment saying what you found and why the retry stands in for a fix —
   the harness artifact, the contention, the thing you ruled out. The existing
-  `flaky: 4` on `search_registrations_spec` is the pattern: it names WebDriver's
-  unreliable `go_forward` onto a `turbo-action: advance` entry and explains why
-  more retries than the default. A bare `flaky: true` with no comment tells the
+  `flaky: 4` on `search_registrations_spec` is the pattern: it names the click
+  landing on `about:blank`, lists what it ruled out, and says it went
+  unreproduced under local CPU throttling. A bare `flaky: true` with no comment tells the
   next person nothing and will outlive the problem.
 - Say plainly in your summary that you papered over it rather than fixed it, so
   the user can decide whether that's good enough.
@@ -138,9 +138,10 @@ Keep that loop on the one spec file — escalating it to `bin/ci` costs minutes 
 parallel workers and browsers per iteration, and answers the same question no better.
 
 Green locally three times doesn't mean "not reproducible, add a retry". It
-narrows the cause to something CI has and you don't: **contention** (CI runs 5
-parallel shards on one runner) or **ordering** (a different seed, or state left
-by another example). Reason about which, then look for the mechanism.
+narrows the cause to something CI has and you don't: **contention** (browser,
+Rails and Postgres sharing one runner) or **ordering** (a different seed,
+knapsack handing this shard a different set of files, or state left by another
+example). Reason about which, then look for the mechanism.
 
 For contention, slow the renderer rather than the machine — CPU hogs slow the Ruby
 side too, so a loop of runs takes minutes and the extra load is spent where the race
@@ -324,8 +325,8 @@ papering over a race.
 ## Working on an already-tagged spec
 
 `flaky:` retries only run on CI (`RETRY_FLAKY`, see `spec/rails_helper.rb`).
-`flaky: true` retries twice; `flaky: <n>` overrides the count. So local runs
-don't retry, and a `flaky:`-tagged spec failing once locally is not
+`flaky: true` retries twice; `flaky: <n>` overrides the count. So a plain
+`bundle exec rspec` doesn't retry (`bin/ci` sets `RETRY_FLAKY`), and a `flaky:`-tagged spec failing once locally is not
 automatically "the known flake" — it may be a plain reproducible failure that
 the tag has been hiding on CI.
 

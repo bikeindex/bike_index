@@ -26,7 +26,7 @@ Production JSON reachable with the admin OAuth token:
 
 Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability for the controller — `admin_data` for the two status endpoints, `bug_reports` for the bug reports (a universal ability covers both). Controllers: `app/controllers/api/admin_data_controller.rb`, `app/controllers/admin/bug_reports_controller.rb`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 
-All operations go through the helper — run it from the repo root:
+All operations go through the helper:
 
 ```
 .claude/skills/admin-data-api/scripts/admin_data.rb <command>

@@ -119,4 +119,4 @@ Then run specs for the merged area, **including the browser ones**. The base ren
 
 ## Never force-push
 
-No exceptions, even on a personal branch. If history has already diverged from the remote and you're tempted to force-push, stop — recover with `git reset --soft <origin-branch>` to get the pushed commits back, then add follow-up work as new commits and push normally.
+No exceptions, even on a personal branch. If history has already diverged from the remote and you're tempted to force-push, stop and merge `origin/<branch>` back in — then add follow-up work as new commits and push normally.

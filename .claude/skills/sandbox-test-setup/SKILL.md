@@ -7,8 +7,7 @@ description: >-
   points at its reference; each covers getting `ruby`, `bundle`, `bin/lint`, a
   database and a browser working there. Read it whenever a session runs RSpec,
   `bundle` or `bin/lint`, needs a running dev server, or hits any of these:
-  `env: 'ruby': No such file or directory`, `Could not find 'bundler' (4.0.0.beta2)`,
-  `Bundler::RubyVersionMismatch`, `command not found: rspec`,
+  `env: 'ruby': No such file or directory`, `Could not find 'bundler' (4.0.x)`, `command not found: rspec`,
   `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a `bin/` script,
   `Sprockets::Rails::Helper::AssetNotFound`, `tailwind.css is not present`,
   `LoadError: Could not open library 'vips.so.42'`, or a Playwright
@@ -55,7 +54,7 @@ layout-rendering request specs, not just system specs.)
 
 ## A `:js` spec runs precompiled JS when `public/assets` exists
 
-`public/assets/.sprockets-manifest.json` — left behind by any `bin/ci` or
+`public/assets/.sprockets-manifest.json` — left behind by any `bin/turbo_tests` or
 `bin/rails assets:precompile` run — is what the test environment resolves
 `controllers/**/*.js` through, so a Stimulus controller you just edited is
 served at whatever digest that manifest names. **The spec then exercises the

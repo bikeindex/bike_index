@@ -23,7 +23,7 @@ export PATH="$HOME/.local/share/mise/shims:$PATH"
 ```
 
 The shims directory rather than an `installs/ruby/<version>/bin` path:
-it resolves through `mise.toml`, so it doesn't go stale at the next Ruby
+it resolves through `.tool-versions`, so it doesn't go stale at the next Ruby
 bump, and it covers Node too.
 
 Then run specs the normal way:

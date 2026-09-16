@@ -80,26 +80,26 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atoms/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
-Three of those carry a rule beyond "use the component":
+Four of those carry a rule beyond "use the component":
 
 - **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.
 - **A `UI::Forms::*` field gets its label from `UI::Forms::Group`** — render it inside a `Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, `TextEditor`, and `FileUpload`, whose own `Upload` button is a second label for the same input and audits clean beside `Group`'s (`spec/components/ui/forms/group/component_system_spec.rb`) — never drop `Group` for a bare `<label>` to avoid it. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
 - **Every typeahead / autocomplete goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. `spec/components/ui/forms/combobox` shows how to invoke it.
 - **Every chart goes through `UI::Chart::Component`** — chartkick's `column_chart`/`line_chart`/`pie_chart` helpers are pinned `preload: false` and fetched by the component's `ui--chart` controller, so a bare helper call renders the placeholder and nothing else. Pass `kind:` for a line or pie. A page with no Stimulus (`layout: false`) loads them itself: `app/views/welcome/bike_creation_graph.html.erb`.
 
-`Atoms::*` (`app/components/atoms/`) holds the small value-rendering components — `Atoms::Serial`, `Atoms::Sticker`, `Atoms::ShortId`, `Atoms::Phone`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atoms::Serial::Component`, not `BikeHelper#render_serial_display`.
+`Atoms::*` (`app/components/atoms/`) holds the small value-rendering components — `Atoms::Serial`, `Atoms::Sticker`, `Atoms::ShortId`, `Atoms::Phone`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atoms::Serial::Component`.
 
 ## Form drafts: always `form-persist`
 
-**A form worth not retyping mirrors itself to localStorage through the `form-persist` controller** — never one of your own. It takes a `data-form-persist-key-value` unique per record, since the derived key is the form's action. See `app/components/pages/register/step1/component.rb` and `app/components/pages/register/step2/component.html.erb`.
+**A form worth not retyping mirrors itself to localStorage through the `form-persist` controller** — never one of your own. It takes a `data-form-persist-key-value` when the derived key — the pathname plus the form's action — isn't unique per form. See `app/components/pages/register/step1/component.rb` and `app/components/pages/register/step2/component.html.erb`.
 
 **A controller whose UI hangs off a restored field reconciles in two places** — a `form-persist:restored@window->…` entry in the element's `data-action`, and the same call in its own `connect`. A hand-rolled `window.addEventListener` is the older idiom; don't add more. See `app/components/pages/register/step1/component.html.erb` with `app/javascript/controllers/register/heading_controller.js`.
 
 ## Current-page links: always `UI::ActiveLink`
 
-**Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
+**Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match_paths:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
 
-With `match: :query`, **`query:` is the params the entry stands for, not the ones its `path:` sets** — a filter entry that toggles links *away* from itself to clear the filter, so the two differ. Passing `path:`'s value to both fails silently, and only on the entry that is currently applied.
+**`match_params:` is the params the entry stands for, not the ones its `path:` sets** — a filter entry that toggles links *away* from itself to clear the filter, so the two differ. Passing `path:`'s value to both fails silently, and only on the entry that is currently applied.
 
 ## Showing and hiding elements: always use the collapse helpers
 
@@ -162,11 +162,11 @@ This project uses the ViewComponent gem to render components.
 - **Moving a view into a component turns its locals into methods.** A `<% x = … %>` computed once per template becomes a method run once per *call site* — which is how a single pluck becomes one per table row. Memoize anything that queries as you move it.
 - **Converting a partial — to a component, or from haml to ERB — is a faithful move, not a cleanup.** Carry the markup over verbatim — including comments and commented-out code. Those lines are often a deliberate stash (a link that's temporarily disabled, a snippet someone expects to restore), so dropping them silently loses intent and surprises the reviewer, who expects the diff to read as "same content, new home." The only changes a conversion should introduce are the mechanical ones the move *requires*: `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it, and the like. If you spot something that genuinely looks like dead code worth removing, that's a separate judgment call — raise it with the user or do it in its own commit, don't fold it into the move.
 
-## Turbo is opt-in, and opting a form in has two consequences
+## Turbo is opt-in, and opting a form in has consequences
 
 `application.js` sets `Turbo.session.drive = false`, so links and forms submit natively
-until something carries `data-turbo="true"`. Two things bite the first time a form opts
-in, neither of which shows up as an error — the page just behaves oddly:
+until something carries `data-turbo="true"`. These bite the first time a form opts
+in, none of which shows up as an error — the page just behaves oddly:
 
 - **A controller-rendered component takes its content type from the request.** A Turbo
   submission sends `Accept: text/vnd.turbo-stream.html` first, and `render Foo::Component.new(...)`

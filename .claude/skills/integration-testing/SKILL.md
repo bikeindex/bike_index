@@ -93,7 +93,7 @@ end
 Browser boot is real, but it is rarely what makes a slow file slow. Time the file before
 merging anything: a `wait_for_timeout`/`sleep` sized to cover the slowest case is typically
 most of the runtime, and merging examples doesn't touch it. Consolidating the two
-`ui/button*` specs from 7 examples to 3 saved ~2s of the 44s they took; replacing one 400ms
+`ui/button*` specs saved ~2s of the 44s they took; replacing one 400ms
 settle saved the other ~32s.
 
 Wait on the condition instead, capped so a cancelled or infinite animation can't hang the
@@ -179,18 +179,16 @@ When repeated assertions get noisy, define small DSL-style helpers in the file (
 
 A component system spec (`spec/components/**/*_system_spec.rb`) exists to verify a component renders and behaves correctly in a real browser — and "correctly" includes being accessible. **Every component system spec must call `expect_axe_clean` at least once**, after the component has rendered (and after any state change that swaps in new markup — a new field, an opened menu, an added row). The axe audit catches missing accessible names, bad ARIA, and broken label associations that no CSS-selector assertion would.
 
-Treat an axe failure as a real bug in the component, not noise to silence: fix the markup (add the `aria-label`, associate the `<label>`, correct the `role`) rather than narrowing the audit. The shared helper already disables the rules that don't apply to an isolated component preview (`region`, `landmark-*`, `page-has-heading-one`, etc.), so a remaining violation is almost always genuine.
+Treat an axe failure as a real bug in the component, not noise to silence: fix the markup (add the `aria-label`, associate the `<label>`, correct the `role`) rather than narrowing the audit. The shared helper disables a handful of rules (`spec/support/axe.rb`) — preview artifacts plus colour contrast — so a remaining violation is almost always genuine.
 
 ```ruby
-visit "/rails/view_components/form/text_editor/component/default"
+visit "/rails/view_components/ui/forms/text_editor/component/default"
 
-expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 2, wait: 10)
+expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10)
 expect_axe_clean
 
-click_button "Add feature slug"
-
-expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 3)
-expect_axe_clean # re-audit: the cloned row is new markup
+# ...and again after anything that swaps in new markup - an opened menu, a cloned row
+expect_axe_clean
 ```
 
 ## A preview is not the page

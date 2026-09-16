@@ -76,7 +76,7 @@ and then nothing, with a `message` naming the provider rather than your code.
   *retryable* job — `retry: false` reports every blip, and `ScheduledJob`
   defaults to it.
 - A retry only silences a blip shorter than Sidekiq's first backoff,
-  `15 + rand(30)` seconds. Check the notice timestamps against that.
+  `15 + rand(10)` seconds. Check the notice timestamps against that.
 - Check what a mid-operation failure leaves behind — retrying doesn't help work
   that isn't idempotent. `ActiveStorage::Blob#purge` destroys the row before
   deleting the file, so a failed delete orphans the file for good.

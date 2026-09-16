@@ -61,7 +61,7 @@ A component having no spec yet isn't a reason to put it in the request spec inst
 
 ## `render_in_view_context` takes its subjects as method arguments
 
-A component needing a `form_builder` renders inside `render_in_view_context { form_for … }`, which `instance_exec`s its block in the view context — so `let` values aren't in scope and a bare `organization` raises `NameError`. Wrap it in a `def rendered_component(organization, current_user)` and call that from the `let(:component)`; the block closes over the method's locals. `spec/components/pages/admin/organizations/form/wrapper/component_spec.rb` is the pattern.
+A component needing a `form_builder` renders inside `render_in_view_context { form_for … }`, which `instance_exec`s its block in the view context — so `let` values aren't in scope and a bare `organization` raises `NameError`. Wrap it in a `def rendered_component(organization)` and call that from the `let(:component)`; the block closes over the method's locals. `spec/components/pages/admin/organizations/form/wrapper/component_spec.rb` is the pattern.
 
 ## `display_dev_info?` is false in test, so nothing it gates is verifiable
 

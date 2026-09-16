@@ -10,7 +10,7 @@ description: >-
   one `## Screenshots` comment — finding, creating, editing and verifying it — so other workflows
   (the `pr` skill's screenshot phase) call it to host images and get URLs back, then hand it a
   composed body to post.
-allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read, Write, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_find, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_close
+allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read, Write, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_snapshot, mcp__playwright__browser_find, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_close
 ---
 
 # Upload Image to PR
@@ -91,8 +91,6 @@ Take a snapshot and scroll to the bottom to find the comment area. GitHub render
 ## Step 5: Upload every image in one call
 
 The `<input type="file">` from step 4 is **CSS-hidden** — calling `browser_file_upload` against its ref directly fails with "can only be used when there is related modal state present." First click the visible attach button on the comment form to open the native file chooser, then `browser_file_upload` will satisfy that chooser.
-
-Two things hide that button before you can click it. The comment form starts **collapsed** — click `[aria-label="Add a comment"]` to expand it — and it then opens with the **Preview** tab selected, which leaves the whole `.js-write-bucket` (attach button included) at `display: none`. Click the Write tab first; until you do, every search for the button returns nothing and the file input reads as present-but-hidden, which looks like a changed GitHub UI rather than the wrong tab.
 
 Its text is **"Paste, drop, or click to add files"**. `data-file-attachment-for="fc-new_comment_field"` identifies it, but matches the icon-only "Attach files" toolbar button too — add the size class to disambiguate, or Playwright fails strict mode on two elements:
 

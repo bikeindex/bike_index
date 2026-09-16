@@ -22,11 +22,11 @@ Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just c
 } | sort -u | xargs bin/lint
 ```
 
-`xargs` rather than `bin/lint $(…)`, because zsh doesn't word-split an unquoted command substitution — the interpolated form hands the whole list over as one argument and reports `Not found:` followed by every file. `rtk proxy` for the same reason the greps below need it: the hook rewrites these into a stat whose trailing `Changes:` line then arrives as a filename.
+`xargs` rather than `bin/lint $(…)` — command substitution splits on spaces in filenames. `rtk proxy` for the same reason the greps below need it: the hook rewrites these into a stat whose trailing `Changes:` line then arrives as a filename.
 
 **Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` ran immediately above — so its edits are uncommitted, and a file it touched that the branch hadn't committed yet (a shared controller it reached into, say) is invisible to that range and goes unlinted. The second `git diff HEAD` picks up the working tree. Same union applies to the spec scoping and to both audits below — they run before the commit too, so the bare `origin/main...HEAD` greps as written read none of what `/simplify` and the CLAUDE.md pass just changed.
 
-**Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (`bin/lint:64` falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
+**Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (`bin/lint:90` falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
 
 A clean run over Ruby-only paths prints **nothing at all** — the summary table comes from the ERB formatter, so silence plus exit 0 is the pass, not a swallowed error. `--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped, so a branch touching none of the lintable types exits cleanly rather than looking like a failure. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating. Never revert what the linter wrote — if a too-broad run reformats files outside the branch, those fixes stay in the diff.
 
@@ -106,24 +106,16 @@ Judge each against the **Comments** section of `CLAUDE.md` and reach a verdict o
 `CLAUDE.md`'s Translations section has the rule; this is how to find the branch's violations:
 
 ```bash
-git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
+rtk proxy git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
 ```
 
 Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` and `Pages::Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/pages/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
 
-### Only if you have rtk: check these greps read a diff at all
+### Only if you have rtk: `rtk proxy` anything you grep or count
 
 Skip this section if `rtk` isn't installed — nothing below applies to a plain shell.
 
-rtk's hook rewrites *some* `git diff` invocations into a summarized stat, and `grep` over a stat matches nothing. Both greps above then report clean having read zero lines, which is indistinguishable from passing. Measured on one branch: the cycle-type command was rewritten and found 0 of its 17 hits, while the comment audit's ran through untouched — so which invocations get rewritten isn't predictable from the command, and has to be checked rather than assumed.
-
-Counting is worse than grepping, because the stat isn't empty. It ends with a `Changes:` line, so `git diff --name-only … | wc -l` reports **1** for a diff that touches none of the paths — the migration and cycle-type checks both read as one hit rather than zero, and chasing a migration the branch never added is a slower failure than missing one. Pipe to `wc -l` only through `rtk proxy`, or read the file list itself.
-
-`rtk proxy` bypasses the hook. Run the check both ways when it comes back empty; disagreement means you were grepping a stat:
-
-```bash
-rtk proxy git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
-```
+rtk's hook rewrites every `git diff` and `git log`. A `git diff` without `-U0` comes back summarized, its hunk lines indented, so `grep '^+…'` reads clean having matched nothing; `--name-only` gains a trailing `Changes:` line, so `wc -l` reports **1** for a diff that touches no matching path, and `bin/lint` takes it as a filename. `git log` loses its merge commits either way. Put `rtk proxy` on every diff you grep, count or hand to `xargs`.
 
 Commit everything from this before re-dating migrations.
 
