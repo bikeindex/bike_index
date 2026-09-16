@@ -107,7 +107,7 @@ comm -12 <(git diff --name-only $MB origin/main | sort) <(git diff --name-only $
 
 ## A merged `Gemfile.lock` needs `bundle install` before anything else runs
 
-A dependency bump arriving in the merge leaves the lockfile ahead of what's installed, and every `bin/` script and spec then dies at boot with `Could not find <gem> in locally installed gems (Bundler::GemNotFound)`. That reads like a broken script rather than a missing gem — `bundle install` is the whole fix, and it should leave the lockfile untouched (if it rewrites it, the merge resolved it wrong). A `bin/dev` already running keeps its old gems until it restarts.
+A dependency bump arriving in the merge leaves the lockfile ahead of what's installed, and every `bin/` script and spec then dies at boot with `Could not find <gem> in locally installed gems (Bundler::GemNotFound)`. That reads like a broken script rather than a missing gem — `bundle install` is the whole fix, and it should leave the lockfile untouched (if it rewrites it, the merge resolved it wrong). A `bin/dev` already running keeps its old gems until it restarts — `bin/rails restart` is enough, and leaves its watchers up.
 
 ## Run the linter, not just the specs
 
