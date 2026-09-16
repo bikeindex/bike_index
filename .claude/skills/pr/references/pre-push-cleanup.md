@@ -8,6 +8,8 @@ Invoke the `/simplify` command to review the changed code for reuse, simplificat
 
 Skip it when the diff has no code in it — a docs-, skill- or config-only branch gives it nothing to review, and it fans out subagents to find that out.
 
+**Read `git diff` before committing what it produced.** Its review agents edit the working tree to check their own findings, and one that stops mid-verification leaves the edit behind — so the tree afterwards holds changes you never decided to apply, indistinguishable from the ones you did. One run here dropped a `current_user.reload` that way, while a *different* agent argued in its report that the same line was load-bearing.
+
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
 **That range breaks when earlier branch work was split into its own PRs and merged.** Those commits return through a merge from the base, so `<last-simplify-commit>..HEAD` includes all of them plus everything else the base gained — hundreds of files, none of it yours. Check with `git log --oneline <last-simplify-commit>..HEAD`; if it lists the base's merges, scope to your own commits instead (`git show` each) rather than a range. `--no-merges` doesn't rescue it — it hides the merge commits, not the commits they brought in, so the file list comes back just as wrong.
