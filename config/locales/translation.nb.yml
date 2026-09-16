@@ -2772,6 +2772,12 @@ nb:
       widely_used: Det er den mest brukte og vellykkede sykkelregistreringstjenesten
         i verden med over %{bikes_count} katalogiserte sykler, %{partners_count} fellesskapspartnere
         og titusenvis av daglige søk.
+      kelsey_graywill_bio_html: "<strong>Kelsey Graywill</strong> jobber med grafisk
+        design, illustrasjoner og markedsføringsmateriell for Bike Index. Hun er en
+        utrettelig forkjemper for aktiv mobilitet som aldri har lært å kjøre bil.
+        Hun startet med sykkelforkjempervirksomhet der hun lærte barn å sykle på offentlige
+        barneskoler, og gikk deretter over til kommunikasjon i en sykkelkoalisjon
+        før hun ble med i Bike Index.\n"
     lightspeed:
       a_few_things_to_note: 'Et par ting å merke seg:'
       a_listing_on_bike_index_will_be_created: Når Lightspeed Retail-kontoen din er

@@ -2856,6 +2856,12 @@ es:
       widely_used: Es el servicio de registro de bicicletas más utilizado y exitoso
         del mundo, con más de %{bikes_count} bicicletas catalogadas, %{partners_count}
         socios comunitarios y decenas de miles de búsquedas diarias.
+      kelsey_graywill_bio_html: "<strong>Kelsey Graywill</strong> se encarga del diseño
+        gráfico, la ilustración y el material de marketing para Bike Index. Defensora
+        incansable de la movilidad activa, que nunca ha aprendido a conducir, comenzó
+        su trayectoria en la promoción del ciclismo enseñando a niños a montar en
+        bicicleta en escuelas primarias públicas, para luego dedicarse a la comunicación
+        en una coalición ciclista antes de unirse a Bike Index.\n"
     lightspeed:
       a_few_things_to_note: 'Algunos puntos a tener en cuenta:'
       a_listing_on_bike_index_will_be_created: Una vez que conectes tu cuenta de Lightspeed
