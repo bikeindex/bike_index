@@ -37,6 +37,21 @@ module UI
         ]))
       end
 
+      # The segmented control: one track, the active entry raised out of it
+      def toggle
+        render(UI::ButtonGroup::Component.new(style: :toggle, entries: [
+          ComponentStructs::Shapes.entry("Spreadsheet", active: true, data: {action: "click->something#show"}),
+          ComponentStructs::Shapes.entry("Thumbnail", data: {action: "click->something#show"})
+        ]))
+      end
+
+      def toggle_links
+        render(UI::ButtonGroup::Component.new(style: :toggle, entries: [
+          ComponentStructs::Shapes.entry("Current search", href: "#", active: true),
+          ComponentStructs::Shapes.entry("Last year", href: "#")
+        ]))
+      end
+
       def full_width
         render(UI::ButtonGroup::Component.new(full_width: true, entries: %w[xs s m l xl].map { |size|
           ComponentStructs::Shapes.entry(size.upcase, href: "#", active: size == "m")
