@@ -59,7 +59,7 @@ RSpec.describe Pages::Org::Search::Form::Component, :js, type: :system do
       page.refresh
       expect(page).to have_css(panel, visible: true, wait: 5)
 
-      click_button "Done"
+      click_button "Search settings"
       expect(page).not_to have_css(panel, visible: true, wait: 5)
     end
   end

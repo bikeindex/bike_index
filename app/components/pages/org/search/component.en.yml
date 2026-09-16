@@ -18,7 +18,6 @@ en:
             stat_stolen: Reported stolen
           filters:
             date_range: 'Date range:'
-            done: Done
             search_settings: Search settings
           form:
             doesnt_look_like_serial: >-

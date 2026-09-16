@@ -10,11 +10,10 @@
       <span class="tw:sr-only"><%= translation(".search_settings") %></span>
     <% end %>
 
-    <%= render(UI::Button::Component.new(size: :sm, data: {action: "click->ui--collapse#toggle"})) do %>
+    <span class="tw:text-sm">
       <%= translation(".date_range") %>
       <span class="tw:font-bold"><%= period_label %></span>
-      <%= render(UI::IconChevron::Component.new(direction: :down)) %>
-    <% end %>
+    </span>
 
     <%#
       Rebuilt by org--search on every filter change: this row renders outside the results
@@ -35,14 +34,7 @@
     "
     data-ui--collapse-target="content"
   >
-    <div class="tw:flex tw:items-center tw:gap-2">
-      <%= render(UI::Header::Component.new(text: translation(".search_settings"), tag: :h3, html_class: "uncap tw:mb-0!")) %>
-
-      <div class="tw:ml-auto">
-        <%= render(UI::Button::Component.new(text: translation(".done"), size: :sm,
-        data: {action: "click->ui--collapse#toggle"})) %>
-      </div>
-    </div>
+    <%= render(UI::Header::Component.new(text: translation(".search_settings"), tag: :h3, html_class: "uncap tw:mb-0!")) %>
 
     <% filter_groups.each do |group| %>
       <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
