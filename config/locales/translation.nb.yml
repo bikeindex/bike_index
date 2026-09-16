@@ -6017,6 +6017,9 @@ nb:
               where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du
                 kontakter om en annonse du fant på nettet, inkluderer du en lenke
                 i feltet nedenfor
+              know_who_has_this_bike_type: Vet du hvem som har denne %{bike_type}?
+              what_do_you_need_to_ask: Hva trenger du å spørre om om dette %{bike_type}?
+                Legg inn en lenke i feltet nedenfor hvis det finnes en som kan hjelpe.
             parking_notification_form:
               address_or_intersection: Adresse eller veikryss
               create_parking_notification: Opprett et nytt parkeringsvarsel
