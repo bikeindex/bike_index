@@ -91,6 +91,8 @@ The only way a cassette changes is a spec run that records it:
 
 `git status` after a spec run is the only signal; a run that re-records prints nothing.
 
+**Never write `WebMock.stub_request`. HTTP in a spec is a cassette, with no exceptions.** A stub asserts what you imagined a service returns; a cassette records what it actually returned, which is the same reason cassettes are never hand-edited. The handful of `WebMock.stub_request` calls still in `spec/` are legacy — existing usage is not a precedent to copy.
+
 ## Stubbing ENV
 
 Never partial-mock `ENV` with `allow(ENV).to receive(:[]).and_call_original` — it makes every subsequent `ENV[...]` lookup go through RSpec's message router, which is slow and easy to break by forgetting a `.with(...)` branch.

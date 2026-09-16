@@ -2235,6 +2235,8 @@ nb:
           organization_signed_in: Du er logget inn
         skip_if_signed_in:
           already_signed_in: Du er allerede logget på!
+        turnstile_verified:
+          verify_not_a_robot: Vennligst bekreft at du ikke er en robot
     feedbacks:
       block_the_spam:
         please_sign_in: Logg på for å sende den meldingen
@@ -5030,31 +5032,6 @@ nb:
       you: Du
       your_bikes: Syklene dine
       your_preferences: Dine preferanser
-    org_search_columns:
-      avery_cell: Avery eksporterbar
-      color_cell: Farge
-      created_at_cell: Registrert
-      creation_description_cell: Kilde
-      cycle_type_cell: Bil type
-      impound_id_cell: Beslags-ID
-      impounded_cell: Beslaglagt
-      manufacturer_cell: Produsent
-      model_cell: Modell
-      notes_cell: Notater
-      owner_email_cell: Sendt til
-      owner_name_cell: Eiers navn
-      propulsion_type_cell: Elbil (fremdrift)
-      reg_address_cell: Adresse
-      reg_extra_registration_number_cell: Sekundærnr.
-      reg_organization_affiliation_cell: Tilknytning
-      reg_phone_cell: Telefon
-      reg_student_id_cell: Student ID
-      serial_number_cell: Serienummer
-      status_cell: Status
-      sticker_cell: Klistremerke
-      stolen_cell: Stjålet
-      updated_at_cell: Oppdatert
-      url_cell: URL-adresse
     recovery_display:
       bike: Sykkel
       recovered_date: gjenopprettet %{date}
@@ -5587,8 +5564,13 @@ nb:
           settings:
             address: 'Adresse:'
             all: Alle
+            avery_cell: Avery eksporterbar
             bike: registrering
+            color_cell: Farge
             create_export_of_vehicles: Opprett eksport av søkte %{cycle_type}
+            created_at_cell: Registrert
+            creation_description_cell: Kilde
+            cycle_type_cell: Bil type
             default: misligholde
             filter_impounded_html: bare <strong>beslaglagt</strong>
             filter_no_address_html: bare <strong>ingen</strong> adresse
@@ -5598,11 +5580,30 @@ nb:
             filter_stolen_html: bare stjålet
             filter_with_address_html: bare <strong>med</strong> adresse
             filter_with_stickers_html: bare <strong>med</strong> klistremerker
+            impound_id_cell: Beslags-ID
+            impounded_cell: Beslaglagt
+            manufacturer_cell: Produsent
+            model_cell: Modell
             none: ingen
+            notes_cell: Notater
+            owner_email_cell: Sendt til
+            owner_name_cell: Eiers navn
+            propulsion_type_cell: Elbil (fremdrift)
+            reg_address_cell: Adresse
+            reg_extra_registration_number_cell: Sekundærnr.
+            reg_organization_affiliation_cell: Tilknytning
+            reg_phone_cell: Telefon
+            reg_student_id_cell: Student ID
+            serial_number_cell: Serienummer
             settings: innstillinger
             show_notes_search: vis notatsøk
             status: 'Status:'
+            status_cell: Status
+            sticker_cell: Klistremerke
             stickers: 'Klistremerker:'
+            stolen_cell: Stjålet
+            updated_at_cell: Oppdatert
+            url_cell: URL-adresse
             vehicle: registrering
             visible_columns: Synlige kolonner
           wrapper:

@@ -1782,6 +1782,8 @@ en:
             are unsure as to the reasons for this, please contact us.
         skip_if_signed_in:
           already_signed_in: You're already signed in!
+        turnstile_verified:
+          verify_not_a_robot: Please confirm you're not a robot
     feedbacks:
       block_the_spam:
         please_sign_in: Please sign in to send that message

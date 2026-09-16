@@ -2130,6 +2130,8 @@ nl:
           organization_signed_in: Je bent ingelogd.
         skip_if_signed_in:
           already_signed_in: Je bent al ingelogd!
+        turnstile_verified:
+          verify_not_a_robot: Bevestig alstublieft dat u geen robot bent.
     oauth:
       applications:
         ensure_app_owner!:
@@ -4463,31 +4465,6 @@ nl:
       search_owner_email: Zoek eigenaar e-mail
       submit: Voorleggen
       within: binnen
-    org_search_columns:
-      avery_cell: Avery Exporteerbaar
-      color_cell: Kleur
-      created_at_cell: Geregistreerd
-      creation_description_cell: Bron
-      cycle_type_cell: 'Voertuigtype:'
-      impound_id_cell: Inbeslagname-ID
-      impounded_cell: In beslag genomen bij
-      manufacturer_cell: Fabrikant
-      model_cell: Model
-      notes_cell: Notes
-      owner_email_cell: Verzonden naar
-      owner_name_cell: Eigenaar naam
-      propulsion_type_cell: Elektrisch voertuig (aandrijving)
-      reg_address_cell: Adres
-      reg_extra_registration_number_cell: Secundair#
-      reg_organization_affiliation_cell: Aansluiting
-      reg_phone_cell: Telefoon
-      reg_student_id_cell: Student-ID
-      serial_number_cell: Serie
-      status_cell: Toestand
-      sticker_cell: Sticker
-      stolen_cell: Gestolen
-      updated_at_cell: Bijgewerkt
-      url_cell: URL
     recovery_display:
       bike: Fiets
       recovered_date: hersteld %{date}
@@ -5748,8 +5725,13 @@ nl:
           settings:
             address: 'Adres:'
             all: Alle
+            avery_cell: Avery Exporteerbaar
             bike: Registratie
+            color_cell: Kleur
             create_export_of_vehicles: Export maken van gezochte %{cycle_type}
+            created_at_cell: Geregistreerd
+            creation_description_cell: Bron
+            cycle_type_cell: 'Voertuigtype:'
             default: standaard
             filter_impounded_html: alleen <strong>in beslag genomen</strong>
             filter_no_address_html: alleen <strong>geen</strong> adres
@@ -5759,11 +5741,30 @@ nl:
             filter_stolen_html: alleen gestolen
             filter_with_address_html: alleen <strong>met</strong> adres
             filter_with_stickers_html: alleen <strong>met</strong> stickers
+            impound_id_cell: Inbeslagname-ID
+            impounded_cell: In beslag genomen bij
+            manufacturer_cell: Fabrikant
+            model_cell: Model
             none: geen
+            notes_cell: Notes
+            owner_email_cell: Verzonden naar
+            owner_name_cell: Eigenaar naam
+            propulsion_type_cell: Elektrisch voertuig (aandrijving)
+            reg_address_cell: Adres
+            reg_extra_registration_number_cell: Secundair#
+            reg_organization_affiliation_cell: Aansluiting
+            reg_phone_cell: Telefoon
+            reg_student_id_cell: Student-ID
+            serial_number_cell: Serie
             settings: Instellingen
             show_notes_search: notities weergeven zoeken
             status: 'Toestand:'
+            status_cell: Toestand
+            sticker_cell: Sticker
             stickers: 'stickers:'
+            stolen_cell: Gestolen
+            updated_at_cell: Bijgewerkt
+            url_cell: URL
             vehicle: Registratie
             visible_columns: Zichtbare kolommen
           wrapper:
