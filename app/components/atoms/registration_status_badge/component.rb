@@ -3,8 +3,8 @@
 module Atoms
   module RegistrationStatusBadge
     # A bike's registration status as a badge, with a tooltip explaining what the
-    # status means. The label is Bike's own humanized status, so "with owner"
-    # reads as "registered" here and everywhere else at once.
+    # status means. The label is Bike's own humanized status, so "with owner" reads
+    # as "registered" everywhere at once.
     class Component < ApplicationComponent
       COLORS = {
         with_owner: :success,
@@ -49,9 +49,7 @@ module Atoms
         end
       end
 
-      def status_key
-        @status_key ||= status_humanized.tr(" ", "_").to_sym
-      end
+      def status_key = status_humanized.tr(" ", "_").to_sym
     end
   end
 end

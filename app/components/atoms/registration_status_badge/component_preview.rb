@@ -41,7 +41,7 @@ module Atoms
 
       # The marketplace preview, where the listing is still a draft
       def override_to_for_sale
-        render(Atoms::RegistrationStatusBadge::Component.new(bike: ::Bike.new, override_to_for_sale: true))
+        render_badge(:registered, override_to_for_sale: true)
       end
 
       # @param size select { choices: [xs, sm, md, lg] }
@@ -51,7 +51,7 @@ module Atoms
 
       private
 
-      # Unsaved bikes - every status the badge renders is reachable without a database
+      # Every status is reachable from an unsaved bike, so previews need no records
       def status_bikes
         {
           registered: ::Bike.new,
