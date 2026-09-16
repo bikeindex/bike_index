@@ -699,6 +699,24 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    # Passing the organization is what keeps the allowance from widening what they see
+    # about their own registrations - the phone included, via phoneable_by?
+    context "registered with the passed organization" do
+      let(:bike) { FactoryBot.create(:bike_organized, :impounded, :with_ownership_claimed, creation_organization: contactable_organization, user: owner) }
+      let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false, phone: "7183914410") }
+
+      before { contactable_organization.update_attribute :enabled_feature_slugs, ["unstolen_notifications"] }
+
+      it "is false, and the phone stays hidden" do
+        expect(bike.reload.organized?(contactable_organization)).to be_truthy
+        expect(bike.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+        expect(bike.contactable_without_claiming?(contactable_user, contactable_organization)).to be_falsey
+
+        expect(bike.phoneable_by?(contactable_user)).to be_truthy
+        expect(bike.phoneable_by?(contactable_user, contactable_organization)).to be_falsey
+      end
+    end
+
     # Matching enabled?, so the submit is accepted for the panel a superuser is shown
     # when previewing an organization - they're a member of none
     context "superuser" do

@@ -610,7 +610,7 @@ class Bike < ApplicationRecord
   def contact_owner?(u = nil, organization = nil)
     return false unless u.present?
     return true if status_stolen? && current_stolen_record.present?
-    return true if contactable_without_claiming?(u)
+    return true if contactable_without_claiming?(u, organization)
     return false unless owner&.notification_unstolen
     return u.enabled?("unstolen_notifications") unless organization.present? # Passed organization overrides user setting to speed stuff up
 
@@ -618,11 +618,13 @@ class Bike < ApplicationRecord
   end
 
   # Messaging whoever has the vehicle, rather than opening a claim against it, is for
-  # the organizations we already trust with unstolen registrations
-  def contactable_without_claiming?(passed_user = nil)
-    return false if passed_user.blank?
+  # the organizations we already trust with unstolen registrations - and never for a
+  # registration of the passed organization's own, which they reach the ordinary way
+  def contactable_without_claiming?(u = nil, organization = nil)
+    return false unless u.present?
+    return false if organization.present? && organized?(organization)
 
-    status_abandoned_or_impounded? && passed_user.contact_impounded?
+    status_abandoned_or_impounded? && u.contact_impounded?
   end
 
   def contact_owner_user?(u = nil, organization = nil)
@@ -650,12 +652,12 @@ class Bike < ApplicationRecord
     @phone
   end
 
-  def phoneable_by?(passed_user = nil)
+  def phoneable_by?(passed_user = nil, organization = nil)
     return false unless phone.present?
     return true if passed_user&.superuser?(controller_name: "bikes", action_name: "show")
 
     if current_stolen_record.blank?
-      return false unless contact_owner?(passed_user) # This return false if user isn't present
+      return false unless contact_owner?(passed_user, organization) # This return false if user isn't present
 
       return !passed_user.ambassador? # we aren't giving ambassadors access to phones rn
     end

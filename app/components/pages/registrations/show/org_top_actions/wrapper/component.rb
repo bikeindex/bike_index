@@ -88,13 +88,12 @@ module Pages
                 (staff? && away_from_owner_contactable?)
             end
 
-            # Only a registration that isn't the org's own - theirs carries the owner's
-            # contact already, and on their own impound the update action is what they
-            # act through. The allowance of the org being viewed as, not of the viewer:
-            # a superuser previewing an organization is a member of none
+            # The viewed org's allowance, so previewing shows what that org sees, and the
+            # viewer's, so the submit accepts what this opens. Their own impound belongs
+            # to the update action below, not this one
             def away_from_owner_contactable?
-              @bike.status_abandoned_or_impounded? && !impounded_by_organization? &&
-                !@bike.organized?(@organization) && @organization.contact_impounded?
+              !impounded_by_organization? && @organization.contact_impounded? &&
+                @bike.contactable_without_claiming?(@current_user, @organization)
             end
 
             def show_impound?

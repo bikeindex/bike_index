@@ -61,12 +61,11 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       end
     end
 
-    # Someone else is holding it, so the allowance reaches them instead
     context "by another organization" do
       let(:impound_organization_id) { FactoryBot.create(:organization).id }
 
-      it "renders the message action rather than the impound update" do
-        expect(action_panels).to eq(%w[message notifications_show])
+      it "renders no impound update" do
+        expect(action_panels).to eq(%w[notifications_show])
       end
     end
 
@@ -76,7 +75,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
       let(:impound_record) { ImpoundRecord.new }
 
       it "renders no impound update" do
-        expect(action_panels).to eq(%w[message notifications_show])
+        expect(action_panels).to eq(%w[notifications_show])
       end
     end
   end
