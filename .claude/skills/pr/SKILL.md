@@ -35,6 +35,7 @@ Run the `gh` commands as written. The appendix at the bottom covers the one envi
 
 - Uncommitted changes you made in this session: commit them now. Otherwise the cleanup, the classifier and the diff you describe all silently skip them, and the PR body describes the wrong diff.
 - Uncommitted changes you didn't make: stop and ask. Don't sweep someone else's work into a commit.
+- Uncommitted changes you made that belong on a different branch: leave them, and say so in your summary. `origin/main...HEAD` never sees them; check the merge below doesn't touch those paths (`rtk proxy git diff --name-only HEAD...origin/main`) so a dirty tree can't block it.
 
 ### Determine the base branch
 
@@ -142,7 +143,7 @@ The one that talks itself into existence is the "still accurate" update — a la
 
 Two gates, either of which skips the section outright:
 
-- **Not a frontend diff** — per the classifier above.
+- **Not a frontend diff** — per the classifier above. **Unless a `## Screenshots` comment already exists**: the user asked for those captures, so a commit since the last one that changes what they show stales them even here. Recapture only those pages.
 - **No `gh`, or no browser signed in to GitHub.** Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. The `gh`-less sandbox in the appendix is this case.
 
 Otherwise read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment. Screenshot tooling never blocks the PR — if it fails, report the failure and carry on to **What this run taught you**.
