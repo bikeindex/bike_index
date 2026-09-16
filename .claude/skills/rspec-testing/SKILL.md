@@ -91,13 +91,6 @@ The only way a cassette changes is a spec run that records it:
 
 **Never write `WebMock.stub_request`. HTTP in a spec is a cassette, with no exceptions.** A stub asserts what you imagined a service returns; a cassette records what it actually returned, which is the same reason cassettes are never hand-edited. The handful of `WebMock.stub_request` calls still in `spec/` are legacy — existing usage is not a precedent to copy.
 
-Two things make it tempting, and neither holds:
-
-- **"I have no credentials to record with."** Check before believing it. Cloudflare, Stripe and most third parties publish testing credentials their real API answers — Turnstile's `1x0000000000000000000000000000000AA` returns a real `success: true` from siteverify with no account. One `curl` settles it.
-- **"It's a failure case I can't record."** Then it's a cassette of the failure, or it isn't a spec. VCR is configured with `allow_http_connections_when_no_cassette = false`, so an unrecorded request already raises — that's the repo telling you every request is meant to be recorded.
-
-A raw stub is also actively harmful next to VCR: they share the same hook, so a stub registered by one example outlives it and answers the *other* example's cassette. The spec then passes or fails on file order, which reads as a flake rather than a fixture fighting itself.
-
 ## Stubbing ENV
 
 Never partial-mock `ENV` with `allow(ENV).to receive(:[]).and_call_original` — it makes every subsequent `ENV[...]` lookup go through RSpec's message router, which is slow and easy to break by forgetting a `.with(...)` branch.
