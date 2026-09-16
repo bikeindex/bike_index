@@ -69,4 +69,29 @@ RSpec.describe Pages::Registrations::Show::ContactImpound::Component, type: :com
       expect(page.native.text).to be_blank
     end
   end
+
+  # Each scenario resolves its own viewer, so one it can't find says so rather than
+  # previewing a page the card doesn't render on
+  describe "Wrapper::ContactImpound::ComponentPreview" do
+    let(:preview) { Pages::Registrations::Show::Wrapper::ContactImpound::ComponentPreview.new }
+
+    def notice_text(rendered) = rendered[:component]&.instance_variable_get(:@text)
+
+    it "says so when no organization is trusted to message without claiming" do
+      expect(bike.reload.status_found?).to be_truthy
+      expect(organization_role.organization.update(is_paid: false)).to be_truthy
+
+      expect(notice_text(preview.found)).to match("trusted to message without claiming")
+    end
+
+    context "a trusted organization has a member" do
+      def preview_viewer(rendered) = rendered.dig(:locals, :component).instance_variable_get(:@current_user)
+
+      it "previews the found registration as that member" do
+        expect(bike.reload.status_found?).to be_truthy
+
+        expect(preview_viewer(preview.found)).to eq current_user
+      end
+    end
+  end
 end
