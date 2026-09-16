@@ -8,11 +8,11 @@ The flow: decide what to capture → capture the branch → upload → capture t
 
 **This phase needs `gh` *and* a browser signed in to GitHub. Missing either, skip the whole thing** — don't capture, don't upload, don't post anything in its place. Say in your summary that screenshots need a machine with both, and hand back the PR URL.
 
-**Check the browser session here, before step 1, not when you reach the upload.** The MCP browser's github.com cookies come from a storage-state file that expires on its own schedule, so a run that captured fine last week signs out mid-workflow — and finding out at step 3 wastes both capture loops and a base-branch checkout. One `browser_navigate` to the PR plus `browser_snapshot` settles it: a "Sign in" link in the header means signed out. Re-login can't be driven headlessly (`github-pr-images`' `references/headless-relogin.md` has the user-run helper), so this is a stop-and-ask, and it costs nothing to ask before capturing rather than after.
+**Check the browser session here, before step 1, not when you reach the upload.** The MCP browser's github.com cookies come from a storage-state file that expires on its own schedule, so a run that captured fine last week signs out mid-workflow — and finding out at step 3 wastes both capture loops and a base-branch checkout. One `browser_navigate` to the PR plus `browser_snapshot` settles it: a "Sign in" link in the header means signed out. Re-login can't be driven headlessly (`github-pr-images`' `references/headless-relogin.md` has the user-run helper), so this is a stop-and-ask.
 
 The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an MCP browser that rejects the egress proxy's CA, so github.com won't even load (`ERR_CERT_AUTHORITY_INVALID`) and a logged-in session can't be established headlessly. Capture alone would work there, which is the trap — PNGs nothing can host, and no way to post them.
 
-**Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — reads as a fine idea in the moment and leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment. That's how #4126 ended up with three comments telling one story. If the evidence is worth having, put it in your summary to the user and let them decide where it goes.
+**Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment; that's how #4126 ended up with three comments telling one story. If it's worth having, put it in your summary and let the user decide where it goes.
 
 ## Preflight: a CSS diff needs a fresh tailwind build
 
@@ -27,7 +27,7 @@ You're only here because the diff is frontend (SKILL.md's classifier gates on th
 - New PR → capture every affected page.
 - Existing PR → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
 
-**A page the diff no longer touches loses its block rather than gaining a recapture.** When work lands on the base separately — the branch's own commits merged as another PR, say — `git diff origin/main -- <path>` for those files comes back empty, and their before/after now documents a change this PR doesn't make, with a "main 👆" shot taken before the base moved. Drop the `### <url-path>` block; don't recapture it to show two identical images.
+**A page the diff no longer touches loses its block rather than gaining a recapture.** When its work lands on the base separately, `git diff origin/main -- <path>` comes back empty and the before/after documents a change this PR doesn't make. Drop the `### <url-path>` block; don't recapture it to show two identical images.
 
 Reading that comment is `github-pr-images`'s job, since it owns it — ask it for the current body before deciding. This costs no browser: it's a `gh api` read.
 
@@ -39,7 +39,7 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-**Confirm the page renders what changed, before capturing it.** A page that looks like the obvious home for a component often isn't — `/admin/organizations/:id/edit` has seven tables and none of them is `UI::Table`, and its address fields aren't `UI::Forms::AddressGroup` either. One `browser_evaluate` counting the component's own marker class settles it; a shot that turns out not to contain the change is a whole capture round wasted, base branch included. A component with a preview is the reliable fallback.
+**Confirm the page renders what changed, before capturing it.** A page that looks like the obvious home for a component often isn't, and a shot that turns out not to contain the change wastes a whole capture round, base branch included. One `browser_evaluate` counting the component's own marker class settles it; a component with a preview is the reliable fallback.
 
 ## 2. Capture branch screenshots
 
@@ -49,19 +49,17 @@ If it returns failures it couldn't diagnose, report them and leave the PR withou
 
 ## 3. Host the branch screenshots and get inline URLs
 
-Invoke `github-pr-images` with the PNGs from step 2 and **no body** — that's its host-only call, and it returns the `user-attachments/assets/` URLs without posting anything. This runs before step 4, not after it: the upload is the first thing to touch GitHub, so an expired browser session surfaces here, having cost one capture round rather than two and a base checkout. The comment gets composed here in step 5 and posted by that same skill in one go at the end, so nothing lands on the PR until the before/after is complete. GitHub mints persistent URLs that render inline in the browser (release assets would force a download on click).
+Invoke `github-pr-images` with the PNGs from step 2 and **no body** — that's its host-only call, and it returns the `user-attachments/assets/` URLs without posting anything. This runs before step 4: the upload is the first thing to touch GitHub, so an expired browser session surfaces having cost one capture round rather than two and a base checkout. Step 5 composes the comment and that same skill posts it in one go, so nothing lands on the PR until the before/after is complete.
 
 Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
 ## 4. Capture and upload the same URLs on the base branch
 
-Capture the **base-branch** version (the base from SKILL.md's **Orient**) of every screenshot from step 2 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you got this far, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
+Capture the **base-branch** version (the base from SKILL.md's **Orient**) of every screenshot from step 2 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured.
 
 Skip per-page only when the URL didn't exist on the base (a brand-new route or page added in this PR) — there's nothing to compare to.
 
 Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless **Orient** chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-pr-images` for those PNGs, host-only exactly as in step 3.
-
-`git rev-list --count HEAD..origin/main` first: **Prepare the branch**'s merge normally leaves it 0, but on a long run the remote moves after that merge, and the "before" then shows base commits the branch never saw.
 
 Two things the checkout itself does, either side of it:
 
@@ -106,7 +104,7 @@ Brand-new page (URL didn't exist on the base — see step 4), no comparison row:
 
 Rules:
 - Each page gets a `### <url-path>` subheading (the literal path, e.g. `/`, `/bikes/42`, `/admin/strava_activities`) followed by its own table.
-- **Every** entry uses this table, with **no exceptions** — including component previews. A preview is a responsive page with a real URL, so it gets the same desktop+mobile before/after cells as any page. A width-invariant component (small icon, fixed-size control) just yields matching desktop and mobile shots — that's expected; keep both columns, never collapse to one image or special-case previews.
+- **Every** entry uses this table, with **no exceptions** — including component previews, which are responsive pages with real URLs. A width-invariant component just yields matching desktop and mobile shots; keep both columns, never collapse to one image.
 - **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 

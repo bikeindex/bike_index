@@ -209,11 +209,6 @@ A non-zero `naturalWidth` on every image is the pass.
 
 Then `browser_close`. **Posting is always terminal** — nothing follows it, in this skill or in any caller — so a post always closes, and a host-only call (step 8) always leaves the browser for whoever called it. That pair needs no signal from the caller and leaves no session running: the profile lock would otherwise stay held and the next `browser_navigate` anywhere fails with "Browser is already in use". `frontend-screenshots` hands you an open browser for the same reason rather than paying the startup twice.
 
-## Tips
-
-- **Image sizing**: Control display size via HTML `<img>` tags: `<img width="800" alt="description" src="..." />`
-- **Multiple images**: one `browser_file_upload` call with every path; extract all URLs before clearing
-
 ## Troubleshooting
 
 | Issue | Solution |
@@ -222,14 +217,11 @@ Then `browser_close`. **Posting is always terminal** — nothing follows it, in 
 | File path with special characters (e.g., Unicode narrow spaces from CleanShot) | Copy file into the project's `tmp/` with a simple name: `cp /path/CleanShot*keyword*.png tmp/screenshot.png` |
 | File upload fails | Ensure the file path is absolute |
 | Textarea doesn't contain URLs yet | Poll it (step 5) until the count matches the files uploaded, rather than waiting a fixed interval |
-| Attach button not in the snapshot | The form is collapsed or on the Preview tab — expand `[aria-label="Add a comment"]`, then click Write |
+| Attach button not in the snapshot | Query it directly — `button.Button--small[data-file-attachment-for="fc-new_comment_field"]`; the bare attribute selector matches two elements and fails strict mode |
 | Textarea selector not found | GitHub UI changes occasionally — use the multi-selector JS in Step 4 to find the current element |
 | Playwright MCP not registered | Approve the `playwright` server from the project `.mcp.json` (Claude Code prompts on project entry), then restart the session or `/mcp` → reconnect |
 | PR not found / 404 | Private repos return 404 for unauthenticated users — check login state |
 
 ## Notes
 
-- GitHub `user-attachments/assets/` URLs are **persistent** — images remain accessible even without submitting the comment
-- Editing the description directly in the browser UI is fragile due to GitHub UI structure changes — updating via `gh pr edit` is strongly preferred
-- Every image goes up in a single `browser_file_upload` call; extract all the URLs before clearing
-- Playwright MCP preserves cookies/login state across calls within a session; across sessions the login comes from the shared `--storage-state` file (`mcp-auth.json`), loaded at startup
+- GitHub `user-attachments/assets/` URLs are **persistent** — images stay reachable without ever submitting the comment

@@ -8,11 +8,11 @@ Invoke the `/simplify` command to review the changed code for reuse, simplificat
 
 Skip it when the diff has no code in it — a docs- or skill-only branch gives it nothing to review, and it fans out subagents to find that out. Config by file extension isn't the test: a `.github/workflows/*.yml` with a `run:` block is a shell script, and reviewing one is how the nightly-reseed branch found its only cleanup.
 
-**Read `git diff` before committing what it produced.** Its review agents edit the working tree to check their own findings, and one that stops mid-verification leaves the edit behind — so the tree afterwards holds changes you never decided to apply, indistinguishable from the ones you did. One run here dropped a `current_user.reload` that way, while a *different* agent argued in its report that the same line was load-bearing.
+**Read `git diff` before committing what it produced.** Its review agents edit the working tree to check their own findings, and one that stops mid-verification leaves the edit behind — indistinguishable from the changes you decided to apply.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
-**That range breaks when earlier branch work was split into its own PRs and merged.** Those commits return through a merge from the base, so `<last-simplify-commit>..HEAD` includes all of them plus everything else the base gained — hundreds of files, none of it yours. Check with `git log --oneline <last-simplify-commit>..HEAD`; if it lists the base's merges, scope to your own commits instead (`git show` each) rather than a range. `--no-merges` doesn't rescue it — it hides the merge commits, not the commits they brought in, so the file list comes back just as wrong.
+**That range breaks when earlier branch work was split into its own PRs and merged.** Those commits return through a merge from the base, so `<last-simplify-commit>..HEAD` includes all of them plus everything else the base gained — hundreds of files, none of it yours. Check `git log --oneline <last-simplify-commit>..HEAD`; if it lists the base's merges, scope to your own commits (`git show` each) instead. `--no-merges` doesn't rescue it — it hides the merge commits, not the commits they brought in.
 
 Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just changed). Always `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo:
 
@@ -24,11 +24,11 @@ Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just c
 
 `xargs` rather than `bin/lint $(…)` — command substitution splits on spaces in filenames. `rtk proxy` for the same reason the greps below need it: the hook rewrites these into a stat whose trailing `Changes:` line then arrives as a filename.
 
-**Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` ran immediately above — so its edits are uncommitted, and a file it touched that the branch hadn't committed yet (a shared controller it reached into, say) is invisible to that range and goes unlinted. The second `git diff HEAD` picks up the working tree. Same union applies to the spec scoping and to both audits below — they run before the commit too, so the bare `origin/main...HEAD` greps as written read none of what `/simplify` and the CLAUDE.md pass just changed.
+**Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` just edited the tree — a file it touched that the branch hadn't committed yet is invisible to that range and goes unlinted. Same union applies to the spec scoping and the audits below, which also run before the commit.
 
 **Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (`bin/lint:90` falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
 
-A clean run over Ruby-only paths prints **nothing at all** — the summary table comes from the ERB formatter, so silence plus exit 0 is the pass, not a swallowed error. `--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped, so a branch touching none of the lintable types exits cleanly rather than looking like a failure. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating. Never revert what the linter wrote — if a too-broad run reformats files outside the branch, those fixes stay in the diff.
+A clean run over Ruby-only paths prints **nothing at all** — the summary table comes from the ERB formatter, so silence plus exit 0 is the pass. `--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating.
 
 Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
 
@@ -38,7 +38,7 @@ Then review the changed files against `CLAUDE.md` (root and any nested ones in t
 
 **`bin/update_component_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into, so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of every component that renders it — `SharedBlocks::Navbar::Wrapper` and `SharedBlocks::Footer` both, for one edit — and regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
 
-It hashes the component's *files*, not its output, and globs the whole directory — so a comment that renders nothing bumps the digest just the same, whether you put it in the template or in `component.rb`. A `<%# … %>` explaining one line can therefore flush every cached row of every organization. Somewhere outside the component directory (`.herb.yml`, the PR body) is the free place to say it.
+It hashes the component's *files*, not its output, and globs the whole directory — so a comment that renders nothing bumps the digest just the same, whether you put it in the template or in `component.rb`. Somewhere outside the component directory (`.herb.yml`, the PR body) is the free place to say it.
 
 ### The spec audit
 
@@ -66,10 +66,7 @@ This applies to the branch's specs, not the suite's. Don't delete pre-existing e
 
 When the branch adds or edits `CLAUDE.md`/`AGENTS.md` or anything under `.claude/skills/`, check every
 claim it makes against the code before pushing — a doc asserting *why* something is done is as capable of
-being wrong as a comment, and nothing runs it. Two on one branch here: "a `<td>` ignores the height the
-animation drives" (it doesn't — measured 346px → 0), and "the homepage can still answer" a pending
-migration (`migration_error = :page_load` raises for every request; the real cause was the file watcher's
-race). Both read as obvious. Also check what the edit *moved* — a rule relocated into a skill is a rule
+being wrong as a comment, and nothing runs it. The wrong ones read as obvious. Also check what the edit *moved* — a rule relocated into a skill is a rule
 that only loads when that skill triggers.
 
 ### The churn audit
@@ -84,7 +81,7 @@ Smallest files first — one at `+1 -1` is either the point of the branch or pur
 
 **What `bin/lint` wrote is not churn** and stays, including in files the branch otherwise didn't touch — see the rule at the top of `CLAUDE.md`.
 
-Sweeping mechanical edits are where this collects, since the script that made them had one shape and the file had another. One branch here reverted 17 files whose only change was a moved keyword argument.
+Sweeping mechanical edits are where this collects.
 
 ### The comment audit
 
@@ -95,7 +92,7 @@ git diff origin/main...HEAD -U0 -- '*.rb' '*.erb' '*.haml' '*.js' '*.ts' '*.coff
   grep -E '^(\+\+\+ |\+.*(#|//|<%#|-#|/\*))'
 ```
 
-The `+++ b/…` lines keep each hit attached to its file; the code-path filter keeps markdown headings out. It catches trailing comments too, and over-matches on `#{}` interpolation — that's fine, the list is candidates to judge, not verdicts.
+The `+++ b/…` lines keep each hit attached to its file; the code-path filter keeps markdown headings out. It over-matches on `#{}` interpolation and catches trailing comments — the list is candidates to judge, not verdicts.
 
 **An empty result on a non-empty diff means the pathspec missed the branch, not that the branch is clean** — the same silent-pass the rtk section below describes, from a different cause. `bin/kamal_review` (no extension) and `.github/workflows/*.yml` are why `bin/*` and `*.yml` are on the list; add whatever else the branch touches and re-run rather than reading the blank as a verdict.
 

@@ -54,9 +54,7 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to CLAUDE.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required churn, spec and comment audits, and the cycle-type translation check. Commit everything it produces before re-dating migrations.
-
-All three audits are required every run, not just when the diff looks messy. The churn one asks what each hunk changes about what the code does, and reverts the ones with no answer; the spec one asks of every example the branch adds *what bug does this fail on?*, and deletes the ones that only restate the code.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, its four audits, and the cycle-type translation check. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
 
 ### Freshen stale migration timestamps
 
@@ -180,6 +178,6 @@ Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI;
 | Publish | `gh pr create --draft` | `create_pull_request`, `draft: true`, `head: "<branch>"` |
 | Publish | `gh pr edit <n> --body-file` | `update_pull_request` |
 
-Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` reports correctly) — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
+Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
-**There is no Screenshots row because the section doesn't run here.** No `gh` means no browser session either, so nothing can be hosted or posted; skip it and say so, rather than reaching for `add_issue_comment` to post something in its place. PR #4126 is what that looks like when you don't: three comments telling one story, none of them replaceable by the next run.
+**There is no Screenshots row because the section doesn't run here.** No `gh` means no browser session either, so nothing can be hosted or posted; skip it and say so, rather than reaching for `add_issue_comment` to post something in its place.

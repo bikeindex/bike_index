@@ -26,13 +26,6 @@ matches; the other two won't apply and are the bulk of the material.
 | `/home/vercel-sandbox/workspace` (Amazon Linux 2023) | Conductor cloud sandbox | `references/conductor-cloud.md` |
 | `/home/user/bike_index` | Claude Code web sandbox | `references/web-sandbox.md` |
 
-What separates them is how much is missing, and that's worth knowing before you
-start debugging. On macOS the Ruby is installed and only the PATH is wrong. In the
-Conductor cloud sandbox nothing is preinstalled but egress is open, so mise builds
-the pinned Ruby in a couple of minutes. In the web sandbox egress is filtered too,
-so Ruby comes from a GitHub source build and several tools have to be pointed at
-what the image already ships.
-
 Two things hold in all three.
 
 ## Tailwind build (every environment)

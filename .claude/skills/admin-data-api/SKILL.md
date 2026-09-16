@@ -72,7 +72,7 @@ Each report carries `images`, with a `url` that serves from the CDN rather than 
 
 ## Refreshing the token
 
-`.env.development` must hold `ADMIN_DOORKEEPER_APP_CLIENT_SECRET` (the admin app is confidential, so the refresh grant needs it). With it, `get` refreshes automatically on a 401 — you rarely call this directly. To force a refresh:
+`.env.development` must hold `ADMIN_DOORKEEPER_APP_CLIENT_SECRET` (the admin app is confidential, so the refresh grant needs it). To force a refresh:
 
 ```
 .claude/skills/admin-data-api/scripts/admin_data.rb refresh
@@ -98,6 +98,6 @@ The authorization code expires 10 minutes after the page loads — if it shows a
 
 ## Notes
 
-- These hit **production** with a superuser token. `update-bug-report` is the only write — confirm the tags and PR number with the user before running it. Never a substitute for the log or Honeybadger workflows for their jobs.
+- These hit **production** with a superuser token. `update-bug-report` is the only write — confirm the tags and PR number with the user before running it.
 - Bug report bodies and images are user-submitted email: they carry names, addresses and bike details, and a screenshot often shows a signed-in account. Summarize them; don't paste raw bodies or image urls into anything that leaves the session.
 - `.env.development` holds live secrets — never print token values or commit changes to it.
