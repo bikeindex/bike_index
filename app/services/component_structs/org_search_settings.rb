@@ -5,12 +5,10 @@ module ComponentStructs
   # search. Everything around the panel Pages::Org::Search::Settings renders reads the same
   # values, so it's built once and passed whole.
   #
-  # Column labels live in shared.org_search_columns because the table headers read the same
-  # ones; the filter descriptions stay in the settings component's scope, which its template
-  # also reads them from.
+  # Its copy lives in that panel's sidecar, which the panel's own template reads too, and
+  # which MARKUP_DIGEST covers — the checkboxes render inside the registration show cache.
   class OrgSearchSettings
-    COLUMN_SCOPE = "shared.org_search_columns"
-    PANEL_SCOPE = %i[components pages org search settings].freeze
+    TRANSLATION_SCOPE = %i[components pages org search settings].freeze
 
     COLUMN_RENAME_KEYS = %i[
       created_at_cell
@@ -85,7 +83,7 @@ module ComponentStructs
 
     def column_renames
       @column_renames ||= COLUMN_RENAME_KEYS.to_h { |key|
-        name = translation(key, COLUMN_SCOPE)
+        name = translation(key)
         name = "#{@organization.short_name} #{name}" if ORG_PREFIXED_COLUMNS.include?(key)
         [key, name]
       }
@@ -124,8 +122,8 @@ module ComponentStructs
 
     private
 
-    def translation(key, scope = PANEL_SCOPE)
-      ActiveSupport::HtmlSafeTranslation.translate(key, scope:)
+    def translation(key)
+      ActiveSupport::HtmlSafeTranslation.translate(key, scope: TRANSLATION_SCOPE)
     end
   end
 end

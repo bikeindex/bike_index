@@ -5082,31 +5082,6 @@ en:
       search_registrations: Search Registrations
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_message: Stolen Message
-    org_search_columns:
-      avery_cell: Avery Exportable
-      color_cell: Color
-      created_at_cell: Registered
-      creation_description_cell: Source
-      cycle_type_cell: Vehicle type
-      impound_id_cell: Impound ID
-      impounded_cell: Impounded
-      manufacturer_cell: Manufacturer
-      model_cell: Model
-      notes_cell: Registration Notes
-      owner_email_cell: Sent to
-      owner_name_cell: Owner name
-      propulsion_type_cell: E-vehicle (propulsion)
-      reg_address_cell: Address
-      reg_extra_registration_number_cell: Secondary#
-      reg_organization_affiliation_cell: Affiliation
-      reg_phone_cell: Phone
-      reg_student_id_cell: Student ID
-      serial_number_cell: Serial
-      status_cell: Status
-      sticker_cell: Sticker
-      stolen_cell: Stolen
-      updated_at_cell: Updated
-      url_cell: URL
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}
