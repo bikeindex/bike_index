@@ -2289,6 +2289,8 @@ es:
           organization_signed_in: Has iniciado sesión
         skip_if_signed_in:
           already_signed_in: "¡Ya has iniciado sesión!"
+        turnstile_verified:
+          verify_not_a_robot: Por favor, confirma que no eres un robot.
     feedbacks:
       block_the_spam:
         please_sign_in: Por favor, inicia sesión para enviar ese mensaje.
