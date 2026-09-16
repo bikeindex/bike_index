@@ -155,10 +155,6 @@ RSpec.describe "Bike search", :js, type: :system do
     # snapshots, invoked on turbo:load (which does fire on these restorations).
     visit_search_via_nav
     expect(page).to have_css(".bike-box-item", wait: 10)
-    # Drop the entries made getting here -- the homepage, the unfiltered search, and the
-    # about:blank the example started on -- so go_back/go_forward below walk only the
-    # searches. It used to flake on the leftover stolenness=stolen one.
-    reset_browser_history
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
     # Each search re-fetches the kind counts (turbo:submit-end -> setKindCounts):
