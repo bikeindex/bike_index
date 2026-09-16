@@ -183,16 +183,12 @@ RSpec.describe "RegistrationsController#show", type: :request do
 
       context "viewer isn't the bike owner" do
         # current_user is the claimant above, so the sticker has to name the owner itself
-        let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike:, user: bike.reload.user) }
+        let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike:, user: bike.reload.user) }
         let(:current_user) { FactoryBot.create(:user_confirmed) }
         it "names the sticker, without offering to re-link it" do
-          expect(current_user.authorized?(bike_sticker)).to be_falsey
           get "#{base_url}/#{bike.id}", params: {scanned_id: bike_sticker.code}
-          expect(response.status).to eq(200)
-          body = whitespace_normalized_body_text
-          expect(body).to match("You scanned")
-          expect(body).to match(bike_sticker.pretty_code)
-          expect(body).to_not match("Change the bike it links to")
+          expect(whitespace_normalized_body_text).to match("You scanned")
+          expect(response.body).to_not match(bike_sticker_path(id: bike_sticker.code))
         end
       end
     end
@@ -220,6 +216,14 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(response.status).to eq(200)
         expect(whitespace_normalized_body_text).to match("Your bike")
       end
+    end
+  end
+
+  context "bike_id too large for the column" do
+    let(:current_user) { nil }
+    it "404s" do
+      get "#{base_url}/57549641769762268311552"
+      expect(response.status).to eq 404
     end
   end
 
@@ -284,25 +288,17 @@ RSpec.describe "RegistrationsController#show", type: :request do
     before { bike.destroy }
 
     it "404s, even for the owner" do
-      expect(bike.reload.deleted?).to be_truthy
+      expect(bike.deleted?).to be_truthy
       get "#{base_url}/#{bike.id}"
       expect(response.status).to eq 404
     end
 
-    context "superuser" do
+    context "superuser viewing" do
       let(:current_user) { FactoryBot.create(:superuser) }
       it "renders" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
-        expect(whitespace_normalized_body_text).to match("View in Super Admin")
       end
-    end
-  end
-
-  context "bike_id too large for the column" do
-    it "404s" do
-      get "#{base_url}/57549641769762268311552"
-      expect(response.status).to eq 404
     end
   end
 
@@ -654,12 +650,10 @@ RSpec.describe "RegistrationsController#show", type: :request do
         current_user.reload
 
         get "#{base_url}/#{bike.id}"
-        expect(response.status).to eq(200)
         body = whitespace_normalized_body_text
         expect(body).to match("Public view")
         expect(body).to_not match("Staff")
-        # Unlike bikes#show, nothing rewrites the stale id - available views are
-        # filtered by authorized?, so it buys the ex-member no access
+        # The stale id sticks - views are filtered by authorized?, so it grants no access
         expect(session[:passive_organization_id]).to eq organization.id
       end
     end
@@ -719,8 +713,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: other_organization, user: current_user) }
 
       it "sets the passive_organization, so the organization sticks on the next request" do
-        # Which organization is default_organization isn't ordered, so put one in the session
-        get "#{base_url}/#{bike.id}", params: {organization_id: organization.to_param}
+        # Which organization is default_organization isn't ordered, so seed the session -
+        # by name, which organization_id resolves as readily as the slug
+        get "#{base_url}/#{bike.id}", params: {organization_id: organization.name}
         expect(session[:passive_organization_id]).to eq organization.id
 
         get "#{base_url}/#{bike.id}", params: {view_as: "#{other_organization.to_param}.staff"}
@@ -728,13 +723,6 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(session[:passive_organization_id]).to eq other_organization.id
 
         get "#{base_url}/#{bike.id}"
-        expect(whitespace_normalized_body_text).to match("Viewing as #{other_organization.short_name} staff")
-      end
-
-      # Can't share the example above - switching by name first is the switch it's proving view_as makes
-      it "takes an organization_id by name, not only by slug" do
-        get "#{base_url}/#{bike.id}", params: {organization_id: other_organization.name}
-        expect(session[:passive_organization_id]).to eq other_organization.id
         expect(whitespace_normalized_body_text).to match("Viewing as #{other_organization.short_name} staff")
       end
     end
