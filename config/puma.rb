@@ -39,6 +39,7 @@ directory ENV.fetch("STACK_PATH", ".")
 # prune_bundler re-execs Puma, so the bind has to come from this file. Cloud 66's Procfile `-b` still wins.
 port ENV.fetch("PORT", 3000)
 
-# bin/setup, bin/update and dev:lograge already touch tmp/restart.txt expecting a reboot, and
-# nothing watched it. Dev only: elsewhere a writable path that restarts the web process is a liability.
-plugin :tmp_restart if ENV.fetch("RAILS_ENV", "development") == "development"
+# bin/setup, bin/update and dev:lograge already touch tmp/restart.txt; nothing watched it.
+# Dev only — tmp_restart re-execs, which would undo the phased restart .cloud66/manifest.yml
+# relies on. RACK_ENV too: production's Procfile passes it, and puma exports its own `-e` late.
+plugin :tmp_restart if (ENV["RAILS_ENV"] || ENV["RACK_ENV"] || "development") == "development"
