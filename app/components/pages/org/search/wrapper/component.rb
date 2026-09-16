@@ -88,9 +88,11 @@ module Pages
             new_organization_registration_path(@organization.to_param)
           end
 
+          # TODO: the thumbnail chip is inert until the view behind it exists - see the
+          # Bike Thumbnails design doc
           def result_view_entries
             [ComponentStructs::Shapes.entry(translation(".view_spreadsheet"), active: true),
-              ComponentStructs::Shapes.entry(translation(".view_thumbnail"), disabled: true)]
+              ComponentStructs::Shapes.entry(translation(".view_thumbnail"))]
           end
 
           def show_pagination?
