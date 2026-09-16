@@ -12,8 +12,7 @@ module UI
 
       CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
 
-      # The track and segment sizes are Kelsey's mock (kelsey_redesign/new-org-search),
-      # which doesn't land on the spacing or text scale
+      # Track and segment sizes are kelsey_redesign/new-org-search's, not the type scale
       TRACK_CLASSES = "tw:inline-flex tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
         "tw:bg-gray-100 tw:p-[3px] tw:dark:border-gray-700 tw:dark:bg-gray-800"
 
