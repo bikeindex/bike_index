@@ -37,7 +37,7 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
     it "renders the entries as segments of a single track" do
       expect(component).to have_css("div.tw\\:bg-gray-100")
       expect(component).to have_no_css("div.tw\\:flex-wrap")
-      expect(component).to have_css("a.tw\\:text-2xs", count: 2)
+      expect(component).to have_css("a.tw\\:font-extrabold", count: 2)
     end
   end
 

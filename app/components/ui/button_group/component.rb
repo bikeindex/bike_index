@@ -12,13 +12,15 @@ module UI
 
       CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
 
-      TRACK_CLASSES = "tw:inline-flex tw:gap-0.5 tw:rounded-lg tw:border tw:border-gray-200 " \
-        "tw:bg-gray-100 tw:p-0.5 tw:dark:border-gray-700 tw:dark:bg-gray-800"
+      # The track and segment sizes are Kelsey's mock (kelsey_redesign/new-org-search),
+      # which doesn't land on the spacing or text scale
+      TRACK_CLASSES = "tw:inline-flex tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
+        "tw:bg-gray-100 tw:p-[3px] tw:dark:border-gray-700 tw:dark:bg-gray-800"
 
       # Only the segment's own look — focus, disabled and the hover guard come from UI::Button
       SEGMENT_CLASSES = [
-        "tw:inline-flex tw:items-center tw:cursor-pointer tw:transition-colors tw:rounded-md",
-        "tw:px-3 tw:py-1 tw:text-2xs tw:font-extrabold tw:whitespace-nowrap",
+        "tw:inline-flex tw:items-center tw:cursor-pointer tw:transition-colors tw:rounded-lg",
+        "tw:px-3 tw:py-[5px] tw:text-[11.5px] tw:font-extrabold tw:whitespace-nowrap",
         "tw:no-underline tw:hover:no-underline tw:text-gray-400",
         "tw:not-disabled:not-aria-disabled:hover:text-gray-900",
         "tw:focus:ring-purple-500/40",
