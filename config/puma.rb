@@ -39,7 +39,6 @@ directory ENV.fetch("STACK_PATH", ".")
 # prune_bundler re-execs Puma, so the bind has to come from this file. Cloud 66's Procfile `-b` still wins.
 port ENV.fetch("PORT", 3000)
 
-# `bin/rails restart` reboots the app without bouncing bin/dev's asset watchers, for what
-# Zeitwerk doesn't reload — a renamed initializer, a dropped importmap pin. bin/setup,
-# bin/update and dev:lograge already call it; without this plugin nothing watches the file.
-plugin :tmp_restart
+# bin/setup, bin/update and dev:lograge already touch tmp/restart.txt expecting a reboot, and
+# nothing watched it. Dev only: elsewhere a writable path that restarts the web process is a liability.
+plugin :tmp_restart if ENV.fetch("RAILS_ENV", "development") == "development"
