@@ -4,15 +4,19 @@
 # browser behavior Capybara doesn't abstract across drivers, which is implemented for the
 # Playwright driver via its raw page (see spec/support/capybara.rb).
 module IntegrationSpecHelpers
-  # Clear the back/forward stack so go_back/go_forward operate on this example's
-  # own short stack -- Capybara never resets history between examples, so it
-  # accumulates across the suite.
+  # Prune the back/forward stack to the current entry, so go_back/go_forward operate on
+  # entries this example made -- including the about:blank every example starts on, which
+  # a traversal can otherwise land on (Capybara reports nil for an `about:` current_path).
   def reset_browser_history
     page.driver.with_playwright_page do |playwright_page|
       session = playwright_page.context.new_cdp_session(playwright_page)
       session.send_message("Page.resetNavigationHistory")
       session.detach
     end
+
+    # Assert rather than assume: a prune that doesn't take says nothing here, and
+    # surfaces much later as a page that traversed somewhere the example never went
+    expect(page.evaluate_script("window.history.length")).to eq(1)
   end
 
   # Turn on touch emulation, which is what makes `(pointer: coarse)` match, so
