@@ -1,7 +1,4 @@
-<% settings = Pages::Org::Search::Settings::Component.new(
-  organization: current_organization,
-  skip_search_and_filters: true
-) %>
+<% settings = ComponentStructs::OrgSearchSettings.new(organization: current_organization) %>
 
 <% search_kind = @search_kind %>
 
@@ -94,7 +91,7 @@
     class="tw:mb-4 tw:flex tw:flex-wrap tw:gap-3"
   ></div>
 
-  <%= render settings %>
+  <%= render Pages::Org::Search::Settings::Component.new(settings:, skip_search_and_filters: true) %>
 
   <div id="multi_serial_results" data-org--multi-search-target="results"></div>
 </div>

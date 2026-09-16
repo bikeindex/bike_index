@@ -5,8 +5,8 @@ module Pages
     module Search
       module Wrapper
         class Component < ApplicationComponent
-          delegate :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
-            to: :settings_component
+          delegate :cycle_type, :active_search_filter_descriptions, to: :settings
+
           def initialize(
             organization:,
             pagy:,
@@ -24,6 +24,7 @@ module Pages
             stolenness: "all",
             bike_sticker: nil,
             model_audit: nil,
+            settings: nil,
             skip_search_and_filters: false,
             skip_settings: false,
             skip_count: false
@@ -44,6 +45,7 @@ module Pages
             @stolenness = stolenness
             @bike_sticker = bike_sticker
             @model_audit = model_audit
+            @settings = settings
             @skip_search_and_filters = skip_search_and_filters
             @skip_settings = skip_settings
             @skip_count = skip_count
@@ -51,18 +53,21 @@ module Pages
 
           private
 
-          def settings_component
-            @settings_component ||= Pages::Org::Search::Settings::Component.new(
+          def settings
+            @settings ||= ComponentStructs::OrgSearchSettings.new(
               organization: @organization,
               interpreted_params: @interpreted_params,
               sortable_search_params: @sort_state.search_params,
               params: @params,
               search_stickers: @search_stickers,
               search_address: @search_address,
-              search_status: @search_status,
-              bike_sticker: @bike_sticker,
-              skip_search_and_filters: @skip_search_and_filters
+              search_status: @search_status
             )
+          end
+
+          def settings_component
+            @settings_component ||= Pages::Org::Search::Settings::Component
+              .new(settings:, skip_search_and_filters: @skip_search_and_filters)
           end
 
           def show_search_query_summary?
@@ -70,8 +75,7 @@ module Pages
           end
 
           def component_wrapper_data_attributes
-            return {} if @skip_settings
-            settings_component.column_toggle_data_attributes
+            @skip_settings ? {} : settings.column_toggle_data_attributes
           end
 
           def show_pagination?
