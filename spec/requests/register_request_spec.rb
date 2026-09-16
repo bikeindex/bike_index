@@ -541,7 +541,7 @@ RSpec.describe RegisterController, type: :request do
     context "a risky email, with the challenge configured" do
       let(:owner_email) { "rider@yahoo.com" }
       before do
-        stub_const("Integrations::Turnstile::SITE_KEY", "1x00000000000000000000AA")
+        stub_const("Integrations::Turnstile::SITE_KEY", Integrations::Turnstile::TESTING_SITE_KEY)
         stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
       end
 

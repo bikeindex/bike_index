@@ -3,37 +3,37 @@
 module SharedBlocks
   module Turnstile
     class Component < ApplicationComponent
-      # email: what the form was submitted with, so a browser that never ran the reveal
-      # still gets the widget on the re-render rather than bouncing forever.
-      # site_key: previews and the system spec pass Cloudflare's testing key
-      def initialize(email: nil, site_key: nil)
+      def initialize(email: nil, site_key: Integrations::Turnstile.site_key)
         @email = email
-        # Only falls back once the secret is set too - a half-configured Turnstile would
-        # otherwise render a widget nothing verifies
-        @site_key = site_key || (Integrations::Turnstile::SITE_KEY if Integrations::Turnstile.enabled?)
+        @site_key = site_key
       end
 
       def render? = @site_key.present?
 
       def call
-        safe_join([tag.div(widget, class: wrapper_class, data: {"shared-blocks--turnstile-target": "widget"}), script])
+        safe_join([tag.div(widget, class: wrapper_class, data: {"shared-blocks--turnstile-target": "widget"}),
+          (script if already_risky?)].compact)
       end
 
       private
 
-      # Hidden until the turnstile controller sees an address worth asking, or until the
-      # address already submitted is one - whichever gets there first
+      # The address a challenged submission came back with - a browser that never ran the
+      # reveal gets the widget from here rather than posting without a token forever
+      def already_risky? = Integrations::Turnstile.risky_email?(@email)
+
       def wrapper_class
-        class_names("tw:my-4", "tw:hidden" => !Integrations::Turnstile.risky_email?(@email))
+        class_names("tw:my-4", "tw:hidden" => !already_risky?)
       end
 
       def widget
         tag.div(class: "cf-turnstile", data: {sitekey: @site_key, theme: "auto"})
       end
 
-      # defer rather than async - the widget above has to be in the DOM when it runs
+      # api.js renders every .cf-turnstile it finds on load, so shipping it to everyone
+      # would inject a cross-origin iframe on two of the busiest forms. The controller
+      # appends it on reveal instead
       def script
-        tag.script(src: "https://challenges.cloudflare.com/turnstile/v0/api.js", defer: true)
+        tag.script(src: Integrations::Turnstile::SCRIPT_URL, defer: true)
       end
     end
   end

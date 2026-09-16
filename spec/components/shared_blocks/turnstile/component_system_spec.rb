@@ -10,16 +10,18 @@ RSpec.describe SharedBlocks::Turnstile::Component, :js, type: :system do
 
     expect(page).to have_field(type: "email")
     expect(page).to have_no_css(".cf-turnstile")
+    # api.js ships on the first reveal rather than to everyone who opens the form
+    expect(page).to have_no_css("head script[src*='challenges.cloudflare.com']", visible: :all)
 
-    fill_in_email "rider@gmail.com"
+    fill_in "you@example.com", with: "rider@gmail.com"
     expect(page).to have_no_css(".cf-turnstile")
 
-    # Typed rather than set, since the reveal listens for input events
-    fill_in_email "rider@yahoo.com"
+    fill_in "you@example.com", with: "rider@yahoo.com"
     expect(page).to have_css(".cf-turnstile")
+    expect(page).to have_css("head script[src*='challenges.cloudflare.com']", visible: :all)
 
-    # And back again - a corrected address stops being asked
-    fill_in_email "rider@gmail.com"
+    # And back again
+    fill_in "you@example.com", with: "rider@gmail.com"
     expect(page).to have_no_css(".cf-turnstile")
   end
 
@@ -33,11 +35,5 @@ RSpec.describe SharedBlocks::Turnstile::Component, :js, type: :system do
     visit("#{base_path}without_keys")
 
     expect(page).to have_no_css(".cf-turnstile", visible: :all)
-  end
-
-  def fill_in_email(email)
-    field = find("input[type='email']")
-    field.set("")
-    field.send_keys(email)
   end
 end

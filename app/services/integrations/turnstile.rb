@@ -6,21 +6,26 @@ module Integrations
     SECRET_KEY = ENV["TURNSTILE_SECRET_KEY"]
     RESPONSE_PARAM = "cf-turnstile-response"
     TIMEOUT_SECONDS = 5
-    # Substrings, so each covers its country domains too (@yahoo.co.uk, @hotmail.co.nz).
-    # Every spam complaint Postmark has on file is one of these two
-    RISKY_EMAIL_DOMAINS = ["@yahoo.co", "@hotmail.co"].freeze
-    # Cloudflare's published always-passes key, for previews and the system spec
+    # Cloudflare's published always-passes key
     TESTING_SITE_KEY = "1x00000000000000000000AA"
+    SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js"
+    # Substrings, so each covers @yahoo.co.uk and the rest of the country domains
+    RISKY_EMAIL_DOMAINS = ["@yahoo.co", "@hotmail.co"].freeze
 
     def enabled? = SITE_KEY.present? && SECRET_KEY.present?
+
+    # Half-configured renders a widget nothing verifies, so the key is only worth
+    # rendering with once the secret is there to check it against
+    def site_key = (SITE_KEY if enabled?)
 
     # Unconfigured is unchallenged, so a missing key can't lock anyone out of registering
     def challenge?(email) = enabled? && risky_email?(email)
 
-    def risky_email?(email) = email.present? && RISKY_EMAIL_DOMAINS.any? { email.match?(it) }
+    # Downcased: users_controller asks before the record is saved, so before
+    # EmailNormalizer has run over what was typed
+    def risky_email?(email) = RISKY_EMAIL_DOMAINS.any? { email.to_s.downcase.include?(it) }
 
-    # The token is single use - a form re-rendered for some other error has to mint a
-    # fresh one, which is why the widget renders on every challenged submission
+    # The token is single use, so a re-rendered form has to mint a fresh one
     def verified?(token, remote_ip: nil)
       return false if token.blank?
 

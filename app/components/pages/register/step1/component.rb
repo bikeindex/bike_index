@@ -28,6 +28,7 @@ module Pages
           {data: {turbo: true, controller: "autofocus form-persist register--retry shared-blocks--turnstile",
                   form_persist_key_value: "register-start-#{@b_param.id_token}",
                   "shared-blocks--turnstile-domains-value": Integrations::Turnstile::RISKY_EMAIL_DOMAINS.to_json,
+                  "shared-blocks--turnstile-script-url-value": Integrations::Turnstile::SCRIPT_URL,
                   action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
                     "input->shared-blocks--turnstile#update submit->form-persist#clear"}}
         end

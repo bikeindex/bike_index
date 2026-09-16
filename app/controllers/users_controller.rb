@@ -22,7 +22,7 @@ class UsersController < ApplicationController
     if requested_locale != I18n.default_locale
       @user.preferred_language = requested_locale
     end
-    if turnstile_verified? && @user.save
+    if turnstile_verified?(@user, @user.email) && @user.save
       sign_in_and_redirect(@user)
     else
       @page_errors = @user.errors
@@ -205,17 +205,6 @@ class UsersController < ApplicationController
   end
 
   private
-
-  # The browser's reveal decides who is asked, this decides whether they answered - a
-  # form posted without running any of it lands here the same way
-  def turnstile_verified?
-    return true unless Integrations::Turnstile.challenge?(@user.email)
-    return true if Integrations::Turnstile.verified?(params[Integrations::Turnstile::RESPONSE_PARAM],
-      remote_ip: forwarded_ip_address)
-
-    @user.errors.add(:base, translation(:verify_not_a_robot, controller_method: :create))
-    false
-  end
 
   def permitted_parameters
     params.require(:user)
