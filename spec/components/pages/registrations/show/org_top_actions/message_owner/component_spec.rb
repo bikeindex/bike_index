@@ -37,6 +37,25 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
     end
   end
 
+  # Whoever holds it already knows where it is, so the sighting question doesn't apply
+  context "with an impounded bike" do
+    let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: true, phone: "7183914410") }
+    let(:bike) { FactoryBot.create(:bike, :impounded, :with_ownership_claimed, user: owner, cycle_type: "e-scooter").reload }
+    let(:trusted_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "unstolen_notifications") }
+    let(:current_user) { FactoryBot.create(:organization_user, organization: trusted_organization) }
+
+    it "asks what they need rather than where they saw it, and withholds the phone" do
+      render_inline(described_class.new(bike:, current_user:))
+
+      expect(page).to have_text("Know who has this e-scooter?")
+      expect(page).to_not have_text("Know something about this e-scooter")
+      expect(page).to have_css("textarea[placeholder^='What do you need to ask about this e-scooter']", visible: :all)
+      # The allowance is permission to send a message, not to call whoever holds it
+      expect(bike.phoneable_by?(current_user)).to be_truthy
+      expect(page).to_not have_text("Or call")
+    end
+  end
+
   context "with an unstolen bike the owner allows contact about" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "unstolen_notifications") }
     let(:current_user) { FactoryBot.create(:organization_user, organization:) }
