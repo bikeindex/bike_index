@@ -4,6 +4,10 @@ module UI
   module Forms
     module Turnstile
       class Component < ApplicationComponent
+        # api.js renders every .cf-turnstile it finds on load, so the controller appends it on
+        # the first reveal rather than shipping it to everyone who opens the form
+        SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js"
+
         def initialize(email: nil)
           @email = email
         end
@@ -17,8 +21,8 @@ module UI
 
         private
 
-        # The address a challenged submission came back with - a browser that never ran the
-        # reveal gets the widget from here rather than posting without a token forever
+        # The address a challenged submission came back with - the widget and the script
+        # both come from here, so a browser whose Stimulus never connects can still answer
         def already_risky? = EmailDomain.risky_email?(@email)
 
         def wrapper_class
@@ -29,11 +33,8 @@ module UI
           tag.div(class: "cf-turnstile", data: {sitekey: Integrations::Turnstile::SITE_KEY, theme: "auto"})
         end
 
-        # api.js renders every .cf-turnstile it finds on load, so shipping it to everyone
-        # would inject a cross-origin iframe on two of the busiest forms. The controller
-        # appends it on reveal instead
         def script
-          tag.script(src: Integrations::Turnstile::SCRIPT_URL, defer: true)
+          tag.script(src: SCRIPT_URL, defer: true)
         end
       end
     end

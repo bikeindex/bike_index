@@ -38,7 +38,7 @@
 
           = form_for @user, html: { data: { controller: "ui--forms--turnstile",
             "ui--forms--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
-            "ui--forms--turnstile-script-url-value": Integrations::Turnstile::SCRIPT_URL,
+            "ui--forms--turnstile-script-url-value": UI::Forms::Turnstile::Component::SCRIPT_URL,
             action: "input->ui--forms--turnstile#update" } } do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner

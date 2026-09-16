@@ -6,7 +6,6 @@ module Integrations
     SECRET_KEY = ENV["CLOUDFLARE_TURNSTILE_SECRET_KEY"]
     RESPONSE_PARAM = "cf-turnstile-response"
     TIMEOUT_SECONDS = 5
-    SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js"
     # Both keys, since half-configured renders a widget nothing verifies - and an env
     # to switch the challenge off without pulling them
     ENABLED = (SITE_KEY.present? && SECRET_KEY.present? &&

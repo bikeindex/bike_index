@@ -25,18 +25,27 @@ export default class extends Controller {
     const email = this.element.querySelector('input[type="email"]')?.value?.toLowerCase() ?? ''
     const risky = this.domainsValue.some(domain => email.includes(domain))
     this.widgetTarget.classList.toggle('tw:hidden', !risky)
-    if (risky) this.loadScript()
+    if (risky) this.ensureWidget()
   }
 
-  // api.js renders every .cf-turnstile on the page when it loads, so it's fetched on the
-  // first reveal rather than shipped to everyone who opens the form
-  loadScript () {
-    if (this.scriptLoaded) return
+  // api.js renders every .cf-turnstile it finds on load, so it ships on the first reveal
+  // rather than to everyone who opens the form. A container Turbo swapped in after that
+  // load is not one it finds, so a reveal past the first has to render its own
+  ensureWidget () {
+    if (window.turnstile) return this.renderWidget()
+    // In flight from an earlier reveal - its load will find this container itself
+    if (document.querySelector(`script[src="${this.scriptUrlValue}"]`)) return
 
-    this.scriptLoaded = true
     const script = document.createElement('script')
     script.src = this.scriptUrlValue
     script.defer = true
     document.head.appendChild(script)
+  }
+
+  // Rendering a second widget into a container that has one raises. Turbo's cached
+  // preview restores an already-rendered container, as does re-revealing
+  renderWidget () {
+    const container = this.widgetTarget.querySelector('.cf-turnstile')
+    if (!container.hasChildNodes()) window.turnstile.render(container)
   }
 }
