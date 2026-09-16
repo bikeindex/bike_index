@@ -18,15 +18,15 @@
 
         <% if show_search_query_summary? %>
           <%= translation(".matching_bikes_html",
-            count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count)) %>
+            count: bikes_count, cycle_type: settings.cycle_type.pluralize(@pagy.count)) %>
         <% else %>
           <%= translation(".registered_bikes_html",
-            count: bikes_count, cycle_type: cycle_type.pluralize(@pagy.count),
+            count: bikes_count, cycle_type: settings.cycle_type.pluralize(@pagy.count),
             org_name: @organization.short_name) %>
         <% end %>
 
-        <% if active_search_filter_descriptions.any? %>
-          <em>— <%= safe_join(active_search_filter_descriptions, " · ") %></em>
+        <% if settings.active_search_filter_descriptions.any? %>
+          <em>— <%= safe_join(settings.active_search_filter_descriptions, " · ") %></em>
         <% end %>
 
         <em><%= @humanized_time_range %></em>
@@ -66,7 +66,7 @@
       <div class="col-md-4 text-right">
         <%= select_tag :per_page_select,
           options_for_select(
-            [10, 25, 50, 100].map { |i| ["#{i} #{cycle_type.pluralize(10)} per page", i] },
+            [10, 25, 50, 100].map { |i| ["#{i} #{settings.cycle_type.pluralize(10)} per page", i] },
             selected: @per_page
           ),
           class: "form-control d-inline-block",

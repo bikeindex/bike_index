@@ -5,8 +5,6 @@ module Pages
     module Search
       module Wrapper
         class Component < ApplicationComponent
-          delegate :cycle_type, :active_search_filter_descriptions, to: :settings
-
           def initialize(
             organization:,
             pagy:,

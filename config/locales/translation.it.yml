@@ -5287,6 +5287,31 @@ it:
       you: Voi
       your_bikes: Le tue biciclette
       your_preferences: Le tue preferenze
+    org_search_columns:
+      avery_cell: Avery Esportabile
+      color_cell: Colore
+      created_at_cell: Registrato
+      creation_description_cell: Fonte
+      cycle_type_cell: Tipo di veicolo
+      impound_id_cell: ID del sequestro
+      impounded_cell: Sequestrato
+      manufacturer_cell: Produttore
+      model_cell: Modello
+      notes_cell: Note
+      owner_email_cell: Inviato a
+      owner_name_cell: Nome del proprietario
+      propulsion_type_cell: Veicolo elettrico (propulsione)
+      reg_address_cell: Indirizzo
+      reg_extra_registration_number_cell: Secondario#
+      reg_organization_affiliation_cell: Affiliazione
+      reg_phone_cell: Telefono
+      reg_student_id_cell: Tessera studentesca
+      serial_number_cell: Seriale
+      status_cell: Stato
+      sticker_cell: Adesivo
+      stolen_cell: Rubata
+      updated_at_cell: Fatto
+      url_cell: URL
     recovery_display:
       bike: Bicicletta
       recovered_date: recuperato %{date}
@@ -5835,13 +5860,8 @@ it:
           settings:
             address: 'Indirizzo:'
             all: Tutti
-            avery_cell: Avery Esportabile
             bike: registrazione
-            color_cell: Colore
             create_export_of_vehicles: Crea l'esportazione della ricerca %{cycle_type}
-            created_at_cell: Registrato
-            creation_description_cell: Fonte
-            cycle_type_cell: Tipo di veicolo
             default: predefinito
             filter_impounded_html: solo <strong>sequestrato</strong>
             filter_no_address_html: solo <strong>nessun</strong> indirizzo
@@ -5851,74 +5871,24 @@ it:
             filter_stolen_html: solo rubato
             filter_with_address_html: solo <strong>con</strong> indirizzo
             filter_with_stickers_html: solo <strong>con</strong> adesivi
-            impound_id_cell: ID del sequestro
-            impounded_cell: Sequestrato
-            manufacturer_cell: Produttore
-            model_cell: Modello
-            multi_search: ricerca seriale multipla
             none: nessuno
-            notes_cell: Note
-            owner_email_cell: Inviato a
-            owner_name_cell: Nome del proprietario
-            propulsion_type_cell: Veicolo elettrico (propulsione)
-            reg_address_cell: Indirizzo
-            reg_extra_registration_number_cell: Secondario#
-            reg_organization_affiliation_cell: Affiliazione
-            reg_phone_cell: Telefono
-            reg_student_id_cell: Tessera studentesca
-            serial_number_cell: Seriale
             settings: impostazioni
             show_notes_search: mostra le note cerca
             status: 'Stato:'
-            status_cell: Stato
-            sticker_cell: Adesivo
             stickers: 'Adesivi:'
-            stolen_cell: Rubata
-            updated_at_cell: Fatto
-            url_cell: URL
             vehicle: registrazione
             visible_columns: Colonne visibili
           wrapper:
-            affiliation: Affiliazione
-            avery_exportable: Avery Esportabile
-            bike: registrazione
-            e_vehicle_propulsion: Veicolo elettrico (propulsione)
             e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
-            link: Collegamento
             matching_bikes_html: "%{count} %{cycle_type} corrispondente"
-            mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
-            phone: Telefono
-            reg_address: Indirizzo
             registered_bikes_html: "%{count} %{cycle_type} corrispondente a %{org_name}"
-            student_id: Tessera studentesca
-            vehicle: registrazione
             view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
         search_results:
           bikes_table:
             assign_bike_sticker: Collegamento
-            avery: Avery?
-            color: Colore
             email_hidden: email nascosto
             hidden_not_registered: nascosto, non registrato con %{org_name}
-            impound_id: ID del sequestro
-            impounded: Sequestrato
             link_sticker: adesivo di collegamento
-            manufacturer: Produttore
-            model: Modello
-            notes: Note
-            owner_name: Nome del proprietario
-            propulsion_type: Propulsione
-            registered: Registrato
-            secondary_number: Secondario#
-            sent_to: Inviato a
-            serial: Seriale
-            source: Fonte
-            status_cell: Stato
-            sticker: Adesivo
-            stolen: Rubata
-            updated: Fatto
-            url: URL
-            vehicle_type: Tipo di veicolo
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:
