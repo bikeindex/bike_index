@@ -1,6 +1,6 @@
 # Pre-push cleanup
 
-The cleanup and migration halves of SKILL.md's **Prepare the branch**, in full. Everything here runs against committed work and diffs `origin/main...HEAD` — substitute the base branch from **Orient**, since shell state doesn't carry between commands.
+The cleanup and migration halves of SKILL.md's **Prepare the branch**, in full. Everything here runs against committed work and diffs `origin/main...HEAD` — substitute the base branch from **Orient**, since shell state doesn't carry between commands. The audits inherit that: run them after committing, or pair them with a pass over `rtk proxy git diff HEAD`, or a comment you razored in the working tree still reads as present.
 
 ## Simplify, lint, and conform to CLAUDE.md
 

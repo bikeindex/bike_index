@@ -523,6 +523,21 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
     end
 
+    context "honeypot filled" do
+      let(:create_params) { super().merge(additional: "http://spam.example.com") }
+
+      it "flags the registration spam and skips the confirmation email" do
+        expect { post base_url, params: create_params }
+          .to_not change(Email::PartialRegistrationJob.jobs, :size)
+        empty_b_param.reload
+        expect(empty_b_param.likely_spam?).to be_truthy
+        # No token generated, so nothing marks the address as having been written to
+        expect(empty_b_param.email_confirmation_token).to be_blank
+        expect(empty_b_param.email_confirmation_sent_at).to be_blank
+        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
+      end
+    end
+
     context "motorized, stolen, manufacturer not in the list" do
       let(:step_1_params) do
         {b_param: {manufacturer_id: "Fancy Cycles", owner_email:},

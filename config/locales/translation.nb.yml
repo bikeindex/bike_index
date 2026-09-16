@@ -3729,7 +3729,6 @@ nb:
         nye Ascend-salgsintegrering tillate deg å registrere hver sykkel du selger
         automatisk. Oppsettet tar omtrent 10 minutter.
     bike_shop_packages:
-      additional: Ytterligere
       bike_index_for_bike_shops: Sykkelindeks for sykkelbutikker
       choose_a_package_size: Velg en pakkestørrelse
       compare_plans_and_features: Sammenlign planer og funksjoner

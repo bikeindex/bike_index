@@ -381,11 +381,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     it "marks a registration spam when a bot fills the honeypot, without letting on" do
       start_registration
-
-      # A rider can't see or reach the honeypot, so only a bot fills it in
-      honeypot = find_field("Additional", visible: :hidden)
-      expect(honeypot[:tabindex]).to eq "-1"
-      page.execute_script("arguments[0].value = 'http://spam.example.com'", honeypot)
+      fill_honeypot
 
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")

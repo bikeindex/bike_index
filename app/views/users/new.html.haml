@@ -40,10 +40,7 @@
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
 
-            -# Honeypot spam trap - hidden from people, only bots fill it in
-            .form-group.additional-field{ class: "tw:hidden" }
-              = f.label :additional, "Additional", class: "sr-only"
-              = f.text_field :additional, tabindex: -1, autocomplete: "off", class: "form-control"
+            = render(SharedBlocks::Honeypot::Component.new(form_builder: f))
 
             .form-group
               = f.label :email, class: 'sr-only'

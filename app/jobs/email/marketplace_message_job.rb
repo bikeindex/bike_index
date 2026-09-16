@@ -20,11 +20,11 @@ module Email
       notification = marketplace_message.notifications.first
       notification ||= Notification.create(kind:, notifiable: marketplace_message,
         user_id: likely_spam ? marketplace_message.sender_id : marketplace_message.receiver_id)
-      # track_email_delivery returns if delivery_success, but return early here to prevent updating the cache
-      return if notification.delivery_success?
+      # track_email returns if settled, but return early here to prevent updating the cache
+      return if notification.settled?
 
       delivery = nil
-      Notification.track_email_delivery(notification) do
+      Notifications::Deliver.track_email(notification) do
         delivery = if likely_spam
           AdminMailer.blocked_marketplace_message_email(marketplace_message).deliver_now
         else

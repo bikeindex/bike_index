@@ -564,18 +564,7 @@ class Organization < ApplicationRecord
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
     new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
-    if new_slug != slug
-      # If the organization exists, don't invalidate because of it's own slug
-      orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
-      # Force update the deleted short_names and slugs
-      orgs.deleted.where.not("short_name ILIKE ?", "%-deleted")
-        .each { |o| o.update_columns(short_name: "#{o.short_name}-deleted", slug: "#{o.slug}-deleted") }
-      while orgs.where(slug: new_slug).exists?
-        i = i.present? ? i + 1 : 2
-        new_slug = "#{new_slug}-#{i}"
-      end
-      self.slug = new_slug
-    end
+    self.slug = calculated_slug(new_slug) if new_slug != slug
     self.access_token ||= SecurityTokenizer.new_token
     # NOTE: only organizations with child_organizations feature can be selected in admin view, but this doesn't block assignment
     self.child_ids = calculated_children.pluck(:id).presence || []
@@ -627,6 +616,17 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  def calculated_slug(new_slug)
+    orgs = id.present? ? Organization.unscoped.where.not(id:) : Organization.unscoped.all
+    holder = orgs.find_by(slug: new_slug)
+    # The unique index counts deleted rows and destroy skips validations, so a deleted
+    # organization holds its slug until the organization claiming the name saves it
+    holder.save if holder&.deleted?
+    return new_slug if holder.nil? || holder.slug != new_slug
+
+    (2..).lazy.map { "#{new_slug}-#{it}" }.find { |candidate| !orgs.exists?(slug: candidate) }
+  end
 
   def user_email_domain_format
     return if user_email_domain.blank?
