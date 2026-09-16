@@ -5,8 +5,8 @@ module ComponentStructs
   # search. Everything around the panel Pages::Org::Search::Settings renders reads the same
   # values, so it's built once and passed whole.
   #
-  # The labels stay in that component's translation scope; moving them would strand the four
-  # translation.*.yml.
+  # The scope is that component's because its template and this both read the
+  # filter_*_html keys — there's no split that doesn't duplicate them.
   class OrgSearchSettings
     I18N_SCOPE = %i[components pages org search settings].freeze
 
