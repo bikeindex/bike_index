@@ -12,7 +12,7 @@ module SharedBlocks
         # A top-level row -- the group toggles and the leaf links share it, so they stay
         # the same height as each other
         ROW = "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] " \
-          "tw:text-sm tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:max-[760px]:py-3.5"
+          "tw:text-sm tw:leading-tight tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:max-[760px]:py-3.5"
         ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
         # A link goes current off the aria-current the is-active variant already reads; a group
         # toggle off the data-active shared-blocks--org-sidebar puts on the one holding that link
