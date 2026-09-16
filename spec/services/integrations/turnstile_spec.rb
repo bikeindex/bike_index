@@ -4,7 +4,7 @@ RSpec.describe Integrations::Turnstile do
   describe "challenge?" do
     context "configured" do
       before do
-        stub_const("Integrations::Turnstile::SITE_KEY", Integrations::Turnstile::TESTING_SITE_KEY)
+        stub_const("Integrations::Turnstile::SITE_KEY", "site-key")
         stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
       end
 

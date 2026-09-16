@@ -6,8 +6,6 @@ module Integrations
     SECRET_KEY = ENV["TURNSTILE_SECRET_KEY"]
     RESPONSE_PARAM = "cf-turnstile-response"
     TIMEOUT_SECONDS = 5
-    # Cloudflare's published always-passes key
-    TESTING_SITE_KEY = "1x00000000000000000000AA"
     SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js"
 
     def enabled? = SITE_KEY.present? && SECRET_KEY.present?
