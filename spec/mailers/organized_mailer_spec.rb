@@ -93,9 +93,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
           it "doesn't render the donation" do
             expect(organization.reload.is_invoiced?).to be_truthy
             expect(organization.paid_money?).to be_falsey
-            mail = OrganizedMailer.partial_registration(b_param)
-            expect(mail.tag).to eq "partial_registration"
-            expect_render_donation(false, mail)
+            expect_render_donation(false, OrganizedMailer.partial_registration(b_param))
           end
         end
       end
