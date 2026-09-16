@@ -6282,6 +6282,9 @@ es:
               where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos
                 contactas por un anuncio que encontraste en línea, incluye un enlace
                 en el campo a continuación."
+              know_who_has_this_bike_type: "¿Sabes quién tiene este %{bike_type}?"
+              what_do_you_need_to_ask: "¿Qué necesitas preguntar sobre esto %{bike_type}?
+                Incluye un enlace en el campo de abajo si hay alguno que te ayude."
             parking_notification_form:
               address_or_intersection: Dirección o intersección
               create_parking_notification: Crear una nueva notificación de estacionamiento

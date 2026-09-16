@@ -6186,6 +6186,9 @@ nl:
               where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als
                 u contact opneemt over een advertentie die u online hebt gevonden,
                 neemt u een link op in het onderstaande veld
+              know_who_has_this_bike_type: Weet je wie dit %{bike_type} heeft?
+              what_do_you_need_to_ask: Wat wilt u hierover vragen %{bike_type}? Voeg
+                een link toe in het onderstaande veld als er een is die u kan helpen.
             parking_notification_form:
               address_or_intersection: Adres of kruispunt
               create_parking_notification: Maak een nieuwe parkeermelding aan
