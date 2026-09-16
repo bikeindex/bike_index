@@ -25,21 +25,18 @@
 #             app remove, drop the per-PR databases + role, flush its redis db
 #             (unless a still-running PR shares it), remove its containers + volumes
 #   reload_database — reset the app's data in place (image and role are left alone):
-#             stop the worker + cron containers, purge its R2 objects, flush its
-#             redis db, drop both databases, then db:prepare (create, load schema,
-#             seed) in the web container, and restart worker + cron
+#             stop worker + cron, purge its R2 objects, flush its redis db, drop
+#             both databases, db:prepare in web, then start worker + cron again
 # deploy and destroy are per-PR; reload_database also takes `--app sandbox`.
 # deploy is idempotent — same path on first and subsequent deploys;
 # bin/docker-entrypoint creates the per-PR Postgres role on first boot and
 # db:prepare handles schema/seed-or-migrate.
 #
 # Called by .github/workflows/review-app.yml; runs locally too with SSH access and
-# kamal installed under the *active* ruby — the gem's `env ruby` shebang falls
-# through to system ruby 2.6 when the install is a leftover from an older mise
-# version, and reports `can't find gem kamal` as though it were never installed.
-# Kamal reads .kamal/secrets — locally from 1Password (account bike-index, item
-# Kamal/BikeIndex Review) + `gh auth token`; CI copies .kamal/secrets-ci over it
-# first.
+# kamal installed under the *active* ruby — a leftover install under an older mise
+# version reports `can't find gem kamal` from system ruby 2.6. Kamal reads
+# .kamal/secrets — locally from 1Password (account bike-index, item Kamal/BikeIndex
+# Review) + `gh auth token`; CI copies .kamal/secrets-ci over it first.
 
 set -euo pipefail
 
@@ -242,11 +239,10 @@ purge_r2_objects() {
     "bin/rails runner 'ActiveStorage::Blob.find_each { |blob| blob.service.delete(blob.key) }'" || true
 }
 
-# Stopped for a reload so nothing they run between the drop and the end of the seed
-# raises NoDatabaseError into Honeybadger; web stays up, db:prepare runs inside it.
-# Not kamal's own verbs: `app boot` with no --version resolves to the `latest` tag,
-# which on this shared host belongs to whichever app deployed last. Restart by
-# tracked id — kamal leaves earlier deploys' containers under the same labels.
+# Stopped so nothing they run while the databases are gone raises NoDatabaseError
+# into Honeybadger; web stays up, db:prepare runs inside it. Ids, not labels —
+# earlier deploys' containers carry the same ones, and `kamal app boot` would use
+# the `latest` tag, which on this shared host is whichever app deployed last.
 stop_job_containers() {
   job_containers="$(kamal server exec --raw \
     "docker ps -q --filter label=service=${appname} --filter label=role=worker; \
@@ -256,7 +252,7 @@ stop_job_containers() {
   kamal server exec "docker stop ${job_containers}"
 }
 
-# Best-effort, so a failed restart doesn't mask the reload error it's unwinding.
+# Best-effort — mustn't mask the reload error it's unwinding.
 start_job_containers() {
   [[ -n "$job_containers" ]] || return 0
   echo "==> Restarting ${slug}'s worker and cron containers"
@@ -324,9 +320,8 @@ case "$mode" in
   reload_database)
     redis_shared_with="$(redis_db_shared_with)" || review_host_unreachable
 
-    # Before the FLUSHDB below, so nothing enqueues past it. Trapped so a failed
-    # reload still restores them, and disarmed at the end so the restart prints
-    # before "Done" rather than after it.
+    # Before the FLUSHDB, so nothing enqueues past it. Trapped against a failed
+    # reload; disarmed at the end so the restart prints before "Done".
     job_containers=""
     trap start_job_containers EXIT
     stop_job_containers
