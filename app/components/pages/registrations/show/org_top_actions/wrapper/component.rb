@@ -88,8 +88,11 @@ module Pages
 
             # contact_owner? is what the submit and the phone answer to, so a panel this
             # opens is one that will be accepted
+            # Nobody to reach on the organization's own impound - they're holding it, and
+            # the update action below is what they act on it through
             def impound_contactable?
-              @bike.current_impound_record.present? && @bike.contact_owner?(@current_user)
+              @bike.current_impound_record.present? && !impounded_by_organization? &&
+                @bike.contact_owner?(@current_user)
             end
 
             def show_impound?

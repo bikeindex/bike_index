@@ -160,8 +160,7 @@ class ImpoundRecord < ApplicationRecord
   def contactable_without_claiming?(passed_user = nil)
     return false if passed_user.blank?
 
-    passed_user.organizations.where(id: Organization.with_enabled_feature_slugs("unstolen_notifications")
-      .or(Organization.paid_money).or(Organization.ambassador)).limit(1).any?
+    passed_user.organizations.contact_impounded.limit(1).any?
   end
 
   def find_or_build_address_record(country_id: nil)

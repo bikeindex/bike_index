@@ -122,6 +122,18 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
         expect(action_panels).to include("message")
       end
     end
+
+    # They're the ones holding it, so there's nobody to reach - they act on it through
+    # the update action instead
+    context "impounded by the viewing organization" do
+      let(:bike) { FactoryBot.create(:impound_record_with_organization, organization:, display_id: "0001").bike.reload }
+
+      it "renders the impound update rather than the message action" do
+        expect(bike.current_impound_record.organization_id).to eq organization.id
+        expect(action_panels).to_not include("message")
+        expect(action_panels).to include("impound_update")
+      end
+    end
   end
 
   context "without unstolen_notifications" do
