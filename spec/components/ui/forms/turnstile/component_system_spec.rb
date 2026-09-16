@@ -38,7 +38,7 @@ RSpec.describe UI::Forms::Turnstile::Component, :js, type: :system do
     # The token the form posts back, which turnstile_verified? checks against siteverify
     expect(page).to have_field(Integrations::Turnstile::RESPONSE_PARAM, type: "hidden",
       with: "XXXX.DUMMY.TOKEN.XXXX", visible: :all, wait: 10)
-    # The controller is the only thing that loads api.js - Cloudflare bails on a second copy
+    # The component renders the tag here, and the controller's guard sees it and doesn't add its own
     expect(page).to have_css("script[src*='challenges.cloudflare.com']", count: 1, visible: :all)
   end
 

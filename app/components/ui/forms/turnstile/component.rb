@@ -4,8 +4,6 @@ module UI
   module Forms
     module Turnstile
       class Component < ApplicationComponent
-        # api.js renders every .cf-turnstile it finds on load, so the controller appends it on
-        # the first reveal rather than shipping it to everyone who opens the form
         SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js"
 
         def initialize(email: nil)
