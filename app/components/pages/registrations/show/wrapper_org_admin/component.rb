@@ -218,7 +218,7 @@ module Pages
           # Shared with the BikesTable so its column set/labels match the toggle panel
           def other_registrations_settings
             @other_registrations_settings ||=
-              Pages::Org::Search::Settings::Component.new(organization: @organization, skip_search_and_filters: true)
+              Pages::Org::Search::Settings::Component.new(organization: @organization)
           end
 
           def other_registrations_count

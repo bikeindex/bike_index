@@ -150,28 +150,50 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
     end
   end
 
+  describe "filter_groups" do
+    let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes parking_notifications] }
+    let(:search_status) { "impounded" }
+
+    it "returns a group per enabled filter, carrying the searched value" do
+      groups = instance.filter_groups
+      expect(groups.map { it[:name] })
+        .to eq(%i[search_stickers search_address search_status search_parking_notification])
+      expect(groups.find { it[:name] == :search_status }[:selected]).to eq "impounded"
+      expect(groups.find { it[:name] == :search_stickers }[:entries].map { it[:value] })
+        .to eq ["", "with", "none"]
+    end
+
+    context "with no optional features" do
+      let(:enabled_feature_slugs) { %w[bike_search] }
+
+      it "returns only status" do
+        expect(instance.filter_groups.map { it[:name] }).to eq [:search_status]
+      end
+    end
+  end
+
+  describe "render_export?" do
+    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+    it "is false once the search reaches past the organization" do
+      expect(instance.render_export?).to be true
+      expect(described_class.new(**options.merge(search_all: true)).render_export?).to be false
+    end
+  end
+
   describe "rendering" do
-    it "renders settings panel with columns and settings button" do
-      expect(component).to have_css("[data-org--search-target='settings']", visible: :all)
+    it "renders the column panel and its toggle button" do
+      expect(component).to have_css("[data-ui--collapse-target='content']", visible: :all)
       expect(component).to have_css("input[type='checkbox']", visible: :all)
       expect(component).to have_button("settings", visible: :all)
     end
 
-    context "with bike_stickers enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+    context "with toggle_button false" do
+      let(:options) { super().merge(toggle_button: false) }
 
-      it "renders sticker filter radios" do
-        expect(component).to have_text("Stickers")
-        expect(component).to have_css("input[type='radio'][name='search_stickers']", visible: :all)
-      end
-    end
-
-    context "with impound_bikes enabled" do
-      let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
-
-      it "renders impound status filter radios" do
-        expect(component).to have_text("Status")
-        expect(component).to have_css("input[type='radio'][name='search_status'][value='not_impounded']", visible: :all)
+      it "leaves the button to the caller" do
+        expect(component).to have_css("[data-ui--collapse-target='content']", visible: :all)
+        expect(component).not_to have_button("settings", visible: :all)
       end
     end
 
@@ -180,15 +202,6 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
 
       it "renders export link" do
         expect(component).to have_link(text: /Create export/, visible: :all)
-      end
-    end
-
-    context "with search_stickers active" do
-      let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
-      let(:search_stickers) { "with" }
-
-      it "opens settings by default" do
-        expect(component).to have_css("[data-org--search-target='settings']:not(.tw\\:hidden\\!)", visible: :all)
       end
     end
   end

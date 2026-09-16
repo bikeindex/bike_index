@@ -139,6 +139,74 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         end
       end
     end
+    context "with search_all" do
+      it "reaches past the organization's own registrations, and refuses an export" do
+        get base_url, params: {search_no_js: true}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        get base_url, params: {search_no_js: true, search_all: true}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_all)).to be_truthy
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, non_organization_bike.id])
+      end
+
+      context "with csv_exports" do
+        let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+        it "doesn't create an export" do
+          expect {
+            get base_url, params: {search_no_js: true, search_all: true, create_export: true, serial: bike.serial_number}
+          }.to_not change(Export, :count)
+          expect(response.status).to eq(200)
+        end
+      end
+    end
+
+    context "with search_parking_notification" do
+      let(:enabled_feature_slugs) { %w[bike_search parking_notifications] }
+      let!(:notified_bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      let!(:parking_notification) do
+        FactoryBot.create(:parking_notification, organization: current_organization, bike: notified_bike)
+      end
+
+      it "filters on the organization's own notices" do
+        get base_url, params: {search_no_js: true, search_parking_notification: "with"}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_parking_notification)).to eq "with"
+        expect(assigns(:bikes).pluck(:id)).to eq([notified_bike.id])
+
+        get base_url, params: {search_no_js: true, search_parking_notification: "none"}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+      end
+
+      context "without the feature" do
+        let(:enabled_feature_slugs) { %w[bike_search] }
+
+        it "ignores the param" do
+          get base_url, params: {search_no_js: true, search_parking_notification: "with"}
+          expect(assigns(:search_parking_notification)).to eq false
+          expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, notified_bike.id])
+        end
+      end
+    end
+
+    context "chart_only" do
+      it "renders the at-a-glance frame with the searched counts" do
+        get base_url, params: {chart_only: "1"}
+        expect(response.status).to eq(200)
+        expect(response.body).to include('id="registrations_chart_frame"')
+        expect(assigns(:chart_scope)).to eq "search"
+        expect(response.body).to include("Total registrations")
+      end
+
+      it "steps outside the search for the year scope" do
+        get base_url, params: {chart_only: "1", chart_scope: "year", serial: "no-match-at-all"}
+        expect(response.status).to eq(200)
+        expect(assigns(:chart_scope)).to eq "year"
+        expect(response.body).to include("last 12 months")
+      end
+    end
+
     context "turbo_stream" do
       it "renders with update action" do
         get base_url, as: :turbo_stream

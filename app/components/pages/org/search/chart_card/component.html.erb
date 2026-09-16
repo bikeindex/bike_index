@@ -1,0 +1,57 @@
+<%= render(UI::Card::Component.new(full_bleed: true)) do %>
+  <%= helpers.turbo_frame_tag(FRAME_ID, src: @src, loading: (:lazy if @src),
+    class: "tw:block", data: {"org--search-target": "chartFrame"}) do %>
+    <% if @src %>
+      <div class="<%= UI::ChartAsyncFrame::Component::WRAPPER_CLASSES %>">
+        <%= render UI::LoadingSpinner::Component.new(text: t("components.ui.chart_async_frame.loading_chart")) %>
+      </div>
+    <% else %>
+      <div
+        class="
+          tw:mb-2 tw:flex tw:flex-wrap tw:items-center tw:justify-between
+          tw:gap-2
+        "
+      >
+        <span
+          class="
+            tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400
+            tw:uppercase
+          "
+        >
+          <%= caption %>
+        </span>
+
+        <%= render(UI::ButtonGroup::Component.new(entries: scope_entries)) %>
+      </div>
+
+      <%= render(@chart) if @chart %>
+
+      <% if @stats.any? %>
+        <dl
+          class="
+            tw:mt-3 tw:mb-0 tw:flex tw:flex-col tw:gap-2 tw:border-t
+            tw:border-gray-100 tw:pt-3 tw:dark:border-gray-700
+          "
+        >
+          <% @stats.each do |stat| %>
+            <div class="tw:flex tw:items-center tw:gap-2">
+              <span class="tw:h-2.5 tw:w-2.5 tw:shrink-0 tw:rounded-sm <%= BANDS.dig(stat.key, :swatch) %>"></span>
+
+              <dt class="tw:min-w-0 tw:flex-1 tw:truncate tw:text-sm tw:font-medium">
+                <%= translation(".stat_#{stat.key}") %>
+              </dt>
+
+              <dd class="tw:mb-0 tw:font-mono tw:text-base tw:font-semibold">
+                <%= number_display(stat.count) %>
+              </dd>
+
+              <% if stat.delta_display %>
+                <%= render(delta_badge(stat)) %>
+              <% end %>
+            </div>
+          <% end %>
+        </dl>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

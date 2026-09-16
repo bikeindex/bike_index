@@ -8,6 +8,8 @@
   search_stickers: @search_stickers,
   search_address: @search_address,
   search_status: @search_status,
+  search_parking_notification: @search_parking_notification,
+  search_all: @search_all,
   bike_sticker: @bike_sticker
 ) %>
 
@@ -27,31 +29,54 @@
 >
   <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
   <% unless turbo_frame_request? %>
-    <div class="mb-4">
-      <%= render(Pages::Org::Search::Form::Component.new(
-        target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
-        target_frame: :organized_bikes_results_frame,
-        interpreted_params: form_interpreted_params,
-        settings_component:
-      )) do %>
-        <% if @bike_sticker.present? %>
-          <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
+    <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
+    <div class="twwiderow tw:items-start tw:gap-y-4">
+      <div class="tw:min-w-0">
+        <%= render(Pages::Org::Search::Form::Component.new(
+          target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
+          target_frame: :organized_bikes_results_frame,
+          interpreted_params: form_interpreted_params,
+          heading: t(".find_a_registration_html", cycle_type: settings_component.cycle_type),
+          submit_text: t(".search_registrations"),
+          filters_component: Pages::Org::Search::Filters::Component.new(
+            settings_component:,
+            period: @period,
+            start_time: @start_time,
+            end_time: @end_time,
+            sortable_search_params:
+          )
+        )) do |form| %>
+          <% if @bike_sticker.present? %>
+            <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
+          <% end %>
+
+          <% form.with_below_submit do %>
+            <label
+              class="
+                tw:mt-3 tw:mb-0! tw:flex tw:cursor-pointer tw:items-center
+                tw:gap-2
+              "
+            >
+              <%= check_box_tag :search_all, "true", @search_all, form: "Search_Form",
+                data: {action: "change->org--search#filterChanged"} %>
+
+              <%= t(".search_all_html", cycle_type: settings_component.cycle_type.pluralize(2),
+                org_name: current_organization.short_name) %>
+            </label>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
+
+      <div class="tw:min-w-0">
+        <%= render(Pages::Org::Search::ChartCard::Component.new(
+          src: chart_scope_paths[@chart_scope.to_sym], scope: @chart_scope, scope_paths: chart_scope_paths
+        )) %>
+      </div>
     </div>
   <% end %>
 
   <%= render Pages::SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
     render_results: @render_results, current_path: request.original_fullpath) do %>
-    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
-
-    <div class="tw:mt-2 tw:text-right">
-      <%= link_to t(".render_chart", default: "Render chart"),
-        organization_registrations_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)),
-        class: "btn btn-sm btn-outline-secondary #{"active" if @render_chart}",
-        data: {turbo_action: "advance"} %>
-    </div>
-
     <%= render partial: "results" %>
   <% end %>
 </div>

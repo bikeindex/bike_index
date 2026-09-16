@@ -9,7 +9,9 @@ export default class extends Controller {
 
   connect () {
     this.refreshEnabledColumns()
-    this.selectStoredVisibleColumns()
+    // The registrations search renders the checkboxes inside the results frame, which
+    // hasn't loaded yet - the frame's own render is what applies the stored selection there
+    if (this.hasCheckboxesTarget) this.selectStoredVisibleColumns()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
 
@@ -17,10 +19,12 @@ export default class extends Controller {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
   }
 
+  // The checkboxes render inside the results frame, so a search replaces them unchecked -
+  // re-read the stored selection rather than applying what's in the DOM
   handleFrameRender = (event) => {
-    if (!this.element.contains(event.target)) return
+    if (!this.element.contains(event.target) || !this.hasCheckboxesTarget) return
     this.refreshEnabledColumns()
-    this.updateVisibleColumns()
+    this.selectStoredVisibleColumns()
   }
 
   refreshEnabledColumns () {

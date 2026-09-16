@@ -16,7 +16,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   let(:search_stickers) { nil }
   let(:search_address) { nil }
   let(:search_status) { "all" }
-  let(:skip_search_and_filters) { false }
+  let(:search_page) { true }
   let(:bikes) { [bike] }
   let(:options) do
     {
@@ -29,79 +29,53 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       search_stickers:,
       search_address:,
       search_status:,
-      skip_search_and_filters:,
-      stolenness: "all",
+      search_page:,
       humanized_time_range: "in the past year"
     }
   end
 
-  it "renders table with form, checkboxes, and bike data" do
+  it "renders the card header, column panel, table and footer" do
     expect(component).to have_css("table")
     expect(component).to have_css("tbody tr", count: 1)
-    expect(component).to have_css("[data-org--search-target='settings']", visible: :all)
-    # Search form
-    expect(component).to have_css("#Search_Form")
-    # checkboxes
-    expect(component).to have_css("[data-org--search-target='settings'].tw\\:hidden\\!", visible: :all)
+    # the column panel ships collapsed, opened from the header button
+    expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
-    # pagination
-    expect(component).to have_css(".paginate-container")
+    expect(component).to have_button("Column settings", visible: :all)
+    expect(component).to have_link("Add a bike", visible: :all)
+    # footer
+    expect(component).to have_text("showing 1–10 of 25")
     expect(component).to have_css("select#per_page_select")
     # bike data in cells
     expect(component).to have_text(bike.mnfg_name)
   end
 
-  context "with skip_search_and_filters" do
-    let(:skip_search_and_filters) { true }
+  context "without search_page" do
+    let(:search_page) { false }
 
-    it "renders table without search form" do
+    it "renders the table with no header actions, and brings its own controllers" do
       expect(component).to have_css("table")
-      expect(component).not_to have_css("#Search_Form")
-    end
-  end
-
-  context "with bike_stickers enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
-
-    it "renders sticker filter radios" do
-      expect(component).to have_text("Stickers")
-      expect(component).to have_css("input[type='radio'][name='search_stickers']", visible: :all)
+      expect(component).to have_css("[data-controller~='org--search-column-toggle']")
+      expect(component).not_to have_button("Column settings", visible: :all)
+      expect(component).not_to have_link("Add a bike", visible: :all)
     end
   end
 
   context "with impound_bikes enabled" do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
-    it "renders impound status filter radios and impound columns" do
-      expect(component).to have_text("Status")
-      expect(component).to have_css("input[type='radio'][name='search_status'][value='not_impounded']", visible: :all)
+    it "renders impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
       expect(component).to have_css("th.impounded_cell", visible: :all, text: "Impounded")
     end
   end
 
-  context "with search_stickers filter active" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
-    let(:search_stickers) { "with" }
+  context "with search_all" do
+    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+    let(:options) { super().merge(search_all: true) }
 
-    it "displays active filter description" do
-      expect(component).to have_text("with stickers")
-    end
-  end
-
-  context "with search_address filter active" do
-    let(:search_address) { "without_street" }
-
-    it "displays active filter description" do
-      expect(component).to have_text("no address")
-    end
-  end
-
-  context "with search_status filter active" do
-    let(:search_status) { "stolen" }
-
-    it "displays active filter description" do
-      expect(component).to have_text("only stolen")
+    it "drops the export, which would reach past the organization" do
+      expect(component).not_to have_link("Export CSV", visible: :all)
+      expect(component).not_to have_link(text: /Create export/, visible: :all)
     end
   end
 
@@ -128,6 +102,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
     it "renders export link" do
+      expect(component).to have_link("Export CSV", visible: :all)
       expect(component).to have_link(text: /Create export/, visible: :all)
     end
   end
