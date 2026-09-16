@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    pages:
+      org:
+        search:
+          wrapper:
+            e_vehicles_for_audit: 'E-Vehicles for audit:'
+            matching_bikes_html: "%{count} %{cycle_type} matching"
+            registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
+            view_matching_any_audit: view matching any audit

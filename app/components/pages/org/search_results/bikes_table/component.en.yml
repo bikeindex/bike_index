@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    pages:
+      org:
+        search_results:
+          bikes_table:
+            assign_bike_sticker: Assign sticker
+            email_hidden: email hidden
+            hidden_not_registered: hidden, not registered with %{org_name}
+            link_sticker: link sticker
