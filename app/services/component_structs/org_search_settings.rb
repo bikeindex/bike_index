@@ -83,11 +83,6 @@ module ComponentStructs
       ].compact
     end
 
-    def column_toggle_data_attributes
-      {controller: "org--search org--search-column-toggle",
-       "org--search-column-toggle-default-columns-value": initially_checked_columns.to_json}
-    end
-
     def column_renames
       @column_renames ||= COLUMN_RENAME_KEYS.to_h { |key|
         name = translation(key, COLUMN_SCOPE)

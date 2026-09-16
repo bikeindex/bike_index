@@ -73,7 +73,7 @@ module Pages
           end
 
           def component_wrapper_data_attributes
-            @skip_settings ? {} : settings.column_toggle_data_attributes
+            @skip_settings ? {} : Pages::Org::Search::Settings::Component.column_toggle_data_attributes(settings)
           end
 
           def show_pagination?

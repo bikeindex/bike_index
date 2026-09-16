@@ -364,7 +364,7 @@
       </div>
 
       <% if other_registrations_count.positive? %>
-        <%= tag.div(class: "org-search-component tw:mt-3", data: other_registrations_settings.column_toggle_data_attributes) do %>
+        <%= tag.div(class: "org-search-component tw:mt-3", data: Pages::Org::Search::Settings::Component.column_toggle_data_attributes(other_registrations_settings)) do %>
           <%= render(Pages::Org::Search::Settings::Component.new(settings: other_registrations_settings, skip_search_and_filters: true)) %>
 
           <div class="tw:mt-3">

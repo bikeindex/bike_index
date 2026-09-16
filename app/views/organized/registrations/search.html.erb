@@ -18,7 +18,8 @@
   search_notes: params[:search_notes]
 ).compact %>
 
-<%= tag.div(class: "org-search-component", data: settings.column_toggle_data_attributes
+<%= tag.div(class: "org-search-component", data: Pages::Org::Search::Settings::Component
+  .column_toggle_data_attributes(settings)
   .merge("org--search-column-toggle-assign-bike-sticker-value": @bike_sticker.present?)) do %>
   <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
   <% unless turbo_frame_request? %>
