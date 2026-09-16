@@ -5,12 +5,12 @@ module Pages
     module Search
       module Form
         class Component < ApplicationComponent
-          def initialize(target_search_path:, interpreted_params:, target_frame: nil, skip_serial_field: false, settings_component: nil)
+          def initialize(target_search_path:, interpreted_params:, target_frame: nil, skip_serial_field: false, settings: nil)
             @target_search_path = target_search_path
             @interpreted_params = interpreted_params
             @target_frame = target_frame
             @skip_serial_field = skip_serial_field
-            @settings_component = settings_component
+            @settings = settings
             @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
           end
 
@@ -38,7 +38,11 @@ module Pages
           end
 
           def render_notes_field?
-            @settings_component&.organization&.enabled?("registration_notes")
+            @settings&.organization&.enabled?("registration_notes")
+          end
+
+          def settings_component
+            @settings_component ||= Pages::Org::Search::Settings::Component.new(settings: @settings)
           end
         end
       end

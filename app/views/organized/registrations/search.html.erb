@@ -1,14 +1,13 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<% settings_component = Pages::Org::Search::Settings::Component.new(
+<% settings = ComponentStructs::OrgSearchSettings.new(
   organization: current_organization,
   interpreted_params: @interpreted_params,
   sortable_search_params:,
   params:,
   search_stickers: @search_stickers,
   search_address: @search_address,
-  search_status: @search_status,
-  bike_sticker: @bike_sticker
+  search_status: @search_status
 ) %>
 
 <% form_interpreted_params = @interpreted_params.merge(
@@ -22,7 +21,7 @@
 <div
   class="org-search-component"
   data-controller="org--search org--search-column-toggle"
-  data-org--search-column-toggle-default-columns-value="<%= settings_component.initially_checked_columns.to_json %>"
+  data-org--search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
   data-org--search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
 >
   <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
@@ -32,7 +31,7 @@
         target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
         target_frame: :organized_bikes_results_frame,
         interpreted_params: form_interpreted_params,
-        settings_component:
+        settings:
       )) do %>
         <% if @bike_sticker.present? %>
           <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>

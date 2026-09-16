@@ -1,5 +1,5 @@
 <div
-  class="[&_.form-group]:tw:mb-0 tw:my-4 tw:border tw:border-gray-300/70 tw:bg-gray-100 tw:px-3 tw:pt-4 tw:pb-3 <%= 'tw:hidden!' unless settings_default_open? %>"
+  class="[&_.form-group]:tw:mb-0 tw:my-4 tw:border tw:border-gray-300/70 tw:bg-gray-100 tw:px-3 tw:pt-4 tw:pb-3 <%= 'tw:hidden!' unless default_open? %>"
   data-org--search-target="settings"
 >
   <div class="tw:mb-1 tw:flex tw:items-baseline tw:gap-2">
@@ -41,13 +41,13 @@
   </div>
 
   <% unless @skip_search_and_filters %>
-    <% if @organization.enabled?("bike_stickers") %>
+    <% if organization.enabled?("bike_stickers") %>
       <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
         <span class="sort-group-label"><%= translation(".stickers") %></span>
 
         <%= render UI::Forms::RadioButtonGroup::Component.new(
           name: :search_stickers,
-          selected: @search_stickers.presence || "",
+          selected: @settings.search_stickers.presence || "",
           entries: [
             {value: "", label: translation(".all")},
             {value: "with", label: translation(".filter_with_stickers_html")},
@@ -58,13 +58,13 @@
         ) %>
       </div>
     <% end %>
-    <% if @organization.enabled?("reg_address") %>
+    <% if organization.enabled?("reg_address") %>
       <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-1">
         <span class="sort-group-label"><%= translation(".address") %></span>
 
         <%= render UI::Forms::RadioButtonGroup::Component.new(
           name: :search_address,
-          selected: @search_address.presence || "",
+          selected: @settings.search_address.presence || "",
           entries: [
             {value: "", label: translation(".all")},
             {value: "with_street", label: translation(".filter_with_address_html")},
@@ -79,7 +79,7 @@
       <span class="sort-group-label"><%= translation(".status") %></span>
 
       <% status_entries = [{value: "all", label: translation(".all")}]
-        if @organization.enabled?("impound_bikes")
+        if organization.enabled?("impound_bikes")
           status_entries << {value: "not_impounded", label: translation(".filter_not_impounded_html")}
           status_entries << {value: "impounded", label: translation(".filter_impounded_html")}
         end
@@ -88,7 +88,7 @@
 
       <%= render UI::Forms::RadioButtonGroup::Component.new(
         name: :search_status,
-        selected: @search_status,
+        selected: @settings.search_status,
         entries: status_entries,
         form: "Search_Form",
         data: {action: "change->org--search#filterChanged"}
@@ -100,7 +100,7 @@
         tw:justify-between tw:gap-2
       "
     >
-      <% if @organization.enabled?("registration_notes") %>
+      <% if organization.enabled?("registration_notes") %>
         <button
           type="button"
           class="btn btn-sm btn-outline-secondary uncap"
@@ -111,7 +111,7 @@
         </button>
       <% end %>
 
-      <% if @organization.enabled?("csv_exports") %>
+      <% if organization.enabled?("csv_exports") %>
         <div class="tw:ml-auto tw:text-right">
           <%= link_to translation(".create_export_of_vehicles", cycle_type: cycle_type.pluralize(2)),
               organization_registrations_path(search_params.merge(create_export: true)),
@@ -123,7 +123,7 @@
 </div>
 
 <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-4">
-  <%= render(UI::Button::Component.new(color: :primary, size: :sm, active: settings_default_open?, aria: {expanded: settings_default_open?}, data: {action: "click->org--search#toggleSettings", "org--search-target": "settingsButton"})) do %>
+  <%= render(UI::Button::Component.new(color: :primary, size: :sm, active: default_open?, aria: {expanded: default_open?}, data: {action: "click->org--search#toggleSettings", "org--search-target": "settingsButton"})) do %>
     <%= translation(".settings") %>
     <%= helpers.inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", alt: "settings icon" %>
   <% end %>

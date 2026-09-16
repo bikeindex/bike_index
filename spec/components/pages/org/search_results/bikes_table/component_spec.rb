@@ -40,12 +40,12 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
-  context "with an injected settings_component" do
+  context "with injected settings" do
     let(:other_org) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[reg_phone]) }
-    let(:injected) { Pages::Org::Search::Settings::Component.new(organization: other_org) }
-    let(:options) { super().merge(settings_component: injected) }
+    let(:injected) { ComponentStructs::OrgSearchSettings.new(organization: other_org) }
+    let(:options) { super().merge(settings: injected) }
 
-    it "derives columns from the injected component, not a freshly built one" do
+    it "derives columns from the injected settings, not freshly built ones" do
       # the table's own organization has no reg_phone; the injected settings does
       expect(component).to have_css("th.reg_phone_cell", visible: :all)
     end
