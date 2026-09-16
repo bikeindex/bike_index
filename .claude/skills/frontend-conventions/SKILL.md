@@ -141,9 +141,7 @@ to another id entirely.
 
 **What's banned is the component reaching out, not the number of arguments.** State the controller already owns can be named and passed as one value object — `ComponentStructs::IndexState` (built in `ControllerHelpers#admin_index_state`) and `ComponentStructs::SortState` (`ControllerHelpers#sort_state`) are the pattern — value objects live in `app/services/component_structs/`. The component stays pure either way; a bundle just stops seventy views from re-listing the same seventeen assigns.
 
-Bundle only what's cohesive — one subject, assembled in one place. `IndexState` is "this admin index request"; `ComponentStructs::SortState` is "how this table is sorted and what its links carry". A grab-bag of unrelated request facts (`display_dev_info`, `current_user`, `current_country_id`) is not a value object, it's `helpers` renamed — those stay individual arguments.
-
-**A component other components build just to read off is one of these too.** `ComponentStructs::OrgSearchSettings` came out of `Pages::Org::Search::Settings::Component`, which five callers built for its column labels and filter descriptions and only some rendered. `Data.define` when the object just carries its arguments; a plain class when it memoizes derivations, since `Data` instances are frozen and `@x ||=` raises on one. A struct reading a component's translations keeps that component's scope — moving the keys strands the four `translation.*.yml`.
+Bundle only what's cohesive — one subject, assembled in one place. `IndexState` is "this admin index request"; `ComponentStructs::SortState` is "how this table is sorted and what its links carry". A grab-bag of unrelated request facts (`display_dev_info`, `current_user`, `current_country_id`) is not a value object, it's `helpers` renamed — those stay individual arguments. `Data.define` for one that only carries its arguments; a plain class when it memoizes derivations, since `Data` instances are frozen and `@x ||=` raises on one (`ComponentStructs::OrgSearchSettings`).
 
 ## ViewComponent rules
 
