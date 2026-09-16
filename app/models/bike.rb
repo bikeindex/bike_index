@@ -610,6 +610,7 @@ class Bike < ApplicationRecord
   def contact_owner?(u = nil, organization = nil)
     return false unless u.present?
     return true if status_stolen? && current_stolen_record.present?
+    return true if current_impound_record&.contactable_without_claiming?(u)
     return false unless owner&.notification_unstolen
     return u.enabled?("unstolen_notifications") unless organization.present? # Passed organization overrides user setting to speed stuff up
 

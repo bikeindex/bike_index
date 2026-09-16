@@ -347,6 +347,46 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  # The scope and the predicate answer the same question, one in SQL and one in memory
+  describe "contact_impounded" do
+    let(:organization) { FactoryBot.create(:organization) }
+
+    def scoped? = Organization.contact_impounded.where(id: organization.id).any?
+
+    it "is false for an organization trusted with none of the three" do
+      expect(organization.reload.contact_impounded?).to be_falsey
+      expect(scoped?).to be_falsey
+    end
+
+    context "with unstolen_notifications" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "unstolen_notifications") }
+
+      it "is true" do
+        expect(organization.reload.contact_impounded?).to be_truthy
+        expect(scoped?).to be_truthy
+      end
+    end
+
+    context "paid_money" do
+      before { organization.update_attribute :paid_money, true }
+
+      it "is true, without the feature" do
+        expect(organization.reload.enabled?("unstolen_notifications")).to be_falsey
+        expect(organization.contact_impounded?).to be_truthy
+        expect(scoped?).to be_truthy
+      end
+    end
+
+    context "ambassador" do
+      let(:organization) { FactoryBot.create(:organization_ambassador) }
+
+      it "is true" do
+        expect(organization.reload.contact_impounded?).to be_truthy
+        expect(scoped?).to be_truthy
+      end
+    end
+  end
+
   describe "show_single_search_menu_item?" do
     let(:organization) { Organization.new }
 
