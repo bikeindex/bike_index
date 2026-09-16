@@ -3,7 +3,7 @@
 module Pages
   module Org
     module Search
-      module AtAGlance
+      module ChartCard
         # The chart and headline counts beside the org registrations search.
         #
         # Everything lives inside the turbo-frame, header included, so a scope switch or a

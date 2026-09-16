@@ -52,10 +52,6 @@ module Pages
           def render_notes_field?
             @filters_component&.notes_search?
           end
-
-          def card_classes
-            "tw:rounded-xl tw:p-4 #{UI::Card::Component::BASE_CLASSES}"
-          end
         end
       end
     end

@@ -29,8 +29,9 @@
 >
   <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
   <% unless turbo_frame_request? %>
-    <div class="tw:flex tw:flex-col tw:items-start tw:gap-4 tw:lg:flex-row">
-      <div class="tw:w-full tw:min-w-0 tw:lg:flex-1">
+    <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
+    <div class="twwiderow tw:items-start tw:gap-y-4">
+      <div class="tw:min-w-0">
         <%= render(Pages::Org::Search::Form::Component.new(
           target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
           target_frame: :organized_bikes_results_frame,
@@ -66,8 +67,8 @@
         <% end %>
       </div>
 
-      <div class="tw:w-full tw:shrink-0 tw:lg:w-[26rem]">
-        <%= render(Pages::Org::Search::AtAGlance::Component.new(
+      <div class="tw:min-w-0">
+        <%= render(Pages::Org::Search::ChartCard::Component.new(
           src: chart_scope_paths[@chart_scope.to_sym], scope: @chart_scope, scope_paths: chart_scope_paths
         )) %>
       </div>

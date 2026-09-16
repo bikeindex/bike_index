@@ -4,7 +4,7 @@ en:
     pages:
       org:
         search:
-          at_a_glance:
+          chart_card:
             caption_search: At a glance · current search
             caption_year: At a glance · last 12 months
             chart_motorized: E-vehicle

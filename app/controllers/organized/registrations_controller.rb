@@ -20,7 +20,7 @@ module Organized
       if current_organization.enabled?("bike_search")
         @search_claimedness = "all"
         @search_all = Binxtils::InputNormalizer.boolean(params[:search_all])
-        @chart_scope = Pages::Org::Search::AtAGlance::Component.permitted_scope(params[:chart_scope])
+        @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @search_query_present = permitted_org_registration_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
         @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
@@ -32,7 +32,7 @@ module Organized
           create_export_and_redirect
         elsif chart_only?
           search_organization_bikes
-          render at_a_glance_component, layout: false
+          render chart_card_component, layout: false
         elsif @render_results
           search_organization_bikes
           respond_to do |format|
@@ -129,13 +129,13 @@ module Organized
       Binxtils::InputNormalizer.boolean(params[:chart_only])
     end
 
-    def at_a_glance_component
-      Pages::Org::Search::AtAGlance::Component.new(scope: @chart_scope, scope_paths: chart_scope_paths,
+    def chart_card_component
+      Pages::Org::Search::ChartCard::Component.new(scope: @chart_scope, scope_paths: chart_scope_paths,
         chart: registrations_chart, stats: registrations_stats)
     end
 
     def chart_scope_paths
-      @chart_scope_paths ||= Pages::Org::Search::AtAGlance::Component::SCOPES.index_with do |scope|
+      @chart_scope_paths ||= Pages::Org::Search::ChartCard::Component::SCOPES.index_with do |scope|
         organization_registrations_path(helpers.sortable_search_params.merge(
           organization_id: current_organization.to_param, chart_only: "1", chart_scope: scope
         ))
@@ -170,9 +170,9 @@ module Organized
                 stolen: in_range.where(status: "status_stolen")}
 
       UI::Chart::Component.new(
-        series: scopes.map { |key, scope| {name: t("components.pages.org.search.at_a_glance.chart_#{key}"), data: chart_counts(scope)} },
+        series: scopes.map { |key, scope| {name: t("components.pages.org.search.chart_card.chart_#{key}"), data: chart_counts(scope)} },
         time_range: chart_time_range,
-        colors: Pages::Org::Search::AtAGlance::Component::BANDS.values.map { it[:hex] },
+        colors: Pages::Org::Search::ChartCard::Component::BANDS.values.map { it[:hex] },
         height: "180px",
         stacked: true
       )
