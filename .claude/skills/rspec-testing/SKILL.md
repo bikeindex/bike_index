@@ -89,7 +89,14 @@ The only way a cassette changes is a spec run that records it:
 
 `git status` after a spec run is the only signal; a run that re-records prints nothing.
 
-**Don't reach for `WebMock.stub_request` on a host a cassette also covers.** VCR hooks into WebMock, so a raw stub registered by one example outlives it and answers the *other* example's cassette — the spec then passes or fails on file order, which reads as a flake rather than a fixture fighting itself. A third-party endpoint is recordable more often than it looks: Cloudflare, Stripe and the like publish testing credentials that their real API answers, so "I don't have keys" usually isn't the blocker. Keep WebMock for what can't be recorded — `bike_book_spec.rb`'s `to_timeout` is the case.
+**Never write `WebMock.stub_request`. HTTP in a spec is a cassette, with no exceptions.** A stub asserts what you imagined a service returns; a cassette records what it actually returned, which is the same reason cassettes are never hand-edited. The handful of `WebMock.stub_request` calls still in `spec/` are legacy — existing usage is not a precedent to copy.
+
+Two things make it tempting, and neither holds:
+
+- **"I have no credentials to record with."** Check before believing it. Cloudflare, Stripe and most third parties publish testing credentials their real API answers — Turnstile's `1x0000000000000000000000000000000AA` returns a real `success: true` from siteverify with no account. One `curl` settles it.
+- **"It's a failure case I can't record."** Then it's a cassette of the failure, or it isn't a spec. VCR is configured with `allow_http_connections_when_no_cassette = false`, so an unrecorded request already raises — that's the repo telling you every request is meant to be recorded.
+
+A raw stub is also actively harmful next to VCR: they share the same hook, so a stub registered by one example outlives it and answers the *other* example's cassette. The spec then passes or fails on file order, which reads as a flake rather than a fixture fighting itself.
 
 ## Stubbing ENV
 
