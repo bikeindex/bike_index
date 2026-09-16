@@ -714,7 +714,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
 
       it "sets the passive_organization, so the organization sticks on the next request" do
         # Which organization is default_organization isn't ordered, so seed the session -
-        # by name, which organization_id resolves as readily as the slug
+        # by name, which organization_id takes as well as a slug
         get "#{base_url}/#{bike.id}", params: {organization_id: organization.name}
         expect(session[:passive_organization_id]).to eq organization.id
 
