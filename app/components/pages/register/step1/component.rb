@@ -25,10 +25,12 @@ module Pages
         def form_options
           return {data: {turbo: false}, html: {target: "_top"}} if @embed
 
-          {data: {turbo: true, controller: "autofocus form-persist register--retry",
+          {data: {turbo: true, controller: "autofocus form-persist register--retry shared-blocks--turnstile",
                   form_persist_key_value: "register-start-#{@b_param.id_token}",
+                  "shared-blocks--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
+                  "shared-blocks--turnstile-script-url-value": Integrations::Turnstile::SCRIPT_URL,
                   action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
-                    "submit->form-persist#clear"}}
+                    "input->shared-blocks--turnstile#update submit->form-persist#clear"}}
         end
 
         # Derived when the frame's src doesn't name one
