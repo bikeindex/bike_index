@@ -108,7 +108,7 @@ module Pages
           end
 
           def owner_phone
-            @bike.phone if @bike.phoneable_by?(@current_user)
+            @bike.phone if @bike.phoneable_by?(@current_user, @organization)
           end
 
           def current_ownership
