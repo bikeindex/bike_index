@@ -7,12 +7,12 @@ RSpec.describe MailerHelper, type: :helper do
       expect(render_donation?).to be_truthy
       expect(render_donation?(organization)).to be_truthy
     end
-    context "organization with invoice" do
+    context "organization with a $0 invoice" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features) }
       it "is falsey" do
         expect(organization.reload.is_invoiced?).to be_truthy
         expect(organization.paid_money?).to be_falsey
-        expect(render_donation?(organization)).to be_truthy
+        expect(render_donation?(organization)).to be_falsey
       end
     end
     context "organization paid_money" do

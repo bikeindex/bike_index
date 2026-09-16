@@ -88,6 +88,16 @@ RSpec.describe OrganizedMailer, type: :mailer do
             expect(mail.deliver_now.text_part.body.to_s).to include("HEADERXSNIPPET").and include("PARTIALYXSNIPPET")
           end
         end
+        context "with a $0 invoice" do
+          let(:organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user) }
+          it "doesn't render the donation" do
+            expect(organization.reload.is_invoiced?).to be_truthy
+            expect(organization.paid_money?).to be_falsey
+            mail = OrganizedMailer.partial_registration(b_param)
+            expect(mail.tag).to eq "partial_registration"
+            expect_render_donation(false, mail)
+          end
+        end
       end
     end
   end
