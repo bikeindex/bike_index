@@ -14,7 +14,6 @@ module SpamEstimator
       (score - bike_ownership_reduction(user)).clamp(0, 100)
     end
 
-    # matched terms and their counts, recorded on the ban so false positives are auditable
     def seo_spam_matches(user) = Text.seo_spam_matches(scannable_text(user))
 
     #

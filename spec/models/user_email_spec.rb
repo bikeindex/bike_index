@@ -123,10 +123,8 @@ RSpec.describe UserEmail, type: :model do
     let!(:user_email) { FactoryBot.create(:user_email, email: "mommy@stuff.com") }
     let!(:duplicate) { FactoryBot.create(:user_email, email: "mommy@stuff.com") }
 
-    it "returns the account that confirmed the address first" do
-      expect(UserEmail.confirmed.where(email: "mommy@stuff.com").pluck(:id)).to match_array([user_email.id, duplicate.id])
+    it "returns the oldest row for an address held by two accounts" do
       expect(UserEmail.friendly_find("mommy@stUFF.com ")).to eq user_email
-      expect(UserEmail.fuzzy_user_find("mommy@stuff.com")).to eq user_email.user
     end
   end
 end

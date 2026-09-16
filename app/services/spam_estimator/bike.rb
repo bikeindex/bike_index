@@ -7,8 +7,7 @@ module SpamEstimator
     def estimate(bike, stolen_record = nil)
       estimate = 0
       return estimate if bike.blank?
-      # serial_number isn't in cached_data, and it's the most common injection target.
-      # cached_data is nil until the bike is saved, so the model fields are checked directly
+      # cached_data is nil until the bike is saved, and never holds serial_number - the most common injection target
       return 100 if Text.certain_spam?(bike.cached_data) || Text.certain_spam?(bike.serial_number) ||
         Text.certain_spam?("#{bike.frame_model} #{bike.manufacturer_other}")
 

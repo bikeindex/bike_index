@@ -222,7 +222,7 @@ module SpamEstimator
       I18n.transliterate(str).downcase
     end
 
-    conceal :strip_diacritics, :vowel_frequency_suspiciousness, :vowel_ratio,
+    conceal :looks_malicious?, :strip_diacritics, :vowel_frequency_suspiciousness, :vowel_ratio,
       :capital_count_suspiciousness, :non_letter_count_suspiciousness,
       :space_count_suspiciousness, :downcase_transliterate
   end
