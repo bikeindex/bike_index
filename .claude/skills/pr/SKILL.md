@@ -35,7 +35,6 @@ Run the `gh` commands as written. The appendix at the bottom covers the one envi
 
 - Uncommitted changes you made in this session: commit them now. Otherwise the cleanup, the classifier and the diff you describe all silently skip them, and the PR body describes the wrong diff.
 - Uncommitted changes you didn't make: stop and ask. Don't sweep someone else's work into a commit.
-- Uncommitted changes you made that belong on a different branch: leave them, and say so in your summary. `origin/main...HEAD` never sees them; check the merge below doesn't touch those paths (`rtk proxy git diff --name-only HEAD...origin/main`) so a dirty tree can't block it.
 
 ### Determine the base branch
 
