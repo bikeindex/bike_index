@@ -20,11 +20,9 @@ module SpamEstimator
       ;\s*(?:drop|delete|truncate|exec)\b
     /xi
 
-    # Scored by estimate, so these are only terms that never show up in a real registration or theft
-    # report: no bike is named after them (Soma, Norco and Ultram count only after a buying verb),
-    # and nobody reports a bike stolen outside one
-    PHARMACY_REGEX = /(?:
-      \b(?:
+    # Scored by estimate, so these are only terms that never show up in a real registration or
+    # theft report — Soma, Norco and Ultram count only after a buying verb
+    PHARMACY_REGEX = /\b(?:
         erectile\s+dysfunction | (?:buy|order|purchase)\s+(?:soma|norco|ultram) |
         pain\s?o\s?soma | viagra | cialis | levitra | kamagra | sildenafil | tadalafil | vardenafil | avanafil |
         cenforce | vidalista | fildena | tramadol | tapentadol | aspadol | oxycodone | oxycontin | roxicodone | hydrocodone | percocet |
@@ -34,8 +32,7 @@ module SpamEstimator
         vyvanse | provigil | modafinil | modalert | modvigil | armodafinil | artvigil | waklert | ambien | zolpidem |
         belbien | belbein | zopiclone | eszopiclone | restoril | carisoprodol | fioricet | butalbital | pregabalin |
         gabapentin | phentermine | adipex | meridia | sibutramine | reductil | ozempic | semaglutide | cytotec | misoprostol
-      )\b
-    )/xi
+      )\b/xi
 
     # crypto, gambling, adult, gift-card and pharmacy terms that SEO-spam profiles exist to promote.
     # Word boundaries matter: usernames are auto-generated random strings, so
@@ -95,11 +92,11 @@ module SpamEstimator
     def estimate(str)
       return 0 if str.blank?
       return 100 if looks_malicious?(str)
-      # pharmacy spam is well-formed prose, so the shape checks below score it 0
-      return 100 if PHARMACY_REGEX.match?(str)
 
       str_length ||= str.length.to_f
       return 10 if str_length == 1
+      # pharmacy spam is well-formed prose, so the shape checks below score it 0
+      return 100 if PHARMACY_REGEX.match?(str)
 
       str_downlate ||= downcase_transliterate(str)
 
