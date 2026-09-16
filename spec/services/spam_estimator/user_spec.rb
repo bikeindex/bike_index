@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe SpamEstimator::User do
+  def spam_matches(user)
+    SpamEstimator::Text.seo_spam_matches(described_class.scannable_text(user))
+  end
+
   describe "estimate" do
     let(:user) { User.new(show_bikes: true, name:, description:) }
     let(:name) { "Rider Person" }
@@ -85,7 +89,7 @@ RSpec.describe SpamEstimator::User do
         ["Pre-arranged and prepaid funeral options across Adelaide.",
           "Prepaid travel SIM cards and eSIMs, so you stay connected overseas."]
           .each do |description|
-            expect(described_class.seo_spam_matches(User.new(show_bikes: true, description:)))
+            expect(spam_matches(User.new(show_bikes: true, description:)))
               .to eq({"prepaid" => 1})
           end
       end
@@ -100,8 +104,20 @@ RSpec.describe SpamEstimator::User do
       end
 
       it "stays below the threshold" do
-        expect(described_class.seo_spam_matches(user).values.sum).to eq 1
+        expect(spam_matches(user).values.sum).to eq 1
         expect(described_class.estimate(user)).to be < SpamEstimator::User::MARK_SPAM_PERCENT
+      end
+    end
+
+    context "online pharmacy profile" do
+      let(:user) do
+        User.new(show_bikes: true, username: "pills4cure", title: "Pills4Cure",
+          description: "An online pharmacy offering medications for pain relief, erectile dysfunction and more.",
+          my_bikes_hash: {"link_target" => "https://www.pills4cure.com/"})
+      end
+
+      it "is above the spam threshold" do
+        expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
       end
     end
 
@@ -126,19 +142,6 @@ RSpec.describe SpamEstimator::User do
       let(:user) { User.new(show_bikes: true, name: "VhriBJhD1nuwHoI9", username: "efgBz9pNdd7efgBz9", description:) }
       it "stays below the threshold" do
         expect(described_class.estimate(user)).to be < SpamEstimator::User::MARK_SPAM_PERCENT
-      end
-    end
-
-    context "seo_spam_matches" do
-      let(:user) { User.new(show_bikes: true, title: "Nhà cái uy tín", description: "nha cai casino") }
-
-      it "tallies matched terms, normalizing case and diacritics" do
-        expect(described_class.seo_spam_matches(user)).to eq({"nha cai" => 2, "uy tin" => 1, "casino" => 1})
-      end
-
-      it "is empty for a blank user" do
-        expect(described_class.seo_spam_matches(nil)).to eq({})
-        expect(described_class.seo_spam_matches(User.new)).to eq({})
       end
     end
 
@@ -178,6 +181,16 @@ RSpec.describe SpamEstimator::User do
         bike.update(likely_spam: true)
         expect(described_class.estimate(user.reload)).to eq base
       end
+    end
+  end
+
+  describe "scannable_text" do
+    let(:user) { User.new(title: "Nhà cái uy tín", twitter: "casinovip") }
+
+    it "includes the link fields and handles" do
+      expect(described_class.scannable_text(user)).to eq "Nhà cái uy tín casinovip"
+      expect(described_class.scannable_text(nil)).to eq ""
+      expect(described_class.scannable_text(User.new)).to eq ""
     end
   end
 end

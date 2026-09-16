@@ -230,4 +230,33 @@ RSpec.describe SpamEstimator::Text do
       expect(described_class.send(:capital_count_suspiciousness, "#{str.downcase}#{str.downcase}AABBC")).to be_between(0, 5)
     end
   end
+
+  describe "seo_spam_matches" do
+    it "tallies matched terms, normalizing case and diacritics" do
+      expect(described_class.seo_spam_matches("Nhà cái uy tín nha cai casino"))
+        .to eq({"nha cai" => 2, "uy tin" => 1, "casino" => 1})
+    end
+
+    it "is empty for a blank string" do
+      expect(described_class.seo_spam_matches(nil)).to eq({})
+      expect(described_class.seo_spam_matches("")).to eq({})
+    end
+
+    it "counts generic medical words, but not an MG Road address" do
+      expect(described_class.seo_spam_matches("Sports medicine clinic. We manage medication and fit prescription glasses. Fish oil 1000mg."))
+        .to eq({"medicine" => 1, "medication" => 1, "prescription" => 1, "1000mg" => 1})
+      expect(described_class.seo_spam_matches("Visit us at 123 MG Road, Bengaluru, or 45 MG Rd")).to eq({})
+    end
+
+    it "counts bike names only after a buying verb" do
+      expect(described_class.seo_spam_matches("Buy Soma online, order Norco")).to eq({"buy soma" => 1, "order norco" => 1})
+    end
+  end
+
+  describe "estimate with a pharmacy term" do
+    it "is 100, since the shape checks score well-formed prose 0" do
+      expect(described_class.estimate("Aspadol 100mg")).to eq 100
+      expect(described_class.estimate("Buy Ambien online for insomnia")).to eq 100
+    end
+  end
 end
