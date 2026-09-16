@@ -4465,7 +4465,7 @@ nl:
       submit: Voorleggen
       within: binnen
     org_search_columns:
-      avery_cell: Avery Exporteerbaar
+      avery_cell: Avery?
       color_cell: Kleur
       created_at_cell: Geregistreerd
       creation_description_cell: Bron
@@ -4477,7 +4477,7 @@ nl:
       notes_cell: Notes
       owner_email_cell: Verzonden naar
       owner_name_cell: Eigenaar naam
-      propulsion_type_cell: Elektrisch voertuig (aandrijving)
+      propulsion_type_cell: Voortstuwing
       reg_address_cell: Adres
       reg_extra_registration_number_cell: Secundair#
       reg_organization_affiliation_cell: Aansluiting

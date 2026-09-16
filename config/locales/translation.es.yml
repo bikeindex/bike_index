@@ -5274,7 +5274,7 @@ es:
       your_bikes: Tus bicicletas
       your_preferences: Tus preferencias
     org_search_columns:
-      avery_cell: Exportable de Avery
+      avery_cell: "¿Avery?"
       color_cell: Color
       created_at_cell: Registrado
       creation_description_cell: Fuente
@@ -5286,7 +5286,7 @@ es:
       notes_cell: Notas de registro
       owner_email_cell: Enviado a
       owner_name_cell: Nombre del propietario
-      propulsion_type_cell: Vehículo eléctrico (propulsión)
+      propulsion_type_cell: Propulsión
       reg_address_cell: DIRECCIÓN
       reg_extra_registration_number_cell: Secundario#
       reg_organization_affiliation_cell: Afiliación

@@ -142,6 +142,12 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       expect(instance.column_renames[:color_cell]).to eq "Color"
       expect(instance.column_renames[:reg_student_id_cell]).to eq "#{organization.short_name} Student ID"
     end
+
+    it "leaves the columns the table also heads unprefixed" do
+      expect(instance.column_renames[:avery_cell]).to eq "Avery?"
+      expect(instance.column_renames[:notes_cell]).to eq "Registration Notes"
+      expect(instance.column_renames[:propulsion_type_cell]).to eq "Propulsion"
+    end
   end
 
   describe "enabled_columns" do

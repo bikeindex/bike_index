@@ -51,6 +51,18 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
+  # The settings panel's checkboxes read the same column_renames, so pinning the text here
+  # pins both — these three read differently in the two scopes before they were merged
+  context "with avery_export and registration_notes enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search avery_export registration_notes] }
+
+    it "labels the columns the way the table always has" do
+      expect(component).to have_css("th.avery_cell", visible: :all, normalize_ws: true, exact_text: "Avery?")
+      expect(component).to have_css("th.propulsion_type_cell", visible: :all, normalize_ws: true, exact_text: "Propulsion")
+      expect(component).to have_css("th.notes_cell", visible: :all, normalize_ws: true, exact_text: "Registration Notes")
+    end
+  end
+
   context "with render_sortable" do
     let(:options) { {organization:, bikes:, render_sortable: true} }
 
