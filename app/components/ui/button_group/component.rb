@@ -5,10 +5,10 @@ module UI
     # A row of chips that navigate or act — the link/button counterpart of
     # UI::Forms::RadioButtonGroup, which chips off CHIP_CLASSES too.
     #
-    # style: :button is a row of separate chips; :toggle is a segmented control — one
-    # track, with the active entry raised out of it.
+    # kind: :toggle renders them as a segmented control instead — one track, with the
+    # active entry raised out of it.
     class Component < ApplicationComponent
-      STYLES = %i[button toggle].freeze
+      KINDS = %i[button toggle].freeze
 
       CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
 
@@ -25,7 +25,7 @@ module UI
         UI::Button::Component::FOCUS_CLASSES,
         UI::Button::Component::DISABLED_CLASSES,
         "tw:is-active:bg-white tw:is-active:text-gray-900 tw:is-active:shadow-sm",
-        "tw:dark:is-active:bg-gray-900 tw:dark:is-active:text-gray-100"
+        "tw:is-active:dark:bg-gray-900 tw:is-active:dark:text-gray-100"
       ].join(" ").freeze
 
       # full_width lays the chips out as equal columns that wrap, staying the same width
@@ -36,12 +36,14 @@ module UI
       end
 
       # entries: ComponentStructs::Shapes' entries
-      def initialize(entries:, full_width: false, style: :button)
-        raise ArgumentError, "unknown style #{style.inspect}, expected one of: #{STYLES.join(", ")}" unless STYLES.include?(style)
+      def initialize(entries:, full_width: false, kind: :button)
+        raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}" unless KINDS.include?(kind)
+        # The track sizes itself to its segments, so there's no column layout to widen
+        raise ArgumentError, "full_width is not supported for the toggle kind" if full_width && kind == :toggle
 
         @entries = entries
         @full_width = full_width
-        @style = style
+        @kind = kind
       end
 
       def call
@@ -52,13 +54,9 @@ module UI
 
       private
 
-      def toggle?
-        @style == :toggle
-      end
+      def toggle? = @kind == :toggle
 
-      def group_classes
-        toggle? ? TRACK_CLASSES : self.class.layout_classes(full_width: @full_width)
-      end
+      def group_classes = toggle? ? TRACK_CLASSES : self.class.layout_classes(full_width: @full_width)
 
       def chip(entry)
         active = entry[:active].presence # false would render data-active="false", nil renders nothing

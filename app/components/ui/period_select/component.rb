@@ -16,9 +16,7 @@ module UI
 
       # What the selected period's button reads, for a caller naming the period elsewhere
       def self.period_label(period)
-        entry = PERIODS.find { it[:key] == period.to_s }
-        return I18n.t("components.ui.period_select.custom") if entry.nil?
-
+        entry = PERIODS.find { it[:key] == period.to_s } || {label: "custom"}
         [entry[:prefix], entry[:label]].compact
           .map { I18n.t("components.ui.period_select.#{it}") }.join(" ")
       end
