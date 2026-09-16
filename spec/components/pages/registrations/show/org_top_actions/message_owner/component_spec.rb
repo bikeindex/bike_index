@@ -37,6 +37,19 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
     end
   end
 
+  # Whoever holds it already knows where it is, so the sighting question doesn't apply
+  context "with an impounded bike" do
+    let(:bike) { FactoryBot.create(:bike, :impounded, cycle_type: "e-scooter").reload }
+
+    it "asks what they need rather than where they saw it" do
+      render_inline(described_class.new(bike:, current_user:))
+
+      expect(page).to have_text("Know who has this e-scooter?")
+      expect(page).to_not have_text("Know something about this e-scooter")
+      expect(page).to have_css("textarea[placeholder^='What do you need to ask about this e-scooter']", visible: :all)
+    end
+  end
+
   context "with an unstolen bike the owner allows contact about" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "unstolen_notifications") }
     let(:current_user) { FactoryBot.create(:organization_user, organization:) }
