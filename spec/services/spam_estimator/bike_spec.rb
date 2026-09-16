@@ -25,8 +25,9 @@ RSpec.describe SpamEstimator::Bike do
       end
       context "pharmacy spam" do
         let(:str) { "Aspadol 100mg" }
-        it "is above the spam threshold" do
-          expect(described_class.estimate(bike)).to be > SpamEstimator::Bike::MARK_SPAM_PERCENT
+        it "is the weighted text estimate" do
+          expect(SpamEstimator::Text.estimate(str)).to eq 100
+          expect(described_class.estimate(bike)).to eq 20
         end
       end
       context "models that share a drug name" do

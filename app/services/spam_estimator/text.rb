@@ -20,10 +20,12 @@ module SpamEstimator
       ;\s*(?:drop|delete|truncate|exec)\b
     /xi
 
-    # Soma, Norco and Ultram are bike names, so they only count after a buying verb
+    # Scored by estimate, so these are only terms that never show up in a real registration or theft
+    # report: no bike is named after them (Soma, Norco and Ultram count only after a buying verb),
+    # and nobody reports a bike stolen outside one
     PHARMACY_REGEX = /(?:
       \b(?:
-        pharmacy | pharmacies | erectile\s+dysfunction | (?:buy|order|purchase)\s+(?:soma|norco|ultram) |
+        erectile\s+dysfunction | (?:buy|order|purchase)\s+(?:soma|norco|ultram) |
         pain\s?o\s?soma | viagra | cialis | levitra | kamagra | sildenafil | tadalafil | vardenafil | avanafil |
         cenforce | vidalista | fildena | tramadol | tapentadol | aspadol | oxycodone | oxycontin | roxicodone | hydrocodone | percocet |
         vicodin | lorcet | lortab | codeine | fentanyl | dilaudid | hydromorphone | suboxone | subutex | buprenorphine |
@@ -32,9 +34,45 @@ module SpamEstimator
         vyvanse | provigil | modafinil | modalert | modvigil | armodafinil | artvigil | waklert | ambien | zolpidem |
         belbien | belbein | zopiclone | eszopiclone | restoril | carisoprodol | fioricet | butalbital | pregabalin |
         gabapentin | phentermine | adipex | meridia | sibutramine | reductil | ozempic | semaglutide | cytotec | misoprostol
-      )\b |
+      )\b
+    )/xi
+
+    # crypto, gambling, adult, gift-card and pharmacy terms that SEO-spam profiles exist to promote.
+    # Word boundaries matter: usernames are auto-generated random strings, so
+    # unanchored substrings ("Judith", "Hagen", "Sloth", "Donohue") would ban real people.
+    SEO_SPAM_REGEX = /(?:
+      \b(?:
+        bitcoin | btc | ethereum | crypto(?:currency|\s?wallet)? | blockchain | binance |
+        coinbase | dogecoin | altcoin | memecoin | defi | web3 | metamask | airdrop |
+        presale | usdt | tether |
+        casino | kasino | gambling | roulette | blackjack | baccarat | poker | sportsbook |
+        jackpot | judi | togel | toto | situs | gacor | bandar | slot | agen | maxwin |
+        terpercaya | taruhan | alternatif | gampang | pragmatic\s+play | scatter\s+hitam |
+        rtp | bet365 | betting | wager |
+        bokep | hentai | xvideo | (?:phim|clip|truyen)\s?sex |
+        nha\s+cai | ca\s+cuoc | da\s+ga | soi\s+keo | no\s+hu | xoc\s+dia |
+        nap\s+tien | dang\s+nhap | truc\s+tuyen | khuyen\s+mai | uy\s+tin |
+        game\s+bai | co\s+bac | song\s+bac | xo\s+so | lo\s+de |
+        link\s+truy\s+cap | clip\s+(?:hot|nong) |
+        # estimate scores PHARMACY_REGEX against frame models and theft reports, so anything that
+        # shows up in a real one ("Omega Pharma", "stolen outside the pharmacy") stays here
+        pharmacy | pharmacies | pharmacists? | pharma | drugstore | prescriptions? | medications? |
+        medicines? | meds | painkillers? | opioids? | impotence |
+        # "MG Road" is a common street name in India
+        \d+\s?mg(?!\s+r(?:oa)?d\b)
+      )\b | 18\+ |
       # spam usernames run it into digits (pills4cure), so a word boundary won't match
-      (?<![a-z])pills?(?![a-z])
+      (?<![a-z])pills?(?![a-z]) |
+      # Gift-card "check your balance" farms run the brand together in usernames and
+      # domains (mcgiftgiftcardmall3, vanillaprepaid.io), so these can't be \b-anchored.
+      gift\s?(?:cards?|code) | prepaid |
+      (?:mc|my|wm|walmart|five\s?back|vanilla|visa|amex|master(?:card)?)-?\s?e?-?gift |
+      (?:one|my)-?\s?vanilla | vanilla-?\s?balance | secure-?\s?spend |
+      (?:card|gift)\s?balance | balance\s?(?:check|inquiry|inquiries) |
+      check\s?(?:my|your|the)?\s?balance | reward\s?cards? |
+      card\s?activation | activate\s+(?:my\s|your\s|the\s)?(?:gift\s?)?card |
+      redeem\s+(?:code|card) |
+      #{PHARMACY_REGEX}
     )/xi
 
     def looks_malicious?(str)
@@ -43,11 +81,22 @@ module SpamEstimator
       str.match?(MALICIOUS_REGEX)
     end
 
+    # matched terms and their counts, recorded on the ban so false positives are auditable.
+    # Vietnamese spam appears both with and without diacritics, so strip them first —
+    # I18n.transliterate can't (it renders Vietnamese vowels as "?")
+    def seo_spam_matches(str)
+      return {} if str.blank?
+
+      strip_diacritics(str).scan(SEO_SPAM_REGEX).map { |term| term.downcase.gsub(/\s+/, " ") }.tally
+    end
+
     # eariot are the most frequent letters - this could be incorporated into calculations
     # Currently, doing a weird vowel count thing
     def estimate(str)
       return 0 if str.blank?
       return 100 if looks_malicious?(str)
+      # pharmacy spam is well-formed prose, so the shape checks below score it 0
+      return 100 if PHARMACY_REGEX.match?(str)
 
       str_length ||= str.length.to_f
       return 10 if str_length == 1
@@ -65,6 +114,10 @@ module SpamEstimator
     #
     # private below here
     #
+
+    def strip_diacritics(str)
+      str.unicode_normalize(:nfd).gsub(/\p{Mn}/, "").tr("đĐ", "dD")
+    end
 
     def vowel_frequency_suspiciousness(str, str_length = nil, str_downlate = nil)
       str_length ||= str.length.to_f
@@ -166,7 +219,7 @@ module SpamEstimator
       I18n.transliterate(str).downcase
     end
 
-    conceal :vowel_frequency_suspiciousness, :vowel_ratio,
+    conceal :strip_diacritics, :vowel_frequency_suspiciousness, :vowel_ratio,
       :capital_count_suspiciousness, :non_letter_count_suspiciousness,
       :space_count_suspiciousness, :downcase_transliterate
   end

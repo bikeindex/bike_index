@@ -9,8 +9,6 @@ module SpamEstimator
       return estimate if bike.blank?
       # serial_number isn't in cached_data, and it's the most common injection target
       return 100 if Text.looks_malicious?(bike.cached_data) || Text.looks_malicious?(bike.serial_number)
-      # only pharmacy terms: the user estimator's other SEO terms are real bike models (Casino, Blackjack, Slot)
-      return 100 if SpamEstimator::Text::PHARMACY_REGEX.match?("#{bike.frame_model} #{bike.manufacturer_other}")
 
       estimate += 35 if bike.creation_organization&.spam_registrations
       estimate += 0.2 * Text.estimate(bike.frame_model)

@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe SpamEstimator::User do
+  def spam_matches(user)
+    SpamEstimator::Text.seo_spam_matches(described_class.scannable_text(user))
+  end
+
   describe "estimate" do
     let(:user) { User.new(show_bikes: true, name:, description:) }
     let(:name) { "Rider Person" }
@@ -85,7 +89,7 @@ RSpec.describe SpamEstimator::User do
         ["Pre-arranged and prepaid funeral options across Adelaide.",
           "Prepaid travel SIM cards and eSIMs, so you stay connected overseas."]
           .each do |description|
-            expect(described_class.seo_spam_matches(User.new(show_bikes: true, description:)))
+            expect(spam_matches(User.new(show_bikes: true, description:)))
               .to eq({"prepaid" => 1})
           end
       end
@@ -100,7 +104,7 @@ RSpec.describe SpamEstimator::User do
       end
 
       it "stays below the threshold" do
-        expect(described_class.seo_spam_matches(user).values.sum).to eq 1
+        expect(spam_matches(user).values.sum).to eq 1
         expect(described_class.estimate(user)).to be < SpamEstimator::User::MARK_SPAM_PERCENT
       end
     end
@@ -113,7 +117,7 @@ RSpec.describe SpamEstimator::User do
       end
 
       it "is above the spam threshold" do
-        expect(described_class.seo_spam_matches(user)).to eq({"pills" => 3, "pharmacy" => 1, "medications" => 1, "erectile dysfunction" => 1})
+        expect(spam_matches(user)).to eq({"pills" => 3, "pharmacy" => 1, "medications" => 1, "erectile dysfunction" => 1})
         expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
       end
     end
@@ -122,7 +126,7 @@ RSpec.describe SpamEstimator::User do
       let(:description) { "Sports medicine clinic. We manage medication and fit prescription glasses. Fish oil 1000mg." }
 
       it "counts them as references" do
-        expect(described_class.seo_spam_matches(user))
+        expect(spam_matches(user))
           .to eq({"medicine" => 1, "medication" => 1, "prescription" => 1, "1000mg" => 1})
       end
 
@@ -130,16 +134,16 @@ RSpec.describe SpamEstimator::User do
         let(:description) { "Visit us at 123 MG Road, Bengaluru, or 45 MG Rd" }
 
         it "is not a dosage" do
-          expect(described_class.seo_spam_matches(user)).to eq({})
+          expect(spam_matches(user)).to eq({})
         end
       end
     end
 
     context "bike brands that share a drug's name" do
       it "counts them only after a buying verb" do
-        expect(described_class.seo_spam_matches(User.new(show_bikes: true, description: "I ride a Soma Wolverine and a Norco Search")))
+        expect(spam_matches(User.new(show_bikes: true, description: "I ride a Soma Wolverine and a Norco Search")))
           .to eq({})
-        expect(described_class.seo_spam_matches(User.new(show_bikes: true, description: "Buy Soma online, order Norco")))
+        expect(spam_matches(User.new(show_bikes: true, description: "Buy Soma online, order Norco")))
           .to eq({"buy soma" => 1, "order norco" => 1})
       end
     end
@@ -168,16 +172,13 @@ RSpec.describe SpamEstimator::User do
       end
     end
 
-    context "seo_spam_matches" do
-      let(:user) { User.new(show_bikes: true, title: "Nhà cái uy tín", description: "nha cai casino") }
+    context "scannable_text" do
+      let(:user) { User.new(show_bikes: true, title: "Nhà cái uy tín", twitter: "casinovip") }
 
-      it "tallies matched terms, normalizing case and diacritics" do
-        expect(described_class.seo_spam_matches(user)).to eq({"nha cai" => 2, "uy tin" => 1, "casino" => 1})
-      end
-
-      it "is empty for a blank user" do
-        expect(described_class.seo_spam_matches(nil)).to eq({})
-        expect(described_class.seo_spam_matches(User.new)).to eq({})
+      it "includes the link fields and handles" do
+        expect(described_class.scannable_text(user)).to eq "Nhà cái uy tín casinovip"
+        expect(described_class.scannable_text(nil)).to eq ""
+        expect(described_class.scannable_text(User.new)).to eq ""
       end
     end
 

@@ -230,4 +230,16 @@ RSpec.describe SpamEstimator::Text do
       expect(described_class.send(:capital_count_suspiciousness, "#{str.downcase}#{str.downcase}AABBC")).to be_between(0, 5)
     end
   end
+
+  describe "seo_spam_matches" do
+    it "tallies matched terms, normalizing case and diacritics" do
+      expect(described_class.seo_spam_matches("Nhà cái uy tín nha cai casino"))
+        .to eq({"nha cai" => 2, "uy tin" => 1, "casino" => 1})
+    end
+
+    it "is empty for a blank string" do
+      expect(described_class.seo_spam_matches(nil)).to eq({})
+      expect(described_class.seo_spam_matches("")).to eq({})
+    end
+  end
 end
