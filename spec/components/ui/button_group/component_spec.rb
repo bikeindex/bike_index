@@ -23,6 +23,25 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
     expect(component.css("a").first["class"]).to eq(UI::Button::Component.build_classes(color: :secondary, size: :md))
   end
 
+  describe "style" do
+    it "raises on one it doesn't have" do
+      expect { described_class.new(entries:, style: :segmented) }
+        .to raise_error(ArgumentError, /unknown style :segmented/)
+    end
+
+    context "toggle" do
+      let(:component) { render_inline(described_class.new(entries:, style: :toggle)) }
+
+      # The group is one track, so it drops the between-chip gap the button style wraps with
+      it "renders the entries as segments of a single track" do
+        expect(component).to have_css("div.tw\\:bg-gray-100")
+        expect(component).to have_no_css("div.tw\\:flex-wrap")
+        expect(component.css("a").first["class"]).to eq(described_class::SEGMENT_CLASSES)
+        expect(component).to have_css("a[href='/active'][data-active='true']", text: "Active")
+      end
+    end
+  end
+
   context "entries without an href" do
     let(:entries) { [{label: "Map", active: true, data: {action: "click->map#show"}}, {label: "List"}] }
 
