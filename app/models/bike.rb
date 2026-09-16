@@ -610,11 +610,20 @@ class Bike < ApplicationRecord
   def contact_owner?(u = nil, organization = nil)
     return false unless u.present?
     return true if status_stolen? && current_stolen_record.present?
-    return true if current_impound_record&.contactable_without_claiming?(u)
+    return true if contactable_without_claiming?(u)
     return false unless owner&.notification_unstolen
     return u.enabled?("unstolen_notifications") unless organization.present? # Passed organization overrides user setting to speed stuff up
 
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
+  end
+
+  # Messaging whoever has the vehicle, rather than opening a claim against it, is for
+  # the organizations we already trust with unstolen registrations
+  def contactable_without_claiming?(passed_user = nil)
+    return false if passed_user.blank?
+    return false unless status_abandoned? || current_impound_record.present?
+
+    passed_user.organizations.contact_impounded.limit(1).any?
   end
 
   def contact_owner_user?(u = nil, organization = nil)

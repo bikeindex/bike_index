@@ -636,6 +636,69 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "contactable_without_claiming?" do
+    let(:bike) { FactoryBot.create(:bike, :impounded) }
+    let(:organization_role) { FactoryBot.create(:organization_role_claimed) }
+    let(:contactable_user) { organization_role.user }
+    let(:contactable_organization) { organization_role.organization }
+
+    it "is false without a user, and for a user whose organization qualifies on nothing" do
+      expect(bike.reload.contactable_without_claiming?).to be_falsey
+      expect(bike.contactable_without_claiming?(FactoryBot.create(:user_confirmed))).to be_falsey
+      expect(contactable_organization.reload.paid_money?).to be_falsey
+      expect(bike.contactable_without_claiming?(contactable_user)).to be_falsey
+    end
+
+    context "organization has unstolen_notifications" do
+      before { contactable_organization.update_attribute :enabled_feature_slugs, ["unstolen_notifications"] }
+
+      it "is true" do
+        expect(bike.reload.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+      end
+
+      # Nothing is away from its owner, so the allowance has nobody to reach
+      context "bike is with its owner" do
+        let(:bike) { FactoryBot.create(:bike) }
+
+        it "is false" do
+          expect(bike.reload.status_with_owner?).to be_truthy
+          expect(bike.contactable_without_claiming?(contactable_user.reload)).to be_falsey
+        end
+      end
+
+      # An abandoned bike has no impound record - the allowance is about the status,
+      # not about there being a record to claim
+      context "bike is abandoned" do
+        let(:bike) { FactoryBot.create(:bike, status: :status_abandoned) }
+
+        it "is true" do
+          expect(bike.reload.current_impound_record).to be_blank
+          expect(bike.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+          expect(bike.contact_owner?(contactable_user)).to be_truthy
+        end
+      end
+    end
+
+    # paid_money is a wider allowance than the feature - an organization can be paid
+    # without having bought unstolen_notifications
+    context "organization is paid" do
+      before { contactable_organization.update_attribute :paid_money, true }
+
+      it "is true, without the unstolen_notifications feature" do
+        expect(contactable_organization.reload.enabled?("unstolen_notifications")).to be_falsey
+        expect(bike.reload.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+      end
+    end
+
+    context "organization is an ambassador organization" do
+      before { contactable_organization.update_attribute :kind, "ambassador" }
+
+      it "is true" do
+        expect(bike.reload.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+      end
+    end
+  end
+
   describe "owner" do
     let(:delete_user) { FactoryBot.create(:user) }
     let!(:ownership) { FactoryBot.create(:ownership_claimed, user_id: delete_user.id) }
