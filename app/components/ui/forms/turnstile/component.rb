@@ -40,10 +40,10 @@ module UI
           tag.script(src: SCRIPT_URL, defer: true)
         end
 
-        # api.js is what draws the widget, so scripting off leaves nothing to answer -
-        # and the submission that got here has already been turned away for not answering
+        # api.js is what draws the widget, so scripting off leaves nothing to answer.
+        # A warning rather than an error - the error above it already says the submission failed
         def no_js_alert
-          tag.noscript(render(UI::Alerts::Base::Component.new(kind: :error,
+          tag.noscript(render(UI::Alerts::Base::Component.new(kind: :warning,
             text: translation(".enable_javascript"))))
         end
       end

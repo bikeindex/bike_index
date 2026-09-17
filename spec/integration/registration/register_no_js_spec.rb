@@ -171,8 +171,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
     end
   end
 
-  # Turnstile's widget is drawn by api.js, so scripting off can never answer the challenge -
-  # the step comes back with an error whose only way out is turning JavaScript on
+  # Turnstile's widget is drawn by api.js, so scripting off can never answer the challenge
   context "a risky email, with the challenge configured" do
     let(:owner_email) { "rider@yahoo.com" }
     before do
@@ -195,7 +194,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
       expect(page).to have_content("Verifying this email address requires JavaScript")
       # Step 1 saves what it was given either way - it's the link out that's withheld
       expect(BParam.last.owner_email).to eq owner_email
-      expect(ActionMailer::Base.deliveries.count).to eq 0
+      expect(Email::PartialRegistrationJob.jobs.count).to eq 0
     end
   end
 

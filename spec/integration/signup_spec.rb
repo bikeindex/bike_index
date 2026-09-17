@@ -3,42 +3,13 @@
 require "rails_helper"
 
 RSpec.describe "Signup", :js, type: :system do
-  let(:email) { "newrider@msu.edu" }
+  include_context :signup_flow_steps
+
   let(:password) { "a-long-enough-password" }
-
-  # Signing up leaves them passwordless, and the emailed link is the only way out of that -
-  # so both examples start here, signed in and nudged to set a password
-  def sign_up_and_confirm
-    visit new_user_path
-    expect(page).to have_no_field("Password")
-
-    fill_in "Email", with: email
-    fill_in "Name", with: "New Rider"
-    check "user_terms_of_service"
-
-    expect { click_button "Sign up" }.to change(Email::ConfirmationJob.jobs, :count).by(1)
-    expect(page).to have_content("Follow the link in the email to finish signing up", wait: 10)
-
-    user = User.find_by(email:)
-    expect(user.passwordless_user?).to be_truthy
-    expect(user.confirmed?).to be_falsey
-
-    Email::ConfirmationJob.drain
-    # The interstitial waits for a click; that the GET alone doesn't confirm is
-    # users_request_spec's job
-    visit emailed_path("/users/confirm")
-    expect(user.reload.confirmed?).to be_falsey
-    click_button "Sign in"
-    expect(page).to have_link("set a password to sign in", wait: 10)
-    expect(user.reload.confirmed?).to be_truthy
-
-    dismiss_donation_modal
-
-    user
-  end
 
   it "sets a password from the nudge, then signs back in with it" do
     user = sign_up_and_confirm
+    dismiss_donation_modal
 
     click_link "set a password to sign in"
     expect(page).to have_field("Update your password")
@@ -92,6 +63,7 @@ RSpec.describe "Signup", :js, type: :system do
 
   it "signs in with a magic link, then confirms an additional email and removes it" do
     user = sign_up_and_confirm
+    dismiss_donation_modal
     additional_email = "newrider@umich.edu"
 
     visit "/logout"
@@ -137,35 +109,13 @@ RSpec.describe "Signup", :js, type: :system do
   end
 end
 
-# Its own describe rather than a context, since the driver is the whole difference and
-# the block above is `:js`. Signing up is two plain forms - the sign-up form and the
-# interstitial the emailed link lands on - so a rider with scripting off gets all of it
+# Its own describe rather than a context, which would inherit the `:js` above it
 RSpec.describe "Signup without JavaScript", type: :system, driver: :playwright_no_js do
-  let(:email) { "newrider@msu.edu" }
+  include_context :signup_flow_steps
 
-  it "signs up, then confirms from the emailed link" do
-    visit new_user_path
+  it "signs up and confirms with scripting off" do
+    sign_up_and_confirm
 
-    # They sign in with emailed links, so there's no password to pick either way
-    expect(page).to have_no_field("Password")
-
-    fill_in "Email", with: email
-    fill_in "Name", with: "New Rider"
-    check "user_terms_of_service"
-
-    expect { click_button "Sign up" }.to change(Email::ConfirmationJob.jobs, :count).by(1)
-    expect(page).to have_content("Follow the link in the email to finish signing up")
-
-    user = User.find_by(email:)
-    expect(user.confirmed?).to be_falsey
-
-    Email::ConfirmationJob.drain
-    # A GET onto a one-button form, which is a form either way
-    visit emailed_path("/users/confirm")
-    click_button "Sign in"
-
-    # Signed in and passwordless, which is the nudge sign_in_flash renders
-    expect(page).to have_link("set a password to sign in")
-    expect(user.reload.confirmed?).to be_truthy
+    expect(page).to have_current_path(my_account_path)
   end
 end
