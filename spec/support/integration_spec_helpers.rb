@@ -4,22 +4,10 @@
 # browser behavior Capybara doesn't abstract across drivers, which is implemented for the
 # Playwright driver via its raw page (see spec/support/capybara.rb).
 module IntegrationSpecHelpers
-  # Clear the back/forward stack so go_back/go_forward operate on this example's
-  # own short stack -- Capybara never resets history between examples, so it
-  # accumulates across the suite.
-  def reset_browser_history
-    page.driver.with_playwright_page do |playwright_page|
-      session = playwright_page.context.new_cdp_session(playwright_page)
-      session.send_message("Page.resetNavigationHistory")
-      session.detach
-    end
-  end
-
   # Turn on touch emulation, which is what makes `(pointer: coarse)` match, so
   # touch-only styles render (Playwright's emulate_media doesn't cover pointer).
-  # The override lives as long as the CDP session, so unlike reset_browser_history
-  # this one is left attached -- the browser context is recreated between
-  # examples, which is teardown enough.
+  # The session is left attached -- the browser context is recreated between examples,
+  # which is teardown enough.
   def emulate_touch_device
     page.driver.with_playwright_page do |playwright_page|
       session = playwright_page.context.new_cdp_session(playwright_page)
