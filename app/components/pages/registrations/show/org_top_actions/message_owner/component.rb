@@ -16,6 +16,22 @@ module Pages
 
             private
 
+            # Whoever holds an impounded vehicle already knows where it is, so the
+            # sighting the stolen case asks for is the wrong question to put to them
+            def impounded?
+              @bike.current_impound_record.present?
+            end
+
+            def heading
+              translation(impounded? ? ".know_who_has_this_bike_type" : ".know_something_about_this_bike_type",
+                bike_type: @bike.type)
+            end
+
+            def message_placeholder
+              translation(impounded? ? ".what_do_you_need_to_ask" : ".where_did_you_see_this_bike",
+                bike_type: @bike.type)
+            end
+
             def message_notification
               @message_notification ||= StolenNotification.new(bike: @bike)
             end

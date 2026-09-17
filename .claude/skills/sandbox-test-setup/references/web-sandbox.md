@@ -122,13 +122,7 @@ bundle exec rails db:migrate db:test:prepare
 
 ## Starting the dev server
 
-`CLAUDE.md` says to stop and ask the user to start `bin/dev`. That rule is about
-*their* machine, where the server is a process they own and may already have
-running. **In the web sandbox there is nobody to ask** — the container is yours,
-it's ephemeral, and nothing else is on the port — so start it yourself when a
-task needs a running app (screenshots, checking a page actually renders). On the
-macOS workspace and the Conductor cloud sandbox the rule stands: a human owns
-that machine, so ask.
+Start it yourself here — nobody else is in this container (SKILL.md).
 
 Two things beyond Toolchain + Services above. Development databases, which the
 test setup doesn't create — and which don't take `database.yml`'s `CI=1` branch,

@@ -22,7 +22,7 @@ class UsersController < ApplicationController
     if requested_locale != I18n.default_locale
       @user.preferred_language = requested_locale
     end
-    if @user.save
+    if turnstile_verified?(@user, @user.email) && @user.save
       sign_in_and_redirect(@user)
     else
       @page_errors = @user.errors
