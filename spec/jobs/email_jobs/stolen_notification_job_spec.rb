@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe EmailJobs::StolenNotificationJob, type: :job do
-  let(:subject) { EmailJobs::StolenNotificationJob }
-  let(:instance) { subject.new }
+  let(:subject) { described_class }
+  let(:instance) { described_class.new }
   let(:creator) { FactoryBot.create(:user_confirmed) }
   let(:owner_email) { "targetbike@example.org" }
   let(:user) { FactoryBot.create(:user) }

@@ -1,4 +1,4 @@
-module SpreadsheetsJobs
+module SpreadsheetJobs
   class TsvCreatorJob < ScheduledJob
     prepend ScheduledJobRecorder
 
@@ -26,10 +26,10 @@ module SpreadsheetsJobs
     end
 
     def enqueue_scheduled_jobs
-      SpreadsheetsJobs::TsvCreatorJob.perform_async("create_manufacturer")
-      SpreadsheetsJobs::TsvCreatorJob.perform_async("create_daily_tsvs")
-      SpreadsheetsJobs::TsvCreatorJob.perform_in(20.minutes, "create_stolen_with_reports", true)
-      SpreadsheetsJobs::TsvCreatorJob.perform_in(1.hour, "create_stolen", true)
+      self.class.perform_async("create_manufacturer")
+      self.class.perform_async("create_daily_tsvs")
+      self.class.perform_in(20.minutes, "create_stolen_with_reports", true)
+      self.class.perform_in(1.hour, "create_stolen", true)
     end
   end
 end

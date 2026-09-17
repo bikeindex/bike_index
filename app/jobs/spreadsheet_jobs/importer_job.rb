@@ -1,4 +1,4 @@
-module SpreadsheetsJobs
+module SpreadsheetJobs
   class ImporterJob < ApplicationJob
     RESOURCES_URL = "https://raw.githubusercontent.com/bikeindex/bike_data/refs/heads/main/data".freeze
     # Maps each importer module (e.g. Spreadsheets::Manufacturers) to its CSV filename in the bike_data repo

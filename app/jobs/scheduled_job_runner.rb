@@ -54,7 +54,7 @@ class ScheduledJobRunner < ScheduledJob
       ScheduledAutocompleteCheckJob,
       ScheduledSearchForExternalRegistryBikesJob,
       ScheduledStoreLogSearchesJob,
-      SpreadsheetsJobs::TsvCreatorJob,
+      SpreadsheetJobs::TsvCreatorJob,
       StravaJobs::ScheduledRequestEnqueuer,
       StravaJobs::ScheduledRequestPriorityUpdator,
       # UnusedOwnershipRemovalJob,

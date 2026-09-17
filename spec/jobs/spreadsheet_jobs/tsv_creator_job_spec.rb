@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe SpreadsheetsJobs::TsvCreatorJob, type: :job do
+RSpec.describe SpreadsheetJobs::TsvCreatorJob, type: :job do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
 

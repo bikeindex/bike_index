@@ -49,14 +49,14 @@ module EmailJobs
         next if no_survey?(bike)
         break if sent > enqueue_limit
 
-        EmailJobs::ScheduledSurveyJob.perform_in((enqueue_count + sent) * 5, bike.id)
+        self.class.perform_in((enqueue_count + sent) * 5, bike.id)
         sent += 1
       end
       potential_stolen_bikes.limit(enqueue_count - sent).find_each do |bike|
         next if no_survey?(bike)
         break if sent > enqueue_limit
 
-        EmailJobs::ScheduledSurveyJob.perform_in((enqueue_count + sent) * 5, bike.id)
+        self.class.perform_in((enqueue_count + sent) * 5, bike.id)
         sent += 1
       end
     end

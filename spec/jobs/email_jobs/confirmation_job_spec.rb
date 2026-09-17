@@ -4,7 +4,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
   before { stub_const("EmailDomain::VERIFICATION_ENABLED", true) }
 
   it "sends a welcome email" do
-    VCR.use_cassette("EmailJobs::ConfirmationJob-default") do
+    VCR.use_cassette("email-confirmation_job-default") do
       user = FactoryBot.create(:user)
       ActionMailer::Base.deliveries = []
       expect do
@@ -72,7 +72,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
       expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
       ActionMailer::Base.deliveries = []
       expect do
-        VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+        VCR.use_cassette("email-confirmation_job-g_mail") do
           EmailJobs::ConfirmationJob.new.perform(user.id)
         end
       end.to change(Notification, :count).by 1
@@ -88,7 +88,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
       it "sends the email and doesn't create a ban" do
         ActionMailer::Base.deliveries = []
         expect do
-          VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+          VCR.use_cassette("email-confirmation_job-g_mail") do
             EmailJobs::ConfirmationJob.new.perform(user_prior.id)
           end
         end.to change(Notification, :count).by 1
@@ -104,7 +104,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
       it "creates the user and sends the email" do
         expect(User.unscoped.count).to eq 2
         expect do
-          VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+          VCR.use_cassette("email-confirmation_job-g_mail") do
             EmailJobs::ConfirmationJob.new.perform(user.id)
           end
         end.to change(Notification, :count).by 1
@@ -119,7 +119,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
           ActionMailer::Base.deliveries = []
           expect(EmailDomain.ban_or_provisional.count).to eq 0
           expect do
-            VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+            VCR.use_cassette("email-confirmation_job-g_mail") do
               EmailJobs::ConfirmationJob.new.perform(user.id)
             end
           end.to change(Notification, :count).by 1
@@ -148,7 +148,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
       expect(User.unscoped.count).to eq 2 # Because the admin from email_domain
       ActionMailer::Base.deliveries = []
       expect do
-        VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+        VCR.use_cassette("email-confirmation_job-g_mail") do
           EmailJobs::ConfirmationJob.new.perform(user.id)
         end
       end.to change(Notification, :count).by 1
@@ -167,7 +167,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
         expect(User.unscoped.count).to eq 2
         expect(EmailBan.send(:email_plus_duplicate_matches, user.email).pluck(:id)).to match_array([user_prior.id])
         expect do
-          VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+          VCR.use_cassette("email-confirmation_job-g_mail") do
             EmailJobs::ConfirmationJob.new.perform(user.id)
           end
         end.to change(Notification, :count).by 1
@@ -182,7 +182,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
         expect(User.unscoped.count).to eq 2
         expect(EmailBan.send(:email_plus_duplicate_matches, user.email).pluck(:id)).to match_array([user_prior.id])
         expect do
-          VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+          VCR.use_cassette("email-confirmation_job-g_mail") do
             EmailJobs::ConfirmationJob.new.perform(user.id)
           end
         end.to change(Notification, :count).by 1
@@ -196,7 +196,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
         expect(User.unscoped.count).to eq 2
         expect do
           expect(EmailBan.send(:email_plus_duplicate?, user.email, user.created_at)).to be_falsey
-          VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+          VCR.use_cassette("email-confirmation_job-g_mail") do
             EmailJobs::ConfirmationJob.new.perform(user.id)
           end
         end.to change(Notification, :count).by 1
@@ -214,7 +214,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
           expect(EmailBan.send(:email_plus_duplicate_matches, user.email).pluck(:id)).to match_array([user_prior.id, user2.id, user3.id])
           expect(EmailBan.send(:email_plus_duplicate_matches, user_prior.email).pluck(:id)).to match_array([user.id, user2.id, user3.id])
           expect do
-            VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+            VCR.use_cassette("email-confirmation_job-g_mail") do
               EmailJobs::ConfirmationJob.new.perform(user.id)
             end
           end.to change(Notification, :count).by 1
@@ -236,7 +236,7 @@ RSpec.describe EmailJobs::ConfirmationJob, type: :job do
     it "sends the email and doesn't create a ban" do
       ActionMailer::Base.deliveries = []
       expect do
-        VCR.use_cassette("EmailJobs::ConfirmationJob-g.mail") do
+        VCR.use_cassette("email-confirmation_job-g_mail") do
           EmailJobs::ConfirmationJob.new.perform(user.id)
         end
       end.to change(Notification, :count).by 1

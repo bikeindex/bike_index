@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe EmailJobs::UpdatedTermsJob, type: :job do
   let(:user) { FactoryBot.create(:organization_user) }
-  let(:subject) { EmailJobs::UpdatedTermsJob.new }
+  let(:subject) { described_class.new }
   before do
     subject.redis.expire(subject.enqueued_emails_key, 0)
     ActionMailer::Base.deliveries = []
