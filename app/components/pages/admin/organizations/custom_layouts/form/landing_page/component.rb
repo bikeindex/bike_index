@@ -20,11 +20,6 @@ module Pages
                 admin_organization_custom_layout_path(organization_id: @organization.to_param, id: "landing_page")
               end
 
-              def version_history_path
-                admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage",
-                  search_item_id: @landing_page.id, period: "all")
-              end
-
               def hover_param = "&button_hover=#{@suggested_button_hover.delete_prefix("#")}"
             end
           end

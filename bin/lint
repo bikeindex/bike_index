@@ -44,6 +44,14 @@ rescue ArgumentError, SystemCallError
   false
 end
 
+# A branch's changed files include the ones it deleted - only a path git has no
+# history for is a typo. An empty pathspec would walk all of history
+def never_tracked(paths)
+  return paths if paths.none?
+
+  paths - IO.popen(["git", "log", "--format=", "--name-only", "--", *paths], err: File::NULL, &:read).split("\n")
+end
+
 def lint_kind(file)
   extension = File.extname(file).delete_prefix(".")
   kind = EXTENSIONS_BY_KIND.find { |_kind, extensions| extensions.include?(extension) }&.first
@@ -63,7 +71,8 @@ FileUtils.chdir APP_ROOT do
 
   if file_args.any?
     present, missing = file_args.partition { |arg| File.exist?(arg) }
-    warn "Not found: #{missing.join(", ")}" if missing.any?
+    unknown = never_tracked(missing)
+    warn "Not found: #{unknown.join(", ")}" if unknown.any?
 
     # Unlintable paths are skipped rather than raised on, so that passing a branch's
     # changed files works - they'll include .haml, .scss and friends

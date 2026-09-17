@@ -17,10 +17,11 @@ module UI
 
       # turbo: Drive is off app-wide and opted into per element; one data-turbo on the nav
       # covers every tab, since Turbo reads it off the closest ancestor carrying it
-      def initialize(tabs:, nav_label:, turbo: false)
+      def initialize(tabs:, nav_label:, turbo: false, margin_classes: "tw:mb-3")
         @tabs = tabs
         @nav_label = nav_label
         @turbo = turbo
+        @margin_classes = margin_classes
       end
 
       private
