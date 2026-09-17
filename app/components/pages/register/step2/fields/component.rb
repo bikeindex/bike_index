@@ -7,22 +7,23 @@ module Pages
         # What step 2 asks for, ending in the button that submits it - rendered into
         # whichever form holds it, its own or the single-page flow's
         class Component < ApplicationComponent
-          # show_owner_email: what step 1 settled, shown back because it was a page ago.
-          # The single-page form asks for it in the field right above these
-          def initialize(b_param:, steps:, form:, current_user: nil, show_owner_email: true)
+          # show_owner_email: step 1's address echoed back, which the single-page form
+          # doesn't need - it has the field itself
+          def initialize(b_param:, steps:, form:, current_user: nil, organization: nil,
+            show_owner_email: true)
             @b_param = b_param
             @steps = steps
             @form = form
             @current_user = current_user
+            @organization = organization
             @show_owner_email = show_owner_email
           end
 
           private
 
-          # The copy stays with the step - the fields moved out of its template, the scope didn't
-          def translation(key, **kwargs)
-            super(key, scope: [:components, :pages, :register, :step2], **kwargs)
-          end
+          # The copy stays in step 2's sidecar - it's translated into four other locales
+          # there, which a move would orphan
+          def component_translation_scope = [:components, :pages, :register, :step2]
 
           def cycle_type
             @b_param.type
@@ -69,8 +70,12 @@ module Pages
 
           # What the account already holds only answers the organization's fields when the
           # registration is the registrant's own - registering for someone else asks for theirs
+          # defined?, since nil is the common answer and ||= would re-ask - each ask is a
+          # user_emails query
           def reg_field_user
-            @current_user if @b_param.self_made?(@current_user)
+            return @reg_field_user if defined?(@reg_field_user)
+
+            @reg_field_user = @current_user if @b_param.self_made?(@current_user)
           end
 
           # The additional fields the organization asks for, gated exactly as bikes/new

@@ -82,8 +82,8 @@ module BikeServices
     # motorized? first - it's in memory, and creation_organization is a query
     def registration_sequence(b_param, separate_attestation: false, user: nil)
       return nil unless b_param.motorized?
-      # Left to the registrant to fill in on their own, so the flow has no sequence and
-      # the bike is created without one - unless the registrant is the one registering
+      # Left to the registrant, so the flow has no sequence and the bike is created
+      # without one
       return nil if separate_attestation && !b_param.self_made?(user)
 
       organization = b_param.creation_organization
@@ -429,16 +429,16 @@ module BikeServices
     # Every step the registration has reached, in order - each one opens the next, so the
     # flow stops at the first that hasn't been done
     def permitted_steps(b_param, sequence, steps)
-      reached = steps.take_while { step_completed?(b_param, it, sequence:, steps:) }.count
+      single_page = steps.exclude?("2")
+      reached = steps.take_while { step_completed?(b_param, it, sequence:, single_page:) }.count
       steps.first(reached + 1)
     end
 
     # Whether a step has been submitted with everything it asks for
-    def step_completed?(b_param, step, sequence:, steps:)
+    def step_completed?(b_param, step, sequence:, single_page: false)
       case step
-      # A flow with no step 2 asks for both on one page, so step 1 is only done
-      # once it has the details step 2 would have asked for
-      when "1" then steps.include?("2") ? b_param.manufacturer_id.present? : details_completed?(b_param)
+      # One page asks for both, so step 1 isn't done until it has step 2's details too
+      when "1" then single_page ? details_completed?(b_param) : b_param.manufacturer_id.present?
       when "2" then details_completed?(b_param)
       when "report" then report_completed?(b_param)
       when "review" then acknowledgment(b_param).present?

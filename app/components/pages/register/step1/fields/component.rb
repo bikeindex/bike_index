@@ -15,10 +15,13 @@ module Pages
 
           private
 
-          # The copy stays with the step - the fields moved out of its template, the scope didn't
-          def translation(key, **kwargs)
-            super(key, scope: [:components, :pages, :register, :step1], **kwargs)
+          def organization
+            @organization ||= @b_param.creation_organization
           end
+
+          # The copy stays in step 1's sidecar - it's translated into four other locales
+          # there, which a move would orphan
+          def component_translation_scope = [:components, :pages, :register, :step1]
 
           def cycle_type
             @b_param.type
@@ -31,13 +34,13 @@ module Pages
 
           # owner_email is the setting bikes/new labels its email field with
           def email_label
-            OrgServices::Displayer.registration_field_label(@organization, "owner_email", strip_tags: true) ||
-              (translation(".email_school", org_name: @organization.short_name) if @organization&.school?) ||
+            OrgServices::Displayer.registration_field_label(organization, "owner_email", strip_tags: true) ||
+              (translation(".email_school", org_name: organization.short_name) if organization&.school?) ||
               translation(".email")
           end
 
           def email_placeholder
-            OrgServices::Displayer.registration_field_label(@organization, "email_placeholder", strip_tags: true) ||
+            OrgServices::Displayer.registration_field_label(organization, "email_placeholder", strip_tags: true) ||
               translation(".email_placeholder")
           end
         end

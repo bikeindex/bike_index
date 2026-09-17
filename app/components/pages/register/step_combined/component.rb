@@ -6,21 +6,20 @@ module Pages
       # Step 1 and step 2 on one page, for the switch that asks for the whole
       # registration at once. Its submission is step 1's, carrying step 2's fields
       class Component < ApplicationComponent
-        def initialize(b_param:, steps:, current_user: nil, skip_heading: false)
+        def initialize(b_param:, steps:, current_user: nil, skip_heading: false, organization: nil)
           @b_param = b_param
           @steps = steps
           @current_user = current_user
           @skip_heading = skip_heading
+          @organization = organization
         end
 
         private
 
-        # Step 1's copy - the page only arranges the two steps, it has none of its own
-        def translation(key, **kwargs)
-          super(key, scope: [:components, :pages, :register, :step1], **kwargs)
-        end
+        # The page arranges the two steps and has no copy of its own
+        def component_translation_scope = [:components, :pages, :register, :step1]
 
-        # Both steps' controllers, on the one form that now holds both their fields
+        # Both steps' controllers, on the one form that holds both their fields
         def form_options
           {data: {turbo: true, form_persist_key_value: "register-combined-#{@b_param.id_token}",
                   controller: "autofocus form-persist register--status-fields register--organization " \
@@ -42,11 +41,6 @@ module Pages
           return translation(".register_your_vehicle") if organization.blank?
 
           translation(".register_your_vehicle_with_org", org_name: organization.short_name)
-        end
-
-        # slug => the word the section label uses, for register--heading to swap in
-        def cycle_type_names
-          CycleType.slug_translation_hash_lowercase_short
         end
       end
     end

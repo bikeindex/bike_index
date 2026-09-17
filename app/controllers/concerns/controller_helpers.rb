@@ -191,15 +191,22 @@ module ControllerHelpers
     session[:old_register_view].present?
   end
 
-  # The two switches beside the legacy one on the organization's add-a-bike page, which
-  # ride the session the same way - step 1 and step 2 asked for together, and the
-  # attestation left for the registrant rather than the member registering for them
+  # The switches beside the legacy one on the organization's add-a-bike page, riding the
+  # session the same way: both steps asked for at once, and the attestation left to the
+  # registrant rather than the member registering for them
   def register_single_page?
     session[:register_single_page].present?
   end
 
   def register_separate_attestation?
     session[:register_separate_attestation].present?
+  end
+
+  # Both entry points into the flow build it the same way - the organization's page and
+  # the /register submissions it hands off to have to agree on whether there's a sequence
+  def register_flow_sequence(b_param)
+    BikeServices::Register.registration_sequence(b_param, user: current_user,
+      separate_attestation: register_separate_attestation?)
   end
 
   def show_general_alert

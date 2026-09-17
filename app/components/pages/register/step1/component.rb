@@ -6,7 +6,7 @@ module Pages
       # Step 1 of the registration flow: the quick-start form
       class Component < ApplicationComponent
         def initialize(b_param:, steps:, current_user: nil, embed: false, button_color: nil,
-          button_hover_color: nil, skip_heading: false)
+          button_hover_color: nil, skip_heading: false, organization: nil)
           @b_param = b_param
           @steps = steps
           @current_user = current_user
@@ -14,6 +14,7 @@ module Pages
           @button_color = button_color
           @button_hover_color = button_hover_color
           @skip_heading = skip_heading
+          @organization = organization
         end
 
         private
@@ -68,12 +69,6 @@ module Pages
         def start_over_path
           new_register_path({discard_token: @b_param.id_token, organization_id: organization&.slug,
                              status: @b_param.bike["status"]}.compact)
-        end
-
-        # slug => the word the section label uses, for register--heading to swap in
-        # (the same map bikes/new hands its JS as window.cycleTypeTranslations)
-        def cycle_type_names
-          CycleType.slug_translation_hash_lowercase_short
         end
 
         # Step 1 is only revisitable once submitted, so this is a return from step 2

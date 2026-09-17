@@ -94,7 +94,7 @@ Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScr
 
 Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work.
 
-**A "down" answer expires — re-run the curl each time you need the server, including right before reporting it down.** `bin/dev` takes about a minute to bind the port, so a check landing during its boot says down about a server that's about to be up, and one started mid-session never gets noticed.
+**A "down" answer expires — re-run the curl each time you need the server, including right before reporting it down.** `bin/dev` boots Rails twice (`log:clear`, then puma) and calls `gh` in between, so a check landing in that gap says down about a server that's about to be up — and one started mid-session never gets noticed at all.
 
 ## Pull requests
 

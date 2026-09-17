@@ -354,30 +354,26 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get "#{base_url}/new", params: {register_settings: true}.merge(params)
       end
 
-      def step_1_fields
-        Nokogiri::HTML(response.body).css("form[action='/register'] [name^='b_param[']").map { |n| n["name"] }.uniq
-      end
-
-      def step_2_fields
-        Nokogiri::HTML(response.body).css("form[action='/register'] [name^='bike[']").map { |n| n["name"] }.uniq
+      def form_field_names(scope)
+        Nokogiri::HTML(response.body).css("form[action='/register'] [name^='#{scope}[']").map { |n| n["name"] }.uniq
       end
 
       it "asks for both steps on one page, and stops once it's unchecked" do
         get "#{base_url}/new"
-        expect(step_2_fields).to eq([])
+        expect(form_field_names("bike")).to eq([])
 
         set_switches(single_page: true)
         expect(session[:register_single_page]).to be_present
-        expect(step_1_fields).to include "b_param[owner_email]"
-        expect(step_2_fields).to include "bike[serial_number]"
+        expect(form_field_names("b_param")).to include "b_param[owner_email]"
+        expect(form_field_names("bike")).to include "bike[serial_number]"
 
         # The preference follows the session rather than the link that set it
         get "#{base_url}/new"
-        expect(step_2_fields).to include "bike[serial_number]"
+        expect(form_field_names("bike")).to include "bike[serial_number]"
 
         set_switches
         expect(session[:register_single_page]).to be_blank
-        expect(step_2_fields).to eq([])
+        expect(form_field_names("bike")).to eq([])
       end
 
       it "stores the separate attestation switch" do

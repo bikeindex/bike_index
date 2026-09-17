@@ -15,16 +15,6 @@ module SharedBlocks
           @controller_name = controller_name
           @action_name = action_name
         end
-
-        private
-
-        # The register flow supplies its own full-bleed shell, the way it does outside the
-        # sidebar - a container's gutter would leave white down either side of the gray
-        def content_container
-          return nil if @controller_name == "registrations" && @action_name == "new"
-
-          helpers.organized_container
-        end
       end
     end
   end

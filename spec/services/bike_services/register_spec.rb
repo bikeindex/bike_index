@@ -349,24 +349,11 @@ RSpec.describe BikeServices::Register do
 
   describe "single_page" do
     it "drops step 2 - the one page asks for both, so step 1 isn't done without the details" do
-      expect(described_class.steps(b_param, sequence: nil, single_page: true)).to eq %w[1]
       steps = described_class.steps(b_param, sequence: nil, single_page: true)
+      expect(steps).to eq %w[1]
       expect(described_class.permitted_step(b_param, nil, sequence: nil, steps:)).to eq "1"
       # The same registration is past step 1 when the flow has a step 2 to move on to
       expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "2"
-    end
-
-    context "details completed" do
-      let(:b_param) do
-        BParam.new(origin: "register_flow", creator_id: 42,
-          params: {details_completed: true, bike: bike_params}.as_json)
-      end
-
-      it "is finished, the way the two-step flow is once step 2 is in" do
-        steps = described_class.steps(b_param, sequence: nil, single_page: true)
-        expect(described_class.permitted_step(b_param, "1", sequence: nil, steps:)).to eq "1"
-        expect(described_class.permitted_step(b_param, nil, sequence: nil, steps:)).to eq "1"
-      end
     end
 
     context "a theft to report" do

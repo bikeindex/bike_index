@@ -42,8 +42,9 @@ class RegisterController < ApplicationController
   # a tokenized step, so the frame is one request and nothing past step 1 is embeddable
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
-    # single_page: false - the frame is step 1 alone, whatever the session's switch says
-    render Pages::Register::Embed::Component.new(b_param: @b_param, steps: flow_steps(single_page: false), current_user:,
+    # Not flow_steps - the frame is step 1 alone, whatever the session's switch says
+    steps = BikeServices::Register.steps(@b_param, sequence: @registration_sequence)
+    render Pages::Register::Embed::Component.new(b_param: @b_param, steps:, current_user:,
       header_tags_options: helpers.header_tags_component_options,
       button_color: HexColor.normalize(params[:button]),
       button_hover_color: HexColor.normalize(params[:button_hover])), layout: false
@@ -72,7 +73,7 @@ class RegisterController < ApplicationController
       render Pages::Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
     when "1"
       @page_title = I18n.t("meta_titles.register_step_1")
-      render start_component(steps:)
+      render start_component(single_page: register_single_page?, steps:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
       render Pages::Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps:)
@@ -86,7 +87,8 @@ class RegisterController < ApplicationController
     single_page = params[:single_page].present?
     saved &&= save_details if single_page
     unless saved && turnstile_verified?(@b_param, @b_param.owner_email)
-      return render(start_component(single_page:), status: :unprocessable_entity)
+      return render(start_component(single_page:, steps: flow_steps(single_page:)),
+        status: :unprocessable_entity)
     end
 
     # Step 2 says the link is on its way, so it goes out here rather than at the end
@@ -182,10 +184,9 @@ class RegisterController < ApplicationController
       additional: params[:additional])
   end
 
-  # The flow's opening page - step 1, or step 1 and step 2 asked for together
-  def start_component(single_page: register_single_page?, steps: nil)
+  def start_component(single_page:, steps:)
     component = single_page ? Pages::Register::StepCombined::Component : Pages::Register::Step1::Component
-    component.new(b_param: @b_param, steps: steps || flow_steps(single_page:), current_user:)
+    component.new(b_param: @b_param, steps:, current_user:)
   end
 
   def complete_registration
@@ -248,8 +249,7 @@ class RegisterController < ApplicationController
 
   # Resolved once - the step math, the progress bar and the pages themselves all read it
   def find_registration_sequence
-    @registration_sequence = BikeServices::Register.registration_sequence(@b_param,
-      user: current_user, separate_attestation: register_separate_attestation?)
+    @registration_sequence = register_flow_sequence(@b_param)
   end
 
   # Read at render time rather than in a filter: the submissions save first, and where

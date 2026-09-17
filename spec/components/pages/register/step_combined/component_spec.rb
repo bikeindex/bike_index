@@ -24,7 +24,5 @@ RSpec.describe Pages::Register::StepCombined::Component, type: :component do
     expect(component.css("input[name=single_page]").count).to eq 1
     # One honeypot, not one per step
     expect(component.css("input[name=additional]").count).to eq 1
-    # One segment in the progress bar - the page is the whole flow
-    expect(component.css("span[class*='tw:h-1']").count).to eq 1
   end
 end

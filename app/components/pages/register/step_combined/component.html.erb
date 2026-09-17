@@ -1,5 +1,5 @@
 <%= render Pages::Register::Page::Component.new(data: {controller: "register--heading",
-    "register--heading-names-value": cycle_type_names.to_json,
+    "register--heading-names-value": CycleType.slug_translation_hash_lowercase_short.to_json,
     action: "hw-combobox:selection->register--heading#update " \
       "form-persist:restored@window->register--heading#update"}) do %>
   <%= render Pages::Register::Progress::Component.new(steps: @steps, step: 1) %>
@@ -30,6 +30,6 @@
     <% end %>
 
     <%= render Pages::Register::Step2::Fields::Component.new(b_param: @b_param, steps: @steps,
-        form: f, current_user: @current_user, show_owner_email: false) %>
+        form: f, current_user: @current_user, organization:, show_owner_email: false) %>
   <% end %>
 <% end %>
