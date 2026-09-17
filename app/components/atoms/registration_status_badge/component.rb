@@ -13,7 +13,7 @@ module Atoms
         impounded: :warning,
         found: :warning,
         abandoned: :warning,
-        unregistered: :warning
+        unregistered: :pink
       }.freeze
 
       # Tables and columns that only call out the exceptional statuses pass skip_with_owner

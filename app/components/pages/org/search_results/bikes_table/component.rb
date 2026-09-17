@@ -10,7 +10,7 @@ module Pages
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
           # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-          MARKUP_DIGEST = "1ea3dd9e603d"
+          MARKUP_DIGEST = "1c089c3c832e"
 
           def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
             cache_key: nil, sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)

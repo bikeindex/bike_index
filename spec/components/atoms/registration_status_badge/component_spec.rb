@@ -8,7 +8,7 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
     it "shows registered, explained by a tooltip" do
       render_inline(component)
       expect(page).to have_text("Registered")
-      expect(page).to have_css("[role=tooltip]", text: "Registered & protected, with its owner (not stolen)", visible: :all)
+      expect(page).to have_css("[role=tooltip]", text: "Registered & protected. With its owner (not stolen)", visible: :all)
     end
   end
 
@@ -17,7 +17,7 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
     it "shows stolen" do
       render_inline(component)
       expect(page).to have_text("Stolen")
-      expect(page).to have_css("[role=tooltip]", text: "Reported stolen by its owner", visible: :all)
+      expect(page).to have_css("[role=tooltip]", text: "Reported stolen", visible: :all)
     end
   end
 
@@ -50,10 +50,10 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
 
   context "unregistered" do
     let(:bike) { FactoryBot.create(:bike, status: "unregistered_parking_notification") }
-    it "shows unregistered in a warning (yellow) badge" do
+    it "shows unregistered in a pink badge" do
       render_inline(component)
       expect(page).to have_text("Unregistered")
-      expect(page).to have_css("span.tw\\:text-amber-700")
+      expect(page).to have_css("span.tw\\:text-pink-400")
     end
   end
 

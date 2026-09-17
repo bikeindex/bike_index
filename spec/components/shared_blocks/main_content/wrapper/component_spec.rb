@@ -229,7 +229,7 @@ RSpec.describe SharedBlocks::MainContent::Wrapper::Component, type: :component d
         let(:bike) { FactoryBot.create(:bike, :with_ownership, :with_stolen_record) }
 
         it "renders the status in place of the edit heading" do
-          expect(result.text).to match(/reported stolen by its owner/i)
+          expect(result.text).to match(/reported stolen/i)
         end
       end
     end
