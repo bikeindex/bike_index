@@ -1,6 +1,6 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<% settings_component = Pages::Org::Search::Settings::Component.new(
+<% settings = ComponentStructs::OrgSearchSettings.new(
   organization: current_organization,
   interpreted_params: @interpreted_params,
   sortable_search_params:,
@@ -21,12 +21,9 @@
   search_notes: params[:search_notes]
 ).compact %>
 
-<div
-  class="org-search-component"
-  data-controller="org--search org--search-column-toggle"
-  data-org--search-column-toggle-default-columns-value="<%= settings_component.initially_checked_columns.to_json %>"
-  data-org--search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
->
+<%= tag.div(class: "org-search-component", data: Pages::Org::Search::Settings::Component
+  .column_toggle_data_attributes(settings)
+  .merge("org--search-column-toggle-assign-bike-sticker-value": @bike_sticker.present?)) do %>
   <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
   <div class="twwiderow tw:gap-y-4">
     <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
@@ -36,10 +33,10 @@
           target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
           target_frame: :organized_bikes_results_frame,
           interpreted_params: form_interpreted_params,
-          heading: t(".find_a_registration_html", cycle_type: settings_component.cycle_type),
+          heading: t(".find_a_registration_html", cycle_type: settings.cycle_type),
           submit_text: t(".search_registrations"),
           filters_component: Pages::Org::Search::Filters::Component.new(
-            settings_component:,
+            settings:,
             period: @period,
             start_time: @start_time,
             end_time: @end_time,
@@ -66,7 +63,7 @@
               <%= check_box_tag :search_all, "true", @search_all, form: "Search_Form",
                 data: {action: "change->org--search#filterChanged"} %>
 
-              <%= t(".search_all_html", cycle_type: settings_component.cycle_type.pluralize(2),
+              <%= t(".search_all_html", cycle_type: settings.cycle_type.pluralize(2),
                 org_name: current_organization.short_name) %>
             </label>
           <% end %>
@@ -84,8 +81,8 @@
     <div class="tw:col-span-full tw:min-w-0">
       <%= render Pages::SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
         render_results: @render_results, current_path: request.original_fullpath) do %>
-        <%= render partial: "results" %>
+        <%= render partial: "results", locals: {settings:} %>
       <% end %>
     </div>
   </div>
-</div>
+<% end %>

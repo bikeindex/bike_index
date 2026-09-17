@@ -332,6 +332,34 @@ RSpec.describe "Register flow", :js, type: :system do
       a_string_matching(/additional_colors_controller/))
   end
 
+  describe "a risky email, with the challenge configured" do
+    let(:owner_email) { "rider@yahoo.com" }
+    # Cloudflare's interactive-challenge testing sitekey, which renders a widget but issues
+    # no token - so the first submission is turned away without reaching siteverify
+    before do
+      stub_const("Integrations::Turnstile::ENABLED", true)
+      stub_const("Integrations::Turnstile::SITE_KEY", "3x00000000000000000000FF")
+    end
+
+    # The rejected step comes back through Turbo, so its widget is a container api.js was
+    # never loaded alongside - one it doesn't render leaves the rider with no way to answer
+    it "renders the widget again on the step it hands back" do
+      visit "/register/new"
+      type_into("#b_param_manufacturer_id", "Surly")
+      click_combobox_option("Surly")
+      fill_in "b_param[owner_email]", with: owner_email
+
+      expect(page).to have_field(Integrations::Turnstile::RESPONSE_PARAM, type: "hidden",
+        visible: :all, wait: 10)
+
+      click_button "Next"
+
+      expect(page).to have_content("not a robot", wait: 10)
+      expect(page).to have_field(Integrations::Turnstile::RESPONSE_PARAM, type: "hidden",
+        visible: :all, wait: 10)
+    end
+  end
+
   describe "signed in" do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
     let(:friend_email) { "friend@bikeindex.org" }

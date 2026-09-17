@@ -10,12 +10,12 @@ RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
   end
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
   let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
-  let(:settings_component) do
-    Pages::Org::Search::Settings::Component.new(organization:, search_stickers:, search_status: "all")
+  let(:settings) do
+    ComponentStructs::OrgSearchSettings.new(organization:, search_stickers:, search_status: "all")
   end
   let(:search_stickers) { nil }
   let(:options) do
-    {settings_component:, period: "week", start_time: Time.current - 1.week, end_time: Time.current}
+    {settings:, period: "week", start_time: Time.current - 1.week, end_time: Time.current}
   end
 
   it "renders the settings trigger, the period, and the collapsed panel" do

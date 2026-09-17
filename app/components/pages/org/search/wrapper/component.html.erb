@@ -7,7 +7,7 @@
   >
     <p class="tw:mb-0">
       <%= translation(".matching_html", count: number_display(@pagy.count),
-        cycle_type: cycle_type.pluralize(@pagy.count)) %>
+        cycle_type: settings.cycle_type.pluralize(@pagy.count)) %>
 
       <em><%= @humanized_time_range %></em>
     </p>
@@ -39,7 +39,7 @@
           </span>
         <% end %>
 
-        <% if render_export? %>
+        <% if settings.render_export? %>
           <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
             color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
         <% end %>
@@ -71,7 +71,7 @@
     render_sortable: true,
     sort_state: @sort_state,
     bike_sticker: @bike_sticker,
-    settings_component:
+    settings:
   )) %>
 
   <div
@@ -95,7 +95,7 @@
     <div class="tw:ml-auto">
       <%= select_tag :per_page_select,
           options_for_select(
-            [10, 25, 50, 100].map { |i| ["#{i} #{cycle_type.pluralize(10)} per page", i] },
+            [10, 25, 50, 100].map { |i| ["#{i} #{settings.cycle_type.pluralize(10)} per page", i] },
             selected: @per_page
           ),
           class: "form-control tw:m-0! tw:w-auto!",

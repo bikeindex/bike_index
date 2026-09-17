@@ -2286,6 +2286,8 @@ it:
           organization_signed_in: Hai effettuato l'accesso
         skip_if_signed_in:
           already_signed_in: Hai già effettuato l'accesso!
+        turnstile_verified:
+          verify_not_a_robot: Conferma di non essere un robot
     feedbacks:
       block_the_spam:
         please_sign_in: Accedi per inviare il messaggio.
@@ -2830,18 +2832,11 @@ it:
         conto che anche altre persone usano la bicicletta come mezzo di trasporto.
         Porta con sé una vasta conoscenza del mondo del ciclismo e si impegna affinché
         tutto funzioni alla perfezione dietro le quinte di Bike Index.\n"
-      jan_pecnik_bio_html: "<strong>Jan Pecnik</strong> si è appassionato alle biciclette
-        durante il suo master in Olanda, con una specializzazione in imprenditoria
-        sociale. Dopo un paio d'anni trascorsi a pedalare in solitaria, ora aiuta
-        Bike Index ad espandersi in Europa e oltre.\n"
       merging_the_services: 'Unendo i due servizi, Seth e Bryan hanno creato il servizio
         universale di registrazione delle biciclette che entrambi sognavano: un database
         utilizzato e consultato da privati, negozi di biciclette, dipartimenti di
         polizia e altre app. Un registro di biciclette che offre a chiunque la possibilità
         di registrare e recuperare le proprie biciclette.'
-      mike_oleon_bio_html: "<strong>Mike Oleon</strong> si occupa della grafica e
-        delle illustrazioni dell'Indice. Se qualcosa ha un bell'aspetto, probabilmente
-        è merito suo.\n"
       nonprofit_status: organizzazione senza scopo di lucro 501(c)(3)
       seth_built: Seth ha creato Bike Index quando lavorava come meccanico di biciclette
         perché voleva poter registrare le biciclette dei suoi clienti. Bryan ha sviluppato
@@ -2859,6 +2854,13 @@ it:
         maggior successo al mondo, con oltre %{bikes_count} biciclette catalogate,
         %{partners_count} partner della comunità e decine di migliaia di ricerche
         giornaliere.
+      kelsey_graywill_bio_html: "<strong>Kelsey Graywill</strong> si occupa di grafica,
+        illustrazioni e materiale di marketing per Bike Index. Appassionata sostenitrice
+        della mobilità attiva, pur non avendo mai preso la patente, ha iniziato la
+        sua carriera nell'ambito della promozione della bicicletta insegnando ai bambini
+        ad andare in bici nelle scuole elementari pubbliche, per poi passare al settore
+        della comunicazione presso una coalizione ciclistica prima di unirsi a Bike
+        Index.\n"
     lightspeed:
       a_few_things_to_note: 'Alcuni punti da tenere a mente:'
       a_listing_on_bike_index_will_be_created: Una volta collegato il tuo account
@@ -5855,7 +5857,6 @@ it:
             impounded_cell: Sequestrato
             manufacturer_cell: Produttore
             model_cell: Modello
-            multi_search: ricerca seriale multipla
             none: nessuno
             notes_cell: Note
             owner_email_cell: Inviato a
@@ -5879,46 +5880,16 @@ it:
             vehicle: registrazione
             visible_columns: Colonne visibili
           wrapper:
-            affiliation: Affiliazione
-            avery_exportable: Avery Esportabile
-            bike: registrazione
-            e_vehicle_propulsion: Veicolo elettrico (propulsione)
             e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
-            link: Collegamento
             matching_bikes_html: "%{count} %{cycle_type} corrispondente"
-            mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
-            phone: Telefono
-            reg_address: Indirizzo
             registered_bikes_html: "%{count} %{cycle_type} corrispondente a %{org_name}"
-            student_id: Tessera studentesca
-            vehicle: registrazione
             view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
         search_results:
           bikes_table:
             assign_bike_sticker: Collegamento
-            avery: Avery?
-            color: Colore
             email_hidden: email nascosto
             hidden_not_registered: nascosto, non registrato con %{org_name}
-            impound_id: ID del sequestro
-            impounded: Sequestrato
             link_sticker: adesivo di collegamento
-            manufacturer: Produttore
-            model: Modello
-            notes: Note
-            owner_name: Nome del proprietario
-            propulsion_type: Propulsione
-            registered: Registrato
-            secondary_number: Secondario#
-            sent_to: Inviato a
-            serial: Seriale
-            source: Fonte
-            status_cell: Stato
-            sticker: Adesivo
-            stolen: Rubata
-            updated: Fatto
-            url: URL
-            vehicle_type: Tipo di veicolo
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:
@@ -6304,6 +6275,10 @@ it:
               where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se
                 ci contatti in merito a un annuncio che hai trovato online, includi
                 il link nel campo sottostante.
+              know_who_has_this_bike_type: Sai chi ha questo %{bike_type}?
+              what_do_you_need_to_ask: Cosa devi chiedere a riguardo %{bike_type}?
+                Inserisci un link nel campo sottostante se ne trovi uno che ti può
+                essere d'aiuto.
             parking_notification_form:
               address_or_intersection: Indirizzo o incrocio
               create_parking_notification: Crea una nuova notifica di parcheggio

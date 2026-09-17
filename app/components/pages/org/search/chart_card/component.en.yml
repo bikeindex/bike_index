@@ -1,0 +1,18 @@
+---
+en:
+  components:
+    pages:
+      org:
+        search:
+          chart_card:
+            caption_search: Chart · current search
+            caption_year: Chart · Last year overview
+            chart_motorized: E-vehicle
+            chart_registrations: Registrations
+            chart_stolen: Stolen
+            loading: Loading chart...
+            scope_search: Current search
+            scope_year: Last year
+            stat_motorized: E-vehicle registrations
+            stat_registrations: Total registrations
+            stat_stolen: Reported stolen
