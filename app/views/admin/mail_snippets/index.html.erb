@@ -70,7 +70,7 @@
 
           <td>
             <div class="d-block"><%= mail_snippet.subject %></div>
-            <small><%= truncate(mail_snippet.body, length: 100) %></small>
+            <small><%= truncate(mail_snippet.body_stripped, length: 100) %></small>
           </td>
 
           <td class="table-cell-check">

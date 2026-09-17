@@ -566,6 +566,38 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    # A paid organization can reach whoever holds an impounded vehicle without having
+    # bought unstolen_notifications - which is the only thing that would let them
+    # message an ordinary registration
+    context "impounded bike, paid org without unstolen_notifications" do
+      let(:bike) { FactoryBot.create(:bike, :impounded, :with_ownership_claimed, user: owner) }
+      let(:owner) { FactoryBot.create(:user_confirmed, phone: "831289423") }
+      let(:organization_role) { FactoryBot.create(:organization_role_claimed) }
+      let(:user) { organization_role.user }
+      let(:organization) { organization_role.organization }
+
+      it "is contactable and phoneable once the org is paid" do
+        expect(bike.reload.status_found?).to be_truthy
+        expect(user.reload.enabled?("unstolen_notifications", no_superuser_override: true)).to be_falsey
+        expect(bike.contact_owner?(user)).to be_falsey
+        expect(bike.phoneable_by?(user)).to be_falsey
+
+        organization.update_attribute :paid_money, true
+
+        expect(bike.contact_owner?(user.reload)).to be_truthy
+        expect(bike.phoneable_by?(user)).to be_truthy
+      end
+
+      # The allowance sits above the opt-out, so it reaches a holder who declined
+      # unstolen notifications on their own registrations
+      it "overrides notification_unstolen" do
+        organization.update_attribute :paid_money, true
+        owner.update(notification_unstolen: false)
+
+        expect(bike.reload.contact_owner?(user.reload)).to be_truthy
+      end
+    end
+
     context "stolen" do
       let(:stolen_record) { StolenRecord.new(phone: "7883747392", phone_for_users: false, phone_for_shops: false, phone_for_police: false) }
       let(:bike) { Bike.new(current_stolen_record: stolen_record) }
@@ -600,6 +632,103 @@ RSpec.describe Bike, type: :model do
         stolen_record.phone_for_police = true
         expect(bike.phoneable_by?(user)).to be_truthy
         expect(bike.phoneable_by?(User.new)).to be_falsey
+      end
+    end
+  end
+
+  describe "contactable_away_from_owner?" do
+    let(:bike) { FactoryBot.create(:bike, :impounded) }
+    let(:organization_role) { FactoryBot.create(:organization_role_claimed) }
+    let(:contactable_user) { organization_role.user }
+    let(:contactable_organization) { organization_role.organization }
+
+    it "is false without a user, and for a user whose organization qualifies on nothing" do
+      expect(bike.reload.send(:contactable_away_from_owner?)).to be_falsey
+      expect(bike.send(:contactable_away_from_owner?, FactoryBot.create(:user_confirmed))).to be_falsey
+      expect(contactable_organization.reload.paid_money?).to be_falsey
+      expect(bike.send(:contactable_away_from_owner?, contactable_user)).to be_falsey
+    end
+
+    context "organization has unstolen_notifications" do
+      before { contactable_organization.update_attribute :enabled_feature_slugs, ["unstolen_notifications"] }
+
+      it "is true" do
+        expect(bike.reload.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
+      end
+
+      # Nothing is away from its owner, so the allowance has nobody to reach
+      context "bike is with its owner" do
+        let(:bike) { FactoryBot.create(:bike) }
+
+        it "is false" do
+          expect(bike.reload.status_with_owner?).to be_truthy
+          expect(bike.send(:contactable_away_from_owner?, contactable_user.reload)).to be_falsey
+        end
+      end
+
+      # An abandoned bike has no impound record - the allowance is about the status,
+      # not about there being a record to claim
+      context "bike is abandoned" do
+        let(:bike) { FactoryBot.create(:bike, status: :status_abandoned) }
+
+        it "is true" do
+          expect(bike.reload.current_impound_record).to be_blank
+          expect(bike.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
+          expect(bike.contact_owner?(contactable_user)).to be_truthy
+        end
+      end
+    end
+
+    # paid_money is a wider allowance than the feature - an organization can be paid
+    # without having bought unstolen_notifications
+    context "organization is paid" do
+      before { FactoryBot.create(:invoice_with_payment, organization: contactable_organization) }
+
+      it "is true, without the unstolen_notifications feature" do
+        expect(contactable_organization.reload.paid_money?).to be_truthy
+        expect(contactable_organization.enabled?("unstolen_notifications")).to be_falsey
+        expect(bike.reload.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
+      end
+    end
+
+    context "organization is an ambassador organization" do
+      before { contactable_organization.update_attribute :kind, "ambassador" }
+
+      it "is true" do
+        expect(bike.reload.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
+      end
+    end
+
+    # Passing the organization is what keeps the allowance from widening what they see
+    # about their own registrations - the phone included, via phoneable_by?
+    context "registered with the passed organization" do
+      let(:bike) { FactoryBot.create(:bike_organized, :impounded, :with_ownership_claimed, creation_organization: contactable_organization, user: owner) }
+      let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false, phone: "7183914410") }
+
+      before { contactable_organization.update_attribute :enabled_feature_slugs, ["unstolen_notifications"] }
+
+      it "is false, and the phone stays hidden" do
+        expect(bike.reload.organized?(contactable_organization)).to be_truthy
+        expect(bike.send(:contactable_away_from_owner?, contactable_user.reload)).to be_truthy
+        expect(bike.send(:contactable_away_from_owner?, contactable_user, contactable_organization)).to be_falsey
+
+        expect(bike.phoneable_by?(contactable_user)).to be_truthy
+        expect(bike.phoneable_by?(contactable_user, contactable_organization)).to be_falsey
+      end
+    end
+
+    # Matching enabled?, so the submit is accepted for the panel a superuser is shown
+    # when previewing an organization - they're a member of none
+    context "superuser" do
+      let(:superuser) { FactoryBot.create(:superuser) }
+
+      it "is true, and overrides the opt-out" do
+        expect(superuser.organizations).to be_empty
+        expect(bike.reload.send(:contactable_away_from_owner?, superuser)).to be_truthy
+
+        bike.owner&.update(notification_unstolen: false)
+
+        expect(bike.reload.contact_owner?(superuser)).to be_truthy
       end
     end
   end
@@ -752,7 +881,7 @@ RSpec.describe Bike, type: :model do
       let(:status) { "status_with_owner" }
       it "responds with status" do
         expect(bike.status_humanized).to eq "with owner"
-        expect(bike.status_humanized_translated).to eq "with owner"
+        expect(bike.status_humanized_translated).to eq "registered"
       end
     end
   end

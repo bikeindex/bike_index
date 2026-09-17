@@ -4,8 +4,8 @@ module Admin
     include API::TokenAuthenticatable
 
     # Keyed by the BugReport scope each filter applies
-    MEMBERSHIP_FILTERS = {"member" => "Only members", "paid_organization" => "Only paid org",
-                          "paid_organization_staff" => "Only paid org staff"}.freeze
+    MEMBERSHIP_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
+                          "invoiced_organization_staff" => "Only invoiced org staff"}.freeze
     STATUS_FILTER_ALL = "all"
     STATUS_FILTER_INVESTIGATE = "investigate"
 
@@ -132,8 +132,8 @@ module Admin
     def filter_by_membership(bug_reports)
       case @searched_membership
       when "member" then bug_reports.member
-      when "paid_organization" then bug_reports.paid_organization
-      when "paid_organization_staff" then bug_reports.paid_organization_staff
+      when "invoiced_organization" then bug_reports.invoiced_organization
+      when "invoiced_organization_staff" then bug_reports.invoiced_organization_staff
       else bug_reports
       end
     end
@@ -167,7 +167,7 @@ module Admin
 
     def bug_report_json(bug_report)
       bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags status github_pull_request
-        is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
+        is_member is_invoiced_organization is_invoiced_organization_staff received_at created_at updated_at])
         .merge("images" => bug_report.images.map { image_json(it) })
     end
 

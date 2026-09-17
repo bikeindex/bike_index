@@ -26,12 +26,12 @@
 
 <% unless @ended %>
   <h4 class="mt-4">POS kinds <code>start_at</code></h4>
-  <%= helpers.column_chart pos_kinds_start_counts, stacked: true, thousands: ",", colors: start_colors %>
+  <%= render(UI::Chart::Component.new(series: pos_kinds_start_counts, time_range: @time_range, stacked: true, colors: start_colors)) %>
 <% end %>
 
 <% unless @current %>
   <h4 class="mt-4">POS kinds <code>end_at</code></h4>
-  <%= helpers.column_chart pos_kinds_end_counts, stacked: true, thousands: ",", colors: end_colors %>
+  <%= render(UI::Chart::Component.new(series: pos_kinds_end_counts, time_range: @time_range, stacked: true, colors: end_colors)) %>
 <% end %>
 
 <div class="tw:mt-10"></div>

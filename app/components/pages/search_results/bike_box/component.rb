@@ -39,7 +39,7 @@ module Pages
 
         # If for sale, return "For Sale" - otherwise returns price
         def price_span
-          return bike_status_span(@bike) if @event_record.for_sale?
+          return render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :xs)) if @event_record.for_sale?
 
           content_tag(:strong, translation(".price"), class: "attr-title")
         end

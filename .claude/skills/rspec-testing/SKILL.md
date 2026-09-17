@@ -15,9 +15,11 @@ This project uses RSpec. All business logic should be tested.
 
 ## Run only the specs your change touches
 
-Pass the files or directories you changed — `bundle exec rspec spec/components/ui/table spec/requests/bikes/show_request_spec.rb`. Never run a bare `bundle exec rspec`, `spec/`, or a whole top-level directory like `spec/components` or `spec/requests`: those take many minutes and sweep in `:flaky`-tagged system specs. CI runs the full suite.
+AGENTS.md has the rule. When something fails outside the files you changed, re-run that spec file on its own first: failing alone means it's real and gets fixed, never excused as pre-existing; passing alone is the [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) skill, whose first rule is that you can't reach for a retry, a looser matcher, or a deleted assertion to make it green.
 
-When something fails outside the files you changed, re-run that spec file on its own before treating it as yours. Failing alone means it's real, and a real failure gets fixed, never excused as pre-existing. Passing alone means the full run was order-dependent or flaky — that's the [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) skill, and its first rule is that you can't reach for a retry, a looser matcher, or a deleted assertion to make it green.
+## `puts` from a spec doesn't reach you
+
+rtk's rspec wrapper reports a summary and drops the run's stdout, so a `puts` added to a scratch spec to inspect a value vanishes and the run reads as an ordinary pass. Redirect it — `bundle exec rspec spec/foo_spec.rb > tmp/probe.log 2>&1` — or write to a file from inside the example, as [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) does for browser-side values. `--format documentation` does not rescue it.
 
 ## What to test (and what not to)
 
@@ -46,23 +48,35 @@ let!(:bike_transferred) do
 end
 ```
 
+## Session state in a request spec comes from a real request
+
+A request spec reads `session` and `assigns` freely, but a write doesn't outlive the call — the next request rebuilds the session from the cookie. There is no controller spec to fall back on; `spec/controllers/` is gone.
+
+So drive the request that sets the key: `/oauth/authorize?partner=…&company=…` for `partner`/`company` (`arrive_via_partner` in `:existing_doorkeeper_app`), `/session/new?return_to=…` for `return_to`, a bike's recovery link for `recovery_link_token`, a page render as an organization member for `passive_organization_id`. Where a param reaches the same code — `return_to` is read from `params` too — prefer the param over a priming request. `spec/requests/sessions_request_spec.rb` and `spec/requests/users_request_spec.rb` are the patterns.
+
 ## A component's own markup is tested in its component spec
 
 What a component decides about its markup — a label, a placeholder, a class, whether a field renders at all — belongs in `spec/components/**/component_spec.rb`, not in the request spec for a page that happens to render it. Request specs cover the request: status, redirects, what was saved, what the page is wired to.
 
 A component having no spec yet isn't a reason to put it in the request spec instead. `spec/components/pages/register/step2/component_spec.rb` is the pattern, including the `render_x` helper that reloads the record so an object updated mid-example isn't answered from the copy the previous render left behind.
 
+**No stylesheet loads here, so Capybara calls anything hidden by a class visible.** `have_no_field`/`visible: false` against a `tw:hidden` wrapper fails with "found 1 match", which reads as the component rendering the wrong thing. Assert the wrapper instead — `page.find("form div.tw\\:hidden input[name='additional']", visible: :all)` — and leave real invisibility to a `:js` system spec.
+
 ## `render_in_view_context` takes its subjects as method arguments
 
-A component needing a `form_builder` renders inside `render_in_view_context { form_for … }`, which `instance_exec`s its block in the view context — so `let` values aren't in scope and a bare `organization` raises `NameError`. Wrap it in a `def rendered_component(organization, current_user)` and call that from the `let(:component)`; the block closes over the method's locals. `spec/components/pages/admin/organizations/form/wrapper/component_spec.rb` is the pattern.
+A component needing a `form_builder` renders inside `render_in_view_context { form_for … }`, which `instance_exec`s its block in the view context — so `let` values aren't in scope and a bare `organization` raises `NameError`. Wrap it in a `def rendered_component(organization)` and call that from the `let(:component)`; the block closes over the method's locals. `spec/components/pages/admin/organizations/form/wrapper/component_spec.rb` is the pattern.
 
 ## `display_dev_info?` is false in test, so nothing it gates is verifiable
 
 `ControllerHelpers#display_dev_info?` opens with `!Rails.env.test?`. Every `only-dev-visible` block it wraps is unrendered in the suite, so threading the flag through a component — a wrong default, a missed hop — passes green and is wrong only in development. Reading the call sites isn't enough either — it can't show that a `UI::Table` cell block is `instance_exec`'d, so an `@ivar` in one resolves against the table and is always nil. Check it in the browser signed in as `dev@bikeindex.org`; the flag needs `developer?` *and* MiniProfiler, so the superadmin banner button won't do it.
 
-## `log_in` stubs the auth lookup, so it can't answer whether a session ends
+## `log_in` stubs the auth lookup, so it can't answer whether a session ends — or whether a user is confirmed
 
-`spec/support/request_spec_helpers.rb`'s `log_in` (and every `:request_spec_logged_in_as_*` context) stubs `User.from_auth` to return the user, so the cookie is never read and the session outlives anything done to that user — deleting, banning, rotating their `auth_token`. A spec asserting a request signs someone *out* has to sign in for real: `post "/session", params: {session: {email:, password:}}`, then make the request. `spec/requests/sessions_request_spec.rb`'s "deleted after signing in" is the pattern.
+`spec/support/request_spec_helpers.rb`'s `log_in` (and every `:request_spec_logged_in_as_*` context) stubs `User.from_auth` to return the user, so the cookie is never read and the session outlives anything done to that user — deleting, banning, rotating their `auth_token`.
+
+The stub also answers `User.unconfirmed.from_auth`, so `unconfirmed_current_user` is always present. `Sessionable#skip_if_signed_in` asks that *before* it asks whether the user is confirmed, so every request it guards — `/session/new`, `/session/magic_link`, `/users/new` — redirects to `please_confirm_email` under `log_in`, whatever the user is.
+
+Either one means signing in for real: `include_context :request_spec_signed_in_for_real`, which posts real credentials and takes a `let(:user)` override. `spec/requests/sessions_request_spec.rb`'s "deleted after signing in" and its `describe "destroy"` are the patterns.
 
 ## VCR cassettes: never hand-edit, always re-record
 
@@ -77,6 +91,8 @@ The only way a cassette changes is a spec run that records it:
 **Commit what a run re-records.** A modified cassette is a re-recording, not unrelated churn — cassettes carry a `re_record_interval` and are meant to update. Commit it on the branch you're on, whatever that branch is about. Never `git checkout` it away to keep a diff focused.
 
 `git status` after a spec run is the only signal; a run that re-records prints nothing.
+
+**Never write `WebMock.stub_request`. HTTP in a spec is a cassette, with no exceptions.** A stub asserts what you imagined a service returns; a cassette records what it actually returned, which is the same reason cassettes are never hand-edited. The handful of `WebMock.stub_request` calls still in `spec/` are legacy — existing usage is not a precedent to copy.
 
 ## Stubbing ENV
 
@@ -107,13 +123,7 @@ Fix every failing test, even ones that were already failing on `main`. Confirmin
 
 ## Don't weaken assertions to make a failing test pass
 
-When a test goes red, the correct move is **investigate why**, not edit the assertion to match the new output. Watch for these tempting "fixes" that are actually erasing signal:
-
-- Changing an expected value to whatever the page/chart/response now happens to render (e.g. `0` → `null`, an exact count → a range, a specific string → a substring/regex).
-- Loosening `eq` to `include`, dropping `count:` constraints, or replacing `expect(...).to ...` with `expect(...).not_to be_nil`.
-- Deleting the assertion entirely with a "looks unrelated" handwave.
-
-The right loop: reproduce the failure, figure out *what* changed and *why*, then decide intentionally — fix the code if the original assertion captured the right behavior, or update the assertion (with a comment) if the behavior intentionally changed. If you're about to change a test "to make it easier", stop and explain why the new expectation is correct, not just convenient.
+Reproduce the failure and find out what changed before touching the expectation. Changing an expected value to whatever now renders, loosening `eq` to `include`, dropping a `count:`, or deleting the assertion with a "looks unrelated" handwave all erase signal rather than fix anything. Fix the code if the original assertion was right; update it — with a comment — if the behaviour intentionally changed. The [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) skill has the same rule for the intermittent case, where it is absolute.
 
 ## Match a target attributes hash, not one attribute at a time
 
@@ -145,8 +155,6 @@ expect(logo_url).to be_present
 expect(logo_url).not_to include("blank.png")
 expect(logo_url).to eq(organization.avatar_url)
 ```
-
-The bad version spreads one logical assertion across many lines, mixes weak presence checks with the real expected value, and produces noisier failure output.
 
 ## Structuring with `context` and `let`
 
@@ -218,6 +226,8 @@ This is the same instinct as "everything making the same request should be in a 
 
 After writing a spec, scan each `context`/`describe`: if it holds multiple `it` blocks and they don't each sit behind a distinct `context`/`before`/`let`, merge them.
 
+**Not when the first request changes what the next one does.** Same setup isn't the same starting state once a request has run: signing in consumes `session[:return_to]`, and `session[:discourse_redirect]` is set with `||=` so a second arrival can't replace the first. Both merges pass review and go red. Leave those as sibling contexts with a `let` for what differs, and say in a comment why they can't share one example — otherwise the next cleanup pass merges them again.
+
 **A helper that reads the response has to be a `def`, not a `let`.** One example making several requests is exactly where a `let` that parses `response.body` bites: it memoizes the first response and every later assertion re-reads it, so the example fails while the code is right (or worse, passes while the code is wrong). `def` re-evaluates.
 
 ### Good
@@ -259,5 +269,3 @@ context "superuser" do
   end
 end
 ```
-
-This only merges blocks whose setup is identical. Different setup still means separate examples, each in its own `context` with the `let`/`before` that differs — that's the section above, not a contradiction of it.

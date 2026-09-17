@@ -68,7 +68,7 @@ RSpec.configure do |config|
   # Any playwright-driven example, scripting or not - rack_test has nothing to block.
   # An example picks its driver with `driver:` metadata rather than `driven_by`, which
   # runs too late for this to reach the session it chose
-  config.before(:each, type: :system) do
+  config.before(:each, type: :system) do |example|
     driver = Capybara.current_session.driver
     next unless driver.respond_to?(:with_playwright_page)
 
@@ -76,6 +76,29 @@ RSpec.configure do |config|
       BLOCKED_EXTERNAL_HOSTS.each do |host|
         playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
       end
+
+      # A nil current_path is Capybara reporting an `about:` URL -- reached by traversing
+      # to the about:blank every example starts on, or by the page being replaced. These
+      # say which, with the main-frame trail leading to it. Nothing is written unless one
+      # fires, and tmp/capybara is the directory CI uploads with the failure screenshots.
+      log_path = Rails.root.join("tmp/capybara/browser_events.log")
+      trail = []
+      record = lambda do |message|
+        FileUtils.mkdir_p(log_path.dirname)
+        File.open(log_path, "a") do |file|
+          file.puts("#{Time.current.iso8601(3)} #{example.full_description}: #{message}")
+          file.puts("  main frame: #{trail.last(8).join(" -> ")}")
+        end
+      end
+
+      playwright_page.on("crash", ->(_page) { record.call("page crashed") })
+      playwright_page.context.on("page", ->(new_page) { record.call("context opened #{new_page.url}") })
+      playwright_page.on("framenavigated", lambda { |frame|
+        next unless frame.parent_frame.nil?
+
+        trail << frame.url
+        record.call("main frame navigated to #{frame.url}") if frame.url.start_with?("about:")
+      })
     end
   end
 end

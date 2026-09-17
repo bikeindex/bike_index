@@ -4,6 +4,7 @@ class RegistrationsController < ApplicationController
   # redirected here asks for a turbo_stream - which Turbo then silently discards
   before_action :force_html_response, only: %i[show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
+  before_action :sign_in_if_not!, only: %i[show]
   before_action :simple_header, except: %i[show edit]
   around_action :set_reading_role, only: %i[show]
   layout "reg_embed"
@@ -80,7 +81,7 @@ class RegistrationsController < ApplicationController
     @b_param = BParam.new(permitted_params)
     @b_param.errors.add :owner_email, "required" unless @b_param.owner_email.present?
     if @b_param.errors.blank? && @b_param.save
-      Email::PartialRegistrationJob.perform_async(@b_param.id)
+      EmailJobs::PartialRegistrationJob.perform_async(@b_param.id)
     else
       @page_errors = @b_param.errors
       render action: :new

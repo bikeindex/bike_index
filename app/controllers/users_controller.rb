@@ -22,7 +22,7 @@ class UsersController < ApplicationController
     if requested_locale != I18n.default_locale
       @user.preferred_language = requested_locale
     end
-    if @user.save
+    if turnstile_verified?(@user, @user.email) && @user.save
       sign_in_and_redirect(@user)
     else
       @page_errors = @user.errors
@@ -53,7 +53,7 @@ class UsersController < ApplicationController
     user_subject = unconfirmed_current_user
     user_subject ||= User.unconfirmed.fuzzy_unconfirmed_primary_email_find(params[:email])
     if user_subject.present?
-      Email::ConfirmationJob.new.perform(user_subject.id)
+      EmailJobs::ConfirmationJob.new.perform(user_subject.id)
       flash[:success] = translation(:resending_email)
     else
       flash[:error] = translation(:please_sign_in)

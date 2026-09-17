@@ -5,7 +5,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
   let(:bug_report) { FactoryBot.create(:bug_report, tags: ["parking"]) }
   let(:target_json) do
     bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags status github_pull_request
-      is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
+      is_member is_invoiced_organization is_invoiced_organization_staff received_at created_at updated_at])
       .merge("images" => [])
   end
   include_context :request_spec_logged_in_as_superuser
@@ -109,18 +109,18 @@ RSpec.describe Admin::BugReportsController, type: :request do
     end
 
     context "with search_membership" do
-      let!(:bug_report_paid) { FactoryBot.create(:bug_report, is_paid_organization: true) }
+      let!(:bug_report_invoiced) { FactoryBot.create(:bug_report, is_invoiced_organization: true) }
 
       it "filters by the membership snapshot" do
-        expect(bug_report.is_paid_organization).to be_falsey
-        get "#{base_url}.json", params: {search_membership: "paid_organization", search_status: "all"}
-        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_paid.id])
+        expect(bug_report.is_invoiced_organization).to be_falsey
+        get "#{base_url}.json", params: {search_membership: "invoiced_organization", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_invoiced.id])
       end
 
       it "ignores an unknown membership filter" do
         expect(bug_report).to be_present
         get "#{base_url}.json", params: {search_membership: "nonsense", search_status: "all"}
-        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report.id, bug_report_paid.id])
+        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report.id, bug_report_invoiced.id])
       end
     end
   end

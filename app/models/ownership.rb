@@ -311,7 +311,7 @@ class Ownership < ApplicationRecord
     end
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeServices::Creator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
-    Email::OwnershipInvitationJob.perform_in(2.seconds, id)
+    EmailJobs::OwnershipInvitationJob.perform_in(2.seconds, id)
   end
 
   def create_user_registration_for_phone_registration!(user)
@@ -363,8 +363,7 @@ class Ownership < ApplicationRecord
   end
 
   def spam_risky_email?
-    risky_domains = ["@yahoo.co", "@hotmail.co"]
-    return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
+    return false unless EmailDomain.risky_email?(owner_email)
     return true if pos?
 
     embed? && organization&.spam_registrations?

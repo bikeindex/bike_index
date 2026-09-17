@@ -17,8 +17,7 @@ description: >-
 
 ## Pull the fault with `bin/binx_hb`
 
-Run it from the repo root — `bin/binx_hb` with no arguments prints its own usage.
-Two modes matter here: `fault` for the summary, `notice` for the backtrace.
+Run it from the repo root. Two modes matter here: `fault` for the summary, `notice` for the backtrace.
 
 ```
 bin/binx_hb fault  https://app.honeybadger.io/projects/35931/faults/133010748
@@ -32,11 +31,9 @@ fetching again.
 
 It reads `HONEYBADGER_PERSONAL_AUTH_TOKEN` from `.env.development`. Without it
 the command exits saying so — get a new token at honeybadger.io/users/edit and
-ask the user to set it. Don't fall back to the `honeybadger` MCP server: its
-results land in context with no way to redirect them to a file, and a notice's
-`backtrace` field alone can run 130 KB (measured on a Grape API
-`Redis::TimeoutError`, 2026-09-01) against the ~700 tokens `binx_hb` projects it
-into. Aggregates are covered too — `binx_hb trend` and `binx_hb counts`.
+ask the user to set it. Don't fall back to the `honeybadger` MCP server — it can't redirect a notice to
+a file, so a 130 KB backtrace lands whole in context. Aggregates are covered too
+— `binx_hb faults`, `trend` and `counts`.
 
 ## Read the notice in this order
 
@@ -76,7 +73,7 @@ and then nothing, with a `message` naming the provider rather than your code.
   *retryable* job — `retry: false` reports every blip, and `ScheduledJob`
   defaults to it.
 - A retry only silences a blip shorter than Sidekiq's first backoff,
-  `15 + rand(30)` seconds. Check the notice timestamps against that.
+  `15 + rand(10)` seconds. Check the notice timestamps against that.
 - Check what a mid-operation failure leaves behind — retrying doesn't help work
   that isn't idempotent. `ActiveStorage::Blob#purge` destroys the row before
   deleting the file, so a failed delete orphans the file for good.

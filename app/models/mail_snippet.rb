@@ -183,6 +183,10 @@ class MailSnippet < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
+  def body_stripped
+    @body_stripped ||= Binxtils::InputNormalizer.plain_text(body)
+  end
+
   def max_body_length
     nil # match mail_snippet method
   end

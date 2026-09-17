@@ -15,7 +15,7 @@
 #  direct_unclaimed_notifications  :boolean          default(FALSE)
 #  enabled_feature_slugs           :jsonb
 #  graduated_notification_interval :bigint
-#  is_paid                         :boolean          default(FALSE), not null
+#  is_invoiced                     :boolean          default(FALSE), not null
 #  kind                            :integer
 #  lightspeed_register_with_phone  :boolean          default(FALSE)
 #  location_latitude               :float
@@ -24,6 +24,7 @@
 #  manual_pos_kind                 :integer
 #  name                            :string(255)
 #  opted_into_theft_survey_2023    :boolean          default(FALSE)
+#  paid_money                      :boolean          default(FALSE), not null
 #  pos_kind                        :integer          default("no_pos")
 #  previous_slug                   :string
 #  regional_ids                    :jsonb
@@ -154,15 +155,21 @@ class Organization < ApplicationRecord
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
-  scope :paid, -> { where(is_paid: true) }
-  scope :paid_money, -> { where(is_paid: true) } # TODO: make this actually show paid money, rather than just paid
-  scope :unpaid, -> { where(is_paid: false) }
+  scope :invoiced, -> { where(is_invoiced: true) }
+  scope :paid_money, -> { where(paid_money: true) }
+  scope :not_invoiced, -> { where(is_invoiced: false) }
   scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   scope :with_pos, -> { where(pos_kind: with_pos_kinds) }
   scope :with_stolen_message, -> { left_joins(:organization_stolen_message).where.not(organization_stolen_message: {body: nil}) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("enabled_feature_slugs ?| array[:keys]", keys: %w[unstolen_notifications parking_notifications impound_bikes]) }
+  # Named rather than chained so the `or`s compose onto an association - built off the class
+  # so they don't inherit whatever relation this is called on
+  scope :contact_impounded, -> {
+    where(id: Organization.with_enabled_feature_slugs("unstolen_notifications")
+      .or(Organization.paid_money).or(Organization.ambassador))
+  }
   # Regional orgs have to have the organization feature slug AND the search location set
   scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("enabled_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
 
@@ -337,6 +344,10 @@ class Organization < ApplicationRecord
     enabled?("impound_bikes_public") # feature slug applied in calculated_enabled_feature_slugs
   end
 
+  def show_single_search_menu_item?
+    enabled?("bike_search") && !law_enforcement?
+  end
+
   # WARNING! This is not efficient
   def law_enforcement_features_enabled?
     law_enforcement? && current_invoices.any? { |i| i.law_enforcement_functionality_invoice? }
@@ -359,19 +370,9 @@ class Organization < ApplicationRecord
     show_on_map && approved
   end
 
-  # TODO: rename - actually should be "enabled_features?" - because many orgs haven't actually paid
-  def paid?
-    is_paid
-  end
-
-  # For now - just using paid
   def user_registration_all_bikes?
-    paid? && !official_manufacturer? &&
+    is_invoiced? && !official_manufacturer? &&
       USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS.exclude?(id)
-  end
-
-  def paid_money?
-    paid? && current_invoices.any? { |i| i.paid_money_in_full? }
   end
 
   def paid_previously?
@@ -491,7 +492,7 @@ class Organization < ApplicationRecord
   end
 
   def block_short_name_edit?
-    paid? # Prevent url changes breaking landing pages, etc
+    is_invoiced? # Prevent url changes breaking landing pages, etc
   end
 
   def bike_actions?
@@ -553,6 +554,11 @@ class Organization < ApplicationRecord
     features.detect { |f| enabled?(f) }.present?
   end
 
+  # Trusted to message whoever holds an impounded vehicle rather than having to claim it
+  def contact_impounded?
+    enabled?("unstolen_notifications") || paid_money? || ambassador?
+  end
+
   def set_calculated_attributes
     return true unless name.present?
 
@@ -561,25 +567,15 @@ class Organization < ApplicationRecord
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = name_shortener(short_name.presence || name)
     self.ascend_name = nil if ascend_name.blank?
-    self.is_paid = current_invoices.any? || current_parent_invoices.any?
+    self.is_invoiced = calculated_is_invoiced
+    self.paid_money = calculated_paid_money?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.user_email_domain = EmailNormalizer.normalize(user_email_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
     new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
-    if new_slug != slug
-      # If the organization exists, don't invalidate because of it's own slug
-      orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
-      # Force update the deleted short_names and slugs
-      orgs.deleted.where.not("short_name ILIKE ?", "%-deleted")
-        .each { |o| o.update_columns(short_name: "#{o.short_name}-deleted", slug: "#{o.slug}-deleted") }
-      while orgs.where(slug: new_slug).exists?
-        i = i.present? ? i + 1 : 2
-        new_slug = "#{new_slug}-#{i}"
-      end
-      self.slug = new_slug
-    end
+    self.slug = calculated_slug(new_slug) if new_slug != slug
     self.access_token ||= SecurityTokenizer.new_token
     # NOTE: only organizations with child_organizations feature can be selected in admin view, but this doesn't block assignment
     self.child_ids = calculated_children.pluck(:id).presence || []
@@ -632,6 +628,17 @@ class Organization < ApplicationRecord
 
   private
 
+  def calculated_slug(new_slug)
+    orgs = id.present? ? Organization.unscoped.where.not(id:) : Organization.unscoped.all
+    holder = orgs.find_by(slug: new_slug)
+    # The unique index counts deleted rows and destroy skips validations, so a deleted
+    # organization holds its slug until the organization claiming the name saves it
+    holder.save if holder&.deleted?
+    return new_slug if holder.nil? || holder.slug != new_slug
+
+    (2..).lazy.map { "#{new_slug}-#{it}" }.find { |candidate| !orgs.exists?(slug: candidate) }
+  end
+
   def user_email_domain_format
     return if user_email_domain.blank?
     errors.add(:user_email_domain, "must include a .") unless user_email_domain.include?(".")
@@ -658,6 +665,14 @@ class Organization < ApplicationRecord
     return str unless deleted_at.present?
 
     str.match?("-deleted") ? str : "#{str}-deleted"
+  end
+
+  def calculated_is_invoiced
+    current_invoices.any? || current_parent_invoices.any?
+  end
+
+  def calculated_paid_money?
+    is_invoiced? && current_invoices.any? { |i| i.paid_money_in_full? }
   end
 
   def calculated_enabled_feature_slugs

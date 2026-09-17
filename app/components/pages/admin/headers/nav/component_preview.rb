@@ -10,7 +10,7 @@ module Pages
           end
 
           def with_subtitle
-            render(Pages::Admin::Headers::Nav::Component.new(title: "Brakebills", subtitle: "Editing paid functionality"))
+            render(Pages::Admin::Headers::Nav::Component.new(title: "Brakebills", subtitle: "Editing invoice functionality"))
           end
 
           # A template, so the items can render UI:: components

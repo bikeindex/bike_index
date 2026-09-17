@@ -438,7 +438,7 @@ en:
         deleted_at: Deleted at
         enabled_feature_slugs: Enabled feature slugs
         invoices: Invoices
-        is_paid: Is paid
+        is_invoiced: Is invoiced
         kind: Kind
         locations: Locations
         lock_show_on_map: Lock show on map
@@ -693,7 +693,7 @@ en:
           impounded: impounded
           stolen: stolen
           unregistered: unregistered
-          with_owner: with owner
+          with_owner: registered
     enums:
       currency:
         cad: CAD
@@ -714,8 +714,8 @@ en:
         non_e_skateboard: Skateboard (not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
-        personal_mobility: e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle,
-          etc)
+        personal_mobility: e-Personal Mobility Device (EPAMD, e-Skateboard, Segway,
+          e-Unicycle, etc)
         recumbent: Recumbent
         stroller: Stroller
         tall_bike: Tall Bike (multiple frames fused together)
@@ -1322,42 +1322,6 @@ en:
       you_scanned_this_sticker_html: >-
         You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
         to this %{bike_type}.
-    stolen_checklist:
-      a_photo_of_your_bike_type: a photo of your %{bike_type}
-      add: Add
-      add_bike_link_to_your_theft_report_html: Add %{bike_link} to your theft report
-      add_serial_number: Add serial number
-      bike_index_does_this: "(Bike Index does this when you enter your police report
-        number)"
-      contact_seller: CRITICAL - contact who you bought the bike from and find out
-        if they have it
-      facebook_instagram_etc: "(Facebook, Instagram, etc)"
-      leads_online: LEADSonline
-      leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
-      list_bike_type_on_bike_index: List %{bike_type} on Bike Index
-      location_where_the_theft_occurred: location where the theft occurred
-      nl_digid_required: "(DigiD required)"
-      nl_file_police_report: File a Police report!
-      nl_online: Online
-      nl_person: In Person
-      nl_person_report: Search for the closest police station,
-      nl_phone: By Phone
-      nl_phone_report: >-
-        call 0900-8844. You will usually get a phone call appointment for later, at
-        which point you'll give the information to the Police
-      nl_website_link_text: at this politie.nl webpage
-      promoted_stolen_bike_alerts: Promoted Stolen Bike Alerts
-      push_bike_info_to: Push bike info to
-      push_bike_info_to_law_enforcement: >-
-        Push bike info to law enforcement databases (Bike Index does this when you
-        enter your police report number)
-      report_theft_html: Report theft on Bike Index, including %{edit_bike_link}
-      requires_a_serial_number: requires a serial number
-      share_on_twitter: Share on Twitter (Bike Index will do this once we review your
-        listing)
-      share_widely_on_your_personal_social: Share widely on your personal social media
-      supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
-      your_police_report: your Police Report Number
     stolen_map:
       unavailable: The map couldn't be loaded — your browser or device may not support
         it.
@@ -1782,6 +1746,8 @@ en:
             are unsure as to the reasons for this, please contact us.
         skip_if_signed_in:
           already_signed_in: You're already signed in!
+        turnstile_verified:
+          verify_not_a_robot: Please confirm you're not a robot
     feedbacks:
       block_the_spam:
         please_sign_in: Please sign in to send that message
@@ -2158,8 +2124,8 @@ en:
       html:
         marked_recovered_by: 'Marked recovered by:'
         note_if_you_didnt_recover_html: >-
-          <strong>Note:</strong> If you didn't recover your bike, or marked it recovered
-          accidentally, reply to this email and let us know!
+          <strong>Note:</strong> If you didn't recover your %{bike_type}, or marked
+          it recovered accidentally, reply to this email and let us know!
         the_description_of_the_recovery_was: 'The description of the recovery was:'
         were_so_glad_you_got_your_bike_type_back: We're so glad you got your %{bike_type}
           back!
@@ -2196,7 +2162,7 @@ en:
         no_one_should_be_extorted: >-
           If you think this person is extorting you or abusing the system, email us
           and let us know - you should never be forced to 'reward' or 'repay' someone
-          for your stolen bike
+          for your stolen %{bike_type}
         please_help_sender_html: >-
           Please help %{sender_name} contact the owner of this %{link}, they believe
           it is <span class='stolen-color'>stolen</span>!
@@ -2208,15 +2174,15 @@ en:
           registered on Bike Index on %{date}
         update_organization_direct_message_html: >-
           Update the "Stolen emails" setting in %{link} on Bike Index to have these
-          emails sent directly to the owner of the bike, without having to forward
-          them.
+          emails sent directly to the owner of the %{bike_type}, without having to
+          forward them.
         you_can_just_forward_this_message_to: >-
           You can just forward this message to the owner's email address: %{bikeowner_email}
         you_registered_this_bike_type_on: >-
           You registered this %{bike_type} on %{date}. The owner hasn't claimed it
           yet and it isn't marked stolen, so you have received this email to authorize
           contacting them.
-      subject: Stolen bike contact
+      subject: Stolen %{bike_type} contact
     updated_terms_email:
       html:
         as_always_thanks_for_helping_register_bik: As always, thanks for helping register
@@ -2503,19 +2469,17 @@ en:
         over the world before realizing other people use bikes as a means of transport.  He
         brings a wide breath of knowledge of the cycling world and works to make sure everything
         keeps running behind the scenes at Bike Index.
-      jan_pecnik_bio_html: |
-        <strong>Jan Pecnik</strong> fell in love with bikes while studying his masters in the
-        Netherlands, focusing on social entrepreneurship. After a couple of
-        years of solo riding, he now helps Bike Index expand across Europe and
-        beyond.
+      kelsey_graywill_bio_html: |
+        <strong>Kelsey Graywill</strong> does graphic design, illustration, and marketing
+        collateral for Bike Index. A tireless advocate for active mobility who has never
+        learned to drive, she got her start in bike advocacy teaching kids to ride at public
+        elementary schools, then moved into communications at a bike coalition before joining
+        Bike Index.
       merging_the_services: >-
         Merging the two services, Seth and Bryan created the universal bike registration
         service they both dreamed of — a database used and searched by individuals,
         bike shops, police departments and other apps. A bike registry that gives
         everyone the ability to register and recover bicycles.
-      mike_oleon_bio_html: |
-        <strong>Mike Oleon</strong> does the graphic design and illustration for the Index. If
-        anything looks good, it's probably his fault.
       nonprofit_status: 501(c)(3) nonprofit
       seth_built: >-
         Seth built Bike Index when he was a bike mechanic because he wanted to be
@@ -3596,7 +3560,6 @@ en:
         uses Ascend as your POS, our new Ascend point of sale integration will allow
         you to register each bike you sell automatically. Setup takes about 10 minutes.
     bike_shop_packages:
-      additional: Additional
       bike_index_for_bike_shops: Bike Index for bike shops
       choose_a_package_size: Choose a package size
       compare_plans_and_features: Compare Plans and Features
@@ -5076,8 +5039,10 @@ en:
       recoveries: Recoveries
       registration_sequences: Registration sequences
       registration_stickers: Registration stickers
+      registrations_index: Organization Registrations
       reports: Reports
       resources: Resources
+      search_all_registrations: Search all registrations
       search_impounded_vehicles: Search Impounded Vehicles
       search_parking_notifications: Search Parking Notifications
       search_registrations: Search Registrations

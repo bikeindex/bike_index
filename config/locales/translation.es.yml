@@ -646,7 +646,6 @@ es:
         deleted_at: Eliminado en
         enabled_feature_slugs: Identificadores de funciones habilitadas
         invoices: Facturas
-        is_paid: Se paga
         kind: Amable
         locations: Ubicaciones
         lock_show_on_map: Bloquear mostrar en el mapa
@@ -664,6 +663,7 @@ es:
         users: Usuarios
         website: Sitio web
         organization_roles: Membresías
+        is_invoiced: Se factura
       organization_feature:
         amount_cents: Cantidad en centavos
         description: Descripción
@@ -2289,6 +2289,8 @@ es:
           organization_signed_in: Has iniciado sesión
         skip_if_signed_in:
           already_signed_in: "¡Ya has iniciado sesión!"
+        turnstile_verified:
+          verify_not_a_robot: Por favor, confirma que no eres un robot.
     feedbacks:
       block_the_spam:
         please_sign_in: Por favor, inicia sesión para enviar ese mensaje.
@@ -2836,18 +2838,11 @@ es:
         de que otras personas también la utilizaban como medio de transporte. Aporta
         un amplio conocimiento del mundo del ciclismo y se encarga de que todo funcione
         correctamente entre bastidores en Bike Index.\n"
-      jan_pecnik_bio_html: "<strong>Jan Pecnik</strong> se enamoró de las bicicletas
-        mientras cursaba su máster en los Países Bajos, centrado en el emprendimiento
-        social. Tras un par de años recorriendo la ciudad en solitario, ahora ayuda
-        a Bike Index a expandirse por Europa y otros continentes.\n"
       merging_the_services: 'Al fusionar ambos servicios, Seth y Bryan crearon el
         servicio universal de registro de bicicletas con el que ambos soñaban: una
         base de datos utilizada y consultada por particulares, tiendas de bicicletas,
         departamentos de policía y otras aplicaciones. Un registro de bicicletas que
         permite a todos registrar y recuperar sus bicicletas.'
-      mike_oleon_bio_html: "<strong>Mike Oleon</strong> se encarga del diseño gráfico
-        y las ilustraciones del Índice. Si algo luce bien, probablemente sea culpa
-        suya.\n"
       nonprofit_status: Organización sin fines de lucro 501(c)(3)
       seth_built: Seth creó Bike Index cuando era mecánico de bicicletas porque quería
         poder registrar las bicicletas de sus clientes. Bryan desarrolló y dirigió
@@ -2863,6 +2858,12 @@ es:
       widely_used: Es el servicio de registro de bicicletas más utilizado y exitoso
         del mundo, con más de %{bikes_count} bicicletas catalogadas, %{partners_count}
         socios comunitarios y decenas de miles de búsquedas diarias.
+      kelsey_graywill_bio_html: "<strong>Kelsey Graywill</strong> se encarga del diseño
+        gráfico, la ilustración y el material de marketing para Bike Index. Defensora
+        incansable de la movilidad activa, que nunca ha aprendido a conducir, comenzó
+        su trayectoria en la promoción del ciclismo enseñando a niños a montar en
+        bicicleta en escuelas primarias públicas, para luego dedicarse a la comunicación
+        en una coalición ciclista antes de unirse a Bike Index.\n"
     lightspeed:
       a_few_things_to_note: 'Algunos puntos a tener en cuenta:'
       a_listing_on_bike_index_will_be_created: Una vez que conectes tu cuenta de Lightspeed
@@ -3905,7 +3906,6 @@ es:
         de venta, nuestra nueva integración con Ascend te permitirá registrar automáticamente
         cada bicicleta que vendas. La configuración tarda aproximadamente 10 minutos.
     bike_shop_packages:
-      additional: Adicional
       bike_index_for_bike_shops: Índice de bicicletas para tiendas de bicicletas
       choose_a_package_size: Seleccione un tamaño de paquete
       compare_plans_and_features: Compara planes y características
@@ -5336,6 +5336,8 @@ es:
       stolen_hot_sheet: Lista de bicicletas robadas
       stolen_message: Mensaje robado
       in_super_admin: "%{org_name} en superadministrador"
+      registrations_index: Registro de organizaciones
+      search_all_registrations: Buscar en todos los registros
   stolen:
     index:
       ambassador: embajador
@@ -5726,6 +5728,10 @@ es:
           uploading: subir
         group:
           optional: opcional
+        turnstile:
+          enable_javascript: Para verificar esta dirección de correo electrónico se
+            requiere JavaScript. Actívelo y vuelva a enviar el formulario, o utilice
+            una dirección de correo electrónico diferente.
       alerts:
         base:
           error: Error
@@ -5751,6 +5757,16 @@ es:
         hidden_for_unauthorized_users: oculto para usuarios no autorizados
         made_without_serial: hecho sin número de serie
         unknown: desconocido
+      registration_status_badge:
+        abandoned: Se informó que parecía estar abandonado, donde no debería estar.
+        for_sale: Registrado y protegido, puesto a la venta por su propietario.
+        found: Alguien lo encontró y está esperando a que su dueño lo reclame.
+        impounded: En poder de una organización, a la espera de que su propietario
+          la reclame.
+        stolen: Denunciado como robado
+        unregistered: 'No registrado por su propietario: creado a partir de una notificación
+          de estacionamiento.'
+        with_owner: Registrado y protegido. Con su dueño (no robado).
     pages:
       messages:
         thread_show:
@@ -5843,7 +5859,6 @@ es:
             impounded_cell: Incautado
             manufacturer_cell: Fabricante
             model_cell: Modelo
-            multi_search: búsqueda serial múltiple
             none: ninguno
             notes_cell: Notas de registro
             owner_email_cell: Enviado a
@@ -5867,46 +5882,16 @@ es:
             vehicle: registro
             visible_columns: Columnas visibles
           wrapper:
-            affiliation: Afiliación
-            avery_exportable: Exportable de Avery
-            bike: registro
-            e_vehicle_propulsion: Vehículo eléctrico (propulsión)
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
-            link: Enlace
             matching_bikes_html: "%{count} %{cycle_type} coincidentes"
-            mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
-            phone: Teléfono
-            reg_address: DIRECCIÓN
             registered_bikes_html: "%{count} %{cycle_type} coincidente para %{org_name}"
-            student_id: Carné de estudiante
-            vehicle: registro
             view_matching_any_audit: ver coincidencia con cualquier auditoría
         search_results:
           bikes_table:
             assign_bike_sticker: Asignar pegatina
-            avery: "¿Avery?"
-            color: Color
             email_hidden: Correo electrónico oculto
             hidden_not_registered: oculto, no registrado con %{org_name}
-            impound_id: ID del depósito
-            impounded: Incautado
             link_sticker: pegatina de enlace
-            manufacturer: Fabricante
-            model: Modelo
-            notes: Notas de registro
-            owner_name: Nombre del propietario
-            propulsion_type: Propulsión
-            registered: Registrado
-            secondary_number: Secundario#
-            sent_to: Enviado a
-            serial: De serie
-            source: Fuente
-            status_cell: Estado
-            sticker: Etiqueta engomada
-            stolen: Robado
-            updated: Actualizado
-            url: URL
-            vehicle_type: Tipo de vehículo
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
@@ -6288,6 +6273,9 @@ es:
               where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos
                 contactas por un anuncio que encontraste en línea, incluye un enlace
                 en el campo a continuación."
+              know_who_has_this_bike_type: "¿Sabes quién tiene este %{bike_type}?"
+              what_do_you_need_to_ask: "¿Qué necesitas preguntar sobre esto %{bike_type}?
+                Incluye un enlace en el campo de abajo si hay alguno que te ayude."
             parking_notification_form:
               address_or_intersection: Dirección o intersección
               create_parking_notification: Crear una nueva notificación de estacionamiento
@@ -6322,13 +6310,6 @@ es:
             primary_color:
               one: Color primario
               other: Colores primarios
-          status:
-            found: Encontró
-            impounded: Incautado
-            not_stolen: No robado
-            stolen: Robado
-            unregistered: No registrado
-            for_sale: Se vende
           stolen_details:
             department_city: Departamento y ciudad
             description_of_incident: Descripción del incidente
@@ -6351,7 +6332,6 @@ es:
             audience_sent_away: Ya no es tu %{bike_type}
             edit_this_bike: Edita esto %{bike_type}
             mark_stolen: Marca robada
-            registered_protected: Registrado y protegido
             sell_on_marketplace: Vender en el mercado
             share: Compartir
             share_my_page: Comparte mi página

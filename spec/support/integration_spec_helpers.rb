@@ -4,22 +4,10 @@
 # browser behavior Capybara doesn't abstract across drivers, which is implemented for the
 # Playwright driver via its raw page (see spec/support/capybara.rb).
 module IntegrationSpecHelpers
-  # Clear the back/forward stack so go_back/go_forward operate on this example's
-  # own short stack -- Capybara never resets history between examples, so it
-  # accumulates across the suite.
-  def reset_browser_history
-    page.driver.with_playwright_page do |playwright_page|
-      session = playwright_page.context.new_cdp_session(playwright_page)
-      session.send_message("Page.resetNavigationHistory")
-      session.detach
-    end
-  end
-
   # Turn on touch emulation, which is what makes `(pointer: coarse)` match, so
   # touch-only styles render (Playwright's emulate_media doesn't cover pointer).
-  # The override lives as long as the CDP session, so unlike reset_browser_history
-  # this one is left attached -- the browser context is recreated between
-  # examples, which is teardown enough.
+  # The session is left attached -- the browser context is recreated between examples,
+  # which is teardown enough.
   def emulate_touch_device
     page.driver.with_playwright_page do |playwright_page|
       session = playwright_page.context.new_cdp_session(playwright_page)
@@ -124,7 +112,12 @@ module IntegrationSpecHelpers
     end
   end
 
-  def open_settings_menu = find("button[aria-label='Settings']").click
+  # The gear toggles the submenu through shared-blocks--navbar, so a click landing before
+  # that controller connects is swallowed with nothing on the page to say so
+  def open_settings_menu
+    wait_for_stimulus("shared-blocks--navbar")
+    find("button[aria-label='Settings']").click
+  end
 
   def sign_out
     open_settings_menu
@@ -165,13 +158,25 @@ module IntegrationSpecHelpers
   end
 
   # Stimulus lazy loads controller modules, so a rendered page can have none of them
-  # connected yet -- a combobox filters no options, a restored draft reaches no listener
-  def wait_for_stimulus(timeout: Capybara.default_max_wait_time)
+  # connected yet -- a combobox filters no options, a restored draft reaches no listener.
+  # `every` is vacuously true on a document that has parsed no [data-controller] at all,
+  # so name the one being waited for and the wait covers it arriving as well as connecting
+  def wait_for_stimulus(identifier = nil, timeout: Capybara.default_max_wait_time)
     wait_for(timeout:) do
       page.evaluate_script(<<~JS)
         [...document.querySelectorAll('[data-controller]')].every((element) =>
           element.dataset.controller.split(' ').filter(Boolean).every((identifier) =>
             window.Stimulus?.getControllerForElementAndIdentifier(element, identifier)))
+      JS
+    end
+    return if identifier.blank?
+
+    wait_for(timeout:) do
+      page.evaluate_script(<<~JS)
+        (() => {
+          const element = document.querySelector('[data-controller~="#{identifier}"]')
+          return !!(element && window.Stimulus?.getControllerForElementAndIdentifier(element, "#{identifier}"))
+        })()
       JS
     end
   end
@@ -259,7 +264,7 @@ module IntegrationSpecHelpers
 
   # The registration's emailed link, once its job has run
   def confirmation_link
-    Email::PartialRegistrationJob.drain
+    EmailJobs::PartialRegistrationJob.drain
     emailed_path("/register/confirm")
   end
 

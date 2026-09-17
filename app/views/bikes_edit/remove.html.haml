@@ -63,7 +63,8 @@
             %hr
 
             .delete-from-index.no-divider-row
-              = link_to bike_version_path(@bike_version), method: :delete, confirm: "Are you sure?" do
+              = render(UI::ButtonLink::Component.new(href: bike_version_path(@bike_version), color: :link,
+                method: :delete, confirm: "Are you sure?")) do
                 = render "/shared/trash_icon"
                 = t(".delete_this_version_html", version_name: @bike.display_name)
           - else

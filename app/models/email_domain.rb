@@ -36,6 +36,9 @@ class EmailDomain < ApplicationRecord
   STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}.freeze
   TLD_HAS_SUBDOMAIN = %w[.au .br .hk .il .in .jp .mx .nz .tw .uk .us .za].freeze
   SPAM_SCORE_AUTO_BAN = 5
+  # Substrings, so each covers @yahoo.co.uk and the rest of the country domains.
+  # Every spam complaint Postmark has on file is one of these two
+  RISKY_EMAIL_DOMAINS = ["@yahoo.co", "@hotmail.co"].freeze
   # We don't verify with EmailDomains in most tests because it slows things down.
   # This also includes an env to turn if off in case things block up
   VERIFICATION_ENABLED = (!Rails.env.test? && ENV["SKIP_EMAIL_DOMAIN_VERIFICATION"] != "true").freeze
@@ -68,6 +71,10 @@ class EmailDomain < ApplicationRecord
   scope :no_auto_assign_status, -> { where("(data -> 'no_auto_assign_status')::text =?", "true") }
 
   class << self
+    # Downcased: users_controller asks before the record is saved, so before
+    # EmailNormalizer has run over what was typed
+    def risky_email?(email) = RISKY_EMAIL_DOMAINS.any? { email.to_s.downcase.include?(it) }
+
     def find_or_create_for(email_or_domain, skip_processing: false)
       domain = email_or_domain&.split("@")&.last&.strip
       return if domain.blank?

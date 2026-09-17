@@ -332,6 +332,34 @@ RSpec.describe "Register flow", :js, type: :system do
       a_string_matching(/additional_colors_controller/))
   end
 
+  describe "a risky email, with the challenge configured" do
+    let(:owner_email) { "rider@yahoo.com" }
+    # Cloudflare's interactive-challenge testing sitekey, which renders a widget but issues
+    # no token - so the first submission is turned away without reaching siteverify
+    before do
+      stub_const("Integrations::Turnstile::ENABLED", true)
+      stub_const("Integrations::Turnstile::SITE_KEY", "3x00000000000000000000FF")
+    end
+
+    # The rejected step comes back through Turbo, so its widget is a container api.js was
+    # never loaded alongside - one it doesn't render leaves the rider with no way to answer
+    it "renders the widget again on the step it hands back" do
+      visit "/register/new"
+      type_into("#b_param_manufacturer_id", "Surly")
+      click_combobox_option("Surly")
+      fill_in "b_param[owner_email]", with: owner_email
+
+      expect(page).to have_field(Integrations::Turnstile::RESPONSE_PARAM, type: "hidden",
+        visible: :all, wait: 10)
+
+      click_button "Next"
+
+      expect(page).to have_content("not a robot", wait: 10)
+      expect(page).to have_field(Integrations::Turnstile::RESPONSE_PARAM, type: "hidden",
+        visible: :all, wait: 10)
+    end
+  end
+
   describe "signed in" do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
     let(:friend_email) { "friend@bikeindex.org" }
@@ -381,11 +409,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     it "marks a registration spam when a bot fills the honeypot, without letting on" do
       start_registration
-
-      # A rider can't see or reach the honeypot, so only a bot fills it in
-      honeypot = find_field("Additional", visible: :hidden)
-      expect(honeypot[:tabindex]).to eq "-1"
-      page.execute_script("arguments[0].value = 'http://spam.example.com'", honeypot)
+      fill_honeypot
 
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
@@ -400,7 +424,7 @@ RSpec.describe "Register flow", :js, type: :system do
       bike = Bike.spam.last
       expect(bike).to have_attributes(owner_email:, serial_number: "XYZ 123")
       # And the invitation to claim it, enqueued like any other, mails nothing
-      expect { Email::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
     end
   end
 
@@ -508,8 +532,9 @@ RSpec.describe "Register flow", :js, type: :system do
         expect(public_image.image_url).to eq "https://test-uploads.bikeindex.org/#{public_image.file.blob.key}"
 
         # Fetching it is the actual proof the browser's PUT landed - and that the bucket serves it
-        response = Faraday.get(public_image.image_url)
-        expect(response.status).to eq 200
+        # R2 answers 500, not 404, for a key its edge has not caught up with yet
+        response = nil
+        wait_for(timeout: 10) { (response = Faraday.get(public_image.image_url)).status == 200 }
         expect(response.body.bytesize).to eq File.size(image_path)
       end
     end

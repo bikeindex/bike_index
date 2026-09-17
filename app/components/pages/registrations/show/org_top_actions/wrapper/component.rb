@@ -76,11 +76,13 @@ module Pages
               @bike.status_impounded?
             end
 
-            # The owner can be messaged (via a stolen/unstolen notification) when the
-            # bike is stolen, or when the org can send unstolen notifications
+            # What the submit answers to, so a panel this opens is one that's accepted.
+            # Their own impound belongs to the update action below, not this one
             def contactable?
-              @bike.current_stolen_record.present? ||
-                (@bike.status_with_owner? && @organization.enabled?("unstolen_notifications"))
+              return @contactable if defined?(@contactable)
+
+              @contactable = !impounded_by_organization? &&
+                @bike.contact_owner?(@current_user, @organization)
             end
 
             def show_impound?

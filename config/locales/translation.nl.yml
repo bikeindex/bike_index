@@ -625,7 +625,6 @@ nl:
         creation_states: Creatie staten
         deleted_at: Verwijderd om
         invoices: Facturen
-        is_paid: Is betaald
         kind: Soort
         locations: Locaties
         lock_show_on_map: Show op kaart vergrendelen
@@ -645,6 +644,7 @@ nl:
         bike_stickers: Fietscodes
         enabled_feature_slugs: Ingeschakelde functie naaktslakken
         organization_roles: lidmaatschappen
+        is_invoiced: Wordt gefactureerd
       ownership:
         claimed: beweerde
         current: Stroom
@@ -2130,6 +2130,8 @@ nl:
           organization_signed_in: Je bent ingelogd.
         skip_if_signed_in:
           already_signed_in: Je bent al ingelogd!
+        turnstile_verified:
+          verify_not_a_robot: Bevestig alstublieft dat u geen robot bent.
     oauth:
       applications:
         ensure_app_owner!:
@@ -2506,19 +2508,12 @@ nl:
       craig_dalton_bio_html: "<strong>Craig Dalton</strong> dacht dat hij uit de fietsenindustrie
         gegroeid was, totdat Bike Index op zijn pad kwam. Craig zijn ondernemerservaring
         zijn de aanwinst voor de zakelijke kant van Bike Index."
-      jan_pecnik_bio_html: "<strong>Jan Pecnik</strong> werd verliefd op fietsen toen
-        hij met zijn masters, sociale ondernemerschap, in Nederland bezig was. Na
-        een aantal jaren hier alleen mee bezig te zijn geweest, helpt hij nu Bike
-        Index uit te breiden binnen en buiten Europa."
       merging_the_services: Door het samenvoegen van de diensten van Seth en Bryan,
         ontstond er een universele fiets-registratieservice. Dit was een droom die
         uitkwam, een database die wordt gebruikt en doorzocht door zowel particulieren
         als fietsenwinkels, politie en andere apps. Een fietsregister dat iedereen
         de mogelijkheid geeft om fietsen te registreren en te herstellen nadat hij/zij
         hem op de een of andere manier kwijtgeraakt is
-      mike_oleon_bio_html: "<strong>Mike Oleon</strong> houdt zich bezig met de grafische
-        vormgeving van Bike Index. Als het er goed uitziet, dan is het waarschijnlijk
-        zijn fout."
       nonprofit_status: 501 (c) (3) non-profit
       seth_built: 'Seth heeft Bike Index gemaakt toen hij nog werkzaam was als fietsenmaker.
         Hij wilde namelijk de fietsen voor zijn klanten kunnen registreren. Bryan
@@ -2545,6 +2540,12 @@ nl:
         dat andere mensen fietsen als vervoermiddel gebruiken. Hij brengt veel kennis
         van de wielerwereld met zich mee en zorgt ervoor dat achter de schermen bij
         Bike Index alles blijft draaien."
+      kelsey_graywill_bio_html: "<strong>Kelsey Graywill</strong> verzorgt grafisch
+        ontwerp, illustraties en marketingmateriaal voor Bike Index. Als onvermoeibare
+        voorvechter van actieve mobiliteit, die zelf nooit heeft leren autorijden,
+        begon ze haar carrière in de fietsbeweging door kinderen op openbare basisscholen
+        te leren fietsen. Vervolgens werkte ze in de communicatie bij een fietscoalitie
+        voordat ze bij Bike Index kwam.\n"
     privacy:
       available_here: beschikbaar Hier
       changes: wijzigingen
@@ -3518,7 +3519,6 @@ nl:
         Index!
       security_link_text: POS-integratie FAQ
     bike_shop_packages:
-      additional: Extra
       bike_index_for_bike_shops: 'Bike Index voor fietsenwinkels '
       choose_a_package_size: 'Kies een pakketgrootte '
       compare_plans_and_features: Vergelijk Plannen en Functies
@@ -4528,6 +4528,8 @@ nl:
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_message: Gestolen bericht
       in_super_admin: "%{org_name} in superbeheerder"
+      registrations_index: Organisatieregistraties
+      search_all_registrations: Zoek alle registraties
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5625,6 +5627,9 @@ nl:
           uploading: uploaden
         group:
           optional: optioneel
+        turnstile:
+          enable_javascript: Voor het verifiëren van dit e-mailadres is JavaScript
+            vereist. Schakel het in en probeer het opnieuw, of gebruik een ander e-mailadres.
       alerts:
         base:
           error: Fout
@@ -5651,6 +5656,17 @@ nl:
         hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
         made_without_serial: gemaakt zonder serie
         unknown: Onbekend
+      registration_status_badge:
+        abandoned: Er is melding gemaakt van een ogenschijnlijk verlaten locatie,
+          waar het niet thuishoort.
+        for_sale: Geregistreerd en beschermd, te koop aangeboden door de eigenaar.
+        found: Iemand heeft het gevonden en wacht tot de eigenaar het komt ophalen.
+        impounded: In bezit van een organisatie, in afwachting van de rechtmatige
+          eigenaar.
+        stolen: Gemeld als gestolen
+        unregistered: Niet geregistreerd door de eigenaar - aangemaakt op basis van
+          een parkeermelding
+        with_owner: Geregistreerd en beschermd. Bij de eigenaar (niet gestolen).
     pages:
       messages:
         thread_show:
@@ -5743,7 +5759,6 @@ nl:
             impounded_cell: In beslag genomen bij
             manufacturer_cell: Fabrikant
             model_cell: Model
-            multi_search: multi serieel zoeken
             none: geen
             notes_cell: Notes
             owner_email_cell: Verzonden naar
@@ -5767,46 +5782,16 @@ nl:
             vehicle: Registratie
             visible_columns: Zichtbare kolommen
           wrapper:
-            affiliation: Aansluiting
-            avery_exportable: Avery Exporteerbaar
-            bike: Registratie
-            e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
             e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
-            link: Link
             matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
-            mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
-            phone: Telefoon
-            reg_address: Adres
             registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
-            student_id: Student-ID
-            vehicle: Registratie
             view_matching_any_audit: weergave die overeenkomt met elke audit
         search_results:
           bikes_table:
             assign_bike_sticker: Sticker toewijzen
-            avery: Avery?
-            color: Kleur
             email_hidden: email verborgen
             hidden_not_registered: verborgen, niet geregistreerd bij %{org_name}
-            impound_id: Inbeslagname-ID
-            impounded: In beslag genomen bij
             link_sticker: link sticker
-            manufacturer: Fabrikant
-            model: Model
-            notes: Notes
-            owner_name: Eigenaar naam
-            propulsion_type: Voortstuwing
-            registered: Geregistreerd
-            secondary_number: Secundair#
-            sent_to: Verzonden naar
-            serial: Serie
-            source: Bron
-            status_cell: Toestand
-            sticker: Sticker
-            stolen: Gestolen
-            updated: Bijgewerkt
-            url: URL
-            vehicle_type: 'Voertuigtype:'
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
@@ -6192,6 +6177,9 @@ nl:
               where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als
                 u contact opneemt over een advertentie die u online hebt gevonden,
                 neemt u een link op in het onderstaande veld
+              know_who_has_this_bike_type: Weet je wie dit %{bike_type} heeft?
+              what_do_you_need_to_ask: Wat wilt u hierover vragen %{bike_type}? Voeg
+                een link toe in het onderstaande veld als er een is die u kan helpen.
             parking_notification_form:
               address_or_intersection: Adres of kruispunt
               create_parking_notification: Maak een nieuwe parkeermelding aan
@@ -6225,13 +6213,6 @@ nl:
             primary_color:
               one: Primaire kleur
               other: Primaire kleuren
-          status:
-            found: Gevonden
-            impounded: In beslag genomen bij
-            not_stolen: Niet gestolen
-            stolen: Gestolen
-            unregistered: Niet geregistreerd
-            for_sale: Te koop
           stolen_details:
             department_city: Afdeling & stad
             description_of_incident: Beschrijving van het incident
@@ -6254,7 +6235,6 @@ nl:
             audience_sent_away: Niet langer jouw %{bike_type}
             edit_this_bike: Bewerk dit %{bike_type}
             mark_stolen: Gestolen merk
-            registered_protected: Geregistreerd en beschermd
             sell_on_marketplace: Verkoop via de marktplaats
             share: Deel
             share_my_page: Deel mijn pagina

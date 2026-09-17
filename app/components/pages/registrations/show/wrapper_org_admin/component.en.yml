@@ -14,12 +14,10 @@ en:
             creator: Creator
             credibility: Credibility
             edit: Edit
-            has_duplicate_serials: has dup. serials
             internal_notes: Internal notes
             is_false: 'false'
             is_true: 'true'
             link_sticker: Link sticker
-            no_duplicate_serials: no dup. serials
             no_other_registrations: None found
             no_registration_information: No registration information visible to %{org_name}
             not_audited: Not audited
@@ -43,7 +41,6 @@ en:
             post_note: Post note
             posts_as: Posts as %{user}
             registration_information: Registration information
-            registration_number: Bike Index Registration
             restricted_message: >-
               Owner contact is available to admin & staff. You can add notes and request
               an impound.

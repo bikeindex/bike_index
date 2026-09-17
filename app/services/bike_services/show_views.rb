@@ -64,8 +64,8 @@ module BikeServices
       return [] if current_user.blank?
 
       orgs = if current_user.superuser?
-        # A superuser may preview any org it names in ?view_as; brakebills (fully
-        # paid) and ikes-bikes (unpaid) are seeded defaults for the switcher
+        # A superuser may preview any org it names in ?view_as; brakebills (invoiced)
+        # and ikes-bikes (no invoice) are seeded defaults for the switcher
         [organization, bike.organizations.first, preview_organization,
           Organization.friendly_find("brakebills"), Organization.friendly_find("ikes-bikes")]
       else

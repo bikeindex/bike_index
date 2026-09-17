@@ -2,6 +2,7 @@ module Sessionable
   extend ActiveSupport::Concern
 
   SIGN_IN_SCOPE = [:controllers, :concerns, :sessionable, :sign_in_and_redirect].freeze
+  TURNSTILE_SCOPE = [:controllers, :concerns, :sessionable, :turnstile_verified].freeze
 
   def skip_if_signed_in
     store_return_to
@@ -73,6 +74,17 @@ module Sessionable
 
     redirect_to saml_init_path(org_slug: organization.to_param)
     true
+  end
+
+  # The browser's reveal decides who is asked, this decides whether they answered - a
+  # form posted without running any of it lands here the same way
+  def turnstile_verified?(record, email)
+    return true unless Integrations::Turnstile.challenge?(email, user: current_user)
+    return true if Integrations::Turnstile.verified?(params[Integrations::Turnstile::RESPONSE_PARAM],
+      remote_ip: forwarded_ip_address)
+
+    record.errors.add(:base, translation(:verify_not_a_robot, scope: TURNSTILE_SCOPE))
+    false
   end
 
   # The email an unauthenticated request is offering up, wherever its form puts it:

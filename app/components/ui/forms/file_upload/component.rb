@@ -8,8 +8,9 @@ module UI
       # doesn't run - the controller drops its name only once it's driving the upload.
       class Component < ApplicationComponent
         # mb-0 cancels legacy bootstrap's `label` margin, which items-center would
-        # otherwise center along with the button next to it.
-        LABEL_CLASSES = "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-blue-500/40"
+        # otherwise center along with the button next to it. The ring restates
+        # UI::Button's COLORS[:secondary] focus color under the peer variant.
+        LABEL_CLASSES = "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-purple-500/40"
 
         def initialize(form_builder:, attribute:, accept: nil, camera: nil, direct_upload_url: nil, html_options: {})
           @form_builder = form_builder

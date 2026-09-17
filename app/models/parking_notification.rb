@@ -91,7 +91,7 @@ class ParkingNotification < ActiveRecord::Base
   scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
   scope :first_notification, -> { where(repeat_number: 0) }
   scope :not_replaced, -> { where.not(status: "replaced") }
-  scope :email_success, -> { joins(:notifications).merge(Notification.delivery_success).distinct }
+  scope :email_success, -> { joins(:notifications).merge(Notification.delivered).distinct }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -187,7 +187,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def email_success?
-    notifications.delivery_success.exists?
+    notifications.delivered.exists?
   end
 
   def initial_record?

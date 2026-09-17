@@ -80,8 +80,8 @@ class RegisterController < ApplicationController
 
   def create
     saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
-      propulsion_type_motorized: params[:propulsion_type_motorized])
-    unless saved
+      propulsion_type_motorized: params[:propulsion_type_motorized], additional: params[:additional])
+    unless saved && turnstile_verified?(@b_param, @b_param.owner_email)
       return render(Pages::Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end

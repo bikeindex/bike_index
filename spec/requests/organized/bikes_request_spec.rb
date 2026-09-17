@@ -6,6 +6,18 @@ RSpec.describe Organized::BikesController, type: :request do
   let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
+  context "given an authenticated ambassador" do
+    include_context :request_spec_logged_in_as_ambassador
+    let(:org_root_path) { organization_root_path(organization_id: current_organization) }
+
+    it "redirects to the organization root" do
+      expect(get("#{base_url}/recoveries")).to redirect_to(org_root_path)
+      expect(get("#{base_url}/incompletes")).to redirect_to(org_root_path)
+      expect(get("#{base_url}/new")).to redirect_to(org_root_path)
+      expect(post("#{base_url}/12/resend_incomplete_email")).to redirect_to(org_root_path)
+    end
+  end
+
   describe "new" do
     it "redirects" do
       get "#{base_url}/new"
@@ -18,6 +30,7 @@ RSpec.describe Organized::BikesController, type: :request do
         get "#{base_url}/new"
         expect(response.status).to eq(200)
         expect(assigns(:unregistered_parking_notification)).to be_falsey
+        expect(assigns(:current_organization)).to eq current_organization
         expect(response).to render_template(:new)
         expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       end
@@ -46,6 +59,8 @@ RSpec.describe Organized::BikesController, type: :request do
       get "#{base_url}/new_iframe", params: {parking_notification: 1}
       expect(response.status).to eq(200)
       expect(response).to render_template(:new_iframe)
+      expect(assigns(:current_organization)).to eq current_organization
+      expect(assigns(:bike)&.creation_organization_id).to eq current_organization.id
       expect(response.headers["X-Frame-Options"]).to be_blank
     end
     context "without current_organization" do
@@ -67,6 +82,52 @@ RSpec.describe Organized::BikesController, type: :request do
     let(:color) { Color.black }
     let!(:state) { FactoryBot.create(:state_new_york) }
     let(:testable_bike_params) { bike_params.except(:serial_unknown, :b_param_id_token, :cycle_type_slug, :accuracy, :origin) }
+
+    context "without a parking_notification" do
+      let!(:auto_user) { FactoryBot.create(:organization_user, organization: current_organization) }
+      let(:bike_params) do
+        {
+          manufacturer_id: manufacturer.id,
+          owner_email: "something@sss.com",
+          creator_id: 21,
+          primary_frame_color_id: color.id,
+          creation_organization_id: 9292,
+          serial_number: "xcxcxcxcc7xcx"
+        }
+      end
+
+      it "creates, overriding the passed creator and organization" do
+        Sidekiq::Job.clear_all
+        ActionMailer::Base.deliveries = []
+        expect(current_organization.reload.auto_user_id).to_not eq current_user.id
+        expect {
+          post base_url, params: {bike: bike_params}
+        }.to change(Bike.unscoped, :count).by 1
+        EmailJobs::OwnershipInvitationJob.drain
+
+        b_param = BParam.reorder(:created_at).last
+        expect(b_param.owner_email).to eq bike_params[:owner_email]
+        expect(b_param.creation_organization_id).to eq current_organization.id
+        expect(b_param.bike["serial_number"]).to eq bike_params[:serial_number]
+
+        bike = Bike.unscoped.find(b_param.created_bike_id)
+        # example/user_hidden/deleted_at/likely_spam: the bike isn't filtered out of Bike.current's default_scope
+        expect(bike).to have_attributes(example: false, user_hidden: false, deleted_at: nil,
+          likely_spam: false, status: "status_with_owner", serial_number: bike_params[:serial_number],
+          creator_id: current_user.id, creation_organization_id: current_organization.id,
+          manufacturer_id: manufacturer.id, primary_frame_color_id: color.id,
+          secondary_frame_color_id: nil, tertiary_frame_color_id: nil)
+        expect(bike.organizations.pluck(:id)).to eq([current_organization.id])
+        expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
+        expect(bike.current_ownership.origin).to eq "organization_form"
+
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        message = ActionMailer::Base.deliveries.last
+        expect(message.to).to eq([bike_params[:owner_email]])
+        expect(message.subject).to match(/confirm.*registration/i)
+      end
+    end
+
     context "with parking_notification" do
       let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
       let(:state) { FactoryBot.create(:state_new_york) }
@@ -292,10 +353,10 @@ RSpec.describe Organized::BikesController, type: :request do
       expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
       expect(response).to render_template :recoveries
     end
-    context "unpaid organization" do
+    context "organization without an invoice" do
       let(:current_organization) { FactoryBot.create(:organization) }
       it "redirects" do
-        expect(current_organization.reload.paid?).to be_falsey
+        expect(current_organization.reload.is_invoiced?).to be_falsey
         get "#{base_url}/recoveries"
         expect(response.location).to match(organization_registrations_path(organization_id: current_organization.to_param))
       end
@@ -348,8 +409,8 @@ RSpec.describe Organized::BikesController, type: :request do
       let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id)}, origin: "embed_partial") }
       it "renders" do
         current_organization.save # Have to resave organization because of child relationship, and re-stub
-        current_organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs)
-        expect(organization_child.reload.paid?).to be_truthy
+        current_organization.update_columns(is_invoiced: true, enabled_feature_slugs: enabled_feature_slugs)
+        expect(organization_child.reload.is_invoiced?).to be_truthy
 
         expect(partial_registration.organization).to eq organization_child
         get "#{base_url}/incompletes"
@@ -359,11 +420,11 @@ RSpec.describe Organized::BikesController, type: :request do
       end
     end
 
-    context "unpaid organization" do
+    context "organization without an invoice" do
       let(:current_organization) { FactoryBot.create(:organization) }
 
       it "redirects" do
-        expect(current_organization.reload.paid?).to be_falsey
+        expect(current_organization.reload.is_invoiced?).to be_falsey
         get "#{base_url}/incompletes"
         expect(response.location).to match(organization_registrations_path(organization_id: current_organization.to_param))
       end

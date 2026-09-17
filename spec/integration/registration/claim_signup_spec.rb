@@ -31,7 +31,7 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     expect {
       click_button "Register"
       expect(page).to have_content("successfully added", wait: 10)
-    }.to change(Email::OwnershipInvitationJob.jobs, :count).by(1)
+    }.to change(EmailJobs::OwnershipInvitationJob.jobs, :count).by(1)
 
     bike = Bike.last
     ownership = bike.current_ownership
@@ -43,7 +43,7 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     # Deliver the claim email and grab the "Claim the bike" link out of the body.
     # That link points to the bike show page with the ownership token; visiting it
     # primes session[:claim_token_email] so the subsequent signup auto-confirms.
-    Email::OwnershipInvitationJob.drain
+    EmailJobs::OwnershipInvitationJob.drain
     mail = ActionMailer::Base.deliveries.last
     expect(mail.to).to include claimer_email
     body = mail.html_part&.body&.decoded || mail.body.decoded

@@ -60,6 +60,15 @@ RSpec.describe "BikesController#show", type: :request do
       get "#{base_url}/#{bike.to_param}?organization_id=#{organization&.to_param}&sign_in_if_not=true"
       expect(response).to redirect_to new_session_path
       expect(flash[:notice]).to be_present
+      expect(session[:return_to]).to eq bike_path(bike.to_param, sign_in_if_not: true, organization_id: organization.to_param)
+    end
+    context "no organization" do
+      it "redirects to sign in" do
+        get "#{base_url}/#{bike.to_param}?sign_in_if_not=1"
+        expect(response).to redirect_to new_session_path
+        expect(flash[:notice]).to be_present
+        expect(session[:return_to]).to eq "/bikes/#{bike.to_param}?sign_in_if_not=1"
+      end
     end
     context "organization doesn't exist" do
       it "redirects to sign in" do
@@ -74,6 +83,7 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.to_param}?organization_id=#{organization&.to_param}&sign_in_if_not=1"
         expect(flash[:notice]).to be_present
         expect(response).to redirect_to(magic_link_session_path)
+        expect(session[:return_to]).to eq bike_path(bike.to_param, sign_in_if_not: 1, organization_id: organization.to_param)
       end
     end
   end
@@ -235,6 +245,10 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.id}?organization_id=#{organization2.id}"
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
+        expect(assigns(:current_organization)&.id).to eq organization2.id
+        expect(session[:passive_organization_id]).to eq organization2.id
+
+        get "#{base_url}/#{bike.id}?organization_id=#{organization2.name}"
         expect(assigns(:current_organization)&.id).to eq organization2.id
         expect(session[:passive_organization_id]).to eq organization2.id
         expect(whitespace_normalized_body_text).to match("#{organization2.short_name} Access Panel")
@@ -769,6 +783,129 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.id}/spokecard"
         expect(response.status).to eq(200)
         expect(response).to render_template(:spokecard)
+      end
+    end
+  end
+
+  context "passive_organization the user is no longer a member of" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+
+    it "renders, resetting passive_organization_id" do
+      get "/my_account"
+      expect(session[:passive_organization_id]).to eq organization.id
+      current_user.organization_roles.destroy_all
+      current_user.reload
+
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+      expect(assigns(:bike)).to be_present
+      expect(flash).to_not be_present
+      expect(assigns[:current_organization]).to be_nil
+      expect(assigns[:passive_organization]).to be_nil
+      expect(session[:passive_organization_id]).to eq "0"
+
+      get "#{base_url}/#{bike.id}", params: {sign_in_if_not: true, organization_id: organization.id}
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+      expect(assigns[:current_organization]).to be_nil
+      expect(assigns[:passive_organization]).to be_nil
+      expect(session[:passive_organization_id]).to eq "0"
+    end
+  end
+
+  context "organized user viewing a bike" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+
+    shared_examples "renders with the organization" do
+      it "renders, setting passive_organization_id" do
+        expect(bike.send(:editable_organization_ids)).to eq(editable_organization_ids)
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(flash).to_not be_present
+        expect(session[:passive_organization_id]).to eq organization.id
+      end
+    end
+
+    context "organization has no claim on it" do
+      let(:editable_organization_ids) { [] }
+      include_examples "renders with the organization"
+    end
+
+    context "bike created by the organization" do
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      let(:editable_organization_ids) { [organization.id] }
+      include_examples "renders with the organization"
+    end
+
+    context "bike claimed by its owner" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+      let(:editable_organization_ids) { [organization.id] }
+      include_examples "renders with the organization"
+    end
+
+    context "bike claimed by its owner, without can_edit_claimed" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, creation_organization: organization) }
+      let(:editable_organization_ids) { [] }
+      include_examples "renders with the organization"
+    end
+  end
+
+  context "scanned sticker on the bike page" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, bike:, code: "ED09999") }
+
+    it "assigns the sticker, and the viewer is authorized for it" do
+      expect(bike_sticker.claimable_by?(current_user)).to be_truthy
+      expect(current_user.authorized?(bike_sticker)).to be_truthy
+      get "#{base_url}/#{bike.id}", params: {scanned_id: "ED009999", organization_id: organization.id}
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+      expect(flash).to_not be_present
+      expect(assigns(:bike_sticker)).to eq bike_sticker
+      expect(current_user.authorized?(assigns(:bike_sticker))).to be_truthy
+    end
+
+    context "viewer isn't the bike owner" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      it "assigns the sticker, but the viewer isn't authorized for it" do
+        expect(current_user.authorized?(bike_sticker)).to be_falsey
+        get "#{base_url}/#{bike.id}", params: {scanned_id: "ED009999", organization_id: organization.id}
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(flash).to_not be_present
+        expect(assigns(:bike_sticker)).to eq bike_sticker
+        expect(current_user.authorized?(assigns(:bike_sticker))).to be_falsey
+      end
+    end
+  end
+
+  context "bike_id too large for the column" do
+    it "responds with not found" do
+      get "#{base_url}/57549641769762268311552"
+      expect(response.status).to eq 404
+    end
+  end
+
+  context "bike is soft deleted" do
+    before { bike.destroy }
+
+    it "responds with not found" do
+      expect(bike.reload.deleted?).to be_truthy
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq 404
+    end
+
+    context "superuser" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "shows the bike" do
+        expect(bike.reload.deleted?).to be_truthy
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
       end
     end
   end

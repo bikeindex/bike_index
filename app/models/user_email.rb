@@ -52,7 +52,8 @@ class UserEmail < ActiveRecord::Base
     def friendly_find(str)
       return nil if str.blank?
 
-      find_by_email(EmailNormalizer.normalize(str))
+      # email is not unique, so without an order the owner of a duplicated address varies by row order
+      where(email: EmailNormalizer.normalize(str)).order(:id).first
     end
 
     def fuzzy_user_id_find(str)
@@ -116,7 +117,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def send_confirmation_email
-    Email::AdditionalEmailConfirmationJob.perform_async(id) unless confirmed?
+    EmailJobs::AdditionalEmailConfirmationJob.perform_async(id) unless confirmed?
   end
 
   def generate_confirmation

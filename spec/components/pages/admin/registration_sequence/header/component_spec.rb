@@ -18,9 +18,9 @@ RSpec.describe Pages::Admin::RegistrationSequence::Header::Component, type: :com
     # Nothing to explain while it's editable
     expect(page).to_not have_css("[role='tooltip']", visible: :all)
     # Making the draft live is the header's action; discarding it lives at the foot of the page
-    expect(page).to have_css("form[action='#{admin_url}?activate=true'] button", text: "Activate")
+    expect(page).to have_css("a[href='#{admin_url}?activate=true'][data-turbo-method='patch']", text: "Activate")
     expect(page).to_not have_button("Create draft")
-    expect(page).to_not have_button("Discard draft")
+    expect(page).to_not have_link("Discard draft")
   end
 
   it "marks the screen it's on" do
@@ -52,7 +52,7 @@ RSpec.describe Pages::Admin::RegistrationSequence::Header::Component, type: :com
       # What the inert Edit chip points at instead
       expect(page).to have_css("form[action='/admin/registration_sequences?organization_id=#{organization.id}'] button",
         text: "Create draft")
-      expect(page).to_not have_button("Activate")
+      expect(page).to_not have_link("Activate")
     end
 
     context "with a draft already open" do
@@ -86,7 +86,7 @@ RSpec.describe Pages::Admin::RegistrationSequence::Header::Component, type: :com
       expect(page).to have_content("Viewing Template Draft registration sequence", normalize_ws: true)
       expect(page).to have_link("Edit", href: "#{admin_url}/edit")
       expect(page).to_not have_link("View in organization")
-      expect(page).to have_button("Activate")
+      expect(page).to have_link("Activate")
     end
 
     context "live" do

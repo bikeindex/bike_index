@@ -1,10 +1,18 @@
 <style>html, body { margin: 0; padding: 0;} body { overflow: hidden; }</style>
 
+<%#
+  An iframe rendered with no layout, so there is no Stimulus for ui--chart to connect
+  to. The importmap without javascript_importmap_tags: its preload tags are what would
+  drag turbo and jquery into a page that is one chart
+%>
+<%= javascript_inline_importmap_tag %>
+<%= javascript_import_module_tag "Chart.bundle", "chartkick" %>
+
 <% cache("bike_chart_#{@height}", expires_in: 1.hour) do %>
   <% merge = DateTime.strptime('07-01-2014 0', '%m-%d-%Y %H')
     post_merge = Bike.unscoped.where(example: false, user_hidden: false).where('created_at > ?', merge).group_by_month(:created_at).count
     sum = Bike.unscoped.where(example: false, user_hidden: false).where('created_at < ?', merge).count
     result = post_merge.to_a.sort{|x,y| x[0] <=> y[0]}.map { |x,y| { x => (sum += y)} }.reduce({}, :merge) %>
 
-  <%= line_chart result, height: "#{@height}px" %>
+  <%= render(UI::Chart::Component.new(series: result, kind: :line, height: "#{@height}px")) %>
 <% end %>

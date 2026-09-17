@@ -53,9 +53,10 @@
     .col-xs-12
       %p
         #{number_with_delimiter(matching_stolen_bike_listings.count)} matching listings
-        %em
-          = humanized_time_range_column(@time_range_column)
-          = humanized_time_range(@time_range)
+        - unless @period == "all"
+          %em
+            = UI::PeriodSelect::Component.column_label(@time_range_column)
+            = humanized_time_range(@time_range)
         - if sortable_search_params?
           %span.less-strong
             \- view

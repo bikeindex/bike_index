@@ -24,7 +24,7 @@
         <% end %>
       </h4>
 
-      <%= column_chart time_range_counts(collection: available_stolen_records, column: time_range_column), stacked: true, thousands: "," %>
+      <%= render(UI::Chart::Component.new(series: time_range_counts(collection: available_stolen_records, column: time_range_column), time_range: @time_range, stacked: true)) %>
     </div>
   <% end %>
 <% end %>

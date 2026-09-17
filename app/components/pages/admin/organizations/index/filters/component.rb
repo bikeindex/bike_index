@@ -5,13 +5,13 @@ module Pages
     module Organizations
       module Index
         module Filters
-          # The organizations index's nav header: the kind and POS pickers, plus the paid
+          # The organizations index's nav header: the kind and POS pickers, plus the invoiced
           # toggle and the link to a new organization.
           class Component < ApplicationComponent
             POS_GROUPINGS = %w[with_pos without_pos broken_pos].freeze
 
-            def initialize(search_paid:, index:)
-              @search_paid = search_paid
+            def initialize(search_invoiced:, index:)
+              @search_invoiced = search_invoiced
               @index = index
             end
 
@@ -34,7 +34,7 @@ module Pages
                 path: url_for(@index.sortable_search_params.merge(param => value))))
             end
 
-            def paid_path = url_for(@index.sortable_search_params.merge(search_paid: !@search_paid))
+            def invoiced_path = url_for(@index.sortable_search_params.merge(search_invoiced: !@search_invoiced))
           end
         end
       end
