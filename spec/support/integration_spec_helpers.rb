@@ -125,10 +125,17 @@ module IntegrationSpecHelpers
   end
 
   # The gear toggles the submenu through shared-blocks--navbar, which Stimulus lazy loads -
-  # a click landing before it connects is swallowed with nothing on the page to say so
-  def open_settings_menu
-    wait_for_stimulus
-    find("button[aria-label='Settings']").click
+  # a click landing before it connects is swallowed with nothing on the page to say so.
+  # Click again, the way a rider whose click did nothing would; waiting on every connected
+  # controller first isn't enough, since the swallowed click is the one that proves it.
+  def open_settings_menu(wait: 10)
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + wait
+    loop do
+      find("button[aria-label='Settings']").click
+      break if page.has_css?("#setting_submenu[aria-expanded='true']", wait: 1)
+      break if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+    end
+    expect(page).to have_css("#setting_submenu[aria-expanded='true']", wait: 1)
   end
 
   def sign_out
