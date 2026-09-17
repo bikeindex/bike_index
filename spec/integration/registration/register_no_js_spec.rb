@@ -194,7 +194,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
       expect(page).to have_content("Verifying this email address requires JavaScript")
       # Step 1 saves what it was given either way - it's the link out that's withheld
       expect(BParam.last.owner_email).to eq owner_email
-      expect(Email::PartialRegistrationJob.jobs.count).to eq 0
+      expect(EmailJobs::PartialRegistrationJob.jobs.count).to eq 0
     end
   end
 

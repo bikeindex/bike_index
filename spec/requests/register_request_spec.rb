@@ -578,7 +578,7 @@ RSpec.describe RegisterController, type: :request do
             .to eq [owner_email].to_json
 
           expect { post base_url, params: create_params }
-            .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+            .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
           expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
         end
 
@@ -587,7 +587,7 @@ RSpec.describe RegisterController, type: :request do
 
           it "is asked for the challenge" do
             expect { post base_url, params: create_params }
-              .to_not change(Email::PartialRegistrationJob.jobs, :size)
+              .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
             expect(response.body).to include "not a robot"
           end
         end
@@ -597,7 +597,7 @@ RSpec.describe RegisterController, type: :request do
 
           it "is asked for the challenge" do
             expect { post base_url, params: create_params }
-              .to_not change(Email::PartialRegistrationJob.jobs, :size)
+              .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
             expect(response.body).to include "not a robot"
           end
         end
