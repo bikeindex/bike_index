@@ -112,27 +112,6 @@ RSpec.describe GraphingHelper, type: :helper do
     end
   end
 
-  describe "humanized_time_range_column" do
-    it "humanizes created_at" do
-      expect(humanized_time_range_column("created_at")).to eq "created"
-      @period = "all"
-      expect(humanized_time_range_column("created_at")).to be_blank
-      expect(humanized_time_range_column("created_at", return_value_for_all: true)).to eq "created"
-    end
-    it "humanizes start_at and end_at" do
-      expect(humanized_time_range_column("start_at")).to eq "starts"
-      expect(humanized_time_range_column("end_at")).to eq "ends"
-      expect(humanized_time_range_column("subscription_start_at")).to eq "subscription starts"
-      expect(humanized_time_range_column("subscription_end_at")).to eq "subscription ends"
-    end
-    it "humanizes needs_renewal_at" do
-      expect(humanized_time_range_column("needs_renewal_at")).to eq "need renewal"
-    end
-    it "humanizes request_at" do
-      expect(humanized_time_range_column("request_at")).to eq "requested"
-    end
-  end
-
   describe "humanized_time_range" do
     context "standard time range" do
       it "returns period" do

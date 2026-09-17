@@ -87,11 +87,10 @@
             claimed
           </span>
         <% end %>
-        <%= @period == "all" ? "" : "were" %>
-        <em>
-          <%= humanized_time_range_column(@time_range_column) %>
-          <%= humanized_time_range(@time_range) %>
-        </em>
+        <% unless @period == "all" %>
+          were
+          <em><%= UI::PeriodSelect::Component.column_label(@time_range_column) %> <%= humanized_time_range(@time_range) %></em>
+        <% end %>
         <% if sortable_search_params? %>
           - <em><%= link_to "view all stickers", url_for %></em>
         <% end %>
