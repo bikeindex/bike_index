@@ -118,4 +118,13 @@ RSpec.describe UserEmail, type: :model do
       end
     end
   end
+
+  describe "friendly_find" do
+    let!(:user_email) { FactoryBot.create(:user_email, email: "mommy@stuff.com") }
+    let!(:duplicate) { FactoryBot.create(:user_email, email: "mommy@stuff.com") }
+
+    it "returns the oldest row for an address held by two accounts" do
+      expect(UserEmail.friendly_find("mommy@stUFF.com ")).to eq user_email
+    end
+  end
 end
