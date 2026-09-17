@@ -629,6 +629,36 @@ RSpec.describe RegisterController, type: :request do
         end
       end
     end
+
+    # single_page rides the form rather than the session, so the embed's step 1 posts
+    # here unchanged whatever the member who framed it switched on
+    context "the single page form" do
+      include_context :request_spec_logged_in_as_user
+      let(:bike_details) do
+        {primary_frame_color_id: color.id, serial_number: "XYZ 123", status: "status_with_owner",
+         user_name:}
+      end
+      let(:create_params) { super().merge(single_page: true, bike: bike_details) }
+
+      it "saves both steps and finishes the registration" do
+        expect { post base_url, params: create_params }.to change(Bike, :count).by 1
+        expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
+          manufacturer_id: manufacturer.id, creator_id: current_user.id)
+        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: "finished")
+      end
+
+      context "step 2's details missing" do
+        let(:bike_details) { super().except(:user_name) }
+
+        it "re-renders the one page with both steps on it, saving what it has" do
+          expect { post base_url, params: create_params }.to_not change(Bike, :count)
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(empty_b_param.reload).to have_attributes(owner_email:, manufacturer_id: manufacturer.id)
+          fields = Nokogiri::HTML(response.body).css("form[action='/register'] input").map { |el| el["name"] }
+          expect(fields).to include("b_param[owner_email]").and include("bike[serial_number]")
+        end
+      end
+    end
   end
 
   describe "show step: 2" do

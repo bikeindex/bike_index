@@ -80,8 +80,11 @@ module BikeServices
     # The safety rules a registration acknowledges before its bike is created - the
     # organization's active sequence, and only for an e-vehicle
     # motorized? first - it's in memory, and creation_organization is a query
-    def registration_sequence(b_param)
+    def registration_sequence(b_param, separate_attestation: false, user: nil)
       return nil unless b_param.motorized?
+      # Left to the registrant to fill in on their own, so the flow has no sequence and
+      # the bike is created without one - unless the registrant is the one registering
+      return nil if separate_attestation && !b_param.self_made?(user)
 
       organization = b_param.creation_organization
       RegistrationSequence.active_for(organization) if organization.present?
@@ -126,12 +129,13 @@ module BikeServices
     # to, and it's clicked after the acknowledgment pages rather than before them.
     # Placing it asks whether there's a creator yet, which is a query, so this is built once
     # a request and passed down
-    def steps(b_param, sequence:)
+    def steps(b_param, sequence:, single_page: false)
       pages = sequence_pages(sequence)
       rest = pages.each_index.map { step_for_page_index(it) } + (pages.any? ? %w[review] : [])
-      return %w[1 2] + rest unless report_step?(b_param&.status)
+      details = single_page ? %w[1] : %w[1 2]
+      return details + rest unless report_step?(b_param&.status)
 
-      creator_available?(b_param) ? %w[1 2 report] + rest : %w[1 2] + rest + %w[report]
+      creator_available?(b_param) ? details + %w[report] + rest : details + rest + %w[report]
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -425,14 +429,16 @@ module BikeServices
     # Every step the registration has reached, in order - each one opens the next, so the
     # flow stops at the first that hasn't been done
     def permitted_steps(b_param, sequence, steps)
-      reached = steps.take_while { step_completed?(b_param, it, sequence:) }.count
+      reached = steps.take_while { step_completed?(b_param, it, sequence:, steps:) }.count
       steps.first(reached + 1)
     end
 
     # Whether a step has been submitted with everything it asks for
-    def step_completed?(b_param, step, sequence:)
+    def step_completed?(b_param, step, sequence:, steps:)
       case step
-      when "1" then b_param.manufacturer_id.present?
+      # A flow with no step 2 asks for both on one page, so step 1 is only done
+      # once it has the details step 2 would have asked for
+      when "1" then steps.include?("2") ? b_param.manufacturer_id.present? : details_completed?(b_param)
       when "2" then details_completed?(b_param)
       when "report" then report_completed?(b_param)
       when "review" then acknowledgment(b_param).present?
