@@ -29,8 +29,6 @@
   .mt-4
     = render partial: "/shared/bike_search_form", locals: {search_path: bike_versions_path, skip_serial_field: true, include_hidden_search_fields: true}
 
-
-
   .mt-4
     = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:, prepend_text: "Bikes listed")
   .row.mt-4

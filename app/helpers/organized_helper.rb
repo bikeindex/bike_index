@@ -73,8 +73,7 @@ module OrganizedHelper
       %w[exports show],
       %w[exports new],
       %w[users new],
-      %w[dashboard index],
-      %w[impounded_bikes index]
+      %w[dashboard index]
     ].include?([controller_name, action_name])
   end
 
