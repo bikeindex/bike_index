@@ -20,8 +20,8 @@ module SpamEstimator
       ;\s*(?:drop|delete|truncate|exec)\b
     /xi
 
-    # Scored by estimate, so these are only terms that never show up in a real registration or
-    # theft report — Soma, Norco and Ultram count only after a buying verb
+    # certain_spam? scores these 100 wherever text is scored - frame models, theft reports, bug
+    # reports - so only terms no real one uses belong here; Soma, Norco and Ultram need a buying verb
     PHARMACY_REGEX = /\b(?:
         erectile\s+dysfunction | (?:buy|order|purchase)\s+(?:soma|norco|ultram) |
         pain\s?o\s?soma | viagra | cialis | levitra | kamagra | sildenafil | tadalafil | vardenafil | avanafil |
@@ -51,8 +51,7 @@ module SpamEstimator
         nap\s+tien | dang\s+nhap | truc\s+tuyen | khuyen\s+mai | uy\s+tin |
         game\s+bai | co\s+bac | song\s+bac | xo\s+so | lo\s+de |
         link\s+truy\s+cap | clip\s+(?:hot|nong) |
-        # estimate scores PHARMACY_REGEX against frame models and theft reports, so anything that
-        # shows up in a real one ("Omega Pharma", "stolen outside the pharmacy") stays here
+        # real registrations and theft reports use these ("Omega Pharma", "stolen outside the pharmacy")
         pharmacy | pharmacies | pharmacists? | pharma | drugstore | prescriptions? | medications? |
         medicines? | meds | painkillers? | opioids? | impotence |
         # "MG Road" is a common street name in India
@@ -79,11 +78,7 @@ module SpamEstimator
     end
 
     # a verdict rather than a score — a caller weighting estimate down dilutes it to nothing
-    def certain_spam?(str)
-      return false if str.blank?
-
-      looks_malicious?(str) || PHARMACY_REGEX.match?(str)
-    end
+    def certain_spam?(str) = looks_malicious?(str) || PHARMACY_REGEX.match?(str)
 
     # matched terms and their counts, recorded on the ban so false positives are auditable.
     # Vietnamese spam appears both with and without diacritics, so strip them first —

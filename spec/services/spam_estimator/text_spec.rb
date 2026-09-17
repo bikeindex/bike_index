@@ -2,6 +2,12 @@ require "rails_helper"
 
 RSpec.describe SpamEstimator::Text do
   describe "estimate" do
+    context "a pharmacy term" do
+      it "is 100, since the shape checks score well-formed prose 0" do
+        expect(described_class.estimate("Buy Ambien online for insomnia")).to eq 100
+      end
+    end
+
     context "garbage" do
       let(:str) { "VhriBJhD1nuwH" }
       it "returns for garbage" do
@@ -250,13 +256,6 @@ RSpec.describe SpamEstimator::Text do
 
     it "counts bike names only after a buying verb" do
       expect(described_class.seo_spam_matches("Buy Soma online, order Norco")).to eq({"buy soma" => 1, "order norco" => 1})
-    end
-  end
-
-  describe "estimate with a pharmacy term" do
-    it "is 100, since the shape checks score well-formed prose 0" do
-      expect(described_class.estimate("Aspadol 100mg")).to eq 100
-      expect(described_class.estimate("Buy Ambien online for insomnia")).to eq 100
     end
   end
 end

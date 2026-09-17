@@ -7,7 +7,7 @@ module SpamEstimator
     def estimate(user)
       return 0 if user.blank?
 
-      # each crypto/gambling reference is a strong signal, stacked onto the text score
+      # each spam-term reference is a strong signal, stacked onto the text score
       score = spammy_text_estimate(user) + 30 * seo_spam_reference_count(user) +
         promotional_link_estimate(user)
 
@@ -29,7 +29,7 @@ module SpamEstimator
       return "" if user.blank?
 
       [user.name, user.title, user.description, user.username, user.mb_link_title,
-        user.mb_link_target, user.twitter, user.instagram].select(&:present?).join(" ")
+        user.mb_link_target, user.twitter, user.instagram].join(" ")
     end
 
     # description and title are the SEO-spam payload; weight them far above name/username

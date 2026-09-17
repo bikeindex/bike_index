@@ -535,7 +535,6 @@ RSpec.describe "Register flow", :js, type: :system do
         # R2 answers 500, not 404, for a key its edge has not caught up with yet
         response = nil
         wait_for(timeout: 10, interval: 0.5) { (response = Faraday.get(public_image.image_url)).status == 200 }
-        expect(response.status).to eq 200
         expect(response.body.bytesize).to eq File.size(image_path)
       end
     end

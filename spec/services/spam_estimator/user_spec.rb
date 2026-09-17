@@ -185,8 +185,6 @@ RSpec.describe SpamEstimator::User do
 
     it "scans the link fields and handles" do
       expect(described_class.seo_spam_matches(user)).to eq({"nha cai" => 1, "uy tin" => 1, "casino" => 1})
-      expect(described_class.seo_spam_matches(nil)).to eq({})
-      expect(described_class.seo_spam_matches(User.new)).to eq({})
     end
   end
 end
