@@ -24,6 +24,8 @@ module UI
         # mockup's #9a9aa2, which sat at 2.45:1 on this background.
         gray: "tw:bg-[#f0f0f2] tw:text-[#666666] tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-400",
         purple: "tw:bg-purple-50 tw:text-purple-700 tw:border-transparent tw:dark:bg-purple-950 tw:dark:text-purple-200",
+        # The -400 rather than the palette's -700, by choice: 2.5:1 on its own background,
+        # so it reads softer than every other pill rather than as a mistyped shade
         pink: "tw:bg-pink-50 tw:text-pink-400 tw:border-transparent tw:dark:bg-pink-950 tw:dark:text-pink-400",
         rose: "tw:bg-rose-50 tw:text-rose-700 tw:border-transparent tw:dark:bg-rose-950 tw:dark:text-rose-200",
         orange: "tw:bg-orange-50 tw:text-orange-700 tw:border-transparent tw:dark:bg-orange-950 tw:dark:text-orange-200",
