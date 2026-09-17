@@ -5766,6 +5766,17 @@ it:
         hidden_for_unauthorized_users: nascosto agli utenti non autorizzati
         made_without_serial: realizzato senza numero di serie
         unknown: sconosciuto
+      registration_status_badge:
+        abandoned: È stato segnalato come abbandonato, in un luogo dove non dovrebbe
+          essere lasciato.
+        for_sale: Registrato e protetto, messo in vendita dal proprietario
+        found: Qualcuno l'ha trovato e sta aspettando che il proprietario lo reclami.
+        impounded: Detenuto da un'organizzazione, in attesa che il proprietario lo
+          reclami.
+        stolen: Segnalato come rubato
+        unregistered: Non registrato dal proprietario - generato da una notifica di
+          parcheggio
+        with_owner: Registrato e protetto. Con il suo proprietario (non rubato).
     pages:
       messages:
         thread_show:

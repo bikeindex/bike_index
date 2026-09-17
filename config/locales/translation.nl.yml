@@ -5653,6 +5653,17 @@ nl:
         hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
         made_without_serial: gemaakt zonder serie
         unknown: Onbekend
+      registration_status_badge:
+        abandoned: Er is melding gemaakt van een ogenschijnlijk verlaten locatie,
+          waar het niet thuishoort.
+        for_sale: Geregistreerd en beschermd, te koop aangeboden door de eigenaar.
+        found: Iemand heeft het gevonden en wacht tot de eigenaar het komt ophalen.
+        impounded: In bezit van een organisatie, in afwachting van de rechtmatige
+          eigenaar.
+        stolen: Gemeld als gestolen
+        unregistered: Niet geregistreerd door de eigenaar - aangemaakt op basis van
+          een parkeermelding
+        with_owner: Geregistreerd en beschermd. Bij de eigenaar (niet gestolen).
     pages:
       messages:
         thread_show:

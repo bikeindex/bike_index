@@ -5496,6 +5496,15 @@ nb:
         hidden_for_unauthorized_users: skjult for uautoriserte brukere
         made_without_serial: laget uten serie
         unknown: ukjent
+      registration_status_badge:
+        abandoned: Rapportert som forlatt, der den ikke burde stå igjen
+        for_sale: Registrert og beskyttet, lagt ut for salg av eieren
+        found: Noen har funnet den og venter på at eieren skal hente den
+        impounded: Holdes av en organisasjon, venter på at eieren skal gjøre krav
+          på den
+        stolen: Meldt stjålet
+        unregistered: Ikke registrert av eieren – opprettet fra et parkeringsvarsel
+        with_owner: Registrert og beskyttet. Med eieren sin (ikke stjålet)
     pages:
       messages:
         thread_show:
