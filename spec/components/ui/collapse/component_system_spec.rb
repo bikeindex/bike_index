@@ -28,7 +28,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     # The checkbox sits at its full-open offset from the first frame, so unclipped it would
     # be what's hit there - covering, and taking the clicks aimed at, what slides past below.
     expect(page).to have_css("body[data-hit-while-opening='below']")
-    # Settled, it's the rider's again
+    # Reachable again once it settles
     check "panel_checkbox"
     expect(page).to have_checked_field("panel_checkbox")
 
