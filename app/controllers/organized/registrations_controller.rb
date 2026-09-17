@@ -230,12 +230,11 @@ module Organized
       search_status
     end
 
-    # Off the chips' own table, so a value or a feature gate can't be added to one side only
+    # Off the chips' own table, so a value can't be added to one side only
     def permitted_filter(param)
-      group = ComponentStructs::OrgSearchSettings::FILTER_GROUPS.fetch(param)
-      return false unless group[:feature].nil? || current_organization.enabled?(group[:feature])
+      values = ComponentStructs::OrgSearchSettings::FILTER_GROUPS.fetch(param)[:values]
 
-      group[:values].key?(params[param]&.to_sym) ? params[param] : false
+      values.key?(params[param]&.to_sym) ? params[param] : false
     end
 
     def sticker_scoped(bikes)
