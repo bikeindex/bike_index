@@ -5742,7 +5742,8 @@ it:
         group:
           optional: opzionale
         turnstile:
-          enable_javascript: La verifica di questo indirizzo email richiede JavaScript. Attivalo e invia di nuovo, oppure usa un altro indirizzo email.
+          enable_javascript: La verifica di questo indirizzo email richiede JavaScript.
+            Abilitalo e invia di nuovo, oppure utilizza un indirizzo email diverso.
       alerts:
         base:
           error: Errore
