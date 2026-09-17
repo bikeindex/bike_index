@@ -5,13 +5,32 @@ require "rails_helper"
 RSpec.describe "ui--collapse controller", :js, type: :system do
   let(:preview_path) { "/rails/view_components/ui/collapse/component/with_url_param" }
 
-  it "toggles, persists open state to the URL, and restores it on load" do
+  it "toggles, clips while opening, persists open state to the URL, and restores it on load" do
     visit preview_path
 
     # Starts collapsed (tw:hidden), so the body isn't visible and the param is absent.
     expect(page).to have_no_content("Persisted panel body")
 
+    # Registered after Stimulus's, so the frame it samples is one the collapse has
+    # already started: the panel pinned to 0 height with the transition running.
+    page.execute_script(<<~JS)
+      document.querySelector("[data-ui--collapse-target='trigger']").addEventListener("click", () => {
+        requestAnimationFrame(() => {
+          const box = document.getElementById("panel_checkbox").getBoundingClientRect()
+          const hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)
+          document.body.dataset.hitWhileOpening = hit.id || hit.tagName
+        })
+      })
+    JS
+
     click_button("Toggle details")
+
+    # The checkbox sits at its full-open offset from the first frame, so unclipped it would
+    # be what's hit there - covering, and taking the clicks aimed at, what slides past below.
+    expect(page).to have_css("body[data-hit-while-opening='below']")
+    # Reachable again once it settles
+    check "panel_checkbox"
+    expect(page).to have_checked_field("panel_checkbox")
 
     # ui--collapse#show reveals the body, writes ?details=1 via history.replaceState,
     # and flips the trigger's aria-expanded and data-active.
