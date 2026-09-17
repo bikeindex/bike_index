@@ -1,4 +1,4 @@
-<%= render(UI::Card::Component.new(full_bleed: true)) do %>
+<%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:h-full")) do %>
   <%= helpers.turbo_frame_tag(FRAME_ID, src: @src, loading: (:lazy if @src),
     class: "tw:block", data: {"org--search-target": "chartFrame"}) do %>
     <% if @src %>

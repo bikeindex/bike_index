@@ -123,9 +123,12 @@ module Organized
     end
 
     # The card loads with every search now, so the frame asking is enough - unlike the other
-    # org indexes, there's no render_chart toggle in front of it
+    # org indexes, there's no render_chart toggle in front of it. Which is what lets the
+    # scope links advance the address bar: the URL they put there is the whole page on a
+    # reload, and only the chart when the frame is the one asking for it.
     def chart_only?
-      Binxtils::InputNormalizer.boolean(params[:chart_only])
+      Binxtils::InputNormalizer.boolean(params[:chart_only]) ||
+        turbo_frame_request_id == Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s
     end
 
     def chart_card_component
@@ -135,9 +138,10 @@ module Organized
 
     def chart_scope_paths
       @chart_scope_paths ||= Pages::Org::Search::ChartCard::Component::SCOPES.index_with do |scope|
-        organization_registrations_path(helpers.sortable_search_params.merge(
-          organization_id: current_organization.to_param, chart_only: "1", chart_scope: scope
-        ))
+        # The org is the path segment; left in the params it's a string key the route can't
+        # read, so it would double up in the query these links advance the address bar to
+        organization_registrations_path(current_organization.to_param,
+          helpers.sortable_search_params.except(:organization_id).merge(chart_scope: scope))
       end.symbolize_keys
     end
 

@@ -37,6 +37,8 @@ module Pages
 
           ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
 
+          PANEL_COLORS = "tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900"
+
           # Each filter's values and their labels, once — `filter_groups` lays them out and
           # `active_search_filter_descriptions` names the ones in force. feature gates the
           # whole row, value_feature an individual option; blank is the row's "not filtering".
@@ -117,6 +119,14 @@ module Pages
             end
           end
 
+          # A band the width of the card the caller opens it from, per Kelsey's redesign;
+          # standing on its own it's a box in the page flow instead
+          def panel_classes
+            return "tw:border-b tw:border-gray-100 tw:px-4 tw:py-4 #{PANEL_COLORS}" unless @toggle_button
+
+            "tw:my-4 tw:rounded-lg tw:border tw:border-gray-300/70 tw:px-3 tw:pt-4 tw:pb-3 #{PANEL_COLORS}"
+          end
+
           # Nothing when the caller holds the button, and so the collapse element, itself
           def collapse_data_attributes
             return {} unless @toggle_button
@@ -165,11 +175,13 @@ module Pages
             end
           end
 
-          private
-
+          # Public for the caller that renders the export button itself, which can't call
+          # export_path here - a route helper needs the component it's on to be rendering
           def search_params
             @search_params ||= (@sortable_search_params || {}).merge((@interpreted_params || {}).merge(organization_id: @organization.to_param))
           end
+
+          private
 
           def export_path
             organization_registrations_path(search_params.merge(create_export: true))

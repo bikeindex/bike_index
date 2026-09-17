@@ -73,16 +73,11 @@ export default class extends Controller {
 
   // The card sits outside the results frame, so a search leaves it answering the previous
   // one. Gated on the address bar having moved, or the first results render would refetch
-  // the chart the frame is already fetching. The src is the only record of the scope.
+  // the chart the frame is already fetching. The URL carries the scope, so it's the search.
   reloadChart () {
     if (!this.hasChartFrameTarget || window.location.search === this.chartSearch) return
-    const current = this.chartFrameTarget.getAttribute('src')
-    if (!current) return
+    if (!this.chartFrameTarget.getAttribute('src')) return
     this.chartSearch = window.location.search
-    const scope = new URL(current, window.location.origin).searchParams.get('chart_scope')
-    const url = new URL(window.location)
-    url.searchParams.set('chart_only', '1')
-    url.searchParams.set('chart_scope', scope || 'search')
-    this.chartFrameTarget.setAttribute('src', url.toString())
+    this.chartFrameTarget.setAttribute('src', window.location.href)
   }
 }

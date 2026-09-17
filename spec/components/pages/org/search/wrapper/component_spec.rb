@@ -41,7 +41,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
     expect(component).to have_button("Column settings", visible: :all)
-    expect(component).to have_link("Add a bike", visible: :all)
     # footer
     expect(component).to have_text("showing 1–10 of 25")
     expect(component).to have_css("select#per_page_select")
@@ -56,7 +55,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).to have_css("table")
       expect(component).to have_css("[data-controller~='org--search-column-toggle']")
       expect(component).not_to have_button("Column settings", visible: :all)
-      expect(component).not_to have_link("Add a bike", visible: :all)
     end
   end
 
@@ -100,8 +98,9 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   context "with csv_exports enabled" do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
-    it "renders the export, in the column panel" do
+    it "renders the export in the header, beside the column settings button" do
       expect(component).to have_link("Export CSV", visible: :all)
+      expect(component).not_to have_css("[data-ui--collapse-target='content'] a", text: "Export CSV", visible: :all)
     end
   end
 

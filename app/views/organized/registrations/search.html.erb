@@ -27,10 +27,10 @@
   data-org--search-column-toggle-default-columns-value="<%= settings_component.initially_checked_columns.to_json %>"
   data-org--search-column-toggle-assign-bike-sticker-value="<%= @bike_sticker.present? %>"
 >
-  <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
-  <% unless turbo_frame_request? %>
-    <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
-    <div class="twwiderow tw:items-start tw:gap-y-4">
+  <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
+  <div class="twwiderow tw:gap-y-4">
+    <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
+    <% unless turbo_frame_request? %>
       <div class="tw:min-w-0">
         <%= render(Pages::Org::Search::Form::Component.new(
           target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
@@ -49,6 +49,12 @@
           <% if @bike_sticker.present? %>
             <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
           <% end %>
+
+          <%#
+            Carries the chart's scope into the searched URL; search--form keeps it in step
+            with the address bar, which the scope links advance
+          %>
+          <%= hidden_field_tag :chart_scope, @chart_scope %>
 
           <% form.with_below_submit do %>
             <label
@@ -72,11 +78,14 @@
           src: chart_scope_paths[@chart_scope.to_sym], scope: @chart_scope, scope_paths: chart_scope_paths
         )) %>
       </div>
-    </div>
-  <% end %>
+    <% end %>
 
-  <%= render Pages::SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
-    render_results: @render_results, current_path: request.original_fullpath) do %>
-    <%= render partial: "results" %>
-  <% end %>
+    <%# In the row for the container query full_bleed reads, but across both its columns %>
+    <div class="tw:col-span-full tw:min-w-0">
+      <%= render Pages::SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
+        render_results: @render_results, current_path: request.original_fullpath) do %>
+        <%= render partial: "results" %>
+      <% end %>
+    </div>
+  </div>
 </div>

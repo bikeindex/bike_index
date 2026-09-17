@@ -8,6 +8,13 @@
       data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
       <%= helpers.inline_svg_tag "icons/gear.svg", class: "tw:inline tw:h-4 tw:w-4", aria: {hidden: true} %>
       <span class="tw:sr-only"><%= translation(".search_settings") %></span>
+
+      <span
+        data-ui--collapse-target="chevron"
+        class="tw:inline-flex tw:transition-transform"
+      >
+        <%= render(UI::IconChevron::Component.new) %>
+      </span>
     <% end %>
 
     <span class="tw:text-sm">
@@ -28,33 +35,43 @@
 
   <div
     class="
-      tw:mt-3 tw:flex tw:hidden! tw:flex-col tw:gap-3 tw:rounded-xl
-      tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-4
+      tw:@container tw:mt-3 tw:flex tw:hidden! tw:flex-col tw:gap-3
+      tw:rounded-xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-4
       tw:dark:border-gray-700 tw:dark:bg-gray-900
     "
     data-ui--collapse-target="content"
   >
     <%= render(UI::Header::Component.new(text: translation(".search_settings"), tag: :h3, html_class: "uncap tw:mb-0!")) %>
 
-    <% filter_groups.each do |group| %>
-      <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
-        <span class="sort-group-label tw:w-28 tw:shrink-0"><%= group[:label] %></span>
+    <%#
+      Wide enough for both, the per-group wrapper dissolves into the grid (@md:contents), so
+      every label sits in one column sized to the widest; narrower, each group stacks and its
+      chips take the full width rather than wrapping a chip's own label
+    %>
 
-        <%= render(group_chips(group)) %>
-      </div>
-    <% end %>
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-4 tw:@md:grid tw:@md:grid-cols-[auto_1fr]
+        tw:@md:items-baseline tw:@md:gap-x-3 tw:@md:gap-y-5
+      "
+    >
+      <% filter_groups.each do |group| %>
+        <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5 tw:@md:contents">
+          <span class="sort-group-label"><%= group[:label] %></span>
 
-    <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
-      <span class="sort-group-label tw:w-28 tw:shrink-0"><%= translation(".date_range") %></span>
+          <div class="tw:min-w-0">
+            <%= render(group_chips(group)) %>
+          </div>
+        </div>
+      <% end %>
 
-      <%#
-        No flex-1: shrink-to-fit leaves the period select's own justify-end with nothing to
-        push against, so its buttons line up with the filter rows above
-      %>
+      <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5 tw:@md:contents">
+        <span class="sort-group-label"><%= translation(".date_range") %></span>
 
-      <div class="tw:min-w-0">
-        <%= render(UI::PeriodSelect::Component.new(period: @period, start_time: @start_time,
-        end_time: @end_time, sortable_search_params: @sortable_search_params)) %>
+        <div class="tw:min-w-0">
+          <%= render(UI::PeriodSelect::Component.new(period: @period, start_time: @start_time,
+            end_time: @end_time, sortable_search_params: @sortable_search_params, align_start: true)) %>
+        </div>
       </div>
     </div>
 

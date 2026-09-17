@@ -205,6 +205,14 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
       it "renders export link" do
         expect(component).to have_link("Export CSV", visible: :all)
       end
+
+      context "with toggle_button false" do
+        let(:options) { super().merge(toggle_button: false) }
+
+        it "leaves the export to the caller too" do
+          expect(component).not_to have_link("Export CSV", visible: :all)
+        end
+      end
     end
   end
 end

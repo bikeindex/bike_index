@@ -222,7 +222,28 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {chart_only: "1", chart_scope: "year", serial: "no-match-at-all"}
         expect(response.status).to eq(200)
         expect(assigns(:chart_scope)).to eq "year"
-        expect(response.body).to include("last 12 months")
+        expect(response.body).to include("Last year overview")
+      end
+
+      it "renders the chart alone for its own frame, without the param" do
+        get base_url, params: {chart_scope: "year"}, headers: {"Turbo-Frame" => "registrations_chart_frame"}
+        expect(response.status).to eq(200)
+        expect(assigns(:chart_scope)).to eq "year"
+        expect(response.body).to include("Last year overview")
+        expect(response.body).to_not include("Find a registration")
+      end
+
+      # The scope links advance the address bar, so what they put there has to be the page
+      it "links the scopes at the page's own URL, carrying the search" do
+        get base_url, params: {chart_only: "1", period: "week"}
+        expect(response.body).to include("chart_scope=year&amp;period=week")
+        expect(response.body).to_not include("chart_only")
+      end
+
+      # Sorting is a different question than which scope the chart is answering
+      it "keeps the scope in the URL through a sort" do
+        get base_url, params: {search_no_js: true, chart_scope: "year"}
+        expect(response.body).to include("chart_scope=year&amp;direction=asc")
       end
     end
 

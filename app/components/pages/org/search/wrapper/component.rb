@@ -9,7 +9,7 @@ module Pages
         # carries the row of actions across the top, and renders inside the results
         # turbo-frame, so every search brings the whole card back.
         class Component < ApplicationComponent
-          delegate :initially_checked_columns, :cycle_type, to: :settings_component
+          delegate :initially_checked_columns, :cycle_type, :render_export?, to: :settings_component
 
           def initialize(
             organization:,
@@ -55,6 +55,19 @@ module Pages
 
           private
 
+          # On the search page the .twwiderow holding the card supplies the gap above it, and
+          # is the container twfullbleed reads; elsewhere the card stands on its own
+          def card_classes
+            ["org-search-component tw:overflow-hidden tw:rounded-xl", UI::Card::Component::BASE_CLASSES,
+              @search_page ? "tw:twfullbleed" : "tw:mt-4"].join(" ")
+          end
+
+          # Built here rather than on the settings component, which route helpers can't reach
+          # until it's rendered itself
+          def export_path
+            organization_registrations_path(settings_component.search_params.merge(create_export: true))
+          end
+
           def settings_component
             @settings_component ||= Pages::Org::Search::Settings::Component.new(
               organization: @organization,
@@ -69,10 +82,6 @@ module Pages
               search_all: @search_all,
               toggle_button: !@search_page
             )
-          end
-
-          def add_bike_path
-            new_organization_registration_path(@organization.to_param)
           end
 
           # TODO: the thumbnail chip is inert until the view behind it exists - see the

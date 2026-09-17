@@ -34,7 +34,9 @@ module UI
       # on every line — flex would size each line independently. auto-fit needs a
       # definite minimum to count repetitions.
       def self.layout_classes(full_width:)
-        full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-2"
+        return "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" if full_width
+
+        "tw:flex tw:flex-wrap tw:gap-2"
       end
 
       # entries: ComponentStructs::Shapes' entries

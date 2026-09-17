@@ -1,4 +1,4 @@
-<%= tag.div(class: "org-search-component tw:mt-4 tw:overflow-hidden tw:rounded-xl #{UI::Card::Component::BASE_CLASSES}", data: card_data_attributes) do %>
+<%= tag.div(class: card_classes, data: card_data_attributes) do %>
   <div
     class="
       tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:border-b
@@ -33,21 +33,24 @@
 
           <span
             data-ui--collapse-target="chevron"
-            class="tw:inline-block tw:transition-transform"
+            class="tw:inline-flex tw:transition-transform"
           >
-            <%= render(UI::IconChevron::Component.new(direction: :down)) %>
+            <%= render(UI::IconChevron::Component.new) %>
           </span>
         <% end %>
 
-        <%= render(UI::ButtonLink::Component.new(text: t("shared.menu_items_org.add_a_bike"), href: add_bike_path,
-          color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
+        <% if render_export? %>
+          <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
+            color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
+        <% end %>
       </div>
     <% end %>
   </div>
 
-  <div class="tw:px-4">
+  <%# The panel is a band across the card here; opened from its own button it's a box %>
+  <%= tag.div(class: ("tw:px-4" unless @search_page)) do %>
     <%= render(settings_component) %>
-  </div>
+  <% end %>
 
   <%# Only on the search: the model audit's own page already names the audit above this %>
   <% if @search_page && @model_audit.present? %>

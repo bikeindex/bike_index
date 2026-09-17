@@ -1,10 +1,6 @@
 <%= tag.div(data: collapse_data_attributes) do %>
   <div
-    class="
-      tw:my-4 tw:hidden! tw:rounded-lg tw:border tw:border-gray-300/70
-      tw:bg-gray-100 tw:px-3 tw:pt-4 tw:pb-3 tw:dark:border-gray-700
-      tw:dark:bg-gray-900
-    "
+    class="tw:hidden! <%= panel_classes %>"
     data-ui--collapse-target="content"
   >
     <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
@@ -45,7 +41,8 @@
       <% end %>
     </div>
 
-    <% if render_export? %>
+    <%# The caller that renders the trigger renders the export button beside it %>
+    <% if @toggle_button && render_export? %>
       <div
         class="
           tw:mt-4 tw:border-t tw:border-gray-300/70 tw:pt-3 tw:text-right

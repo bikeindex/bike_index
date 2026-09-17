@@ -13,7 +13,9 @@ module Pages
         class Component < ApplicationComponent
           FRAME_ID = :registrations_chart_frame
 
-          SCOPES = %w[search year].freeze
+          # Display order, per Kelsey's redesign; the search is what the page opens on
+          SCOPES = %w[year search].freeze
+          DEFAULT_SCOPE = "search"
 
           # The controller builds the series from the hex, so a color change moves the bar
           # and its stat row's swatch together
@@ -22,7 +24,7 @@ module Pages
                    stolen: {hex: "#dc2626", swatch: "tw:bg-red-600"}}.freeze
 
           def self.permitted_scope(scope)
-            SCOPES.include?(scope.to_s) ? scope.to_s : SCOPES.first
+            SCOPES.include?(scope.to_s) ? scope.to_s : DEFAULT_SCOPE
           end
 
           def initialize(src: nil, scope: nil, scope_paths: {}, chart: nil, stats: [])
@@ -42,7 +44,7 @@ module Pages
           def scope_entries
             SCOPES.map do |scope|
               ComponentStructs::Shapes.entry(translation(".scope_#{scope}"), href: @scope_paths[scope.to_sym],
-                active: @scope == scope, data: {turbo_frame: FRAME_ID})
+                active: @scope == scope, data: {turbo_frame: FRAME_ID, turbo_action: "advance"})
             end
           end
 

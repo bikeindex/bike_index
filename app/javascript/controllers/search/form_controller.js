@@ -69,6 +69,9 @@ export default class extends Controller {
   refreshResults () {
     this.clearStaleFrameBusy()
     this.reloadFrameIfUrlStale()
+    // A frame navigation advances the address bar only once it has rendered, so the sync on
+    // frame-render can't see what it moved to - the org chart's scope arrives this way
+    this.syncHiddenFieldsFromUrl()
   }
 
   // The visible text filters live outside the results frame, so a back/forward
@@ -116,7 +119,16 @@ export default class extends Controller {
     const first = new URL(url, window.location.origin)
     const second = new URL(otherUrl, window.location.origin)
 
-    return first.pathname === second.pathname && first.search !== second.search
+    return first.pathname === second.pathname && this.resultsSearch(first) !== this.resultsSearch(second)
+  }
+
+  // The org chart's scope rides in the address bar so a reload keeps it, but the results
+  // are the same under either scope - switching it mustn't re-run the search.
+  resultsSearch (url) {
+    const params = new URLSearchParams(url.search)
+    params.delete('chart_scope')
+
+    return params.toString()
   }
 
   // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
