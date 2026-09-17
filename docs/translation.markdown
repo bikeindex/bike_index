@@ -196,17 +196,18 @@ automatically create a PR (e.g. `translations-sync-20260216120000`) with the
 updates and fail the build. The PR body records the main commit it was created
 from.
 
-To deploy, merge the translation sync PR.
+To deploy, merge the translation sync PR. The build on main keeps failing until
+you do.
 
-If a translation sync PR is already open, CI will skip creating a duplicate and
-just fail until the existing PR is merged.
+If a sync PR is already open, CI doesn't open a second one — it re-applies the
+sync onto that PR's branch instead, so translations that arrive while it sits
+open are added to it. When the sync turns up nothing the PR doesn't already
+carry, CI says so and just fails.
 
 The check runs on the sync branch too, so the PR's own translations are verified
-rather than skipped. If more translations have landed on translation.io since the
-PR opened, CI pushes them onto the same branch and fails that run — the push
-triggers a run of its own, which passes once the branch is in sync. That happens
-at most once per PR; after that the build just fails, so a sync that can't settle
-doesn't push in a loop.
+rather than skipped. If translation.io has moved since the PR opened, that run
+pushes the difference onto the branch and fails — the push triggers a run of its
+own, which passes once the branch is in sync.
 
 To manually update the keys on translation.io, run
 `bin/rake translation:sync_and_purge` (requires having an active API key locally).
