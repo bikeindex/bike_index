@@ -42,7 +42,7 @@ module Pages
 
                 render(UI::Container::Component.new(width: :wide)) do
                   tag.div(link_to("View history of this #{landing_page? ? "landing page" : "snippet"}",
-                    version_history_path, class: "twlink"), class: "tw:mb-2")
+                    version_history_path, class: "twlink"), class: "tw:mb-8")
                 end
               end
 
