@@ -16,7 +16,8 @@ module Pages
 
         private
 
-        # The page arranges the two steps and has no copy of its own
+        # Step 1's scope, so its heading renders from the same two strings rather than a
+        # copy of them - registered in i18n-tasks.yml's scope_overrides, as that arrangement has to be
         def component_translation_scope = [:components, :pages, :register, :step1]
 
         # Both steps' controllers, on the one form that holds both their fields

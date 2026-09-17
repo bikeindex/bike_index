@@ -20,10 +20,6 @@ module Pages
             @organization ||= @b_param.creation_organization
           end
 
-          # The copy stays in step 1's sidecar - it's translated into four other locales
-          # there, which a move would orphan
-          def component_translation_scope = [:components, :pages, :register, :step1]
-
           def cycle_type
             @b_param.type
           end

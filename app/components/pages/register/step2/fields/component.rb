@@ -21,10 +21,6 @@ module Pages
 
           private
 
-          # The copy stays in step 2's sidecar - it's translated into four other locales
-          # there, which a move would orphan
-          def component_translation_scope = [:components, :pages, :register, :step2]
-
           def cycle_type
             @b_param.type
           end
