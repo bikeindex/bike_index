@@ -14,22 +14,21 @@ module UI
 
       # Soft tinted pills matching the redesign: light background + saturated text
       COLORS = {
-        notice: "tw:bg-blue-50 tw:text-blue-700 tw:border-transparent tw:dark:bg-blue-900 tw:dark:text-blue-200",
-        error: "tw:bg-red-50 tw:text-red-700 tw:border-transparent tw:dark:bg-red-900 tw:dark:text-red-200",
-        warning: "tw:bg-amber-50 tw:text-amber-700 tw:border-transparent tw:dark:bg-amber-900 tw:dark:text-amber-200",
-        success: "tw:bg-green-50 tw:text-green-700 tw:border-transparent tw:dark:bg-green-900 tw:dark:text-green-200",
+        notice: "tw:bg-blue-50 tw:text-blue-700 tw:border-transparent tw:dark:bg-blue-950 tw:dark:text-blue-200",
+        error: "tw:bg-red-50 tw:text-red-700 tw:border-transparent tw:dark:bg-red-950 tw:dark:text-red-200",
+        warning: "tw:bg-amber-50 tw:text-amber-700 tw:border-transparent tw:dark:bg-amber-950 tw:dark:text-amber-200",
+        success: "tw:bg-green-50 tw:text-green-700 tw:border-transparent tw:dark:bg-green-950 tw:dark:text-green-200",
         # Special badge classes:
-        cyan: "tw:bg-cyan-50 tw:text-cyan-700 tw:border-transparent tw:dark:bg-cyan-900 tw:dark:text-cyan-200",
+        cyan: "tw:bg-cyan-50 tw:text-cyan-700 tw:border-transparent tw:dark:bg-cyan-950 tw:dark:text-cyan-200",
         # The redesign's quiet pill. Text is --redesign-gray-500 rather than the
         # mockup's #9a9aa2, which sat at 2.45:1 on this background.
         gray: "tw:bg-[#f0f0f2] tw:text-[#666666] tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-400",
-        # The one dark background deliberately left at -950 when the rest moved to -900
         purple: "tw:bg-purple-50 tw:text-purple-700 tw:border-transparent tw:dark:bg-purple-950 tw:dark:text-purple-200",
         # The -400 rather than the palette's -700, by choice: 2.5:1 on its own background,
         # so it reads softer than every other pill rather than as a mistyped shade
-        pink: "tw:bg-pink-50 tw:text-pink-400 tw:border-transparent tw:dark:bg-pink-900 tw:dark:text-pink-400",
-        rose: "tw:bg-rose-50 tw:text-rose-700 tw:border-transparent tw:dark:bg-rose-900 tw:dark:text-rose-200",
-        orange: "tw:bg-orange-50 tw:text-orange-700 tw:border-transparent tw:dark:bg-orange-900 tw:dark:text-orange-200",
+        pink: "tw:bg-pink-50 tw:text-pink-400 tw:border-transparent tw:dark:bg-pink-950 tw:dark:text-pink-400",
+        rose: "tw:bg-rose-50 tw:text-rose-700 tw:border-transparent tw:dark:bg-rose-950 tw:dark:text-rose-200",
+        orange: "tw:bg-orange-50 tw:text-orange-700 tw:border-transparent tw:dark:bg-orange-950 tw:dark:text-orange-200",
         empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600"
       }.freeze
 
