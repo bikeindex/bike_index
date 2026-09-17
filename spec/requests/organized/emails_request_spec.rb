@@ -59,6 +59,21 @@ RSpec.describe Organized::EmailsController, type: :request do
         expect(all_viewable_email_kinds).to match_array(MailSnippet.organization_message_kinds + %w[finished_registration partial_registration organization_stolen_message])
         expect(assigns(:viewable_email_kinds)).to match_array(all_viewable_email_kinds)
       end
+
+      context "with a snippet" do
+        let!(:mail_snippet) do
+          FactoryBot.create(:mail_snippet, kind: "appears_abandoned_notification",
+            organization: current_organization, body: "<p>Snippet <em>body</em> & more</p>")
+        end
+
+        it "previews the body without its markup" do
+          get base_url
+          expect(response.status).to eq(200)
+          expect(response.body).to include("Snippet body &amp; more")
+          expect(response.body).to_not include("Snippet &lt;em&gt;")
+          expect(response.body).to_not include("&amp;amp;")
+        end
+      end
     end
 
     describe "show" do

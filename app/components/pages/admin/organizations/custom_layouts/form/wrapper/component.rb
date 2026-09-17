@@ -27,6 +27,19 @@ module Pages
 
               def landing_page? = @edit_template == LANDING_PAGE
 
+              def edited_record = landing_page? ? @landing_page : @mail_snippet
+
+              # A landing page is built rather than created, so it has no history until it saves
+              def version_history_link
+                return unless edited_record&.persisted?
+
+                render(UI::Container::Component.new(width: :wide)) do
+                  tag.div(link_to("View history of this #{landing_page? ? "landing page" : "snippet"}",
+                    admin_paper_trail_versions_path(search_item_type: edited_record.class.name,
+                      search_item_id: edited_record.id, period: "all"), class: "twlink"), class: "tw:mb-2")
+                end
+              end
+
               def subtitle
                 return "Landing Page" if landing_page?
 
