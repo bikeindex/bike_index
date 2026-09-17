@@ -244,7 +244,9 @@ them until each module lands: a combobox filters nothing, a one-shot event (like
 form-persist's restore) reaches no listener, and a `fill_in`'s text can end up in
 whatever autofocus left focused. Waiting on any one controller proves nothing about
 the rest — `wait_for_stimulus` (`spec/support/integration_spec_helpers.rb`) waits for
-every identifier the page names.
+every identifier the page names, and **pass it the one you're about to interact with**
+(`wait_for_stimulus("shared-blocks--navbar")`): bare, it is vacuously true on a document
+that has parsed none yet, so it returns before that element even exists.
 
 **Interacting before the legacy page script has bound.** The same shape, one era
 back: `init.coffee`'s `loadPageScript` constructs the per-page class in

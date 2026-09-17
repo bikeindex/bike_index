@@ -23,7 +23,7 @@
       %tr
         %td Status
         %td
-          = bike_status_span(@bike)
+          = render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :sm))
       %tr
         %td Date Stolen
         %td= render UI::Time::Component.new(time: @bike.date_stolen)

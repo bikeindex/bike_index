@@ -6312,13 +6312,6 @@ it:
             primary_color:
               one: Colore primario
               other: Colori primari
-          status:
-            found: Trovato
-            impounded: Sequestrato
-            not_stolen: Non rubato
-            stolen: Rubata
-            unregistered: Non registrato
-            for_sale: In vendita
           stolen_details:
             department_city: Dipartimento e città
             description_of_incident: Descrizione dell'incidente
@@ -6343,7 +6336,6 @@ it:
             audience_sent_away: Non più il tuo %{bike_type}
             edit_this_bike: Modifica questo %{bike_type}
             mark_stolen: Marchio rubato
-            registered_protected: Registrato e protetto
             sell_on_marketplace: Vendi sul Marketplace
             share: Condividere
             share_my_page: Condividi la mia pagina

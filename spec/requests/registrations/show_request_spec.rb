@@ -291,13 +291,13 @@ RSpec.describe "RegistrationsController#show", type: :request do
     let(:current_user) { owner }
     before { bike.update(marked_user_hidden: "true") }
 
-    it "renders for the owner, without the registered badge" do
+    it "renders for the owner" do
       expect(bike.reload.user_hidden).to be_truthy
       get "#{base_url}/#{bike.id}"
       expect(response.status).to eq(200)
       body = whitespace_normalized_body_text
       expect(body).to match("Your bike")
-      expect(body).to_not match("Registered & protected")
+      expect(body).to match("Registered & protected")
     end
 
     context "superuser viewing" do
@@ -467,7 +467,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           expect(body).to match("Impounded")
-          expect(body).to_not match("Not stolen")
+          expect(body).to_not match("Registered & protected")
         end
       end
 
@@ -559,7 +559,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           expect(body).to match("Found")
-          expect(body).to_not match("Not stolen")
+          expect(body).to_not match("Registered & protected")
         end
       end
 
@@ -570,7 +570,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           expect(body).to match("Unregistered")
-          expect(body).to_not match("Not stolen")
+          expect(body).to_not match("Registered & protected")
           expect(body).to_not match("Claimed")
           # Owner & access shows the parking-notification explanation, no owner rows
           expect(body).to match("not registered to a user. It was added to track parking notifications")

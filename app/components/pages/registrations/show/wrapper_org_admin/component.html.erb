@@ -21,7 +21,7 @@
           <%= render(UI::Badge::Component.new(text: translation(".claimed"), color: :notice, indicator: true)) %>
         <% end %>
 
-        <%= render(Pages::Registrations::Show::Status::Component.new(bike: @bike)) %>
+        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike)) %>
       </div>
     </div>
   </div>

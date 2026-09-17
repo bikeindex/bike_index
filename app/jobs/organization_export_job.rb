@@ -170,7 +170,7 @@ class OrganizationExportJob < ApplicationJob
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
     when "vehicle_type" then bike.type_titleize
     when "motorized" then bike.motorized?
-    when "status" then bike.status_humanized_no_with_owner
+    when "status" then Atoms::RegistrationStatusBadge::Component.status_humanized(bike, skip_with_owner: true)
     when "organization_notes" then organization_note_bodies[bike.id]
     end
   end

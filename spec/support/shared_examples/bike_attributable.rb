@@ -225,7 +225,6 @@ RSpec.shared_examples "bike_attributable" do
     let(:obj) { FactoryBot.build(model_sym) }
     it "returns" do
       expect(obj.status_humanized).to eq "with owner"
-      expect(obj.status_humanized_no_with_owner).to eq("")
     end
   end
 end

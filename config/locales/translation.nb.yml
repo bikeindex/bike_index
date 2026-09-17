@@ -6024,13 +6024,6 @@ nb:
             primary_color:
               one: Primærfarge
               other: Primærfarger
-          status:
-            found: Funnet
-            impounded: Beslaglagt
-            not_stolen: Ikke stjålet
-            stolen: Stjålet
-            unregistered: Uregistrert
-            for_sale: Til salgs
           stolen_details:
             department_city: Avdeling og by
             description_of_incident: Beskrivelse av hendelsen
@@ -6054,7 +6047,6 @@ nb:
             audience_sent_away: Ikke lenger din %{bike_type}
             edit_this_bike: Rediger dette %{bike_type}
             mark_stolen: Merke stjålet
-            registered_protected: Registrert og beskyttet
             sell_on_marketplace: Selg på markedsplassen
             share: Dele
             share_my_page: Del siden min

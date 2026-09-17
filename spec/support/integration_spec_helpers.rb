@@ -112,7 +112,12 @@ module IntegrationSpecHelpers
     end
   end
 
-  def open_settings_menu = find("button[aria-label='Settings']").click
+  # The gear toggles the submenu through shared-blocks--navbar, so a click landing before
+  # that controller connects is swallowed with nothing on the page to say so
+  def open_settings_menu
+    wait_for_stimulus("shared-blocks--navbar")
+    find("button[aria-label='Settings']").click
+  end
 
   def sign_out
     open_settings_menu
@@ -153,13 +158,25 @@ module IntegrationSpecHelpers
   end
 
   # Stimulus lazy loads controller modules, so a rendered page can have none of them
-  # connected yet -- a combobox filters no options, a restored draft reaches no listener
-  def wait_for_stimulus(timeout: Capybara.default_max_wait_time)
+  # connected yet -- a combobox filters no options, a restored draft reaches no listener.
+  # `every` is vacuously true on a document that has parsed no [data-controller] at all,
+  # so name the one being waited for and the wait covers it arriving as well as connecting
+  def wait_for_stimulus(identifier = nil, timeout: Capybara.default_max_wait_time)
     wait_for(timeout:) do
       page.evaluate_script(<<~JS)
         [...document.querySelectorAll('[data-controller]')].every((element) =>
           element.dataset.controller.split(' ').filter(Boolean).every((identifier) =>
             window.Stimulus?.getControllerForElementAndIdentifier(element, identifier)))
+      JS
+    end
+    return if identifier.blank?
+
+    wait_for(timeout:) do
+      page.evaluate_script(<<~JS)
+        (() => {
+          const element = document.querySelector('[data-controller~="#{identifier}"]')
+          return !!(element && window.Stimulus?.getControllerForElementAndIdentifier(element, "#{identifier}"))
+        })()
       JS
     end
   end
