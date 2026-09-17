@@ -95,10 +95,13 @@ RSpec.configure do |config|
 
       playwright_page.on("crash", ->(_page) { record.call("page crashed") })
       playwright_page.context.on("page", ->(new_page) { record.call("context opened #{new_page.url}") })
+      # No frame check: Request#frame raises for a request issued before its frame exists,
+      # and this runs on the transport's reader thread, which rescues only IOError - one
+      # raise there stops every later Playwright message. The url says which navigation
       playwright_page.on("requestfailed", lambda { |request|
-        next unless request.navigation_request? && request.frame.parent_frame.nil?
+        next unless request.navigation_request?
 
-        record.call("main frame navigation failed: #{request.url} (#{request.failure})")
+        record.call("navigation failed: #{request.url} (#{request.failure})")
       })
       playwright_page.on("framenavigated", lambda { |frame|
         next unless frame.parent_frame.nil?
