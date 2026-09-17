@@ -8,9 +8,6 @@ module I18nTasks
   # `settings` is either another component or a nested key group of the `search` one, and
   # only the filesystem knows which. Guessing wrongly files the sidecar in a directory with
   # no component.rb, where MARKUP_DIGEST can't see it.
-  #
-  # Anything that isn't a component, or names a directory that doesn't exist yet, falls
-  # through to the write patterns.
   class ComponentRouter < ::I18n::Tasks::Data::Router::PatternRouter
     ROOT = "app/components"
 
@@ -18,21 +15,12 @@ module I18nTasks
       return to_enum(:route, locale, forest) unless block
 
       locale = locale.to_s
-      sidecars = Hash.new { |hash, path| hash[path] = Set.new }
-      unrouted = Set.new
 
-      forest.keys do |key, _node|
-        path = sidecar_for(key, locale)
-        (path ? sidecars[path] : unrouted) << "#{locale}.#{key}"
+      forest.keys.group_by { |key, _| sidecar_for(key, locale) }.each do |path, keys|
+        full_keys = keys.map { |key, _| "#{locale}.#{key}" }.to_set
+        subtree = forest.select_keys(root: true) { |key, _| full_keys.include?(key) }
+        path ? block.yield(path, subtree) : super(locale, subtree, &block)
       end
-
-      sidecars.each do |path, keys|
-        block.yield path, forest.select_keys(root: true) { |key, _| keys.include?(key) }
-      end
-
-      return if unrouted.empty?
-
-      super(locale, forest.select_keys(root: true) { |key, _| unrouted.include?(key) }, &block)
     end
 
     private
