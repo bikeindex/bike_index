@@ -137,6 +137,17 @@ module IntegrationSpecHelpers
     expect(page).to have_content("Logged out")
   end
 
+  # Below the sidebar's mobile breakpoint the nav is an overlay the hamburgler opens through
+  # shared-blocks--org-sidebar, so a click landing before that controller connects is
+  # swallowed the way open_settings_menu's is, leaving `within` on a nav that never opened.
+  # 10s because what's waited on is a module fetch: of this sequence's two call sites, the
+  # one already wrapped in using_wait_time(10) is the one that wasn't failing.
+  def open_org_sidebar(wait: 10)
+    wait_for_stimulus("shared-blocks--org-sidebar", timeout: wait)
+    find("#org_sidebar_hamburgler").click
+    expect(page).to have_css("#org_sidebar_nav", wait:)
+  end
+
   # revised/init.coffee hands the legacy form-well's selects to selectize, which hides the
   # <select> behind a control of its own -- so `select` can't reach them
   def selectize_for(selector)

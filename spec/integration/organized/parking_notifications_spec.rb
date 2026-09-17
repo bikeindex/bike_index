@@ -137,7 +137,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
     dismiss_flash_messages
 
-    find("#org_sidebar_hamburgler").click
+    open_org_sidebar
     within("#org_sidebar_nav") do
       click_button "Parking Notifications"
       click_link "Search Parking Notifications"
