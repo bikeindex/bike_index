@@ -40,8 +40,8 @@ module Atoms
       # @endgroup
 
       # The marketplace preview, where the listing is still a draft
-      def override_to_for_sale
-        render_badge(:registered, override_to_for_sale: true)
+      def override_status
+        render_badge(:registered, override_status: "for sale")
       end
 
       # @param size select { choices: [xs, sm, md, lg] }

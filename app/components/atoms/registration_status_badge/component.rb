@@ -16,18 +16,23 @@ module Atoms
         unregistered: :warning
       }.freeze
 
-      # override_to_for_sale: the marketplace preview, where the listing is still a draft
-      def initialize(bike:, override_to_for_sale: false, skip_with_owner: false, size: :md)
+      # skip_with_owner blanks the common status, for the tables and columns that only
+      # call out the exceptional ones
+      def self.status_humanized(bike, override_status: nil, skip_with_owner: false)
+        status = override_status.presence || bike.status_humanized
+        (skip_with_owner && status == "with owner") ? "" : status
+      end
+
+      # override_status: render this in place of the bike's own - the marketplace preview
+      # passes "for sale" for a listing that's still a draft
+      def initialize(bike:, override_status: nil, skip_with_owner: false, size: :md)
         @bike = bike
-        @override_to_for_sale = override_to_for_sale
+        @override_status = override_status
         @skip_with_owner = skip_with_owner
         @size = size
       end
 
-      # Tables and titles that only call out the exceptional statuses pass skip_with_owner
-      def render?
-        !(@skip_with_owner && status_key == :with_owner)
-      end
+      def render? = status_humanized.present?
 
       def call
         render(UI::Badge::Component.new(
@@ -42,11 +47,8 @@ module Atoms
       private
 
       def status_humanized
-        @status_humanized ||= if @override_to_for_sale && @bike.status_with_owner?
-          "for sale"
-        else
-          @bike.status_humanized
-        end
+        @status_humanized ||= self.class.status_humanized(@bike, override_status: @override_status,
+          skip_with_owner: @skip_with_owner)
       end
 
       def status_key = status_humanized.tr(" ", "_").to_sym

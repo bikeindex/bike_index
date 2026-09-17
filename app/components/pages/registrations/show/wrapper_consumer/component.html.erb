@@ -35,7 +35,7 @@
       </div>
 
       <div class="tw:flex tw:items-center">
-        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_to_for_sale: @marketplace_preview)) %>
+        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_status: ("for sale" if @marketplace_preview))) %>
       </div>
 
       <%= render(current_alerts_component) %>

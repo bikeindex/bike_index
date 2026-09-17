@@ -38,13 +38,13 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
     end
   end
 
-  context "override_to_for_sale" do
-    let(:bike) { FactoryBot.create(:bike) }
-    let(:component) { described_class.new(bike:, override_to_for_sale: true) }
-    it "shows for sale for a bike that isn't listed yet" do
-      expect(bike.is_for_sale?).to be false
+  context "override_status" do
+    let(:bike) { FactoryBot.create(:stolen_bike) }
+    let(:component) { described_class.new(bike:, override_status: "for sale") }
+    it "shows the passed status rather than the bike's own" do
       render_inline(component)
       expect(page).to have_text("For Sale")
+      expect(page).to_not have_text("Stolen")
     end
   end
 
@@ -71,6 +71,23 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
     it "shows found" do
       render_inline(component)
       expect(page).to have_text("Found")
+    end
+  end
+
+  describe ".status_humanized" do
+    it "returns the bike's own status" do
+      expect(described_class.status_humanized(Bike.new(status: :status_stolen))).to eq "stolen"
+    end
+
+    it "prefers an override_status" do
+      expect(described_class.status_humanized(Bike.new(status: :status_stolen), override_status: "for sale")).to eq "for sale"
+    end
+
+    context "skip_with_owner" do
+      it "blanks with owner, but keeps a for sale bike's status" do
+        expect(described_class.status_humanized(Bike.new, skip_with_owner: true)).to eq ""
+        expect(described_class.status_humanized(Bike.new(is_for_sale: true), skip_with_owner: true)).to eq "for sale"
+      end
     end
   end
 
