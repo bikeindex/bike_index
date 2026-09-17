@@ -91,6 +91,19 @@ The log is large and ANSI-coloured; pipe through `sed 's/\x1b\[[0-9;]*m//g'`
 and grep for `Failure/Error`, `expected`, and `rspec ./spec/...` to get the
 failing example ids and the actual message.
 
+**Then download the Capybara screenshot.** Every `:js` failure writes one, and
+`ci.yml` uploads `tmp/capybara/` to the shard's `test-results-<node-index>`
+artifact for exactly this — but the log names the file without saying it's
+fetchable, so it usually goes unread. It shows the page the failure saw, which
+routinely settles a mechanism the log can only hint at: what a click actually
+landed on, a frame still loading, a control in a state no step in the example set.
+
+```bash
+gh api repos/bikeindex/bike_index/actions/runs/<run-id>/artifacts \
+  --jq '.artifacts[] | "\(.id) \(.name)"'
+gh api repos/bikeindex/bike_index/actions/artifacts/<id>/zip > tmp/a.zip && unzip -o tmp/a.zip -d tmp/ci_artifact
+```
+
 ### 2. Read the message literally
 
 The exact failure text usually names the mechanism, and it is easy to skim past

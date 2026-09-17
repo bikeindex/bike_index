@@ -85,18 +85,20 @@ export class CollapseUtils {
    * @param {string} direction - 'vertical' (height) or 'horizontal' (width)
    */
   static show (element, duration, direction = 'vertical') {
-    // Cancel any in-flight hide() finalizer so it doesn't stamp tw:hidden! on us.
-    this._cancelFinalizer(element)
     const { dimension, styles, scale } = this.axis(direction)
     // Bail if already fully shown — but isVisible alone isn't enough: a hide()
     // mid-transition still has display:block/visibility:visible until its finalizer
     // adds tw:hidden!, yet the scale class means the element is collapsed to 0.
     if (this.isVisible(element) && !element.classList.contains(scale)) return
+    // Cancel any in-flight hide() finalizer so it doesn't stamp tw:hidden! on us. Below the
+    // bail: a second show() mid-animation takes that branch, and cancelling first orphans
+    // the pinned size and the clip with nothing left to clear them.
+    this._cancelFinalizer(element)
     // Remove the hidden
     element.classList.remove('tw:hidden!', 'tw:hidden')
-    // An animated hide leaves the size/scale pinned to 0, so reset before the
+    // An animated hide leaves the size/scale/clip pinned, so reset before the
     // duration-0 return too - display alone doesn't uncollapse it
-    element.classList.remove(scale)
+    element.classList.remove(scale, 'tw:overflow-clip')
     this.setSize(element, styles, '')
 
     // Skip animation if duration is 0
@@ -108,7 +110,10 @@ export class CollapseUtils {
     element.classList.add(scale)
     this.setSize(element, styles, 0)
     // Always add transition classes (moving toward a more generalizable collapse method)
-    element.classList.add('tw:transition-all', `tw:duration-${duration}`)
+    // Clipped for the duration: content is laid out from the element's leading edge, so the
+    // pinned size doesn't move it - unclipped it covers whatever is sliding past beneath,
+    // and takes the clicks aimed there. clip rather than hidden: no scroll container.
+    element.classList.add('tw:transition-all', 'tw:overflow-clip', `tw:duration-${duration}`)
     // Remove things that transition to hide the element
     element.classList.remove(scale)
     // Force a reflow so the browser commits the 0 size before transitioning.
@@ -119,6 +124,7 @@ export class CollapseUtils {
     // After transition is complete, remove explicit size (clean up afterward)
     element._collapseFinalizer = setTimeout(() => {
       this.setSize(element, styles, '')
+      element.classList.remove('tw:overflow-clip')
       element._collapseFinalizer = null
     }, duration)
   }
@@ -144,7 +150,9 @@ export class CollapseUtils {
     // Pin the current natural size so the transition has a starting point.
     this.setSize(element, styles, this.naturalSize(element, dimension) + 'px')
     // Always add transition classes (moving toward a more generalizable collapse method)
-    element.classList.add('tw:transition-all', `tw:duration-${duration}`)
+    // Clipped like show(): the scale below shrinks the content about its centre, so its
+    // far edge escapes the shrinking box. The next show() strips it on the way back in.
+    element.classList.add('tw:transition-all', 'tw:overflow-clip', `tw:duration-${duration}`)
     // Add the tailwind class to shrink
     element.classList.add(scale)
     // Force a reflow so the browser commits the natural size before transitioning.
