@@ -64,6 +64,8 @@ None of this governs magic comments, `# rubocop:disable` (keep its justification
 
 A registration is as often an e-scooter, a stroller or a wheelchair, so **never hardcode "bike" in a value that means the cycle type** — interpolate `%{bike_type}` and pass `bike_type: bike.type`. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` is the pattern. Key names (`about_this_bike:`), the product name, and copy that really is bike-only are fine.
 
+**Branch around `translation`, never inside its key.** `translation(found? ? ".found_at" : ".impounded_at")` hides both keys from i18n-tasks, which then reports them unused and deletes them; write `found? ? translation(".found_at") : translation(".impounded_at")` so each key is a literal, and repeat the interpolation arguments rather than hoisting the key into a local. An `i18n-tasks-use` comment is only for a key no branch can make literal — `translation(".#{kind}")` over an open set. This is what hid `thread_show`'s `:removed_message`, which had never matched a key at all.
+
 Run `bundle exec rails prepare_translations` after hand-editing a `component.en.yml`; `bin/lint` doesn't normalize YAML. It strips comments, so a note about the copy — a casing convention, a term to leave untranslated — has to live in `component.rb`.
 
 **A component's copy lives in that component's own sidecar, and orphaning is never a reason to leave it somewhere else.** Keys are meant to be renamed and moved: the translation sync relocates the other four locales on its next run, and non-English readers fall back to English only until it does. A scope that doesn't match its component is the expensive half, and it doesn't expire — so move the key and take the gap.

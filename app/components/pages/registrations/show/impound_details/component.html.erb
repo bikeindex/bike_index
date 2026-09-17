@@ -13,8 +13,7 @@
         <%= render(UI::DefinitionList::Row::Component.new(label: translation(".location"), value: impound_record.formatted_address_string)) %>
       <% end %>
 
-      <%# i18n-tasks-use translation(".found_at"), translation(".impounded_at") %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: translation(found? ? ".found_at" : ".impounded_at"), value: impound_record.impounded_at, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: found? ? translation(".found_at") : translation(".impounded_at"), value: impound_record.impounded_at, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
     <% end %>
   <% end %>
 <% end %>

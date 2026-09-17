@@ -23,15 +23,19 @@ module Pages
             end
 
             def heading
-              # i18n-tasks-use translation(".know_something_about_this_bike_type"), translation(".know_who_has_this_bike_type")
-              translation(impounded? ? ".know_who_has_this_bike_type" : ".know_something_about_this_bike_type",
-                bike_type: @bike.type)
+              if impounded?
+                translation(".know_who_has_this_bike_type", bike_type: @bike.type)
+              else
+                translation(".know_something_about_this_bike_type", bike_type: @bike.type)
+              end
             end
 
             def message_placeholder
-              # i18n-tasks-use translation(".what_do_you_need_to_ask"), translation(".where_did_you_see_this_bike")
-              translation(impounded? ? ".what_do_you_need_to_ask" : ".where_did_you_see_this_bike",
-                bike_type: @bike.type)
+              if impounded?
+                translation(".what_do_you_need_to_ask", bike_type: @bike.type)
+              else
+                translation(".where_did_you_see_this_bike", bike_type: @bike.type)
+              end
             end
 
             def message_notification
