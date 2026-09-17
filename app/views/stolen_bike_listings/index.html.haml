@@ -31,24 +31,8 @@
 
 
 
-  #timeSelectionBtnGroup.mt-4.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "#{false}" }
-    %span.mr-2.less-strong.d-block.d-lg-inline-block
-      Bikes listed
-    %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "all"), data: { period: "all" } }
-      any time
-    %button#periodSelectCustom.btn.btn-outline-secondary.btn-sm.ml-2{ class: ("active" if @period == "custom"), data: { period: "custom" } }
-      custom time frame
-
-  %form#timeSelectionCustom.custom-time-selection.mt-2.mb-2.collapse{ class: @period == "custom" ? "in show" : "" }
-    .form-group
-      = label_tag :start_time_selector, "from", class: "control-label mr-2"
-      = datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
-    .form-group.end-time-contrtol
-      = label_tag :end_time_selector, "to", class: "control-label mr-2"
-      = datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
-    %button#updatePeriodSelectCustom.btn.btn-success.btn-sm.ml-2
-      update
-
+  .mt-4
+    = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:, prepend_text: "Bikes listed")
   .row.mt-4
     .col-xs-12
       %p
@@ -139,7 +123,5 @@
     .col-md-8.mt-4.offset-md-2
       = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"}
 
--# include javascript pack for the time period select
-<script src="/vendored_assets/application.js"></script>
 
 
