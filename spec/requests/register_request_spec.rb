@@ -560,6 +560,48 @@ RSpec.describe RegisterController, type: :request do
         end
         expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
       end
+
+      # The challenge is there to stop a confirmation email going to an unproven address,
+      # so the one address it has nothing to prove is the signed-in rider's own
+      context "signed in, registering to their own address" do
+        include_context :request_spec_logged_in_as_user
+        let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+
+        it "registers without a token, and never shows them a widget" do
+          get "#{base_url}?b_param_token=#{empty_b_param.id_token}&step=1"
+          page = Nokogiri::HTML(response.body)
+          # Still in the DOM, since they may yet type an address that is challenged - but
+          # hidden, unarmed, and named to the reveal as one to keep hidden
+          expect(page.at_css("[data-ui--forms--turnstile-target=widget]")["class"]).to include "tw:hidden"
+          expect(page.css("script[src*='challenges.cloudflare.com']")).to be_empty
+          expect(page.at_css("form")["data-ui--forms--turnstile-exempt-emails-value"])
+            .to eq [owner_email].to_json
+
+          expect { post base_url, params: create_params }
+            .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+          expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
+        end
+
+        context "registering to somebody else's risky address" do
+          let(:step_1_params) { super().deep_merge(b_param: {owner_email: "friend@hotmail.com"}) }
+
+          it "is asked for the challenge" do
+            expect { post base_url, params: create_params }
+              .to_not change(Email::PartialRegistrationJob.jobs, :size)
+            expect(response.body).to include "not a robot"
+          end
+        end
+
+        context "their address is unconfirmed" do
+          let(:current_user) { FactoryBot.create(:user, email: owner_email) }
+
+          it "is asked for the challenge" do
+            expect { post base_url, params: create_params }
+              .to_not change(Email::PartialRegistrationJob.jobs, :size)
+            expect(response.body).to include "not a robot"
+          end
+        end
+      end
     end
 
     context "motorized, stolen, manufacturer not in the list" do

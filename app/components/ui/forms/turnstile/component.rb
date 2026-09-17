@@ -6,14 +6,15 @@ module UI
       class Component < ApplicationComponent
         SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js"
 
-        def initialize(email: nil)
+        def initialize(email: nil, user: nil)
           @email = email
+          @user = user
         end
 
         def render? = Integrations::Turnstile::ENABLED
 
         def call
-          return wrapper unless already_risky?
+          return wrapper unless challenged?
 
           safe_join([wrapper, no_js_alert, script])
         end
@@ -21,15 +22,16 @@ module UI
         private
 
         # The address a challenged submission came back with - the widget and the script
-        # both come from here, so a browser whose Stimulus never connects can still answer
-        def already_risky? = EmailDomain.risky_email?(@email)
+        # both come from here, so a browser whose Stimulus never connects can still answer.
+        # Still rendered hidden when it's false: the rider can type a challenged address next
+        def challenged? = Integrations::Turnstile.challenge?(@email, user: @user)
 
         def wrapper
           tag.div(widget, class: wrapper_class, data: {"ui--forms--turnstile-target": "widget"})
         end
 
         def wrapper_class
-          class_names("tw:my-4", "tw:hidden" => !already_risky?)
+          class_names("tw:my-4", "tw:hidden" => !challenged?)
         end
 
         def widget

@@ -29,9 +29,13 @@ module Pages
                   form_persist_key_value: "register-start-#{@b_param.id_token}",
                   "ui--forms--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
                   "ui--forms--turnstile-script-url-value": UI::Forms::Turnstile::Component::SCRIPT_URL,
+                  "ui--forms--turnstile-exempt-emails-value": exempt_emails.to_json,
                   action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
                     "input->ui--forms--turnstile#update submit->form-persist#clear"}}
         end
+
+        # The reveal skips these, the way Integrations::Turnstile skips them on submit
+        def exempt_emails = @current_user&.confirmed_emails || []
 
         # Derived when the frame's src doesn't name one
         def button_hover_color
