@@ -424,7 +424,7 @@ RSpec.describe "Register flow", :js, type: :system do
       bike = Bike.spam.last
       expect(bike).to have_attributes(owner_email:, serial_number: "XYZ 123")
       # And the invitation to claim it, enqueued like any other, mails nothing
-      expect { Email::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
     end
   end
 
@@ -532,8 +532,9 @@ RSpec.describe "Register flow", :js, type: :system do
         expect(public_image.image_url).to eq "https://test-uploads.bikeindex.org/#{public_image.file.blob.key}"
 
         # Fetching it is the actual proof the browser's PUT landed - and that the bucket serves it
-        response = Faraday.get(public_image.image_url)
-        expect(response.status).to eq 200
+        # R2 answers 500, not 404, for a key its edge has not caught up with yet
+        response = nil
+        wait_for(timeout: 10) { (response = Faraday.get(public_image.image_url)).status == 200 }
         expect(response.body.bytesize).to eq File.size(image_path)
       end
     end

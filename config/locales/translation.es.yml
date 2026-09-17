@@ -5755,6 +5755,16 @@ es:
         hidden_for_unauthorized_users: oculto para usuarios no autorizados
         made_without_serial: hecho sin número de serie
         unknown: desconocido
+      registration_status_badge:
+        abandoned: Se informó que parecía estar abandonado, donde no debería estar.
+        for_sale: Registrado y protegido, puesto a la venta por su propietario.
+        found: Alguien lo encontró y está esperando a que su dueño lo reclame.
+        impounded: En poder de una organización, a la espera de que su propietario
+          la reclame.
+        stolen: Denunciado como robado
+        unregistered: 'No registrado por su propietario: creado a partir de una notificación
+          de estacionamiento.'
+        with_owner: Registrado y protegido. Con su dueño (no robado).
     pages:
       messages:
         thread_show:
@@ -6298,13 +6308,6 @@ es:
             primary_color:
               one: Color primario
               other: Colores primarios
-          status:
-            found: Encontró
-            impounded: Incautado
-            not_stolen: No robado
-            stolen: Robado
-            unregistered: No registrado
-            for_sale: Se vende
           stolen_details:
             department_city: Departamento y ciudad
             description_of_incident: Descripción del incidente
@@ -6327,7 +6330,6 @@ es:
             audience_sent_away: Ya no es tu %{bike_type}
             edit_this_bike: Edita esto %{bike_type}
             mark_stolen: Marca robada
-            registered_protected: Registrado y protegido
             sell_on_marketplace: Vender en el mercado
             share: Compartir
             share_my_page: Comparte mi página

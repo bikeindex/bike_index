@@ -103,7 +103,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect {
           post base_url, params: {bike: bike_params}
         }.to change(Bike.unscoped, :count).by 1
-        Email::OwnershipInvitationJob.drain
+        EmailJobs::OwnershipInvitationJob.drain
 
         b_param = BParam.reorder(:created_at).last
         expect(b_param.owner_email).to eq bike_params[:owner_email]

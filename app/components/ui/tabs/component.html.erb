@@ -6,7 +6,7 @@
 %>
 
 <nav
-  class="twgutter-bleed tw:mb-3 tw:overflow-x-auto tw:pt-1"
+  class="twgutter-bleed tw:overflow-x-auto tw:pt-1 <%= @margin_classes %>"
   aria-label="<%= @nav_label %>"
   <%= tag.attributes(data: {controller: "ui--tabs", turbo: (true if @turbo)}) %>
 >

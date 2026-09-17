@@ -187,8 +187,8 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
       expect(marketplace_message).to have_attributes(new_params.except(:initial_record_id))
       expect(marketplace_message.sender_id).to eq current_user.id
       expect(marketplace_message.receiver_id).to eq marketplace_listing.seller_id
-      expect(Email::MarketplaceMessageJob.jobs.count).to eq 1
-      Email::MarketplaceMessageJob.drain
+      expect(EmailJobs::MarketplaceMessageJob.jobs.count).to eq 1
+      EmailJobs::MarketplaceMessageJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
       expect(marketplace_message.notifications.count).to eq 1
       expect(marketplace_message.notifications.first.delivery_status).to eq "delivery_success"
@@ -262,7 +262,7 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
           post base_url, params: {marketplace_message: reply_params}
           expect(flash[:success]).to be_present
         end.to change(MarketplaceMessage, :count).by(1)
-          .and change(Email::MarketplaceMessageJob.jobs, :count).by(1)
+          .and change(EmailJobs::MarketplaceMessageJob.jobs, :count).by(1)
 
         new_marketplace_message = MarketplaceMessage.last
         expect(new_marketplace_message).to have_attributes(reply_params.except(:subject))
@@ -270,8 +270,8 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
         expect(new_marketplace_message.sender_id).to eq current_user.id
         expect(new_marketplace_message.receiver_id).to eq marketplace_message.sender_id
 
-        expect(Email::MarketplaceMessageJob.jobs.map { |j| j["args"] }.flatten).to include(marketplace_message.id)
-        Email::MarketplaceMessageJob.drain
+        expect(EmailJobs::MarketplaceMessageJob.jobs.map { |j| j["args"] }.flatten).to include(marketplace_message.id)
+        EmailJobs::MarketplaceMessageJob.drain
         expect(ActionMailer::Base.deliveries.blank?).to be_falsey
         expect(marketplace_message.reload.notifications.first.delivery_status).to eq "delivery_success"
       end
@@ -297,9 +297,9 @@ RSpec.describe MyAccounts::MessagesController, type: :request do
 
         new_message = MarketplaceMessage.last
         expect(new_message.likely_spam?).to be_truthy
-        expect(Email::MarketplaceMessageJob.jobs.count).to eq 1
+        expect(EmailJobs::MarketplaceMessageJob.jobs.count).to eq 1
 
-        Email::MarketplaceMessageJob.drain
+        EmailJobs::MarketplaceMessageJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(new_message.notifications.count).to eq 1
         expect(new_message.notifications.first.kind).to eq "marketplace_message_blocked"

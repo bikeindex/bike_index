@@ -54,9 +54,9 @@ module CallbackJobs
     def send_welcoming_email(user)
       # If the user is confirmed, send the welcome email, otherwise send the confirmation email
       if user.confirmed?
-        Email::WelcomeJob.perform_async(user.id)
+        EmailJobs::WelcomeJob.perform_async(user.id)
       else
-        Email::ConfirmationJob.perform_in(1.second, user.id)
+        EmailJobs::ConfirmationJob.perform_in(1.second, user.id)
       end
     end
 

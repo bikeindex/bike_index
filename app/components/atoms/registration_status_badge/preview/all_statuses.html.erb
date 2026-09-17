@@ -1,0 +1,5 @@
+<ul class="tw:flex tw:flex-col tw:items-start tw:gap-3">
+  <% bikes.each do |bike| %>
+    <li><%= render(Atoms::RegistrationStatusBadge::Component.new(bike:)) %></li>
+  <% end %>
+</ul>

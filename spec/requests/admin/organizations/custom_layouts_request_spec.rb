@@ -136,6 +136,21 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
             end
           end
         end
+
+        context "with a snippet" do
+          let(:snippet_kind) { MailSnippet.organization_snippet_kinds.first }
+          let!(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization:, kind: snippet_kind) }
+
+          it "links to the version history" do
+            get "#{base_url}/#{snippet_kind}/edit"
+            expect(response.status).to eq(200)
+            expect(response.body).to include "View history of this snippet"
+            expect(response.body).to include CGI.escapeHTML(
+              admin_paper_trail_versions_path(search_item_type: "MailSnippet",
+                search_item_id: mail_snippet.id, period: "all")
+            )
+          end
+        end
       end
     end
 
