@@ -64,7 +64,7 @@ None of this governs magic comments, `# rubocop:disable` (keep its justification
 
 A registration is as often an e-scooter, a stroller or a wheelchair, so **never hardcode "bike" in a value that means the cycle type** — interpolate `%{bike_type}` and pass `bike_type: bike.type`. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` is the pattern. Key names (`about_this_bike:`), the product name, and copy that really is bike-only are fine.
 
-**Branch around `translation`, never inside its key.** `translation(found? ? ".found_at" : ".impounded_at")` hides both keys, so i18n-tasks reports them unused and they get deleted — write `found? ? translation(".found_at") : translation(".impounded_at")`, repeating the interpolation arguments rather than hoisting the key into a local. Save `i18n-tasks-use` for a key built from a value with no fixed set; a closed one is a `case` with a literal key per branch, however long the list. It's what hid `thread_show`'s `:removed_message`, which matched no key at all.
+**Branch around `translation`, never inside its key.** `translation(found? ? ".found_at" : ".impounded_at")` hides both keys, so i18n-tasks reports them unused and they get deleted — write `found? ? translation(".found_at") : translation(".impounded_at")`, repeating the interpolation arguments rather than hoisting the key into a local. A set of any size is a `case` with a literal key per branch. It's what hid `thread_show`'s `:removed_message`, which matched no key at all.
 
 Run `bundle exec rails prepare_translations` after hand-editing a `component.en.yml`; `bin/lint` doesn't normalize YAML. It strips comments, so a note about the copy — a casing convention, a term to leave untranslated — has to live in `component.rb`.
 
