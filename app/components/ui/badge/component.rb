@@ -24,7 +24,9 @@ module UI
         # mockup's #9a9aa2, which sat at 2.45:1 on this background.
         gray: "tw:bg-[#f0f0f2] tw:text-[#666666] tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-400",
         purple: "tw:bg-purple-50 tw:text-purple-600 tw:border-transparent tw:dark:bg-purple-900 tw:dark:text-purple-300",
-        fuchsia: "tw:bg-fuchsia-50 tw:text-fuchsia-700 tw:border-transparent tw:dark:bg-fuchsia-900 tw:dark:text-fuchsia-300",
+        # -200/-800 rather than the palette's -50/-700: at pill size a -50 tint reads
+        # white, and this is the one pill whose background has to say purple
+        fuchsia: "tw:bg-fuchsia-200 tw:text-fuchsia-800 tw:border-transparent tw:dark:bg-fuchsia-900 tw:dark:text-fuchsia-300",
         # The -400 rather than the palette's -700, by choice: 2.5:1 on its own background,
         # so it reads softer than every other pill rather than as a mistyped shade
         pink: "tw:bg-pink-50 tw:text-pink-400 tw:border-transparent tw:dark:bg-pink-900 tw:dark:text-pink-400",

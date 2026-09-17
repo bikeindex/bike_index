@@ -34,7 +34,7 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
     it "shows for sale in a fuchsia badge" do
       render_inline(component)
       expect(page).to have_text("For Sale")
-      expect(page).to have_css("span.tw\\:text-fuchsia-700")
+      expect(page).to have_css("span.tw\\:text-fuchsia-800")
     end
   end
 
