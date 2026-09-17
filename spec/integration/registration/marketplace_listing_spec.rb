@@ -59,12 +59,8 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
 
     type_into("#bike_primary_frame_color_id", "Red")
     click_combobox_option("Red")
-    fill_in "bike[frame_model]", with: "Cross Check"
-    fill_in "bike[serial_number]", with: "MKT12345"
-
-    # A lost fill leaves the serial empty and the browser holds the submit, so without this
-    # the flake below surfaces 10s later as a missing "Registration complete"
-    expect(page).to have_field("bike[serial_number]", with: "MKT12345")
+    fill_in_verified "bike[frame_model]", with: "Cross Check"
+    fill_in_verified "bike[serial_number]", with: "MKT12345"
     click_button "Complete Bike Registration"
 
     expect(page).to have_content("Registration complete")

@@ -41,7 +41,8 @@ export default class extends Controller {
       else field.dataset.organizationOff = 'true'
     })
     // Announced rather than applied: register--status-fields reads the flag, and which of
-    // us runs first isn't ours to decide when we're both answering form-persist's restore
-    this.dispatch('changed')
+    // us runs first isn't ours to decide when we're both answering form-persist's restore.
+    // With our duration - dropping it left a restore animating what we applied instantly.
+    this.dispatch('changed', { detail: { duration } })
   }
 }
