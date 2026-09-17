@@ -5,47 +5,46 @@ module UI
     # A row of chips that navigate or act — the link/button counterpart of
     # UI::Forms::RadioButtonGroup, which chips off CHIP_CLASSES too.
     #
-    # style: :button is a row of separate chips; :toggle is the redesign's segmented
-    # control, where the group is one track and the active entry is the raised segment in it.
+    # kind: :toggle renders them as a segmented control instead — one track, with the
+    # active entry raised out of it.
     class Component < ApplicationComponent
-      STYLES = %i[button toggle].freeze
+      KINDS = %i[button toggle].freeze
 
       CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
 
-      TRACK_CLASSES = "tw:inline-flex tw:gap-0.5 tw:rounded-lg tw:border tw:border-gray-200 " \
-        "tw:bg-gray-100 tw:p-0.5 tw:dark:border-gray-700 tw:dark:bg-gray-800"
+      # Track and segment sizes come from kelsey_redesign/new-org-search/, not the type scale
+      TRACK_CLASSES = "tw:inline-flex tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
+        "tw:bg-gray-100 tw:p-[3px] tw:dark:border-gray-700 tw:dark:bg-gray-800"
 
-      # Only the segment's own look: the focus, disabled and hover-guard halves come from
-      # UI::Button, whose rationales for each shouldn't need a second copy here.
-      # Resting is the unselected segment; is-active raises the selected one out of the track.
+      # Only what the segment doesn't share with a button — the rest is UI::Button's
       SEGMENT_CLASSES = [
-        "tw:inline-flex tw:items-center tw:cursor-pointer tw:transition-colors tw:rounded-md",
-        "tw:px-3 tw:py-1 tw:text-2xs tw:font-extrabold tw:whitespace-nowrap",
+        UI::Button::Component::BASE_CLASSES,
+        UI::Button::Component::FOCUS_CLASSES,
+        UI::Button::Component::DISABLED_CLASSES,
+        "tw:px-3 tw:py-[5px] tw:text-[11.5px] tw:font-extrabold tw:whitespace-nowrap",
         "tw:no-underline tw:hover:no-underline tw:text-gray-400",
         "tw:not-disabled:not-aria-disabled:hover:text-gray-900",
         "tw:focus:ring-purple-500/40",
-        UI::Button::Component::FOCUS_CLASSES,
-        UI::Button::Component::DISABLED_CLASSES,
         "tw:is-active:bg-white tw:is-active:text-gray-900 tw:is-active:shadow-sm",
-        "tw:dark:is-active:bg-gray-900 tw:dark:is-active:text-gray-100"
+        "tw:is-active:dark:bg-gray-900 tw:is-active:dark:text-gray-100"
       ].join(" ").freeze
 
       # full_width lays the chips out as equal columns that wrap, staying the same width
       # on every line — flex would size each line independently. auto-fit needs a
       # definite minimum to count repetitions.
       def self.layout_classes(full_width:)
-        return "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" if full_width
-
-        "tw:flex tw:flex-wrap tw:gap-2"
+        full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-2"
       end
 
       # entries: ComponentStructs::Shapes' entries
-      def initialize(entries:, full_width: false, style: :button)
-        raise ArgumentError, "unknown style #{style.inspect}, expected one of: #{STYLES.join(", ")}" unless STYLES.include?(style)
+      def initialize(entries:, full_width: false, kind: :button)
+        raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}" unless KINDS.include?(kind)
+        # The track sizes itself to its segments, so there's no column layout to widen
+        raise ArgumentError, "full_width is not supported for the toggle kind" if full_width && kind == :toggle
 
         @entries = entries
         @full_width = full_width
-        @style = style
+        @kind = kind
       end
 
       def call
@@ -56,13 +55,9 @@ module UI
 
       private
 
-      def toggle?
-        @style == :toggle
-      end
+      def toggle? = @kind == :toggle
 
-      def group_classes
-        toggle? ? TRACK_CLASSES : self.class.layout_classes(full_width: @full_width)
-      end
+      def group_classes = toggle? ? TRACK_CLASSES : self.class.layout_classes(full_width: @full_width)
 
       def chip(entry)
         active = entry[:active].presence # false would render data-active="false", nil renders nothing

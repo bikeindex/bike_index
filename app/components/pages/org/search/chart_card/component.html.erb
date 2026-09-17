@@ -21,7 +21,7 @@
           <%= caption %>
         </span>
 
-        <%= render(UI::ButtonGroup::Component.new(entries: scope_entries, style: :toggle)) %>
+        <%= render(UI::ButtonGroup::Component.new(entries: scope_entries, kind: :toggle)) %>
       </div>
 
       <%= render(@chart) if @chart %>
