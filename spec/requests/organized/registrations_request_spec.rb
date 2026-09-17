@@ -385,6 +385,32 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
+    context "both steps on one page" do
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
+      let(:color) { FactoryBot.create(:color, name: "Red") }
+
+      # The one page submits both steps together, so the whole registration is this post
+      def register_e_scooter
+        get "#{base_url}/new", params: {register_settings: true, single_page: true}
+        b_param = BParam.last
+        post "/register", params: {b_param_token: b_param.id_token, single_page: true,
+                                   propulsion_type_motorized: true,
+                                   b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email: "customer@example.com"},
+                                   bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+                                          status: "status_with_owner", user_name: "Sally Rider"}}
+        b_param.reload
+      end
+
+      # The submission is what makes it an e-vehicle, so the sequence isn't knowable
+      # until it's saved - and nothing after this post resolves it again
+      it "stops at the safety pages, which the submission is what asks for" do
+        b_param = nil
+        expect { b_param = register_e_scooter }.to_not change(Bike, :count)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+      end
+    end
+
     context "the registrant fills out the attestation separately" do
       let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
       let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }

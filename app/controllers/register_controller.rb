@@ -85,7 +85,12 @@ class RegisterController < ApplicationController
       propulsion_type_motorized: params[:propulsion_type_motorized], additional: params[:additional])
     # The combined form says so itself - the embed frames step 1 alone whatever the session holds
     single_page = params[:single_page].present?
-    saved &&= save_details if single_page
+    if single_page
+      saved &&= save_details
+      # Saving step 1 is what makes the registration an e-vehicle, so the filter's sequence
+      # was resolved too early - and this page finishes here rather than on a later request
+      find_registration_sequence
+    end
     unless saved && turnstile_verified?(@b_param, @b_param.owner_email)
       return render(start_component(single_page:, steps: flow_steps(single_page:)),
         status: :unprocessable_entity)
