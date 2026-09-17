@@ -208,7 +208,7 @@ class Payment < ApplicationRecord
 
     user&.update(skip_update: false, updated_at: Time.current) # Bump user, will create a mailchimp_datum if required
     if stripe? && paid? && email.present? && !theft_alert?
-      Email::ReceiptJob.perform_async(id)
+      EmailJobs::ReceiptJob.perform_async(id)
     end
     return if invoice.blank?
 

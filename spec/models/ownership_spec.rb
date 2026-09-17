@@ -63,7 +63,7 @@ RSpec.describe Ownership, type: :model do
       expect {
         bike.ownerships.create(creator: ownership2.creator,
           owner_email: "s@s.com")
-      }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
+      }.to change(EmailJobs::OwnershipInvitationJob.jobs, :size).by(1)
       expect(bike.ownerships.count).to eq 3
       expect(bike.reload.send(:calculated_current_ownership)&.id).to be > ownership2.id
       expect(ownership1.reload.current).to be_falsey

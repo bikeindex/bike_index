@@ -11,6 +11,29 @@ RSpec.describe Integrations::Turnstile do
         expect(described_class.challenge?("rider@gmail.com")).to be_falsey
         expect(described_class.challenge?(nil)).to be_falsey
       end
+
+      context "a signed-in rider" do
+        let(:user) { FactoryBot.create(:user_confirmed, email: "rider@yahoo.com") }
+        let!(:second_email) do
+          FactoryBot.create(:user_email, user:, email: "rider@hotmail.com", confirmation_token: nil)
+        end
+
+        it "asks for every address but the ones they've confirmed" do
+          expect(described_class.challenge?("rider@yahoo.com", user:)).to be_falsey
+          expect(described_class.challenge?("  Rider@Yahoo.com ", user:)).to be_falsey
+          expect(described_class.challenge?(second_email.email, user:)).to be_falsey
+          expect(described_class.challenge?("friend@yahoo.com", user:)).to be_truthy
+        end
+
+        context "the address isn't confirmed" do
+          let(:user) { FactoryBot.create(:user, email: "rider@yahoo.com") }
+          let!(:second_email) { nil }
+
+          it "asks - an unconfirmed address is what the challenge is protecting" do
+            expect(described_class.challenge?("rider@yahoo.com", user:)).to be_truthy
+          end
+        end
+      end
     end
 
     context "switched off" do

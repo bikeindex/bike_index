@@ -22,8 +22,8 @@ RSpec.describe BikeJobs::AfterStolenRecordSaveJob, type: :job do
       expect(stolen_record.reload.organization_stolen_message_id).to eq organization_stolen_message.id
       ActionMailer::Base.deliveries = []
       expect {
-        Email::OwnershipInvitationJob.new.perform(ownership.id)
-        Email::OwnershipInvitationJob.new.perform(ownership.id)
+        EmailJobs::OwnershipInvitationJob.new.perform(ownership.id)
+        EmailJobs::OwnershipInvitationJob.new.perform(ownership.id)
       }.to change(Notification, :count).by(1)
       expect(ActionMailer::Base.deliveries.count).to eq 1
       ownership.reload

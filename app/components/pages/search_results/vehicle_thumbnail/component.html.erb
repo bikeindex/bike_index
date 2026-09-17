@@ -12,7 +12,7 @@
   <h4 class="tw:flex tw:items-center tw:text-lg">
     <span>
       <% if render_status? %>
-        <%= bike_status_span(@bike) %> :
+        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :xs)) %>
       <% end %>
 
       <% if render_for_sale_info? %>

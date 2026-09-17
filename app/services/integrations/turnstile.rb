@@ -12,7 +12,11 @@ module Integrations
       ENV["CLOUDFLARE_TURNSTILE_DISABLE"] != "true").freeze
 
     # Unchallenged while it's off, so a missing key can't lock anyone out of registering
-    def challenge?(email) = ENABLED && EmailDomain.risky_email?(email)
+    def challenge?(email, user: nil)
+      return false unless ENABLED
+
+      EmailDomain.risky_email?(email) && !own_confirmed_email?(email, user)
+    end
 
     # The token is single use, so a re-rendered form has to mint a fresh one
     def verified?(token, remote_ip: nil)
@@ -28,6 +32,15 @@ module Integrations
     # private below here
     #
 
+    # What the challenge protects is a confirmation email to an unproven address, which a
+    # signed-in rider registering to their own already answered. Their unconfirmed addresses
+    # aren't proven, and someone else's risky address is asked whoever is signed in
+    def own_confirmed_email?(email, user)
+      return false if user.blank?
+
+      user.confirmed_emails.include?(EmailNormalizer.normalize(email))
+    end
+
     def connection
       Faraday.new(url: "https://challenges.cloudflare.com") do |conn|
         conn.headers["Content-Type"] = "application/json"
@@ -37,6 +50,6 @@ module Integrations
       end
     end
 
-    conceal :connection
+    conceal :own_confirmed_email?, :connection
   end
 end

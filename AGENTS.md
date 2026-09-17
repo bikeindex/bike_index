@@ -27,7 +27,7 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - Omit named arguments' values from hashes (ie prefer `{x:, y:}` instead of `{x: x, y: y}`)
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
 - prefer un-abbreviated variable names
-- Use full class/module names everywhere — `UI::Forms::Combobox::Component`, not the `Combobox::Component` that lexical scope also resolves from inside `UI::Forms`
+- Use full class/module names everywhere — `UI::Forms::Combobox::Component`, not the `Combobox::Component` that lexical scope also resolves from inside `UI::Forms`. A class naming *itself* is the exception: `self.class.perform_in`, not a re-typed `EmailJobs::ScheduledSurveyJob.perform_in` — `BikeJobs::UpdateTheftAlertFacebookJob` is the pattern, and it keeps the next namespace rename off these lines
 - **A namespace under `Admin::` or `Pages::` shadows a top-level one of the same name** — `Pages::Search` hides the `Search::` controllers from every `.rb` nested in it. Nothing fails at boot; it raises only where something reads the shadowed constant, so check a new namespace against `Object.const_defined?("LandingPages", false)` after an eager load. Rename the collision away rather than prefixing call sites with `::` — job namespaces carry the `*_jobs` suffix, `LandingPageOrganizations` holds the landing-page slugs. Templates are exempt: a compiled template's `Module.nesting` is the component class alone, so a bare `Saml::` there still reaches the top level.
 - **Prefer composition over inheritance and `include`.** Share behavior by calling an object that owns it, not by mixing a module into several classes or adding a base class. A `module` extracted only to be `include`d in two classes is usually one of those classes with a parameter — pass the difference in as an argument instead. Rails' own extension points (`ApplicationRecord`, `ApplicationJob`, `ActiveSupport::Concern` for controller filters) are fine; new mixins of our own are what to avoid.
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Don't write a stateless service as a `class` with `def self.` methods.
@@ -64,9 +64,17 @@ None of this governs magic comments, `# rubocop:disable` (keep its justification
 
 A registration is as often an e-scooter, a stroller or a wheelchair, so **never hardcode "bike" in a value that means the cycle type** — interpolate `%{bike_type}` and pass `bike_type: bike.type`. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` is the pattern. Key names (`about_this_bike:`), the product name, and copy that really is bike-only are fine.
 
+**Branch around `translation`, never inside its key.** `translation(found? ? ".found_at" : ".impounded_at")` hides both keys, so i18n-tasks reports them unused and they get deleted — write `found? ? translation(".found_at") : translation(".impounded_at")`, repeating the interpolation arguments rather than hoisting the key into a local. A set of any size is a `case` with a literal key per branch. It's what hid `thread_show`'s `:removed_message`, which matched no key at all.
+
 Run `bundle exec rails prepare_translations` after hand-editing a `component.en.yml`; `bin/lint` doesn't normalize YAML. It strips comments, so a note about the copy — a casing convention, a term to leave untranslated — has to live in `component.rb`.
 
-**A key that's new or has moved scope needs hand-editing into all four `config/locales/translation.*.yml`** — the next sync overwrites them. New: `raise_on_missing_translations` is on in test, so a spec rendering in another locale (`spec/components/shared_blocks/footer/component_spec.rb`, in `:nl`) fails without it. Moved: nothing catches the orphan — i18n-tasks' `config/locales/%{locale}.yml` glob never reads these files — and every non-English reader silently drops back to English until the next sync. Edit the lines rather than round-tripping the YAML, which re-wraps every folded string. On a sync landing on the base, apply the base's move onto your files, then check for a scope both sides created: it auto-merges into two sibling keys of the same name and YAML keeps the last.
+**A component's copy lives in that component's own sidecar, and orphaning is never a reason to leave it somewhere else.** The sync relocates the other four locales on its next run, and non-English readers fall back to English only until it does — a scope that doesn't match its component doesn't expire.
+
+**Don't hand-edit `config/locales/translation.*.yml` for a new key either** — the sync writes those four too. A lookup in another locale raises rather than falling back in test, so the three `:nl` specs (`shared_blocks/footer`, `navbar/wrapper`, `header_tags`) go red until the sync reaches the key.
+
+When a sync lands on the base, apply the base's move onto your files rather than the reverse, then check for a scope both sides created: it auto-merges into two sibling keys of the same name and YAML keeps the last.
+
+**i18n-tasks sees only `en`, and `config/locales/translation.*.yml` has to stay out of its `data.read`** — reading them makes `normalize` rewrite all four, which translation.io rewrites back on its next run; routing them nowhere deletes them. All they'd report is a scope move's orphan, which the sync prunes anyway.
 
 ## Subagents
 
@@ -88,11 +96,15 @@ Uses RSpec. All business logic should be tested. The `rspec-testing` skill cover
 
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded. To clear stale contents, `rm` the file and re-run the spec.
 
+**Name a cassette in lowercase, without the constant** — `stripe-update_prices_job`, not `StripeJobs::UpdatePricesJob`. A namespace rename then leaves every cassette alone, and the name greps to its own filename, which the constant form doesn't: VCR rewrites `::` and `.` to `_` on the way to disk.
+
 ## Frontend Development
 
 Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScript files exist but are deprecated. The `bin/dev` command handles Tailwind and JS builds. The `frontend-conventions` skill has the conventions.
 
 Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work.
+
+**`app/views` holds more `.haml` than `.erb`** — deprecated, but 301 files against 266, so a grep for call sites that passes `--include='*.erb'` and stops there misses the majority of the directory. Anything a view can reach needs `*.haml` in the pathspec too; the miss surfaces as a `NoMethodError` at render, caught only by a spec that renders that page.
 
 ## Pull requests
 
@@ -110,6 +122,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **A Tailwind `@utility`'s position in the generated sheet follows the properties it declares.** Adding a declaration to an existing one moves the whole rule, so it can drop behind a class it used to outrank and silently undo a sibling declaration — `rounded-none` added to `twfullbleed` put the full-bleed card's sides and top back. Force each declaration (`tw:border-x-0!`) rather than relying on where the rule lands.
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
+- **Fragment caches carry the locale; `Rails.cache.fetch` doesn't.** `ApplicationComponentHelper#cache` folds `I18n.locale` into every key, so a component's own locale-less `cache_key` is fine. A `Rails.cache.fetch` in a service skips that, and one locale serves another's copy — `UserServices::MenuItemsOrg` did. Locale comes from a request param or `Accept-Language` as much as `user.preferred_language`, so `current_user` in the key doesn't stand in for it.
 - **A bike is written on every user-facing edit path, so `cache_key_with_version` already moves.** `BikeServices::Updator` merges `updated_by_user_at: Time.current` into its `@bike.update`, and the records edited through the bike's nested attributes (marketplace listing, stolen record, address) all save that way — so "editing X doesn't touch the bike" is nearly always wrong, and a fragment cache keyed on the bike needs no extra term for X. Probing it with a bare `bike.update(...)` in `rails runner` bypasses the updator and shows no change; go through the controller.
 - **A version constraint in the `Gemfile` needs a matching `.github/dependabot.yml` ignore.** Dependabot widens the constraint rather than skipping the update, so a pin with no ignore entry is silently reverted by a later bump PR — `redis` went that way in #4215, undoing #4175 and leaving its comment behind to explain a pin that was no longer there.
 - **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.

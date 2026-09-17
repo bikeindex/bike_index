@@ -230,7 +230,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect(b_param.partial_registration?).to be_truthy
           expect(b_param.motorized?).to be_falsey
           expect(b_param.params["propulsion_type_motorized"]).to be_blank
-          expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
+          expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
           expect(assigns(:simple_header)).to be_truthy
         end
       end
@@ -243,8 +243,8 @@ RSpec.describe RegistrationsController, type: :request do
           expect(response).to render_template(:create)
           b_param = BParam.last
           expect(b_param.primary_frame_color_id).to eq bogus_color_id
-          expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
-          Email::PartialRegistrationJob.drain
+          expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
+          EmailJobs::PartialRegistrationJob.drain
           expect(ActionMailer::Base.deliveries.count).to eq 1
           expect(ActionMailer::Base.deliveries.last.to).to eq(["scan@stuff.com"])
         end
@@ -269,7 +269,7 @@ RSpec.describe RegistrationsController, type: :request do
           expect(attrs).to match_hash_indifferently b_param
           expect(b_param.origin).to eq "embed_partial"
           expect(b_param.motorized?).to be_truthy
-          expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
+          expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
           expect(b_param.partial_registration?).to be_truthy
         end
 
@@ -284,7 +284,7 @@ RSpec.describe RegistrationsController, type: :request do
             expect(b_param.origin).to eq "embed_partial"
             expect(b_param.cycle_type).to eq "bike"
             expect(b_param.motorized?).to be_truthy
-            expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
+            expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
             expect(b_param.partial_registration?).to be_truthy
           end
         end

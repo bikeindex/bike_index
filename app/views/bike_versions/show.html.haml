@@ -7,7 +7,7 @@
   .row
     .col-md-8
       %h1.bike-title
-        = bike_status_span(@bike)
+        = render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :sm))
         %span.uncap= bike_title_html(@bike)
 
     .col-md-4.ad-col

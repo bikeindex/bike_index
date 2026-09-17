@@ -235,5 +235,17 @@ RSpec.describe UserServices::MenuItemsOrg do
         expect(bulk[:children].map { |child| child[:label] }).to eq(["Ascend Imports", "Exports"])
       end
     end
+
+    describe "caching", :caching do
+      include_context :caching_basic
+      let(:organization) { FactoryBot.create(:organization) }
+
+      it "varies by locale" do
+        english = items.first[:label]
+        dutch = I18n.with_locale(:nl) { described_class.for(organization:, current_user:) }.first[:label]
+
+        expect(english).to_not eq dutch
+      end
+    end
   end
 end

@@ -512,9 +512,9 @@ RSpec.describe RegisterController, type: :request do
 
     it "saves step 1, emails the confirmation link and redirects to step 2" do
       expect { post base_url, params: create_params }
-        .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+        .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
       expect(BParam.count).to eq 1
-      expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(empty_b_param.id, "partial_register_confirmation")
+      expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(empty_b_param.id, "partial_register_confirmation")
       empty_b_param.reload
       expect(empty_b_param.email_confirmation_token).to be_present
       expect(empty_b_param).to have_attributes(origin: "register_flow", owner_email:,
@@ -528,7 +528,7 @@ RSpec.describe RegisterController, type: :request do
 
       it "flags the registration spam and skips the confirmation email" do
         expect { post base_url, params: create_params }
-          .to_not change(Email::PartialRegistrationJob.jobs, :size)
+          .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
         empty_b_param.reload
         expect(empty_b_param.likely_spam?).to be_truthy
         # No token generated, so nothing marks the address as having been written to
@@ -547,7 +547,7 @@ RSpec.describe RegisterController, type: :request do
 
       it "re-renders step 1 without emailing, until the challenge is answered" do
         expect { post base_url, params: create_params }
-          .to_not change(Email::PartialRegistrationJob.jobs, :size)
+          .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.body).to include "not a robot"
         # Saved either way, so the re-render still has what they entered
@@ -556,9 +556,51 @@ RSpec.describe RegisterController, type: :request do
 
         VCR.use_cassette("integrations_turnstile-verified") do
           expect { post base_url, params: create_params.merge("cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX") }
-            .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+            .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
         end
         expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
+      end
+
+      # The challenge is there to stop a confirmation email going to an unproven address,
+      # so the one address it has nothing to prove is the signed-in rider's own
+      context "signed in, registering to their own address" do
+        include_context :request_spec_logged_in_as_user
+        let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+
+        it "registers without a token, and never shows them a widget" do
+          get "#{base_url}?b_param_token=#{empty_b_param.id_token}&step=1"
+          page = Nokogiri::HTML(response.body)
+          # Still in the DOM, since they may yet type an address that is challenged - but
+          # hidden, unarmed, and named to the reveal as one to keep hidden
+          expect(page.at_css("[data-ui--forms--turnstile-target=widget]")["class"]).to include "tw:hidden"
+          expect(page.css("script[src*='challenges.cloudflare.com']")).to be_empty
+          expect(page.at_css("form")["data-ui--forms--turnstile-exempt-emails-value"])
+            .to eq [owner_email].to_json
+
+          expect { post base_url, params: create_params }
+            .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
+          expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
+        end
+
+        context "registering to somebody else's risky address" do
+          let(:step_1_params) { super().deep_merge(b_param: {owner_email: "friend@hotmail.com"}) }
+
+          it "is asked for the challenge" do
+            expect { post base_url, params: create_params }
+              .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
+            expect(response.body).to include "not a robot"
+          end
+        end
+
+        context "their address is unconfirmed" do
+          let(:current_user) { FactoryBot.create(:user, email: owner_email) }
+
+          it "is asked for the challenge" do
+            expect { post base_url, params: create_params }
+              .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
+            expect(response.body).to include "not a robot"
+          end
+        end
       end
     end
 
@@ -1532,7 +1574,7 @@ RSpec.describe RegisterController, type: :request do
       it "confirms nothing, and emails a new link once the last one is old enough" do
         # The link went out moments ago, so this doesn't send a second
         expect { post "#{base_url}/confirm_email", params: wrong_params }
-          .to_not change(Email::PartialRegistrationJob.jobs, :size)
+          .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
         expect(b_param.reload.email_confirmed?).to be_falsey
         expect(flash[:error]).to be_present
         expect(response).to redirect_to step_path("2")
@@ -1540,7 +1582,7 @@ RSpec.describe RegisterController, type: :request do
         sent_at = Time.current - BikeServices::Register::CONFIRMATION_EMAIL_INTERVAL - 1.minute
         b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => sent_at))
         expect { post "#{base_url}/confirm_email", params: wrong_params }
-          .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+          .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
       end
     end
 

@@ -5471,6 +5471,9 @@ nb:
           uploading: opplasting
         group:
           optional: valgfri
+        turnstile:
+          enable_javascript: Bekreftelse av denne e-postadressen krever JavaScript.
+            Slå det på og send inn på nytt, eller bruk en annen e-postadresse.
       alerts:
         base:
           error: Feil
@@ -5496,6 +5499,15 @@ nb:
         hidden_for_unauthorized_users: skjult for uautoriserte brukere
         made_without_serial: laget uten serie
         unknown: ukjent
+      registration_status_badge:
+        abandoned: Rapportert som forlatt, der den ikke burde stå igjen
+        for_sale: Registrert og beskyttet, lagt ut for salg av eieren
+        found: Noen har funnet den og venter på at eieren skal hente den
+        impounded: Holdes av en organisasjon, venter på at eieren skal gjøre krav
+          på den
+        stolen: Meldt stjålet
+        unregistered: Ikke registrert av eieren – opprettet fra et parkeringsvarsel
+        with_owner: Registrert og beskyttet. Med eieren sin (ikke stjålet)
     pages:
       messages:
         thread_show:
@@ -6024,13 +6036,6 @@ nb:
             primary_color:
               one: Primærfarge
               other: Primærfarger
-          status:
-            found: Funnet
-            impounded: Beslaglagt
-            not_stolen: Ikke stjålet
-            stolen: Stjålet
-            unregistered: Uregistrert
-            for_sale: Til salgs
           stolen_details:
             department_city: Avdeling og by
             description_of_incident: Beskrivelse av hendelsen
@@ -6054,7 +6059,6 @@ nb:
             audience_sent_away: Ikke lenger din %{bike_type}
             edit_this_bike: Rediger dette %{bike_type}
             mark_stolen: Merke stjålet
-            registered_protected: Registrert og beskyttet
             sell_on_marketplace: Selg på markedsplassen
             share: Dele
             share_my_page: Del siden min

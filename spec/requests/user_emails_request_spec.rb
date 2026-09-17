@@ -13,7 +13,7 @@ RSpec.describe UserEmailsController, type: :request do
         log_in(user)
         expect {
           post "#{base_url}/#{user_email.id}/resend_confirmation"
-        }.to change(Email::AdditionalEmailConfirmationJob.jobs, :size).by 1
+        }.to change(EmailJobs::AdditionalEmailConfirmationJob.jobs, :size).by 1
         expect(flash[:success]).to be_present
       end
     end
@@ -23,7 +23,7 @@ RSpec.describe UserEmailsController, type: :request do
         log_in(FactoryBot.create(:user_confirmed))
         expect {
           post "#{base_url}/#{user_email.id}/resend_confirmation"
-        }.to change(Email::AdditionalEmailConfirmationJob.jobs, :size).by 0
+        }.to change(EmailJobs::AdditionalEmailConfirmationJob.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
@@ -32,7 +32,7 @@ RSpec.describe UserEmailsController, type: :request do
       it "does not enqueue a job and sets the flash (and does not break)" do
         expect {
           post "#{base_url}/33333/resend_confirmation"
-        }.to change(Email::AdditionalEmailConfirmationJob.jobs, :size).by 0
+        }.to change(EmailJobs::AdditionalEmailConfirmationJob.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe UserEmailsController, type: :request do
         log_in(FactoryBot.create(:user_confirmed))
         expect {
           post "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: user_email.confirmation_token}
-        }.to change(Email::AdditionalEmailConfirmationJob.jobs, :size).by 0
+        }.to change(EmailJobs::AdditionalEmailConfirmationJob.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
@@ -115,7 +115,7 @@ RSpec.describe UserEmailsController, type: :request do
       it "does not enqueue a job and sets the flash (and does not break)" do
         expect {
           post "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: user_email.confirmation_token}
-        }.to change(Email::AdditionalEmailConfirmationJob.jobs, :size).by 0
+        }.to change(EmailJobs::AdditionalEmailConfirmationJob.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
@@ -193,7 +193,7 @@ RSpec.describe UserEmailsController, type: :request do
         log_in(FactoryBot.create(:user_confirmed))
         expect {
           delete "#{base_url}/#{user_email.id}"
-        }.to change(Email::AdditionalEmailConfirmationJob.jobs, :size).by 0
+        }.to change(EmailJobs::AdditionalEmailConfirmationJob.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
     end
@@ -202,7 +202,7 @@ RSpec.describe UserEmailsController, type: :request do
       it "does not delete the email and sets an error flash" do
         expect {
           delete "#{base_url}/#{user_email.id}"
-        }.to change(Email::AdditionalEmailConfirmationJob.jobs, :size).by 0
+        }.to change(EmailJobs::AdditionalEmailConfirmationJob.jobs, :size).by 0
         expect(flash[:error]).to match(/signed in with primary email/)
       end
     end

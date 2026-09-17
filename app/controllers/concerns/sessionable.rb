@@ -78,7 +78,7 @@ module Sessionable
   # The browser's reveal decides who is asked, this decides whether they answered - a
   # form posted without running any of it lands here the same way
   def turnstile_verified?(record, email)
-    return true unless Integrations::Turnstile.challenge?(email)
+    return true unless Integrations::Turnstile.challenge?(email, user: current_user)
     return true if Integrations::Turnstile.verified?(params[Integrations::Turnstile::RESPONSE_PARAM],
       remote_ip: forwarded_ip_address)
 
