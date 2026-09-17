@@ -44,8 +44,8 @@ RSpec.describe CycleType, type: :model do
       let(:cycle_type) { CycleType.new("personal-mobility") }
 
       let(:name_and_secondary_names) do
-        ["personal-mobility", "e-personal mobility (epamd, e-skateboard, segway, e-unicycle, etc)",
-          "e-personal mobility", "epamd", "e-skateboard", "segway", "e-unicycle"]
+        ["personal-mobility", "e-personal mobility device (epamd, e-skateboard, segway, e-unicycle, etc)",
+          "e-personal mobility device", "epamd", "e-skateboard", "segway", "e-unicycle"]
       end
       it "finds by various names" do
         expect(cycle_type.id).to eq 18

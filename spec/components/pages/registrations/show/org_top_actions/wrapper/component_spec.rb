@@ -5,7 +5,6 @@ require "rails_helper"
 RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, type: :component do
   let(:enabled_feature_slugs) { %w[unstolen_notifications impound_bikes parking_notifications] }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:status) { :status_with_owner }
   let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: true) }
   let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "bike", user: owner).reload }
   let(:org_role) { :staff }
