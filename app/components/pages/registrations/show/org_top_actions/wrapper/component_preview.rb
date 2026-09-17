@@ -32,8 +32,10 @@ module Pages
               Component.new(bike:, organization:, org_role:, current_user: lookbook_user)
             end
 
+            # An unclaimed bike has no owner to message, and contact_owner? reads one
             def preview_bike(status)
-              ::Bike.new(status:, cycle_type: "bike")
+              ::Bike.new(status:, cycle_type: "bike",
+                current_ownership: ::Ownership.new(claimed: true, user: lookbook_user))
             end
 
             # Stolen is the one state carried by an association rather than the status

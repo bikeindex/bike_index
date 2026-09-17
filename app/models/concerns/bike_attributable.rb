@@ -35,6 +35,10 @@ module BikeAttributable
     %w[status_stolen status_impounded].include?(status)
   end
 
+  def status_abandoned_or_impounded?
+    %w[status_abandoned status_impounded].include?(status)
+  end
+
   def status_found?
     return false unless status_impounded?
 

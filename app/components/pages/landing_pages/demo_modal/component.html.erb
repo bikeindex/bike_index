@@ -10,7 +10,7 @@
 
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number)) %>
 
-      <%= render(SharedBlocks::Honeypot::Component.new(form_builder: f)) %>
+      <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
 
       <%= f.hidden_field :feedback_type, value: @feedback_type %>
       <%= f.hidden_field :body, value: "lead" %>

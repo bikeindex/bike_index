@@ -538,6 +538,30 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
+    context "a risky email, with the challenge configured" do
+      let(:owner_email) { "rider@yahoo.com" }
+      before do
+        stub_const("Integrations::Turnstile::ENABLED", true)
+        stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
+      end
+
+      it "re-renders step 1 without emailing, until the challenge is answered" do
+        expect { post base_url, params: create_params }
+          .to_not change(Email::PartialRegistrationJob.jobs, :size)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include "not a robot"
+        # Saved either way, so the re-render still has what they entered
+        expect(empty_b_param.reload.owner_email).to eq owner_email
+        expect(empty_b_param.email_confirmation_token).to be_blank
+
+        VCR.use_cassette("integrations_turnstile-verified") do
+          expect { post base_url, params: create_params.merge("cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX") }
+            .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+        end
+        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
+      end
+    end
+
     context "motorized, stolen, manufacturer not in the list" do
       let(:step_1_params) do
         {b_param: {manufacturer_id: "Fancy Cycles", owner_email:},
