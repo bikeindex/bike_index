@@ -12,7 +12,7 @@
               <strong><%= UI::PeriodSelect::Component.column_label(@time_range_column) %></strong>
             <% end %>
 
-            <%= humanized_time_range(@index.time_range, period: @index.period) %>
+            <%= render(Atoms::TimeRange::Component.new(time_range: @index.time_range, period: @index.period)) %>
           </em>
         <% elsif show_today_count? %>
           <em class="less-strong">

@@ -52,33 +52,6 @@ module GraphingHelper
     end
   end
 
-  def humanized_time_range(time_range, period: @period)
-    return nil if period.blank? || period == "all"
-
-    unless period == "custom"
-      period_display = period.match?("next_") ? period.tr("_", " ") : "past #{period}"
-      return "in the #{period_display}"
-    end
-    group_period = group_by_method(time_range)
-    precision_class = if group_period == :group_by_minute
-      "preciseTimeSeconds"
-    elsif group_period == :group_by_hour
-      "preciseTime"
-    else
-      ""
-    end
-    content_tag(:span) do
-      concat "from "
-      concat content_tag(:em, l(time_range.first, format: :convert_time), class: "localizeTime #{precision_class}")
-      concat " to "
-      if time_range.last > Time.current - 5.minutes
-        concat content_tag(:em, "now")
-      else
-        concat content_tag(:em, l(time_range.last, format: :convert_time), class: "localizeTime #{precision_class}")
-      end
-    end
-  end
-
   # Initially just used by scheduled jobs display, but could be used by other things!
   def period_in_words(seconds)
     return "" if seconds.blank?

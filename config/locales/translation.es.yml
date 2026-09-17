@@ -5765,6 +5765,12 @@ es:
         unregistered: 'No registrado por su propietario: creado a partir de una notificación
           de estacionamiento.'
         with_owner: Registrado y protegido. Con su dueño (no robado).
+      time_range:
+        from: desde
+        in_the_next: en el próximo %{period}
+        in_the_past: en el último %{period}
+        now: ahora
+        to: hasta
     pages:
       messages:
         thread_show:

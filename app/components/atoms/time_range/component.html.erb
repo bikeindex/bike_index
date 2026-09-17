@@ -1,0 +1,10 @@
+<% if custom? %>
+  <span>
+    <%= translation(".from") %>
+    <em><%= render endpoint(@time_range.first) %></em>
+    <%= translation(".to") %>
+    <em><%= ends_now? ? translation(".now") : render(endpoint(@time_range.last)) %></em>
+  </span>
+<% else %>
+  <%= period_phrase %>
+<% end %>

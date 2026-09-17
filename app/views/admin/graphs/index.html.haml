@@ -24,6 +24,6 @@
     %p.mt-4
       #{number_display(@total_count)} matching #{@kind}
       %em
-        = humanized_time_range(@time_range)
+        = render(Atoms::TimeRange::Component.new(time_range: @time_range, period: @period))
   .mt-4
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params)))

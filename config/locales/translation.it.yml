@@ -5779,6 +5779,12 @@ it:
         unregistered: Non registrato dal proprietario - generato da una notifica di
           parcheggio
         with_owner: Registrato e protetto. Con il suo proprietario (non rubato).
+      time_range:
+        from: da
+        in_the_next: nel prossimo %{period}
+        in_the_past: "nell'ultimo %{period}"
+        now: adesso
+        to: a
     pages:
       messages:
         thread_show:

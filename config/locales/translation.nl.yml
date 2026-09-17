@@ -5666,6 +5666,12 @@ nl:
         unregistered: Niet geregistreerd door de eigenaar - aangemaakt op basis van
           een parkeermelding
         with_owner: Geregistreerd en beschermd. Bij de eigenaar (niet gestolen).
+      time_range:
+        from: van
+        in_the_next: in de komende %{period}
+        in_the_past: in de afgelopen %{period}
+        now: nu
+        to: tot
     pages:
       messages:
         thread_show:

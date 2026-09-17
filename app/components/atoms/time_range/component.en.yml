@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    atoms:
+      time_range:
+        from: from
+        in_the_next: in the next %{period}
+        in_the_past: in the past %{period}
+        now: now
+        to: to

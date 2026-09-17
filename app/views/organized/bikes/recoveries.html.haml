@@ -17,7 +17,7 @@
 %p
   %strong
     = pluralize(@pagy.count, t(".recovery"))
-    = humanized_time_range(@time_range)
+    = render(Atoms::TimeRange::Component.new(time_range: @time_range, period: @period))
 
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.table-compact-long
   %thead.small-header

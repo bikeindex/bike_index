@@ -33,7 +33,7 @@
 >
   <div>
     <%= pluralize(number_with_delimiter(@pagy.count), "matching import") %>
-    <em><%= humanized_time_range(@time_range) %></em>
+    <em><%= render(Atoms::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
   </div>
 
   <div>

@@ -5507,6 +5507,12 @@ nb:
         stolen: Meldt stjålet
         unregistered: Ikke registrert av eieren – opprettet fra et parkeringsvarsel
         with_owner: Registrert og beskyttet. Med eieren sin (ikke stjålet)
+      time_range:
+        from: fra
+        in_the_next: i løpet av neste %{period}
+        in_the_past: i løpet av siste %{period}
+        now: nå
+        to: til
     pages:
       messages:
         thread_show:
