@@ -5,7 +5,7 @@ en:
       registration_status_badge:
         abandoned: Reported as appearing abandoned, where it shouldn't be left
         for_sale: Registered & protected, listed for sale by its owner
-        found: Someone found it and is holding it for its owner
+        found: Someone found it and is waiting for its owner to claim it
         impounded: Held by an organization, waiting for its owner to claim it
         stolen: Reported stolen
         unregistered: Not registered by its owner - created from a parking notification
