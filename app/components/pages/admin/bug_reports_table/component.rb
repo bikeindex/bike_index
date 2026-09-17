@@ -5,7 +5,7 @@ module Pages
     module BugReportsTable
       class Component < ApplicationComponent
         # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "7768cb9c2358"
+        MARKUP_DIGEST = "c4de58d89bb0"
 
         def initialize(collection:, searchable_tags:, sort_state: ComponentStructs::SortState.new, display_dev_info: false, render_sortable: false)
           @collection = collection

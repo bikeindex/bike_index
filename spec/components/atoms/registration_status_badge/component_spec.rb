@@ -31,10 +31,10 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
 
   context "for sale" do
     let(:bike) { FactoryBot.create(:bike, is_for_sale: true) }
-    it "shows for sale in a fuchsia badge" do
+    it "shows for sale in a purple badge" do
       render_inline(component)
       expect(page).to have_text("For Sale")
-      expect(page).to have_css("span.tw\\:text-fuchsia-800")
+      expect(page).to have_css("span.tw\\:text-purple-700")
     end
   end
 
