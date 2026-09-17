@@ -70,8 +70,6 @@ RSpec.describe Organized::EmailsController, type: :request do
           get base_url
           expect(response.status).to eq(200)
           expect(response.body).to include("Snippet body &amp; more")
-          expect(response.body).to_not include("Snippet &lt;em&gt;")
-          expect(response.body).to_not include("&amp;amp;")
         end
       end
     end

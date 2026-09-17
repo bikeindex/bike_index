@@ -39,8 +39,7 @@
         %td
           - if mail_snippets.any?
             %small
-              -# escape: false - strip_tags escapes what it leaves behind, so truncate would double it
-              = truncate(strip_tags(mail_snippets.first.body), length: 100, escape: false)
+              = truncate(mail_snippets.first.body_stripped, length: 100)
     - if current_organization.enabled?("organization_stolen_message")
       - organization_stolen_message = OrganizationStolenMessage.for(current_organization)
       %tr
