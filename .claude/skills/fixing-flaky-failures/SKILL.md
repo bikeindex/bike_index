@@ -91,16 +91,18 @@ The log is large and ANSI-coloured; pipe through `sed 's/\x1b\[[0-9;]*m//g'`
 and grep for `Failure/Error`, `expected`, and `rspec ./spec/...` to get the
 failing example ids and the actual message.
 
-**Then download the Capybara screenshot.** A `:js` failure uploads one per
-example to the shard's `test-results-<n>` artifact — the log names the file but
-not that it's fetchable. It shows the page the failure saw, which routinely
-settles a mechanism the log can only hint at: what a click actually landed on,
-a frame still loading, a control in a state no step in the example set.
+**Then download the Capybara screenshot.** Every `:js` failure writes one, and
+`ci.yml` uploads `tmp/capybara/` to the shard's `test-results-<node-index>`
+artifact for exactly this — but the log names the file without saying it's
+fetchable, so it usually goes unread. It shows the page the failure saw, which
+routinely settles a mechanism the log can only hint at: what a click actually
+landed on, a frame still loading, a control in a state no step in the example set.
 
 ```bash
 gh api repos/bikeindex/bike_index/actions/runs/<run-id>/artifacts \
   --jq '.artifacts[] | "\(.id) \(.name)"'
 gh api repos/bikeindex/bike_index/actions/artifacts/<id>/zip > tmp/a.zip && unzip -o tmp/a.zip -d tmp/ci_artifact
+```
 
 ### 2. Read the message literally
 
@@ -264,16 +266,6 @@ parsing — so an interaction landing between the two is swallowed with nothing 
 the page to say so. `wait_for_page_script`
 (`spec/support/integration_spec_helpers.rb`) waits on `window.pageScript`; reach for
 it after any navigation into a jQuery-driven control.
-
-**Clicking into a panel that is still opening.** `ui--collapse` animates the
-panel's height for 200ms while its children stay put at their full-open offsets,
-so a target inside it holds still — passing Playwright's stability check — while
-the whole page slides underneath. The click then lands on whatever is passing
-through. The tell is an interception naming an element from a *later* part of the
-page, or a click that "worked" and changed the wrong control. `settle_animations`
-(`spec/support/integration_spec_helpers.rb`) waits a transition out; the panel
-itself clips for the duration (`collapse_utils.js`), so a target that's still
-unreachable after that is a different bug.
 
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
 A Turbo frame that reloads (an eager frame, `reloadFrameIfUrlStale` on
