@@ -16,15 +16,13 @@ module Atoms
         unregistered: :warning
       }.freeze
 
-      # skip_with_owner blanks the common status, for the tables and columns that only
-      # call out the exceptional ones
+      # Tables and columns that only call out the exceptional statuses pass skip_with_owner
       def self.status_humanized(bike, override_status: nil, skip_with_owner: false)
         status = override_status.presence || bike.status_humanized
         (skip_with_owner && status == "with owner") ? "" : status
       end
 
-      # override_status: render this in place of the bike's own - the marketplace preview
-      # passes "for sale" for a listing that's still a draft
+      # override_status: the marketplace preview, where the listing is still a draft
       def initialize(bike:, override_status: nil, skip_with_owner: false, size: :md)
         @bike = bike
         @override_status = override_status

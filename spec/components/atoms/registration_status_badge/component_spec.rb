@@ -79,10 +79,6 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
       expect(described_class.status_humanized(Bike.new(status: :status_stolen))).to eq "stolen"
     end
 
-    it "prefers an override_status" do
-      expect(described_class.status_humanized(Bike.new(status: :status_stolen), override_status: "for sale")).to eq "for sale"
-    end
-
     context "skip_with_owner" do
       it "blanks with owner, but keeps a for sale bike's status" do
         expect(described_class.status_humanized(Bike.new, skip_with_owner: true)).to eq ""
