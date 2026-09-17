@@ -241,6 +241,14 @@ visibility assertions fail in ways that read as flakes. The
 [`sandbox-test-setup`](../sandbox-test-setup/SKILL.md) skill has the build
 command per environment. Same class of thing: an unmigrated test DB, a stale VCR cassette.
 
+A build that's *present but predates a merge* fails the same way and reads worse, because
+the class the failing spec needs is in the source and the whole suite is otherwise green —
+Tailwind only generates what the content scan saw, so a class arriving with the merge
+(`tw:h-64`, used by one preview) isn't in a build from before it. `bin/dev` down means no
+watcher, so its `app/assets/builds/*.css` mtime against the merge commit's is the check;
+`bin/rails tailwindcss:build` is the fix. Deterministic, not intermittent: three identical
+failures with no ordering component is this rather than a flake.
+
 **Shared state across examples.** The autocomplete cache (`autc:test:*`) lives
 in a Redis DB shared across `:js` examples and survives 600s, and `load_all`
 never invalidates it — so a stale entry from an earlier spec changes what a
