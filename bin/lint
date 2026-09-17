@@ -44,13 +44,12 @@ rescue ArgumentError, SystemCallError
   false
 end
 
-# A branch's changed files include the ones it deleted, so a path that isn't on disk
-# is only worth reporting when git has no history for it either - ie a typo
+# A branch's changed files include the ones it deleted - only a path git has no
+# history for is a typo. An empty pathspec would walk all of history
 def never_tracked(paths)
-  args = ["git", "-c", "core.quotePath=false", "log", "--format=", "--name-only", "--", *paths]
-  paths - IO.popen(args, err: File::NULL, &:read).split("\n")
-rescue SystemCallError
-  paths
+  return paths if paths.none?
+
+  paths - IO.popen(["git", "log", "--format=", "--name-only", "--", *paths], err: File::NULL, &:read).split("\n")
 end
 
 def lint_kind(file)
@@ -72,7 +71,7 @@ FileUtils.chdir APP_ROOT do
 
   if file_args.any?
     present, missing = file_args.partition { |arg| File.exist?(arg) }
-    unknown = missing.any? ? never_tracked(missing) : []
+    unknown = never_tracked(missing)
     warn "Not found: #{unknown.join(", ")}" if unknown.any?
 
     # Unlintable paths are skipped rather than raised on, so that passing a branch's

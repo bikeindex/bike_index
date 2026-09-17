@@ -26,7 +26,7 @@ Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just c
 
 **Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` just edited the tree — a file it touched that the branch hadn't committed yet is invisible to that range and goes unlinted. Same union applies to the spec scoping and the audits below, which also run before the commit.
 
-**Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (`bin/lint:100` falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
+**Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (it falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
 
 A clean run over Ruby-only paths prints **nothing at all** — the summary table comes from the ERB formatter, so silence plus exit 0 is the pass. Paths the branch deleted are skipped silently — "Not found" means a path git has no history for, ie a typo. Files with no linter (`.haml`, `.scss`, `.md`) are skipped. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating.
 
