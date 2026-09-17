@@ -92,7 +92,7 @@ The diff is frontend if a changed path matches one of these **and** renders a pa
 - `config/tailwind*`, `tailwind.config.*`, `postcss.config.*`
 - `*.scss`, `*.css`, `*.coffee`, `*.js`, `*.ts`
 
-Excluded despite matching: mailer views (`app/views/*_mailer/**`, `app/views/user_emails/**`), API and JSON views (`app/views/api/**`, `*.json*`, `*.jbuilder`), and build config (`app/assets/config/manifest.js`, `esbuild.config.js`). A diff that only changes comments or non-rendering config isn't frontend either.
+Excluded despite matching: mailer views (`app/views/*_mailer/**`, `app/views/user_emails/**`) and email components (`app/components/emails/**`) — capture those only when the user asks, via the mailer preview `frontend-screenshots` documents. API and JSON views (`app/views/api/**`, `*.json*`, `*.jbuilder`), and build config (`app/assets/config/manifest.js`, `esbuild.config.js`). A diff that only changes comments or non-rendering config isn't frontend either.
 
 Markup a reviewer can't see is also excluded — a `tw:hidden` field, a `data-` attribute, an `aria-` or `meta` change. It renders, so the paths above match it, but before and after are the same image, and the `## Screenshots` comment it produces is two identical captures. Ask what the shot would *show*, not whether a template changed. #4222 and #4262 (the register honeypot, added to each step) are the pattern; neither posted screenshots.
 
@@ -142,7 +142,7 @@ The one that talks itself into existence is the "still accurate" update — a la
 
 Two gates, either of which skips the section outright:
 
-- **Not a frontend diff** — per the classifier above.
+- **Not a frontend diff** — per the classifier above. **Unless a `## Screenshots` comment already exists**: the user asked for those captures, so a commit since the last one that changes what they show stales them even here. Recapture only those pages.
 - **No `gh`, or no browser signed in to GitHub.** Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. The `gh`-less sandbox in the appendix is this case.
 
 Otherwise read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment. Screenshot tooling never blocks the PR — if it fails, report the failure and carry on to **What this run taught you**.

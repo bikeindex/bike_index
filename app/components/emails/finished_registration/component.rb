@@ -73,9 +73,9 @@ module Emails
       def intro_body
         return translation("were_sorry_your_bike_type_was_stolen", bike_type: bike.type) if bike.status_stolen?
         return if bike.status_impounded?
-        return translation("registration_complete_message") if claimed?
+        return translation("registration_complete_message", bike_type: bike.type) if claimed?
 
-        translation("registration_confirm_message")
+        translation("registration_confirm_message", bike_type: bike.type)
       end
 
       def detail_message
@@ -91,7 +91,7 @@ module Emails
       end
 
       def cta_text
-        return translation("view_your_bike") if claimed?
+        return translation("view_your_bike", bike_type: bike.type) if claimed?
         return translation("claim_the_bike_type", bike_type: bike.type) if registered_by_owner?
 
         translation("confirm_this_bike_type", bike_type: bike.type)
