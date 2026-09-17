@@ -57,21 +57,6 @@ module GraphingHelper
     end
   end
 
-  # period and render_chart default to the view's ivars - a component passes its own,
-  # since it has no @period of its own to read
-  def humanized_time_range_column(time_range_column, return_value_for_all: false, period: @period, render_chart: @render_chart)
-    return_value_for_all = true if render_chart # Because otherwise it's confusing
-    return nil unless return_value_for_all || !(period == "all")
-
-    humanized_text = time_range_column.to_s.gsub("_at", "").humanize.downcase
-    return humanized_text.gsub("request", "requested") if time_range_column&.match?("request_at")
-    return humanized_text.gsub("start", "starts") if time_range_column&.match?("start_at")
-    return humanized_text.gsub("end", "ends") if time_range_column&.match?("end_at")
-    return humanized_text.gsub("needs", "need") if time_range_column&.match?("needs_renewal_at")
-
-    humanized_text
-  end
-
   def humanized_time_range(time_range, period: @period)
     return nil if period.blank? || period == "all"
 
