@@ -195,7 +195,7 @@
     <% end %>
   <% end %>
 
-  <div class="tw:mt-6 tw:flex tw:items-center tw:justify-center tw:gap-4">
+  <div class="tw:mt-6 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
     <%= render(UI::Button::Component.new(text: "Update the #{@bike.type}", color: :primary, size: :lg, type: "submit")) %>
 
     <% unless @bike.deleted? %>

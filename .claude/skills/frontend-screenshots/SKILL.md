@@ -47,12 +47,12 @@ get back local PNG paths.
 Pick the user the caller specified, or default to `user@bikeindex.org` (lowest privilege; most non-org-affiliated pages render for them). All seeded users use password `pleaseplease12`, and `db/seeds/seed_test_users.rb` is the list of record:
 
 - `user@bikeindex.org` — no org memberships. Default. Use for personal pages (`/my_account`, `/bikes/new`) or to show how an org-less account sees a route.
-- `member@brakebills.edu` — `member` (not admin) of Brakebills; the one seeded login that isn't `@bikeindex.org`. Use to capture the non-admin view of an org.
+- `member@brakebills.edu` — `member` (not admin) of Brakebills. Use to capture the non-admin view of an org.
 - `admin@bikeindex.org` — `SuperuserAbility`; effectively admin of every org. Use when capturing admin-only menu items, `/admin/...` routes, or org pages where you want the fully-loaded sidebar.
 - `dev@bikeindex.org` — `SuperuserAbility` **and** `developer`. Use for the pages gated on both: the `Dev:` navbar entries and `/admin/organizations/:slug/custom_layouts/...`, which redirect for `admin@`.
 - `:anonymous` — skip sign-in entirely. Use for public pages where the signed-out rendering is the point.
 
-Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), sign in. In development every page carries a **"sign in as superadmin"** button in the top banner — one click, no credentials, and it lands on `/admin`; use it whenever the target needs a superuser. Otherwise drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. It's two steps (email → Continue → password), and **both** submits need addressing by value — `input[name='commit'][value='Continue']` then `input[name='commit'][value='Log in']`. A `[type=submit]` selector fails strict mode on either, and so does `input[name='commit']` alone on the first step, where the banner's "sign in as superadmin" is the other match. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
+Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), sign in. In development every page carries a **"sign in as superadmin"** button in the top banner — one click, no credentials, and it lands on `/admin`; use it whenever the target needs a superuser. Otherwise drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. It's two steps (email → Continue → password), and **both** submits need addressing by value — `input[name='commit'][value='Continue']` then `input[name='commit'][value='Log in']`. A `[type=submit]` selector fails strict mode on either, and so does `input[name='commit']` on the second step, where "Email me the link" is the other match. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
 
 **Picking an org slug.** When the URL is org-scoped (`/o/<slug>/...`) and the caller didn't specify a slug, default to `brakebills`
 
@@ -64,7 +64,7 @@ document.getElementById('navUserSettingLink')?.dataset.email
 
 If it's set but not one of the seeded emails, **stop and ask** — you're signed in as a non-seed user (PII risk on upload). If it's `undefined` when you expected a session, sign-in didn't take (often the seeds haven't run — `bundle exec rails db:seed`); retry the sign-in, don't capture signed-out. For `:anonymous`, expect `undefined` and confirm before continuing.
 
-The admin layout has no `#navUserSettingLink`, so on an `/admin/...` route it reads `undefined` for a session that's fine — reaching the page at all proves superuser. Confirm the data instead: every email the page renders should be `@bikeindex.org` or `@brakebills.edu`.
+The admin layout has no `#navUserSettingLink`, so on an `/admin/...` route it reads `undefined` for a session that's fine — reaching the page at all proves superuser. Confirm the data instead: every email the page renders should be a seeded one — `@bikeindex.org`, `member@brakebills.edu`, or the `user@fakegmail.com` / `user1@gmail.com` / `user_2@gmail.com` bike owners.
 
 ```js
 (document.body.innerText.match(/[\w.+-]+@[\w.-]+/g) || []).slice(0, 8)
@@ -102,9 +102,7 @@ If the returned content height is **less than the viewport height**, `browser_re
 
 **The sidebar scrolls inside itself, so `body.scrollHeight` doesn't say whether its lower rows are in the shot.** At 1440×900 its own scroller overflows, and a row near the bottom captures as absent. Measure the row you're there for and resize the viewport height past its `getBoundingClientRect().bottom`. On mobile the sidebar is behind `button[aria-label="Menu"]` — open it, and run the same open-the-menu step on the base branch so the pair compares like for like. That state is an overlay taller than the viewport over a much longer page, which is one of the two cases to capture `fullPage: false` — the other is below.
 
-**Viewport-only is the caller's call, never yours — except when the diff's subject is a `position: fixed` or `sticky` element.** `fullPage` paints it once, where it sits at scroll 0, and nowhere else: on the 10,007px `/accept_vendor_terms` its bottom bar landed at y=798 with the remaining 9,100px of that column bare. Capture those at `fullPage: false`, scrolled to where the element pins. When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page. Absent that, full page is the default at both sizes: a tall page, a sliver in a PR table cell, or a page whose change sits above the fold are none of them reasons to crop on your own.
-
-Element-only crops (`target:`) still slice context off — don't use them for page captures.
+**Viewport-only is the caller's call, never yours — except when the diff's subject is a `position: fixed` or `sticky` element.** `fullPage` paints it once, where it sits at scroll 0, and nowhere else: on the 10,007px `/accept_vendor_terms` its bottom bar landed at y=798 with the remaining 9,100px of that column bare. Capture those at `fullPage: false`, scrolled to where the element pins. When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page.
 
 **Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw.
 
@@ -112,11 +110,17 @@ Element-only crops (`target:`) still slice context off — don't use them for pa
 
 **One capture's `?organization_id=` or `?view_as=<org>` changes what the *next* param-less URL renders.** `set_passive_organization` writes the org into the session, and `/registrations/:id` with no params then resolves through `default_view_for` to that org's admin view — so a `/registrations/54` shot taken after a `view_as=brakebills.staff` one is the org page, in the org layout, at the same URL. Nothing errors, and the pair only looks wrong once you open it. Navigate `?organization_id=false` before any capture whose URL carries no `view_as`, and remember the session survives the base-branch checkout, so the branch and base loops can drift apart on this if their orders differ.
 
+**`localStorage` survives that checkout too, and a mid-capture interaction writes to it.** The org search column toggle persists the checked set to `orgRegistrationColumns`, so a base loop run after a branch loop that toggled columns loads the branch's column set — the pair then compares different tables at the same URL. Clear the key, or re-apply the interaction, at the start of each loop rather than once per run.
+
 **An element missing from the shot may be a stale asset build, not the code.** `bin/dev`'s watchers don't pick up a new `@theme` token, so a class keyed off one (`tw:navbar:block!`) is absent from what the server serves while the specs — whose builds you regenerated — pass. Confirm with `getComputedStyle` on the element, then run `bin/rails tailwindcss:build` (or `dartsass:build` for a `.scss` edit); sprockets serves the new digest on the next request, so this needs no `bin/dev` restart and isn't `assets:precompile`.
 
-Sanity-check each PNG: under ~5 KB usually means the page errored. Pull `browser_console_messages` and look only for **uncaught exceptions from app code** (Stimulus registration failures, `TypeError`s in `app/javascript/**`) — Webpacker logs, asset 404s, third-party deprecation warnings are noise. To diagnose a failed capture: HTTP status via `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"`, response body via `curl -s "$BASE_URL/<path>" | head -200`, full backtrace via `tail -200 log/development.log`.
+Sanity-check each PNG: under ~5 KB usually means the page errored. Pull `browser_console_messages` and look only for **uncaught exceptions from app code** (Stimulus registration failures, `TypeError`s in `app/javascript/**`) — asset 404s and third-party deprecation warnings are noise. To diagnose a failed capture: HTTP status via `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"`, response body via `curl -s "$BASE_URL/<path>" | head -200`, full backtrace via `tail -200 log/development.log`.
 
 **A 429 mid-capture is rack-attack, not a broken page.** `requests/ip` allows a burst per 20 seconds (`config/initializers/rack_attack.rb`), which a loop of `fetch`es from `browser_evaluate` blows through — navigate the pages you're capturing rather than probing them in bulk, and wait the window out rather than retrying.
+
+## Mailer previews (email components)
+
+An email renders at `$BASE_URL/rails/mailers/<mailer>/<action>`, but that route is preview chrome around an iframe — append `&part=text%2Fhtml` for the email body alone, which is what to capture. Every `OrganizedMailerPreview` action takes a record id (`?bike_id=75&part=text%2Fhtml`); `spec/mailers/previews/` is the list of actions and their params. Pick the record for the state you need — `finished_registration` renders a different email for a claimed ownership than an unclaimed one.
 
 ## Component previews (when no page shows the state)
 
@@ -154,7 +158,7 @@ When the caller wants before/after, repeat the capture loop against the base ref
 
 **Capture the base at what the branch actually merged, not at the ref's tip.** A fetch moves `origin/main` to commits the branch hasn't taken, so a base capture there renders *the base's newer work* and the diff attributes it to this PR. Check `git rev-list --count HEAD..$BASE_REF` before detaching: non-zero means merge first, or detach at `$(git merge-base HEAD $BASE_REF)` instead. On a busy repo the base can move between the branch capture and the base capture of the same run.
 
-**The detached checkout in step 3 is a sanctioned exception to "never change branch" — don't stop and ask for it.** It is the only one: it detaches at a *remote* ref, reads, and returns to the same branch within this section, committing nothing. The return to the original branch is part of that sequence, not a second exception. Every other reason to leave the current branch still needs the user's say-so — nothing here licenses checking out some other branch, `git checkout -b`, or a checkout that outlives the capture.
+**The detached checkout in step 3 is a sanctioned exception to "never change branch" — don't stop and ask for it.** It detaches at a *remote* ref, reads, and returns to the same branch within this section, committing nothing. Nothing here licenses any other checkout, `git checkout -b`, or one that outlives the capture.
 
 1. `git status` — abort if there are uncommitted changes.
 2. Diff `db/migrate/` between the branch and `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error.

@@ -26,7 +26,7 @@ ENV_FILE = ".env.development"
 PARAMS_LIMIT = 500
 ISO8601 = "%Y-%m-%dT%H:%M:%SZ"
 
-options = {all_frames: false, limit: 1}
+options = {all_frames: false, limit: 1, page: 1}
 
 parser = OptionParser.new do |opts|
   opts.banner = <<~BANNER
@@ -45,6 +45,7 @@ parser = OptionParser.new do |opts|
       binx_hb notice backend/133010748
       binx_hb notice backend/133010748 --all-frames
       binx_hb faults frontend 7d
+      binx_hb faults backend 24H --page 2
       binx_hb trend csp 14d
       binx_hb counts csp
 
@@ -52,6 +53,7 @@ parser = OptionParser.new do |opts|
 
   opts.on("--all-frames", "notice: include gem frames, not just app frames") { options[:all_frames] = true }
   opts.on("--limit N", Integer, "notice: fetch N notices (default 1)") { |count| options[:limit] = count }
+  opts.on("--page N", Integer, "faults: page of the 25-row listing (default 1)") { |page| options[:page] = page }
   opts.on("-h", "--help") {
     puts opts
     exit
@@ -190,15 +192,22 @@ when "faults"
   # occurred_after is Unix epoch seconds; an ISO8601 value is silently ignored,
   # which returns faults last seen years ago with a null notices_count_in_range.
   since = window_start(window, "24H")
-  body = get("/projects/#{project_id}/faults?limit=25&order=frequent&occurred_after=#{since.to_i}", token)
-  path = save(body, "hb-faults-#{project_id}.json")
+  body = get("/projects/#{project_id}/faults?limit=25&order=frequent&occurred_after=#{since.to_i}&page=#{options[:page]}", token)
+  # Suffixed past the first, so paging doesn't leave the raw file holding one page
+  # while the reader treats it as the whole window.
+  path = save(body, "hb-faults-#{project_id}#{"-page#{options[:page]}" if options[:page] > 1}.json")
+
+  parsed = JSON.parse(body)
 
   puts "PROJECT #{project_name} (#{project_id})   since #{since.strftime(ISO8601)}"
   puts %w[in_window lifetime class component state last_notice url].join("\t")
-  JSON.parse(body)["results"].each do |fault|
+  parsed["results"].each do |fault|
     puts [fault["notices_count_in_range"], fault["notices_count"], fault["klass"], fault["component"] || "-",
       fault["resolved"] ? "resolved" : "open", fault["last_notice_at"], fault["url"]].join("\t")
   end
+  # One incident mints a fault per job, so the tail of a burst falls off the end of
+  # the page - and every row of it reads 1-in-window, same as the rows that fit.
+  puts "NOTE: more faults in window than shown - re-run with --page #{options[:page] + 1}" if parsed.dig("links", "next")
   puts "raw: #{path}"
 when "counts"
   # One systemic problem mints a fault per distinct message, so a long tail of

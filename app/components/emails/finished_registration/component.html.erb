@@ -62,7 +62,7 @@
 <% end %>
 
 <div class="finished-registration-card finished-registration-bike-box">
-  <h3><%= translation("bike_details") %></h3>
+  <h3><%= translation("bike_details", bike_type: bike.type_titleize) %></h3>
   <%= render(Emails::Partials::BikeBox::Component.new(bike:, ownership: @ownership, bike_url_path: bike_url_with_token)) %>
 
   <% if bike.status_stolen_or_impounded? %>
@@ -74,7 +74,7 @@
       <% else %>
         <%= translation("hopefully_you_find_the_bike", bike_type: bike.type) %>
         <strong>
-          <%= link_to(translation("mark_your_bike_recovered"), recovery_url, "data-pm-no-track" => true) %>
+          <%= link_to(translation("mark_your_bike_recovered", bike_type: bike.type), recovery_url, "data-pm-no-track" => true) %>
           <%= translation("when_you_do") %>
         </strong>
       <% end %>
@@ -92,7 +92,7 @@
       <p>
         <%= translation("a_donation_will_prioritize_prefix") %>
         <%= link_to translation("prioritize_your_listing"), news_url('get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso') %>
-        <%= translation("a_donation_will_prioritize_suffix") %>
+        <%= translation("a_donation_will_prioritize_suffix", bike_type: bike.type) %>
       </p>
     </div>
   <% end %>
@@ -109,7 +109,7 @@
 <% elsif show_default_security_section? %>
   <div class="finished-registration-card finished-registration-security">
     <h2>
-      <%= translation("protect_your_bike_by_following_these_lock") %>
+      <%= translation("protect_your_bike_by_following_these_lock", bike_type: bike.type) %>
     </h2>
 
     <table
@@ -123,7 +123,7 @@
         <tr>
           <td class="locking-copy">
             <h3 class="uncap" style="font-weight: 400">
-              <%= translation("use_a_ulock") %> <%= translation("cable_locks_should_never_be_used") %>
+              <%= translation("use_a_ulock") %> <%= translation("cable_locks_should_never_be_used", bike_type: bike.type) %>
             </h3>
           </td>
 
@@ -174,9 +174,9 @@
         <tr>
           <td class="pro-tip-copy">
             <p>
-              <%= translation("indoor_storage_tip") %>
+              <%= translation("indoor_storage_tip", bike_type: bike.type) %>
               <%= translation("read_more_about_prefix") %>
-              <%= link_to translation("protecting_your_bike_here"), protect_your_bike_url %>.
+              <%= link_to translation("protecting_your_bike_here", bike_type: bike.type), protect_your_bike_url %>.
             </p>
           </td>
 
@@ -208,8 +208,11 @@
                       alt: translation("theft_victims_illustration"),
                       class: "next-step-art" %>
 
-            <h3><%= translation("what_if_my_bike_gets_stolen") %></h3>
-            <p><%= translation("stolen_guidance") %></p>
+            <h3>
+              <%= translation("what_if_my_bike_gets_stolen", bike_type: bike.type) %>
+            </h3>
+
+            <p><%= translation("stolen_guidance", bike_type: bike.type) %></p>
           </td>
 
           <td class="next-step">
@@ -221,7 +224,9 @@
               <%= translation("keep_your_registration_updated") %>
             </h3>
 
-            <p><%= translation("updated_registration_guidance") %></p>
+            <p>
+              <%= translation("updated_registration_guidance", bike_type: bike.type) %>
+            </p>
           </td>
         </tr>
       </tbody>

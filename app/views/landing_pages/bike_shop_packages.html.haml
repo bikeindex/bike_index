@@ -99,7 +99,7 @@
         = f.label :email, class: "form-label"
         = f.email_field :email, value: current_user&.email, required: true, class: "form-control"
 
-      = render(SharedBlocks::Honeypot::Component.new(form_builder: f))
+      = render(UI::Forms::Honeypot::Component.new(form_builder: f))
 
       - if @feedback.errors.present?
         .form-group.additional-field
