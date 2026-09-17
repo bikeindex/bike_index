@@ -9,44 +9,9 @@ module Atoms
           locals: {bikes: status_bikes.values})
       end
 
-      # @!group Statuses
-      def registered
-        render_badge(:registered)
-      end
-
-      def for_sale
-        render_badge(:for_sale)
-      end
-
-      def stolen
-        render_badge(:stolen)
-      end
-
-      def impounded
-        render_badge(:impounded)
-      end
-
-      def found
-        render_badge(:found)
-      end
-
-      def abandoned
-        render_badge(:abandoned)
-      end
-
-      def unregistered
-        render_badge(:unregistered)
-      end
-      # @endgroup
-
-      # The marketplace preview, where the listing is still a draft
-      def override_status
-        render_badge(:registered, override_status: "for sale")
-      end
-
       # @param size select { choices: [xs, sm, md, lg] }
       def sizes(size: "lg")
-        render_badge(:stolen, size: size&.to_sym)
+        render(Atoms::RegistrationStatusBadge::Component.new(bike: status_bikes[:stolen], size: size&.to_sym))
       end
 
       private
@@ -67,10 +32,6 @@ module Atoms
       # An impound record with no organization is someone finding it, not impounding it
       def found_bike
         ::Bike.new(status: :status_impounded).tap { it.impound_records.build }
-      end
-
-      def render_badge(status, **options)
-        render(Atoms::RegistrationStatusBadge::Component.new(bike: status_bikes[status], **options))
       end
     end
   end
