@@ -181,34 +181,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
-    context "with search_parking_notification" do
-      let(:enabled_feature_slugs) { %w[bike_search parking_notifications] }
-      let!(:notified_bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
-      let!(:parking_notification) do
-        FactoryBot.create(:parking_notification, organization: current_organization, bike: notified_bike)
-      end
-
-      it "filters on the organization's own notices" do
-        get base_url, params: {search_no_js: true, search_parking_notification: "with"}
-        expect(response.status).to eq(200)
-        expect(assigns(:search_parking_notification)).to eq "with"
-        expect(assigns(:bikes).pluck(:id)).to eq([notified_bike.id])
-
-        get base_url, params: {search_no_js: true, search_parking_notification: "none"}
-        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-      end
-
-      context "without the feature" do
-        let(:enabled_feature_slugs) { %w[bike_search] }
-
-        it "ignores the param" do
-          get base_url, params: {search_no_js: true, search_parking_notification: "with"}
-          expect(assigns(:search_parking_notification)).to eq false
-          expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, notified_bike.id])
-        end
-      end
-    end
-
     context "chart_only" do
       it "renders the chart frame with the searched counts" do
         get base_url, params: {chart_only: "1"}

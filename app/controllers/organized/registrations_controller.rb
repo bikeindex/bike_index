@@ -205,7 +205,6 @@ module Organized
       bikes = address_scoped(bikes)
       bikes = status_scoped(bikes)
       bikes = unregisteredness_scoped(bikes)
-      bikes = parking_notification_scoped(bikes)
       if params[:search_model_audit_id].present?
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
@@ -228,7 +227,6 @@ module Organized
       end
       @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
       @search_unregisteredness = permitted_filter(:search_unregisteredness)
-      @search_parking_notification = permitted_filter(:search_parking_notification)
       search_status
     end
 
@@ -273,16 +271,6 @@ module Organized
       when "only_registered" then bikes.not_unregistered_parking_notification
       else bikes
       end
-    end
-
-    # Scoped to the organization's own notices unless the search has widened past them
-    def parking_notification_scoped(bikes)
-      return bikes unless @search_parking_notification
-
-      notified = ParkingNotification.where.not(bike_id: nil).select(:bike_id)
-      notified = notified.where(organization_id: current_organization.id) unless @search_all
-
-      (@search_parking_notification == "with") ? bikes.where(id: notified) : bikes.where.not(id: notified)
     end
 
     def search_status
@@ -331,7 +319,7 @@ module Organized
       return false if params[:search_stickers].present? && params[:search_stickers] != "all"
 
       params.slice(:search_address, :search_email, :search_model_audit_id, :search_notes, :search_status,
-        :search_unregisteredness, :search_parking_notification).values.reject(&:blank?).none?
+        :search_unregisteredness).values.reject(&:blank?).none?
     end
 
     def no_interpreted_params?

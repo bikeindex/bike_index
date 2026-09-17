@@ -162,14 +162,13 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   end
 
   describe "filter_groups" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes parking_notifications] }
+    let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes] }
     let(:search_status) { "impounded" }
 
     it "returns a group per enabled filter, carrying the searched value" do
       groups = instance.filter_groups
       expect(groups.map { it[:name] })
-        .to eq(%i[search_stickers search_address search_status search_unregisteredness
-          search_parking_notification])
+        .to eq(%i[search_stickers search_address search_status search_unregisteredness])
       expect(groups.find { it[:name] == :search_status }[:selected]).to eq "impounded"
       expect(groups.find { it[:name] == :search_stickers }[:entries].map { it[:value] })
         .to eq ["", "with", "none"]

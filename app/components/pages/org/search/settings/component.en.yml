@@ -17,7 +17,6 @@ en:
             export_csv: Export CSV
             filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address
-            filter_no_parking_notification_html: only <strong>not</strong> notified
             filter_no_sticker_html: only <strong>no</strong> sticker
             filter_not_impounded_html: only <strong>not</strong> impounded
             filter_not_stolen_or_impounded_html: not stolen or impounded
@@ -25,7 +24,6 @@ en:
             filter_only_unregistered_html: only <strong>unregistered</strong>
             filter_stolen_html: only stolen
             filter_with_address_html: only <strong>with</strong> address
-            filter_with_parking_notification_html: only <strong>notified</strong>
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_id_cell: Impound ID
             impounded_cell: Impounded
@@ -35,7 +33,6 @@ en:
             notes_cell: Registration Notes
             owner_email_cell: Sent to
             owner_name_cell: Owner name
-            parking_notifications: 'Parking notif:'
             propulsion_type_cell: E-vehicle (propulsion)
             reg_address_cell: Address
             reg_extra_registration_number_cell: Secondary#

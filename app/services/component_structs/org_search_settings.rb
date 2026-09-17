@@ -55,10 +55,7 @@ module ComponentStructs
                                stolen: :filter_stolen_html}},
       search_unregisteredness: {label: :unregistered,
                                 values: {only_unregistered: :filter_only_unregistered_html,
-                                         only_registered: :filter_not_unregistered_html}},
-      search_parking_notification: {label: :parking_notifications, feature: "parking_notifications",
-                                    values: {with: :filter_with_parking_notification_html,
-                                             none: :filter_no_parking_notification_html}}
+                                         only_registered: :filter_not_unregistered_html}}
     }.freeze
 
     DEFAULT_COLUMNS = %w[created_at_cell stolen_cell manufacturer_cell model_cell
@@ -71,13 +68,12 @@ module ComponentStructs
 
     def initialize(organization:, interpreted_params: {}, sortable_search_params: {}, params: {},
       search_stickers: nil, search_address: nil, search_status: "all", search_unregisteredness: nil,
-      search_parking_notification: nil, search_all: false)
+      search_all: false)
       @organization = organization
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
       @params = params
-      @filter_values = {search_stickers:, search_address:, search_status:,
-                        search_unregisteredness:, search_parking_notification:}
+      @filter_values = {search_stickers:, search_address:, search_status:, search_unregisteredness:}
       @search_all = search_all
     end
 
