@@ -28,7 +28,7 @@ module GraphingHelper
   end
 
   def group_by_method(time_range)
-    period_s = time_period_s(time_range)
+    period_s = time_range_length(time_range)
     if period_s < 3601 # 1.hour + 1 second
       :group_by_minute
     elsif period_s < 5.days
@@ -50,7 +50,7 @@ module GraphingHelper
       "%a%l %p"
     elsif group_period == :group_by_month
       "%Y-%-m"
-    elsif group_period == :group_by_day && (time_period_s(time_range) < 10.days)
+    elsif group_period == :group_by_day && (time_range_length(time_range) < 10.days)
       "%a %-m-%-d"
     else # Default handling
       "%Y-%-m-%-d"
@@ -131,9 +131,5 @@ module GraphingHelper
   # buckets: range is what makes groupdate emit the empty ones
   def grouping(time_range)
     {range: time_range, format: group_by_format(time_range), time_zone: Time.zone}
-  end
-
-  def time_period_s(time_range)
-    time_range.last - time_range.first
   end
 end
