@@ -204,7 +204,9 @@ just fail until the existing PR is merged.
 The check runs on the sync branch too, so the PR's own translations are verified
 rather than skipped. If more translations have landed on translation.io since the
 PR opened, CI pushes them onto the same branch and fails that run — the push
-triggers a run of its own, which passes once the branch is in sync.
+triggers a run of its own, which passes once the branch is in sync. That happens
+at most once per PR; after that the build just fails, so a sync that can't settle
+doesn't push in a loop.
 
 To manually update the keys on translation.io, run
 `bin/rake translation:sync_and_purge` (requires having an active API key locally).
