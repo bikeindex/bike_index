@@ -72,6 +72,8 @@ Run `bundle exec rails prepare_translations` after hand-editing a `component.en.
 
 When a sync lands on the base, apply the base's move onto your files rather than the reverse, then check for a scope both sides created: it auto-merges into two sibling keys of the same name and YAML keeps the last.
 
+**i18n-tasks sees only `en`, and `config/locales/translation.*.yml` has to stay out of its `data.read`** — reading them makes `normalize` rewrite all four, which translation.io rewrites back on its next run, and routing them nowhere makes it delete them instead. The drift that would report is a key still translated whose English original has gone, which is the state a scope move is supposed to leave behind and the sync prunes on its own.
+
 ## Subagents
 
 When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-hoc fan-out — pick the model by how much of the *search* the agent has to invent, not by how simple the task sounds:
