@@ -1840,45 +1840,6 @@ es:
       view_public_non_listing: Ver registro público
       viewing_listing_preview: Esta es una vista previa de su anuncio de "se vende".
         No es visible públicamente.
-    stolen_checklist:
-      a_photo_of_your_bike_type: una foto de tu %{bike_type}
-      add: Agregar
-      add_bike_link_to_your_theft_report_html: Añade %{bike_link} a tu informe de
-        robo.
-      add_serial_number: Agregar número de serie
-      bike_index_does_this: "(Bike Index hace esto cuando ingresas tu número de informe
-        policial)"
-      contact_seller: 'CRÍTICO: contacta con quien te compró la bicicleta y averigua
-        si la tienen.'
-      facebook_instagram_etc: "(Facebook, Instagram, etc.)"
-      leads_online: LEADSonline
-      leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
-      list_bike_type_on_bike_index: Lista %{bike_type} en Bike Index
-      location_where_the_theft_occurred: lugar donde ocurrió el robo
-      nl_digid_required: "(Se requiere identificación digital)"
-      nl_file_police_report: "¡Presenta una denuncia ante la policía!"
-      nl_online: En línea
-      nl_person: En persona
-      nl_person_report: Busque la comisaría de policía más cercana,
-      nl_phone: Por teléfono
-      nl_phone_report: Llame al 0900-8844. Normalmente le llamarán para concertar
-        una cita telefónica más tarde, momento en el que deberá proporcionar la información
-        a la policía.
-      nl_website_link_text: en esta página web politie.nl
-      promoted_stolen_bike_alerts: Se promocionan las alertas de bicicletas robadas.
-      push_bike_info_to: Empujar información de bicicleta a
-      push_bike_info_to_law_enforcement: Enviar información sobre bicicletas a las
-        bases de datos policiales (Bike Index lo hace cuando ingresas tu número de
-        informe policial).
-      report_theft_html: Denuncie el robo en Bike Index, incluyendo %{edit_bike_link}
-      requires_a_serial_number: requiere un número de serie
-      share_on_twitter: Compartir en Twitter (Bike Index lo hará una vez que revisemos
-        tu anuncio).
-      share_widely_on_your_personal_social: Compártelo ampliamente en tus redes sociales
-        personales.
-      supercharge_sharing_on_facebook: Potencia al máximo tus publicaciones en Facebook
-        con Bike Index.
-      your_police_report: Su número de informe policial
     theft_alerts:
       new:
         best_value: La mejor relación calidad-precio
@@ -5557,8 +5518,6 @@ es:
           stolen_at: 'Robado en:'
           stolen_from: 'Robado de:'
       finished_registration:
-        a_correctly_locked_bike: Una bicicleta correctamente asegurada. El cuadro
-          está bloqueado al portabicicletas y ambas ruedas están aseguradas.
         a_donation_will_prioritize_prefix: Una donación será
         a_donation_will_prioritize_suffix: y ayúdanos a devolverte tu bicicleta. Somos
           una organización sin fines de lucro 501(c)(3) y dependemos de donaciones
@@ -5781,14 +5740,12 @@ es:
           subject: Sujeto
           to: a
           to_me: a mí
-          you_to: tú a
         threads_index:
           from: De
           me: a mí
           to: A
       org:
         bulk_import_error:
-          ascend: Ascender
           ascend_unprocessable_html: La importación masiva <span class="text-danger">no
             se pudo procesar</span> porque no se encontró ninguna organización con
             el nombre de ascenso <strong>%{ascend_name}.</strong>
@@ -5801,7 +5758,6 @@ es:
             importación masiva.
           fix_this_by: 'Solucione esto mediante:'
           go_to_organizations_html: Ir a %{link}
-          line: Línea
           line_error: Error de línea
           line_errors: 'Errores de línea:'
           line_label: 'Línea:'
@@ -5835,7 +5791,6 @@ es:
             search_notes: Notas de búsqueda
             search_owner_email_or_name: Buscar el correo electrónico o el nombre del
               propietario
-            submit: entregar
           settings:
             address: 'DIRECCIÓN:'
             all: todo
@@ -5908,15 +5863,11 @@ es:
             all_statuses: Todos los estados
             cannot_update_with_kind: Este registro no se puede actualizar con '{kind}'.
             hide_update: Ocultar actualización
-            impound_records: Registros incautados
-            interpreted_params: Parámetros interpretados
             matching_impound_record:
               one: registro de incautación coincidente
               other: registros de incautación coincidentes
             only_unregistered: Solo usuarios no registrados
             only_user_registered: Solo usuarios registrados
-            pagy: Página
-            per_page: Por página
             status_records: Registros %{status}
             update_multiple_records: Actualizar varios registros
       register:
@@ -6346,12 +6297,10 @@ es:
             creator: Creador
             credibility: Credibilidad
             edit: Editar
-            has_duplicate_serials: tiene números de serie duplicados
             internal_notes: Notas internas
             is_false: FALSO
             is_true: verdadero
             link_sticker: Pegatina de enlace
-            no_duplicate_serials: Sin duplicados. Números de serie
             no_other_registrations: No se encontró ninguno
             no_registration_information: No se muestra información de registro para
               %{org_name}
@@ -6376,7 +6325,6 @@ es:
             post_note: Nota postal
             posts_as: Publicaciones como %{user}
             registration_information: Información de registro
-            registration_number: Registro del índice de bicicletas
             restricted_message: El contacto con el propietario está disponible para
               el personal administrativo y de apoyo. Puede agregar notas y solicitar
               la retirada del vehículo.
@@ -6405,7 +6353,6 @@ es:
       search:
         everything_combobox:
           made_by: hecho por
-          only_for: solo para
           query_items_description: Cuadro combinado de descripciones de búsqueda
           search_descriptions: Descripciones de búsqueda
           search_for: Buscar
@@ -6420,7 +6367,6 @@ es:
           price_minimum: Precio mínimo
           search_for_primary_activity: Buscar tipo de actividad principal
           search_for_serial_number: Buscar número de serie
-          submit: entregar
         kind_select_fields:
           marketplace_scope_for_sale: Se vende en cualquier lugar
           marketplace_scope_for_sale_proximity: Se vende en la zona de búsqueda
@@ -6438,7 +6384,6 @@ es:
           thumbnail_view: Ver como miniaturas
       search_results:
         bike_box:
-          deleted: Eliminado
           ended_at: Finalizado
           location: Ubicación
           not_applicable: N / A
@@ -6556,6 +6501,45 @@ es:
               a continuación."
             write_a_message: Escribe un mensaje
             zipcode: Código Postal
+        stolen_checklist:
+          a_photo_of_your_bike_type: una foto de tu %{bike_type}
+          add: Agregar
+          add_bike_link_to_your_theft_report_html: Añade %{bike_link} a tu informe
+            de robo.
+          add_serial_number: Agregar número de serie
+          bike_index_does_this: "(Bike Index hace esto cuando ingresas tu número de
+            informe policial)"
+          contact_seller: 'CRÍTICO: contacta con quien te compró la bicicleta y averigua
+            si la tienen.'
+          facebook_instagram_etc: "(Facebook, Instagram, etc.)"
+          leads_online: LEADSonline
+          leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
+          list_bike_type_on_bike_index: Lista %{bike_type} en Bike Index
+          location_where_the_theft_occurred: lugar donde ocurrió el robo
+          nl_digid_required: "(Se requiere identificación digital)"
+          nl_file_police_report: "¡Presenta una denuncia ante la policía!"
+          nl_online: En línea
+          nl_person: En persona
+          nl_person_report: Busque la comisaría de policía más cercana,
+          nl_phone: Por teléfono
+          nl_phone_report: Llame al 0900-8844. Normalmente le llamarán para concertar
+            una cita telefónica más tarde, momento en el que deberá proporcionar la
+            información a la policía.
+          nl_website_link_text: en esta página web politie.nl
+          promoted_stolen_bike_alerts: Se promocionan las alertas de bicicletas robadas.
+          push_bike_info_to: Empujar información de bicicleta a
+          push_bike_info_to_law_enforcement: Enviar información sobre bicicletas a
+            las bases de datos policiales (Bike Index lo hace cuando ingresas tu número
+            de informe policial).
+          report_theft_html: Denuncie el robo en Bike Index, incluyendo %{edit_bike_link}
+          requires_a_serial_number: requiere un número de serie
+          share_on_twitter: Compartir en Twitter (Bike Index lo hará una vez que revisemos
+            tu anuncio).
+          share_widely_on_your_personal_social: Compártelo ampliamente en tus redes
+            sociales personales.
+          supercharge_sharing_on_facebook: Potencia al máximo tus publicaciones en
+            Facebook con Bike Index.
+          your_police_report: Su número de informe policial
       homepage:
         for_buttons:
           bike_shops: Tiendas de bicicletas
@@ -6604,7 +6588,6 @@ es:
             Bike Index
           strava_connected_pending: Conectado a Strava. La sincronización comenzará
             en breve.
-          strava_integration: Integración con Strava
           sync_error: Error de sincronización
           sync_error_description: Se ha producido un error al sincronizar tus actividades
             de Strava. Intenta desconectarte y volver a conectarte.
@@ -6701,7 +6684,6 @@ es:
         organized:
           additional_features_html: Bike Index ofrece funciones adicionales para organizaciones
             policiales verificadas. Comuníquese con %{email_link} para activarlas.
-          admin_panel: Panel de administración
           how_integration_works: cómo funciona la integración
           integrate_bike_index_with_ascend: Integrar Bike Index con Ascend
           integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed.
