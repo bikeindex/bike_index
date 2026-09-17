@@ -101,6 +101,13 @@
 <% if helpers.organized_include_javascript_pack? %>
   <script>
     window.passiveOrganizationId = <%== @passive_organization&.slug.to_json %>;
+    // The pack publishes periodSelector only where it finds #timeSelectionBtnGroup, and the
+    // parking notification map calls it regardless. UI::PeriodSelect navigates rather than
+    // re-querying, so the current params already carry the period the map wants. Goes when
+    // the map stops coming from the pack
+    window.periodSelector = {
+      urlParamsWithNewPeriod: () => new URLSearchParams(window.location.search)
+    };
   </script>
   <%# Important that this is below the content, sometimes important page data is added to the dom in there %>
   <script src="/vendored_assets/application.js"></script>
