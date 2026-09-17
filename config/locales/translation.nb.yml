@@ -5471,6 +5471,8 @@ nb:
           uploading: opplasting
         group:
           optional: valgfri
+        turnstile:
+          enable_javascript: Verifisering av denne e-postadressen krever JavaScript. Slå det på og send inn på nytt, eller bruk en annen e-postadresse.
       alerts:
         base:
           error: Feil

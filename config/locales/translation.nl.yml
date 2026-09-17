@@ -5627,6 +5627,8 @@ nl:
           uploading: uploaden
         group:
           optional: optioneel
+        turnstile:
+          enable_javascript: Het verifiëren van dit e-mailadres vereist JavaScript. Schakel het in en verstuur opnieuw, of gebruik een ander e-mailadres.
       alerts:
         base:
           error: Fout

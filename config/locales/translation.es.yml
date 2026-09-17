@@ -5728,6 +5728,8 @@ es:
           uploading: subir
         group:
           optional: opcional
+        turnstile:
+          enable_javascript: La verificación de esta dirección de correo electrónico requiere JavaScript. Actívalo y vuelve a enviar, o usa otra dirección de correo electrónico.
       alerts:
         base:
           error: Error

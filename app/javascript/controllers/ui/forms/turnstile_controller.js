@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Which addresses get asked, not whether they answer - the server re-checks the token.
 export default class extends Controller {
   static targets = ['widget']
-  static values = { domains: Array, scriptUrl: String }
+  static values = { domains: Array, scriptUrl: String, exemptEmails: Array }
 
   // Lazily loaded, so the address may already be typed (or form-persist-restored)
   connect () {
@@ -22,8 +22,9 @@ export default class extends Controller {
   update = () => {
     if (!this.hasWidgetTarget) return
 
-    const email = this.element.querySelector('input[type="email"]')?.value?.toLowerCase() ?? ''
-    const risky = this.domainsValue.some(domain => email.includes(domain))
+    const email = this.element.querySelector('input[type="email"]')?.value?.trim()?.toLowerCase() ?? ''
+    const risky = this.domainsValue.some(domain => email.includes(domain)) &&
+      !this.exemptEmailsValue.includes(email)
     this.widgetTarget.classList.toggle('tw:hidden', !risky)
     if (risky) this.ensureWidget()
   }
