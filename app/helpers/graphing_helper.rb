@@ -28,17 +28,12 @@ module GraphingHelper
   end
 
   def group_by_method(time_range)
-    period_s = time_range_length(time_range)
-    if period_s < 3601 # 1.hour + 1 second
-      :group_by_minute
-    elsif period_s < 5.days
-      :group_by_hour
-    elsif period_s < 5_000_000 # around 60 days
-      :group_by_day
-    elsif period_s < 31449600 # 364 days (52 weeks)
-      :group_by_week
-    else
-      :group_by_month
+    case time_range_length(time_range)
+    when ...3601 then :group_by_minute # 1.hour + 1 second
+    when ...5.days then :group_by_hour
+    when ...5_000_000 then :group_by_day # around 60 days
+    when ...31449600 then :group_by_week # 364 days (52 weeks)
+    else :group_by_month
     end
   end
 
