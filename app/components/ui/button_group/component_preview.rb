@@ -37,6 +37,13 @@ module UI
         ]))
       end
 
+      def toggle
+        render(UI::ButtonGroup::Component.new(kind: :toggle, entries: [
+          ComponentStructs::Shapes.entry("Spreadsheet", active: true, data: {action: "click->something#show"}),
+          ComponentStructs::Shapes.entry("Thumbnail", data: {action: "click->something#show"})
+        ]))
+      end
+
       def full_width
         render(UI::ButtonGroup::Component.new(full_width: true, entries: %w[xs s m l xl].map { |size|
           ComponentStructs::Shapes.entry(size.upcase, href: "#", active: size == "m")

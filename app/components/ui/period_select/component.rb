@@ -14,6 +14,13 @@ module UI
         {key: "all", prefix: nil, label: "all"}
       ].freeze
 
+      # What the selected period's button reads, for a caller naming the period elsewhere
+      def self.period_label(period)
+        entry = PERIODS.find { it[:key] == period.to_s } || {label: "custom"}
+        [entry[:prefix], entry[:label]].compact
+          .map { I18n.t("components.ui.period_select.#{it}") }.join(" ")
+      end
+
       def initialize(period:, start_time:, end_time:, sortable_search_params: {}, include_future: false, prepend_text: nil)
         @include_future = include_future
         @prepend_text = prepend_text
