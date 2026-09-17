@@ -1,11 +1,11 @@
 # Logging into GitHub when the MCP runs headless
 
-The Playwright MCP is registered in the project's **`.mcp.json`** (inspect with `claude mcp get playwright`) with `--isolated --headless`, seeding each browser session's auth from a storage-state file: `--storage-state=${HOME}/.cache/ms-playwright/mcp-auth.json`. Two consequences:
+The Playwright MCP is registered in the project's **`.mcp.json`** (inspect with `claude mcp list`) with `--isolated --headless`, seeding each browser session's auth from a storage-state file: `--storage-state=${HOME}/.cache/ms-playwright/mcp-auth.json`. Two consequences:
 
 - The github.com session lives in that file, not in a browser profile. Every new browser session re-reads it at context creation.
 - The file is read-only from the MCP's perspective: `--isolated` keeps the profile in memory and never writes back to disk. A login performed inside the MCP browser is lost when the browser closes — so re-login means **regenerating the state file**, not driving the MCP browser through the login form. (This holds even if the MCP happens to be running headed: an in-browser login lasts only until that browser session ends.)
 
-Confirm the exact `--storage-state` path from `claude mcp get playwright` rather than assuming it — the commands below use `$HOME/.cache/ms-playwright/mcp-auth.json`, the current value.
+Confirm the exact `--storage-state` path from `claude mcp list` rather than assuming it — the commands below use `$HOME/.cache/ms-playwright/mcp-auth.json`, the current value.
 
 ## When to do this
 
@@ -19,7 +19,7 @@ Run a one-shot headed browser that saves storage on close — no MCP config edit
 npx -y playwright open --save-storage="$HOME/.cache/ms-playwright/mcp-auth.json" https://github.com/login
 ```
 
-If Playwright's managed Chromium isn't installed, the command errors with an install hint — either run `npx playwright install chromium` first, or append `--browser=chrome` to use the system Chrome instead.
+If Playwright's managed Chromium isn't installed, the command errors with an install hint — either run `npx playwright install chromium` first, or append `--channel chrome` to use the system Chrome instead.
 
 1. The command blocks until the browser is closed, so launch it in the background (or ask the user to run it in their own terminal).
 2. A visible browser window opens at the GitHub login page. The user signs in themselves — credentials, 2FA, passkey. **Do not type their credentials for them.**

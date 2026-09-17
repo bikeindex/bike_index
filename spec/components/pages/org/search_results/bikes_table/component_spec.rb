@@ -40,14 +40,38 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
-  context "with an injected settings_component" do
+  context "with injected settings" do
     let(:other_org) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[reg_phone]) }
-    let(:injected) { Pages::Org::Search::Settings::Component.new(organization: other_org) }
-    let(:options) { super().merge(settings_component: injected) }
+    let(:injected) { ComponentStructs::OrgSearchSettings.new(organization: other_org) }
+    let(:options) { super().merge(settings: injected) }
 
-    it "derives columns from the injected component, not a freshly built one" do
+    it "derives columns from the injected settings, not freshly built ones" do
       # the table's own organization has no reg_phone; the injected settings does
       expect(component).to have_css("th.reg_phone_cell", visible: :all)
+    end
+  end
+
+  context "with every column's feature enabled" do
+    let(:enabled_feature_slugs) do
+      %w[bike_search avery_export bike_stickers impound_bikes registration_notes
+        reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
+    end
+    # The panel builds a checkbox per enabled_columns entry, and org--search-column-toggle
+    # only ever reveals a column whose cell class matches a checked one
+    let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
+
+    it "heads one column per settings checkbox, and no others" do
+      headers = component.css("th.hideableColumn")
+        .map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
+
+      expect(headers).to match_array(settings.enabled_columns)
+    end
+
+    it "heads the columns with the shared labels" do
+      expect(component).to have_css("th.avery_cell", normalize_ws: true, exact_text: "Avery Exportable")
+      expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "E-vehicle (propulsion)")
+      expect(component).to have_css("th.notes_cell", normalize_ws: true,
+        exact_text: "#{organization.short_name} Registration Notes")
     end
   end
 
@@ -69,7 +93,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   context "when a bike does not belong to the organization" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_phone] }
+    let(:enabled_feature_slugs) { %w[bike_search reg_phone reg_extra_registration_number] }
     let(:other_org) { FactoryBot.create(:organization) }
     let(:bike) do
       FactoryBot.create(:bike_organized,
@@ -79,15 +103,16 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
         phone: "555-555-1212")
     end
 
-    it "redacts private fields and leaves non-private columns visible" do
+    it "redacts every registration field, leaving public columns visible" do
       expect(component).to have_css("tbody tr", count: 1)
       expect(component).to have_text(bike.mnfg_name)
       expect(component).not_to have_text("stranger@example.com")
       expect(component).not_to have_text("555-555-1212")
+      expect(component).not_to have_text("SECRET-EXTRA")
       hidden_text = "hidden, not registered with #{organization.short_name}"
       expect(component).to have_css(".owner_email_cell em.less-strong", text: hidden_text)
       expect(component).to have_css(".reg_phone_cell em.less-strong", text: hidden_text)
-      expect(component).to have_text("SECRET-EXTRA")
+      expect(component).to have_css(".reg_extra_registration_number_cell em.less-strong", text: hidden_text)
     end
   end
 end

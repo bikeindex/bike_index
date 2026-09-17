@@ -364,11 +364,11 @@
       </div>
 
       <% if other_registrations_count.positive? %>
-        <%= tag.div(class: "org-search-component tw:mt-3", data: other_registrations_settings.column_toggle_data_attributes) do %>
-          <%= render(other_registrations_settings) %>
+        <%= tag.div(class: "org-search-component tw:mt-3", data: Pages::Org::Search::Settings::Component.column_toggle_data_attributes(other_registrations_settings)) do %>
+          <%= render(Pages::Org::Search::Settings::Component.new(settings: other_registrations_settings, skip_search_and_filters: true)) %>
 
           <div class="tw:mt-3">
-            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings_component: other_registrations_settings)) %>
+            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings: other_registrations_settings)) %>
           </div>
         <% end %>
       <% end %>

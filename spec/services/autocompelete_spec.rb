@@ -14,8 +14,8 @@ RSpec.describe Autocomplete do
       expect(Autocomplete.normalize("Bikes & Trikes")).to eq "bikes trikes"
     end
     it "normalizes dashes and parens" do
-      expect(Autocomplete.normalize("e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)"))
-        .to eq "e personal mobility epamd e skateboard segway e unicycle etc"
+      expect(Autocomplete.normalize("e-Personal Mobility Device (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)"))
+        .to eq "e personal mobility device epamd e skateboard segway e unicycle etc"
       expect(Autocomplete.normalize("Cargo Tricycle (trike with front storage, e.g. Christiania bike)"))
         .to eq "cargo tricycle trike with front storage eg christiania bike"
     end

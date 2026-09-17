@@ -44,15 +44,13 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
     let(:trusted_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "unstolen_notifications") }
     let(:current_user) { FactoryBot.create(:organization_user, organization: trusted_organization) }
 
-    it "asks what they need rather than where they saw it, and withholds the phone" do
+    it "asks what they need rather than where they saw it" do
       render_inline(described_class.new(bike:, current_user:))
 
       expect(page).to have_text("Know who has this e-scooter?")
       expect(page).to_not have_text("Know something about this e-scooter")
       expect(page).to have_css("textarea[placeholder^='What do you need to ask about this e-scooter']", visible: :all)
-      # The allowance is permission to send a message, not to call whoever holds it
-      expect(bike.phoneable_by?(current_user)).to be_truthy
-      expect(page).to_not have_text("Or call")
+      expect(page).to have_link("718-391-4410", href: "tel:718-391-4410")
     end
   end
 

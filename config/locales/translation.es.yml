@@ -2289,6 +2289,8 @@ es:
           organization_signed_in: Has iniciado sesión
         skip_if_signed_in:
           already_signed_in: "¡Ya has iniciado sesión!"
+        turnstile_verified:
+          verify_not_a_robot: Por favor, confirma que no eres un robot.
     feedbacks:
       block_the_spam:
         please_sign_in: Por favor, inicia sesión para enviar ese mensaje.
@@ -5843,7 +5845,6 @@ es:
             impounded_cell: Incautado
             manufacturer_cell: Fabricante
             model_cell: Modelo
-            multi_search: búsqueda serial múltiple
             none: ninguno
             notes_cell: Notas de registro
             owner_email_cell: Enviado a
@@ -5867,46 +5868,16 @@ es:
             vehicle: registro
             visible_columns: Columnas visibles
           wrapper:
-            affiliation: Afiliación
-            avery_exportable: Exportable de Avery
-            bike: registro
-            e_vehicle_propulsion: Vehículo eléctrico (propulsión)
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
-            link: Enlace
             matching_bikes_html: "%{count} %{cycle_type} coincidentes"
-            mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
-            phone: Teléfono
-            reg_address: DIRECCIÓN
             registered_bikes_html: "%{count} %{cycle_type} coincidente para %{org_name}"
-            student_id: Carné de estudiante
-            vehicle: registro
             view_matching_any_audit: ver coincidencia con cualquier auditoría
         search_results:
           bikes_table:
             assign_bike_sticker: Asignar pegatina
-            avery: "¿Avery?"
-            color: Color
             email_hidden: Correo electrónico oculto
             hidden_not_registered: oculto, no registrado con %{org_name}
-            impound_id: ID del depósito
-            impounded: Incautado
             link_sticker: pegatina de enlace
-            manufacturer: Fabricante
-            model: Modelo
-            notes: Notas de registro
-            owner_name: Nombre del propietario
-            propulsion_type: Propulsión
-            registered: Registrado
-            secondary_number: Secundario#
-            sent_to: Enviado a
-            serial: De serie
-            source: Fuente
-            status_cell: Estado
-            sticker: Etiqueta engomada
-            stolen: Robado
-            updated: Actualizado
-            url: URL
-            vehicle_type: Tipo de vehículo
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:

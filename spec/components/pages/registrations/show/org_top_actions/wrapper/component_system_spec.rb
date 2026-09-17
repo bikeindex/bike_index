@@ -6,6 +6,9 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, :j
   let(:preview_path) { "/rails/view_components/pages/registrations/show/org_top_actions/wrapper/component/default" }
   # The preview renders against the seeded brakebills org, so every feature-gated action shows
   let!(:organization) { FactoryBot.create(:organization_brakebills) }
+  # It renders as lookbook_user, which finds the first user - and the message action needs
+  # one, since contact_owner? answers false without a viewer
+  let!(:lookbook_user) { FactoryBot.create(:superuser) }
 
   # The preview stacks a section per scenario, each its own accordion
   def scenario(label)

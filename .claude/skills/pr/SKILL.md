@@ -54,9 +54,7 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to CLAUDE.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required churn, spec and comment audits, and the cycle-type translation check. Commit everything it produces before re-dating migrations.
-
-All three audits are required every run, not just when the diff looks messy. The churn one asks what each hunk changes about what the code does, and reverts the ones with no answer; the spec one asks of every example the branch adds *what bug does this fail on?*, and deletes the ones that only restate the code.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, its four audits, and the cycle-type translation check. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
 
 ### Freshen stale migration timestamps
 
@@ -75,7 +73,7 @@ Run in parallel:
 
 Diff against `origin/main`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff. If you skipped **Prepare the branch**, `git fetch origin` first. If the branch has no commits ahead of `origin/main`, stop and tell the user.
 
-**`rtk proxy` the `git log`** — rtk's hook strips merge commits from `git log --oneline`, so the merge **Prepare the branch** just made is absent and the branch reads as though it never merged. The `--format` form isn't rewritten.
+**`rtk proxy` the `git log`** — rtk's hook strips merge commits from `git log --oneline`, so the merge **Prepare the branch** just made is absent and the branch reads as though it never merged.
 
 `gh pr view` exits non-zero with "no pull requests found" when the branch has none — that's the answer to the create-or-update question below, not a broken command, and it's the normal case on a first run.
 
@@ -94,7 +92,7 @@ The diff is frontend if a changed path matches one of these **and** renders a pa
 - `config/tailwind*`, `tailwind.config.*`, `postcss.config.*`
 - `*.scss`, `*.css`, `*.coffee`, `*.js`, `*.ts`
 
-Excluded despite matching: mailer views (`app/views/*_mailer/**`, `app/views/user_emails/**`), API and JSON views (`app/views/api/**`, `*.json*`, `*.jbuilder`), and build config (`app/assets/config/manifest.js`, `esbuild.config.js`). A diff that only changes comments or non-rendering config isn't frontend either.
+Excluded despite matching: mailer views (`app/views/*_mailer/**`, `app/views/user_emails/**`) and email components (`app/components/emails/**`) — capture those only when the user asks, via the mailer preview `frontend-screenshots` documents. API and JSON views (`app/views/api/**`, `*.json*`, `*.jbuilder`), and build config (`app/assets/config/manifest.js`, `esbuild.config.js`). A diff that only changes comments or non-rendering config isn't frontend either.
 
 Markup a reviewer can't see is also excluded — a `tw:hidden` field, a `data-` attribute, an `aria-` or `meta` change. It renders, so the paths above match it, but before and after are the same image, and the `## Screenshots` comment it produces is two identical captures. Ask what the shot would *show*, not whether a template changed. #4222 and #4262 (the register honeypot, added to each step) are the pattern; neither posted screenshots.
 
@@ -144,7 +142,7 @@ The one that talks itself into existence is the "still accurate" update — a la
 
 Two gates, either of which skips the section outright:
 
-- **Not a frontend diff** — per the classifier above.
+- **Not a frontend diff** — per the classifier above. **Unless a `## Screenshots` comment already exists**: the user asked for those captures, so a commit since the last one that changes what they show stales them even here. Recapture only those pages.
 - **No `gh`, or no browser signed in to GitHub.** Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. The `gh`-less sandbox in the appendix is this case.
 
 Otherwise read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment. Screenshot tooling never blocks the PR — if it fails, report the failure and carry on to **What this run taught you**.
@@ -180,6 +178,6 @@ Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI;
 | Publish | `gh pr create --draft` | `create_pull_request`, `draft: true`, `head: "<branch>"` |
 | Publish | `gh pr edit <n> --body-file` | `update_pull_request` |
 
-Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` reports correctly) — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
+Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
-**There is no Screenshots row because the section doesn't run here.** No `gh` means no browser session either, so nothing can be hosted or posted; skip it and say so, rather than reaching for `add_issue_comment` to post something in its place. PR #4126 is what that looks like when you don't: three comments telling one story, none of them replaceable by the next run.
+**There is no Screenshots row because the section doesn't run here.** No `gh` means no browser session either, so nothing can be hosted or posted; skip it and say so, rather than reaching for `add_issue_comment` to post something in its place.

@@ -363,8 +363,7 @@ class Ownership < ApplicationRecord
   end
 
   def spam_risky_email?
-    risky_domains = ["@yahoo.co", "@hotmail.co"]
-    return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
+    return false unless EmailDomain.risky_email?(owner_email)
     return true if pos?
 
     embed? && organization&.spam_registrations?

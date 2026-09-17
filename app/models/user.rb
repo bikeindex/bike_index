@@ -407,6 +407,12 @@ class User < ApplicationRecord
     organizations.with_enabled_feature_slugs(features).limit(1).any?
   end
 
+  def contact_impounded?
+    return true if superuser?
+
+    organizations.contact_impounded.limit(1).any?
+  end
+
   def auth_token_time(auth_token_type)
     SecurityTokenizer.token_time(self[auth_token_type])
   end
