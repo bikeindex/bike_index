@@ -8,7 +8,7 @@ module Atoms
     class Component < ApplicationComponent
       COLORS = {
         with_owner: :success,
-        for_sale: :purple,
+        for_sale: :fuchsia,
         stolen: :error,
         impounded: :warning,
         found: :warning,
