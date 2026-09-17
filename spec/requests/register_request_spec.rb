@@ -547,7 +547,7 @@ RSpec.describe RegisterController, type: :request do
 
       it "re-renders step 1 without emailing, until the challenge is answered" do
         expect { post base_url, params: create_params }
-          .to_not change(Email::PartialRegistrationJob.jobs, :size)
+          .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.body).to include "not a robot"
         # Saved either way, so the re-render still has what they entered
@@ -556,7 +556,7 @@ RSpec.describe RegisterController, type: :request do
 
         VCR.use_cassette("integrations_turnstile-verified") do
           expect { post base_url, params: create_params.merge("cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX") }
-            .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+            .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
         end
         expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
       end
