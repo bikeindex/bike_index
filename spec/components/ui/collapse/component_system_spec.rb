@@ -34,4 +34,30 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     expect(page).not_to have_current_path(/details=1/, url: true)
     expect(page).to have_css("button[aria-expanded='false'][data-active='false']", text: "Toggle details")
   end
+
+  it "clips the panel's content while it animates open" do
+    visit "/rails/view_components/ui/collapse/component/with_content_below"
+
+    # Registered after Stimulus's, so the frame it samples is one the collapse has
+    # already started: the panel pinned to 0 height with the transition running.
+    page.execute_script(<<~JS)
+      document.querySelector("[data-ui--collapse-target='trigger']").addEventListener("click", () => {
+        requestAnimationFrame(() => {
+          const box = document.getElementById("panel_checkbox").getBoundingClientRect()
+          const hit = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2)
+          document.body.dataset.hitWhileOpening = hit.id || hit.tagName
+        })
+      })
+    JS
+
+    click_button "Toggle panel"
+
+    # The panel lays its content out from its top edge, so the checkbox sits at its
+    # full-open position from the first frame. Unclipped it takes the clicks aimed at
+    # whatever is still sliding down beneath it.
+    expect(page).to have_css("body[data-hit-while-opening='below']")
+
+    check "panel_checkbox"
+    expect(page).to have_checked_field("panel_checkbox")
+  end
 end

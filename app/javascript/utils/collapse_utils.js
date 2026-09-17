@@ -96,7 +96,7 @@ export class CollapseUtils {
     element.classList.remove('tw:hidden!', 'tw:hidden')
     // An animated hide leaves the size/scale pinned to 0, so reset before the
     // duration-0 return too - display alone doesn't uncollapse it
-    element.classList.remove(scale)
+    element.classList.remove(scale, 'tw:overflow-hidden')
     this.setSize(element, styles, '')
 
     // Skip animation if duration is 0
@@ -108,7 +108,10 @@ export class CollapseUtils {
     element.classList.add(scale)
     this.setSize(element, styles, 0)
     // Always add transition classes (moving toward a more generalizable collapse method)
-    element.classList.add('tw:transition-all', `tw:duration-${duration}`)
+    // overflow-hidden for the duration: the pinned size doesn't move the content, which is
+    // laid out from the panel's top edge, so unclipped it paints over the page sliding down
+    // beneath it - and a click aimed there lands on whatever is passing through.
+    element.classList.add('tw:transition-all', 'tw:overflow-hidden', `tw:duration-${duration}`)
     // Remove things that transition to hide the element
     element.classList.remove(scale)
     // Force a reflow so the browser commits the 0 size before transitioning.
@@ -119,6 +122,7 @@ export class CollapseUtils {
     // After transition is complete, remove explicit size (clean up afterward)
     element._collapseFinalizer = setTimeout(() => {
       this.setSize(element, styles, '')
+      element.classList.remove('tw:overflow-hidden')
       element._collapseFinalizer = null
     }, duration)
   }
