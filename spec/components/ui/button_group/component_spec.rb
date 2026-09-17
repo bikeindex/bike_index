@@ -23,6 +23,27 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
     expect(component.css("a").first["class"]).to eq(UI::Button::Component.build_classes(color: :secondary, size: :md))
   end
 
+  it "raises on a kind it doesn't have" do
+    expect { described_class.new(entries:, kind: :segmented) }
+      .to raise_error(ArgumentError, /unknown kind :segmented/)
+  end
+
+  it "raises on a full_width it can't honor" do
+    expect { described_class.new(entries:, kind: :toggle, full_width: true) }
+      .to raise_error(ArgumentError, /full_width is not supported/)
+  end
+
+  context "kind: toggle" do
+    let(:component) { render_inline(described_class.new(entries:, kind: :toggle)) }
+
+    # One row, so no flex-wrap — the button kind's chips wrap
+    it "renders the entries as segments of a single track" do
+      expect(component).to have_css("div.tw\\:bg-gray-100")
+      expect(component).to have_no_css("div.tw\\:flex-wrap")
+      expect(component).to have_css("a.tw\\:font-extrabold", count: 2)
+    end
+  end
+
   context "entries without an href" do
     let(:entries) { [{label: "Map", active: true, data: {action: "click->map#show"}}, {label: "List"}] }
 
