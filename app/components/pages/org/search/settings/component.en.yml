@@ -4,14 +4,6 @@ en:
     pages:
       org:
         search:
-          form:
-            doesnt_look_like_serial: >-
-              This doesn't look like a serial number. Serials are usually 6+ letters
-              and numbers, located under the bottom bracket.
-            search_for_serial_number: Search for serial number
-            search_notes: Search notes
-            search_owner_email_or_name: Search owner email or name
-            submit: submit
           settings:
             address: 'Address:'
             all: all
@@ -35,7 +27,6 @@ en:
             impounded_cell: Impounded
             manufacturer_cell: Manufacturer
             model_cell: Model
-            multi_search: multi serial search
             none: none
             notes_cell: Registration Notes
             owner_email_cell: Sent to
@@ -58,18 +49,3 @@ en:
             url_cell: URL
             vehicle: registration
             visible_columns: Visible columns
-          wrapper:
-            affiliation: Affiliation
-            avery_exportable: Avery Exportable
-            bike: registration
-            e_vehicle_propulsion: E-vehicle (propulsion)
-            e_vehicles_for_audit: 'E-Vehicles for audit:'
-            link: Link
-            matching_bikes_html: "%{count} %{cycle_type} matching"
-            mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
-            phone: Phone
-            reg_address: Address
-            registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
-            student_id: Student ID
-            vehicle: registration
-            view_matching_any_audit: view matching any audit

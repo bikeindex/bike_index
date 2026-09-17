@@ -31,6 +31,8 @@ data:
     - ['components.emails.partials.{:}.*', 'app/components/emails/partials/\1/component.%{locale}.yml']
     - ['components.pages.bikes.org.{:}.*', 'app/components/pages/bikes/org/\1/component.%{locale}.yml']
     - ['components.pages.org.impound_records.{:}.*', 'app/components/pages/org/impound_records/\1/component.%{locale}.yml']
+    - ['components.pages.org.search.{:}.*', 'app/components/pages/org/search/\1/component.%{locale}.yml']
+    - ['components.pages.org.search_results.{:}.*', 'app/components/pages/org/search_results/\1/component.%{locale}.yml']
     - ['components.shared_blocks.main_content.{:}.*', 'app/components/shared_blocks/main_content/\1/component.%{locale}.yml']
     - ['components.shared_blocks.navbar.{:}.*', 'app/components/shared_blocks/navbar/\1/component.%{locale}.yml']
     - ['components.shared_blocks.user_alerts.{:}.*', 'app/components/shared_blocks/user_alerts/\1/component.%{locale}.yml']

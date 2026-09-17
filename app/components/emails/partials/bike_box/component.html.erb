@@ -6,7 +6,7 @@
           href="<%= @bike_url_path %>"
           data-pm-no-track="<%= skip_link_tracking? %>"
         >
-          <%= image_tag thumb_url, alt: translation("bike_photo") %>
+          <%= image_tag thumb_url, alt: translation("bike_photo", bike_type: @bike.type_titleize) %>
         </a>
       </td>
 

@@ -2235,6 +2235,8 @@ nb:
           organization_signed_in: Du er logget inn
         skip_if_signed_in:
           already_signed_in: Du er allerede logget på!
+        turnstile_verified:
+          verify_not_a_robot: Vennligst bekreft at du ikke er en robot
     feedbacks:
       block_the_spam:
         please_sign_in: Logg på for å sende den meldingen
@@ -5582,7 +5584,6 @@ nb:
             impounded_cell: Beslaglagt
             manufacturer_cell: Produsent
             model_cell: Modell
-            multi_search: søk i flere serier
             none: ingen
             notes_cell: Notater
             owner_email_cell: Sendt til
@@ -5606,46 +5607,16 @@ nb:
             vehicle: registrering
             visible_columns: Synlige kolonner
           wrapper:
-            affiliation: Tilknytning
-            avery_exportable: Avery eksporterbar
-            bike: registrering
-            e_vehicle_propulsion: Elbil (fremdrift)
             e_vehicles_for_audit: 'Elbiler for revisjon:'
-            link: Link
             matching_bikes_html: "%{count} %{cycle_type} samsvarende"
-            mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
-            phone: Telefon
-            reg_address: Adresse
             registered_bikes_html: "%{count} %{cycle_type} samsvarer med %{org_name}"
-            student_id: Student ID
-            vehicle: registrering
             view_matching_any_audit: visning som samsvarer med enhver revisjon
         search_results:
           bikes_table:
             assign_bike_sticker: Tildel klistremerke
-            avery: Avery?
-            color: Farge
             email_hidden: e-post skjult
             hidden_not_registered: skjult, ikke registrert hos %{org_name}
-            impound_id: Beslags-ID
-            impounded: Beslaglagt
             link_sticker: lenkeklistremerke
-            manufacturer: Produsent
-            model: Modell
-            notes: Notater
-            owner_name: Eiers navn
-            propulsion_type: Fremdrift
-            registered: Registrert
-            secondary_number: Sekundærnr.
-            sent_to: Sendt til
-            serial: Serienummer
-            source: Kilde
-            status_cell: Status
-            sticker: Klistremerke
-            stolen: Stjålet
-            updated: Oppdatert
-            url: URL-adresse
-            vehicle_type: Bil type
           multi_result_chip:
             no_results: ingen treff
           multi_results:

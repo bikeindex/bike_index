@@ -45,7 +45,8 @@ Rails.application.configure do
       "https://platform.twitter.com",
       "https://api.mapbox.com",
       "https://cdn.jsdelivr.net",
-      "https://js.stripe.com"
+      "https://js.stripe.com",
+      "https://challenges.cloudflare.com"
     policy.style_src :self, :unsafe_inline,
       "https://fonts.googleapis.com",
       "https://www.gstatic.com", # Google Translate styles
@@ -73,6 +74,7 @@ Rails.application.configure do
       "https://www.googletagmanager.com"
     policy.worker_src :self, :blob
     policy.frame_src :self,
+      "https://challenges.cloudflare.com",
       "https://www.google.com",
       # Google Ads conversion tracking iframes use country-specific Google domains
       "https://www.google.ca",

@@ -139,7 +139,7 @@ RSpec.describe CustomerMailer, type: :mailer do
     it "renders email" do
       mail = CustomerMailer.recovered_from_link(stolen_record)
       expect(mail.to).to eq([bike.owner_email])
-      expect(mail.subject).to eq "Your tall bike (multiple frames fused together) has been marked recovered!"
+      expect(mail.subject).to eq "Your tall bike has been marked recovered!"
       expect(mail.from).to eq(["bryan@bikeindex.org"])
       expect(mail.body.encoded).to match recovered_description
       expect(mail.deliver_now.text_part.body.to_s).to include(recovered_description).and include("was marked")
@@ -283,6 +283,23 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.to).to eq([marketplace_message.receiver.email])
       expect(mail.body.encoded.strip).to match marketplace_message.body
       expect(mail.message_stream).to eq "outbound"
+    end
+  end
+
+  describe "user_alert_email" do
+    let(:bike) do
+      FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record,
+        cycle_type: "personal-mobility", latitude: nil, longitude: nil)
+    end
+    let(:user_alert) { FactoryBot.create(:user_alert, kind: "stolen_bike_without_location", bike:, user: bike.owner) }
+
+    it "names the cycle type in the subject and the body" do
+      mail = CustomerMailer.user_alert_email(user_alert)
+      expect(mail.subject).to eq "Your stolen e-personal mobility device is missing its location"
+      body = mail.body.encoded
+      expect(body).to match "Your stolen e-personal mobility device is missing location"
+      expect(body).to match "won't find your e-personal mobility device"
+      expect(body).to_not match "personal-mobility"
     end
   end
 end

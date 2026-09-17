@@ -18,17 +18,17 @@
 
 - if @user_alert.kind == "stolen_bike_without_location"
   %h2
-    Your stolen #{@bike.cycle_type} is missing location
+    Your stolen #{@bike.type} is missing location
 
   %p
-    People searching for stolen bikes in the area won't find your bike - <em>which is how most bikes are recovered</em>.
+    People searching for stolen bikes in the area won't find your #{@bike.type} - <em>which is how most bikes are recovered</em>.
 
   %p
     %strong
       - if @bike.theft_alerts.paid.any?
         We can't turn on your promoted alert
       - else
-        We can't alert anyone about your bike being stolen
+        We can't alert anyone about your #{@bike.type} being stolen
       %span.stolen-color
         until you add a location.
 

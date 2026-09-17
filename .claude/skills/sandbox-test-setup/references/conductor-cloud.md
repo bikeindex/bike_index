@@ -22,7 +22,7 @@ sudo dnf install -y gcc gcc-c++ make openssl-devel readline-devel \
 # 2. Install mise (not preinstalled)
 curl -fsSL https://mise.run | sh          # -> ~/.local/bin/mise
 
-# 3. Build the Ruby + Node pinned in mise.toml. `mise install` reads the file;
+# 3. Build the Ruby + Node pinned in .tool-versions. `mise install` reads the file;
 #    the Ruby compile is ~2 min because cache.ruby-lang.org is reachable here.
 export PATH="$HOME/.local/bin:$PATH"
 cd /home/vercel-sandbox/workspace
@@ -44,7 +44,7 @@ bundle install      # ~8s once shared-mime-info is present; vendor/bundle + .bun
 
 `bin/lint`, `bundle exec rspec`, etc. then work normally. If a subprocess
 drops the mise shim (same harness quirk as Local macOS), prefix the install
-dir directly instead of reactivating (match the version in `mise.toml`):
+dir directly instead of reactivating (match the version in `.tool-versions`):
 
 ```bash
 export PATH="$HOME/.local/share/mise/installs/ruby/4.0.6/bin:$PATH"

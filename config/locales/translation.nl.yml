@@ -2130,6 +2130,8 @@ nl:
           organization_signed_in: Je bent ingelogd.
         skip_if_signed_in:
           already_signed_in: Je bent al ingelogd!
+        turnstile_verified:
+          verify_not_a_robot: Bevestig alstublieft dat u geen robot bent.
     oauth:
       applications:
         ensure_app_owner!:
@@ -5743,7 +5745,6 @@ nl:
             impounded_cell: In beslag genomen bij
             manufacturer_cell: Fabrikant
             model_cell: Model
-            multi_search: multi serieel zoeken
             none: geen
             notes_cell: Notes
             owner_email_cell: Verzonden naar
@@ -5767,46 +5768,16 @@ nl:
             vehicle: Registratie
             visible_columns: Zichtbare kolommen
           wrapper:
-            affiliation: Aansluiting
-            avery_exportable: Avery Exporteerbaar
-            bike: Registratie
-            e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
             e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
-            link: Link
             matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
-            mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
-            phone: Telefoon
-            reg_address: Adres
             registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
-            student_id: Student-ID
-            vehicle: Registratie
             view_matching_any_audit: weergave die overeenkomt met elke audit
         search_results:
           bikes_table:
             assign_bike_sticker: Sticker toewijzen
-            avery: Avery?
-            color: Kleur
             email_hidden: email verborgen
             hidden_not_registered: verborgen, niet geregistreerd bij %{org_name}
-            impound_id: Inbeslagname-ID
-            impounded: In beslag genomen bij
             link_sticker: link sticker
-            manufacturer: Fabrikant
-            model: Model
-            notes: Notes
-            owner_name: Eigenaar naam
-            propulsion_type: Voortstuwing
-            registered: Geregistreerd
-            secondary_number: Secundair#
-            sent_to: Verzonden naar
-            serial: Serie
-            source: Bron
-            status_cell: Toestand
-            sticker: Sticker
-            stolen: Gestolen
-            updated: Bijgewerkt
-            url: URL
-            vehicle_type: 'Voertuigtype:'
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
