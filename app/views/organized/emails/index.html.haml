@@ -39,7 +39,7 @@
         %td
           - if mail_snippets.any?
             %small
-              = truncate(mail_snippets.first.body, length: 100)
+              = truncate(mail_snippets.first.body_stripped, length: 100)
     - if current_organization.enabled?("organization_stolen_message")
       - organization_stolen_message = OrganizationStolenMessage.for(current_organization)
       %tr
