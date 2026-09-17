@@ -29,7 +29,7 @@ RSpec.describe "Viewing a registration", :js, type: :system do
       click_button "Send message"
       expect(page).to have_content("Thanks for looking out!", wait: 10)
     }.to change(StolenNotification, :count).by(1)
-      .and change(Email::StolenNotificationJob.jobs, :count).by(1)
+      .and change(EmailJobs::StolenNotificationJob.jobs, :count).by(1)
 
     stolen_notification = StolenNotification.last
     expect(stolen_notification.bike).to eq bike

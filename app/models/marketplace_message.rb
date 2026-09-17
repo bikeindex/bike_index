@@ -301,7 +301,7 @@ class MarketplaceMessage < ApplicationRecord
   def process_notification
     return if skip_processing
 
-    Email::MarketplaceMessageJob.perform_async(id)
+    EmailJobs::MarketplaceMessageJob.perform_async(id)
   end
 
   def duplicate_of

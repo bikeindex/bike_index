@@ -117,7 +117,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def send_confirmation_email
-    Email::AdditionalEmailConfirmationJob.perform_async(id) unless confirmed?
+    EmailJobs::AdditionalEmailConfirmationJob.perform_async(id) unless confirmed?
   end
 
   def generate_confirmation

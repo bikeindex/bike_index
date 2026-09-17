@@ -738,7 +738,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect {
         patch base_url, params: {bike: {owner_email: new_email}}
       }.to change(Ownership, :count).by(1)
-      Email::OwnershipInvitationJob.drain
+      EmailJobs::OwnershipInvitationJob.drain
       expect_bike_transferred_but_unclaimed
     end
 
@@ -752,7 +752,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect {
           patch base_url, params: {bike: {owner_email: "#{new_email.upcase} "}}
         }.to change(Ownership, :count).by(1)
-        Email::OwnershipInvitationJob.drain
+        EmailJobs::OwnershipInvitationJob.drain
         expect_bike_transferred_but_unclaimed
       end
     end

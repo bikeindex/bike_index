@@ -15,7 +15,7 @@ RSpec.describe StripeEvent, type: :model do
 
     context "subscription stripe_checkout completed" do
       # Need to re-record Stripe cassettes?
-      # 1. Run Stripe::UpdatePricesJob.new.perform in console to add the Stripe dev prices
+      # 1. Run StripeJobs::UpdatePricesJob.new.perform in console to add the Stripe dev prices
       # 2. Go to /memberships/new and purchase a plus membership
       # 3. Go to Stripe workbench webhooks
       # 4. Copy in the webhook fixtures

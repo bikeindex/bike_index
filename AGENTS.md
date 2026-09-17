@@ -27,7 +27,7 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - Omit named arguments' values from hashes (ie prefer `{x:, y:}` instead of `{x: x, y: y}`)
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
 - prefer un-abbreviated variable names
-- Use full class/module names everywhere — `UI::Forms::Combobox::Component`, not the `Combobox::Component` that lexical scope also resolves from inside `UI::Forms`
+- Use full class/module names everywhere — `UI::Forms::Combobox::Component`, not the `Combobox::Component` that lexical scope also resolves from inside `UI::Forms`. A class naming *itself* is the exception: `self.class.perform_in`, not a re-typed `EmailJobs::ScheduledSurveyJob.perform_in` — `BikeJobs::UpdateTheftAlertFacebookJob` is the pattern, and it keeps the next namespace rename off these lines
 - **A namespace under `Admin::` or `Pages::` shadows a top-level one of the same name** — `Pages::Search` hides the `Search::` controllers from every `.rb` nested in it. Nothing fails at boot; it raises only where something reads the shadowed constant, so check a new namespace against `Object.const_defined?("LandingPages", false)` after an eager load. Rename the collision away rather than prefixing call sites with `::` — job namespaces carry the `*_jobs` suffix, `LandingPageOrganizations` holds the landing-page slugs. Templates are exempt: a compiled template's `Module.nesting` is the component class alone, so a bare `Saml::` there still reaches the top level.
 - **Prefer composition over inheritance and `include`.** Share behavior by calling an object that owns it, not by mixing a module into several classes or adding a base class. A `module` extracted only to be `include`d in two classes is usually one of those classes with a parameter — pass the difference in as an argument instead. Rails' own extension points (`ApplicationRecord`, `ApplicationJob`, `ActiveSupport::Concern` for controller filters) are fine; new mixins of our own are what to avoid.
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Don't write a stateless service as a `class` with `def self.` methods.
@@ -87,6 +87,8 @@ Uses RSpec. All business logic should be tested. The `rspec-testing` skill cover
 **Assert on what a drain produces, not on the flag that precedes it.** A column a job reconciles when it runs records what was true at write time — `Ownership#skip_email` is one — so it answers a different question than the one you're asking.
 
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded. To clear stale contents, `rm` the file and re-run the spec.
+
+**Name a cassette in lowercase, without the constant** — `stripe-update_prices_job`, not `StripeJobs::UpdatePricesJob`. A namespace rename then leaves every cassette alone, and the name greps to its own filename, which the constant form doesn't: VCR rewrites `::` and `.` to `_` on the way to disk.
 
 ## Frontend Development
 

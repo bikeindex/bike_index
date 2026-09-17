@@ -688,12 +688,12 @@ RSpec.describe BParam, type: :model do
   describe "partial_resent_notifications" do
     let(:b_param) { FactoryBot.create(:b_param_partial_registration, created_at: created_at) }
     let(:created_at) { Time.current }
-    before { Email::PartialRegistrationJob.new.perform(b_param.id) }
+    before { EmailJobs::PartialRegistrationJob.new.perform(b_param.id) }
     it "doesn't include initial notification" do
       expect(b_param.partial_notification_pre_tracking?).to be_falsey
       expect(b_param.partial_notifications.count).to eq 1
       expect(b_param.partial_notification_resends.count).to eq 0
-      Email::PartialRegistrationJob.new.perform(b_param.id)
+      EmailJobs::PartialRegistrationJob.new.perform(b_param.id)
       b_param.reload
       expect(b_param.partial_notifications.count).to eq 2
       expect(b_param.partial_notification_resends.count).to eq 1
@@ -891,7 +891,7 @@ RSpec.describe BParam, type: :model do
       end
     end
 
-    # Email::PartialRegistrationJob destroys them for banned email domains
+    # EmailJobs::PartialRegistrationJob destroys them for banned email domains
     context "destroyed" do
       it "doesn't alert about a registration that's gone" do
         expect(b_param.unfinished_registration?).to be_truthy
