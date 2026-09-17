@@ -44,6 +44,15 @@ rescue ArgumentError, SystemCallError
   false
 end
 
+# A branch's changed files include the ones it deleted, so a path that isn't on disk
+# is only worth reporting when git has no history for it either - ie a typo
+def never_tracked(paths)
+  args = ["git", "-c", "core.quotePath=false", "log", "--format=", "--name-only", "--", *paths]
+  paths - IO.popen(args, err: File::NULL, &:read).split("\n")
+rescue SystemCallError
+  paths
+end
+
 def lint_kind(file)
   extension = File.extname(file).delete_prefix(".")
   kind = EXTENSIONS_BY_KIND.find { |_kind, extensions| extensions.include?(extension) }&.first
@@ -63,7 +72,8 @@ FileUtils.chdir APP_ROOT do
 
   if file_args.any?
     present, missing = file_args.partition { |arg| File.exist?(arg) }
-    warn "Not found: #{missing.join(", ")}" if missing.any?
+    unknown = missing.any? ? never_tracked(missing) : []
+    warn "Not found: #{unknown.join(", ")}" if unknown.any?
 
     # Unlintable paths are skipped rather than raised on, so that passing a branch's
     # changed files works - they'll include .haml, .scss and friends
