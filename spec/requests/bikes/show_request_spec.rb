@@ -6,7 +6,7 @@ RSpec.describe "BikesController#show", type: :request do
   let(:ownership) { FactoryBot.create(:ownership) }
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
-  # This is required by show, if it isn't present it raises ReadOnlyError
+  # RearGearType is required by show, if it isn't present it raises ReadOnlyError.
   # The redesign is the default, so the kill switch is what keeps this page reachable
   before do
     RearGearType.fixed

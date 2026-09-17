@@ -137,7 +137,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
     buyer = User.find_by(email: buyer_email)
     expect(buyer.confirmed?).to be_falsey
 
-    # Confirming spends the return_to stored when they clicked "contact the owner"
+    # Confirming spends the return_to stored when they clicked "Contact the seller"
     EmailJobs::ConfirmationJob.drain
     visit emailed_path("/users/confirm")
     click_button "Sign in"
