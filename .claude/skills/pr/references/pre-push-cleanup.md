@@ -28,7 +28,7 @@ Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just c
 
 **Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (`bin/lint:90` falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
 
-A clean run over Ruby-only paths prints **nothing at all** — the summary table comes from the ERB formatter, so silence plus exit 0 is the pass. `--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating.
+A clean run over Ruby-only paths prints **nothing at all** — the summary table comes from the ERB formatter, so silence plus exit 0 is the pass. Read that status from `bin/lint` itself, not from `bin/lint … | tail`, which reports `tail`'s 0 however `bin/lint` exited — and a run that can't reach `standardrb` still prints the ERB summary, so "clean" scrolls past above a `== Command [...] failed ==` you didn't see. `--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating.
 
 Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
 
