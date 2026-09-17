@@ -29,10 +29,10 @@ module GraphingHelper
 
   def group_by_method(time_range)
     case time_range_length(time_range)
-    when ...3601 then :group_by_minute # 1.hour + 1 second
+    when ...(1.hour + 1) then :group_by_minute
     when ...5.days then :group_by_hour
     when ...5_000_000 then :group_by_day # around 60 days
-    when ...31449600 then :group_by_week # 364 days (52 weeks)
+    when ...52.weeks then :group_by_week
     else :group_by_month
     end
   end

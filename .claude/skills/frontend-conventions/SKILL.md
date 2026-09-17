@@ -124,15 +124,10 @@ searched from source — a hook with no consumer in `app/` is routinely live. It
 `$(`— and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
 that binds `#infoCheck`. So removing an id silently disables behaviour, sometimes behaviour attached
 to another id entirely.
-
-**A guarded init also publishes globals, and its callers don't re-check the guard** — so grep the bundle
-for what the module *assigns*, not only for the hooks it binds. `#timeSelectionBtnGroup` gates
-`window.periodSelector = …`, and the parking notification map calls
-`window.periodSelector.urlParamsWithNewPeriod()` regardless; converting that page to `UI::PeriodSelect`
-left the map throwing on `undefined` and fetching nothing. That failure is louder than a disabled
-handler and lands somewhere else entirely, so **load a converted page and read
-`browser_console_messages`** — an uncaught `TypeError` from `/vendored_assets/` is this, and no spec
-catches it.
+Grep for what a module *assigns*, not only the hooks it binds — a guarded init publishes globals and
+its callers don't re-check the guard. `#timeSelectionBtnGroup` gates `window.periodSelector`, which
+`binxAppOrgParkingNotificationMapping.urlParamsForOpts` calls regardless. No spec catches it; a
+converted page's `browser_console_messages` does.
 
 - Zero consumers: delete it, don't rename it.
 - Consumers exist: either update them, or leave the hook in place — the consumers are the *reason* it earns its spot in the markup.
