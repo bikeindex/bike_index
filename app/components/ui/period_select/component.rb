@@ -14,16 +14,10 @@ module UI
         {key: "all", prefix: nil, label: "all"}
       ].freeze
 
-      # The verb an admin index's time_range_column reads as - "created", "subscription ends".
-      # Admin-only, so it humanizes rather than translating
+      # What a time_range_column reads as in prose - "created", "subscription ends"
       def self.column_label(time_range_column)
-        label = time_range_column.to_s.gsub("_at", "").humanize.downcase
-        return label.gsub("request", "requested") if time_range_column&.match?("request_at")
-        return label.gsub("start", "starts") if time_range_column&.match?("start_at")
-        return label.gsub("end", "ends") if time_range_column&.match?("end_at")
-        return label.gsub("needs", "need") if time_range_column&.match?("needs_renewal_at")
-
-        label
+        time_range_column.to_s.delete_suffix("_at").humanize.downcase
+          .sub(/(request|start|end)\z/, "request" => "requested", "start" => "starts", "end" => "ends")
       end
 
       # What the selected period's button reads, for a caller naming the period elsewhere
