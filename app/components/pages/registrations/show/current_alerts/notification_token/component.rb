@@ -41,8 +41,11 @@ module Pages
             end
 
             def resolve_button_text
-              key = graduated? ? ".mark_graduated_resolved" : ".mark_parking_resolved"
-              translation(key, bike_type: @bike.type)
+              if graduated?
+                translation(".mark_graduated_resolved", bike_type: @bike.type)
+              else
+                translation(".mark_parking_resolved", bike_type: @bike.type)
+              end
             end
 
             def organization

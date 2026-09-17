@@ -52,4 +52,4 @@
       html_options: {value: @b_param.owner_email, placeholder: email_placeholder}) %>
 <% end %>
 
-<%= render UI::Forms::Turnstile::Component.new(email: @b_param.owner_email) %>
+<%= render UI::Forms::Turnstile::Component.new(email: @b_param.owner_email, user: @current_user) %>

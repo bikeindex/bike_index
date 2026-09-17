@@ -214,7 +214,7 @@ module BikeServices
       return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
 
       b_param.generate_email_confirmation_token!
-      Email::PartialRegistrationJob.perform_async(b_param.id, "partial_register_confirmation")
+      EmailJobs::PartialRegistrationJob.perform_async(b_param.id, "partial_register_confirmation")
       true
     end
 

@@ -26,7 +26,7 @@
     <%# Step 1 posts its own scope, which create reads separately from step 2's %>
     <%= fields_for(:b_param, @b_param) do |b_param_form| %>
       <%= render Pages::Register::Step1::Fields::Component.new(b_param: @b_param,
-          form: b_param_form, organization:) %>
+          form: b_param_form, current_user: @current_user, organization:) %>
     <% end %>
 
     <%= render Pages::Register::Step2::Fields::Component.new(b_param: @b_param, steps: @steps,

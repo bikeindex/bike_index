@@ -44,27 +44,6 @@ $stolen-color: $red;
   color: $stolen-color;
 }
 
-// tailwind fuchsia-600
-$found-color: oklch(59.1% 0.293 322.896);
-.found-color {
-  color: $found-color;
-}
-
-$for-sale-color: $green;
-.for-sale-color {
-  color: $for-sale-color;
-}
-
-$impounded-color: $stolen-color;
-.impounded-color {
-  color: $impounded-color;
-}
-
-$unregistered-color: #f0ad4e; // text-warning color
-.unregistered-color {
-  color: $unregistered-color;
-}
-
 // current boostrap has this class, do something similar
 .text-dark {
   color: $body-font-color !important;

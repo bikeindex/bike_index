@@ -50,9 +50,9 @@
       </div>
     <% end %>
 
-    <% if bike.status_stolen? %>
-      <span class="twless-strong tw:ml-2">stolen</span>
-    <% end %>
+    <span class="tw:ml-2">
+      <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
+    </span>
   <% end %>
 
   <% table.column(label: "Created by") do |bike| %>

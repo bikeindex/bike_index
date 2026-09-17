@@ -9,7 +9,7 @@
         <% if show_time_range? %>
           <em>
             <% if @time_range_column.present? %>
-              <strong><%= humanized_time_range_column_display %></strong>
+              <strong><%= UI::PeriodSelect::Component.column_label(@time_range_column) %></strong>
             <% end %>
 
             <%= humanized_time_range(@index.time_range, period: @index.period) %>

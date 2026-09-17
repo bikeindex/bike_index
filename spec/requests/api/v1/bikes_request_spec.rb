@@ -443,7 +443,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect {
           post base_url, params: {bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token}
         }.to change(Ownership, :count).by(1)
-        Email::OwnershipInvitationJob.drain
+        EmailJobs::OwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 example bikez").first
@@ -477,7 +477,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect {
           post base_url, params: options
         }.to change(Ownership, :count).by(1)
-        Email::OwnershipInvitationJob.drain
+        EmailJobs::OwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first
@@ -503,7 +503,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         expect {
           post base_url, params: options
         }.to change(Ownership, :count).by(1)
-        Email::OwnershipInvitationJob.drain
+        EmailJobs::OwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq(0)
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first

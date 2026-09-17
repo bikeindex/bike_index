@@ -26,11 +26,15 @@ module Pages
                     "register--retry ui--forms--turnstile",
                   "ui--forms--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
                   "ui--forms--turnstile-script-url-value": UI::Forms::Turnstile::Component::SCRIPT_URL,
+                  "ui--forms--turnstile-exempt-emails-value": exempt_emails.to_json,
                   action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
                     "hw-combobox:selection->register--status-fields#update " \
                     "register--organization:changed->register--status-fields#update " \
                     "input->ui--forms--turnstile#update submit->form-persist#clear"}}
         end
+
+        # The reveal skips these, the way Integrations::Turnstile skips them on submit
+        def exempt_emails = @current_user&.confirmed_emails || []
 
         def organization
           @organization ||= @b_param.creation_organization

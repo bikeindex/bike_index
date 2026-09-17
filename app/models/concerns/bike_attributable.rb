@@ -56,12 +56,6 @@ module BikeAttributable
     Bike.status_humanized_translated(status_humanized)
   end
 
-  def status_humanized_no_with_owner
-    return "" if status == "status_with_owner"
-
-    status_humanized
-  end
-
   # We may eventually remove the boolean. For now, we're just going with it.
   def made_without_serial?
     made_without_serial

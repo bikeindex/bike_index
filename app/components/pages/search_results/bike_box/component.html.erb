@@ -76,7 +76,7 @@
           <% end %>
         <% else %>
           <li>
-            <%= bike_status_span(@bike) %>:
+            <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :xs)) %>
             <span class="localizeTime"><%= l occurred_at_with_fallback, format: :convert_time %></span>
           </li>
           <%= attr_list_item(

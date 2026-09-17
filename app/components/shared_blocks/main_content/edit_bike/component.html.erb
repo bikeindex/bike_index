@@ -10,7 +10,7 @@
         <% if @bike.status_with_owner? %>
           <%= translation(".edit") %>
         <% else %>
-          <%= bike_status_span(@bike) %>
+          <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :sm)) %>
         <% end %>
 
         <% if @bike.version? %>

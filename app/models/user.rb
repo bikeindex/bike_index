@@ -439,7 +439,7 @@ class User < ApplicationRecord
 
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::ResetPasswordJob.perform_async(id, return_to)
+    EmailJobs::ResetPasswordJob.perform_async(id, return_to)
     true
   end
 
@@ -451,7 +451,7 @@ class User < ApplicationRecord
 
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::MagicLoginLinkJob.perform_async(id, return_to)
+    EmailJobs::MagicLoginLinkJob.perform_async(id, return_to)
   end
 
   # Unlike send_magic_link_email, reuses an unexpired token and sends no email

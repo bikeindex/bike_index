@@ -31,7 +31,13 @@ module UI
         # What a screen reader reads in place of the icon. :purple names a color rather
         # than a meaning, so it announces the meaning it actually carries
         def announcement
-          translation((@kind == :purple) ? ".info" : ".#{@kind}")
+          case @kind
+          when :error then translation(".error")
+          when :warning then translation(".warning")
+          when :success then translation(".success")
+          when :purple then translation(".info")
+          else translation(".notice")
+          end
         end
 
         def normalized_kind(kind)

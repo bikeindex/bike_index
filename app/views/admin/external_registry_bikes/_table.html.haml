@@ -32,7 +32,7 @@
               %span.less-strong-right.d-none.d-md-block
                 = bike.id
           %td
-            %small= bike_status_span(bike)
+            = render(Atoms::RegistrationStatusBadge::Component.new(bike:, size: :xs))
           %td
             - if bike.mnfg_name == "unknown_brand"
               %small.less-strong unknown

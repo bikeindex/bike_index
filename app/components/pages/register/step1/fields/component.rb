@@ -7,9 +7,10 @@ module Pages
         # What step 1 asks for, rendered into whichever form holds it - its own, or the
         # single-page flow's, where these sit above step 2's details
         class Component < ApplicationComponent
-          def initialize(b_param:, form:, organization: nil)
+          def initialize(b_param:, form:, current_user: nil, organization: nil)
             @b_param = b_param
             @form = form
+            @current_user = current_user
             @organization = organization
           end
 

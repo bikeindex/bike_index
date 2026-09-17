@@ -91,6 +91,19 @@ The log is large and ANSI-coloured; pipe through `sed 's/\x1b\[[0-9;]*m//g'`
 and grep for `Failure/Error`, `expected`, and `rspec ./spec/...` to get the
 failing example ids and the actual message.
 
+**Then download the Capybara screenshot.** Every `:js` failure writes one, and
+`ci.yml` uploads `tmp/capybara/` to the shard's `test-results-<node-index>`
+artifact for exactly this — but the log names the file without saying it's
+fetchable, so it usually goes unread. It shows the page the failure saw, which
+routinely settles a mechanism the log can only hint at: what a click actually
+landed on, a frame still loading, a control in a state no step in the example set.
+
+```bash
+gh api repos/bikeindex/bike_index/actions/runs/<run-id>/artifacts \
+  --jq '.artifacts[] | "\(.id) \(.name)"'
+gh api repos/bikeindex/bike_index/actions/artifacts/<id>/zip > tmp/a.zip && unzip -o tmp/a.zip -d tmp/ci_artifact
+```
+
 ### 2. Read the message literally
 
 The exact failure text usually names the mechanism, and it is easy to skim past
@@ -232,9 +245,11 @@ command per environment. Same class of thing: an unmigrated test DB, a stale VCR
 in a Redis DB shared across `:js` examples and survives 600s, and `load_all`
 never invalidates it — so a stale entry from an earlier spec changes what a
 combobox returns. The fix is `Autocomplete::Loader.clear_redis` in `before`,
-not a retry. Browser history is the same shape: `reset_browser_history`
-(`spec/support/integration_spec_helpers.rb`) drops entries earlier examples left, so
-`go_back`/`go_forward` walk this example's own stack.
+not a retry. Browser history looks like the same shape and isn't: the driver closes
+the browser context between examples, so no entry outlives one. A spec that resets
+history is treating its own earlier steps as contamination — walk them the way a
+reader would instead, and note that entry 0 of every example is `about:blank`, which
+a traversal lands on as a nil `current_path`.
 
 **Interacting with a page whose controllers haven't connected.** `application.js`
 lazy loads every Stimulus controller, so a freshly rendered page answers to none of
@@ -242,7 +257,9 @@ them until each module lands: a combobox filters nothing, a one-shot event (like
 form-persist's restore) reaches no listener, and a `fill_in`'s text can end up in
 whatever autofocus left focused. Waiting on any one controller proves nothing about
 the rest — `wait_for_stimulus` (`spec/support/integration_spec_helpers.rb`) waits for
-every identifier the page names.
+every identifier the page names, and **pass it the one you're about to interact with**
+(`wait_for_stimulus("shared-blocks--navbar")`): bare, it is vacuously true on a document
+that has parsed none yet, so it returns before that element even exists.
 
 **Interacting before the legacy page script has bound.** The same shape, one era
 back: `init.coffee`'s `loadPageScript` constructs the per-page class in

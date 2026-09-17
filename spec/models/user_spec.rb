@@ -624,7 +624,7 @@ RSpec.describe User, type: :model do
       user = FactoryBot.create(:user)
       expect {
         expect(user.send_password_reset_email).to be_truthy
-      }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
+      }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(1)
       expect(user.reload.token_for_password_reset).not_to be_nil
     end
 
@@ -636,7 +636,7 @@ RSpec.describe User, type: :model do
       expect {
         expect(user.send_password_reset_email).to be_falsey
         expect(user.send_password_reset_email).to be_falsey
-      }.to change(Email::ResetPasswordJob.jobs, :size).by(0)
+      }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(0)
       user.reload
       expect(user.token_for_password_reset).to eq current_token
     end
@@ -648,7 +648,7 @@ RSpec.describe User, type: :model do
       expect(user.magic_link_token).to be_nil
       expect {
         user.send_magic_link_email
-      }.to change(Email::MagicLoginLinkJob.jobs, :size).by(1)
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(1)
       expect(user.reload.magic_link_token).not_to be_nil
     end
 
@@ -659,7 +659,7 @@ RSpec.describe User, type: :model do
       user.send_magic_link_email
       expect {
         user.send_magic_link_email
-      }.to change(Email::ResetPasswordJob.jobs, :size).by(0)
+      }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(0)
       user.reload
       expect(user.magic_link_token).to eq token
     end
