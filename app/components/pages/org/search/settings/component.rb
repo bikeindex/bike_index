@@ -10,6 +10,10 @@ module Pages
         class Component < ApplicationComponent
           PANEL_COLORS = "tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900"
 
+          # Whoever renders the collapse element declares it, so the key has one home
+          COLLAPSE_DATA = {controller: "ui--collapse",
+                           "ui--collapse-storage-key-value": "orgRegistrationColumnsOpen"}.freeze
+
           # Goes on the element wrapping this panel, which the caller renders — so class-level,
           # not an instance built only to read off
           def self.column_toggle_data_attributes(settings, controllers: nil)
@@ -38,7 +42,7 @@ module Pages
           def collapse_data_attributes
             return {} unless @toggle_button
 
-            {controller: "ui--collapse", "ui--collapse-storage-key-value": "orgRegistrationColumnsOpen"}
+            COLLAPSE_DATA
           end
 
           def export_path

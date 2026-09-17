@@ -7,7 +7,7 @@ export default class extends Controller {
   static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'filterSummary']
 
   connect () {
-    this.chartSearch = window.location.search
+    this.chartSearch = this.chartParams()
     this.initNotesSearch()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
@@ -72,12 +72,21 @@ export default class extends Controller {
   }
 
   // The card sits outside the results frame, so a search leaves it answering the previous
-  // one. Gated on the address bar having moved, or the first results render would refetch
+  // one. Gated on the search itself having moved, or the first results render would refetch
   // the chart the frame is already fetching. The URL carries the scope, so it's the search.
   reloadChart () {
-    if (!this.hasChartFrameTarget || window.location.search === this.chartSearch) return
+    if (!this.hasChartFrameTarget || this.chartParams() === this.chartSearch) return
     if (!this.chartFrameTarget.getAttribute('src')) return
-    this.chartSearch = window.location.search
+    this.chartSearch = this.chartParams()
     this.chartFrameTarget.setAttribute('src', window.location.href)
+  }
+
+  // A page turn, a sort or a per-page change returns the same chart, so they don't count
+  // as the address bar having moved.
+  chartParams () {
+    const params = new URLSearchParams(window.location.search);
+    ['page', 'sort', 'sort_direction', 'direction', 'per_page'].forEach(name => params.delete(name))
+
+    return params.toString()
   }
 }

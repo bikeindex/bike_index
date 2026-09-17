@@ -33,8 +33,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
   end
 
-  def settings_selector
-    "[data-org--search-target='settings']"
+  # The gear opens the search settings; the results card's own button opens the columns
+  def panel_for(storage_key)
+    # first: the period select inside the search settings declares a nested ui--collapse
+    find("[data-ui--collapse-storage-key-value='#{storage_key}']", visible: :all)
+      .first("[data-ui--collapse-target='content']", visible: :all)
   end
 
   # multi_search paints the chips from UI::Badge's palette via JS, so take the
@@ -43,26 +46,24 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     UI::Badge::Component::COLORS.fetch(color).split.first
   end
 
-  def expect_settings_open
-    expect(find(settings_selector, visible: :all)["class"]).not_to include("tw:hidden!")
-    expect(page).to have_css("[data-org--search-target='settingsButton'][data-active='true']")
+  def expect_filters_open
+    expect(panel_for("orgRegistrationFiltersOpen")["class"]).not_to include("tw:hidden!")
+    expect(page).to have_css("button[title='Search settings'][data-active='true']")
   end
 
-  def open_settings_if_not
-    if find(settings_selector, visible: :all)["class"].include?("tw:hidden!")
-      click_button "settings"
-    end
+  def open_filters_if_not
+    click_button "Search settings" if panel_for("orgRegistrationFiltersOpen")["class"].include?("tw:hidden!")
+  end
+
+  def open_columns_if_not
+    click_button "Column settings" if panel_for("orgRegistrationColumnsOpen")["class"].include?("tw:hidden!")
   end
 
   def rendered_bike_ids
     page.all("tbody tr a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
   end
 
-  # flaky: the in-frame "Render chart" advance-link toggle intermittently leaves
-  # the results frame showing a stale snapshot under Playwright (its history/frame
-  # nav settles differently than Selenium's), so the toggle reads the wrong state.
-  # Retry like the back/forward sync spec; a real browser renders it reliably.
-  it "searches by email and serial", flaky: 4 do
+  it "searches by email and serial" do
     # Create enough bikes to trigger pagination (default per_page is 10)
     FactoryBot.create_list(:bike_organized, 10, creation_organization: organization)
 
@@ -86,7 +87,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # Search by serial number
     fill_in "serial", with: bike1.serial_number
-    find("#search-button").click
+    click_button "Search registrations"
 
     expect(page).to have_current_path(/serial=/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
@@ -94,7 +95,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Clear serial and search by email
     fill_in "serial", with: ""
     fill_in "search_email", with: "alice@example.com"
-    find("#search-button").click
+    click_button "Search registrations"
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
@@ -116,7 +117,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", minimum: 10)
 
     # Pagination should be visible with multiple pages
-    expect(page).to have_css(".paginate-container a", minimum: 1)
+    expect(page).to have_css("nav[aria-label='Pages'] a", minimum: 1)
 
     # Click page 2 — turbo frame updates without full reload
     click_link "2"
@@ -132,13 +133,13 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # Search again — this fails if the frame was removed by turbo_stream.replace
     fill_in "search_email", with: "alice@example.com"
-    find("#search-button").click
+    click_button "Search registrations"
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame", wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
 
     # Third submission to confirm frame is still intact
     fill_in "search_email", with: ""
-    find("#search-button").click
+    click_button "Search registrations"
     expect(page).to have_css("tbody tr", count: 10, wait: 10)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
 
@@ -155,13 +156,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Go back
     page.go_back
     expect(page).to have_css("tbody tr", count: 10, wait: 10)
-    # Open settings to reveal the export link
-    open_settings_if_not
     # go_back re-renders the results frame, and while it's busy the wrapper grows
     # a min-height -- the table lands over the link and swallows the click. The
     # click then waits out a full page navigation, which also outruns the 2s default.
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
-    using_wait_time(10) { click_link "Create export of searched registrations" }
+    using_wait_time(10) { click_link "Export CSV" }
 
     expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
     all_bike_ids = organization.bikes.pluck(:id).sort
@@ -173,10 +172,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.go_back
     expect(page).to have_css("table", wait: 10)
 
-    open_settings_if_not
-    click_button "show notes search"
+    open_filters_if_not
+    check "show_notes_search"
     fill_in "search_notes", with: "red lock"
-    find("#search-button").click
+    click_button "Search registrations"
 
     expect(page).to have_current_path(/search_notes=red/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
@@ -186,17 +185,17 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # "past year" excludes bike1 (2 years ago)
     click_link "past year"
     expect(page).to have_current_path(/period=year/, wait: 10)
-    expect(page).to have_text("0 registrations matching")
+    expect(page).to have_text("0 matching registrations")
 
     fill_in "search_notes", with: ""
-    find("#search-button").click
+    click_button "Search registrations"
     expect(page).to have_current_path(/period=year/, wait: 10)
-    expect(page).to have_text("11 registrations matching", wait: 10)
+    expect(page).to have_text("11 matching registrations", wait: 10)
 
     # "past day" additionally excludes bike2 (3 days ago)
     click_link "past day"
     expect(page).to have_current_path(/period=day/, wait: 10)
-    expect(page).to have_text("10 registrations matching")
+    expect(page).to have_text("10 matching registrations")
 
     # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago).
     # Search on the page (no URL navigation): switch to past year, then submit the email filter.
@@ -204,7 +203,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     fill_in "search_email", with: "bob@example.com"
-    find("#search-button").click
+    click_button "Search registrations"
     expect(page).to have_current_path(/search_email=bob/, wait: 10)
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_field("search_email", with: "bob@example.com")
@@ -231,21 +230,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.execute_script("document.cookie = 'timezone=America/Los_Angeles;path=/;max-age=31536000;SameSite=Lax'")
     expect(browser_cookie_value("timezone")).to eq("America/Los_Angeles")
 
-    # Switch to past 30 days for daily chart bucketing, then enable the chart on the search page
+    # Switch to past 30 days, for daily chart bucketing. The chart card loads with the
+    # page now, so there's nothing to turn on.
+    open_filters_if_not
     click_link "past 30 days"
     expect(page).to have_current_path(/period=month/, wait: 10)
-    # "Render chart" lives inside the results frame the period change above
-    # replaces. Fully settle that frame navigation before clicking, so the
-    # advance nav isn't superseded mid-swap: rows in (bob is the only past-30-day
-    # match), Turbo's `busy` flag cleared, and the freshly-rendered link (its href
-    # now toggles to render_chart=true) present -- then click that exact link.
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
-    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
-    expect(page).to have_link("Render chart", href: /render_chart=true/, wait: 10)
-
-    click_link "Render chart", href: /render_chart=true/
-    expect(page).to have_current_path(/render_chart=true/, wait: 10)
-    expect(page).to have_css("table", wait: 10)
     # Chart loads async via a lazy turbo-frame; wait for the canvas before checking the
     # inline init data - chartkick and Chart.js arrive on demand, from ui--chart
     expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas", wait: 10)
@@ -263,13 +253,13 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # 30 days again -- and the URL already says year, so only the count shows it.
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
     fill_in "search_email", with: ""
-    find("#search-button").click
+    click_button "Search registrations"
     expect(page).to have_current_path(/period=year/, wait: 10)
     # The "custom" button lives inside the results frame, which this search
     # replaces. Wait for the swap to finish (count reflects the cleared email)
     # before toggling it -- otherwise Playwright grabs the old button and it
     # detaches mid-click ("Element is not attached to the DOM").
-    expect(page).to have_text("11 registrations matching", wait: 10)
+    expect(page).to have_text("11 matching registrations", wait: 10)
 
     click_button "custom"
     start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
@@ -303,7 +293,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("th.url_cell", visible: :hidden)
       expect(page).to have_css("th.impounded_cell", visible: :hidden)
       # Uncheck a default column — it hides
-      open_settings_if_not
+      open_columns_if_not
       uncheck "manufacturer_cell"
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("td.manufacturer_cell", visible: :hidden, minimum: 1)
@@ -316,11 +306,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("th.impounded_cell", visible: :visible)
 
       # Choose "only stolen"
+      open_filters_if_not
       choose("search_status_stolen", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=stolen/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
-      expect(page).to have_text("1 registration matching")
+      expect(page).to have_text("1 matching registration")
       expect(page).to have_text("only stolen")
       # Column choices persist after the search
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
@@ -328,15 +319,15 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("th.impounded_cell", visible: :visible)
 
       # Settings persisted open via localStorage; choose "only impounded"
-      expect_settings_open
+      expect_filters_open
       choose("search_status_impounded", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=impounded/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
 
       # Doesn't have export, because no csv_export feature
-      expect_settings_open
-      expect(page).to_not have_text "Create export of searched registrations"
+      expect_filters_open
+      expect(page).to_not have_link "Export CSV"
 
       # Choose "not stolen or impounded"
       choose("search_status_with_owner", allow_label_click: true, visible: :all)
@@ -519,8 +510,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).not_to have_css("th.avery_cell", visible: :visible)
       expect(page).not_to have_css("th.assign_bike_sticker_cell")
 
-      # Open settings and check avery — toggles column visibility client-side
-      open_settings_if_not
+      # Open the column panel and check avery — toggles column visibility client-side
+      open_columns_if_not
       check "avery_cell"
       # Avery column should be visible with check mark for exportable bike
       expect(page).to have_css("th.avery_cell", visible: :visible)
@@ -530,29 +521,30 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       uncheck "avery_cell"
       expect(page).not_to have_css("th.avery_cell", visible: :visible)
 
-      # Open settings and choose "only with address"
+      # Open the search settings and choose "only with address"
+      open_filters_if_not
       choose("search_address_with_street", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_address=with_street/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
-      expect(page).to have_text("1 registration matching")
+      expect(page).to have_text("1 matching registration")
       expect(page).to have_text("only with address")
 
-      expect_settings_open
+      expect_filters_open
       expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
-      using_wait_time(10) { click_link "Create export of searched registrations" }
+      using_wait_time(10) { click_link "Export CSV" }
       expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
       export_ids = find("#export_custom_bike_ids", visible: :all).value.split(", ").map(&:to_i).sort
       expect(export_ids).to eq([avery_bike.id])
       page.go_back
       expect(page).to have_css("tbody tr", count: 1, wait: 10)
 
-      expect_settings_open
+      expect_filters_open
       choose("search_stickers_with", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_stickers=with/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 0)
-      expect(page).to have_text("0 registrations matching")
+      expect(page).to have_text("0 matching registrations")
       expect(page).to have_text("only with address")
       expect(page).to have_text("only with stickers")
 

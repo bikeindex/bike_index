@@ -34,20 +34,31 @@
           "
         >
           <% @stats.each do |stat| %>
+            <%# Only dt/dd directly inside the row, which is what a <dl> takes %>
             <div class="tw:flex tw:items-center tw:gap-2">
-              <span class="tw:h-2.5 tw:w-2.5 tw:shrink-0 tw:rounded-sm <%= BANDS.dig(stat.key, :swatch) %>"></span>
+              <dt
+                class="
+                  tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2
+                  tw:text-sm tw:font-medium
+                "
+              >
+                <span class="tw:h-2.5 tw:w-2.5 tw:shrink-0 tw:rounded-sm <%= BANDS.dig(stat.key, :swatch) %>"></span>
 
-              <dt class="tw:min-w-0 tw:flex-1 tw:truncate tw:text-sm tw:font-medium">
-                <%= translation(".stat_#{stat.key}") %>
+                <span class="tw:truncate"><%= translation(".stat_#{stat.key}") %></span>
               </dt>
 
-              <dd class="tw:mb-0 tw:font-mono tw:text-base tw:font-semibold">
+              <dd
+                class="
+                  tw:mb-0 tw:flex tw:items-center tw:gap-2 tw:font-mono
+                  tw:text-base tw:font-semibold
+                "
+              >
                 <%= number_display(stat.count) %>
-              </dd>
 
-              <% if stat.delta_display %>
-                <%= render(delta_badge(stat)) %>
-              <% end %>
+                <% if stat.delta_display %>
+                  <%= render(delta_badge(stat)) %>
+                <% end %>
+              </dd>
             </div>
           <% end %>
         </dl>

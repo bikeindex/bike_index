@@ -102,7 +102,6 @@ module ComponentStructs
 
     def notes_search_label = translation(:show_notes_search)
 
-    # An export reaching past the organization would carry registrations that aren't its own
     def render_export? = @organization.enabled?("csv_exports") && !@search_all
 
     def initially_checked_columns

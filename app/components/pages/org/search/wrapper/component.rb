@@ -9,8 +9,6 @@ module Pages
         # carries the row of actions across the top, and renders inside the results
         # turbo-frame, so every search brings the whole card back.
         class Component < ApplicationComponent
-          delegate :cycle_type, :render_export?, to: :settings
-
           def initialize(
             organization:,
             pagy:,
@@ -103,7 +101,7 @@ module Pages
           # The search page declares org--search itself, on a div spanning the form and the
           # chart as well as this card
           def card_data_attributes
-            collapse = {controller: "ui--collapse", "ui--collapse-storage-key-value": "orgRegistrationColumnsOpen"}
+            collapse = Pages::Org::Search::Settings::Component::COLLAPSE_DATA
             return collapse if @search_page
 
             Pages::Org::Search::Settings::Component

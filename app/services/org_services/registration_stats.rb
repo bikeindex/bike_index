@@ -15,6 +15,10 @@ module OrgServices
       end
     end
 
+    #
+    # private below here
+    #
+
     def counts(bikes, time_range)
       scoped = bikes.where(created_at: time_range)
 

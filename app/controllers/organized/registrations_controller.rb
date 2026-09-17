@@ -23,7 +23,8 @@ module Organized
         @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
-        @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+        # The chart response has no form in it, so it skips the combobox's per-item lookups
+        @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params) unless chart_only?
         @per_page = permitted_per_page(default: 10)
 
         if create_export?
@@ -137,12 +138,12 @@ module Organized
     end
 
     def chart_scope_paths
-      @chart_scope_paths ||= Pages::Org::Search::ChartCard::Component::SCOPES.index_with do |scope|
+      @chart_scope_paths ||= Pages::Org::Search::ChartCard::Component::SCOPES.to_h do |scope|
         # The org is the path segment; left in the params it's a string key the route can't
         # read, so it would double up in the query these links advance the address bar to
-        organization_registrations_path(current_organization.to_param,
-          helpers.sortable_search_params.except(:organization_id).merge(chart_scope: scope))
-      end.symbolize_keys
+        [scope.to_sym, organization_registrations_path(current_organization.to_param,
+          helpers.sortable_search_params.except(:organization_id).merge(chart_scope: scope))]
+      end
     end
 
     # `year` ignores the search, so the card still answers when the search has narrowed to
@@ -226,14 +227,17 @@ module Organized
         false
       end
       @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
-      @search_unregisteredness = permitted_filter(:search_unregisteredness, %w[only_unregistered only_registered])
-      @search_parking_notification = current_organization.enabled?("parking_notifications") &&
-        permitted_filter(:search_parking_notification, %w[with none])
+      @search_unregisteredness = permitted_filter(:search_unregisteredness)
+      @search_parking_notification = permitted_filter(:search_parking_notification)
       search_status
     end
 
-    def permitted_filter(param, values)
-      values.include?(params[param]) ? params[param] : false
+    # Off the chips' own table, so a value or a feature gate can't be added to one side only
+    def permitted_filter(param)
+      group = ComponentStructs::OrgSearchSettings::FILTER_GROUPS.fetch(param)
+      return false unless group[:feature].nil? || current_organization.enabled?(group[:feature])
+
+      group[:values].key?(params[param]&.to_sym) ? params[param] : false
     end
 
     def sticker_scoped(bikes)

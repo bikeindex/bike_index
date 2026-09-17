@@ -37,9 +37,7 @@ module Pages
 
           private
 
-          def caption
-            translation((@scope == "year") ? ".caption_year" : ".caption_search")
-          end
+          def caption = translation(".caption_#{@scope}")
 
           def scope_entries
             SCOPES.map do |scope|
