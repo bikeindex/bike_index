@@ -37,7 +37,6 @@ module UI
         ]))
       end
 
-      # The segmented control: one track, the active entry raised out of it
       def toggle
         render(UI::ButtonGroup::Component.new(kind: :toggle, entries: [
           ComponentStructs::Shapes.entry("Spreadsheet", active: true, data: {action: "click->something#show"}),
