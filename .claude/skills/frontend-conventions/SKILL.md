@@ -45,6 +45,8 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 - **Every date/time** renders through `UI::Time::Component` — `render(UI::Time::Component.new(time: some_time))`. It emits the client-localized `localizeTime` span the frontend JS converts to the viewer's timezone. This is the *only* way to show a time: never `l(time, ...)`, `strftime`, `time_ago_in_words`, or a hand-written `localizeTime` span. Pass `format: :localize_time_precise` when you need seconds precision (default is `:localize_time`). It self-hides when `time` is nil, so no surrounding `if` guard is needed.
   - Legacy `l(time, format: :convert_time)` inside a `localizeTime` span predates the component and is still all over the admin tables. Convert one to `UI::Time::Component` whenever you touch the line it's on — including when it's the body of a `link_to`.
 
+- **A decorative icon is `inline_svg_tag(..., aria_hidden: true)`** — `aria: {hidden: true}` is a hash `inline_svg` drops, leaving an `svg[role=img]` with no accessible name, which only an axe audit in a `:js` spec catches.
+
 **Building markup to pass into a component argument uses `capture`** — a component keyword like `UI::Alerts::Base`'s `header:` or `UI::Header`'s `text:` takes a string, so a heading that wraps a link or an `<em>` has to be captured first.
 
 ## A component dropped into legacy markup is styled on the component
