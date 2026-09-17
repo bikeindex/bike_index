@@ -5653,6 +5653,17 @@ nl:
         hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
         made_without_serial: gemaakt zonder serie
         unknown: Onbekend
+      registration_status_badge:
+        abandoned: Er is melding gemaakt van een ogenschijnlijk verlaten locatie,
+          waar het niet thuishoort.
+        for_sale: Geregistreerd en beschermd, te koop aangeboden door de eigenaar.
+        found: Iemand heeft het gevonden en wacht tot de eigenaar het komt ophalen.
+        impounded: In bezit van een organisatie, in afwachting van de rechtmatige
+          eigenaar.
+        stolen: Gemeld als gestolen
+        unregistered: Niet geregistreerd door de eigenaar - aangemaakt op basis van
+          een parkeermelding
+        with_owner: Geregistreerd en beschermd. Bij de eigenaar (niet gestolen).
     pages:
       messages:
         thread_show:
@@ -6199,13 +6210,6 @@ nl:
             primary_color:
               one: Primaire kleur
               other: Primaire kleuren
-          status:
-            found: Gevonden
-            impounded: In beslag genomen bij
-            not_stolen: Niet gestolen
-            stolen: Gestolen
-            unregistered: Niet geregistreerd
-            for_sale: Te koop
           stolen_details:
             department_city: Afdeling & stad
             description_of_incident: Beschrijving van het incident
@@ -6228,7 +6232,6 @@ nl:
             audience_sent_away: Niet langer jouw %{bike_type}
             edit_this_bike: Bewerk dit %{bike_type}
             mark_stolen: Gestolen merk
-            registered_protected: Geregistreerd en beschermd
             sell_on_marketplace: Verkoop via de marktplaats
             share: Deel
             share_my_page: Deel mijn pagina

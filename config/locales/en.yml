@@ -693,7 +693,7 @@ en:
           impounded: impounded
           stolen: stolen
           unregistered: unregistered
-          with_owner: with owner
+          with_owner: registered
     enums:
       currency:
         cad: CAD

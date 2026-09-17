@@ -103,11 +103,9 @@
             </small>
           <% end %>
 
-          <% if bike.status_stolen? %>
-            <span class="tw:absolute tw:right-0 tw:bottom-0 tw:text-xs <%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
-              stolen
-            </span>
-          <% end %>
+          <span class="tw:absolute tw:right-0 tw:bottom-0">
+            <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
+          </span>
         </div>
       <% end %>
 

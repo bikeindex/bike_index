@@ -62,7 +62,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
               token: recovery_link_token,
               stolen_record: recovery_info
             }
-        }.to change(Email::RecoveredFromLinkJob.jobs, :size).by(1)
+        }.to change(EmailJobs::RecoveredFromLinkJob.jobs, :size).by(1)
         stolen_record.reload
         bike.reload
         expect(bike.status_stolen?).to be_falsey
@@ -81,7 +81,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
         it "updates and assigns recovering_user" do
           expect {
             put base_url, params: {bike_id: bike.id, token: recovery_link_token, stolen_record: recovery_info}
-          }.to change(Email::RecoveredFromLinkJob.jobs, :size).by(1)
+          }.to change(EmailJobs::RecoveredFromLinkJob.jobs, :size).by(1)
           stolen_record.reload
           bike.reload
 
@@ -101,7 +101,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
       it "does not update" do
         expect {
           put base_url, params: {bike_id: bike.id, token: "XDSFCVVVVVVVVVSD888", stolen_record: recovery_info}
-        }.to change(Email::RecoveredFromLinkJob.jobs, :size).by(0)
+        }.to change(EmailJobs::RecoveredFromLinkJob.jobs, :size).by(0)
         stolen_record.reload
         bike.reload
 

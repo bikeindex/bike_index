@@ -191,7 +191,7 @@ module BikeServices
       bike = validate_record(b_param, bike)
       return bike unless bike.present? && bike.id.present?
 
-      # NOTE: spaminess is recalculated in Email::OwnershipInvitationJob as a failsafe
+      # NOTE: spaminess is recalculated in EmailJobs::OwnershipInvitationJob as a failsafe
       if SpamEstimator::Bike.estimate(bike) > SpamEstimator::Bike::MARK_SPAM_PERCENT
         bike.update(likely_spam: true)
       end

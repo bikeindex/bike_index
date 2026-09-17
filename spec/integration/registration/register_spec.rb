@@ -424,7 +424,7 @@ RSpec.describe "Register flow", :js, type: :system do
       bike = Bike.spam.last
       expect(bike).to have_attributes(owner_email:, serial_number: "XYZ 123")
       # And the invitation to claim it, enqueued like any other, mails nothing
-      expect { Email::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
     end
   end
 

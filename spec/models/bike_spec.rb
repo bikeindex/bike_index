@@ -881,7 +881,7 @@ RSpec.describe Bike, type: :model do
       let(:status) { "status_with_owner" }
       it "responds with status" do
         expect(bike.status_humanized).to eq "with owner"
-        expect(bike.status_humanized_translated).to eq "with owner"
+        expect(bike.status_humanized_translated).to eq "registered"
       end
     end
   end

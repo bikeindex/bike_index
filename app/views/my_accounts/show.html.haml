@@ -40,7 +40,8 @@
                       = bike_thumb_image(bike)
                     .bike-information.multi-attr-lists
                       %h5.title-link
-                        = link_to bike_title_html(bike, include_status: true), bike_path(bike)
+                        = render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs))
+                        = link_to bike_title_html(bike), bike_path(bike)
                       %ul.attr-list
                         %li
                           %strong.attr-title #{t(".serial")}:

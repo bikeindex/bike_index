@@ -1,14 +1,5 @@
 # There is also BikeServices::Displayer for things that aren't only used in view files
 module BikeHelper
-  def bike_status_span(bike, override_to_for_sale: false)
-    status_humanized = override_to_for_sale ? "for sale" : bike.status_humanized
-    return "" if status_humanized == "with owner" # for sale is status_with_owner
-
-    content_tag(:strong,
-      Bike.status_humanized_translated(status_humanized),
-      class: "#{status_humanized.tr(" ", "-")}-color uppercase bike-status-html")
-  end
-
   def bike_thumb_image(bike)
     thumb_image_url = BikeServices::Displayer.thumb_image_url(bike)
     if thumb_image_url.present?
@@ -18,13 +9,9 @@ module BikeHelper
     end
   end
 
-  def bike_title_html(bike, include_status: false)
+  def bike_title_html(bike)
     content_tag(:span) do
       concat(deleted_span) if bike.deleted?
-      if include_status && bike_status_span(bike).present?
-        concat(bike_status_span(bike))
-        concat(" ")
-      end
       year_and_mnfg = [bike.year, bike.mnfg_name].compact.join(" ")
       concat(content_tag(:strong, year_and_mnfg))
       concat(" #{bike.frame_model_truncated}") if bike.frame_model.present?
