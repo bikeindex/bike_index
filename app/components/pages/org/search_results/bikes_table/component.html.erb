@@ -108,23 +108,14 @@
 
     <% settings.additional_registration_fields.each do |reg_field| %>
       <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
-        <% if bike.organized?(organization) %>
-          <% bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
-          <% if bike_attr == "address" %>
-            <% if bike.valid_mailing_address? %>
-              <small>
-                <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street) %>
-              </small>
-            <% end %>
-          <% elsif bike_attr == "organization_affiliation" %>
-            <%= bike.organization_affiliation(organization)&.humanize %>
-          <% elsif bike_attr == "student_id" %>
-            <%= bike.student_id(organization) %>
-          <% else %>
-            <%= bike.send(bike_attr) %>
-          <% end %>
-        <% else %>
+        <% if !bike.organized?(organization) %>
           <%= hidden_html %>
+        <% elsif reg_field != "reg_address" %>
+          <%= OrgServices::RegistrationFields.value(bike:, organization:, reg_field:) %>
+        <% elsif bike.valid_mailing_address? %>
+          <small>
+            <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street) %>
+          </small>
         <% end %>
       <% end %>
     <% end %>
