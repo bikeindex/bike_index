@@ -25,9 +25,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     using_wait_time(10) do
       sign_in(user)
       dismiss_flash_messages
-      # 720px wide, so the sidebar is an overlay behind the top bar's hamburgler.
-      # Its registrations group is the one open on a page no group matches.
-      find("#org_sidebar_hamburgler").click
+      # Its registrations group is the one open on a page no group matches
+      open_org_sidebar
       within("#org_sidebar_nav") { click_link "Search Registrations" }
       expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/)
     end
@@ -371,7 +370,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
 
     it "searches multiple serials, shows results, and caches rows by updated_at" do
-      find("#org_sidebar_hamburgler").click
+      open_org_sidebar
       within("#org_sidebar_nav") { click_link "Multi search" }
       expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 

@@ -17,10 +17,6 @@
       </p>
 
       <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
-        <% if @bike.claimed? && !unregistered? %>
-          <%= render(UI::Badge::Component.new(text: translation(".claimed"), color: :notice, indicator: true)) %>
-        <% end %>
-
         <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike)) %>
       </div>
     </div>

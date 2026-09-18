@@ -24,8 +24,10 @@ export default class extends Controller {
     window.removeEventListener('form-persist:restored', this.boundRestore)
   }
 
-  update () {
-    this.applyStatuses()
+  // register--organization:changed carries the duration it applied its own fields with;
+  // a combobox selection carries none, which is the animated default a pick should have
+  update (event) {
+    this.applyStatuses(event?.detail?.duration)
   }
 
   applyStatuses (duration) {

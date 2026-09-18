@@ -117,9 +117,9 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Fill every field: text, chip radio, unit select, comboboxes (including the
     # collapsed additional-color rows) and the missing-serial checkbox
-    fill_in "bike[user_name]", with: user_name
-    fill_in "bike[frame_model]", with: "Marlin 7"
-    fill_in "bike[year]", with: "2023"
+    fill_in_verified "bike[user_name]", with: user_name
+    fill_in_verified "bike[frame_model]", with: "Marlin 7"
+    fill_in_verified "bike[year]", with: "2023"
     type_into("#bike_primary_frame_color_id", "Red")
     click_combobox_option("Red")
     click_button "+ Add another color"
@@ -139,7 +139,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Unchecking has to undo the animated hide, not just its display:none
     uncheck "Missing serial"
-    fill_in "bike[serial_number]", with: "SERIAL9"
+    fill_in_verified "bike[serial_number]", with: "SERIAL9"
 
     check "Missing serial"
     expect(page).to have_no_field("bike[serial_number]")
@@ -210,7 +210,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     expect(page).to have_field("bike_status", with: "Stolen", wait: 10)
     expect(find("input[name='bike[status]']", visible: :all).value).to eq "status_stolen"
-    fill_in "bike[phone]", with: "(555) 000-0000"
+    fill_in_verified "bike[phone]", with: "(555) 000-0000"
 
     # Anonymous, so this uploads against the registration's token - after the reload above,
     # which would have dropped a file picked before it
@@ -393,7 +393,7 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_current_path(/step=2/, url: true)
       expect(Bike.count).to eq 0
 
-      fill_in "bike[user_name]", with: user_name
+      fill_in_verified "bike[user_name]", with: user_name
       click_button "Complete Bike Registration"
 
       expect(page).to have_content("Registration complete")
@@ -413,7 +413,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "XYZ 123"
+      fill_in_verified "bike[serial_number]", with: "XYZ 123"
 
       # The bot gets the same finished page it would if it had gotten away with it
       click_button "Complete Bike Registration"
@@ -448,8 +448,8 @@ RSpec.describe "Register flow", :js, type: :system do
     def complete_the_registration
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "HELD1234"
-      fill_in "bike[user_name]", with: user_name # anonymous, so it's asked for
+      fill_in_verified "bike[serial_number]", with: "HELD1234"
+      fill_in_verified "bike[user_name]", with: user_name # anonymous, so it's asked for
       click_button "Complete Bike Registration"
     end
 
@@ -523,7 +523,7 @@ RSpec.describe "Register flow", :js, type: :system do
         # A color is required for the bike to save, and signed in it saves on submit
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
-        fill_in "bike[serial_number]", with: "R2UP1234"
+        fill_in_verified "bike[serial_number]", with: "R2UP1234"
         click_button "Complete Bike Registration"
         expect(page).to have_content("Registration complete")
 

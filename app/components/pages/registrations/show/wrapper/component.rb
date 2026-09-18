@@ -9,7 +9,7 @@ module Pages
         class Component < ApplicationComponent
           # Digest of the markup inside the cache block — the cached_markup_digest spec
           # keeps it current, following what this tree renders out into UI:: and elsewhere
-          MARKUP_DIGEST = "bb19d05e05fa"
+          MARKUP_DIGEST = "48725a88ce8c"
 
           def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {}, display_dev_info: false)
             @bike = bike
@@ -31,8 +31,8 @@ module Pages
           end
 
           # Keyed on the viewer for the admin view's per-user content. The bike's cache
-          # version misses org-scoped records that don't touch it (notes, model audits, the
-          # owner's other registrations), so the inner component folds those in via
+          # version misses records that don't touch it (the owner's other registrations),
+          # so the inner component folds those in via
           # #cache_version — as does the prompt, whose alert is inside the cached body,
           # token and clock-derived form bounds and all. Cached CSRF tokens are
           # session-scoped and can't be keyed here — the csrf-refresh controller reissues

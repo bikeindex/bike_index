@@ -86,6 +86,18 @@ module IntegrationSpecHelpers
     end
   end
 
+  # fill_in that says so when the text misses, for the fields wait_for_details_step's
+  # comment describes: a focus change between fill's two round trips inserts it at the
+  # caret of whatever was focused before, leaving this field empty and that one holding
+  # both values. Nothing fails there, so it surfaces pages away at whatever reads either
+  # field next. Only for a value that round-trips unchanged - a field the page rewrites
+  # (strip-inputs, a formatter) never matches, and would read as the fill having missed.
+  def fill_in_verified(locator, with:, wait: 1)
+    fill_in(locator, with:)
+    fill_in(locator, with:) unless has_field?(locator, with:, wait:)
+    expect(page).to have_field(locator, with:)
+  end
+
   # Type into a field with real keystrokes. Capybara's `set`/`fill_in` go through
   # Playwright's fill, which dispatches only an `input` event; JS that opens on
   # keydown (e.g. hotwire_combobox's async dropdown) needs real key events.
@@ -125,6 +137,17 @@ module IntegrationSpecHelpers
     expect(page).to have_content("Logged out")
   end
 
+  # Below the sidebar's mobile breakpoint the nav is an overlay the hamburgler opens through
+  # shared-blocks--org-sidebar, so a click landing before that controller connects is
+  # swallowed the way open_settings_menu's is, leaving `within` on a nav that never opened.
+  # 10s because what's waited on is a module fetch: of this sequence's two call sites, the
+  # one already wrapped in using_wait_time(10) is the one that wasn't failing.
+  def open_org_sidebar(wait: 10)
+    wait_for_stimulus("shared-blocks--org-sidebar", timeout: wait)
+    find("#org_sidebar_hamburgler").click
+    expect(page).to have_css("#org_sidebar_nav", wait:)
+  end
+
   # revised/init.coffee hands the legacy form-well's selects to selectize, which hides the
   # <select> behind a control of its own -- so `select` can't reach them
   def selectize_for(selector)
@@ -150,7 +173,8 @@ module IntegrationSpecHelpers
   end
 
   # fill_in focuses the field, then sends its text a round trip later - so a controller
-  # connecting in between lands the text in the field filled just before
+  # connecting in between lands the text in the field filled just before. This covers the
+  # connect; fill_in_verified covers a fill racing anything that arrives after it
   def wait_for_details_step(wait: Capybara.default_max_wait_time)
     expect(page).to have_content("Add your bike", wait:)
     expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
