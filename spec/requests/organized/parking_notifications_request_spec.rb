@@ -119,6 +119,18 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       get "#{base_url}/#{parking_notification.to_param}"
       expect(response.status).to eq(200)
       expect(response).to render_template :show
+      expect(response.body).not_to include("created from a parking notification")
+    end
+
+    context "unregistered bike" do
+      let(:parking_notification) do
+        FactoryBot.create(:parking_notification_unregistered, organization: current_organization, user: current_user)
+      end
+      it "renders the registration status badge" do
+        get "#{base_url}/#{parking_notification.to_param}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("created from a parking notification")
+      end
     end
   end
 
