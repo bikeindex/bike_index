@@ -1,0 +1,35 @@
+<%= render Pages::Register::Page::Component.new(data: {controller: "register--heading",
+    "register--heading-names-value": CycleType.slug_translation_hash_lowercase_short.to_json,
+    action: "hw-combobox:selection->register--heading#update " \
+      "form-persist:restored@window->register--heading#update"}) do %>
+  <%= render Pages::Register::Progress::Component.new(steps: @steps, step: 1) %>
+
+  <% unless @skip_heading %>
+    <%= render UI::Header::Component.new(text: heading_text) %>
+  <% end %>
+
+  <% if @b_param.errors.any? %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
+  <% end %>
+
+  <%= form_with(url: register_path, method: :post, scope: :bike, **form_options) do |f| %>
+    <%= hidden_field_tag :b_param_token, @b_param.id_token %>
+
+    <%# What tells create both steps are here - the embed frames step 1 alone %>
+    <%= hidden_field_tag :single_page, true %>
+
+    <%# So the organization survives a submission that has to build a registration %>
+    <%= hidden_field_tag :organization_id, organization.id if organization.present? %>
+
+    <%= render UI::Forms::Honeypot::Component.new %>
+
+    <%# Step 1 posts its own scope, which create reads separately from step 2's %>
+    <%= fields_for(:b_param, @b_param) do |b_param_form| %>
+      <%= render Pages::Register::Step1Fields::Component.new(b_param: @b_param,
+          form: b_param_form, current_user: @current_user, organization:) %>
+    <% end %>
+
+    <%= render Pages::Register::Step2Fields::Component.new(b_param: @b_param, steps: @steps,
+        form: f, current_user: @current_user, organization:, show_owner_email: false) %>
+  <% end %>
+<% end %>

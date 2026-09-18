@@ -348,6 +348,110 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
+    context "the switches below the legacy one" do
+      # Both submit together, so what's checked is the whole setting
+      def set_switches(**params)
+        get "#{base_url}/new", params: {register_settings: true}.merge(params)
+      end
+
+      def form_field_names(scope)
+        Nokogiri::HTML(response.body).css("form[action='/register'] [name^='#{scope}[']").map { |n| n["name"] }.uniq
+      end
+
+      it "asks for both steps on one page, and stops once it's unchecked" do
+        get "#{base_url}/new"
+        expect(form_field_names("bike")).to eq([])
+
+        set_switches(single_page: true)
+        expect(session[:register_single_page]).to be_present
+        expect(form_field_names("b_param")).to include "b_param[owner_email]"
+        expect(form_field_names("bike")).to include "bike[serial_number]"
+
+        # The preference follows the session rather than the link that set it
+        get "#{base_url}/new"
+        expect(form_field_names("bike")).to include "bike[serial_number]"
+
+        set_switches
+        expect(session[:register_single_page]).to be_blank
+        expect(form_field_names("bike")).to eq([])
+      end
+
+      it "stores the separate attestation switch" do
+        set_switches(separate_attestation: true)
+        expect(session[:register_separate_attestation]).to be_present
+
+        set_switches(single_page: true)
+        expect(session[:register_separate_attestation]).to be_blank
+      end
+    end
+
+    context "both steps on one page" do
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
+      let(:color) { FactoryBot.create(:color, name: "Red") }
+
+      # The one page submits both steps together, so the whole registration is this post
+      def register_e_scooter
+        get "#{base_url}/new", params: {register_settings: true, single_page: true}
+        b_param = BParam.last
+        post "/register", params: {b_param_token: b_param.id_token, single_page: true,
+                                   propulsion_type_motorized: true,
+                                   b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email: "customer@example.com"},
+                                   bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+                                          status: "status_with_owner", user_name: "Sally Rider"}}
+        b_param.reload
+      end
+
+      # The submission is what makes it an e-vehicle, so the sequence isn't knowable
+      # until it's saved - and nothing after this post resolves it again
+      it "stops at the safety pages, which the submission is what asks for" do
+        b_param = nil
+        expect { b_param = register_e_scooter }.to_not change(Bike, :count)
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+      end
+    end
+
+    context "the registrant fills out the attestation separately" do
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
+      let(:color) { FactoryBot.create(:color, name: "Red") }
+      let(:owner_email) { "customer@example.com" }
+      let(:details) do
+        {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+         status: "status_with_owner", user_name: "Sally Rider"}
+      end
+
+      # Through the flow rather than the service, since the switch is a session preference
+      def register_e_scooter
+        get "#{base_url}/new", params: {register_settings: true, separate_attestation: true}
+        b_param = BParam.last
+        post "/register", params: {b_param_token: b_param.id_token, propulsion_type_motorized: true,
+                                   b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}}
+        patch "/register", params: {b_param_token: b_param.id_token, bike: details}
+        b_param.reload
+      end
+
+      it "creates the bike off step 2, with no safety pages and no acknowledgment" do
+        b_param = nil
+        expect { b_param = register_e_scooter }.to change(Bike, :count).by 1
+        expect(RegistrationSequenceAcknowledgment.count).to eq 0
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
+        expect(Bike.last).to have_attributes(owner_email:, cycle_type: "e-scooter")
+        # Nothing left over to alert the member who registered it
+        expect(b_param.unfinished_registration?(current_user)).to be_falsey
+      end
+
+      context "registering their own" do
+        let(:owner_email) { current_user.email }
+
+        it "asks for the attestation, which is theirs to agree to" do
+          b_param = nil
+          expect { b_param = register_e_scooter }.to_not change(Bike, :count)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        end
+      end
+    end
+
     context "not an organization member" do
       include_context :request_spec_logged_in_as_user
 

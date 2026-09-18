@@ -4,12 +4,6 @@ en:
     pages:
       register:
         step1:
-          bike_info_html: "%{cycle_type} info"
-          electric_helper: Check electric so we flag e-bikes and verify certification.
-          electric_motorized: "⚡️ Electric (motorized)"
-          email: Email
-          email_placeholder: you@example.com
-          email_school: "%{org_name} email"
           just_the_essentials: Just the essentials to start.
           next: Next
           no_need_to_wait: We'll email a confirmation link — you don't have to wait
@@ -20,6 +14,4 @@ en:
           start_over_certain: Start over?
           start_over_discards: This begins a new registration — nothing you've entered
             here carries over.
-          vehicle_type: Vehicle type
           yes_start_over: Yes, start over
-          your_info: Your info

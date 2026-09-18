@@ -55,6 +55,7 @@ module Organized
     def new
       # Arriving here is the way back from the embed form, whatever sent them
       session.delete(:old_register_view)
+      assign_register_settings if params[:register_settings].present?
       # "false" is owner_email_for's no-default sentinel - the member registering here
       # isn't the owner
       @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: session[:register_b_param_token],
@@ -67,10 +68,11 @@ module Organized
       @skip_general_alert = true
       # The form carries this registration's token, and a cached page would carry a stale one
       response.set_header("Cache-Control", "no-store")
-      sequence = BikeServices::Register.registration_sequence(@b_param)
-      steps = BikeServices::Register.steps(@b_param, sequence:)
+      sequence = register_flow_sequence(@b_param)
+      steps = BikeServices::Register.steps(@b_param, sequence:, single_page: register_single_page?)
       render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, steps:,
-        organization: current_organization, current_user:)
+        organization: current_organization, current_user:, single_page: register_single_page?,
+        separate_attestation: register_separate_attestation?)
     end
 
     def multi_search
@@ -90,6 +92,12 @@ module Organized
     end
 
     private
+
+    # Both switches submit together, so an unchecked box is what turns one off
+    def assign_register_settings
+      session[:register_single_page] = params[:single_page].presence
+      session[:register_separate_attestation] = params[:separate_attestation].presence
+    end
 
     def normalized_search_kind
       (params[:search_kind] == "stickers") ? "stickers" : "serials"

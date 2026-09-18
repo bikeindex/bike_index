@@ -55,6 +55,10 @@ module OrganizedHelper
   end
 
   def organized_container
+    # No container at all - the register flow supplies its own full-bleed shell, and a
+    # gutter would leave white down either side of its gray
+    return nil if [controller_name, action_name] == %w[registrations new]
+
     fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits registrations]
     return "container-fluid" if fluid.include?(controller_name)
 

@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    pages:
+      register:
+        step1_fields:
+          bike_info_html: "%{cycle_type} info"
+          electric_helper: Check electric so we flag e-bikes and verify certification.
+          electric_motorized: "⚡️ Electric (motorized)"
+          email: Email
+          email_placeholder: you@example.com
+          email_school: "%{org_name} email"
+          vehicle_type: Vehicle type
+          your_info: Your info
