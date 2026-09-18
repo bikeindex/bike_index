@@ -10,9 +10,10 @@ import { Controller } from '@hotwired/stimulus'
 // hw-combobox:selection->form-persist#save submit->form-persist#clear".
 // The storage key defaults to pathname + the form's action (see derivedKey);
 // set data-form-persist-key-value only when that isn't unique per form.
-// A restore is announced as form-persist:restored on window - a controller whose
-// UI hangs off restored fields listens for it and reconciles in its own connect,
-// since a lazily loaded module can arrive after the announcement.
+// A restore that changed something is announced as form-persist:restored on window - one
+// that found no draft announces nothing. A controller whose UI hangs off restored fields
+// listens for it and reconciles in its own connect, since a lazily loaded module can
+// arrive after the announcement.
 // Writes are debounced (DEBOUNCE_MS) and a restored draft is discarded once
 // older than TTL_MS.
 const DEBOUNCE_MS = 400
@@ -65,30 +66,36 @@ export default class extends Controller {
   // selection), so the draft wins for them.
   restore () {
     const stored = this.read()
-    this.fields.forEach((field) => {
-      const value = stored[field.name]
-      if (value == null) return
-      if (field.type === 'radio') {
-        if (!this.radioGroupChecked(field.name)) field.checked = field.value === value
-      } else if (field.type === 'checkbox') {
-        field.checked = value === true
-      } else if (field.tagName === 'SELECT') {
-        field.value = value
-        // A select drives sibling fields (org--impound-update, address-group),
-        // and assigning the value fires nothing - so say what a user pick says
-        field.dispatchEvent(new Event('change', { bubbles: true }))
-      } else if (!field.value) {
-        field.value = value
-      }
-    })
-    this.comboboxes.forEach(({ hidden, display }) => {
-      if (stored[hidden.name] == null) return
+    const restoredFields = this.fields.filter((field) => this.restoreField(field, stored[field.name])).length
+    const comboboxes = this.comboboxes.filter(({ hidden }) => stored[hidden.name] != null)
+    comboboxes.forEach(({ hidden, display }) => {
       hidden.value = stored[hidden.name]
       display.value = stored[`${hidden.name}::display`] || stored[hidden.name]
     })
-    // Controllers whose UI hangs off restored fields (collapsed rows, checkbox
-    // driven sections) reconcile on this event.
-    window.dispatchEvent(new CustomEvent('form-persist:restored'))
+    // Controllers whose UI hangs off restored fields (collapsed rows, checkbox driven
+    // sections) reconcile on this event. Only when there was a draft: announcing an
+    // empty one has them collapse and disable fields under whatever is being typed.
+    if (restoredFields || comboboxes.length) window.dispatchEvent(new CustomEvent('form-persist:restored'))
+  }
+
+  // Whether the draft carried this field, and it was this one's to take
+  restoreField (field, value) {
+    if (value == null) return false
+    if (field.type === 'radio') {
+      if (this.radioGroupChecked(field.name)) return false
+      field.checked = field.value === value
+    } else if (field.type === 'checkbox') {
+      field.checked = value === true
+    } else if (field.tagName === 'SELECT') {
+      field.value = value
+      // A select drives sibling fields (org--impound-update, address-group),
+      // and assigning the value fires nothing - so say what a user pick says
+      field.dispatchEvent(new Event('change', { bubbles: true }))
+    } else {
+      if (field.value) return false
+      field.value = value
+    }
+    return true
   }
 
   write () {

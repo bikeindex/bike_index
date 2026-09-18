@@ -39,7 +39,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
 
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
-        fill_in "bike[serial_number]", with: "XYZ 123"
+        fill_in_verified "bike[serial_number]", with: "XYZ 123"
 
         # Student ID is required, so the browser holds the submit while the organization is on
         click_button "Complete Bike Registration"
@@ -85,7 +85,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
 
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
-        fill_in "bike[serial_number]", with: "XYZ 123"
+        fill_in_verified "bike[serial_number]", with: "XYZ 123"
         click_button "Complete Bike Registration"
 
         expect(page).to have_content("Registration complete")
@@ -136,10 +136,10 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       click_button "Next"
 
       wait_for_details_step
-      fill_in "bike[user_name]", with: user_name
+      fill_in_verified "bike[user_name]", with: user_name
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "XYZ 123"
+      fill_in_verified "bike[serial_number]", with: "XYZ 123"
       # The safety pages come next, so step 2 no longer finishes the registration
       click_button "Next"
 
@@ -237,15 +237,15 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         # The rider never sees the failure, only the retry - waited out past Capybara's default
         wait_for_details_step(wait: 10)
 
-        fill_in "bike[user_name]", with: user_name
+        fill_in_verified "bike[user_name]", with: user_name
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
-        fill_in "bike[serial_number]", with: "XYZ 123"
+        fill_in_verified "bike[serial_number]", with: "XYZ 123"
         # A theft, so the report is in the flow too - it waits on the emailed link, which
         # puts it last rather than after this form
         type_into("#bike_status", "Stolen")
         click_combobox_option("Stolen")
-        fill_in "bike[phone]", with: "555 000 0000"
+        fill_in_verified "bike[phone]", with: "555 000 0000"
         click_button "Next"
 
         expect(page).to have_content("Battery & charging")

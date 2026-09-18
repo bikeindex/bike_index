@@ -77,10 +77,12 @@ RSpec.configure do |config|
         playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
       end
 
-      # A nil current_path is Capybara reporting an `about:` URL -- reached by traversing
-      # to the about:blank every example starts on, or by the page being replaced. These
-      # say which, with the main-frame trail leading to it. Nothing is written unless one
-      # fires, and tmp/capybara is the directory CI uploads with the failure screenshots.
+      # Capybara reports a nil current_path for three URLs, not just the about:blank one
+      # (session.rb: nil for an `about:` scheme, then `path unless path&.empty?`) -- an
+      # empty URL, and chrome-error://chromewebdata, which is what Chrome commits when a
+      # cross-document navigation fails outright. All three screenshot blank, so the log is
+      # what tells them apart. Nothing is written unless one fires, and tmp/capybara is the
+      # directory CI uploads with the failure screenshots.
       log_path = Rails.root.join("tmp/capybara/browser_events.log")
       trail = []
       record = lambda do |message|
@@ -93,11 +95,19 @@ RSpec.configure do |config|
 
       playwright_page.on("crash", ->(_page) { record.call("page crashed") })
       playwright_page.context.on("page", ->(new_page) { record.call("context opened #{new_page.url}") })
+      # No frame check: Request#frame raises for a request issued before its frame exists,
+      # and this runs on the transport's reader thread, which rescues only IOError - one
+      # raise there stops every later Playwright message. The url says which navigation
+      playwright_page.on("requestfailed", lambda { |request|
+        next unless request.navigation_request?
+
+        record.call("navigation failed: #{request.url} (#{request.failure})")
+      })
       playwright_page.on("framenavigated", lambda { |frame|
         next unless frame.parent_frame.nil?
 
         trail << frame.url
-        record.call("main frame navigated to #{frame.url}") if frame.url.start_with?("about:")
+        record.call("main frame navigated to #{frame.url}") unless frame.url.start_with?("http")
       })
     end
   end

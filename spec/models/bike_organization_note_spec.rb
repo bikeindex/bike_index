@@ -25,6 +25,14 @@ RSpec.describe BikeOrganizationNote, type: :model do
     end
   end
 
+  describe "bike touch" do
+    let(:bike) { FactoryBot.create(:bike_organized, updated_at: 1.day.ago) }
+
+    it "touches the bike" do
+      expect { FactoryBot.create(:bike_organization_note, bike:) }.to change { bike.reload.updated_at }
+    end
+  end
+
   describe "versioning" do
     include_context :with_paper_trail
 

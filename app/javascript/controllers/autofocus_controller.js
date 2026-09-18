@@ -11,6 +11,10 @@ const FIELDS = [
 
 export default class extends Controller {
   connect () {
+    // Lazily loaded, so connect can land after the rider picked a field of their own -
+    // focusing then would take the caret off it
+    if (this.element.contains(document.activeElement)) return
+
     const field = [...this.element.querySelectorAll(FIELDS)].find((el) => el.offsetParent !== null)
     field?.focus()
   }

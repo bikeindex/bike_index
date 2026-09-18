@@ -33,10 +33,18 @@ fi
 # instead of reading as "some other branch" and skipping green
 current_branch="$(git rev-parse --abbrev-ref HEAD)"
 
-if [ "$current_branch" != "$TRANSLATION_BRANCH" ]; then
-  output "${GREEN}" "Skipping: on ${current_branch}, not TRANSLATION_BRANCH: ${TRANSLATION_BRANCH}"
-  exit 0
-fi
+sync_branch_prefix="translations-sync-"
+sync_commit_message="translations sync"
+
+# A sync branch is checked too, rather than skipping green: translation.io gains
+# translations while its PR sits open
+case "$current_branch" in
+  "$TRANSLATION_BRANCH" | "$sync_branch_prefix"*) ;;
+  *)
+    output "${GREEN}" "Skipping: on ${current_branch}, neither TRANSLATION_BRANCH (${TRANSLATION_BRANCH}) nor a ${sync_branch_prefix} branch"
+    exit 0
+    ;;
+esac
 
 echo bundle exec rake translation:sync_and_purge prepare_translations
 bundle exec rake translation:sync_and_purge prepare_translations
@@ -57,41 +65,71 @@ else
   git --no-pager diff
 
   if [ -n "$CI" ]; then
-    output "${YELLOW}" "On CI — creating translation sync PR"
-
-    # Branches are named translations-sync-<timestamp>, so `gh pr list --head`
-    # can't be used — it wants an exact branch name.
-    # Deliberately not failure-tolerant: a swallowed error reads as "no open sync
-    # PR" and opens a duplicate.
-    existing_pr=$(gh pr list --state open --limit 100 --json number,headRefName \
-      --jq 'map(select(.headRefName | startswith("translations-sync")))[0].number')
-    if [ -n "$existing_pr" ]; then
-      output "${YELLOW}" "Translation sync PR already exists: #${existing_pr} — skipping PR creation"
-      exit 1
-    fi
-
-    branch_name="translations-sync-$(date +%Y%m%d%H%M%S)"
-
     git config user.name "github-actions[bot]"
     git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    git checkout -b "$branch_name"
+    # Sync branches carry a timestamp, so `gh pr list --head` can't be used — it
+    # wants an exact branch name.
+    # Deliberately not failure-tolerant: a swallowed error reads as "no open sync
+    # PR" and opens a duplicate.
+    open_sync_pr=$(gh pr list --state open --limit 100 --json number,headRefName \
+      --jq "map(select(.headRefName | startswith(\"$sync_branch_prefix\")))[0] | select(.) | \"\(.number) \(.headRefName)\"")
+    read -r open_pr_number open_pr_branch <<<"$open_sync_pr"
+
+    if [ "$current_branch" = "$open_pr_branch" ]; then
+      output "${YELLOW}" "On CI — re-syncing sync PR #${open_pr_number}"
+      push_branch="$current_branch"
+    elif [ "$current_branch" != "$TRANSLATION_BRANCH" ]; then
+      output "${RED}" "No open sync PR for ${current_branch} — leaving the branch alone"
+      exit 1
+    elif [ -n "$open_pr_branch" ]; then
+      output "${YELLOW}" "On CI — adding these translations to open sync PR #${open_pr_number}"
+      push_branch="$open_pr_branch"
+    else
+      output "${YELLOW}" "On CI — creating translation sync PR"
+      push_branch="${sync_branch_prefix}$(date +%Y%m%d%H%M%S)"
+      # Sha too: main has moved on by the time anyone reads the PR
+      pr_body="Created from ${TRANSLATION_BRANCH} at $(git rev-parse HEAD) ($(git log -1 --format=%s))"
+    fi
+
     git stash pop || true
     git add config/locales/
-    git commit -m "translations sync"
+    git commit -m "$sync_commit_message"
+
+    if [ -n "$open_pr_branch" ] && [ "$open_pr_branch" != "$current_branch" ]; then
+      # The PR's branch forked from an older main, so the sync is re-applied onto its
+      # tip rather than pushed from here — the push has to fast-forward, and the
+      # locales as this run just synced them are what the PR should carry
+      synced_locales="$(git rev-parse HEAD)"
+      git fetch origin "$push_branch"
+      git checkout -B "$push_branch" FETCH_HEAD
+      git checkout "$synced_locales" -- config/locales/
+
+      # The timestamp file moves on every sync, so it can't speak to whether
+      # translation.io returned anything the PR doesn't already have
+      if git diff --cached --quiet -- config/locales ":(exclude)config/locales/.translation_io"; then
+        output "${YELLOW}" "#${open_pr_number} already carries these translations — merge it"
+        exit 1
+      fi
+      git commit -m "$sync_commit_message"
+    fi
 
     # In CI the checkout persists the App token as git creds, so this pushes as
     # the App — a non-default-token push is what fires `on: push` and gives the
     # PR its required checks. A default-token push triggers no workflows at all.
-    git push origin "$branch_name"
+    git push origin "HEAD:${push_branch}"
 
-    gh pr create \
-      --title "Automated translations sync from CI" \
-      --body "" \
-      --base main \
-      --head "$branch_name"
+    if [ -z "$open_pr_branch" ]; then
+      gh pr create \
+        --title "Automated translations sync from CI" \
+        --body "$pr_body" \
+        --base main \
+        --head "$push_branch"
 
-    output "${YELLOW}" "PR created with CI running. Build will fail until the PR is merged."
+      output "${YELLOW}" "PR created with CI running. Build will fail until the PR is merged."
+    else
+      output "${YELLOW}" "Pushed onto #${open_pr_number}. That push's own run re-checks it."
+    fi
   fi
 
   exit 1
