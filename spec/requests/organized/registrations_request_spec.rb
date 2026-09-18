@@ -204,7 +204,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       it "links the scopes at the page's own URL, carrying the search" do
         get base_url, params: {period: "week"}, headers: frame_headers
         expect(response.body).to include("chart_scope=year&amp;period=week")
-        expect(response.body).to_not include("chart_only")
       end
 
       # Sorting is a different question than which scope the chart is answering

@@ -123,8 +123,8 @@ module Organized
       SORTABLE_COLUMNS
     end
 
-    # The frame asking, not a param: the scope links put this URL in the address bar,
-    # where a reload has to be the whole page
+    # The frame asking, with no render_chart gate: the card always loads, and the scope links
+    # put this URL in the address bar, where a reload has to be the whole page
     def chart_only?
       turbo_frame_request_id == Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s
     end
