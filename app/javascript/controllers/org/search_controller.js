@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'filterSummary']
+  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'filterSummary', 'periodLabel']
 
   connect () {
     this.chartSearch = this.chartParams()
@@ -20,6 +20,7 @@ export default class extends Controller {
   // looks after itself - ui--collapse reconnects with it - but the chart is outside them.
   handleFrameRender = (event) => {
     if (this.hasChartFrameTarget && event.target === this.chartFrameTarget) return
+    this.syncPeriod()
     this.reloadChart()
   }
 
@@ -62,6 +63,26 @@ export default class extends Controller {
 
     this.filterSummaryTarget.innerHTML = active.join(' · ')
     this.filterSummaryTarget.hidden = active.length === 0
+  }
+
+  // The period buttons navigate the results frame from outside it, so the button that's
+  // active and the row's label still describe the last period until this catches them up.
+  // A blank period is a search that didn't change it, which leaves what's rendered.
+  syncPeriod () {
+    const period = new URLSearchParams(window.location.search).get('period')
+    if (!period) return
+    let active
+    this.element.querySelectorAll('a[data-period]').forEach(button => {
+      if (button.dataset.period === period) {
+        button.dataset.active = 'true'
+        active = button
+      } else {
+        delete button.dataset.active
+      }
+    })
+    if (active && this.hasPeriodLabelTarget) {
+      this.periodLabelTarget.textContent = active.textContent.replace(/\s+/g, ' ').trim()
+    }
   }
 
   perPageChanged () {

@@ -20,7 +20,7 @@
 
     <span class="tw:text-sm">
       <%= translation(".date_range") %>
-      <span class="tw:font-bold"><%= period_label %></span>
+      <span class="tw:font-bold" data-org--search-target="periodLabel"><%= period_label %></span>
     </span>
 
     <%#
@@ -59,7 +59,17 @@
       <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2">
         <span class="tw:text-sm tw:font-bold tw:text-gray-500"><%= translation(".date_range") %></span>
 
-        <div class="tw:min-w-0 tw:flex-1">
+        <%#
+          Drive is off app-wide, so outside the frame these links reloaded the whole page - and
+          the fresh window's time-localizer rewrote the timezone cookie. They navigate the
+          results like the chips beside them do, and org--search catches up what's out here.
+        %>
+
+        <div
+          class="tw:min-w-0 tw:flex-1"
+          data-turbo="true"
+          data-turbo-frame="<%= @target_frame %>"
+        >
           <%= render(UI::PeriodSelect::Component.new(period: @period, start_time: @start_time,
             end_time: @end_time, sortable_search_params: @sortable_search_params, align_start: true)) %>
         </div>
