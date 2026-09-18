@@ -234,12 +234,12 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         FactoryBot.create(:registration_sequence_acknowledgment, bike:)
       end
 
-      it "sorts the unacknowledged as the earliest" do
+      it "sorts by when this organization's sequence was acknowledged" do
         get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "desc"}
-        expect(assigns(:bikes).map(&:id)).to eq([bike_acknowledged_later.id, bike_acknowledged_earlier.id, bike.id])
+        expect(assigns(:bikes).map(&:id)).to eq([bike.id, bike_acknowledged_later.id, bike_acknowledged_earlier.id])
 
         get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "asc"}
-        expect(assigns(:bikes).map(&:id)).to eq([bike.id, bike_acknowledged_earlier.id, bike_acknowledged_later.id])
+        expect(assigns(:bikes).map(&:id)).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, bike.id])
       end
     end
 
