@@ -75,6 +75,16 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
+  context "with reg_student_id enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search reg_student_id] }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+    before { bike.current_ownership.update(registration_info: {"student_id" => "JD_4821"}) }
+
+    it "renders the student ID as registered" do
+      expect(component).to have_css("td.reg_student_id_cell", exact_text: "JD_4821", normalize_ws: true)
+    end
+  end
+
   context "with registration_sequences enabled" do
     let(:enabled_feature_slugs) { %w[bike_search registration_sequences] }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }

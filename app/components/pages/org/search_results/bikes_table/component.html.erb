@@ -119,7 +119,7 @@
           <% elsif bike_attr == "organization_affiliation" %>
             <%= bike.organization_affiliation(organization)&.humanize %>
           <% elsif bike_attr == "student_id" %>
-            <%= bike.student_id(organization)&.humanize %>
+            <%= bike.student_id(organization) %>
           <% else %>
             <%= bike.send(bike_attr) %>
           <% end %>
