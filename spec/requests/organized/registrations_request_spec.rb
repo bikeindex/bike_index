@@ -181,33 +181,28 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
-    context "chart_only" do
-      it "renders the chart frame with the searched counts" do
-        get base_url, params: {chart_only: "1"}
+    context "the chart frame asking" do
+      let(:frame_headers) { {"Turbo-Frame" => "registrations_chart_frame"} }
+
+      it "renders the chart alone, with the searched counts" do
+        get base_url, headers: frame_headers
         expect(response.status).to eq(200)
         expect(response.body).to include('id="registrations_chart_frame"')
         expect(assigns(:chart_scope)).to eq "search"
         expect(response.body).to include("Total registrations")
+        expect(response.body).to_not include("Find a registration")
       end
 
       it "steps outside the search for the year scope" do
-        get base_url, params: {chart_only: "1", chart_scope: "year", serial: "no-match-at-all"}
+        get base_url, params: {chart_scope: "year", serial: "no-match-at-all"}, headers: frame_headers
         expect(response.status).to eq(200)
         expect(assigns(:chart_scope)).to eq "year"
         expect(response.body).to include("Last year overview")
-      end
-
-      it "renders the chart alone for its own frame, without the param" do
-        get base_url, params: {chart_scope: "year"}, headers: {"Turbo-Frame" => "registrations_chart_frame"}
-        expect(response.status).to eq(200)
-        expect(assigns(:chart_scope)).to eq "year"
-        expect(response.body).to include("Last year overview")
-        expect(response.body).to_not include("Find a registration")
       end
 
       # The scope links advance the address bar, so what they put there has to be the page
       it "links the scopes at the page's own URL, carrying the search" do
-        get base_url, params: {chart_only: "1", period: "week"}
+        get base_url, params: {period: "week"}, headers: frame_headers
         expect(response.body).to include("chart_scope=year&amp;period=week")
         expect(response.body).to_not include("chart_only")
       end

@@ -123,13 +123,10 @@ module Organized
       SORTABLE_COLUMNS
     end
 
-    # The card loads with every search now, so the frame asking is enough - unlike the other
-    # org indexes, there's no render_chart toggle in front of it. Which is what lets the
-    # scope links advance the address bar: the URL they put there is the whole page on a
-    # reload, and only the chart when the frame is the one asking for it.
+    # The frame asking, not a param: the scope links put this URL in the address bar,
+    # where a reload has to be the whole page
     def chart_only?
-      Binxtils::InputNormalizer.boolean(params[:chart_only]) ||
-        turbo_frame_request_id == Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s
+      turbo_frame_request_id == Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s
     end
 
     def chart_card_component
