@@ -3396,7 +3396,6 @@ pre code {
 }
 
 .admin-subnav,
-.custom-time-selection,
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -13738,64 +13737,6 @@ table .photo-cell img {
 
 #recovery-bike-image-text.bike-image-added .not-using-bike-image {
   display: none
-}
-
-#timeSelectionBtnGroup .period-select-standard {
-  transition: opacity .5s ease-in-out
-}
-
-#timeSelectionBtnGroup.custom-period-selected .period-select-standard {
-  opacity: .6
-}
-
-.custom-time-selection {
-  justify-content: flex-end
-}
-
-.custom-time-selection .form-group {
-  display: flex;
-  flex: 0 0 auto;
-  flex-flow: row wrap;
-  align-items: center;
-  margin-bottom: 0
-}
-
-.custom-time-selection label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0
-}
-
-.custom-time-selection .form-control {
-  display: inline-block;
-  width: auto;
-  max-width: 100%;
-  vertical-align: middle
-}
-
-.custom-time-selection .btn-success {
-  margin-right: 15px
-}
-
-.custom-time-selection .end-time-control {
-  margin-left: 0
-}
-
-@media(max-width:767.98px) {
-  .custom-time-selection {
-    justify-content: flex-start
-  }
-  .custom-time-selection .form-group {
-    margin-top: 8px;
-    flex: 0 0 75%;
-    max-width: 75%;
-    position: relative;
-    padding-left: 15px
-  }
-  .custom-time-selection .end-time-control {
-    margin-left: 0
-  }
 }
 
 .pagination-flex {
