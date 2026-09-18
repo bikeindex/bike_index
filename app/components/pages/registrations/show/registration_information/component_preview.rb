@@ -12,20 +12,12 @@ module Pages
             card(acknowledged_bike, "acknowledged e-vehicle")
           end
 
-          def staff_without_acknowledgment
-            card(unacknowledged_bike, "unacknowledged e-vehicle")
-          end
-
           def staff_with_sticker
             card(org_bikes.where(id: ::BikeSticker.select(:bike_id)).last, "stickered bike")
           end
 
           def limited_member
             card(acknowledged_bike, "acknowledged e-vehicle", org_role: :limited)
-          end
-
-          def unregistered_parking_notification
-            card(org_bikes.where(status: "unregistered_parking_notification").last, "unregistered parking notification")
           end
 
           def registered_with_another_organization
@@ -53,10 +45,6 @@ module Pages
 
           def acknowledged_bike
             org_bikes.where(id: ::RegistrationSequenceAcknowledgment.for_organization(lookbook_organization).select(:bike_id)).last
-          end
-
-          def unacknowledged_bike
-            org_bikes.motorized.where.not(id: ::RegistrationSequenceAcknowledgment.where.not(bike_id: nil).select(:bike_id)).last
           end
 
           def other_bike

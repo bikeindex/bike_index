@@ -78,7 +78,7 @@ RSpec.describe Pages::Registrations::Show::RegistrationInformation::Component, t
     let!(:other_bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
 
     it "renders a situation the environment has no record for" do
-      render_preview(:staff_without_acknowledgment)
+      render_preview(:staff_with_acknowledgment)
 
       expect(page).to have_text("Nothing to preview")
     end
