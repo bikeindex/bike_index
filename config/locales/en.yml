@@ -1322,42 +1322,6 @@ en:
       you_scanned_this_sticker_html: >-
         You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
         to this %{bike_type}.
-    stolen_checklist:
-      a_photo_of_your_bike_type: a photo of your %{bike_type}
-      add: Add
-      add_bike_link_to_your_theft_report_html: Add %{bike_link} to your theft report
-      add_serial_number: Add serial number
-      bike_index_does_this: "(Bike Index does this when you enter your police report
-        number)"
-      contact_seller: CRITICAL - contact who you bought the bike from and find out
-        if they have it
-      facebook_instagram_etc: "(Facebook, Instagram, etc)"
-      leads_online: LEADSonline
-      leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
-      list_bike_type_on_bike_index: List %{bike_type} on Bike Index
-      location_where_the_theft_occurred: location where the theft occurred
-      nl_digid_required: "(DigiD required)"
-      nl_file_police_report: File a Police report!
-      nl_online: Online
-      nl_person: In Person
-      nl_person_report: Search for the closest police station,
-      nl_phone: By Phone
-      nl_phone_report: >-
-        call 0900-8844. You will usually get a phone call appointment for later, at
-        which point you'll give the information to the Police
-      nl_website_link_text: at this politie.nl webpage
-      promoted_stolen_bike_alerts: Promoted Stolen Bike Alerts
-      push_bike_info_to: Push bike info to
-      push_bike_info_to_law_enforcement: >-
-        Push bike info to law enforcement databases (Bike Index does this when you
-        enter your police report number)
-      report_theft_html: Report theft on Bike Index, including %{edit_bike_link}
-      requires_a_serial_number: requires a serial number
-      share_on_twitter: Share on Twitter (Bike Index will do this once we review your
-        listing)
-      share_widely_on_your_personal_social: Share widely on your personal social media
-      supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
-      your_police_report: your Police Report Number
     stolen_map:
       unavailable: The map couldn't be loaded — your browser or device may not support
         it.
