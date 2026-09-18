@@ -12,8 +12,10 @@ module Pages
             card(acknowledged_bike, "acknowledged e-vehicle")
           end
 
+          # @label Staff with sticker (not motorized)
           def staff_with_sticker
-            card(org_bikes.where(id: ::BikeSticker.select(:bike_id)).last, "stickered bike")
+            card(org_bikes.where.not(propulsion_type: ::PropulsionType::MOTORIZED).where(id: ::BikeSticker.select(:bike_id)).last,
+              "stickered bike that isn't an e-vehicle")
           end
 
           def limited_member
