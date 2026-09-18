@@ -48,7 +48,7 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
       acknowledged_at = for_organization(organization)
         .where("registration_sequence_acknowledgments.bike_id = bikes.id")
         .select("MAX(registration_sequence_acknowledgments.created_at)")
-      Arel.sql("(#{acknowledged_at.to_sql}) #{(direction == "asc") ? "ASC" : "DESC"}, bikes.id DESC")
+      Arel.sql("(#{acknowledged_at.to_sql}) #{(direction == "asc") ? "ASC" : "DESC"}")
     end
   end
 
