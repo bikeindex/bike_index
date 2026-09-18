@@ -682,6 +682,16 @@ RSpec.describe "RegistrationsController#show", type: :request do
           expect(body).to_not match("Request impound")
         end
       end
+
+      context "with bike_stickers" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[bike_stickers]) }
+
+        it "offers linking a sticker" do
+          get "#{base_url}/#{bike.id}"
+          expect(whitespace_normalized_body_text).to match("Link sticker")
+          expect(response.body).to include(organization_sticker_path(id: "code", organization_id: organization.to_param))
+        end
+      end
     end
 
     context "passive_organization the user is no longer a member of" do

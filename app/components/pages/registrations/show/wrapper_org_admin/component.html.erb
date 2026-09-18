@@ -260,7 +260,7 @@
     <% end %>
   <% end %>
 
-  <% if staff? && @organization.enabled?("bike_stickers") %>
+  <% if @organization.enabled?("bike_stickers") %>
     <%= render(UI::Modal::Component.new(id: "link-sticker-modal", title: translation(".link_sticker"))) do |modal| %>
       <% modal.with_body do %>
         <%= form_with model: BikeSticker.new, url: organization_sticker_path(id: "code", organization_id: @organization.to_param), method: :put, class: "tw:flex tw:flex-col tw:gap-3" do |form| %>
