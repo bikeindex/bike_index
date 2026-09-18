@@ -88,10 +88,9 @@ module Pages
             @bike.phone if @bike.phoneable_by?(@current_user, @organization)
           end
 
-          # The owner & access card's rows — unlike registration information's, blank renders a "-"
           def owner_reg_field_rows
-            Pages::Registrations::Show::RegistrationInformation::Component.field_rows(bike: @bike, organization: @organization,
-              reg_fields: Pages::Registrations::Show::RegistrationInformation::Component::OWNER_ACCESS_REG_FIELDS)
+            OrgServices::RegistrationFields.rows(bike: @bike, organization: @organization,
+              reg_fields: OrgServices::RegistrationFields::OWNER_ACCESS_REG_FIELDS)
           end
 
           def show_notes?

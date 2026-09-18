@@ -77,13 +77,14 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
   context "with registration_sequences enabled" do
     let(:enabled_feature_slugs) { %w[bike_search registration_sequences] }
-    let(:unacknowledged_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
+    let(:unacknowledged_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
     let(:bikes) { [bike, unacknowledged_bike] }
     let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization:) }
     let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike:) }
 
     it "renders when each bike was acknowledged" do
-      expect(component).to have_css("th.acknowledgment_cell", visible: :all, normalize_ws: true, exact_text: "Safety acknowledgment")
+      expect(component).to have_css("th.acknowledgment_cell", visible: :all, normalize_ws: true, exact_text: "Registration sequence acknowledgment")
       expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
     end
   end
