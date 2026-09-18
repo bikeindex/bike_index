@@ -62,6 +62,24 @@ RSpec.describe Pages::Registrations::Show::RegistrationInformation::Component, t
     end
   end
 
+  describe "e-vehicle audit" do
+    it "doesn't render the row for a bike that isn't an e-vehicle" do
+      render_inline(component)
+
+      expect(page).to have_no_text("E-Vehicle Audit")
+    end
+
+    context "on an e-vehicle" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, propulsion_type: "pedal-assist") }
+
+      it "renders that it isn't audited" do
+        render_inline(component)
+
+        expect(page).to have_text("Not audited")
+      end
+    end
+  end
+
   context "on a bike registered elsewhere, without credibility or sticker features" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
 

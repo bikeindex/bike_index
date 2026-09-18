@@ -19,8 +19,10 @@ module Pages
           end
 
           def limited_member
-            card(org_bikes.where(model_audit_id: nil).where.not(status: "unregistered_parking_notification").last,
-              "unaudited bike", org_role: :limited)
+            bike = acknowledged_bike
+            # Unsaved - every seeded e-vehicle is audited, so this shows one that hasn't been yet
+            bike&.model_audit = nil
+            card(bike, "acknowledged e-vehicle", org_role: :limited)
           end
 
           def registered_with_another_organization

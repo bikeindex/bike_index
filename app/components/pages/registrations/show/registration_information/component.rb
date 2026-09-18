@@ -79,6 +79,11 @@ module Pages
             @model_audit = @bike.model_audit
           end
 
+          # A motorized-only manufacturer's bikes are audited whatever their propulsion
+          def show_audit?
+            @bike.motorized? || model_audit.present?
+          end
+
           def organization_model_audit
             return @organization_model_audit if defined?(@organization_model_audit)
 

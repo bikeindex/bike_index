@@ -94,16 +94,18 @@
           <% if @organization.enabled?("avery_export") %>
             <%= info_row(translation(".avery_exportable"), @bike.avery_exportable? ? translation(".is_true") : translation(".is_false")) %>
           <% end %>
-          <%= info_row(translation(".audit")) do %>
-            <% if organization_model_audit.present? %>
-              <%= link_to helpers.model_audit_display(model_audit), organization_model_audit_path(model_audit, organization_id: @organization.to_param), class: "twlink" %>
-              <span class="tw:ml-2 tw:font-bold <%= helpers.status_display_class(organization_model_audit.certification_status) %>">
-                <%= organization_model_audit.certification_status_humanized %>
-              </span>
-            <% else %>
-              <span class="tw:opacity-65">
-                <%= translation(".not_audited") %>
-              </span>
+          <% if show_audit? %>
+            <%= info_row(translation(".audit")) do %>
+              <% if organization_model_audit.present? %>
+                <%= link_to helpers.model_audit_display(model_audit), organization_model_audit_path(model_audit, organization_id: @organization.to_param), class: "twlink" %>
+                <span class="tw:ml-2 tw:font-bold <%= helpers.status_display_class(organization_model_audit.certification_status) %>">
+                  <%= organization_model_audit.certification_status_humanized %>
+                </span>
+              <% else %>
+                <span class="tw:opacity-65">
+                  <%= translation(".not_audited") %>
+                </span>
+              <% end %>
             <% end %>
           <% end %>
           <% if show_registration_sequence? %>

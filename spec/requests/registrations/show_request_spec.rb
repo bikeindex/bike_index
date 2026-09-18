@@ -420,8 +420,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Owner & access")
         expect(body).to match(bike.owner_name)
         expect(body).to match(bike.owner_email)
-        expect(body).to match("E-Vehicle Audit")
-        # Gated by credibility_badges and additional_registrations_information
+        # Gated by e-vehicles, credibility_badges and additional_registrations_information
+        expect(body).to_not match("E-Vehicle Audit")
         expect(body).to_not match("Credibility")
         expect(body).to_not match("Other registrations")
       end
