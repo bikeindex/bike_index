@@ -11,6 +11,16 @@ RSpec.describe BikeOrganization, type: :model do
     end
   end
 
+  describe "bike touch" do
+    let(:bike_organization) { FactoryBot.create(:bike_organization) }
+    let(:bike) { bike_organization.bike }
+
+    it "touches the bike on destroy" do
+      bike.update_column(:updated_at, 1.day.ago)
+      expect { bike_organization.destroy }.to change { bike.reload.updated_at }
+    end
+  end
+
   describe "uniqueness" do
     let!(:bike_organization) { FactoryBot.create(:bike_organization) }
     let(:duplicate) { BikeOrganization.new(bike_id: bike_organization.bike_id, organization_id: bike_organization.organization_id) }

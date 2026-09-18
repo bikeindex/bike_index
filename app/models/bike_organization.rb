@@ -20,7 +20,7 @@
 class BikeOrganization < ApplicationRecord
   acts_as_paranoid
 
-  belongs_to :bike
+  belongs_to :bike, touch: true
   belongs_to :organization
 
   validates_presence_of :bike_id, :organization_id

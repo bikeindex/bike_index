@@ -31,8 +31,7 @@ module Pages
 
           # Records shown here that don't touch the bike, so its cache version misses them
           def cache_version
-            [organization_registered?, bike_organization_note&.updated_at, organization_model_audit&.updated_at,
-              other_registrations.maximum(:updated_at), other_registrations_count,
+            [other_registrations.maximum(:updated_at), other_registrations_count,
               *current_alerts_component.cache_version]
           end
 

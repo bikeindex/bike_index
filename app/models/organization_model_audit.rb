@@ -29,6 +29,7 @@ class OrganizationModelAudit < ApplicationRecord
   validates_uniqueness_of :model_audit_id, scope: %i[organization_id], allow_nil: false
 
   before_validation :set_calculated_attributes
+  after_commit :touch_bikes, if: :touch_bikes?
 
   def self.organizations_to_audit
     # We enqueue every single model_audit when it's turned on for an org for the first time
@@ -67,6 +68,16 @@ class OrganizationModelAudit < ApplicationRecord
   end
 
   private
+
+  # The registration page shows this for every bike of the model, registered with the org or not.
+  # bikes_count updates on every UpdateModelAuditJob run, so skip those
+  def touch_bikes?
+    destroyed? || previously_new_record? || saved_change_to_certification_status?
+  end
+
+  def touch_bikes
+    Bike.unscoped.where(model_audit_id:).update_all(updated_at: Time.current)
+  end
 
   def calculated_certification_status
     if current_organization_model_attestation.present?
