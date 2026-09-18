@@ -53,7 +53,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
   context "with every column's feature enabled" do
     let(:enabled_feature_slugs) do
-      %w[bike_search avery_export bike_stickers impound_bikes registration_notes
+      %w[bike_search avery_export bike_stickers impound_bikes registration_notes registration_sequences
         reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
     end
     # The panel builds a checkbox per enabled_columns entry, and org--search-column-toggle
@@ -72,6 +72,19 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "E-vehicle (propulsion)")
       expect(component).to have_css("th.notes_cell", normalize_ws: true,
         exact_text: "#{organization.short_name} Registration Notes")
+    end
+  end
+
+  context "with registration_sequences enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search registration_sequences] }
+    let(:unacknowledged_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let(:bikes) { [bike, unacknowledged_bike] }
+    let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization:) }
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike:) }
+
+    it "renders when each bike was acknowledged" do
+      expect(component).to have_css("th.acknowledgment_cell", visible: :all, normalize_ws: true, exact_text: "Safety acknowledgment")
+      expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
     end
   end
 

@@ -158,6 +158,21 @@
       <% end %>
     <% end %>
 
+    <% if organization.enabled?("registration_sequences") %>
+      <% table.column(label: settings.column_renames[:acknowledgment_cell], classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
+        <% if bike.organized?(organization) %>
+          <% acknowledgment = RegistrationSequenceAcknowledgment.find_for(bike:, organization:) %>
+          <% if acknowledgment.present? %>
+            <small class="localizeTime">
+              <%= l acknowledgment.acknowledged_at, format: :convert_time %>
+            </small>
+          <% end %>
+        <% else %>
+          <%= hidden_html %>
+        <% end %>
+      <% end %>
+    <% end %>
+
     <% if organization.enabled?("bike_stickers") %>
       <% table.column(label: settings.column_renames[:sticker_cell], classes: "hideableColumn sticker_cell tw:pt-0", header_classes: "tw:pt-1") do |bike| %>
         <% bike.bike_stickers.each do |bs| %>

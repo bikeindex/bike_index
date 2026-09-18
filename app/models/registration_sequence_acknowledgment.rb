@@ -41,6 +41,8 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
     def create_for(b_param, sequence:, user: nil)
       create(registration_sequence: sequence, b_param:, user:, owner_email: b_param.owner_email)
     end
+
+    def find_for(bike:, organization:) = for_organization(organization).where(bike_id: bike.id).last
   end
 
   def acknowledged_at = created_at
