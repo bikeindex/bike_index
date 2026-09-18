@@ -99,8 +99,8 @@
 
             <td>
               <% if marketplace_listing.buyer_id.present? %>
-                <%= cache(marketplace_listing.buyer_id) do %>
-                  <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_listing.buyer_id, render_search: true) %>
+                <%= cache(marketplace_listing.buyer) do %>
+                  <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_listing.buyer, render_search: true) %>
                 <% end %>
               <% end %>
             </td>
