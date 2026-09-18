@@ -71,8 +71,6 @@ class UpdateModelAuditJob < ApplicationJob
 
       OrganizationModelAudit.organizations_to_audit.pluck(:id)
         .each { |id| update_org_model_audit(model_audit, id) }
-      # Busts the registration page cache, which shows the model audit
-      bikes(model_audit).update_all(updated_at: Time.current)
     ensure
       # Unlock!
       lock_manager.unlock(redlock)
@@ -154,16 +152,12 @@ class UpdateModelAuditJob < ApplicationJob
     bikes_count = bikes.count
     bike_at = bikes.last&.created_at || nil
 
-    organization_model_audit = model_audit.organization_model_audits
-      .where(organization_id: organization_id).first
+    organization_model_audit = model_audit.organization_model_audits.find_or_initialize_by(organization_id:)
+    organization_model_audit.update!(bikes_count:, last_bike_created_at: bike_at)
+    # The registration page shows the status, and bikes_count changes on most runs
+    return unless organization_model_audit.saved_change_to_certification_status?
 
-    if organization_model_audit.blank?
-      model_audit.organization_model_audits.create!(bikes_count: bikes_count,
-        organization_id: organization_id, last_bike_created_at: bike_at)
-    elsif organization_model_audit.present?
-      organization_model_audit.update!(bikes_count: bikes_count,
-        last_bike_created_at: bike_at)
-    end
+    bikes(model_audit).update_all(updated_at: Time.current)
   end
 
   def enqueue_delayed_processing_for_bike_ids(bike_ids)

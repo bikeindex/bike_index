@@ -138,7 +138,8 @@ RSpec.describe UpdateModelAuditJob, type: :job do
           instance.perform(model_audit.id)
         }.to change(ModelAudit, :count).by 0
         expect(Bike.unscoped.where(model_audit_id: model_audit.id).count).to eq 3
-        expect(bike2.reload.updated_at).to be > (Time.current - 1.minute)
+        # bike2 shouldn't have been updated
+        expect(bike2.reload.updated_at).to be < (Time.current - 9.minutes)
         expect(bike1.reload.model_audit_id).to eq model_audit.id
         expect(model_audit.organization_model_audits.count).to eq 1
         organization_model_audit = model_audit.organization_model_audits.first
@@ -147,6 +148,18 @@ RSpec.describe UpdateModelAuditJob, type: :job do
         expect(organization_model_audit.certification_status).to be_nil
         expect(organization_model_audit.last_bike_created_at).to be_within(1).of time
       end
+      it "touches the model's bikes only when the organization's certification status changes" do
+        instance.perform(model_audit.id)
+        bike2.update_column(:updated_at, 1.day.ago)
+        instance.perform(model_audit.id)
+        expect(bike2.reload.updated_at).to be < 1.hour.ago
+
+        FactoryBot.create(:model_attestation, model_audit:, organization:, kind: :uncertified_by_trusted_org)
+        instance.perform(model_audit.id)
+        expect(model_audit.organization_model_audits.first.certification_status).to eq "uncertified_by_your_org"
+        expect(bike2.reload.updated_at).to be > 1.minute.ago
+      end
+
       context "likely_spam bike" do
         it "creates an organization_model_audit, updates likely_spam" do
           expect(organization.reload.bikes.pluck(:id)).to eq([bike3.id])
