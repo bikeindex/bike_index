@@ -46,26 +46,6 @@ RSpec.describe OrganizationModelAudit, type: :model do
     end
   end
 
-  describe "touch_bikes" do
-    let(:organization) { FactoryBot.create(:organization) }
-    let!(:bike) { FactoryBot.create(:bike, model_audit_id: model_audit.id, updated_at: 1.day.ago) }
-    let(:organization_model_audit) { FactoryBot.create(:organization_model_audit, model_audit:, organization:) }
-    def bike_updated_at = bike.reload.updated_at
-
-    it "touches the model's bikes when the displayed status changes" do
-      expect { organization_model_audit }.to change { bike_updated_at }
-
-      bike.update_column(:updated_at, 1.day.ago)
-      expect { organization_model_audit.update!(bikes_count: 12) }.to_not change { bike_updated_at }
-
-      FactoryBot.create(:model_attestation, model_audit:, kind: :uncertified_by_trusted_org, organization:)
-      expect { organization_model_audit.update!(bikes_count: 13) }.to change { bike_updated_at }
-
-      bike.update_column(:updated_at, 1.day.ago)
-      expect { organization_model_audit.destroy }.to change { bike_updated_at }
-    end
-  end
-
   describe "bikes" do
     let!(:bike) { FactoryBot.create(:bike_organized, model_audit_id: model_audit.id) }
     let(:organization) { FactoryBot.create(:organization) }

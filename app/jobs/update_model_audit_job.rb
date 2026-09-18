@@ -71,6 +71,8 @@ class UpdateModelAuditJob < ApplicationJob
 
       OrganizationModelAudit.organizations_to_audit.pluck(:id)
         .each { |id| update_org_model_audit(model_audit, id) }
+      # Busts the registration page cache, which shows the model audit
+      bikes(model_audit).update_all(updated_at: Time.current)
     ensure
       # Unlock!
       lock_manager.unlock(redlock)
@@ -122,7 +124,7 @@ class UpdateModelAuditJob < ApplicationJob
       enqueue_delayed_processing_for_bike_ids(matching_bikes.pluck(:id))
     end
 
-    matching_bikes.update_all(model_audit_id: nil)
+    matching_bikes.update_all(model_audit_id: nil, updated_at: Time.current)
     OrganizationModelAudit.where(model_audit_id: model_audit.id).destroy_all
     model_audit.destroy
   end
@@ -141,7 +143,7 @@ class UpdateModelAuditJob < ApplicationJob
 
     # Update all non_matching bikes (so they aren't accidentally processed in update_org_model_audit)
     non_matching_bike_ids = model_audit.bikes.pluck(:id) - matching_bikes.pluck(:id)
-    Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
+    Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil, updated_at: Time.current)
     # enqueue for any non-matching bikes
     enqueue_delayed_processing_for_bike_ids(non_matching_bike_ids)
   end

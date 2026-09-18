@@ -138,7 +138,6 @@ RSpec.describe UpdateModelAuditJob, type: :job do
           instance.perform(model_audit.id)
         }.to change(ModelAudit, :count).by 0
         expect(Bike.unscoped.where(model_audit_id: model_audit.id).count).to eq 3
-        # Touched by the new organization_model_audit, not re-saved by the job
         expect(bike2.reload.updated_at).to be > (Time.current - 1.minute)
         expect(bike1.reload.model_audit_id).to eq model_audit.id
         expect(model_audit.organization_model_audits.count).to eq 1
