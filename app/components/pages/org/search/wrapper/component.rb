@@ -75,7 +75,7 @@ module Pages
           # On the search page the .twwiderow holding the card supplies the gap above it, and
           # is the container twfullbleed reads; elsewhere the card stands on its own
           def card_classes
-            ["org-search-component tw:overflow-hidden tw:rounded-xl", UI::Card::Component::BASE_CLASSES,
+            ["org-search-component tw:rounded-xl", UI::Card::Component::BASE_CLASSES,
               @search_page ? "tw:twfullbleed" : "tw:mt-4"].join(" ")
           end
 

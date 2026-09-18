@@ -184,12 +184,15 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
-  describe "render_export?" do
+  describe "export_disabled?" do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
-    it "is false once the search reaches past the organization" do
-      expect(instance.render_export?).to be true
-      expect(described_class.new(**options.merge(search_all: true)).render_export?).to be false
+    it "is true once the search reaches past the organization, which still renders the export" do
+      expect(instance.export_disabled?).to be false
+
+      search_all = described_class.new(**options.merge(search_all: true))
+      expect(search_all.render_export?).to be true
+      expect(search_all.export_disabled?).to be true
     end
   end
 

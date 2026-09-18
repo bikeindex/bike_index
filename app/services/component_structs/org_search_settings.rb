@@ -98,7 +98,10 @@ module ComponentStructs
 
     def notes_search_label = translation(:show_notes_search)
 
-    def render_export? = @organization.enabled?("csv_exports") && !@search_all
+    def render_export? = @organization.enabled?("csv_exports")
+
+    # An export past the organization would carry other organizations' registrations
+    def export_disabled? = @search_all
 
     def initially_checked_columns
       @initially_checked_columns ||= [

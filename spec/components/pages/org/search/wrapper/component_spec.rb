@@ -71,8 +71,9 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
     let(:options) { super().merge(search_all: true) }
 
-    it "drops the export, which would reach past the organization" do
-      expect(component).not_to have_link("Export CSV", visible: :all)
+    it "disables the export, which would reach past the organization, and says why" do
+      expect(component).to have_css("a[aria-disabled='true']:not([href])", text: "Export CSV")
+      expect(component).to have_css("[data-controller='ui--tooltip']", text: "Turn off searching all registrations")
     end
   end
 
