@@ -102,9 +102,9 @@ module Pages
             @acknowledgment = RegistrationSequenceAcknowledgment.find_for(bike: @bike, organization: @organization)
           end
 
-          # Sticker, phone and address are shown elsewhere
+          # Sticker and phone are shown elsewhere
           def registration_field_rows
-            reg_fields = @organization.additional_registration_fields - %w[reg_bike_sticker reg_phone reg_address] -
+            reg_fields = @organization.additional_registration_fields - %w[reg_bike_sticker reg_phone] -
               OrgServices::RegistrationFields::OWNER_ACCESS_REG_FIELDS
             OrgServices::RegistrationFields.rows(bike: @bike, organization: @organization, reg_fields:)
               .reject { |_label, value| value.blank? }

@@ -88,13 +88,10 @@ module Pages
             @bike.phone if @bike.phoneable_by?(@current_user, @organization)
           end
 
-          def owner_address_record
-            BikeServices::CalculateLocation.registration_address_record(@bike) if @bike.valid_mailing_address?
-          end
-
+          # The address renders its own row
           def owner_reg_field_rows
             OrgServices::RegistrationFields.rows(bike: @bike, organization: @organization,
-              reg_fields: OrgServices::RegistrationFields::OWNER_ACCESS_REG_FIELDS)
+              reg_fields: OrgServices::RegistrationFields::OWNER_ACCESS_REG_FIELDS - ["reg_address"])
           end
 
           def show_notes?

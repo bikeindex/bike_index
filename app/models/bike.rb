@@ -731,6 +731,10 @@ class Bike < ApplicationRecord
     creation_organization.default_location.address_hash_legacy != addy
   end
 
+  def mailing_address_record
+    BikeServices::CalculateLocation.registration_address_record(self) if valid_mailing_address?
+  end
+
   def address_hash
     current_stolen_record&.address_hash || current_impound_record&.address_hash ||
       address_record&.address_hash

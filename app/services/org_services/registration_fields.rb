@@ -3,7 +3,7 @@ module OrgServices
     extend Functionable
 
     # Shown with the owner rather than in registration information
-    OWNER_ACCESS_REG_FIELDS = %w[reg_organization_affiliation reg_student_id].freeze
+    OWNER_ACCESS_REG_FIELDS = %w[reg_address reg_organization_affiliation reg_student_id].freeze
 
     # [label, value] for each of reg_fields the organization collects
     def rows(bike:, organization:, reg_fields:)
@@ -22,10 +22,8 @@ module OrgServices
     end
 
     def label(organization:, reg_field:)
-      custom = organization.registration_field_labels&.dig(reg_field)
-      return Binxtils::InputNormalizer.sanitize(custom) if custom.present?
-
-      OrganizationFeature.reg_field_to_bike_attrs(reg_field).humanize(keep_id_suffix: true)
+      OrgServices::Displayer.registration_field_label(organization, reg_field, strip_tags: true) ||
+        OrganizationFeature.reg_field_to_bike_attrs(reg_field).humanize(keep_id_suffix: true)
     end
   end
 end

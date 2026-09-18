@@ -112,9 +112,9 @@
           <%= hidden_html %>
         <% elsif reg_field != "reg_address" %>
           <%= OrgServices::RegistrationFields.value(bike:, organization:, reg_field:) %>
-        <% elsif bike.valid_mailing_address? %>
+        <% else %>
           <small>
-            <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(bike), visible_attribute: :street) %>
+            <%= render UI::AddressDisplay::Component.new(address_record: bike.mailing_address_record, visible_attribute: :street) %>
           </small>
         <% end %>
       <% end %>
