@@ -38,7 +38,7 @@
         - unless @period == "all"
           %em
             = UI::PeriodSelect::Component.column_label(@time_range_column)
-            = render(Atoms::TimeRange::Component.new(time_range: @time_range, period: @period))
+            = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
         - if sortable_search_params?
           %span.less-strong
             \- view

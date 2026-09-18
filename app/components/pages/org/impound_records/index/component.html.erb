@@ -12,7 +12,7 @@
       <%= number_with_delimiter(@pagy.count) %>
       <%= translation(".matching_impound_record", count: @pagy.count) %>
 
-      <em><%= render(Atoms::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
+      <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
 
       <div class="tw:ml-2 tw:inline-block">
         <%= render(UI::Dropdown::Component.new(name: status_dropdown_text, button_color: :primary, active: @search_status != "current")) do |dropdown| %>

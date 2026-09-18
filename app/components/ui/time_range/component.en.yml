@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    atoms:
+    ui:
       time_range:
         from: from
         in_the_next: in the next %{period}

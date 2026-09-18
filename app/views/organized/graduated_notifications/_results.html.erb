@@ -8,7 +8,7 @@
 <div class="row mt-4 mb-4">
   <div class="col-sm-6">
     <%= pluralize(number_with_delimiter(@pagy.count), "matching graduated notifications") %>
-    <em><%= render(Atoms::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
+    <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
 
     <% if user_search_params_present? %>
       <span class="less-strong">

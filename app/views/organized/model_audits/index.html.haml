@@ -8,7 +8,7 @@
 .mt-4.mb-4
   = pluralize(number_with_delimiter(@pagy.count), "matching models")
   %em
-    = render(Atoms::TimeRange::Component.new(time_range: @time_range, period: @period))
+    = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
   - if params[:search_mnfg_name].present?
     %span.less-strong
       for manufacturer

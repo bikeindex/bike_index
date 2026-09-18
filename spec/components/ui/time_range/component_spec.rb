@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Atoms::TimeRange::Component, type: :component do
+RSpec.describe UI::TimeRange::Component, type: :component do
   let(:time_range) { (Time.current - 1.week)..Time.current }
 
   def render_component(period:, range: time_range)

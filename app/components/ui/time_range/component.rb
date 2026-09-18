@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Atoms
+module UI
   module TimeRange
     class Component < ApplicationComponent
       # The localizer reads its precision off the class list, so a range bucketed
