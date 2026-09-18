@@ -159,7 +159,7 @@
     <% end %>
 
     <% if organization.enabled?("registration_sequences") %>
-      <% table.column(label: settings.column_renames[:acknowledgment_cell], classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
+      <% table.column(sortable: "acknowledged_at", label: settings.column_renames[:acknowledgment_cell], classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
         <% if bike.motorized? %>
           <% if bike.organized?(organization) %>
             <small>
