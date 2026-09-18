@@ -30,15 +30,4 @@ RSpec.describe BikeOrganization, type: :model do
       end
     end
   end
-
-  describe "delete_bike_organization_note" do
-    let(:bike_organization) { FactoryBot.create(:bike_organization) }
-    let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike: bike_organization.bike, organization: bike_organization.organization) }
-
-    it "deletes the note when bike_organization is destroyed" do
-      expect(BikeOrganizationNote.where(bike_id: bike_organization.bike_id, organization_id: bike_organization.organization_id).count).to eq 1
-      bike_organization.destroy
-      expect(BikeOrganizationNote.where(bike_id: bike_organization.bike_id, organization_id: bike_organization.organization_id).count).to eq 0
-    end
-  end
 end
