@@ -160,12 +160,14 @@
 
     <% if organization.enabled?("registration_sequences") %>
       <% table.column(label: settings.column_renames[:acknowledgment_cell], classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
-        <% if !bike.organized?(organization) %>
-          <%= hidden_html %>
-        <% elsif bike.motorized? %>
-          <small>
-            <%= render(UI::Time::Component.new(time: RegistrationSequenceAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>
-          </small>
+        <% if bike.motorized? %>
+          <% if bike.organized?(organization) %>
+            <small>
+              <%= render(UI::Time::Component.new(time: RegistrationSequenceAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>
+            </small>
+          <% else %>
+            <%= hidden_html %>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>

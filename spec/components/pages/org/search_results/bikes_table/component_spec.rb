@@ -87,6 +87,24 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("th.acknowledgment_cell", visible: :all, normalize_ws: true, exact_text: "Registration sequence acknowledgment")
       expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
     end
+
+    context "with a bike registered elsewhere" do
+      let(:other_bike) { FactoryBot.create(:bike, propulsion_type:) }
+      let(:bikes) { [other_bike] }
+      let(:propulsion_type) { "pedal-assist" }
+
+      it "renders the e-vehicle as hidden" do
+        expect(component).to have_css("td.acknowledgment_cell", text: "hidden, not registered")
+      end
+
+      context "that isn't an e-vehicle" do
+        let(:propulsion_type) { "foot-pedal" }
+
+        it "renders nothing" do
+          expect(component).to have_no_css("td.acknowledgment_cell", text: "hidden")
+        end
+      end
+    end
   end
 
   context "with render_sortable" do
