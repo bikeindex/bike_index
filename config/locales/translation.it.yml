@@ -5848,6 +5848,7 @@ it:
             url_cell: URL
             vehicle: registrazione
             visible_columns: Colonne visibili
+            acknowledgment_cell: Conferma della sequenza di registrazione
           wrapper:
             e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
             matching_bikes_html: "%{count} %{cycle_type} corrispondente"
@@ -6308,21 +6309,10 @@ it:
           wrapper_org_admin:
             about_this_bike: Informazioni su questo %{bike_type}
             assign_sticker: Collegamento
-            audit: Audit dei veicoli elettrici
-            avery_exportable: Avery Esportabile
-            claimed: Rivendicato
-            creation_source: Fonte
-            creator: Creatore
-            credibility: Credibilità
             edit: Modifica
             internal_notes: Note interne
-            is_false: falso
-            is_true: VERO
             link_sticker: Adesivo di collegamento
             no_other_registrations: Nessun risultato trovato
-            no_registration_information: Nessuna informazione di registrazione visibile
-              a %{org_name}
-            not_audited: Non sottoposto a revisione contabile
             not_registered_message: Non è possibile contattare il proprietario per
               le biciclette al di fuori della propria organizzazione. È comunque possibile
               aggiungere note interne.
@@ -6332,7 +6322,6 @@ it:
               nella discussione.'
             org_can_edit: "%{org_name} può modificare questo %{bike_type}"
             org_can_edit_sub: Incluso dopo che %{bike_type} è stato rivendicato.
-            organization_registered: Organizzazione
             other_registrations: Altre registrazioni di questo utente
             other_registrations_count_html: "%{count} altre registrazioni"
             owner_access: Proprietario e accesso
@@ -6342,15 +6331,12 @@ it:
             photo_archive: Archivio fotografico
             post_note: Posta
             posts_as: Pubblica come %{user}
-            registration_information: Informazioni di registrazione
             restricted_message: Il contatto del proprietario è disponibile per amministratori
               e personale. È possibile aggiungere note e richiedere il ritiro dell'animale.
             restricted_title: Accesso limitato per il tuo ruolo
             role_limited: Limitato
             role_staff: Personale
             showing_recent: Mostrando il %{count} più recente
-            sticker: Adesivo
-            sticker_claimed: reclamato
             sticker_code: Codice adesivo
             unregistered_owner: Questo %{bike_type} non è registrato a un utente.
               È stato aggiunto per tenere traccia delle notifiche di parcheggio.
@@ -6367,6 +6353,25 @@ it:
             price_is_firm_true: il prezzo non è negoziabile
             still_for_sale_at: Ancora in vendita a
             this_bike_is_for_sale: Questo %{bike_type} è in vendita
+          registration_information:
+            acknowledged_html: Riconosciuto %{time}
+            audit: Audit dei veicoli elettrici
+            avery_exportable: Avery Esportabile
+            claimed: Rivendicato
+            creation_source: Fonte
+            creator: Creatore
+            credibility: Credibilità
+            is_false: falso
+            is_true: VERO
+            link_sticker: Adesivo di collegamento
+            no_registration_information: Nessuna informazione di registrazione visibile
+              a %{org_name}
+            not_audited: Non sottoposto a revisione contabile
+            organization_registered: Organizzazione
+            registration_information: Informazioni di registrazione
+            registration_sequence: Sequenza di registrazione
+            sticker: Adesivo
+            sticker_claimed: reclamato
       search:
         everything_combobox:
           made_by: realizzato da
