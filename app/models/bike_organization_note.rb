@@ -20,7 +20,7 @@
 class BikeOrganizationNote < ApplicationRecord
   has_paper_trail only: %i[bike_id body]
 
-  belongs_to :bike
+  belongs_to :bike, touch: true
   belongs_to :organization
   belongs_to :user
 

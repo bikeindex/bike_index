@@ -76,7 +76,7 @@ module Organized
     def update
       bike = Bike.unscoped.find_id(params[:id])
 
-      unless bike.organized?(current_organization) && current_organization.enabled?("registration_notes")
+      unless bike.visible_by?(current_user) && current_organization.enabled?("registration_notes")
         flash[:error] = "Not authorized to update notes"
         redirect_to(bike_path(bike)) && return
       end
