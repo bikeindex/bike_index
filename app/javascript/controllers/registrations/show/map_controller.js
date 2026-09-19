@@ -1,13 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
 
+/* global IntersectionObserver */
+
 // Connects to data-controller='registrations--show--map'
 // Renders a map centered on the coordinates, marking them with a pin (point) or
 // a translucent red circle (approximate area).
-
-// The 36px pin's tip sits 21/24 of the way down, so shift it by the 3/24 below
-// the tip to land the tip — not the pin's bottom edge — on the spot
-const PIN_OFFSET = [0, 4.5]
 
 // A translucent circle covering the approximate area
 const CIRCLE_PAINT = (radiusMeters, latitude) => ({
@@ -21,11 +19,20 @@ export default class extends Controller {
   static values = {
     latitude: Number,
     longitude: Number,
-    radiusMeters: Number,
-    point: Boolean
+    radiusMeters: Number
   }
 
-  async connect () {
+  // Load only once on screen — it can sit in a collapsed panel or below the fold
+  connect () {
+    this.observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return
+      this.observer.disconnect()
+      this.#load()
+    }, { rootMargin: '200px' })
+    this.observer.observe(this.element)
+  }
+
+  async #load () {
     try {
       const maplibregl = await loadMapLibre()
       if (!this.element.isConnected) return // disconnected while loading
@@ -37,6 +44,7 @@ export default class extends Controller {
   }
 
   disconnect () {
+    this.observer?.disconnect()
     this.map?.remove()
     this.map = null
   }
@@ -68,9 +76,9 @@ export default class extends Controller {
     })
     this.map.addControl(new ExpandControl(), 'top-right')
 
-    if (this.pointValue) {
+    if (this.hasPinTarget) {
       const element = this.pinTarget.content.firstElementChild.cloneNode(true)
-      new maplibregl.Marker({ element, anchor: 'bottom', offset: PIN_OFFSET }).setLngLat(center).addTo(this.map)
+      new maplibregl.Marker({ element, anchor: 'bottom' }).setLngLat(center).addTo(this.map)
       return
     }
 
