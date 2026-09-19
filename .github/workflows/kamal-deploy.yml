@@ -24,6 +24,10 @@ on:
         description: The kamal command to run on the host
         required: true
         type: string
+      app:
+        description: bin/kamal_review --app target (a PR slug or sandbox)
+        required: true
+        type: string
       image_tag:
         description: GHCR image tag to build/push and deploy (deploy only)
         type: string
@@ -192,3 +196,9 @@ jobs:
         run: cp .kamal/secrets-ci .kamal/secrets
       - name: Run kamal command
         run: ${{ inputs.command }}
+      # A cancelled deploy leaves kamal's lock behind, and every later deploy pulls
+      # its image then fails on the lock before pruning — it filled the host's disk.
+      # The concurrency group means no other run holds this app's lock.
+      - name: Release the deploy lock
+        if: cancelled()
+        run: bin/kamal_review lock release --app "${{ inputs.app }}"

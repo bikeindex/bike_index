@@ -253,7 +253,9 @@ stop_job_containers() {
 }
 
 # Best-effort — mustn't mask the reload error it's unwinding.
-start_job_containers() {
+resume_app() {
+  echo "==> Taking ${slug} out of maintenance"
+  kamal app live || true
   [[ -n "$job_containers" ]] || return 0
   echo "==> Restarting ${slug}'s worker and cron containers"
   kamal server exec "docker start ${job_containers}" || true
@@ -323,7 +325,7 @@ case "$mode" in
     # Before the FLUSHDB, so nothing enqueues past it. Trapped against a failed
     # reload; disarmed at the end so the restart prints before "Done".
     job_containers=""
-    trap start_job_containers EXIT
+    trap resume_app EXIT
     stop_job_containers
 
     # Both run before the drop: the blob keys only exist in the database we're about
@@ -331,6 +333,11 @@ case "$mode" in
     # load into that same logical redis DB.
     purge_r2_objects
     flush_redis_db "$redis_shared_with"
+
+    # web stays up to run db:prepare, so the proxy answers its requests with a 503
+    # until then rather than letting them raise NoDatabaseError.
+    echo "==> Putting ${slug} into maintenance"
+    kamal app maintenance --message "Reloading the database"
 
     # Strict, unlike destroy's drop — a half-dropped database must not be reported
     # as a reload. Rails reconnects the connections FORCE terminates.
@@ -344,7 +351,7 @@ case "$mode" in
     kamal app exec --reuse --roles web "bin/rails db:prepare"
 
     trap - EXIT
-    start_job_containers
+    resume_app
 
     echo "==> Done. URL: https://${slug}.review.bikeindex.org"
     ;;
