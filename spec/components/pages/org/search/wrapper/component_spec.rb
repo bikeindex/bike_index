@@ -75,6 +75,23 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     it "disables the export, which would reach past the organization, and says why" do
       expect(component).to have_css("a[aria-disabled='true']:not([href])", text: "Export CSV")
       expect(component).to have_css("[data-controller='ui--tooltip']", text: "Turn off searching all registrations")
+      expect(component).to have_text("25 matching registrations")
+    end
+
+    context "with over 1,000 matches" do
+      let(:pagy) { Pagy::Offset.new(count: 1_001, page: 1, limit: 10) }
+
+      it "caps the count" do
+        expect(component).to have_text("> 1,000 matching registrations")
+      end
+    end
+  end
+
+  context "with over 1,000 matches, not searching all" do
+    let(:pagy) { Pagy::Offset.new(count: 1_001, page: 1, limit: 10) }
+
+    it "shows the count" do
+      expect(component).to have_text("1,001 matching registrations")
     end
   end
 

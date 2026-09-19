@@ -9,6 +9,8 @@ module Pages
         # carries the row of actions across the top, and renders inside the results
         # turbo-frame, so every search brings the whole card back.
         class Component < ApplicationComponent
+          SEARCH_ALL_COUNT_LIMIT = 1_000
+
           def initialize(
             organization:,
             pagy:,
@@ -54,6 +56,12 @@ module Pages
           end
 
           private
+
+          def count_display
+            return number_display(@pagy.count) unless @search_all && @pagy.count > SEARCH_ALL_COUNT_LIMIT
+
+            safe_join(["> ", number_display(SEARCH_ALL_COUNT_LIMIT)])
+          end
 
           def settings
             @settings ||= ComponentStructs::OrgSearchSettings.new(

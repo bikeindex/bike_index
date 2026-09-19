@@ -6,7 +6,7 @@
     "
   >
     <p class="tw:mb-0">
-      <%= translation(".matching_html", count: number_display(@pagy.count),
+      <%= translation(".matching_html", count: count_display,
         cycle_type: settings.cycle_type.pluralize(@pagy.count)) %>
 
       <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
