@@ -60,7 +60,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       it "renders a PUT form for creating the following invoice" do
         get "#{base_url}/#{invoice.to_param}/edit"
         action = "#{base_url}/#{invoice.to_param}?create_following_invoice=true"
-        expect(Nokogiri::HTML(response.body).at_css("form[action='#{action}'] input[name=_method][value=put]")).to be_present
+        expect(Capybara.string(response.body)).to have_css("form[action='#{action}'] input[name=_method][value=put]", visible: :hidden)
       end
     end
   end
