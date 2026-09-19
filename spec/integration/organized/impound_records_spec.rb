@@ -213,7 +213,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(page).to have_content(/impound this bike/i)
 
     # Enter the address by hand to skip the geolocation prompt and enable submit
-    choose "Enter address manually", allow_label_click: true
+    click_button "Enter address manually"
     fill_in "parking_notification_street", with: "100 Main St"
     fill_in "parking_notification_city", with: "New York"
 

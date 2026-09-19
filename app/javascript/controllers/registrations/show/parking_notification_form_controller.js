@@ -92,25 +92,29 @@ export default class extends Controller {
   // Segmented control: "current" places a pin on the map, "entered" reveals the
   // address fields
   selectLocationMode (event) {
-    if (event.target.value === 'entered') this.enterManually()
-    else this.startLocation()
+    if (event.currentTarget.dataset.mode === 'entered') this.enterManually(COLLAPSE_DURATION_MS)
+    else this.startLocation(COLLAPSE_DURATION_MS)
   }
 
-  // Reflect the chosen mode across the radios, the hidden flag, the required
+  // Reflect the chosen mode across the toggle, the hidden flag, the required
   // fields and which of the map / address panels is showing
-  applyLocationMode (manual) {
+  applyLocationMode (manual, duration) {
     const value = manual ? 'entered' : 'current'
-    this.locationModeTargets.forEach((radio) => { radio.checked = radio.value === value })
+    this.locationModeTargets.forEach((button) => {
+      const active = String(button.dataset.mode === value)
+      button.dataset.active = active
+      button.ariaPressed = active
+    })
     if (this.hasUseEnteredAddressTarget) this.useEnteredAddressTarget.value = manual
     this.setManualRequired(manual)
-    this.toggle(this.addressGroupTarget, manual)
-    this.toggle(this.mapSectionTarget, !manual)
+    collapse(manual ? 'show' : 'hide', this.addressGroupTarget, duration)
+    collapse(manual ? 'hide' : 'show', this.mapSectionTarget, duration)
   }
 
   // Show the map and seed the pin. Once a location has resolved this session the
   // pin is already placed, so just re-reveal the map.
   startLocation (revealDuration = 0) {
-    this.applyLocationMode(false)
+    this.applyLocationMode(false, revealDuration)
 
     if (this.located) {
       // The frame may still be mid-collapse, so measure once it has settled
@@ -330,8 +334,8 @@ export default class extends Controller {
     } catch { /* leave the fields for them to fill in */ }
   }
 
-  enterManually () {
-    this.applyLocationMode(true)
+  enterManually (duration = 0) {
+    this.applyLocationMode(true, duration)
     // Seed from the resolved address while it still describes the pin, without
     // waiting on the network; a pin that has moved gets a fresh geocode instead
     if (this.geocodedFor === this.pinKey) this.fillAddress()
@@ -341,7 +345,7 @@ export default class extends Controller {
 
   // Whether "enter address manually" is the selected mode
   get manualMode () {
-    return this.locationModeTargets.some((radio) => radio.value === 'entered' && radio.checked)
+    return this.locationModeTargets.some((button) => button.dataset.mode === 'entered' && button.dataset.active === 'true')
   }
 
   addressField (attribute) {
