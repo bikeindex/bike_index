@@ -10,10 +10,10 @@ RSpec.describe Pages::Registrations::Show::Map::Component, type: :component do
     expect(node["data-registrations--show--map-latitude-value"]).to eq "40.7"
     expect(node["data-registrations--show--map-longitude-value"]).to eq "-73.9"
     expect(node["data-registrations--show--map-radius-meters-value"]).to eq "1000"
-    expect(node["data-registrations--show--map-point-value"]).to eq "false"
     expect(node).to have_css("[data-registrations--show--map-target='canvas']")
     # Shown by the controller when MapLibre/WebGL is unavailable
     expect(node).to have_css("p[hidden][data-registrations--show--map-target='unavailable']", text: "map couldn't be loaded", visible: :all)
+    expect(node).to_not have_css("[data-registrations--show--map-target='pin']", visible: :all)
   end
 
   context "precise (exact address public)" do
@@ -28,7 +28,7 @@ RSpec.describe Pages::Registrations::Show::Map::Component, type: :component do
     let(:options) { {latitude: 40.7, longitude: -73.9, point: true} }
     it "marks the location as a point" do
       render_inline(component)
-      expect(page.find("div[data-controller='registrations--show--map']")["data-registrations--show--map-point-value"]).to eq "true"
+      expect(page).to have_css("template[data-registrations--show--map-target='pin']", visible: :all)
     end
   end
 

@@ -1,3 +1,7 @@
+<% if @registration_sequence.organization.present? %>
+  <%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @registration_sequence.organization, active: :registration_sequences, display_dev_info: display_dev_info?)) %>
+<% end %>
+
 <div class="tw:mx-auto tw:max-w-3xl tw:py-4">
   <%= render Pages::Admin::RegistrationSequence::Header::Component.new(registration_sequence: @registration_sequence, mode: :view) %>
 

@@ -44,6 +44,14 @@ module UI
         ]))
       end
 
+      # The chart card's scope switcher: the same track, with links in it
+      def toggle_links
+        render(UI::ButtonGroup::Component.new(kind: :toggle, entries: [
+          ComponentStructs::Shapes.entry("Current search", href: "#", active: true),
+          ComponentStructs::Shapes.entry("Last year", href: "#")
+        ]))
+      end
+
       def full_width
         render(UI::ButtonGroup::Component.new(full_width: true, entries: %w[xs s m l xl].map { |size|
           ComponentStructs::Shapes.entry(size.upcase, href: "#", active: size == "m")

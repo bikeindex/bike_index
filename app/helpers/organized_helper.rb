@@ -21,7 +21,8 @@ module OrganizedHelper
       elsif bike.unregistered_parking_notification? # Only care if currently unregistered parking notification
         # If it's an unregistered bike, don't display where it was created
         # ... since it only could've been created in one place
-        concat(content_tag(:em, " unregistered", class: "small text-warning"))
+        concat(" ")
+        concat(render(Atoms::RegistrationStatusBadge::Component.new(bike:, size: :xs)))
       elsif !skip_creation && bike.creation_kind.present?
         concat(", ")
         concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)), class: "less-strong"))
@@ -73,8 +74,7 @@ module OrganizedHelper
       %w[exports show],
       %w[exports new],
       %w[users new],
-      %w[dashboard index],
-      %w[impounded_bikes index]
+      %w[dashboard index]
     ].include?([controller_name, action_name])
   end
 
