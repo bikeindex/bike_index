@@ -7,11 +7,11 @@ class ApplicationComponent < ViewComponent::Base
   # because the tracker follows only components that opt in, so one missed include anywhere
   # in a cached tree is a silently stale fragment.
   #
-  # The tracker reads one shape: a constant directly after `render`. A component rendered
-  # through a local or a method, built into a collection, or referenced for a constant is
-  # invisible to it, and its markup goes stale inside any cache above it — so those name
-  # themselves in a `# Template Dependency: Full::Class::Name` comment, which the tracker
-  # resolves into the tree. The application_component spec is what finds the ones missing.
+  # The tracker reads one shape: a constant directly after `render`. Anything else names
+  # itself in a `# Template Dependency:` comment, which is the gem's own seam — widening
+  # the tracker instead would mean patching a private method of an API it labels
+  # experimental, where a release breaking it costs stale caches rather than an error.
+  # The frontend-conventions skill has the rule; this spec finds what's missing.
   include ViewComponent::ExperimentallyCacheable
   include ApplicationComponentHelper
 

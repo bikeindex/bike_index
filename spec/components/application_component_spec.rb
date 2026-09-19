@@ -16,12 +16,10 @@ RSpec.describe ApplicationComponent, type: :component do
   end
 
   describe "cache digests" do
-    # ViewComponent's tracker reads one shape, a constant directly after `render`, so a
-    # component rendered through a local or a method, built into a collection, or
-    # referenced for a constant drops out of the digest and goes stale inside every cache
-    # above it — with the key still moving for its siblings, so nothing else catches it.
-    # A source scan finds what the tracker misses; the fix is a `# Template Dependency:`
-    # comment naming the full class on the component that renders it.
+    # What the tracker misses goes stale with the key still moving for its siblings, so
+    # nothing else catches it. A source scan is the oracle here: anything the markup
+    # reaches has to be in the tree, via a `# Template Dependency:` comment wherever the
+    # tracker can't see the render itself.
     it "digests every component the markup under a cache key reaches" do
       uncovered = cached_components.sort_by(&:name).filter_map do |component|
         missing = reachable_paths(component) - digested_paths(component)
@@ -32,26 +30,37 @@ RSpec.describe ApplicationComponent, type: :component do
 
       expect(uncovered).to eq []
     end
+
+    # A directive is a claim about what the component renders, and it keeps whatever it
+    # names in the digest — so one left behind after its render moved away silently
+    # over-invalidates every cache above it
+    it "renders every component a Template Dependency names" do
+      unreferenced = component_classes.sort_by(&:name).filter_map do |component|
+        declared = File.read(component.identifier).scan(/^\s*# Template Dependency: (\S+)/).flatten
+        missing = declared - referenced_components(component).map(&:name)
+        "#{component} names #{missing.join(", ")}" if missing.any?
+      end
+
+      expect(unreferenced).to eq []
+    end
   end
 
   private
 
+  def component_classes
+    Rails.application.eager_load!
+    ApplicationComponent.descendants.select(&:identifier)
+  end
+
   # The components whose markup digest is folded into a cache key: one keying its own
   # fragment, or one a view names because `skip_digest` left the key to carry it
   def cached_components
-    files = Rails.root.glob("app/components/**/component.rb") + Rails.root.glob("app/views/**/*.{erb,haml}")
-    files.flat_map { |file| cached_components_in(file) }.uniq
-  end
+    own = component_classes.select { |component| File.read(component.identifier).include?("self.class.cache_digest") }
+    named = Rails.root.glob("app/views/**/*.{erb,haml}").flat_map do |file|
+      file.read.scan(/\b((?:[A-Z][A-Za-z0-9]*::)+Component)\.cache_digest/).flatten
+    end
 
-  def cached_components_in(file)
-    source = file.read
-    return [] unless source.include?("cache_digest")
-
-    named = source.scan(/\b((?:[A-Z][A-Za-z0-9]*::)+Component)\.cache_digest/).flatten.filter_map(&:safe_constantize)
-    return named unless source.include?("self.class.cache_digest")
-
-    # Read from the file's own module nesting, so ui/ comes back as UI:: rather than Ui::
-    [[*source.scan(/^\s*module ([A-Z]\w*)/).flatten, "Component"].join("::").safe_constantize, *named].compact
+    (own + named.uniq.filter_map(&:safe_constantize)).uniq
   end
 
   # Everything this component's markup can reach by source reference, followed the way
@@ -67,11 +76,13 @@ RSpec.describe ApplicationComponent, type: :component do
   end
 
   # References resolve the way Ruby resolves them, so walk out from the referencing
-  # file's own namespace and let the autoloader answer
+  # file's own namespace and let the autoloader answer. Prose naming a component it only
+  # points at renders nothing, so comment lines don't count as references.
   def referenced_components(component)
     component_files(component).flat_map { |file|
       namespace = file.dirname.relative_path_from(Rails.root.join("app/components")).to_s.split("/").map(&:camelize)
-      file.read.scan(/\b(?:[A-Z][A-Za-z0-9]*::)+Component\b/).filter_map do |reference|
+      markup = file.read.lines.grep_v(/^\s*(#|-#|<%#)/).join
+      markup.scan(/\b(?:[A-Z][A-Za-z0-9]*::)+Component\b/).filter_map do |reference|
         namespace.length.downto(0).filter_map { |i| [*namespace[0, i], reference].join("::").safe_constantize }
           .find { |found| found.is_a?(Class) && found < ViewComponent::Base }
       end
@@ -87,7 +98,7 @@ RSpec.describe ApplicationComponent, type: :component do
   # What Action View's digest tree actually reaches, which is what the digest covers
   def digested_paths(component)
     prefix = "#{ViewComponent::CacheDigest::VIRTUAL_PATH_PREFIX}/"
-    finder = ActionView::LookupContext.new(ActionController::Base.view_paths)
+    finder = ViewComponent::CacheDigest.default_finder
     tree = ActionView::Digestor.tree(ViewComponent::CacheDigest.virtual_path_for(component), finder)
     flattened_dependencies(tree.to_dep_map).filter_map { |name| name.delete_prefix(prefix) if name.start_with?(prefix) }
   end

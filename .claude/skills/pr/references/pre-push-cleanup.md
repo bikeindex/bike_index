@@ -8,7 +8,7 @@ Invoke the `/simplify` command to review the changed code for reuse, simplificat
 
 Skip it when the diff has no code in it — a docs- or skill-only branch gives it nothing to review, and it fans out subagents to find that out. Config by file extension isn't the test: a `.github/workflows/*.yml` with a `run:` block is a shell script, and reviewing one is how the nightly-reseed branch found its only cleanup.
 
-**Read `git diff` before committing what it produced.** Its review agents edit the working tree to check their own findings, and one that stops mid-verification leaves the edit behind — indistinguishable from the changes you decided to apply.
+**Read `git diff` the moment the agents return — before running anything, not just before committing.** Its review agents edit the working tree to check their own findings, and one that stops mid-verification leaves the edit behind, indistinguishable from the changes you decided to apply. An agent verifying that a sweeping mechanical edit is load-bearing reverts all of it, so the next spec run goes red on the branch's own subject and reads as a bug you introduced rather than a tree someone else reset.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 

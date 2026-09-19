@@ -14,7 +14,6 @@ module UI
       # for the comboboxes a list can't serve (see UI::Forms::Combobox::Component), where
       # the options become a datalist of suggestions instead.
       class Component < ApplicationComponent
-        # Template Dependency: UI::Forms::Combobox::Component
         # [display, value] pairs, the shape options_for_select takes
         def initialize(name:, label:, value: nil, options: [], required: false, text: false)
           @name = name
