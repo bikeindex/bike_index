@@ -5614,6 +5614,17 @@ nl:
             one: "%{count}-fout verhinderde dat dit %{object_name} werd opgeslagen:"
             other: "%{count}-fouten hebben ervoor gezorgd dat %{object_name} niet
               kon worden opgeslagen:"
+      time_range:
+        from: uit
+        in_the_next_month: in de komende maand
+        in_the_next_week: volgende week
+        in_the_past_day: in de afgelopen dag
+        in_the_past_hour: in het afgelopen uur
+        in_the_past_month: in de afgelopen maand
+        in_the_past_week: in de afgelopen week
+        in_the_past_year: in het afgelopen jaar
+        now: nu
+        to: Naar
     atoms:
       serial:
         hidden: verborgen
@@ -6197,6 +6208,7 @@ nl:
             share: Deel
             share_my_page: Deel mijn pagina
             audience_marketplace_preview: Voorbeeldweergave van de advertentie
+            nickname: 'bijnaam: %{name}'
           wrapper_org_admin:
             about_this_bike: Over dit %{bike_type}
             assign_sticker: Sticker toewijzen

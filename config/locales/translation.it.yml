@@ -5722,6 +5722,17 @@ it:
           error_prevented_this_from_being_saved:
             one: 'L''errore %{count} ha impedito il salvataggio di %{object_name}:'
             other: 'Gli errori %{count} hanno impedito il salvataggio di questo %{object_name}:'
+      time_range:
+        from: da
+        in_the_next_month: nel prossimo mese
+        in_the_next_week: nella prossima settimana
+        in_the_past_day: nell'ultimo giorno
+        in_the_past_hour: nell'ultima ora
+        in_the_past_month: nell'ultimo mese
+        in_the_past_week: nella scorsa settimana
+        in_the_past_year: nell'ultimo anno
+        now: Ora
+        to: a
     atoms:
       serial:
         hidden: nascosto
@@ -6307,6 +6318,7 @@ it:
             share: Condividere
             share_my_page: Condividi la mia pagina
             audience_marketplace_preview: Anteprima dell'inserzione
+            nickname: 'soprannome: %{name}'
           wrapper_org_admin:
             about_this_bike: Informazioni su questo %{bike_type}
             assign_sticker: Collegamento

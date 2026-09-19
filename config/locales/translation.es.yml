@@ -5710,6 +5710,17 @@ es:
           error_prevented_this_from_being_saved:
             one: 'El error %{count} impidió que se guardara este %{object_name}:'
             other: 'Los errores %{count} impidieron que se guardara este %{object_name}:'
+      time_range:
+        from: de
+        in_the_next_month: en el próximo mes
+        in_the_next_week: la próxima semana
+        in_the_past_day: en el último día
+        in_the_past_hour: en la última hora
+        in_the_past_month: en el último mes
+        in_the_past_week: en la última semana
+        in_the_past_year: en el último año
+        now: ahora
+        to: a
     atoms:
       serial:
         hidden: oculto
@@ -6289,6 +6300,7 @@ es:
             share: Compartir
             share_my_page: Comparte mi página
             audience_marketplace_preview: Vista previa del anuncio
+            nickname: 'apodo: %{name}'
           wrapper_org_admin:
             about_this_bike: Acerca de esto %{bike_type}
             assign_sticker: Asignar pegatina

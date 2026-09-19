@@ -5457,6 +5457,17 @@ nb:
           error_prevented_this_from_being_saved:
             one: 'Feilen %{count} forhindret at denne %{object_name} ble lagret:'
             other: "%{count}-feil forhindret at denne %{object_name}-en ble lagret:"
+      time_range:
+        from: fra
+        in_the_next_month: i løpet av neste måned
+        in_the_next_week: i løpet av neste uke
+        in_the_past_day: i løpet av det siste døgnet
+        in_the_past_hour: i løpet av den siste timen
+        in_the_past_month: i løpet av den siste måneden
+        in_the_past_week: i løpet av den siste uken
+        in_the_past_year: i løpet av det siste året
+        now: nå
+        to: til
     atoms:
       serial:
         hidden: skjult
@@ -6021,6 +6032,7 @@ nb:
             share: Dele
             share_my_page: Del siden min
             audience_marketplace_preview: Forhåndsvisning av oppføring
+            nickname: 'kallenavn: %{name}'
           wrapper_org_admin:
             about_this_bike: Om dette %{bike_type}
             assign_sticker: Tildel klistremerke

@@ -15,7 +15,7 @@
   = t(".incomplete")
   = t(".registration").pluralize(@pagy.count)
   %em
-    = humanized_time_range(@time_range)
+    = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
 
 .mt-4.mb-2
   = form_tag incompletes_organization_bikes_path(organization_id: current_organization.to_param), method: :get do
