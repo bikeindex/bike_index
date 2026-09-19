@@ -1,6 +1,5 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
-    include Rails::Pagination
     include Binxtils::SortableTable
 
     DEFAULT_PER_PAGE = 200
@@ -16,7 +15,6 @@ module Organized
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
-      # These are set here because we render them in HTML
       @search_kind = if ParkingNotification.kinds.include?(params[:search_kind]).present?
         params[:search_kind]
       else
@@ -30,17 +28,8 @@ module Organized
 
       @search_unregistered = %w[only_unregistered not_unregistered].include?(params[:search_unregistered]) ? params[:search_unregistered] : "all"
 
-      headers["Vary"] = "Accept" # When hitting back button, tell browser not use the json response
       respond_to do |format|
         format.html { render index_component }
-        format.json do
-          pagy, records = pagy(:countish, sorted_parking_notifications, limit: @per_page, page: permitted_page)
-          # This was already set up, so I left it when upgrading to pagy
-          set_pagination_headers(pagy, @per_page)
-          render json: records,
-            root: "parking_notifications",
-            each_serializer: ParkingNotificationSerializer
-        end
       end
     end
 
@@ -116,7 +105,9 @@ module Organized
     end
 
     def index_component
-      parking_notifications = sorted_parking_notifications.limit(@per_page).load
+      parking_notifications = matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+        .includes(:user, bike: [:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_ownership])
+        .limit(@per_page).load
       Pages::Org::ParkingNotifications::Index::Component.new(
         organization: current_organization,
         parking_notifications:,
@@ -140,11 +131,6 @@ module Organized
         notifications_failed_resolved: @notifications_failed_resolved,
         repeated_kind: @repeated_kind
       )
-    end
-
-    def sorted_parking_notifications
-      matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-        .includes(:user, :impound_record, bike: [:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_ownership])
     end
 
     def permitted_parameters
@@ -233,23 +219,6 @@ module Organized
       return nil unless params[:search_southwest_coords].present? && params[:search_northeast_coords].present?
 
       [params[:search_southwest_coords].split(","), params[:search_northeast_coords].split(",")].flatten.map(&:to_f)
-    end
-
-    # Pulling this out of api-pagination gem because the gem doesn't allow overriding the max per
-    def set_pagination_headers(pagy, per_page)
-      url = request.base_url + request.path_info
-      pages = ApiPagination.pages_from(pagy)
-      links = []
-
-      pages.each do |k, v|
-        new_params = request.query_parameters.merge(page: v)
-        links << %(<#{url}?#{new_params.to_param}>; rel="#{k}")
-      end
-
-      headers["Page"] = pagy.page
-      headers["Link"] = links.join(", ") unless links.empty?
-      headers["Per-Page"] = per_page.to_s
-      headers["Total"] = pagy.count.to_s
     end
   end
 end
