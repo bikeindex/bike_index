@@ -493,11 +493,11 @@ RSpec.describe Organized::BikesController, type: :request do
 
       context "bike not in organization" do
         let(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user) }
-        it "redirects with flash error" do
+        it "updates notes" do
           patch "#{base_url}/#{other_bike.id}", params: {notes: "test notes"}
           expect(response).to redirect_to(bike_path(other_bike))
-          expect(flash[:error]).to be_present
-          expect(BikeOrganizationNote.find_by(bike_id: other_bike.id, organization_id: current_organization.id)).to be_nil
+          expect(flash[:success]).to be_present
+          expect(BikeOrganizationNote.find_by(bike_id: other_bike.id, organization_id: current_organization.id).body).to eq "test notes"
         end
       end
     end
