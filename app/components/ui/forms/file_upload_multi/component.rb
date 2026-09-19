@@ -8,10 +8,6 @@ module UI
       # endpoint answers {html:} with the markup for what it stored (or {error:} with why it
       # wouldn't). Already-stored items are the component's content, and new ones join them.
       class Component < ApplicationComponent
-        # mb-0 cancels legacy bootstrap's `label` margin, which items-center would
-        # otherwise center along with the text next to it.
-        LABEL_CLASSES = "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-blue-500/40"
-
         def initialize(url:, file_param:, params: {}, accept: nil, list_html_options: {})
           @url = url
           @file_param = file_param
@@ -22,7 +18,8 @@ module UI
           @input_id = "file_upload_multi_#{SecureRandom.hex(4)}"
 
           # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.
-          @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: LABEL_CLASSES)
+          @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md,
+            html_class: UI::Forms::FileUpload::Component::LABEL_CLASSES)
         end
 
         private
