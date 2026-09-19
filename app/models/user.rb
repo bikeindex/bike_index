@@ -154,8 +154,8 @@ class User < ApplicationRecord
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
 
-  scope :email_banned, -> { left_joins(:email_bans_active).where.not(email_bans: {id: nil}) }
-  scope :no_email_bans, -> { left_joins(:email_bans_active).where(email_bans: {id: nil}) }
+  scope :email_banned, -> { where(id: EmailBan.period_active.banning_account_email.select(:user_id)) }
+  scope :no_email_bans, -> { where.not(id: EmailBan.period_active.banning_account_email.select(:user_id)) }
   scope :banned, -> { where(banned: true) }
   scope :valid_only, -> { no_email_bans.where(banned: false) }
   scope :confirmed, -> { where(confirmed: true) }
@@ -371,14 +371,14 @@ class User < ApplicationRecord
     # Prioritization of organizations
     orgs.ambassador.limit(1).first ||
       orgs.paid_money.limit(1).first ||
-      orgs.paid.limit(1).first ||
+      orgs.invoiced.limit(1).first ||
       orgs.law_enforcement.limit(1).first ||
       orgs.bike_shop.limit(1).first ||
       orgs.limit(1).first
   end
 
-  def paid_org?
-    organizations.paid.limit(1).any?
+  def invoiced_org?
+    organizations.invoiced.limit(1).any?
   end
 
   # Their registration was paid for, so don't ask them for a donation on top of it
@@ -407,6 +407,12 @@ class User < ApplicationRecord
     organizations.with_enabled_feature_slugs(features).limit(1).any?
   end
 
+  def contact_impounded?
+    return true if superuser?
+
+    organizations.contact_impounded.limit(1).any?
+  end
+
   def auth_token_time(auth_token_type)
     SecurityTokenizer.token_time(self[auth_token_type])
   end
@@ -433,7 +439,7 @@ class User < ApplicationRecord
 
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::ResetPasswordJob.perform_async(id, return_to)
+    EmailJobs::ResetPasswordJob.perform_async(id, return_to)
     true
   end
 
@@ -445,7 +451,7 @@ class User < ApplicationRecord
 
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::MagicLoginLinkJob.perform_async(id, return_to)
+    EmailJobs::MagicLoginLinkJob.perform_async(id, return_to)
   end
 
   # Unlike send_magic_link_email, reuses an unexpired token and sends no email
@@ -558,7 +564,7 @@ class User < ApplicationRecord
   end
 
   def render_donation_request
-    return nil unless has_police_organization_role? && !organizations.law_enforcement.paid.limit(1).any?
+    return nil unless has_police_organization_role? && !organizations.law_enforcement.invoiced.limit(1).any?
 
     "law_enforcement"
   end
@@ -577,7 +583,7 @@ class User < ApplicationRecord
   end
 
   def email_banned?
-    email_bans_active.any?
+    email_bans_active.banning_account_email.any?
   end
 
   def set_calculated_attributes

@@ -8,7 +8,7 @@ module Organized
     def show
       @current = params[:day].blank?
       @day = @current ? nil : params[:day].to_date
-      @hot_sheet = HotSheet.for(current_organization, @day)
+      @hot_sheet = HotSheet.for(current_organization, @day).first
     end
 
     def edit

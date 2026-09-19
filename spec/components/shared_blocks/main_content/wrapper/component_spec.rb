@@ -221,7 +221,7 @@ RSpec.describe SharedBlocks::MainContent::Wrapper::Component, type: :component d
       it "renders the edit header and menu around the page" do
         expect(result.css("#edit-bike-skeleton").to_html).to match "<p>the page</p>"
         expect(result.text).to match "Details"
-        expect(result.css(".bike-status-html").count).to eq 0
+        expect(result.text).to_not match(/registered & protected/i)
         expect(result.text).to match bike.mnfg_name
       end
 
@@ -229,7 +229,7 @@ RSpec.describe SharedBlocks::MainContent::Wrapper::Component, type: :component d
         let(:bike) { FactoryBot.create(:bike, :with_ownership, :with_stolen_record) }
 
         it "renders the status in place of the edit heading" do
-          expect(result.css(".bike-status-html").text).to match(/stolen/i)
+          expect(result.text).to match(/reported stolen/i)
         end
       end
     end

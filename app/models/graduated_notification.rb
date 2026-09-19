@@ -68,7 +68,7 @@ class GraduatedNotification < ApplicationRecord
   scope :email_success, -> {
     left_outer_joins(:notifications)
       .pre_notification_integration
-      .or(left_outer_joins(:notifications).merge(Notification.delivery_success))
+      .or(left_outer_joins(:notifications).merge(Notification.delivered))
       .distinct
   }
 
@@ -168,7 +168,7 @@ class GraduatedNotification < ApplicationRecord
   def email_success?
     return true if pre_notification_integration?
 
-    notifications.delivery_success.exists?
+    notifications.delivered.exists?
   end
 
   # Get it unscoped, because we delete it
@@ -357,7 +357,7 @@ class GraduatedNotification < ApplicationRecord
     notification = notifications.first ||
       Notification.create(kind: "graduated_notification", notifiable: self,
         user_id:, message_channel_target: email, bike_id:)
-    notification.track_email_delivery do
+    Notifications::Deliver.track_email(notification) do
       OrganizedMailer.graduated_notification(self).deliver_now
     end
   end
@@ -365,7 +365,7 @@ class GraduatedNotification < ApplicationRecord
   def calculated_status
     # Because prior to commit, the value for the current notification isn't set
     return "marked_remaining" if marked_remaining_at.present?
-    return "delivery_failure" if processed_at.present? && notifications.delivery_failure.exists?
+    return "delivery_failure" if processed_at.present? && notifications.delivery_failed.exists?
 
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
     return "bike_graduated" if email_success? || primary_notification.present? && primary_notification.email_success?

@@ -250,6 +250,14 @@ RSpec.describe PublicImagesController, type: :request do
           delete "#{base_url}/#{public_image.id}"
         }.to change(PublicImage, :count).by(-1)
       end
+      it "redirects to the bike when the image's own page is the referer" do
+        expect {
+          delete "#{base_url}/#{public_image.id}",
+            headers: {"HTTP_REFERER" => "http://www.example.com#{base_url}/#{public_image.id}"}
+        }.to change(PublicImage, :count).by(-1)
+        expect(response).to redirect_to(edit_bike_path(bike))
+      end
+
       context "owner and hidden bike" do
         it "allows the destroy" do
           bike.update(marked_user_hidden: true)
@@ -328,6 +336,14 @@ RSpec.describe PublicImagesController, type: :request do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
     let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+
+    describe "show" do
+      it "renders the owner's view" do
+        get "#{base_url}/#{public_image.id}"
+        expect(response.code).to eq("200")
+        expect(response.body).to match(t("public_images.show.looks_like_this_is_your_image"))
+      end
+    end
 
     describe "edit" do
       it "renders" do

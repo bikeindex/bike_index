@@ -47,7 +47,6 @@ module Pages
           end
 
           def show_sticker_modal?
-            # display stickers if org has paid for them
             @organization.enabled?("bike_stickers")
           end
 
@@ -82,7 +81,7 @@ module Pages
           end
 
           def show_notes?
-            organization_registered? && @organization.enabled?("registration_notes")
+            @organization.enabled?("registration_notes")
           end
 
           def bike_organization_note

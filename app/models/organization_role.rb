@@ -11,7 +11,6 @@
 #  hot_sheet_notification   :integer          default("notification_never")
 #  invited_email            :string(255)
 #  priority                 :integer          default(0), not null
-#  receive_hot_sheet        :boolean          default(FALSE)
 #  role                     :integer
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null

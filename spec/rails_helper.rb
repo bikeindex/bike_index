@@ -55,14 +55,11 @@ RSpec.configure do |config|
   # include translation / localization methods
   config.include AbstractController::Translation
 
-  # Add our request/controller spec helpers
+  # Add our request spec helpers
   config.include RequestSpecHelpers, type: :request
-  config.include ControllerSpecHelpers, type: :controller
-  config.include JsonHelpers, type: :controller
   config.include JsonHelpers, type: :request
   config.include HtmlContentHelpers, type: :request
   config.include StripeHelpers, type: :request
-  config.include StripeHelpers, type: :controller
   config.include StripeHelpers, type: :service
 
   # Set default geocoder location
@@ -94,7 +91,7 @@ VCR.configure do |config|
 
   %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
     MAXMIND_KEY R2_TEST_ACCESS_KEY R2_TEST_ACCESS_KEY_SECRET R2_TEST_ENDPOINT SENDGRID_EMAIL_VALIDATION_KEY
-    LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN
+    LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN CLOUDFLARE_TURNSTILE_SECRET_KEY
     STRAVA_TEST_REFRESH_TOKEN].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
   end

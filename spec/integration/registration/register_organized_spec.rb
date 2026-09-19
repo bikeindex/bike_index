@@ -10,7 +10,10 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
   describe "signed in" do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-    before { sign_in(current_user) }
+    before do
+      sign_in(current_user)
+      expect(page).to have_current_path("/my_account")
+    end
 
     # The one organization they're in, assigned without any link naming it
     context "a member of one organization" do
@@ -36,7 +39,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
 
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
-        fill_in "bike[serial_number]", with: "XYZ 123"
+        fill_in_verified "bike[serial_number]", with: "XYZ 123"
 
         # Student ID is required, so the browser holds the submit while the organization is on
         click_button "Complete Bike Registration"
@@ -68,7 +71,8 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
     end
 
     context "a member of an organization that pays" do
-      let(:organization) { FactoryBot.create(:organization, :paid, short_name: "Brakebills") }
+      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization:) }
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
 
       it "stops asking them for a donation once they have its registration" do
@@ -81,7 +85,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
 
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
-        fill_in "bike[serial_number]", with: "XYZ 123"
+        fill_in_verified "bike[serial_number]", with: "XYZ 123"
         click_button "Complete Bike Registration"
 
         expect(page).to have_content("Registration complete")
@@ -132,10 +136,10 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       click_button "Next"
 
       wait_for_details_step
-      fill_in "bike[user_name]", with: user_name
+      fill_in_verified "bike[user_name]", with: user_name
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "XYZ 123"
+      fill_in_verified "bike[serial_number]", with: "XYZ 123"
       # The safety pages come next, so step 2 no longer finishes the registration
       click_button "Next"
 
@@ -233,15 +237,15 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         # The rider never sees the failure, only the retry - waited out past Capybara's default
         wait_for_details_step(wait: 10)
 
-        fill_in "bike[user_name]", with: user_name
+        fill_in_verified "bike[user_name]", with: user_name
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
-        fill_in "bike[serial_number]", with: "XYZ 123"
+        fill_in_verified "bike[serial_number]", with: "XYZ 123"
         # A theft, so the report is in the flow too - it waits on the emailed link, which
         # puts it last rather than after this form
         type_into("#bike_status", "Stolen")
         click_combobox_option("Stolen")
-        fill_in "bike[phone]", with: "555 000 0000"
+        fill_in_verified "bike[phone]", with: "555 000 0000"
         click_button "Next"
 
         expect(page).to have_content("Battery & charging")

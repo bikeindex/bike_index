@@ -11,9 +11,17 @@
   </button>
 
   <div data-ui--collapse-target="content" class="tw:mt-2 tw:hidden">
-    <p class="tw:mb-0">
+    <p class="tw:mb-0 tw:h-64">
       Persisted panel body — open state lives in the <code>?details=1</code> URL
       param.
     </p>
+
+    <label class="tw:flex tw:items-center tw:gap-2">
+      <%= check_box_tag :panel_checkbox, "1", false %> Panel checkbox
+    </label>
+  </div>
+
+  <div id="below" class="tw:h-96">
+    Content the panel pushes down as it opens
   </div>
 </div>

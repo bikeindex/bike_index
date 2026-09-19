@@ -72,6 +72,25 @@ RSpec.describe Admin::DashboardController, type: :request do
       end
     end
 
+    describe "index user counts" do
+      let!(:user_today) { FactoryBot.create(:user) }
+      let!(:user_yesterday) { FactoryBot.create(:user, created_at: Time.current.beginning_of_day - 2.hours) }
+      let!(:user_earlier) { FactoryBot.create(:user, created_at: Time.current - 1.week) }
+      let!(:email_ban) { FactoryBot.create(:email_ban, reason: :honeypot) }
+
+      it "counts the valid users, split by day" do
+        Organization.example && Cgroup.additional_parts # Read replica
+        expect(User.unscoped.pluck(:id)).to match_array([current_user.id, user_today.id,
+          user_yesterday.id, user_earlier.id, email_ban.user_id])
+        get "/admin"
+        expect(response.code).to eq "200"
+        # The email_banned user is in none of the counts
+        expect(assigns(:users_count)).to eq 4
+        expect(assigns(:users_today)).to eq 2 # user_today and current_user
+        expect(assigns(:users_yesterday)).to eq 1
+      end
+    end
+
     describe "credibility_badges" do
       it "renders" do
         get "/admin/credibility_badges"

@@ -11,14 +11,10 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
   before do
     # Org drafts are cloned from the global template seeded here
     load Rails.root.join("db/seeds/seed_registration_sequence_template.rb").to_s
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
+    sign_in(user)
   end
 
-  it "builds a draft from the template, then edits a page and the sequence" do
+  it "builds a draft from the template, edits a page and the sequence, then deletes the page" do
     visit "/o/#{organization.to_param}/registration_sequences"
 
     # Build the draft (cloned from the seeded template) and open the management view
@@ -76,6 +72,17 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     expect(edited.body).to include("reviewed 2026")
     expect(edited.image).to be_attached
     expect(draft.registration_sequence_pages.pluck(:title)).to include("Campus-specific rules")
+
+    # A Turbo DELETE gated by an onclick -- dismissing has to stop Turbo too
+    pages_before = draft.registration_sequence_pages.count
+
+    expect(dismiss_confirm { click_link "Delete page" }).to match(/can't be undone/)
+    expect(draft.registration_sequence_pages.count).to eq pages_before
+
+    accept_confirm { click_link "Delete page" }
+
+    expect(page).to have_content("Draft registration sequence")
+    expect(draft.registration_sequence_pages.count).to eq(pages_before - 1)
   end
 
   it "gates each preview page on its rules like the real flow, then finishes to editing" do

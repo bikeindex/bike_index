@@ -167,7 +167,11 @@ module Pages
         # rather than offering it
         def report_phone_required_texts
           BikeServices::Register::REPORT_RECORDS.keys.index_with do |status|
-            translation((status == "status_stolen") ? ".phone_required_stolen" : ".phone_required_found", cycle_type:)
+            if status == "status_stolen"
+              translation(".phone_required_stolen", cycle_type:)
+            else
+              translation(".phone_required_found", cycle_type:)
+            end
           end
         end
 

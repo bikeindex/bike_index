@@ -71,9 +71,9 @@
               <%= creator_cell %>
             <% end %>
 
-            <% if @bike.creation_description.present? %>
+            <% if @bike.creation_kind.present? %>
               &ndash;
-              <em>Via <%= render(Atoms::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) %></em>
+              <em>Via <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: current_ownership)) %></em>
 
 
               <% if current_ownership&.doorkeeper_app_id.present? %>

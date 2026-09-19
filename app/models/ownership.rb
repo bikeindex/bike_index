@@ -118,10 +118,22 @@ class Ownership < ApplicationRecord
       ORIGIN_ENUM.keys.map(&:to_s)
     end
 
-    def origin_humanized(str)
-      return nil unless str.present?
+    # Every value creation_kind can return. It restates that method's branching, so
+    # ownership_spec checks it against what instantiating each enum value produces
+    def creation_kinds
+      (Organization.pos_kinds.select { Organization.pos?(it) } + %w[bulk_import] + origins).map(&:to_sym)
+    end
 
-      str.titleize.downcase
+    def creation_kind_humanized(creation_kind)
+      return nil unless creation_kinds.include?(creation_kind&.to_sym)
+
+      I18n.t(creation_kind, scope: %i[activerecord enums ownership creation_kind])
+    end
+
+    def creation_kind_description(creation_kind)
+      return nil unless creation_kinds.include?(creation_kind&.to_sym)
+
+      I18n.t(creation_kind, scope: %i[activerecord enums ownership creation_kind_description])
     end
 
     def current_at(time)
@@ -189,18 +201,11 @@ class Ownership < ApplicationRecord
     organization.present? && organization.direct_unclaimed_notifications?
   end
 
-  def creation_description
-    if pos?
-      pos_kind.to_s.gsub("_pos", "").humanize
-    elsif bulk?
-      "bulk import"
-    elsif origin.present?
-      return "org reg" if %w[embed_extended organization_form].include?(origin)
-      return "landing page" if origin == "embed_partial"
-      return "parking notification" if origin == "creator_unregistered_parking_notification"
+  def creation_kind
+    return pos_kind.to_sym if pos?
+    return :bulk_import if bulk?
 
-      self.class.origin_humanized(origin)
-    end
+    origin&.to_sym
   end
 
   def owner
@@ -306,7 +311,7 @@ class Ownership < ApplicationRecord
     end
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeServices::Creator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
-    Email::OwnershipInvitationJob.perform_in(2.seconds, id)
+    EmailJobs::OwnershipInvitationJob.perform_in(2.seconds, id)
   end
 
   def create_user_registration_for_phone_registration!(user)
@@ -358,8 +363,7 @@ class Ownership < ApplicationRecord
   end
 
   def spam_risky_email?
-    risky_domains = ["@yahoo.co", "@hotmail.co"]
-    return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
+    return false unless EmailDomain.risky_email?(owner_email)
     return true if pos?
 
     embed? && organization&.spam_registrations?

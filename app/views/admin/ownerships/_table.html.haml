@@ -58,7 +58,7 @@
             - else
               = creator.display_name
           %td
-            %small= ownership.creation_description
+            %small= render Atoms::Org::OriginDisplay::Component.new(ownership:)
           %td
             = ownership.owner_email
           - if display_dev_info?

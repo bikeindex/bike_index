@@ -1,6 +1,6 @@
 <% last_email_errored = @user.user_emails&.last_email_errored || UserEmail.none %>
 
-<% if @user.banned? || @user.deleted? || last_email_errored.any? || @user.email_banned? %>
+<% if @user.banned? || @user.deleted? || last_email_errored.any? || @user.email_bans_active.any? %>
   <div class="row mb-4">
     <% if @user.deleted? %>
       <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3 mt-4">
@@ -63,12 +63,13 @@
       </div>
     <% end %>
 
-    <% if @user.email_banned? %>
+    <% if @user.email_bans_active.any? %>
       <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3 mt-4">
         <div class="alert alert-danger mb-4">
           <h4 class="text-danger">User's email banned (not delivered)</h4>
           Reasons:
           <% @user.email_bans_active.each do |email_ban| %>
+            <strong><%= email_ban.email %></strong>
             <%= email_ban.reason_humanized %>
 
             <small class="less-strong">

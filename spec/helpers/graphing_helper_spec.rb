@@ -21,10 +21,18 @@ RSpec.describe GraphingHelper, type: :helper do
           .to eq({"11:16 AM" => 0, "11:17 AM" => 1, "11:18 AM" => 0, "11:19 AM" => 0})
       end
     end
-    describe "time_range_counts" do
+    describe "time_range_amounts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 10.01, " 1:18 PM" => 0, " 1:19 PM" => 0} }
-      it "returns the thing with want" do
+      it "converts to dollars, or leaves the cents alone" do
         expect(time_range_amounts(collection: Payment.all, convert_to_dollars: true)).to eq target_counts
+        expect(time_range_amounts(collection: Payment.all))
+          .to eq({" 1:16 PM" => 0, " 1:17 PM" => 1001, " 1:18 PM" => 0, " 1:19 PM" => 0})
+      end
+    end
+    describe "empty_time_range_counts" do
+      it "matches the buckets a collection with no rows counts into" do
+        expect(empty_time_range_counts).to eq({" 1:16 PM" => 0, " 1:17 PM" => 0, " 1:18 PM" => 0, " 1:19 PM" => 0})
+        expect(empty_time_range_counts).to eq time_range_counts(collection: Payment.none)
       end
     end
   end
@@ -101,27 +109,6 @@ RSpec.describe GraphingHelper, type: :helper do
       it "is year-month" do
         expect(end_time.strftime(group_by_format(time_range))).to eq "2020-1"
       end
-    end
-  end
-
-  describe "humanized_time_range_column" do
-    it "humanizes created_at" do
-      expect(humanized_time_range_column("created_at")).to eq "created"
-      @period = "all"
-      expect(humanized_time_range_column("created_at")).to be_blank
-      expect(humanized_time_range_column("created_at", return_value_for_all: true)).to eq "created"
-    end
-    it "humanizes start_at and end_at" do
-      expect(humanized_time_range_column("start_at")).to eq "starts"
-      expect(humanized_time_range_column("end_at")).to eq "ends"
-      expect(humanized_time_range_column("subscription_start_at")).to eq "subscription starts"
-      expect(humanized_time_range_column("subscription_end_at")).to eq "subscription ends"
-    end
-    it "humanizes needs_renewal_at" do
-      expect(humanized_time_range_column("needs_renewal_at")).to eq "need renewal"
-    end
-    it "humanizes request_at" do
-      expect(humanized_time_range_column("request_at")).to eq "requested"
     end
   end
 

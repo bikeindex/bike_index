@@ -23,15 +23,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # waits for its target to settle before it lands. That wait is Capybara's,
     # so the 2s default is what times out here on a loaded machine.
     using_wait_time(10) do
-      visit new_session_path
-      fill_in "Email", with: user.email
-      click_button "Continue"
-      fill_in "Password", with: "testthisthing7$"
-      click_button "Log in"
+      sign_in(user)
       dismiss_flash_messages
-      # 720px wide, so the sidebar is an overlay behind the top bar's hamburgler.
-      # Its registrations group is the one open on a page no group matches.
-      find("#org_sidebar_hamburgler").click
+      # Its registrations group is the one open on a page no group matches
+      open_org_sidebar
       within("#org_sidebar_nav") { click_link "Search Registrations" }
       expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/)
     end
@@ -250,9 +245,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_link "Render chart", href: /render_chart=true/
     expect(page).to have_current_path(/render_chart=true/, wait: 10)
     expect(page).to have_css("table", wait: 10)
-    # Chart loads async via a lazy turbo-frame; wait for the chartkick element
-    # before checking the inline init data.
-    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-']", wait: 10)
+    # Chart loads async via a lazy turbo-frame; wait for the canvas before checking the
+    # inline init data - chartkick and Chart.js arrive on demand, from ui--chart
+    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas", wait: 10)
     # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket is empty (null)
     expect(page.html).to include(%(["#{la_date_key}",1]))
     expect(page.html).to include(%(["#{cdt_date_key}",null]))
@@ -384,7 +379,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
 
     it "searches multiple serials, shows results, and caches rows by updated_at" do
-      find("#org_sidebar_hamburgler").click
+      open_org_sidebar
       within("#org_sidebar_nav") { click_link "Multi search" }
       expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 

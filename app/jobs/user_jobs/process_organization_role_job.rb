@@ -14,10 +14,12 @@ module UserJobs
         notification = organization_role.notifications.where(kind: "organization_invitation").first ||
           Notification.create(kind: "organization_invitation", notifiable: organization_role,
             user_id: organization_role.user_id, message_channel_target: organization_role.invited_email)
-        notification.track_email_delivery do
+        Notifications::Deliver.track_email(notification) do
           OrganizedMailer.organization_invitation(organization_role).deliver_now
         end
-        organization_role.update(email_invitation_sent_at: Time.current, skip_processing: true)
+        if notification.delivery_success?
+          organization_role.update(email_invitation_sent_at: Time.current, skip_processing: true)
+        end
       end
 
       # Bust cache keys on user and organization

@@ -17,8 +17,8 @@ module Pages
                  .map { |display, value| {display:, value: value.to_s} }}
             end
 
-            def initialize(search_paid:, features_and_settings_ids:, index:)
-              @search_paid = search_paid
+            def initialize(search_invoiced:, features_and_settings_ids:, index:)
+              @search_invoiced = search_invoiced
               @features_and_settings_ids = features_and_settings_ids
               @index = index
             end

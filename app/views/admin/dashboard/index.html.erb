@@ -41,12 +41,8 @@
     <div class="row justify-content-end">
       <div class="col-auto">
         <p>
-          <%= number_with_delimiter(User.valid_only.count) %> users total
-          <% today = User.valid_only.where("users.created_at >= ?", Time.current.beginning_of_day).count %>
-
-          <% yesterday = (User.valid_only.where("users.created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
-
-          <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
+          <%= number_with_delimiter(@users_count) %> users total
+          <em>(<%= number_with_delimiter(@users_yesterday) %> yesterday, <%= number_with_delimiter(@users_today) %> today)</em>
         </p>
       </div>
     </div>

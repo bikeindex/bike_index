@@ -72,20 +72,20 @@
         end %>
 
       <div class="col-12 mt-2">
-        <%= column_chart theft_alerts_graph, stacked: true, thousands: "," %>
+        <%= render(UI::Chart::Component.new(series: theft_alerts_graph, time_range: @time_range, stacked: true)) %>
       </div>
 
       <% if @search_facebook_data %>
         <h3 class="mt-5">
           <em>Sum of Facebook reach for ads started in the period</em>
         </h3>
-        <%= column_chart facebook_reach_graph, stacked: true, thousands: "," %>
+        <%= render(UI::Chart::Component.new(series: facebook_reach_graph, time_range: @time_range, stacked: true)) %>
         <div class="mt-5"></div>
       <% end %>
 
       <% unless @search_recovered %>
         <div class="col-12 mt-2">
-          <%= column_chart alerts_recoveries_graph, stacked: true, thousands: "," %>
+          <%= render(UI::Chart::Component.new(series: alerts_recoveries_graph, time_range: @time_range, stacked: true)) %>
         </div>
       <% end %>
     <% end %>

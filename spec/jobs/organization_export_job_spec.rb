@@ -204,6 +204,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           owner_name: "George Smith",
           registered_at: bike.created_at.utc.to_s,
           registered_by: nil, # Since user isn't part of organization. TODO: Currently not implemented
+          registration_method: "web",
           serial: bike.serial_number,
           status: nil, # no status
           thumbnail: nil,
@@ -230,6 +231,18 @@ RSpec.describe OrganizationExportJob, type: :job do
         # And matching the whole thing
         expect(generated_csv_string).to eq(csv_string)
         expect(export.rows).to eq 1
+      end
+    end
+
+    context "registration_method" do
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: {headers: %w[registration_method]}) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creation_state_origin: "embed_partial") }
+
+      # The column is the component's copy, not the raw kind
+      it "exports the kind's label" do
+        expect(bike.reload.creation_kind).to eq :embed_partial
+        instance.perform(export.id)
+        expect(export.reload.file.read.split("\n").last).to eq instance.comma_wrapped_string(["old landing page"]).chomp
       end
     end
 
@@ -348,6 +361,7 @@ RSpec.describe OrganizationExportJob, type: :job do
               owner_name: nil,
               registered_at: bike.created_at.utc.to_s,
               registered_by: nil,
+              registration_method: "web",
               serial: bike.serial_number,
               status: nil,
               thumbnail: nil,
@@ -446,10 +460,11 @@ RSpec.describe OrganizationExportJob, type: :job do
             owner_name: nil,
             registered_at: partial_registration.created_at.utc.to_s,
             registered_by: nil,
+            registration_method: nil,
             serial: nil,
             status: nil,
             thumbnail: nil,
-            vehicle_type: "e-Personal Mobility",
+            vehicle_type: "e-Personal Mobility Device",
             bike_sticker: nil,
             organization_affiliation: nil,
             phone: nil,
@@ -497,10 +512,11 @@ RSpec.describe OrganizationExportJob, type: :job do
               owner_name: nil,
               registered_at: bike.created_at.utc.to_s,
               registered_by: nil,
+              registration_method: "web",
               serial: bike.serial_number,
               status: nil,
               thumbnail: nil,
-              vehicle_type: "e-Personal Mobility",
+              vehicle_type: "e-Personal Mobility Device",
               bike_sticker: nil,
               organization_affiliation: "community_member",
               phone: "7177423423",
@@ -568,6 +584,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             owner_name: nil,
             registered_at: bike.created_at.utc.to_s,
             registered_by: nil,
+            registration_method: "web",
             serial: bike.serial_number,
             status: "impounded",
             thumbnail: nil,

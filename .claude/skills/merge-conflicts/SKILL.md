@@ -16,9 +16,9 @@ allowed-tools: Bash, Read, Edit, Write, Glob, Grep
 
 # Resolving merge conflicts
 
-When a branch needs to catch up with its base, or a merge/cherry-pick/pull leaves conflict markers, follow this — the goal is a clean, honest integration that a reviewer can trust and that never rewrites shared history.
-
 ## Determine the base branch first — don't assume `main`
+
+**Re-read `git branch --show-current` rather than trusting the branch from earlier in the session.** Conductor runs sessions concurrently, so another one can check this worktree out onto a different branch and commit to it while your conversation is open — and the base you resolved for the branch you *were* on is then the wrong base, merged into work you haven't read.
 
 "Update from base", "sync with main", "this branch is behind", "merge the base in" all need a base branch to merge *from*. **Don't default to `main`.** A branch is often stacked on another feature branch, and merging `main` instead silently pulls the wrong history — the diff looks "already up to date" against `main` while the real base has commits you're missing. Resolve the base in this order:
 
@@ -29,12 +29,13 @@ When a branch needs to catch up with its base, or a merge/cherry-pick/pull leave
 
 **Re-resolve the base every time — it moves.** When a base branch's PR merges, GitHub retargets the child PR (usually to `main`), so what you merged from last time may no longer be the base. Check `gh pr view <branch> --json baseRefName`, and `gh pr list` for whether the old base still has an open PR. A base whose PR has merged often keeps accumulating commits behind no PR at all; those aren't yours to integrate.
 
-If 1–3 turn up nothing and the branch clearly builds on another feature branch — it was created by merging one in, was cut from `main` but layers work that lives on an unmerged branch, or the user talks about it as part of a stack — **ask which branch to update from (offer the likely candidate) rather than merging `main`.** Confirm before running the merge; a wrong base is expensive to unwind. Note that being 0-behind `main` proves nothing here — a stacked branch is normally 0-behind `main` and still far behind its real base.
+If 1–3 turn up nothing and the branch clearly builds on another feature branch — it was created by merging one in, was cut from `main` but layers work that lives on an unmerged branch, or the user talks about it as part of a stack — **ask which branch to update from (offer the likely candidate) rather than merging `main`.** Confirm before running the merge; a wrong base is expensive to unwind.
 
 ## Bring a branch up to date
 
 - `git fetch origin`, then `git merge --no-edit origin/<base>` (the base resolved above, not reflexively `main`).
-- **Merge, never rebase.** Rebasing rewrites the branch's history; if the branch is already pushed, republishing it needs a force-push, and we never force-push. A merge commit keeps the real history and is always safe to push on top of.
+- **Read what the merge brought in from the merge itself, not from an earlier ahead/behind count** — `git log --oneline <pre-merge-HEAD>..<merge-commit>^2`. Conductor worktrees share one `.git`, so `refs/remotes/origin/*` is shared too: another session's `git fetch` advances your base mid-conversation, and a count taken before the merge under-reports it. Telling the user "1 commit behind" and then merging 2 is how that surfaces.
+- **Merge, never rebase.** Republishing a rebased branch needs a force-push, and we never force-push.
 - If uncommitted work blocks the merge, commit that work first (it belongs to the branch anyway), then merge.
 - Already up to date → nothing to do.
 
@@ -51,13 +52,13 @@ git merge --no-edit <sha>
 git merge --no-edit origin/main
 ```
 
-That makes your side byte-identical to what the squash put on `main`, so the add/add conflicts collapse and you're left only with files this branch actually changed. Measured on one base sitting a single commit ahead: 3 conflicts (`.env`, `bin/binx_hb`, a skill file) became 1 — the one real edit.
+That makes your side byte-identical to what the squash put on `main`, so the add/add conflicts collapse and you're left only with files this branch actually changed.
 
 The branch is usually deleted locally *and* on the remote by then, so don't look for `origin/<base>`; `headRefOid` and `refs/pull/<n>/head` are how you reach the commit.
 
 ## Keep the merge commit to *just* the merge
 
-A merge commit should contain **only** the reconciliation of the two histories — nothing else. Don't fold in lint fixes, refactors, renames, or "while I'm here" cleanups. Those are real changes a reviewer needs to see on their own; buried inside a merge they're invisible in most diff views and impossible to revert independently. Land them as separate commits *after* the merge.
+A merge commit should contain **only** the reconciliation of the two histories — nothing else. Don't fold in lint fixes, refactors, renames, or "while I'm here" cleanups; buried inside a merge they're invisible in most diff views. Land them as separate commits *after* the merge.
 
 ## Resolving conflicts
 
@@ -68,6 +69,7 @@ When git leaves `<<<<<<<` / `=======` / `>>>>>>>` markers:
 - **Ask when it isn't clear-cut.** If you can't confidently tell which side should win, or the two changes are semantically entangled, stop and ask the user rather than guessing. A wrong silent resolution is worse than a question.
 - **Both sides added at the same spot? Order matters.** Keeping both isn't enough when either block has side effects. If the incoming block ends by reloading the page, anything of yours that depends on unsaved state has to come *after* it — concatenated the other way it still passes while testing nothing.
 - **Don't blanket-replace a renamed string.** Two call sites that shared a string can have legitimately diverged; `sed`-ing the whole file changes the one that shouldn't move.
+- **A conflicted `schema_migrations` list takes both versions.** Each side appended its own migration, so keep both lines in descending order — in `db/structure.sql` and `db/primary_replica_structure.sql` alike — then `bin/rails db:migrate` to re-dump. Never hand-edit the structure files.
 - **A conflicted `MARKUP_DIGEST` has no side to pick.** Both branches bumped it because both edited the cached markup, so neither literal describes the merge. Take either, then run `bin/update_component_digests` and commit what it writes. Expect these on any component with a digest, and on components whose digest covers a tree the other side edited — the constant that conflicts is often not in a file you touched.
 - After resolving, verify the result actually makes sense — the merged code should reflect both intents, not just parse. Run the relevant tests if the conflict touched logic.
 
@@ -85,7 +87,7 @@ Every differing file must be explainable as *this branch's work* (or a sibling b
 
 **Resolving two files to opposite sides breaks the interface between them**, and neither looks wrong on its own. Taking the base's version of a component while the helper that calls it auto-merges keeping your argument is an unknown-keyword error on every render, past an audit that reports both files as expected. Whenever you reset a file that has callers, grep the arguments you dropped: `git grep -n '<kwarg>' -- app` should come back empty, or only where the base still accepts it.
 
-This is what it catches, all of which has actually happened here:
+What it catches:
 
 - **Deleted code coming back.** A constant, predicate, or callback the base removed reappears, along with the call sites that reference it — reintroducing behavior the base decided against.
 - **Another branch's change riding along.** A retention window, a flag, a tweak that came in when you merged a sibling branch and the base never took. Not yours to carry; reset it.
@@ -103,7 +105,7 @@ comm -12 <(git diff --name-only $MB origin/main | sort) <(git diff --name-only $
 
 ## A merged `Gemfile.lock` needs `bundle install` before anything else runs
 
-A dependency bump arriving in the merge leaves the lockfile ahead of what's installed, and every `bin/` script and spec then dies at boot with `Could not find <gem> in locally installed gems (Bundler::GemNotFound)`. That reads like a broken script rather than a missing gem — `bundle install` is the whole fix, and it should leave the lockfile untouched (if it rewrites it, the merge resolved it wrong). A `bin/dev` already running keeps its old gems until it restarts.
+A dependency bump arriving in the merge leaves the lockfile ahead of what's installed, and every `bin/` script and spec then dies at boot with `Could not find <gem> in locally installed gems (Bundler::GemNotFound)`. That reads like a broken script rather than a missing gem — `bundle install` is the whole fix, and it should leave the lockfile untouched (if it rewrites it, the merge resolved it wrong). A `bin/dev` already running keeps its old gems until it restarts — `bin/rails restart` is enough, and leaves its watchers up.
 
 ## Run the linter, not just the specs
 
@@ -115,4 +117,4 @@ Then run specs for the merged area, **including the browser ones**. The base ren
 
 ## Never force-push
 
-No exceptions, even on a personal branch. If history has already diverged from the remote and you're tempted to force-push, stop — recover with `git reset --soft <origin-branch>` to get the pushed commits back, then add follow-up work as new commits and push normally.
+No exceptions, even on a personal branch. If history has already diverged from the remote and you're tempted to force-push, stop and merge `origin/<branch>` back in — then add follow-up work as new commits and push normally.

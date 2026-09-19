@@ -35,6 +35,10 @@ module BikeAttributable
     %w[status_stolen status_impounded].include?(status)
   end
 
+  def status_abandoned_or_impounded?
+    %w[status_abandoned status_impounded].include?(status)
+  end
+
   def status_found?
     return false unless status_impounded?
 
@@ -50,12 +54,6 @@ module BikeAttributable
 
   def status_humanized_translated
     Bike.status_humanized_translated(status_humanized)
-  end
-
-  def status_humanized_no_with_owner
-    return "" if status == "status_with_owner"
-
-    status_humanized
   end
 
   # We may eventually remove the boolean. For now, we're just going with it.

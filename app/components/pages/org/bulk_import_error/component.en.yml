@@ -4,7 +4,6 @@ en:
     pages:
       org:
         bulk_import_error:
-          ascend: Ascend
           ascend_unprocessable_html: >-
             Bulk Import <span class="text-danger">failed to process</span> because
             no organization was found with the ascend name of <strong>%{ascend_name}</strong>
@@ -17,7 +16,6 @@ en:
             to
           fix_this_by: 'Fix this by:'
           go_to_organizations_html: Go to %{link}
-          line: Line
           line_error: Line error
           line_errors: 'Line errors:'
           line_label: 'Line:'

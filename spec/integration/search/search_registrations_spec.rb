@@ -35,8 +35,9 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css("turbo-frame#search_registrations_results_frame[complete]:not([busy])", wait: 10)
     retry_on_detach { first(".bike-box-item .title-link a").click }
     # Navigation and render assert separately because they fail differently: a nil
-    # current_path is about:blank (Capybara returns nil for an `about:` scheme), not a
-    # lost click; current_path without the h1 is just a slow bike page.
+    # current_path is a URL with no path -- about:blank, a failed navigation's
+    # chrome-error:, or nothing committed -- not a lost click, and browser_events.log
+    # says which; current_path without the h1 is just a slow bike page.
     expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
     expect(page).to have_css("h1.bike-title", wait: 15)
     page.go_back
@@ -131,11 +132,12 @@ RSpec.describe "Bike search", :js, type: :system do
     click_first_bike_and_go_back
   end
 
-  # flaky: 4 (4 attempts), and a retry rather than a fix: the click at the end lands
-  # on about:blank (a nil current_path, and a blank Capybara screenshot in the CI
-  # artifacts). That click is the example's only real browser navigation - the bike
-  # link opts out of Turbo with data-turbo="false" - so what fails is the browser
-  # abandoning a cross-document navigation started off the tail of a traversal, not
+  # flaky: 4 (4 attempts), and a retry rather than a fix: the click at the end leaves a
+  # nil current_path and a blank Capybara screenshot. Read as about:blank when it was
+  # found, though the evidence never separated that from a navigation that failed into
+  # chrome-error: - browser_events.log now does. That click is the example's only real
+  # browser navigation - the bike link opts out of Turbo with data-turbo="false" - so
+  # what fails is a cross-document navigation started off the tail of a traversal, not
   # a slow frame fetch or a go_forward that no-ops, both of which leave a real URL.
   # Ruled out too: the frame being back in flight under the click, since turbo:load
   # - so reloadFrameIfUrlStale - has already fired by the time the settle in
@@ -155,10 +157,6 @@ RSpec.describe "Bike search", :js, type: :system do
     # snapshots, invoked on turbo:load (which does fire on these restorations).
     visit_search_via_nav
     expect(page).to have_css(".bike-box-item", wait: 10)
-    # Drop history accumulated by earlier examples so go_back/go_forward below
-    # operate on this example's own short stack, not a stale foreign entry (the
-    # leftover stolenness=stolen URL this used to flake on).
-    reset_browser_history
     choose("stolenness_all", allow_label_click: true, visible: :all)
 
     # Each search re-fetches the kind counts (turbo:submit-end -> setKindCounts):

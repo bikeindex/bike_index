@@ -8,7 +8,7 @@ description: >-
   typeahead/autocomplete is `UI::Forms::Combobox`, never hand-rolled
   markup), that **helpers are deprecated — render a view component
   taking full keyword arguments instead of adding or extending one**,
-  ViewComponent rules (keyword arguments, instance variables,
+  ViewComponent rules (when to write a partial instead, keyword arguments, instance variables,
   `helpers.` prefix in templates), and `UI::Time::Component` for every
   date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
@@ -20,13 +20,11 @@ description: >-
 
 # Frontend conventions
 
-This project uses **Stimulus.js** for JavaScript interactivity and **Tailwind CSS** for styling. There are SCSS styles and CoffeeScript files, but they are deprecated — don't add to them.
-
-The `bin/dev` command handles building and updating Tailwind and JS.
+SCSS and CoffeeScript files are deprecated — don't add to them.
 
 **Format ERB before committing.** After editing any `.html.erb`, run `bin/lint` on the files or directories you changed — `bin/lint app/components/ui/table`. It runs `herb-lint` and `herb-format`, which sort `tw:` classes, reflow long `class` attributes onto multiple lines, and flag things like an `<input>` missing `autocomplete`. CI's `lint_and_scan` job runs both as steps separate from `standardrb`/`rubocop`, so hand-edited ERB that skips formatting fails CI even when the Ruby is clean.
 
-Scope it rather than running bare `bin/lint`: a whole-repo run reformats files outside your change, and every file it rewrites that you've already read gets re-injected into context in full.
+Scope it: every file a bare run rewrites that you've already read is re-injected into context in full.
 
 ## Tailwind classes and helpers
 
@@ -40,9 +38,7 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 - The default text color is `tw:twtext-color` (`tw:twtext-color!` to force it). It's an `@utility`, hence the `tw:` prefix — **any Bike Index class that something `@apply`s has to be an `@utility`**; v4's `@apply` rejects a `@layer components` class with "Cannot apply unknown utility class".
 - **A custom `@utility` has no fixed rank against a core one it collides with** — Tailwind sorts custom and core utilities together, so `tw:twfullbleed` emits after `tw:border` while another pairing may go the other way. A hand-written `@layer utilities { }` block in `bike_index_components.css` *does* have a fixed rank: it emits after everything Tailwind generates, so it takes ties and needs no `@variant` or `!`. That's also how to define an unprefixed class name — `@utility` would force the `tw:` prefix. `.only-dev-visible` is the pattern for both. Grep `app/assets/builds/tailwind.css` for the two selectors when a collision matters.
 - **A Tailwind class a Stimulus controller toggles is a literal in that controller**, not a `static classes` value the template has to carry — `ui/table_controller.js` toggling `tw:overflow-x-scroll` is the pattern, and there are ~40 of those against one `static classes`. Tailwind scans `app/javascript`, so the utility is generated either way; reach for `static classes` only when call sites need different classes.
-- **Every number** should be rendered with `number_display(number)`. This applies even when a number is composed into a string with non-numeric values — wrap the number itself, not the surrounding string.
-  - Good: `[number_display(@bike.year), @bike.mnfg_name].join(" ")`
-  - Bad: `[@bike.year, @bike.mnfg_name].join(" ")`
+- **Every number** renders with `number_display(number)` — including one composed into a string: `[number_display(@bike.year), @bike.mnfg_name].join(" ")` wraps the number, not the string.
   - "Number" includes years, counts, prices, distances, IDs — anything numeric, even when it reads like a label.
 - **Currency amounts** use `amount_display(obj)` instead of `number_display` directly. It takes an object that responds to `amount_cents`, `amount`, `currency_symbol`, and `currency_name` (e.g. a `MarketplaceListing`), and renders the symbol + `number_display(amount)` together. Don't reach for `number_to_currency` or roll your own.
 - **Every phone number** renders through `Atoms::Phone::Component` — never a hand-rolled `tel:` link or `number_to_phone`. It links by default; pass `skip_link: true` for plain text. See `app/components/atoms/phone/`. Non-markup callers that need the formatted string (a form field value, a translation interpolation) use `Phonifyer.display`.
@@ -72,31 +68,34 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 - Plain button or form submit — **a form submits with `color: :primary`**: `render UI::Button::Component.new(text: "Save", color: :primary, type: "submit")`. Pass a class as `html_class:` — the component builds its own, so a `class:` raises.
 - A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
-- A standalone action button (POST/DELETE/etc. to a URL) — a link that performs an action: pass `method:` to `ButtonLink` and it renders `button_to` for you (`render UI::ButtonLink::Component.new(text: "Delete", color: :error, href: bike_path(@bike), method: :delete)`), so don't hand-roll a `button_to` or wrap a submit button in a bare form. Extra `html_options` flow through: pass `params:` for a POST that carries params (they render as hidden fields — no manual `form_with`/`hidden_field_tag` needed), and `form: {onsubmit: …}` for a confirm on the wrapping form.
+- A standalone action button (POST/DELETE/etc. to a URL) — a link that performs an action: pass `method:` to `ButtonLink` and it renders `button_to` for you (`render UI::ButtonLink::Component.new(text: "Delete", color: :error, href: bike_path(@bike), method: :delete)`), so don't hand-roll a `button_to` or wrap a submit button in a bare form. Extra `html_options` flow through: pass `params:` for a POST that carries params (they render as hidden fields — no manual `form_with`/`hidden_field_tag` needed).
 
-  - **Not inside another form** — `button_to` renders a `<form>`, and the parser drops a nested one, hoisting its button and hidden inputs into the outer form. The button then submits *that* form, and the `form: {onsubmit: …}` confirm goes with the dropped tag. Nothing errors; it just does the wrong thing when clicked. On a page that is itself a form (the my_account edit templates, every `form_well`), pass `data: {method: :delete, confirm: "…"}` to `ButtonLink` instead — jquery_ujs handles it, and `my_accounts/_root.html.haml` has done it that way for years. `Pages::MyAccount::OrganizationRoles` is the worked example.
+  - **Not inside another form** — `button_to` renders a `<form>`, and the parser drops a nested one, hoisting its button into the outer form, which that button then submits. Nothing errors; it just does the wrong thing when clicked. Either pass `confirm:` (which switches the component to a Turbo link — see below), or, for an action with no prompt, carry the verb yourself with `data: {turbo: true, turbo_method: :put}` on a link.
+
+- **An action that needs confirming passes `confirm:` alongside `method:`**, and the component renders a Turbo link rather than a `button_to` — an `<a>` carrying the method plus an `onclick` that Turbo's click handler honours. So a confirming action nests anywhere a link does, and no call site spells the mechanism out. `Pages::MyAccount::OrganizationRoles` is the worked example.
 
 The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atoms/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
-Three of those carry a rule beyond "use the component":
+Four of those carry a rule beyond "use the component":
 
 - **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.
-- **A `UI::Forms::*` field renders no label of its own** — render it inside a `UI::Forms::Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, and `TextEditor`. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
+- **A `UI::Forms::*` field gets its label from `UI::Forms::Group`** — render it inside a `Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, `TextEditor`, and `FileUpload`, whose own `Upload` button is a second label for the same input and audits clean beside `Group`'s (`spec/components/ui/forms/group/component_system_spec.rb`) — never drop `Group` for a bare `<label>` to avoid it. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
 - **Every typeahead / autocomplete goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. `spec/components/ui/forms/combobox` shows how to invoke it.
+- **Every chart goes through `UI::Chart::Component`** — chartkick's `column_chart`/`line_chart`/`pie_chart` helpers are pinned `preload: false` and fetched by the component's `ui--chart` controller, so a bare helper call renders the placeholder and nothing else. Pass `kind:` for a line or pie. A page with no Stimulus (`layout: false`) loads them itself: `app/views/welcome/bike_creation_graph.html.erb`.
 
-`Atoms::*` (`app/components/atoms/`) holds the small value-rendering components — `Atoms::Serial`, `Atoms::Sticker`, `Atoms::ShortId`, `Atoms::Phone`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atoms::Serial::Component`, not `BikeHelper#render_serial_display`.
+`Atoms::*` (`app/components/atoms/`) holds the small value-rendering components — `Atoms::Serial`, `Atoms::Sticker`, `Atoms::ShortId`, `Atoms::Phone`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atoms::Serial::Component`.
 
 ## Form drafts: always `form-persist`
 
-**A form worth not retyping mirrors itself to localStorage through the `form-persist` controller** — never one of your own. It takes a `data-form-persist-key-value` unique per record, since the derived key is the form's action. See `app/components/pages/register/step1/component.rb` and `app/components/pages/register/step2/component.html.erb`.
+**A form worth not retyping mirrors itself to localStorage through the `form-persist` controller** — never one of your own. It takes a `data-form-persist-key-value` when the derived key — the pathname plus the form's action — isn't unique per form. See `app/components/pages/register/step1/component.rb` and `app/components/pages/register/step2/component.html.erb`.
 
 **A controller whose UI hangs off a restored field reconciles in two places** — a `form-persist:restored@window->…` entry in the element's `data-action`, and the same call in its own `connect`. A hand-rolled `window.addEventListener` is the older idiom; don't add more. See `app/components/pages/register/step1/component.html.erb` with `app/javascript/controllers/register/heading_controller.js`.
 
 ## Current-page links: always `UI::ActiveLink`
 
-**Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
+**Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match_paths:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
 
-With `match: :query`, **`query:` is the params the entry stands for, not the ones its `path:` sets** — a filter entry that toggles links *away* from itself to clear the filter, so the two differ. Passing `path:`'s value to both fails silently, and only on the entry that is currently applied.
+**`match_params:` is the params the entry stands for, not the ones its `path:` sets** — a filter entry that toggles links *away* from itself to clear the filter, so the two differ. Passing `path:`'s value to both fails silently, and only on the entry that is currently applied.
 
 ## Showing and hiding elements: always use the collapse helpers
 
@@ -115,7 +114,7 @@ The collapsible element starts hidden with the **`tw:hidden` class** (not the `h
 
 ## No dead hooks in markup
 
-Only add an `id` or non-utility `class` when something concrete consumes it — a CSS rule, a JS/Stimulus selector, a test fixture, an accessibility attribute. Don't keep or invent "structural identifier" hooks "in case something needs them later," and don't replace a removed hook with a renamed one out of inertia.
+Only add an `id` or non-utility `class` when something concrete consumes it — a CSS rule, a JS/Stimulus selector, a test fixture, an accessibility attribute. Don't keep or invent "structural identifier" hooks "in case something needs them later."
 
 When deleting an `id`/`class`, grep the repo for the name before deciding what to do with it:
 
@@ -125,6 +124,10 @@ searched from source — a hook with no consumer in `app/` is routinely live. It
 `$(`— and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
 that binds `#infoCheck`. So removing an id silently disables behaviour, sometimes behaviour attached
 to another id entirely.
+Grep for what a module *assigns*, not only the hooks it binds — a guarded init publishes globals and
+its callers don't re-check the guard. `#timeSelectionBtnGroup` gates `window.periodSelector`, which
+`binxAppOrgParkingNotificationMapping.urlParamsForOpts` calls regardless. No spec catches it; a
+converted page's `browser_console_messages` does.
 
 - Zero consumers: delete it, don't rename it.
 - Consumers exist: either update them, or leave the hook in place — the consumers are the *reason* it earns its spot in the markup.
@@ -136,15 +139,15 @@ to another id entirely.
 - A *view helper* that only gathers a component's arguments out of controller assigns is still a helper — pass those arguments from the view.
 - `ApplicationComponentHelper` is the exception (`number_display`, `amount_display`, `check_mark`, `search_emoji`) — value formatters `ApplicationComponent` already includes, so components call them bare.
 
-**What's banned is the component reaching out, not the number of arguments.** State the controller already owns can be named and passed as one value object — `ComponentStructs::IndexState` (built in `ControllerHelpers#admin_index_state`) and `ComponentStructs::SortState` (`ControllerHelpers#sort_state`) are the pattern — value objects live in `app/services/component_structs/`. The component stays pure either way; a bundle just stops seventy views from re-listing the same seventeen assigns.
+**What's banned is the component reaching out, not the number of arguments.** State the controller already owns can be named and passed as one value object — `ComponentStructs::IndexState` (built in `ControllerHelpers#admin_index_state`) and `ComponentStructs::SortState` (`ControllerHelpers#sort_state`) are the pattern — value objects live in `app/services/component_structs/`.
 
-Bundle only what's cohesive — one subject, assembled in one place. `IndexState` is "this admin index request"; `ComponentStructs::SortState` is "how this table is sorted and what its links carry". A grab-bag of unrelated request facts (`display_dev_info`, `current_user`, `current_country_id`) is not a value object, it's `helpers` renamed — those stay individual arguments.
+Bundle only what's cohesive — one subject, assembled in one place. `IndexState` is "this admin index request"; `ComponentStructs::SortState` is "how this table is sorted and what its links carry". A grab-bag of unrelated request facts (`display_dev_info`, `current_user`, `current_country_id`) is not a value object, it's `helpers` renamed — those stay individual arguments. `Data.define` for one that only carries its arguments; a plain class when it memoizes derivations, since `Data` instances are frozen and `@x ||=` raises on one (`ComponentStructs::OrgSearchSettings`).
 
 ## ViewComponent rules
 
 This project uses the ViewComponent gem to render components.
 
-- Prefer view components to partials — **unless the `component.rb` would hold no Ruby beyond `initialize` assigning its arguments to ivars, and fewer than 3 callers render it.** Then it's a partial: the class buys nothing, and the arguments are locals the template already has. A `UI::Table` conversion lands here often, since the cell blocks are `instance_exec`'d — a partial's locals survive that, so it needs none of the local-aliasing preamble a component template does. Reach for the component once there's logic to name, a `MARKUP_DIGEST`, or a third caller.
+- **Before creating a component, check it earns its class.** If its `component.rb` would hold nothing but `initialize` assigning arguments to ivars, and fewer than 3 callers render it, write a partial instead, with `<%# locals: (…) %>` at the top. An admin index table on `UI::Table` is the usual case: `admin/strava_gears/_table.html.erb` is the pattern, and `Pages::Admin::IndexSkeleton` renders the `_table` partial without a `table_view:`. A component earns its class with logic to name, a `MARKUP_DIGEST`, or a third caller; past that bar, prefer components to partials.
 - **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
 - View components must initialize with keyword arguments. Everything the component needs must be passed in explicitly by the caller — never reach into controller state from inside a component (e.g. `controller.instance_variable_get(:@bike)`). If the component needs `@bike`, the caller renders `Component.new(bike: @bike)`.
@@ -157,13 +160,13 @@ This project uses the ViewComponent gem to render components.
 - **A `UI::Table` cell block is `instance_exec`'d against the component.** Inside `table.column ... do`, bare calls and `@ivar`s resolve on `UI::Table::Component`, not the view. A bare call raises, but **an `@ivar` fails silently** — it reads `nil`, or worse, an identically-named ivar the table happens to hold. Reach state through the readers the table exposes (`sort_state.search_params`, not `sortable_search_params`), and for anything else assign a local above the block, the way `Pages::Org::ImpoundRecords::Table` carries `current_organization` and `current_user`. Above the `UI::Table::Component.new` block the view's own helpers work; rewriting those too is churn.
 - **A component that `include`s a helper is coupled to whatever ivars that helper reads.** `GraphingHelper#humanized_time_range` reads `@period` off the object it's mixed into, so moving that ivar out of the component silently returns nil rather than failing. Pass the value as an argument when converting a component to explicit arguments.
 - **Moving a view into a component turns its locals into methods.** A `<% x = … %>` computed once per template becomes a method run once per *call site* — which is how a single pluck becomes one per table row. Memoize anything that queries as you move it.
-- **Converting a partial — to a component, or from haml to ERB — is a faithful move, not a cleanup.** Carry the markup over verbatim — including comments and commented-out code. Those lines are often a deliberate stash (a link that's temporarily disabled, a snippet someone expects to restore), so dropping them silently loses intent and surprises the reviewer, who expects the diff to read as "same content, new home." The only changes a conversion should introduce are the mechanical ones the move *requires*: `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it, and the like. If you spot something that genuinely looks like dead code worth removing, that's a separate judgment call — raise it with the user or do it in its own commit, don't fold it into the move.
+- **Converting a partial — to a component, or from haml to ERB — is a faithful move, not a cleanup.** Carry the markup over verbatim, including comments and commented-out code: those are often a deliberate stash (a link temporarily disabled, a snippet someone expects to restore). The only changes a conversion introduces are the ones the move requires — `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it. Dead code worth removing goes in its own commit.
 
-## Turbo is opt-in, and opting a form in has two consequences
+## Turbo is opt-in, and opting a form in has consequences
 
 `application.js` sets `Turbo.session.drive = false`, so links and forms submit natively
-until something carries `data-turbo="true"`. Two things bite the first time a form opts
-in, neither of which shows up as an error — the page just behaves oddly:
+until something carries `data-turbo="true"`. These bite the first time a form opts
+in, none of which shows up as an error — the page just behaves oddly:
 
 - **A controller-rendered component takes its content type from the request.** A Turbo
   submission sends `Accept: text/vnd.turbo-stream.html` first, and `render Foo::Component.new(...)`

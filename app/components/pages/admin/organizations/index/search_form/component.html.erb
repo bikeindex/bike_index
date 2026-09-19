@@ -1,7 +1,7 @@
 <%= form_with(url: admin_organizations_path, method: :get,
   html: {class: "twsearchrow"}) do |form| %>
   <%= render partial: "/shared/hidden_search_fields" %>
-  <%= hidden_field_tag :search_paid, @search_paid %>
+  <%= hidden_field_tag :search_invoiced, @search_invoiced %>
   <%= hidden_field_tag :search_pos, @index.params[:search_pos] %>
 
   <%# The combobox styles its own input, so its width goes on a wrapper %>

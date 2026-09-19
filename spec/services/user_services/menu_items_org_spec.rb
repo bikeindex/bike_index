@@ -51,7 +51,8 @@ RSpec.describe UserServices::MenuItemsOrg do
       let(:target) do
         [
           group_item(:registrations, "#{organization.short_name} Registrations", "bike", [
-            link_item("Search Registrations", "/o/#{organization.to_param}/registrations")
+            link_item("Organization Registrations", "/o/#{organization.to_param}/registrations"),
+            link_item("Search all registrations", "/search/registrations?stolenness=all")
           ]),
           link_item("Add a bike", "/o/#{organization.to_param}/registrations/new",
             icon: "plus-circle", match_params: {parking_notification: nil})
@@ -117,6 +118,19 @@ RSpec.describe UserServices::MenuItemsOrg do
           link_item("Recoveries", "/o/#{slug}/bikes/recoveries"),
           link_item("Registration stickers", "/o/#{slug}/stickers", match_paths: "/o/#{slug}/stickers/**")
         ])
+      end
+
+      context "law enforcement" do
+        let(:organization) { FactoryBot.create(:organization_brakebills, kind: "law_enforcement") }
+
+        it "splits the registrations row, the whole registry being what they search" do
+          registrations = items.find { |item| item[:key] == :registrations }
+
+          expect(registrations[:children].first(2)).to eq([
+            link_item("Organization Registrations", "/o/#{slug}/registrations"),
+            link_item("Search all registrations", "/search/registrations?stolenness=all")
+          ])
+        end
       end
 
       it "renders the one row with nowhere to link as disabled" do
@@ -219,6 +233,18 @@ RSpec.describe UserServices::MenuItemsOrg do
         bulk = items.find { |item| item[:key] == :bulk }
 
         expect(bulk[:children].map { |child| child[:label] }).to eq(["Ascend Imports", "Exports"])
+      end
+    end
+
+    describe "caching", :caching do
+      include_context :caching_basic
+      let(:organization) { FactoryBot.create(:organization) }
+
+      it "varies by locale" do
+        english = items.first[:label]
+        dutch = I18n.with_locale(:nl) { described_class.for(organization:, current_user:) }.first[:label]
+
+        expect(english).to_not eq dutch
       end
     end
   end

@@ -913,8 +913,8 @@ CREATE TABLE public.bug_reports (
     subject text,
     body text,
     is_member boolean DEFAULT false NOT NULL,
-    is_paid_organization boolean DEFAULT false NOT NULL,
-    is_paid_organization_staff boolean DEFAULT false NOT NULL,
+    is_invoiced_organization boolean DEFAULT false NOT NULL,
+    is_invoiced_organization_staff boolean DEFAULT false NOT NULL,
     github_pull_request integer,
     tags text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
@@ -1281,7 +1281,8 @@ CREATE TABLE public.email_bans (
     end_at timestamp(6) without time zone,
     reason integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    user_email_id bigint
 );
 
 
@@ -1721,10 +1722,12 @@ CREATE TABLE public.hot_sheets (
     organization_id bigint,
     stolen_record_ids jsonb,
     recipient_ids jsonb,
-    delivery_status character varying,
     sheet_date date,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    delivery_status integer DEFAULT 0,
+    delivery_error character varying,
+    message_id character varying
 );
 
 
@@ -2831,7 +2834,6 @@ CREATE TABLE public.organization_roles (
     claimed_at timestamp without time zone,
     email_invitation_sent_at timestamp without time zone,
     created_by_magic_link boolean DEFAULT false,
-    receive_hot_sheet boolean DEFAULT false,
     hot_sheet_notification integer DEFAULT 0,
     role integer,
     priority integer DEFAULT 0 NOT NULL
@@ -2957,7 +2959,7 @@ CREATE TABLE public.organizations (
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT true,
     avatar character varying(255),
-    is_paid boolean DEFAULT false NOT NULL,
+    is_invoiced boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
     enabled_feature_slugs jsonb,
     parent_organization_id integer,
@@ -2978,7 +2980,8 @@ CREATE TABLE public.organizations (
     manufacturer_id bigint,
     direct_unclaimed_notifications boolean DEFAULT false,
     spam_registrations boolean DEFAULT false,
-    opted_into_theft_survey_2023 boolean DEFAULT false
+    opted_into_theft_survey_2023 boolean DEFAULT false,
+    paid_money boolean DEFAULT false NOT NULL
 );
 
 
@@ -6661,6 +6664,13 @@ CREATE INDEX index_customer_contacts_on_bike_id ON public.customer_contacts USIN
 
 
 --
+-- Name: index_email_bans_on_user_email_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_bans_on_user_email_id ON public.email_bans USING btree (user_email_id);
+
+
+--
 -- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7804,6 +7814,11 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260915181500'),
+('20260915110042'),
+('20260912102406'),
+('20260909120000'),
+('20260908163548'),
 ('20260821100000'),
 ('20260819120000'),
 ('20260815152851'),

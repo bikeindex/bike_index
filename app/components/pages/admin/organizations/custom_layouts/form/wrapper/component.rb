@@ -6,9 +6,9 @@ module Pages
       module CustomLayouts
         module Form
           module Wrapper
-            # The custom layouts tab for one template. Which form renders, the subtitle and the
-            # top-right link all turn on whether the template is the landing page, so the header
-            # renders here rather than leaving the view to answer that three times.
+            # The custom layouts tab for one template. Everything that turns on whether the template
+            # is the landing page - which form renders, the subtitle, the top-right link, the record
+            # the history link points at - resolves here rather than in the view.
             class Component < ApplicationComponent
               LANDING_PAGE = "landing_page"
 
@@ -26,6 +26,25 @@ module Pages
               private
 
               def landing_page? = @edit_template == LANDING_PAGE
+
+              def edited_record = landing_page? ? @landing_page : @mail_snippet
+
+              # A landing page is built rather than created, so it has no history until it saves
+              def version_history_path
+                return unless edited_record.persisted?
+
+                admin_paper_trail_versions_path(search_item_type: edited_record.class.name,
+                  search_item_id: edited_record.id, period: "all")
+              end
+
+              def version_history_link
+                return if version_history_path.blank?
+
+                render(UI::Container::Component.new(width: :wide)) do
+                  tag.div(link_to("View history of this #{landing_page? ? "landing page" : "snippet"}",
+                    version_history_path, class: "twlink"), class: "tw:mb-8")
+                end
+              end
 
               def subtitle
                 return "Landing Page" if landing_page?

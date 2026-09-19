@@ -36,14 +36,14 @@
             - else
               = t(".sign_up")
 
-          = form_for @user do |f|
+          = form_for @user, html: { data: { controller: "ui--forms--turnstile",
+            "ui--forms--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
+            "ui--forms--turnstile-script-url-value": UI::Forms::Turnstile::Component::SCRIPT_URL,
+            action: "input->ui--forms--turnstile#update" } } do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
 
-            -# Honeypot spam trap - hidden from people, only bots fill it in
-            .form-group.additional-field{ class: "tw:hidden" }
-              = f.label :additional, "Additional", class: "sr-only"
-              = f.text_field :additional, tabindex: -1, autocomplete: "off", class: "form-control"
+            = render(UI::Forms::Honeypot::Component.new(form_builder: f))
 
             .form-group
               = f.label :email, class: 'sr-only'
@@ -68,5 +68,7 @@
                 %label
                   = f.check_box :notification_newsletters
                   = t(".get_bike_indexs_newsletter")
+
+            = render(UI::Forms::Turnstile::Component.new(email: @user.email))
 
             = f.submit t(".sign_up"), class: 'btn btn-primary btn-lg'

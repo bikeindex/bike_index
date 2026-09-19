@@ -48,6 +48,7 @@ class Export < ApplicationRecord
     owner_email
     owner_name
     registered_by
+    registration_method
     status
     thumbnail
     vehicle_type

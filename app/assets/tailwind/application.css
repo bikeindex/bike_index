@@ -18,7 +18,8 @@
  * ancestor activates tw:dark:* utilities. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* The selected/pressed state of a button, link or menu item, however it's flagged.
+/* The selected/pressed state of a button, link or menu item, however it's flagged —
+ * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
  * order, and sorting after `dark` is what lets tw:is-active:* beat the resting,
  * hover and dark colors it overrides without `!important`.
@@ -26,7 +27,7 @@
  * The :not()s keep a disabled element from looking active, and tie the specificity of
  * the hovers they beat (guarded not-disabled:not-aria-disabled:) — sorting last only
  * settles ties, so without them a pressed button renders its hover color. */
-@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active):not(:disabled):not([aria-disabled="true"]));
+@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active, :has(> :checked)):not(:disabled):not([aria-disabled="true"]));
 
 @theme {
   --font-sans: "Open Sans", sans-serif;
@@ -212,6 +213,10 @@ body.with-org-sidebar {
 
   margin-left: var(--org-sidebar-width, 266px);
   transition: margin-left 0.18s ease;
+  /* The sidebar is fixed, so the general alert is the first in-flow child and its
+     margin-top would otherwise collapse out through body, over the canvas -- which
+     the browser paints near-black when it prefers dark */
+  display: flow-root;
 }
 
 /* The sidebar runs the height of the window, so the content does too -- a short page

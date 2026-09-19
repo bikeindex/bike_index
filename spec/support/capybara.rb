@@ -68,7 +68,7 @@ RSpec.configure do |config|
   # Any playwright-driven example, scripting or not - rack_test has nothing to block.
   # An example picks its driver with `driver:` metadata rather than `driven_by`, which
   # runs too late for this to reach the session it chose
-  config.before(:each, type: :system) do
+  config.before(:each, type: :system) do |example|
     driver = Capybara.current_session.driver
     next unless driver.respond_to?(:with_playwright_page)
 
@@ -76,6 +76,39 @@ RSpec.configure do |config|
       BLOCKED_EXTERNAL_HOSTS.each do |host|
         playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
       end
+
+      # Capybara reports a nil current_path for three URLs, not just the about:blank one
+      # (session.rb: nil for an `about:` scheme, then `path unless path&.empty?`) -- an
+      # empty URL, and chrome-error://chromewebdata, which is what Chrome commits when a
+      # cross-document navigation fails outright. All three screenshot blank, so the log is
+      # what tells them apart. Nothing is written unless one fires, and tmp/capybara is the
+      # directory CI uploads with the failure screenshots.
+      log_path = Rails.root.join("tmp/capybara/browser_events.log")
+      trail = []
+      record = lambda do |message|
+        FileUtils.mkdir_p(log_path.dirname)
+        File.open(log_path, "a") do |file|
+          file.puts("#{Time.current.iso8601(3)} #{example.full_description}: #{message}")
+          file.puts("  main frame: #{trail.last(8).join(" -> ")}")
+        end
+      end
+
+      playwright_page.on("crash", ->(_page) { record.call("page crashed") })
+      playwright_page.context.on("page", ->(new_page) { record.call("context opened #{new_page.url}") })
+      # No frame check: Request#frame raises for a request issued before its frame exists,
+      # and this runs on the transport's reader thread, which rescues only IOError - one
+      # raise there stops every later Playwright message. The url says which navigation
+      playwright_page.on("requestfailed", lambda { |request|
+        next unless request.navigation_request?
+
+        record.call("navigation failed: #{request.url} (#{request.failure})")
+      })
+      playwright_page.on("framenavigated", lambda { |frame|
+        next unless frame.parent_frame.nil?
+
+        trail << frame.url
+        record.call("main frame navigated to #{frame.url}") unless frame.url.start_with?("http")
+      })
     end
   end
 end

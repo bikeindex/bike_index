@@ -8,7 +8,7 @@ module BikeJobs
 
     def perform
       bikes_with_matches.each do |bike, match|
-        Email::BikePossiblyFoundNotificationJob
+        EmailJobs::BikePossiblyFoundNotificationJob
           .perform_async(bike.id, match.class.to_s, match.id)
       end
     end

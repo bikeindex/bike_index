@@ -119,6 +119,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       get "#{base_url}/#{parking_notification.to_param}"
       expect(response.status).to eq(200)
       expect(response).to render_template :show
+      expect(response.body).to include('data-registrations--show--map-latitude-value="40.7143528"')
+      expect(response.body).to_not match("maps.googleapis.com")
     end
   end
 
@@ -171,7 +173,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           current_organization.reload
           invoice = current_organization.current_invoices.first
           expect(invoice.paid_in_full?).to be_truthy
-          expect(current_organization.is_paid).to be_truthy
+          expect(current_organization.is_invoiced).to be_truthy
           expect(current_organization.enabled?("parking_notifications")).to be_falsey
           expect {
             post base_url, params: {

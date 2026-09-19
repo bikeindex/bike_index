@@ -3,15 +3,6 @@
 require "rails_helper"
 
 RSpec.describe "Landing page demo modals", :js, type: :system do
-  def log_in_via_browser(user)
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    expect(page).to have_current_path("/my_account", wait: 5)
-  end
-
   def fill_in_and_submit_demo_form(name_label:, name_value:, contact_name: "Jane Doe", email: nil)
     expect(page).to have_content("Contact us for a free trial", wait: 5)
     fill_in "Name", with: contact_name
@@ -51,11 +42,11 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       expect {
         click_button "Let's chat"
         expect(page).to have_content("Thank", wait: 5)
-      }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
+      }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
 
       expect(Feedback.last).to have_attributes(target_attributes)
 
-      Email::FeedbackNotificationJob.drain
+      EmailJobs::FeedbackNotificationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
       mail = ActionMailer::Base.deliveries.last
       expect(mail.subject).to eq "New School lead: Test University"
@@ -75,7 +66,8 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
     end
 
     it "submits a city lead via CTA button" do
-      log_in_via_browser(user)
+      sign_in(user)
+      expect(page).to have_current_path("/my_account")
       visit "/for_law_enforcement"
       expect(page).to have_content("bike theft recovery")
       open_modal(".le-cta-section button[commandfor]")
@@ -83,11 +75,11 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       expect {
         fill_in_and_submit_demo_form(name_label: "City", name_value: "Portland")
         expect(page).to have_content("Thank", wait: 5)
-      }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
+      }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
 
       expect(Feedback.last).to have_attributes(target_attributes)
 
-      Email::FeedbackNotificationJob.drain
+      EmailJobs::FeedbackNotificationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
       mail = ActionMailer::Base.deliveries.last
       expect(mail.subject).to eq "New City lead: Portland"

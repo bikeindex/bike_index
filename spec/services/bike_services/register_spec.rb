@@ -665,7 +665,7 @@ RSpec.describe BikeServices::Register do
     it "mints a token and emails it, once per interval" do
       expect(described_class.send_confirmation_email(b_param)).to be_truthy
       expect(b_param.reload.email_confirmation_token).to be_present
-      Email::PartialRegistrationJob.drain
+      EmailJobs::PartialRegistrationJob.drain
       expect(Notification.count).to eq 1
 
       # Anyone holding the registration's token can ask for a resend, so it's rate limited

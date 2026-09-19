@@ -22,11 +22,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # bar's hamburgler. Chrome's --window-size flag is unreliable in headless
     # mode, so resize explicitly.
     page.current_window.resize_to(720, 2000)
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
+    sign_in(user)
   end
 
   def click_filter(text)
@@ -141,7 +137,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
     dismiss_flash_messages
 
-    find("#org_sidebar_hamburgler").click
+    open_org_sidebar
     within("#org_sidebar_nav") do
       click_button "Parking Notifications"
       click_link "Search Parking Notifications"

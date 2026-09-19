@@ -3,6 +3,29 @@ require "rails_helper"
 RSpec.describe Organized::ManagesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/manage" }
 
+  context "not signed in" do
+    let(:current_organization) { FactoryBot.create(:organization) }
+
+    it "stores return_to and the organization, then redirects to sign in" do
+      get base_url
+      expect(session[:return_to]).to eq base_url
+      expect(session[:passive_organization_id]).to eq current_organization.id
+      expect(flash[:notice]).to be_present
+      expect(response).to redirect_to(new_session_path)
+    end
+
+    context "organization has passwordless_users" do
+      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
+      it "redirects to magic link" do
+        get base_url
+        expect(session[:return_to]).to eq base_url
+        expect(session[:passive_organization_id]).to eq current_organization.id
+        expect(flash[:notice]).to be_present
+        expect(response).to redirect_to(magic_link_session_path)
+      end
+    end
+  end
+
   context "given an authenticated ambassador" do
     include_context :request_spec_logged_in_as_ambassador
 
@@ -53,6 +76,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(response).to render_template :show
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to eq current_organization
+        expect(session[:passive_organization_id]).to eq current_organization.id
         expect(assigns(:controller_namespace)).to eq "organized"
         expect(assigns(:page_id)).to eq "organized_manage_show"
       end
@@ -91,7 +115,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             approved: false,
             access_token: "stuff7",
             lock_show_on_map: true,
-            is_paid: false
+            is_invoiced: false
           }
         end
         let(:user2) { FactoryBot.create(:organization_user, organization: current_organization) }
@@ -109,7 +133,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             website: " www.drseuss.org",
             name: "some new name",
             kind: "bike_shop",
-            is_paid: true,
+            is_invoiced: true,
             lock_show_on_map: false,
             show_on_map: true,
             locations_attributes: []
@@ -449,9 +473,9 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:notice]).to be_present
         end
       end
-      context "paid organization" do
+      context "organization with an invoice" do
         it "does not destroy" do
-          current_organization.update_attribute :is_paid, true
+          current_organization.update_attribute :is_invoiced, true
           expect {
             delete base_url
           }.to change(Organization, :count).by(0)

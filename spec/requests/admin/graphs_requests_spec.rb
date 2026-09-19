@@ -85,7 +85,7 @@ RSpec.describe Admin::GraphsController, type: :request do
       it "returns json" do
         get "#{base_url}/variable", params: {search_kind: "users", timezone: "America/Los_Angeles", period: "all"}
         expect(response.status).to eq(200)
-        expect(json_result.is_a?(Array)).to be_truthy
+        expect(json_result.map { it["name"] }).to eq(["Users"])
         expect(assigns(:start_time)).to be_within(1.day).of earliest_time
         expect(assigns(:end_time)).to be_within(1.minute).of Time.current
       end
@@ -108,7 +108,7 @@ RSpec.describe Admin::GraphsController, type: :request do
       it "returns json" do
         get "#{base_url}/variable", params: {search_kind: "recoveries", timezone: "America/Los_Angeles"}
         expect(response.status).to eq(200)
-        expect(json_result.is_a?(Array)).to be_truthy
+        expect(json_result.map { it["name"] }).to eq(["Recoveries"])
         expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
         expect(assigns(:end_time)).to be_within(1.minute).of Time.current
       end

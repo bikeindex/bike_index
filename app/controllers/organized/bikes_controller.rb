@@ -43,7 +43,7 @@ module Organized
 
       @b_param = current_organization.incomplete_b_params.find_by_id(params[:id])
       if @b_param.present?
-        Email::PartialRegistrationJob.perform_async(@b_param.id)
+        EmailJobs::PartialRegistrationJob.perform_async(@b_param.id)
         flash[:success] = "Incomplete registration re-sent!"
       else
         flash[:error] = "Unable to find that incomplete bike"
@@ -76,7 +76,7 @@ module Organized
     def update
       bike = Bike.unscoped.find_id(params[:id])
 
-      unless bike.organized?(current_organization) && current_organization.enabled?("registration_notes")
+      unless bike.visible_by?(current_user) && current_organization.enabled?("registration_notes")
         flash[:error] = "Not authorized to update notes"
         redirect_to(bike_path(bike)) && return
       end

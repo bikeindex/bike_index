@@ -7,9 +7,8 @@ description: >-
   points at its reference; each covers getting `ruby`, `bundle`, `bin/lint`, a
   database and a browser working there. Read it whenever a session runs RSpec,
   `bundle` or `bin/lint`, needs a running dev server, or hits any of these:
-  `env: 'ruby': No such file or directory`, `Could not find 'bundler' (4.0.0.beta2)`,
-  `Bundler::RubyVersionMismatch`, `command not found: rspec`,
-  `uninitialized constant Pathname` from a `bin/` script,
+  `env: 'ruby': No such file or directory`, `Could not find 'bundler' (4.0.x)`, `command not found: rspec`,
+  `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a `bin/` script,
   `Sprockets::Rails::Helper::AssetNotFound`, `tailwind.css is not present`,
   `LoadError: Could not open library 'vips.so.42'`, or a Playwright
   browser-not-found or build-number mismatch. The fix is almost never a reinstall
@@ -26,13 +25,6 @@ matches; the other two won't apply and are the bulk of the material.
 | `/Users/…/conductor/workspaces/…` | local macOS Conductor workspace | `references/local-macos.md` |
 | `/home/vercel-sandbox/workspace` (Amazon Linux 2023) | Conductor cloud sandbox | `references/conductor-cloud.md` |
 | `/home/user/bike_index` | Claude Code web sandbox | `references/web-sandbox.md` |
-
-What separates them is how much is missing, and that's worth knowing before you
-start debugging. On macOS the Ruby is installed and only the PATH is wrong. In the
-Conductor cloud sandbox nothing is preinstalled but egress is open, so mise builds
-the pinned Ruby in a couple of minutes. In the web sandbox egress is filtered too,
-so Ruby comes from a GitHub source build and several tools have to be pointed at
-what the image already ships.
 
 Two things hold in all three.
 
@@ -55,7 +47,7 @@ layout-rendering request specs, not just system specs.)
 
 ## A `:js` spec runs precompiled JS when `public/assets` exists
 
-`public/assets/.sprockets-manifest.json` — left behind by any `bin/ci` or
+`public/assets/.sprockets-manifest.json` — left behind by any `bin/turbo_tests` or
 `bin/rails assets:precompile` run — is what the test environment resolves
 `controllers/**/*.js` through, so a Stimulus controller you just edited is
 served at whatever digest that manifest names. **The spec then exercises the

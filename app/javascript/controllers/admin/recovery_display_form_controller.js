@@ -6,7 +6,6 @@ export default class extends Controller {
   static targets = [
     'characterCounter',
     'characterTotal',
-    'photoUploadInput',
     'remotePhotoUrl',
     'bikeImageText',
     'useImageButton',

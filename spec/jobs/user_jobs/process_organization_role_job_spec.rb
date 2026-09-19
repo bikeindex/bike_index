@@ -92,8 +92,8 @@ RSpec.describe UserJobs::ProcessOrganizationRoleJob, type: :job do
         expect(user.organization_roles).to eq([organization_role])
         expect(user.email).to eq email
         expect(user.confirmed?).to be_truthy
-        expect(Email::WelcomeJob.jobs.count).to eq 0
-        expect(Email::ConfirmationJob.jobs.count).to eq 0
+        expect(EmailJobs::WelcomeJob.jobs.count).to eq 0
+        expect(EmailJobs::ConfirmationJob.jobs.count).to eq 0
         # We don't want to send users emails for organizations with passwordless users
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         # There was a bug where users weren't getting the magic link token when it was sent to them. So verify that we create the token
@@ -149,6 +149,20 @@ RSpec.describe UserJobs::ProcessOrganizationRoleJob, type: :job do
       context "user with email exists but is not yet assigned" do
         let!(:user) { FactoryBot.create(:user_confirmed, email: "existing@example.com") }
         let(:organization_role) { FactoryBot.create(:organization_role, invited_email: "existing@example.com", user: nil) }
+
+        context "user is email_banned" do
+          let!(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :honeypot) }
+          it "doesn't send, and leaves the invitation unsent so it can go out later" do
+            instance.perform(organization_role.id)
+
+            organization_role.reload
+            expect(organization_role.user).to eq user
+            expect(organization_role.email_invitation_sent_at).to be_blank
+            expect(ActionMailer::Base.deliveries.count).to eq 0
+            expect(organization_role.notifications.first.delivery_status).to eq "delivery_banned"
+          end
+        end
+
         it "sends one email and does not enqueue a duplicate processing job" do
           Sidekiq::Job.clear_all
           expect(organization_role.user).to be_blank

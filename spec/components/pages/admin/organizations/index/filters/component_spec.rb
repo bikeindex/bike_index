@@ -10,7 +10,7 @@ RSpec.describe Pages::Admin::Organizations::Index::Filters::Component, type: :co
   end
   let(:component) do
     with_request_url("/admin/organizations") do
-      render_inline(described_class.new(search_paid: false, index:))
+      render_inline(described_class.new(search_invoiced: false, index:))
     end
   end
 

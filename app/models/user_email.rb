@@ -52,7 +52,8 @@ class UserEmail < ActiveRecord::Base
     def friendly_find(str)
       return nil if str.blank?
 
-      find_by_email(EmailNormalizer.normalize(str))
+      # email is not unique, so without an order the owner of a duplicated address varies by row order
+      where(email: EmailNormalizer.normalize(str)).order(:id).first
     end
 
     def fuzzy_user_id_find(str)
@@ -99,6 +100,11 @@ class UserEmail < ActiveRecord::Base
       # Ensure we aren't somehow deleting an email
       # because it doesn't have a user_email associated with it
       user.update_attribute :email, email
+      # This is the account's address now, so a ban naming it bans the account - except a reason
+      # already banned account-wide: is_not_duplicate_ban only counts older, already-active bans
+      account_ban_reasons = user.email_bans_active.banning_account_email.pluck(:reason)
+      user.email_bans_active.where(user_email_id: id).where.not(reason: account_ban_reasons)
+        .each { |email_ban| email_ban.update(user_email_id: nil) }
     end
   end
 
@@ -111,7 +117,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def send_confirmation_email
-    Email::AdditionalEmailConfirmationJob.perform_async(id) unless confirmed?
+    EmailJobs::AdditionalEmailConfirmationJob.perform_async(id) unless confirmed?
   end
 
   def generate_confirmation

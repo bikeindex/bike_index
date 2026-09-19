@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 # The organization menu, grouped the way the design lays it out: collapsible groups
-# that own their children. SharedBlocks::Navbar::OrgSidebar renders it and api/v3/me serves it,
-# cached per [organization, user].
+# that own their children. SharedBlocks::Navbar::OrgSidebar renders it and api/v3/me serves it.
 #
 # Its rows are ComponentStructs::Shapes'.
 module UserServices
@@ -13,8 +12,9 @@ module UserServices
     def for(organization:, current_user:, old_register_view: false)
       return [] if organization.nil? || current_user.nil?
 
+      # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
       Rails.cache.fetch(["menu_items_org_v1", organization, current_user,
-        old_register_view]) do
+        old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
     end
@@ -83,8 +83,7 @@ module UserServices
 
     def registrations_group(organization)
       children = [
-        ComponentStructs::Shapes.link(translation(:search_registrations),
-          routes.organization_registrations_path(organization_id: organization.to_param)),
+        *registrations_links(organization),
         enabled_link(organization, "show_partial_registrations", translation(:incomplete_registrations),
           routes.incompletes_organization_bikes_path(organization.to_param)),
         enabled_link(organization, "bike_search", translation(:multi_search),
@@ -97,6 +96,15 @@ module UserServices
 
       ComponentStructs::Shapes.group(:registrations,
         translation(:org_registrations, org_name: organization.short_name), "bike", children)
+    end
+
+    def registrations_links(organization)
+      path = routes.organization_registrations_path(organization_id: organization.to_param)
+      return [ComponentStructs::Shapes.link(translation(:search_registrations), path)] if organization.show_single_search_menu_item?
+
+      [ComponentStructs::Shapes.link(translation(:registrations_index), path),
+        ComponentStructs::Shapes.link(translation(:search_all_registrations),
+          routes.search_registrations_path(stolenness: "all"))]
     end
 
     # The old view puts this row on organized/bikes#new, which the parking notification row
@@ -253,7 +261,7 @@ module UserServices
     end
 
     conceal :build_items, :organization_sections, :super_admin_link, :ambassador_items,
-      :registrations_group, :add_bike_link, :impounded_group,
+      :registrations_group, :registrations_links, :add_bike_link, :impounded_group,
       :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
       :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :translation, :routes
   end

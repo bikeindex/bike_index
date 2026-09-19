@@ -71,9 +71,9 @@ RSpec.shared_examples "bike_attributable" do
       let(:type) { "personal-mobility" }
       let(:propulsion_type) { "throttle" }
       it "returns expected" do
-        expect(obj.cycle_type_name).to eq "e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)"
-        expect(obj.type).to eq "e-personal mobility"
-        expect(obj.type_titleize).to eq "e-Personal Mobility"
+        expect(obj.cycle_type_name).to eq "e-Personal Mobility Device (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)"
+        expect(obj.type).to eq "e-personal mobility device"
+        expect(obj.type_titleize).to eq "e-Personal Mobility Device"
         expect(obj.propulsion_titleize).to eq "Throttle"
       end
     end
@@ -225,7 +225,6 @@ RSpec.shared_examples "bike_attributable" do
     let(:obj) { FactoryBot.build(model_sym) }
     it "returns" do
       expect(obj.status_humanized).to eq "with owner"
-      expect(obj.status_humanized_no_with_owner).to eq("")
     end
   end
 end

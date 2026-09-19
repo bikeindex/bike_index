@@ -30,12 +30,9 @@ binx_cat web | rg '"status":5'   # stream a server's logs, oldest lines first
 binx_cat -l worker               # list the files that would be streamed
 ```
 
-`binx_logs` leaves the rotated archives gzipped on disk (`tmp/<server>-production.log.<date>-<n>.gz`) alongside today's still-rotating, uncompressed log (`tmp/current-production-<server>.log`). **Always read them through `binx_cat <server>`** — it decompresses the archives and concatenates everything in chronological order on the fly. Don't glob the files yourself, and don't build your own concatenated copy: a day of web logs is ~630 MB uncompressed, and decompression is cheap next to the search, so streaming is free.
+Both need mise's Ruby ahead of the system one (`undefined method 'filter_map'` or a `syntax error` in `~/bin/binx_logs` means `/usr/bin/ruby` 2.6 ran them) — prefix the command with `PATH="$(dirname "$(mise which ruby)"):$PATH"`.
 
-| Server | Contents |
-|---|---|
-| `binx_cat web` | Puma request logs — mostly Lograge JSON, one line per request |
-| `binx_cat worker` | Background workers — free-form Rails/job/library lines |
+`binx_logs` leaves the rotated archives gzipped on disk (`tmp/<server>-production.log.<date>-<n>.gz`) alongside today's still-rotating, uncompressed log (`tmp/current-production-<server>.log`). **Always read them through `binx_cat <server>`** — it decompresses the archives and concatenates everything in chronological order on the fly. Don't glob the files yourself, and don't build your own concatenated copy: a day of web logs is ~630 MB uncompressed, and decompression is cheap next to the search, so streaming is free.
 
 **Review both by default.** A question framed around requests ("why are we 500ing") usually has half its answer in the worker log: the job that poisoned the cache, the Honeybadger client silently dropping error reports, a worker process crash-looping. Only skip a server when the user explicitly scopes to one.
 
@@ -68,7 +65,7 @@ Key fields:
 | `allocations` | Ruby object allocations — high allocations + long duration is a strong signal of a bad query plan |
 | `params` | Object literal — may contain commas/colons; don't split lines on `,` |
 
-When a request raises, you also get **separate, non-JSON lines** starting with `[<request-id>]` at column 0 (no syslog header) containing the exception class, message, and stack trace, *followed* by another JSON line for `/500` (the `ErrorsController#server_error` render). That secondary `/500` line is noise for most analyses — it inflates 500 counts unless you filter it out.
+When a request raises, you also get **separate, non-JSON lines** starting with `[<request-id>]` at column 0 (no syslog header) containing the exception class, message, and stack trace, *followed* by another JSON line for `/500` (the `ErrorsController#server_error` render). That secondary `/500` line inflates 500 counts — exclude `"controller":"ErrorsController"` when counting.
 
 **Worker — free-form.** Only a trickle of Lograge lines (bots hitting the worker host by IP). The bulk is:
 
@@ -195,13 +192,12 @@ rg -z -I -o '"status":[0-9]+' $(binx_cat -l web) | sort | uniq -c | sort -rn
 
 ## Pitfalls
 
-- **Don't stop at the web log.** Job failures, cache poisoning, and worker crash-loops only show up in `binx_cat worker`, and they're often the cause of what the web log records as a symptom.
+- **Under rtk, wrap any pipeline that keeps whole lines in `rtk proxy sh -c '…'`.** The hook rewrites `rg` into a filter that cuts each line at ~300 characters and writes `[... omitted end of long line]` into the output itself, so a spooled file loses `u_id`, `params` and everything after `location` for good. `-o` extractions of early fields survive, which hides it.
+
 - **Sidekiq job lines are not in the worker log.** Searching it for `Sidekiq`, `TID-`, `Performing`, or `Enqueued` returns nothing — it holds Rails-level output from worker processes, not Sidekiq's own job lifecycle log. Use Sidekiq's web UI or Honeybadger for per-job success/failure.
 - **Honeybadger throttle warnings mean Honeybadger is under-counting.** `Unable to report error; reached max queue size of 100` and `Error report failed: project is sending too many errors` in the worker log mean error reports were *dropped client-side*. When these are firing, Honeybadger fault counts are a floor, not a total — trust the logs over the dashboard for that window, and treat the onset time of these warnings as the real start of the incident.
-- **Each errored request creates ≥2 JSON lines** — the original + the rendered `/500` page. Counting `"status":500` over-counts unless you exclude `"controller":"ErrorsController"` or filter to one of them.
 - **`rg | sort | uniq` on JSON fragments is fine for counting**, but don't `awk -F,` or `cut -d,` on a whole line — `params:{…}` contains commas. Anchor splits to the field name (`-F'"duration":'`).
-- **`grep -E` patterns need `-E` dropped for `rg`**, which is always regex. Conversely `rg` has no `-P`; it's Rust regex, so no backreferences or lookaround — none of the patterns here need them.
-- **Durations are ms**, not seconds. A "slow" search is `> 60000`, not `> 60`.
+- **`rg` has no `-P`** — it's Rust regex, so no backreferences or lookaround; none of the patterns here need them.
 - **The replication-conflict cancel error** (`PG::TRSerializationFailure: canceling statement due to conflict with recovery`) means the *replica* killed the query because WAL recovery was blocked — it's a symptom of a slow query holding the replica too long, not a bug in the SQL itself. Look for the underlying duration to find the real cause.
 - **Bots and scanners produce a lot of noise** in 4xx and 5xx counts (path-traversal probes, `.well-known/*` lookups, npm CDN-style 404s). Nearly every request line in the *worker* log is a bot hitting the host's bare IP — `ActionController::RoutingError (No route matches [POST] "/")` there is noise, not a routing regression. Eyeball the path before treating an error spike as a real issue.
 - **The Bash tool truncates long lines it *displays*** with `[... omitted end of long line]`. The data itself is intact — redirecting to a file or piping onward preserves full lines — but a whole Lograge line printed to the transcript gets clipped at the end (`@timestamp`, `@version`, `message`). So don't eyeball trailing fields off a raw line; extract them with `rg -o '<trailing-field>'` so the short *match* is what's displayed.
@@ -221,8 +217,4 @@ binx_cat web | sed -E 's/^[^{]+//' \
 
 ## Honeybadger vs. log files
 
-For "what's currently broken in production" or "is exception X happening more this week", Honeybadger is the right source — it has aggregation, dedup, and time-series. Read it with `bin/binx_hb` (`faults`, `fault`, `notice`, `trend`, `counts`), not the MCP. Reach for this skill when:
-
-- The user has already downloaded or pointed you at a specific log file, or
-- The question is about *requests that didn't raise* (slow successful queries, traffic patterns, status-code mix), which Honeybadger doesn't capture, or
-- The worker log shows Honeybadger client throttling, in which case its counts are unreliable for that window.
+"What's currently broken in production" and "is exception X happening more this week" are Honeybadger questions — read it with `bin/binx_hb` (`faults`, `fault`, `notice`, `trend`, `counts`), not the MCP. This skill is for requests that *didn't* raise: slow successful queries, traffic patterns, status-code mix.

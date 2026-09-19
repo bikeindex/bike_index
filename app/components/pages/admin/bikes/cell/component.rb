@@ -62,11 +62,9 @@ module Pages
               if @bike.version?
                 concat(" ")
                 concat(render(UI::Badge::Component.new(text: "V", title: "Bike Version", color: :purple, size: :sm)))
-              elsif @bike.unregistered_parking_notification?
-                concat(content_tag(:em, " unregistered", class: "small text-warning"))
-              elsif @bike.creation_description.present?
+              elsif @bike.creation_kind.present? && !@bike.unregistered_parking_notification?
                 concat(", ")
-                concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)), class: "less-strong"))
+                concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(ownership: @bike.current_ownership)), class: "less-strong"))
               end
             end
           end

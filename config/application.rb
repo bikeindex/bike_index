@@ -50,7 +50,8 @@ module Bikeindex
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks rails])
+    # i18n_tasks is required by config/i18n-tasks.yml, which runs without Rails
+    config.autoload_lib(ignore: %w[assets tasks rails i18n_tasks])
 
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql

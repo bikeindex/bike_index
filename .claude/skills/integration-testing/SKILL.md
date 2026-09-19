@@ -27,82 +27,31 @@ If a user does it in the UI, the spec does it in the UI — every step, includin
 
 If the UI path is hard, that's a real signal — usually a production bug (stale asset cache, missing seed data, wrong API URL). Fix the root cause; don't `execute_script` or factory around it. When it's *intermittent* rather than hard, the same principle applies with sharper teeth — see [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md), which owns flake diagnosis and the rule that coverage is never what gives way.
 
+`form.requestSubmit()` and clicking the submit button aren't the same event either: Turbo re-enables the **submitter** when a submission finishes, so a programmatically submitted form has no button to re-enable and looks correctly disabled, while the same code under a real click leaves the button live. This bites hardest when *verifying* rather than setting up.
+
 Legitimate exceptions: reference data that exists in production via migrations, admin accounts outside the user flow, and stubs for genuinely external services (third-party APIs, Stripe, geocoders).
 
 A step the browser never performs — a server-to-server token exchange, a webhook callback — goes over real HTTP to Capybara's own server rather than through the page: `Net::HTTP.post_form(URI.join(Capybara.current_session.server.base_url, "/oauth/token"), params)`. VCR's `ignore_hosts` covers `localhost`, so it isn't blocked. `spec/integration/oauth_spec.rb` is the pattern.
 
 ## One `it` per setup; many assertions per `it`
 
-Unit specs prefer one assertion per example. **Integration specs prefer the opposite**: when several assertions share the same fixture and the same initial `visit`, fold them into one example that walks through state transitions (click → assert → click → assert).
+The [`rspec-testing`](../rspec-testing/SKILL.md) skill's "One example per distinct setup" rule, with the browser boot cost on top: a long, sectioned-with-comments example pays one boot, four short examples pay four.
 
-Use `context` only when the *setup* differs — a different `let!`, a different page, a different feature flag. Don't split a single user flow across sibling `it` blocks just because each step has its own assertion.
-
-**Combine same-setup work, even when scenarios feel independent.** Before writing a new `describe`/`context`/`it`, read the existing file and find an example whose fixtures and initial `visit` match what you need — then append your clicks/assertions to it. It's tempting to leave a separate `it` for things that feel like different concerns ("button-state test", "filter-persistence test", "URL-param test", "mobile-layout test"). Don't. A long, sectioned-with-comments example pays one browser boot; four short examples pay four. Failure attribution is fine — the failed line number tells you exactly which phase broke. Only add a new block when the setup genuinely differs.
-
-### Good
-
-```ruby
-it "filters listings, persists filters across pagination, and clears them" do
-  expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 12)
-
-  fill_in "Manufacturer", with: "Yuba"
-  click_button "Search"
-
-  expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 8)
-  expect(find_field("Manufacturer").value).to eq "Yuba"
-
-  click_link "Next"
-
-  expect(page).to have_current_path(/page=2/)
-  expect(find_field("Manufacturer").value).to eq "Yuba"
-
-  click_link "Clear filters"
-
-  expect(find_field("Manufacturer").value).to be_blank
-  expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 12)
-end
-```
-
-### Bad
-
-```ruby
-# Three browser sessions for what's effectively one user flow.
-it "filters listings by manufacturer" do
-  fill_in "Manufacturer", with: "Yuba"
-  click_button "Search"
-  expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 8)
-end
-
-it "persists filters across pagination" do
-  fill_in "Manufacturer", with: "Yuba"
-  click_button "Search"
-  click_link "Next"
-  expect(find_field("Manufacturer").value).to eq "Yuba"
-end
-
-it "clears filters when Clear is clicked" do
-  fill_in "Manufacturer", with: "Yuba"
-  click_button "Search"
-  click_link "Clear filters"
-  expect(find_field("Manufacturer").value).to be_blank
-end
-```
+**Combine same-setup work, even when scenarios feel independent.** Before writing a new `describe`/`context`/`it`, read the existing file and find an example whose fixtures and initial `visit` match what you need — then append your clicks/assertions to it. It's tempting to leave a separate `it` for things that feel like different concerns ("button-state test", "filter-persistence test", "URL-param test", "mobile-layout test"). Don't. Failure attribution is fine — the failed line number tells you exactly which phase broke. Only add a new block when the setup genuinely differs.
 
 ## Measure before consolidating — a fixed sleep usually outweighs the boots
 
 Browser boot is real, but it is rarely what makes a slow file slow. Time the file before
 merging anything: a `wait_for_timeout`/`sleep` sized to cover the slowest case is typically
 most of the runtime, and merging examples doesn't touch it. Consolidating the two
-`ui/button*` specs from 7 examples to 3 saved ~2s of the 44s they took; replacing one 400ms
+`ui/button*` specs saved ~2s of the 44s they took; replacing one 400ms
 settle saved the other ~32s.
 
 Wait on the condition instead, capped so a cancelled or infinite animation can't hang the
-example. `settle_animations` in `spec/support/system_spec_helpers.rb` is the one to reach for
+example. `settle_animations` in `spec/support/integration_spec_helpers.rb` is the one to reach for
 when a measurement follows a state change — it awaits the element's own transitions and races
-them against the cap as a ceiling. This is *stricter* than a sleep, not a trade: a state that
-transitions nothing returns in two frames, and one that runs longer than the sleep would have
-been is no longer measured mid-flight. Prove the wait is load-bearing before trusting it —
-drop the cap to 1ms and the assertions it protects should fail.
+them against the cap as a ceiling. Prove the wait is load-bearing before trusting it — drop the
+cap to 1ms and the assertions it protects should fail.
 
 `element.evaluate_script` may return a Promise; the driver awaits it before handing back.
 
@@ -171,24 +120,24 @@ expect(page).to have_css('button[aria-pressed="true"]')
 page.execute_script("document.querySelector('.search-btn').click()")
 ```
 
-When repeated assertions get noisy, define small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) — they read better than scattered selectors and keep you out of `page.execute_script`.
+Clicking a top-nav link by its label is ambiguous — the footer repeats Marketplace, Blog, Donate and most of the rest, so scope it: `within("#primary-main-menu") { click_link "Marketplace" }`. The navbar renders each of those twice more, mobile and desktop, but only one is visible at a given width, so that isn't what the `Ambiguous` names.
+
+When repeated assertions get noisy, define small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) — they read better than scattered selectors and keep you out of `page.execute_script`. **Check `spec/support/integration_spec_helpers.rb` before writing one, and move it there once a second spec wants the same one.**
 
 ## Component system specs must assert accessibility
 
 A component system spec (`spec/components/**/*_system_spec.rb`) exists to verify a component renders and behaves correctly in a real browser — and "correctly" includes being accessible. **Every component system spec must call `expect_axe_clean` at least once**, after the component has rendered (and after any state change that swaps in new markup — a new field, an opened menu, an added row). The axe audit catches missing accessible names, bad ARIA, and broken label associations that no CSS-selector assertion would.
 
-Treat an axe failure as a real bug in the component, not noise to silence: fix the markup (add the `aria-label`, associate the `<label>`, correct the `role`) rather than narrowing the audit. The shared helper already disables the rules that don't apply to an isolated component preview (`region`, `landmark-*`, `page-has-heading-one`, etc.), so a remaining violation is almost always genuine.
+Treat an axe failure as a real bug in the component, not noise to silence: fix the markup (add the `aria-label`, associate the `<label>`, correct the `role`) rather than narrowing the audit. The shared helper disables a handful of rules (`spec/support/axe.rb`) — preview artifacts plus colour contrast — so a remaining violation is almost always genuine.
 
 ```ruby
-visit "/rails/view_components/form/text_editor/component/default"
+visit "/rails/view_components/ui/forms/text_editor/component/default"
 
-expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 2, wait: 10)
+expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10)
 expect_axe_clean
 
-click_button "Add feature slug"
-
-expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 3)
-expect_axe_clean # re-audit: the cloned row is new markup
+# ...and again after anything that swaps in new markup - an opened menu, a cloned row
+expect_axe_clean
 ```
 
 ## A preview is not the page
@@ -252,22 +201,10 @@ things that cost real time when they go wrong:
   Without it a key collision quietly means half your interceptions never happened.
 - **A client-side timer you lengthen outruns Capybara's default wait.** `default_max_wait_time` is
   2 seconds here, so a retry/debounce stretched to 3s needs an explicit `wait:` on the next
-  assertion. Use `wait_for { ... }` (in `SystemSpecHelpers`) to block on something only the browser
+  assertion. Use `wait_for { ... }` (in `IntegrationSpecHelpers`) to block on something only the browser
   knows — a route handler's record of a request it answered — that no Capybara matcher can see.
-
-## Drive it the way a user does, when checking what a click leaves behind
-
-This is the "real user path" rule again, and it bites hardest when *verifying* rather than setting
-up. `form.requestSubmit()` and clicking the submit button are not the same event: Turbo re-enables
-the **submitter** when a submission finishes, so a form submitted programmatically has no button to
-re-enable and looks correctly disabled — while the same code under a real click leaves the button
-live. A probe that drives the page programmatically can pass on a page that's broken for a rider.
 
 ## Build Tailwind before running system specs
 
-CI builds `app/assets/builds/tailwind.css` automatically; your local sandbox does not. Without it, Tailwind utility classes (most importantly `tw:hidden` → `display: none`) silently don't apply, and assertions like `expect(tooltip).not_to be_visible` fail in confusing ways that look like flakes but aren't.
-
-**Before running any `:js, type: :system` spec locally, run `bin/rails tailwindcss:build`** (or have `bin/dev` running, which watches and rebuilds). If a system spec is failing on visibility/styling assertions, check `app/assets/builds/tailwind.css` exists and is recent before assuming the test or component is broken.
-
-See the [`frontend-conventions`](../frontend-conventions/SKILL.md) skill for the `tw:` prefix and other styling rules.
+Without a current `app/assets/builds/tailwind.css`, `tw:hidden` silently doesn't apply and visibility assertions fail in ways that read as flakes. The [`sandbox-test-setup`](../sandbox-test-setup/SKILL.md) skill has the build command per environment; see [`frontend-conventions`](../frontend-conventions/SKILL.md) for the `tw:` prefix.
 

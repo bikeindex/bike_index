@@ -15,22 +15,25 @@ module GraphingHelper
       .to_h
   end
 
+  # What time_range_counts returns for a collection with no matching rows, without a
+  # relation to run a query through. series: because groupdate only fills the whole range
+  # for a relation - an enumerable gets the buckets it found, which for [] is none
+  def empty_time_range_counts(time_range = @time_range)
+    [].send(group_by_method(time_range), **grouping(time_range), series: true) { it }
+      .transform_values { 0 }
+  end
+
   def time_range_length(time_range)
     time_range.last - time_range.first
   end
 
   def group_by_method(time_range)
-    period_s = time_period_s(time_range)
-    if period_s < 3601 # 1.hour + 1 second
-      :group_by_minute
-    elsif period_s < 5.days
-      :group_by_hour
-    elsif period_s < 5_000_000 # around 60 days
-      :group_by_day
-    elsif period_s < 31449600 # 364 days (52 weeks)
-      :group_by_week
-    else
-      :group_by_month
+    case time_range_length(time_range)
+    when ...(1.hour + 1) then :group_by_minute
+    when ...5.days then :group_by_hour
+    when ...5_000_000 then :group_by_day # around 60 days
+    when ...52.weeks then :group_by_week
+    else :group_by_month
     end
   end
 
@@ -42,26 +45,11 @@ module GraphingHelper
       "%a%l %p"
     elsif group_period == :group_by_month
       "%Y-%-m"
-    elsif group_period == :group_by_day && (time_period_s(time_range) < 10.days)
+    elsif group_period == :group_by_day && (time_range_length(time_range) < 10.days)
       "%a %-m-%-d"
     else # Default handling
       "%Y-%-m-%-d"
     end
-  end
-
-  # period and render_chart default to the view's ivars - a component passes its own,
-  # since it has no @period of its own to read
-  def humanized_time_range_column(time_range_column, return_value_for_all: false, period: @period, render_chart: @render_chart)
-    return_value_for_all = true if render_chart # Because otherwise it's confusing
-    return nil unless return_value_for_all || !(period == "all")
-
-    humanized_text = time_range_column.to_s.gsub("_at", "").humanize.downcase
-    return humanized_text.gsub("request", "requested") if time_range_column&.match?("request_at")
-    return humanized_text.gsub("start", "starts") if time_range_column&.match?("start_at")
-    return humanized_text.gsub("end", "ends") if time_range_column&.match?("end_at")
-    return humanized_text.gsub("needs", "need") if time_range_column&.match?("needs_renewal_at")
-
-    humanized_text
   end
 
   def humanized_time_range(time_range, period: @period)
@@ -131,17 +119,12 @@ module GraphingHelper
 
   def collection_grouped(collection:, column: "created_at", time_range: nil)
     time_range ||= @time_range
-    # Note: by specifying the range parameter, we force it to display empty days
-    collection.send(
-      group_by_method(time_range),
-      column,
-      range: time_range,
-      format: group_by_format(time_range),
-      time_zone: Time.zone
-    )
+    collection.send(group_by_method(time_range), column, **grouping(time_range))
   end
 
-  def time_period_s(time_range)
-    time_range.last - time_range.first
+  # Shared with empty_time_range_counts, whose whole contract is producing the same
+  # buckets: range is what makes groupdate emit the empty ones
+  def grouping(time_range)
+    {range: time_range, format: group_by_format(time_range), time_zone: Time.zone}
   end
 end

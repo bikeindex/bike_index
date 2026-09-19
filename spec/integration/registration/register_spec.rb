@@ -117,9 +117,9 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Fill every field: text, chip radio, unit select, comboboxes (including the
     # collapsed additional-color rows) and the missing-serial checkbox
-    fill_in "bike[user_name]", with: user_name
-    fill_in "bike[frame_model]", with: "Marlin 7"
-    fill_in "bike[year]", with: "2023"
+    fill_in_verified "bike[user_name]", with: user_name
+    fill_in_verified "bike[frame_model]", with: "Marlin 7"
+    fill_in_verified "bike[year]", with: "2023"
     type_into("#bike_primary_frame_color_id", "Red")
     click_combobox_option("Red")
     click_button "+ Add another color"
@@ -139,7 +139,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Unchecking has to undo the animated hide, not just its display:none
     uncheck "Missing serial"
-    fill_in "bike[serial_number]", with: "SERIAL9"
+    fill_in_verified "bike[serial_number]", with: "SERIAL9"
 
     check "Missing serial"
     expect(page).to have_no_field("bike[serial_number]")
@@ -210,7 +210,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     expect(page).to have_field("bike_status", with: "Stolen", wait: 10)
     expect(find("input[name='bike[status]']", visible: :all).value).to eq "status_stolen"
-    fill_in "bike[phone]", with: "(555) 000-0000"
+    fill_in_verified "bike[phone]", with: "(555) 000-0000"
 
     # Anonymous, so this uploads against the registration's token - after the reload above,
     # which would have dropped a file picked before it
@@ -332,11 +332,42 @@ RSpec.describe "Register flow", :js, type: :system do
       a_string_matching(/additional_colors_controller/))
   end
 
+  describe "a risky email, with the challenge configured" do
+    let(:owner_email) { "rider@yahoo.com" }
+    # Cloudflare's interactive-challenge testing sitekey, which renders a widget but issues
+    # no token - so the first submission is turned away without reaching siteverify
+    before do
+      stub_const("Integrations::Turnstile::ENABLED", true)
+      stub_const("Integrations::Turnstile::SITE_KEY", "3x00000000000000000000FF")
+    end
+
+    # The rejected step comes back through Turbo, so its widget is a container api.js was
+    # never loaded alongside - one it doesn't render leaves the rider with no way to answer
+    it "renders the widget again on the step it hands back" do
+      visit "/register/new"
+      type_into("#b_param_manufacturer_id", "Surly")
+      click_combobox_option("Surly")
+      fill_in "b_param[owner_email]", with: owner_email
+
+      expect(page).to have_field(Integrations::Turnstile::RESPONSE_PARAM, type: "hidden",
+        visible: :all, wait: 10)
+
+      click_button "Next"
+
+      expect(page).to have_content("not a robot", wait: 10)
+      expect(page).to have_field(Integrations::Turnstile::RESPONSE_PARAM, type: "hidden",
+        visible: :all, wait: 10)
+    end
+  end
+
   describe "signed in" do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
     let(:friend_email) { "friend@bikeindex.org" }
 
-    before { sign_in(current_user) }
+    before do
+      sign_in(current_user)
+      expect(page).to have_current_path("/my_account")
+    end
 
     it "asks for a name once the registration is going to someone other than them" do
       # Step 1 prefills their own address, which their account is already the name for
@@ -362,7 +393,7 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_current_path(/step=2/, url: true)
       expect(Bike.count).to eq 0
 
-      fill_in "bike[user_name]", with: user_name
+      fill_in_verified "bike[user_name]", with: user_name
       click_button "Complete Bike Registration"
 
       expect(page).to have_content("Registration complete")
@@ -378,15 +409,11 @@ RSpec.describe "Register flow", :js, type: :system do
 
     it "marks a registration spam when a bot fills the honeypot, without letting on" do
       start_registration
-
-      # A rider can't see or reach the honeypot, so only a bot fills it in
-      honeypot = find_field("Additional", visible: :hidden)
-      expect(honeypot[:tabindex]).to eq "-1"
-      page.execute_script("arguments[0].value = 'http://spam.example.com'", honeypot)
+      fill_honeypot
 
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "XYZ 123"
+      fill_in_verified "bike[serial_number]", with: "XYZ 123"
 
       # The bot gets the same finished page it would if it had gotten away with it
       click_button "Complete Bike Registration"
@@ -397,7 +424,7 @@ RSpec.describe "Register flow", :js, type: :system do
       bike = Bike.spam.last
       expect(bike).to have_attributes(owner_email:, serial_number: "XYZ 123")
       # And the invitation to claim it, enqueued like any other, mails nothing
-      expect { Email::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
     end
   end
 
@@ -421,8 +448,8 @@ RSpec.describe "Register flow", :js, type: :system do
     def complete_the_registration
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "HELD1234"
-      fill_in "bike[user_name]", with: user_name # anonymous, so it's asked for
+      fill_in_verified "bike[serial_number]", with: "HELD1234"
+      fill_in_verified "bike[user_name]", with: user_name # anonymous, so it's asked for
       click_button "Complete Bike Registration"
     end
 
@@ -475,7 +502,10 @@ RSpec.describe "Register flow", :js, type: :system do
     context "signed in" do
       let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-      before { sign_in(current_user) }
+      before do
+        sign_in(current_user)
+        expect(page).to have_current_path("/my_account")
+      end
 
       it "PUTs the photo to the bucket and serves it from the storage domain" do
         start_registration
@@ -493,7 +523,7 @@ RSpec.describe "Register flow", :js, type: :system do
         # A color is required for the bike to save, and signed in it saves on submit
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
-        fill_in "bike[serial_number]", with: "R2UP1234"
+        fill_in_verified "bike[serial_number]", with: "R2UP1234"
         click_button "Complete Bike Registration"
         expect(page).to have_content("Registration complete")
 
@@ -502,8 +532,9 @@ RSpec.describe "Register flow", :js, type: :system do
         expect(public_image.image_url).to eq "https://test-uploads.bikeindex.org/#{public_image.file.blob.key}"
 
         # Fetching it is the actual proof the browser's PUT landed - and that the bucket serves it
-        response = Faraday.get(public_image.image_url)
-        expect(response.status).to eq 200
+        # R2 answers 500, not 404, for a key its edge has not caught up with yet
+        response = nil
+        wait_for(timeout: 10) { (response = Faraday.get(public_image.image_url)).status == 200 }
         expect(response.body.bytesize).to eq File.size(image_path)
       end
     end

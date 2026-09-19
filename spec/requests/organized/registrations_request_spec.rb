@@ -7,7 +7,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
   describe "index" do
-    # NOTE: Additional index tests in controller spec because of session
     let(:query_params) do
       {
         search_no_js: true,
@@ -160,7 +159,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       it "searches for bikes with stickers" do
         expect(impounded_bike.reload.status).to eq "status_impounded"
         expect(bike_with_sticker.reload.bike_sticker?).to be_truthy
-        expect(current_organization.reload.paid?).to be_truthy
+        expect(current_organization.reload.is_invoiced?).to be_truthy
         get base_url, params: {search_no_js: true, search_stickers: "none"}
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
@@ -208,18 +207,39 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
-    context "unpaid organization" do
+    context "organization without an invoice" do
       let(:current_organization) { FactoryBot.create(:organization) }
 
       it "renders without search" do
         expect(impounded_bike.reload.status).to eq "status_impounded"
-        expect(current_organization.reload.paid?).to be_falsey
+        expect(current_organization.reload.is_invoiced?).to be_falsey
         expect(Bike).to_not receive(:search)
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
+      end
+    end
+
+    context "sorted by registration sequence acknowledgment" do
+      let(:enabled_feature_slugs) { %w[bike_search registration_sequences] }
+      let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization: current_organization) }
+      let!(:bike_acknowledged_earlier) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      let!(:bike_acknowledged_later) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      before do
+        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_earlier, created_at: 2.days.ago)
+        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_later, created_at: 1.day.ago)
+        # Another organization's acknowledgment doesn't count
+        FactoryBot.create(:registration_sequence_acknowledgment, bike:)
+      end
+
+      it "sorts by when this organization's sequence was acknowledged" do
+        get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "desc"}
+        expect(assigns(:bikes).map(&:id)).to eq([bike.id, bike_acknowledged_later.id, bike_acknowledged_earlier.id])
+
+        get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "asc"}
+        expect(assigns(:bikes).map(&:id)).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, bike.id])
       end
     end
 
@@ -365,6 +385,13 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template :multi_search
     end
+
+    it "wires up multi-search and the column toggle on one element" do
+      get "#{base_url}/multi_search"
+      wrapper = Nokogiri::HTML(response.body).at_css("[data-org--multi-search-url-value]")
+      expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search org--search org--search-column-toggle])
+      expect(JSON.parse(wrapper["data-org--search-column-toggle-default-columns-value"])).to include("created_at_cell")
+    end
   end
 
   describe "multi_search_response" do
@@ -488,10 +515,26 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     let!(:current_organization) { FactoryBot.create(:organization) }
     let(:base_url) { "/o/#{current_organization.to_param}/registrations" }
 
-    it "redirects the user" do
+    it "redirects the user, blanking passive_organization_id" do
       get base_url
       expect(response).to redirect_to my_account_url
       expect(flash[:error]).to be_present
+      # zero rather than nil, so we don't look it up again
+      expect(session[:passive_organization_id]).to eq "0"
+    end
+
+    context "superuser" do
+      include_context :request_spec_logged_in_as_superuser
+
+      it "renders, assigning the organization" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response).to render_template :index
+        expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:passive_organization)).to eq current_organization
+        expect(assigns(:page_id)).to eq "organized_registrations_index"
+        expect(session[:passive_organization_id]).to eq current_organization.id
+      end
     end
   end
 end

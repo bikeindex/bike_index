@@ -16,43 +16,22 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     FrontGearType.fixed
   end
 
-  def selectize_for(field_id)
-    find("##{field_id}", visible: :all).find(:xpath, "./following-sibling::div[contains(@class, 'selectize-control')][1]")
-  end
-
-  def pick_selectize_option(field_id, text)
-    container = selectize_for(field_id)
-    container.find(".selectize-input").click
-    container.find(".selectize-dropdown-content .option", text: text, wait: 5).click
-  end
-
   it "registers a bike to another email, signs out, and the recipient signs up via the claim email link" do
-    # Sign in as the registrar
-    visit new_session_path
-    fill_in "Email", with: registrar.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    expect(page).to have_content("Logged in", wait: 5)
+    sign_in(registrar)
+    expect(page).to have_content("Logged in")
 
     # Register a bike to a different owner email
     visit "/bikes/new"
     fill_in "Serial number", with: "ABC123XYZ"
 
-    # Manufacturer field is a text input enhanced by selectize + remote autocomplete
-    manufacturer_box = selectize_for("bike_manufacturer_id")
-    manufacturer_box.find(".selectize-input").click
-    type_into(manufacturer_box.find(".selectize-input input"), "Surly")
-    expect(page).to have_css(".selectize-dropdown-content .option", text: "Surly", wait: 5)
-    find(".selectize-dropdown-content .option", text: "Surly").click
-
-    pick_selectize_option("bike_primary_frame_color_id", "Black")
+    pick_remote_selectize("#bike_manufacturer_id", "Surly")
+    pick_selectize("#bike_primary_frame_color_id", "Black")
     fill_in "Owner email", with: claimer_email
 
     expect {
       click_button "Register"
       expect(page).to have_content("successfully added", wait: 10)
-    }.to change(Email::OwnershipInvitationJob.jobs, :count).by(1)
+    }.to change(EmailJobs::OwnershipInvitationJob.jobs, :count).by(1)
 
     bike = Bike.last
     ownership = bike.current_ownership
@@ -64,7 +43,7 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     # Deliver the claim email and grab the "Claim the bike" link out of the body.
     # That link points to the bike show page with the ownership token; visiting it
     # primes session[:claim_token_email] so the subsequent signup auto-confirms.
-    Email::OwnershipInvitationJob.drain
+    EmailJobs::OwnershipInvitationJob.drain
     mail = ActionMailer::Base.deliveries.last
     expect(mail.to).to include claimer_email
     body = mail.html_part&.body&.decoded || mail.body.decoded

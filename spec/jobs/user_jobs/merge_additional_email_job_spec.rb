@@ -16,7 +16,7 @@ RSpec.describe UserJobs::MergeAdditionalEmailJob, type: :job do
     let(:organization_role) { FactoryBot.create(:organization_role, invited_email: "#{email.upcase} ") }
     let(:stripe_id) { nil }
 
-    context "existing user account", flaky: true do
+    context "existing user account" do
       let(:bike) { FactoryBot.create(:bike, creator_id: old_user.id) }
       let(:pre_created_ownership) { FactoryBot.create(:ownership, creator_id: old_user.id) }
       let(:old_user_ownership) { FactoryBot.create(:ownership, owner_email: email) }
