@@ -37,7 +37,7 @@ module Pages
           end
 
           def subtitle
-            render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)).presence
+            @subtitle ||= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)).presence
           end
 
           def current_view
