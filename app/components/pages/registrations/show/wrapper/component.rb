@@ -7,6 +7,9 @@ module Pages
         # Renders the registration show page as the resolved [kind, organization]
         # perspective (e.g. [:public, nil] or [:staff, org]) and fragment-caches it.
         class Component < ApplicationComponent
+          # Template Dependency: Pages::Registrations::Show::WrapperConsumer::Component
+          # Template Dependency: Pages::Registrations::Show::WrapperOrgAdmin::Component
+          # Template Dependency: Pages::Registrations::Show::CurrentAlerts::TokenPrompt::Component
           def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {}, display_dev_info: false)
             @bike = bike
             @display_dev_info = display_dev_info

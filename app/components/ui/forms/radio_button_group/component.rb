@@ -4,6 +4,7 @@ module UI
   module Forms
     module RadioButtonGroup
       class Component < ApplicationComponent
+        # Template Dependency: UI::ButtonGroup::Component
         # Only checked and focus are restated, since those hang off the radio
         # rather than the <label> the chip classes land on.
         CHIP_CLASSES = [

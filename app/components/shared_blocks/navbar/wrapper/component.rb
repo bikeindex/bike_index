@@ -7,6 +7,8 @@ module SharedBlocks
       # organization gets SharedBlocks::Navbar::OrgSidebar in its place, which this picks.
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
+        # Template Dependency: SharedBlocks::Navbar::OrgSidebar::Component
+        # Template Dependency: SharedBlocks::Navbar::PrimaryMenu::Component
         def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
           passive_organization: nil, old_register_view: false)
           @logo_only = logo_only

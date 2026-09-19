@@ -56,7 +56,7 @@ The ones to cut, all of which have been written here:
 - **A class list the template writes literally.** Pinning `class="tw:w-full tw:max-w-3xl"` re-asserts the source. The exception is a class the component *computes* — a conditional `active`, a width chosen from an argument — where the branch is the point.
 - **What a request spec already covers.** A component spec listing the fields a form renders, next to a request spec that asserts the same names, is one of them maintained for nothing. Keep the one closest to the logic.
 
-Keep, without hesitating, the ones tied to a failure mode: a conditional branch, a computed value, an argument guard that would otherwise fail silently, `it_behaves_like "cached_markup_digest"`, and any example written *because* something broke — say so in a comment above it, so the next audit doesn't mistake it for a change-detector.
+Keep, without hesitating, the ones tied to a failure mode: a conditional branch, a computed value, an argument guard that would otherwise fail silently, anything asserting what a fragment cache keys on, and any example written *because* something broke — say so in a comment above it, so the next audit doesn't mistake it for a change-detector.
 
 This applies to the branch's specs, not the suite's. Don't delete pre-existing examples you merely moved between files.
 

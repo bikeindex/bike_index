@@ -3,6 +3,7 @@
 module UI
   module Table
     class Component < ApplicationComponent
+      # Template Dependency: UI::TableColumn::Component
       # Cell blocks are instance_exec'd, so this is how they reach the sort state
       attr_reader :sort_state
 

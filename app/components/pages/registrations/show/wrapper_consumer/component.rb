@@ -5,6 +5,7 @@ module Pages
     module Show
       module WrapperConsumer
         class Component < ApplicationComponent
+          # Template Dependency: Pages::Registrations::Show::CurrentAlerts::Wrapper::Component
           include BikeHelper
 
           # owner: overrides the computed ownership, so the wrapper can force view_as
