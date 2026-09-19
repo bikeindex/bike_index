@@ -116,12 +116,13 @@ module Organized
     end
 
     def index_component
+      parking_notifications = sorted_parking_notifications.limit(@per_page).load
       Pages::Org::ParkingNotifications::Index::Component.new(
         organization: current_organization,
-        parking_notifications: sorted_parking_notifications.limit(@per_page).load,
-        total_count: matching_parking_notifications.count,
+        parking_notifications:,
+        total_count: (parking_notifications.size < @per_page) ? parking_notifications.size : matching_parking_notifications.count,
         per_page: @per_page,
-        sort_state:,
+        search_params: sort_state.search_params,
         interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact,
         search_kind: @search_kind,
         search_status: @search_status,
@@ -143,7 +144,7 @@ module Organized
 
     def sorted_parking_notifications
       matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-        .includes(:user, :bike, :impound_record)
+        .includes(:user, :impound_record, bike: [:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_ownership])
     end
 
     def permitted_parameters

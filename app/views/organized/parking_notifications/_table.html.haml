@@ -1,4 +1,4 @@
-- skip_map_cell ||= false
+- map_rows ||= false
 - skip_bike ||= false
 - skip_repeat ||= false
 - render_address ||= false
@@ -12,9 +12,9 @@
   .parking-notifications-table.hide-status .status-cell { display: none; }
   .parking-notifications-table.show-multiselect .multiselect-cell { display: table-cell; }
 
-%table.table.table-striped.table-bordered.table-sm.without-exterior-border.parking-notifications-table{ class: hide_status ? "hide-status" : "", data: { "org--parking-notifications-index-target" => "table" } }
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.parking-notifications-table{ class: hide_status ? "hide-status" : "", data: ({ "org--parking-notifications-index-target" => "table" } if map_rows) }
   %thead.small-header.hidden-md-down
-    - unless skip_map_cell
+    - if map_rows
       %th.map-cell
     %th
       - if render_sortable
@@ -49,7 +49,7 @@
       %th.multiselect-cell.table-cell-check.collapse
         = render UI::Button::Component.new(text: check_mark, color: :link, title: "Select all", data: { action: "table-multi-checkbox#toggleAll" })
   %tbody
-    - unless skip_map_cell
+    - if map_rows
       %tr{ class: ("tw:hidden" if parking_notifications.any?), data: { "org--parking-notifications-index-target" => "emptyRow" } }
         %td{ colspan: 10 } No matching notifications
     - parking_notifications.each do |parking_notification|
@@ -64,9 +64,9 @@
           %strong
             Message:
           = parking_notification.message
-      - map_row_data = { "org--parking-notifications-index-target" => "row", latitude: parking_notification.latitude, longitude: parking_notification.longitude } unless skip_map_cell
+      - map_row_data = { "org--parking-notifications-index-target" => "row", latitude: parking_notification.latitude, longitude: parking_notification.longitude } if map_rows
       %tr{ data: map_row_data }
-        - unless skip_map_cell
+        - if map_rows
           %td.map-cell
             = render UI::Button::Component.new(text: "↑", color: :link, title: "Show on map", data: { action: "org--parking-notifications-index#showOnMap" })
         %td

@@ -90,7 +90,9 @@ export default class extends Controller {
     this.map.addControl(new ExpandControl(), 'top-right')
     this.popup = new maplibregl.Popup({ offset: 32, maxWidth: 'min(90vw, 60rem)', closeOnClick: false })
 
-    this.markers = new Map(this.rowTargets.filter((row) => row.dataset.latitude && row.dataset.longitude)
+    // rowTargets re-queries the DOM on every read, and every moveend reads it
+    this.rows = this.rowTargets
+    this.markers = new Map(this.rows.filter((row) => row.dataset.latitude && row.dataset.longitude)
       .map((row) => [row, this.#addMarker(maplibregl, row)]))
 
     if (this.placeValue.length) {
@@ -127,20 +129,18 @@ export default class extends Controller {
   // The row, under the table's header, without the map and checkbox columns
   #popupContent (row) {
     const table = this.tableTarget.cloneNode(false)
-    table.classList.remove('show-multiselect')
     table.append(this.tableTarget.tHead.cloneNode(true))
     const clone = row.cloneNode(true)
     clone.classList.remove('tw:hidden', 'tw:hidden!')
     table.createTBody().append(clone)
     table.querySelectorAll('.map-cell, .multiselect-cell').forEach((cell) => cell.remove())
-    // Clones inside the controller would register as its targets
-    table.querySelectorAll('[data-org--parking-notifications-index-target]')
-      .forEach((element) => element.removeAttribute('data-org--parking-notifications-index-target'))
-    table.removeAttribute('data-org--parking-notifications-index-target')
 
     const wrapper = document.createElement('div')
     wrapper.className = 'tw:overflow-x-auto'
     wrapper.append(table)
+    // Clones inside the controller would register as its targets
+    wrapper.querySelectorAll('[data-org--parking-notifications-index-target]')
+      .forEach((element) => element.removeAttribute('data-org--parking-notifications-index-target'))
     return wrapper
   }
 
@@ -156,12 +156,13 @@ export default class extends Controller {
 
   #filterRows () {
     const bounds = this.map.getBounds()
-    const visibleRows = this.rowTargets.filter((row) => this.markers.has(row) && bounds.contains(this.markers.get(row).getLngLat()))
-    this.rowTargets.forEach((row) => collapse(visibleRows.includes(row) ? 'show' : 'hide', row, 0))
-    collapse(visibleRows.length ? 'hide' : 'show', this.emptyRowTarget, 0)
-    this.visibleCountTarget.textContent = visibleRows.length.toLocaleString()
+    const visibleRows = new Set(this.rows.filter((row) => this.markers.has(row) && bounds.contains(this.markers.get(row).getLngLat())))
+    // Not collapse(): its per-row computed-style read, between these writes, forces a recalc each
+    this.rows.forEach((row) => row.classList.toggle('tw:hidden!', !visibleRows.has(row)))
+    collapse(visibleRows.size ? 'hide' : 'show', this.emptyRowTarget, 0)
+    this.visibleCountTarget.textContent = visibleRows.size.toLocaleString()
 
-    const allVisible = visibleRows.length === this.rowTargets.length && !this.#nothingAtLocation
+    const allVisible = visibleRows.size === this.rows.length && !this.#nothingAtLocation
     collapse(allVisible ? 'hide' : 'show', this.fitTarget)
   }
 
@@ -189,8 +190,7 @@ export default class extends Controller {
   // blocked CDN). Reveal a message instead of leaving a blank box.
   #showUnavailable (error) {
     console.warn('Parking notifications map failed to render:', error)
-    this.map?.remove()
-    this.map = null
+    this.disconnect()
     this.canvasTarget.hidden = true
     this.unavailableTarget.hidden = false
   }

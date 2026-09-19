@@ -206,7 +206,6 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     expect(page).to have_css(rows, count: 2)
     expect(page).to have_content("2 visible")
 
-    # A row's map link opens its popup; escape closes it
     within(row_for(abandoned)) { click_button "Show on map" }
     within(".maplibregl-popup") { expect(page).to have_content("Appears abandoned") }
     find("body").send_keys(:escape)

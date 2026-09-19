@@ -78,30 +78,25 @@
   <div class="tw:mt-2 tw:mb-6 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
     <%= render(UI::Dropdown::Component.new(name: kind_display(@search_kind), button_size: :sm, active: @search_kind != "all")) do |dropdown| %>
       <% (["all"] + ParkingNotification.kinds).each do |kind| %>
-        <% kind_active = @search_kind == kind %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display(kind), path: index_path(search_kind: (kind_active ? nil : kind)), match_params: {search_kind: (kind == "all") ? nil : kind}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display(kind), path: toggle_path(:search_kind, kind, @search_kind), match_params: {search_kind: (kind == "all") ? nil : kind}) } %>
 
         <%# Divider after "all" %>
         <% dropdown.with_entry_divider if kind == "all" %>
       <% end %>
     <% end %>
 
-    <%= render(UI::Dropdown::Component.new(name: unregistered_display, button_size: :sm, active: @search_unregistered != "all")) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All bikes", path: index_path(search_unregistered: "all"), match_params: {search_unregistered: [nil, "all"]}) } %>
-      <% dropdown.with_entry_divider %>
-      <% unregistered_active = @search_unregistered == "only_unregistered" %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only unregistered bikes", path: index_path(search_unregistered: (unregistered_active ? nil : "only_unregistered")), match_params: {search_unregistered: "only_unregistered"}) } %>
-      <% unregistered_not_active = @search_unregistered == "not_unregistered" %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Registered bikes only", path: index_path(search_unregistered: (unregistered_not_active ? nil : "not_unregistered")), match_params: {search_unregistered: "not_unregistered"}) } %>
+    <%= render(UI::Dropdown::Component.new(name: UNREGISTERED_DISPLAY[@search_unregistered], button_size: :sm, active: @search_unregistered != "all")) do |dropdown| %>
+      <% UNREGISTERED_DISPLAY.each do |value, text| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text:, path: toggle_path(:search_unregistered, value, @search_unregistered), match_params: {search_unregistered: (value == "all") ? [nil, "all"] : value}) } %>
+        <% dropdown.with_entry_divider if value == "all" %>
+      <% end %>
     <% end %>
 
     <%= render(UI::Dropdown::Component.new(name: current_status[:m], button_size: :sm, active: @search_status != "current")) do |dropdown| %>
       <%# NOTE! this list does not include resolved_otherwise - because that's a failure state, which shouldn't happen. If there start being multiple notifications in that state, revisit this decision %>
       <% status_display_hash.each do |status, display_hash| %>
-        <% status_active = @search_status == status.to_s %>
-
         <% dropdown.with_entry_item do %>
-          <%= render UI::ActiveLink::Component.new(path: index_path(search_status: (status_active ? nil : status)), match_params: {search_status: (status == :current) ? [nil, "current"] : status}) do %>
+          <%= render UI::ActiveLink::Component.new(path: toggle_path(:search_status, status, @search_status), match_params: {search_status: (status == :current) ? [nil, "current"] : status}) do %>
             <%= display_hash[:m] %>
 
             <% if display_hash[:s].present? %>
@@ -123,7 +118,7 @@
     ) %>
   </div>
 
-  <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params: search_params) %>
+  <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params: @search_params) %>
 
   <div class="mt-4">
     <%= render(Pages::Org::Search::Form::Component.new(target_search_path: organization_parking_notifications_path(organization_id: @organization.to_param), interpreted_params: @interpreted_params)) %>
@@ -141,14 +136,14 @@
         <% end %>
         <em class="less-strong">
           view notifications
-          <%= link_to "for all bikes", organization_parking_notifications_path(search_params.merge(search_bike_id: nil)) %>
+          <%= link_to "for all bikes", organization_parking_notifications_path(@search_params.merge(search_bike_id: nil)) %>
         </em>
       <% end %>
 
       <% if @filtered_user_id.present? %>
         Only notifications created by
         <strong><%= @filtered_user&.display_name&.truncate(20) %></strong>
-        <span class="less-strong"><%= link_to "(view by all)", organization_parking_notifications_path(search_params.merge(user_id: nil)) %></span>
+        <span class="less-strong"><%= link_to "(view by all)", organization_parking_notifications_path(@search_params.merge(user_id: nil)) %></span>
       <% end %>
     </div>
 
@@ -204,7 +199,7 @@
 
     <div class="full-screen-table">
       <%# only hide status on current - because otherwise it displays the time things were resolved %>
-      <%= render partial: "organized/parking_notifications/table", locals: {parking_notifications: @parking_notifications, hide_status: @search_status == "current", render_sortable: true} %>
+      <%= render partial: "organized/parking_notifications/table", locals: {parking_notifications: @parking_notifications, hide_status: @search_status == "current", render_sortable: true, map_rows: true} %>
     </div>
   <% end %>
 <% end %>

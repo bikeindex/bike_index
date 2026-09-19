@@ -17,7 +17,13 @@ module Pages
             impounded_resolved: {m: "Impounded resolved", s: "impounded bikes which have been resolved"}
           }.freeze
 
-          def initialize(organization:, parking_notifications:, total_count:, per_page:, sort_state:,
+          UNREGISTERED_DISPLAY = {
+            "all" => "All bikes",
+            "only_unregistered" => "Only unregistered bikes",
+            "not_unregistered" => "Registered bikes only"
+          }.freeze
+
+          def initialize(organization:, parking_notifications:, total_count:, per_page:, search_params:,
             interpreted_params:, search_kind:, search_status:, search_unregistered:, unpermitted_statuses:,
             period:, start_time:, end_time:, search_bounding_box: nil, map_place: nil, map_location: nil,
             search_bike_id: nil, filtered_user_id: nil, filtered_user: nil,
@@ -26,7 +32,7 @@ module Pages
             @parking_notifications = parking_notifications
             @total_count = total_count
             @per_page = per_page
-            @sort_state = sort_state
+            @search_params = search_params
             @interpreted_params = interpreted_params
             @search_kind = search_kind
             @search_status = search_status
@@ -59,20 +65,13 @@ module Pages
             }
           end
 
-          def search_params
-            @sort_state.search_params
-          end
-
-          def index_path(link_params)
-            organization_parking_notifications_path(search_params.merge(organization_id: @organization.id).merge(link_params))
+          # An entry that's already applied links to clearing it
+          def toggle_path(key, value, current)
+            organization_parking_notifications_path(@search_params.merge(:organization_id => @organization.id, key => ((current == value.to_s) ? nil : value)))
           end
 
           def kind_display(kind)
             (kind == "all") ? "All types" : "#{kind.humanize}s"
-          end
-
-          def unregistered_display
-            (@search_unregistered == "not_unregistered") ? "Registered bikes only" : "#{@search_unregistered.humanize} bikes"
           end
 
           def status_display_hash
