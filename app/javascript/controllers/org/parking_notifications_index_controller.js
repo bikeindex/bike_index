@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { ExpandControl, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { ExpandControl, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION, showMapUnavailable } from 'utils/maplibre'
 import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='org--parking-notifications-index'
@@ -22,7 +22,8 @@ export default class extends Controller {
 
       this.#render(maplibregl)
     } catch (error) {
-      this.#showUnavailable(error)
+      showMapUnavailable(error, { source: this.identifier, map: this.map, canvas: this.canvasTarget, message: this.unavailableTarget })
+      this.map = null
     }
   }
 
@@ -184,15 +185,6 @@ export default class extends Controller {
       else url.searchParams.delete(key)
     })
     window.location.href = url.pathname + url.search
-  }
-
-  // WebGL/MapLibre can be unavailable (crawlers, headless browsers, disabled GPU,
-  // blocked CDN). Reveal a message instead of leaving a blank box.
-  #showUnavailable (error) {
-    console.warn('Parking notifications map failed to render:', error)
-    this.disconnect()
-    this.canvasTarget.hidden = true
-    this.unavailableTarget.hidden = false
   }
 }
 

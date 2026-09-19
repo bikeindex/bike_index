@@ -25,7 +25,9 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     sign_in(user)
   end
 
+  # Each filter loads a new page, and a click before ui--dropdown connects doesn't open it
   def click_filter(menu, text)
+    wait_for_stimulus("ui--dropdown")
     click_button "Open #{menu} menu"
     click_link text
   end
