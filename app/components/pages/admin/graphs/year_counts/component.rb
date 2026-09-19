@@ -21,7 +21,7 @@ module Pages
           private
 
           def rows
-            @rows ||= Array(FIRST_YEAR..Time.current.year).map do |year|
+            @rows ||= (FIRST_YEAR..Time.current.year).map do |year|
               Row.new(year:, counts: @bounding_box ? bounded_counts(year) : cached_everywhere_counts(year))
             end
           end
@@ -47,29 +47,28 @@ module Pages
 
           def cached_everywhere_counts(year)
             Rails.cache.fetch("admin_graphs_year_counts_#{year}", expires_in: 1.hour) do
-              date = Date.new(year)
               registered = with_projection(year, bikes, :created_at)
-              stolen_counts(year, stolen_before: stolen_records.where("date_stolen < ?", date.beginning_of_year).count).merge(
+              stolen_counts(year, before_column: :date_stolen).merge(
                 "Stolen & non, in year" => registered,
-                "Total Stolen & non by eoy" => through_year(bikes.where("created_at < ?", date.all_year.last).count, registered),
+                "Total Stolen & non by eoy" => through_year(bikes.where(created_at: ...Date.new(year).all_year.last).count, registered),
                 "Users in year" => with_projection(year, User.unscoped, :created_at)
               )
             end
           end
 
           def bounded_counts(year)
-            stolen_counts(year, stolen_before: stolen_records.where("stolen_records.created_at < ?", Date.new(year).beginning_of_year).count)
+            stolen_counts(year, before_column: "stolen_records.created_at")
           end
 
-          def stolen_counts(year, stolen_before:)
+          def stolen_counts(year, before_column:)
             date = Date.new(year)
             stolen = with_projection(year, stolen_records, DATE_STOLEN_YEARS.include?(year) ? :date_stolen : "stolen_records.created_at")
             recovered_in_year = with_projection(year, recovered_records, :recovered_at)
             {
               "Stolen in year" => stolen,
-              "Total stolen by eoy" => through_year(stolen_before, stolen),
+              "Total stolen by eoy" => through_year(stolen_records.where(before_column => ...date).count, stolen),
               "Recovered in year" => recovered_in_year,
-              "Recovered by eoy" => through_year(recovered_records.where("recovered_at < ?", date.beginning_of_year).count, recovered_in_year)
+              "Recovered by eoy" => through_year(recovered_records.where(recovered_at: ...date).count, recovered_in_year)
             }
           end
 

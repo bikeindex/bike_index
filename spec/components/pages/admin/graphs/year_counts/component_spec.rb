@@ -12,8 +12,14 @@ RSpec.describe Pages::Admin::Graphs::YearCounts::Component, type: :component do
 
   context "everywhere" do
     let(:bounding_box) { nil }
+    let(:cache_key) { "admin_graphs_year_counts_#{Time.current.year}" }
     let!(:stolen_record) { FactoryBot.create(:stolen_record) }
-    before { Rails.cache.delete("admin_graphs_year_counts_#{Time.current.year}") }
+    # The test cache is a file_store, so a leftover entry would outlive the run
+    around do |example|
+      Rails.cache.delete(cache_key)
+      example.run
+      Rails.cache.delete(cache_key)
+    end
 
     it "counts every stolen record, and registrations and users" do
       expect(headers.last).to eq "Users in year"

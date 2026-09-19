@@ -27,17 +27,14 @@
 
 <div class="mt-4"></div>
 
-<% location_radius = params[:location_radius].present? ? params[:location_radius].to_i : 100 %>
-<% box = params[:location].present? && GeocodeHelper.bounding_box(params[:location], location_radius) %>
-
-<% if box.present? %>
+<% if @bounding_box.present? %>
   <h4 class="mt-4">
-    Records <em>within <%= location_radius %> miles of</em>
+    Records <em>within <%= @location_radius %> miles of</em>
     <strong><%= params[:location] %></strong>
   </h4>
 
   <div class="mt-3">
-    <%= render(Pages::Admin::Graphs::YearCounts::Component.new(bounding_box: box)) %>
+    <%= render(Pages::Admin::Graphs::YearCounts::Component.new(bounding_box: @bounding_box)) %>
   </div>
 <% else %>
   <h2>
