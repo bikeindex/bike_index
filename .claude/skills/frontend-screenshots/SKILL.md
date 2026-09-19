@@ -162,7 +162,7 @@ When the caller wants before/after, repeat the capture loop against the base ref
 
 1. `git status` — abort if there are uncommitted changes.
 2. Diff `db/migrate/` between the branch and `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error.
-3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_REF` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD at the remote ref is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
+3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_REF` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD at the remote ref is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files — the watcher can lag that first request, so confirm the page shows the base's markup (the changed element gone) and re-navigate if it doesn't — repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
 
 A `Gemfile.lock` diff is **not** a reason to abort.
 
