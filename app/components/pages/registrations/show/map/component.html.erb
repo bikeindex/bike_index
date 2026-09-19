@@ -14,6 +14,12 @@
     class="tw:h-full tw:w-full"
   ></div>
 
+  <% if @point %>
+    <template data-registrations--show--map-target="pin">
+      <%= helpers.inline_svg_tag("kelsey/registration_show/map-pin.svg", class: "tw:pointer-events-none tw:h-9 tw:w-9 tw:fill-purple-500 tw:text-purple-500 tw:[&_circle]:fill-purple-800 tw:[&_circle]:stroke-none tw:drop-shadow-md", aria_hidden: true) %>
+    </template>
+  <% end %>
+
   <p
     hidden
     data-registrations--show--map-target="unavailable"

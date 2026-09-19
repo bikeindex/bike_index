@@ -14,6 +14,7 @@ RSpec.describe Pages::Registrations::Show::Map::Component, type: :component do
     expect(node).to have_css("[data-registrations--show--map-target='canvas']")
     # Shown by the controller when MapLibre/WebGL is unavailable
     expect(node).to have_css("p[hidden][data-registrations--show--map-target='unavailable']", text: "map couldn't be loaded", visible: :all)
+    expect(node).to_not have_css("[data-registrations--show--map-target='pin']", visible: :all)
   end
 
   context "precise (exact address public)" do
@@ -29,6 +30,7 @@ RSpec.describe Pages::Registrations::Show::Map::Component, type: :component do
     it "marks the location as a point" do
       render_inline(component)
       expect(page.find("div[data-controller='registrations--show--map']")["data-registrations--show--map-point-value"]).to eq "true"
+      expect(page).to have_css("template[data-registrations--show--map-target='pin']", visible: :all)
     end
   end
 

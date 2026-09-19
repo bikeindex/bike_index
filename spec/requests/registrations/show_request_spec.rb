@@ -510,6 +510,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
             # The View notifications action opens the parking-notification show panel
             expect(body).to match("View notification")
             expect(body).to match("Parked incorrectly")
+            expect(response.body).to include('data-registrations--show--map-latitude-value="40.7143528"')
             expect(response.body).to match(organization_parking_notification_path(ParkingNotification.last.id, organization_id: organization.to_param))
           end
         end

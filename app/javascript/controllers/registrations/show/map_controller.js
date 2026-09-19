@@ -2,17 +2,12 @@ import { Controller } from '@hotwired/stimulus'
 import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 // Connects to data-controller='registrations--show--map'
-// Renders a map centered on the coordinates, marking them with a dot (point) or
+// Renders a map centered on the coordinates, marking them with a pin (point) or
 // a translucent red circle (approximate area).
 
-// A fixed dot marking the exact spot
-const POINT_PAINT = {
-  'circle-radius': 7,
-  'circle-color': 'red',
-  'circle-opacity': 0.9,
-  'circle-stroke-width': 2,
-  'circle-stroke-color': 'white'
-}
+// The 36px pin's tip sits 21/24 of the way down, so shift it by the 3/24 below
+// the tip to land the tip — not the pin's bottom edge — on the spot
+const PIN_OFFSET = [0, 4.5]
 
 // A translucent circle covering the approximate area
 const CIRCLE_PAINT = (radiusMeters, latitude) => ({
@@ -22,7 +17,7 @@ const CIRCLE_PAINT = (radiusMeters, latitude) => ({
 })
 
 export default class extends Controller {
-  static targets = ['canvas', 'unavailable']
+  static targets = ['canvas', 'unavailable', 'pin']
   static values = {
     latitude: Number,
     longitude: Number,
@@ -73,6 +68,12 @@ export default class extends Controller {
     })
     this.map.addControl(new ExpandControl(), 'top-right')
 
+    if (this.pointValue) {
+      const element = this.pinTarget.content.firstElementChild.cloneNode(true)
+      new maplibregl.Marker({ element, anchor: 'bottom', offset: PIN_OFFSET }).setLngLat(center).addTo(this.map)
+      return
+    }
+
     this.map.on('load', () => {
       this.map.addSource('location', {
         type: 'geojson',
@@ -82,7 +83,7 @@ export default class extends Controller {
         id: 'location',
         type: 'circle',
         source: 'location',
-        paint: this.pointValue ? POINT_PAINT : CIRCLE_PAINT(this.radiusMetersValue, this.latitudeValue)
+        paint: CIRCLE_PAINT(this.radiusMetersValue, this.latitudeValue)
       })
     })
   }
