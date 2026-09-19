@@ -29,7 +29,7 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
       BikeOrganizationNote.upsert(bike:, organization:, body: "Second note", user: current_user)
       render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
 
-      expect(page).to have_text(/First note.*Note by #{other_user.display_name}.*Current note.*Note by #{current_user.display_name}/m)
+      expect(page).to have_text(/First note.*Note by #{other_user.display_name}.*Current note.*most recent update by #{current_user.display_name}.*You'll post as #{current_user.display_name}/m)
       expect(page).to have_field("Current note", with: "Second note")
       expect(page).to have_button("Update note")
     end

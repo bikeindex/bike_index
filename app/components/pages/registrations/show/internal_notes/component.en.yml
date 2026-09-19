@@ -7,8 +7,9 @@ en:
           internal_notes:
             current_note: Current note
             internal_notes: Internal notes
+            most_recent_update_by: most recent update by %{user}
             note_by: Note by %{user}
             post_note: Post note
-            posting_as: You're posting as %{user}
-            update_hint: History of your changes will be visible above
+            update_hint: You'll post as %{user} — history of your changes will be
+              visible above
             update_note: Update note
