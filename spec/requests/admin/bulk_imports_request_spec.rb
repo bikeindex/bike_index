@@ -21,6 +21,8 @@ RSpec.describe Admin::BulkImportsController, type: :request do
       expect(response).to be_ok
       expect(response).to render_template(:show)
       expect(flash).to_not be_present
+      action = "/admin/bulk_imports/#{bulk_import.id}?reprocess=true"
+      expect(Nokogiri::HTML(response.body).at_css("form[action='#{action}'] input[name=_method][value=put]")).to be_present
     end
   end
 
