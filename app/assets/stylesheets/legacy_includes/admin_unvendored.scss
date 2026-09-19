@@ -9629,8 +9629,10 @@ label {
   text-transform: uppercase !important
 }
 
-.full-screen-table {
-  overflow-x: auto
+.full-screen-table-overflown {
+  overflow-x: scroll;
+  margin-left: -15px;
+  margin-right: -15px
 }
 
 @media(max-width:767.98px) {
