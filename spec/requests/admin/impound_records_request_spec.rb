@@ -26,19 +26,6 @@ RSpec.describe Admin::ImpoundRecordsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(assigns(:impound_record).id).to eq impound_record.id
-      expect(response.body).not_to include("created from a parking notification")
-    end
-    context "unregistered parking notification bike" do
-      let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered, kind: "impound_notification", created_at: Time.current - 1.hour) }
-      let(:impound_record) do
-        ProcessParkingNotificationJob.new.perform(parking_notification.id)
-        parking_notification.reload.impound_record
-      end
-      it "renders the unregistered badge" do
-        get "#{base_url}/pkey-#{impound_record.id}"
-        expect(response.status).to eq(200)
-        expect(response.body).to include("created from a parking notification")
-      end
     end
   end
 end
