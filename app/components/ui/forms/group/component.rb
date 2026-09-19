@@ -7,6 +7,8 @@ module UI
         # Text under the field. The input points at it with aria-describedby -- a
         # content block renders its own field, so it passes helper_text_id itself.
         renders_one :helper_text
+        # Small text inside the label, after the required/optional marker
+        renders_one :label_note
 
         # Pass a block (a UI::Forms::Combobox, Select, TextEditor...) and it renders in
         # place of the input -- `kind` is then unused. Without a form_builder that block
@@ -60,8 +62,10 @@ module UI
 
         # The label carries a required "*" or an "optional" badge, keyed off required?.
         def label_content
-          safe_join([@label_text, label_suffix_markup], " ")
+          safe_join([@label_text, label_suffix_markup, label_note_markup].compact, " ")
         end
+
+        def label_note_markup = label_note? ? tag.small(label_note, class: "twless-strong") : nil
 
         def label_suffix_markup
           return required? ? required_marker : optional_marker unless @required_toggleable
