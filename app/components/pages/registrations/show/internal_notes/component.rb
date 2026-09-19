@@ -14,11 +14,6 @@ module Pages
 
           private
 
-          def label_text
-            safe_join([translation(".current_note"),
-              tag.span(translation(".posting_as", user: @current_user.display_name), class: "tw:text-sm tw:font-normal tw:opacity-65")], " ")
-          end
-
           def note_by(note)
             safe_join([translation(".note_by", user: note.user&.display_name),
               render(UI::Time::Component.new(time: note.updated_at))], " ")
