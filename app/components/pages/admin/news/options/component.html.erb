@@ -116,17 +116,10 @@
         <div class="form-group">
           <div class="controls">
             <label>
-              <input
-                type="radio"
-                name="index_image_id"
-                value="0"
-                class="index_image_0"
-              >
-              No primary image
+              <%= @form_builder.radio_button :index_image_id, 0 %> No primary
+              image
               <small class="less-strong">Otherwise, select a primary image with the radio button next to the image</small>
             </label>
-
-            <%= @form_builder.hidden_field :index_image_id %>
           </div>
         </div>
       </div>

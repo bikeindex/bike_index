@@ -92,6 +92,12 @@ Uses RSpec. All business logic should be tested. The `rspec-testing` skill cover
 
 **Verify with `bundle exec rspec` over the spec files covering what you changed — usually one to three.** Not `bin/turbo_tests`, `bin/ci`, or a whole directory (`spec/integration`, `spec/components`) — that's a suite run by another name. "It renders on every page, so anything could break" is the rationalization to watch for. A red example is a reason to re-run that example, not its directory. Say which specs you ran and why those. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
 
+**A spec that lands on `/admin` seeds `Organization.example` in a `before`.** The dashboard reads it
+under the reading role, so a superuser login that redirects there raises `ActiveRecord::ReadOnlyError`
+on a write to `organizations` — which reads as a database misconfiguration rather than a missing
+record. `spec/integration/admin/news_images_spec.rb` and `spec/requests/admin/dashboard_request_spec.rb`
+both do it.
+
 **Assert on what a drain produces, not on the flag that precedes it.** A column a job reconciles when it runs records what was true at write time — `Ownership#skip_email` is one — so it answers a different question than the one you're asking.
 
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded. To clear stale contents, `rm` the file and re-run the spec.

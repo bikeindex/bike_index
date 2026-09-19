@@ -5583,12 +5583,17 @@ nl:
           not_real: Dat lijkt niet uw echte e-mailadres te zijn. Voer een e-mailadres
             in waarop u e-mails ontvangt.
           submit_anyway: Formulier toch verzenden
-        file_upload:
-          no_file_chosen: Geen bestand gekozen
-          take_picture: Maak een foto
-          upload: Uploaden
-          upload_failed: Uploaden mislukt
-          uploading: uploaden
+        files:
+          picker:
+            no_file_chosen: Geen bestand gekozen
+            take_picture: Maak een foto
+            upload: Uploaden
+          upload:
+            upload_failed: Uploaden mislukt
+            uploading: uploaden
+          upload_multiple:
+            upload_failed: Uploaden mislukt
+            uploading: uploaden
         group:
           optional: optioneel
         turnstile:

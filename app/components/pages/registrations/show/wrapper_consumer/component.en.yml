@@ -12,7 +12,6 @@ en:
             audience_sent_away: No longer your %{bike_type}
             edit_this_bike: Edit this %{bike_type}
             mark_stolen: Mark stolen
-            nickname: 'nickname: %{name}'
             sell_on_marketplace: Sell on Marketplace
             share: Share
             share_my_page: Share my page

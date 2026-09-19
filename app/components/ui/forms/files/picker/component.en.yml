@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        files:
+          picker:
+            no_file_chosen: No file chosen
+            take_picture: Take picture
+            upload: Upload

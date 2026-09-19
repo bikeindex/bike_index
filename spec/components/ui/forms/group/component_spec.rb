@@ -118,7 +118,7 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
 
     it "marks the input required and appends an asterisk instead of the badge" do
       expect(component).to have_css("input[required]")
-      expect(component).to have_css("label span", text: "*")
+      expect(component).to have_css("label span[title='required']", text: "*")
       expect(component).to_not have_text("optional")
     end
   end

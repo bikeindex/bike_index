@@ -79,7 +79,7 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 Four of those carry a rule beyond "use the component":
 
 - **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.
-- **A `UI::Forms::*` field gets its label from `UI::Forms::Group`** — render it inside a `Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, `TextEditor`, and `FileUpload`, whose own `Upload` button is a second label for the same input and audits clean beside `Group`'s (`spec/components/ui/forms/group/component_system_spec.rb`) — never drop `Group` for a bare `<label>` to avoid it. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
+- **A `UI::Forms::*` field gets its label from `UI::Forms::Group`** — render it inside a `Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, `TextEditor`, and `Files::Upload`, whose own `Upload` button is a second label for the same input and audits clean beside `Group`'s (`spec/components/ui/forms/group/component_system_spec.rb`) — never drop `Group` for a bare `<label>` to avoid it. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
 - **Every typeahead / autocomplete goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. `spec/components/ui/forms/combobox` shows how to invoke it.
 - **Every chart goes through `UI::Chart::Component`** — chartkick's `column_chart`/`line_chart`/`pie_chart` helpers are pinned `preload: false` and fetched by the component's `ui--chart` controller, so a bare helper call renders the placeholder and nothing else. Pass `kind:` for a line or pie. A page with no Stimulus (`layout: false`) loads them itself: `app/views/welcome/bike_creation_graph.html.erb`.
 
@@ -209,7 +209,7 @@ rest of the table's state. Reach it through the reader, not the bare helper:
 
 `application_standalone.js` is a plain `<script src>` in the admin layout, and everything it
 sets up binds once inside one `$(document).ready` gated on `#admin-content` — the per-page
-select, the selectize filters, the nested location fields, the uppy uploader. Turbo Drive
+select, the selectize filters, the nested location fields. Turbo Drive
 doesn't re-execute an unchanged script tag, and a back/forward restoration hands back a
 *clone* of its snapshot, so that markup comes back looking live with nothing bound to it.
 
@@ -219,8 +219,8 @@ And it's the page you navigate *away from* that breaks, not just the one you lan
 
 So a screen carrying any of it passes `turbo: false` — `Pages::Admin::Headers::Tabs` takes it, and
 `Pages::Admin::Organizations::CustomLayouts::Form::Wrapper` is the one that does. Before opting a new section in,
-check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields`,
-`#multipleUserSelect` and `.UppyForm`.
+check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields` and
+`#multipleUserSelect`.
 
 ## Screenshots
 

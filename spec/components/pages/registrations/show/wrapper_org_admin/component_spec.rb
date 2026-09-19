@@ -19,6 +19,17 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
     end
   end
 
+  describe "title" do
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, year: 2020, frame_model: "Stumpjumper", name: "Morning commuter") }
+
+    it "titles by year, manufacturer and model, with the nickname beneath" do
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      expect(page).to have_css("h1", text: "2020 #{bike.mnfg_name} Stumpjumper")
+      expect(page).to have_css("h1 + p", text: "nickname: Morning commuter")
+    end
+  end
+
   describe "notes" do
     include_context :with_paper_trail
 
