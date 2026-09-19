@@ -15,6 +15,20 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+        expect(response.body).to_not include("Organization sections")
+      end
+
+      context "filtered to an organization" do
+        let!(:other_draft) { FactoryBot.create(:registration_sequence, organization: FactoryBot.create(:organization)) }
+
+        it "renders the organization's tabs" do
+          get base_url, params: {organization_id: organization.id}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+          active_tab = Nokogiri::HTML(response.body).at_css("nav a[aria-current]")
+          expect(active_tab.text.squish).to eq "Registration sequences 1"
+          expect(active_tab["href"]).to eq "/admin/registration_sequences?organization_id=#{organization.id}"
+        end
       end
 
       it "offers to create the template when there isn't one" do
@@ -90,6 +104,19 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(response.body).to_not include("registration_sequence[faq_url]")
+        active_tab = Nokogiri::HTML(response.body).at_css("nav a[aria-current]")
+        expect(active_tab.text.squish).to eq "Registration sequences 1"
+        expect(active_tab["href"]).to eq "/admin/registration_sequences?organization_id=#{organization.id}"
+      end
+
+      context "template" do
+        let!(:template) { FactoryBot.create(:registration_sequence_template, :with_pages) }
+
+        it "renders without organization tabs" do
+          get "#{base_url}/#{template.id}"
+          expect(response.status).to eq(200)
+          expect(response.body).to_not include("Organization sections")
+        end
       end
     end
 

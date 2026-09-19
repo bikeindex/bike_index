@@ -10,6 +10,7 @@ module Admin
       # The sequence organizations' drafts are cloned from, reachable without hunting the
       # table for it. Its draft when there is one - that's what there is to do to it
       @template = ::RegistrationSequence.existing_draft_for(nil) || ::RegistrationSequence.active_template
+      @organization = ::Organization.unscoped.find_by(id: params[:organization_id]) if params[:organization_id].present?
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
         matching_registration_sequences.includes(:organization, :registration_sequence_pages)

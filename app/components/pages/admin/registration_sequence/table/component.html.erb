@@ -1,0 +1,24 @@
+<%= render(UI::Table::Component.new(records: @registration_sequences, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+  <% table.column(sortable: "created_at", label: "Created", lower_right: ->(registration_sequence) { registration_sequence.id }) do |registration_sequence| %>
+    <%= link_to render(UI::Time::Component.new(time: registration_sequence.created_at)),
+      admin_registration_sequence_path(registration_sequence) %>
+  <% end %>
+
+  <% table.column(sortable: "updated_at", label: "Updated") do |registration_sequence| %>
+    <small><%= render(UI::Time::Component.new(time: registration_sequence.updated_at, format: :localize_time_precise)) %></small>
+  <% end %>
+
+  <% table.column(sortable: "organization_id", label: "Organization") do |registration_sequence| %>
+    <%= render(Pages::Admin::Organizations::Cell::Component.new(organization: registration_sequence.organization,
+      organization_id: registration_sequence.organization_id, render_search: true,
+      search_url: admin_registration_sequences_path(sort_state.search_params.to_h.merge(organization_id: registration_sequence.organization_id)))) %>
+  <% end %>
+
+  <% table.column(label: "Status") do |registration_sequence| %>
+    <%= registration_sequence.status.titleize %>
+  <% end %>
+
+  <% table.column(label: "Pages") do |registration_sequence| %>
+    <%= number_display(registration_sequence.registration_sequence_pages.size) %>
+  <% end %>
+<% end %>

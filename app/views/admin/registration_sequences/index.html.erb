@@ -1,3 +1,7 @@
+<% if @organization.present? %>
+  <%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :registration_sequences, display_dev_info: display_dev_info?)) %>
+<% end %>
+
 <% nav_header_list_items = capture do %>
   <li>
     <%= render(UI::Dropdown::Component.new(
@@ -28,4 +32,5 @@
   collection: @collection,
   viewing: controller_name.humanize,
   nav_header_list_items:, chart_collection: @render_chart && matching_registration_sequences,
+  table_view: render(Pages::Admin::RegistrationSequence::Table::Component.new(registration_sequences: @collection, sort_state:, render_sortable: true)),
 )) %>
