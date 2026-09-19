@@ -6,6 +6,14 @@ module UI
       class Component < ApplicationComponent
         SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js"
 
+        # The values its controller reads off the form. The reveal skips user's confirmed
+        # addresses, the way Integrations::Turnstile skips them on submit
+        def self.form_data(user: nil)
+          {"ui--forms--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
+           "ui--forms--turnstile-script-url-value": SCRIPT_URL,
+           "ui--forms--turnstile-exempt-emails-value": (user&.confirmed_emails || []).to_json}
+        end
+
         def initialize(email: nil, user: nil)
           @email = email
           @user = user

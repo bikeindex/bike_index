@@ -28,15 +28,10 @@ module Pages
 
           {data: {turbo: true, controller: "autofocus form-persist register--retry ui--forms--turnstile",
                   form_persist_key_value: "register-start-#{@b_param.id_token}",
-                  "ui--forms--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
-                  "ui--forms--turnstile-script-url-value": UI::Forms::Turnstile::Component::SCRIPT_URL,
-                  "ui--forms--turnstile-exempt-emails-value": exempt_emails.to_json,
+                  **UI::Forms::Turnstile::Component.form_data(user: @current_user),
                   action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
                     "input->ui--forms--turnstile#update submit->form-persist#clear"}}
         end
-
-        # The reveal skips these, the way Integrations::Turnstile skips them on submit
-        def exempt_emails = @current_user&.confirmed_emails || []
 
         # Derived when the frame's src doesn't name one
         def button_hover_color
@@ -56,14 +51,6 @@ module Pages
 
         def organization
           @organization ||= @b_param.creation_organization
-        end
-
-        # The step is still asking what's being registered, so the heading can't name the
-        # type. Framed, the page around it already says whose registration this is
-        def heading_text
-          return translation(".register_your_vehicle") if @embed || organization.blank?
-
-          translation(".register_your_vehicle_with_org", org_name: organization.short_name)
         end
 
         # Names this registration rather than leaving it to the session, which another tab

@@ -1,17 +1,5 @@
-<%= render Pages::Register::Page::Component.new(data: {controller: "register--heading",
-    "register--heading-names-value": CycleType.slug_translation_hash_lowercase_short.to_json,
-    action: "hw-combobox:selection->register--heading#update " \
-      "form-persist:restored@window->register--heading#update"}) do %>
-  <%= render Pages::Register::Progress::Component.new(steps: @steps, step: 1) %>
-
-  <% unless @skip_heading %>
-    <%= render UI::Header::Component.new(text: heading_text) %>
-  <% end %>
-
-  <% if @b_param.errors.any? %>
-    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
-  <% end %>
-
+<%= render Pages::Register::StartPage::Component.new(b_param: @b_param, steps: @steps, organization:,
+    skip_heading: @skip_heading) do %>
   <%= form_with(url: register_path, method: :post, scope: :bike, **form_options) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 

@@ -1,0 +1,16 @@
+<%= render Pages::Register::Page::Component.new(embed: @embed, data: {controller: "register--heading",
+    "register--heading-names-value": CycleType.slug_translation_hash_lowercase_short.to_json,
+    action: "hw-combobox:selection->register--heading#update " \
+      "form-persist:restored@window->register--heading#update"}) do %>
+  <%= render Pages::Register::Progress::Component.new(steps: @steps, step: 1) %>
+
+  <% unless @skip_heading %>
+    <%= render UI::Header::Component.new(text: heading_text, subtitle: @subtitle) %>
+  <% end %>
+
+  <% if @b_param.errors.any? %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
+  <% end %>
+
+  <%= content %>
+<% end %>

@@ -16,36 +16,20 @@ module Pages
 
         private
 
-        # Step 1's scope, so its heading renders from the same two strings rather than a
-        # copy of them - registered in i18n-tasks.yml's scope_overrides, as that arrangement has to be
-        def component_translation_scope = [:components, :pages, :register, :step1]
-
         # Both steps' controllers, on the one form that holds both their fields
         def form_options
           {data: {turbo: true, form_persist_key_value: "register-combined-#{@b_param.id_token}",
                   controller: "autofocus form-persist register--status-fields register--organization " \
                     "register--retry ui--forms--turnstile",
-                  "ui--forms--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
-                  "ui--forms--turnstile-script-url-value": UI::Forms::Turnstile::Component::SCRIPT_URL,
-                  "ui--forms--turnstile-exempt-emails-value": exempt_emails.to_json,
+                  **UI::Forms::Turnstile::Component.form_data(user: @current_user),
                   action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
                     "hw-combobox:selection->register--status-fields#update " \
                     "register--organization:changed->register--status-fields#update " \
                     "input->ui--forms--turnstile#update submit->form-persist#clear"}}
         end
 
-        # The reveal skips these, the way Integrations::Turnstile skips them on submit
-        def exempt_emails = @current_user&.confirmed_emails || []
-
         def organization
           @organization ||= @b_param.creation_organization
-        end
-
-        # The page is still asking what's being registered, so the heading can't name the type
-        def heading_text
-          return translation(".register_your_vehicle") if organization.blank?
-
-          translation(".register_your_vehicle_with_org", org_name: organization.short_name)
         end
       end
     end

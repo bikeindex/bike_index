@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      register:
+        start_page:
+          register_your_vehicle: Register your vehicle!
+          register_your_vehicle_with_org: Register your vehicle with %{org_name}!
