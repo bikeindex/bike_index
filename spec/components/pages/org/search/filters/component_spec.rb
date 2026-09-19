@@ -18,15 +18,14 @@ RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
     {settings:, period: "week", start_time: Time.current - 1.week, end_time: Time.current}
   end
 
-  it "renders the settings trigger, the period, and the collapsed panel" do
+  it "renders the settings trigger, the period, the collapsed panel and its radios" do
     expect(component).to have_button("Search settings")
     expect(component).to have_text("past 7 days")
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
-  end
-
-  it "renders each filter group's radios against the search form" do
     expect(component).to have_css("input[type='radio'][name='search_stickers'][form='Search_Form']", visible: :all)
     expect(component).to have_css("input[type='radio'][name='search_status'][form='Search_Form']", visible: :all)
+    # The notes toggle is registration_notes' own
+    expect(component).not_to have_text("show notes search")
   end
 
   context "with the sticker filter on" do
@@ -34,12 +33,6 @@ RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
 
     it "says what the search is filtered to" do
       expect(component).to have_text("only no sticker")
-    end
-  end
-
-  context "without registration_notes" do
-    it "leaves out the notes toggle" do
-      expect(component).not_to have_text("show notes search")
     end
   end
 

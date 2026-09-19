@@ -6,17 +6,13 @@ RSpec.describe Pages::Org::Search::Form::Component, :js, type: :system do
   let(:preview_path) { "/rails/view_components/pages/org/search/form/component/default" }
 
   describe "default preview" do
-    it "renders the search form" do
+    it "renders the search form, and submits it" do
       visit(preview_path)
 
       expect(page).to have_css("form#Search_Form")
       expect_axe_clean
       expect(page).to have_field("search_email")
       expect(page).to have_field("serial")
-    end
-
-    it "submits the form" do
-      visit(preview_path)
 
       fill_in "search_email", with: "test@example.com"
       fill_in "serial", with: "ABC123"

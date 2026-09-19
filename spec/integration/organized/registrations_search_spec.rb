@@ -112,12 +112,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).not_to have_css("button[aria-label=\"#{search_all_email_disabled}\"]")
 
     # The chart's scope rides in the address bar, so a search keeps it
-    click_link "Last year"
-    expect(page).to have_current_path(/chart_scope=year/, wait: 10)
+    click_link "Current search"
+    expect(page).to have_current_path(/chart_scope=search/, wait: 10)
     fill_in "search_email", with: "bob@example.com"
     click_button "Search registrations"
     expect(page).to have_current_path(/search_email=bob/, wait: 10)
-    expect(page).to have_current_path(/chart_scope=year/)
+    expect(page).to have_current_path(/chart_scope=search/)
 
     # submits when enter is pressed twice
     visit bikes_path
@@ -247,12 +247,14 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.execute_script("document.cookie = 'timezone=America/Los_Angeles;path=/;max-age=31536000;SameSite=Lax'")
     expect(browser_cookie_value("timezone")).to eq("America/Los_Angeles")
 
-    # Switch to past 30 days, for daily chart bucketing. The chart card loads with the
-    # page now, so there's nothing to turn on.
+    # Switch to past 30 days, for daily chart bucketing
     open_filters_if_not
     click_link "past 30 days"
     expect(page).to have_current_path(/period=month/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
+    # The default year scope ignores the period, so the daily buckets are the search's
+    click_link "Current search"
+    expect(page).to have_current_path(/chart_scope=search/, wait: 10)
     # Chart loads async via a lazy turbo-frame; wait for the canvas before checking the
     # inline init data - chartkick and Chart.js arrive on demand, from ui--chart
     expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas", wait: 10)

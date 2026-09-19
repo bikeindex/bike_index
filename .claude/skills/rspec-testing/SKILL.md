@@ -61,8 +61,6 @@ A component having no spec yet isn't a reason to put it in the request spec inst
 
 **No stylesheet loads here, so Capybara calls anything hidden by a class visible.** `have_no_field`/`visible: false` against a `tw:hidden` wrapper fails with "found 1 match", which reads as the component rendering the wrong thing. Assert the wrapper instead — `page.find("form div.tw\\:hidden input[name='additional']", visible: :all)` — and leave real invisibility to a `:js` system spec.
 
-**A request spec asserting markup wraps the body in `Capybara.string(response.body)`.** On the bare string, `have_css`/`have_field` fall through to RSpec's predicate matcher and fail with "expected … to respond to `has_css?`", which reads as a selector that didn't match. `spec/requests/sessions_request_spec.rb` is the pattern.
-
 ## `render_in_view_context` takes its subjects as method arguments
 
 A component needing a `form_builder` renders inside `render_in_view_context { form_for … }`, which `instance_exec`s its block in the view context — so `let` values aren't in scope and a bare `organization` raises `NameError`. Wrap it in a `def rendered_component(organization)` and call that from the `let(:component)`; the block closes over the method's locals. `spec/components/pages/admin/organizations/form/wrapper/component_spec.rb` is the pattern.

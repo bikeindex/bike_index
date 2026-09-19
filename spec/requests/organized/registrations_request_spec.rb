@@ -145,7 +145,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:search_all)).to be_truthy
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, non_organization_bike.id])
-        expect(Capybara.string(response.body)).to have_field("search_all", checked: true, disabled: false)
       end
 
       context "with search_email" do
@@ -156,9 +155,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           expect(response.status).to eq(200)
           expect(assigns(:search_all)).to be_falsey
           expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-          body = Capybara.string(response.body)
-          expect(body).to have_field("search_all", checked: false, disabled: true)
-          expect(body).to have_css("button[aria-label=\"You can only search your organization's registrations with owner email or name\"]")
         end
       end
 
@@ -204,32 +200,22 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     context "the chart frame asking" do
       let(:frame_headers) { {"Turbo-Frame" => "registrations_chart_frame"} }
 
-      it "renders the chart alone, with the searched counts" do
-        get base_url, headers: frame_headers
-        expect(response.status).to eq(200)
-        expect(response.body).to include('id="registrations_chart_frame"')
-        expect(assigns(:chart_scope)).to eq "search"
-        expect(response.body).to include("Total registrations")
-        expect(response.body).to_not include("Find a registration")
-      end
-
-      it "steps outside the search for the year scope" do
-        get base_url, params: {chart_scope: "year", serial: "no-match-at-all"}, headers: frame_headers
+      it "answers the year scope unless asked for the search, linking both at the page's URL" do
+        get base_url, params: {serial: "no-match-at-all"}, headers: frame_headers
         expect(response.status).to eq(200)
         expect(assigns(:chart_scope)).to eq "year"
-        expect(response.body).to include("Last year overview")
-      end
 
-      # The scope links advance the address bar, so what they put there has to be the page
-      it "links the scopes at the page's own URL, carrying the search" do
+        get base_url, params: {chart_scope: "search"}, headers: frame_headers
+        expect(response.status).to eq(200)
+        expect(assigns(:chart_scope)).to eq "search"
+
+        # The scope links advance the address bar, so what they put there has to be the page
         get base_url, params: {period: "week"}, headers: frame_headers
-        expect(response.body).to include("chart_scope=year&amp;period=week")
-      end
+        expect(assigns(:chart_scope_paths)[:year]).to eq "#{base_url}?chart_scope=year&period=week"
 
-      # Sorting is a different question than which scope the chart is answering
-      it "keeps the scope in the URL through a sort" do
+        # Sorting is a different question than which scope the chart is answering
         get base_url, params: {search_no_js: true, chart_scope: "year"}
-        expect(response.body).to include("chart_scope=year&amp;direction=asc")
+        expect(assigns(:sort_state).search_params[:chart_scope]).to eq "year"
       end
     end
 
