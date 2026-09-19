@@ -43,10 +43,6 @@ module Pages
 
             COLLAPSE_DATA
           end
-
-          def export_path
-            organization_registrations_path(@settings.search_params.merge(create_export: true))
-          end
         end
       end
     end

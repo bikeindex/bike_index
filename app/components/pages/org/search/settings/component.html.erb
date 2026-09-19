@@ -41,16 +41,22 @@
       <% end %>
     </div>
 
-    <%# The caller that renders the trigger renders the export button beside it %>
+    <%#
+      The caller that renders the trigger renders the export button beside it. Standing
+      alone, the panel's search params don't describe the bikes on the page
+    %>
+
     <% if @toggle_button && @settings.render_export? %>
       <div
         class="
-          tw:mt-4 tw:border-t tw:border-gray-300/70 tw:pt-3 tw:text-right
-          tw:dark:border-gray-700
+          tw:mt-4 tw:flex tw:items-center tw:justify-end tw:gap-2
+          tw:border-t tw:border-gray-300/70 tw:pt-3 tw:dark:border-gray-700
         "
       >
-        <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
-          color: :purple, size: :sm, data: {turbo_frame: "_top"})) %>
+        <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
+          color: :purple, size: :sm, disabled: true)) %>
+
+        <%= render(UI::Tooltip::Component.new(text: translation(".export_unavailable"))) %>
       </div>
     <% end %>
   </div>

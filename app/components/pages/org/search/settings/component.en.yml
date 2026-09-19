@@ -16,6 +16,7 @@ en:
             cycle_type_cell: Vehicle type
             default: default
             export_csv: Export CSV
+            export_unavailable: Can't create export of this
             filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address
             filter_no_sticker_html: only <strong>no</strong> sticker
