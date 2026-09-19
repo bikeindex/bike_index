@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'filterSummary', 'searchAll', 'searchAllHint']
 
   connect () {
     this.chartSearch = this.chartParams()
@@ -20,7 +20,6 @@ export default class extends Controller {
   // looks after itself - ui--collapse reconnects with it - but the chart is outside them.
   handleFrameRender = (event) => {
     if (this.hasChartFrameTarget && event.target === this.chartFrameTarget) return
-    this.syncPeriodLabel()
     this.reloadChart()
   }
 
@@ -71,16 +70,6 @@ export default class extends Controller {
 
     this.filterSummaryTarget.innerHTML = active.join(' · ')
     this.filterSummaryTarget.hidden = active.length === 0
-  }
-
-  // The label sits outside the results frame the period buttons navigate. It reads the
-  // button from the URL rather than its active state, which ui--period-select sets too.
-  syncPeriodLabel () {
-    const period = new URLSearchParams(window.location.search).get('period')
-    const button = period && this.element.querySelector(`[data-period="${period}"]`)
-    if (button && this.hasPeriodLabelTarget) {
-      this.periodLabelTarget.textContent = button.textContent.replace(/\s+/g, ' ').trim()
-    }
   }
 
   perPageChanged () {

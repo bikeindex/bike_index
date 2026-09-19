@@ -3,6 +3,7 @@
 module UI
   module PeriodSelect
     class Component < ApplicationComponent
+      # Template Dependency: UI::ButtonGroup::Component
       PERIODS = [
         {key: "next_week", prefix: "next", label: "seven_days", future: true},
         {key: "next_month", prefix: "next", label: "thirty_days", future: true},
@@ -37,6 +38,11 @@ module UI
       end
 
       private
+
+      # The row a chip group lays out, so the two line up where they're stacked
+      def row_classes
+        "text-right #{UI::ButtonGroup::Component.group_classes(kind: :button, full_width: false)} tw:justify-end"
+      end
 
       def visible_periods
         @include_future ? PERIODS : PERIODS.reject { |p| p[:future] }

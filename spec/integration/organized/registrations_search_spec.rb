@@ -139,6 +139,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Click page 2 — turbo frame updates without full reload
     click_link "2"
     expect(page).to have_current_path(/page=2/, wait: 10)
+    # The date range renders outside the frame, so its links are rebuilt from the address
+    # bar - carrying the search, and starting a period change over at the first page
+    expect(find_link("past year", visible: :all)[:href]).to_not include("page=2")
     expect(page).to have_css("table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 1)
 
@@ -228,6 +231,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # rendered_bike_ids can read a row that's being replaced mid-render
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
+    expect(find_link("past day", visible: :all)[:href]).to include("search_email=bob")
+    expect(find_link("past day", visible: :all)[:href]).to include("search_email=bob")
 
     # Chart test must run before the custom-range click below: that submission
     # writes session[:timezone] from Intl.DateTimeFormat (varies between local

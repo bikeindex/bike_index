@@ -1,8 +1,5 @@
 <div data-controller="ui--collapse ui--period-select">
-  <div
-    class="text-right tw:flex tw:flex-wrap tw:justify-end tw:gap-1 tw:sm:gap-2"
-    role="group"
-  >
+  <div class="<%= row_classes %>" role="group">
     <% if @prepend_text.present? %>
       <span class="mr-2 less-strong d-block d-lg-inline-block">
         <%= @prepend_text %>
