@@ -239,7 +239,7 @@ module Organized
     def permitted_filter(param)
       values = ComponentStructs::OrgSearchSettings::FILTER_GROUPS.fetch(param)[:values]
 
-      values.key?(params[param]&.to_sym) ? params[param] : false
+      values.key?(params[param].to_s.to_sym) ? params[param] : false
     end
 
     def sticker_scoped(bikes)

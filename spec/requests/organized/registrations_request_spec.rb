@@ -194,6 +194,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {search_no_js: true, search_unregisteredness: "whatever"}
         expect(assigns(:search_unregisteredness)).to eq false
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, unregistered_bike.id])
+
+        # nor does a malformed one
+        get base_url, params: {search_no_js: true, search_unregisteredness: ["only_unregistered"]}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_unregisteredness)).to eq false
       end
     end
 
