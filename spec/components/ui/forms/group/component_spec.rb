@@ -173,6 +173,19 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
+  describe "label_note" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, required: true)) do |group|
+        group.with_label_note { "as it appears on the account" }
+      end
+    end
+
+    it "renders in the label, after the required marker" do
+      expect(component).to have_css("label[for='user_name'] small", text: "as it appears on the account")
+      expect(component.css("label").inner_html).to match(/\*<\/span> <small/)
+    end
+  end
+
   describe "helper_text" do
     let(:component) do
       render_inline(described_class.new(form_builder:, attribute:)) do |group|
