@@ -1771,40 +1771,6 @@ nl:
       view_public_non_listing: Bekijk openbare registratie
       viewing_listing_preview: Dit is een voorbeeld van uw 'te koop'-advertentie.
         Deze is niet openbaar zichtbaar.
-    stolen_checklist:
-      a_photo_of_your_bike_type: een foto van je %{bike_type}
-      add: Toevoegen
-      add_bike_link_to_your_theft_report_html: Voeg %{bike_link} toe aan uw diefstalrapport
-      add_serial_number: Voeg framenummer toe
-      bike_index_does_this: "(Bike Index doet dit wanneer u uw politierapportnummer
-        invoert)"
-      contact_seller: KRITIEK - neem contact op met wie u de fiets hebt gekocht en
-        kijk of zij deze hebben
-      facebook_instagram_etc: "(Facebook, Instagram, enz.)"
-      leads_online: LeadsOnline
-      leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
-      list_bike_type_on_bike_index: Lijst %{bike_type} op Bike Index
-      location_where_the_theft_occurred: locatie waar de diefstal plaatsvond
-      promoted_stolen_bike_alerts: Gepromoveerde fietswaarschuwingen
-      push_bike_info_to: Push fietsinfo naar
-      push_bike_info_to_law_enforcement: Push-fietsinformatie naar wetshandhavingsdatabases
-        (Bike Index doet dit wanneer u uw politierapportnummer invoert)
-      report_theft_html: Diefstal op fietsindex melden, waaronder %{edit_bike_link}
-      requires_a_serial_number: vereist een framenummer
-      share_on_twitter: Deel op Twitter (Bike Index doet dit zodra we uw vermelding
-        hebben bekeken)
-      share_widely_on_your_personal_social: Deel veel op uw persoonlijke sociale media
-      supercharge_sharing_on_facebook: Superchar delen op Facebook met Bike Index
-      your_police_report: uw politierapportnummer
-      nl_digid_required: "(DigiD vereist)"
-      nl_file_police_report: Dien een politierapport in!
-      nl_online: Online
-      nl_person: Persoonlijk
-      nl_person_report: Zoeken naar het dichtstbijzijnde politiebureau,
-      nl_phone: Per telefoon
-      nl_phone_report: bel 0900-8844. Meestal krijgt u later een telefoongesprekafspraak,
-        waarna u de informatie aan de politie doorgeeft
-      nl_website_link_text: op deze plitie.nl webpagina
     theft_alerts:
       new:
         best_value: Beste aanbieding
@@ -5455,8 +5421,6 @@ nl:
           stolen_at: 'Gestolen bij:'
           stolen_from: 'Gestolen van:'
       finished_registration:
-        a_correctly_locked_bike: Een correct vergrendelde fiets. Het frame is vergrendeld
-          aan het fietsenrek en beide wielen zijn vastgezet.
         a_donation_will_prioritize_prefix: Een donatie zal
         a_donation_will_prioritize_suffix: En help ons uw fiets terug te bezorgen.
           Wij zijn een 501(c)(3) non-profitorganisatie en zijn afhankelijk van donaties
@@ -5619,17 +5583,22 @@ nl:
           not_real: Dat lijkt niet uw echte e-mailadres te zijn. Voer een e-mailadres
             in waarop u e-mails ontvangt.
           submit_anyway: Formulier toch verzenden
-        file_upload:
-          no_file_chosen: Geen bestand gekozen
-          take_picture: Maak een foto
-          upload: Uploaden
-          upload_failed: Uploaden mislukt
-          uploading: uploaden
         group:
           optional: optioneel
         turnstile:
           enable_javascript: Voor het verifiëren van dit e-mailadres is JavaScript
             vereist. Schakel het in en probeer het opnieuw, of gebruik een ander e-mailadres.
+        files:
+          picker:
+            no_file_chosen: Geen bestand gekozen
+            take_picture: Maak een foto
+            upload: Uploaden
+          upload:
+            upload_failed: Uploaden mislukt
+            uploading: uploaden
+          upload_multiple:
+            upload_failed: Uploaden mislukt
+            uploading: uploaden
       alerts:
         base:
           error: Fout
@@ -5649,6 +5618,17 @@ nl:
             one: "%{count}-fout verhinderde dat dit %{object_name} werd opgeslagen:"
             other: "%{count}-fouten hebben ervoor gezorgd dat %{object_name} niet
               kon worden opgeslagen:"
+      time_range:
+        from: uit
+        in_the_next_month: in de komende maand
+        in_the_next_week: volgende week
+        in_the_past_day: in de afgelopen dag
+        in_the_past_hour: in het afgelopen uur
+        in_the_past_month: in de afgelopen maand
+        in_the_past_week: in de afgelopen week
+        in_the_past_year: in het afgelopen jaar
+        now: nu
+        to: Naar
     atoms:
       serial:
         hidden: verborgen
@@ -5681,14 +5661,12 @@ nl:
           subject: Onderwerp
           to: Naar
           to_me: voor mij
-          you_to: jij naar
         threads_index:
           from: uit
           me: mij
           to: Naar
       org:
         bulk_import_error:
-          ascend: Stijg op
           ascend_unprocessable_html: Het bulkimportproces <span class="text-danger">is
             mislukt</span> omdat er geen organisatie is gevonden met de oplopende
             naam <strong>%{ascend_name}.</strong>
@@ -5702,7 +5680,6 @@ nl:
             toegewezen.
           fix_this_by: 'Los dit op door:'
           go_to_organizations_html: Ga naar %{link}
-          line: Lijn
           line_error: Regelfout
           line_errors: 'Regelfouten:'
           line_label: 'Lijn:'
@@ -5735,7 +5712,6 @@ nl:
             search_notes: Zoeknotities
             search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de
               eigenaar.
-            submit: Voorleggen
           settings:
             address: 'Adres:'
             all: Alle
@@ -5781,6 +5757,7 @@ nl:
             url_cell: URL
             vehicle: Registratie
             visible_columns: Zichtbare kolommen
+            acknowledgment_cell: Bevestiging van de registratieprocedure
           wrapper:
             e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
             matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
@@ -5809,15 +5786,11 @@ nl:
             all_statuses: Alle statussen
             cannot_update_with_kind: Dit record kan niet worden bijgewerkt met '{kind}'.
             hide_update: Update verbergen
-            impound_records: Inbeslagnamegegevens
-            interpreted_params: Geïnterpreteerde_parameters
             matching_impound_record:
               one: overeenkomend inbeslagname record
               other: overeenkomende inbeslagnamegegevens
             only_unregistered: Alleen niet-geregistreerde
             only_user_registered: Alleen geregistreerde gebruikers
-            pagy: Pagy
-            per_page: Per pagina
             status_records: "%{status} records"
             update_multiple_records: Meerdere records bijwerken
       register:
@@ -6187,8 +6160,8 @@ nl:
               map_hint: Verschuif de kaart zodat de speld de gewenste plek markeert.
               map_unavailable: De kaart kon niet worden geladen; de locatie was nog
                 steeds ingesteld via uw apparaat.
-              parking_notification_notes_html: "%{org_name} interne notities worden
-                <small>niet getoond aan de gebruiker</small>"
+              not_shown_to_user: niet aan de gebruiker getoond
+              parking_notification_notes: "%{org_name} interne notities"
             parking_notification_show:
               no_notifications: Geen parkeermeldingen voor deze %{bike_type}
               parking_notifications: Verlaten records
@@ -6239,35 +6212,19 @@ nl:
             share: Deel
             share_my_page: Deel mijn pagina
             audience_marketplace_preview: Voorbeeldweergave van de advertentie
+            nickname: 'bijnaam: %{name}'
           wrapper_org_admin:
             about_this_bike: Over dit %{bike_type}
             assign_sticker: Sticker toewijzen
-            audit: Audit van elektrische voertuigen
-            avery_exportable: Avery Exporteerbaar
-            claimed: beweerde
-            creation_source: Bron
-            creator: Schepper
-            credibility: Geloofwaardigheid
             edit: Bewerken
-            has_duplicate_serials: heeft dubbele serienummers
-            internal_notes: Interne notities
-            is_false: vals
-            is_true: waar
             link_sticker: Link sticker
-            no_duplicate_serials: geen dubbele serienummers
             no_other_registrations: Geen gevonden
-            no_registration_information: Geen registratiegegevens zichtbaar voor %{org_name}
-            not_audited: Niet gecontroleerd
             not_registered_message: Voor fietsen buiten uw organisatie is het niet
               mogelijk om contact op te nemen met de eigenaar. U kunt wel interne
               notities toevoegen.
             not_registered_title: Niet geregistreerd bij %{org_name}
-            note_by: Opmerking van %{user}
-            notes_placeholder: Nieuwe interne notitie — je vorige notities blijven
-              in dit gesprek bewaard.
             org_can_edit: "%{org_name} kan deze %{bike_type} bewerken"
             org_can_edit_sub: Ook nadat %{bike_type} is geclaimd.
-            organization_registered: Organisatie
             other_registrations: Andere registraties door deze gebruiker
             other_registrations_count_html: "%{count} andere registraties"
             owner_access: Eigenaar & toegang
@@ -6275,10 +6232,6 @@ nl:
             owner_name: Naam
             owner_phone: Telefoon
             photo_archive: Fotoarchief
-            post_note: Post-notitie
-            posts_as: Berichten als %{user}
-            registration_information: Registratiegegevens
-            registration_number: Fietsindexregistratie
             restricted_message: De contactgegevens van de eigenaar zijn beschikbaar
               voor de administratie en het personeel. U kunt notities toevoegen en
               een inbeslagname aanvragen.
@@ -6286,8 +6239,6 @@ nl:
             role_limited: Beperkt
             role_staff: Personeel
             showing_recent: De meest recente %{count} weergeven
-            sticker: Sticker
-            sticker_claimed: beweerde
             sticker_code: Stickercode
             unregistered_owner: Deze %{bike_type} is niet geregistreerd bij een gebruiker.
               Het is toegevoegd om parkeermeldingen te volgen.
@@ -6304,10 +6255,38 @@ nl:
             price_is_firm_true: prijs is vast
             still_for_sale_at: Nog steeds te koop bij
             this_bike_is_for_sale: Dit %{bike_type} is te koop
+          registration_information:
+            acknowledged_html: Bevestigd %{time}
+            audit: Audit van elektrische voertuigen
+            avery_exportable: Avery Exporteerbaar
+            claimed: beweerde
+            creation_source: Bron
+            creator: Schepper
+            credibility: Geloofwaardigheid
+            is_false: vals
+            is_true: waar
+            link_sticker: Link sticker
+            no_registration_information: Geen registratiegegevens zichtbaar voor %{org_name}
+            not_audited: Niet gecontroleerd
+            organization_registered: Organisatie
+            registration_information: Registratiegegevens
+            registration_sequence: Registratievolgorde
+            sticker: Sticker
+            sticker_claimed: beweerde
+          internal_notes:
+            current_note: Huidige notitie
+            deleted_user: een verwijderde gebruiker
+            internal_notes: Interne notities
+            most_recent_update_by: meest recente update door %{user}
+            note_by: Opmerking van %{user}
+            post_note: Post-notitie
+            update_hint: Je plaatst je bericht als %{user} — de geschiedenis van je
+              wijzigingen is hierboven zichtbaar.
+            update_note: Update-notitie
+            updated_by: Bijgewerkt door %{user}
       search:
         everything_combobox:
           made_by: gemaakt door
-          only_for: alleen voor
           query_items_description: Zoekbeschrijvingen combobox
           search_descriptions: Zoek beschrijvingen
           search_for: Zoeken naar
@@ -6322,7 +6301,6 @@ nl:
           price_minimum: Minimumprijs
           search_for_primary_activity: Zoek primair activiteitstype
           search_for_serial_number: Zoek naar framenummer
-          submit: Voorleggen
         kind_select_fields:
           marketplace_scope_for_sale: Overal te koop
           marketplace_scope_for_sale_proximity: Te koop in zoekgebied
@@ -6340,7 +6318,6 @@ nl:
           thumbnail_view: Bekijken als miniaturen
       search_results:
         bike_box:
-          deleted: Verwijderd
           ended_at: Einde
           location: Plaats
           not_applicable: Niet van toepassing
@@ -6455,6 +6432,41 @@ nl:
               u een link op in het onderstaande veld
             write_a_message: Schrijf een bericht
             zipcode: Postcode
+        stolen_checklist:
+          a_photo_of_your_bike_type: een foto van je %{bike_type}
+          add: Toevoegen
+          add_bike_link_to_your_theft_report_html: Voeg %{bike_link} toe aan uw diefstalrapport
+          add_serial_number: Voeg framenummer toe
+          bike_index_does_this: "(Bike Index doet dit wanneer u uw politierapportnummer
+            invoert)"
+          contact_seller: KRITIEK - neem contact op met wie u de fiets hebt gekocht
+            en kijk of zij deze hebben
+          facebook_instagram_etc: "(Facebook, Instagram, enz.)"
+          leads_online: LeadsOnline
+          leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
+          list_bike_type_on_bike_index: Lijst %{bike_type} op Bike Index
+          location_where_the_theft_occurred: locatie waar de diefstal plaatsvond
+          nl_digid_required: "(DigiD vereist)"
+          nl_file_police_report: Dien een politierapport in!
+          nl_online: Online
+          nl_person: Persoonlijk
+          nl_person_report: Zoeken naar het dichtstbijzijnde politiebureau,
+          nl_phone: Per telefoon
+          nl_phone_report: bel 0900-8844. Meestal krijgt u later een telefoongesprekafspraak,
+            waarna u de informatie aan de politie doorgeeft
+          nl_website_link_text: op deze plitie.nl webpagina
+          promoted_stolen_bike_alerts: Gepromoveerde fietswaarschuwingen
+          push_bike_info_to: Push fietsinfo naar
+          push_bike_info_to_law_enforcement: Push-fietsinformatie naar wetshandhavingsdatabases
+            (Bike Index doet dit wanneer u uw politierapportnummer invoert)
+          report_theft_html: Diefstal op fietsindex melden, waaronder %{edit_bike_link}
+          requires_a_serial_number: vereist een framenummer
+          share_on_twitter: Deel op Twitter (Bike Index doet dit zodra we uw vermelding
+            hebben bekeken)
+          share_widely_on_your_personal_social: Deel veel op uw persoonlijke sociale
+            media
+          supercharge_sharing_on_facebook: Superchar delen op Facebook met Bike Index
+          your_police_report: uw politierapportnummer
       homepage:
         for_buttons:
           bike_shops: Fietsenwinkels
@@ -6502,7 +6514,6 @@ nl:
           strava_bikes_connected: Strava-fietsen gekoppeld aan Bike Index-fietsen
           strava_connected_pending: Verbonden met Strava. De synchronisatie start
             binnenkort.
-          strava_integration: Strava-integratie
           sync_error: Synchronisatiefout
           sync_error_description: Er is een fout opgetreden bij het synchroniseren
             van je Strava-activiteiten. Probeer de verbinding te verbreken en opnieuw
@@ -6600,7 +6611,6 @@ nl:
           additional_features_html: Bike Index biedt extra functies voor geverifieerde
             wetshandhavingsorganisaties. Neem contact op met %{email_link} om ze ingeschakeld
             te krijgen.
-          admin_panel: Admin panel
           how_integration_works: hoe de integratie werkt
           integrate_bike_index_with_ascend: Integreer Bike Index met Ascend
           integrate_bike_index_with_lightspeed: Integreer Bike Index met Lightspeed

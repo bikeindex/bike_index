@@ -119,6 +119,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       get "#{base_url}/#{parking_notification.to_param}"
       expect(response.status).to eq(200)
       expect(response).to render_template :show
+      expect(response.body).to include('data-registrations--show--map-latitude-value="40.7143528"')
+      expect(response.body).to_not match("maps.googleapis.com")
     end
   end
 

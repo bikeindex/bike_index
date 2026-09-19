@@ -4,10 +4,7 @@
   = render(UI::Header::Component.new) do
     Parking Notification
     - if @parking_notification.unregistered_bike
-      %small.text-warning
-        for
-        %em
-          unregistered #{@bike.type}
+      = render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_status: "unregistered"))
 
 = render partial: "repeated_updates_information" # Render information about the result of create_and_send_repeats
 

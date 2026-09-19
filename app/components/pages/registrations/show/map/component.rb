@@ -5,7 +5,7 @@ module Pages
     module Show
       module Map
         # A MapLibre map centered on a location. Marks it with a translucent circle
-        # (an approximate area) or, when point: is set, a dot at the exact spot.
+        # (an approximate area) or, when point: is set, a pin at the exact spot.
         # The registrations--show--map Stimulus controller lazy-loads MapLibre GL.
         class Component < ApplicationComponent
           def initialize(latitude:, longitude:, precise: false, point: false)

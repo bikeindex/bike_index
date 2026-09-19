@@ -4,8 +4,6 @@ module Atoms
   module Admin
     module PaginationWithCount
       class Component < ApplicationComponent
-        include GraphingHelper # for humanized_time_range
-
         def initialize(collection:, index:, count: nil, count_detail: nil, skip_total: false,
           viewing: nil, time_range_column: nil)
           @collection = collection

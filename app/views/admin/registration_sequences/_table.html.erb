@@ -1,57 +1,30 @@
-<% render_sortable ||= false %>
+<%# locals: (collection:, render_sortable: false) %>
 
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered table-sm">
-    <thead class="thead-light">
-      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", label: "Created", lower_right: ->(registration_sequence) { registration_sequence.id }) do |registration_sequence| %>
+    <%= link_to render(UI::Time::Component.new(time: registration_sequence.created_at)),
+      admin_registration_sequence_path(registration_sequence) %>
+  <% end %>
 
-      <th class="small">
-        <%= sortable "updated_at", render_sortable: render_sortable %>
-      </th>
+  <% table.column(sortable: "updated_at", label: "Updated") do |registration_sequence| %>
+    <small><%= render(UI::Time::Component.new(time: registration_sequence.updated_at, format: :localize_time_precise)) %></small>
+  <% end %>
 
-      <th>
-        <%= sortable "organization_id", "Organization", render_sortable: render_sortable %>
-      </th>
+  <% table.column(sortable: "organization_id", label: "Organization") do |registration_sequence| %>
+    <% if registration_sequence.template? %>
+      <span class="twless-strong"><%= registration_sequence.badge_name %></span>
+    <% else %>
+      <%= render(Pages::Admin::Organizations::Cell::Component.new(organization: registration_sequence.organization,
+        organization_id: registration_sequence.organization_id, render_search: true,
+        search_url: admin_registration_sequences_path(sort_state.search_params.to_h.merge(organization_id: registration_sequence.organization_id)))) %>
+    <% end %>
+  <% end %>
 
-      <th>Status</th>
-      <th>Pages</th>
-    </thead>
+  <% table.column(label: "Status") do |registration_sequence| %>
+    <%= registration_sequence.status.titleize %>
+  <% end %>
 
-    <tbody
-      data-controller="update-cached-sortable-links"
-      data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
-    >
-      <% collection.each do |registration_sequence| %>
-        <tr>
-          <td>
-            <div class="less-strong-hold">
-              <%= link_to admin_registration_sequence_path(registration_sequence) do %>
-                <%= render UI::Time::Component.new(time: registration_sequence.created_at) %>
-              <% end %>
-
-              <span class="less-strong-right d-none d-md-block">
-                <%= registration_sequence.id %>
-              </span>
-            </div>
-          </td>
-
-          <td>
-            <small class="localizeTime preciseTime">
-              <%= l registration_sequence.updated_at, format: :convert_time %>
-            </small>
-          </td>
-
-          <td>
-            <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: registration_sequence.organization, render_search: true) %>
-          </td>
-
-          <td><%= registration_sequence.status.titleize %></td>
-
-          <td>
-            <%= number_display(registration_sequence.registration_sequence_pages.size) %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column(label: "Pages") do |registration_sequence| %>
+    <%= number_display(registration_sequence.registration_sequence_pages.size) %>
+  <% end %>
+<% end %>

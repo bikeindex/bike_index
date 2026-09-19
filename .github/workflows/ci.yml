@@ -222,11 +222,12 @@ jobs:
       #   run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
       # Checkout persists this App token (below) as the git creds so the sync
       # branch is pushed as the App — only a non-default-token push fires
-      # `on: push`, which is what attaches the required checks to the PR.
+      # `on: push`, which is what attaches the required checks to the PR. The sync
+      # branch mints it too — its own run pushes further drift onto the branch.
       # Falls back to default creds until the App secrets exist.
       - name: Mint translations-sync token
         id: translations_token
-        if: matrix.ci_node_index == 1 && github.ref == 'refs/heads/main' && env.TRANSLATIONS_SYNC_APP_ID != ''
+        if: matrix.ci_node_index == 1 && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/translations-sync-')) && env.TRANSLATIONS_SYNC_APP_ID != ''
         uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
@@ -259,7 +260,7 @@ jobs:
           su postgres -c "$pgbin/pg_ctl -D /pgdata -l /tmp/postgres.log -w -o '-c listen_addresses=127.0.0.1 -c fsync=off -c full_page_writes=off -c synchronous_commit=off' start"
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
-      - name: Sync translations (only on main by default)
+      - name: Sync translations (main and open sync branches)
         if: matrix.ci_node_index == 1
         env:
           GH_TOKEN: ${{ steps.translations_token.outputs.token || github.token }}

@@ -8,7 +8,7 @@ description: >-
   typeahead/autocomplete is `UI::Forms::Combobox`, never hand-rolled
   markup), that **helpers are deprecated — render a view component
   taking full keyword arguments instead of adding or extending one**,
-  ViewComponent rules (keyword arguments, instance variables,
+  ViewComponent rules (when to write a partial instead, keyword arguments, instance variables,
   `helpers.` prefix in templates), and `UI::Time::Component` for every
   date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
@@ -79,7 +79,7 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 Four of those carry a rule beyond "use the component":
 
 - **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.
-- **A `UI::Forms::*` field gets its label from `UI::Forms::Group`** — render it inside a `Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, `TextEditor`, and `FileUpload`, whose own `Upload` button is a second label for the same input and audits clean beside `Group`'s (`spec/components/ui/forms/group/component_system_spec.rb`) — never drop `Group` for a bare `<label>` to avoid it. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
+- **A `UI::Forms::*` field gets its label from `UI::Forms::Group`** — render it inside a `Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, `TextEditor`, and `Files::Upload`, whose own `Upload` button is a second label for the same input and audits clean beside `Group`'s (`spec/components/ui/forms/group/component_system_spec.rb`) — never drop `Group` for a bare `<label>` to avoid it. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
 - **Every typeahead / autocomplete goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. `spec/components/ui/forms/combobox` shows how to invoke it.
 - **Every chart goes through `UI::Chart::Component`** — chartkick's `column_chart`/`line_chart`/`pie_chart` helpers are pinned `preload: false` and fetched by the component's `ui--chart` controller, so a bare helper call renders the placeholder and nothing else. Pass `kind:` for a line or pie. A page with no Stimulus (`layout: false`) loads them itself: `app/views/welcome/bike_creation_graph.html.erb`.
 
@@ -124,6 +124,10 @@ searched from source — a hook with no consumer in `app/` is routinely live. It
 `$(`— and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
 that binds `#infoCheck`. So removing an id silently disables behaviour, sometimes behaviour attached
 to another id entirely.
+Grep for what a module *assigns*, not only the hooks it binds — a guarded init publishes globals and
+its callers don't re-check the guard. `#timeSelectionBtnGroup` gates `window.periodSelector`, which
+`binxAppOrgParkingNotificationMapping.urlParamsForOpts` calls regardless. No spec catches it; a
+converted page's `browser_console_messages` does.
 
 - Zero consumers: delete it, don't rename it.
 - Consumers exist: either update them, or leave the hook in place — the consumers are the *reason* it earns its spot in the markup.
@@ -143,7 +147,7 @@ Bundle only what's cohesive — one subject, assembled in one place. `IndexState
 
 This project uses the ViewComponent gem to render components.
 
-- Prefer view components to partials — **unless the `component.rb` would hold no Ruby beyond `initialize` assigning its arguments to ivars, and fewer than 3 callers render it.** Then it's a partial: the class buys nothing, and the arguments are locals the template already has. A `UI::Table` conversion lands here often, since the cell blocks are `instance_exec`'d — a partial's locals survive that, so it needs none of the local-aliasing preamble a component template does. Reach for the component once there's logic to name, a `MARKUP_DIGEST`, or a third caller.
+- **Before creating a component, check it earns its class.** If its `component.rb` would hold nothing but `initialize` assigning arguments to ivars, and fewer than 3 callers render it, write a partial instead, with `<%# locals: (…) %>` at the top. An admin index table on `UI::Table` is the usual case: `admin/strava_gears/_table.html.erb` is the pattern, and `Pages::Admin::IndexSkeleton` renders the `_table` partial without a `table_view:`. A component earns its class with logic to name, a cache key to build, or a third caller; past that bar, prefer components to partials.
 - **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
 - View components must initialize with keyword arguments. Everything the component needs must be passed in explicitly by the caller — never reach into controller state from inside a component (e.g. `controller.instance_variable_get(:@bike)`). If the component needs `@bike`, the caller renders `Component.new(bike: @bike)`.
@@ -151,10 +155,13 @@ This project uses the ViewComponent gem to render components.
 - In ViewComponent templates, use the `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`) — a legacy bridge, and a sign the helper wants to be a component.
   - Rule of thumb: try the bare call first. Only add `helpers.` if it fails with `NoMethodError` — route helpers (`new_bike_path`) and ActionView tag/url builders (`tag.span`, `content_tag`, `link_to`) are mixed into `ViewComponent::Base` directly, so they don't need it.
 - **Never nest a component inside a folder that already holds a `component.rb`.** Each component lives in `app/components/<path>/component.rb` (and `spec/components/<path>/component_spec.rb`); siblings go in sibling folders, not subfolders. If you have `pages/search/everything_combobox/component.rb` and need a related component, place it at `pages/search/everything_combobox_options/component.rb` (module `Pages::Search::EverythingComboboxOptions`), not `pages/search/everything_combobox/options/component.rb`.
-- **Run `bin/update_component_digests` after editing markup that a cached component renders**, rather than computing a digest by hand. Components with a `MARKUP_DIGEST` (`SharedBlocks::Footer`, `SharedBlocks::Navbar::Wrapper`) fold it into their fragment cache key, and it follows `render X::Component` transitively — so editing any component they render, however far down, moves theirs too. It hashes each of those components' *paths* alongside their contents, so moving or renaming one stales every digest above it even though the markup is byte-identical. The `cached_markup_digest` shared example is what catches a stale one.
+- **Cached markup has no digest to maintain.** `ApplicationComponent` includes `ViewComponent::ExperimentallyCacheable`, so a `cache` block moves when anything it renders changes.
+- **A component that builds its own `cache_key` includes `self.class.cache_digest`** — `SharedBlocks::Footer` is the pattern.
+- **A component not rendered as a literal constant after `render` needs a `# Template Dependency: Full::Class::Component` line** in the component that uses it — `render(inner_component)`, a collection, or a constant read all count. `SharedBlocks::Navbar::Wrapper` is the pattern; `spec/components/application_component_spec.rb` fails on a missing or stale one.
+- **`skip_digest: true` and components outside `ApplicationComponent` bypass the digest.** A `skip_digest` key carries the component's `cache_digest` itself — `welcome/index.html.erb` is the pattern.
 - **Change a component's signature, then open its `component_preview.rb`** — nothing renders previews in the suite, so a stale one raises `ArgumentError: unknown keyword` on its Lookbook page with the whole suite green. `curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/rails/view_components/<path>/component/<scenario>"` is the check.
 - **A `UI::Table` cell block is `instance_exec`'d against the component.** Inside `table.column ... do`, bare calls and `@ivar`s resolve on `UI::Table::Component`, not the view. A bare call raises, but **an `@ivar` fails silently** — it reads `nil`, or worse, an identically-named ivar the table happens to hold. Reach state through the readers the table exposes (`sort_state.search_params`, not `sortable_search_params`), and for anything else assign a local above the block, the way `Pages::Org::ImpoundRecords::Table` carries `current_organization` and `current_user`. Above the `UI::Table::Component.new` block the view's own helpers work; rewriting those too is churn.
-- **A component that `include`s a helper is coupled to whatever ivars that helper reads.** `GraphingHelper#humanized_time_range` reads `@period` off the object it's mixed into, so moving that ivar out of the component silently returns nil rather than failing. Pass the value as an argument when converting a component to explicit arguments.
+- **A component that `include`s a helper is coupled to whatever ivars that helper reads.** `GraphingHelper#time_range_counts` falls back to `@time_range` off the object it's mixed into, so moving that ivar out of the component silently returns nil rather than failing. Pass the value as an argument when converting a component to explicit arguments.
 - **Moving a view into a component turns its locals into methods.** A `<% x = … %>` computed once per template becomes a method run once per *call site* — which is how a single pluck becomes one per table row. Memoize anything that queries as you move it.
 - **Converting a partial — to a component, or from haml to ERB — is a faithful move, not a cleanup.** Carry the markup over verbatim, including comments and commented-out code: those are often a deliberate stash (a link temporarily disabled, a snippet someone expects to restore). The only changes a conversion introduces are the ones the move requires — `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it. Dead code worth removing goes in its own commit.
 
@@ -202,7 +209,7 @@ rest of the table's state. Reach it through the reader, not the bare helper:
 
 `application_standalone.js` is a plain `<script src>` in the admin layout, and everything it
 sets up binds once inside one `$(document).ready` gated on `#admin-content` — the per-page
-select, the selectize filters, the nested location fields, the uppy uploader. Turbo Drive
+select, the selectize filters, the nested location fields. Turbo Drive
 doesn't re-execute an unchanged script tag, and a back/forward restoration hands back a
 *clone* of its snapshot, so that markup comes back looking live with nothing bound to it.
 
@@ -212,8 +219,8 @@ And it's the page you navigate *away from* that breaks, not just the one you lan
 
 So a screen carrying any of it passes `turbo: false` — `Pages::Admin::Headers::Tabs` takes it, and
 `Pages::Admin::Organizations::CustomLayouts::Form::Wrapper` is the one that does. Before opting a new section in,
-check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields`,
-`#multipleUserSelect` and `.UppyForm`.
+check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields` and
+`#multipleUserSelect`.
 
 ## Screenshots
 

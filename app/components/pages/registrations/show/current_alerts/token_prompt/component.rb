@@ -8,6 +8,9 @@ module Pages
           # Picks the one prompt a request's tokens have earned, and renders it as the
           # dialog or as the alert in the page body
           class Component < ApplicationComponent
+            # Template Dependency: Pages::Registrations::Show::CurrentAlerts::ClaimInvitation::Component
+            # Template Dependency: Pages::Registrations::Show::CurrentAlerts::NotificationToken::Component
+            # Template Dependency: Pages::Registrations::Show::CurrentAlerts::RecoveryPrompt::Component
             # Only one, like the legacy overlays — stacked dialogs would bury each other.
             # Recovery beats a notification, and claiming is the fallback
             def self.prompt_for(bike:, current_user: nil, current_alerts: {}, variant: :modal)

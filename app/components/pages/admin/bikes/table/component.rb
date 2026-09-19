@@ -9,9 +9,6 @@ module Pages
         # render_sortable to enable sort links, render_multi_check for the delete
         # checkboxes, and skip_user to drop the owner column.
         class Component < ApplicationComponent
-          # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-          MARKUP_DIGEST = "8e4644d975b9"
-
           def initialize(bikes:, sort_state: ComponentStructs::SortState.new, display_dev_info: false, no_show_header: false,
             show_serial: false, skip_manufacturer_link: false, render_sortable: false,
             skip_user: false, render_multi_check: false)
@@ -24,12 +21,6 @@ module Pages
             @render_sortable = render_sortable
             @skip_user = skip_user
             @render_multi_check = render_multi_check
-          end
-
-          private
-
-          def cache_key
-            "admin-bikes-#{MARKUP_DIGEST}"
           end
         end
       end

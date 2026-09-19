@@ -5,7 +5,7 @@ module ComponentStructs
   # search. Everything around the panel Pages::Org::Search::Settings renders reads the same
   # values, so it's built once and passed whole.
   #
-  # Its copy sits in that panel's sidecar — the only home a MARKUP_DIGEST reaches.
+  # Its copy sits in that panel's sidecar — the only home the component's cache digest reaches.
   class OrgSearchSettings
     TRANSLATION_SCOPE = %i[components pages org search settings].freeze
 
@@ -30,6 +30,7 @@ module ComponentStructs
       impound_id_cell
       impounded_cell
       avery_cell
+      acknowledgment_cell
       cycle_type_cell
       propulsion_type_cell
       status_cell
@@ -95,7 +96,8 @@ module ComponentStructs
         *additional_registration_fields.map { |field| "#{field}_cell" },
         ("notes_cell" if @organization.enabled?("registration_notes")),
         *(%w[impound_id_cell impounded_cell] if @organization.enabled?("impound_bikes")),
-        ("avery_cell" if @organization.enabled?("avery_export"))
+        ("avery_cell" if @organization.enabled?("avery_export")),
+        ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
       ].compact.uniq.sort_by { |cell| column_renames[cell.to_sym] }
     end
 

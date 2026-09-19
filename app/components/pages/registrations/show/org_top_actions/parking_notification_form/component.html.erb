@@ -38,11 +38,12 @@
           class="tw:mb-4"
           data-registrations--show--parking-notification-form-target="locationSection"
         >
-          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", selected: "current", entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}], data: {action: "registrations--show--parking-notification-form#selectLocationMode", "registrations--show--parking-notification-form-target": "locationMode"})) %>
+          <div class="tw:mb-3">
+            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", kind: :toggle, selected: "current", entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}], data: {action: "registrations--show--parking-notification-form#selectLocationMode", "registrations--show--parking-notification-form-target": "locationMode"})) %>
+          </div>
 
           <div
             data-registrations--show--parking-notification-form-target="mapSection"
-            class="tw:mt-3"
           >
             <%# The map and the hint for using it stand or fall together %>
             <div
@@ -59,17 +60,13 @@
                   tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900
                 "
               >
-                <%# The pin lives inside the map so it comes along into fullscreen %>
+                <%# The target lives inside the map so it comes along into fullscreen %>
                 <div
                   data-registrations--show--parking-notification-form-target="map"
                   class="tw:relative tw:h-full tw:w-full"
                 >
-                  <%#
-                    A fixed pin marks the map center; moving the map places the pin.
-                    Its tip is at 21/24 of the viewBox, so shift by that much (not the
-                    full height) to land the tip — not the empty box below it — on centre
-                  %>
-                  <%= helpers.inline_svg_tag("kelsey/registration_show/map-pin.svg", class: "tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-1/2 tw:z-10 tw:h-9 tw:w-9 tw:-translate-x-1/2 tw:-translate-y-[87.5%] tw:text-red-600 tw:drop-shadow-md", aria_hidden: true) %>
+                  <%# A fixed target marks the map center; moving the map places it %>
+                  <%= helpers.inline_svg_tag("kelsey/registration_show/map-target.svg", class: "tw:absolute tw:top-1/2 tw:left-1/2 tw:z-10 tw:h-12 tw:w-12 tw:-translate-1/2 tw:drop-shadow-md", aria_hidden: true) %>
                 </div>
               </div>
 
@@ -89,7 +86,7 @@
 
           <div
             data-registrations--show--parking-notification-form-target="addressGroup"
-            class="tw:mt-3 tw:hidden"
+            class="tw:hidden"
           >
             <%= form.hidden_field :use_entered_address, value: false, data: {"registrations--show--parking-notification-form-target": "useEnteredAddress"} %>
 
@@ -109,11 +106,13 @@
 
         <div class="tw:mb-4">
           <p class="twlabel">Photo</p>
-          <%= render(UI::Forms::FileUpload::Component.new(form_builder: form, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
+          <%= render(UI::Forms::Files::Upload::Component.new(form_builder: form, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
           <%= form.hidden_field :image_cache %>
         </div>
 
-        <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :internal_notes, kind: :text_area, label_text: translation(".parking_notification_notes_html", org_name: @organization.short_name), html_options: {rows: 2})) %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :internal_notes, kind: :text_area, label_text: translation(".parking_notification_notes", org_name: @organization.short_name), html_options: {rows: 2})) do |group| %>
+          <% group.with_label_note { translation(".not_shown_to_user") } %>
+        <% end %>
 
         <%= render(UI::Button::Component.new(text: "Create parking notification", color: :primary, type: "submit", disabled: true, data: {"registrations--show--parking-notification-form-target": "submit"})) %>
       <% end %>

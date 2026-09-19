@@ -1,0 +1,24 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          registration_information:
+            acknowledged_html: Acknowledged %{time}
+            audit: E-Vehicle Audit
+            avery_exportable: Avery Exportable
+            claimed: Claimed
+            creation_source: Source
+            creator: Creator
+            credibility: Credibility
+            is_false: 'false'
+            is_true: 'true'
+            link_sticker: Link sticker
+            no_registration_information: No registration information visible to %{org_name}
+            not_audited: Not audited
+            organization_registered: Organization
+            registration_information: Registration information
+            registration_sequence: Registration sequence
+            sticker: Sticker
+            sticker_claimed: claimed

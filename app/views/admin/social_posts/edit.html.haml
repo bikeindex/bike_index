@@ -12,7 +12,7 @@
           = image_tag(@social_post.posted_image)
       - else
         = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo", wrapper_class: "form-group")) do
-          = render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
+          = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
           - if @social_post.image.present?
             .form-check
               = f.check_box :remove_image, class: "form-check-input"

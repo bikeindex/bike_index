@@ -4,32 +4,32 @@ module UI
   module Forms
     module RadioButtonGroup
       class Component < ApplicationComponent
-        # Only checked and focus are restated, since those hang off the radio
-        # rather than the <label> the chip classes land on.
-        CHIP_CLASSES = [
-          UI::ButtonGroup::Component::CHIP_CLASSES,
-          "tw:mb-0", # the chip is a <label>, which legacy CSS gives a bottom margin
-          "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
-          # A <label> is never :disabled — these carry the specificity to beat the hover
-          # they override, which is guarded not-disabled:not-aria-disabled:
-          "tw:has-[:checked]:not-disabled:not-aria-disabled:hover:bg-purple-500 tw:has-[:checked]:not-disabled:not-aria-disabled:hover:border-purple-500",
-          "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40",
+        # Template Dependency: UI::ButtonGroup::Component
+        # A <label> never takes focus, so the ring hangs off the radio inside it
+        LABEL_CLASSES = [
+          "tw:mb-0", # a <label>, which legacy CSS gives a bottom margin
           "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze
 
+        CHIP_CLASSES = [UI::ButtonGroup::Component::CHIP_CLASSES, LABEL_CLASSES].join(" ").freeze
+
+        SEGMENT_CLASSES = [UI::ButtonGroup::Component::SEGMENT_CLASSES, LABEL_CLASSES].join(" ").freeze
+
         # full_width: chips share the row evenly (the frame-size XS-XL selector),
         # rather than each taking only the width of its label.
-        def initialize(name:, entries:, selected: nil, form: nil, full_width: false, data: {})
+        # kind: :toggle renders UI::ButtonGroup's segmented control, with a radio per segment
+        def initialize(name:, entries:, selected: nil, form: nil, full_width: false, kind: :button, data: {})
+          @group_classes = UI::ButtonGroup::Component.group_classes(kind:, full_width:)
+          @label_classes = (kind == :toggle) ? SEGMENT_CLASSES : CHIP_CLASSES
           @name = name
           @entries = entries
           @selected = selected.to_s
           @form = form
-          @full_width = full_width
           @data = data
         end
 
         def call
-          tag.div(class: UI::ButtonGroup::Component.layout_classes(full_width: @full_width)) do
+          tag.div(class: @group_classes) do
             safe_join(@entries.map { |option| chip(option) })
           end
         end
@@ -39,7 +39,7 @@ module UI
         def chip(option)
           value = option[:value].to_s
 
-          tag.label(class: CHIP_CLASSES) do
+          tag.label(class: @label_classes) do
             radio_button_tag(@name, value, value == @selected, class: "tw:sr-only", form: @form, data: @data) +
               tag.span(option[:label].html_safe)
           end

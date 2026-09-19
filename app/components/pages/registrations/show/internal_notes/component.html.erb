@@ -1,0 +1,38 @@
+<%= render(UI::Card::Component.new) do %>
+  <h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">
+    <%= translation(".internal_notes") %>
+  </h2>
+
+  <% @previous_notes.each_with_index do |note, index| %>
+    <div class="tw:mt-3 tw:border-b tw:border-gray-100 tw:pb-3 tw:dark:border-gray-800">
+      <p class="tw:text-sm"><%= note.body %></p>
+
+      <p class="twless-strong tw:mt-1 tw:text-xs">
+        <% if index.zero? %>
+          <%= translation(".note_by", user: author_name(note)) %>
+        <% else %>
+          <%= translation(".updated_by", user: author_name(note)) %>
+        <% end %>
+
+        <%= render(UI::Time::Component.new(time: note.updated_at)) %>
+      </p>
+    </div>
+  <% end %>
+
+  <%= form_with(url: @url, method: :patch, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |f| %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area, label_text: translation(".current_note"), optional_badge: false, wrapper_class: nil, html_options: {value: @note&.body, rows: 3, class: "tw:w-full"})) do |group| %>
+      <% if @note&.body.present? %>
+        <% group.with_label_note do %>
+          <%= translation(".most_recent_update_by", user: author_name(@note)) %>
+          <%= render(UI::Time::Component.new(time: @note.updated_at, preposition: true)) %>
+        <% end %>
+      <% end %>
+
+      <% group.with_helper_text { translation(".update_hint", user: @current_user.display_name) } %>
+    <% end %>
+
+    <div class="tw:mt-2 tw:flex tw:justify-end">
+      <%= f.submit @note ? translation(".update_note") : translation(".post_note"), class: UI::Button::Component.build_classes(color: :primary, size: :sm) %>
+    </div>
+  <% end %>
+<% end %>

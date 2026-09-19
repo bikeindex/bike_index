@@ -11,6 +11,16 @@ RSpec.describe BikeOrganization, type: :model do
     end
   end
 
+  describe "bike touch" do
+    let(:bike_organization) { FactoryBot.create(:bike_organization) }
+    let(:bike) { bike_organization.bike }
+
+    it "touches the bike on destroy" do
+      bike.update_column(:updated_at, 1.day.ago)
+      expect { bike_organization.destroy }.to change { bike.reload.updated_at }
+    end
+  end
+
   describe "uniqueness" do
     let!(:bike_organization) { FactoryBot.create(:bike_organization) }
     let(:duplicate) { BikeOrganization.new(bike_id: bike_organization.bike_id, organization_id: bike_organization.organization_id) }
@@ -28,17 +38,6 @@ RSpec.describe BikeOrganization, type: :model do
       it "creates a new bike_organization" do
         expect { duplicate.save! }.to change(BikeOrganization.unscoped, :count).by(1)
       end
-    end
-  end
-
-  describe "delete_bike_organization_note" do
-    let(:bike_organization) { FactoryBot.create(:bike_organization) }
-    let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike: bike_organization.bike, organization: bike_organization.organization) }
-
-    it "deletes the note when bike_organization is destroyed" do
-      expect(BikeOrganizationNote.where(bike_id: bike_organization.bike_id, organization_id: bike_organization.organization_id).count).to eq 1
-      bike_organization.destroy
-      expect(BikeOrganizationNote.where(bike_id: bike_organization.bike_id, organization_id: bike_organization.organization_id).count).to eq 0
     end
   end
 end

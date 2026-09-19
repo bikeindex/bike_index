@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :component do
-  it_behaves_like "cached_markup_digest"
-
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
@@ -53,7 +51,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
   context "with every column's feature enabled" do
     let(:enabled_feature_slugs) do
-      %w[bike_search avery_export bike_stickers impound_bikes registration_notes
+      %w[bike_search avery_export bike_stickers impound_bikes registration_notes registration_sequences
         reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
     end
     # The panel builds a checkbox per enabled_columns entry, and org--search-column-toggle
@@ -72,6 +70,48 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "E-vehicle (propulsion)")
       expect(component).to have_css("th.notes_cell", normalize_ws: true,
         exact_text: "#{organization.short_name} Registration Notes")
+    end
+  end
+
+  context "with reg_student_id enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search reg_student_id] }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+    before { bike.current_ownership.update(registration_info: {"student_id" => "JD_4821"}) }
+
+    it "renders the student ID as registered" do
+      expect(component).to have_css("td.reg_student_id_cell", exact_text: "JD_4821", normalize_ws: true)
+    end
+  end
+
+  context "with registration_sequences enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search registration_sequences] }
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
+    let(:unacknowledged_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
+    let(:bikes) { [bike, unacknowledged_bike] }
+    let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization:) }
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike:) }
+
+    it "renders when each bike was acknowledged" do
+      expect(component).to have_css("th.acknowledgment_cell", visible: :all, normalize_ws: true, exact_text: "Registration sequence acknowledgment")
+      expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
+    end
+
+    context "with a bike registered elsewhere" do
+      let(:other_bike) { FactoryBot.create(:bike, propulsion_type:) }
+      let(:bikes) { [other_bike] }
+      let(:propulsion_type) { "pedal-assist" }
+
+      it "renders the e-vehicle as hidden" do
+        expect(component).to have_css("td.acknowledgment_cell", text: "hidden, not registered")
+      end
+
+      context "that isn't an e-vehicle" do
+        let(:propulsion_type) { "foot-pedal" }
+
+        it "renders nothing" do
+          expect(component).to have_no_css("td.acknowledgment_cell", text: "hidden")
+        end
+      end
     end
   end
 
@@ -115,4 +155,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css(".reg_extra_registration_number_cell em.less-strong", text: hidden_text)
     end
   end
+
+  let(:cached_record) { bike }
+  it_behaves_like("cached_table_rows") { let(:row_cache_key) { "org-#{organization.id}-#{described_class.cache_digest}" } }
 end
