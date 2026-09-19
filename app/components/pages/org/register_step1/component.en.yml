@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    pages:
+      org:
+        register_step1:
+          go_back_to_old_view: Go back to the old view
+          separate_attestation: Registrant fills out the registration attestation
+            separately
+          single_page: Show registration in a single page
+          update: Update

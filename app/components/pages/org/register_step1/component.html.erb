@@ -8,19 +8,19 @@
       tw:dark:text-gray-100
     "
   >
-    <%= link_to "Go back to the old view", new_organization_bike_path(organization_id: @organization.to_param, old_view: true), class: "twlink" %>
+    <%= link_to translation(".go_back_to_old_view"), new_organization_bike_path(organization_id: @organization.to_param, old_view: true), class: "twlink" %>
   </p>
 
   <%= form_with(url: switches_path, method: :get, data: {turbo: false}) do %>
     <%= hidden_field_tag :register_settings, true %>
 
     <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: @single_page,
-        label: "Show registration in a single page") %>
+        label: translation(".single_page")) %>
 
     <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,
-        class_name: "tw:mt-2", label: "Registrant fills out the registration attestation separately") %>
+        class_name: "tw:mt-2", label: translation(".separate_attestation")) %>
 
-    <%= render UI::Button::Component.new(text: "Update", color: :secondary, size: :sm,
+    <%= render UI::Button::Component.new(text: translation(".update"), color: :secondary, size: :sm,
         type: "submit", html_class: "tw:mt-3") %>
   <% end %>
 </div>

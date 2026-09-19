@@ -429,16 +429,15 @@ module BikeServices
     # Every step the registration has reached, in order - each one opens the next, so the
     # flow stops at the first that hasn't been done
     def permitted_steps(b_param, sequence, steps)
-      single_page = steps.exclude?("2")
-      reached = steps.take_while { step_completed?(b_param, it, sequence:, single_page:) }.count
+      reached = steps.take_while { step_completed?(b_param, it, sequence:, steps:) }.count
       steps.first(reached + 1)
     end
 
     # Whether a step has been submitted with everything it asks for
-    def step_completed?(b_param, step, sequence:, single_page: false)
+    def step_completed?(b_param, step, sequence:, steps:)
       case step
-      # One page asks for both, so step 1 isn't done until it has step 2's details too
-      when "1" then single_page ? details_completed?(b_param) : b_param.manufacturer_id.present?
+      # With no step 2, step 1's page asks for its details too
+      when "1" then steps.include?("2") ? b_param.manufacturer_id.present? : details_completed?(b_param)
       when "2" then details_completed?(b_param)
       when "report" then report_completed?(b_param)
       when "review" then acknowledgment(b_param).present?
