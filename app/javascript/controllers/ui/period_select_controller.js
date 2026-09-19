@@ -4,25 +4,6 @@ import { Controller } from '@hotwired/stimulus'
 // non-period filters (e.g. search_email) survive — the form itself only carries
 // start_time_selector / end_time_selector, so a default GET would drop them.
 export default class extends Controller {
-  connect () {
-    document.addEventListener('turbo:frame-render', this.sync)
-  }
-
-  disconnect () {
-    document.removeEventListener('turbo:frame-render', this.sync)
-  }
-
-  // For buttons rendered outside the frame they navigate. A blank period is a search that
-  // didn't change it.
-  sync = () => {
-    const period = new URLSearchParams(window.location.search).get('period')
-    if (!period) return
-    this.element.querySelectorAll('[data-period]').forEach(button => {
-      button.dataset.active = String(button.dataset.period === period)
-      button.classList.toggle('tw:opacity-60', period === 'custom')
-    })
-  }
-
   submit (event) {
     event.preventDefault()
     const form = event.currentTarget
