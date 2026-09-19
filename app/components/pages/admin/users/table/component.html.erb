@@ -2,12 +2,6 @@
   <style>.deleted-cell {display: none !important;}</style>
 <% end %>
 
-<% unless @display_dev_info %>
-  <style>
-    .only-dev-visible {display: none !important;}
-  </style>
-<% end %>
-
 <%# prevent double borders %>
 <style>
   tbody td.only-dev-visible {border-top: 0px;}

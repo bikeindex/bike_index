@@ -1,9 +1,7 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<% display_dev_info = display_dev_info? %>
-
 <div class="pt-2">
-  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_bulk_import", display_dev_info]))) do |table| %>
+  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name("admin_bulk_import"))) do |table| %>
     <% table.column(sortable: "created_at") do |bulk_import| %>
       <%= link_to render(UI::Time::Component.new(time: bulk_import.created_at)), admin_bulk_import_url(bulk_import), class: "twlink" %>
 
@@ -19,14 +17,12 @@
 
       <% if bulk_import.timeout_failure? %>
         <em class="small">import failed to process</em>
-        <% if display_dev_info %>
-          <small class="only-dev-visible">still pending</small>
-        <% end %>
+        <small class="only-dev-visible">still pending</small>
       <% end %>
     <% end %>
 
     <% table.column(label: "Errors", header_classes: "tw:font-normal") do |bulk_import| %>
-      <%= render(Pages::Org::BulkImportError::Component.new(bulk_import:, short_display: true, in_admin: true, display_dev_info:)) %>
+      <%= render(Pages::Org::BulkImportError::Component.new(bulk_import:, short_display: true, in_admin: true, display_dev_info: true)) %>
     <% end %>
 
     <% table.column(sortable: "user_id", label: "Creator") do |bulk_import| %>

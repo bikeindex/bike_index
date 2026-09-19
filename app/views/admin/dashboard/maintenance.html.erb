@@ -30,7 +30,7 @@
 </h2>
 
 <% if @bikes.any? %>
-  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?) %>
+  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:) %>
 
   <div class="row justify-content-end">
     <div class="col-auto">
