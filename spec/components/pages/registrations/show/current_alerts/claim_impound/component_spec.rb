@@ -105,8 +105,7 @@ RSpec.describe Pages::Registrations::Show::CurrentAlerts::ClaimImpound::Componen
     end
   end
 
-  # display_impound_claim? matches the bike a claim was submitted *with*, which has
-  # no impound_record of its own
+  # The bike a claim was submitted *with* has no impound_record of its own
   context "viewing the stolen bike the claim was submitted with" do
     let(:stolen_record) { FactoryBot.create(:stolen_record, bike: FactoryBot.create(:bike, :with_ownership)) }
     let(:bike) { stolen_record.bike.reload }

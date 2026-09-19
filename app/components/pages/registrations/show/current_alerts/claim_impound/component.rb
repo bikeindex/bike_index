@@ -6,8 +6,8 @@ module Pages
       module CurrentAlerts
         module ClaimImpound
           # "Does this look like your bike?" — lets a non-owner open an impound claim
-          # against one of their stolen bikes, then shows that claim once it exists, on
-          # the stolen bike too. Mirrors the contact-owner card.
+          # against one of their stolen bikes, then shows that claim on either bike.
+          # Mirrors the contact-owner card.
           class Component < ApplicationComponent
             def initialize(bike:, current_user: nil, owner: false, organization: nil)
               @bike = bike
@@ -19,9 +19,9 @@ module Pages
             # An organization's staff panel isn't asking whether the bike is theirs
             def render?
               return false if @organization.present?
-              # A claim is opened with the claimant's own stolen bike, which the displayer
-              # hides from its owner
-              return submitting_impound_claim.present? if @owner
+              # The claimant owns the stolen bike they opened it with, which the displayer hides from them
+              return true if submitting_impound_claim.present?
+              return false if @owner
 
               BikeServices::Displayer.display_impound_claim?(@bike, @current_user)
             end
