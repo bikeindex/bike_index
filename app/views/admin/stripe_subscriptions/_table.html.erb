@@ -1,5 +1,8 @@
 <%# locals: (collection:, render_sortable: false) %>
 
+<%# A cell's own cache would digest UI::Table's template, not this one %>
+<% user_cell_cache = cache_fragment_name("user_cell") %>
+
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(stripe_subscription) { stripe_subscription.id }) do |stripe_subscription| %>
     <% if stripe_subscription.membership_id.present? %>
@@ -31,7 +34,7 @@
 
   <% table.column(sortable: "user_id") do |stripe_subscription| %>
     <% if stripe_subscription.user_id.present? %>
-      <% cache(stripe_subscription.user) do %>
+      <% cache([user_cell_cache, stripe_subscription.user], skip_digest: true) do %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: stripe_subscription.user, render_search: true) %>
       <% end %>
     <% else %>

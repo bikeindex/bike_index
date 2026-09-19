@@ -1,5 +1,8 @@
 <%# locals: (collection:, render_sortable: false, skip_marketplace_listing: false, truncate_length: 100) %>
 
+<%# A cell's own cache would digest UI::Table's template, not this one %>
+<% user_cell_cache = cache_fragment_name("user_cell") %>
+
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: (->(record) { tag.span(record.id, class: "only-dev-visible") } if display_dev_info?)) do |marketplace_message| %>
     <%= link_to admin_marketplace_message_path(marketplace_message), class: "twlink" do %>
@@ -41,7 +44,7 @@
   <% end %>
 
   <% table.column(sortable: "sender_id") do |marketplace_message| %>
-    <% cache(marketplace_message.sender) do %>
+    <% cache([user_cell_cache, marketplace_message.sender, render_sortable], skip_digest: true) do %>
       <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_message.sender, render_search: render_sortable) %>
     <% end %>
   <% end %>

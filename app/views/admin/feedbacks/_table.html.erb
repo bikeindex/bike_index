@@ -2,6 +2,9 @@
 
 <% render_kind_search = render_sortable && params[:search_kind].blank? %>
 
+<%# A cell's own cache would digest UI::Table's template, not this one %>
+<% user_cell_cache = cache_fragment_name("user_cell") %>
+
 <%= render(UI::Table::Component.new(records: feedbacks, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |feedback| %>
     <%= link_to admin_feedback_url(feedback), class: "twlink" do %>
@@ -11,7 +14,7 @@
 
   <% unless skip_user %>
     <% table.column(label: "User") do |feedback| %>
-      <% cache(feedback.user) do %>
+      <% cache([user_cell_cache, feedback.user, feedback.email, render_sortable], skip_digest: true) do %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, email: feedback.email, user: feedback.user, render_search: render_sortable) %>
       <% end %>
     <% end %>

@@ -1,5 +1,8 @@
 <%# locals: (memberships:, skip_user: false, render_sortable: false) %>
 
+<%# A cell's own cache would digest UI::Table's template, not this one %>
+<% user_cell_cache = cache_fragment_name("user_cell") %>
+
 <%= render(UI::Table::Component.new(records: memberships, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(membership) { membership.id }) do |membership| %>
     <%= link_to render(UI::Time::Component.new(time: membership.created_at)), admin_membership_url(membership), class: "twlink" %>
@@ -7,7 +10,7 @@
 
   <% unless skip_user %>
     <% table.column(sortable: "user_id") do |membership| %>
-      <% cache(membership.user) do %>
+      <% cache([user_cell_cache, membership.user_id, membership.user], skip_digest: true) do %>
         <%= render Pages::Admin::Users::Cell::Component.new(user: membership.user, user_id: membership.user_id) %>
       <% end %>
     <% end %>
@@ -30,7 +33,7 @@
       <%= link_to "Stripe", membership.stripe_admin_url, class: "twlink" %>
     <% else %>
       <div class="less-strong">
-        <% cache(membership.creator) do %>
+        <% cache([user_cell_cache, membership.creator_id, membership.creator], skip_digest: true) do %>
           <%= render Pages::Admin::Users::Cell::Component.new(user: membership.creator, user_id: membership.creator_id) %>
         <% end %>
       </div>

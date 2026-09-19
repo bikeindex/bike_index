@@ -2,6 +2,9 @@
 
 <% render_organization_search = params[:organization_id].blank? %>
 
+<%# A cell's own cache would digest UI::Table's template, not this one %>
+<% user_cell_cache = cache_fragment_name("user_cell") %>
+
 <%= render(UI::Table::Component.new(records: organization_roles, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(organization_role) { organization_role.id }) do |organization_role| %>
     <%= link_to render(UI::Time::Component.new(time: organization_role.created_at)), admin_organization_role_url(organization_role), class: "twlink" %>
@@ -9,7 +12,7 @@
 
   <% table.column(sortable: "invited_email", label: "Recipient") do |organization_role| %>
     <% if organization_role.user.present? %>
-      <% cache(organization_role.user) do %>
+      <% cache([user_cell_cache, organization_role.user], skip_digest: true) do %>
         <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.user) %>
       <% end %>
     <% else %>
@@ -29,7 +32,7 @@
 
   <% table.column(sortable: "sender_id", label: "Sender", header_classes: "tw:text-xs") do |organization_role| %>
     <% if organization_role.sender.present? %>
-      <% cache(organization_role.sender) do %>
+      <% cache([user_cell_cache, organization_role.sender], skip_digest: true) do %>
         <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.sender) %>
       <% end %>
     <% else %>
