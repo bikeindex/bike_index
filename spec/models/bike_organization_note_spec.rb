@@ -91,5 +91,15 @@ RSpec.describe BikeOrganizationNote, type: :model do
       expect(previous_notes.map(&:body)).to eq %w[First Third]
       expect(previous_notes.map(&:user)).to eq [user, other_user]
     end
+
+    # bikes#show, which renders them, runs under set_reading_role
+    it "reads under the reading role" do
+      BikeOrganizationNote.upsert(bike:, organization:, body: "First", user:)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Second", user:)
+      note = BikeOrganizationNote.last
+
+      previous_notes = ActiveRecord::Base.connected_to(role: :reading) { note.previous_notes }
+      expect(previous_notes.map(&:body)).to eq %w[First]
+    end
   end
 end
