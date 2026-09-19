@@ -56,8 +56,6 @@
   <% end %>
 
   <% table.column(label: "Helped", header_classes: "tw:font-normal", classes: "tw:text-center") do |recovery| %>
-    <%# Posted %>
-    <%# check_mark if recovery.recovery_posted %>
     <%= check_mark if recovery.index_helped_recovery %>
   <% end %>
 

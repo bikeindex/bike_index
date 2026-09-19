@@ -3,23 +3,19 @@
 <%# Handle cases where bike is user hidden or deleted %>
 <% rows = @stolen_records.map { |stolen_record| [stolen_record, stolen_record.bike || Bike.unscoped.find_id(stolen_record.bike_id)] } %>
 
-<% united_states = Country.united_states %>
-
 <%= render(UI::Table::Component.new(records: rows, render_sortable:, sort_state:)) do |table| %>
-  <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0", title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "tw:text-center") do |(stolen_record, _bike)| %>
+  <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0", title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "tw:text-center") do |(stolen_record)| %>
     <%= check_box_tag "sr_selected[#{stolen_record.id}]", stolen_record.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
   <% end %>
 
-  <% table.column(sortable: "created_at", label: "Stolen created") do |(stolen_record, _bike)| %>
+  <% table.column(sortable: "created_at", label: "Stolen created") do |(stolen_record)| %>
     <%= link_to edit_admin_stolen_bike_url(stolen_record, stolen_record_id: true), class: "twlink tw:text-xs" do %>
       <%= render UI::Time::Component.new(time: stolen_record.created_at) %>
     <% end %>
   <% end %>
 
-  <% table.column(sortable: "date_stolen", label: "Stolen at", classes: "tw:text-xs") do |(stolen_record, _bike)| %>
-    <% if stolen_record.date_stolen.present? %>
-      <%= render UI::Time::Component.new(time: stolen_record.date_stolen) %>
-    <% end %>
+  <% table.column(sortable: "date_stolen", label: "Stolen at", classes: "tw:text-xs") do |(stolen_record)| %>
+    <%= render UI::Time::Component.new(time: stolen_record.date_stolen) %>
   <% end %>
 
   <% table.column(label: "Bike info", header_classes: "tw:font-normal") do |(stolen_record, bike)| %>
@@ -38,13 +34,13 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Theft info", header_classes: "tw:font-normal", classes: "tw:w-1/2") do |(stolen_record, _bike)| %>
+  <% table.column(label: "Theft info", header_classes: "tw:font-normal", classes: "tw:w-1/2") do |(stolen_record)| %>
     <%= stolen_record.theft_description %>
   <% end %>
 
-  <% table.column(label: "Country", header_classes: "tw:font-normal", classes: "tw:text-xs") do |(stolen_record, _bike)| %>
+  <% table.column(label: "Country", header_classes: "tw:font-normal", classes: "tw:text-xs") do |(stolen_record)| %>
     <% if stolen_record.country.present? %>
-      <% if stolen_record.country == united_states %>
+      <% if stolen_record.country.united_states? %>
         <span class="less-strong">US</span>
       <% else %>
         <span class="text-success"><%= stolen_record.country.iso %></span>
@@ -52,7 +48,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "City", header_classes: "tw:font-normal") do |(stolen_record, _bike)| %>
+  <% table.column(label: "City", header_classes: "tw:font-normal") do |(stolen_record)| %>
     <span class="<%= stolen_record.city.blank? ? "less-strong" : "" %>">
       <%= [stolen_record.city, stolen_record.region, stolen_record.postal_code].reject(&:blank?).first %>
     </span>

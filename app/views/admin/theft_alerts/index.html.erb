@@ -176,15 +176,15 @@
         style="max-height: 500px; overflow-y: scroll;"
       >
         <%= render(UI::Table::Component.new(records: searched_theft_alerts.cities_count, sort_state:)) do |table| %>
-          <% table.column(label: "Country", classes: "tw:text-xs") do |(country, _city, _state, _count)| %>
+          <% table.column(label: "Country", classes: "tw:text-xs") do |(country)| %>
             <%= country %>
           <% end %>
 
-          <% table.column(label: "City") do |(country, city, state, _count)| %>
+          <% table.column(label: "City") do |(country, city, state)| %>
             <%= link_to city.presence || "Blank location", admin_theft_alerts_path(sort_state.search_params.merge(search_location: "#{city}, #{state} #{country}")), class: "twlink" %>
           <% end %>
 
-          <% table.column(label: "State", classes: "tw:text-xs") do |(_country, _city, state, _count)| %>
+          <% table.column(label: "State", classes: "tw:text-xs") do |(_country, _city, state)| %>
             <%= state %>
           <% end %>
 

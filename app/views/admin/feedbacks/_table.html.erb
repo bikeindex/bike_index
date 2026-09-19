@@ -25,7 +25,7 @@
     <%= feedback.humanized_type %>
 
     <% if render_kind_search %>
-      <%= link_to search_emoji, admin_feedbacks_path(sort_state.search_params.merge(search_kind: feedback.feedback_type)), class: "small" %>
+      <%= link_to search_emoji, admin_feedbacks_path(sort_state.search_params.merge(search_kind: feedback.feedback_type)), class: "display-sortable-link small" %>
     <% end %>
   <% end %>
 

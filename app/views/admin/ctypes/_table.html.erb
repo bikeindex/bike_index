@@ -17,7 +17,7 @@
     <%= ctype.cgroup.name.titleize %>
   <% end %>
 
-  <% table.column(sortable: "image", label: "Has image?", classes: "large-screens") do |ctype| %>
+  <% table.column(sortable: "image", label: "Has image?", classes: "tw:hidden tw:lg:table-cell") do |ctype| %>
     <%= check_mark if ctype.image? %>
   <% end %>
 

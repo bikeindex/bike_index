@@ -1,6 +1,4 @@
-<%# locals: (collection:, render_sortable: false, skip_user: false) %>
-
-<% render_deleted = @render_deleted %>
+<%# locals: (collection:, render_sortable: false, skip_user: false, render_deleted: @render_deleted) %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(record) { content_tag(:span, record.id, class: "only-dev-visible") }) do |superuser_ability| %>

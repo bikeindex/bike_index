@@ -46,17 +46,17 @@
     <% unless params[:query].present? %>
       <div class="row mb-4 mt-4">
         <div class="col-sm-8 offset-sm-2">
-          <% invoice_row = ->(name, invoices) {
-              {name:, count: number_display(invoices.count), amount_due: MoneyFormatter.money_format(invoices.sum(:amount_due_cents)),
-               amount_paid: MoneyFormatter.money_format(invoices.sum(:amount_paid_cents))}
-            }
-            invoice_rows = [
-              invoice_row.call("First invoice", matching_invoices.first_invoice),
-              invoice_row.call("Renewals", matching_invoices.renewal_invoice),
-              invoice_row.call("Free invoices", matching_invoices.free),
-              invoice_row.call("Not free", matching_invoices.paid),
-              invoice_row.call("All", matching_invoices).transform_values { |value| tag.strong(value) }
-            ] %>
+          <% invoice_rows = {
+              "First invoice" => matching_invoices.first_invoice,
+              "Renewals" => matching_invoices.renewal_invoice,
+              "Free invoices" => matching_invoices.free,
+              "Not free" => matching_invoices.paid,
+              "All" => matching_invoices
+            }.map do |name, invoices|
+              row = {name:, count: number_display(invoices.count), amount_due: MoneyFormatter.money_format(invoices.sum(:amount_due_cents)),
+                     amount_paid: MoneyFormatter.money_format(invoices.sum(:amount_paid_cents))}
+              (name == "All") ? row.transform_values { |value| tag.strong(value) } : row
+            end %>
 
           <%= render(UI::Table::Component.new(records: invoice_rows)) do |table| %>
             <% table.column(label: "") { |row| row[:name] } %>

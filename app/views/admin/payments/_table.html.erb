@@ -9,15 +9,13 @@
 
   <% unless skip_paid_at %>
     <% table.column(sortable: "paid_at", label: "Paid", classes: "tw:text-xs") do |payment| %>
-      <% if payment.paid_at.present? %>
-        <%= render UI::Time::Component.new(time: payment.paid_at) %>
-      <% end %>
+      <%= render UI::Time::Component.new(time: payment.paid_at) %>
     <% end %>
   <% end %>
 
   <% unless skip_user %>
     <% table.column(sortable: "user_id") do |payment| %>
-      <%= cache(payment.user) do %>
+      <% cache(payment.user) do %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, email: payment.email, user: payment.user, render_search: render_sortable) %>
       <% end %>
     <% end %>
@@ -27,7 +25,7 @@
     <% if payment.referral_source.present? %>
       <code class="small"><%= payment.referral_source %></code>
       <% if render_sortable %>
-        <small><%= link_to search_emoji, url_for(sort_state.search_params.merge(query: payment.referral_source)) %></small>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(query: payment.referral_source)), class: "display-sortable-link small" %>
       <% end %>
     <% end %>
   <% end %>
@@ -41,18 +39,13 @@
       <% end %>
 
       <% if render_sortable %>
-        <small><%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: payment.kind)) %></small>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: payment.kind)), class: "display-sortable-link small" %>
       <% end %>
     <% end %>
   <% end %>
 
   <% table.column(sortable: "organization_id") do |payment| %>
-    <% if payment.organization.present? %>
-      <%= link_to payment.organization.short_name, admin_organization_path(payment.organization), class: "twlink" %>
-      <% if render_organization_search %>
-        <small><%= link_to search_emoji, url_for(sort_state.search_params.merge(organization_id: payment.organization_id)) %></small>
-      <% end %>
-    <% end %>
+    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: payment.organization, organization_id: payment.organization_id, sort_state:, render_search: render_organization_search) %>
   <% end %>
 
   <% table.column(sortable: "invoice_id") do |payment| %>
@@ -67,7 +60,7 @@
         <%= payment.payment_method.humanize.downcase %>
       <% end %>
 
-      <small><%= link_to search_emoji, url_for(sort_state.search_params.merge(search_payment_method: payment.payment_method)) %></small>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_payment_method: payment.payment_method)), class: "display-sortable-link small" %>
     <% end %>
   <% end %>
 

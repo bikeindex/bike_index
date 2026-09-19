@@ -55,7 +55,7 @@
       <% organizations = Organization.where(id: import_counts.keys).index_by(&:id) %>
 
       <%= render(UI::Table::Component.new(records: import_counts.to_a, sort_state:)) do |table| %>
-        <% table.column(label: "Organization") do |(id, _count)| %>
+        <% table.column(label: "Organization") do |(id)| %>
           <% if id.present? %>
             <%= link_to organizations[id]&.name || id, url_for(sort_state.search_params.merge(organization_id: id)), class: "twlink" %>
             <%= link_to link_emoji, admin_organization_path(id) %>
@@ -70,10 +70,6 @@
         <% end %>
       <% end %>
     </div>
-  <% end %>
-
-  <% unless display_dev_info? %>
-    <style>.only-dev-visible {display: none !important;} </style>
   <% end %>
 
   <%= render partial: "/admin/bulk_imports/table", locals: {collection: @bulk_imports, render_sortable: true} %>

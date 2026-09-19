@@ -1,7 +1,7 @@
 <%# locals: (rows:) %>
 
 <%= render(UI::Table::Component.new(records: rows)) do |table| %>
-  <% table.column(label: "") do |year, _counts| %>
+  <% table.column(label: "") do |(year)| %>
     <%= year %>
   <% end %>
 
@@ -9,9 +9,9 @@
     <% table.column(label:) do |_year, counts| %>
       <% if counts[index] %>
         <% count, projection = counts[index] %>
-        <%= number_with_delimiter(count) %>
+        <%= number_display(count) %>
         <% if projection %>
-          <span class="less-strong ml-1"><%= number_with_delimiter(projection) %></span>
+          <span class="less-strong ml-1"><%= number_display(projection) %></span>
         <% end %>
       <% end %>
     <% end %>

@@ -10,15 +10,11 @@
   <% end %>
 
   <% table.column(sortable: "start_at") do |email_ban| %>
-    <% if email_ban.start_at.present? %>
-      <%= render UI::Time::Component.new(time: email_ban.start_at) %>
-    <% end %>
+    <%= render UI::Time::Component.new(time: email_ban.start_at) %>
   <% end %>
 
   <% table.column(sortable: "end_at") do |email_ban| %>
-    <% if email_ban.end_at.present? %>
-      <%= render UI::Time::Component.new(time: email_ban.end_at) %>
-    <% end %>
+    <%= render UI::Time::Component.new(time: email_ban.end_at) %>
   <% end %>
 
   <% table.column(sortable: "user_id") do |email_ban| %>

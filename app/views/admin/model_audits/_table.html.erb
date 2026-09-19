@@ -3,12 +3,8 @@
 <% org_ids = OrganizationModelAudit.distinct.pluck(:organization_id) %>
 <% org_names_hash = Organization.where(id: org_ids).pluck(:id, :short_name).to_h %>
 
-<% unless display_dev_info? %>
-  <style>.only-dev-visible {display: none !important;}</style>
-<% end %>
-
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name("admin_model_audit"))) do |table| %>
-  <% table.column(sortable: "created_at", header_classes: "tw:text-xs", lower_right: ->(model_audit) { content_tag(:code, model_audit.id, class: "only-dev-visible") }) do |model_audit| %>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_model_audit", display_dev_info?]))) do |table| %>
+  <% table.column(sortable: "created_at", header_classes: "tw:text-xs", lower_right: (->(record) { tag.span(record.id, class: "only-dev-visible") } if display_dev_info?)) do |model_audit| %>
     <%= render UI::Time::Component.new(time: model_audit.created_at) %>
   <% end %>
 
@@ -19,9 +15,7 @@
   <% table.column(sortable: "mnfg_name", label: "Manufacturer") do |model_audit| %>
     <%= model_audit.mnfg_name %>
 
-    <small>
-      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_mnfg_name: model_audit.mnfg_name)), class: "twlink" %>
-    </small>
+    <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_mnfg_name: model_audit.mnfg_name)), class: "display-sortable-link small" %>
   <% end %>
 
   <% table.column(label: "Mnfg other", header_classes: "tw:font-normal tw:text-xs", classes: "tw:text-center") do |model_audit| %>

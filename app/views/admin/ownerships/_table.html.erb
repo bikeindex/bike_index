@@ -46,7 +46,7 @@
     <% end %>
 
     <% if render_dev_info %>
-      <% table.column(label: tag.span("send email?", class: "only-dev-visible"), header_classes: "tw:font-normal tw:text-xs") do |ownership| %>
+      <% table.column(label: "send email?", classes: "only-dev-visible", header_classes: "tw:font-normal tw:text-xs") do |ownership| %>
         <%= check_mark if ownership.send_email %>
       <% end %>
     <% end %>

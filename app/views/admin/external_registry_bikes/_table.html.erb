@@ -17,7 +17,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Info", classes: "tw:hidden tw:lg:table-cell") do |bike| %>
+  <% table.column(label: "Info", classes: "tw:hidden tw:lg:table-cell", header_classes: "tw:font-normal") do |bike| %>
     <%= bike.frame_model %>
     <span class="less-strong"><%= bike.frame_colors.to_sentence %></span>
   <% end %>
@@ -26,11 +26,11 @@
     <small><%= bike.short_address %></small>
   <% end %>
 
-  <% table.column(label: "Serial", classes: "admin-bike-table-serial-cell") do |bike| %>
+  <% table.column(label: "Serial", classes: "admin-bike-table-serial-cell", header_classes: "tw:font-normal") do |bike| %>
     <small class="less-strong"><%= bike.serial_number %></small>
   <% end %>
 
-  <% table.column(label: "Registry") do |bike| %>
+  <% table.column(label: "Registry", header_classes: "tw:font-normal") do |bike| %>
     <%= link_to bike.registry_name, bike.url, target: :_blank, class: "twlink" %>
   <% end %>
 <% end %>

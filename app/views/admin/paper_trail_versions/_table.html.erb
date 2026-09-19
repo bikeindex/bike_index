@@ -9,9 +9,7 @@
     <%= version.event %>
 
     <% if render_sortable %>
-      <small>
-        <%= link_to "🔎", url_for(sort_state.search_params.merge(search_event: version.event)), class: "display-sortable-link" %>
-      </small>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_event: version.event)), class: "display-sortable-link small" %>
     <% end %>
   <% end %>
 
@@ -19,9 +17,7 @@
     <%= link_to "#{version.item_type} ##{version.item_id}", helpers.admin_path_for_object(version), class: "twlink tw:mr-1" %>
 
     <% if render_sortable %>
-      <small>
-        <%= link_to "🔎", url_for(sort_state.search_params.merge(search_item_type: version.item_type, search_item_id: version.item_id)), class: "display-sortable-link" %>
-      </small>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_item_type: version.item_type, search_item_id: version.item_id)), class: "display-sortable-link small" %>
     <% end %>
   <% end %>
 

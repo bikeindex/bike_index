@@ -1,15 +1,11 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<% unless display_dev_info? %>
-  <style>.only-dev-visible {display: none !important;} </style>
-<% end %>
-
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
-  <% table.column(sortable: "created_at", header_classes: "tw:text-xs", lower_right: ->(model_attestation) { content_tag(:code, model_attestation.id, class: "only-dev-visible") }) do |model_attestation| %>
+  <% table.column(sortable: "created_at", header_classes: "tw:text-xs", lower_right: (->(record) { tag.span(record.id, class: "only-dev-visible") } if display_dev_info?)) do |model_attestation| %>
     <%= render UI::Time::Component.new(time: model_attestation.created_at) %>
   <% end %>
 
-  <% if sort_column == "updated_at" %>
+  <% if sort_state.sort == "updated_at" %>
     <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |model_attestation| %>
       <%= render UI::Time::Component.new(time: model_attestation.updated_at) %>
     <% end %>
@@ -20,9 +16,7 @@
     <strong><%= model_audit.mnfg_name %></strong>
     <%= helpers.model_audit_frame_model_display(model_audit, truncate: true) %>
 
-    <small>
-      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_model_audit_id: model_audit.id)), class: "twlink" %>
-    </small>
+    <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_model_audit_id: model_audit.id)), class: "display-sortable-link small" %>
 
     <% if model_attestation.organization_id.present? %>
       <%= link_to "view in org", organization_model_audit_path(model_attestation.model_audit_id, organization_id: model_attestation.organization&.to_param), class: "twlink tw:text-xs tw:inline-block less-strong" %>
@@ -40,9 +34,7 @@
   <% table.column(sortable: "organization_id") do |model_attestation| %>
     <% if model_attestation.organization %>
       <%= link_to model_attestation.organization.short_name || model_attestation.organization_id, organization_model_audits_path(organization_id: model_attestation.organization.to_param), class: "twlink" %>
-      <small>
-        <%= link_to search_emoji, url_for(sort_state.search_params.merge(organization_id: model_attestation.organization.to_param)), class: "twlink" %>
-      </small>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(organization_id: model_attestation.organization.to_param)), class: "display-sortable-link small" %>
     <% end %>
   <% end %>
 

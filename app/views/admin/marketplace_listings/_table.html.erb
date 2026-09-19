@@ -1,23 +1,20 @@
 <%# locals: (collection:, render_sortable: false, skip_item: false) %>
 
-<%# require inline CSS setting because of caching %>
-<% unless display_dev_info? %>
-  <style>.only-dev-visible {display: none !important;}</style>
-<% end %>
-
 <div
   data-controller="update-cached-sortable-links"
-  data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
+  data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_marketplace_listing", skip_item]))) do |table| %>
-    <% table.column(sortable: "created_at", lower_right: ->(marketplace_listing) { content_tag(:span, marketplace_listing.id, class: "only-dev-visible") }) do |marketplace_listing| %>
+  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_marketplace_listing", skip_item, display_dev_info?]))) do |table| %>
+    <% table.column(sortable: "created_at", lower_right: (->(record) { tag.span(record.id, class: "only-dev-visible") } if display_dev_info?)) do |marketplace_listing| %>
       <%= link_to admin_marketplace_listing_path(marketplace_listing), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: marketplace_listing.created_at) %>
       <% end %>
     <% end %>
 
-    <% table.column(sortable: "updated_at", classes: "only-dev-visible tw:text-xs") do |marketplace_listing| %>
-      <%= render UI::Time::Component.new(time: marketplace_listing.updated_at) %>
+    <% if display_dev_info? %>
+      <% table.column(sortable: "updated_at", classes: "only-dev-visible tw:text-xs") do |marketplace_listing| %>
+        <%= render UI::Time::Component.new(time: marketplace_listing.updated_at) %>
+      <% end %>
     <% end %>
 
     <% table.column(sortable: "status") do |marketplace_listing| %>
@@ -25,15 +22,11 @@
     <% end %>
 
     <% table.column(sortable: "published_at") do |marketplace_listing| %>
-      <% if marketplace_listing.published_at.present? %>
-        <%= render UI::Time::Component.new(time: marketplace_listing.published_at) %>
-      <% end %>
+      <%= render UI::Time::Component.new(time: marketplace_listing.published_at) %>
     <% end %>
 
     <% table.column(sortable: "end_at") do |marketplace_listing| %>
-      <% if marketplace_listing.end_at.present? %>
-        <%= render UI::Time::Component.new(time: marketplace_listing.end_at) %>
-      <% end %>
+      <%= render UI::Time::Component.new(time: marketplace_listing.end_at) %>
     <% end %>
 
     <% unless skip_item %>

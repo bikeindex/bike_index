@@ -60,7 +60,7 @@
     </span>
   <% end %>
 
-  <% table.column(label: "") do |email_domain| %>
+  <% table.column(label: "", header_classes: "tw:font-normal") do |email_domain| %>
     <%= render partial: "admin/email_domains/data_details", locals: {email_domain:} %>
   <% end %>
 <% end %>

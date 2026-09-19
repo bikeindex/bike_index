@@ -21,11 +21,11 @@
     <%= stripe_price.interval %>
   <% end %>
 
-  <% table.column(label: "Test?") do |stripe_price| %>
+  <% table.column(label: "Test?", header_classes: "tw:font-normal") do |stripe_price| %>
     <%= check_mark if stripe_price.test? %>
   <% end %>
 
-  <% table.column(label: "Active?") do |stripe_price| %>
+  <% table.column(label: "Active?", header_classes: "tw:font-normal") do |stripe_price| %>
     <%= cross_mark unless stripe_price.active? %>
   <% end %>
 

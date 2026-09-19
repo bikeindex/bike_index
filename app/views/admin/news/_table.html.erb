@@ -7,11 +7,11 @@
     <small><%= render UI::Time::Component.new(time: blog.created_at) %></small>
   <% end %>
 
-  <% table.column(sortable: "user_id", label: "Creator", classes: "d-none d-lg-table-cell") do |blog| %>
+  <% table.column(sortable: "user_id", label: "Creator", classes: "tw:hidden tw:lg:table-cell") do |blog| %>
     <%= blog.user&.name || blog.user&.email %>
   <% end %>
 
-  <% table.column(sortable: "updated_at", classes: "tw:text-xs d-none d-lg-table-cell") do |blog| %>
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs tw:hidden tw:lg:table-cell") do |blog| %>
     <%= render UI::Time::Component.new(time: blog.updated_at) %>
   <% end %>
 

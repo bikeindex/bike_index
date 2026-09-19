@@ -119,7 +119,7 @@
 
             <% table.column(label: header, classes: "tw:text-center") do %>
               <em class="less-strong">
-                <%= number_with_delimiter(payment_count[:count]) %> -
+                <%= number_display(payment_count[:count]) %> -
               </em>
 
               <%= payment_count[:money] %>

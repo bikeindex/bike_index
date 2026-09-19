@@ -9,8 +9,8 @@
 
   <% table.column(sortable: "invited_email", label: "Recipient") do |organization_role| %>
     <% if organization_role.user.present? %>
-      <%= cache(organization_role.user) do %>
-        <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.user, render_search: false) %>
+      <% cache(organization_role.user) do %>
+        <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.user) %>
       <% end %>
     <% else %>
       <%= organization_role.invited_email %>
@@ -24,15 +24,13 @@
   <% end %>
 
   <% table.column(sortable: "claimed_at") do |organization_role| %>
-    <% if organization_role.claimed_at.present? %>
-      <%= render UI::Time::Component.new(time: organization_role.claimed_at) %>
-    <% end %>
+    <%= render UI::Time::Component.new(time: organization_role.claimed_at) %>
   <% end %>
 
   <% table.column(sortable: "sender_id", label: "Sender", header_classes: "tw:text-xs") do |organization_role| %>
     <% if organization_role.sender.present? %>
-      <%= cache(organization_role.sender) do %>
-        <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.sender, render_search: false) %>
+      <% cache(organization_role.sender) do %>
+        <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.sender) %>
       <% end %>
     <% else %>
       <%= organization_role.sender_id %>
@@ -45,9 +43,7 @@
 
   <% if render_deleted %>
     <% table.column(sortable: "deleted_at", header_classes: "tw:text-xs", classes: "tw:text-sm") do |organization_role| %>
-      <% if organization_role.deleted_at.present? %>
-        <%= render UI::Time::Component.new(time: organization_role.deleted_at) %>
-      <% end %>
+      <%= render UI::Time::Component.new(time: organization_role.deleted_at) %>
     <% end %>
   <% end %>
 <% end %>

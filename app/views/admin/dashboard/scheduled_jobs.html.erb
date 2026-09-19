@@ -27,20 +27,20 @@ end %>
 <div class="mt-4">
   <%= render(UI::Table::Component.new(records: jobs)) do |table| %>
     <% if display_dev_info? %>
-      <% table.column(label: "", header_classes: "only-dev-visible") do |klass, _last_started, _last_finished| %>
+      <% table.column(label: "", classes: "only-dev-visible") do |(klass)| %>
         <code class="small"><%= klass %></code>
       <% end %>
     <% end %>
 
-    <% table.column(label: "Job") do |klass, _last_started, _last_finished| %>
+    <% table.column(label: "Job") do |(klass)| %>
       <%= klass.to_s.gsub(/\Ascheduled/i, "").gsub(/worker\z/i, "").underscore.humanize %>
     <% end %>
 
-    <% table.column(label: "Frequency") do |klass, _last_started, _last_finished| %>
+    <% table.column(label: "Frequency") do |(klass)| %>
       <%= helpers.period_in_words(klass.frequency) %>
     <% end %>
 
-    <% table.column(label: "Next run") do |klass, last_started, _last_finished| %>
+    <% table.column(label: "Next run") do |klass, last_started| %>
       <% if klass.new.skip_scheduling? %>
         <%= render UI::Alerts::Base::Component.new(text: "Skipped", kind: :warning, margin_classes: "") %>
       <% elsif last_started.blank? || (last_started + klass.frequency) < Time.current %>
@@ -50,7 +50,7 @@ end %>
       <% end %>
     <% end %>
 
-    <% table.column(label: "Last started") do |_klass, last_started, _last_finished| %>
+    <% table.column(label: "Last started") do |_klass, last_started| %>
       <%= render UI::Time::Component.new(time: last_started, format: :localize_time_precise) %>
     <% end %>
 

@@ -1,9 +1,7 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<% render_id = display_dev_info? %>
-
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
-  <% table.column(sortable: "created_at", lower_right: render_id ? ->(bike_organization_note) { content_tag(:span, bike_organization_note.id, class: "only-dev-visible") } : nil) do |bike_organization_note| %>
+  <% table.column(sortable: "created_at", lower_right: (->(record) { tag.span(record.id, class: "only-dev-visible") } if display_dev_info?)) do |bike_organization_note| %>
     <%= link_to admin_bike_organization_note_path(bike_organization_note), class: "twlink" do %>
       <%= render UI::Time::Component.new(time: bike_organization_note.created_at) %>
     <% end %>

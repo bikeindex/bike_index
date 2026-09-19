@@ -110,7 +110,7 @@
 
       <div class="col-sm-6 offset-sm-3 mt-4">
         <%= render(UI::Table::Component.new(records: origin_rows)) do |table| %>
-          <% table.column(label: "Origin") do |origin, _bike_count| %>
+          <% table.column(label: "Origin") do |(origin)| %>
             <% if colors.key?(origin) %>
               <%# Chartkick fills its columns at half opacity and outlines them; the swatch matches %>
               <span
@@ -135,14 +135,13 @@
     <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: graph_kind)), stacked: true)) %>
   <% end %>
 
-  <% organization_ids = bikes.distinct.pluck(:creation_organization_id) %>
-  <% organization_rows = organization_ids.map { |org_id| [org_id, bikes.where(creation_organization_id: org_id).count] }
-    .sort { |a, b| b[1] <=> a[1] }
-    .map { |org_id, bike_count| [org_id, Organization.unscoped.find_by_id(org_id), bike_count] } %>
+  <% organization_counts = bikes.group(:creation_organization_id).count.sort_by { |_org_id, bike_count| -bike_count } %>
+  <% organizations = Organization.unscoped.where(id: organization_counts.map(&:first)).index_by(&:id) %>
+  <% organization_rows = organization_counts.map { |org_id, bike_count| [org_id, organizations[org_id], bike_count] } %>
 
   <div class="col-sm-8 offset-sm-2 mt-4">
     <%= render(UI::Table::Component.new(records: organization_rows)) do |table| %>
-      <% table.column(label: "Organization") do |org_id, organization, _bike_count| %>
+      <% table.column(label: "Organization") do |org_id, organization| %>
         <% if organization.present? %>
           <%= link_to organization.name, admin_bikes_path(sortable_params.merge(organization_id: org_id, render_chart: true)), class: "twlink" %>
           <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(organization_id: org_id)) %>
@@ -157,11 +156,11 @@
         <% end %>
       <% end %>
 
-      <% table.column(label: "Kind") do |_org_id, organization, _bike_count| %>
+      <% table.column(label: "Kind") do |_org_id, organization| %>
         <%= organization&.kind&.humanize %>
       <% end %>
 
-      <% table.column(label: "Integration", header_classes: "tw:font-normal tw:text-xs") do |_org_id, organization, _bike_count| %>
+      <% table.column(label: "Integration", header_classes: "tw:font-normal tw:text-xs") do |_org_id, organization| %>
         <%= organization&.pos_kind&.humanize %>
       <% end %>
 

@@ -52,6 +52,6 @@
   <% end %>
 
   <% table.column(label: "Posts", header_classes: "tw:font-normal") do |social_account| %>
-    <%= number_with_delimiter(social_account.social_posts.count) %>
+    <%= number_display(social_account.social_posts.count) %>
   <% end %>
 <% end %>

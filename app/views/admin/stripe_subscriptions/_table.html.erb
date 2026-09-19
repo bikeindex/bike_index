@@ -22,20 +22,16 @@
   <% end %>
 
   <% table.column(sortable: "start_at") do |stripe_subscription| %>
-    <% if stripe_subscription.start_at.present? %>
-      <%= render UI::Time::Component.new(time: stripe_subscription.start_at) %>
-    <% end %>
+    <%= render UI::Time::Component.new(time: stripe_subscription.start_at) %>
   <% end %>
 
   <% table.column(sortable: "end_at") do |stripe_subscription| %>
-    <% if stripe_subscription.end_at.present? %>
-      <%= render UI::Time::Component.new(time: stripe_subscription.end_at) %>
-    <% end %>
+    <%= render UI::Time::Component.new(time: stripe_subscription.end_at) %>
   <% end %>
 
   <% table.column(sortable: "user_id") do |stripe_subscription| %>
     <% if stripe_subscription.user_id.present? %>
-      <%= cache(stripe_subscription.user) do %>
+      <% cache(stripe_subscription.user) do %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: stripe_subscription.user, render_search: true) %>
       <% end %>
     <% else %>
@@ -47,17 +43,17 @@
     <%= stripe_subscription.stripe_status %>
   <% end %>
 
-  <% table.column(label: "Referral Source") do |stripe_subscription| %>
+  <% table.column(label: "Referral Source", header_classes: "tw:font-normal") do |stripe_subscription| %>
     <%= stripe_subscription.referral_source %>
   <% end %>
 
-  <% table.column(label: "Stripe") do |stripe_subscription| %>
+  <% table.column(label: "Stripe", header_classes: "tw:font-normal") do |stripe_subscription| %>
     <% if stripe_subscription.stripe_id.present? %>
       <%= link_to stripe_subscription.stripe_id.truncate(20), stripe_subscription.stripe_admin_url, title: stripe_subscription.stripe_id, class: "twlink" %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Payments") do |stripe_subscription| %>
+  <% table.column(label: "Payments", header_classes: "tw:font-normal") do |stripe_subscription| %>
     <% payment_count = stripe_subscription.payments.count %>
     <small><%= number_display(payment_count) %></small>
 

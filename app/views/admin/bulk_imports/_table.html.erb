@@ -19,7 +19,9 @@
 
       <% if bulk_import.timeout_failure? %>
         <em class="small">import failed to process</em>
-        <small class="only-dev-visible">still pending</small>
+        <% if display_dev_info %>
+          <small class="only-dev-visible">still pending</small>
+        <% end %>
       <% end %>
     <% end %>
 
@@ -57,7 +59,7 @@
     <% end %>
 
     <% table.column(label: "Bikes", header_classes: "tw:font-normal") do |bulk_import| %>
-      <%= number_display bulk_import.ownerships.count %>
+      <%= number_display bulk_import.ownerships.size %>
     <% end %>
   <% end %>
 </div>

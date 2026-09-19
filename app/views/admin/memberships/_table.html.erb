@@ -7,8 +7,8 @@
 
   <% unless skip_user %>
     <% table.column(sortable: "user_id") do |membership| %>
-      <%= cache(membership.user) do %>
-        <%= render Pages::Admin::Users::Cell::Component.new(user: membership.user, user_id: membership.user_id, render_search: false) %>
+      <% cache(membership.user) do %>
+        <%= render Pages::Admin::Users::Cell::Component.new(user: membership.user, user_id: membership.user_id) %>
       <% end %>
     <% end %>
   <% end %>
@@ -18,9 +18,7 @@
   <% end %>
 
   <% table.column(sortable: "end_at") do |membership| %>
-    <% if membership.end_at.present? %>
-      <%= render UI::Time::Component.new(time: membership.end_at) %>
-    <% end %>
+    <%= render UI::Time::Component.new(time: membership.end_at) %>
   <% end %>
 
   <% table.column(sortable: "level") do |membership| %>
@@ -32,8 +30,8 @@
       <%= link_to "Stripe", membership.stripe_admin_url, class: "twlink" %>
     <% else %>
       <div class="less-strong">
-        <%= cache(membership.creator) do %>
-          <%= render Pages::Admin::Users::Cell::Component.new(user: membership.creator, user_id: membership.creator_id, render_search: false) %>
+        <% cache(membership.creator) do %>
+          <%= render Pages::Admin::Users::Cell::Component.new(user: membership.creator, user_id: membership.creator_id) %>
         <% end %>
       </div>
     <% end %>
