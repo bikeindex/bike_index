@@ -8,7 +8,7 @@ Invoke the `/simplify` command to review the changed code for reuse, simplificat
 
 Skip it when the diff has no code in it — a docs- or skill-only branch gives it nothing to review, and it fans out subagents to find that out. Config by file extension isn't the test: a `.github/workflows/*.yml` with a `run:` block is a shell script, and reviewing one is how the nightly-reseed branch found its only cleanup.
 
-**Read `git diff` the moment the agents return — before running anything, not just before committing.** Its review agents edit the working tree to check their own findings, and one that stops mid-verification leaves the edit behind, indistinguishable from the changes you decided to apply. An agent verifying that a sweeping mechanical edit is load-bearing reverts all of it, so the next spec run goes red on the branch's own subject and reads as a bug you introduced rather than a tree someone else reset.
+**Read `git diff` as soon as the agents return, before running anything.** An agent that stops mid-verification leaves its edit in the tree — including a sweeping edit it reverted to test, which then reads as your regression.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
@@ -35,8 +35,6 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 **`bin/rails tailwindcss:build` before the `:js` ones, after the last template edit.** Tailwind's content scan reads the templates, so adding or removing a class in an `.erb` changes the built CSS — and a system spec asserting a computed style (`spec/components/ui/dropdown/component_system_spec.rb` reads `getComputedStyle(...).color`) fails against the stale build until it's rebuilt. A merge that brings in `app/assets/tailwind/**` does it too. The failure names the assertion, not the build, so it reads as a real regression.
 
 Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style and testing conventions. A frontend diff also reads the `frontend-conventions` skill: `CLAUDE.md` points there rather than stating the frontend rules, so checking it alone misses them — a component that should have been a partial went through this pass on #4308. Only touch lines this branch already changed.
-
-**There is no digest to regenerate before pushing.** `ApplicationComponent` includes `ViewComponent::ExperimentallyCacheable`, so Rails' template digest follows every component a cached block renders and moves on its own. Nothing to run, and nothing that can be left stale in the diff.
 
 ### The spec audit
 
