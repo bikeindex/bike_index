@@ -14,3 +14,4 @@ en:
             update_hint: You'll post as %{user} — history of your changes will be
               visible above.
             update_note: Update note
+            updated_by: Updated by %{user}

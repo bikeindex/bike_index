@@ -27,10 +27,11 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
     it "renders the current note to update, with the notes it replaced above" do
       BikeOrganizationNote.upsert(bike:, organization:, body: "First note", user: other_user)
       BikeOrganizationNote.upsert(bike:, organization:, body: "Second note", user: current_user)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Third note", user: current_user)
       render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
 
-      expect(page).to have_text(/First note.*Note by #{other_user.display_name}.*Current note.*most recent update by #{current_user.display_name}.*You'll post as #{current_user.display_name}/m)
-      expect(page).to have_field("Current note", with: "Second note")
+      expect(page).to have_text(/First note.*Note by #{other_user.display_name}.*Second note.*Updated by #{current_user.display_name}.*Current note.*most recent update by #{current_user.display_name}.*You'll post as #{current_user.display_name}/m)
+      expect(page).to have_field("Current note", with: "Third note")
       expect(page).to have_button("Update note")
     end
 

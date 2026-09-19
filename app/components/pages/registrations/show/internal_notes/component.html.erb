@@ -3,12 +3,17 @@
     <%= translation(".internal_notes") %>
   </h2>
 
-  <% @previous_notes.each do |note| %>
+  <% @previous_notes.each_with_index do |note, index| %>
     <div class="tw:mt-3 tw:border-b tw:border-gray-100 tw:pb-3 tw:dark:border-gray-800">
       <p class="tw:text-sm"><%= note.body %></p>
 
       <p class="twless-strong tw:mt-1 tw:text-xs">
-        <%= translation(".note_by", user: note.user&.display_name) %>
+        <% if index.zero? %>
+          <%= translation(".note_by", user: note.user&.display_name) %>
+        <% else %>
+          <%= translation(".updated_by", user: note.user&.display_name) %>
+        <% end %>
+
         <%= render(UI::Time::Component.new(time: note.updated_at)) %>
       </p>
     </div>
