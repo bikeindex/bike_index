@@ -66,7 +66,7 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "Progress", header_classes: "tw:font-normal") do |export| %>
+    <% table.column(label: "Progress") do |export| %>
       <% progress = export.calculated_progress %>
 
       <% color = case progress
@@ -78,17 +78,17 @@
       <%= render UI::Badge::Component.new(text: progress, color:, size: :sm) %>
     <% end %>
 
-    <% table.column(label: "Creator", header_classes: "tw:font-normal") do |export| %>
+    <% table.column(label: "Creator") do |export| %>
       <% if export.user_id.present? %>
         <%= export.user.display_name %>
       <% end %>
     <% end %>
 
-    <% table.column(label: "Organization", header_classes: "tw:font-normal") do |export| %>
+    <% table.column(label: "Organization") do |export| %>
       <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: export.organization, render_search: true) %>
     <% end %>
 
-    <% table.column(label: "File", header_classes: "tw:font-normal") do |export| %>
+    <% table.column(label: "File") do |export| %>
       <% if export.file.url.present? %>
         <small title="<%= export.file.url %>">
           <%= truncate(export.file.url, length: 50) %>
@@ -96,7 +96,7 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "Kind", header_classes: "tw:font-normal") do |export| %>
+    <% table.column(label: "Kind") do |export| %>
       <% display_kind = export.avery_export? ? "avery" : export.kind %>
       <%= link_to display_kind, url_for(sort_state.search_params.merge(search_kind: display_kind)) %>
 
@@ -107,13 +107,13 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "Rows", header_classes: "tw:font-normal") do |export| %>
+    <% table.column(label: "Rows") do |export| %>
       <% if export.finished? %>
         <%= number_display(export.rows) %>
       <% end %>
     <% end %>
 
-    <% table.column(label: "Registrations", header_classes: "tw:font-normal") do |export| %>
+    <% table.column(label: "Registrations") do |export| %>
       <% if export.only_custom_bike_ids %>
         <%= render UI::Badge::Component.new(text: "specific", title: "Only specified registrations", color: :purple, size: :sm) %>
       <% else %>
