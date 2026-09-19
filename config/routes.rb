@@ -374,6 +374,8 @@ Rails.application.routes.draw do
     resources :news do
       collection do
         get :listicle_image_edit
+        # Selection chips for the tags combobox on the edit form
+        post :content_tag_chips
       end
     end
     resources :manufacturers do
