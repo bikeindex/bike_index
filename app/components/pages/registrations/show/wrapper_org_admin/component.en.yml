@@ -8,16 +8,12 @@ en:
             about_this_bike: About this %{bike_type}
             assign_sticker: Assign sticker
             edit: Edit
-            internal_notes: Internal notes
             link_sticker: Link sticker
             no_other_registrations: None found
             not_registered_message: >-
               Owner contact isn't available for bikes outside your organization. You
               can still add internal notes.
             not_registered_title: Not registered with %{org_name}
-            note_by: Note by %{user}
-            notes_placeholder: New internal note — your previous notes are kept in
-              the thread.
             org_can_edit: "%{org_name} can edit this %{bike_type}"
             org_can_edit_sub: Including after the %{bike_type} is claimed.
             other_registrations: Other registrations by this user
@@ -27,8 +23,6 @@ en:
             owner_name: Name
             owner_phone: Phone
             photo_archive: Photo archive
-            post_note: Post note
-            posts_as: Posts as %{user}
             restricted_message: >-
               Owner contact is available to admin & staff. You can add notes and request
               an impound.
