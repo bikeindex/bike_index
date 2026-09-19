@@ -8,6 +8,7 @@ module UI
     # kind: :toggle renders them as a segmented control instead — one track, with the
     # active entry raised out of it.
     class Component < ApplicationComponent
+      # Template Dependency: UI::Button::Component
       KINDS = %i[button toggle].freeze
 
       CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze

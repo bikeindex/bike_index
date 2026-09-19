@@ -14,6 +14,20 @@ RSpec.shared_context :caching_enabled do
       Rails.cache = original_rails_cache if original_rails_cache
     end
   end
+
+  # Keys of the fragments a block writes, expanded the way the store sees them. Nothing
+  # about the rendered markup says whether it was cached or which parts of the key were
+  # there, and a block that writes none rendered entirely from the cache.
+  def fragments_written
+    keys = []
+    subscriber = ActiveSupport::Notifications.subscribe("write_fragment.action_controller") do |_name, _start, _finish, _id, payload|
+      keys << ActiveSupport::Cache.expand_cache_key(payload[:key])
+    end
+    yield
+    keys
+  ensure
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+  end
 end
 
 RSpec.shared_context :caching_basic do

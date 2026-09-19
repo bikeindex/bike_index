@@ -7,7 +7,7 @@ module I18nTasks
   # write pattern can't work out: in `components.pages.org.search.settings.address`,
   # `settings` is either another component or a nested key group of the `search` one, and
   # only the filesystem knows which. Guessing wrongly files the sidecar in a directory with
-  # no component.rb, where MARKUP_DIGEST can't see it.
+  # no component.rb, where no component's cache digest can see it.
   class ComponentRouter < ::I18n::Tasks::Data::Router::PatternRouter
     ROOT = "app/components"
 

@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe SharedBlocks::Navbar::Wrapper::Component, type: :component do
-  it_behaves_like "cached_markup_digest"
-
   let(:current_user) { nil }
   let(:instance) { described_class.new(current_user:, current_user_or_unconfirmed_user: current_user) }
   let(:component) { with_request_url("/") { render_inline(instance) } }
