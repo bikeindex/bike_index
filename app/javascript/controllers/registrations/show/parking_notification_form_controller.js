@@ -105,7 +105,7 @@ export default class extends Controller {
       button.dataset.active = active
       button.ariaPressed = active
     })
-    if (this.hasUseEnteredAddressTarget) this.useEnteredAddressTarget.value = manual
+    this.useEnteredAddressTarget.value = manual
     this.setManualRequired(manual)
     collapse(manual ? 'show' : 'hide', this.addressGroupTarget, duration)
     collapse(manual ? 'hide' : 'show', this.mapSectionTarget, duration)
@@ -345,7 +345,7 @@ export default class extends Controller {
 
   // Whether "enter address manually" is the selected mode
   get manualMode () {
-    return this.locationModeTargets.some((button) => button.dataset.mode === 'entered' && button.dataset.active === 'true')
+    return this.useEnteredAddressTarget.value === 'true'
   }
 
   addressField (attribute) {
