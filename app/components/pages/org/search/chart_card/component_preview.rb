@@ -6,18 +6,18 @@ module Pages
       module ChartCard
         class ComponentPreview < ApplicationComponentPreview
           def default
-            render(Pages::Org::Search::ChartCard::Component.new(scope: "search", scope_paths:,
+            render(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
               chart:, stats:))
           end
 
-          def year_scope
-            render(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
+          def search_scope
+            render(Pages::Org::Search::ChartCard::Component.new(scope: "search", scope_paths:,
               chart:, stats:))
           end
 
           # What the card shows until the lazy frame answers
           def loading
-            render(Pages::Org::Search::ChartCard::Component.new(src: scope_paths[:search], scope_paths:))
+            render(Pages::Org::Search::ChartCard::Component.new(src: scope_paths[:year], scope_paths:))
           end
 
           private

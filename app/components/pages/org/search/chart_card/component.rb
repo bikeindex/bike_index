@@ -13,9 +13,9 @@ module Pages
         class Component < ApplicationComponent
           FRAME_ID = :registrations_chart_frame
 
-          # Display order, per Kelsey's redesign; the search is what the page opens on
+          # Display order, per Kelsey's redesign
           SCOPES = %w[year search].freeze
-          DEFAULT_SCOPE = "search"
+          DEFAULT_SCOPE = "year"
 
           # The controller builds the series from the hex, so a color change moves the bar
           # and its stat row's swatch together
