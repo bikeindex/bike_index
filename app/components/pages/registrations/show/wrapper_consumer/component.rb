@@ -32,14 +32,7 @@ module Pages
           end
 
           def title
-            @bike.name.presence || bike_title_html(@bike)
-          end
-
-          # The public title already carries the year and model
-          def subtitle
-            return if current_view.first == :public
-
-            @subtitle ||= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike))
+            bike_title_html(@bike)
           end
 
           def current_view

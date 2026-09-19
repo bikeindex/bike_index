@@ -11,7 +11,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
   end
 
   context "consumer view" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, year: 2020, frame_model: "Stumpjumper") }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, year: 2020, frame_model: "Stumpjumper", name: "Morning commuter") }
     let(:current_user) { bike.reload.user }
 
     it "renders the redesigned consumer view with owner actions" do
@@ -25,7 +25,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       expect(body).to match("Mark stolen")
       expect(body).to match("Add photo")
       expect(body).to match("Edit this bike")
-      expect(body).to match("2020 Stumpjumper ·")
+      expect(body).to match("2020 #{bike.mnfg_name} Stumpjumper Morning commuter")
       expect(response.body).to match(edit_bike_path(bike, edit_template: bike.default_edit_template))
     end
 
@@ -40,7 +40,6 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to_not match("Sell on Marketplace")
         expect(body).to_not match("Mark stolen")
         expect(body).to_not match("Add photo")
-        expect(body).to_not match("2020 Stumpjumper ·")
       end
     end
 
