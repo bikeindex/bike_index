@@ -89,7 +89,7 @@
         <% end %>
         <% unless @period == "all" %>
           were
-          <em><%= UI::PeriodSelect::Component.column_label(@time_range_column) %> <%= humanized_time_range(@time_range) %></em>
+          <em><%= UI::PeriodSelect::Component.column_label(@time_range_column) %> <%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
         <% end %>
         <% if sortable_search_params? %>
           - <em><%= link_to "view all stickers", url_for %></em>

@@ -12,7 +12,7 @@
   .col-md-7.col-lg-9.mt-4
     = pluralize(number_with_delimiter(@pagy.count), "matching impound claim")
     %em
-      = humanized_time_range(@time_range)
+      = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
     - if @impound_record.present?
       for
       %strong

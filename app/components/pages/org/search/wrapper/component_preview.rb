@@ -14,7 +14,8 @@ module Pages
               bikes:,
               per_page: 10,
               params: {},
-              humanized_time_range: "in the past year"
+              time_range: (Time.current - 1.year)..Time.current,
+              period: "year"
             )
           end
 
