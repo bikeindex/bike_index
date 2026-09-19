@@ -41,6 +41,9 @@ get back local PNG paths.
 - **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
   back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the
   per-workspace throwaway DB), or capture previews.
+- **A workspace with no `WORKSPACE_ID` is on `bikeindex_development`, which is a production dump** —
+  millions of bikes and no seed users, so the sign-in below fails and every real page shows real
+  owner emails. Capture previews there; don't seed it, and don't upload a real page's shot.
 
 ## Sign in (with the PII gate)
 
