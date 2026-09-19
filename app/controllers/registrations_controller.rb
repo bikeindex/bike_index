@@ -45,9 +45,9 @@ class RegistrationsController < ApplicationController
       # Unrelated validations (e.g. a preferred_language no longer available) can block
       # the update, so return to the view they came from rather than bouncing them
       flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
-      return redirect_to(bike_view_path(bike, !show_legacy))
+      return redirect_to(bike_view_path(bike, show_legacy: !show_legacy))
     end
-    redirect_to(bike_view_path(bike, show_legacy))
+    redirect_to(bike_view_path(bike, show_legacy:))
   end
 
   # The redesign has no edit view of its own; edit still lives on the bike
@@ -89,10 +89,6 @@ class RegistrationsController < ApplicationController
   end
 
   private
-
-  def bike_view_path(bike, show_legacy)
-    show_legacy ? bike_path(bike) : registration_path(bike)
-  end
 
   # Both session touches mirror the legacy bikes#show: the recovery token is spent as
   # it's read, and a matching claim token records the email so signing up can claim

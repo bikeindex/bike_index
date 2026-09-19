@@ -213,6 +213,16 @@ module ControllerHelpers
     @registration_redesign_enabled = !Flipper.enabled?(:registration_redesign_disabled)
   end
 
+  def registration_redesign_shown?
+    registration_redesign_enabled? && !registration_show_legacy?
+  end
+
+  # The bike's page as this viewer sees it, so a redirect lands there rather than
+  # hopping through bikes#show
+  def bike_view_path(bike, show_legacy: !registration_redesign_shown?)
+    show_legacy ? bike_path(bike) : registration_path(bike)
+  end
+
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank? ||
       render_donation_request?
