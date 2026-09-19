@@ -53,4 +53,22 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     expect(page).not_to have_current_path(/details=1/, url: true)
     expect(page).to have_css("button[aria-expanded='false'][data-active='false']", text: "Toggle details")
   end
+
+  it "persists the open state to localStorage, leaving the URL alone" do
+    visit "/rails/view_components/ui/collapse/component/with_storage_key"
+    expect(page).to have_no_content("Stored panel body")
+
+    click_button("Toggle stored panel")
+    expect(page).to have_content("Stored panel body")
+    expect(page).not_to have_current_path(/\?/, url: true)
+
+    visit "/rails/view_components/ui/collapse/component/with_storage_key"
+    expect(page).to have_content("Stored panel body")
+    expect(page).to have_css("button[aria-expanded='true']", text: "Toggle stored panel")
+
+    click_button("Toggle stored panel")
+    expect(page).to have_no_content("Stored panel body")
+    visit "/rails/view_components/ui/collapse/component/with_storage_key"
+    expect(page).to have_no_content("Stored panel body")
+  end
 end

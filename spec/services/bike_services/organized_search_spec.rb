@@ -38,4 +38,25 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.notes(Bike.all, "", organization)).to eq(Bike.all)
     end
   end
+
+  describe "the settings panel's filters" do
+    let(:bike_with_sticker) { FactoryBot.create(:bike, :with_address_record) }
+    let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }
+    let!(:bike_stolen) { FactoryBot.create(:bike, :with_stolen_record) }
+    let!(:bike_impounded) { FactoryBot.create(:bike, :impounded) }
+
+    it "narrows by each value, and leaves the search alone for any other" do
+      expect(described_class.stickers(Bike.all, "with").pluck(:id)).to eq([bike_with_sticker.id])
+      expect(described_class.stickers(Bike.all, "none").pluck(:id)).to match_array([bike_stolen.id, bike_impounded.id])
+      expect(described_class.stickers(Bike.all, false).count).to eq 3
+
+      expect(described_class.address(Bike.all, "with_street").pluck(:id)).to eq([bike_with_sticker.id])
+      expect(described_class.address(Bike.all, "without_street").pluck(:id)).to match_array([bike_stolen.id, bike_impounded.id])
+      expect(described_class.address(Bike.all, false).count).to eq 3
+
+      expect(described_class.status(Bike.all, "stolen").pluck(:id)).to eq([bike_stolen.id])
+      expect(described_class.status(Bike.all, "not_impounded").pluck(:id)).to match_array([bike_with_sticker.id, bike_stolen.id])
+      expect(described_class.status(Bike.all, "all").count).to eq 3
+    end
+  end
 end

@@ -27,7 +27,10 @@ module UI
           .map { I18n.t("components.ui.period_select.#{it}") }.join(" ")
       end
 
-      def initialize(period:, start_time:, end_time:, sortable_search_params: {}, include_future: false, prepend_text: nil)
+      # align_start: beside a label rather than in the page corner
+      def initialize(period:, start_time:, end_time:, sortable_search_params: {}, include_future: false,
+        prepend_text: nil, align_start: false)
+        @align_start = align_start
         @include_future = include_future
         @prepend_text = prepend_text
         @period = period
