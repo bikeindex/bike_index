@@ -25,7 +25,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       expect(body).to match("Mark stolen")
       expect(body).to match("Add photo")
       expect(body).to match("Edit this bike")
-      expect(body).to match("2020 #{bike.mnfg_name} Stumpjumper Nickname: Morning commuter")
+      expect(body).to match("2020 #{bike.mnfg_name} Stumpjumper nickname: Morning commuter")
       expect(response.body).to match(edit_bike_path(bike, edit_template: bike.default_edit_template))
     end
 
