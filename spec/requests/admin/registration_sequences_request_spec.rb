@@ -15,6 +15,20 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+        expect(response.body).to_not include("Organization sections")
+        expect(response.body).to include("/admin/registration_sequences?organization_id=#{organization.id}\"")
+      end
+
+      context "filtered to an organization" do
+        let!(:other_draft) { FactoryBot.create(:registration_sequence, organization: FactoryBot.create(:organization)) }
+
+        it "renders the organization's tabs" do
+          get base_url, params: {organization_id: organization.id}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+          expect(Capybara.string(response.body)).to have_css("nav a[aria-current][href='/admin/registration_sequences?organization_id=#{organization.id}']",
+            text: /Registration sequences\s+1/)
+        end
       end
 
       it "offers to create the template when there isn't one" do
@@ -41,6 +55,7 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
           get base_url, params: {search_status: "draft"}
           expect(response.status).to eq(200)
           expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+          expect(response.body).to include("/admin/registration_sequences?organization_id=#{organization.id}&amp;search_status=draft")
         end
       end
     end
@@ -90,6 +105,18 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(response.body).to_not include("registration_sequence[faq_url]")
+        expect(Capybara.string(response.body)).to have_css("nav a[aria-current][href='/admin/registration_sequences?organization_id=#{organization.id}']",
+          text: /Registration sequences\s+1/)
+      end
+
+      context "template" do
+        let!(:template) { FactoryBot.create(:registration_sequence_template, :with_pages) }
+
+        it "renders without organization tabs" do
+          get "#{base_url}/#{template.id}"
+          expect(response.status).to eq(200)
+          expect(response.body).to_not include("Organization sections")
+        end
       end
     end
 
