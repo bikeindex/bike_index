@@ -265,11 +265,11 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with header_classes font-normal" do
-    it "adds font-normal class to th" do
+  context "with a sortable column" do
+    it "sets only the plain headers to normal weight" do
       result = render_inline(described_class.new(records:)) do |table|
-        table.column(label: "Name") { |r| r.name }
-        table.column(label: "Email", header_classes: "tw:font-normal") { |r| r.email }
+        table.column(sortable: "name") { |r| r.name }
+        table.column(label: "Email") { |r| r.email }
       end
 
       headers = result.css("th")
