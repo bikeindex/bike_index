@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class Rack::Attack
-  MAX_REQUESTS_PER_TWENTY = ENV.fetch("RACK_ATTACK_MAX_LIMIT", 30).to_i
+  # A shop, campus or department browses from one NAT'd address and shares this budget,
+  # so match the API's 5/second below rather than the 1.5 that a single tab can reach
+  MAX_REQUESTS_PER_TWENTY = ENV.fetch("RACK_ATTACK_MAX_LIMIT", 100).to_i
   API_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_API_MAX_LIMIT", 150).to_i
   CSP_REPORTS_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_CSP_LIMIT", MAX_REQUESTS_PER_TWENTY).to_i
 
