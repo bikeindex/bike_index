@@ -27,11 +27,7 @@ module UI
           .map { I18n.t("components.ui.period_select.#{it}") }.join(" ")
       end
 
-      # align_start: for a caller that puts the buttons beside a label, rather than
-      # the page-corner row every other one is
-      def initialize(period:, start_time:, end_time:, sortable_search_params: {}, include_future: false,
-        prepend_text: nil, align_start: false)
-        @align_start = align_start
+      def initialize(period:, start_time:, end_time:, sortable_search_params: {}, include_future: false, prepend_text: nil)
         @include_future = include_future
         @prepend_text = prepend_text
         @period = period
