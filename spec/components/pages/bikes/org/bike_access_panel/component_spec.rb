@@ -138,6 +138,14 @@ RSpec.describe Pages::Bikes::Org::BikeAccessPanel::Component, type: :component d
       expect(instance.render?).to be_truthy
       expect(component).to have_css "div"
     end
+
+    context "with registration_notes" do
+      let(:enabled_feature_slugs) { %w[registration_notes] }
+
+      it "renders the notes form" do
+        expect(component).to have_button("Save note")
+      end
+    end
   end
 
   context "without organization membership" do
