@@ -11,19 +11,23 @@
   </button>
 
   <div data-ui--collapse-target="content" class="tw:mt-2 tw:hidden">
-    <p
+    <div
       class="
-        tw:mb-0 tw:flex tw:h-64 tw:items-center tw:justify-center
-        tw:rounded-lg tw:bg-gray-100 tw:text-center tw:dark:bg-gray-800
+        tw:flex tw:h-64 tw:flex-col tw:items-center tw:justify-between
+        tw:rounded-lg tw:bg-gray-100 tw:p-4 tw:text-center
+        tw:dark:bg-gray-800
       "
     >
-      Persisted panel body — open state lives in the <code>?details=1</code> URL
-      param.
-    </p>
+      <p class="tw:mb-0">
+        Persisted panel body — open state lives in the <code>?details=1</code>
+        URL param. Lookbook frames this page, so the param lands on the frame's
+        own URL: open the preview in its own window to watch the address bar.
+      </p>
 
-    <label class="tw:flex tw:items-center tw:gap-2">
-      <%= check_box_tag :panel_checkbox, "1", false %> Panel checkbox
-    </label>
+      <label class="tw:mb-0 tw:flex tw:items-center tw:gap-2">
+        <%= check_box_tag :panel_checkbox, "1", false %> Panel checkbox
+      </label>
+    </div>
   </div>
 
   <%# Tall enough that the opening panel reaches over it - what the spec's clipping check reads %>
