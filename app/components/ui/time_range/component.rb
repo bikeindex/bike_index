@@ -13,7 +13,7 @@ module UI
       end
 
       def call
-        return period_phrase unless @period == "custom"
+        return h(period_phrase) unless @period == "custom"
 
         content_tag(:span) do
           safe_join([translation(".from"), tag.em(render(endpoint(@time_range.first))),
