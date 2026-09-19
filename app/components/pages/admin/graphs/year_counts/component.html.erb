@@ -6,7 +6,10 @@
   <% labels.each do |label| %>
     <% table.column(label:) do |row| %>
       <% count, projection = row.counts[label] %>
-      <%= number_display(count) %>
+
+      <% if count %>
+        <%= number_display(count) %>
+      <% end %>
 
       <% if projection %>
         <span class="less-strong ml-1"><%= number_display(projection) %></span>

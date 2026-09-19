@@ -34,10 +34,11 @@ RSpec.describe Pages::Admin::Graphs::YearCounts::Component, type: :component do
     let!(:recovered_in_chicago) { FactoryBot.create(:stolen_record_recovered, :in_chicago) }
 
     # StolenRecord.recovered is unscoped, so chaining it here would count Chicago too
-    it "only counts the records inside it, without the registration columns" do
-      expect(headers.last).to eq "Recovered by eoy"
+    it "only counts the records inside it, leaving the registration columns empty" do
+      expect(headers.last).to eq "Users in year"
       expect(current_year_counts["Stolen in year"]).to eq "1"
       expect(current_year_counts["Recovered in year"]).to eq "1"
+      expect(current_year_counts["Users in year"]).to be_nil
     end
   end
 end

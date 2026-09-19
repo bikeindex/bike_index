@@ -4,13 +4,14 @@ module Pages
   module Admin
     module Graphs
       module YearCounts
-        # Yearly stolen/recovered counts - everywhere, or within bounding_box, which drops the
-        # registration and user columns. The current year also gets an end-of-year projection
+        # Yearly stolen/recovered counts - everywhere, or within bounding_box, which leaves the
+        # registration and user columns empty. The current year also gets an end-of-year projection
         class Component < ApplicationComponent
           FIRST_YEAR = 2013
           # SBR's import set created_at for these years, so they count date_stolen. After, created_at
           # is more reliable, and we're showing bikes registered/recorded - not stolen times
           DATE_STOLEN_YEARS = [2013, 2014].freeze
+          REGISTRATION_LABELS = ["Stolen & non, in year", "Total Stolen & non by eoy", "Users in year"].freeze
 
           Row = Data.define(:year, :counts)
 
@@ -49,15 +50,17 @@ module Pages
             Rails.cache.fetch("admin_graphs_year_counts_#{year}", expires_in: 1.hour) do
               registered = with_projection(year, bikes, :created_at)
               stolen_counts(year, before_column: :date_stolen).merge(
-                "Stolen & non, in year" => registered,
-                "Total Stolen & non by eoy" => through_year(bikes.where(created_at: ...Date.new(year).all_year.last).count, registered),
-                "Users in year" => with_projection(year, User.unscoped, :created_at)
+                REGISTRATION_LABELS.zip([registered,
+                  through_year(bikes.where(created_at: ...Date.new(year).all_year.last).count, registered),
+                  with_projection(year, User.unscoped, :created_at)]).to_h
               )
             end
           end
 
+          # The registrations and users a box would cover aren't counted, so their columns render empty
           def bounded_counts(year)
             stolen_counts(year, before_column: "stolen_records.created_at")
+              .merge(REGISTRATION_LABELS.index_with(nil))
           end
 
           def stolen_counts(year, before_column:)
