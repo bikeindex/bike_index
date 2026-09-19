@@ -1,21 +1,24 @@
 import { Controller } from '@hotwired/stimulus'
 import { DirectUpload } from '@rails/activestorage'
 import { collapse } from 'utils/collapse_utils'
-import * as dropZone from 'utils/drop_zone'
 
 // Connects to data-controller='ui--forms--file-upload'
 // Shows the selected filename (or a count for multiple files) in the field, previews an
 // image pick, and frames the controls as a drop target while a file is dragged over the page.
 // With a url value, uploads the pick straight to storage and posts its signed blob id.
+// With a list (UI::Forms::FileUploadMultiple), the url is an endpoint instead: each pick is
+// posted to it on its own, and the markup it answers with joins the list.
 export default class extends Controller {
-  static targets = ['input', 'filename', 'dropZone', 'preview', 'previewImage', 'signedId']
+  static targets = ['input', 'filename', 'dropZone', 'preview', 'previewImage', 'signedId', 'list', 'status']
   // stall: how long without progress before the upload is treated as dead
   static values = {
     placeholder: String,
     url: String,
     uploading: String,
     failed: String,
-    stall: { type: Number, default: 30000 }
+    stall: { type: Number, default: 30000 },
+    params: Object,
+    fileParam: String
   }
 
   connect () {
@@ -26,12 +29,14 @@ export default class extends Controller {
     // The field posts its own bytes until this runs, which is what makes the form work
     // without JS - once we're uploading, the signed id is what the form carries instead.
     if (this.urlValue) this.inputTarget.removeAttribute('name')
+    this.listRequests = new Set()
   }
 
   disconnect () {
     document.removeEventListener('submit', this.boundHold, true)
     clearTimeout(this.stallTimer)
     this.releaseObjectUrl()
+    this.listRequests.forEach((request) => request.abort())
   }
 
   get form () {
@@ -49,15 +54,50 @@ export default class extends Controller {
     this.inputTarget.removeAttribute('capture')
   }
 
-  dragOver (event) { dropZone.dragOver(event, this.dropZoneTarget) }
+  dragOver (event) {
+    if (!draggingFile(event)) return
+    event.preventDefault() // without this the browser opens the file instead
 
-  endDrag (event) { dropZone.endDrag(event, this.dropZoneTarget) }
+    this.dropZoneTarget.dataset.dragging = 'true'
+  }
 
-  highlightDropZone () { dropZone.highlight(this.dropZoneTarget) }
+  // Bound to both dragleave and drop. dragleave fires for every element crossed, but
+  // relatedTarget is null only on leaving the window -- and on a drop, which ends it too.
+  endDrag (event) {
+    if (event.relatedTarget) return
+    event.preventDefault()
 
-  unhighlightDropZone (event) { dropZone.unhighlight(event, this.dropZoneTarget) }
+    delete this.dropZoneTarget.dataset.dragging
+    this.unhighlightDropZone()
+  }
 
-  drop (event) { dropZone.assignDroppedFiles(event, this.inputTarget) }
+  highlightDropZone () {
+    this.dropZoneTarget.dataset.over = 'true'
+  }
+
+  // The frame wraps the controls, so dragging onto one of them leaves the frame
+  // in the event's terms -- only a relatedTarget outside it is a real exit.
+  unhighlightDropZone (event) {
+    if (event?.relatedTarget && this.dropZoneTarget.contains(event.relatedTarget)) return
+
+    delete this.dropZoneTarget.dataset.over
+  }
+
+  drop (event) {
+    event.preventDefault()
+    const dropped = [...event.dataTransfer.files]
+    if (dropped.length === 0) return
+
+    // Assigning a FileList is the only way to fill a file input; `multiple`
+    // decides how much of the drop it can hold.
+    const transfer = new window.DataTransfer()
+    ;(this.inputTarget.multiple ? dropped : dropped.slice(0, 1)).forEach((file) => transfer.items.add(file))
+    this.inputTarget.files = transfer.files
+    // Assigning files fires nothing. Picking a file natively fires both, and both
+    // have listeners: `input` drives display(), `change` is what callers bind to.
+    this.inputTarget.dispatchEvent(new Event('input', { bubbles: true }))
+    this.inputTarget.dispatchEvent(new Event('change', { bubbles: true }))
+  }
 
   display () {
     const { files } = this.inputTarget
@@ -65,8 +105,58 @@ export default class extends Controller {
       files.length === 0
         ? this.placeholderValue
         : files.length === 1 ? files[0].name : `${files.length} files`
+    if (this.hasListTarget) return this.postEach()
+
     this.showPreview(files[0])
     if (this.urlValue && files[0]) this.upload(files[0])
+  }
+
+  // One request per file, so a slow one doesn't hold the rest back and a rejected one
+  // doesn't take them down with it.
+  postEach () {
+    const files = [...this.inputTarget.files]
+    // The requests hold the files now; clearing lets the same one be picked again
+    this.inputTarget.value = ''
+    files.forEach((file) => this.post(file))
+  }
+
+  post (file) {
+    const row = this.statusRow(file)
+    const body = new FormData()
+    body.append(this.fileParamValue, file)
+    Object.entries(this.paramsValue).forEach(([key, value]) => body.append(key, value))
+
+    const request = new window.XMLHttpRequest()
+    this.listRequests.add(request)
+    request.open('POST', this.urlValue)
+    request.responseType = 'json'
+    request.setRequestHeader('X-CSRF-Token', document.querySelector('meta[name="csrf-token"]')?.content)
+    request.upload.addEventListener('progress', (event) => {
+      if (event.lengthComputable) row.lastElementChild.textContent = `${this.uploadingValue} ${percent(event)}%`
+    })
+    request.addEventListener('loadend', () => this.posted(request, row))
+    request.send(body)
+  }
+
+  posted (request, row) {
+    this.listRequests.delete(request)
+    if (request.response?.html) {
+      this.listTarget.insertAdjacentHTML('beforeend', request.response.html)
+      return row.remove()
+    }
+
+    row.dataset.failed = 'true'
+    row.lastElementChild.textContent = request.response?.error || this.failedValue
+  }
+
+  statusRow (file) {
+    const row = document.createElement('li')
+    row.className = 'tw:flex tw:gap-2 tw:text-sm tw:text-gray-500 tw:data-[failed=true]:text-red-600 tw:dark:text-gray-400 tw:dark:data-[failed=true]:text-red-400'
+    row.innerHTML = '<span class="tw:min-w-0 tw:truncate"></span><span class="tw:whitespace-nowrap"></span>'
+    row.firstElementChild.textContent = file.name
+    row.lastElementChild.textContent = this.uploadingValue
+    this.statusTarget.appendChild(row)
+    return row
   }
 
   // Reads the file the browser already holds, so the preview lands on the pick rather than
@@ -164,8 +254,7 @@ export default class extends Controller {
     this.watchForStall()
     if (!event.lengthComputable) return
 
-    const percent = Math.round((event.loaded / event.total) * 100)
-    this.status(this.uploadingFile, `${this.uploadingValue} ${percent}%`)
+    this.status(this.uploadingFile, `${this.uploadingValue} ${percent(event)}%`)
   }
 
   // Submitting mid-upload would drop the file, so hold the form until the blob lands.
@@ -177,4 +266,13 @@ export default class extends Controller {
     await this.pending
     this.form.requestSubmit()
   }
+}
+
+// Dragged text and page elements fire these events too; only files matter here.
+function draggingFile (event) {
+  return event.dataTransfer?.types?.includes('Files')
+}
+
+function percent (event) {
+  return Math.round((event.loaded / event.total) * 100)
 }

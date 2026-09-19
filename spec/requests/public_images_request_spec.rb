@@ -138,7 +138,7 @@ RSpec.describe PublicImagesController, type: :request do
       let(:blog) { FactoryBot.create(:blog) }
       let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
       context "admin authorized" do
-        # The html is what UI::Forms::FileUploadMulti appends to the list it's already showing
+        # The html is what UI::Forms::FileUploadMultiple appends to the list it's already showing
         it "creates an image, answering with the item's markup" do
           post base_url, params: {blog_id: blog.id, public_image: {name: "cool name", image: file}, format: :js}
           blog.reload

@@ -100,7 +100,7 @@ class PublicImagesController < ApplicationController
 
   protected
 
-  # Rendered here rather than built in JS, so the item UI::Forms::FileUploadMulti appends is
+  # Rendered here rather than built in JS, so the item UI::Forms::FileUploadMultiple appends is
   # the same markup as the ones the page loaded with
   def admin_image_html
     render_to_string(partial: "public_images/admin_public_image", locals: {public_image: @public_image})

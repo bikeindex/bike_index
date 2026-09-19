@@ -25,7 +25,7 @@ module UI
           @attachment_url = attached_url
           @thumbnail_url = thumbnail_version_url || @attachment_url
 
-          @direct_upload_url = direct_upload_url
+          @upload_url = direct_upload_url
           # Carries the blob the browser uploaded. Scoped to the form builder like every other
           # field here, so two of these on one page don't collide on the same param
           @signed_id_field = "#{form_builder.object_name}[#{attribute}_signed_id]" if direct_upload_url.present?
@@ -39,7 +39,19 @@ module UI
           @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: LABEL_CLASSES)
         end
 
+        # FileUploadMultiple renders this template, so it reads these keys rather than its own
+        def component_translation_scope = %i[components ui forms file_upload]
+
         private
+
+        # sr-only keeps the native input focusable and in the accessibility tree; the label is the visible, clickable button.
+        def file_input = @form_builder.file_field(@attribute, @html_options)
+
+        # Stimulus has no default event for a label, so name click explicitly.
+        def file_label
+          @form_builder.label(@attribute, label_content, class: @label_classes,
+            data: {action: "click->ui--forms--file-upload#chooseFile"})
+        end
 
         # The button's gap-1.5 spaces these; the icon is decorative, the text names it.
         def label_content
@@ -54,7 +66,7 @@ module UI
         end
 
         def record
-          @form_builder.object
+          @form_builder&.object
         end
 
         def attachment

@@ -36,7 +36,8 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
       it "doesn't send the tabs through turbo" do
         get "#{base_url}/landing_page/edit"
         expect(response.status).to eq(200)
-        expect(response.body).to include("data-controller=\"ui--forms--file-upload-multi\"")
+        expect(response.body).to include("data-ui--forms--file-upload-target=\"list\"")
+        expect(response.body).to include("data-ui--forms--file-upload-params-value=\"{&quot;organization_id&quot;:&quot;#{organization.to_param}&quot;}\"")
         expect(response.body).to_not include('data-turbo="true"')
       end
 
