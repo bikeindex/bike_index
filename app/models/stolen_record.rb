@@ -88,6 +88,8 @@ class StolenRecord < ApplicationRecord
     "Bike was not locked"
   ].freeze
 
+  # The API and bulk imports keep accepting the names from before the address_record rename
+  LEGACY_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   enum :recovery_display_status, RECOVERY_DISPLAY_STATUS_ENUM
 
   belongs_to :bike
@@ -133,9 +135,16 @@ class StolenRecord < ApplicationRecord
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
-  scope :without_street, -> { where(street: ["", nil]) }
+
 
   class << self
+    def legacy_attrs_renamed(attrs)
+      attrs.except(*LEGACY_ATTRS.keys)
+        .merge(attrs.slice(*LEGACY_ATTRS.keys).compact_blank.transform_keys(LEGACY_ATTRS)) do |_key, current, legacy|
+          current.presence || legacy
+        end
+    end
+
     def permitted_visible_attribute(string_or_sym = nil, default: nil)
       AddressRecord.permitted_visible_attribute(string_or_sym, default:)
     end
@@ -259,10 +268,6 @@ class StolenRecord < ApplicationRecord
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?
     address_present?
-  end
-
-  def without_street?
-    street.blank?
   end
 
   def set_calculated_attributes
