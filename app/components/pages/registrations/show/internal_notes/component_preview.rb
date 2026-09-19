@@ -14,7 +14,6 @@ module Pages
             render_notes([note("Owner picked it up from the rack by the library.", "Alice Staff", 2.hours.ago)])
           end
 
-          # Each post replaces the note, and paper_trail keeps the ones before it
           def thread_with_previous_notes
             render_notes([
               note("Owner confirmed the new lock — clear to release.", "Alice Staff", 20.minutes.ago),
@@ -24,17 +23,17 @@ module Pages
           end
 
           def author_deleted
-            render_notes([::BikeOrganizationNote.new(body: "Written by someone who has since left.", updated_at: 1.week.ago)])
+            render_notes([BikeOrganizationNote.new(body: "Written by someone who has since left.", updated_at: 1.week.ago)])
           end
 
           private
 
           def render_notes(notes)
-            render(Component.new(notes:, url: "#", current_user: ::User.new(name: "Preview User")))
+            render(Component.new(notes:, url: "#", current_user: User.new(name: "Preview User")))
           end
 
           def note(body, user_name, updated_at)
-            ::BikeOrganizationNote.new(body:, updated_at:, user: ::User.new(name: user_name))
+            BikeOrganizationNote.new(body:, updated_at:, user: User.new(name: user_name))
           end
         end
       end

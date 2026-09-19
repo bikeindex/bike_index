@@ -16,7 +16,7 @@
   <% end %>
 
   <%= form_with(url: @url, method: :patch, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |f| %>
-    <%= f.text_area :notes, name: "notes", rows: 3, class: "twinput tw:w-full", placeholder: translation(".notes_placeholder") %>
+    <%= f.text_area :notes, rows: 3, class: "twinput tw:w-full", placeholder: translation(".notes_placeholder") %>
 
     <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
       <small class="tw:opacity-65">
