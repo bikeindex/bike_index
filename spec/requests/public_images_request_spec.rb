@@ -146,8 +146,8 @@ RSpec.describe PublicImagesController, type: :request do
           expect(public_image.name).to eq "cool name"
           expect(JSON.parse(response.body)["html"]).to include("id=\"image-#{public_image.id}\"")
           # Blog images are the ones that can be deleted and made primary
-          expect(JSON.parse(response.body)["html"]).to include("image-delete-button")
-          expect(JSON.parse(response.body)["html"]).to include("index-image-select")
+          expect(JSON.parse(response.body)["html"]).to include("admin--public-image#destroy")
+          expect(JSON.parse(response.body)["html"]).to include("name=\"blog[index_image_id]\"")
         end
 
         context "with an unstorable file" do
@@ -207,8 +207,8 @@ RSpec.describe PublicImagesController, type: :request do
           post base_url, params: {mail_snippet_id: mail_snippet.to_param, public_image: {name: "cool name", image: file}, format: :js}
           mail_snippet.reload
           expect(mail_snippet.public_images.first.name).to eq "cool name"
-          expect(JSON.parse(response.body)["html"]).to_not include("image-delete-button")
-          expect(JSON.parse(response.body)["html"]).to_not include("index-image-select")
+          expect(JSON.parse(response.body)["html"]).to_not include("admin--public-image#destroy")
+          expect(JSON.parse(response.body)["html"]).to_not include("index_image_id")
         end
       end
       context "not admin" do
@@ -225,6 +225,18 @@ RSpec.describe PublicImagesController, type: :request do
 
   describe "destroy" do
     let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
+    context "blog, from the admin image list" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: FactoryBot.create(:blog)) }
+
+      # A redirect would have the fetch render the whole edit page, only to discard it
+      it "answers no content" do
+        expect {
+          delete "#{base_url}/#{public_image.id}", headers: {"Accept" => "application/json"}
+        }.to change(PublicImage, :count).by(-1)
+        expect(response.status).to eq 204
+      end
+    end
     context "mail_snippet" do
       it "rejects the destroy" do
         public_image = FactoryBot.create(:public_image,

@@ -70,6 +70,8 @@ class PublicImagesController < ApplicationController
     end
     image_path = public_image_path(@public_image)
     @public_image.destroy
+    return head(:no_content) if request.format.json?
+
     flash[:success] = translation(:image_deleted)
     if imageable_type == "Blog"
       redirect_to(edit_admin_news_url(@imageable.title_slug), status: 303) && return

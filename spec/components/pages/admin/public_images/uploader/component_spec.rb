@@ -11,7 +11,7 @@ RSpec.describe Pages::Admin::PublicImages::Uploader::Component, type: :component
 
     it "names the param PublicImagesController#create finds the blog back by" do
       expect(component).to have_css("[data-ui--forms--file-upload-multi-params-value='{\"blog_id\":#{imageable.id}}']")
-      expect(component).to have_css("ul#public_images.row li#image-#{public_image.id}")
+      expect(component).to have_css("ul.row li#image-#{public_image.id}")
     end
   end
 

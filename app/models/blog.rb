@@ -238,7 +238,8 @@ class Blog < ApplicationRecord
   end
 
   def set_index_image
-    self.index_image_id = nil unless PublicImage.where(id: index_image_id).present?
+    # 0 is "No primary image", which no PublicImage matches
+    self.index_image_id = nil unless index_image_id == 0 || PublicImage.where(id: index_image_id).present?
     if index_image_id.present?
       if index_image_id == 0
         self.index_image = nil

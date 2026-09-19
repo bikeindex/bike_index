@@ -1,6 +1,6 @@
-- blog_image = public_image.imageable_type == 'Blog'
+- blog = public_image.imageable if public_image.imageable_type == 'Blog'
 - original_url = public_image.image_url
-%li.admin-public-image.collapse.show.mt-1.col-xl-4.col-sm-6{ id: "image-#{public_image.id}", "data-imageid" => public_image.id }
+%li.admin-public-image.mt-1.col-xl-4.col-sm-6{ id: "image-#{public_image.id}", data: ({ controller: "admin--public-image", "admin--public-image-url-value": public_image_path(public_image) } if blog) }
   .card.bg-light
     .card-body
       .row
@@ -15,12 +15,12 @@
         .col-9
           %textarea.form-control
             \&lt;img class="post-image" src="#{original_url}" alt="ENTER YOUR TEXT HERE"&gt;
-      .row
-        .col-6
-          - if blog_image
-            = link_to "delete", public_image_url(public_image, return_url: edit_admin_news_url(public_image.imageable)), method: :delete, data: { confirm: "Are you sure? You could lose any unsaved changes!" }, class: "image-delete-button"
-        .col-6.text-right
-          - if blog_image
-            %label.index-image-select.form-check-inline
-              %input{ class: "index_image_#{public_image.id}", name: "index_image_id", type: "radio", value: "#{public_image.id}" }
+      - if blog
+        .row
+          .col-6
+            = render(UI::Button::Component.new(text: "delete", color: :error, size: :sm, data: { action: "admin--public-image#destroy" }))
+          .col-6.text-right
+            %label.form-check-inline
+              -# The list sits outside the blog's form, so `form` is what joins it to "No primary image"
+              %input{ type: "radio", name: "blog[index_image_id]", value: public_image.id, form: dom_id(blog, :edit), checked: blog.index_image_id == public_image.id }
               %em.ml-1 primary image
