@@ -18,7 +18,12 @@
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area, label_text: translation(".current_note"), optional_badge: false, wrapper_class: nil, html_options: {value: @note&.body, rows: 3, class: "tw:w-full"})) do |group| %>
       <% if @note&.body.present? %>
         <% group.with_label_note do %>
-          <%= translation(".most_recent_update_by", user: @note.user&.display_name) %>
+          <% if @note.user.present? %>
+            <%= translation(".most_recent_update_by", user: @note.user.display_name) %>
+          <% else %>
+            <%= translation(".most_recent_update") %>
+          <% end %>
+
           <%= render(UI::Time::Component.new(time: @note.updated_at, preposition: true)) %>
         <% end %>
       <% end %>

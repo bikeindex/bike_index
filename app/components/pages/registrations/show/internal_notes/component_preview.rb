@@ -6,6 +6,7 @@ module Pages
       module InternalNotes
         # In-memory notes, so nothing is written to the database
         class ComponentPreview < ApplicationComponentPreview
+          # @!group States
           def no_notes
             render_notes(nil)
           end
@@ -25,6 +26,7 @@ module Pages
           def author_deleted
             render_notes(BikeOrganizationNote.new(body: "Written by someone who has since left.", updated_at: 1.week.ago))
           end
+          # @!endgroup
 
           private
 

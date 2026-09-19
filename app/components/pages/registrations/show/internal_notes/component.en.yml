@@ -7,6 +7,7 @@ en:
           internal_notes:
             current_note: Current note
             internal_notes: Internal notes
+            most_recent_update: most recent update
             most_recent_update_by: most recent update by %{user}
             note_by: Note by %{user}
             post_note: Post note
