@@ -203,7 +203,9 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
         route.fulfill(status: 200, json: {version: 8, sources: {}, layers: []})
       })
     end
-    visit base_url
+    # An area around both New York and Chicago
+    visit "#{base_url}?search_southwest_coords=40,-88&search_northeast_coords=42.5,-73"
+    expect(page).to have_link("search everywhere")
 
     # Every current notification gets a pin, and the map fits to them all
     expect(page).to have_css(".maplibregl-marker", count: 3, wait: 15)
@@ -211,13 +213,18 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     expect(page).to have_content("3 visible")
 
     within(row_for(abandoned)) { click_button "Show on map" }
-    within(".maplibregl-popup") { expect(page).to have_content("Appears abandoned") }
+    within(".maplibregl-popup") do
+      expect(page).to have_content("Appears abandoned")
+      expect(page).not_to have_link("Created")
+    end
     find("body").send_keys(:escape)
     expect(page).not_to have_css(".maplibregl-popup")
 
     fill_in "Search map", with: "New York"
     find_field("Search map").send_keys(:enter)
     expect(page).to have_content("2 visible", wait: 15)
+    # A place search drops the searched area
+    expect(page).not_to have_link("search everywhere")
     expect(page).to have_css(row_for(far_away), visible: :hidden)
 
     click_link "retrieve/send repeat notification"

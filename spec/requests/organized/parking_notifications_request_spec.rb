@@ -32,6 +32,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(response.status).to eq(200)
         expect(response.body).to include(notification_path(parking_notification_retrieved))
         expect(response.body).to include(%(data-org--parking-notifications-index-bounding-box-value="[40.7,-74.1,40.8,-73.9]"))
+        expect(response.body).to include(%(href="#{base_url}?search_status=all">search everywhere</a>))
         expect(response.body).to match(/data-org--parking-notifications-index-place-value="\[-?[\d.]+,-?[\d.]+\]"/)
       end
     end

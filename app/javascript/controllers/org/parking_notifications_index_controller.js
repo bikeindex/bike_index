@@ -5,7 +5,7 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='org--parking-notifications-index'
 // Pins every loaded notification on the map, and narrows the table to the ones in view
 export default class extends Controller {
-  static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeInput', 'redo', 'fit',
+  static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeForm', 'placeInput', 'redo', 'fit',
     'visibleCount', 'table', 'row', 'emptyRow', 'submit']
 
   static values = {
@@ -49,9 +49,14 @@ export default class extends Controller {
     }
   }
 
+  // A place outside the searched area would show none of its notifications
   searchPlace (event) {
     event.preventDefault()
-    this.#visit({ map_location: this.placeInputTarget.value.trim() || null })
+    this.#visit({
+      map_location: this.placeInputTarget.value.trim() || null,
+      search_southwest_coords: null,
+      search_northeast_coords: null
+    })
   }
 
   showOnMap (event) {
@@ -87,9 +92,11 @@ export default class extends Controller {
       cooperativeGestures: true,
       attributionControl: { customAttribution: OSM_ATTRIBUTION }
     })
+    const placeForm = this.placeFormTarget.content.firstElementChild.cloneNode(true)
+    this.map.addControl({ onAdd: () => placeForm, onRemove: () => placeForm.remove() }, 'top-left')
     this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
     this.map.addControl(new ExpandControl(), 'top-right')
-    this.popup = new maplibregl.Popup({ offset: 32, maxWidth: 'min(90vw, 60rem)', closeOnClick: false })
+    this.popup = new maplibregl.Popup({ offset: 32, maxWidth: 'min(90vw, 60rem)', closeOnClick: false, focusAfterOpen: false })
 
     // rowTargets re-queries the DOM on every read, and every moveend reads it
     this.rows = this.rowTargets
@@ -130,7 +137,10 @@ export default class extends Controller {
   // The row, under the table's header, without the map and checkbox columns
   #popupContent (row) {
     const table = this.tableTarget.cloneNode(false)
-    table.append(this.tableTarget.tHead.cloneNode(true))
+    const head = this.tableTarget.tHead.cloneNode(true)
+    // The sort links would re-sort the page from inside a popup
+    head.querySelectorAll('a').forEach((link) => link.replaceWith(...link.childNodes))
+    table.append(head)
     const clone = row.cloneNode(true)
     clone.classList.remove('tw:hidden', 'tw:hidden!')
     table.createTBody().append(clone)
