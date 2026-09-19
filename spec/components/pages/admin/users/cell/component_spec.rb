@@ -31,6 +31,18 @@ RSpec.describe Pages::Admin::Users::Cell::Component, type: :component do
     end
   end
 
+  context "with a soft-deleted user" do
+    let(:deleted_user) { FactoryBot.create(:user, email: "deleted@example.com").tap(&:destroy) }
+    let(:options) { {user_id: deleted_user.id} }
+
+    it "links their email and marks them deleted, rather than missing" do
+      expect(User.find_by(id: deleted_user.id)).to be_nil
+      expect(component).to have_css("a[href$='/admin/users/#{deleted_user.id}']", text: "deleted@example.com")
+      expect(component.text).to include("user deleted")
+      expect(component.text).not_to include("Missing user")
+    end
+  end
+
   context "with missing user and no email" do
     let(:options) { {user_id: 888} }
 
