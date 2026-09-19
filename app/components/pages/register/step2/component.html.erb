@@ -44,7 +44,7 @@
     <div class="tw:mb-4" data-controller="register--additional-colors">
       <%= f.label :primary_frame_color_id, class: "twlabel" do %>
         <%= translation(".color") %>
-        <%= tag.span("*", class: "tw:text-red-600") %>
+        <%= render UI::Forms::RequiredMarker::Component.new %>
         <%= render UI::Badge::Component.new(text: translation(".up_to_3"), size: :xs) %>
       <% end %>
 
@@ -139,7 +139,7 @@
       <div class="tw:flex tw:items-center tw:justify-between tw:gap-2">
         <%= f.label :serial_number, class: "twlabel" do %>
           <%= translation(".serial_number") %>
-          <%= tag.span("*", class: "tw:text-red-600") %>
+          <%= render UI::Forms::RequiredMarker::Component.new %>
         <% end %>
 
         <%= render UI::Button::Component.new(color: :link, html_class: "tw:text-xs tw:font-bold",
