@@ -217,8 +217,10 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
       expect(page).to have_content("Appears abandoned")
       expect(page).not_to have_link("Created")
     end
+    expect(page).to have_css(".maplibregl-marker[aria-current='true']", count: 1)
     find("body").send_keys(:escape)
     expect(page).not_to have_css(".maplibregl-popup")
+    expect(page).not_to have_css(".maplibregl-marker[aria-current]")
 
     fill_in "Search map", with: "New York"
     find_field("Search map").send_keys(:enter)

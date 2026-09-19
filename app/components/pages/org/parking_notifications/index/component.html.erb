@@ -23,7 +23,7 @@
     ></div>
 
     <template data-org--parking-notifications-index-target="pin">
-      <%= render UI::Button::Component.new(color: :link, html_class: "tw:opacity-75 tw:hover:opacity-100", title: "Show notification") do %>
+      <%= render UI::Button::Component.new(color: :link, html_class: "tw:opacity-75 tw:transition-opacity tw:hover:opacity-100 tw:aria-[current=true]:z-1 tw:aria-[current=true]:opacity-100 tw:*:origin-bottom tw:*:transition-[scale] tw:aria-[current=true]:*:scale-125", title: "Show notification") do %>
         <%= helpers.inline_svg_tag("kelsey/registration_show/map-pin-solid.svg", class: "tw:h-8 tw:drop-shadow-md", aria_hidden: true) %>
       <% end %>
     </template>

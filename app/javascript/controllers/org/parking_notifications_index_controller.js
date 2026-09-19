@@ -97,6 +97,7 @@ export default class extends Controller {
     this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
     this.map.addControl(new ExpandControl(), 'top-right')
     this.popup = new maplibregl.Popup({ offset: 32, maxWidth: 'min(90vw, 60rem)', closeOnClick: false, focusAfterOpen: false })
+    this.popup.on('close', () => this.#markCurrentPin(null))
 
     // rowTargets re-queries the DOM on every read, and every moveend reads it
     this.rows = this.rowTargets
@@ -129,9 +130,18 @@ export default class extends Controller {
   }
 
   #openPopup (row) {
-    this.popup.setLngLat(this.markers.get(row).getLngLat())
+    const marker = this.markers.get(row)
+    this.popup.setLngLat(marker.getLngLat())
       .setDOMContent(this.#popupContent(row))
       .addTo(this.map)
+    // After addTo, which closes the popup it reopens
+    this.#markCurrentPin(marker.getElement())
+  }
+
+  #markCurrentPin (pin) {
+    this.currentPin?.removeAttribute('aria-current')
+    pin?.setAttribute('aria-current', 'true')
+    this.currentPin = pin
   }
 
   // The row, under the table's header, without the map and checkbox columns
