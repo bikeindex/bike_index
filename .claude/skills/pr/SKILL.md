@@ -5,7 +5,7 @@ description: >-
   asks to create/open/make a PR, or to edit/update/rewrite/fix the PR
   description, body, summary, or title — including bare phrasings like "update
   pr" or "update the PR" with no other object — for both new PRs and existing
-  ones. Note this runs `/simplify`, `bin/lint`, a CLAUDE.md conformance pass and
+  ones. Note this runs `/simplify`, `bin/lint`, an AGENTS.md conformance pass and
   a merge from the base before writing the body — skipped when the ask is only to
   reword the description — and pushes the result. For
   frontend diffs, delegates the screenshot phase to `references/screenshots.md`,
@@ -52,9 +52,9 @@ Bring the branch up to date so the PR reflects the current base and merges witho
 
 This has to happen before the cleanup below, which diffs against `origin/main`.
 
-### Simplify, lint, and conform to CLAUDE.md
+### Simplify, lint, and conform to AGENTS.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, its four audits, and the cycle-type translation check. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its four audits, and the cycle-type translation check. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
 
 ### Freshen stale migration timestamps
 
@@ -155,8 +155,8 @@ Last, before reporting the PR URL. Look back over the whole run and ask whether 
 
 - **Did any skill mislead you?** A command that failed, a path or version that had moved, a step that didn't match what the repo does now — fix it in that skill. This skill included.
 - **Did you work around something undocumented?** If the next run would hit the same wall, the fix belongs in the skill, not in your memory.
-- **Did the branch establish a convention?** A new pattern, a rule you had to infer from existing code, or a guideline you found yourself explaining — that's `CLAUDE.md` (root, or the nested one nearest the code).
-- **Did `/simplify` or the CLAUDE.md pass flag the same thing more than once?** A repeated correction is a missing written rule.
+- **Did the branch establish a convention?** A new pattern, a rule you had to infer from existing code, or a guideline you found yourself explaining — that's `AGENTS.md` (root, or the nested one nearest the code).
+- **Did `/simplify` or the AGENTS.md pass flag the same thing more than once?** A repeated correction is a missing written rule.
 
 Most runs turn up nothing — say so and stop.
 
