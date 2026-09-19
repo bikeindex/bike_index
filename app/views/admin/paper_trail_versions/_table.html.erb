@@ -23,7 +23,7 @@
 
   <% table.column(label: "Whodunnit") do |version| %>
     <% if version.whodunnit.present? %>
-      <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: User.find_by(id: version.whodunnit), user_id: version.whodunnit.to_i, render_search: render_sortable) %>
+      <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user_id: version.whodunnit.to_i, render_search: render_sortable) %>
     <% end %>
   <% end %>
 

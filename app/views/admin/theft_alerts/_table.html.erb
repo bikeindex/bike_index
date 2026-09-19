@@ -2,7 +2,6 @@
 
 <% render_dev_info = display_dev_info? %>
 
-<%# A cell's own cache would digest UI::Table's template, not this one %>
 <% user_cell_cache = cache_fragment_name("user_cell") %>
 
 <%= render(UI::Table::Component.new(records: theft_alerts, render_sortable:, sort_state:)) do |table| %>

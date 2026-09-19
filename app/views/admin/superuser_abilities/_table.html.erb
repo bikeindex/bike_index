@@ -1,6 +1,5 @@
 <%# locals: (collection:, render_sortable: false, skip_user: false, render_deleted: @render_deleted) %>
 
-<%# A cell's own cache would digest UI::Table's template, not this one %>
 <% user_cell_cache = cache_fragment_name("user_cell") %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>

@@ -55,7 +55,6 @@
       <% organizations = Organization.unscoped.where(id: kind_counts.keys).index_by(&:id) %>
       <% organization_rows = kind_counts.map { |id, counts| {organization_id: id, organization: organizations[id], counts:} }
         .sort_by { |row| row[:counts].values.sum } %>
-      <% total_counts = BikeStickerUpdate.kinds.index_with { |kind| organization_rows.sum { |row| row[:counts].fetch(kind, 0) } } %>
 
       <div class="mt-2">
         <%= render(UI::Table::Component.new(records: organization_rows, sort_state:)) do |table| %>
@@ -69,7 +68,7 @@
 
           <% if @search_kind == "all" %>
             <% BikeStickerUpdate.kinds.each do |kind| %>
-              <% table.column(label: kind.humanize, classes: "tw:text-sm", footer: number_display(total_counts[kind])) do |row| %>
+              <% table.column(label: kind.humanize, classes: "tw:text-sm", footer: number_display(organization_rows.sum { |row| row[:counts].fetch(kind, 0) })) do |row| %>
                 <%= number_display(row[:counts].fetch(kind, 0)) %>
               <% end %>
             <% end %>

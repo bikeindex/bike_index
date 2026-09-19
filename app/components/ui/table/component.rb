@@ -53,7 +53,7 @@ module UI
       end
 
       def footer?
-        @columns.any? { |col| !col.footer.nil? }
+        @columns.any?(&:footer)
       end
 
       def sortable_table

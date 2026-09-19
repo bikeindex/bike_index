@@ -63,14 +63,13 @@ module Pages
 
           def stolen_counts(year, stolen_before:)
             date = Date.new(year)
-            recovered = recovered_records
             stolen = with_projection(year, stolen_in_year(year), stolen_records.where("stolen_records.created_at" => past_year))
-            recovered_in_year = with_projection(year, recovered.where(recovered_at: date.all_year).count, recovered.where(recovered_at: past_year))
+            recovered_in_year = with_projection(year, recovered_records.where(recovered_at: date.all_year).count, recovered_records.where(recovered_at: past_year))
             {
               "Stolen in year" => stolen,
               "Total stolen by eoy" => through_year(stolen_before, stolen),
               "Recovered in year" => recovered_in_year,
-              "Recovered by eoy" => through_year(recovered.where("recovered_at < ?", date.beginning_of_year).count, recovered_in_year)
+              "Recovered by eoy" => through_year(recovered_records.where("recovered_at < ?", date.beginning_of_year).count, recovered_in_year)
             }
           end
 

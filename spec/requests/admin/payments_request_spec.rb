@@ -31,8 +31,8 @@ RSpec.describe Admin::PaymentsController, type: :request do
       expect(response.body).to include(subject.amount_formatted)
     end
 
-    # A cache() inside a UI::Table cell digests the table's template, so a bare
-    # cache(payment.user) shared its fragment with every other admin table caching that user
+    # A cache() inside a UI::Table cell digests the table's template, so an unprefixed key
+    # would share this fragment with every admin table caching the same user
     context "with caching", :caching do
       include_context :caching_basic
 

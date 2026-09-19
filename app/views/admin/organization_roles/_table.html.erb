@@ -2,7 +2,6 @@
 
 <% render_organization_search = params[:organization_id].blank? %>
 
-<%# A cell's own cache would digest UI::Table's template, not this one %>
 <% user_cell_cache = cache_fragment_name("user_cell") %>
 
 <%= render(UI::Table::Component.new(records: organization_roles, render_sortable:, sort_state:)) do |table| %>
