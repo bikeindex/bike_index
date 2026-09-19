@@ -26,7 +26,6 @@
 <%= render(Pages::Admin::Graphs::YearCounts::Component.new) %>
 
 <div class="mt-4"></div>
-<div class="mt-4"></div>
 
 <% location_radius = params[:location_radius].present? ? params[:location_radius].to_i : 100 %>
 <% box = params[:location].present? && GeocodeHelper.bounding_box(params[:location], location_radius) %>

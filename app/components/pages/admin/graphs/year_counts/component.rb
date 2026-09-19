@@ -48,11 +48,11 @@ module Pages
           def cached_everywhere_counts(year)
             Rails.cache.fetch("admin_graphs_year_counts_#{year}", expires_in: 1.hour) do
               date = Date.new(year)
-              registered = with_projection(year, bikes.where(created_at: date.all_year).count, bikes.where(created_at: past_year))
+              registered = with_projection(year, bikes, :created_at)
               stolen_counts(year, stolen_before: stolen_records.where("date_stolen < ?", date.beginning_of_year).count).merge(
                 "Stolen & non, in year" => registered,
                 "Total Stolen & non by eoy" => through_year(bikes.where("created_at < ?", date.all_year.last).count, registered),
-                "Users in year" => with_projection(year, User.unscoped.where(created_at: date.all_year).count, User.unscoped.where(created_at: past_year))
+                "Users in year" => with_projection(year, User.unscoped, :created_at)
               )
             end
           end
@@ -63,8 +63,8 @@ module Pages
 
           def stolen_counts(year, stolen_before:)
             date = Date.new(year)
-            stolen = with_projection(year, stolen_in_year(year), stolen_records.where("stolen_records.created_at" => past_year))
-            recovered_in_year = with_projection(year, recovered_records.where(recovered_at: date.all_year).count, recovered_records.where(recovered_at: past_year))
+            stolen = with_projection(year, stolen_records, DATE_STOLEN_YEARS.include?(year) ? :date_stolen : "stolen_records.created_at")
+            recovered_in_year = with_projection(year, recovered_records, :recovered_at)
             {
               "Stolen in year" => stolen,
               "Total stolen by eoy" => through_year(stolen_before, stolen),
@@ -73,16 +73,12 @@ module Pages
             }
           end
 
-          def stolen_in_year(year)
-            column = DATE_STOLEN_YEARS.include?(year) ? :date_stolen : "stolen_records.created_at"
-            stolen_records.where(column => Date.new(year).all_year).count
-          end
-
           # [count, projected end-of-year count] - only the current year is projected, without seasonality
-          def with_projection(year, count, past_year_scope)
+          def with_projection(year, scope, column)
+            count = scope.where(column => Date.new(year).all_year).count
             return [count, nil] unless year == Time.current.year
 
-            [count, count + (BigDecimal(past_year_scope.count) / 365 * days_left).to_i]
+            [count, count + (BigDecimal(scope.where(column => past_year).count) / 365 * days_left).to_i]
           end
 
           def through_year(before, (count, projection))
