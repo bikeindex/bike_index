@@ -18,7 +18,6 @@ RSpec.describe Pages::Org::Search::ChartCard::Component, type: :component do
     expect(component).to have_link("Current search", href: scope_paths[:search])
     expect(component).to have_text("Total registrations")
     expect(component).to have_text("+100%")
-    # No earlier window to compare against, so the row renders without a delta
     expect(component).to have_text("Reported stolen")
     expect(component).to have_css("dl div", count: 2)
   end
