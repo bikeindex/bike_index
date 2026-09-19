@@ -11,7 +11,15 @@ module UI
       # Template Dependency: UI::Button::Component
       KINDS = %i[button toggle].freeze
 
+      # Chip line height and row gaps come from kelsey_redesign/new-org-search/, not the type scale
       CHIP_CLASSES = "#{UI::Button::Component.build_classes(color: :secondary, size: :md)} tw:leading-4".freeze
+
+      # UI::PeriodSelect lays its own buttons out with these, so a period row and a chip
+      # group line up where they're stacked
+      ROW_CLASSES = "tw:flex tw:flex-wrap tw:gap-x-1 tw:gap-y-2"
+
+      # auto-fit needs a definite minimum to count repetitions
+      FULL_WIDTH_ROW_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2"
 
       # Track and segment sizes come from kelsey_redesign/new-org-search/, not the type scale
       TRACK_CLASSES = "tw:inline-flex tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
@@ -33,12 +41,11 @@ module UI
       ].join(" ").freeze
 
       # full_width lays the chips out as equal columns that wrap, staying the same width
-      # on every line — flex would size each line independently. auto-fit needs a
-      # definite minimum to count repetitions.
+      # on every line — flex would size each line independently
       def self.group_classes(kind:, full_width:)
         case kind
         when :button
-          full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-x-1 tw:gap-y-2"
+          full_width ? FULL_WIDTH_ROW_CLASSES : ROW_CLASSES
         when :toggle
           # The track sizes itself to its segments, so there's no column layout to widen
           raise ArgumentError, "full_width is not supported for the toggle kind" if full_width

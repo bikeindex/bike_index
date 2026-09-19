@@ -39,9 +39,9 @@ module UI
 
       private
 
-      # A chip group's row, so the two line up where they're stacked. The caller places it
+      # The chips are this component's own size; only the row is shared
       def row_classes
-        UI::ButtonGroup::Component.group_classes(kind: :button, full_width: false)
+        UI::ButtonGroup::Component::ROW_CLASSES
       end
 
       def visible_periods
