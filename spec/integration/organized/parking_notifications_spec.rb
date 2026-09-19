@@ -193,7 +193,9 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     expect(page).to have_css(rows, count: 1)
   end
 
-  it "maps the notifications, and resolves the checked ones" do
+  it "maps the notifications, and resolves only the checked ones in view" do
+    # In Chicago, while the others are at the geocoder stub's New York
+    far_away = FactoryBot.create(:parking_notification_organized, organization:, user:, latitude: 41.8781, longitude: -87.6298)
     page.current_window.resize_to(1400, 2000)
     page.driver.with_playwright_page do |playwright_page|
       # Serve an empty MapLibre style so the map builds without fetching basemap tiles
@@ -204,21 +206,27 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     visit base_url
 
     # Every current notification gets a pin, and the map fits to them all
-    expect(page).to have_css(".maplibregl-marker", count: 2, wait: 15)
-    expect(page).to have_css(rows, count: 2)
-    expect(page).to have_content("2 visible")
+    expect(page).to have_css(".maplibregl-marker", count: 3, wait: 15)
+    expect(page).to have_css(rows, count: 3)
+    expect(page).to have_content("3 visible")
 
     within(row_for(abandoned)) { click_button "Show on map" }
     within(".maplibregl-popup") { expect(page).to have_content("Appears abandoned") }
     find("body").send_keys(:escape)
     expect(page).not_to have_css(".maplibregl-popup")
 
+    fill_in "Search map", with: "New York"
+    find_field("Search map").send_keys(:enter)
+    expect(page).to have_content("2 visible", wait: 15)
+    expect(page).to have_css(row_for(far_away), visible: :hidden)
+
     click_link "retrieve/send repeat notification"
     click_button "Select all"
     select "Mark retrieved/resolved", from: "kind"
     expect {
       click_button "Resolve notifications"
-      expect(page).to have_current_path(/parking_notifications/, wait: 10)
+      expect(page).to have_css(rows, count: 1, wait: 10)
     }.to change { [unregistered, abandoned].map { it.reload.status } }.to(%w[retrieved retrieved])
+    expect(far_away.reload.status).to eq "current"
   end
 end

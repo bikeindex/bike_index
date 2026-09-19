@@ -159,7 +159,12 @@ export default class extends Controller {
     const bounds = this.map.getBounds()
     const visibleRows = new Set(this.rows.filter((row) => this.markers.has(row) && bounds.contains(this.markers.get(row).getLngLat())))
     // Not collapse(): its per-row computed-style read, between these writes, forces a recalc each
-    this.rows.forEach((row) => row.classList.toggle('tw:hidden!', !visibleRows.has(row)))
+    this.rows.forEach((row) => {
+      row.classList.toggle('tw:hidden!', !visibleRows.has(row))
+      // Disabled, a hidden row's check neither submits nor gets selected by "Select all"
+      const checkbox = row.querySelector('input[type=checkbox]')
+      if (checkbox) checkbox.disabled = !visibleRows.has(row)
+    })
     collapse(visibleRows.size ? 'hide' : 'show', this.emptyRowTarget, 0)
     this.visibleCountTarget.textContent = visibleRows.size.toLocaleString()
 
