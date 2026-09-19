@@ -68,7 +68,7 @@ module UI
       end
 
       def tfoot_classes(bordered:)
-        [td_classes(bordered:), "tw:border-t-2 tw:border-t-gray-300 tw:font-bold tw:dark:border-t-gray-500"].join(" ")
+        [td_classes(bordered:), "tw:border-t-2 tw:border-t-gray-200 tw:font-bold tw:dark:border-t-gray-600"].join(" ")
       end
 
       private
