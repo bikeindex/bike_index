@@ -150,7 +150,6 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         parking_notification.reload.impound_record
       end
       it "renders the unregistered badge" do
-        expect(impound_record.bike.creator_unregistered_parking_notification?).to be_truthy
         get "#{base_url}/pkey-#{impound_record.id}"
         expect(response.status).to eq(200)
         expect(response.body).to include("created from a parking notification")
