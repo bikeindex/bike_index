@@ -3,10 +3,11 @@
 module UI
   module Table
     class Component < ApplicationComponent
+      # Template Dependency: UI::TableColumn::Component
       # Cell blocks are instance_exec'd, so this is how they reach the sort state
       attr_reader :sort_state
 
-      # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
+      # Pass cache_key (normally self.class.cache_digest) to enable per-row fragment caching.
       def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
         @records = records
         @sort_state = sort_state

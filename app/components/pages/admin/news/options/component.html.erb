@@ -69,13 +69,14 @@
       </div>
 
       <div class="col-md-6">
-        <div class="form-group fancy-select no-restore-on-backspace unfancy">
+        <div class="form-group">
           <%= @form_builder.label :content_tag_names, class: "control-label" do %>
             Tags <small class="less-strong">at least one required</small>
           <% end %>
 
-          <%= @form_builder.select(:content_tag_names, content_tag_options, {include_blank: true},
-                {multiple: true, class: "form-control", required: true}) %>
+          <%= render UI::Forms::Combobox::Component.new(name: :content_tag_names, form: @form_builder, dialog_label: "Tags",
+                placeholder: "Add tag", options: content_tag_options, required: true,
+                multiselect_chip_src: content_tag_chips_admin_news_index_path) %>
         </div>
       </div>
 
@@ -115,17 +116,10 @@
         <div class="form-group">
           <div class="controls">
             <label>
-              <input
-                type="radio"
-                name="index_image_id"
-                value="0"
-                class="index_image_0"
-              >
-              No primary image
+              <%= @form_builder.radio_button :index_image_id, 0 %> No primary
+              image
               <small class="less-strong">Otherwise, select a primary image with the radio button next to the image</small>
             </label>
-
-            <%= @form_builder.hidden_field :index_image_id %>
           </div>
         </div>
       </div>

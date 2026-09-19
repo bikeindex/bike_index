@@ -27,6 +27,8 @@ output "${CYAN}" "Checking Translations"
 # repo at all without this. Only under $CI — locally it would write ~/.gitconfig.
 if [ -n "$CI" ]; then
   git config --global --add safe.directory "$PWD"
+  git config user.name "github-actions[bot]"
+  git config user.email "github-actions[bot]@users.noreply.github.com"
 fi
 
 # Assigned rather than tested inline, so a git that can't answer aborts under `set -e`
@@ -45,6 +47,19 @@ case "$current_branch" in
     exit 0
     ;;
 esac
+
+# A sync branch forked from an older main, so its purge would drop every key main
+# gained since — and push that deletion onto the PR and translation.io
+if [ "$current_branch" != "$TRANSLATION_BRANCH" ]; then
+  # The CI checkout is depth 1, which leaves the merge no base to find
+  if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+    git fetch --unshallow origin "$TRANSLATION_BRANCH"
+  else
+    git fetch origin "$TRANSLATION_BRANCH"
+  fi
+  # Conflicts can only be in config/locales, which the sync rewrites wholesale
+  git merge --no-edit -X ours FETCH_HEAD
+fi
 
 echo bundle exec rake translation:sync_and_purge prepare_translations
 bundle exec rake translation:sync_and_purge prepare_translations
@@ -65,9 +80,6 @@ else
   git --no-pager diff
 
   if [ -n "$CI" ]; then
-    git config user.name "github-actions[bot]"
-    git config user.email "github-actions[bot]@users.noreply.github.com"
-
     # Sync branches carry a timestamp, so `gh pr list --head` can't be used — it
     # wants an exact branch name.
     # Deliberately not failure-tolerant: a swallowed error reads as "no open sync

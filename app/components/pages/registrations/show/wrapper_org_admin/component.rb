@@ -5,6 +5,8 @@ module Pages
     module Show
       module WrapperOrgAdmin
         class Component < ApplicationComponent
+          # Template Dependency: Pages::Registrations::Show::ComponentList::Component
+          # Template Dependency: Pages::Registrations::Show::CurrentAlerts::Wrapper::Component
           include BikeHelper
 
           OTHER_REGISTRATIONS_LIMIT = 10
@@ -82,6 +84,10 @@ module Pages
 
           def title
             bike_title_html(@bike)
+          end
+
+          def subtitle
+            @subtitle ||= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)).presence
           end
 
           def owner_phone

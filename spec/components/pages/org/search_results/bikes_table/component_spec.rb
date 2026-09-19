@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :component do
-  it_behaves_like "cached_markup_digest"
-
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
@@ -157,4 +155,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css(".reg_extra_registration_number_cell em.less-strong", text: hidden_text)
     end
   end
+
+  let(:cached_record) { bike }
+  it_behaves_like("cached_table_rows") { let(:row_cache_key) { "org-#{organization.id}-#{described_class.cache_digest}" } }
 end

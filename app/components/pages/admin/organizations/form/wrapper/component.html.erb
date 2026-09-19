@@ -82,12 +82,12 @@
 
     <%= checkbox_field(:direct_unclaimed_notifications, "Send emails directly to unclaimed bike owners", note: "don't require org to forward") %>
 
-    <% parent_org_note = capture do %>
-      <strong class="text-danger">(probably) do not add parents!</strong>
-      Parents must be part of the same organization
-    <% end %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: "Parent organization")) do |group| %>
+      <% group.with_label_note do %>
+        <strong class="text-danger">(probably) do not add parents!</strong>
+        Parents must be part of the same organization
+      <% end %>
 
-    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: label_with_note("Parent organization", parent_org_note))) do |group| %>
       <% group.with_helper_text do %>
         <strong>Use the "regional" feature instead.</strong>
         <em>To add regional organizations rather than child/parent relationships, enable it through an invoice for the organization. All organizations with a location in the same area will automatically be associated.</em>
@@ -113,7 +113,9 @@
     <% if @organization.persisted? %>
       <% no_members = @organization.organization_roles.count == 0 %>
 
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: label_with_note("Auto user email", "embed registration email"))) do |group| %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: "Auto user email")) do |group| %>
+        <% group.with_label_note { "embed registration email" } %>
+
         <% if no_members %>
           <% group.with_helper_text do %>
             You can use <%= ENV["AUTO_ORG_MEMBER"] %> if there are no members of

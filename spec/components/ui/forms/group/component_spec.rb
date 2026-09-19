@@ -105,12 +105,20 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     expect(component).to have_css("input.twinput")
   end
 
+  context "with optional_badge: false" do
+    let(:component) { render_inline(described_class.new(form_builder:, attribute:, optional_badge: false)) }
+
+    it "leaves the label unmarked" do
+      expect(component).to have_css("label", exact_text: "Name")
+    end
+  end
+
   context "when required" do
     let(:required) { true }
 
     it "marks the input required and appends an asterisk instead of the badge" do
       expect(component).to have_css("input[required]")
-      expect(component).to have_css("label span", text: "*")
+      expect(component).to have_css("label span[title='required']", text: "*")
       expect(component).to_not have_text("optional")
     end
   end
@@ -162,6 +170,19 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
       expect(component).to have_css("my-field")
       expect(component).to_not have_css("input")
       expect(component).to_not have_css("textarea")
+    end
+  end
+
+  describe "label_note" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, required: true)) do |group|
+        group.with_label_note { "as it appears on the account" }
+      end
+    end
+
+    it "renders in the label, after the required marker" do
+      expect(component).to have_css("label[for='user_name'] small", text: "as it appears on the account")
+      expect(component.css("label").inner_html).to match(/\*<\/span> <small/)
     end
   end
 

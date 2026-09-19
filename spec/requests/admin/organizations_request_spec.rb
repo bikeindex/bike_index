@@ -28,6 +28,20 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/show")
     end
+    context "registration_sequences tab" do
+      let!(:registration_sequence) { FactoryBot.create(:registration_sequence, organization:) }
+      it "renders the organization's sequences in place of its profile" do
+        get "#{base_url}/#{organization.to_param}", params: {active_tab: "registration_sequences"}
+        expect(response.status).to eq(200)
+        expect(response).to render_template("admin/organizations/registration_sequences")
+        expect(assigns(:bikes)).to be_nil
+        body = Capybara.string(response.body)
+        expect(body).to have_css("nav a[aria-current][href='#{base_url}/#{organization.to_param}?active_tab=registration_sequences']",
+          text: /Registration sequences\s+1/)
+        expect(body).to have_link(href: "/admin/registration_sequences/#{registration_sequence.id}")
+        expect(body).to have_css("input[role='combobox'][placeholder='Viewing Organizations']")
+      end
+    end
     context "unknown organization" do
       it "raises" do
         get "#{base_url}/d89safdf"

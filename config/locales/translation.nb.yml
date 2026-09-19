@@ -5427,17 +5427,24 @@ nb:
           not_real: Det ser ikke ut som din virkelige e-postadresse. Vennligst skriv
             inn en e-postadresse du mottar e-post fra
           submit_anyway: Send inn skjemaet likevel
-        file_upload:
-          no_file_chosen: Ingen fil valgt
-          take_picture: Ta bilde
-          upload: Last opp
-          upload_failed: opplastingen mislyktes
-          uploading: opplasting
         group:
           optional: valgfri
         turnstile:
           enable_javascript: Bekreftelse av denne e-postadressen krever JavaScript.
             Slå det på og send inn på nytt, eller bruk en annen e-postadresse.
+        files:
+          picker:
+            no_file_chosen: Ingen fil valgt
+            take_picture: Ta bilde
+            upload: Last opp
+          upload:
+            upload_failed: opplastingen mislyktes
+            uploading: opplasting
+          upload_multiple:
+            upload_failed: opplastingen mislyktes
+            uploading: opplasting
+        required_marker:
+          required: nødvendig
       alerts:
         base:
           error: Feil
@@ -5456,6 +5463,17 @@ nb:
           error_prevented_this_from_being_saved:
             one: 'Feilen %{count} forhindret at denne %{object_name} ble lagret:'
             other: "%{count}-feil forhindret at denne %{object_name}-en ble lagret:"
+      time_range:
+        from: fra
+        in_the_next_month: i løpet av neste måned
+        in_the_next_week: i løpet av neste uke
+        in_the_past_day: i løpet av det siste døgnet
+        in_the_past_hour: i løpet av den siste timen
+        in_the_past_month: i løpet av den siste måneden
+        in_the_past_week: i løpet av den siste uken
+        in_the_past_year: i løpet av det siste året
+        now: nå
+        to: til
     atoms:
       serial:
         hidden: skjult
@@ -5967,8 +5985,8 @@ nb:
               map_hint: Dra kartet slik at nålen markerer stedet
               map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
                 angitt fra enheten din.
-              parking_notification_notes_html: "%{org_name} interne notater <small>vises
-                ikke til brukeren</small>"
+              not_shown_to_user: ikke vist for brukeren
+              parking_notification_notes: "%{org_name} interne notater"
             parking_notification_show:
               no_notifications: Ingen parkeringsvarsler for denne %{bike_type}
               parking_notifications: Parkeringsmeldinger
@@ -6024,15 +6042,11 @@ nb:
             about_this_bike: Om dette %{bike_type}
             assign_sticker: Tildel klistremerke
             edit: Endre
-            internal_notes: Interne notater
             link_sticker: Lenkeklistremerke
             no_other_registrations: Ingen funnet
             not_registered_message: Eierkontakt er ikke tilgjengelig for sykler utenfor
               organisasjonen din. Du kan fortsatt legge til interne notater.
             not_registered_title: Ikke registrert hos %{org_name}
-            note_by: Merknad av %{user}
-            notes_placeholder: Nytt internt notat – dine tidligere notater lagres
-              i tråden.
             org_can_edit: "%{org_name} kan redigere denne %{bike_type}"
             org_can_edit_sub: Inkludert etter at %{bike_type} er gjort krav på.
             other_registrations: Andre registreringer av denne brukeren
@@ -6042,8 +6056,6 @@ nb:
             owner_name: Navn
             owner_phone: Telefon
             photo_archive: Fotoarkiv
-            post_note: Legg inn notat
-            posts_as: Innlegg som %{user}
             restricted_message: Administrasjon og ansatte kan kontakte eieren. Du
               kan legge til notater og be om beslag.
             restricted_title: Begrenset for din rolle
@@ -6085,6 +6097,19 @@ nb:
             registration_sequence: Registreringssekvens
             sticker: Klistremerke
             sticker_claimed: hevdet
+          internal_notes:
+            current_note: Gjeldende notat
+            deleted_user: en slettet bruker
+            internal_notes: Interne notater
+            most_recent_update_by: siste oppdatering av %{user}
+            note_by: Merknad av %{user}
+            post_note: Legg inn notat
+            update_hint: Du legger ut innlegget som %{user} – historikken over endringene
+              dine vil være synlig ovenfor.
+            update_note: Oppdater merknad
+            updated_by: Oppdatert av %{user}
+          subtitle:
+            nickname: 'kallenavn: %{name}'
       search:
         everything_combobox:
           made_by: laget av

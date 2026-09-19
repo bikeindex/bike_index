@@ -30,8 +30,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       search_address:,
       search_status:,
       skip_search_and_filters:,
-      stolenness: "all",
-      humanized_time_range: "in the past year"
+      stolenness: "all"
     }
   end
 

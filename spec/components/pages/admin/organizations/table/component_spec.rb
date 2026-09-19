@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Pages::Admin::Organizations::Table::Component, type: :component do
-  it_behaves_like "cached_markup_digest"
-
   let(:organization) { FactoryBot.create(:organization, name: "Cool Bikes", short_name: "Cool Bikes") }
   let(:render_deleted) { false }
   let(:component) do
@@ -34,4 +32,7 @@ RSpec.describe Pages::Admin::Organizations::Table::Component, type: :component d
       expect(component).to have_css("td.deleted-col .localizeTime")
     end
   end
+
+  let(:cached_record) { organization }
+  it_behaves_like "cached_table_rows"
 end

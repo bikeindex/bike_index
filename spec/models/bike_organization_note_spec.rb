@@ -73,4 +73,33 @@ RSpec.describe BikeOrganizationNote, type: :model do
       end
     end
   end
+  describe "previous_notes" do
+    include_context :with_paper_trail
+
+    let(:bike) { FactoryBot.create(:bike_organized) }
+    let(:organization) { bike.organizations.first }
+    let(:user) { FactoryBot.create(:user) }
+    let(:other_user) { FactoryBot.create(:user) }
+
+    it "is the notes it replaced, oldest first, skipping blanks" do
+      BikeOrganizationNote.upsert(bike:, organization:, body: "First", user:)
+      BikeOrganizationNote.upsert(bike:, organization:, body: " ", user:)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Third", user: other_user)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Fourth", user:)
+      previous_notes = BikeOrganizationNote.last.previous_notes
+
+      expect(previous_notes.map(&:body)).to eq %w[First Third]
+      expect(previous_notes.map(&:user)).to eq [user, other_user]
+    end
+
+    # bikes#show, which renders them, runs under set_reading_role
+    it "reads under the reading role" do
+      BikeOrganizationNote.upsert(bike:, organization:, body: "First", user:)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Second", user:)
+      note = BikeOrganizationNote.last
+
+      previous_notes = ActiveRecord::Base.connected_to(role: :reading) { note.previous_notes }
+      expect(previous_notes.map(&:body)).to eq %w[First]
+    end
+  end
 end

@@ -33,6 +33,12 @@ class BikeOrganizationNote < ApplicationRecord
     note.update!(body:, user:)
   end
 
+  # upsert overwrites the note, so the ones it replaced come from its versions
+  def previous_notes
+    versions.where(event: "update").map(&:reify).select { it.body.present? }
+      .tap { ActiveRecord::Associations::Preloader.new(records: it, associations: :user).call }
+  end
+
   private
 
   def set_calculated_attributes
