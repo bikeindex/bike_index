@@ -152,9 +152,6 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Click page 2 — turbo frame updates without full reload
     click_link "2"
     expect(page).to have_current_path(/page=2/, wait: 10)
-    # The date range renders outside the frame, so its links are rebuilt from the address
-    # bar - carrying the search, and starting a period change over at the first page
-    expect(find_link("past year", visible: :all)[:href]).to_not include("page=2")
     expect(page).to have_css("table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 1)
 
@@ -216,9 +213,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # filters by period and custom time range — 12 bikes total: bike1 (2.years.ago), bike2 (3.days.ago), 10 create_list (now)
     # "past year" excludes bike1 (2 years ago)
-    click_link "past year"
+    chart_src = chart_frame[:src]
+    choose("period_year", allow_label_click: true, visible: :all)
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_text("0 matching registrations")
+    # The date range is the search's, and the year chart isn't - so it stays as it was
+    expect(chart_frame[:src]).to eq chart_src
 
     fill_in "search_notes", with: ""
     click_button "Search registrations"
@@ -226,13 +226,13 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_text("11 matching registrations", wait: 10)
 
     # "past day" additionally excludes bike2 (3 days ago)
-    click_link "past day"
+    choose("period_day", allow_label_click: true, visible: :all)
     expect(page).to have_current_path(/period=day/, wait: 10)
     expect(page).to have_text("10 matching registrations")
 
     # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago).
     # Search on the page (no URL navigation): switch to past year, then submit the email filter.
-    click_link "past year"
+    choose("period_year", allow_label_click: true, visible: :all)
     expect(page).to have_current_path(/period=year/, wait: 10)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     fill_in "search_email", with: "bob@example.com"
@@ -244,8 +244,14 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # rendered_bike_ids can read a row that's being replaced mid-render
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
-    expect(find_link("past day", visible: :all)[:href]).to include("search_email=bob")
-    expect(find_link("past day", visible: :all)[:href]).to include("search_email=bob")
+
+    # The date range submits the search form, so it carries the search - and, with no page
+    # field in it, starts over at the first page
+    choose("period_month", allow_label_click: true, visible: :all)
+    expect(page).to have_current_path(/period=month/, wait: 10)
+    expect(page).to have_current_path(/search_email=bob/)
+    expect(page).not_to have_current_path(/page=2/)
+    expect(page).to have_css("tbody tr", count: 1)
 
     # Chart test must run before the custom-range click below: that submission
     # writes session[:timezone] from Intl.DateTimeFormat (varies between local
@@ -267,7 +273,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # Switch to past 30 days, for daily chart bucketing
     open_filters_if_not
-    click_link "past 30 days"
+    choose("period_month", allow_label_click: true, visible: :all)
     expect(page).to have_current_path(/period=month/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
     # The default year scope ignores the period, so the daily buckets are the search's
@@ -285,7 +291,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only.
     # Runs after the chart test because the Stimulus submit posts a timezone param that pins
     # session[:timezone], which would otherwise override the cookie set above.
-    click_link "past year"
+    choose("period_year", allow_label_click: true, visible: :all)
     expect(page).to have_current_path(/period=year/, wait: 10)
     # Let the period navigation land before submitting. The search posts the
     # period the frame currently holds, so submitting mid-swap searches the past
@@ -311,6 +317,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # rendered_bike_ids can read a row that's being replaced mid-render
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
+
+    # No chip stands for the custom range, so the form carries it through a search
+    click_button "Search registrations"
+    expect(page).to have_current_path(/period=custom/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
   end
 
   it "moves the result view through the address bar, and back from localStorage" do

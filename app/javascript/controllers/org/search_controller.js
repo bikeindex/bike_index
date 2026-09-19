@@ -89,6 +89,8 @@ export default class extends Controller {
   syncFilterSummary () {
     if (!this.hasFilterSummaryTarget) return
     const active = [...document.querySelectorAll('input[type=radio][form="Search_Form"]:checked')]
+      // The row above the summary names the date range itself
+      .filter(radio => radio.name !== 'period')
       .filter(radio => radio.value !== '' && radio.value !== 'all')
       .map(radio => radio.closest('label')?.querySelector('span')?.innerHTML)
       .filter(Boolean)

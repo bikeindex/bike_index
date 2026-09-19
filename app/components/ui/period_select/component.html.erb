@@ -6,25 +6,26 @@
       </span>
     <% end %>
 
-    <% visible_periods.each do |p| %>
-      <%= render period_button(p[:key]) do %>
-        <span>
-          <% if p[:prefix] %>
-            <span class="d-none d-md-inline">
-              <%= translation(".#{p[:prefix]}") %>
-            </span>
-          <% end %><%= translation(".#{p[:label]}") %>
-        </span>
+    <% if @form %>
+      <%= render(period_radios) %>
+    <% else %>
+      <% visible_periods.each do |p| %>
+        <%= render period_button(p[:key]) do %>
+          <span>
+            <% if p[:prefix] %>
+              <span class="d-none d-md-inline">
+                <%= translation(".#{p[:prefix]}") %>
+              </span>
+            <% end %><%= translation(".#{p[:label]}") %>
+          </span>
+        <% end %>
       <% end %>
     <% end %>
 
-    <%= render UI::Button::Component.new(
-      text: translation(".custom"),
-      size: :sm,
-      active: @period == "custom",
-      html_class: period_button_class,
-      data: {period: "custom", action: "click->ui--collapse#toggle"}
-    ) %>
+    <%= render(custom_button) %>
+
+    <%# None of the chips is the custom range, so a search would drop it otherwise %>
+    <%= hidden_field_tag :period, "custom", form: @form if @form && @period == "custom" %>
   </div>
 
   <%= form_with(
