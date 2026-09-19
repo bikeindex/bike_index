@@ -21,9 +21,27 @@ RSpec.describe Admin::PaymentsController, type: :request do
 
   describe "index" do
     it "renders" do
+      subject
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+
+      get base_url, params: {search_payment_method: "show"}
+      expect(response.status).to eq(200)
+      expect(response.body).to include(subject.amount_formatted)
+    end
+
+    # A cache() inside a UI::Table cell digests the table's template, so an unprefixed key
+    # would share this fragment with every admin table caching the same user
+    context "with caching", :caching do
+      include_context :caching_basic
+
+      it "keys the user cell to this partial and the payment's email" do
+        subject
+        keys = fragments_written { get base_url }
+        expect(keys.count).to eq 1
+        expect(keys.first).to include("admin/payments/_table", current_user.cache_key_with_version, subject.email)
+      end
     end
   end
 

@@ -63,95 +63,57 @@
   <% end %>
 <% end %>
 
-<% show_created_at = sort_column == "created_at" || Binxtils::InputNormalizer.boolean(params[:search_show_created_at]) %>
+<% show_created_at = sort_state.sort == "created_at" || Binxtils::InputNormalizer.boolean(params[:search_show_created_at]) %>
+
+<% render_search = params[:organization_id].blank? %>
 
 <% table_view = capture do %>
-  <div class="full-screen-table">
-    <table class="table table-striped table-bordered table-sm without-exterior-border">
-      <thead class="small-header">
-        <th><%= sortable "start_at" %></th>
+  <%= render(UI::Table::Component.new(records: @organization_statuses, render_sortable: true, sort_state:)) do |table| %>
+    <% table.column(sortable: "start_at", lower_right: (->(record) { tag.span(record.id, class: "only-dev-visible") } if display_dev_info?)) do |organization_status| %>
+      <%= render UI::Time::Component.new(time: organization_status.start_at, format: :localize_time_precise) %>
+    <% end %>
 
-        <% if show_created_at %>
-          <th class="small"><%= sortable "created_at" %></th>
-        <% end %>
+    <% if show_created_at %>
+      <% table.column(sortable: "created_at", classes: "tw:text-xs") do |organization_status| %>
+        <%= render UI::Time::Component.new(time: organization_status.created_at) %>
+      <% end %>
+    <% end %>
 
-        <th><%= sortable "end_at" %></th>
-        <th>Duration</th>
-        <th><%= sortable "organization_id" %></th>
-        <th><%= sortable "pos_kind", "POS kind" %></th>
-        <th><%= sortable "kind" %></th>
+    <% table.column(sortable: "end_at") do |organization_status| %>
+      <%= render UI::Time::Component.new(time: organization_status.end_at, format: :localize_time_precise) %>
+    <% end %>
 
-        <th class="small">
-          <%= sortable "organization_deleted_at", "Deleted" %>
-        </th>
-      </thead>
+    <% table.column(label: "Duration") do |organization_status| %>
+      <% if organization_status.end_at.present? %>
+        <%= helpers.period_in_words(organization_status.end_at - organization_status.start_at) %>
+      <% end %>
+    <% end %>
 
-      <tbody>
-        <% @organization_statuses.each do |organization_status| %>
-          <tr>
-            <td>
-              <span class="localizeTime preciseTime">
-                <%= l organization_status.start_at, format: :convert_time %>
-              </span>
+    <% table.column(sortable: "organization_id") do |organization_status| %>
+      <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: organization_status.organization, organization_id: organization_status.organization_id, render_search:) %>
+    <% end %>
 
-              <% if display_dev_info? %>
-                <code class="small only-dev-visible">
-                  <%= organization_status.id %>
-                </code>
-              <% end %>
-            </td>
+    <% table.column(sortable: "pos_kind", label: "POS kind") do |organization_status| %>
+      <% status_class = organization_status.pos_kind.match?(/broken/) ? "text-danger" : "" %>
+      <% status_class = "less-strong" if organization_status.pos_kind == "no_pos" %>
 
-            <% if show_created_at %>
-              <td class="small">
-                <span class="localizeTime">
-                  <%= l organization_status.created_at, format: :convert_time %>
-                </span>
-              </td>
-            <% end %>
+      <span class="<%= status_class %>">
+        <%= organization_status.pos_kind&.humanize %>
+      </span>
+    <% end %>
 
-            <td>
-              <% if organization_status.end_at.present? %>
-                <span class="localizeTime preciseTime">
-                  <%= l organization_status.end_at, format: :convert_time %>
-                </span>
-              <% end %>
-            </td>
+    <% table.column(sortable: "kind") do |organization_status| %>
+      <%= Organization.kind_humanized(organization_status.kind) %>
+    <% end %>
 
-            <td>
-              <% if organization_status.end_at.present? %>
-                <%= period_in_words(organization_status.end_at - organization_status.start_at) %>
-              <% end %>
-            </td>
-
-            <td>
-              <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
-            </td>
-
-            <td>
-              <% status_class = organization_status.pos_kind.match?(/broken/) ? "text-danger" : "" %>
-              <% status_class = "less-strong" if organization_status.pos_kind == "no_pos" %>
-
-              <span class="<%= status_class %>">
-                <%= organization_status.pos_kind&.humanize %>
-              </span>
-            </td>
-
-            <td>
-              <%= Organization.kind_humanized(organization_status.kind) %>
-            </td>
-
-            <td>
-              <% if organization_status.organization_deleted_at.present? %>
-                <span class="localizeTime preciseTime text-danger">
-                  <%= l organization_status.organization_deleted_at, format: :convert_time %>
-                </span>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+    <% table.column(sortable: "organization_deleted_at", label: "Deleted", classes: "tw:text-xs") do |organization_status| %>
+      <% if organization_status.organization_deleted_at.present? %>
+        <span class="text-danger">
+          <%= render UI::Time::Component.new(time: organization_status.organization_deleted_at, format: :localize_time_precise) %>
+        </span>
+      <% end %>
+    <% end %>
+  <% end %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(

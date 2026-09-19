@@ -64,6 +64,8 @@ RSpec.describe Admin::GraphsController, type: :request do
   end
 
   describe "tables" do
+    include_context :geocoder_default_location
+    include_context :geocoder_stubbed_bounding_box
     it "renders" do
       get "#{base_url}/tables"
       expect(response.status).to eq(200)
@@ -71,6 +73,7 @@ RSpec.describe Admin::GraphsController, type: :request do
       get "#{base_url}/tables", params: {location: "San Francisco, CA"}
       expect(response.status).to eq(200)
       expect(response).to render_template(:tables)
+      expect(response.body).to include("within 100 miles of")
     end
   end
 

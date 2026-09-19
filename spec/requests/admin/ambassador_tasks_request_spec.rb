@@ -6,12 +6,15 @@ RSpec.describe Admin::AmbassadorTasksController, type: :request do
     include_context :request_spec_logged_in_as_superuser
 
     describe "#index" do
+      let!(:ambassador_task) { FactoryBot.create(:ambassador_task) }
+
       it "renders the index template" do
         get base_url
 
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(flash).to_not be_present
+        expect(response.body).to include(ambassador_task.title)
       end
     end
 

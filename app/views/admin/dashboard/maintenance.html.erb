@@ -1,0 +1,42 @@
+<div class="admin-subnav">
+  <div class="col-12">
+    <h1>Maintaining things</h1>
+  </div>
+</div>
+
+<h2>Component manufacturer other</h2>
+
+<%= render partial: "/admin/components/table", locals: {collection: @component_mnfgs} %>
+
+<h2>Component type other</h2>
+
+<%= render partial: "/admin/components/table", locals: {collection: @component_types} %>
+
+<h2>Handlebar Types other</h2>
+
+<%= render(UI::Table::Component.new(records: @bikes_other_handlebar_type)) do |table| %>
+  <% table.column(label: "Date") do |bike| %>
+    <%= render UI::Time::Component.new(time: bike.created_at) %>
+  <% end %>
+
+  <% table.column(label: "Bike") do |bike| %>
+    <%= render Pages::Admin::Bikes::Cell::Component.new(bike:) %>
+  <% end %>
+<% end %>
+
+<h2>
+  Recent example bikes
+  <%= link_to "Delete example bikes", admin_destroy_example_bikes_url %>
+</h2>
+
+<% if @bikes.any? %>
+  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:) %>
+
+  <div class="row justify-content-end">
+    <div class="col-auto">
+      <p><%= Bike.unscoped.where(example: true).count %> example bikes total</p>
+    </div>
+  </div>
+<% else %>
+  No example bikes right now!
+<% end %>

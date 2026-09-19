@@ -7,14 +7,14 @@
       <code class="small"><%= @organization_id %></code>
     <% elsif organization_subject.deleted? %>
       <small>
-        <span class="less-strong"><%= organization_subject.name %></span>
+        <span class="less-strong"><%= display_name %></span>
 
         <% if organization_subject.deleted? %>
           <span class="<%= error_text_class %>">deleted!</span>
         <% end %>
       </small>
     <% else %>
-      <%= organization_subject.name %>
+      <%= display_name %>
     <% end %>
   <% end %>
   <% if @render_search && computed_search_url.present? %>

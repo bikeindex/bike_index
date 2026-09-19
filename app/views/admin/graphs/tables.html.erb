@@ -1,0 +1,51 @@
+<%# Make sure that period is passed - because it's a different period than other places %>
+<% sortable_params = {period: default_period}.merge(sortable_search_params).symbolize_keys %>
+
+<% if current_user.superuser? %>
+  <%= render partial: "admin/graphs/graphs_subnav", locals: {location_count: true, sortable_params: sortable_params} %>
+<% end %>
+
+<div class="mb-4">
+  <%= form_tag tables_admin_graphs_path, method: :get do %>
+    <div class="form-inline">
+      <%= text_field_tag :location, params[:location], placeholder: "Location", class: "form-control mr-2" %>
+      <%= text_field_tag :location_radius, params[:location_radius], placeholder: "Proximity in miles", class: "form-control mr-2" %>
+      <%= hidden_field_tag :tables, true %>
+      <%= submit_tag "Load", name: "search", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>
+
+<h2>Records everywhere</h2>
+
+<p>
+  The <span class="less-strong">data in this color</span> is (simplified, not
+  accounting for seasonalness) projections for the end of the current year
+</p>
+
+<%= render(Pages::Admin::Graphs::YearCounts::Component.new) %>
+
+<div class="mt-4"></div>
+<div class="mt-4"></div>
+
+<% location_radius = params[:location_radius].present? ? params[:location_radius].to_i : 100 %>
+<% box = params[:location].present? && GeocodeHelper.bounding_box(params[:location], location_radius) %>
+
+<% if box.present? %>
+  <h4 class="mt-4">
+    Records <em>within <%= location_radius %> miles of</em>
+    <strong><%= params[:location] %></strong>
+  </h4>
+
+  <div class="mt-3">
+    <%= render(Pages::Admin::Graphs::YearCounts::Component.new(bounding_box: box)) %>
+  </div>
+<% else %>
+  <h2>
+    <em>Add a location to the search section at the top of the page to see stats about that location</em>
+  </h2>
+
+  <% if params[:location].present? %>
+    <h4>The location and proximity you entered weren't useable. Try again.</h4>
+  <% end %>
+<% end %>

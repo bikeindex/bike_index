@@ -1,0 +1,43 @@
+<%# locals: (collection:, render_sortable: false, show_count: false) %>
+
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(primary_activity) { primary_activity.id }) do |primary_activity| %>
+    <%= link_to edit_admin_primary_activity_path(primary_activity.id), class: "twlink" do %>
+      <%= render UI::Time::Component.new(time: primary_activity.created_at) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "name") do |primary_activity| %>
+    <%= primary_activity.name %>
+  <% end %>
+
+  <% if display_dev_info? %>
+    <% table.column(label: "slug", classes: "only-dev-visible tw:text-xs") do |primary_activity| %>
+      <%= primary_activity.slug %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Display name", classes: "tw:text-xs") do |primary_activity| %>
+    <%= primary_activity.display_name %>
+  <% end %>
+
+  <% table.column(sortable: "family", label: "Family?", classes: "tw:text-center") do |primary_activity| %>
+    <%= check_mark if primary_activity.family %>
+  <% end %>
+
+  <% table.column(sortable: "primary_activity_family_id", label: "Family") do |primary_activity| %>
+    <% unless primary_activity.primary_activity_family_id == primary_activity.id %>
+      <%= primary_activity.family_name %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "priority") do |primary_activity| %>
+    <%= number_display(primary_activity.priority) %>
+  <% end %>
+
+  <% if show_count %>
+    <% table.column(label: "Bike Count") do |primary_activity| %>
+      <%= link_to number_display(Bike.where(primary_activity_id: primary_activity.id).count), admin_bikes_path(primary_activity: primary_activity.id), class: "twlink" %>
+    <% end %>
+  <% end %>
+<% end %>

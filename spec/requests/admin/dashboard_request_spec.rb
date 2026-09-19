@@ -132,9 +132,13 @@ RSpec.describe Admin::DashboardController, type: :request do
         Organization.example && Cgroup.additional_parts && Ctype.other # Read replica
         FactoryBot.create(:manufacturer, name: "other")
         BParam.create(creator_id: current_user.id)
+        component = FactoryBot.create(:component, ctype: Ctype.other, manufacturer: Manufacturer.other, model_name: "Other model")
+        bike = FactoryBot.create(:bike, handlebar_type: "other")
         get "/admin/maintenance"
         expect(response.code).to eq "200"
         expect(response).to render_template(:maintenance)
+        expect(response.body).to include(component.model_name)
+        expect(response.body).to include(admin_bike_path(bike))
       end
     end
 
@@ -149,6 +153,16 @@ RSpec.describe Admin::DashboardController, type: :request do
         expect(response.code).to eq("200")
         # assigns(:tsvs).should eq(tsvs)
         expect(assigns(:blocklist).include?("2")).to be_truthy
+      end
+
+      # The blocklist shares the file info's redis key, so it's set without one
+      context "without a blocklist" do
+        it "renders the tsvs" do
+          FileCacheMaintainer.reset_file_info("current_stolen_bikes.tsv", Time.current)
+          get "/admin/tsvs"
+          expect(response.code).to eq("200")
+          expect(response.body).to include("current_stolen_bikes.tsv")
+        end
       end
     end
 

@@ -5,11 +5,14 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
+    let!(:recovery_display) { FactoryBot.create(:recovery_display, quote_by: "Some quoter") }
+
     it "renders" do
       get base_url
       expect(response).to be_ok
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
+      expect(response.body).to include("Some quoter")
     end
   end
 
