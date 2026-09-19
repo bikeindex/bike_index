@@ -19,7 +19,33 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
     end
   end
 
+  describe "title" do
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, year: 2020, frame_model: "Stumpjumper", name: "Morning commuter") }
+
+    it "titles by year, manufacturer and model, with the nickname beneath" do
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      expect(page).to have_css("h1", text: "2020 #{bike.mnfg_name} Stumpjumper")
+      expect(page).to have_css("h1 + p", text: "nickname: Morning commuter")
+    end
+  end
+
   describe "notes" do
+    include_context :with_paper_trail
+
+    let(:other_user) { FactoryBot.create(:organization_user, organization:) }
+
+    it "renders the current note to update, with the notes it replaced above" do
+      BikeOrganizationNote.upsert(bike:, organization:, body: "First note", user: other_user)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Second note", user: current_user)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Third note", user: current_user)
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      expect(page).to have_text(/First note.*Note by #{other_user.display_name}.*Second note.*Updated by #{current_user.display_name}.*Current note.*most recent update by #{current_user.display_name}.*You'll post as #{current_user.display_name}/m)
+      expect(page).to have_field("Current note", with: "Third note")
+      expect(page).to have_button("Update note")
+    end
+
     context "on a bike registered elsewhere" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
 

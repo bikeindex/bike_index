@@ -138,21 +138,26 @@ RSpec.describe PublicImagesController, type: :request do
       let(:blog) { FactoryBot.create(:blog) }
       let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
       context "admin authorized" do
-        it "creates an image" do
+        # The html is what UI::Forms::Files::UploadMultiple appends to the list it's already showing
+        it "creates an image, answering with the item's markup" do
           post base_url, params: {blog_id: blog.id, public_image: {name: "cool name", image: file}, format: :js}
-          expect(JSON.parse(response.body)).to be_present
           blog.reload
-          expect(blog.public_images.first.name).to eq "cool name"
+          public_image = blog.public_images.first
+          expect(public_image.name).to eq "cool name"
+          expect(json_result[:html]).to include("id=\"image-#{public_image.id}\"")
+          expect(json_result[:html]).to include("admin--public-image#destroy")
+          expect(json_result[:html]).to include("name=\"blog[index_image_id]\"")
         end
-        context "sent from uppy" do
-          it "creates an image" do
-            post base_url, params: {blog_id: blog.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js}
-            public_image = PublicImage.last
-            expect(JSON.parse(response.body)).to be_present
-            blog.reload
-            expect(blog.public_images).not_to be_empty
-            expect(blog.public_images.first.name).to eq "cool name"
-            expect(public_image.imageable).to eq(blog)
+
+        context "with an unstorable file" do
+          let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/manufacturer-test-import.csv"))) }
+
+          it "answers with the reason rather than markup" do
+            expect {
+              post base_url, params: {blog_id: blog.id, public_image: {name: "cool name", image: file}, format: :js}
+            }.to_not change(PublicImage, :count)
+            expect(response.code).to eq("422")
+            expect(json_result[:error]).to be_present
           end
         end
         context "blog_id not given" do
@@ -160,7 +165,7 @@ RSpec.describe PublicImagesController, type: :request do
             expect {
               post base_url, params: {blog_id: "", public_image: {name: "cool name", image: file}, format: :js}
             }.to change(PublicImage, :count).by 1
-            expect(JSON.parse(response.body)).to be_present
+            expect(json_result).to be_present
           end
         end
       end
@@ -197,21 +202,12 @@ RSpec.describe PublicImagesController, type: :request do
       let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
       let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
       context "admin authorized" do
-        it "creates an image" do
+        it "creates an image, answering with markup that can't be deleted or made primary" do
           post base_url, params: {mail_snippet_id: mail_snippet.to_param, public_image: {name: "cool name", image: file}, format: :js}
           mail_snippet.reload
           expect(mail_snippet.public_images.first.name).to eq "cool name"
-        end
-        context "sent from uppy" do
-          it "creates an image" do
-            post base_url, params: {mail_snippet_id: mail_snippet.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js}
-            public_image = PublicImage.last
-            expect(JSON.parse(response.body)).to be_present
-            mail_snippet.reload
-            expect(mail_snippet.public_images).not_to be_empty
-            expect(mail_snippet.public_images.first.name).to eq "cool name"
-            expect(public_image.imageable).to eq(mail_snippet)
-          end
+          expect(json_result[:html]).to_not include("admin--public-image#destroy")
+          expect(json_result[:html]).to_not include("index_image_id")
         end
       end
       context "not admin" do
@@ -228,6 +224,29 @@ RSpec.describe PublicImagesController, type: :request do
 
   describe "destroy" do
     let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
+    context "blog, from the admin image list" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: FactoryBot.create(:blog)) }
+
+      # A redirect would have the fetch render the whole edit page, only to discard it
+      it "answers no content" do
+        expect {
+          delete "#{base_url}/#{public_image.id}", headers: {"Accept" => "application/json"}
+        }.to change(PublicImage, :count).by(-1)
+        expect(response.status).to eq 204
+      end
+
+      context "not admin" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+        it "answers unauthorized rather than redirecting" do
+          expect {
+            delete "#{base_url}/#{public_image.id}", headers: {"Accept" => "application/json"}
+          }.to_not change(PublicImage, :count)
+          expect(response.status).to eq 401
+        end
+      end
+    end
     context "mail_snippet" do
       it "rejects the destroy" do
         public_image = FactoryBot.create(:public_image,

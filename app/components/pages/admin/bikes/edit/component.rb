@@ -14,12 +14,6 @@ module Pages
 
           private
 
-          def manufacturer_label
-            safe_join(["Manufacturer",
-              tag.em(link_to("mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "twless-strong"),
-                class: "tw:text-xs")], " ")
-          end
-
           def organization_options
             @organization_options ||= @organizations.pluck(:name, :id)
           end

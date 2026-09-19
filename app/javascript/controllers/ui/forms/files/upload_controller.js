@@ -2,15 +2,13 @@ import { Controller } from '@hotwired/stimulus'
 import { DirectUpload } from '@rails/activestorage'
 import { collapse } from 'utils/collapse_utils'
 
-// Connects to data-controller='ui--forms--file-upload'
-// Shows the selected filename (or a count for multiple files) in the field, previews an
-// image pick, and frames the controls as a drop target while a file is dragged over the page.
-// With a url value, uploads the pick straight to storage and posts its signed blob id.
+// Connects to data-controller='ui--forms--files--upload'
+// Previews an image pick. With a url value, uploads the pick straight to storage and posts
+// its signed blob id.
 export default class extends Controller {
-  static targets = ['input', 'filename', 'dropZone', 'preview', 'previewImage', 'signedId']
+  static targets = ['input', 'preview', 'previewImage', 'signedId', 'status']
   // stall: how long without progress before the upload is treated as dead
   static values = {
-    placeholder: String,
     url: String,
     uploading: String,
     failed: String,
@@ -37,68 +35,7 @@ export default class extends Controller {
     return this.element.closest('form')
   }
 
-  // Both buttons open the one input; `capture` is what sends it to the camera.
-  takePicture () {
-    this.inputTarget.setAttribute('capture', 'environment')
-    this.inputTarget.click()
-  }
-
-  // Runs before the label's own activation forwards the click to the input.
-  chooseFile () {
-    this.inputTarget.removeAttribute('capture')
-  }
-
-  dragOver (event) {
-    if (!draggingFile(event)) return
-    event.preventDefault() // without this the browser opens the file instead
-
-    this.dropZoneTarget.dataset.dragging = 'true'
-  }
-
-  // Bound to both dragleave and drop. dragleave fires for every element crossed, but
-  // relatedTarget is null only on leaving the window -- and on a drop, which ends it too.
-  endDrag (event) {
-    if (event.relatedTarget) return
-    event.preventDefault()
-
-    delete this.dropZoneTarget.dataset.dragging
-    this.unhighlightDropZone()
-  }
-
-  highlightDropZone () {
-    this.dropZoneTarget.dataset.over = 'true'
-  }
-
-  // The frame wraps the controls, so dragging onto one of them leaves the frame
-  // in the event's terms -- only a relatedTarget outside it is a real exit.
-  unhighlightDropZone (event) {
-    if (event?.relatedTarget && this.dropZoneTarget.contains(event.relatedTarget)) return
-
-    delete this.dropZoneTarget.dataset.over
-  }
-
-  drop (event) {
-    event.preventDefault()
-    const dropped = [...event.dataTransfer.files]
-    if (dropped.length === 0) return
-
-    // Assigning a FileList is the only way to fill a file input; `multiple`
-    // decides how much of the drop it can hold.
-    const transfer = new window.DataTransfer()
-    ;(this.inputTarget.multiple ? dropped : dropped.slice(0, 1)).forEach((file) => transfer.items.add(file))
-    this.inputTarget.files = transfer.files
-    // Assigning files fires nothing. Picking a file natively fires both, and both
-    // have listeners: `input` drives display(), `change` is what callers bind to.
-    this.inputTarget.dispatchEvent(new Event('input', { bubbles: true }))
-    this.inputTarget.dispatchEvent(new Event('change', { bubbles: true }))
-  }
-
-  display () {
-    const { files } = this.inputTarget
-    this.filenameTarget.textContent =
-      files.length === 0
-        ? this.placeholderValue
-        : files.length === 1 ? files[0].name : `${files.length} files`
+  picked ({ detail: { files } }) {
     this.showPreview(files[0])
     if (this.urlValue && files[0]) this.upload(files[0])
   }
@@ -137,8 +74,7 @@ export default class extends Controller {
   upload (file) {
     this.abortUpload() // Picking again shouldn't leave the discarded file uploading
     this.signedIdTarget.value = ''
-    this.uploadingFile = file
-    this.status(file, this.uploadingValue)
+    this.status(this.uploadingValue)
 
     const upload = new DirectUpload(file, this.urlValue, this)
     this.currentUpload = upload
@@ -147,7 +83,7 @@ export default class extends Controller {
       if (this.currentUpload !== upload) return // A newer pick owns the field now
 
       if (!error) this.signedIdTarget.value = blob.signed_id
-      this.status(file, error && this.failedValue)
+      this.status(error && this.failedValue, !!error)
       this.finish()
     })
     this.watchForStall()
@@ -178,13 +114,14 @@ export default class extends Controller {
     clearTimeout(this.stallTimer)
     this.stallTimer = setTimeout(() => {
       this.signedIdTarget.value = ''
-      this.status(this.uploadingFile, this.failedValue)
+      this.status(this.failedValue, true)
       this.abortUpload()
     }, this.stallValue)
   }
 
-  status (file, suffix) {
-    this.filenameTarget.textContent = suffix ? `${file.name} — ${suffix}` : file.name
+  status (text, failed = false) {
+    this.statusTarget.textContent = text || ''
+    this.statusTarget.dataset.failed = failed
   }
 
   // DirectUpload delegate hook - the handle that makes a discarded upload cancellable
@@ -198,8 +135,7 @@ export default class extends Controller {
     this.watchForStall()
     if (!event.lengthComputable) return
 
-    const percent = Math.round((event.loaded / event.total) * 100)
-    this.status(this.uploadingFile, `${this.uploadingValue} ${percent}%`)
+    this.status(`${this.uploadingValue} ${percent(event)}%`)
   }
 
   // Submitting mid-upload would drop the file, so hold the form until the blob lands.
@@ -213,7 +149,6 @@ export default class extends Controller {
   }
 }
 
-// Dragged text and page elements fire these events too; only files matter here.
-function draggingFile (event) {
-  return event.dataTransfer?.types?.includes('Files')
+function percent (event) {
+  return Math.round((event.loaded / event.total) * 100)
 }

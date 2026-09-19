@@ -56,8 +56,7 @@ module BikeServices
       end
       return false if user.blank?
 
-      bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
-        bike.impound_claims_claimed.active.where(user_id: user.id).any?
+      bike.impound_claims_claimed.active.where(user_id: user.id).any?
     end
 
     def display_marketplace_message?(bike, _user = nil)

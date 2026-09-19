@@ -1,0 +1,23 @@
+<div
+  data-controller="ui--forms--files--upload-multiple"
+  data-ui--forms--files--upload-multiple-url-value="<%= @url %>"
+  data-ui--forms--files--upload-multiple-params-value="<%= @params.to_json %>"
+  data-ui--forms--files--upload-multiple-file-param-value="<%= @file_param %>"
+  data-ui--forms--files--upload-multiple-uploading-value="<%= translation(".uploading") %>"
+  data-ui--forms--files--upload-multiple-failed-value="<%= translation(".upload_failed") %>"
+  data-action="ui--forms--files--picker:picked->ui--forms--files--upload-multiple#picked"
+>
+  <%= render(UI::Forms::Files::Picker::Component.new(input_options: @input_options, accept: @accept)) do |picker| %>
+    <% picker.with_attached do %>
+      <%= tag.ul(content, **@list_html_options.deep_merge(data: {"ui--forms--files--upload-multiple-target": "list"})) %>
+    <% end %>
+
+    <% picker.with_status do %>
+      <ul
+        class="tw:mt-2"
+        aria-live="polite"
+        data-ui--forms--files--upload-multiple-target="status"
+      ></ul>
+    <% end %>
+  <% end %>
+</div>

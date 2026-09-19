@@ -48,10 +48,10 @@ module Pages
             def reg_field_text(reg_field)
               case reg_field
               when "owner_email"
-                {label: safe_join(["Custom Label for ", tag.em("Owner Email"), ' (e.g. "uiowa.edu email")']),
+                {label: safe_join(["Custom Label for ", tag.em("Owner Email")]), example: 'e.g. "uiowa.edu email"',
                  note: "often desired by universities"}
               when "email_placeholder"
-                {label: safe_join(["Custom Placeholder for ", tag.em("Owner Email"), ' (e.g. "you@uiowa.edu")']),
+                {label: safe_join(["Custom Placeholder for ", tag.em("Owner Email")]), example: 'e.g. "you@uiowa.edu"',
                  note: "the greyed out example inside the empty field"}
               else
                 {label: safe_join(["Custom Label for ",

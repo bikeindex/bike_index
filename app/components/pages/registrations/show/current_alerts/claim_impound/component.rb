@@ -6,7 +6,7 @@ module Pages
       module CurrentAlerts
         module ClaimImpound
           # "Does this look like your bike?" — lets a non-owner open an impound claim
-          # against one of their stolen bikes, then shows that claim once it exists.
+          # against one of their stolen bikes, then shows that claim on either bike.
           # Mirrors the contact-owner card.
           class Component < ApplicationComponent
             def initialize(bike:, current_user: nil, owner: false, organization: nil)
@@ -18,7 +18,10 @@ module Pages
 
             # An organization's staff panel isn't asking whether the bike is theirs
             def render?
-              return false if hidden_from_viewer?
+              return false if @organization.present?
+              # The claimant owns the stolen bike they opened it with, which the displayer hides from them
+              return true if submitting_impound_claim.present?
+              return false if @owner
 
               BikeServices::Displayer.display_impound_claim?(@bike, @current_user)
             end
@@ -27,16 +30,12 @@ module Pages
             # moves when they save or submit it. Guarded rather than gated on render?, which
             # would cost queries of its own on the pages that have no claim to show
             def cache_version
-              return [] if hidden_from_viewer? || @current_user.blank?
+              return [] if @organization.present? || @current_user.blank?
 
               [ImpoundClaim.involving_bike_id(@bike.id).where(user_id: @current_user.id).maximum(:updated_at)]
             end
 
             private
-
-            def hidden_from_viewer?
-              @owner || @organization.present?
-            end
 
             def heading
               return translation(".your_claim") if shown_impound_claim

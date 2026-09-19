@@ -5,6 +5,8 @@ module Admin
     # Each has a template of its own rendering its slice of the organization form; #edit
     # picks between them, so only "edit" is an action
     FORM_TABS = %w[edit locations invoice_functionality sso].freeze
+    # Like FORM_TABS, each names a template of its own - one #show renders in place of the profile
+    SHOW_TABS = %w[registration_sequences].freeze
 
     before_action :find_organization, only: %w[show edit update destroy]
     before_action :set_admin_form_page_id, only: %w[edit new]
@@ -22,6 +24,9 @@ module Admin
     end
 
     def show
+      active_tab = params[:active_tab].presence_in(SHOW_TABS)
+      return render(action: active_tab) if active_tab.present?
+
       @deleted_organization_roles = @organization.deleted? || Binxtils::InputNormalizer.boolean(params[:deleted_organization_roles])
       bikes = @organization.bikes.reorder("created_at desc")
       @bikes_count = bikes.size

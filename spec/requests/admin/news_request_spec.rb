@@ -21,10 +21,16 @@ RSpec.describe Admin::NewsController, type: :request do
   end
 
   describe "edit" do
-    it "renders" do
+    let!(:public_image) { FactoryBot.create(:public_image, imageable: blog) }
+
+    it "renders, with the uploader holding the images the blog already has" do
       get "#{base_url}/#{blog.to_param}/edit"
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
+      expect(response.body).to include("data-ui--forms--files--upload-multiple-target=\"list\"")
+      # what PublicImagesController#create finds the blog back by - its id, since to_param is the slug
+      expect(response.body).to include("data-ui--forms--files--upload-multiple-params-value=\"{&quot;blog_id&quot;:#{blog.id}}\"")
+      expect(response.body).to include("id=\"image-#{public_image.id}\"")
     end
   end
 
@@ -35,7 +41,7 @@ RSpec.describe Admin::NewsController, type: :request do
         title: "new title thing stuff",
         body: "<p>html</p>",
         language: "en",
-        content_tag_names: [content_tag.name]
+        content_tag_names: content_tag.name
       }
       put "#{base_url}/#{blog.to_param}", params: {blog: blog_attrs}
       blog.reload
@@ -50,6 +56,17 @@ RSpec.describe Admin::NewsController, type: :request do
         blog.reload
         expect(blog.kind).to eq "info"
       end
+    end
+  end
+
+  describe "content_tag_chips" do
+    let!(:content_tag) { FactoryBot.create(:content_tag, name: "Recovery stories") }
+
+    it "renders a chip for each existing tag" do
+      post "#{base_url}/content_tag_chips", params: {combobox_values: "Recovery stories,Not a tag", for_id: "blog_content_tag_names"},
+        as: :turbo_stream
+      expect(response.status).to eq(200)
+      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten).to eq(["Recovery stories"])
     end
   end
 end

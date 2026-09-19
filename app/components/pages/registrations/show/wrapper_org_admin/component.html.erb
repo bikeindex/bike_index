@@ -12,9 +12,9 @@
 
       <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
 
-      <p class="tw:opacity-65">
-        <%= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)) %>
-      </p>
+      <% if subtitle %>
+        <p class="tw:opacity-65"><%= subtitle %></p>
+      <% end %>
 
       <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
         <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike)) %>
@@ -91,45 +91,9 @@
       <% end %>
 
       <% if show_notes? %>
-        <%= render(UI::Card::Component.new(additional_classes: "tw:order-4 tw:lg:order-none")) do %>
-          <h2
-            class="
-              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-              tw:uppercase
-            "
-          >
-            <%= translation(".internal_notes") %>
-          </h2>
-
-          <% if bike_organization_note.present? %>
-            <div
-              class="
-                tw:mt-3 tw:border-b tw:border-gray-100 tw:pb-3
-                tw:dark:border-gray-800
-              "
-            >
-              <p class="tw:text-sm"><%= bike_organization_note.body %></p>
-
-              <p class="tw:mt-1 tw:text-xs tw:opacity-65">
-                <%= translation(".note_by", user: bike_organization_note.user&.display_name) %>
-
-                <%= render(UI::Time::Component.new(time: bike_organization_note.updated_at)) %>
-              </p>
-            </div>
-          <% end %>
-
-          <%= form_with(url: notes_url, method: :patch, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |f| %>
-            <%= f.text_area :notes, value: bike_organization_note&.body, name: "notes", rows: 3, class: "twinput tw:w-full", placeholder: translation(".notes_placeholder") %>
-
-            <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
-              <small class="tw:opacity-65">
-                <%= translation(".posts_as", user: @current_user.display_name) %>
-              </small>
-
-              <%= f.submit translation(".post_note"), class: UI::Button::Component.build_classes(color: :primary, size: :sm) %>
-            </div>
-          <% end %>
-        <% end %>
+        <div class="tw:order-4 tw:lg:order-none">
+          <%= render(Pages::Registrations::Show::InternalNotes::Component.new(note: bike_organization_note, url: notes_url, current_user: @current_user)) %>
+        </div>
       <% end %>
 
       <% component_list = Pages::Registrations::Show::ComponentList::Component.new(bike: @bike, collapsed: true) %>

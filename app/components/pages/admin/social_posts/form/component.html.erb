@@ -24,17 +24,14 @@
       <div class="card-body">
         <div class="row">
           <div class="col-md-6">
-            <% account_label = capture do %>
-              Account
-              <small class="less-strong">will send the original post</small>
-            <% end %>
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :social_account_id, label_text: "Account", wrapper_class: "form-group")) do |group| %>
+              <% group.with_label_note { "will send the original post" } %>
 
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :social_account_id, label_text: account_label, wrapper_class: "form-group")) do %>
               <%= render UI::Forms::Combobox::Component.new(name: :social_account_id, form: f, placeholder: "Choose  ", include_blank: true, options: account_options) %>
             <% end %>
 
             <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo", wrapper_class: "form-group")) do %>
-              <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
+              <%= render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
             <% end %>
           </div>
 

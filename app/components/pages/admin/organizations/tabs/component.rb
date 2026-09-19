@@ -42,7 +42,7 @@ module Pages
               ComponentStructs::Shapes.tab("Invoices", admin_organization_invoices_path(organization_id: @organization),
                 tab: :invoices),
               ComponentStructs::Shapes.tab("Registration sequences",
-                admin_registration_sequences_path(organization_id: @organization.id),
+                admin_organization_path(@organization, active_tab: "registration_sequences"),
                 count: (@organization.registration_sequences.size if render_tab?(:registration_sequences)),
                 tab: :registration_sequences),
               ComponentStructs::Shapes.tab("Custom layouts",
