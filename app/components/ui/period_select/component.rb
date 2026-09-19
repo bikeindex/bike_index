@@ -39,10 +39,9 @@ module UI
 
       private
 
-      # A chip group's row, ending in the page corner - so a period row and a group of
-      # chips line up where they're stacked
+      # A chip group's row, so the two line up where they're stacked. The caller places it
       def row_classes
-        "#{UI::ButtonGroup::Component.group_classes(kind: :button, full_width: false)} tw:justify-end"
+        UI::ButtonGroup::Component.group_classes(kind: :button, full_width: false)
       end
 
       def visible_periods
