@@ -31,7 +31,7 @@
     <div class="tw:flex tw:flex-wrap tw:justify-end tw:gap-4 tw:md:text-right tw:lg:flex-nowrap <%= (@skip_total ? "col-12" : "col-md-7") %>">
       <%= render(UI::Pagination::Component.new(pagy: @index.pagy, page_params: @index.params)) %>
 
-      <%= select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @index.per_page), {id: nil, class: "form-control d-inline-block", style: "margin-top: -6px; max-width: 8rem;", data: {controller: "admin--per-page-select", action: "admin--per-page-select#navigate"}} %>
+      <%= select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @index.per_page), id: nil, class: "form-control d-inline-block", style: "margin-top: -6px; max-width: 8rem;", data: {controller: "admin--per-page-select", action: "admin--per-page-select#navigate"} %>
     </div>
   <% end %>
 </div>

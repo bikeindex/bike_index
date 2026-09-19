@@ -5,6 +5,6 @@ export default class extends Controller {
   navigate ({ target }) {
     const url = new URL(window.location)
     url.searchParams.set('per_page', target.value)
-    window.location = url.toString()
+    window.location = url
   }
 }
