@@ -1,44 +1,29 @@
-<% render_sortable ||= false %>
+<%# locals: (collection:, render_sortable: false) %>
 
-<div class="full-screen-table">
-  <table class="table table-bordered table-striped">
-    <thead>
-      <th class="w-25">Created</th>
-      <th class="w-25">Organization</th>
-      <th class="w-25">Text</th>
-      <th class="w-25">image</th>
-    </thead>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(label: "Created", classes: "tw:w-1/4", header_classes: "tw:font-normal") do |ad| %>
+    <%= link_to edit_admin_ad_url(ad), class: "twlink" do %>
+      <%= render UI::Time::Component.new(time: ad.created_at) %>
+    <% end %>
+  <% end %>
 
-    <tbody>
-      <% collection.each do |ad| %>
-        <tr>
-          <td class="w-25">
-            <a class="localizeTime" href="<%= edit_admin_ad_url(ad) %>">
-              <%= l ad.created_at, format: :convert_time %>
-            </a>
-          </td>
+  <% table.column(label: "Organization", classes: "tw:w-1/4", header_classes: "tw:font-normal") do |ad| %>
+    <%= ad.organization.name if ad.organization.present? %>
+  <% end %>
 
-          <td class="w-25">
-            <%= ad.organization.name if ad.organization.present? %>
-          </td>
+  <% table.column(label: "Text", classes: "tw:w-1/4", header_classes: "tw:font-normal") do |ad| %>
+    <h3>
+      <%= link_to ad.title, edit_admin_ad_url(ad), class: "text-dark" %>
+    </h3>
 
-          <td class="w-25">
-            <h3>
-              <%= link_to ad.title, edit_admin_ad_url(ad), class: "text-dark" %>
-            </h3>
+    <p>
+      <%= link_to ad.body, edit_admin_ad_url(ad), class: "text-dark" %>
+    </p>
+  <% end %>
 
-            <p>
-              <%= link_to ad.body, edit_admin_ad_url(ad), class: "text-dark" %>
-            </p>
-          </td>
-
-          <td class="w-25">
-            <% if ad.image.present? %>
-              <%= image_tag ad.image_url(:small), alt: "#{ad.title} ad" %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column(label: "image", classes: "tw:w-1/4", header_classes: "tw:font-normal") do |ad| %>
+    <% if ad.image.present? %>
+      <%= image_tag ad.image_url(:small), alt: "#{ad.title} ad" %>
+    <% end %>
+  <% end %>
+<% end %>

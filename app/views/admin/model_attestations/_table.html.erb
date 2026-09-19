@@ -4,111 +4,67 @@
   <style>.only-dev-visible {display: none !important;} </style>
 <% end %>
 
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered table-sm without-exterior-border">
-    <thead class="small-header">
-      <th>
-        <small>
-          <%= sortable "created_at", render_sortable: render_sortable %>
-        </small>
-      </th>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", header_classes: "tw:text-xs", lower_right: ->(model_attestation) { content_tag(:code, model_attestation.id, class: "only-dev-visible") }) do |model_attestation| %>
+    <%= render UI::Time::Component.new(time: model_attestation.created_at) %>
+  <% end %>
 
-      <% if sort_column == "updated_at" %>
-        <th>
-          <small>
-            <%= sortable "updated_at", render_sortable: render_sortable %>
-          </small>
-        </th>
-      <% end %>
+  <% if sort_column == "updated_at" %>
+    <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |model_attestation| %>
+      <%= render UI::Time::Component.new(time: model_attestation.updated_at) %>
+    <% end %>
+  <% end %>
 
-      <th>
-        <%= sortable "model_audit_id", render_sortable: render_sortable %>
-      </th>
+  <% table.column(sortable: "model_audit_id", classes: "tw:min-w-50") do |model_attestation| %>
+    <% model_audit = model_attestation.model_audit %>
+    <strong><%= model_audit.mnfg_name %></strong>
+    <%= helpers.model_audit_frame_model_display(model_audit, truncate: true) %>
 
-      <th><small>Vehicles&nbsp;#</small></th>
-      <th><%= sortable "kind", render_sortable: render_sortable %></th>
+    <small>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_model_audit_id: model_audit.id)), class: "twlink" %>
+    </small>
 
-      <th>
-        <%= sortable "organization_id", render_sortable: render_sortable %>
-      </th>
+    <% if model_attestation.organization_id.present? %>
+      <%= link_to "view in org", organization_model_audit_path(model_attestation.model_audit_id, organization_id: model_attestation.organization&.to_param), class: "twlink tw:text-xs tw:inline-block less-strong" %>
+    <% end %>
+  <% end %>
 
-      <th><%= sortable "user_id", render_sortable: render_sortable %></th>
-      <th>File/URL</th>
-      <th>Info</th>
-    </thead>
+  <% table.column(label: "Vehicles #", header_classes: "tw:font-normal tw:text-xs") do |model_attestation| %>
+    <%= link_to number_display(model_attestation.model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_attestation.model_audit_id), class: "twlink" %>
+  <% end %>
 
-    <tbody>
-      <% collection.each do |model_attestation| %>
-        <% model_audit = model_attestation.model_audit %>
+  <% table.column(sortable: "kind") do |model_attestation| %>
+    <%= model_attestation.kind_humanized %>
+  <% end %>
 
-        <tr>
-          <td>
-            <span class="localizeTime">
-              <%= l model_attestation.created_at, format: :convert_time %>
-            </span>
+  <% table.column(sortable: "organization_id") do |model_attestation| %>
+    <% if model_attestation.organization %>
+      <%= link_to model_attestation.organization.short_name || model_attestation.organization_id, organization_model_audits_path(organization_id: model_attestation.organization.to_param), class: "twlink" %>
+      <small>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(organization_id: model_attestation.organization.to_param)), class: "twlink" %>
+      </small>
+    <% end %>
+  <% end %>
 
-            <code class="small d-inline-block only-dev-visible">
-              <%= model_attestation.id %>
-            </code>
-          </td>
+  <% table.column(sortable: "user_id") do |model_attestation| %>
+    <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: model_attestation.user, render_search: true) %>
+  <% end %>
 
-          <% if sort_column == "updated_at" %>
-            <td class="small">
-              <span class="localizeTime">
-                <%= l model_attestation.updated_at, format: :convert_time %>
-              </span>
-            </td>
-          <% end %>
+  <% table.column(label: "File/URL", header_classes: "tw:font-normal") do |model_attestation| %>
+    <% if model_attestation.file.present? %>
+      <strong>
+        <%= link_to "File", model_attestation.file.url, target: "_blank", class: "twlink" %>
+      </strong>
+    <% end %>
 
-          <td style="min-width: 200px">
-            <strong><%= model_audit.mnfg_name %></strong>
-            <%= model_audit_frame_model_display(model_audit, truncate: true) %>
+    <% if model_attestation.url.present? %>
+      <small>
+        <%= link_to truncate(model_attestation.url), model_attestation.url, class: "twlink" %>
+      </small>
+    <% end %>
+  <% end %>
 
-            <small>
-              <%= link_to search_emoji, url_for(sortable_search_params.merge(search_model_audit_id: model_audit.id)) %>
-            </small>
-
-            <% if model_attestation.organization_id.present? %>
-              <%= link_to "view in org", organization_model_audit_path(model_attestation.model_audit_id, organization_id: model_attestation.organization&.to_param), class: "small d-inline-block less-strong" %>
-            <% end %>
-          </td>
-
-          <td>
-            <%= link_to number_display(model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_audit.id) %>
-          </td>
-
-          <td><%= model_attestation.kind_humanized %></td>
-
-          <td>
-            <% if model_attestation.organization %>
-              <%= link_to model_attestation.organization&.short_name || model_attestation.organization_id, organization_model_audits_path(organization_id: model_attestation.organization&.to_param), class: "text-link" %>
-              <small>
-                <%= link_to search_emoji, url_for(sortable_search_params.merge(organization_id: model_attestation.organization&.to_param)) %>
-              </small>
-            <% end %>
-          </td>
-
-          <td>
-            <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: model_attestation.user, render_search: true) %>
-          </td>
-
-          <td>
-            <% if model_attestation.file.present? %>
-              <strong>
-                <%= link_to "File", model_attestation.file.url, target: "_blank" %>
-              </strong>
-            <% end %>
-
-            <% if model_attestation.url.present? %>
-              <small>
-                <%= link_to truncate(model_attestation.url), model_attestation.url %>
-              </small>
-            <% end %>
-          </td>
-
-          <td><%= model_attestation.info %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column(label: "Info", header_classes: "tw:font-normal") do |model_attestation| %>
+    <%= model_attestation.info %>
+  <% end %>
+<% end %>

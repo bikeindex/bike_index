@@ -1,0 +1,41 @@
+<%# locals: (memberships:, skip_user: false, render_sortable: false) %>
+
+<%= render(UI::Table::Component.new(records: memberships, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(membership) { membership.id }) do |membership| %>
+    <%= link_to render(UI::Time::Component.new(time: membership.created_at)), admin_membership_url(membership), class: "twlink" %>
+  <% end %>
+
+  <% unless skip_user %>
+    <% table.column(sortable: "user_id") do |membership| %>
+      <%= cache(membership.user) do %>
+        <%= render Pages::Admin::Users::Cell::Component.new(user: membership.user, user_id: membership.user_id, render_search: false) %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "start_at") do |membership| %>
+    <%= render UI::Time::Component.new(time: membership.start_at) %>
+  <% end %>
+
+  <% table.column(sortable: "end_at") do |membership| %>
+    <% if membership.end_at.present? %>
+      <%= render UI::Time::Component.new(time: membership.end_at) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "level") do |membership| %>
+    <%= membership.level_humanized %>
+  <% end %>
+
+  <% table.column(sortable: "creator") do |membership| %>
+    <% if membership.stripe_managed? %>
+      <%= link_to "Stripe", membership.stripe_admin_url, class: "twlink" %>
+    <% else %>
+      <div class="less-strong">
+        <%= cache(membership.creator) do %>
+          <%= render Pages::Admin::Users::Cell::Component.new(user: membership.creator, user_id: membership.creator_id, render_search: false) %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

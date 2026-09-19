@@ -1,0 +1,62 @@
+<%# locals: (social_posts:, render_sortable: false, skip_social_account: false, skip_kind: false, skip_stolen_record: false, skip_reposts: false) %>
+
+<%= render(UI::Table::Component.new(records: social_posts, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at") do |social_post| %>
+    <%= link_to admin_social_post_path(social_post.id), class: "twlink" do %>
+      <%= render UI::Time::Component.new(time: social_post.created_at) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Platform ID", header_classes: "tw:font-normal", classes: "tw:text-xs") do |social_post| %>
+    <%= link_to social_post.platform_id || "ID MISSING!", social_post.post_link, class: "twlink" %>
+  <% end %>
+
+  <% unless skip_social_account %>
+    <% table.column(sortable: "social_account_id") do |social_post| %>
+      <% if social_post.social_account.present? %>
+        <%= link_to social_post.social_account.screen_name, admin_social_posts_path(search_social_account_id: social_post.social_account.to_param), class: "twlink" %>
+      <% else %>
+        <%= social_post.poster %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% unless skip_kind %>
+    <% table.column(sortable: "kind") do |social_post| %>
+      <small><%= social_post.kind&.gsub(/_?post/, "")&.humanize %></small>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Post", header_classes: "tw:font-normal") do |social_post| %>
+    <% if social_post.repost? %>
+      <strong>RT:</strong>
+      <%= link_to social_post.original_post&.poster, admin_social_post_path(social_post.original_post), class: "twlink" %>
+    <% else %>
+      <small>
+        <% if social_post.body_html.present? %>
+          <%= Binxtils::InputNormalizer.sanitize(social_post.body_html) %>
+        <% else %>
+          <%= social_post.body %>
+        <% end %>
+      </small>
+    <% end %>
+  <% end %>
+
+  <% unless skip_stolen_record %>
+    <% table.column(label: "Stolen Record", header_classes: "tw:font-normal") do |social_post| %>
+      <% if social_post.stolen_post? && social_post.stolen_record.present? %>
+        <small><%= link_to social_post.bike&.title_string || social_post.stolen_record.id, admin_stolen_bike_path(social_post.stolen_record_id, stolen_record_id: true), class: "twlink" %></small>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Image?", header_classes: "tw:font-normal") do |social_post| %>
+    <%= check_mark if social_post.image.present? || social_post.posted_image.present? %>
+  <% end %>
+
+  <% unless skip_reposts %>
+    <% table.column(label: "Reposts", header_classes: "tw:font-normal") do |social_post| %>
+      <%= social_post.reposts.count unless social_post.repost? %>
+    <% end %>
+  <% end %>
+<% end %>

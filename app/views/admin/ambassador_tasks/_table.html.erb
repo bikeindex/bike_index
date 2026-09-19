@@ -1,23 +1,15 @@
-<% render_sortable ||= false %>
+<%# locals: (collection:, render_sortable: false) %>
 
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered ambassador-tasks-table">
-    <thead class="small-header">
-      <tr>
-        <th>Title</th>
-        <th>Description</th>
-        <th></th>
-      </tr>
-    </thead>
+<%= render(UI::Table::Component.new(records: collection, classes: "ambassador-tasks-table")) do |table| %>
+  <% table.column(label: "Title", header_classes: "tw:font-normal") do |task| %>
+    <%= task.title %>
+  <% end %>
 
-    <tbody>
-      <% collection.each do |task| %>
-        <tr>
-          <td><%= task.title %></td>
-          <td><%= task.description_html.html_safe %></td>
-          <td><%= link_to "Edit", edit_admin_ambassador_task_path(task) %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column(label: "Description", header_classes: "tw:font-normal") do |task| %>
+    <%= task.description_html.html_safe %>
+  <% end %>
+
+  <% table.column(label: "") do |task| %>
+    <%= link_to "Edit", edit_admin_ambassador_task_path(task), class: "twlink" %>
+  <% end %>
+<% end %>

@@ -4,8 +4,7 @@ module Pages
   module Admin
     module Invoices
       module Form
-        # The invoice form, on both new and edit. The feature checkboxes and the running totals
-        # are driven by the vendored admin bundle, which finds them by id.
+        # The invoice form, on both new and edit
         class Component < ApplicationComponent
           def initialize(organization:, invoice:, organization_features:, display_dev_info: false)
             @organization = organization
@@ -13,11 +12,6 @@ module Pages
             @organization_features = organization_features
             @display_dev_info = display_dev_info
           end
-
-          private
-
-          # Memoized - read once per checkbox otherwise, and it's a query each time
-          def selected_feature_ids = @selected_feature_ids ||= @invoice.organization_feature_ids
 
           # Named individually rather than as an array, so the ids ride in a hidden field the
           # controller rewrites - see admin--invoice-form
@@ -32,6 +26,11 @@ module Pages
           def show_feature_slugs?(organization_feature)
             @display_dev_info && organization_feature.feature_slugs_string.present?
           end
+
+          private
+
+          # Memoized - read once per checkbox otherwise, and it's a query each time
+          def selected_feature_ids = @selected_feature_ids ||= @invoice.organization_feature_ids
 
           # Passed to the fields rather than assigned onto the invoice - rendering it
           # shouldn't write to it

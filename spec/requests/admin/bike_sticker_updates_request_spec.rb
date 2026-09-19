@@ -13,6 +13,10 @@ RSpec.describe Admin::BikeStickerUpdatesController, type: :request do
       expect(response).to render_template(:index)
       expect(bike_sticker_update.bike_sticker.bike_sticker_updates.count).to eq 2
       expect(assigns(:bike_sticker_updates).pluck(:id)).to match_array bike_sticker_update.bike_sticker.bike_sticker_updates.pluck(:id)
+
+      get base_url, params: {render_chart: true}
+      expect(response.status).to eq(200)
+      expect(response.body).to include("no organization")
     end
   end
 end

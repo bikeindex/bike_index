@@ -21,9 +21,14 @@ RSpec.describe Admin::PaymentsController, type: :request do
 
   describe "index" do
     it "renders" do
+      subject
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+
+      get base_url, params: {search_payment_method: "show"}
+      expect(response.status).to eq(200)
+      expect(response.body).to include(subject.amount_formatted)
     end
   end
 

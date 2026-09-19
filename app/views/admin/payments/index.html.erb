@@ -105,44 +105,34 @@
 
     <% if payments_counts.present? %>
       <div class="col-sm">
-        <div class="full-screen-table">
-          <table class="table table-striped table-bordered table-sm text-center">
-            <thead>
-              <% payments_counts.each do |payment_count| %>
-                <th>
-                  <%= payment_count[:name].pluralize %>
+        <%= render(UI::Table::Component.new(records: [payments_counts])) do |table| %>
+          <% payments_counts.each do |payment_count| %>
+            <% header = capture do %>
+              <%= payment_count[:name].pluralize %>
 
-                  <% if params[:search_kind].present? %>
-                    <%= link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "small em" %>
-                  <% else %>
-                    <%= link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: payment_count[:kind])), class: "small em" %>
-                  <% end %>
-                </th>
+              <% if params[:search_kind].present? %>
+                <%= link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "small em" %>
+              <% else %>
+                <%= link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: payment_count[:kind])), class: "small em" %>
               <% end %>
-            </thead>
+            <% end %>
 
-            <tbody>
-              <tr>
-                <% payments_counts.each do |payment_count| %>
-                  <td>
-                    <em class="less-strong">
-                      <%= number_with_delimiter(payment_count[:count]) %> -
-                    </em>
+            <% table.column(label: header, classes: "tw:text-center") do %>
+              <em class="less-strong">
+                <%= number_with_delimiter(payment_count[:count]) %> -
+              </em>
 
-                    <%= payment_count[:money] %>
+              <%= payment_count[:money] %>
 
-                    <% if payment_count[:name] == "payment" && payment_count[:count] > 0 %>
-                      <br>
-                      <small class="text-warning">
-                        There shouldn't be payments without invoices
-                      </small>
-                    <% end %>
-                  </td>
-                <% end %>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              <% if payment_count[:name] == "payment" && payment_count[:count] > 0 %>
+                <br>
+                <small class="text-warning">
+                  There shouldn't be payments without invoices
+                </small>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
       </div>
     <% end %>
   </div>

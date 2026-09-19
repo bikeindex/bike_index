@@ -1,0 +1,53 @@
+<%# locals: (organization_roles:, skip_organization: false, render_sortable: false, render_deleted: false) %>
+
+<% render_organization_search = params[:organization_id].blank? %>
+
+<%= render(UI::Table::Component.new(records: organization_roles, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(organization_role) { organization_role.id }) do |organization_role| %>
+    <%= link_to render(UI::Time::Component.new(time: organization_role.created_at)), admin_organization_role_url(organization_role), class: "twlink" %>
+  <% end %>
+
+  <% table.column(sortable: "invited_email", label: "Recipient") do |organization_role| %>
+    <% if organization_role.user.present? %>
+      <%= cache(organization_role.user) do %>
+        <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.user, render_search: false) %>
+      <% end %>
+    <% else %>
+      <%= organization_role.invited_email %>
+    <% end %>
+  <% end %>
+
+  <% unless skip_organization %>
+    <% table.column(sortable: "organization_id") do |organization_role| %>
+      <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: render_organization_search) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "claimed_at") do |organization_role| %>
+    <% if organization_role.claimed_at.present? %>
+      <%= render UI::Time::Component.new(time: organization_role.claimed_at) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "sender_id", label: "Sender", header_classes: "tw:text-xs") do |organization_role| %>
+    <% if organization_role.sender.present? %>
+      <%= cache(organization_role.sender) do %>
+        <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.sender, render_search: false) %>
+      <% end %>
+    <% else %>
+      <%= organization_role.sender_id %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "role", label: "Admin?", header_classes: "tw:text-xs") do |organization_role| %>
+    <%= check_mark if organization_role.admin? %>
+  <% end %>
+
+  <% if render_deleted %>
+    <% table.column(sortable: "deleted_at", header_classes: "tw:text-xs", classes: "tw:text-sm") do |organization_role| %>
+      <% if organization_role.deleted_at.present? %>
+        <%= render UI::Time::Component.new(time: organization_role.deleted_at) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

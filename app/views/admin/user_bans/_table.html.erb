@@ -1,65 +1,32 @@
 <%# locals: (collection:, render_sortable: false) %>
 <% viewing_deleted ||= @viewing_deleted %>
 
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered table-sm">
-    <thead class="thead-light">
-      <th><%= sortable "created_at", render_sortable: %></th>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: (->(user_ban) { content_tag(:span, user_ban.id, class: "only-dev-visible") } if display_dev_info?)) do |user_ban| %>
+    <%= render UI::Time::Component.new(time: user_ban.created_at) %>
+  <% end %>
 
-      <% if viewing_deleted %>
-        <th><%= sortable "deleted_at", render_sortable: %></th>
-      <% end %>
+  <% if viewing_deleted %>
+    <% table.column(sortable: "deleted_at") do |user_ban| %>
+      <span class="tw:text-red-500"><%= render UI::Time::Component.new(time: user_ban.deleted_at) %></span>
+    <% end %>
+  <% end %>
 
-      <th><%= sortable "user_id", render_sortable: %></th>
-      <th><%= sortable "reason", render_sortable: %></th>
-      <th><%= sortable "creator_id", render_sortable: %></th>
-      <th>Description</th>
-    </thead>
+  <% table.column(sortable: "user_id") do |user_ban| %>
+    <%= render Pages::Admin::Users::Cell::Component.new(user: user_ban.user, render_search: false) %>
+  <% end %>
 
-    <tbody>
-      <% collection.each do |user_ban| %>
-        <tr>
-          <td>
-            <div class="less-strong-hold">
-              <span class="localizeTime">
-                <%= l user_ban.created_at, format: :convert_time %>
-              </span>
+  <% table.column(sortable: "reason") do |user_ban| %>
+    <%= user_ban.reason_humanized %>
+  <% end %>
 
-              <% if display_dev_info? %>
-                <span class="less-strong-right d-none d-md-block only-dev-visible">
-                  <%= user_ban.id %>
-                </span>
-              <% end %>
-            </div>
-          </td>
+  <% table.column(sortable: "creator_id") do |user_ban| %>
+    <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: user_ban.creator, render_search: render_sortable) %>
+  <% end %>
 
-          <% if viewing_deleted %>
-            <td>
-              <div class="less-strong-hold">
-                <span class="localizeTime tw:text-red-500">
-                  <%= l user_ban.deleted_at, format: :convert_time %>
-                </span>
-              </div>
-            </td>
-          <% end %>
-
-          <td>
-            <%= render Pages::Admin::Users::Cell::Component.new(user: user_ban.user, render_search: false) %>
-          </td>
-
-          <td><%= user_ban.reason_humanized %></td>
-
-          <td>
-            <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: user_ban.creator, render_search: render_sortable) %>
-          </td>
-
-          <td>
-            <small title="<%= user_ban.description %>">
-              <%= user_ban.description&.truncate(100) %>
-            </small>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column(label: "Description", header_classes: "tw:font-normal") do |user_ban| %>
+    <small title="<%= user_ban.description %>">
+      <%= user_ban.description&.truncate(100) %>
+    </small>
+  <% end %>
+<% end %>

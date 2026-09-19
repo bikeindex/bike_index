@@ -1,0 +1,73 @@
+<%# locals: (recoveries:, render_sortable: false, skip_bike: false) %>
+
+<%= render(UI::Table::Component.new(records: recoveries, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "recovered_at") do |recovery| %>
+    <%= link_to edit_admin_recovery_url(recovery.id), class: "twlink" do %>
+      <% if recovery.recovered_at.blank? %>
+        <span class="text-danger">no recovery date</span>
+      <% end %>
+
+      <%= render UI::Time::Component.new(time: recovery.recovered_at || recovery.created_at) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "date_stolen", label: "Stolen", classes: "tw:text-xs") do |recovery| %>
+    <%= render UI::Time::Component.new(time: recovery.date_stolen) %>
+  <% end %>
+
+  <% table.column(sortable: "recovery_display_status", label: "Status") do |recovery| %>
+    <small><%= recovery.recovery_display_status.gsub("_", "&nbsp;").html_safe %></small>
+  <% end %>
+
+  <% unless skip_bike %>
+    <% table.column(label: "Bike", header_classes: "tw:font-normal", lower_right: ->(recovery) { link_to(recovery.bike_id, edit_admin_bike_url(recovery.bike), class: "twlink") if recovery.bike.present? }) do |recovery| %>
+      <% if recovery.bike.present? %>
+        <%= recovery.bike.title_string %>
+        <% if recovery.estimated_value.present? %>
+          <small class="less-strong">$<%= recovery.estimated_value %></small>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Recovery info", header_classes: "tw:font-normal") do |recovery| %>
+    <% if recovery.recovered_description.present? %>
+      <small><%= recovery.recovered_description %></small>
+    <% end %>
+
+    <small class="less-strong">
+      <%= recovery.theft_description.truncate(200) if recovery.theft_description.present? %>
+    </small>
+
+    <% if recovery.recovering_user.present? %>
+      <br>
+      <small class="less-strong">
+        Recovered by
+        <%= link_to recovery.recovering_user.display_name, admin_user_path(recovery.recovering_user.to_param), class: "twlink" %>
+        <% unless recovery.recovering_user_owner? %>
+          <span class="text-warning">not owner!</span>
+        <% end %>
+      </small>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Location", header_classes: "tw:font-normal") do |recovery| %>
+    <%= render Atoms::Admin::AddressRecordCell::Component.new(address_record: recovery) %>
+  <% end %>
+
+  <% table.column(label: "Helped", header_classes: "tw:font-normal", classes: "tw:text-center") do |recovery| %>
+    <%# Posted %>
+    <%# check_mark if recovery.recovery_posted %>
+    <%= check_mark if recovery.index_helped_recovery %>
+  <% end %>
+
+  <% table.column(label: "Shareable", header_classes: "tw:font-normal", classes: "tw:text-center") do |recovery| %>
+    <%= check_mark if recovery.can_share_recovery %>
+  <% end %>
+
+  <% table.column(label: "Display", header_classes: "tw:font-normal", classes: "tw:text-center") do |recovery| %>
+    <% if recovery.recovery_display.present? %>
+      <%= link_to check_mark, edit_admin_recovery_display_url(recovery.recovery_display), class: "twlink" %>
+    <% end %>
+  <% end %>
+<% end %>

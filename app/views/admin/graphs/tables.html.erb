@@ -1,0 +1,97 @@
+<%# Make sure that period is passed - because it's a different period than other places %>
+<% sortable_params = {period: default_period}.merge(sortable_search_params).symbolize_keys %>
+
+<% if current_user.superuser? %>
+  <%= render partial: "admin/graphs/graphs_subnav", locals: {location_count: true, sortable_params: sortable_params} %>
+<% end %>
+
+<div class="mb-4">
+  <%= form_tag tables_admin_graphs_path, method: :get do %>
+    <div class="form-inline">
+      <%= text_field_tag :location, params[:location], placeholder: "Location", class: "form-control mr-2" %>
+      <%= text_field_tag :location_radius, params[:location_radius], placeholder: "Proximity in miles", class: "form-control mr-2" %>
+      <%= hidden_field_tag :tables, true %>
+      <%= submit_tag "Load", name: "search", class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>
+
+<% years = Array(2013..Time.current.year)
+  days_left = Time.current.end_of_year.yday - Time.current.yday
+  past_year = (Time.current - 1.year)..Time.current
+  bikes = Bike.with_user_hidden
+  stolen_records = StolenRecord.unscoped.joins(:bike).merge(bikes)
+  # SBR's import set created_at for 2013 and 2014, so those years count date_stolen. After, created_at is
+  # more reliable, and we're showing bikes registered/recorded - not stolen times
+  stolen_in_year = lambda do |scope, year|
+    ([2013, 2014].include?(year) ? scope.where(date_stolen: Date.new(year).all_year) : scope.where("stolen_records.created_at" => Date.new(year).all_year)).count
+  end
+  # [count, projected end-of-year count], projecting (without seasonality) only the current year
+  with_projection = lambda do |year, count, past_year_scope|
+    [count, (count + (BigDecimal(past_year_scope.count) / 365 * days_left).to_i if year == Time.current.year)]
+  end
+  through_year = ->(before, (count, projection)) { [before + count, projection && before + projection] }
+
+  everywhere_rows = years.map do |year|
+    Rails.cache.fetch("admin_graphs_tables_#{year}", expires_in: 1.hour) do
+      date = Date.new(year)
+      stolen = with_projection.(year, stolen_in_year.(stolen_records, year), stolen_records.where("stolen_records.created_at" => past_year))
+      recovered = with_projection.(year, stolen_records.recovered.where(recovered_at: date.all_year).count, stolen_records.recovered.where(recovered_at: past_year))
+      all = with_projection.(year, bikes.where(created_at: date.all_year).count, bikes.where(created_at: past_year))
+      [year, [
+        stolen, through_year.(stolen_records.where("date_stolen < ?", date.beginning_of_year).count, stolen),
+        recovered, through_year.(stolen_records.recovered.where("recovered_at < ?", date.beginning_of_year).count, recovered),
+        all, through_year.(bikes.where("created_at < ?", date.all_year.last).count, all),
+        with_projection.(year, User.unscoped.where(created_at: date.all_year).count, User.unscoped.where(created_at: past_year))
+      ]]
+    end
+  end %>
+
+<h2>Records everywhere</h2>
+
+<p>
+  The <span class="less-strong">data in this color</span> is (simplified, not
+  accounting for seasonalness) projections for the end of the current year
+</p>
+
+<%= render partial: "year_counts_table", locals: {rows: everywhere_rows} %>
+
+<div class="mt-4"></div>
+<div class="mt-4"></div>
+
+<% location_radius = params[:location_radius].present? ? params[:location_radius].to_i : 100 %>
+<% box = params[:location].present? && GeocodeHelper.bounding_box(params[:location], location_radius) %>
+
+<% if box.present? %>
+  <%
+    # To calculate for a specific time period:
+    # stolen_records.where("stolen_records.created_at" => Time.current.beginning_of_month..Time.current).within_bounding_box(GeocodeHelper.bounding_box('Seattle', 25)).count
+    bounded_stolen_records = stolen_records.within_bounding_box(box)
+    bounded_rows = years.map do |year|
+      date = Date.new(year)
+      stolen = with_projection.(year, stolen_in_year.(bounded_stolen_records, year), bounded_stolen_records.where("stolen_records.created_at > ?", Time.current - 1.year))
+      recovered = with_projection.(year, bounded_stolen_records.where(recovered_at: date.all_year).count, bounded_stolen_records.where(recovered_at: past_year))
+      [year, [
+        stolen, through_year.(bounded_stolen_records.where("stolen_records.created_at < ?", date.beginning_of_year).count, stolen),
+        recovered, through_year.(bounded_stolen_records.where("recovered_at < ?", date.beginning_of_year).count, recovered)
+      ]]
+    end
+  %>
+
+  <h4 class="mt-4">
+    Records <em>within <%= location_radius %> miles of</em>
+    <strong><%= params[:location] %></strong>
+  </h4>
+
+  <div class="mt-3">
+    <%= render partial: "year_counts_table", locals: {rows: bounded_rows} %>
+  </div>
+<% else %>
+  <h2>
+    <em>Add a location to the search section at the top of the page to see stats about that location</em>
+  </h2>
+
+  <% if params[:location].present? %>
+    <h4>The location and proximity you entered weren't useable. Try again.</h4>
+  <% end %>
+<% end %>

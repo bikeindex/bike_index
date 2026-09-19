@@ -51,35 +51,24 @@
 <% table_view = capture do %>
   <% if @org_count %>
     <div class="col-sm-6 offset-sm-3 mt-4">
-      <div class="full-screen-table">
-        <table class="table table-striped table-bordered table-sm">
-          <thead>
-            <th class="text-left">Organization</th>
-            <th class="text-right">Imports</th>
-          </thead>
+      <% import_counts = matching_bulk_imports.group(:organization_id).count %>
+      <% organizations = Organization.where(id: import_counts.keys).index_by(&:id) %>
 
-          <tbody>
-            <% matching_bulk_imports.distinct.pluck(:organization_id).each do |id| %>
-              <tr>
-                <td>
-                  <% if id.present? %>
-                    <% organization = Organization.find_by_id(id) %>
-                    <%= link_to organization&.name || id, url_for(sortable_search_params.merge(organization_id: id)) %>
-                    <%= link_to link_emoji, admin_organization_path(id) %>
-                  <% else %>
-                    <%= link_to "No organization", url_for(sortable_search_params.merge(organization_id: "none")) %>
-                    <span class="text-danger">missing org!</span>
-                  <% end %>
-                </td>
+      <%= render(UI::Table::Component.new(records: import_counts.to_a, sort_state:)) do |table| %>
+        <% table.column(label: "Organization") do |(id, _count)| %>
+          <% if id.present? %>
+            <%= link_to organizations[id]&.name || id, url_for(sort_state.search_params.merge(organization_id: id)), class: "twlink" %>
+            <%= link_to link_emoji, admin_organization_path(id) %>
+          <% else %>
+            <%= link_to "No organization", url_for(sort_state.search_params.merge(organization_id: "none")), class: "twlink" %>
+            <span class="tw:text-red-600">missing org!</span>
+          <% end %>
+        <% end %>
 
-                <td>
-                  <%= number_display(matching_bulk_imports.where(organization_id: id).count) %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+        <% table.column(label: "Imports", classes: "tw:text-right") do |(_id, count)| %>
+          <%= number_display(count) %>
+        <% end %>
+      <% end %>
     </div>
   <% end %>
 

@@ -1,0 +1,36 @@
+<%# locals: (bikes: @bikes, show_serial: params[:show_serial].present?, render_sortable: false) %>
+
+<%= render(UI::Table::Component.new(records: bikes, render_sortable:, sort_state:, classes: show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
+  <% table.column(sortable: "created_at", label: "Added to Binx", lower_right: ->(bike) { bike.id }) do |bike| %>
+    <%= link_to render(UI::Time::Component.new(time: bike.created_at)), admin_external_registry_bike_url(bike), class: "twlink tw:text-xs" %>
+  <% end %>
+
+  <% table.column(sortable: "status", header_classes: "tw:text-xs") do |bike| %>
+    <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, size: :xs)) %>
+  <% end %>
+
+  <% table.column(sortable: "mnfg_name", label: "Manufacturer") do |bike| %>
+    <% if bike.mnfg_name == "unknown_brand" %>
+      <small class="less-strong">unknown</small>
+    <% else %>
+      <%= bike.mnfg_name %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Info", classes: "tw:hidden tw:lg:table-cell") do |bike| %>
+    <%= bike.frame_model %>
+    <span class="less-strong"><%= bike.frame_colors.to_sentence %></span>
+  <% end %>
+
+  <% table.column(label: "Location", header_classes: "tw:text-xs tw:font-normal") do |bike| %>
+    <small><%= bike.short_address %></small>
+  <% end %>
+
+  <% table.column(label: "Serial", classes: "admin-bike-table-serial-cell") do |bike| %>
+    <small class="less-strong"><%= bike.serial_number %></small>
+  <% end %>
+
+  <% table.column(label: "Registry") do |bike| %>
+    <%= link_to bike.registry_name, bike.url, target: :_blank, class: "twlink" %>
+  <% end %>
+<% end %>
