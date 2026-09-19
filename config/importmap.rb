@@ -28,11 +28,6 @@ pin "highlight.js/lib/languages/json", to: "highlight.js--json.js", preload: fal
 pin "chartkick", to: "chartkick.js", preload: false
 pin "Chart.bundle", to: "Chart.bundle.js", preload: false
 
-# jQuery is required for select2, which is used by search. It should not be used!
-# ideally we transition off it soon!
-pin "jquery", to: "https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.js", preload: true
-pin "select2", to: "https://cdn.jsdelivr.net/npm/select2@4.0.8/dist/js/select2.full.min.js"
-
 # Our javascript!
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin_all_from "app/components", under: "components"

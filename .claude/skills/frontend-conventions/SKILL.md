@@ -13,8 +13,8 @@ description: >-
   date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
   controllers, Tailwind classes, or any frontend code that touches styling
-  or interactivity — including admin screens, whose unlayered legacy CSS and
-  prebuilt jQuery bundle invert several of these rules. Stimulus.js is the
+  or interactivity — including admin screens, whose unlayered legacy CSS
+  inverts several of these rules. Stimulus.js is the
   JavaScript framework; SCSS and CoffeeScript files exist but are deprecated.
 ---
 
@@ -118,10 +118,11 @@ Only add an `id` or non-utility `class` when something concrete consumes it — 
 
 When deleting an `id`/`class`, grep the repo for the name before deciding what to do with it:
 
-**On admin, grep `public/vendored_assets/*.js` as well as `app/`.** `application_standalone.js` still binds
-behaviour by id and class, and its source left the repo with the webpack config, so it can't be rebuilt or
-searched from source — a hook with no consumer in `app/` is routinely live. Its handlers are guarded on a hook being present — minified, so grep the id itself rather than
-`$(`— and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
+**On a page that loads a vendored bundle, grep `public/vendored_assets/*.js` as well as `app/`.** The
+organization pages load `application.js` and the Doorkeeper layout `application_standalone.js`; both bind
+behaviour by id and class, and their source left the repo with the webpack config, so they can't be rebuilt —
+a hook with no consumer in `app/` is routinely live. Each `.js.map` still carries the original source in
+`sourcesContent`, which reads far better than the minified bundle. Handlers are guarded on a hook being present, and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
 that binds `#infoCheck`. So removing an id silently disables behaviour, sometimes behaviour attached
 to another id entirely.
 Grep for what a module *assigns*, not only the hooks it binds — a guarded init publishes globals and
@@ -204,23 +205,6 @@ pattern — rather than restated in each view.
 param starting with `search_`, plus the sort and period keys — which is how a filter link keeps the
 rest of the table's state. Reach it through the reader, not the bare helper:
 `url_for(@index.sortable_search_params.merge(search_kind: "x"))`.
-
-### Admin pages that carry legacy JS can't be Turbo-visited
-
-`application_standalone.js` is a plain `<script src>` in the admin layout, and everything it
-sets up binds once inside one `$(document).ready` gated on `#admin-content` — the per-page
-select, the selectize filters, the nested location fields. Turbo Drive
-doesn't re-execute an unchanged script tag, and a back/forward restoration hands back a
-*clone* of its snapshot, so that markup comes back looking live with nothing bound to it.
-
-Two things follow. `turbo-cache-control` doesn't help — a restoration that re-fetches still
-renders through Drive, and the admin layout doesn't yield `:header` to set it with anyway.
-And it's the page you navigate *away from* that breaks, not just the one you land on.
-
-So a screen carrying any of it passes `turbo: false` — `Pages::Admin::Headers::Tabs` takes it, and
-`Pages::Admin::Organizations::CustomLayouts::Form::Wrapper` is the one that does. Before opting a new section in,
-check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields` and
-`#multipleUserSelect`.
 
 ## Screenshots
 
