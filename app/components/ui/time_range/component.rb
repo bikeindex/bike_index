@@ -12,6 +12,15 @@ module UI
         @period = period
       end
 
+      def call
+        return period_phrase unless @period == "custom"
+
+        content_tag(:span) do
+          safe_join([translation(".from"), tag.em(render(endpoint(@time_range.first))),
+            translation(".to"), tag.em(ends_now? ? translation(".now") : render(endpoint(@time_range.last)))], " ")
+        end
+      end
+
       private
 
       def render? = @period.present? && @period != "all"
