@@ -6306,6 +6306,7 @@ it:
             share: Condividere
             share_my_page: Condividi la mia pagina
             audience_marketplace_preview: Anteprima dell'inserzione
+            nickname: 'soprannome: %{name}'
           wrapper_org_admin:
             about_this_bike: Informazioni su questo %{bike_type}
             assign_sticker: Collegamento
