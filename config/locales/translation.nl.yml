@@ -5599,6 +5599,8 @@ nl:
           upload_multiple:
             upload_failed: Uploaden mislukt
             uploading: uploaden
+        required_marker:
+          required: verplicht
       alerts:
         base:
           error: Fout
@@ -6212,7 +6214,6 @@ nl:
             share: Deel
             share_my_page: Deel mijn pagina
             audience_marketplace_preview: Voorbeeldweergave van de advertentie
-            nickname: 'bijnaam: %{name}'
           wrapper_org_admin:
             about_this_bike: Over dit %{bike_type}
             assign_sticker: Sticker toewijzen
@@ -6284,6 +6285,8 @@ nl:
               wijzigingen is hierboven zichtbaar.
             update_note: Update-notitie
             updated_by: Bijgewerkt door %{user}
+          subtitle:
+            nickname: 'bijnaam: %{name}'
       search:
         everything_combobox:
           made_by: gemaakt door
