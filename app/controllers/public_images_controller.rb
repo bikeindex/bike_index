@@ -20,13 +20,12 @@ class PublicImagesController < ApplicationController
       @public_image.save
       render("create_revised") && return
     else
-      if params[:blog_id].present?
-        @blog = Blog.find(params[:blog_id])
-        @public_image.imageable = @blog
+      @public_image.imageable = if params[:blog_id].present?
+        Blog.find(params[:blog_id])
       elsif params[:mail_snippet_id]
-        @public_image.imageable = MailSnippet.find(params[:mail_snippet_id])
+        MailSnippet.find(params[:mail_snippet_id])
       else
-        @public_image.imageable = current_organization
+        current_organization
       end
       render(json: {html: admin_image_html}) && return if @public_image.save
 
@@ -139,6 +138,8 @@ class PublicImagesController < ApplicationController
   def ensure_authorized_to_update!
     @public_image = PublicImage.unscoped.find(params[:id])
     unless current_user_image_authorized?(@public_image)
+      render(json: {error: "Access denied"}, status: 401) && return if request.format.json?
+
       flash[:error] = translation(:no_permission_to_edit)
       redirecting_path = @public_image.bike? ? bike_path(@public_image.imageable) : user_root_url
       redirect_to(redirecting_path) && return

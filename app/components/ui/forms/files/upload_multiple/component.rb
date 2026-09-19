@@ -9,10 +9,9 @@ module UI
         # stored (or {error:} with why it wouldn't). Already-stored items are the content, and new
         # ones join them where Upload would preview its one.
         class Component < ApplicationComponent
-          def initialize(url:, file_param:, params: {}, accept: nil, camera: nil, list_html_options: {})
+          def initialize(url:, file_param:, params: {}, accept: nil, list_html_options: {})
             @url = url
             @accept = accept
-            @camera = camera
             @data = {"ui--forms--files--picker-params-value": params, "ui--forms--files--picker-file-param-value": file_param}
             @list_html_options = list_html_options
             # No name: nothing submits it, the controller posts its files itself. The id is random so

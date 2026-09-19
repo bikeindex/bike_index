@@ -238,12 +238,12 @@ class Blog < ApplicationRecord
   end
 
   def set_index_image
-    # 0 is "No primary image", which no PublicImage matches
-    self.index_image_id = nil unless index_image_id == 0 || PublicImage.where(id: index_image_id).present?
+    # 0 is "No primary image"
+    return self.index_image = self.index_image_lg = nil if index_image_id == 0
+
+    self.index_image_id = nil unless PublicImage.where(id: index_image_id).exists?
     if index_image_id.present?
-      if index_image_id == 0
-        self.index_image = nil
-      elsif is_listicle
+      if is_listicle
         li = listicles.find(index_image_id)
       else
         pi = public_images.find(index_image_id)

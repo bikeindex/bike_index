@@ -8,19 +8,12 @@ RSpec.describe UI::Forms::Files::UploadMultiple::Component, type: :component do
     render_inline(described_class.new(url: "/public_images", file_param: "file", **options)) { "<li>already stored</li>".html_safe }
   end
 
-  it "renders the picker, the drop frame and the list of what's already stored" do
-    expect(component).to have_css("[data-controller='ui--forms--files--picker']")
-    expect(component).to have_css("[data-ui--forms--files--picker-url-value='/public_images']")
-    expect(component).to have_css("input[type='file'][multiple][data-ui--forms--files--picker-target='input']")
-    expect(component).to have_css("label", text: "Upload")
-    # decorative -- the label text is what names it
-    expect(component).to have_css("label svg[aria-hidden='true']")
+  it "renders what's already stored as the list, and a status for each upload below the picker" do
     expect(component).to have_css("ul[data-ui--forms--files--picker-target='list'] li", text: "already stored")
     # each upload gets a row here, so it announces without the list moving focus
     expect(component).to have_css("ul[aria-live='polite'][data-ui--forms--files--picker-target='status']")
     # nothing submits the input -- the controller reads its files and posts them itself
-    expect(component).to have_no_css("input[type='file'][name]")
-    expect(component).to have_no_css("input[type='file'][accept]")
+    expect(component).to have_css("input[type='file'][multiple]:not([name])")
   end
 
   describe "params" do
@@ -41,7 +34,6 @@ RSpec.describe UI::Forms::Files::UploadMultiple::Component, type: :component do
     end
   end
 
-  # Two on a page would otherwise hand both labels the same input
   it "gives the input an id of its own, which its label points at" do
     ids = 2.times.map { render_inline(described_class.new(url: "/x", file_param: "f")).css("input[type=file]").first["id"] }
 

@@ -144,10 +144,9 @@ RSpec.describe PublicImagesController, type: :request do
           blog.reload
           public_image = blog.public_images.first
           expect(public_image.name).to eq "cool name"
-          expect(JSON.parse(response.body)["html"]).to include("id=\"image-#{public_image.id}\"")
-          # Blog images are the ones that can be deleted and made primary
-          expect(JSON.parse(response.body)["html"]).to include("admin--public-image#destroy")
-          expect(JSON.parse(response.body)["html"]).to include("name=\"blog[index_image_id]\"")
+          expect(json_result[:html]).to include("id=\"image-#{public_image.id}\"")
+          expect(json_result[:html]).to include("admin--public-image#destroy")
+          expect(json_result[:html]).to include("name=\"blog[index_image_id]\"")
         end
 
         context "with an unstorable file" do
@@ -158,7 +157,7 @@ RSpec.describe PublicImagesController, type: :request do
               post base_url, params: {blog_id: blog.id, public_image: {name: "cool name", image: file}, format: :js}
             }.to_not change(PublicImage, :count)
             expect(response.code).to eq("422")
-            expect(JSON.parse(response.body)["error"]).to be_present
+            expect(json_result[:error]).to be_present
           end
         end
         context "blog_id not given" do
@@ -166,7 +165,7 @@ RSpec.describe PublicImagesController, type: :request do
             expect {
               post base_url, params: {blog_id: "", public_image: {name: "cool name", image: file}, format: :js}
             }.to change(PublicImage, :count).by 1
-            expect(JSON.parse(response.body)).to be_present
+            expect(json_result).to be_present
           end
         end
       end
@@ -207,8 +206,8 @@ RSpec.describe PublicImagesController, type: :request do
           post base_url, params: {mail_snippet_id: mail_snippet.to_param, public_image: {name: "cool name", image: file}, format: :js}
           mail_snippet.reload
           expect(mail_snippet.public_images.first.name).to eq "cool name"
-          expect(JSON.parse(response.body)["html"]).to_not include("admin--public-image#destroy")
-          expect(JSON.parse(response.body)["html"]).to_not include("index_image_id")
+          expect(json_result[:html]).to_not include("admin--public-image#destroy")
+          expect(json_result[:html]).to_not include("index_image_id")
         end
       end
       context "not admin" do
@@ -235,6 +234,17 @@ RSpec.describe PublicImagesController, type: :request do
           delete "#{base_url}/#{public_image.id}", headers: {"Accept" => "application/json"}
         }.to change(PublicImage, :count).by(-1)
         expect(response.status).to eq 204
+      end
+
+      context "not admin" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+        it "answers unauthorized rather than redirecting" do
+          expect {
+            delete "#{base_url}/#{public_image.id}", headers: {"Accept" => "application/json"}
+          }.to_not change(PublicImage, :count)
+          expect(response.status).to eq 401
+        end
       end
     end
     context "mail_snippet" do

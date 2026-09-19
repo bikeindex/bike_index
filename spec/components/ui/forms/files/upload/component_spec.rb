@@ -11,18 +11,9 @@ RSpec.describe UI::Forms::Files::Upload::Component, type: :component do
   let(:attribute) { :avatar }
   let(:options) { {} }
 
-  it "renders the input, the upload label and the drop frame -- but no camera, and an empty preview" do
+  it "renders the builder's field, labelled, and an empty preview" do
     expect(component).to have_css("input#user_avatar[type='file'][name='user[avatar]']")
-    expect(component).to have_css("[data-controller='ui--forms--files--picker']")
-    expect(component).to have_css("[data-ui--forms--files--picker-target='input']")
-    expect(component).to have_css("[data-ui--forms--files--picker-target='filename']", text: "No file chosen")
-    expect(component).to have_css("label[data-action='click->ui--forms--files--picker#chooseFile']", text: "Upload")
-    # decorative -- the label text is what names it
-    expect(component).to have_css("label svg[aria-hidden='true']")
-    # the frame is always rendered -- only its outline reacts to a drag
-    expect(component).to have_css("[data-ui--forms--files--picker-target='dropZone'].tw\\:outline-transparent")
-    # nothing accepted, so nothing to photograph
-    expect(component).to have_no_css("button[data-action='ui--forms--files--picker#takePicture']")
+    expect(component).to have_css("label[for='user_avatar']", text: "Upload")
     # nothing attached, so the preview ships hidden and srcless, waiting for a pick
     # hidden! because collapse() hides with the important variant, and tw:block is on the same element
     expect(component).to have_css("a[data-ui--forms--files--picker-target='preview'].tw\\:hidden\\! img")

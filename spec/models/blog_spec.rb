@@ -124,14 +124,15 @@ RSpec.describe Blog, type: :model do
       expect(blog.index_image_id).to eq(public_image.id)
     end
 
-    # "No primary image" on the admin form - it used to be swapped for the last image
-    it "keeps 0, with no index image" do
+    # "No primary image" on the admin form
+    it "keeps 0, clearing the index images" do
       blog = FactoryBot.create(:blog)
       FactoryBot.create(:public_image, imageable: blog)
       blog.reload
       blog.update(index_image_id: 0)
       expect(blog.reload.index_image_id).to eq 0
       expect(blog.index_image).to be_nil
+      expect(blog.index_image_lg).to be_nil
     end
   end
 

@@ -10,6 +10,12 @@ RSpec.describe UI::Forms::Files::Picker::Component, type: :component do
     expect(component).to have_css("input#picker[type='file'].tw\\:sr-only")
     expect(component).to have_css("label[for='picker'][data-action='click->ui--forms--files--picker#chooseFile']", text: "Upload")
     expect(component).to have_css("[data-ui--forms--files--picker-target='filename']", text: "No file chosen")
+    # decorative -- the label text is what names it
+    expect(component).to have_css("label svg[aria-hidden='true']")
+    # the frame is always rendered -- only its outline reacts to a drag
+    expect(component).to have_css("[data-ui--forms--files--picker-target='dropZone'].tw\\:outline-transparent")
+    # nothing accepted, so nothing to photograph
+    expect(component).to have_no_css("button[data-action='ui--forms--files--picker#takePicture']")
   end
 
   it "accepts a string, an array, or nothing" do
