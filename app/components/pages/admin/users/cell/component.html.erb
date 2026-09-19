@@ -17,6 +17,10 @@
     <span title="<%= @email %>"><%= email_display %></span>
   <% end %>
 
+  <% if deleted_user? %>
+    <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">user deleted</small>
+  <% end %>
+
   <%= render(Atoms::Admin::Badges::User::Component.new(user: @user)) %>
 
   <% if show_search? %>
