@@ -1,4 +1,6 @@
-<%= render(UI::Table::Component.new(records: @registration_sequences, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+<%# locals: (collection:, render_sortable: false) %>
+
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", label: "Created", lower_right: ->(registration_sequence) { registration_sequence.id }) do |registration_sequence| %>
     <%= link_to render(UI::Time::Component.new(time: registration_sequence.created_at)),
       admin_registration_sequence_path(registration_sequence) %>

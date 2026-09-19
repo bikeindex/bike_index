@@ -16,6 +16,7 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         expect(response).to render_template(:index)
         expect(assigns(:collection).pluck(:id)).to eq([draft.id])
         expect(response.body).to_not include("Organization sections")
+        expect(response.body).to include("/admin/registration_sequences?organization_id=#{organization.id}\"")
       end
 
       context "filtered to an organization" do
@@ -54,6 +55,7 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
           get base_url, params: {search_status: "draft"}
           expect(response.status).to eq(200)
           expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+          expect(response.body).to include("/admin/registration_sequences?organization_id=#{organization.id}&amp;search_status=draft")
         end
       end
     end
