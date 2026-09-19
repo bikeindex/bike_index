@@ -33,7 +33,11 @@ module Pages
           end
 
           def title
-            @bike.name.presence || bike_title_html(@bike)
+            bike_title_html(@bike)
+          end
+
+          def subtitle
+            translation(".nickname", name: @bike.name) if @bike.name.present?
           end
 
           def current_view

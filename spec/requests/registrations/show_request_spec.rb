@@ -11,7 +11,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
   end
 
   context "consumer view" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, year: 2020, frame_model: "Stumpjumper", name: "Morning commuter") }
     let(:current_user) { bike.reload.user }
 
     it "renders the redesigned consumer view with owner actions" do
@@ -25,6 +25,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       expect(body).to match("Mark stolen")
       expect(body).to match("Add photo")
       expect(body).to match("Edit this bike")
+      expect(body).to match("2020 #{bike.mnfg_name} Stumpjumper nickname: Morning commuter")
       expect(response.body).to match(edit_bike_path(bike, edit_template: bike.default_edit_template))
     end
 
@@ -510,6 +511,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
             # The View notifications action opens the parking-notification show panel
             expect(body).to match("View notification")
             expect(body).to match("Parked incorrectly")
+            expect(response.body).to include('data-registrations--show--map-latitude-value="40.7143528"')
             expect(response.body).to match(organization_parking_notification_path(ParkingNotification.last.id, organization_id: organization.to_param))
           end
         end
