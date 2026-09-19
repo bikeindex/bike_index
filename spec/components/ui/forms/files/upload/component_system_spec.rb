@@ -2,10 +2,10 @@
 
 require "rails_helper"
 
-RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
-  let(:base_path) { "/rails/view_components/ui/forms/file_upload/component/" }
-  let(:drop_frame) { "[data-ui--forms--file-upload-target='dropZone']" }
-  let(:preview) { "[data-ui--forms--file-upload-target='preview']" }
+RSpec.describe UI::Forms::Files::Upload::Component, :js, type: :system do
+  let(:base_path) { "/rails/view_components/ui/forms/files/upload/component/" }
+  let(:drop_frame) { "[data-ui--forms--files--picker-target='dropZone']" }
+  let(:preview) { "[data-ui--forms--files--upload-target='preview']" }
   # Dragging a file has no Capybara equivalent -- the drag source is the OS, not the
   # page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
   let(:start_drag) do
@@ -19,7 +19,7 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
   it "takes a file from the picker or a drag, and offers the camera only to a coarse pointer" do
     visit("#{base_path}default")
 
-    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "No file chosen")
+    expect(page).to have_css("[data-ui--forms--files--picker-target='filename']", text: "No file chosen")
     expect(page).to have_css("label", text: "Upload")
     # the frame is idle until something is dragged
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
@@ -28,7 +28,7 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
 
     attach_file("file", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
 
-    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "bike.jpg")
+    expect(page).to have_css("[data-ui--forms--files--picker-target='filename']", text: "bike.jpg")
     # the pick previews straight from the browser's copy, rather than waiting on an upload
     expect(page).to have_css("#{preview}[href^='blob:'] img[src^='blob:']")
 
@@ -67,11 +67,11 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
     # Two files into a single-file input -- only the first should land.
     page.execute_script(<<~JS)
       window.fileTransfer.items.add(new File(["y"], "second.jpg", {type: "image/jpeg"}))
-      document.querySelector("[data-controller='ui--forms--file-upload'] label")
+      document.querySelector("[data-controller='ui--forms--files--picker'] label")
         .dispatchEvent(new DragEvent("drop", {bubbles: true, dataTransfer: window.fileTransfer}))
     JS
 
-    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "dropped.jpg")
+    expect(page).to have_css("[data-ui--forms--files--picker-target='filename']", text: "dropped.jpg")
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
     # those bytes aren't a jpeg whatever the name says -- the previous preview goes rather
     # than staying up as a broken image
@@ -106,7 +106,7 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
 
       expect(page).to have_css("#{preview}[href*='bike.jpg'] img[src*='bike.jpg']")
       # Nothing picked this session, so the field still names no file
-      expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "No file chosen")
+      expect(page).to have_css("[data-ui--forms--files--picker-target='filename']", text: "No file chosen")
       expect_axe_clean
     end
   end

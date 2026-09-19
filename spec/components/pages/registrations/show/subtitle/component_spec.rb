@@ -1,14 +1,19 @@
 require "rails_helper"
 
 RSpec.describe Pages::Registrations::Show::Subtitle::Component, type: :component do
-  let(:color) { FactoryBot.create(:color, name: "Blue") }
-  let(:bike) { FactoryBot.create(:bike, year: 2020, frame_model: "Rocket", primary_frame_color: color) }
-  let(:component) { described_class.new(bike:) }
+  let(:bike) { FactoryBot.create(:bike, name:) }
+  let(:name) { "<b>Morning</b> commuter" }
+  let(:component) { render_inline(described_class.new(bike:)) }
 
-  it "combines year and model with the colors" do
-    render_inline(component)
-    expect(page).to have_text("2020")
-    expect(page).to have_text("Rocket")
-    expect(page).to have_text("Blue")
+  it "renders the nickname" do
+    expect(component).to have_text("nickname: <b>Morning</b> commuter")
+  end
+
+  context "without a name" do
+    let(:name) { nil }
+
+    it "renders nothing" do
+      expect(component.to_html).to eq ""
+    end
   end
 end

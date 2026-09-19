@@ -12,9 +12,9 @@
 
       <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
 
-      <p class="tw:opacity-65">
-        <%= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)) %>
-      </p>
+      <% if subtitle %>
+        <p class="tw:opacity-65"><%= subtitle %></p>
+      <% end %>
 
       <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
         <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike)) %>

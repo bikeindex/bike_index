@@ -5692,12 +5692,17 @@ it:
           not_real: Questo non sembra essere il tuo vero indirizzo email. Inserisci
             un indirizzo email a cui ricevi le email.
           submit_anyway: Invia comunque il modulo
-        file_upload:
-          no_file_chosen: Nessun file selezionato
-          take_picture: Scatta una foto
-          upload: Caricamento
-          upload_failed: caricamento non riuscito
-          uploading: caricamento
+        files:
+          picker:
+            no_file_chosen: Nessun file selezionato
+            take_picture: Scatta una foto
+            upload: Caricamento
+          upload:
+            upload_failed: caricamento non riuscito
+            uploading: caricamento
+          upload_multiple:
+            upload_failed: caricamento non riuscito
+            uploading: caricamento
         group:
           optional: opzionale
         turnstile:
@@ -6322,16 +6327,12 @@ it:
             about_this_bike: Informazioni su questo %{bike_type}
             assign_sticker: Collegamento
             edit: Modifica
-            internal_notes: Note interne
             link_sticker: Adesivo di collegamento
             no_other_registrations: Nessun risultato trovato
             not_registered_message: Non è possibile contattare il proprietario per
               le biciclette al di fuori della propria organizzazione. È comunque possibile
               aggiungere note interne.
             not_registered_title: Non registrato con %{org_name}
-            note_by: Nota di %{user}
-            notes_placeholder: 'Nuova nota interna: le note precedenti vengono conservate
-              nella discussione.'
             org_can_edit: "%{org_name} può modificare questo %{bike_type}"
             org_can_edit_sub: Incluso dopo che %{bike_type} è stato rivendicato.
             other_registrations: Altre registrazioni di questo utente
@@ -6341,8 +6342,6 @@ it:
             owner_name: Nome
             owner_phone: Telefono
             photo_archive: Archivio fotografico
-            post_note: Posta
-            posts_as: Pubblica come %{user}
             restricted_message: Il contatto del proprietario è disponibile per amministratori
               e personale. È possibile aggiungere note e richiedere il ritiro dell'animale.
             restricted_title: Accesso limitato per il tuo ruolo
@@ -6384,6 +6383,17 @@ it:
             registration_sequence: Sequenza di registrazione
             sticker: Adesivo
             sticker_claimed: reclamato
+          internal_notes:
+            current_note: Nota corrente
+            deleted_user: un utente eliminato
+            internal_notes: Note interne
+            most_recent_update_by: ultimo aggiornamento di %{user}
+            note_by: Nota di %{user}
+            post_note: Posta
+            update_hint: Pubblicherai come %{user} — la cronologia delle tue modifiche
+              sarà visibile qui sopra.
+            update_note: Nota di aggiornamento
+            updated_by: Aggiornato da %{user}
       search:
         everything_combobox:
           made_by: realizzato da

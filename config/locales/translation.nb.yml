@@ -5427,12 +5427,17 @@ nb:
           not_real: Det ser ikke ut som din virkelige e-postadresse. Vennligst skriv
             inn en e-postadresse du mottar e-post fra
           submit_anyway: Send inn skjemaet likevel
-        file_upload:
-          no_file_chosen: Ingen fil valgt
-          take_picture: Ta bilde
-          upload: Last opp
-          upload_failed: opplastingen mislyktes
-          uploading: opplasting
+        files:
+          picker:
+            no_file_chosen: Ingen fil valgt
+            take_picture: Ta bilde
+            upload: Last opp
+          upload:
+            upload_failed: opplastingen mislyktes
+            uploading: opplasting
+          upload_multiple:
+            upload_failed: opplastingen mislyktes
+            uploading: opplasting
         group:
           optional: valgfri
         turnstile:
@@ -6036,15 +6041,11 @@ nb:
             about_this_bike: Om dette %{bike_type}
             assign_sticker: Tildel klistremerke
             edit: Endre
-            internal_notes: Interne notater
             link_sticker: Lenkeklistremerke
             no_other_registrations: Ingen funnet
             not_registered_message: Eierkontakt er ikke tilgjengelig for sykler utenfor
               organisasjonen din. Du kan fortsatt legge til interne notater.
             not_registered_title: Ikke registrert hos %{org_name}
-            note_by: Merknad av %{user}
-            notes_placeholder: Nytt internt notat – dine tidligere notater lagres
-              i tråden.
             org_can_edit: "%{org_name} kan redigere denne %{bike_type}"
             org_can_edit_sub: Inkludert etter at %{bike_type} er gjort krav på.
             other_registrations: Andre registreringer av denne brukeren
@@ -6054,8 +6055,6 @@ nb:
             owner_name: Navn
             owner_phone: Telefon
             photo_archive: Fotoarkiv
-            post_note: Legg inn notat
-            posts_as: Innlegg som %{user}
             restricted_message: Administrasjon og ansatte kan kontakte eieren. Du
               kan legge til notater og be om beslag.
             restricted_title: Begrenset for din rolle
@@ -6097,6 +6096,17 @@ nb:
             registration_sequence: Registreringssekvens
             sticker: Klistremerke
             sticker_claimed: hevdet
+          internal_notes:
+            current_note: Gjeldende notat
+            deleted_user: en slettet bruker
+            internal_notes: Interne notater
+            most_recent_update_by: siste oppdatering av %{user}
+            note_by: Merknad av %{user}
+            post_note: Legg inn notat
+            update_hint: Du legger ut innlegget som %{user} – historikken over endringene
+              dine vil være synlig ovenfor.
+            update_note: Oppdater merknad
+            updated_by: Oppdatert av %{user}
       search:
         everything_combobox:
           made_by: laget av
