@@ -65,9 +65,13 @@ module Pages
             }
           end
 
+          def index_path(**changes)
+            organization_parking_notifications_path({**@search_params, **changes, organization_id: @organization.to_param})
+          end
+
           # An entry that's already applied links to clearing it
           def toggle_path(key, value, current)
-            organization_parking_notifications_path(@search_params.merge(:organization_id => @organization.id, key => ((current == value.to_s) ? nil : value)))
+            index_path(key => ((current == value.to_s) ? nil : value))
           end
 
           def kind_display(kind)

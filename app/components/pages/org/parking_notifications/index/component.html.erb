@@ -73,7 +73,7 @@
         <%= number_display(@total_count) %> total matches
         <% if @search_bounding_box.present? %>
           in this area &middot;
-          <%= link_to "search everywhere", organization_parking_notifications_path(@search_params.except(:organization_id, :search_southwest_coords, :search_northeast_coords)) %>
+          <%= link_to "search everywhere", index_path(search_southwest_coords: nil, search_northeast_coords: nil) %>
         <% end %>
         <% if @parking_notifications.size >= @per_page %>
           <em>- first <%= number_display(@per_page) %> loaded</em>
@@ -143,14 +143,14 @@
         <% end %>
         <em class="less-strong">
           view notifications
-          <%= link_to "for all bikes", organization_parking_notifications_path(@search_params.merge(search_bike_id: nil)) %>
+          <%= link_to "for all bikes", index_path(search_bike_id: nil) %>
         </em>
       <% end %>
 
       <% if @filtered_user_id.present? %>
         Only notifications created by
         <strong><%= @filtered_user&.display_name&.truncate(20) %></strong>
-        <span class="less-strong"><%= link_to "(view by all)", organization_parking_notifications_path(@search_params.merge(user_id: nil)) %></span>
+        <span class="less-strong"><%= link_to "(view by all)", index_path(user_id: nil) %></span>
       <% end %>
     </div>
 

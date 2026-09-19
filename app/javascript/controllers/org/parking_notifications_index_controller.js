@@ -46,6 +46,7 @@ export default class extends Controller {
       this.#visit({ search_southwest_coords: null, search_northeast_coords: null })
     } else {
       this.#fitToMarkers()
+      this.#forgetPlace()
     }
   }
 
@@ -117,7 +118,9 @@ export default class extends Controller {
     // Only a move the user made changes what "current location" means
     this.map.on('moveend', (event) => {
       this.#filterRows()
-      if (event.originalEvent) collapse('show', this.redoTarget)
+      if (!event.originalEvent) return
+      collapse('show', this.redoTarget)
+      this.#forgetPlace()
     })
   }
 
@@ -198,6 +201,15 @@ export default class extends Controller {
 
   get #nothingAtLocation () {
     return this.#hasBoundingBox && !this.rowTargets.length
+  }
+
+  // Once the map leaves the searched place, the URL shouldn't reopen on it
+  #forgetPlace () {
+    const url = new URL(window.location.href)
+    if (!url.searchParams.has('map_location')) return
+
+    url.searchParams.delete('map_location')
+    window.history.replaceState(window.history.state, '', url)
   }
 
   // Merged into the current URL, so the rest of the search carries over

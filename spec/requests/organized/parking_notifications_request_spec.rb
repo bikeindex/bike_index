@@ -33,6 +33,9 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(response.body).to include(notification_path(parking_notification_retrieved))
         expect(response.body).to include(%(data-org--parking-notifications-index-bounding-box-value="[40.7,-74.1,40.8,-73.9]"))
         expect(response.body).to include(%(href="#{base_url}?search_status=all">search everywhere</a>))
+        # organization_id is the path's, so no link repeats it as a query param
+        expect(response.body).to include(%(href="#{base_url}?search_kind=appears_abandoned_notification&amp;search_northeast_coords=40.8%2C-73.9))
+        expect(response.body).not_to match(/parking_notifications\?[^"]*organization_id=/)
         expect(response.body).to match(/data-org--parking-notifications-index-place-value="\[-?[\d.]+,-?[\d.]+\]"/)
       end
     end

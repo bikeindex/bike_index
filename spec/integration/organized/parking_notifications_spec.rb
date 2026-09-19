@@ -237,5 +237,13 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
       expect(page).to have_css(rows, count: 1, wait: 10)
     }.to change { [unregistered, abandoned].map { it.reload.status } }.to(%w[retrieved retrieved])
     expect(far_away.reload.status).to eq "current"
+
+    # Back on the searched place, with only the far away notification left. Fitting to it
+    # leaves the place, so the URL stops reopening there
+    expect(page).to have_current_path(/map_location=New/)
+    click_button "Fit map to notifications"
+    # The count updates when the fly from New York to Chicago lands, a few seconds out
+    expect(page).to have_content("1 visible", wait: 10)
+    expect(page).not_to have_current_path(/map_location/)
   end
 end
