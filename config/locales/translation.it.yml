@@ -5692,12 +5692,17 @@ it:
           not_real: Questo non sembra essere il tuo vero indirizzo email. Inserisci
             un indirizzo email a cui ricevi le email.
           submit_anyway: Invia comunque il modulo
-        file_upload:
-          no_file_chosen: Nessun file selezionato
-          take_picture: Scatta una foto
-          upload: Caricamento
-          upload_failed: caricamento non riuscito
-          uploading: caricamento
+        files:
+          picker:
+            no_file_chosen: Nessun file selezionato
+            take_picture: Scatta una foto
+            upload: Caricamento
+          upload:
+            upload_failed: caricamento non riuscito
+            uploading: caricamento
+          upload_multiple:
+            upload_failed: caricamento non riuscito
+            uploading: caricamento
         group:
           optional: opzionale
         turnstile:
