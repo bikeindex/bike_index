@@ -219,8 +219,8 @@ module ControllerHelpers
 
   # The bike's page as this viewer sees it, so a redirect lands there rather than
   # hopping through bikes#show
-  def bike_view_path(bike, show_legacy: !registration_redesign_shown?)
-    show_legacy ? bike_path(bike) : registration_path(bike)
+  def bike_view_path(bike, show_legacy: !registration_redesign_shown?, **query)
+    show_legacy ? bike_path(bike, query) : registration_path(bike, query)
   end
 
   def show_general_alert

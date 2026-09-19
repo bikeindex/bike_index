@@ -63,7 +63,7 @@ class BikesController < Bikes::BaseController
       flash[:error] = translation(:unable_to_find_sticker, scanned_id: params[:scanned_id])
       redirect_to user_root_url
     elsif @bike_sticker.bike.present?
-      redirect_to(bike_url(@bike_sticker.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id])) && return
+      redirect_to(bike_view_path(@bike_sticker.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id])) && return
     elsif current_user.present?
       if current_user.member_of?(@bike_sticker.organization)
         set_passive_organization(@bike_sticker.organization)
