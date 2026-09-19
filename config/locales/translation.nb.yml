@@ -6020,6 +6020,7 @@ nb:
             share: Dele
             share_my_page: Del siden min
             audience_marketplace_preview: Forhåndsvisning av oppføring
+            nickname: 'kallenavn: %{name}'
           wrapper_org_admin:
             about_this_bike: Om dette %{bike_type}
             assign_sticker: Tildel klistremerke

@@ -6288,6 +6288,7 @@ es:
             share: Compartir
             share_my_page: Comparte mi página
             audience_marketplace_preview: Vista previa del anuncio
+            nickname: 'apodo: %{name}'
           wrapper_org_admin:
             about_this_bike: Acerca de esto %{bike_type}
             assign_sticker: Asignar pegatina
