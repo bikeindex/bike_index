@@ -1,0 +1,20 @@
+<div
+  data-controller="ui--collapse"
+  data-ui--collapse-storage-key-value="collapsePreviewOpen"
+>
+  <button
+    type="button"
+    data-action="ui--collapse#toggle"
+    data-ui--collapse-target="trigger"
+    aria-expanded="false"
+    class="twlink"
+  >
+    Toggle stored panel
+  </button>
+
+  <div data-ui--collapse-target="content" class="tw:mt-2 tw:hidden">
+    <p class="tw:mb-0">
+      Stored panel body — open state lives in localStorage, not the URL.
+    </p>
+  </div>
+</div>
