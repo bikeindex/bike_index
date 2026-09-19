@@ -92,7 +92,7 @@
 
       <% if show_notes? %>
         <div class="tw:order-4 tw:lg:order-none">
-          <%= render(Pages::Registrations::Show::InternalNotes::Component.new(notes: notes_thread, url: notes_url, current_user: @current_user)) %>
+          <%= render(Pages::Registrations::Show::InternalNotes::Component.new(note: bike_organization_note, url: notes_url, current_user: @current_user)) %>
         </div>
       <% end %>
 

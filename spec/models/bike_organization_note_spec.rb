@@ -73,7 +73,7 @@ RSpec.describe BikeOrganizationNote, type: :model do
       end
     end
   end
-  describe "thread" do
+  describe "previous_notes" do
     include_context :with_paper_trail
 
     let(:bike) { FactoryBot.create(:bike_organized) }
@@ -81,14 +81,15 @@ RSpec.describe BikeOrganizationNote, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:other_user) { FactoryBot.create(:user) }
 
-    it "is the note followed by the ones it replaced, newest first, skipping blanks" do
+    it "is the notes it replaced, oldest first, skipping blanks" do
       BikeOrganizationNote.upsert(bike:, organization:, body: "First", user:)
       BikeOrganizationNote.upsert(bike:, organization:, body: " ", user:)
       BikeOrganizationNote.upsert(bike:, organization:, body: "Third", user: other_user)
-      thread = BikeOrganizationNote.last.thread
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Fourth", user:)
+      previous_notes = BikeOrganizationNote.last.previous_notes
 
-      expect(thread.map(&:body)).to eq %w[Third First]
-      expect(thread.map(&:user)).to eq [other_user, user]
+      expect(previous_notes.map(&:body)).to eq %w[First Third]
+      expect(previous_notes.map(&:user)).to eq [user, other_user]
     end
   end
 end

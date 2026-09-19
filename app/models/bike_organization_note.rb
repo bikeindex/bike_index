@@ -34,9 +34,8 @@ class BikeOrganizationNote < ApplicationRecord
   end
 
   # upsert overwrites the note, so the ones it replaced come from its versions
-  def thread
-    previous_notes = versions.where(event: "update").reorder(id: :desc).map(&:reify)
-    [self, *previous_notes].select { it.body.present? }
+  def previous_notes
+    versions.where(event: "update").map(&:reify).select { it.body.present? }
       .tap { ActiveRecord::Associations::Preloader.new(records: it, associations: :user).call }
   end
 

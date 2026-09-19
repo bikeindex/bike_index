@@ -6,6 +6,6 @@ RSpec.describe Pages::Registrations::Show::InternalNotes::Component, type: :comp
   it "renders a note whose author was deleted" do
     render_preview(:author_deleted)
 
-    expect(page).to have_text("Written by someone who has since left.")
+    expect(page).to have_field("Current note", with: "Written by someone who has since left.")
   end
 end

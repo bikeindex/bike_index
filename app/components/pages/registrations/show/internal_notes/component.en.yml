@@ -5,9 +5,10 @@ en:
       registrations:
         show:
           internal_notes:
+            current_note: Current note
             internal_notes: Internal notes
             note_by: Note by %{user}
-            notes_placeholder: New internal note — your previous notes are kept in
-              the thread.
             post_note: Post note
             posts_as: Posts as %{user}
+            update_hint: Update note — history of your changes will be visible above
+            update_note: Update note

@@ -24,13 +24,14 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
 
     let(:other_user) { FactoryBot.create(:organization_user, organization:) }
 
-    it "renders previous notes in the thread" do
+    it "renders the current note to update, with the notes it replaced above" do
       BikeOrganizationNote.upsert(bike:, organization:, body: "First note", user: other_user)
       BikeOrganizationNote.upsert(bike:, organization:, body: "Second note", user: current_user)
       render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
 
-      expect(page).to have_text(/Second note.*Note by #{current_user.display_name}.*First note.*Note by #{other_user.display_name}/m)
-      expect(page).to have_field("notes", with: "")
+      expect(page).to have_text(/First note.*Note by #{other_user.display_name}.*Current note.*Note by #{current_user.display_name}/m)
+      expect(page).to have_field("Current note", with: "Second note")
+      expect(page).to have_button("Update note")
     end
 
     context "on a bike registered elsewhere" do

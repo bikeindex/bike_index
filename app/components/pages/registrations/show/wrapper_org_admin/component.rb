@@ -98,8 +98,8 @@ module Pages
             @organization.enabled?("registration_notes")
           end
 
-          def notes_thread
-            BikeOrganizationNote.find_by(bike_id: @bike.id, organization_id: @organization.id)&.thread || []
+          def bike_organization_note
+            BikeOrganizationNote.find_by(bike_id: @bike.id, organization_id: @organization.id)
           end
 
           def notes_url

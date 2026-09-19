@@ -3,27 +3,33 @@
     <%= translation(".internal_notes") %>
   </h2>
 
-  <% @notes.each do |note| %>
+  <% @previous_notes.each do |note| %>
     <div class="tw:mt-3 tw:border-b tw:border-gray-100 tw:pb-3 tw:dark:border-gray-800">
       <p class="tw:text-sm"><%= note.body %></p>
 
-      <p class="tw:mt-1 tw:text-xs tw:opacity-65">
-        <%= translation(".note_by", user: note.user&.display_name) %>
-
-        <%= render(UI::Time::Component.new(time: note.updated_at)) %>
-      </p>
+      <p class="tw:mt-1 tw:text-xs tw:opacity-65"><%= note_by(note) %></p>
     </div>
   <% end %>
 
   <%= form_with(url: @url, method: :patch, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |f| %>
-    <%= f.text_area :notes, rows: 3, class: "twinput tw:w-full", placeholder: translation(".notes_placeholder") %>
+    <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-2">
+      <%= f.label :notes, translation(".current_note"), class: "twlabel" %>
 
-    <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
+      <% if @note&.body.present? %>
+        <small class="tw:opacity-65"><%= note_by(@note) %></small>
+      <% end %>
+    </div>
+
+    <%= f.text_area :notes, value: @note&.body, rows: 3, class: "twinput tw:w-full" %>
+
+    <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-2">
       <small class="tw:opacity-65">
+        <%= translation(".update_hint") %>
+        <br>
         <%= translation(".posts_as", user: @current_user.display_name) %>
       </small>
 
-      <%= f.submit translation(".post_note"), class: UI::Button::Component.build_classes(color: :primary, size: :sm) %>
+      <%= f.submit @note.present? ? translation(".update_note") : translation(".post_note"), class: UI::Button::Component.build_classes(color: :primary, size: :sm) %>
     </div>
   <% end %>
 <% end %>

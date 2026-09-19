@@ -7,29 +7,29 @@ module Pages
         # In-memory notes, so nothing is written to the database
         class ComponentPreview < ApplicationComponentPreview
           def no_notes
-            render_notes([])
+            render_notes(nil)
           end
 
           def single_note
-            render_notes([note("Owner picked it up from the rack by the library.", "Alice Staff", 2.hours.ago)])
+            render_notes(note("Owner picked it up from the rack by the library.", "Alice Staff", 2.hours.ago))
           end
 
-          def thread_with_previous_notes
-            render_notes([
-              note("Owner confirmed the new lock — clear to release.", "Alice Staff", 20.minutes.ago),
-              note("Called the owner, left a voicemail.", "Bob Member", 1.day.ago),
-              note("Found locked to the handrail outside Hall B.", "Alice Staff", 3.days.ago)
-            ])
+          def with_previous_notes
+            render_notes(note("Owner confirmed the new lock — clear to release.", "Alice Staff", 20.minutes.ago),
+              previous_notes: [
+                note("Found locked to the handrail outside Hall B.", "Alice Staff", 3.days.ago),
+                note("Called the owner, left a voicemail.", "Bob Member", 1.day.ago)
+              ])
           end
 
           def author_deleted
-            render_notes([BikeOrganizationNote.new(body: "Written by someone who has since left.", updated_at: 1.week.ago)])
+            render_notes(BikeOrganizationNote.new(body: "Written by someone who has since left.", updated_at: 1.week.ago))
           end
 
           private
 
-          def render_notes(notes)
-            render(Component.new(notes:, url: "#", current_user: User.new(name: "Preview User")))
+          def render_notes(note, previous_notes: [])
+            render(Component.new(note:, previous_notes:, url: "#", current_user: User.new(name: "Preview User")))
           end
 
           def note(body, user_name, updated_at)
