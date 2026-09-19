@@ -24,6 +24,21 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
     end
   end
 
+  describe "internal notes" do
+    include_context :with_paper_trail
+
+    let(:other_user) { FactoryBot.create(:organization_user, organization:) }
+
+    it "renders previous notes in the thread" do
+      BikeOrganizationNote.upsert(bike:, organization:, body: "First note", user: other_user)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Second note", user: current_user)
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      expect(page).to have_text(/Second note.*Note by #{current_user.display_name}.*First note.*Note by #{other_user.display_name}/m)
+      expect(page).to have_field("notes", with: "")
+    end
+  end
+
   describe "other registrations" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[additional_registrations_information]) }
 

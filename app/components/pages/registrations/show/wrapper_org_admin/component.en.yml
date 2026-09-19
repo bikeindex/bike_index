@@ -14,7 +14,6 @@ en:
             creator: Creator
             credibility: Credibility
             edit: Edit
-            internal_notes: Internal notes
             is_false: 'false'
             is_true: 'true'
             link_sticker: Link sticker
@@ -25,9 +24,6 @@ en:
               Owner contact isn't available for bikes outside your organization. You
               can still add internal notes.
             not_registered_title: Not registered with %{org_name}
-            note_by: Note by %{user}
-            notes_placeholder: New internal note — your previous notes are kept in
-              the thread.
             org_can_edit: "%{org_name} can edit this %{bike_type}"
             org_can_edit_sub: Including after the %{bike_type} is claimed.
             organization_registered: Organization
@@ -38,8 +34,6 @@ en:
             owner_name: Name
             owner_phone: Phone
             photo_archive: Photo archive
-            post_note: Post note
-            posts_as: Posts as %{user}
             registration_information: Registration information
             restricted_message: >-
               Owner contact is available to admin & staff. You can add notes and request

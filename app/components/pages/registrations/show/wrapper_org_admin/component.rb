@@ -197,6 +197,14 @@ module Pages
             @bike_organization_note ||= BikeOrganizationNote.find_by(bike_id: @bike.id, organization_id: @organization.id)
           end
 
+          # An upsert overwrites the one note per bike and org, so earlier notes come from its versions
+          def notes_thread
+            return [] if bike_organization_note.blank?
+
+            previous_notes = bike_organization_note.versions.where(event: "update").reorder(id: :desc).map(&:reify)
+            [bike_organization_note, *previous_notes].select { it.body.present? }
+          end
+
           def notes_url
             organization_bike_path(@bike, organization_id: @organization.to_param)
           end
