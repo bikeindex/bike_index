@@ -160,9 +160,7 @@
         <a
           class="gray-link"
           href="#sendRepeatNotifications"
-          data-toggle="collapse"
-          data-target="#sendRepeatNotifications"
-          data-action="org--parking-notifications-index#showMultiselect"
+          data-action="org--parking-notifications-index#showMultiselect:prevent"
         >
           retrieve/send repeat notification
         </a>
@@ -172,7 +170,11 @@
 
   <%# Form needs to wrap the table too %>
   <%= form_for ParkingNotification.new, url: organization_parking_notifications_path(organization_id: @organization), html: {data: {controller: "table-multi-checkbox"}} do |f| %>
-    <div id="sendRepeatNotifications" class="collapse">
+    <div
+      id="sendRepeatNotifications"
+      class="tw:hidden"
+      data-org--parking-notifications-index-target="repeatForm"
+    >
       <%# similar form on parking notification show %>
       <div class="row">
         <div class="mt-4 mb-4 col-md-8 offset-md-2 col-xl-6 offset-xl-3">

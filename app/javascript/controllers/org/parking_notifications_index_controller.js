@@ -6,7 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 // Pins every loaded notification on the map, and narrows the table to the ones in view
 export default class extends Controller {
   static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeForm', 'placeInput', 'redo', 'fit',
-    'visibleCount', 'table', 'row', 'emptyRow', 'submit']
+    'visibleCount', 'table', 'row', 'emptyRow', 'repeatForm', 'submit']
 
   static values = {
     latitude: Number,
@@ -72,9 +72,9 @@ export default class extends Controller {
     this.popup?.remove()
   }
 
-  // Bootstrap's collapse opens the form; the checkbox column is ours
   showMultiselect (event) {
     collapse('hide', event.currentTarget)
+    collapse('show', this.repeatFormTarget)
     this.tableTarget.classList.add('show-multiselect')
   }
 
