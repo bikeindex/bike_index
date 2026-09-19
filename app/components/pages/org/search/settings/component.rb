@@ -5,8 +5,7 @@ module Pages
     module Search
       module Settings
         # The column-visibility panel. Its sidecar holds the copy for everything
-        # ComponentStructs::OrgSearchSettings names — the column labels and the filters —
-        # since a component's own directory is the only home MARKUP_DIGEST reaches.
+        # ComponentStructs::OrgSearchSettings names — the column labels and the filters.
         class Component < ApplicationComponent
           PANEL_COLORS = "tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900"
 
