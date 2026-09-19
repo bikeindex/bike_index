@@ -37,7 +37,7 @@ RSpec.describe Pages::Admin::Organizations::Form::Wrapper::Component, type: :com
 
   it "keeps the label's own note in the label, and what followed the field as helper text" do
     expect(component.at_css("label[for='organization_parent_organization_id']").text.squish)
-      .to eq "Parent organization (probably) do not add parents! Parents must be part of the same organization optional"
+      .to eq "Parent organization optional (probably) do not add parents! Parents must be part of the same organization"
     expect(component.at_css("#organization_parent_organization_id_helper").text.squish)
       .to start_with "Use the \"regional\" feature instead."
   end
