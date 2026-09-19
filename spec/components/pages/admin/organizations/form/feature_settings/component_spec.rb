@@ -26,7 +26,7 @@ RSpec.describe Pages::Admin::Organizations::Form::FeatureSettings::Component, ty
     it "renders the permitted domain, disabled for a non-developer" do
       expect(component).to have_field("organization_user_email_domain", disabled: true)
       expect(component.at_css("label[for='organization_user_email_domain']").text.squish)
-        .to eq "permitted domain for passwordless sign in passwordless sign in feature optional"
+        .to eq "permitted domain for passwordless sign in optional passwordless sign in feature"
       expect(domain_helper_text.text.squish).to eq "Ask Seth for help changing this, it's delicate"
       # the "@" is a prefix on the field, not a line of its own above it
       expect(domain_field.parent.name).to eq "div"
