@@ -5679,6 +5679,12 @@ es:
             favor, introduce una dirección de correo electrónico donde recibas correos
             electrónicos.
           submit_anyway: Enviar formulario de todos modos
+        group:
+          optional: opcional
+        turnstile:
+          enable_javascript: Para verificar esta dirección de correo electrónico se
+            requiere JavaScript. Actívelo y vuelva a enviar el formulario, o utilice
+            una dirección de correo electrónico diferente.
         files:
           picker:
             no_file_chosen: No se ha seleccionado ningún archivo.
@@ -5690,12 +5696,6 @@ es:
           upload_multiple:
             upload_failed: Falló la carga
             uploading: subir
-        group:
-          optional: opcional
-        turnstile:
-          enable_javascript: Para verificar esta dirección de correo electrónico se
-            requiere JavaScript. Actívelo y vuelva a enviar el formulario, o utilice
-            una dirección de correo electrónico diferente.
       alerts:
         base:
           error: Error
