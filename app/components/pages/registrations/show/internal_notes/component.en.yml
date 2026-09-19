@@ -12,5 +12,5 @@ en:
             note_by: Note by %{user}
             post_note: Post note
             update_hint: You'll post as %{user} — history of your changes will be
-              visible above
+              visible above.
             update_note: Update note
