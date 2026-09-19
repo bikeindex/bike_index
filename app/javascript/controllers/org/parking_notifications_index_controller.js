@@ -191,7 +191,7 @@ export default class extends Controller {
     collapse(visibleRows.size ? 'hide' : 'show', this.emptyRowTarget, 0)
     this.visibleCountTarget.textContent = visibleRows.size.toLocaleString()
 
-    const allVisible = visibleRows.size === this.rows.length && !this.#nothingAtLocation
+    const allVisible = visibleRows.size === this.markers.size && !this.#nothingAtLocation
     collapse(allVisible ? 'hide' : 'show', this.fitTarget)
   }
 

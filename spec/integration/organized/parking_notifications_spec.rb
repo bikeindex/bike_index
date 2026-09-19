@@ -196,6 +196,8 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
   it "maps the notifications, and resolves only the checked ones in view" do
     # In Chicago, while the others are at the geocoder stub's New York
     far_away = FactoryBot.create(:parking_notification_organized, organization:, user:, latitude: 41.8781, longitude: -87.6298)
+    # As when the geocoder fails: the address alone passes validation
+    ungeocoded = FactoryBot.create(:parking_notification_organized, organization:, user:, latitude: nil, longitude: nil, skip_geocoding: true, street: "1 Main St")
     page.current_window.resize_to(1400, 2000)
     page.driver.with_playwright_page do |playwright_page|
       # Serve an empty MapLibre style so the map builds without fetching basemap tiles
@@ -234,9 +236,9 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     select "Mark retrieved/resolved", from: "kind"
     expect {
       click_button "Resolve notifications"
-      expect(page).to have_css(rows, count: 1, wait: 10)
+      expect(page).to have_css(rows, count: 2, visible: :all, wait: 10)
     }.to change { [unregistered, abandoned].map { it.reload.status } }.to(%w[retrieved retrieved])
-    expect(far_away.reload.status).to eq "current"
+    expect([far_away, ungeocoded].map { it.reload.status }).to eq %w[current current]
 
     # Back on the searched place, with only the far away notification left. Fitting to it
     # leaves the place, so the URL stops reopening there
@@ -245,5 +247,8 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # The count updates when the fly from New York to Chicago lands, a few seconds out
     expect(page).to have_content("1 visible", wait: 10)
     expect(page).not_to have_current_path(/map_location/)
+    # Every pin is in view, though the ungeocoded row has none
+    expect(page).not_to have_button("Fit map to notifications")
+    expect(page).to have_css(row_for(ungeocoded), visible: :hidden)
   end
 end
