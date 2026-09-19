@@ -17,7 +17,7 @@
   = render(Pages::Admin::Headers::IndexInfo::Component.new(index: admin_index_state, viewing: "Stickers"))
 .row
   .col-md-8.offset-md-2.mt-2
-    = form_tag reassign_admin_bike_stickers_path, method: :get, id: "reassign_form" do
+    = form_tag reassign_admin_bike_stickers_path, method: :get do
 
       .card.bg-light
         .card-body
@@ -49,16 +49,8 @@
           - if @valid_selection
             .alert.alert-success.mt-4
               %h4 Selected codes can be reassigned
-              = hidden_field_tag :reassign_now, false
               .text-center
-                %btn#reassignNowBtn.btn.btn-success.btn-lg{style: "cursor: pointer"}
-                  Reassign Now
-            :javascript
-              $('#reassignNowBtn').on('click', e => {
-                e.preventDefault()
-                $('#reassign_now').val(true)
-                $("#reassign_form").submit()
-              })
+                = button_tag "Reassign Now", name: :reassign_now, value: true, class: "btn btn-success btn-lg"
           .alert.alert-info.mt-4
             %h4 To reassign codes:
             %ul

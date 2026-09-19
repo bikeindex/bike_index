@@ -35,6 +35,8 @@ module UI
         # Centered as a block, so blurring lines up with the input's own centered text
         STACKED_OVERLAY_CLASSES = "tw:flex tw:flex-col tw:justify-center tw:overflow-hidden"
         STACKED_INPUT_CLASSES = "tw:min-h-13"
+        MULTISELECT_REQUIRED_ACTIONS = "hw-combobox:selection->ui--forms--multiselect-required#sync " \
+          "hw-combobox:removal->ui--forms--multiselect-required#sync"
 
         def initialize(name:, options: [], src: nil, rich_display: nil, no_js: nil, **combobox_options)
           @name = name
@@ -65,6 +67,8 @@ module UI
         end
 
         def js_required? = @no_js.present? && @combobox_options[:required].present?
+
+        def multiselect_required? = @combobox_options[:multiselect_chip_src].present? && @combobox_options[:required].present?
 
         # What this falls back to without JavaScript. A select posts the options' own
         # values, so only a textbox needs the caller to say what to show (`no_js: {value:}`)
@@ -102,8 +106,10 @@ module UI
         # is placed against. data-js-required is what the fallback's stylesheet hides
         def wrapper_attrs
           controllers = [("ui--forms--combobox-display" if @rich_display),
-            ("ui--forms--js-required" if js_required?)].compact
+            ("ui--forms--js-required" if js_required?),
+            ("ui--forms--multiselect-required" if multiselect_required?)].compact
           data = {controller: controllers.presence&.join(" "),
+                  action: (MULTISELECT_REQUIRED_ACTIONS if multiselect_required?),
                   js_required: (true if @no_js.present?)}.compact
           {class: ("tw:relative" if @rich_display), data:}.compact
         end
