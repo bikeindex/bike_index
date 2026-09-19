@@ -5,7 +5,6 @@ require "rails_helper"
 RSpec.describe Pages::Admin::Bikes::Table::Component, type: :component do
   let(:bike) { FactoryBot.create(:bike, :with_ownership, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes") }
   let(:cached_record) { bike }
-  let(:row_cache_key) { described_class.cache_digest }
   let(:component) do
     with_controller_class(Admin::BikesController) do
       with_request_url("/admin/bikes") { render_inline(described_class.new(bikes: [bike])) }
