@@ -36,7 +36,7 @@ module Pages
           end
 
           def subtitle
-            translation(".named", name: @bike.name) if @bike.name.present?
+            translation(".nickname", name: @bike.name) if @bike.name.present?
           end
 
           def current_view
