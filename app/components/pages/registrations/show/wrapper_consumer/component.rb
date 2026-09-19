@@ -39,7 +39,7 @@ module Pages
           def subtitle
             return if current_view.first == :public
 
-            render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike))
+            @subtitle ||= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike))
           end
 
           def current_view

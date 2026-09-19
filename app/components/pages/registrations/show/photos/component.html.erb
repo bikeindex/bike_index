@@ -2,8 +2,6 @@
   <% if has_photos? %>
     <div
       data-controller="registrations--show--photos"
-      data-registrations--show--photos-active-class="tw:border-blue-500"
-      data-registrations--show--photos-inactive-class="tw:border-transparent"
       class="tw:flex tw:flex-col tw:gap-3"
     >
       <a
@@ -35,9 +33,11 @@
                 data-large-url="<%= public_image.image_url(:large) %>"
                 data-original-url="<%= public_image.image_url %>"
                 data-photo-alt="<%= public_image.image_alt %>"
+                aria-current="<%= index == 0 %>"
                 class="
-                  tw:cursor-pointer tw:overflow-hidden tw:rounded-sm tw:border-2
-                  <%= (index == 0) ? "tw:border-blue-500" : "tw:border-transparent" %>
+                  tw:cursor-pointer tw:overflow-hidden tw:rounded-sm
+                  tw:border-2 tw:border-transparent
+                  tw:aria-[current=true]:border-blue-500
                 "
               >
                 <%= image_tag public_image.image_url(:small), alt: public_image.image_alt, class: "tw:h-16 tw:w-16 tw:object-cover" %>
