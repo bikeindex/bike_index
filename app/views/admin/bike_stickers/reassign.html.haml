@@ -50,7 +50,7 @@
             .alert.alert-success.mt-4
               %h4 Selected codes can be reassigned
               .text-center
-                = button_tag "Reassign Now", name: :reassign_now, value: true, class: "btn btn-success btn-lg"
+                = render UI::Button::Component.new(text: "Reassign Now", color: :primary, size: :lg, type: "submit", name: :reassign_now, value: true)
           .alert.alert-info.mt-4
             %h4 To reassign codes:
             %ul
