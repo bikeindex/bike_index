@@ -21,5 +21,32 @@ module BikeServices
         .where(bike_organization_notes: {organization_id: organization.id})
         .where("bike_organization_notes.body ILIKE ?", query_string)
     end
+
+    def stickers(bikes, value)
+      case value
+      when "none" then bikes.no_bike_sticker
+      when "with" then bikes.bike_sticker
+      else bikes
+      end
+    end
+
+    # none and with are removed in favour of street - it reflects people's expectations better
+    def address(bikes, value)
+      case value
+      when "none" then bikes.without_location
+      when "without_street" then bikes.without_street
+      when "with_street" then bikes.with_street
+      when "with" then bikes.with_location
+      else bikes
+      end
+    end
+
+    def status(bikes, value)
+      case value
+      when "all" then bikes
+      when "not_impounded" then bikes.where.not(status: "status_impounded")
+      else bikes.where(status: "status_#{value}")
+      end
+    end
   end
 end

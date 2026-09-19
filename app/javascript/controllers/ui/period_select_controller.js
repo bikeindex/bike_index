@@ -18,11 +18,7 @@ export default class extends Controller {
     const period = new URLSearchParams(window.location.search).get('period')
     if (!period) return
     this.element.querySelectorAll('[data-period]').forEach(button => {
-      if (button.dataset.period === period) {
-        button.dataset.active = 'true'
-      } else {
-        delete button.dataset.active
-      }
+      button.dataset.active = String(button.dataset.period === period)
       button.classList.toggle('tw:opacity-60', period === 'custom')
     })
   }

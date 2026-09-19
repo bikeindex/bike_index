@@ -36,7 +36,7 @@
     builder: BikeIndexFormBuilder,
     html: {class: custom_form_classes, data: {"ui--collapse-target": "content", action: "submit->ui--period-select#submit"}}
   ) do |f| %>
-    <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-3">
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3 <%= @align_start ? "tw:justify-start" : "tw:justify-end" %>">
       <div class="tw:flex tw:items-center tw:gap-2">
         <%= f.label :start_time_selector, translation(".from"), class: "twlabel tw:m-0" %>
 
