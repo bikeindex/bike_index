@@ -30,6 +30,7 @@ module ComponentStructs
       impound_id_cell
       impounded_cell
       avery_cell
+      acknowledgment_cell
       cycle_type_cell
       propulsion_type_cell
       status_cell
@@ -126,7 +127,8 @@ module ComponentStructs
         *additional_registration_fields.map { |field| "#{field}_cell" },
         ("notes_cell" if @organization.enabled?("registration_notes")),
         *(%w[impound_id_cell impounded_cell] if @organization.enabled?("impound_bikes")),
-        ("avery_cell" if @organization.enabled?("avery_export"))
+        ("avery_cell" if @organization.enabled?("avery_export")),
+        ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
       ].compact.uniq.sort_by { |cell| column_renames[cell.to_sym] }
     end
 

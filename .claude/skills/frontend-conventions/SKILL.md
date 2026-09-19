@@ -8,7 +8,7 @@ description: >-
   typeahead/autocomplete is `UI::Forms::Combobox`, never hand-rolled
   markup), that **helpers are deprecated — render a view component
   taking full keyword arguments instead of adding or extending one**,
-  ViewComponent rules (keyword arguments, instance variables,
+  ViewComponent rules (when to write a partial instead, keyword arguments, instance variables,
   `helpers.` prefix in templates), and `UI::Time::Component` for every
   date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
@@ -149,7 +149,7 @@ Bundle only what's cohesive — one subject, assembled in one place. `IndexState
 
 This project uses the ViewComponent gem to render components.
 
-- Prefer view components to partials — **unless the `component.rb` would hold no Ruby beyond `initialize` assigning its arguments to ivars, and fewer than 3 callers render it.** Then it's a partial: the class buys nothing, and the arguments are locals the template already has. A `UI::Table` conversion lands here often, since the cell blocks are `instance_exec`'d — a partial's locals survive that, so it needs none of the local-aliasing preamble a component template does. Reach for the component once there's logic to name, a `MARKUP_DIGEST`, or a third caller.
+- **Before creating a component, check it earns its class.** If its `component.rb` would hold nothing but `initialize` assigning arguments to ivars, and fewer than 3 callers render it, write a partial instead, with `<%# locals: (…) %>` at the top. An admin index table on `UI::Table` is the usual case: `admin/strava_gears/_table.html.erb` is the pattern, and `Pages::Admin::IndexSkeleton` renders the `_table` partial without a `table_view:`. A component earns its class with logic to name, a `MARKUP_DIGEST`, or a third caller; past that bar, prefer components to partials.
 - **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
 - View components must initialize with keyword arguments. Everything the component needs must be passed in explicitly by the caller — never reach into controller state from inside a component (e.g. `controller.instance_variable_get(:@bike)`). If the component needs `@bike`, the caller renders `Component.new(bike: @bike)`.

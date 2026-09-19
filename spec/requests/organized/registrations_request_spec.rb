@@ -295,6 +295,27 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
+    context "sorted by registration sequence acknowledgment" do
+      let(:enabled_feature_slugs) { %w[bike_search registration_sequences] }
+      let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization: current_organization) }
+      let!(:bike_acknowledged_earlier) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      let!(:bike_acknowledged_later) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      before do
+        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_earlier, created_at: 2.days.ago)
+        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_later, created_at: 1.day.ago)
+        # Another organization's acknowledgment doesn't count
+        FactoryBot.create(:registration_sequence_acknowledgment, bike:)
+      end
+
+      it "sorts by when this organization's sequence was acknowledged" do
+        get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "desc"}
+        expect(assigns(:bikes).map(&:id)).to eq([bike.id, bike_acknowledged_later.id, bike_acknowledged_earlier.id])
+
+        get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "asc"}
+        expect(assigns(:bikes).map(&:id)).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, bike.id])
+      end
+    end
+
     context "with search_notes" do
       let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }

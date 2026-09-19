@@ -41,6 +41,7 @@ RSpec.describe Admin::RegistrationSequencePagesController, type: :request do
         get "#{member_url}/#{page.id}/edit"
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
+        expect(response.body).to_not include("Organization sections")
       end
     end
 
@@ -83,6 +84,13 @@ RSpec.describe Admin::RegistrationSequencePagesController, type: :request do
           registration_sequence_page: {title: "Campus rules", body: "<ul><li>first</li></ul>"}
         }
         expect(draft.registration_sequence_pages.first.reload.title).to eq("Campus rules")
+      end
+
+      it "renders the organization's tabs on a page's editor" do
+        get "#{member_url}/#{draft.registration_sequence_pages.first.id}/edit"
+        expect(response.status).to eq(200)
+        expect(Capybara.string(response.body)).to have_css("nav a[aria-current][href='/admin/registration_sequences?organization_id=#{draft.organization_id}']",
+          text: /Registration sequences\s+1/)
       end
     end
 

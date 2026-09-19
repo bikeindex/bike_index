@@ -2,7 +2,8 @@ module Organized
   class RegistrationsController < Organized::BaseController
     include Binxtils::SortableTable
 
-    SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
+    SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type
+      acknowledged_at]
 
     helper_method :chart_scope_paths
 
@@ -211,7 +212,13 @@ module Organized
       @available_bikes = @searched_bikes.where(created_at: @time_range)
       return if chart_only?
 
-      @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+      @pagy, @bikes = pagy(:countish, @available_bikes.reorder(search_order(org)), limit: @per_page, page: permitted_page)
+    end
+
+    def search_order(organization)
+      return "bikes.#{sort_column} #{sort_direction}" if sort_column != "acknowledged_at"
+
+      RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)
     end
 
     # Every filter normalizes here and applies in its own *_scoped, so the shell render (which

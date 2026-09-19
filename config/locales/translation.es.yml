@@ -5836,6 +5836,7 @@ es:
             url_cell: URL
             vehicle: registro
             visible_columns: Columnas visibles
+            acknowledgment_cell: Confirmación de la secuencia de registro
           wrapper:
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
             matching_bikes_html: "%{count} %{cycle_type} coincidentes"
@@ -6290,21 +6291,10 @@ es:
           wrapper_org_admin:
             about_this_bike: Acerca de esto %{bike_type}
             assign_sticker: Asignar pegatina
-            audit: Auditoría de vehículos eléctricos
-            avery_exportable: Exportable de Avery
-            claimed: Afirmado
-            creation_source: Fuente
-            creator: Creador
-            credibility: Credibilidad
             edit: Editar
             internal_notes: Notas internas
-            is_false: FALSO
-            is_true: verdadero
             link_sticker: Pegatina de enlace
             no_other_registrations: No se encontró ninguno
-            no_registration_information: No se muestra información de registro para
-              %{org_name}
-            not_audited: No auditado
             not_registered_message: La información de contacto del propietario no
               está disponible para bicicletas que no pertenezcan a su organización.
               Sin embargo, puede agregar notas internas.
@@ -6314,7 +6304,6 @@ es:
               en el hilo.'
             org_can_edit: "%{org_name} puede editar esto %{bike_type}"
             org_can_edit_sub: Incluso después de que se reclame %{bike_type}.
-            organization_registered: Organización
             other_registrations: Otros registros de este usuario
             other_registrations_count_html: "%{count} otros registros"
             owner_access: Propietario y acceso
@@ -6324,7 +6313,6 @@ es:
             photo_archive: Archivo fotográfico
             post_note: Nota postal
             posts_as: Publicaciones como %{user}
-            registration_information: Información de registro
             restricted_message: El contacto con el propietario está disponible para
               el personal administrativo y de apoyo. Puede agregar notas y solicitar
               la retirada del vehículo.
@@ -6332,8 +6320,6 @@ es:
             role_limited: Limitado
             role_staff: Personal
             showing_recent: Mostrando el %{count} más reciente
-            sticker: Etiqueta engomada
-            sticker_claimed: afirmado
             sticker_code: Código de la pegatina
             unregistered_owner: Este %{bike_type} no está registrado a ningún usuario.
               Se agregó para realizar un seguimiento de las notificaciones de estacionamiento.
@@ -6350,6 +6336,25 @@ es:
             price_is_firm_true: El precio es fijo.
             still_for_sale_at: Todavía se vende en
             this_bike_is_for_sale: Este %{bike_type} está a la venta
+          registration_information:
+            acknowledged_html: Reconocido %{time}
+            audit: Auditoría de vehículos eléctricos
+            avery_exportable: Exportable de Avery
+            claimed: Afirmado
+            creation_source: Fuente
+            creator: Creador
+            credibility: Credibilidad
+            is_false: FALSO
+            is_true: verdadero
+            link_sticker: Pegatina de enlace
+            no_registration_information: No se muestra información de registro para
+              %{org_name}
+            not_audited: No auditado
+            organization_registered: Organización
+            registration_information: Información de registro
+            registration_sequence: Secuencia de registro
+            sticker: Etiqueta engomada
+            sticker_claimed: afirmado
       search:
         everything_combobox:
           made_by: hecho por

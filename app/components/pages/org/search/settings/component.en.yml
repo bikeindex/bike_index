@@ -5,6 +5,7 @@ en:
       org:
         search:
           settings:
+            acknowledgment_cell: Registration sequence acknowledgment
             address: 'Address:'
             all: all
             avery_cell: Avery Exportable
