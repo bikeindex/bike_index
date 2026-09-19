@@ -30,7 +30,8 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       search_address:,
       search_status:,
       search_page:,
-      humanized_time_range: "in the past year"
+      time_range: (Time.current - 1.year)..Time.current,
+      period: "year"
     }
   end
 

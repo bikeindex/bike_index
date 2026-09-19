@@ -23,7 +23,8 @@ module Pages
             search_status: "all",
             search_unregisteredness: nil,
             search_all: false,
-            humanized_time_range: nil,
+            time_range: nil,
+            period: nil,
             bike_sticker: nil,
             model_audit: nil,
             settings: nil,
@@ -42,7 +43,8 @@ module Pages
             @search_status = search_status
             @search_unregisteredness = search_unregisteredness
             @search_all = search_all
-            @humanized_time_range = humanized_time_range
+            @time_range = time_range
+            @period = period
             @bike_sticker = bike_sticker
             @model_audit = model_audit
             @settings = settings

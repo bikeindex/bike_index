@@ -25,7 +25,7 @@
 
 = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
   Registrations
-  = humanized_time_range(@time_range)
+  = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
 .full-screen-table.mt-4
   %table.table.table-striped.table-bordered.table-sm
     %tbody
@@ -67,7 +67,7 @@
 
   = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-5")) do
     Registrations by organizations granting #{current_organization.name} visibility
-    = humanized_time_range(@time_range)
+    = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead
