@@ -30,7 +30,8 @@
 
     <% descriptions = active_search_filter_descriptions %>
 
-    <%= tag.em(safe_join(descriptions, " · "), class: "less-strong tw:text-sm",
+    <%# The separator is a ::before so it hides along with the summary %>
+    <%= tag.em(safe_join(descriptions, " · "), class: "less-strong tw:text-sm tw:before:mr-2 tw:before:content-['·']",
       hidden: descriptions.none?, data: {"org--search-target": "filterSummary"}) %>
   </div>
 
@@ -44,9 +45,9 @@
   >
     <%= render(UI::Header::Component.new(text: translation(".search_settings"), tag: :h3, html_class: "uncap tw:mb-0!")) %>
 
-    <div class="tw:flex tw:flex-col tw:gap-4">
+    <div class="tw:flex tw:flex-col tw:gap-6">
       <% filter_groups.each do |group| %>
-        <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2">
+        <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-2">
           <span class="tw:text-sm tw:font-bold tw:text-gray-500"><%= group[:label] %></span>
 
           <%# flex-1: the chips shrink and wrap beside their label rather than below it %>
@@ -56,7 +57,7 @@
         </div>
       <% end %>
 
-      <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2">
+      <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-2">
         <span class="tw:text-sm tw:font-bold tw:text-gray-500"><%= translation(".date_range") %></span>
 
         <div class="tw:min-w-0 tw:flex-1">
