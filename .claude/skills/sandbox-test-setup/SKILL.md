@@ -67,7 +67,7 @@ live without it.
 
 ## Whose machine it is decides who starts `bin/dev`
 
-`CLAUDE.md` says to stop and ask rather than starting a dev server. That holds on
+`AGENTS.md` says to stop and ask rather than starting a dev server. That holds on
 the two environments a human owns — the macOS workspace and the Conductor cloud
 sandbox. The web sandbox is the exception, since nobody else is in that container;
 `references/web-sandbox.md` covers starting it there.

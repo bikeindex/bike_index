@@ -36,6 +36,8 @@ module Admin
 
     def tables
       @kind = ""
+      @location_radius = params[:location_radius].presence&.to_i || 100
+      @bounding_box = GeocodeHelper.bounding_box(params[:location], @location_radius) if params[:location].present?
     end
 
     helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period,

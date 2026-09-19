@@ -2,7 +2,7 @@
 
 The cleanup and migration halves of SKILL.md's **Prepare the branch**, in full. Everything here runs against committed work and diffs `origin/main...HEAD` — substitute the base branch from **Orient**, since shell state doesn't carry between commands. The audits inherit that: run them after committing, or pair them with a pass over `rtk proxy git diff HEAD`, or a comment you razored in the working tree still reads as present.
 
-## Simplify, lint, and conform to CLAUDE.md
+## Simplify, lint, and conform to AGENTS.md
 
 Invoke the `/simplify` command to review the changed code for reuse, simplification, and efficiency cleanups and apply them. It's quality-only — it won't touch correctness — so it's safe to run unattended; if it reports nothing to clean up, move on.
 
@@ -34,7 +34,7 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 
 **`bin/rails tailwindcss:build` before the `:js` ones, after the last template edit.** Tailwind's content scan reads the templates, so adding or removing a class in an `.erb` changes the built CSS — and a system spec asserting a computed style (`spec/components/ui/dropdown/component_system_spec.rb` reads `getComputedStyle(...).color`) fails against the stale build until it's rebuilt. A merge that brings in `app/assets/tailwind/**` does it too. The failure names the assertion, not the build, so it reads as a real regression.
 
-Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style and testing conventions. A frontend diff also reads the `frontend-conventions` skill: `CLAUDE.md` points there rather than stating the frontend rules, so checking it alone misses them — a component that should have been a partial went through this pass on #4308. Only touch lines this branch already changed.
+Then review the changed files against `AGENTS.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style and testing conventions. A frontend diff also reads the `frontend-conventions` skill: `AGENTS.md` points there rather than stating the frontend rules, so checking it alone misses them — a component that should have been a partial went through this pass on #4308. Only touch lines this branch already changed.
 
 ### The spec audit
 
@@ -60,7 +60,7 @@ This applies to the branch's specs, not the suite's. Don't delete pre-existing e
 
 ### The documentation audit
 
-When the branch adds or edits `CLAUDE.md`/`AGENTS.md` or anything under `.claude/skills/`, check every
+When the branch adds or edits `AGENTS.md` or anything under `.claude/skills/`, check every
 claim it makes against the code before pushing — a doc asserting *why* something is done is as capable of
 being wrong as a comment, and nothing runs it. The wrong ones read as obvious. Also check what the edit *moved* — a rule relocated into a skill is a rule
 that only loads when that skill triggers.
@@ -75,7 +75,7 @@ rtk proxy git diff origin/main...HEAD --stat
 
 Smallest files first — one at `+1 -1` is either the point of the branch or pure churn, and telling which takes a moment. `git checkout origin/main -- <file>` when the whole file is churn; when it rides along inside a real change, put the surrounding lines back so the diff shows only what moved.
 
-**What `bin/lint` wrote is not churn** and stays, including in files the branch otherwise didn't touch — see the rule at the top of `CLAUDE.md`.
+**What `bin/lint` wrote is not churn** and stays, including in files the branch otherwise didn't touch — see the rule at the top of `AGENTS.md`.
 
 Sweeping mechanical edits are where this collects.
 
@@ -92,11 +92,11 @@ The `+++ b/…` lines keep each hit attached to its file; the code-path filter k
 
 **An empty result on a non-empty diff means the pathspec missed the branch, not that the branch is clean** — the same silent-pass the rtk section below describes, from a different cause. `bin/kamal_review` (no extension) and `.github/workflows/*.yml` are why `bin/*` and `*.yml` are on the list; add whatever else the branch touches and re-run rather than reading the blank as a verdict.
 
-Judge each against the **Comments** section of `CLAUDE.md` and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome, razoring the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
+Judge each against the **Comments** section of `AGENTS.md` and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome, razoring the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
 
 ### The cycle-type translation check
 
-`CLAUDE.md`'s Translations section has the rule; this is how to find the branch's violations:
+`AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:
 
 ```bash
 rtk proxy git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'

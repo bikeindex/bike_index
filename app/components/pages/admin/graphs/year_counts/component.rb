@@ -4,13 +4,14 @@ module Pages
   module Admin
     module Graphs
       module YearCounts
-        # Yearly stolen/recovered counts - everywhere, or within bounding_box, which drops the
-        # registration and user columns. The current year also gets an end-of-year projection
+        # Yearly stolen/recovered counts - everywhere, or within bounding_box, which leaves the
+        # registration and user columns empty. The current year also gets an end-of-year projection
         class Component < ApplicationComponent
           FIRST_YEAR = 2013
           # SBR's import set created_at for these years, so they count date_stolen. After, created_at
           # is more reliable, and we're showing bikes registered/recorded - not stolen times
           DATE_STOLEN_YEARS = [2013, 2014].freeze
+          REGISTRATION_LABELS = ["Stolen & non, in year", "Total Stolen & non by eoy", "Users in year"].freeze
 
           Row = Data.define(:year, :counts)
 
@@ -21,7 +22,7 @@ module Pages
           private
 
           def rows
-            @rows ||= Array(FIRST_YEAR..Time.current.year).map do |year|
+            @rows ||= (FIRST_YEAR..Time.current.year).map do |year|
               Row.new(year:, counts: @bounding_box ? bounded_counts(year) : cached_everywhere_counts(year))
             end
           end
@@ -47,42 +48,39 @@ module Pages
 
           def cached_everywhere_counts(year)
             Rails.cache.fetch("admin_graphs_year_counts_#{year}", expires_in: 1.hour) do
-              date = Date.new(year)
-              registered = with_projection(year, bikes.where(created_at: date.all_year).count, bikes.where(created_at: past_year))
-              stolen_counts(year, stolen_before: stolen_records.where("date_stolen < ?", date.beginning_of_year).count).merge(
-                "Stolen & non, in year" => registered,
-                "Total Stolen & non by eoy" => through_year(bikes.where("created_at < ?", date.all_year.last).count, registered),
-                "Users in year" => with_projection(year, User.unscoped.where(created_at: date.all_year).count, User.unscoped.where(created_at: past_year))
+              registered = with_projection(year, bikes, :created_at)
+              stolen_counts(year, before_column: :date_stolen).merge(
+                REGISTRATION_LABELS.zip([registered,
+                  through_year(bikes.where(created_at: ...Date.new(year).all_year.last).count, registered),
+                  with_projection(year, User.unscoped, :created_at)]).to_h
               )
             end
           end
 
+          # The registrations and users a box would cover aren't counted, so their columns render empty
           def bounded_counts(year)
-            stolen_counts(year, stolen_before: stolen_records.where("stolen_records.created_at < ?", Date.new(year).beginning_of_year).count)
+            stolen_counts(year, before_column: "stolen_records.created_at")
+              .merge(REGISTRATION_LABELS.index_with(nil))
           end
 
-          def stolen_counts(year, stolen_before:)
+          def stolen_counts(year, before_column:)
             date = Date.new(year)
-            stolen = with_projection(year, stolen_in_year(year), stolen_records.where("stolen_records.created_at" => past_year))
-            recovered_in_year = with_projection(year, recovered_records.where(recovered_at: date.all_year).count, recovered_records.where(recovered_at: past_year))
+            stolen = with_projection(year, stolen_records, DATE_STOLEN_YEARS.include?(year) ? :date_stolen : "stolen_records.created_at")
+            recovered_in_year = with_projection(year, recovered_records, :recovered_at)
             {
               "Stolen in year" => stolen,
-              "Total stolen by eoy" => through_year(stolen_before, stolen),
+              "Total stolen by eoy" => through_year(stolen_records.where(before_column => ...date).count, stolen),
               "Recovered in year" => recovered_in_year,
-              "Recovered by eoy" => through_year(recovered_records.where("recovered_at < ?", date.beginning_of_year).count, recovered_in_year)
+              "Recovered by eoy" => through_year(recovered_records.where(recovered_at: ...date).count, recovered_in_year)
             }
           end
 
-          def stolen_in_year(year)
-            column = DATE_STOLEN_YEARS.include?(year) ? :date_stolen : "stolen_records.created_at"
-            stolen_records.where(column => Date.new(year).all_year).count
-          end
-
           # [count, projected end-of-year count] - only the current year is projected, without seasonality
-          def with_projection(year, count, past_year_scope)
+          def with_projection(year, scope, column)
+            count = scope.where(column => Date.new(year).all_year).count
             return [count, nil] unless year == Time.current.year
 
-            [count, count + (BigDecimal(past_year_scope.count) / 365 * days_left).to_i]
+            [count, count + (BigDecimal(scope.where(column => past_year).count) / 365 * days_left).to_i]
           end
 
           def through_year(before, (count, projection))
