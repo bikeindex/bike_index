@@ -210,15 +210,15 @@ module Geocodeable
       return
     end
 
-    GeocodeHelper.assignable_address_hash_for(
+    geocoded_attrs = GeocodeHelper.assignable_address_hash_for(
       formatted_address_string(render_country: :always), new_attrs: true
-    ).each do |key, value|
-      # Don't overwrite any values except latitude and longitude
-      if self[key].blank? || %i[latitude longitude].include?(key)
-        self[key] = value
-      end
-    end
+    )
+    self.attributes = geocoded_attrs.slice(:latitude, :longitude)
+    assign_blank_geocoded_attrs(geocoded_attrs)
+  end
 
+  def assign_blank_geocoded_attrs(geocoded_attrs)
+    self.attributes = geocoded_attrs.reject { |key, _value| self[key].present? }
     assign_region_record if region_string_changed?
   end
 end

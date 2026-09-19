@@ -316,7 +316,8 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             end
             context "with legacy stolen attribute names" do
               let(:legacy_stolen_record_params) do
-                stolen_record_params.except(:postal_code, :region_record_id).merge(zipcode: "94141", state_id: "")
+                stolen_record_params.except(:street, :postal_code, :region_record_id)
+                  .merge(address: "2143412", zipcode: "94141", state_id: "", postal_code: "")
               end
               it "creates with the renamed stolen attributes" do
                 Sidekiq::Job.clear_all
@@ -328,7 +329,7 @@ RSpec.describe Organized::BulkImportsController, type: :request do
                 }.to change(BulkImport, :count).by 1
                 bulk_import = BulkImport.last
                 expect(bulk_import.kind).to eq "stolen"
-                expect(bulk_import.data["stolen_record"]).to match_hash_indifferently legacy_stolen_record_params.except(:bad_attribute)
+                expect(bulk_import.data["stolen_record"]).to match_hash_indifferently stolen_record_params.except(:bad_attribute, :region_record_id)
 
                 expect { BulkImportJob.drain }.to change(Bike, :count).by 2
                 stolen_record1 = bulk_import.bikes.reorder(:created_at).first.current_stolen_record

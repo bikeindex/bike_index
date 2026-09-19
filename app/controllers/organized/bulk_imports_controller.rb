@@ -2,6 +2,9 @@ module Organized
   class BulkImportsController < Organized::BaseController
     include Binxtils::SortableTable
 
+    # Bulk importers still post the names from before stolen records used address_record attributes
+    LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
+
     skip_before_action :ensure_member!
 
     skip_before_action :ensure_current_organization!, only: [:create]
@@ -147,8 +150,11 @@ module Organized
     end
 
     def stolen_attributes
-      {data: {stolen_record:
-        params.require(:stolen_record).permit(*BikeServices::StolenRecordUpdator.old_attr_accessible)}}
+      permitted = params.require(:stolen_record)
+        .permit(*BikeServices::StolenRecordUpdator.old_attr_accessible, *LEGACY_STOLEN_ATTRS.keys).to_h
+      legacy_attrs = permitted.slice(*LEGACY_STOLEN_ATTRS.keys).compact_blank.transform_keys(LEGACY_STOLEN_ATTRS)
+      {data: {stolen_record: permitted.except(*LEGACY_STOLEN_ATTRS.keys)
+        .merge(legacy_attrs) { |_key, current, legacy| current.presence || legacy }}}
     end
   end
 end
