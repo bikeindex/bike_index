@@ -5,6 +5,7 @@ module Atoms
     module Badges
       module BikeHiddenExplanation
         class Component < ApplicationComponent
+          # Template Dependency: UI::Alerts::Base::Component
           def initialize(bike:)
             @bike = bike
           end

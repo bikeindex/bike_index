@@ -5,7 +5,7 @@ module ComponentStructs
   # search. Everything around the panel Pages::Org::Search::Settings renders reads the same
   # values, so it's built once and passed whole.
   #
-  # Its copy sits in that panel's sidecar — the only home a MARKUP_DIGEST reaches.
+  # Its copy sits in that panel's sidecar — the only home the component's cache digest reaches.
   class OrgSearchSettings
     TRANSLATION_SCOPE = %i[components pages org search settings].freeze
 

@@ -8,7 +8,7 @@ Invoke the `/simplify` command to review the changed code for reuse, simplificat
 
 Skip it when the diff has no code in it — a docs- or skill-only branch gives it nothing to review, and it fans out subagents to find that out. Config by file extension isn't the test: a `.github/workflows/*.yml` with a `run:` block is a shell script, and reviewing one is how the nightly-reseed branch found its only cleanup.
 
-**Read `git diff` before committing what it produced.** Its review agents edit the working tree to check their own findings, and one that stops mid-verification leaves the edit behind — indistinguishable from the changes you decided to apply.
+**Read `git diff` as soon as the agents return, before running anything.** An agent that stops mid-verification leaves its edit in the tree — including a sweeping edit it reverted to test, which then reads as your regression.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
@@ -36,10 +36,6 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 
 Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style and testing conventions. A frontend diff also reads the `frontend-conventions` skill: `CLAUDE.md` points there rather than stating the frontend rules, so checking it alone misses them — a component that should have been a partial went through this pass on #4308. Only touch lines this branch already changed.
 
-**`bin/update_component_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into, so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of every component that renders it — `SharedBlocks::Navbar::Wrapper` and `SharedBlocks::Footer` both, for one edit — and regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice. Run it on every branch that touches `app/components` rather than grepping for which digests could be affected — the grep misses the chain (`Registrations::Show::Wrapper` renders the map four components down), and the script is a no-op when nothing moved.
-
-It hashes the component's *files*, not its output, and globs the whole directory — so a comment that renders nothing bumps the digest just the same, whether you put it in the template or in `component.rb`. Somewhere outside the component directory (`.herb.yml`, the PR body) is the free place to say it.
-
 ### The spec audit
 
 **Required, same as the comment audit below.** List the examples the branch adds:
@@ -58,7 +54,7 @@ The ones to cut, all of which have been written here:
 - **A class list the template writes literally.** Pinning `class="tw:w-full tw:max-w-3xl"` re-asserts the source. The exception is a class the component *computes* — a conditional `active`, a width chosen from an argument — where the branch is the point.
 - **What a request spec already covers.** A component spec listing the fields a form renders, next to a request spec that asserts the same names, is one of them maintained for nothing. Keep the one closest to the logic.
 
-Keep, without hesitating, the ones tied to a failure mode: a conditional branch, a computed value, an argument guard that would otherwise fail silently, `it_behaves_like "cached_markup_digest"`, and any example written *because* something broke — say so in a comment above it, so the next audit doesn't mistake it for a change-detector.
+Keep, without hesitating, the ones tied to a failure mode: a conditional branch, a computed value, an argument guard that would otherwise fail silently, anything asserting what a fragment cache keys on, and any example written *because* something broke — say so in a comment above it, so the next audit doesn't mistake it for a change-detector.
 
 This applies to the branch's specs, not the suite's. Don't delete pre-existing examples you merely moved between files.
 
