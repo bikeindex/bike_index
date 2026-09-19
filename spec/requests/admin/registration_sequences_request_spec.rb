@@ -25,9 +25,8 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
           get base_url, params: {organization_id: organization.id}
           expect(response.status).to eq(200)
           expect(assigns(:collection).pluck(:id)).to eq([draft.id])
-          active_tab = Nokogiri::HTML(response.body).at_css("nav a[aria-current]")
-          expect(active_tab.text.squish).to eq "Registration sequences 1"
-          expect(active_tab["href"]).to eq "/admin/registration_sequences?organization_id=#{organization.id}"
+          expect(Capybara.string(response.body)).to have_css("nav a[aria-current][href='/admin/registration_sequences?organization_id=#{organization.id}']",
+            text: /Registration sequences\s+1/)
         end
       end
 
@@ -104,9 +103,8 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(response.body).to_not include("registration_sequence[faq_url]")
-        active_tab = Nokogiri::HTML(response.body).at_css("nav a[aria-current]")
-        expect(active_tab.text.squish).to eq "Registration sequences 1"
-        expect(active_tab["href"]).to eq "/admin/registration_sequences?organization_id=#{organization.id}"
+        expect(Capybara.string(response.body)).to have_css("nav a[aria-current][href='/admin/registration_sequences?organization_id=#{organization.id}']",
+          text: /Registration sequences\s+1/)
       end
 
       context "template" do

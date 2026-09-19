@@ -1,5 +1,5 @@
-<% if @organization.present? %>
-  <%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :registration_sequences, display_dev_info: display_dev_info?)) %>
+<% if current_organization.present? %>
+  <%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: current_organization, active: :registration_sequences, display_dev_info: display_dev_info?)) %>
 <% end %>
 
 <% nav_header_list_items = capture do %>
