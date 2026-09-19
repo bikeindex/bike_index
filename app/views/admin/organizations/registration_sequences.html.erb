@@ -1,0 +1,4 @@
+<%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :registration_sequences, display_dev_info: display_dev_info?)) %>
+
+<%= render partial: "/admin/registration_sequences/table",
+      locals: {collection: @organization.registration_sequences.includes(:organization, :registration_sequence_pages).reorder(created_at: :desc)} %>

@@ -11,9 +11,13 @@
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Organization") do |registration_sequence| %>
-    <%= render(Pages::Admin::Organizations::Cell::Component.new(organization: registration_sequence.organization,
-      organization_id: registration_sequence.organization_id, render_search: true,
-      search_url: admin_registration_sequences_path(sort_state.search_params.to_h.merge(organization_id: registration_sequence.organization_id)))) %>
+    <% if registration_sequence.organization_id.blank? %>
+      <span class="twless-strong">Template</span>
+    <% else %>
+      <%= render(Pages::Admin::Organizations::Cell::Component.new(organization: registration_sequence.organization,
+        organization_id: registration_sequence.organization_id, render_search: true,
+        search_url: admin_registration_sequences_path(sort_state.search_params.to_h.merge(organization_id: registration_sequence.organization_id)))) %>
+    <% end %>
   <% end %>
 
   <% table.column(label: "Status") do |registration_sequence| %>
