@@ -1,4 +1,4 @@
-<%= render(UI::Forms::FilePicker::Component.new(form_builder: @form_builder, attribute: @attribute,
+<%= render(UI::Forms::Files::Picker::Component.new(form_builder: @form_builder, attribute: @attribute,
       input_options: @html_options, accept: @accept, camera: @camera, url: @direct_upload_url)) do |picker| %>
   <% picker.with_attached do %>
     <%#
@@ -9,13 +9,13 @@
 
     <%= tag.a(href: @attachment_url,
           class: ["tw:mb-2 tw:block tw:w-fit", ("tw:hidden!" if @attachment_url.blank?)],
-          data: {"ui--forms--file-upload-target": "preview"}) do %>
+          data: {"ui--forms--files--picker-target": "preview"}) do %>
       <%= tag.img(src: @thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded",
-            data: {"ui--forms--file-upload-target": "previewImage"}) %>
+            data: {"ui--forms--files--picker-target": "previewImage"}) %>
     <% end %>
 
     <% if @signed_id_field %>
-      <%= hidden_field_tag @signed_id_field, nil, data: {"ui--forms--file-upload-target": "signedId"} %>
+      <%= hidden_field_tag @signed_id_field, nil, data: {"ui--forms--files--picker-target": "signedId"} %>
     <% end %>
   <% end %>
 <% end %>

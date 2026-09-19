@@ -5427,12 +5427,13 @@ nb:
           not_real: Det ser ikke ut som din virkelige e-postadresse. Vennligst skriv
             inn en e-postadresse du mottar e-post fra
           submit_anyway: Send inn skjemaet likevel
-        file_picker:
-          no_file_chosen: Ingen fil valgt
-          take_picture: Ta bilde
-          upload: Last opp
-          upload_failed: opplastingen mislyktes
-          uploading: opplasting
+        files:
+          picker:
+            no_file_chosen: Ingen fil valgt
+            take_picture: Ta bilde
+            upload: Last opp
+            upload_failed: opplastingen mislyktes
+            uploading: opplasting
         group:
           optional: valgfri
         turnstile:

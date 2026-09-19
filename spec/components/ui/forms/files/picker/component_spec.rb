@@ -2,14 +2,14 @@
 
 require "rails_helper"
 
-RSpec.describe UI::Forms::FilePicker::Component, type: :component do
+RSpec.describe UI::Forms::Files::Picker::Component, type: :component do
   let(:options) { {} }
   let(:component) { render_inline(described_class.new(input_options: {id: "picker"}, **options)) }
 
   it "labels the input it's given, whatever renders above and below" do
     expect(component).to have_css("input#picker[type='file'].tw\\:sr-only")
-    expect(component).to have_css("label[for='picker'][data-action='click->ui--forms--file-upload#chooseFile']", text: "Upload")
-    expect(component).to have_css("[data-ui--forms--file-upload-target='filename']", text: "No file chosen")
+    expect(component).to have_css("label[for='picker'][data-action='click->ui--forms--files--picker#chooseFile']", text: "Upload")
+    expect(component).to have_css("[data-ui--forms--files--picker-target='filename']", text: "No file chosen")
   end
 
   it "accepts a string, an array, or nothing" do
@@ -26,7 +26,7 @@ RSpec.describe UI::Forms::FilePicker::Component, type: :component do
       let(:options) { {accept: ImageUploader.permitted_extensions} }
 
       it "renders a camera button with the camera icon" do
-        expect(component).to have_css("button[data-action='ui--forms--file-upload#takePicture']", text: "Take picture")
+        expect(component).to have_css("button[data-action='ui--forms--files--picker#takePicture']", text: "Take picture")
         # decorative -- the button text is what names it
         expect(component).to have_css("button svg[aria-hidden='true']")
       end
@@ -36,7 +36,7 @@ RSpec.describe UI::Forms::FilePicker::Component, type: :component do
       let(:options) { {accept: PdfUploader.permitted_extensions} }
 
       it "renders no camera button" do
-        expect(component).to have_no_css("button[data-action='ui--forms--file-upload#takePicture']")
+        expect(component).to have_no_css("button[data-action='ui--forms--files--picker#takePicture']")
       end
     end
 
@@ -44,7 +44,7 @@ RSpec.describe UI::Forms::FilePicker::Component, type: :component do
       let(:options) { {accept: ".csv", camera: true} }
 
       it "renders a camera button" do
-        expect(component).to have_css("button[data-action='ui--forms--file-upload#takePicture']", text: "Take picture")
+        expect(component).to have_css("button[data-action='ui--forms--files--picker#takePicture']", text: "Take picture")
       end
     end
 
@@ -52,7 +52,7 @@ RSpec.describe UI::Forms::FilePicker::Component, type: :component do
       let(:options) { {accept: "image/*", camera: false} }
 
       it "renders no camera button" do
-        expect(component).to have_no_css("button[data-action='ui--forms--file-upload#takePicture']")
+        expect(component).to have_no_css("button[data-action='ui--forms--files--picker#takePicture']")
       end
     end
   end

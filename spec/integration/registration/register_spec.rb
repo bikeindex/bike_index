@@ -483,8 +483,8 @@ RSpec.describe "Register flow", :js, type: :system do
       hang_the_upload
       # Shortens the wait rather than skipping a step - the whole path still runs
       page.execute_script(<<~JS)
-        document.querySelector("[data-controller~='ui--forms--file-upload']")
-          .setAttribute("data-ui--forms--file-upload-stall-value", "1500")
+        document.querySelector("[data-controller~='ui--forms--files--picker']")
+          .setAttribute("data-ui--forms--files--picker-stall-value", "1500")
       JS
 
       attach_file("bike_image", image_path, make_visible: true)

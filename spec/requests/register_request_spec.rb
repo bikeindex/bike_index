@@ -731,7 +731,7 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to_not include "confirmation link to your email"
       # the shared upload component, rather than this page's own pair of buttons. The field
       # posts its own bytes as rendered; JS swaps that for the signed id it uploads to
-      expect(response.body).to include "ui--forms--file-upload"
+      expect(response.body).to include "ui--forms--files--picker"
       expect(response.body).to include "bike[image]"
       expect(response.body).to include "bike[image_signed_id]"
     end

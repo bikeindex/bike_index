@@ -2,11 +2,11 @@ import { Controller } from '@hotwired/stimulus'
 import { DirectUpload } from '@rails/activestorage'
 import { collapse } from 'utils/collapse_utils'
 
-// Connects to data-controller='ui--forms--file-upload'
+// Connects to data-controller='ui--forms--files--picker'
 // Shows the selected filename (or a count for multiple files) in the field, previews an
 // image pick, and frames the controls as a drop target while a file is dragged over the page.
 // With a url value, uploads the pick straight to storage and posts its signed blob id.
-// With a list (UI::Forms::FileUploadMultiple), the url is an endpoint instead: each pick is
+// With a list (UI::Forms::Files::UploadMultiple), the url is an endpoint instead: each pick is
 // posted to it on its own, and the markup it answers with joins the list.
 export default class extends Controller {
   static targets = ['input', 'filename', 'dropZone', 'preview', 'previewImage', 'signedId', 'list', 'status']

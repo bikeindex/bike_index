@@ -5679,12 +5679,13 @@ es:
             favor, introduce una dirección de correo electrónico donde recibas correos
             electrónicos.
           submit_anyway: Enviar formulario de todos modos
-        file_picker:
-          no_file_chosen: No se ha seleccionado ningún archivo.
-          take_picture: Toma una foto
-          upload: Subir
-          upload_failed: Falló la carga
-          uploading: subir
+        files:
+          picker:
+            no_file_chosen: No se ha seleccionado ningún archivo.
+            take_picture: Toma una foto
+            upload: Subir
+            upload_failed: Falló la carga
+            uploading: subir
         group:
           optional: opcional
         turnstile:

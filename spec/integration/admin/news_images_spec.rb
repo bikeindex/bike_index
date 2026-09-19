@@ -33,7 +33,7 @@ RSpec.describe "Admin news images", :js, type: :system do
       expect(page).to have_field(type: "textarea", with: /<img class="post-image" src="#{uploaded.image_url}"/)
     end
     # the row that stood in for it while it uploaded is gone
-    expect(page).to have_no_css("[data-ui--forms--file-upload-target='status'] li")
+    expect(page).to have_no_css("[data-ui--forms--files--picker-target='status'] li")
 
     # An image's radio sits outside the blog's form, and still saves with it
     within("#image-#{uploaded.id}") { choose "primary image" }

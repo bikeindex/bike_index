@@ -106,7 +106,7 @@
 
         <div class="tw:mb-4">
           <p class="twlabel">Photo</p>
-          <%= render(UI::Forms::FileUpload::Component.new(form_builder: form, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
+          <%= render(UI::Forms::Files::Upload::Component.new(form_builder: form, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
           <%= form.hidden_field :image_cache %>
         </div>
 

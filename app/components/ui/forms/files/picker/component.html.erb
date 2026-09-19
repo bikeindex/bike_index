@@ -1,12 +1,12 @@
 <%# drop is bound to the root, not the frame, so dropping on the button works too. %>
 <div
-  data-controller="ui--forms--file-upload"
-  data-ui--forms--file-upload-placeholder-value="<%= @placeholder %>"
+  data-controller="ui--forms--files--picker"
+  data-ui--forms--files--picker-placeholder-value="<%= @placeholder %>"
   <%# Blank unless the caller named an endpoint - the controller only uploads when it has one %>
-  data-ui--forms--file-upload-url-value="<%= @url %>"
-  data-ui--forms--file-upload-uploading-value="<%= translation(".uploading") %>"
-  data-ui--forms--file-upload-failed-value="<%= translation(".upload_failed") %>"
-  data-action="drop->ui--forms--file-upload#drop dragover@document->ui--forms--file-upload#dragOver dragleave@document->ui--forms--file-upload#endDrag drop@document->ui--forms--file-upload#endDrag"
+  data-ui--forms--files--picker-url-value="<%= @url %>"
+  data-ui--forms--files--picker-uploading-value="<%= translation(".uploading") %>"
+  data-ui--forms--files--picker-failed-value="<%= translation(".upload_failed") %>"
+  data-action="drop->ui--forms--files--picker#drop dragover@document->ui--forms--files--picker#dragOver dragleave@document->ui--forms--files--picker#endDrag drop@document->ui--forms--files--picker#endDrag"
   <%= tag.attributes(data: @data) %>
 >
   <%#
@@ -26,8 +26,8 @@
       tw:dark:data-[dragging=true]:outline-gray-600
       tw:dark:data-[over=true]:bg-blue-950
     "
-    data-ui--forms--file-upload-target="dropZone"
-    data-action="dragenter->ui--forms--file-upload#highlightDropZone dragleave->ui--forms--file-upload#unhighlightDropZone"
+    data-ui--forms--files--picker-target="dropZone"
+    data-action="dragenter->ui--forms--files--picker#highlightDropZone dragleave->ui--forms--files--picker#unhighlightDropZone"
   >
     <%= attached %>
 
@@ -37,13 +37,13 @@
       <%= file_input %>
 
       <%# Stimulus has no default event for a label, so name click explicitly. %>
-      <%= label_tag @input_id, label_content, class: @label_classes, data: {action: "click->ui--forms--file-upload#chooseFile"} %>
+      <%= label_tag @input_id, label_content, class: @label_classes, data: {action: "click->ui--forms--files--picker#chooseFile"} %>
 
       <% if @camera %>
         <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>
         <%= render UI::Button::Component.new(
               html_class: "tw:whitespace-nowrap tw:pointer-fine:hidden",
-              data: {action: "ui--forms--file-upload#takePicture"}
+              data: {action: "ui--forms--files--picker#takePicture"}
             ) do %>
           <%# hidden from AT: the button's own text already names it %>
           <%= helpers.inline_svg_tag("icons/camera.svg", class: "tw:h-4 tw:w-4", aria_hidden: true) %>
@@ -53,7 +53,7 @@
 
       <span
         class="tw:min-w-0 tw:truncate tw:text-gray-500 tw:dark:text-gray-400"
-        data-ui--forms--file-upload-target="filename"
+        data-ui--forms--files--picker-target="filename"
       >
         <%= @placeholder %>
       </span>

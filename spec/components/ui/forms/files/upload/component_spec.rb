@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe UI::Forms::FileUpload::Component, type: :component do
+RSpec.describe UI::Forms::Files::Upload::Component, type: :component do
   let(:record) { User.new }
   let(:form_builder) do
     BikeIndexFormBuilder.new(:user, record, ActionView::Base.new(ActionView::LookupContext.new([]), {}, nil), {})
@@ -13,20 +13,20 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
 
   it "renders the input, the upload label and the drop frame -- but no camera, and an empty preview" do
     expect(component).to have_css("input#user_avatar[type='file'][name='user[avatar]']")
-    expect(component).to have_css("[data-controller='ui--forms--file-upload']")
-    expect(component).to have_css("[data-ui--forms--file-upload-target='input']")
-    expect(component).to have_css("[data-ui--forms--file-upload-target='filename']", text: "No file chosen")
-    expect(component).to have_css("label[data-action='click->ui--forms--file-upload#chooseFile']", text: "Upload")
+    expect(component).to have_css("[data-controller='ui--forms--files--picker']")
+    expect(component).to have_css("[data-ui--forms--files--picker-target='input']")
+    expect(component).to have_css("[data-ui--forms--files--picker-target='filename']", text: "No file chosen")
+    expect(component).to have_css("label[data-action='click->ui--forms--files--picker#chooseFile']", text: "Upload")
     # decorative -- the label text is what names it
     expect(component).to have_css("label svg[aria-hidden='true']")
     # the frame is always rendered -- only its outline reacts to a drag
-    expect(component).to have_css("[data-ui--forms--file-upload-target='dropZone'].tw\\:outline-transparent")
+    expect(component).to have_css("[data-ui--forms--files--picker-target='dropZone'].tw\\:outline-transparent")
     # nothing accepted, so nothing to photograph
-    expect(component).to have_no_css("button[data-action='ui--forms--file-upload#takePicture']")
+    expect(component).to have_no_css("button[data-action='ui--forms--files--picker#takePicture']")
     # nothing attached, so the preview ships hidden and srcless, waiting for a pick
     # hidden! because collapse() hides with the important variant, and tw:block is on the same element
-    expect(component).to have_css("a[data-ui--forms--file-upload-target='preview'].tw\\:hidden\\! img")
-    expect(component).to have_no_css("[data-ui--forms--file-upload-target='preview'][href]")
+    expect(component).to have_css("a[data-ui--forms--files--picker-target='preview'].tw\\:hidden\\! img")
+    expect(component).to have_no_css("[data-ui--forms--files--picker-target='preview'][href]")
     expect(component).to have_no_css("img[src]")
   end
 
@@ -53,16 +53,16 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
     # drops the name only once it's uploading them itself
     it "renders a named field alongside the signed id it will fill" do
       expect(component).to have_css("input[type='file'][name='user[avatar]']")
-      expect(component).to have_css("[data-ui--forms--file-upload-url-value='/register/direct_uploads?b_param_token=xyz']")
-      expect(component).to have_css("input[type='hidden'][name='user[avatar_signed_id]'][data-ui--forms--file-upload-target='signedId']", visible: :all)
+      expect(component).to have_css("[data-ui--forms--files--picker-url-value='/register/direct_uploads?b_param_token=xyz']")
+      expect(component).to have_css("input[type='hidden'][name='user[avatar_signed_id]'][data-ui--forms--files--picker-target='signedId']", visible: :all)
     end
 
     context "without one" do
       let(:options) { {} }
 
       it "renders no signed id field" do
-        expect(component).to have_no_css("[data-ui--forms--file-upload-target='signedId']", visible: :all)
-        expect(component).to have_no_css("[data-ui--forms--file-upload-url-value]:not([data-ui--forms--file-upload-url-value=''])")
+        expect(component).to have_no_css("[data-ui--forms--files--picker-target='signedId']", visible: :all)
+        expect(component).to have_no_css("[data-ui--forms--files--picker-url-value]:not([data-ui--forms--files--picker-url-value=''])")
       end
     end
   end

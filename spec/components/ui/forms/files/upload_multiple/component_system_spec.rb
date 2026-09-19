@@ -2,9 +2,9 @@
 
 require "rails_helper"
 
-RSpec.describe UI::Forms::FileUploadMultiple::Component, :js, type: :system do
-  let(:drop_frame) { "[data-ui--forms--file-upload-target='dropZone']" }
-  let(:status) { "[data-ui--forms--file-upload-target='status']" }
+RSpec.describe UI::Forms::Files::UploadMultiple::Component, :js, type: :system do
+  let(:drop_frame) { "[data-ui--forms--files--picker-target='dropZone']" }
+  let(:status) { "[data-ui--forms--files--picker-target='status']" }
   let(:fixture) { Rails.root.join("spec/fixtures/bike.jpg").to_s }
   # Dragging a file has no Capybara equivalent -- the drag source is the OS, not the
   # page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
@@ -19,9 +19,9 @@ RSpec.describe UI::Forms::FileUploadMultiple::Component, :js, type: :system do
   # Nothing answers the preview's url, so every pick ends in the failed state -- which is
   # what shows that each file is uploaded, and reported on, in a request of its own
   it "gives every picked or dropped file a row of its own, and says which ones didn't land" do
-    visit("/rails/view_components/ui/forms/file_upload_multiple/component/default")
+    visit("/rails/view_components/ui/forms/files/upload_multiple/component/default")
 
-    expect(page).to have_css("[data-ui--forms--file-upload-target='list'] li", text: "already stored")
+    expect(page).to have_css("[data-ui--forms--files--picker-target='list'] li", text: "already stored")
     expect(page).to have_no_css("#{status} li")
     # the frame is idle until something is dragged
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
@@ -34,7 +34,7 @@ RSpec.describe UI::Forms::FileUploadMultiple::Component, :js, type: :system do
     expect(page).to have_css("#{status} li[data-failed='true']", text: "exif_orientation.jpg")
     expect(page).to have_css("#{status} li", text: "upload failed", count: 2)
     # the list is only added to by an upload that landed
-    expect(page).to have_css("[data-ui--forms--file-upload-target='list'] li", count: 1)
+    expect(page).to have_css("[data-ui--forms--files--picker-target='list'] li", count: 1)
 
     page.execute_script(start_drag)
 
@@ -54,7 +54,7 @@ RSpec.describe UI::Forms::FileUploadMultiple::Component, :js, type: :system do
     # Two files at once -- both land, unlike the single-file picker.
     page.execute_script(<<~JS)
       window.fileTransfer.items.add(new File(["y"], "second.jpg", {type: "image/jpeg"}))
-      document.querySelector("[data-ui--forms--file-upload-target='list']")
+      document.querySelector("[data-ui--forms--files--picker-target='list']")
         .dispatchEvent(new DragEvent("drop", {bubbles: true, dataTransfer: window.fileTransfer}))
     JS
 
