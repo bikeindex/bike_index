@@ -56,19 +56,16 @@
             <div class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
               <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
                 <%= check_box_tag :search_all, "true", @search_all, form: "Search_Form",
-                  disabled: params[:search_email].present?,
+                  disabled: @search_all_locked,
                   data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll"} %>
 
                 <%= t(".search_all_html", cycle_type: settings.cycle_type.pluralize(2),
                   org_name: current_organization.short_name) %>
               </label>
 
-              <span
-                data-org--search-target="searchAllHint"
-                class="tw:leading-none <%= "tw:hidden" if params[:search_email].blank? %>"
-              >
-                <%= render(UI::Tooltip::Component.new(text: t(".search_all_email_disabled"))) %>
-              </span>
+              <%= tag.span(render(UI::Tooltip::Component.new(text: t(".search_all_email_disabled"))),
+                class: "tw:leading-none", hidden: !@search_all_locked,
+                data: {"org--search-target": "searchAllHint"}) %>
             </div>
           <% end %>
         <% end %>

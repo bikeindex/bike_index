@@ -150,7 +150,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       context "with search_email" do
         let!(:non_organization_bike) { FactoryBot.create(:bike, owner_email: bike.owner_email) }
-        let(:tooltip) { "button[aria-label=\"You can only search your organization's registrations with owner email or name\"]" }
 
         it "only searches the organization's registrations" do
           get base_url, params: {search_no_js: true, search_all: true, search_email: bike.owner_email}
@@ -159,7 +158,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
           body = Capybara.string(response.body)
           expect(body).to have_field("search_all", checked: false, disabled: true)
-          expect(body).to have_css(tooltip)
+          expect(body).to have_css("button[aria-label=\"You can only search your organization's registrations with owner email or name\"]")
         end
       end
 

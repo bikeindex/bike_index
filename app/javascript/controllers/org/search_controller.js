@@ -49,7 +49,7 @@ export default class extends Controller {
     const hasEmail = event.target.value.trim() !== ''
     this.searchAllTarget.disabled = hasEmail
     if (hasEmail) this.searchAllTarget.checked = false
-    if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.toggle('tw:hidden', !hasEmail)
+    this.searchAllHintTarget.hidden = !hasEmail
   }
 
   filterChanged () {
