@@ -145,8 +145,12 @@
 
       <div class="tw:mt-6 tw:md:w-1/2">
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :child_enabled_feature_slugs_string,
-          kind: :text_area, label_text: child_slugs_label,
+          kind: :text_area, label_text: "Features passed on to children",
           html_options: {rows: 2, placeholder: "comma separated list of features"})) do |group| %>
+          <% group.with_label_note do %>
+            <em>If this is for a parent organization, choose which features from this invoice should apply to the child organizations</em>
+          <% end %>
+
           <% group.with_helper_text do %>
             <em>available features in current invoice:</em>
             <%= safe_join(@invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ") %>

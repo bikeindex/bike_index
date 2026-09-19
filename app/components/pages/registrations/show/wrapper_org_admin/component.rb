@@ -5,6 +5,8 @@ module Pages
     module Show
       module WrapperOrgAdmin
         class Component < ApplicationComponent
+          # Template Dependency: Pages::Registrations::Show::ComponentList::Component
+          # Template Dependency: Pages::Registrations::Show::CurrentAlerts::Wrapper::Component
           include BikeHelper
 
           OTHER_REGISTRATIONS_LIMIT = 10

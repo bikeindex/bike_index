@@ -4,6 +4,7 @@ module UI
   module Forms
     module RadioButtonGroup
       class Component < ApplicationComponent
+        # Template Dependency: UI::ButtonGroup::Component
         # A <label> never takes focus, so the ring hangs off the radio inside it
         LABEL_CLASSES = [
           "tw:mb-0", # a <label>, which legacy CSS gives a bottom margin
