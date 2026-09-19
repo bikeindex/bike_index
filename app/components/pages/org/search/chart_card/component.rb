@@ -39,6 +39,8 @@ module Pages
 
           def caption = translation(".caption_#{@scope}")
 
+          def follows_search? = @scope == "search"
+
           def scope_entries
             SCOPES.map do |scope|
               ComponentStructs::Shapes.entry(translation(".scope_#{scope}"), href: @scope_paths[scope.to_sym],

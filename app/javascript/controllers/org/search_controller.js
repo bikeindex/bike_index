@@ -105,10 +105,12 @@ export default class extends Controller {
   }
 
   // The card sits outside the results frame, so a search leaves it answering the previous
-  // one. Gated on the search itself having moved, or the first results render would refetch
-  // the chart the frame is already fetching. The URL carries the scope, so it's the search.
+  // one - when its scope is the search, which the card says by rendering the target. Gated
+  // on the search itself having moved, or the first results render would refetch the chart
+  // the frame is already fetching. The URL carries the scope, so it's the search.
   reloadChart () {
-    if (!this.hasChartFrameTarget || this.chartParams() === this.chartSearch) return
+    if (!this.hasChartFrameTarget || !this.hasChartFollowsSearchTarget) return
+    if (this.chartParams() === this.chartSearch) return
     if (!this.chartFrameTarget.getAttribute('src')) return
     this.chartSearch = this.chartParams()
     this.chartFrameTarget.setAttribute('src', window.location.href)
