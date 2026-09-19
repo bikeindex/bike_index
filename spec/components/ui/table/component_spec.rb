@@ -157,47 +157,60 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
+  # Every part of a row's key serves a stale row if it drops out, and nothing about the
+  # rendered markup shows which parts are there — so these assert on the keys written
   context "with cache_key", :caching do
     include_context :caching_basic
 
-    it "caches each row" do
-      users = FactoryBot.create_list(:user, 2)
+    let(:users) { FactoryBot.create_list(:user, 2) }
 
+    def render_table(cache_key: "test")
       with_controller_class(ApplicationController) do
-        result = render_inline(described_class.new(records: users, cache_key: "test")) do |table|
+        render_inline(described_class.new(records: users, cache_key:)) do |table|
           table.column(label: "Name") { |u| u.name }
-          table.column(label: "Email") { |u| u.email }
-        end
-
-        expect(result).to have_css("td", text: users.first.name)
-        expect(result).to have_css("td", text: users.second.email)
-      end
-    end
-
-    it "caches rows with lower_right content" do
-      users = FactoryBot.create_list(:user, 2)
-
-      with_controller_class(ApplicationController) do
-        result = render_inline(described_class.new(records: users, cache_key: "lr-test")) do |table|
           table.column(label: "Email", lower_right: ->(u) { u.id }) { |u| u.email }
         end
-
-        expect(result).to have_css("td div", text: /#{users.first.email}/)
-        expect(result).to have_css("td div small", text: users.first.id.to_s)
       end
     end
 
-    it "namespaces cache keys with a string" do
-      users = FactoryBot.create_list(:user, 1)
+    it "writes a fragment per row, scoped to the record, the cache_key and the locale" do
+      result = nil
+      keys = fragments_written { result = render_table }
 
-      with_controller_class(ApplicationController) do
-        render_inline(described_class.new(records: users, cache_key: "view-a")) do |table|
-          table.column(label: "Name") { |u| u.name }
-        end
+      expect(result).to have_css("td", text: users.first.name)
+      expect(result).to have_css("td div small", text: users.first.id.to_s)
+      expect(keys.count).to eq 2
+      expect(keys.first).to include("test", users.first.cache_key_with_version, "locale/en")
+      expect(keys.second).to include(users.second.cache_key_with_version)
 
-        render_inline(described_class.new(records: users, cache_key: "view-b")) do |table|
-          table.column(label: "Name") { |u| u.name }
-        end
+      expect(fragments_written { render_table }).to eq([])
+
+      # cache_key namespaces the rows, so another table rendering the same records
+      # doesn't serve this one's cells
+      expect(fragments_written { render_table(cache_key: "other") }.count).to eq 2
+
+      # The version in each record's key is what busts that row when the record changes
+      users.first.update(name: "Changed name")
+      rewritten = fragments_written { render_table }
+      expect(rewritten.count).to eq 1
+      expect(rewritten.first).to include(users.first.cache_key_with_version)
+    end
+
+    context "in another locale" do
+      it "keys the rows to that locale" do
+        keys = I18n.with_locale(:nl) { fragments_written { render_table } }
+
+        expect(keys.first).to include("locale/nl")
+      end
+    end
+
+    context "without a cache_key" do
+      it "renders every row uncached" do
+        result = nil
+        keys = fragments_written { result = render_table(cache_key: nil) }
+
+        expect(keys).to eq([])
+        expect(result).to have_css("td", text: users.first.name)
       end
     end
   end

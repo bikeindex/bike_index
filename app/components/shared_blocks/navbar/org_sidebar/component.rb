@@ -6,6 +6,7 @@ module SharedBlocks
       # The organization admin sidebar. It stands in for the whole navbar on every page a
       # member with a passive organization sees, so it carries their account links too.
       class Component < ApplicationComponent
+        # Template Dependency: SharedBlocks::Navbar::AccountMenu::Component
         COLLAPSE_BREAKPOINT = 1100
         MOBILE_BREAKPOINT = 760
 
