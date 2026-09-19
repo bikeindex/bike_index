@@ -5443,8 +5443,6 @@ nb:
           upload_multiple:
             upload_failed: opplastingen mislyktes
             uploading: opplasting
-        required_marker:
-          required: nødvendig
       alerts:
         base:
           error: Feil
@@ -6038,6 +6036,7 @@ nb:
             share: Dele
             share_my_page: Del siden min
             audience_marketplace_preview: Forhåndsvisning av oppføring
+            nickname: 'kallenavn: %{name}'
           wrapper_org_admin:
             about_this_bike: Om dette %{bike_type}
             assign_sticker: Tildel klistremerke
@@ -6108,8 +6107,6 @@ nb:
               dine vil være synlig ovenfor.
             update_note: Oppdater merknad
             updated_by: Oppdatert av %{user}
-          subtitle:
-            nickname: 'kallenavn: %{name}'
       search:
         everything_combobox:
           made_by: laget av

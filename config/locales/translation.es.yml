@@ -5696,8 +5696,6 @@ es:
           upload_multiple:
             upload_failed: Falló la carga
             uploading: subir
-        required_marker:
-          required: requerido
       alerts:
         base:
           error: Error
@@ -6306,6 +6304,7 @@ es:
             share: Compartir
             share_my_page: Comparte mi página
             audience_marketplace_preview: Vista previa del anuncio
+            nickname: 'apodo: %{name}'
           wrapper_org_admin:
             about_this_bike: Acerca de esto %{bike_type}
             assign_sticker: Asignar pegatina
@@ -6378,8 +6377,6 @@ es:
               visible arriba.
             update_note: Nota de actualización
             updated_by: Actualizado por %{user}
-          subtitle:
-            nickname: 'apodo: %{name}'
       search:
         everything_combobox:
           made_by: hecho por
