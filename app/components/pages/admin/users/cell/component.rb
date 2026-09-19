@@ -5,6 +5,7 @@ module Pages
     module Users
       module Cell
         class Component < ApplicationComponent
+          # Template Dependency: UI::Alerts::Base::Component
           def initialize(
             user: nil,
             user_id: nil,

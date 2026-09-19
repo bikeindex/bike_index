@@ -5,6 +5,7 @@ module SharedBlocks
     module PrimaryMenu
       # The navbar's main menu, rendered from a manifest of items rather than repeated markup
       class Component < ApplicationComponent
+        # Template Dependency: SharedBlocks::Navbar::UserSettingsMenu::Component
         # Rows that exist on both sides of the navbar's breakpoint, so each has to hide
         # on the other -- the desktop side takes two classes, mobile-first
         SIDE_CLASSES = {mobile: "d-lg-none", desktop: "d-none d-lg-block"}.freeze
