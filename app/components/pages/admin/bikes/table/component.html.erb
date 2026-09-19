@@ -93,12 +93,12 @@
             <small>📷</small>
           <% end %>
 
-          <span class="lg:tw:inline tw:hidden tw:text-gray-400">
+          <span class="tw:hidden tw:text-gray-400 tw:lg:inline">
             <%= bike.frame_colors.to_sentence %>
           </span>
 
           <% if BikeServices::Displayer.paint_description?(bike) %>
-            <small class="lg:tw:inline tw:hidden tw:text-gray-400">
+            <small class="tw:hidden tw:text-gray-400 tw:lg:inline">
               <%= link_to bike.paint_description, edit_admin_paint_url(bike.paint) %>
             </small>
           <% end %>
