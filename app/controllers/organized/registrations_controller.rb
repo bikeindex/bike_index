@@ -2,7 +2,8 @@ module Organized
   class RegistrationsController < Organized::BaseController
     include Binxtils::SortableTable
 
-    SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type]
+    SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type
+      acknowledged_at]
 
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response]
     around_action :set_reading_role, only: :multi_search_response
@@ -183,7 +184,13 @@ module Organized
       @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
       return if chart_only?
 
-      @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+      @pagy, @bikes = pagy(:countish, @available_bikes.reorder(search_order(org)), limit: @per_page, page: permitted_page)
+    end
+
+    def search_order(organization)
+      return "bikes.#{sort_column} #{sort_direction}" if sort_column != "acknowledged_at"
+
+      RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)
     end
 
     # Set filter params for settings component on initial (non-turbo) page load

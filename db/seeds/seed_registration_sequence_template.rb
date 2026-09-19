@@ -64,4 +64,12 @@ if brakebills.present?
     .update_all(heading: "#{brakebills.short_name} campus policies")
   sequence.make_active!
   puts "Registration sequence activated for Brakebills: #{sequence.registration_sequence_pages.count} pages\n"
+
+  # All but one of the e-vehicles, so a registration shows both with and without an acknowledgment
+  acknowledged = brakebills.bikes.motorized.order(:id).to_a[0...-1]
+  acknowledged.each do |bike|
+    RegistrationSequenceAcknowledgment.create!(registration_sequence: sequence, bike:, user: bike.creator,
+      owner_email: bike.owner_email)
+  end
+  puts "Acknowledged the Brakebills registration sequence for #{acknowledged.count} e-vehicles\n"
 end
