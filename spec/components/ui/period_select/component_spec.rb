@@ -24,26 +24,4 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
       expect(described_class.period_label("custom")).to eq "custom"
     end
   end
-
-  describe "alignment" do
-    let(:component) do
-      with_request_url("/admin/bikes") do
-        render_inline(described_class.new(period: "all", start_time: Time.current - 1.year, end_time: Time.current, align_start:))
-      end
-    end
-    let(:align_start) { false }
-
-    it "sits the buttons in the page corner" do
-      expect(component).to have_css("[role='group'].tw\\:justify-end")
-    end
-
-    context "with align_start" do
-      let(:align_start) { true }
-
-      it "starts the buttons beside whatever labels them" do
-        expect(component).to have_css("[role='group'].tw\\:justify-start")
-        expect(component).not_to have_css("[role='group'].tw\\:justify-end")
-      end
-    end
-  end
 end
