@@ -101,7 +101,7 @@ module Pages
           end
 
           def bike_organization_note
-            BikeOrganizationNote.find_by(bike_id: @bike.id, organization_id: @organization.id)
+            @bike_organization_note ||= BikeOrganizationNote.find_by(bike_id: @bike.id, organization_id: @organization.id)
           end
 
           def notes_url
