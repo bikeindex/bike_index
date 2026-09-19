@@ -157,30 +157,47 @@ module Organized
       @chart_bikes ||= (chart_scope_year? ? organization_bikes : @searched_bikes).unscope(:order)
     end
 
+    # Whole months, so the bars are comparable rather than the first and last being part ones
     def chart_time_range
-      @chart_time_range ||= chart_scope_year? ? ((Time.current.beginning_of_day - 1.year)..Time.current) : @time_range
+      @chart_time_range ||= chart_scope_year? ? ((Time.current.beginning_of_month - 1.year)..Time.current) : @time_range
     end
 
     def registrations_stats
-      OrgServices::RegistrationStats.for_range(chart_bikes, chart_time_range,
-        compare: chart_scope_year? || @period != "all")
+      @registrations_stats ||= cache_year_chart(:stats) do
+        OrgServices::RegistrationStats.for_range(chart_bikes, chart_time_range,
+          compare: chart_scope_year? || @period != "all")
+      end
     end
 
-    # The bands partition the total: an e-vehicle reported stolen is counted once, as stolen
     def registrations_chart
-      in_range = chart_bikes.where(created_at: chart_time_range)
-      not_stolen = in_range.where.not(status: "status_stolen")
-      scopes = {registrations: not_stolen.where.not(propulsion_type: PropulsionType::MOTORIZED),
-                motorized: not_stolen.motorized,
-                stolen: in_range.where(status: "status_stolen")}
-
       UI::Chart::Component.new(
-        series: scopes.map { |key, scope| {name: t("components.pages.org.search.chart_card.chart_#{key}"), data: chart_counts(scope)} },
+        series: chart_band_counts.map { |key, data| {name: t("components.pages.org.search.chart_card.chart_#{key}"), data:} },
         time_range: chart_time_range,
         colors: Pages::Org::Search::ChartCard::Component::BANDS.values.map { it[:hex] },
         height: "180px",
         stacked: true
       )
+    end
+
+    # The bands partition the total: an e-vehicle reported stolen is counted once, as stolen
+    def chart_band_counts
+      @chart_band_counts ||= cache_year_chart(:bands) do
+        in_range = chart_bikes.where(created_at: chart_time_range)
+        not_stolen = in_range.where.not(status: "status_stolen")
+
+        {registrations: chart_counts(not_stolen.where.not(propulsion_type: PropulsionType::MOTORIZED)),
+         motorized: chart_counts(not_stolen.motorized),
+         stolen: chart_counts(in_range.where(status: "status_stolen"))}
+      end
+    end
+
+    # The year scope answers the organization rather than the search, so every member asks
+    # for the same counts. Numbers only, so no locale in the key
+    def cache_year_chart(key, &block)
+      return yield unless chart_scope_year?
+
+      Rails.cache.fetch(["org_registrations_chart", key, current_organization.id,
+        Time.current.beginning_of_hour.to_i], expires_in: 1.hour, &block)
     end
 
     def chart_counts(bikes)
