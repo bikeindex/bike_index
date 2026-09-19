@@ -6304,16 +6304,12 @@ es:
             about_this_bike: Acerca de esto %{bike_type}
             assign_sticker: Asignar pegatina
             edit: Editar
-            internal_notes: Notas internas
             link_sticker: Pegatina de enlace
             no_other_registrations: No se encontró ninguno
             not_registered_message: La información de contacto del propietario no
               está disponible para bicicletas que no pertenezcan a su organización.
               Sin embargo, puede agregar notas internas.
             not_registered_title: No está registrado con %{org_name}
-            note_by: Nota de %{user}
-            notes_placeholder: 'Nueva nota interna: tus notas anteriores se conservan
-              en el hilo.'
             org_can_edit: "%{org_name} puede editar esto %{bike_type}"
             org_can_edit_sub: Incluso después de que se reclame %{bike_type}.
             other_registrations: Otros registros de este usuario
@@ -6323,8 +6319,6 @@ es:
             owner_name: Nombre
             owner_phone: Teléfono
             photo_archive: Archivo fotográfico
-            post_note: Nota postal
-            posts_as: Publicaciones como %{user}
             restricted_message: El contacto con el propietario está disponible para
               el personal administrativo y de apoyo. Puede agregar notas y solicitar
               la retirada del vehículo.
@@ -6367,6 +6361,17 @@ es:
             registration_sequence: Secuencia de registro
             sticker: Etiqueta engomada
             sticker_claimed: afirmado
+          internal_notes:
+            current_note: Nota actual
+            deleted_user: un usuario eliminado
+            internal_notes: Notas internas
+            most_recent_update_by: Última actualización realizada por %{user}
+            note_by: Nota de %{user}
+            post_note: Nota postal
+            update_hint: Publicarás como %{user}; el historial de tus cambios será
+              visible arriba.
+            update_note: Nota de actualización
+            updated_by: Actualizado por %{user}
       search:
         everything_combobox:
           made_by: hecho por

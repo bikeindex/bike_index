@@ -6212,16 +6212,12 @@ nl:
             about_this_bike: Over dit %{bike_type}
             assign_sticker: Sticker toewijzen
             edit: Bewerken
-            internal_notes: Interne notities
             link_sticker: Link sticker
             no_other_registrations: Geen gevonden
             not_registered_message: Voor fietsen buiten uw organisatie is het niet
               mogelijk om contact op te nemen met de eigenaar. U kunt wel interne
               notities toevoegen.
             not_registered_title: Niet geregistreerd bij %{org_name}
-            note_by: Opmerking van %{user}
-            notes_placeholder: Nieuwe interne notitie — je vorige notities blijven
-              in dit gesprek bewaard.
             org_can_edit: "%{org_name} kan deze %{bike_type} bewerken"
             org_can_edit_sub: Ook nadat %{bike_type} is geclaimd.
             other_registrations: Andere registraties door deze gebruiker
@@ -6231,8 +6227,6 @@ nl:
             owner_name: Naam
             owner_phone: Telefoon
             photo_archive: Fotoarchief
-            post_note: Post-notitie
-            posts_as: Berichten als %{user}
             restricted_message: De contactgegevens van de eigenaar zijn beschikbaar
               voor de administratie en het personeel. U kunt notities toevoegen en
               een inbeslagname aanvragen.
@@ -6274,6 +6268,17 @@ nl:
             registration_sequence: Registratievolgorde
             sticker: Sticker
             sticker_claimed: beweerde
+          internal_notes:
+            current_note: Huidige notitie
+            deleted_user: een verwijderde gebruiker
+            internal_notes: Interne notities
+            most_recent_update_by: meest recente update door %{user}
+            note_by: Opmerking van %{user}
+            post_note: Post-notitie
+            update_hint: Je plaatst je bericht als %{user} — de geschiedenis van je
+              wijzigingen is hierboven zichtbaar.
+            update_note: Update-notitie
+            updated_by: Bijgewerkt door %{user}
       search:
         everything_combobox:
           made_by: gemaakt door
