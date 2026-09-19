@@ -36,7 +36,8 @@ RSpec.describe ApplicationComponent, type: :component do
     # over-invalidates every cache above it
     it "renders every component a Template Dependency names" do
       unreferenced = component_classes.sort_by(&:name).filter_map do |component|
-        declared = File.read(component.identifier).scan(/^\s*# Template Dependency: (\S+)/).flatten
+        declared = component.ancestors.select { it <= ApplicationComponent }
+          .flat_map { |ancestor| File.read(ancestor.identifier).scan(ViewComponent::CacheDigest::EXPLICIT_DEPENDENCY).flatten }
         missing = declared - referenced_components(component).map(&:name)
         "#{component} names #{missing.join(", ")}" if missing.any?
       end

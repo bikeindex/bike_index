@@ -1,17 +1,13 @@
 # frozen_string_literal: true
 
 class ApplicationComponent < ViewComponent::Base
-  # Puts every component in Rails' template digest tree, so a `cache` block invalidates when
-  # anything it renders changes — which Action View can't see on its own, since a component
-  # is a Ruby object to it rather than a template. Included here rather than per component
-  # because the tracker follows only components that opt in, so one missed include anywhere
-  # in a cached tree is a silently stale fragment.
+  # Puts every component in Rails' template digest tree. Included here rather than per
+  # component because the tracker follows only components that opt in, so one missed
+  # include in a cached tree is a silently stale fragment.
   #
-  # The tracker reads one shape: a constant directly after `render`. Anything else names
-  # itself in a `# Template Dependency:` comment, which is the gem's own seam — widening
-  # the tracker instead would mean patching a private method of an API it labels
-  # experimental, where a release breaking it costs stale caches rather than an error.
-  # The frontend-conventions skill has the rule; this spec finds what's missing.
+  # The tracker reads only a constant directly after `render`; anything else needs a
+  # Template Dependency directive (the frontend-conventions skill has the rule). This
+  # comment can't spell the directive out — the gem scans every ancestor's source for it.
   include ViewComponent::ExperimentallyCacheable
   include ApplicationComponentHelper
 
