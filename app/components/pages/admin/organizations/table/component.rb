@@ -6,9 +6,6 @@ module Pages
       module Table
         # The admin organizations index table, also rendered on the admin dashboard.
         class Component < ApplicationComponent
-          # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-          MARKUP_DIGEST = "8b389837a692"
-
           def initialize(organizations:, sort_state: ComponentStructs::SortState.new,
             render_sortable: false, render_deleted: false)
             @organizations = organizations
@@ -19,7 +16,7 @@ module Pages
 
           private
 
-          def cache_key = "admin-organizations-#{MARKUP_DIGEST}"
+          def cache_key = "admin-organizations-#{self.class.cache_digest}"
 
           def pos_link(organization)
             display = organization.pos_kind.to_s.gsub("pos", "")

@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class ApplicationComponent < ViewComponent::Base
+  # Puts every component in Rails' template digest tree, so a `cache` block invalidates when
+  # anything it renders changes — which Action View can't see on its own, since a component
+  # is a Ruby object to it rather than a template. Included here rather than per component
+  # because the tracker follows only components that opt in, so one missed include anywhere
+  # in a cached tree is a silently stale fragment.
+  include ViewComponent::ExperimentallyCacheable
   include ApplicationComponentHelper
 
   def raise_if_invalid_value!(attribute, value, options = {})

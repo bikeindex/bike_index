@@ -70,7 +70,6 @@ When git leaves `<<<<<<<` / `=======` / `>>>>>>>` markers:
 - **Both sides added at the same spot? Order matters.** Keeping both isn't enough when either block has side effects. If the incoming block ends by reloading the page, anything of yours that depends on unsaved state has to come *after* it — concatenated the other way it still passes while testing nothing.
 - **Don't blanket-replace a renamed string.** Two call sites that shared a string can have legitimately diverged; `sed`-ing the whole file changes the one that shouldn't move.
 - **A conflicted `schema_migrations` list takes both versions.** Each side appended its own migration, so keep both lines in descending order — in `db/structure.sql` and `db/primary_replica_structure.sql` alike — then `bin/rails db:migrate` to re-dump. Never hand-edit the structure files.
-- **A conflicted `MARKUP_DIGEST` has no side to pick.** Both branches bumped it because both edited the cached markup, so neither literal describes the merge. Take either, then run `bin/update_markup_digests` and commit what it writes. Expect these on anything with a digest — a component, or a view template carrying the assignment in a comment — and on whatever's digest covers a tree the other side edited, so the line that conflicts is often not in a file you touched.
 - After resolving, verify the result actually makes sense — the merged code should reflect both intents, not just parse. Run the relevant tests if the conflict touched logic.
 
 ## The dangerous part is what merged *cleanly*

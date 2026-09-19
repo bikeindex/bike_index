@@ -36,9 +36,7 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 
 Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style, testing conventions, and frontend rules. Only touch lines this branch already changed.
 
-**`bin/update_markup_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into — components and partials both — so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of everything that renders it, `SharedBlocks::Navbar::Wrapper` and `SharedBlocks::Footer` both for one edit, plus any view template carrying a digest comment. Regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
-
-It hashes *files*, not output, and globs a component's whole directory — so a comment that renders nothing bumps the digest just the same, whether you put it in the template or in `component.rb`. Somewhere outside the component directory (`.herb.yml`, the PR body) is the free place to say it.
+**There is no digest to regenerate before pushing.** `ApplicationComponent` includes `ViewComponent::ExperimentallyCacheable`, so Rails' template digest follows every component a cached block renders and moves on its own. Nothing to run, and nothing that can be left stale in the diff.
 
 ### The spec audit
 

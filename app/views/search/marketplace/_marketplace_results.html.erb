@@ -1,4 +1,3 @@
-<%# MARKUP_DIGEST = "fe72868e524c" %>
 <% if flash[:notice].present? && @pagy.page == 1 %>
   <div class="tw:mx-auto tw:max-w-7xl tw:px-4">
     <%= render(UI::Alerts::Base::Component.new(text: flash[:notice], kind: :warning, dismissable: true)) %>

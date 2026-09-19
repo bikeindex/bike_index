@@ -10,7 +10,7 @@ the Gemfile. It surfaces differently depending on the entry point:
 - a `bin/` script (`bin/rspec`, `bin/lint`) → `uninitialized constant Pathname`,
   `undefined method 'intersect?' for Array` (`bin/lint`, on a 2.6 that predates
   it), or the same `Could not find 'bundler'` when it boots Rails
-  (`bin/update_markup_digests`)
+  (`bin/benchmark_search`)
 
 Check first; only prefix PATH if `ruby -v` doesn't already print 4.0.6
 (`mise exec -- ruby`/`bundle` are unreliable in this harness — they

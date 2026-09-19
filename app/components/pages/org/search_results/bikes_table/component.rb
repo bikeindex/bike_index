@@ -9,16 +9,13 @@ module Pages
         # the search form, column-toggle settings, or pagination (e.g. a user's other
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
-          # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-          MARKUP_DIGEST = "23cd3e32da3f"
-
           def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
             cache_key: nil, sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
             @bikes = bikes
             @current_user = current_user
             @render_sortable = render_sortable
-            @cache_key = cache_key || "org-#{organization.id}-#{MARKUP_DIGEST}"
+            @cache_key = cache_key || "org-#{organization.id}-#{self.class.cache_digest}"
             @sort_state = sort_state
             @bike_sticker = bike_sticker
             @settings = settings

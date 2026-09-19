@@ -7,9 +7,6 @@ module SharedBlocks
       # organization gets SharedBlocks::Navbar::OrgSidebar in its place, which this picks.
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
-        # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "4aca8803c515"
-
         def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
           passive_organization: nil, old_register_view: false)
           @logo_only = logo_only
@@ -44,7 +41,7 @@ module SharedBlocks
 
         # The whole nav renders the same on every page a user sees, so the user is the key
         def cache_key
-          [MARKUP_DIGEST, @current_user_or_unconfirmed_user]
+          [self.class.cache_digest, @current_user_or_unconfirmed_user]
         end
 
         def primary_menu
