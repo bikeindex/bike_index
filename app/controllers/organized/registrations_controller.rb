@@ -20,7 +20,8 @@ module Organized
 
       if current_organization.enabled?("bike_search")
         @search_claimedness = "all"
-        @search_all = Binxtils::InputNormalizer.boolean(params[:search_all])
+        # Owner email and name only search the organization's own registrations
+        @search_all = params[:search_email].blank? && Binxtils::InputNormalizer.boolean(params[:search_all])
         @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)

@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'filterSummary', 'periodLabel']
+  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
 
   connect () {
     this.chartSearch = this.chartParams()
@@ -42,6 +42,14 @@ export default class extends Controller {
     this.notesFieldTarget.classList.toggle('tw:hidden', !open)
     localStorage.setItem('orgRegistrationNotesSearchOpen', String(open))
     if (this.hasNotesCheckboxTarget) this.notesCheckboxTarget.checked = open
+  }
+
+  emailChanged (event) {
+    if (!this.hasSearchAllTarget) return
+    const hasEmail = event.target.value.trim() !== ''
+    this.searchAllTarget.disabled = hasEmail
+    if (hasEmail) this.searchAllTarget.checked = false
+    if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.toggle('tw:hidden', !hasEmail)
   }
 
   filterChanged () {

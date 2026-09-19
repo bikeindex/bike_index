@@ -7,6 +7,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes show_bulk_import] }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bikes_path) { "/o/#{organization.to_param}/registrations" }
+  let(:search_all_email_disabled) { "You can only search your organization's registrations with owner email or name" }
 
   let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "alice@example.com", created_at: 2.years.ago) }
   let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "bob@example.com", created_at: 3.days.ago) }
@@ -91,15 +92,24 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/serial=/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
 
-    # Clear serial and search by email
+    # Owner email only searches the organization's registrations, so it locks "search all"
+    check "search_all"
+    expect(page).to have_current_path(/search_all=true/, wait: 10)
     fill_in "serial", with: ""
     fill_in "search_email", with: "alice@example.com"
+    expect(page).to have_field("search_all", checked: false, disabled: true)
+    find("button[aria-label=\"#{search_all_email_disabled}\"]").hover
+    expect(page).to have_css("[role=tooltip]", text: search_all_email_disabled)
     click_button "Search registrations"
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
     expect(page).to have_content("alice@example.com")
     expect(page).not_to have_content("bob@example.com")
+
+    fill_in "search_email", with: ""
+    expect(page).to have_field("search_all", checked: false, disabled: false)
+    expect(page).not_to have_css("button[aria-label=\"#{search_all_email_disabled}\"]")
 
     # submits when enter is pressed twice
     visit bikes_path

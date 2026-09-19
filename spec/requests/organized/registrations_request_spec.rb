@@ -145,6 +145,22 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:search_all)).to be_truthy
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, non_organization_bike.id])
+        expect(Capybara.string(response.body)).to have_field("search_all", checked: true, disabled: false)
+      end
+
+      context "with search_email" do
+        let!(:non_organization_bike) { FactoryBot.create(:bike, owner_email: bike.owner_email) }
+        let(:tooltip) { "button[aria-label=\"You can only search your organization's registrations with owner email or name\"]" }
+
+        it "only searches the organization's registrations" do
+          get base_url, params: {search_no_js: true, search_all: true, search_email: bike.owner_email}
+          expect(response.status).to eq(200)
+          expect(assigns(:search_all)).to be_falsey
+          expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+          body = Capybara.string(response.body)
+          expect(body).to have_field("search_all", checked: false, disabled: true)
+          expect(body).to have_css(tooltip)
+        end
       end
 
       context "with csv_exports" do
