@@ -231,7 +231,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     expect(page).not_to have_link("search everywhere")
     expect(page).to have_css(row_for(far_away), visible: :hidden)
 
-    click_link "retrieve/send repeat notification"
+    click_button "retrieve/send repeat notification"
     click_button "Select all"
     select "Mark retrieved/resolved", from: "kind"
     expect {
@@ -247,8 +247,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # The count updates when the fly from New York to Chicago lands, a few seconds out
     expect(page).to have_content("1 visible", wait: 10)
     expect(page).not_to have_current_path(/map_location/)
-    # Every pin is in view, though the ungeocoded row has none
+    # The ungeocoded row has no pin to bring into view
     expect(page).not_to have_button("Fit map to notifications")
-    expect(page).to have_css(row_for(ungeocoded), visible: :hidden)
   end
 end

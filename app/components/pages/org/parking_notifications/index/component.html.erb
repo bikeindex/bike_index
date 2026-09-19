@@ -157,13 +157,11 @@
     <div class="col-md-6 col-xs-12">
       <%# Hide the repeat notification interface because the checks don't display on mobile %>
       <div class="text-right hidden-md-down">
-        <a
-          class="gray-link"
-          href="#sendRepeatNotifications"
-          data-action="org--parking-notifications-index#showMultiselect:prevent"
-        >
-          retrieve/send repeat notification
-        </a>
+        <%= render UI::Button::Component.new(
+          text: "retrieve/send repeat notification",
+          color: :link,
+          data: {action: "org--parking-notifications-index#showMultiselect"}
+        ) %>
       </div>
     </div>
   </div>
@@ -171,7 +169,6 @@
   <%# Form needs to wrap the table too %>
   <%= form_for ParkingNotification.new, url: organization_parking_notifications_path(organization_id: @organization), html: {data: {controller: "table-multi-checkbox"}} do |f| %>
     <div
-      id="sendRepeatNotifications"
       class="tw:hidden"
       data-org--parking-notifications-index-target="repeatForm"
     >

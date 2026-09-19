@@ -200,7 +200,7 @@ export default class extends Controller {
   }
 
   get #nothingAtLocation () {
-    return this.#hasBoundingBox && !this.rowTargets.length
+    return this.#hasBoundingBox && !this.rows.length
   }
 
   // Once the map leaves the searched place, the URL shouldn't reopen on it
