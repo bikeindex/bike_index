@@ -4,29 +4,15 @@ module UI
   module Forms
     module RadioButtonGroup
       class Component < ApplicationComponent
-        # Only checked and focus are restated, since those hang off the radio
-        # rather than the <label> the chip classes land on.
+        # A <label> never takes focus, so the ring hangs off the radio inside it
         LABEL_CLASSES = [
           "tw:mb-0", # a <label>, which legacy CSS gives a bottom margin
           "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze
 
-        CHIP_CLASSES = [
-          UI::ButtonGroup::Component::CHIP_CLASSES,
-          LABEL_CLASSES,
-          "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
-          # A <label> is never :disabled — these carry the specificity to beat the hover
-          # they override, which is guarded not-disabled:not-aria-disabled:
-          "tw:has-[:checked]:not-disabled:not-aria-disabled:hover:bg-purple-500 tw:has-[:checked]:not-disabled:not-aria-disabled:hover:border-purple-500",
-          "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40"
-        ].join(" ").freeze
+        CHIP_CLASSES = [UI::ButtonGroup::Component::CHIP_CLASSES, LABEL_CLASSES].join(" ").freeze
 
-        SEGMENT_CLASSES = [
-          UI::ButtonGroup::Component::SEGMENT_CLASSES,
-          LABEL_CLASSES,
-          "tw:has-[:checked]:bg-white tw:has-[:checked]:text-gray-900 tw:has-[:checked]:shadow-sm",
-          "tw:has-[:checked]:dark:bg-gray-900 tw:has-[:checked]:dark:text-gray-100"
-        ].join(" ").freeze
+        SEGMENT_CLASSES = [UI::ButtonGroup::Component::SEGMENT_CLASSES, LABEL_CLASSES].join(" ").freeze
 
         # full_width: chips share the row evenly (the frame-size XS-XL selector),
         # rather than each taking only the width of its label.

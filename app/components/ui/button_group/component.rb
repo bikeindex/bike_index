@@ -35,12 +35,17 @@ module UI
       # on every line — flex would size each line independently. auto-fit needs a
       # definite minimum to count repetitions.
       def self.group_classes(kind:, full_width:)
-        raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}" unless KINDS.include?(kind)
-        return full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-2" if kind == :button
-        # The track sizes itself to its segments, so there's no column layout to widen
-        raise ArgumentError, "full_width is not supported for the toggle kind" if full_width
+        case kind
+        when :button
+          full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-2"
+        when :toggle
+          # The track sizes itself to its segments, so there's no column layout to widen
+          raise ArgumentError, "full_width is not supported for the toggle kind" if full_width
 
-        TRACK_CLASSES
+          TRACK_CLASSES
+        else
+          raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}"
+        end
       end
 
       # entries: ComponentStructs::Shapes' entries

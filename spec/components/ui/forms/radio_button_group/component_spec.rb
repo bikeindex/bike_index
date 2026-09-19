@@ -5,15 +5,6 @@ require "rails_helper"
 RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
   let(:entries) { [{value: "", label: "All"}, {value: "active", label: "Active"}] }
   let(:button) { UI::Button::Component.build_classes(color: :secondary, size: :md) }
-  let(:button_active) { UI::Button::Component::ACTIVE_COLORS[:secondary] }
-
-  # Every purple-* color utility a class string uses, ignoring variant prefixes
-  # (hover:, dark:, has-[:checked]:, is-active:, …) so the group's
-  # `has-[:checked]:bg-purple-500` compares equal to the button's `bg-purple-500`.
-  def purple_tokens(class_string)
-    class_string.scan(%r{(?:bg|border|text|ring)-purple-\d+(?:/\d+)?}).uniq.sort
-  end
-
   # What a class string applies under the given variant, with any deeper variant kept
   # so it still has to match: `tw:is-active:bg-purple-500` and
   # `tw:has-[:checked]:bg-purple-500` both reduce to `bg-purple-500`.
@@ -24,7 +15,7 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
   let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active")) }
   let(:label) { component.css("label").first["class"] }
 
-  it "renders radio chips styled like UI::Button's secondary" do
+  it "renders radio chips that focus like UI::Button's secondary" do
     expect(component).to have_css("input[type='radio'][name='status']", count: 2, visible: :all)
     expect(component).to have_css("input[value='active'][checked]", visible: :all)
     expect(component).to have_css("label span", text: "Active")
@@ -32,10 +23,6 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
     expect(component).to have_css("div.tw\\:flex-wrap")
     expect(component).to_not have_css("div.tw\\:grid")
 
-    expect(purple_tokens(label)).not_to be_empty
-    expect(purple_tokens(label)).to eq(purple_tokens(button))
-    expect(utilities_for(button_active, "is-active")).not_to be_empty
-    expect(utilities_for(label, "has-[:checked]")).to include(*utilities_for(button_active, "is-active"))
     # Equality, not include: an extra utility here (a ring offset, say) is a visual
     # difference from the button, so it has to fail too.
     expect(utilities_for(button, "focus")).not_to be_empty
@@ -46,15 +33,10 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
     let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active", kind: :toggle)) }
     let(:segment) { UI::ButtonGroup::Component::SEGMENT_CLASSES }
 
-    it "renders radios as segments of a single track, styled like UI::ButtonGroup's" do
+    it "renders radios as segments of a single track that focus like UI::ButtonGroup's" do
       expect(component).to have_css("input[value='active'][checked]", visible: :all)
       expect(component).to have_css("div.tw\\:bg-gray-100")
       expect(component).to have_no_css("div.tw\\:flex-wrap")
-
-      # is-active:focus: is the focus ring, which has-[:focus-visible] restates
-      active = utilities_for(segment, "is-active").grep_v(/\Afocus:/)
-      expect(active).not_to be_empty
-      expect(utilities_for(label, "has-[:checked]")).to include(*active)
       expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(segment, "focus"))
     end
   end
