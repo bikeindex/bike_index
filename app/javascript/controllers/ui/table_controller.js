@@ -142,8 +142,8 @@ export default class extends Controller {
       }
     }
 
-    // Body rows
-    const bodyRows = table.querySelectorAll('tbody tr')
+    // Body and footer rows
+    const bodyRows = table.querySelectorAll('tbody tr, tfoot tr')
     if (bordered) {
       bodyRows.forEach(row => {
         const tds = this.visibleCells(row, 'td')
