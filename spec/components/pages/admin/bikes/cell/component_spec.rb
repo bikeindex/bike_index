@@ -56,8 +56,9 @@ RSpec.describe Pages::Admin::Bikes::Cell::Component, type: :component do
     context "unregistered_parking_notification" do
       let(:bike) { FactoryBot.create(:bike, status: "unregistered_parking_notification") }
 
-      it "renders unregistered tag" do
-        expect(component.css("em.text-warning").text).to include("unregistered")
+      it "renders the unregistered badge once" do
+        expect(component.text.scan("Unregistered").count).to eq 1
+        expect(component.css("em.text-warning")).to be_empty
       end
     end
 

@@ -3,7 +3,7 @@
 module UI
   module ButtonGroup
     # A row of chips that navigate or act — the link/button counterpart of
-    # UI::Forms::RadioButtonGroup, which chips off CHIP_CLASSES too.
+    # UI::Forms::RadioButtonGroup, which builds on CHIP_CLASSES and SEGMENT_CLASSES.
     #
     # kind: :toggle renders them as a segmented control instead — one track, with the
     # active entry raised out of it.
@@ -21,7 +21,9 @@ module UI
         UI::Button::Component::BASE_CLASSES,
         UI::Button::Component::FOCUS_CLASSES,
         UI::Button::Component::DISABLED_CLASSES,
-        "tw:px-3 tw:py-[5px] tw:text-[11.5px] tw:font-extrabold tw:whitespace-nowrap",
+        # The line height is part of the size: an arbitrary font size pairs none of its own,
+        # so the page's inherited 30px made a 24px segment 40px tall
+        "tw:px-3 tw:py-[5px] tw:text-[11.5px]/[1.2] tw:font-extrabold tw:whitespace-nowrap",
         "tw:no-underline tw:hover:no-underline tw:text-gray-400",
         "tw:not-disabled:not-aria-disabled:hover:text-gray-900",
         "tw:focus:ring-purple-500/40",
@@ -32,32 +34,34 @@ module UI
       # full_width lays the chips out as equal columns that wrap, staying the same width
       # on every line — flex would size each line independently. auto-fit needs a
       # definite minimum to count repetitions.
-      def self.layout_classes(full_width:)
-        full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-2"
+      def self.group_classes(kind:, full_width:)
+        case kind
+        when :button
+          full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-2"
+        when :toggle
+          # The track sizes itself to its segments, so there's no column layout to widen
+          raise ArgumentError, "full_width is not supported for the toggle kind" if full_width
+
+          TRACK_CLASSES
+        else
+          raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}"
+        end
       end
 
       # entries: ComponentStructs::Shapes' entries
       def initialize(entries:, full_width: false, kind: :button)
-        raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}" unless KINDS.include?(kind)
-        # The track sizes itself to its segments, so there's no column layout to widen
-        raise ArgumentError, "full_width is not supported for the toggle kind" if full_width && kind == :toggle
-
+        @group_classes = self.class.group_classes(kind:, full_width:)
+        @chip_classes = (kind == :toggle) ? SEGMENT_CLASSES : CHIP_CLASSES
         @entries = entries
-        @full_width = full_width
-        @kind = kind
       end
 
       def call
-        tag.div(class: group_classes) do
+        tag.div(class: @group_classes) do
           safe_join(@entries.map { |entry| chip(entry) })
         end
       end
 
       private
-
-      def toggle? = @kind == :toggle
-
-      def group_classes = toggle? ? TRACK_CLASSES : self.class.layout_classes(full_width: @full_width)
 
       def chip(entry)
         active = entry[:active].presence # false would render data-active="false", nil renders nothing
@@ -65,7 +69,7 @@ module UI
         # takes no disabled attribute, so a link would stay live
         href = entry[:disabled] ? nil : entry[:href].presence
         attributes = entry.except(:label, :href, :active).deep_merge(
-          class: toggle? ? SEGMENT_CLASSES : CHIP_CLASSES,
+          class: @chip_classes,
           data: {active:},
           aria: href ? {current: active} : {pressed: active}
         )
