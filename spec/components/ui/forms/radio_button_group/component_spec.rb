@@ -52,6 +52,33 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
     expect(component).to_not have_css("div.tw\\:grid")
   end
 
+  it "raises on full_width with the toggle kind" do
+    expect { described_class.new(name: :status, entries:, kind: :toggle, full_width: true) }
+      .to raise_error(ArgumentError, /full_width is not supported/)
+  end
+
+  context "kind: toggle" do
+    let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active", kind: :toggle)) }
+    let(:segment) { UI::ButtonGroup::Component::SEGMENT_CLASSES }
+
+    it "renders radios as segments of a single track" do
+      expect(component).to have_css("input[value='active'][checked]", visible: :all)
+      expect(component).to have_css("div.tw\\:bg-gray-100")
+      expect(component).to have_no_css("div.tw\\:flex-wrap")
+    end
+
+    # is-active:focus: is the focus ring, which has-[:focus-visible] restates
+    it "applies the segment's active utilities when checked" do
+      active = utilities_for(segment, "is-active").grep_v(/\Afocus:/)
+      expect(active).not_to be_empty
+      expect(utilities_for(label, "has-[:checked]")).to include(*active)
+    end
+
+    it "focuses exactly like the segment" do
+      expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(segment, "focus"))
+    end
+  end
+
   context "full_width" do
     let(:component) do
       render_inline(described_class.new(name: "bike[frame_size]", full_width: true, selected: "m",

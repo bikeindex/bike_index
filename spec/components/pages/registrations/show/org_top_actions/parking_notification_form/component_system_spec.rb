@@ -213,7 +213,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
     expect(page).to have_css(".maplibregl-ctrl-fullscreen", visible: :all)
 
     # Manual entry reveals the fields and geocodes the pin into them
-    click_button "Enter address manually"
+    find("label", text: "Enter address manually").click
 
     expect(page).to have_field("Address or intersection", with: "2363a Bryant Street")
     expect(page).to have_field("City", with: "San Francisco")
@@ -227,21 +227,21 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
     # A hand-edited address survives toggling modes (the seed only fills when blank)
     fill_in "Address or intersection", with: "NE corner of 24th & Bryant"
 
-    click_button "Set on map"
+    find("label", text: "Set on map").click
 
     expect(page).to have_no_field("Address or intersection")
     expect(coordinate("use_entered_address")).to eq("false")
 
-    click_button "Enter address manually"
+    find("label", text: "Enter address manually").click
 
     expect(page).to have_field("Address or intersection", with: "NE corner of 24th & Bryant")
 
     # Moving the pin makes that address the wrong one, so the fresh geocode replaces
     # it — the hand-edit only survives while it still describes where the pin sits
-    click_button "Set on map"
+    find("label", text: "Set on map").click
     drag_map_until_moved
 
-    click_button "Enter address manually"
+    find("label", text: "Enter address manually").click
 
     expect(page).to have_field("Address or intersection", with: "1200 Valencia Street")
     expect(page).to have_field("City", with: "Oakland")
@@ -266,7 +266,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
 
       expect(page).to have_current_path(located_url, url: true, wait: 10)
 
-      click_button "Enter address manually"
+      find("label", text: "Enter address manually").click
       fill_in "Address or intersection", with: "NE corner of 24th & Bryant"
 
       expect(page).to have_field("City", with: "San Francisco", wait: 10)
@@ -377,16 +377,16 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
       expect(coordinate("latitude")).to eq(organization.map_focus_coordinates[:latitude].to_s)
       expect(page.current_url).to_not include("map_lat")
 
-      click_button "Enter address manually"
+      find("label", text: "Enter address manually").click
 
       expect(page).to have_field("Address or intersection", with: "")
       expect(address_field("city")).to eq("")
 
       # Moving the map makes the pin a chosen spot, so manual entry seeds from it
-      click_button "Set on map"
+      find("label", text: "Set on map").click
       drag_map_until_moved
 
-      click_button "Enter address manually"
+      find("label", text: "Enter address manually").click
 
       expect(page).to have_field("Address or intersection", with: "1200 Valencia Street")
       expect(page).to have_field("City", with: "Oakland")

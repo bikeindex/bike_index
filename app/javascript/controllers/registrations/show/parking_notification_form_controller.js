@@ -92,20 +92,16 @@ export default class extends Controller {
   // Segmented control: "current" places a pin on the map, "entered" reveals the
   // address fields
   selectLocationMode (event) {
-    if (event.currentTarget.dataset.mode === 'entered') this.enterManually(COLLAPSE_DURATION_MS)
+    if (event.target.value === 'entered') this.enterManually(COLLAPSE_DURATION_MS)
     else this.startLocation(COLLAPSE_DURATION_MS)
   }
 
-  // Reflect the chosen mode across the toggle, the hidden flag, the required
+  // Reflect the chosen mode across the radios, the hidden flag, the required
   // fields and which of the map / address panels is showing
   applyLocationMode (manual, duration) {
     const value = manual ? 'entered' : 'current'
-    this.locationModeTargets.forEach((button) => {
-      const active = String(button.dataset.mode === value)
-      button.dataset.active = active
-      button.ariaPressed = active
-    })
-    this.useEnteredAddressTarget.value = manual
+    this.locationModeTargets.forEach((radio) => { radio.checked = radio.value === value })
+    if (this.hasUseEnteredAddressTarget) this.useEnteredAddressTarget.value = manual
     this.setManualRequired(manual)
     collapse(manual ? 'show' : 'hide', this.addressGroupTarget, duration)
     collapse(manual ? 'hide' : 'show', this.mapSectionTarget, duration)
@@ -345,7 +341,7 @@ export default class extends Controller {
 
   // Whether "enter address manually" is the selected mode
   get manualMode () {
-    return this.useEnteredAddressTarget.value === 'true'
+    return this.locationModeTargets.some((radio) => radio.value === 'entered' && radio.checked)
   }
 
   addressField (attribute) {

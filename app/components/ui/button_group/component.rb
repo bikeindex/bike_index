@@ -3,7 +3,7 @@
 module UI
   module ButtonGroup
     # A row of chips that navigate or act — the link/button counterpart of
-    # UI::Forms::RadioButtonGroup, which chips off CHIP_CLASSES too.
+    # UI::Forms::RadioButtonGroup, which builds on CHIP_CLASSES and SEGMENT_CLASSES.
     #
     # kind: :toggle renders them as a segmented control instead — one track, with the
     # active entry raised out of it.

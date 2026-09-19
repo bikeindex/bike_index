@@ -39,7 +39,7 @@
           data-registrations--show--parking-notification-form-target="locationSection"
         >
           <div class="tw:mb-3">
-            <%= render(UI::ButtonGroup::Component.new(kind: :toggle, entries: [["current", "Set on map"], ["entered", "Enter address manually"]].map { |mode, label| ComponentStructs::Shapes.entry(label, active: mode == "current", data: {mode:, action: "registrations--show--parking-notification-form#selectLocationMode", "registrations--show--parking-notification-form-target": "locationMode"}) })) %>
+            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", kind: :toggle, selected: "current", entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}], data: {action: "registrations--show--parking-notification-form#selectLocationMode", "registrations--show--parking-notification-form-target": "locationMode"})) %>
           </div>
 
           <div

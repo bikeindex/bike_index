@@ -17,29 +17,46 @@ module UI
           "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze
 
+        SEGMENT_CLASSES = [
+          UI::ButtonGroup::Component::SEGMENT_CLASSES,
+          "tw:mb-0",
+          "tw:has-[:checked]:bg-white tw:has-[:checked]:text-gray-900 tw:has-[:checked]:shadow-sm",
+          "tw:has-[:checked]:dark:bg-gray-900 tw:has-[:checked]:dark:text-gray-100",
+          "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
+        ].join(" ").freeze
+
         # full_width: chips share the row evenly (the frame-size XS-XL selector),
         # rather than each taking only the width of its label.
-        def initialize(name:, entries:, selected: nil, form: nil, full_width: false, data: {})
+        # kind: :toggle renders UI::ButtonGroup's segmented control, with a radio per segment
+        def initialize(name:, entries:, selected: nil, form: nil, full_width: false, kind: :button, data: {})
+          raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{UI::ButtonGroup::Component::KINDS.join(", ")}" unless UI::ButtonGroup::Component::KINDS.include?(kind)
+          raise ArgumentError, "full_width is not supported for the toggle kind" if full_width && kind == :toggle
+
           @name = name
           @entries = entries
           @selected = selected.to_s
           @form = form
           @full_width = full_width
+          @kind = kind
           @data = data
         end
 
         def call
-          tag.div(class: UI::ButtonGroup::Component.layout_classes(full_width: @full_width)) do
+          tag.div(class: group_classes) do
             safe_join(@entries.map { |option| chip(option) })
           end
         end
 
         private
 
+        def toggle? = @kind == :toggle
+
+        def group_classes = toggle? ? UI::ButtonGroup::Component::TRACK_CLASSES : UI::ButtonGroup::Component.layout_classes(full_width: @full_width)
+
         def chip(option)
           value = option[:value].to_s
 
-          tag.label(class: CHIP_CLASSES) do
+          tag.label(class: toggle? ? SEGMENT_CLASSES : CHIP_CLASSES) do
             radio_button_tag(@name, value, value == @selected, class: "tw:sr-only", form: @form, data: @data) +
               tag.span(option[:label].html_safe)
           end

@@ -46,7 +46,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
     # Skip the geolocation prompt by entering the address by hand; this reveals the
     # address fields and enables the (initially disabled) submit button.
-    click_button "Enter address manually"
+    choose "Enter address manually", allow_label_click: true
     fill_in "parking_notification_street", with: "100 Main St"
     fill_in "parking_notification_city", with: "New York"
     choose "Parked incorrectly", allow_label_click: true
