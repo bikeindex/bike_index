@@ -124,16 +124,16 @@
   .ui-table thead tr th:last-child {
     @apply tw:rounded-tr-sm;
   }
-  .ui-table tbody tr:last-child td:first-child {
+  .ui-table :is(tbody:last-child, tfoot) tr:last-child td:first-child {
     @apply tw:rounded-bl-sm;
   }
-  .ui-table tbody tr:last-child td:last-child {
+  .ui-table :is(tbody:last-child, tfoot) tr:last-child td:last-child {
     @apply tw:rounded-br-sm;
   }
-  .ui-table-bordered tbody tr td:first-child {
+  .ui-table-bordered :is(tbody, tfoot) tr td:first-child {
     @apply tw:ui-table-bordered-td-first;
   }
-  .ui-table-bordered tbody tr td:last-child {
+  .ui-table-bordered :is(tbody, tfoot) tr td:last-child {
     @apply tw:ui-table-bordered-td-last;
   }
   .ui-table-bordered thead tr th:first-child {
