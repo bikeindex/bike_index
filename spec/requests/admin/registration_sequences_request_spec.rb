@@ -227,7 +227,7 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         expect { delete "#{base_url}/#{draft.id}" }
           .to change(RegistrationSequence, :count).by(-1)
           .and change(RegistrationSequencePage, :count).by(-2)
-        expect(response).to redirect_to(base_url)
+        expect(response).to redirect_to("/admin/organizations/#{organization.to_param}?active_tab=registration_sequences")
       end
 
       context "activated sequence" do
