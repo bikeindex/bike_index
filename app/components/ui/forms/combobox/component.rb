@@ -66,9 +66,11 @@ module UI
           js_required? ? @combobox_options.except(:required) : @combobox_options
         end
 
-        def js_required? = @no_js.present? && @combobox_options[:required].present?
+        def required? = @combobox_options[:required].present?
 
-        def multiselect_required? = @combobox_options[:multiselect_chip_src].present? && @combobox_options[:required].present?
+        def js_required? = @no_js.present? && required?
+
+        def multiselect_required? = @combobox_options[:multiselect_chip_src].present? && required?
 
         # What this falls back to without JavaScript. A select posts the options' own
         # values, so only a textbox needs the caller to say what to show (`no_js: {value:}`)
@@ -102,7 +104,7 @@ module UI
           form ? form.field_name(@name) : @name
         end
 
-        # Only a rich display needs the controller, or the positioning context its overlay
+        # Only a rich display needs the display controller, or the positioning context its overlay
         # is placed against. data-js-required is what the fallback's stylesheet hides
         def wrapper_attrs
           controllers = [("ui--forms--combobox-display" if @rich_display),
