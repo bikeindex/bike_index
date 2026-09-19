@@ -38,11 +38,12 @@
           class="tw:mb-4"
           data-registrations--show--parking-notification-form-target="locationSection"
         >
-          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", selected: "current", entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}], data: {action: "registrations--show--parking-notification-form#selectLocationMode", "registrations--show--parking-notification-form-target": "locationMode"})) %>
+          <div class="tw:mb-3">
+            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", kind: :toggle, selected: "current", entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}], data: {action: "registrations--show--parking-notification-form#selectLocationMode", "registrations--show--parking-notification-form-target": "locationMode"})) %>
+          </div>
 
           <div
             data-registrations--show--parking-notification-form-target="mapSection"
-            class="tw:mt-3"
           >
             <%# The map and the hint for using it stand or fall together %>
             <div
@@ -85,7 +86,7 @@
 
           <div
             data-registrations--show--parking-notification-form-target="addressGroup"
-            class="tw:mt-3 tw:hidden"
+            class="tw:hidden"
           >
             <%= form.hidden_field :use_entered_address, value: false, data: {"registrations--show--parking-notification-form-target": "useEnteredAddress"} %>
 
