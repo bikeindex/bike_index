@@ -14,6 +14,16 @@ module Admin
       @blog = Blog.new(published_at: Time.current, user_id: current_user.id)
     end
 
+    # Values are tag names, which Blog#content_tag_names= reads
+    def content_tag_chips
+      values = params[:combobox_values].to_s.split(",")
+      chips = (values & ContentTag.where(name: values).pluck(:name)).map do
+        helpers.hw_combobox_selection_chip(display: it, value: it, for_id: params[:for_id])
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
+    end
+
     def image_edit
       @listicle = Listicle.find(params[:id])
       @blog = @listicle.blog
@@ -93,7 +103,7 @@ module Admin
         :user_email,
         :user_id,
         :info_kind,
-        content_tag_names: []
+        :content_tag_names
       )
     end
 

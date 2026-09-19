@@ -44,7 +44,7 @@ RSpec.describe Admin::NewsController, type: :request do
         title: "new title thing stuff",
         body: "<p>html</p>",
         language: "en",
-        content_tag_names: [content_tag.name]
+        content_tag_names: content_tag.name
       }
       put "#{base_url}/#{blog.to_param}", params: {blog: blog_attrs}
       blog.reload
@@ -59,6 +59,17 @@ RSpec.describe Admin::NewsController, type: :request do
         blog.reload
         expect(blog.kind).to eq "info"
       end
+    end
+  end
+
+  describe "content_tag_chips" do
+    let!(:content_tag) { FactoryBot.create(:content_tag, name: "Recovery stories") }
+
+    it "renders a chip for each existing tag" do
+      post "#{base_url}/content_tag_chips", params: {combobox_values: "Recovery stories,Not a tag", for_id: "blog_content_tag_names"},
+        as: :turbo_stream
+      expect(response.status).to eq(200)
+      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten).to eq(["Recovery stories"])
     end
   end
 end

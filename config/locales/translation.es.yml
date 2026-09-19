@@ -5679,6 +5679,12 @@ es:
             favor, introduce una dirección de correo electrónico donde recibas correos
             electrónicos.
           submit_anyway: Enviar formulario de todos modos
+        group:
+          optional: opcional
+        turnstile:
+          enable_javascript: Para verificar esta dirección de correo electrónico se
+            requiere JavaScript. Actívelo y vuelva a enviar el formulario, o utilice
+            una dirección de correo electrónico diferente.
         files:
           picker:
             no_file_chosen: No se ha seleccionado ningún archivo.
@@ -5690,12 +5696,8 @@ es:
           upload_multiple:
             upload_failed: Falló la carga
             uploading: subir
-        group:
-          optional: opcional
-        turnstile:
-          enable_javascript: Para verificar esta dirección de correo electrónico se
-            requiere JavaScript. Actívelo y vuelva a enviar el formulario, o utilice
-            una dirección de correo electrónico diferente.
+        required_marker:
+          required: requerido
       alerts:
         base:
           error: Error
@@ -6304,7 +6306,6 @@ es:
             share: Compartir
             share_my_page: Comparte mi página
             audience_marketplace_preview: Vista previa del anuncio
-            nickname: 'apodo: %{name}'
           wrapper_org_admin:
             about_this_bike: Acerca de esto %{bike_type}
             assign_sticker: Asignar pegatina
@@ -6377,6 +6378,8 @@ es:
               visible arriba.
             update_note: Nota de actualización
             updated_by: Actualizado por %{user}
+          subtitle:
+            nickname: 'apodo: %{name}'
       search:
         everything_combobox:
           made_by: hecho por

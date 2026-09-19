@@ -5583,6 +5583,11 @@ nl:
           not_real: Dat lijkt niet uw echte e-mailadres te zijn. Voer een e-mailadres
             in waarop u e-mails ontvangt.
           submit_anyway: Formulier toch verzenden
+        group:
+          optional: optioneel
+        turnstile:
+          enable_javascript: Voor het verifiëren van dit e-mailadres is JavaScript
+            vereist. Schakel het in en probeer het opnieuw, of gebruik een ander e-mailadres.
         files:
           picker:
             no_file_chosen: Geen bestand gekozen
@@ -5594,11 +5599,8 @@ nl:
           upload_multiple:
             upload_failed: Uploaden mislukt
             uploading: uploaden
-        group:
-          optional: optioneel
-        turnstile:
-          enable_javascript: Voor het verifiëren van dit e-mailadres is JavaScript
-            vereist. Schakel het in en probeer het opnieuw, of gebruik een ander e-mailadres.
+        required_marker:
+          required: verplicht
       alerts:
         base:
           error: Fout
@@ -6212,7 +6214,6 @@ nl:
             share: Deel
             share_my_page: Deel mijn pagina
             audience_marketplace_preview: Voorbeeldweergave van de advertentie
-            nickname: 'bijnaam: %{name}'
           wrapper_org_admin:
             about_this_bike: Over dit %{bike_type}
             assign_sticker: Sticker toewijzen
@@ -6284,6 +6285,8 @@ nl:
               wijzigingen is hierboven zichtbaar.
             update_note: Update-notitie
             updated_by: Bijgewerkt door %{user}
+          subtitle:
+            nickname: 'bijnaam: %{name}'
       search:
         everything_combobox:
           made_by: gemaakt door
