@@ -33,7 +33,7 @@ class BikeOrganizationNote < ApplicationRecord
     note.update!(body:, user:)
   end
 
-  # An upsert overwrites the one note per bike and org, so the notes it replaced come from its versions
+  # upsert overwrites the note, so the ones it replaced come from its versions
   def thread
     previous_notes = versions.where(event: "update").reorder(id: :desc).map(&:reify)
     [self, *previous_notes].select { it.body.present? }

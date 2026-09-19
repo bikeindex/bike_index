@@ -4,7 +4,6 @@ module Pages
   module Registrations
     module Show
       module InternalNotes
-        # The org's note on a registration, newest first with the notes it replaced below
         class Component < ApplicationComponent
           def initialize(notes:, url:, current_user:)
             @notes = notes
