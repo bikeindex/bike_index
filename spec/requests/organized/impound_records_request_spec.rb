@@ -138,6 +138,22 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(assigns(:impound_record)).to eq impound_record
+      expect(response.body).not_to include("created from a parking notification")
+    end
+    context "unregistered parking notification bike" do
+      let(:parking_notification) do
+        FactoryBot.create(:parking_notification_unregistered, organization: current_organization, user: current_user,
+          kind: "impound_notification")
+      end
+      let(:impound_record) do
+        ProcessParkingNotificationJob.new.perform(parking_notification.id)
+        parking_notification.reload.impound_record
+      end
+      it "renders the unregistered badge" do
+        get "#{base_url}/pkey-#{impound_record.id}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("created from a parking notification")
+      end
     end
     context "with prefix" do
       let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike, display_id_integer: 1111, display_id_prefix: "d8sff-") }
