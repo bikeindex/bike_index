@@ -62,8 +62,10 @@ module UI
 
         # The label carries a required "*" or an "optional" badge, keyed off required?.
         def label_content
-          safe_join([@label_text, label_suffix_markup, (tag.small(label_note, class: "twless-strong") if label_note?)].compact, " ")
+          safe_join([@label_text, label_suffix_markup, label_note_markup].compact, " ")
         end
+
+        def label_note_markup = label_note? ? tag.small(label_note, class: "twless-strong") : nil
 
         def label_suffix_markup
           return required? ? required_marker : optional_marker unless @required_toggleable

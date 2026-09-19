@@ -82,13 +82,11 @@
 
     <%= checkbox_field(:direct_unclaimed_notifications, "Send emails directly to unclaimed bike owners", note: "don't require org to forward") %>
 
-    <% parent_org_note = capture do %>
-      <strong class="text-danger">(probably) do not add parents!</strong>
-      Parents must be part of the same organization
-    <% end %>
-
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: "Parent organization")) do |group| %>
-      <% group.with_label_note { parent_org_note } %>
+      <% group.with_label_note do %>
+        <strong class="text-danger">(probably) do not add parents!</strong>
+        Parents must be part of the same organization
+      <% end %>
 
       <% group.with_helper_text do %>
         <strong>Use the "regional" feature instead.</strong>
