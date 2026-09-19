@@ -101,8 +101,13 @@
   <%= render(@filters_component) if @filters_component %>
 
   <% if card? %>
+    <%#
+      data-turbo: Drive is off app-wide, and a submitter outside the form it submits carries
+      its own opt-in - without it the search is a full page load rather than a frame one
+    %>
     <%= render(UI::Button::Component.new(text: @submit_text, color: :primary, size: :lg, type: "submit",
-      form: "Search_Form", html_class: "tw:mt-3 tw:w-full#{" tw:disabled:cursor-wait" if turbo?}")) %>
+      form: "Search_Form", data: ({turbo: true} if turbo?),
+      html_class: "tw:mt-3 tw:w-full#{" tw:disabled:cursor-wait" if turbo?}")) %>
 
     <%= below_submit %>
   <% end %>
