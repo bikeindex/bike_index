@@ -36,10 +36,14 @@ RSpec.describe UI::TimeRange::Component, type: :component do
       expect(html.css("em span.localizeTime").length).to eq 2
     end
 
-    it "asks for seconds precision on a short range" do
-      range = (Time.current - 30.minutes)..(Time.current - 10.minutes)
-      html = render_component(period: "custom", range:)
-      expect(html.css("span.preciseTimeSeconds").length).to eq 2
+    it "shows seconds for an hour or less, and minutes beyond it" do
+      now = Time.current
+      hour = render_component(period: "custom", range: (now - 2.hours)..(now - 1.hour))
+      expect(hour.css("span.preciseTimeSeconds").length).to eq 2
+
+      longer = render_component(period: "custom", range: (now - 2.hours - 1.minute)..(now - 1.hour))
+      expect(longer.css("span.preciseTimeSeconds")).to be_empty
+      expect(longer.css("span.preciseTime").length).to eq 2
     end
   end
 end

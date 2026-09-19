@@ -3,10 +3,6 @@
 module UI
   module TimeRange
     class Component < ApplicationComponent
-      # A minute-bucketed range's endpoints differ only in their seconds
-      TIME_FORMATS = {group_by_minute: :localize_time_precise_seconds,
-                      group_by_hour: :localize_time_precise}.freeze
-
       def initialize(time_range:, period:)
         @time_range = time_range
         @period = period
@@ -39,7 +35,14 @@ module UI
       end
 
       def endpoint(time)
-        UI::Time::Component.new(time:, format: TIME_FORMATS[helpers.group_by_method(@time_range)])
+        UI::Time::Component.new(time:, format: time_format)
+      end
+
+      def time_format
+        length = @time_range.last - @time_range.first
+        if length <= 1.hour then :localize_time_precise_seconds
+        elsif length < 5.days then :localize_time_precise
+        end
       end
 
       # Anything this recent was "now" when the range was built
