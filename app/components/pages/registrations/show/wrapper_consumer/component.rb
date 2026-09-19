@@ -35,6 +35,10 @@ module Pages
             bike_title_html(@bike)
           end
 
+          def subtitle
+            translation(".named", name: @bike.name) if @bike.name.present?
+          end
+
           def current_view
             return [:marketplace_preview, nil] if @marketplace_preview
 
