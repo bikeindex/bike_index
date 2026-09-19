@@ -22,10 +22,12 @@
 
     <%= f.text_area :notes, value: @note&.body, rows: 3, class: "twinput tw:w-full" %>
 
+    <p class="tw:mt-1 tw:text-sm tw:opacity-65">
+      <%= translation(".update_hint") %>
+    </p>
+
     <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-2">
       <small class="tw:opacity-65">
-        <%= translation(".update_hint") %>
-        <br>
         <%= translation(".posts_as", user: @current_user.display_name) %>
       </small>
 
