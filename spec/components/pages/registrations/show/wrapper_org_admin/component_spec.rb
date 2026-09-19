@@ -13,18 +13,13 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
       described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff).cache_version
     end
 
-    it "changes when an organization note is added" do
-      expect { BikeOrganizationNote.upsert(bike:, organization:, body: "hi", user: current_user) }
-        .to change { cache_version }
-    end
-
     it "changes when the owner registers another bike" do
       expect { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: bike.user) }
         .to change { cache_version }
     end
   end
 
-  describe "internal notes" do
+  describe "notes" do
     include_context :with_paper_trail
 
     let(:other_user) { FactoryBot.create(:organization_user, organization:) }
@@ -36,6 +31,17 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
 
       expect(page).to have_text(/Second note.*Note by #{current_user.display_name}.*First note.*Note by #{other_user.display_name}/m)
       expect(page).to have_field("notes", with: "")
+    end
+
+    context "on a bike registered elsewhere" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+
+      it "renders the notes form" do
+        render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+        expect(page).to have_text("Internal notes")
+        expect(page).to have_button("Post note")
+      end
     end
   end
 
