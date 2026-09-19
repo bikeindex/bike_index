@@ -6263,8 +6263,8 @@ it:
               map_hint: Trascina la mappa in modo che il segnaposto indichi il punto
               map_unavailable: 'Impossibile caricare la mappa: la posizione è ancora
                 impostata dal tuo dispositivo.'
-              parking_notification_notes_html: "%{org_name} note interne <small>non
-                mostrate all'utente</small>"
+              not_shown_to_user: non mostrato all'utente
+              parking_notification_notes: "%{org_name} note interne"
             parking_notification_show:
               no_notifications: Nessuna notifica di parcheggio per questo %{bike_type}
               parking_notifications: Notifiche di parcheggio

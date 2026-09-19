@@ -6155,8 +6155,8 @@ nl:
               map_hint: Verschuif de kaart zodat de speld de gewenste plek markeert.
               map_unavailable: De kaart kon niet worden geladen; de locatie was nog
                 steeds ingesteld via uw apparaat.
-              parking_notification_notes_html: "%{org_name} interne notities worden
-                <small>niet getoond aan de gebruiker</small>"
+              not_shown_to_user: niet aan de gebruiker getoond
+              parking_notification_notes: "%{org_name} interne notities"
             parking_notification_show:
               no_notifications: Geen parkeermeldingen voor deze %{bike_type}
               parking_notifications: Verlaten records

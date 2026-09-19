@@ -6246,8 +6246,8 @@ es:
               map_hint: Arrastra el mapa para que el marcador señale el lugar.
               map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba
                 configurada desde su dispositivo.
-              parking_notification_notes_html: "%{org_name} Las notas internas <small>no
-                se muestran al usuario.</small>"
+              not_shown_to_user: no se muestra al usuario
+              parking_notification_notes: "%{org_name} notas internas"
             parking_notification_show:
               no_notifications: No hay notificaciones de estacionamiento para este
                 %{bike_type}

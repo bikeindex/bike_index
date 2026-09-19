@@ -5978,8 +5978,8 @@ nb:
               map_hint: Dra kartet slik at nålen markerer stedet
               map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
                 angitt fra enheten din.
-              parking_notification_notes_html: "%{org_name} interne notater <small>vises
-                ikke til brukeren</small>"
+              not_shown_to_user: ikke vist for brukeren
+              parking_notification_notes: "%{org_name} interne notater"
             parking_notification_show:
               no_notifications: Ingen parkeringsvarsler for denne %{bike_type}
               parking_notifications: Parkeringsmeldinger
