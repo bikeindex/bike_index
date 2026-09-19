@@ -24,52 +24,37 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
   let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active")) }
   let(:label) { component.css("label").first["class"] }
 
-  it "renders radios with the selected one checked" do
+  it "renders radio chips styled like UI::Button's secondary" do
     expect(component).to have_css("input[type='radio'][name='status']", count: 2, visible: :all)
     expect(component).to have_css("input[value='active'][checked]", visible: :all)
     expect(component).to have_css("label span", text: "Active")
-  end
-
-  it "uses the same purple palette as UI::Button's secondary" do
-    expect(purple_tokens(label)).not_to be_empty
-    expect(purple_tokens(label)).to eq(purple_tokens(button))
-  end
-
-  it "applies the button's active utilities when checked" do
-    expect(utilities_for(button_active, "is-active")).not_to be_empty
-    expect(utilities_for(label, "has-[:checked]")).to include(*utilities_for(button_active, "is-active"))
-  end
-
-  # Equality, not include: an extra utility here (a ring offset, say) is a visual
-  # difference from the button, so it has to fail too.
-  it "focuses exactly like the button, with nothing extra" do
-    expect(utilities_for(button, "focus")).not_to be_empty
-    expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(button, "focus"))
-  end
-
-  it "sizes each chip to its label" do
+    # Each chip sized to its label
     expect(component).to have_css("div.tw\\:flex-wrap")
     expect(component).to_not have_css("div.tw\\:grid")
+
+    expect(purple_tokens(label)).not_to be_empty
+    expect(purple_tokens(label)).to eq(purple_tokens(button))
+    expect(utilities_for(button_active, "is-active")).not_to be_empty
+    expect(utilities_for(label, "has-[:checked]")).to include(*utilities_for(button_active, "is-active"))
+    # Equality, not include: an extra utility here (a ring offset, say) is a visual
+    # difference from the button, so it has to fail too.
+    expect(utilities_for(button, "focus")).not_to be_empty
+    expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(button, "focus"))
   end
 
   context "kind: toggle" do
     let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active", kind: :toggle)) }
     let(:segment) { UI::ButtonGroup::Component::SEGMENT_CLASSES }
 
-    it "renders radios as segments of a single track" do
+    it "renders radios as segments of a single track, styled like UI::ButtonGroup's" do
       expect(component).to have_css("input[value='active'][checked]", visible: :all)
       expect(component).to have_css("div.tw\\:bg-gray-100")
       expect(component).to have_no_css("div.tw\\:flex-wrap")
-    end
 
-    # is-active:focus: is the focus ring, which has-[:focus-visible] restates
-    it "applies the segment's active utilities when checked" do
+      # is-active:focus: is the focus ring, which has-[:focus-visible] restates
       active = utilities_for(segment, "is-active").grep_v(/\Afocus:/)
       expect(active).not_to be_empty
       expect(utilities_for(label, "has-[:checked]")).to include(*active)
-    end
-
-    it "focuses exactly like the segment" do
       expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(segment, "focus"))
     end
   end
@@ -80,13 +65,10 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
         entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} }))
     end
 
-    it "renders the chips" do
+    # The grid itself is UI::ButtonGroup.group_classes, covered in its spec
+    it "renders the chips in the grid layout" do
       expect(component).to have_css("input[type='radio'][name='bike[frame_size]']", count: 5, visible: :all)
       expect(component).to have_css("input[value='m'][checked]", visible: :all)
-    end
-
-    # The grid itself is UI::ButtonGroup.group_classes, covered in its spec
-    it "passes full_width through to the layout" do
       expect(component).to have_css("div.tw\\:grid")
     end
   end
