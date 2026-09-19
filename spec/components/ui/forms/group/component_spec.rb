@@ -105,6 +105,14 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     expect(component).to have_css("input.twinput")
   end
 
+  context "with optional_badge: false" do
+    let(:component) { render_inline(described_class.new(form_builder:, attribute:, optional_badge: false)) }
+
+    it "leaves the label unmarked" do
+      expect(component).to have_css("label", exact_text: "Name")
+    end
+  end
+
   context "when required" do
     let(:required) { true }
 

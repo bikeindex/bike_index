@@ -14,15 +14,17 @@ module UI
         # whatever the block renders with the attribute's id.
         # required_toggleable: the answer is decided in the browser, so the label renders
         # both markers with the inactive one hidden - it can't be rebuilt from JS. They're
-        # [data-required-marker] and [data-optional-marker] for whichever controller flips them
+        # [data-required-marker] and [data-optional-marker] for whichever controller flips them.
+        # optional_badge: false leaves a non-required label unmarked
         def initialize(attribute:, form_builder: nil, kind: :text_field, label_text: nil, required: false,
-          required_toggleable: false, wrapper_class: "tw:mb-4", html_options: {})
+          required_toggleable: false, optional_badge: true, wrapper_class: "tw:mb-4", html_options: {})
           @form_builder = form_builder
           @attribute = attribute
           @kind = Input::Component.validate_kind!(kind)
           @label_text = label_text || attribute.to_s.humanize
           @required = required
           @required_toggleable = required_toggleable
+          @optional_badge = optional_badge
           @wrapper_class = wrapper_class
           @html_options = html_options
         end
@@ -60,7 +62,7 @@ module UI
 
         # The label carries a required "*" or an "optional" badge, keyed off required?.
         def label_content
-          safe_join([@label_text, label_suffix_markup], " ")
+          safe_join([@label_text, label_suffix_markup].compact, " ")
         end
 
         def label_suffix_markup
@@ -72,7 +74,9 @@ module UI
 
         def required_marker = tag.span("*", class: "tw:text-red-600")
 
-        def optional_marker = render(UI::Badge::Component.new(text: translation(".optional"), size: :xs))
+        def optional_marker
+          render(UI::Badge::Component.new(text: translation(".optional"), size: :xs)) if @optional_badge
+        end
 
         def required?
           @required || ActiveModel::Type::Boolean.new.cast(@html_options[:required])
