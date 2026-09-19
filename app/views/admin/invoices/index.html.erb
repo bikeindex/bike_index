@@ -46,102 +46,23 @@
     <% unless params[:query].present? %>
       <div class="row mb-4 mt-4">
         <div class="col-sm-8 offset-sm-2">
-          <div class="full-screen-table">
-            <table class="table table-striped table-bordered table-sm text-center">
-              <thead>
-                <tr class="text-left">
-                  <th></th>
-                  <th>count</th>
-                  <th>amount due</th>
-                  <th>amount paid</th>
-                </tr>
-              </thead>
+          <% *invoice_rows, all_row = {
+              "First invoice" => matching_invoices.first_invoice,
+              "Renewals" => matching_invoices.renewal_invoice,
+              "Free invoices" => matching_invoices.free,
+              "Not free" => matching_invoices.paid,
+              "All" => matching_invoices
+            }.map do |name, invoices|
+              {name:, count: number_display(invoices.count), amount_due: MoneyFormatter.money_format(invoices.sum(:amount_due_cents)),
+               amount_paid: MoneyFormatter.money_format(invoices.sum(:amount_paid_cents))}
+            end %>
 
-              <tbody>
-                <tr class="text-left">
-                  <% payments = matching_invoices.first_invoice %>
-
-                  <td>First invoice</td>
-                  <td><%= number_display(payments.count) %></td>
-
-                  <td>
-                    <%= MoneyFormatter.money_format(payments.sum(:amount_due_cents)) %>
-                  </td>
-
-                  <td>
-                    <%= MoneyFormatter.money_format(payments.sum(:amount_paid_cents)) %>
-                  </td>
-                </tr>
-
-                <tr class="text-left">
-                  <% payments = matching_invoices.renewal_invoice %>
-
-                  <td>Renewals</td>
-                  <td><%= number_display(payments.count) %></td>
-
-                  <td>
-                    <%= MoneyFormatter.money_format(payments.sum(:amount_due_cents)) %>
-                  </td>
-
-                  <td>
-                    <%= MoneyFormatter.money_format(payments.sum(:amount_paid_cents)) %>
-                  </td>
-                </tr>
-
-                <tr class="text-left">
-                  <% payments = matching_invoices.free %>
-
-                  <td>Free invoices</td>
-                  <td><%= number_display(payments.count) %></td>
-
-                  <td>
-                    <%= MoneyFormatter.money_format(payments.sum(:amount_due_cents)) %>
-                  </td>
-
-                  <td>
-                    <%= MoneyFormatter.money_format(payments.sum(:amount_paid_cents)) %>
-                  </td>
-                </tr>
-
-                <tr class="text-left">
-                  <% payments = matching_invoices.paid %>
-
-                  <td>Not free</td>
-                  <td><%= number_display(payments.count) %></td>
-
-                  <td>
-                    <%= MoneyFormatter.money_format(payments.sum(:amount_due_cents)) %>
-                  </td>
-
-                  <td>
-                    <%= MoneyFormatter.money_format(payments.sum(:amount_paid_cents)) %>
-                  </td>
-                </tr>
-
-                <tr class="text-left">
-                  <td><strong>All</strong></td>
-
-                  <td>
-                    <strong>
-                      <%= number_display(matching_invoices.count) %>
-                    </strong>
-                  </td>
-
-                  <td>
-                    <strong>
-                      <%= MoneyFormatter.money_format(matching_invoices.sum(:amount_due_cents)) %>
-                    </strong>
-                  </td>
-
-                  <td>
-                    <strong>
-                      <%= MoneyFormatter.money_format(matching_invoices.sum(:amount_paid_cents)) %>
-                    </strong>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <%= render(UI::Table::Component.new(records: invoice_rows)) do |table| %>
+            <% table.column(label: "", footer: all_row[:name]) { |row| row[:name] } %>
+            <% table.column(label: "count", footer: all_row[:count]) { |row| row[:count] } %>
+            <% table.column(label: "amount due", footer: all_row[:amount_due]) { |row| row[:amount_due] } %>
+            <% table.column(label: "amount paid", footer: all_row[:amount_paid]) { |row| row[:amount_paid] } %>
+          <% end %>
         </div>
       </div>
     <% end %>
