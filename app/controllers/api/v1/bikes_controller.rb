@@ -97,7 +97,10 @@ module API
       end
 
       def permitted_b_params
-        params.as_json
+        b_params = params.as_json
+        return b_params if b_params["stolen_record"].blank?
+
+        b_params.merge("stolen_record" => StolenRecord.legacy_attrs_renamed(b_params["stolen_record"]))
       end
     end
   end

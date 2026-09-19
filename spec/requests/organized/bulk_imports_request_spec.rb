@@ -316,7 +316,8 @@ RSpec.describe Organized::BulkImportsController, type: :request do
             end
             context "with legacy stolen attribute names" do
               let(:legacy_stolen_record_params) do
-                stolen_record_params.except(:postal_code, :region_record_id).merge(zipcode: "94141", state_id: "")
+                stolen_record_params.except(:street, :postal_code, :region_record_id)
+                  .merge(address: "2143412", zipcode: "94141", state_id: "", postal_code: "")
               end
               it "creates with the renamed stolen attributes" do
                 Sidekiq::Job.clear_all

@@ -105,8 +105,10 @@ module Admin
       @only_without_location = Binxtils::InputNormalizer.boolean(params[:search_without_location])
       if @unapproved_only
         available_stolen_records = StolenRecord.current.unapproved
-        unless @only_without_location
-          @unapproved_without_location_count = available_stolen_records.without_street.count
+        if @only_without_location
+          available_stolen_records = available_stolen_records.without_location
+        else
+          @unapproved_without_location_count = available_stolen_records.without_location.count
           available_stolen_records = available_stolen_records.with_location
         end
       else

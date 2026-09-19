@@ -49,6 +49,9 @@ module Geocodeable
 
     belongs_to :country
     belongs_to :region_record, class_name: "State"
+
+    scope :with_street, -> { where.not(street: ["", nil]) }
+    scope :without_street, -> { where(street: ["", nil]) }
   end
 
   def metric_units?
@@ -65,6 +68,10 @@ module Geocodeable
 
   def without_location?
     latitude.blank?
+  end
+
+  def without_street?
+    street.blank?
   end
 
   def address_present?
@@ -210,15 +217,15 @@ module Geocodeable
       return
     end
 
-    GeocodeHelper.assignable_address_hash_for(
+    geocoded_attrs = GeocodeHelper.assignable_address_hash_for(
       formatted_address_string(render_country: :always), new_attrs: true
-    ).each do |key, value|
-      # Don't overwrite any values except latitude and longitude
-      if self[key].blank? || %i[latitude longitude].include?(key)
-        self[key] = value
-      end
-    end
+    )
+    self.attributes = geocoded_attrs.slice(:latitude, :longitude)
+    assign_blank_geocoded_attrs(geocoded_attrs)
+  end
 
+  def assign_blank_geocoded_attrs(geocoded_attrs)
+    self.attributes = geocoded_attrs.select { |key, _value| self[key].blank? }
     assign_region_record if region_string_changed?
   end
 end
