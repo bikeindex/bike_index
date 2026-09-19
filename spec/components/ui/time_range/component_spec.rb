@@ -9,41 +9,29 @@ RSpec.describe UI::TimeRange::Component, type: :component do
     render_inline(described_class.new(time_range: range, period:))
   end
 
-  context "a named period" do
-    it "names it in prose" do
+  context "a named period, all, or none" do
+    it "names a named period in prose, and renders nothing otherwise" do
       expect(render_component(period: "week").to_html.strip).to eq "in the past week"
       expect(render_component(period: "next_week").to_html.strip).to eq "in the next week"
-    end
-  end
-
-  context "all, or no period" do
-    it "renders nothing" do
       expect(render_component(period: "all").to_html).to be_blank
       expect(render_component(period: nil).to_html).to be_blank
     end
   end
 
   context "custom" do
-    it "renders the endpoints, the last as now" do
-      html = render_component(period: "custom")
-      expect(html.css("em").last.text.strip).to eq "now"
-      expect(html.css("em span.localizeTime").length).to eq 1
-    end
+    let(:now) { Time.current }
 
-    it "renders a finished range's end as a time" do
-      range = (Time.current - 2.weeks)..(Time.current - 1.week)
-      html = render_component(period: "custom", range:)
-      expect(html.css("em span.localizeTime").length).to eq 2
-    end
+    it "renders the endpoints at the chart bucket's precision, a recent end as now" do
+      ongoing = render_component(period: "custom")
+      expect(ongoing.css("em").last.text.strip).to eq "now"
+      expect(ongoing.css("em span.localizeTime").length).to eq 1
 
-    it "shows seconds within the chart's minute bucket, and minutes beyond it" do
-      now = Time.current
       hour = render_component(period: "custom", range: (now - 2.hours)..(now - 1.hour))
-      expect(hour.css("span.preciseTimeSeconds").length).to eq 2
+      expect(hour.css("em span.preciseTimeSeconds").length).to eq 2
 
       longer = render_component(period: "custom", range: (now - 2.hours - 1.minute)..(now - 1.hour))
       expect(longer.css("span.preciseTimeSeconds")).to be_empty
-      expect(longer.css("span.preciseTime").length).to eq 2
+      expect(longer.css("em span.preciseTime").length).to eq 2
     end
   end
 end
