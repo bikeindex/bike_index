@@ -25,6 +25,22 @@ RSpec.describe UI::Table::Component, type: :component do
     expect(component).to have_css("td", text: "Alice")
     expect(component).to have_css("td", text: "bob@example.com")
     expect(component).to have_css("table.ui-table")
+    expect(component).not_to have_css("tfoot")
+  end
+
+  context "with a footer" do
+    let(:component) do
+      render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Name", footer: "Total") { |r| r.name }
+        table.column(label: "Email") { |r| r.email }
+      end
+    end
+
+    it "renders one footer cell per column, after the rows" do
+      expect(component).to have_css("tfoot tr td", count: 2)
+      expect(component).to have_css("tfoot td:first-child", text: "Total")
+      expect(component).not_to have_css("tbody td", text: "Total")
+    end
   end
 
   context "with custom classes" do
