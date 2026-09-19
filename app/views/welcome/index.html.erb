@@ -1,7 +1,13 @@
 <%= stylesheet_link_tag "kelsey_styles", "data-turbo-track" => "reload" %>
 
 <div class="root-landing-page">
-  <% cache("redesigned_homepage-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
+  <%#
+    skip_digest keeps edits to the rest of this template out of the key, so the hero's
+    own digest is what covers its markup
+  %>
+
+  <% cache(["redesigned_homepage", Pages::Homepage::Top::Component.cache_digest,
+    @recovery_displays.maximum(:updated_at)], skip_digest: true) do %>
     <%= render(Pages::Homepage::Top::Component.new(recoveries_value: Counts.recoveries_value,
       organization_count: Organization.count,
       recovery_displays: @recovery_displays)) %>
