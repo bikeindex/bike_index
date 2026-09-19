@@ -151,6 +151,19 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(organized_include_javascript_pack?).to be_truthy
       end
     end
+    context "parking_notifications" do
+      let(:controller_name) { "parking_notifications" }
+      it "is falsey on the index" do
+        expect(organized_container).to eq "container-fluid"
+        expect(organized_include_javascript_pack?).to be_falsey
+      end
+      context "show" do
+        let(:action_name) { "show" }
+        it "is truthy" do
+          expect(organized_include_javascript_pack?).to be_truthy
+        end
+      end
+    end
     context "bikes recoveries" do
       let(:controller_name) { "bikes" }
       let(:action_name) { "recoveries" }
