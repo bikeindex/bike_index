@@ -18,7 +18,8 @@ module Pages
             search_address: nil,
             search_status: "all",
             search_query_present: false,
-            humanized_time_range: nil,
+            time_range: nil,
+            period: nil,
             stolenness: "all",
             bike_sticker: nil,
             model_audit: nil,
@@ -39,7 +40,8 @@ module Pages
             @search_address = search_address
             @search_status = search_status
             @search_query_present = search_query_present
-            @humanized_time_range = humanized_time_range
+            @time_range = time_range
+            @period = period
             @stolenness = stolenness
             @bike_sticker = bike_sticker
             @model_audit = model_audit

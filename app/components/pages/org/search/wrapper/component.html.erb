@@ -29,7 +29,7 @@
           <em>— <%= safe_join(settings.active_search_filter_descriptions, " · ") %></em>
         <% end %>
 
-        <em><%= @humanized_time_range %></em>
+        <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
       </p>
     </div>
   <% end %>
