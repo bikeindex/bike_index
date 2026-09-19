@@ -1,0 +1,199 @@
+import { Controller } from '@hotwired/stimulus'
+import { ExpandControl, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { collapse } from 'utils/collapse_utils'
+
+// Connects to data-controller='org--parking-notifications-index'
+// Pins every loaded notification on the map, and narrows the table to the ones in view
+export default class extends Controller {
+  static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeInput', 'redo', 'fit',
+    'visibleCount', 'table', 'row', 'emptyRow', 'submit']
+
+  static values = {
+    latitude: Number,
+    longitude: Number,
+    boundingBox: Array, // [south, west, north, east]
+    place: Array // [latitude, longitude]
+  }
+
+  async connect () {
+    try {
+      const maplibregl = await loadMapLibre()
+      if (!this.element.isConnected) return // disconnected while loading
+
+      this.#render(maplibregl)
+    } catch (error) {
+      this.#showUnavailable(error)
+    }
+  }
+
+  disconnect () {
+    this.map?.remove()
+    this.map = null
+  }
+
+  redoSearch () {
+    const bounds = this.map.getBounds()
+    this.#visit({
+      search_southwest_coords: coordinates(bounds.getSouthWest()),
+      search_northeast_coords: coordinates(bounds.getNorthEast())
+    })
+  }
+
+  // With nothing inside the searched area there's nothing to fit, so search everywhere
+  fit () {
+    if (this.#nothingAtLocation) {
+      this.#visit({ search_southwest_coords: null, search_northeast_coords: null })
+    } else {
+      this.#fitToMarkers()
+    }
+  }
+
+  searchPlace (event) {
+    event.preventDefault()
+    this.#visit({ map_location: this.placeInputTarget.value.trim() || null })
+  }
+
+  showOnMap (event) {
+    const row = event.currentTarget.closest('tr')
+    if (!this.markers?.has(row)) return
+
+    this.canvasTarget.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    this.#openPopup(row)
+  }
+
+  closePopup () {
+    this.popup?.remove()
+  }
+
+  // Bootstrap's collapse opens the form; the checkbox column is ours
+  showMultiselect (event) {
+    collapse('hide', event.currentTarget)
+    this.tableTarget.classList.add('show-multiselect')
+  }
+
+  updateSubmitText (event) {
+    this.submitTarget.value = event.target.value === 'mark_retrieved' ? 'Resolve notifications' : 'Create notifications'
+  }
+
+  #render (maplibregl) {
+    const [south, west, north, east] = this.boundingBoxValue
+    this.map = new maplibregl.Map({
+      container: this.canvasTarget,
+      style: MAPS_STYLE_URL,
+      center: [this.longitudeValue, this.latitudeValue],
+      zoom: 13,
+      bounds: this.#hasBoundingBox ? [[west, south], [east, north]] : undefined,
+      cooperativeGestures: true,
+      attributionControl: { customAttribution: OSM_ATTRIBUTION }
+    })
+    this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
+    this.map.addControl(new ExpandControl(), 'top-right')
+    this.popup = new maplibregl.Popup({ offset: 32, maxWidth: 'min(90vw, 60rem)', closeOnClick: false })
+
+    this.markers = new Map(this.rowTargets.filter((row) => row.dataset.latitude && row.dataset.longitude)
+      .map((row) => [row, this.#addMarker(maplibregl, row)]))
+
+    if (this.placeValue.length) {
+      const [latitude, longitude] = this.placeValue
+      const element = this.placePinTarget.content.firstElementChild.cloneNode(true)
+      new maplibregl.Marker({ element }).setLngLat([longitude, latitude]).addTo(this.map)
+      this.map.jumpTo({ center: [longitude, latitude], zoom: 14 })
+    } else if (!this.#hasBoundingBox) {
+      this.#fitToMarkers({ animate: false })
+    }
+
+    this.#filterRows()
+    // Only a move the user made changes what "current location" means
+    this.map.on('moveend', (event) => {
+      this.#filterRows()
+      if (event.originalEvent) collapse('show', this.redoTarget)
+    })
+  }
+
+  #addMarker (maplibregl, row) {
+    const element = this.pinTarget.content.firstElementChild.cloneNode(true)
+    element.addEventListener('click', () => this.#openPopup(row))
+    return new maplibregl.Marker({ element, anchor: 'bottom' })
+      .setLngLat([Number(row.dataset.longitude), Number(row.dataset.latitude)])
+      .addTo(this.map)
+  }
+
+  #openPopup (row) {
+    this.popup.setLngLat(this.markers.get(row).getLngLat())
+      .setDOMContent(this.#popupContent(row))
+      .addTo(this.map)
+  }
+
+  // The row, under the table's header, without the map and checkbox columns
+  #popupContent (row) {
+    const table = this.tableTarget.cloneNode(false)
+    table.classList.remove('show-multiselect')
+    table.append(this.tableTarget.tHead.cloneNode(true))
+    const clone = row.cloneNode(true)
+    clone.classList.remove('tw:hidden', 'tw:hidden!')
+    table.createTBody().append(clone)
+    table.querySelectorAll('.map-cell, .multiselect-cell').forEach((cell) => cell.remove())
+    // Clones inside the controller would register as its targets
+    table.querySelectorAll('[data-org--parking-notifications-index-target]')
+      .forEach((element) => element.removeAttribute('data-org--parking-notifications-index-target'))
+    table.removeAttribute('data-org--parking-notifications-index-target')
+
+    const wrapper = document.createElement('div')
+    wrapper.className = 'tw:overflow-x-auto'
+    wrapper.append(table)
+    return wrapper
+  }
+
+  #fitToMarkers (options = {}) {
+    if (!this.markers.size) return
+
+    const lngLats = [...this.markers.values()].map((marker) => marker.getLngLat())
+    const lngs = lngLats.map(({ lng }) => lng)
+    const lats = lngLats.map(({ lat }) => lat)
+    const bounds = [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]]
+    this.map.fitBounds(bounds, { padding: 40, maxZoom: 16, ...options })
+  }
+
+  #filterRows () {
+    const bounds = this.map.getBounds()
+    const visibleRows = this.rowTargets.filter((row) => this.markers.has(row) && bounds.contains(this.markers.get(row).getLngLat()))
+    this.rowTargets.forEach((row) => collapse(visibleRows.includes(row) ? 'show' : 'hide', row, 0))
+    collapse(visibleRows.length ? 'hide' : 'show', this.emptyRowTarget, 0)
+    this.visibleCountTarget.textContent = visibleRows.length.toLocaleString()
+
+    const allVisible = visibleRows.length === this.rowTargets.length && !this.#nothingAtLocation
+    collapse(allVisible ? 'hide' : 'show', this.fitTarget)
+  }
+
+  get #hasBoundingBox () {
+    return this.boundingBoxValue.length === 4
+  }
+
+  get #nothingAtLocation () {
+    return this.#hasBoundingBox && !this.rowTargets.length
+  }
+
+  // Merged into the current URL, so the rest of the search carries over
+  #visit (params) {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('page')
+    if (!('map_location' in params)) url.searchParams.delete('map_location')
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) url.searchParams.set(key, value)
+      else url.searchParams.delete(key)
+    })
+    window.location.href = url.pathname + url.search
+  }
+
+  // WebGL/MapLibre can be unavailable (crawlers, headless browsers, disabled GPU,
+  // blocked CDN). Reveal a message instead of leaving a blank box.
+  #showUnavailable (error) {
+    console.warn('Parking notifications map failed to render:', error)
+    this.map?.remove()
+    this.map = null
+    this.canvasTarget.hidden = true
+    this.unavailableTarget.hidden = false
+  }
+}
+
+const coordinates = (lngLat) => `${lngLat.lat.toFixed(6)},${lngLat.lng.toFixed(6)}`

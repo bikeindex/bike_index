@@ -12,7 +12,28 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     it "renders" do
       get base_url
       expect(response.status).to eq(200)
-      expect(response).to render_template(:index)
+      expect(response.body).to match("No matching notifications")
+    end
+    context "with parking notifications" do
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:) }
+      let!(:parking_notification_retrieved) { FactoryBot.create(:parking_notification_organized, :retrieved, organization: current_organization) }
+      let(:bounding_box_params) { {search_southwest_coords: "40.7,-74.1", search_northeast_coords: "40.8,-73.9"} }
+      def notification_path(notification) = organization_parking_notification_path(notification, organization_id: current_organization.id)
+
+      it "renders the current ones for the map" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response.body).to include(notification_path(parking_notification))
+        expect(response.body).to include(%(data-latitude="#{parking_notification.latitude}"))
+        expect(response.body).not_to include(notification_path(parking_notification_retrieved))
+        expect(response.body).to include(%(data-org--parking-notifications-index-bounding-box-value="[]"))
+
+        get base_url, params: bounding_box_params.merge(search_status: "all", map_location: "New York")
+        expect(response.status).to eq(200)
+        expect(response.body).to include(notification_path(parking_notification_retrieved))
+        expect(response.body).to include(%(data-org--parking-notifications-index-bounding-box-value="[40.7,-74.1,40.8,-73.9]"))
+        expect(response.body).to match(/data-org--parking-notifications-index-place-value="\[-?[\d.]+,-?[\d.]+\]"/)
+      end
     end
     context "json" do
       it "returns empty" do

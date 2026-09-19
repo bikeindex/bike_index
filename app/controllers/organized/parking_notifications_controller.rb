@@ -12,13 +12,6 @@ module Organized
     def index
       @search_bounding_box = search_bounding_box
       @per_page = permitted_per_page(default: DEFAULT_PER_PAGE, max: ParkingNotification::MAX_PER_PAGE)
-      @page_data = {
-        google_maps_key: ENV["GOOGLE_MAPS"],
-        per_page: @per_page,
-        default_location: @search_bounding_box.blank?,
-        map_center_lat: map_center(@search_bounding_box).first,
-        map_center_lng: map_center(@search_bounding_box).last
-      }
 
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
@@ -39,10 +32,9 @@ module Organized
 
       headers["Vary"] = "Accept" # When hitting back button, tell browser not use the json response
       respond_to do |format|
-        format.html
+        format.html { render index_component }
         format.json do
-          pagy, records = pagy(:countish, matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-            .includes(:user, :bike, :impound_record), limit: @per_page, page: permitted_page)
+          pagy, records = pagy(:countish, sorted_parking_notifications, limit: @per_page, page: permitted_page)
           # This was already set up, so I left it when upgrading to pagy
           set_pagination_headers(pagy, @per_page)
           render json: records,
@@ -74,8 +66,6 @@ module Organized
         redirect_back(fallback_location: organization_parking_notifications_path(organization_id: current_organization.to_param))
       end
     end
-
-    helper_method :matching_parking_notifications, :search_params_present?
 
     private
 
@@ -125,9 +115,35 @@ module Organized
       @matching_parking_notifications = notifications.where(created_at: @time_range)
     end
 
-    def search_params_present?
-      # Eventually, will check period select, etc
-      (params.keys & %w[search_bike_id]).any?
+    def index_component
+      Pages::Org::ParkingNotifications::Index::Component.new(
+        organization: current_organization,
+        parking_notifications: sorted_parking_notifications.limit(@per_page).load,
+        total_count: matching_parking_notifications.count,
+        per_page: @per_page,
+        sort_state:,
+        interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact,
+        search_kind: @search_kind,
+        search_status: @search_status,
+        search_unregistered: @search_unregistered,
+        unpermitted_statuses: @unpermitted_statuses,
+        period: @period,
+        start_time: @start_time,
+        end_time: @end_time,
+        search_bounding_box: @search_bounding_box,
+        map_place: (GeocodeHelper.coordinates_for(params[:map_location]).values.compact if params[:map_location].present?),
+        map_location: params[:map_location],
+        search_bike_id: params[:search_bike_id],
+        filtered_user_id: params[:user_id],
+        filtered_user: (user_subject || User.find_by_id(params[:user_id]) if params[:user_id].present?),
+        notifications_failed_resolved: @notifications_failed_resolved,
+        repeated_kind: @repeated_kind
+      )
+    end
+
+    def sorted_parking_notifications
+      matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+        .includes(:user, :bike, :impound_record)
     end
 
     def permitted_parameters
@@ -216,14 +232,6 @@ module Organized
       return nil unless params[:search_southwest_coords].present? && params[:search_northeast_coords].present?
 
       [params[:search_southwest_coords].split(","), params[:search_northeast_coords].split(",")].flatten.map(&:to_f)
-    end
-
-    def map_center(bounding_box)
-      return current_organization.map_focus_coordinates.values unless bounding_box.present?
-
-      lat_dif = bounding_box[0] - bounding_box[2]
-      lng_dif = bounding_box[1] - bounding_box[3]
-      [bounding_box[0] + lat_dif, bounding_box[1] + lng_dif]
     end
 
     # Pulling this out of api-pagination gem because the gem doesn't allow overriding the max per
