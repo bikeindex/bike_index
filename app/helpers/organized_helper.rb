@@ -54,34 +54,6 @@ module OrganizedHelper
     end
   end
 
-  def organized_container
-    # No container at all - the register flow supplies its own full-bleed shell, and a
-    # gutter would leave white down either side of its gray
-    return nil if [controller_name, action_name] == %w[registrations new]
-
-    fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits registrations]
-    return "container-fluid" if fluid.include?(controller_name)
-
-    if controller_name == "bulk_imports" && action_name == "show"
-      return "container-fluid"
-    end
-    "container"
-  end
-
-  def organized_include_javascript_pack?
-    return true if organized_container == "container-fluid"
-
-    [
-      %w[bikes recoveries],
-      %w[bikes incompletes],
-      %w[exports show],
-      %w[exports new],
-      %w[users new],
-      %w[dashboard index],
-      %w[impounded_bikes index]
-    ].include?([controller_name, action_name])
-  end
-
   def status_display_class(status)
     return "" if status.blank?
 

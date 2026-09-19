@@ -18,8 +18,7 @@ module ControllerHelpers
       :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
-      :render_donation_request?, :old_register_view?, :register_single_page?,
-      :register_separate_attestation?, :sort_state, :admin_index_state
+      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state
     before_action :enable_rack_profiler
 
     before_action do
