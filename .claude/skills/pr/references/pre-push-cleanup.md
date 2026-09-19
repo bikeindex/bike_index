@@ -36,9 +36,9 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 
 Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style, testing conventions, and frontend rules. Only touch lines this branch already changed.
 
-**`bin/update_component_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into, so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of every component that renders it — `SharedBlocks::Navbar::Wrapper` and `SharedBlocks::Footer` both, for one edit — and regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
+**`bin/update_markup_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into — components and partials both — so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of everything that renders it, `SharedBlocks::Navbar::Wrapper` and `SharedBlocks::Footer` both for one edit, plus any view template carrying a digest comment. Regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
 
-It hashes the component's *files*, not its output, and globs the whole directory — so a comment that renders nothing bumps the digest just the same, whether you put it in the template or in `component.rb`. Somewhere outside the component directory (`.herb.yml`, the PR body) is the free place to say it.
+It hashes *files*, not output, and globs a component's whole directory — so a comment that renders nothing bumps the digest just the same, whether you put it in the template or in `component.rb`. Somewhere outside the component directory (`.herb.yml`, the PR body) is the free place to say it.
 
 ### The spec audit
 

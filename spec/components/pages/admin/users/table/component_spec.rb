@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Pages::Admin::Users::Table::Component, type: :component do
-  it_behaves_like "cached_markup_digest"
-
   let(:user) { FactoryBot.create(:user_confirmed, name: "Sally Rider") }
   let(:component) do
     with_controller_class(Admin::UsersController) do

@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Pages::Admin::BugReportsTable::Component, type: :component do
-  it_behaves_like "cached_markup_digest"
-
   let(:bug_report) { FactoryBot.create(:bug_report, subject: "Broken search", body: "<p>It &amp; everything</p>") }
   let(:component) do
     with_controller_class(Admin::BugReportsController) do

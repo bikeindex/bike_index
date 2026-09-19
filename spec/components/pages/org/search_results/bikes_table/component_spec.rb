@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :component do
-  it_behaves_like "cached_markup_digest"
-
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do

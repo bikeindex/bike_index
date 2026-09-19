@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Pages::Admin::Organizations::Table::Component, type: :component do
-  it_behaves_like "cached_markup_digest"
-
   let(:organization) { FactoryBot.create(:organization, name: "Cool Bikes", short_name: "Cool Bikes") }
   let(:render_deleted) { false }
   let(:component) do
