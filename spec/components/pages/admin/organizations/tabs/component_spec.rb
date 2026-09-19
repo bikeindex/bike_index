@@ -18,14 +18,14 @@ RSpec.describe Pages::Admin::Organizations::Tabs::Component, type: :component do
 
   describe "the invoice functionality tab" do
     it "is absent without invoice features" do
-      expect(component).to_not have_link("Edit invoice functionality")
+      expect(component).to_not have_link("Edit invoiced functionality")
     end
 
     context "with an invoiced organization" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, name: "Cool Bikes") }
 
       it "renders" do
-        expect(component).to have_link("Edit invoice functionality",
+        expect(component).to have_link("Edit invoiced functionality",
           href: "/admin/organizations/#{organization.to_param}/edit?tab=invoice_functionality")
       end
     end
@@ -36,7 +36,7 @@ RSpec.describe Pages::Admin::Organizations::Tabs::Component, type: :component do
 
       it "renders it, active" do
         expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish })
-          .to eq ["Edit invoice functionality"]
+          .to eq ["Edit invoiced functionality"]
       end
     end
   end
@@ -64,6 +64,26 @@ RSpec.describe Pages::Admin::Organizations::Tabs::Component, type: :component do
 
       it "renders it, active" do
         expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["SSO"]
+      end
+    end
+  end
+
+  describe "the registration sequences tab" do
+    it "is absent without the feature" do
+      expect(component).to_not have_link("Registration sequences")
+    end
+
+    context "with registration_sequences enabled" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, name: "Cool Bikes",
+          enabled_feature_slugs: "registration_sequences")
+      end
+
+      before { FactoryBot.create(:registration_sequence, organization:) }
+
+      it "renders, counting them" do
+        expect(component).to have_link("Registration sequences 1",
+          href: "/admin/registration_sequences?organization_id=#{organization.id}")
       end
     end
   end
@@ -99,6 +119,14 @@ RSpec.describe Pages::Admin::Organizations::Tabs::Component, type: :component do
 
       it "links to the organization's emails" do
         expect(organized_view["href"]).to eq "/o/#{organization.to_param}/emails"
+      end
+    end
+
+    context "on registration sequences" do
+      let(:active) { :registration_sequences }
+
+      it "links to the organization's registration sequences" do
+        expect(organized_view["href"]).to eq "/o/#{organization.to_param}/registration_sequences"
       end
     end
 
