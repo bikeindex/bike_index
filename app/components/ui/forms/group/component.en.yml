@@ -5,3 +5,4 @@ en:
       forms:
         group:
           optional: optional
+          required: required

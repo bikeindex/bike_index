@@ -70,7 +70,7 @@ module UI
             tag.span(optional_marker, data: {optional_marker: true}, hidden: required?)])
         end
 
-        def required_marker = tag.span("*", class: "tw:text-red-600")
+        def required_marker = tag.span("*", class: "tw:text-red-600", title: translation(".required"))
 
         def optional_marker = render(UI::Badge::Component.new(text: translation(".optional"), size: :xs))
 
