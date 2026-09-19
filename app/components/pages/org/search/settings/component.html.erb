@@ -46,14 +46,16 @@
     <% if @toggle_button && @settings.render_export? %>
       <div
         class="
-          tw:mt-4 tw:flex tw:items-center tw:justify-end tw:gap-2
-          tw:border-t tw:border-gray-300/70 tw:pt-3 tw:dark:border-gray-700
+          tw:mt-4 tw:border-t tw:border-gray-300/70 tw:pt-3 tw:text-right
+          tw:dark:border-gray-700
         "
       >
-        <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
-          color: :purple, size: :sm, disabled: true)) %>
+        <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+          <% tooltip.with_body { translation(".export_unavailable") } %>
 
-        <%= render(UI::Tooltip::Component.new(text: translation(".export_unavailable"))) %>
+          <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
+            color: :purple, size: :sm, disabled: true)) %>
+        <% end %>
       </div>
     <% end %>
   </div>

@@ -40,8 +40,8 @@ RSpec.describe Pages::Org::Search::Settings::Component, type: :component do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
     it "renders the export disabled, since the panel's search isn't the page's bikes" do
-      expect(component).to have_css("a[aria-disabled='true']:not([href])", text: "Export CSV", visible: :all)
-      expect(component).to have_css("button[aria-label=\"Can't create export of this\"]", visible: :all)
+      expect(component).to have_css("[data-controller='ui--tooltip'] button a[aria-disabled='true']:not([href])", text: "Export CSV", visible: :all)
+      expect(component).to have_css("[role=tooltip]", text: "Can't create export of this", visible: :all)
     end
 
     context "with toggle_button false" do

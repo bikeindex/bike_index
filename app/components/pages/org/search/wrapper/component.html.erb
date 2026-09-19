@@ -39,13 +39,16 @@
           </span>
         <% end %>
 
-        <% if settings.render_export? %>
-          <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
-            color: :primary, size: :sm, disabled: settings.export_disabled?, data: {turbo_frame: "_top"})) %>
+        <% if settings.render_export? && settings.export_disabled? %>
+          <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+            <% tooltip.with_body { translation(".export_unavailable") } %>
 
-          <% if settings.export_disabled? %>
-            <%= render(UI::Tooltip::Component.new(text: translation(".export_unavailable"))) %>
+            <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
+              color: :primary, size: :sm, disabled: true)) %>
           <% end %>
+        <% elsif settings.render_export? %>
+          <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
+            color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
         <% end %>
       </div>
     <% end %>
