@@ -14,9 +14,8 @@ module Pages
           delegate :filter_groups, :active_search_filter_descriptions, :notes_search_label,
             :organization, to: :@settings
 
-          def initialize(settings:, period:, start_time:, end_time:, target_frame:, sortable_search_params: {})
+          def initialize(settings:, period:, start_time:, end_time:, sortable_search_params: {})
             @settings = settings
-            @target_frame = target_frame
             @period = period
             @start_time = start_time
             @end_time = end_time

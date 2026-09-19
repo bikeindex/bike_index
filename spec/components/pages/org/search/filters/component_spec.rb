@@ -15,8 +15,7 @@ RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
   end
   let(:search_stickers) { nil }
   let(:options) do
-    {settings:, period: "week", start_time: Time.current - 1.week, end_time: Time.current,
-     target_frame: :organized_bikes_results_frame}
+    {settings:, period: "week", start_time: Time.current - 1.week, end_time: Time.current}
   end
 
   it "renders the settings trigger, the period, and the collapsed panel" do
