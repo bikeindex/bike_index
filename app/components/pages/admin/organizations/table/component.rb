@@ -16,8 +16,6 @@ module Pages
 
           private
 
-          def cache_key = "admin-organizations-#{self.class.cache_digest}"
-
           def pos_link(organization)
             display = organization.pos_kind.to_s.gsub("pos", "")
 

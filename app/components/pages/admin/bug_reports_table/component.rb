@@ -11,12 +11,6 @@ module Pages
           @display_dev_info = display_dev_info
           @render_sortable = render_sortable
         end
-
-        private
-
-        def cache_key
-          "admin-bug-reports-#{self.class.cache_digest}"
-        end
       end
     end
   end

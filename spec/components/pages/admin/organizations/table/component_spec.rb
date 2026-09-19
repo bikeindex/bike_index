@@ -34,6 +34,6 @@ RSpec.describe Pages::Admin::Organizations::Table::Component, type: :component d
   end
 
   let(:cached_record) { organization }
-  let(:row_cache_prefix) { "admin-organizations-" }
+  let(:row_cache_key) { described_class.cache_digest }
   it_behaves_like "cached_table_rows"
 end

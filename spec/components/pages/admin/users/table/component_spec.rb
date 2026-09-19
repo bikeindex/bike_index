@@ -16,6 +16,6 @@ RSpec.describe Pages::Admin::Users::Table::Component, type: :component do
   end
 
   let(:cached_record) { user }
-  let(:row_cache_prefix) { "admin-users-" }
+  let(:row_cache_key) { described_class.cache_digest }
   it_behaves_like "cached_table_rows"
 end

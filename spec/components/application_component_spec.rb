@@ -56,7 +56,7 @@ RSpec.describe ApplicationComponent, type: :component do
   # The components whose markup digest is folded into a cache key: one keying its own
   # fragment, or one a view names because `skip_digest` left the key to carry it
   def cached_components
-    own = component_classes.select { |component| File.read(component.identifier).include?("self.class.cache_digest") }
+    own = component_classes.select { |component| component_files(component).any? { it.read.include?("self.class.cache_digest") } }
     named = Rails.root.glob("app/views/**/*.{erb,haml}").flat_map do |file|
       file.read.scan(/\b((?:[A-Z][A-Za-z0-9]*::)+Component)\.cache_digest/).flatten
     end

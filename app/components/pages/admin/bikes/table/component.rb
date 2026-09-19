@@ -22,12 +22,6 @@ module Pages
             @skip_user = skip_user
             @render_multi_check = render_multi_check
           end
-
-          private
-
-          def cache_key
-            "admin-bikes-#{self.class.cache_digest}"
-          end
         end
       end
     end

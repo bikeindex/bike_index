@@ -14,12 +14,6 @@ module Pages
             @render_sortable = render_sortable
             @render_deleted = render_deleted
           end
-
-          private
-
-          def cache_key
-            "admin-users-#{self.class.cache_digest}"
-          end
         end
       end
     end
