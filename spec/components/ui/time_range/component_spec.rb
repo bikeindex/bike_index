@@ -36,7 +36,7 @@ RSpec.describe UI::TimeRange::Component, type: :component do
       expect(html.css("em span.localizeTime").length).to eq 2
     end
 
-    it "shows seconds for an hour or less, and minutes beyond it" do
+    it "shows seconds within the chart's minute bucket, and minutes beyond it" do
       now = Time.current
       hour = render_component(period: "custom", range: (now - 2.hours)..(now - 1.hour))
       expect(hour.css("span.preciseTimeSeconds").length).to eq 2
