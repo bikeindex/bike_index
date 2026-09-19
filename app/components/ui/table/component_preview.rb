@@ -54,6 +54,15 @@ module UI
         end
       end
 
+      def with_footer
+        records = sample_records
+        render(UI::Table::Component.new(records:)) do |table|
+          table.column(label: "Cryptid", footer: "Total") { |r| r.name }
+          table.column(label: "Region") { |r| r.region }
+          table.column(label: "Sightings", footer: records.sum(&:sightings).to_fs(:delimited)) { |r| number_with_delimiter(r.sightings) }
+        end
+      end
+
       # @!endgroup
 
       private

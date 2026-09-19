@@ -55,14 +55,12 @@
       <% organizations = Organization.unscoped.where(id: kind_counts.keys).index_by(&:id) %>
       <% organization_rows = kind_counts.map { |id, counts| {organization_id: id, organization: organizations[id], counts:} }
         .sort_by { |row| row[:counts].values.sum } %>
-      <% total_row = {total: true, counts: BikeStickerUpdate.kinds.index_with { |kind| organization_rows.sum { |row| row[:counts].fetch(kind, 0) } }} %>
+      <% total_counts = BikeStickerUpdate.kinds.index_with { |kind| organization_rows.sum { |row| row[:counts].fetch(kind, 0) } } %>
 
       <div class="mt-2">
-        <%= render(UI::Table::Component.new(records: organization_rows + [total_row], sort_state:)) do |table| %>
-          <% table.column(label: "Organization") do |row| %>
-            <% if row[:total] %>
-              Total
-            <% elsif row[:organization].present? %>
+        <%= render(UI::Table::Component.new(records: organization_rows, sort_state:)) do |table| %>
+          <% table.column(label: "Organization", footer: "Total") do |row| %>
+            <% if row[:organization].present? %>
               <%= link_to row[:organization].short_name, admin_bike_sticker_updates_path(sort_state.search_params.merge(organization_id: row[:organization_id])), class: row[:organization].deleted? ? "twlink tw:text-red-600" : "twlink" %>
             <% else %>
               <%= link_to "no organization", admin_bike_sticker_updates_path(sort_state.search_params.merge(organization_id: "none")), class: "twlink tw:text-gray-400" %>
@@ -71,13 +69,13 @@
 
           <% if @search_kind == "all" %>
             <% BikeStickerUpdate.kinds.each do |kind| %>
-              <% table.column(label: kind.humanize, classes: "tw:text-sm") do |row| %>
+              <% table.column(label: kind.humanize, classes: "tw:text-sm", footer: number_display(total_counts[kind])) do |row| %>
                 <%= number_display(row[:counts].fetch(kind, 0)) %>
               <% end %>
             <% end %>
           <% end %>
 
-          <% table.column(label: "Total") do |row| %>
+          <% table.column(label: "Total", footer: number_display(total_counts.values.sum)) do |row| %>
             <%= number_display(row[:counts].values.sum) %>
           <% end %>
         <% end %>

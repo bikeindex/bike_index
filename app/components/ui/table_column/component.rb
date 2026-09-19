@@ -5,9 +5,9 @@ module UI
     class Component < ApplicationComponent
       NBSP = "\u00A0"
 
-      attr_reader :sortable, :cell_block
+      attr_reader :sortable, :cell_block, :footer
 
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, footer: nil, &block)
         @label = label
         @sortable = sortable
         @sort_indicator = sort_indicator
@@ -15,6 +15,7 @@ module UI
         @header_classes = header_classes
         @lower_right = lower_right
         @cell_block = block
+        @footer = footer
       end
 
       # Renders cell content for a record. The block should yield the captured
@@ -64,6 +65,10 @@ module UI
         end
         classes << @classes if @classes
         classes.join(" ")
+      end
+
+      def tfoot_classes(bordered:)
+        [td_classes(bordered:), "tw:border-t-2 tw:border-t-gray-300 tw:font-bold tw:dark:border-t-gray-500"].join(" ")
       end
 
       private

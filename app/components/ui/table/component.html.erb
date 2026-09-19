@@ -27,5 +27,17 @@
         <% end %>
       <% end %>
     </tbody>
+
+    <% if footer? %>
+      <tfoot>
+        <tr>
+          <% @columns.each do |col| %>
+            <td class="<%= col.tfoot_classes(bordered: @bordered) %>">
+              <%= col.footer %>
+            </td>
+          <% end %>
+        </tr>
+      </tfoot>
+    <% end %>
   </table>
 </div>

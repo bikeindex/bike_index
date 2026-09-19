@@ -132,36 +132,32 @@
               recovered_count: stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}).count
             }
           end
-          total_row = %i[alert_count fbook_reach fbook_cents revenue_cents recovered_count]
-            .index_with { |key| plan_rows.sum { |row| row[key] } }.merge(name: "Total", total: true) %>
+          total = %i[alert_count fbook_reach fbook_cents revenue_cents recovered_count]
+            .index_with { |key| plan_rows.sum { |row| row[key] } } %>
         <div class="col">
-          <%= render(UI::Table::Component.new(records: plan_rows + [total_row])) do |table| %>
-            <% table.column(label: "") do |row| %>
-              <% if row[:total] %>
-                <strong><%= row[:name] %></strong>
-              <% else %>
-                <%= row[:name] %>
-                <small><%= MoneyFormatter.money_format(row[:amount_cents_facebook]) %></small>
-              <% end %>
+          <%= render(UI::Table::Component.new(records: plan_rows)) do |table| %>
+            <% table.column(label: "", footer: "Total") do |row| %>
+              <%= row[:name] %>
+              <small><%= MoneyFormatter.money_format(row[:amount_cents_facebook]) %></small>
             <% end %>
 
-            <% table.column(label: "Count") do |row| %>
+            <% table.column(label: "Count", footer: number_display(total[:alert_count])) do |row| %>
               <%= number_display(row[:alert_count]) %>
             <% end %>
 
-            <% table.column(label: "Fbook Reach") do |row| %>
+            <% table.column(label: "Fbook Reach", footer: number_display(total[:fbook_reach])) do |row| %>
               <%= number_display(row[:fbook_reach]) %>
             <% end %>
 
-            <% table.column(label: "Fbook Spend") do |row| %>
+            <% table.column(label: "Fbook Spend", footer: MoneyFormatter.money_format(total[:fbook_cents])) do |row| %>
               <%= MoneyFormatter.money_format(row[:fbook_cents]) %>
             <% end %>
 
-            <% table.column(label: "Revenue", classes: "tw:text-xs") do |row| %>
+            <% table.column(label: "Revenue", classes: "tw:text-xs", footer: MoneyFormatter.money_format(total[:revenue_cents])) do |row| %>
               <%= MoneyFormatter.money_format(row[:revenue_cents]) %>
             <% end %>
 
-            <% table.column(label: "Recovered", classes: "tw:text-xs", header_classes: "tw:font-normal") do |row| %>
+            <% table.column(label: "Recovered", classes: "tw:text-xs", header_classes: "tw:font-normal", footer: number_display(total[:recovered_count])) do |row| %>
               <%= number_display(row[:recovered_count]) %>
             <% end %>
           <% end %>
