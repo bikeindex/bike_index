@@ -136,7 +136,6 @@ class StolenRecord < ApplicationRecord
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
 
-
   class << self
     def legacy_attrs_renamed(attrs)
       attrs.except(*LEGACY_ATTRS.keys)
