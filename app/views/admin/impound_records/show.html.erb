@@ -6,9 +6,7 @@
     <h1>
       Impound Record
       <% if @bike.present? && @bike.creator_unregistered_parking_notification? %>
-        <small class="text-warning">
-          for <em>unregistered <%= @bike.type %></em>
-        </small>
+        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_status: "unregistered")) %>
       <% end %>
     </h1>
 
