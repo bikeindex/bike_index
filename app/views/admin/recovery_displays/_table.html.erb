@@ -15,23 +15,23 @@
     <span class="less-strong"><%= render UI::Time::Component.new(time: recovery_display.updated_at) %></span>
   <% end %>
 
-  <% table.column(label: "Quote", header_classes: "tw:font-normal") do |recovery_display| %>
+  <% table.column(label: "Quote") do |recovery_display| %>
     <%= truncate(recovery_display.quote, length: 140) %>
   <% end %>
 
-  <% table.column(label: "Quoter", header_classes: "tw:font-normal") do |recovery_display| %>
+  <% table.column(label: "Quoter") do |recovery_display| %>
     <%= recovery_display.quote_by %>
   <% end %>
 
-  <% table.column(label: "Location", header_classes: "tw:font-normal") do |recovery_display| %>
+  <% table.column(label: "Location") do |recovery_display| %>
     <%= recovery_display.location_string %>
   <% end %>
 
-  <% table.column(label: "image?", header_classes: "tw:font-normal tw:text-xs", classes: "tw:text-center") do |recovery_display| %>
+  <% table.column(label: "image?", header_classes: "tw:text-xs", classes: "tw:text-center") do |recovery_display| %>
     <%= check_mark if recovery_display.photo_processed? %>
   <% end %>
 
-  <% table.column(label: "Association?", header_classes: "tw:font-normal tw:text-xs", classes: "tw:hidden tw:lg:table-cell tw:text-center") do |recovery_display| %>
+  <% table.column(label: "Association?", header_classes: "tw:text-xs", classes: "tw:hidden tw:lg:table-cell tw:text-center") do |recovery_display| %>
     <%= check_mark if recovery_display.stolen_record_id.present? %>
   <% end %>
 <% end %>

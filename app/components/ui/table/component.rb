@@ -52,6 +52,10 @@ module UI
         @columns.filter_map(&:sortable)
       end
 
+      def sortable_table
+        sortable_columns.any?
+      end
+
       # Stacking + background so the header paints over scrolled rows.
       def sticky_th_classes
         @sticky ? "tw:relative tw:z-10 tw:bg-gray-50 tw:dark:bg-gray-700" : nil

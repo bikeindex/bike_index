@@ -1,17 +1,17 @@
 <%# locals: (collection:, render_sortable: false) %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
-  <% table.column(label: "Created", classes: "tw:w-1/4", header_classes: "tw:font-normal") do |ad| %>
+  <% table.column(label: "Created", classes: "tw:w-1/4") do |ad| %>
     <%= link_to edit_admin_ad_url(ad), class: "twlink" do %>
       <%= render UI::Time::Component.new(time: ad.created_at) %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Organization", classes: "tw:w-1/4", header_classes: "tw:font-normal") do |ad| %>
+  <% table.column(label: "Organization", classes: "tw:w-1/4") do |ad| %>
     <%= ad.organization.name if ad.organization.present? %>
   <% end %>
 
-  <% table.column(label: "Text", classes: "tw:w-1/4", header_classes: "tw:font-normal") do |ad| %>
+  <% table.column(label: "Text", classes: "tw:w-1/4") do |ad| %>
     <h3>
       <%= link_to ad.title, edit_admin_ad_url(ad), class: "text-dark" %>
     </h3>
@@ -21,7 +21,7 @@
     </p>
   <% end %>
 
-  <% table.column(label: "image", classes: "tw:w-1/4", header_classes: "tw:font-normal") do |ad| %>
+  <% table.column(label: "image", classes: "tw:w-1/4") do |ad| %>
     <% if ad.image.present? %>
       <%= image_tag ad.image_url(:small), alt: "#{ad.title} ad" %>
     <% end %>

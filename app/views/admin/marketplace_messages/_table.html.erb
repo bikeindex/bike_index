@@ -17,7 +17,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Body", header_classes: "tw:font-normal") do |marketplace_message| %>
+  <% table.column(label: "Body") do |marketplace_message| %>
     <% if marketplace_message.blocked? %>
       <small class="tw:text-red-500">
         Message blocked!

@@ -28,7 +28,7 @@
     <% end %>
 
     <% unless skip_item %>
-      <% table.column(label: "Item", header_classes: "tw:font-normal") do |marketplace_listing| %>
+      <% table.column(label: "Item") do |marketplace_listing| %>
         <%= render Pages::Admin::Bikes::Cell::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, view_as: "marketplace_preview"), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)) %>
       <% end %>
     <% end %>
@@ -41,7 +41,7 @@
       <%= marketplace_listing.condition %>
     <% end %>
 
-    <% table.column(label: "City", header_classes: "tw:font-normal") do |marketplace_listing| %>
+    <% table.column(label: "City") do |marketplace_listing| %>
       <%= render Atoms::Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record) %>
     <% end %>
 
@@ -55,7 +55,7 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "Messages #", header_classes: "tw:font-normal", classes: "tw:text-xs") do |marketplace_listing| %>
+    <% table.column(label: "Messages #", classes: "tw:text-xs") do |marketplace_listing| %>
       <%= number_display(marketplace_listing.marketplace_messages.count) %>
     <% end %>
   <% end %>

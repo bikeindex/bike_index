@@ -13,7 +13,7 @@
       <%= render UI::Time::Component.new(time: public_image.updated_at, format: :localize_time_precise) %>
     <% end %>
 
-    <% table.column(label: "Image", header_classes: "tw:font-normal") do |public_image| %>
+    <% table.column(label: "Image") do |public_image| %>
       <% image_url = public_image.image_url %>
 
       <% if image_url.present? %>
@@ -25,17 +25,17 @@
     <% end %>
 
     <% if render_size %>
-      <% table.column(label: "Size", header_classes: "tw:font-normal", classes: "tw:text-xs") do |public_image| %>
+      <% table.column(label: "Size", classes: "tw:text-xs") do |public_image| %>
         <% image_size = public_image.image_size %>
         <%= number_to_human_size(image_size) if image_size %>
       <% end %>
     <% end %>
 
-    <% table.column(label: safe_join(["AS ", render(UI::Tooltip::Component.new(text: "ActiveStorage (instead of legacy carrierwave)"))]), header_classes: "tw:font-normal") do |public_image| %>
+    <% table.column(label: safe_join(["AS ", render(UI::Tooltip::Component.new(text: "ActiveStorage (instead of legacy carrierwave)"))])) do |public_image| %>
       <%= check_mark if public_image.activestorage? %>
     <% end %>
 
-    <% table.column(label: "Private", header_classes: "tw:font-normal") do |public_image| %>
+    <% table.column(label: "Private") do |public_image| %>
       <%= check_mark if public_image.is_private? %>
     <% end %>
 
@@ -55,7 +55,7 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "Imageable", header_classes: "tw:font-normal") do |public_image| %>
+    <% table.column(label: "Imageable") do |public_image| %>
       <% imageable_name = public_image.imageable_name.presence || "##{public_image.imageable_id}" %>
       <% imageable_path = helpers.admin_path_for_object(public_image.imageable) %>
 

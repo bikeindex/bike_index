@@ -17,7 +17,7 @@
     <small><%= content_tag.priority %></small>
   <% end %>
 
-  <% table.column(label: "Blogs", header_classes: "tw:font-normal") do |content_tag| %>
+  <% table.column(label: "Blogs") do |content_tag| %>
     <%= number_display(content_tag.blogs.count) %>
   <% end %>
 <% end %>

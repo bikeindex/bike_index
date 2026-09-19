@@ -13,7 +13,7 @@
     <%= check_mark if manufacturer.motorized_only %>
   <% end %>
 
-  <% table.column(label: "Website", header_classes: "tw:font-normal") do |manufacturer| %>
+  <% table.column(label: "Website") do |manufacturer| %>
     <% if manufacturer.website %>
       <%= link_to "Company website", manufacturer.website, class: "twlink" %>
     <% end %>

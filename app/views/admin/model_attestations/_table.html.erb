@@ -23,7 +23,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Vehicles #", header_classes: "tw:font-normal tw:text-xs") do |model_attestation| %>
+  <% table.column(label: "Vehicles #", header_classes: "tw:text-xs") do |model_attestation| %>
     <%= link_to number_display(model_attestation.model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_attestation.model_audit_id), class: "twlink" %>
   <% end %>
 
@@ -42,7 +42,7 @@
     <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: model_attestation.user, render_search: true) %>
   <% end %>
 
-  <% table.column(label: "File/URL", header_classes: "tw:font-normal") do |model_attestation| %>
+  <% table.column(label: "File/URL") do |model_attestation| %>
     <% if model_attestation.file.present? %>
       <strong>
         <%= link_to "File", model_attestation.file.url, target: "_blank", class: "twlink" %>
@@ -56,7 +56,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Info", header_classes: "tw:font-normal") do |model_attestation| %>
+  <% table.column(label: "Info") do |model_attestation| %>
     <%= model_attestation.info %>
   <% end %>
 <% end %>

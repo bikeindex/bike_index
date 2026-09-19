@@ -22,11 +22,11 @@
       <%= paint.bikes_count %>
     <% end %>
 
-    <% table.column(label: "Description", header_classes: "tw:font-normal") do |paint| %>
+    <% table.column(label: "Description") do |paint| %>
       <%= paint.name %>
     <% end %>
 
-    <% table.column(label: "Color", header_classes: "tw:font-normal") do |paint| %>
+    <% table.column(label: "Color") do |paint| %>
       <ul class="small">
         <% if paint.color_id.present? %>
           <li><%= paint.color.name %></li>

@@ -8,7 +8,7 @@
     <%= render UI::Time::Component.new(time: component.created_at) %>
   <% end %>
 
-  <% table.column(label: "Model, description, serial", header_classes: "tw:font-normal") do |component| %>
+  <% table.column(label: "Model, description, serial") do |component| %>
     <%= component.model_name %>
 
     <% if component.description.present? %>
@@ -22,11 +22,11 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Year", header_classes: "tw:font-normal") do |component| %>
+  <% table.column(label: "Year") do |component| %>
     <%= component.year %>
   <% end %>
 
-  <% table.column(label: "Type", header_classes: "tw:font-normal") do |component| %>
+  <% table.column(label: "Type") do |component| %>
     <% if component.ctype_id == ctype_other_id %>
       <span class="stolen-color"><%= component.ctype_other.presence || "-" %></span>
     <% else %>
@@ -34,7 +34,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Front/Rear", header_classes: "tw:font-normal") do |component| %>
+  <% table.column(label: "Front/Rear") do |component| %>
     <%= "front" if component.front %>
     <%= "rear" if component.rear %>
   <% end %>

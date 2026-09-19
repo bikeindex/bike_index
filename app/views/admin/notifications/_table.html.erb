@@ -13,7 +13,7 @@
       <%= render UI::Time::Component.new(time: notification.updated_at) %>
     <% end %>
 
-    <% table.column(label: "Object", header_classes: "tw:font-normal") do |notification| %>
+    <% table.column(label: "Object") do |notification| %>
       <% if notification.notifiable.present? %>
         <%= link_to helpers.admin_path_for_object(notification.notifiable), class: "twlink" do %>
           <%= notification.notifiable.class.to_s.titleize %>
@@ -52,16 +52,16 @@
       <%= notification.kind_humanized&.titleize %>
     <% end %>
 
-    <% table.column(label: "Method", header_classes: "tw:font-normal", classes: "tw:text-xs") do |notification| %>
+    <% table.column(label: "Method", classes: "tw:text-xs") do |notification| %>
       <span class="less-strong"><%= notification.message_channel %></span>
     <% end %>
 
-    <% table.column(label: "Delivered?", header_classes: "tw:font-normal", classes: "tw:text-center") do |notification| %>
+    <% table.column(label: "Delivered?", classes: "tw:text-center") do |notification| %>
       <%= helpers.notification_delivery_display(notification.delivery_status) %>
     <% end %>
 
     <% unless skip_sender %>
-      <% table.column(label: "Sender", header_classes: "tw:font-normal") do |notification| %>
+      <% table.column(label: "Sender") do |notification| %>
         <% sender_display_name = notification.sender_display_name %>
 
         <% if notification.sender.is_a?(User) %>
@@ -73,7 +73,7 @@
     <% end %>
 
     <% unless skip_error %>
-      <% table.column(label: "Delivery Errors", header_classes: "tw:font-normal") do |notification| %>
+      <% table.column(label: "Delivery Errors") do |notification| %>
         <% if notification.delivery_error_spam? %>
           An Email sent to this address was marked as spam
         <% elsif notification.delivery_error_invalid? %>

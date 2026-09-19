@@ -15,15 +15,15 @@
     <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: bike_organization_note.user, user_id: bike_organization_note.user_id, render_search: render_sortable) %>
   <% end %>
 
-  <% table.column(label: "Bike", header_classes: "tw:font-normal") do |bike_organization_note| %>
+  <% table.column(label: "Bike") do |bike_organization_note| %>
     <%= link_to bike_organization_note.bike_id, admin_bike_path(bike_organization_note.bike_id), class: "twlink" %>
   <% end %>
 
-  <% table.column(label: "Organization", header_classes: "tw:font-normal") do |bike_organization_note| %>
+  <% table.column(label: "Organization") do |bike_organization_note| %>
     <%= link_to bike_organization_note.organization.short_name, admin_organization_path(bike_organization_note.organization), class: "twlink" %>
   <% end %>
 
-  <% table.column(label: "Body", header_classes: "tw:font-normal", classes: "tw:text-xs") do |bike_organization_note| %>
+  <% table.column(label: "Body", classes: "tw:text-xs") do |bike_organization_note| %>
     <span title="<%= bike_organization_note.body %>">
       <%= truncate(bike_organization_note.body, length: 80) %>
     </span>

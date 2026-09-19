@@ -12,12 +12,12 @@
   <% end %>
 
   <% if display_dev_info? %>
-    <% table.column(label: "slug", classes: "only-dev-visible tw:text-xs", header_classes: "tw:font-normal") do |primary_activity| %>
+    <% table.column(label: "slug", classes: "only-dev-visible tw:text-xs") do |primary_activity| %>
       <%= primary_activity.slug %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Display name", classes: "tw:text-xs", header_classes: "tw:font-normal") do |primary_activity| %>
+  <% table.column(label: "Display name", classes: "tw:text-xs") do |primary_activity| %>
     <%= primary_activity.display_name %>
   <% end %>
 
@@ -36,7 +36,7 @@
   <% end %>
 
   <% if show_count %>
-    <% table.column(label: "Bike Count", header_classes: "tw:font-normal") do |primary_activity| %>
+    <% table.column(label: "Bike Count") do |primary_activity| %>
       <%= link_to number_display(Bike.where(primary_activity_id: primary_activity.id).count), admin_bikes_path(primary_activity: primary_activity.id), class: "twlink" %>
     <% end %>
   <% end %>

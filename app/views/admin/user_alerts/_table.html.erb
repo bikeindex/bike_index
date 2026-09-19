@@ -19,7 +19,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Object", header_classes: "tw:font-normal") do |user_alert| %>
+  <% table.column(label: "Object") do |user_alert| %>
     <% if user_alert.bike_id.present? %>
       <span class="d-block">
         <small>bike:</small>
@@ -50,7 +50,7 @@
     <%= render UI::Time::Component.new(time: user_alert.resolved_at) %>
   <% end %>
 
-  <% table.column(label: "Notified", header_classes: "tw:font-normal tw:text-xs") do |user_alert| %>
+  <% table.column(label: "Notified", header_classes: "tw:text-xs") do |user_alert| %>
     <%= check_mark if user_alert.notification.present? %>
   <% end %>
 <% end %>

@@ -38,14 +38,14 @@
   <% end %>
 
   <% unless skip_kind %>
-    <% table.column(label: "Kind", header_classes: "tw:font-normal") do |blog| %>
+    <% table.column(label: "Kind") do |blog| %>
       <% if !blog.blog? %>
         <span class="text-info"><%= blog.kind.humanize %></span>
       <% end %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Language", header_classes: "tw:font-normal") do |blog| %>
+  <% table.column(label: "Language") do |blog| %>
     <%= helpers.t(blog.language, scope: [:locales]) %>
   <% end %>
 

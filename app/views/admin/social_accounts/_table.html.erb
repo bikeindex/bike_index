@@ -15,11 +15,11 @@
     <%= cross_mark if social_account.errored? %>
   <% end %>
 
-  <% table.column(label: "Active?", header_classes: "tw:font-normal") do |social_account| %>
+  <% table.column(label: "Active?") do |social_account| %>
     <%= check_mark if social_account.active? %>
   <% end %>
 
-  <% table.column(label: "Default?", header_classes: "tw:font-normal") do |social_account| %>
+  <% table.column(label: "Default?") do |social_account| %>
     <%= check_mark if social_account.default? %>
   <% end %>
 
@@ -31,11 +31,11 @@
     <%= social_account.language %>
   <% end %>
 
-  <% table.column(label: "Address", header_classes: "tw:font-normal") do |social_account| %>
+  <% table.column(label: "Address") do |social_account| %>
     <small class="less-strong"><%= social_account.address %></small>
   <% end %>
 
-  <% table.column(label: "Neighborhood", header_classes: "tw:font-normal") do |social_account| %>
+  <% table.column(label: "Neighborhood") do |social_account| %>
     <small class="less-strong"><%= social_account.neighborhood %></small>
   <% end %>
 
@@ -43,7 +43,7 @@
     <small class="less-strong"><%= social_account.city %></small>
   <% end %>
 
-  <% table.column(label: "State", header_classes: "tw:font-normal") do |social_account| %>
+  <% table.column(label: "State") do |social_account| %>
     <small class="less-strong"><%= social_account.state&.abbreviation %></small>
   <% end %>
 
@@ -51,7 +51,7 @@
     <small class="less-strong"><%= social_account.country&.name %></small>
   <% end %>
 
-  <% table.column(label: "Posts", header_classes: "tw:font-normal") do |social_account| %>
+  <% table.column(label: "Posts") do |social_account| %>
     <%= number_display(social_account.social_posts.count) %>
   <% end %>
 <% end %>

@@ -10,13 +10,13 @@
   <% end %>
 
   <% unless skip_user %>
-    <% table.column(label: "User", header_classes: "tw:font-normal") do |feedback| %>
+    <% table.column(label: "User") do |feedback| %>
       <% cache(feedback.user) do %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, email: feedback.email, user: feedback.user, render_search: render_sortable) %>
       <% end %>
     <% end %>
 
-    <% table.column(label: "Name", header_classes: "tw:font-normal") do |feedback| %>
+    <% table.column(label: "Name") do |feedback| %>
       <%= feedback.name %>
     <% end %>
   <% end %>
@@ -30,14 +30,14 @@
   <% end %>
 
   <% unless skip_bike %>
-    <% table.column(label: "Bike", header_classes: "tw:font-normal") do |feedback| %>
+    <% table.column(label: "Bike") do |feedback| %>
       <% if feedback.bike_id.present? %>
         <%= render Pages::Admin::Bikes::Cell::Component.new(sort_state:, bike: feedback.bike, bike_id: feedback.bike_id, bike_link_path: admin_bike_path(feedback.bike_id, active_tab: "messages"), render_search: true) %>
       <% end %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Body", classes: "tw:w-1/4", header_classes: "tw:font-normal") do |feedback| %>
+  <% table.column(label: "Body", classes: "tw:w-1/4") do |feedback| %>
     <%= feedback.body.truncate(100) %>
   <% end %>
 <% end %>

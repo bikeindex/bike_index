@@ -18,7 +18,7 @@
     <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_mnfg_name: model_audit.mnfg_name)), class: "display-sortable-link small" %>
   <% end %>
 
-  <% table.column(label: "Mnfg other", header_classes: "tw:font-normal tw:text-xs", classes: "tw:text-center") do |model_audit| %>
+  <% table.column(label: "Mnfg other", header_classes: "tw:text-xs", classes: "tw:text-center") do |model_audit| %>
     <%= check_mark if model_audit.manufacturer_other.present? %>
   <% end %>
 
@@ -30,7 +30,7 @@
     <%= link_to number_display(model_audit.bikes_count), admin_bikes_path(search_model_audit_id: model_audit.id), class: "twlink" %>
   <% end %>
 
-  <% table.column(label: "Org vehicles", header_classes: "tw:font-normal") do |model_audit| %>
+  <% table.column(label: "Org vehicles") do |model_audit| %>
     <% model_audit.organization_model_audits.where.not(bikes_count: 0).pluck(:bikes_count, :organization_id).each do |bikes_count, org_id| %>
       <%= link_to organization_model_audits_path(organization_id: org_id, model_audit_id: model_audit.id), class: "twlink tw:text-xs" do %>
         <%= org_names_hash[org_id] %>: <%= number_display(bikes_count) %>
@@ -38,7 +38,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Attestations", header_classes: "tw:font-normal") do |model_audit| %>
+  <% table.column(label: "Attestations") do |model_audit| %>
     <%= number_display(model_audit.model_attestations.count) %>
   <% end %>
 <% end %>

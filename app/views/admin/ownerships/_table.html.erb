@@ -15,7 +15,7 @@
     <% end %>
 
     <% unless skip_bike %>
-      <% table.column(label: "Bike", header_classes: "tw:font-normal", classes: "tw:text-xs") do |ownership| %>
+      <% table.column(label: "Bike", classes: "tw:text-xs") do |ownership| %>
         <% if ownership.bike.present? %>
           <%= link_to helpers.bike_title_html(ownership.bike), admin_bike_path(ownership.bike), class: "twlink" %>
         <% else %>
@@ -24,7 +24,7 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "Creator", header_classes: "tw:font-normal") do |ownership| %>
+    <% table.column(label: "Creator") do |ownership| %>
       <% creator = ownership.creator %>
 
       <% if creator.blank? %>
@@ -46,7 +46,7 @@
     <% end %>
 
     <% if render_dev_info %>
-      <% table.column(label: "send email?", classes: "only-dev-visible", header_classes: "tw:font-normal tw:text-xs") do |ownership| %>
+      <% table.column(label: "send email?", classes: "only-dev-visible", header_classes: "tw:text-xs") do |ownership| %>
         <%= check_mark if ownership.send_email %>
       <% end %>
     <% end %>
@@ -55,11 +55,11 @@
       <%= ownership.organization&.name %>
     <% end %>
 
-    <% table.column(label: "Current?", header_classes: "tw:font-normal tw:text-xs", classes: "tw:text-center") do |ownership| %>
+    <% table.column(label: "Current?", header_classes: "tw:text-xs", classes: "tw:text-center") do |ownership| %>
       <%= check_mark if ownership.current %>
     <% end %>
 
-    <% table.column(label: "Claimed", header_classes: "tw:font-normal tw:text-xs") do |ownership| %>
+    <% table.column(label: "Claimed", header_classes: "tw:text-xs") do |ownership| %>
       <% if ownership.claimed %>
         <% if ownership.claimed_at.present? %>
           <%= render UI::Time::Component.new(time: ownership.claimed_at) %>
@@ -69,7 +69,7 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "User hidden", header_classes: "tw:font-normal tw:text-xs", classes: "tw:hidden tw:md:table-cell tw:text-center") do |ownership| %>
+    <% table.column(label: "User hidden", header_classes: "tw:text-xs", classes: "tw:hidden tw:md:table-cell tw:text-center") do |ownership| %>
       <%= check_mark if ownership.user_hidden %>
     <% end %>
   <% end %>

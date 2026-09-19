@@ -42,12 +42,12 @@
   <% end %>
 
   <% unless skip_bike %>
-    <% table.column(label: "Bike", header_classes: "tw:font-normal") do |theft_alert| %>
+    <% table.column(label: "Bike") do |theft_alert| %>
       <%= render Pages::Admin::Bikes::Cell::Component.new(bike: theft_alert.bike, bike_id: theft_alert.bike_id) %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "User", header_classes: "tw:font-normal") do |theft_alert| %>
+  <% table.column(label: "User") do |theft_alert| %>
     <% cache(theft_alert.user) do %>
       <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: theft_alert.user, render_search: true, user_id: theft_alert.user_id) %>
     <% end %>
@@ -75,11 +75,11 @@
   <% end %>
 
   <% if render_dev_info %>
-    <% table.column(label: "FB updated", classes: "only-dev-visible tw:text-xs", header_classes: "tw:font-normal") do |theft_alert| %>
+    <% table.column(label: "FB updated", classes: "only-dev-visible tw:text-xs") do |theft_alert| %>
       <%= render UI::Time::Component.new(time: theft_alert.facebook_updated_at) %>
     <% end %>
 
-    <% table.column(label: "FB objective", classes: "only-dev-visible", header_classes: "tw:font-normal") do |theft_alert| %>
+    <% table.column(label: "FB objective", classes: "only-dev-visible") do |theft_alert| %>
       <% if theft_alert.objective_adset.present? %>
         <small
           title="Campaign: <%= theft_alert.objective_campaign %>&#10;Adset: <%= theft_alert.objective_adset %>&#10;"
@@ -94,11 +94,11 @@
     <%= number_display(theft_alert.reach) %>
   <% end %>
 
-  <% table.column(label: "Clicks", classes: "tw:text-xs", header_classes: "tw:font-normal") do |theft_alert| %>
+  <% table.column(label: "Clicks", classes: "tw:text-xs") do |theft_alert| %>
     <%= number_display(theft_alert.engagement&.dig("unique_clicks")) %>
   <% end %>
 
-  <% table.column(label: "City", header_classes: "tw:font-normal") do |theft_alert| %>
+  <% table.column(label: "City") do |theft_alert| %>
     <%= theft_alert.city %>
 
     <% if theft_alert.region.present? %>
@@ -108,7 +108,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Notes", classes: "tw:text-xs", header_classes: "tw:font-normal") do |theft_alert| %>
+  <% table.column(label: "Notes", classes: "tw:text-xs") do |theft_alert| %>
     <%= theft_alert.notes %>
 
     <% if theft_alert.facebook_post_url.present? %>

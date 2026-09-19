@@ -33,7 +33,7 @@
     <%= superuser_ability.action_name %>
   <% end %>
 
-  <% table.column(label: "Options", header_classes: "tw:font-normal") do |superuser_ability| %>
+  <% table.column(label: "Options") do |superuser_ability| %>
     <%= superuser_ability.su_options.join(", ") %>
   <% end %>
 

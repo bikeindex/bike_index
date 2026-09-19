@@ -3,19 +3,19 @@
 <h3 class="tw:mt-4">Component groups</h3>
 
 <%= render(UI::Table::Component.new(records: cgroups)) do |table| %>
-  <% table.column(label: "Name", header_classes: "tw:font-normal") do |cgroup| %>
+  <% table.column(label: "Name") do |cgroup| %>
     <%= cgroup.name.titleize %>
   <% end %>
 
-  <% table.column(label: "Priority", header_classes: "tw:font-normal") do |cgroup| %>
+  <% table.column(label: "Priority") do |cgroup| %>
     <%= number_display(cgroup.priority) %>
   <% end %>
 
-  <% table.column(label: "Component types", header_classes: "tw:font-normal") do |cgroup| %>
+  <% table.column(label: "Component types") do |cgroup| %>
     <%= number_display(ctype_counts[cgroup.id] || 0) %>
   <% end %>
 
-  <% table.column(label: "Updated", header_classes: "tw:font-normal") do |cgroup| %>
+  <% table.column(label: "Updated") do |cgroup| %>
     <%= render UI::Time::Component.new(time: cgroup.updated_at) %>
   <% end %>
 <% end %>

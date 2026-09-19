@@ -23,7 +23,7 @@
     <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: user_ban.creator, render_search: render_sortable) %>
   <% end %>
 
-  <% table.column(label: "Description", header_classes: "tw:font-normal") do |user_ban| %>
+  <% table.column(label: "Description") do |user_ban| %>
     <small title="<%= user_ban.description %>">
       <%= user_ban.description&.truncate(100) %>
     </small>

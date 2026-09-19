@@ -71,7 +71,7 @@
 
           <% if @search_kind == "all" %>
             <% BikeStickerUpdate.kinds.each do |kind| %>
-              <% table.column(label: kind.humanize, header_classes: "tw:font-normal", classes: "tw:text-sm") do |row| %>
+              <% table.column(label: kind.humanize, classes: "tw:text-sm") do |row| %>
                 <%= number_display(row[:counts].fetch(kind, 0)) %>
               <% end %>
             <% end %>

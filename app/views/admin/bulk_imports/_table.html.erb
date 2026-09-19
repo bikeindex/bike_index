@@ -21,7 +21,7 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "Errors", header_classes: "tw:font-normal") do |bulk_import| %>
+    <% table.column(label: "Errors") do |bulk_import| %>
       <%= render(Pages::Org::BulkImportError::Component.new(bulk_import:, short_display: true, in_admin: true, display_dev_info: true)) %>
     <% end %>
 
@@ -38,7 +38,7 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "Organization & file", header_classes: "tw:font-normal") do |bulk_import| %>
+    <% table.column(label: "Organization & file") do |bulk_import| %>
       <% if bulk_import.organization.present? %>
         <%= link_to bulk_import.organization.name, admin_bulk_imports_url(sort_state.search_params.merge(organization_id: bulk_import.organization.to_param)), class: "twlink" %>
       <% else %>
@@ -54,7 +54,7 @@
       </small>
     <% end %>
 
-    <% table.column(label: "Bikes", header_classes: "tw:font-normal") do |bulk_import| %>
+    <% table.column(label: "Bikes") do |bulk_import| %>
       <%= number_display bulk_import.ownerships.size %>
     <% end %>
   <% end %>

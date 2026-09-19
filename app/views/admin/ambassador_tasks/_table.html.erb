@@ -1,11 +1,11 @@
 <%# locals: (collection:, render_sortable: false) %>
 
 <%= render(UI::Table::Component.new(records: collection, classes: "ambassador-tasks-table")) do |table| %>
-  <% table.column(label: "Title", header_classes: "tw:font-normal") do |task| %>
+  <% table.column(label: "Title") do |task| %>
     <%= task.title %>
   <% end %>
 
-  <% table.column(label: "Description", header_classes: "tw:font-normal") do |task| %>
+  <% table.column(label: "Description") do |task| %>
     <%= task.description_html.html_safe %>
   <% end %>
 

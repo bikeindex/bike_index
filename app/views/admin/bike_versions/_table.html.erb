@@ -7,7 +7,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Name", header_classes: "tw:font-normal", classes: "tw:text-xs") do |bike_version| %>
+  <% table.column(label: "Name", classes: "tw:text-xs") do |bike_version| %>
     <%= bike_version.name&.truncate(30) %>
   <% end %>
 
@@ -31,7 +31,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Details", header_classes: "tw:font-normal", classes: "tw:text-xs") do |bike_version| %>
+  <% table.column(label: "Details", classes: "tw:text-xs") do |bike_version| %>
     <%= bike_version.mnfg_name %>
 
     <% if bike_version.year.present? %>

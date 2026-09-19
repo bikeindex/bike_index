@@ -15,11 +15,11 @@
     <%= stolen_notification.bike ? stolen_notification.bike.title_string : "Bike deleted!" %>
   <% end %>
 
-  <% table.column(label: "Message", header_classes: "tw:font-normal") do |stolen_notification| %>
+  <% table.column(label: "Message") do |stolen_notification| %>
     <%= stolen_notification.message.truncate(120) %>
   <% end %>
 
-  <% table.column(label: "Sent", header_classes: "tw:font-normal", classes: "tw:text-center") do |stolen_notification| %>
+  <% table.column(label: "Sent", classes: "tw:text-center") do |stolen_notification| %>
     <% sent_count = stolen_notification.send_dates_parsed.count %>
 
     <% if sent_count == 0 %>

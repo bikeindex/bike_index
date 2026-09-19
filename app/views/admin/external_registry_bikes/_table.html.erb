@@ -17,20 +17,20 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Info", classes: "tw:hidden tw:lg:table-cell", header_classes: "tw:font-normal") do |bike| %>
+  <% table.column(label: "Info", classes: "tw:hidden tw:lg:table-cell") do |bike| %>
     <%= bike.frame_model %>
     <span class="less-strong"><%= bike.frame_colors.to_sentence %></span>
   <% end %>
 
-  <% table.column(label: "Location", header_classes: "tw:text-xs tw:font-normal") do |bike| %>
+  <% table.column(label: "Location", header_classes: "tw:text-xs") do |bike| %>
     <small><%= bike.short_address %></small>
   <% end %>
 
-  <% table.column(label: "Serial", classes: "admin-bike-table-serial-cell", header_classes: "tw:font-normal") do |bike| %>
+  <% table.column(label: "Serial", classes: "admin-bike-table-serial-cell") do |bike| %>
     <small class="less-strong"><%= bike.serial_number %></small>
   <% end %>
 
-  <% table.column(label: "Registry", header_classes: "tw:font-normal") do |bike| %>
+  <% table.column(label: "Registry") do |bike| %>
     <%= link_to bike.registry_name, bike.url, target: :_blank, class: "twlink" %>
   <% end %>
 <% end %>

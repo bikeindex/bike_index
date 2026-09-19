@@ -43,11 +43,13 @@ module UI
         end
       end
 
-      def th_classes(bordered:)
+      # A plain header beside sortable ones is normal weight, so the sort links stand out
+      def th_classes(bordered:, sortable_table: false)
         classes = ["tw:px-1 tw:py-2"]
         if bordered
           classes << "tw:border-b tw:border-l tw:border-t tw:border-gray-200 tw:dark:border-gray-600"
         end
+        classes << "tw:font-normal" if sortable_table && sortable.blank?
         classes << @classes if @classes
         classes << @header_classes if @header_classes
         classes.join(" ")
