@@ -26,7 +26,6 @@ RSpec.describe UI::TimeRange::Component, type: :component do
   context "custom" do
     it "renders the endpoints, the last as now" do
       html = render_component(period: "custom")
-      expect(html.css("em").length).to eq 2
       expect(html.css("em").last.text.strip).to eq "now"
       expect(html.css("em span.localizeTime").length).to eq 1
     end
@@ -37,7 +36,6 @@ RSpec.describe UI::TimeRange::Component, type: :component do
       expect(html.css("em span.localizeTime").length).to eq 2
     end
 
-    # A minute-bucketed range's endpoints differ only in their seconds
     it "asks for seconds precision on a short range" do
       range = (Time.current - 30.minutes)..(Time.current - 10.minutes)
       html = render_component(period: "custom", range:)

@@ -3,8 +3,7 @@
 module UI
   module TimeRange
     class Component < ApplicationComponent
-      # The localizer reads its precision off the class list, so a range bucketed
-      # by minute has to render seconds for its endpoints to differ
+      # A minute-bucketed range's endpoints differ only in their seconds
       TIME_FORMATS = {group_by_minute: :localize_time_precise_seconds,
                       group_by_hour: :localize_time_precise}.freeze
 
@@ -17,12 +16,17 @@ module UI
 
       def render? = @period.present? && @period != "all"
 
-      def custom? = @period == "custom"
-
+      # A whole sentence per period, so a locale can inflect it
       def period_phrase
-        return translation(".in_the_next", period: @period.delete_prefix("next_")) if @period.match?("next_")
-
-        translation(".in_the_past", period: @period)
+        case @period
+        when "hour" then translation(".in_the_past_hour")
+        when "day" then translation(".in_the_past_day")
+        when "week" then translation(".in_the_past_week")
+        when "month" then translation(".in_the_past_month")
+        when "year" then translation(".in_the_past_year")
+        when "next_week" then translation(".in_the_next_week")
+        when "next_month" then translation(".in_the_next_month")
+        end
       end
 
       def endpoint(time)

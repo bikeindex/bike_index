@@ -1,4 +1,4 @@
-<% if custom? %>
+<% if @period == "custom" %>
   <span>
     <%= translation(".from") %>
     <em><%= render endpoint(@time_range.first) %></em>
