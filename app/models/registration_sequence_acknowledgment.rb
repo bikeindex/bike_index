@@ -41,6 +41,15 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
     def create_for(b_param, sequence:, user: nil)
       create(registration_sequence: sequence, b_param:, user:, owner_email: b_param.owner_email)
     end
+
+    def find_for(bike:, organization:) = for_organization(organization).where(bike_id: bike.id).last
+
+    def bikes_order(organization:, direction:)
+      acknowledged_at = for_organization(organization)
+        .where("registration_sequence_acknowledgments.bike_id = bikes.id")
+        .select("MAX(registration_sequence_acknowledgments.created_at)")
+      Arel.sql("(#{acknowledged_at.to_sql}) #{(direction == "asc") ? "ASC" : "DESC"}")
+    end
   end
 
   def acknowledged_at = created_at
