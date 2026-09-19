@@ -217,6 +217,36 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {search_no_js: true, chart_scope: "year"}
         expect(assigns(:sort_state).search_params[:chart_scope]).to eq "year"
       end
+
+      it "counts whole months for the year scope, and holds them for the hour" do
+        get base_url, headers: frame_headers
+        expect(assigns(:chart_time_range).first).to eq(Time.current.beginning_of_month - 1.year)
+        expect(assigns(:registrations_stats).first.count).to eq 1
+
+        FactoryBot.create(:bike_organized, creation_organization: current_organization)
+        get base_url, headers: frame_headers
+        expect(assigns(:registrations_stats).first.count).to eq 1
+
+        # The searched scope answers the search as it is, so it isn't held
+        get base_url, params: {chart_scope: "search"}, headers: frame_headers
+        expect(assigns(:registrations_stats).first.count).to eq 2
+      end
+    end
+
+    context "search_result_view" do
+      it "defaults to the spreadsheet, and carries what it's given into the next search" do
+        get base_url, params: {search_no_js: true}
+        expect(assigns(:result_view)).to eq :spreadsheet
+
+        get base_url, params: {search_no_js: true, search_result_view: "nonsense"}
+        expect(assigns(:result_view)).to eq :spreadsheet
+
+        get base_url, params: {search_no_js: true, search_result_view: "thumbnail"}
+        expect(assigns(:result_view)).to eq :thumbnail
+        # The view rides in the address bar, so a new search has to carry it
+        expect(Capybara.string(response.body))
+          .to have_css("#Search_Form input[name=search_result_view][value=thumbnail]", visible: :all)
+      end
     end
 
     context "turbo_stream" do

@@ -49,6 +49,32 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(component).to have_text(bike.mnfg_name)
   end
 
+  context "with result_view thumbnail" do
+    let(:sort_state) { ComponentStructs::SortState.new(search_params: {serial: "xyz"}) }
+    let(:options) { super().merge(result_view: "thumbnail", sort_state:) }
+
+    it "renders no chips until the flag is on" do
+      expect(component).to_not have_link("Spreadsheet")
+      expect(component).to_not have_text("View as")
+    end
+
+    it "marks the chip active and carries the search into the other one's link" do
+      Flipper.enable(:organization_registration_view_switcher)
+      expect(component).to have_css("a[data-active='true']", text: "Thumbnail")
+      expect(component).to have_link("Spreadsheet", href: /search_result_view=spreadsheet/)
+      expect(component).to have_link("Spreadsheet", href: /serial=xyz/)
+    end
+
+    context "with an unknown view" do
+      let(:options) { super().merge(result_view: "nonsense") }
+      before { Flipper.enable(:organization_registration_view_switcher) }
+
+      it "falls back to the spreadsheet" do
+        expect(component).to have_css("a[data-active='true']", text: "Spreadsheet")
+      end
+    end
+  end
+
   context "without search_page" do
     let(:search_page) { false }
 

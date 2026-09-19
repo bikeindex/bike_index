@@ -24,6 +24,7 @@ module Organized
         @search_all_locked = params[:search_email].present?
         @search_all = !@search_all_locked && Binxtils::InputNormalizer.boolean(params[:search_all])
         @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
+        @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
         # The chart response has no form in it, so it skips the combobox's per-item lookups

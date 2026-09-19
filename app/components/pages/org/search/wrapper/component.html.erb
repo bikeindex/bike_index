@@ -13,18 +13,20 @@
     </p>
 
     <% if @search_page %>
-      <div class="tw:flex tw:items-center tw:gap-2">
-        <span
-          class="
-            tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400
-            tw:uppercase
-          "
-        >
-          <%= translation(".view_as") %>
-        </span>
+      <% if render_result_view? %>
+        <div class="tw:flex tw:items-center tw:gap-2">
+          <span
+            class="
+              tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400
+              tw:uppercase
+            "
+          >
+            <%= translation(".view_as") %>
+          </span>
 
-        <%= render(UI::ButtonGroup::Component.new(entries: result_view_entries, kind: :toggle)) %>
-      </div>
+          <%= render(UI::ButtonGroup::Component.new(entries: result_view_entries, kind: :toggle)) %>
+        </div>
+      <% end %>
 
       <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
         <%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},

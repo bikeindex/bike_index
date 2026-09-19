@@ -59,6 +59,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_button "Column settings" if panel_for("orgRegistrationColumnsOpen")["class"].include?("tw:hidden!")
   end
 
+  def chart_frame
+    find("turbo-frame#registrations_chart_frame", visible: :all)
+  end
+
   def rendered_bike_ids
     page.all("tbody tr a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
   end
@@ -86,11 +90,17 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", minimum: 2)
 
     # Search by serial number
+    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas", wait: 10)
+    chart_src = chart_frame[:src]
+
     fill_in "serial", with: bike1.serial_number
     click_button "Search registrations"
 
     expect(page).to have_current_path(/serial=/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1)
+    # The card opens on the year scope, which counts the organization rather than the search
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+    expect(chart_frame[:src]).to eq chart_src
 
     # Owner email only searches the organization's registrations, so it locks "search all"
     check "search_all"
@@ -118,6 +128,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_button "Search registrations"
     expect(page).to have_current_path(/search_email=bob/, wait: 10)
     expect(page).to have_current_path(/chart_scope=search/)
+    # ... and on that scope it follows the search
+    expect(page).to have_css("turbo-frame#registrations_chart_frame[src*='search_email=bob']",
+      visible: :all, wait: 10)
 
     # submits when enter is pressed twice
     visit bikes_path
@@ -260,8 +273,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # The default year scope ignores the period, so the daily buckets are the search's
     click_link "Current search"
     expect(page).to have_current_path(/chart_scope=search/, wait: 10)
-    # Chart loads async via a lazy turbo-frame; wait for the canvas before checking the
-    # inline init data - chartkick and Chart.js arrive on demand, from ui--chart
+    # Chart loads async via a lazy turbo-frame; wait for the frame to be the searched one
+    # before checking the inline init data - the previous scope's canvas answers that wait
+    expect(page).to have_css("turbo-frame#registrations_chart_frame[src*='chart_scope=search'][complete]",
+      visible: :all, wait: 10)
     expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas", wait: 10)
     # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket is empty (null)
     expect(page.html).to include(%(["#{la_date_key}",1]))
@@ -296,6 +311,34 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # rendered_bike_ids can read a row that's being replaced mid-render
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
     expect(rendered_bike_ids).to eq([bike2.id])
+  end
+
+  it "moves the result view through the address bar, and back from localStorage" do
+    Flipper.enable(:organization_registration_view_switcher)
+    visit bikes_path
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+
+    click_link "Thumbnail"
+    expect(page).to have_current_path(/search_result_view=thumbnail/, wait: 10)
+    expect(page).to have_css("a[data-active='true']", text: "Thumbnail", wait: 10)
+
+    fill_in "search_email", with: "alice@example.com"
+    click_button "Search registrations"
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_current_path(/search_result_view=thumbnail/)
+
+    # Stored like the column choices, so arriving without the param brings it back
+    visit bikes_path
+    expect(page).to have_current_path(/search_result_view=thumbnail/, wait: 10)
+    expect(page).to have_css("a[data-active='true']", text: "Thumbnail", wait: 10)
+
+    click_link "Spreadsheet"
+    expect(page).to have_current_path(/search_result_view=spreadsheet/, wait: 10)
+
+    # Back to the default, which the address bar has nothing to say about
+    visit bikes_path
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    expect(page).not_to have_current_path(/search_result_view/)
   end
 
   context "with stolen and impounded bikes" do

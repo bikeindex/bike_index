@@ -11,6 +11,14 @@ module Pages
         class Component < ApplicationComponent
           SEARCH_ALL_COUNT_LIMIT = 1_000
 
+          # Display order, and the first is what search_result_view falls back to
+          RESULT_VIEWS = %i[spreadsheet thumbnail].freeze
+
+          def self.permitted_result_view(result_view)
+            view = result_view&.to_sym
+            RESULT_VIEWS.include?(view) ? view : RESULT_VIEWS.first
+          end
+
           def initialize(
             organization:,
             pagy:,
@@ -30,6 +38,7 @@ module Pages
             bike_sticker: nil,
             model_audit: nil,
             settings: nil,
+            result_view: nil,
             search_page: false
           )
             @organization = organization
@@ -50,6 +59,7 @@ module Pages
             @bike_sticker = bike_sticker
             @model_audit = model_audit
             @settings = settings
+            @result_view = self.class.permitted_result_view(result_view)
             # The search page brings its own Stimulus controllers and opens the column panel
             # from this card's header; everywhere else the card is on its own
             @search_page = search_page
@@ -94,11 +104,20 @@ module Pages
             organization_registrations_path(settings.search_params.merge(create_export: true))
           end
 
-          # TODO: the thumbnail chip is inert until the view behind it exists - see the
-          # Bike Thumbnails design doc
+          def render_result_view? = Flipper.enabled?(:organization_registration_view_switcher)
+
+          # TODO: the chips move search_result_view through the URL, but nothing renders the
+          # thumbnail view behind it yet - see the Bike Thumbnails design doc
           def result_view_entries
-            [ComponentStructs::Shapes.entry(translation(".view_spreadsheet"), active: true),
-              ComponentStructs::Shapes.entry(translation(".view_thumbnail"))]
+            RESULT_VIEWS.map do |view|
+              ComponentStructs::Shapes.entry(translation(".view_#{view}"), href: result_view_path(view),
+                active: @result_view == view, data: {turbo_action: "advance"})
+            end
+          end
+
+          def result_view_path(result_view)
+            organization_registrations_path(@organization.to_param,
+              @sort_state.search_params.except(:organization_id).merge(search_result_view: result_view))
           end
 
           def show_pagination?

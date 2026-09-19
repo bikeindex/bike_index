@@ -2,13 +2,18 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global localStorage */
 
+const RESULT_VIEW_KEY = 'orgRegistrationResultView'
+
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'filterSummary', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'chartFollowsSearch', 'filterSummary', 'resultsFrame', 'searchAll', 'searchAllHint']
+  // What the results rendered as, so a stored preference knows whether it has anything to ask for
+  static values = { resultView: String }
 
   connect () {
     this.chartSearch = this.chartParams()
     this.initNotesSearch()
+    this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
 
@@ -19,8 +24,28 @@ export default class extends Controller {
   // The column panel and the chart render inside frames the search replaces. The panel
   // looks after itself - ui--collapse reconnects with it - but the chart is outside them.
   handleFrameRender = (event) => {
+    this.syncResultView()
     if (this.hasChartFrameTarget && event.target === this.chartFrameTarget) return
     this.reloadChart()
+  }
+
+  // Spreadsheet or thumbnail is the server's choice, so restoring the stored one means
+  // asking the frame for it again - only when the address bar names no view, which every
+  // search and every chip leaves it doing.
+  syncResultView () {
+    const params = new URLSearchParams(window.location.search)
+    const inUrl = params.get('search_result_view')
+    if (inUrl) return localStorage.setItem(RESULT_VIEW_KEY, inUrl)
+
+    const stored = localStorage.getItem(RESULT_VIEW_KEY)
+    if (!stored || stored === this.resultViewValue || !this.hasResultsFrameTarget) return
+
+    params.set('search_result_view', stored)
+    const url = `${window.location.pathname}?${params}`
+    // The address bar moves first, so search--form doesn't read the two as out of step.
+    // Replacing rather than pushing: the rider didn't navigate here.
+    window.history.replaceState(window.history.state, '', url)
+    this.resultsFrameTarget.setAttribute('src', url)
   }
 
   initNotesSearch () {
@@ -93,7 +118,7 @@ export default class extends Controller {
   // as the address bar having moved.
   chartParams () {
     const params = new URLSearchParams(window.location.search);
-    ['page', 'sort', 'sort_direction', 'direction', 'per_page'].forEach(name => params.delete(name))
+    ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view'].forEach(name => params.delete(name))
 
     return params.toString()
   }
