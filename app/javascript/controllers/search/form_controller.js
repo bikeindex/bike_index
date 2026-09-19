@@ -69,9 +69,6 @@ export default class extends Controller {
   refreshResults () {
     this.clearStaleFrameBusy()
     this.reloadFrameIfUrlStale()
-    // A frame navigation advances the address bar only once it has rendered, so the sync on
-    // frame-render can't see what it moved to - the org chart's scope arrives this way
-    this.syncHiddenFieldsFromUrl()
   }
 
   // The visible text filters live outside the results frame, so a back/forward

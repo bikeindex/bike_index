@@ -111,6 +111,14 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_field("search_all", checked: false, disabled: false)
     expect(page).not_to have_css("button[aria-label=\"#{search_all_email_disabled}\"]")
 
+    # The chart's scope rides in the address bar, so a search keeps it
+    click_link "Last year"
+    expect(page).to have_current_path(/chart_scope=year/, wait: 10)
+    fill_in "search_email", with: "bob@example.com"
+    click_button "Search registrations"
+    expect(page).to have_current_path(/search_email=bob/, wait: 10)
+    expect(page).to have_current_path(/chart_scope=year/)
+
     # submits when enter is pressed twice
     visit bikes_path
     expect(page).to have_css("table", wait: 10)
