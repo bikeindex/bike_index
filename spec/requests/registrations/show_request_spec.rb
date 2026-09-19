@@ -420,8 +420,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Owner & access")
         expect(body).to match(bike.owner_name)
         expect(body).to match(bike.owner_email)
-        expect(body).to match("E-Vehicle Audit")
-        # Gated by credibility_badges and additional_registrations_information
+        # Gated by e-vehicles, credibility_badges and additional_registrations_information
+        expect(body).to_not match("E-Vehicle Audit")
         expect(body).to_not match("Credibility")
         expect(body).to_not match("Other registrations")
       end
@@ -670,10 +670,10 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to_not match("not allowed to view this registration")
       end
 
-      context "with parking notifications and impound enabled" do
-        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+      context "with parking notifications, impound and bike_stickers enabled" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes bike_stickers]) }
 
-        it "offers create parking notification, not the impound action" do
+        it "offers create parking notification and linking a sticker, not the impound action" do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           # Limited members can create a parking notification
@@ -681,6 +681,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
           # No impound action for limited (create is staff-only, request impound removed)
           expect(response.body).to_not match('data-panel-name="impound"')
           expect(body).to_not match("Request impound")
+          expect(body).to match("Link sticker")
+          expect(response.body).to include(organization_sticker_path(id: "code", organization_id: organization.to_param))
         end
       end
     end
