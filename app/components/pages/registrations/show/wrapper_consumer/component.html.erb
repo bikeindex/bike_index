@@ -13,7 +13,7 @@
           tw:lg:dark:border-gray-700 tw:lg:dark:bg-gray-800
         "
       >
-        <%= render(Pages::Registrations::Show::Photos::Component.new(bike: @bike, owner: @owner, title: title, subtitle: render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)))) %>
+        <%= render(Pages::Registrations::Show::Photos::Component.new(bike: @bike, owner: @owner, title:, subtitle:)) %>
       </div>
     </div>
 
@@ -28,9 +28,9 @@
             <%= title %>
           </h1>
 
-          <p class="tw:mt-1 tw:text-sm tw:opacity-65">
-            <%= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)) %>
-          </p>
+          <% if subtitle %>
+            <p class="tw:mt-1 tw:text-sm tw:opacity-65"><%= subtitle %></p>
+          <% end %>
         </div>
       </div>
 
