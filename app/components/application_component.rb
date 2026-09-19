@@ -5,9 +5,8 @@ class ApplicationComponent < ViewComponent::Base
   # component because the tracker follows only components that opt in, so one missed
   # include in a cached tree is a silently stale fragment.
   #
-  # The tracker reads only a constant directly after `render`; anything else needs a
-  # Template Dependency directive (the frontend-conventions skill has the rule). This
-  # comment can't spell the directive out — the gem scans every ancestor's source for it.
+  # The frontend-conventions skill has the rule for what the tracker misses. This comment
+  # can't spell that directive out: the gem scans every ancestor's source for it.
   include ViewComponent::ExperimentallyCacheable
   include ApplicationComponentHelper
 

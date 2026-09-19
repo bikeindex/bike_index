@@ -37,7 +37,7 @@ RSpec.describe ApplicationComponent, type: :component do
     it "renders every component a Template Dependency names" do
       unreferenced = component_classes.sort_by(&:name).filter_map do |component|
         declared = component.ancestors.select { it <= ApplicationComponent }
-          .flat_map { |ancestor| File.read(ancestor.identifier).scan(ViewComponent::CacheDigest::EXPLICIT_DEPENDENCY).flatten }
+          .flat_map { File.read(it.identifier).scan(ViewComponent::CacheDigest::EXPLICIT_DEPENDENCY) }.flatten
         missing = declared - referenced_components(component).map(&:name)
         "#{component} names #{missing.join(", ")}" if missing.any?
       end
