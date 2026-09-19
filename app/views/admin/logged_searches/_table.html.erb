@@ -47,7 +47,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id") do |logged_search| %>
-    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: logged_search.organization, organization_id: logged_search.organization_id, sort_state:, render_search: true) %>
+    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: logged_search.organization, organization_id: logged_search.organization_id, search_url: url_for(sort_state.search_params.merge(organization_id: logged_search.organization_id)), render_search: true, short_name: true) %>
   <% end %>
 
   <% table.column(sortable: "user_id") do |logged_search| %>

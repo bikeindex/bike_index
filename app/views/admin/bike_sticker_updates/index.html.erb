@@ -75,7 +75,7 @@
             <% end %>
           <% end %>
 
-          <% table.column(label: "Total", footer: number_display(total_counts.values.sum)) do |row| %>
+          <% table.column(label: "Total", footer: number_display(organization_rows.sum { |row| row[:counts].values.sum })) do |row| %>
             <%= number_display(row[:counts].values.sum) %>
           <% end %>
         <% end %>

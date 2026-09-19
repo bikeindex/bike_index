@@ -1,4 +1,5 @@
 <%# locals: (user_alerts:, render_sortable: false, skip_user: false) %>
+<%# render_message ||= false # Hidden by default, I don't think this is really a thing %>
 
 <%= render(UI::Table::Component.new(records: user_alerts, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |user_alert| %>
@@ -53,4 +54,10 @@
   <% table.column(label: "Notified", header_classes: "tw:text-xs") do |user_alert| %>
     <%= check_mark if user_alert.notification.present? %>
   <% end %>
+
+  <%# unless render_message %>
+  <%# table.column(label: "Message", header_classes: "tw:text-xs") do |user_alert| %>
+  <%# <small>user_alert.message</small> %>
+  <%# end %>
+  <%# end %>
 <% end %>

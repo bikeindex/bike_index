@@ -48,7 +48,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id") do |payment| %>
-    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: payment.organization, organization_id: payment.organization_id, sort_state:, render_search: render_organization_search) %>
+    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: payment.organization, organization_id: payment.organization_id, search_url: url_for(sort_state.search_params.merge(organization_id: payment.organization_id)), render_search: render_organization_search, short_name: true) %>
   <% end %>
 
   <% table.column(sortable: "invoice_id") do |payment| %>
