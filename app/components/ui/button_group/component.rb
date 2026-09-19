@@ -11,7 +11,7 @@ module UI
       # Template Dependency: UI::Button::Component
       KINDS = %i[button toggle].freeze
 
-      CHIP_CLASSES = "#{UI::Button::Component.build_classes(color: :secondary, size: :md)} tw:leading-4".freeze
+      CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
 
       # Track and segment sizes come from kelsey_redesign/new-org-search/, not the type scale
       TRACK_CLASSES = "tw:inline-flex tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
@@ -38,7 +38,7 @@ module UI
       def self.group_classes(kind:, full_width:)
         case kind
         when :button
-          full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-x-1 tw:gap-y-2"
+          full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-1"
         when :toggle
           # The track sizes itself to its segments, so there's no column layout to widen
           raise ArgumentError, "full_width is not supported for the toggle kind" if full_width
