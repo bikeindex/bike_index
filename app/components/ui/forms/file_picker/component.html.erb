@@ -1,0 +1,64 @@
+<%# drop is bound to the root, not the frame, so dropping on the button works too. %>
+<div
+  data-controller="ui--forms--file-upload"
+  data-ui--forms--file-upload-placeholder-value="<%= @placeholder %>"
+  <%# Blank unless the caller named an endpoint - the controller only uploads when it has one %>
+  data-ui--forms--file-upload-url-value="<%= @url %>"
+  data-ui--forms--file-upload-uploading-value="<%= translation(".uploading") %>"
+  data-ui--forms--file-upload-failed-value="<%= translation(".upload_failed") %>"
+  data-action="drop->ui--forms--file-upload#drop dragover@document->ui--forms--file-upload#dragOver dragleave@document->ui--forms--file-upload#endDrag drop@document->ui--forms--file-upload#endDrag"
+  <%= tag.attributes(data: @data) %>
+>
+  <%#
+    The drop target spans the field, framing what's attached and the controls. An outline rather than a
+    border -- drawn outside the box, so the controls line up with the field's own label instead
+    of being indented by padding held in reserve; my-2 is what keeps it off that label.
+    data-over rather than is-active, which also matches :active and would flash the frame
+    whenever the button inside it is pressed.
+  %>
+
+  <div
+    class="
+      tw:my-2 tw:rounded-lg tw:outline-2 tw:outline-offset-2
+      tw:outline-transparent tw:transition-colors tw:outline-dashed
+      tw:data-[dragging=true]:outline-gray-300
+      tw:data-[over=true]:bg-blue-50 tw:data-[over=true]:outline-blue-500
+      tw:dark:data-[dragging=true]:outline-gray-600
+      tw:dark:data-[over=true]:bg-blue-950
+    "
+    data-ui--forms--file-upload-target="dropZone"
+    data-action="dragenter->ui--forms--file-upload#highlightDropZone dragleave->ui--forms--file-upload#unhighlightDropZone"
+  >
+    <%= attached %>
+
+    <%# flex-wrap: the long label and the camera button coincide on a `pointer: none` device %>
+    <div class="tw:relative tw:inline-flex tw:flex-wrap tw:items-center tw:gap-3">
+      <%# sr-only keeps the native input focusable and in the accessibility tree; the label below is the visible, clickable button. %>
+      <%= file_input %>
+
+      <%# Stimulus has no default event for a label, so name click explicitly. %>
+      <%= label_tag @input_id, label_content, class: @label_classes, data: {action: "click->ui--forms--file-upload#chooseFile"} %>
+
+      <% if @camera %>
+        <%# `capture` only reaches a camera on touch devices; a fine pointer would just reopen the file picker. %>
+        <%= render UI::Button::Component.new(
+              html_class: "tw:whitespace-nowrap tw:pointer-fine:hidden",
+              data: {action: "ui--forms--file-upload#takePicture"}
+            ) do %>
+          <%# hidden from AT: the button's own text already names it %>
+          <%= helpers.inline_svg_tag("icons/camera.svg", class: "tw:h-4 tw:w-4", aria_hidden: true) %>
+          <%= translation(".take_picture") %>
+        <% end %>
+      <% end %>
+
+      <span
+        class="tw:min-w-0 tw:truncate tw:text-gray-500 tw:dark:text-gray-400"
+        data-ui--forms--file-upload-target="filename"
+      >
+        <%= @placeholder %>
+      </span>
+    </div>
+
+    <%= status %>
+  </div>
+</div>

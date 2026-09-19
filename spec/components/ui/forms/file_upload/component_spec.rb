@@ -30,6 +30,13 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
     expect(component).to have_no_css("img[src]")
   end
 
+  # A bare input tag renders the same, but leaves the form url-encoded - so the file never posts
+  it "renders through the form builder, which makes the form multipart" do
+    component
+
+    expect(form_builder.multipart).to be true
+  end
+
   context "with html_options" do
     let(:options) { {html_options: {accept: "image/png", multiple: true}} }
 
@@ -37,15 +44,6 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       expect(component).to have_css("input[type='file'][accept='image/png']")
       expect(component).to have_css("input[multiple]")
     end
-  end
-
-  it "accepts a string, an array, or nothing" do
-    expect(render_inline(described_class.new(form_builder:, attribute:, accept: "image/png,image/jpeg")))
-      .to have_css("input[type='file'][accept='image/png,image/jpeg']")
-    expect(render_inline(described_class.new(form_builder:, attribute:, accept: %w[.png .jpg])))
-      .to have_css("input[type='file'][accept='.png,.jpg']")
-    expect(render_inline(described_class.new(form_builder:, attribute:)))
-      .to have_no_css("input[type='file'][accept]")
   end
 
   describe "direct_upload_url" do
@@ -90,42 +88,6 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       # no versions to pick from, so the preview is the attachment itself
       it "previews the attachment, linking to the same url" do
         expect(component).to have_css("a[href='#{record.image_url}'] img[alt='Image'][src='#{record.image_url}']")
-      end
-    end
-  end
-
-  describe "camera" do
-    context "when only images are accepted" do
-      let(:options) { {accept: ImageUploader.permitted_extensions} }
-
-      it "renders a camera button with the camera icon" do
-        expect(component).to have_css("button[data-action='ui--forms--file-upload#takePicture']", text: "Take picture")
-        # decorative -- the button text is what names it
-        expect(component).to have_css("button svg[aria-hidden='true']")
-      end
-    end
-
-    context "when a non-image is also accepted" do
-      let(:options) { {accept: PdfUploader.permitted_extensions} }
-
-      it "renders no camera button" do
-        expect(component).to have_no_css("button[data-action='ui--forms--file-upload#takePicture']")
-      end
-    end
-
-    context "when forced on for a non-image accept" do
-      let(:options) { {accept: ".csv", camera: true} }
-
-      it "renders a camera button" do
-        expect(component).to have_css("button[data-action='ui--forms--file-upload#takePicture']", text: "Take picture")
-      end
-    end
-
-    context "when forced off for an image accept" do
-      let(:options) { {accept: "image/*", camera: false} }
-
-      it "renders no camera button" do
-        expect(component).to have_no_css("button[data-action='ui--forms--file-upload#takePicture']")
       end
     end
   end

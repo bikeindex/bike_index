@@ -5583,7 +5583,7 @@ nl:
           not_real: Dat lijkt niet uw echte e-mailadres te zijn. Voer een e-mailadres
             in waarop u e-mails ontvangt.
           submit_anyway: Formulier toch verzenden
-        file_upload:
+        file_picker:
           no_file_chosen: Geen bestand gekozen
           take_picture: Maak een foto
           upload: Uploaden

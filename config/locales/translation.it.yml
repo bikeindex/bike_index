@@ -5692,7 +5692,7 @@ it:
           not_real: Questo non sembra essere il tuo vero indirizzo email. Inserisci
             un indirizzo email a cui ricevi le email.
           submit_anyway: Invia comunque il modulo
-        file_upload:
+        file_picker:
           no_file_chosen: Nessun file selezionato
           take_picture: Scatta una foto
           upload: Caricamento

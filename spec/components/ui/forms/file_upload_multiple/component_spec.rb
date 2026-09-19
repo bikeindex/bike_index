@@ -41,13 +41,6 @@ RSpec.describe UI::Forms::FileUploadMultiple::Component, type: :component do
     end
   end
 
-  it "accepts a string, an array, or nothing" do
-    expect(render_inline(described_class.new(url: "/x", file_param: "f", accept: "image/png,image/jpeg")))
-      .to have_css("input[type='file'][accept='image/png,image/jpeg']")
-    expect(render_inline(described_class.new(url: "/x", file_param: "f", accept: %w[.png .jpg])))
-      .to have_css("input[type='file'][accept='.png,.jpg']")
-  end
-
   # Two on a page would otherwise hand both labels the same input
   it "gives the input an id of its own, which its label points at" do
     ids = 2.times.map { render_inline(described_class.new(url: "/x", file_param: "f")).css("input[type=file]").first["id"] }

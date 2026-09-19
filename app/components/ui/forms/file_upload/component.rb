@@ -7,66 +7,26 @@ module UI
       # the bytes. The field still renders as an ordinary one, so it posts the file when JS
       # doesn't run - the controller drops its name only once it's driving the upload.
       class Component < ApplicationComponent
-        # mb-0 cancels legacy bootstrap's `label` margin, which items-center would
-        # otherwise center along with the button next to it. The ring restates
-        # UI::Button's COLORS[:secondary] focus color under the peer variant.
-        LABEL_CLASSES = "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-purple-500/40"
-
         def initialize(form_builder:, attribute:, accept: nil, camera: nil, direct_upload_url: nil, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
-          @placeholder = translation(".no_file_chosen")
-
-          accept_list = Array(accept).flat_map { it.to_s.split(",") }.filter_map { it.strip.presence }
-          # `capture` hands back a photo, so the camera is only offered when nothing
-          # but images are accepted -- never on a CSV or PDF field.
-          @camera = camera.nil? ? accept_list.any? && accept_list.all? { image?(it) } : camera
+          @accept = accept
+          @camera = camera
 
           @attachment_url = attached_url
           @thumbnail_url = thumbnail_version_url || @attachment_url
 
-          @upload_url = direct_upload_url
+          @direct_upload_url = direct_upload_url
           # Carries the blob the browser uploaded. Scoped to the form builder like every other
           # field here, so two of these on one page don't collide on the same param
           @signed_id_field = "#{form_builder.object_name}[#{attribute}_signed_id]" if direct_upload_url.present?
-          @html_options = {
-            class: "tw:peer tw:sr-only",
-            accept: accept_list.join(",").presence,
-            data: {"ui--forms--file-upload-target": "input", action: "ui--forms--file-upload#display"}
-          }.merge(html_options)
-
-          # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.
-          @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: LABEL_CLASSES)
+          @html_options = html_options
         end
-
-        # FileUploadMultiple renders this template, so it reads these keys rather than its own
-        def component_translation_scope = %i[components ui forms file_upload]
 
         private
 
-        # sr-only keeps the native input focusable and in the accessibility tree; the label is the visible, clickable button.
-        def file_input = @form_builder.file_field(@attribute, @html_options)
-
-        # Stimulus has no default event for a label, so name click explicitly.
-        def file_label
-          @form_builder.label(@attribute, label_content, class: @label_classes,
-            data: {action: "click->ui--forms--file-upload#chooseFile"})
-        end
-
-        # The button's gap-1.5 spaces these; the icon is decorative, the text names it.
-        def label_content
-          safe_join([
-            helpers.inline_svg_tag("icons/upload.svg", class: "tw:h-4 tw:w-4", aria_hidden: true),
-            translation(".upload")
-          ])
-        end
-
-        def image?(accept_entry)
-          accept_entry.start_with?("image/") || ApplicationUploader.permitted_extensions.include?(accept_entry.downcase)
-        end
-
         def record
-          @form_builder&.object
+          @form_builder.object
         end
 
         def attachment
