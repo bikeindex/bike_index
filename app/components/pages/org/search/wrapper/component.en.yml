@@ -5,7 +5,16 @@ en:
       org:
         search:
           wrapper:
+            column_settings: Column settings
             e_vehicles_for_audit: 'E-Vehicles for audit:'
-            matching_bikes_html: "%{count} %{cycle_type} matching"
-            registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
+            export_csv: Export CSV
+            export_unavailable: >-
+              Exports only include your organization's registrations. Turn off searching
+              all registrations to export.
+            matching_html: "%{count} matching %{cycle_type}"
+            per_page: Results per page
+            showing_html: showing %{from}–%{to} of %{count}
+            view_as: View as
             view_matching_any_audit: view matching any audit
+            view_spreadsheet: Spreadsheet
+            view_thumbnail: Thumbnail

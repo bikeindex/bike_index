@@ -92,7 +92,7 @@
     class="tw:mb-4 tw:flex tw:flex-wrap tw:gap-3"
   ></div>
 
-  <%= render Pages::Org::Search::Settings::Component.new(settings:, skip_search_and_filters: true) %>
+  <%= render Pages::Org::Search::Settings::Component.new(settings:) %>
 
   <div id="multi_serial_results" data-org--multi-search-target="results"></div>
 <% end %>

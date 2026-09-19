@@ -5,6 +5,8 @@ module Organized
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type
       acknowledged_at]
 
+    helper_method :chart_scope_paths
+
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response]
     around_action :set_reading_role, only: :multi_search_response
     # new renders a component, which takes its content type from the request - and index
@@ -18,10 +20,14 @@ module Organized
 
       if current_organization.enabled?("bike_search")
         @search_claimedness = "all"
+        # Owner email and name only search the organization's own registrations
+        @search_all_locked = params[:search_email].present?
+        @search_all = !@search_all_locked && Binxtils::InputNormalizer.boolean(params[:search_all])
+        @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
-        @search_query_present = permitted_org_registration_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
         @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
-        @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+        # The chart response has no form in it, so it skips the combobox's per-item lookups
+        @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params) unless chart_only?
         @per_page = permitted_per_page(default: 10)
 
         if create_export?
@@ -29,7 +35,7 @@ module Organized
           create_export_and_redirect
         elsif chart_only?
           search_organization_bikes
-          render UI::ChartAsyncFrame::Component.new(id: :registrations_chart_frame, chart: registrations_chart), layout: false
+          render chart_card_component, layout: false
         elsif @render_results
           search_organization_bikes
           respond_to do |format|
@@ -120,18 +126,64 @@ module Organized
       SORTABLE_COLUMNS
     end
 
+    # The frame asking, with no render_chart gate: the card always loads, and the scope links
+    # put this URL in the address bar, where a reload has to be the whole page
+    def chart_only?
+      turbo_frame_request_id == Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s
+    end
+
+    def chart_card_component
+      Pages::Org::Search::ChartCard::Component.new(scope: @chart_scope, scope_paths: chart_scope_paths,
+        chart: registrations_chart, stats: registrations_stats)
+    end
+
+    def chart_scope_paths
+      @chart_scope_paths ||= Pages::Org::Search::ChartCard::Component::SCOPES.to_h do |scope|
+        # The org is the path segment; left in the params it's a string key the route can't
+        # read, so it would double up in the query these links advance the address bar to
+        [scope.to_sym, organization_registrations_path(current_organization.to_param,
+          helpers.sortable_search_params.except(:organization_id).merge(chart_scope: scope))]
+      end
+    end
+
+    # `year` ignores the search, so the card still answers when the search has narrowed to
+    # a handful of bikes
+    def chart_scope_year?
+      @chart_scope == "year"
+    end
+
+    def chart_bikes
+      @chart_bikes ||= (chart_scope_year? ? organization_bikes : @searched_bikes).unscope(:order)
+    end
+
+    def chart_time_range
+      @chart_time_range ||= chart_scope_year? ? ((Time.current.beginning_of_day - 1.year)..Time.current) : @time_range
+    end
+
+    def registrations_stats
+      OrgServices::RegistrationStats.for_range(chart_bikes, chart_time_range,
+        compare: chart_scope_year? || @period != "all")
+    end
+
+    # The bands partition the total: an e-vehicle reported stolen is counted once, as stolen
     def registrations_chart
-      return nil if @available_bikes.blank?
+      in_range = chart_bikes.where(created_at: chart_time_range)
+      not_stolen = in_range.where.not(status: "status_stolen")
+      scopes = {registrations: not_stolen.where.not(propulsion_type: PropulsionType::MOTORIZED),
+                motorized: not_stolen.motorized,
+                stolen: in_range.where(status: "status_stolen")}
 
       UI::Chart::Component.new(
-        series: UI::Chart::Component.time_range_counts(
-          collection: @available_bikes.unscope(:order),
-          time_range: @time_range,
-          column: "bikes.created_at"
-        ),
-        time_range: @time_range,
+        series: scopes.map { |key, scope| {name: t("components.pages.org.search.chart_card.chart_#{key}"), data: chart_counts(scope)} },
+        time_range: chart_time_range,
+        colors: Pages::Org::Search::ChartCard::Component::BANDS.values.map { it[:hex] },
+        height: "180px",
         stacked: true
       )
+    end
+
+    def chart_counts(bikes)
+      UI::Chart::Component.time_range_counts(collection: bikes, time_range: chart_time_range, column: "bikes.created_at")
     end
 
     def organization_bikes
@@ -145,43 +197,21 @@ module Organized
     # NOTE: Make sure to add any custom search params to no_org_search_params?
     def search_organization_bikes
       org = current_organization || passive_organization
-      if org.present?
-        bikes = org.bikes.search(@interpreted_params)
-        bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
-        bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present?
-      else
-        bikes = Bike.search(@interpreted_params)
-      end
-      if params[:search_stickers].present?
-        @search_stickers = (params[:search_stickers] == "none") ? "none" : "with"
-        bikes = (@search_stickers == "none") ? bikes.no_bike_sticker : bikes.bike_sticker
-      else
-        @search_stickers = false
-      end
-      if %w[none with with_street without_street].include?(params[:search_address])
-        @search_address = params[:search_address]
-        # Currently removed none and with - instead using street - I think that reflects people's expectations
-        bikes = case @search_address
-        when "none" then bikes.without_location
-        when "without_street" then bikes.without_street
-        when "with_street" then bikes.with_street
-        when "with" then bikes.with_location
-        end
-      else
-        @search_address = false
-      end
-      if search_status != "all"
-        bikes = if search_status == "not_impounded"
-          bikes.where.not(status: "status_impounded")
-        else
-          bikes.where(status: "status_#{search_status}")
-        end
-      end
+      set_search_filter_params
+      bikes = (@search_all || org.blank?) ? Bike.search(@interpreted_params) : org.bikes.search(@interpreted_params)
+      bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
+      bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
+      bikes = sticker_scoped(bikes)
+      bikes = address_scoped(bikes)
+      bikes = status_scoped(bikes)
+      bikes = unregisteredness_scoped(bikes)
       if params[:search_model_audit_id].present?
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
       end
-      @available_bikes = bikes.where(created_at: @time_range) # Maybe sometime we'll do charting
+      # The chart card counts an earlier window too, so it needs the search without a period
+      @searched_bikes = bikes
+      @available_bikes = @searched_bikes.where(created_at: @time_range)
       return if chart_only?
 
       @pagy, @bikes = pagy(:countish, @available_bikes.reorder(search_order(org)), limit: @per_page, page: permitted_page)
@@ -193,7 +223,8 @@ module Organized
       RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)
     end
 
-    # Set filter params for settings component on initial (non-turbo) page load
+    # Every filter normalizes here and applies in its own *_scoped, so the shell render (which
+    # only needs the values, to draw the settings panel) and the search can't drift apart
     def set_search_filter_params
       @search_stickers = if params[:search_stickers].present?
         (params[:search_stickers] == "none") ? "none" : "with"
@@ -201,7 +232,50 @@ module Organized
         false
       end
       @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
+      @search_unregisteredness = permitted_filter(:search_unregisteredness)
       search_status
+    end
+
+    # Off the chips' own table, so a value can't be added to one side only
+    def permitted_filter(param)
+      values = ComponentStructs::OrgSearchSettings::FILTER_GROUPS.fetch(param)[:values]
+
+      values.key?(params[param].to_s.to_sym) ? params[param] : false
+    end
+
+    def sticker_scoped(bikes)
+      return bikes unless @search_stickers
+
+      (@search_stickers == "none") ? bikes.no_bike_sticker : bikes.bike_sticker
+    end
+
+    # none and with are removed in favour of street - it reflects people's expectations better
+    def address_scoped(bikes)
+      case @search_address
+      when "none" then bikes.without_location
+      when "without_street" then bikes.without_street
+      when "with_street" then bikes.with_street
+      when "with" then bikes.with_location
+      else bikes
+      end
+    end
+
+    def status_scoped(bikes)
+      case search_status
+      when "all" then bikes
+      when "not_impounded" then bikes.where.not(status: "status_impounded")
+      else bikes.where(status: "status_#{search_status}")
+      end
+    end
+
+    # A question about the bike's own status, not the notices on it - and the same column
+    # search_status filters, so setting both to named statuses matches nothing
+    def unregisteredness_scoped(bikes)
+      case @search_unregisteredness
+      when "only_unregistered" then bikes.unregistered_parking_notification
+      when "only_registered" then bikes.not_unregistered_parking_notification
+      else bikes
+      end
     end
 
     def search_status
@@ -212,8 +286,11 @@ module Organized
       @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : valid_statuses.last
     end
 
+    # An export reaches every matched bike, so it's refused once the search has widened
+    # past the organization's own registrations
     def create_export?
-      current_organization.enabled?("csv_exports") && Binxtils::InputNormalizer.boolean(params[:create_export])
+      current_organization.enabled?("csv_exports") && !@search_all &&
+        Binxtils::InputNormalizer.boolean(params[:create_export])
     end
 
     def create_export_and_redirect
@@ -246,8 +323,8 @@ module Organized
     def no_org_search_params?
       return false if params[:search_stickers].present? && params[:search_stickers] != "all"
 
-      params.slice(:search_address, :search_email, :search_model_audit_id, :search_notes, :search_status)
-        .values.reject(&:blank?).none?
+      params.slice(:search_address, :search_email, :search_model_audit_id, :search_notes, :search_status,
+        :search_unregisteredness).values.reject(&:blank?).none?
     end
 
     def no_interpreted_params?

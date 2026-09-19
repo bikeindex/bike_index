@@ -11,16 +11,19 @@ en:
             avery_cell: Avery Exportable
             bike: registration
             color_cell: Color
-            create_export_of_vehicles: Create export of searched %{cycle_type}
             created_at_cell: Registered
             creation_description_cell: Source
             cycle_type_cell: Vehicle type
             default: default
+            export_csv: Export CSV
+            export_unavailable: Can't create export of this
             filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address
             filter_no_sticker_html: only <strong>no</strong> sticker
             filter_not_impounded_html: only <strong>not</strong> impounded
             filter_not_stolen_or_impounded_html: not stolen or impounded
+            filter_not_unregistered_html: "<strong>not</strong> unregistered"
+            filter_only_unregistered_html: only <strong>unregistered</strong>
             filter_stolen_html: only stolen
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
@@ -46,6 +49,7 @@ en:
             sticker_cell: Sticker
             stickers: 'Stickers:'
             stolen_cell: Stolen
+            unregistered: 'Unregistered:'
             updated_at_cell: Updated
             url_cell: URL
             vehicle: registration

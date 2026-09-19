@@ -116,7 +116,16 @@ export default class extends Controller {
     const first = new URL(url, window.location.origin)
     const second = new URL(otherUrl, window.location.origin)
 
-    return first.pathname === second.pathname && first.search !== second.search
+    return first.pathname === second.pathname && this.resultsSearch(first) !== this.resultsSearch(second)
+  }
+
+  // The org chart's scope rides in the address bar so a reload keeps it, but the results
+  // are the same under either scope - switching it mustn't re-run the search.
+  resultsSearch (url) {
+    const params = new URLSearchParams(url.search)
+    params.delete('chart_scope')
+
+    return params.toString()
   }
 
   // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward

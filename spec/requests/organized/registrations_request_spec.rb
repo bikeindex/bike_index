@@ -28,7 +28,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response.body).to_not include("fbevents.js")
       expect(assigns(:current_organization)).to eq current_organization
-      expect(assigns(:search_query_present)).to be_truthy
       expect(assigns(:bikes).pluck(:id)).to eq([])
       expect(assigns(:search_stickers)).to eq false
       # create_export fails if the org doesn't have have csv_exports
@@ -39,7 +38,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       get base_url, params: {search_no_js: true, search_address: "without_street"}
       expect(response.status).to eq(200)
-      expect(assigns(:search_query_present)).to be_falsey
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
     context "member_no_bike_edit" do
@@ -49,7 +47,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: query_params
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
-        expect(assigns(:search_query_present)).to be_truthy
         expect(assigns(:bikes).pluck(:id)).to eq([])
       end
     end
@@ -139,6 +136,103 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         end
       end
     end
+    context "with search_all" do
+      it "reaches past the organization's own registrations, and refuses an export" do
+        get base_url, params: {search_no_js: true}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        get base_url, params: {search_no_js: true, search_all: true}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_all)).to be_truthy
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, non_organization_bike.id])
+        expect(Capybara.string(response.body)).to have_field("search_all", checked: true, disabled: false)
+      end
+
+      context "with search_email" do
+        let!(:non_organization_bike) { FactoryBot.create(:bike, owner_email: bike.owner_email) }
+
+        it "only searches the organization's registrations" do
+          get base_url, params: {search_no_js: true, search_all: true, search_email: bike.owner_email}
+          expect(response.status).to eq(200)
+          expect(assigns(:search_all)).to be_falsey
+          expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+          body = Capybara.string(response.body)
+          expect(body).to have_field("search_all", checked: false, disabled: true)
+          expect(body).to have_css("button[aria-label=\"You can only search your organization's registrations with owner email or name\"]")
+        end
+      end
+
+      context "with csv_exports" do
+        let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+        it "doesn't create an export" do
+          expect {
+            get base_url, params: {search_no_js: true, search_all: true, create_export: true, serial: bike.serial_number}
+          }.to_not change(Export, :count)
+          expect(response.status).to eq(200)
+        end
+      end
+    end
+
+    context "with search_unregisteredness" do
+      let!(:unregistered_bike) do
+        FactoryBot.create(:bike_organized, creation_organization: current_organization,
+          status: "unregistered_parking_notification")
+      end
+
+      it "filters on the bike's own status" do
+        get base_url, params: {search_no_js: true, search_unregisteredness: "only_unregistered"}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_unregisteredness)).to eq "only_unregistered"
+        expect(assigns(:bikes).pluck(:id)).to eq([unregistered_bike.id])
+
+        get base_url, params: {search_no_js: true, search_unregisteredness: "only_registered"}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        # and an unrecognized value doesn't filter
+        get base_url, params: {search_no_js: true, search_unregisteredness: "whatever"}
+        expect(assigns(:search_unregisteredness)).to eq false
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, unregistered_bike.id])
+
+        # nor does a malformed one
+        get base_url, params: {search_no_js: true, search_unregisteredness: ["only_unregistered"]}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_unregisteredness)).to eq false
+      end
+    end
+
+    context "the chart frame asking" do
+      let(:frame_headers) { {"Turbo-Frame" => "registrations_chart_frame"} }
+
+      it "renders the chart alone, with the searched counts" do
+        get base_url, headers: frame_headers
+        expect(response.status).to eq(200)
+        expect(response.body).to include('id="registrations_chart_frame"')
+        expect(assigns(:chart_scope)).to eq "search"
+        expect(response.body).to include("Total registrations")
+        expect(response.body).to_not include("Find a registration")
+      end
+
+      it "steps outside the search for the year scope" do
+        get base_url, params: {chart_scope: "year", serial: "no-match-at-all"}, headers: frame_headers
+        expect(response.status).to eq(200)
+        expect(assigns(:chart_scope)).to eq "year"
+        expect(response.body).to include("Last year overview")
+      end
+
+      # The scope links advance the address bar, so what they put there has to be the page
+      it "links the scopes at the page's own URL, carrying the search" do
+        get base_url, params: {period: "week"}, headers: frame_headers
+        expect(response.body).to include("chart_scope=year&amp;period=week")
+      end
+
+      # Sorting is a different question than which scope the chart is answering
+      it "keeps the scope in the URL through a sort" do
+        get base_url, params: {search_no_js: true, chart_scope: "year"}
+        expect(response.body).to include("chart_scope=year&amp;direction=asc")
+      end
+    end
+
     context "turbo_stream" do
       it "renders with update action" do
         get base_url, as: :turbo_stream
@@ -171,7 +265,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {search_no_js: true}
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
-        expect(assigns(:search_query_present)).to be_falsey
         expect(assigns(:search_stickers)).to eq false
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
         expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})

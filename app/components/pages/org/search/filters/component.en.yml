@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      org:
+        search:
+          filters:
+            date_range: 'Date range:'
+            search_settings: Search settings

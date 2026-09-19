@@ -161,25 +161,38 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
-  describe "default_open?" do
-    it "is false" do
-      expect(instance.default_open?).to be_falsey
+  describe "filter_groups" do
+    let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes] }
+    let(:search_status) { "impounded" }
+
+    it "returns a group per enabled filter, carrying the searched value" do
+      groups = instance.filter_groups
+      expect(groups.map { it[:name] })
+        .to eq(%i[search_stickers search_address search_status search_unregisteredness])
+      expect(groups.find { it[:name] == :search_status }[:selected]).to eq "impounded"
+      expect(groups.find { it[:name] == :search_stickers }[:entries].map { it[:value] })
+        .to eq ["", "with", "none"]
     end
 
-    context "with search_address" do
-      let(:search_address) { "with_street" }
+    context "with no optional features" do
+      let(:enabled_feature_slugs) { %w[bike_search] }
 
-      it "is true" do
-        expect(instance.default_open?).to be_truthy
+      it "returns only the ungated ones" do
+        expect(instance.filter_groups.map { it[:name] })
+          .to eq %i[search_status search_unregisteredness]
       end
     end
+  end
 
-    context "with search_open param" do
-      let(:options) { super().merge(params: {search_open: "true"}) }
+  describe "export_disabled?" do
+    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
-      it "is true" do
-        expect(instance.default_open?).to be_truthy
-      end
+    it "is true once the search reaches past the organization, which still renders the export" do
+      expect(instance.export_disabled?).to be false
+
+      search_all = described_class.new(**options.merge(search_all: true))
+      expect(search_all.render_export?).to be true
+      expect(search_all.export_disabled?).to be true
     end
   end
 

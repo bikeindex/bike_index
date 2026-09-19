@@ -1,81 +1,123 @@
-<%= tag.div(class: "org-search-component", data: component_wrapper_data_attributes) do %>
-  <% if @skip_search_and_filters %>
-    <%= render(settings_component) unless @skip_settings %>
-  <% else %>
-    <div class="mb-4">
-      <%= render(Pages::Org::Search::Form::Component.new(
-        target_search_path: organization_registrations_path(organization_id: @organization.to_param),
-        interpreted_params: @interpreted_params.merge(search_email: @params[:search_email], search_notes: @params[:search_notes]).compact,
-        settings: @skip_settings ? nil : settings
-      )) %>
-    </div>
-  <% end %>
+<%= tag.div(class: card_classes, data: card_data_attributes) do %>
+  <div
+    class="
+      tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:px-4
+      tw:py-3
+    "
+  >
+    <p class="tw:mb-0">
+      <%= translation(".matching_html", count: count_display,
+        cycle_type: settings.cycle_type.pluralize(@pagy.count)) %>
 
-  <% unless @skip_count %>
-    <div class="tw:mt-4 tw:flex tw:items-baseline tw:justify-between">
-      <p class="tw:mb-0">
-        <% bikes_count = number_display(@pagy.count) %>
+      <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
+    </p>
 
-        <% if show_search_query_summary? %>
-          <%= translation(".matching_bikes_html",
-            count: bikes_count, cycle_type: settings.cycle_type.pluralize(@pagy.count)) %>
-        <% else %>
-          <%= translation(".registered_bikes_html",
-            count: bikes_count, cycle_type: settings.cycle_type.pluralize(@pagy.count),
-            org_name: @organization.short_name) %>
-        <% end %>
+    <% if @search_page %>
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <span
+          class="
+            tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400
+            tw:uppercase
+          "
+        >
+          <%= translation(".view_as") %>
+        </span>
 
-        <% if settings.active_search_filter_descriptions.any? %>
-          <em>— <%= safe_join(settings.active_search_filter_descriptions, " · ") %></em>
-        <% end %>
-
-        <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
-      </p>
-    </div>
-  <% end %>
-
-  <% unless @skip_search_and_filters %>
-    <% if @model_audit.present? %>
-      <p class="mt-0">
-        <%= translation(".e_vehicles_for_audit") %>
-        <a class="gray-link" href="<%= organization_model_audit_path(@model_audit.to_param, organization_id: @organization.to_param) %>"><%= model_audit_display(@model_audit) %></a>
-        &nbsp;
-        <%= link_to translation(".view_matching_any_audit"),
-            url_for(@sort_state.search_params.merge(search_model_audit_id: nil)),
-            class: "gray-link small" %>
-      </p>
-    <% end %>
-  <% end %>
-
-  <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
-    organization: @organization,
-    bikes: @bikes,
-    current_user: @current_user,
-    render_sortable: true,
-    sort_state: @sort_state,
-    bike_sticker: @bike_sticker,
-    settings:
-  )) %>
-
-  <% if show_pagination? && !@skip_count %>
-    <div class="paginate-container paginate-container-bottom row">
-      <div class="col-md-8 mb-2 mt-4">
-        <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @params, size: :lg, data: {turbo_action: "advance"})) %>
+        <%= render(UI::ButtonGroup::Component.new(entries: result_view_entries, kind: :toggle)) %>
       </div>
 
-      <div class="col-md-4 text-right">
-        <%= select_tag :per_page_select,
+      <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+        <%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},
+          data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
+          <%= translation(".column_settings") %>
+
+          <span
+            data-ui--collapse-target="chevron"
+            class="tw:inline-flex tw:transition-transform"
+          >
+            <%= render(UI::IconChevron::Component.new) %>
+          </span>
+        <% end %>
+
+        <% if settings.render_export? && settings.export_disabled? %>
+          <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+            <% tooltip.with_body { translation(".export_unavailable") } %>
+
+            <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
+              color: :primary, size: :sm, disabled: true)) %>
+          <% end %>
+        <% elsif settings.render_export? %>
+          <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
+            color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# The panel is a band across the card here; opened from its own button it's a box %>
+  <%= tag.div(class: ("tw:px-4" unless @search_page)) do %>
+    <%= render(settings_component) %>
+  <% end %>
+
+  <%# Only on the search: the model audit's own page already names the audit above this %>
+  <% if @search_page && @model_audit.present? %>
+    <p class="tw:px-4 tw:pt-3">
+      <%= translation(".e_vehicles_for_audit") %>
+      <a class="gray-link" href="<%= organization_model_audit_path(@model_audit.to_param, organization_id: @organization.to_param) %>"><%= helpers.model_audit_display(@model_audit) %></a>
+      &nbsp;
+      <%= link_to translation(".view_matching_any_audit"),
+          url_for(@sort_state.search_params.merge(search_model_audit_id: nil)),
+          class: "gray-link small" %>
+    </p>
+  <% end %>
+
+  <%#
+    The table bleeds a gutter past each side; clipping it here rather than on the card
+    leaves the header's tooltips free to open over the card's edge
+  %>
+
+  <div class="tw:overflow-hidden">
+    <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
+      organization: @organization,
+      bikes: @bikes,
+      current_user: @current_user,
+      render_sortable: true,
+      sort_state: @sort_state,
+      bike_sticker: @bike_sticker,
+      settings:
+    )) %>
+  </div>
+
+  <div
+    class="
+      tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:border-t
+      tw:border-gray-100 tw:px-4 tw:py-3 tw:dark:border-gray-700
+    "
+  >
+    <% if show_pagination? %>
+      <%# Pagination's nav is full-width and centred, so it needs a box to share the row %>
+      <div class="tw:w-auto">
+        <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @params, data: {turbo_action: "advance"})) %>
+      </div>
+    <% end %>
+
+    <span class="tw:text-sm tw:text-gray-400">
+      <%= translation(".showing_html", from: number_display(@pagy.from),
+          to: number_display(@pagy.to), count: number_display(@pagy.count)) %>
+    </span>
+
+    <div class="tw:ml-auto">
+      <%= select_tag :per_page_select,
           options_for_select(
             [10, 25, 50, 100].map { |i| ["#{i} #{settings.cycle_type.pluralize(10)} per page", i] },
             selected: @per_page
           ),
-          class: "form-control d-inline-block",
-          style: "width: 100%; max-width: 15rem; margin-top:15px;",
+          class: "form-control tw:m-0! tw:w-auto!",
+          aria: {label: translation(".per_page")},
           data: {
             org__search_target: "perPage",
             action: "change->org--search#perPageChanged"
           } %>
-      </div>
     </div>
-  <% end %>
+  </div>
 <% end %>

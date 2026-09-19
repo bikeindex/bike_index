@@ -5,16 +5,28 @@ module Pages
     module Search
       module Form
         class Component < ApplicationComponent
-          def initialize(target_search_path:, interpreted_params:, target_frame: nil, skip_serial_field: false, settings: nil)
+          # Sits under the full-width submit, so it's outside the <form> and its controls
+          # reach the search with form: "Search_Form"
+          renders_one :below_submit
+
+          def initialize(target_search_path:, interpreted_params:, target_frame: nil, skip_serial_field: false,
+            filters_component: nil, heading: nil, submit_text: nil)
             @target_search_path = target_search_path
             @interpreted_params = interpreted_params
             @target_frame = target_frame
             @skip_serial_field = skip_serial_field
-            @settings = settings
+            @filters_component = filters_component
+            # A heading turns the form into a card, submit spanning it rather than an icon
+            @heading = heading
+            @submit_text = submit_text
             @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
           end
 
           private
+
+          def card?
+            @heading.present?
+          end
 
           def turbo?
             @target_frame.present?
@@ -38,7 +50,7 @@ module Pages
           end
 
           def render_notes_field?
-            @settings&.organization&.enabled?("registration_notes")
+            @filters_component&.notes_search?
           end
         end
       end
