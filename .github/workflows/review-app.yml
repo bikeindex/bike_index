@@ -157,7 +157,6 @@ jobs:
       ref: ${{ needs.resolve.outputs.action == 'deploy' && needs.resolve.outputs.head_sha || github.event.repository.default_branch }}
       # Each action is also the bin/kamal_review subcommand of the same name.
       command: ${{ format('bin/kamal_review {0} --app {1}', needs.resolve.outputs.action, needs.resolve.outputs.slug) }}
-      app: ${{ needs.resolve.outputs.slug }}
       image_tag: ${{ needs.resolve.outputs.slug }}-${{ needs.resolve.outputs.head_sha }}
       service_label: bike-index-${{ needs.resolve.outputs.slug }}
       sprockets_cache_prefix: review-app-sprockets

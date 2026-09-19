@@ -25,8 +25,8 @@
 #             app remove, drop the per-PR databases + role, flush its redis db
 #             (unless a still-running PR shares it), remove its containers + volumes
 #   reload_database — reset the app's data in place (image and role are left alone):
-#             stop worker + cron, purge its R2 objects, flush its redis db, drop
-#             both databases, db:prepare in web, then start worker + cron again
+#             maintenance + stop worker + cron, purge its R2 objects, flush its
+#             redis db, drop both databases, db:prepare in web, then resume
 # deploy and destroy are per-PR; reload_database also takes `--app sandbox`.
 # deploy is idempotent — same path on first and subsequent deploys;
 # bin/docker-entrypoint creates the per-PR Postgres role on first boot and
@@ -239,11 +239,14 @@ purge_r2_objects() {
     "bin/rails runner 'ActiveStorage::Blob.find_each { |blob| blob.service.delete(blob.key) }'" || true
 }
 
-# Stopped so nothing they run while the databases are gone raises NoDatabaseError
-# into Honeybadger; web stays up, db:prepare runs inside it. Ids, not labels —
-# earlier deploys' containers carry the same ones, and `kamal app boot` would use
-# the `latest` tag, which on this shared host is whichever app deployed last.
-stop_job_containers() {
+# So nothing raises NoDatabaseError into Honeybadger while the databases are gone:
+# the proxy 503s web (which stays up to run db:prepare) and worker + cron stop.
+# Ids, not labels — earlier deploys' containers carry the same ones, and `kamal
+# app boot` would use the `latest` tag, which on this shared host is whichever
+# app deployed last.
+pause_app() {
+  echo "==> Putting ${slug} into maintenance"
+  kamal app maintenance --message "Reloading the database"
   job_containers="$(kamal server exec --raw \
     "docker ps -q --filter label=service=${appname} --filter label=role=worker; \
      docker ps -q --filter label=service=${appname} --filter label=role=cron" | tr '\n' ' ')"
@@ -326,18 +329,13 @@ case "$mode" in
     # reload; disarmed at the end so the restart prints before "Done".
     job_containers=""
     trap resume_app EXIT
-    stop_job_containers
+    pause_app
 
     # Both run before the drop: the blob keys only exist in the database we're about
     # to drop, and the FLUSHDB would otherwise wipe the search autocomplete the seeds
     # load into that same logical redis DB.
     purge_r2_objects
     flush_redis_db "$redis_shared_with"
-
-    # web stays up to run db:prepare, so the proxy answers its requests with a 503
-    # until then rather than letting them raise NoDatabaseError.
-    echo "==> Putting ${slug} into maintenance"
-    kamal app maintenance --message "Reloading the database"
 
     # Strict, unlike destroy's drop — a half-dropped database must not be reported
     # as a reload. Rails reconnects the connections FORCE terminates.

@@ -24,16 +24,12 @@ on:
         description: The kamal command to run on the host
         required: true
         type: string
-      app:
-        description: bin/kamal_review --app target (a PR slug or sandbox)
-        required: true
-        type: string
       image_tag:
         description: GHCR image tag to build/push and deploy (deploy only)
         type: string
         default: ""
       service_label:
-        description: kamal `service` label baked onto the image (deploy only)
+        description: kamal `service` label — baked onto the image, and names the app whose lock a cancelled run releases
         type: string
         default: ""
       sprockets_cache_prefix:
@@ -196,9 +192,10 @@ jobs:
         run: cp .kamal/secrets-ci .kamal/secrets
       - name: Run kamal command
         run: ${{ inputs.command }}
-      # A cancelled deploy leaves kamal's lock behind, and every later deploy pulls
-      # its image then fails on the lock before pruning — it filled the host's disk.
-      # The concurrency group means no other run holds this app's lock.
+      # A cancelled run leaves kamal's lock held, failing every later deploy; the
+      # concurrency group means no other run holds it.
       - name: Release the deploy lock
         if: cancelled()
-        run: bin/kamal_review lock release --app "${{ inputs.app }}"
+        env:
+          SERVICE_LABEL: ${{ inputs.service_label }}
+        run: bin/kamal_review lock release --app "${SERVICE_LABEL#bike-index-}"
