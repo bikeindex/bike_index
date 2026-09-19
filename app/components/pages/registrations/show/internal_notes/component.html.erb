@@ -12,19 +12,15 @@
   <% end %>
 
   <%= form_with(url: @url, method: :patch, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |f| %>
-    <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-2">
-      <%= f.label :notes, translation(".current_note"), class: "twlabel" %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area, label_text: translation(".current_note"), wrapper_class: nil, html_options: {value: @note&.body, rows: 3, class: "tw:w-full"})) do |group| %>
+      <% group.with_helper_text do %>
+        <% if @note&.body.present? %>
+          <%= note_by(@note) %> ·
+        <% end %>
 
-      <% if @note&.body.present? %>
-        <small class="tw:opacity-65"><%= note_by(@note) %></small>
+        <%= translation(".update_hint") %>
       <% end %>
-    </div>
-
-    <%= f.text_area :notes, value: @note&.body, rows: 3, class: "twinput tw:w-full" %>
-
-    <p class="tw:mt-1 tw:text-sm tw:opacity-65">
-      <%= translation(".update_hint") %>
-    </p>
+    <% end %>
 
     <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-2">
       <small class="tw:opacity-65">
