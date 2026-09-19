@@ -11,6 +11,12 @@ module Pages
             @url = url
             @current_user = current_user
           end
+
+          private
+
+          def author_name(note)
+            note.user&.display_name || translation(".deleted_user")
+          end
         end
       end
     end

@@ -19,12 +19,9 @@ module Pages
             render_notes(note("Owner confirmed the new lock — clear to release.", "Alice Staff", 20.minutes.ago),
               previous_notes: [
                 note("Found locked to the handrail outside Hall B.", "Alice Staff", 3.days.ago),
+                BikeOrganizationNote.new(body: "Moved it inside for the storm.", updated_at: 2.days.ago),
                 note("Called the owner, left a voicemail.", "Bob Member", 1.day.ago)
               ])
-          end
-
-          def author_deleted
-            render_notes(BikeOrganizationNote.new(body: "Written by someone who has since left.", updated_at: 1.week.ago))
           end
           # @!endgroup
 

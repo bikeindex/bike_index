@@ -3,10 +3,9 @@
 require "rails_helper"
 
 RSpec.describe Pages::Registrations::Show::InternalNotes::Component, type: :component do
-  it "renders a note whose author was deleted" do
-    render_preview(:author_deleted)
+  it "names a deleted author in the history" do
+    render_preview(:with_previous_notes)
 
-    expect(page).to have_field("Current note", with: "Written by someone who has since left.")
-    expect(page).to have_no_css("label small", text: "update by")
+    expect(page).to have_text(/Note by Alice Staff.*Updated by a deleted user.*Updated by Bob Member/m)
   end
 end
