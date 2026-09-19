@@ -26,7 +26,7 @@
       %p.mt-4
         #{number_display(@total_count)} matching #{@kind}
         %em
-          = humanized_time_range(@time_range)
+          = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
 
   .col-md-6.order-1.order-md-2
     - if show_search_statuses
