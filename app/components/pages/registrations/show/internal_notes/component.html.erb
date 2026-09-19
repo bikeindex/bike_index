@@ -12,7 +12,7 @@
   <% end %>
 
   <%= form_with(url: @url, method: :patch, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |f| %>
-    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area, label_text: translation(".current_note"), wrapper_class: nil, html_options: {value: @note&.body, rows: 3, class: "tw:w-full"})) do |group| %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area, label_text:, wrapper_class: nil, html_options: {value: @note&.body, rows: 3, class: "tw:w-full"})) do |group| %>
       <% group.with_helper_text do %>
         <% if @note&.body.present? %>
           <%= note_by(@note) %> ·
@@ -22,11 +22,7 @@
       <% end %>
     <% end %>
 
-    <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-2">
-      <small class="tw:opacity-65">
-        <%= translation(".posts_as", user: @current_user.display_name) %>
-      </small>
-
+    <div class="tw:mt-2 tw:flex tw:justify-end">
       <%= f.submit @note.present? ? translation(".update_note") : translation(".post_note"), class: UI::Button::Component.build_classes(color: :primary, size: :sm) %>
     </div>
   <% end %>

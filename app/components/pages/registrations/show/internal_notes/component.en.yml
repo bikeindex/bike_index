@@ -9,6 +9,6 @@ en:
             internal_notes: Internal notes
             note_by: Note by %{user}
             post_note: Post note
-            posts_as: Posts as %{user}
+            posting_as: You're posting as %{user}
             update_hint: History of your changes will be visible above
             update_note: Update note
