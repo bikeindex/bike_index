@@ -86,6 +86,10 @@ module Pages
             bike_title_html(@bike)
           end
 
+          def subtitle
+            render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)).presence
+          end
+
           def owner_phone
             @bike.phone if @bike.phoneable_by?(@current_user, @organization)
           end
