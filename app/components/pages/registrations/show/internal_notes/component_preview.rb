@@ -29,7 +29,7 @@ module Pages
           private
 
           def render_notes(note, previous_notes: [])
-            render(Component.new(note:, previous_notes:, url: "#", current_user: User.new(name: "Preview User")))
+            render(Pages::Registrations::Show::InternalNotes::Component.new(note:, previous_notes:, url: "#", current_user: User.new(name: "Preview User")))
           end
 
           def note(body, user_name, updated_at)

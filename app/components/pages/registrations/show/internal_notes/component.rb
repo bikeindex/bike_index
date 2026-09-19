@@ -11,13 +11,6 @@ module Pages
             @url = url
             @current_user = current_user
           end
-
-          private
-
-          def note_by(note)
-            safe_join([translation(".note_by", user: note.user&.display_name),
-              render(UI::Time::Component.new(time: note.updated_at))], " ")
-          end
         end
       end
     end

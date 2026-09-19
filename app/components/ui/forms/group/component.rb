@@ -16,8 +16,7 @@ module UI
         # whatever the block renders with the attribute's id.
         # required_toggleable: the answer is decided in the browser, so the label renders
         # both markers with the inactive one hidden - it can't be rebuilt from JS. They're
-        # [data-required-marker] and [data-optional-marker] for whichever controller flips them.
-        # optional_badge: false leaves a non-required label unmarked
+        # [data-required-marker] and [data-optional-marker] for whichever controller flips them
         def initialize(attribute:, form_builder: nil, kind: :text_field, label_text: nil, required: false,
           required_toggleable: false, optional_badge: true, wrapper_class: "tw:mb-4", html_options: {})
           @form_builder = form_builder
