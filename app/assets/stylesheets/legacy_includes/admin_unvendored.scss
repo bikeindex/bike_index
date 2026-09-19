@@ -10066,10 +10066,8 @@ label {
   text-transform: uppercase !important
 }
 
-.full-screen-table-overflown {
-  overflow-x: scroll;
-  margin-left: -15px;
-  margin-right: -15px
+.full-screen-table {
+  overflow-x: auto
 }
 
 @media(max-width:767.98px) {
