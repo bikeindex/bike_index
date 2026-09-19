@@ -155,4 +155,17 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css(".reg_extra_registration_number_cell em.less-strong", text: hidden_text)
     end
   end
+
+  # Action View's template digest can't see the components these cell blocks render, so
+  # the row key carries this component's own digest of them
+  describe "row caching" do
+    include_context :caching_basic
+
+    it "keys each row to its record and this component's markup digest", :caching do
+      keys = fragments_written { component }
+
+      expect(keys.count).to eq 1
+      expect(keys.first).to include(%(org-#{organization.id}-#{described_class.cache_digest}), bike.cache_key_with_version)
+    end
+  end
 end

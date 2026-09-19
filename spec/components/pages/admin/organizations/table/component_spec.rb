@@ -32,4 +32,17 @@ RSpec.describe Pages::Admin::Organizations::Table::Component, type: :component d
       expect(component).to have_css("td.deleted-col .localizeTime")
     end
   end
+
+  # Action View's template digest can't see the components these cell blocks render, so
+  # the row key carries this component's own digest of them
+  describe "row caching" do
+    include_context :caching_basic
+
+    it "keys each row to its record and this component's markup digest", :caching do
+      keys = fragments_written { component }
+
+      expect(keys.count).to eq 1
+      expect(keys.first).to include(%(admin-organizations-#{described_class.cache_digest}), organization.cache_key_with_version)
+    end
+  end
 end

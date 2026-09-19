@@ -14,4 +14,17 @@ RSpec.describe Pages::Admin::Users::Table::Component, type: :component do
     expect(component).to have_css("td", text: "Sally Rider")
     expect(component).to have_css("td", text: user.email)
   end
+
+  # Action View's template digest can't see the components these cell blocks render, so
+  # the row key carries this component's own digest of them
+  describe "row caching" do
+    include_context :caching_basic
+
+    it "keys each row to its record and this component's markup digest", :caching do
+      keys = fragments_written { component }
+
+      expect(keys.count).to eq 1
+      expect(keys.first).to include(%(admin-users-#{described_class.cache_digest}), user.cache_key_with_version)
+    end
+  end
 end
