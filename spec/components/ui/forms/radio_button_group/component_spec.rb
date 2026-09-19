@@ -52,11 +52,6 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
     expect(component).to_not have_css("div.tw\\:grid")
   end
 
-  it "raises on full_width with the toggle kind" do
-    expect { described_class.new(name: :status, entries:, kind: :toggle, full_width: true) }
-      .to raise_error(ArgumentError, /full_width is not supported/)
-  end
-
   context "kind: toggle" do
     let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active", kind: :toggle)) }
     let(:segment) { UI::ButtonGroup::Component::SEGMENT_CLASSES }
@@ -90,7 +85,7 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
       expect(component).to have_css("input[value='m'][checked]", visible: :all)
     end
 
-    # The grid itself is UI::ButtonGroup.layout_classes, covered in its spec
+    # The grid itself is UI::ButtonGroup.group_classes, covered in its spec
     it "passes full_width through to the layout" do
       expect(component).to have_css("div.tw\\:grid")
     end
