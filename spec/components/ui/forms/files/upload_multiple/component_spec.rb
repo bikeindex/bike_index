@@ -9,9 +9,9 @@ RSpec.describe UI::Forms::Files::UploadMultiple::Component, type: :component do
   end
 
   it "renders what's already stored as the list, and a status for each upload below the picker" do
-    expect(component).to have_css("ul[data-ui--forms--files--picker-target='list'] li", text: "already stored")
+    expect(component).to have_css("ul[data-ui--forms--files--upload-multiple-target='list'] li", text: "already stored")
     # each upload gets a row here, so it announces without the list moving focus
-    expect(component).to have_css("ul[aria-live='polite'][data-ui--forms--files--picker-target='status']")
+    expect(component).to have_css("ul[aria-live='polite'][data-ui--forms--files--upload-multiple-target='status']")
     # nothing submits the input -- the controller reads its files and posts them itself
     expect(component).to have_css("input[type='file'][multiple]:not([name])")
   end
@@ -20,8 +20,8 @@ RSpec.describe UI::Forms::Files::UploadMultiple::Component, type: :component do
     let(:options) { {params: {blog_id: 12}} }
 
     it "posts them alongside the file" do
-      expect(component).to have_css("[data-ui--forms--files--picker-params-value='{\"blog_id\":12}']")
-      expect(component).to have_css("[data-ui--forms--files--picker-file-param-value='file']")
+      expect(component).to have_css("[data-ui--forms--files--upload-multiple-params-value='{\"blog_id\":12}']")
+      expect(component).to have_css("[data-ui--forms--files--upload-multiple-file-param-value='file']")
     end
   end
 
@@ -30,7 +30,7 @@ RSpec.describe UI::Forms::Files::UploadMultiple::Component, type: :component do
 
     it "keeps the target the component wires alongside them" do
       expect(component).to have_css("ul#public_images.row[data-order-url='/public_images/order']" \
-        "[data-ui--forms--files--picker-target='list']")
+        "[data-ui--forms--files--upload-multiple-target='list']")
     end
   end
 

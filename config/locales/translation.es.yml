@@ -5684,6 +5684,10 @@ es:
             no_file_chosen: No se ha seleccionado ningún archivo.
             take_picture: Toma una foto
             upload: Subir
+          upload:
+            upload_failed: Falló la carga
+            uploading: subir
+          upload_multiple:
             upload_failed: Falló la carga
             uploading: subir
         group:

@@ -5697,6 +5697,10 @@ it:
             no_file_chosen: Nessun file selezionato
             take_picture: Scatta una foto
             upload: Caricamento
+          upload:
+            upload_failed: caricamento non riuscito
+            uploading: caricamento
+          upload_multiple:
             upload_failed: caricamento non riuscito
             uploading: caricamento
         group:

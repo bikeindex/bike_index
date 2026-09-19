@@ -17,21 +17,19 @@ module UI
           renders_one :status
 
           # Without a form_builder the input is a bare one, and input_options needs an id for its label
-          def initialize(form_builder: nil, attribute: nil, input_options: {}, accept: nil, camera: nil, url: nil, data: {})
+          def initialize(form_builder: nil, attribute: nil, input_options: {}, accept: nil, camera: nil)
             @form_builder = form_builder
             @attribute = attribute
             accept_list = Array(accept).flat_map { it.to_s.split(",") }.filter_map { it.strip.presence }
             # `capture` hands back a photo, so the camera is only offered when nothing
             # but images are accepted -- never on a CSV or PDF field.
             @camera = camera.nil? ? accept_list.any? && accept_list.all? { image?(it) } : camera
-            @url = url
-            @data = data
             @placeholder = translation(".no_file_chosen")
             @input_options = {
               class: "tw:peer tw:sr-only",
               accept: accept_list.join(",").presence,
               data: {"ui--forms--files--picker-target": "input", action: "ui--forms--files--picker#display"}
-            }.merge(input_options)
+            }.deep_merge(input_options)
             @input_id = @input_options[:id] || form_builder&.field_id(attribute)
 
             # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.

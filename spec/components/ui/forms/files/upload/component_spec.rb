@@ -16,8 +16,8 @@ RSpec.describe UI::Forms::Files::Upload::Component, type: :component do
     expect(component).to have_css("label[for='user_avatar']", text: "Upload")
     # nothing attached, so the preview ships hidden and srcless, waiting for a pick
     # hidden! because collapse() hides with the important variant, and tw:block is on the same element
-    expect(component).to have_css("a[data-ui--forms--files--picker-target='preview'].tw\\:hidden\\! img")
-    expect(component).to have_no_css("[data-ui--forms--files--picker-target='preview'][href]")
+    expect(component).to have_css("a[data-ui--forms--files--upload-target='preview'].tw\\:hidden\\! img")
+    expect(component).to have_no_css("[data-ui--forms--files--upload-target='preview'][href]")
     expect(component).to have_no_css("img[src]")
   end
 
@@ -44,16 +44,16 @@ RSpec.describe UI::Forms::Files::Upload::Component, type: :component do
     # drops the name only once it's uploading them itself
     it "renders a named field alongside the signed id it will fill" do
       expect(component).to have_css("input[type='file'][name='user[avatar]']")
-      expect(component).to have_css("[data-ui--forms--files--picker-url-value='/register/direct_uploads?b_param_token=xyz']")
-      expect(component).to have_css("input[type='hidden'][name='user[avatar_signed_id]'][data-ui--forms--files--picker-target='signedId']", visible: :all)
+      expect(component).to have_css("[data-ui--forms--files--upload-url-value='/register/direct_uploads?b_param_token=xyz']")
+      expect(component).to have_css("input[type='hidden'][name='user[avatar_signed_id]'][data-ui--forms--files--upload-target='signedId']", visible: :all)
     end
 
     context "without one" do
       let(:options) { {} }
 
       it "renders no signed id field" do
-        expect(component).to have_no_css("[data-ui--forms--files--picker-target='signedId']", visible: :all)
-        expect(component).to have_no_css("[data-ui--forms--files--picker-url-value]:not([data-ui--forms--files--picker-url-value=''])")
+        expect(component).to have_no_css("[data-ui--forms--files--upload-target='signedId']", visible: :all)
+        expect(component).to have_no_css("[data-ui--forms--files--upload-url-value]:not([data-ui--forms--files--upload-url-value=''])")
       end
     end
   end

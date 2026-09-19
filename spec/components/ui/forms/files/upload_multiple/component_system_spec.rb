@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe UI::Forms::Files::UploadMultiple::Component, :js, type: :system do
-  let(:status) { "[data-ui--forms--files--picker-target='status']" }
+  let(:status) { "[data-ui--forms--files--upload-multiple-target='status']" }
   let(:fixture) { Rails.root.join("spec/fixtures/bike.jpg").to_s }
   # Dragging a file has no Capybara equivalent -- the drag source is the OS, not the
   # page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
@@ -12,7 +12,7 @@ RSpec.describe UI::Forms::Files::UploadMultiple::Component, :js, type: :system d
       const transfer = new DataTransfer()
       transfer.items.add(new File(["x"], "dropped.jpg", {type: "image/jpeg"}))
       transfer.items.add(new File(["y"], "second.jpg", {type: "image/jpeg"}))
-      document.querySelector("[data-ui--forms--files--picker-target='list']")
+      document.querySelector("[data-ui--forms--files--upload-multiple-target='list']")
         .dispatchEvent(new DragEvent("drop", {bubbles: true, dataTransfer: transfer}))
     JS
   end
@@ -22,7 +22,7 @@ RSpec.describe UI::Forms::Files::UploadMultiple::Component, :js, type: :system d
   it "gives every picked or dropped file a row of its own, and says which ones didn't land" do
     visit("/rails/view_components/ui/forms/files/upload_multiple/component/default")
 
-    expect(page).to have_css("[data-ui--forms--files--picker-target='list'] li", text: "already stored")
+    expect(page).to have_css("[data-ui--forms--files--upload-multiple-target='list'] li", text: "already stored")
     expect(page).to have_no_css("#{status} li")
     expect_axe_clean
 
@@ -33,7 +33,7 @@ RSpec.describe UI::Forms::Files::UploadMultiple::Component, :js, type: :system d
     expect(page).to have_css("#{status} li[data-failed='true']", text: "exif_orientation.jpg")
     expect(page).to have_css("#{status} li", text: "upload failed", count: 2)
     # the list is only added to by an upload that landed
-    expect(page).to have_css("[data-ui--forms--files--picker-target='list'] li", count: 1)
+    expect(page).to have_css("[data-ui--forms--files--upload-multiple-target='list'] li", count: 1)
 
     # onto the list, not the button: the whole component takes a drop, and both files of it
     page.execute_script(drop_two_files)

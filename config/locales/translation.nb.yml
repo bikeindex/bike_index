@@ -5432,6 +5432,10 @@ nb:
             no_file_chosen: Ingen fil valgt
             take_picture: Ta bilde
             upload: Last opp
+          upload:
+            upload_failed: opplastingen mislyktes
+            uploading: opplasting
+          upload_multiple:
             upload_failed: opplastingen mislyktes
             uploading: opplasting
         group:

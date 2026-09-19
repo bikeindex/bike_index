@@ -11,8 +11,9 @@ module UI
         class Component < ApplicationComponent
           def initialize(url:, file_param:, params: {}, accept: nil, list_html_options: {})
             @url = url
+            @file_param = file_param
+            @params = params
             @accept = accept
-            @data = {"ui--forms--files--picker-params-value": params, "ui--forms--files--picker-file-param-value": file_param}
             @list_html_options = list_html_options
             # No name: nothing submits it, the controller posts its files itself. The id is random so
             # two on a page don't hand both labels the same input

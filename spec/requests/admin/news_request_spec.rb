@@ -27,9 +27,9 @@ RSpec.describe Admin::NewsController, type: :request do
       get "#{base_url}/#{blog.to_param}/edit"
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
-      expect(response.body).to include("data-ui--forms--files--picker-target=\"list\"")
+      expect(response.body).to include("data-ui--forms--files--upload-multiple-target=\"list\"")
       # what PublicImagesController#create finds the blog back by - its id, since to_param is the slug
-      expect(response.body).to include("data-ui--forms--files--picker-params-value=\"{&quot;blog_id&quot;:#{blog.id}}\"")
+      expect(response.body).to include("data-ui--forms--files--upload-multiple-params-value=\"{&quot;blog_id&quot;:#{blog.id}}\"")
       expect(response.body).to include("id=\"image-#{public_image.id}\"")
     end
   end

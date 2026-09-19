@@ -1,21 +1,41 @@
-<%= render(UI::Forms::Files::Picker::Component.new(form_builder: @form_builder, attribute: @attribute,
-      input_options: @html_options, accept: @accept, camera: @camera, url: @direct_upload_url)) do |picker| %>
-  <% picker.with_attached do %>
-    <%#
-      A pick previews here from a local object url, without waiting on a round trip - so the
-      img ships on every render, srcless and hidden, rather than only when something is attached.
-      block so the controls start a new line, w-fit so the link doesn't stretch past the image.
-    %>
+<div
+  data-controller="ui--forms--files--upload"
+  <%# Blank unless the caller named an endpoint - the controller only uploads when it has one %>
+  data-ui--forms--files--upload-url-value="<%= @direct_upload_url %>"
+  data-ui--forms--files--upload-uploading-value="<%= translation(".uploading") %>"
+  data-ui--forms--files--upload-failed-value="<%= translation(".upload_failed") %>"
+  data-action="ui--forms--files--picker:picked->ui--forms--files--upload#picked"
+>
+  <%= render(UI::Forms::Files::Picker::Component.new(form_builder: @form_builder, attribute: @attribute,
+        input_options: @html_options.deep_merge(data: {"ui--forms--files--upload-target": "input"}), accept: @accept, camera: @camera)) do |picker| %>
+    <% picker.with_attached do %>
+      <%#
+        A pick previews here from a local object url, without waiting on a round trip - so the
+        img ships on every render, srcless and hidden, rather than only when something is attached.
+        block so the controls start a new line, w-fit so the link doesn't stretch past the image.
+      %>
 
-    <%= tag.a(href: @attachment_url,
-          class: ["tw:mb-2 tw:block tw:w-fit", ("tw:hidden!" if @attachment_url.blank?)],
-          data: {"ui--forms--files--picker-target": "preview"}) do %>
-      <%= tag.img(src: @thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded",
-            data: {"ui--forms--files--picker-target": "previewImage"}) %>
+      <%= tag.a(href: @attachment_url,
+            class: ["tw:mb-2 tw:block tw:w-fit", ("tw:hidden!" if @attachment_url.blank?)],
+            data: {"ui--forms--files--upload-target": "preview"}) do %>
+        <%= tag.img(src: @thumbnail_url, alt: @attribute.to_s.humanize, class: "tw:max-h-24 tw:rounded",
+              data: {"ui--forms--files--upload-target": "previewImage"}) %>
+      <% end %>
+
+      <% if @signed_id_field %>
+        <%= hidden_field_tag @signed_id_field, nil, data: {"ui--forms--files--upload-target": "signedId"} %>
+      <% end %>
     <% end %>
 
-    <% if @signed_id_field %>
-      <%= hidden_field_tag @signed_id_field, nil, data: {"ui--forms--files--picker-target": "signedId"} %>
+    <% picker.with_status do %>
+      <p
+        class="
+          tw:mt-1 tw:text-sm tw:text-gray-500 tw:empty:hidden
+          tw:data-[failed=true]:text-red-600 tw:dark:text-gray-400
+          tw:dark:data-[failed=true]:text-red-400
+        "
+        data-ui--forms--files--upload-target="status"
+      ></p>
     <% end %>
   <% end %>
-<% end %>
+</div>

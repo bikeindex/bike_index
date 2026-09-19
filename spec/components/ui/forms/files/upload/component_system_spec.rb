@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe UI::Forms::Files::Upload::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/files/upload/component/" }
   let(:drop_frame) { "[data-ui--forms--files--picker-target='dropZone']" }
-  let(:preview) { "[data-ui--forms--files--picker-target='preview']" }
+  let(:preview) { "[data-ui--forms--files--upload-target='preview']" }
   # Dragging a file has no Capybara equivalent -- the drag source is the OS, not the
   # page -- so the events carry a hand-built DataTransfer, per Playwright's docs.
   let(:start_drag) do

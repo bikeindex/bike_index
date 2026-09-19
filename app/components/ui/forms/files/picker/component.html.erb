@@ -2,12 +2,7 @@
 <div
   data-controller="ui--forms--files--picker"
   data-ui--forms--files--picker-placeholder-value="<%= @placeholder %>"
-  <%# Blank unless the caller named an endpoint - the controller only uploads when it has one %>
-  data-ui--forms--files--picker-url-value="<%= @url %>"
-  data-ui--forms--files--picker-uploading-value="<%= translation(".uploading") %>"
-  data-ui--forms--files--picker-failed-value="<%= translation(".upload_failed") %>"
   data-action="drop->ui--forms--files--picker#drop dragover@document->ui--forms--files--picker#dragOver dragleave@document->ui--forms--files--picker#endDrag drop@document->ui--forms--files--picker#endDrag"
-  <%= tag.attributes(data: @data) %>
 >
   <%#
     The drop target spans the field, framing what's attached and the controls. An outline rather than a

@@ -5588,6 +5588,10 @@ nl:
             no_file_chosen: Geen bestand gekozen
             take_picture: Maak een foto
             upload: Uploaden
+          upload:
+            upload_failed: Uploaden mislukt
+            uploading: uploaden
+          upload_multiple:
             upload_failed: Uploaden mislukt
             uploading: uploaden
         group:
