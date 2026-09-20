@@ -441,14 +441,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:search_all)).to eq true
         expect(assigns(:bikes).pluck(:id)).to eq([other_bike.id])
-        expect(response.body).to include("hidden, not registered with #{current_organization.short_name}")
+        expect(response.body).to include("Hidden because it is not registered with #{current_organization.short_name}")
         expect(response.body).not_to include(other_bike.owner_email)
 
         # Own-org bike: full data renders, no redaction marker
         get "#{base_url}/multi_search_response", params: {serial: "ABCD1234", search_all: "1"}, headers: turbo_headers
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
         expect(response.body).to include(bike.owner_email)
-        expect(response.body).not_to include("hidden, not registered")
+        expect(response.body).not_to include("Hidden because it is not registered")
       end
     end
 
@@ -485,7 +485,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "ZZ999"}, headers: turbo_headers
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([other_bike.id])
-      expect(response.body).to include("hidden, not registered with #{current_organization.short_name}")
+      expect(response.body).to include("Hidden because it is not registered with #{current_organization.short_name}")
       expect(response.body).not_to include(other_bike.owner_email)
 
       # Missing query → bad request

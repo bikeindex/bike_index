@@ -36,7 +36,7 @@ module Pages
             @hidden_label ||= tag.em(translation(".hidden"), class: "less-strong tw:leading-snug tw:text-xs")
           end
 
-          # Rendered per row rather than memoized with its text: the trigger points at its
+          # Rendered per cell rather than memoized with its text: the trigger points at its
           # own tooltip by id. As quiet as the word it sits beside
           def hidden_tooltip
             render(UI::Tooltip::Component.new(text: hidden_tooltip_text)) do |tooltip|

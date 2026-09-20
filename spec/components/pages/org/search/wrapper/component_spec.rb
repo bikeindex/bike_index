@@ -148,11 +148,11 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).not_to have_text("stranger@example.com")
       expect(component).not_to have_text("555-555-1212")
       expect(component).not_to have_text("SECRET-EXTRA")
-      hidden_text = "hidden, not registered with #{organization.short_name}"
-      expect(component).to have_css(".owner_email_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".owner_name_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".reg_phone_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".reg_extra_registration_number_cell em.less-strong", text: hidden_text)
+      hidden_text = "Hidden because it is not registered with #{organization.short_name}"
+      %w[owner_email_cell owner_name_cell reg_phone_cell reg_extra_registration_number_cell].each do |cell|
+        expect(component).to have_css(".#{cell} em.less-strong", text: "hidden")
+        expect(component).to have_css(".#{cell} [role=tooltip]", text: hidden_text, visible: :all)
+      end
     end
   end
 end
