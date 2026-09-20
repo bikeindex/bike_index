@@ -105,9 +105,10 @@ module Organized
     end
 
     def index_component
-      parking_notifications = matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-        .includes(:user, bike: [:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_ownership])
-        .limit(@per_page).load
+      parking_notifications = ParkingNotification.preload_bikes(
+        matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+          .includes(:user).limit(@per_page).load
+      )
       # Symbol keys, or organization_id repeats as a query param beside the path segment
       search_params = sort_state.search_params.to_h.symbolize_keys
       Pages::Org::ParkingNotifications::Index::Component.new(
