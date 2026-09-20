@@ -15,9 +15,9 @@ module Pages
             sort_state: ComponentStructs::SortState.new,
             render_search: false
           )
-            @user = user
             @user_id = user_id || user&.id
-            @email = email || user&.email
+            @user = user || (User.unscoped.find_by(id: @user_id) if @user_id.present?)
+            @email = email || @user&.email
             @search_url = search_url
             @sort_state = sort_state
             @user_link_path_arg = user_link_path
@@ -66,11 +66,15 @@ module Pages
           end
 
           def show_user_link?
-            user_link_path.present?
+            user_link_path.present? && @email.present?
           end
 
           def show_email_only?
             @email.present? && @user.blank?
+          end
+
+          def deleted_user?
+            @user&.deleted?
           end
 
           def show_search?
