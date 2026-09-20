@@ -474,7 +474,10 @@ Rails.application.routes.draw do
 
   get "reverse_geocode", to: "reverse_geocode#index", defaults: {format: "json"}
 
-  mount Lookbook::Engine, at: "/lookbook"
+  # view_component previews — the gem's Bundler group (:development, :test, :sandbox)
+  # decides where it's mounted. Unrestricted, so it must not reach production: the
+  # previews resolve real User and Organization records.
+  mount Lookbook::Engine, at: "/lookbook" if defined?(Lookbook)
 
   get "/400", to: "errors#bad_request", via: :all
   get "/401", to: "errors#unauthorized", via: :all

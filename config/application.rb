@@ -98,7 +98,10 @@ module Bikeindex
       end
     end
     config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
-    config.lookbook.preview_display_options = {theme: ["light", "dark"]} # Add dynamic 'theme' display option
+    # defined? because the gem is absent in production — config.lookbook would raise there
+    if defined?(Lookbook)
+      config.lookbook.preview_display_options = {theme: ["light", "dark"]} # Add dynamic 'theme' display option
+    end
 
     config.generators do |g|
       g.helper nil

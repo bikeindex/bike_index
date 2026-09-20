@@ -1,5 +1,8 @@
 # https://lookbook.build/guide/ui/theming
 
+# Absent in production, where the Gemfile leaves the gem out
+return unless defined?(Lookbook)
+
 Lookbook.configure do |config|
   config.ui_theme = "blue"
   config.ui_theme_overrides = {header_bg: "#3498db"}
