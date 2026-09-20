@@ -47,8 +47,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     expect(page).to have_content("Persisted panel body")
     expect(page).to have_css("button[aria-expanded='true'][data-active='true']", text: "Toggle details")
 
-    # Collapsing again writes the param rather than dropping it, so a form that rebuilds
-    # the address bar from its fields has a collapse it can carry.
+    # Collapsing writes 0 rather than dropping the param, so the state is always explicit.
     click_button("Toggle details")
     expect(page).to have_no_content("Persisted panel body")
     expect(page).to have_current_path(/details=0/, url: true)

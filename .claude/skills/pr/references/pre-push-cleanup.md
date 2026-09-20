@@ -10,6 +10,8 @@ Skip it when the diff has no code in it — a docs- or skill-only branch gives i
 
 **Read `git diff` as soon as the agents return, before running anything.** An agent that stops mid-verification leaves its edit in the tree — including a sweeping edit it reverted to test, which then reads as your regression.
 
+**Brief the agents with the constraint, not the shape you think satisfies it.** "A cell block is instance_exec'd, so a component method is unreachable inside one" is a fact they can work from; "the lambda is required, judge only how it's used" is a conclusion, and it hid that `method(:…)` is how four sibling org tables already bind exactly that. Declining a finding is yours to do on the way back, not theirs to be told up front — the exception is a *second* run, where naming what a previous pass already triaged is what keeps them off it.
+
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
 **The previous run's merge from the base names that commit** — `rtk proxy git log --merges -1 --format=%h origin/main..HEAD`, since **Prepare the branch** merges before it cleans. A run that had nothing to merge left no commit, so the range can reach back further than the last run; that costs a re-triage, not a wrong scope.

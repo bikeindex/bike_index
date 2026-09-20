@@ -18,7 +18,7 @@ export default class extends Controller {
   connect () {
     // Restore the persisted state without animating on load. Restoring applies rather than
     // sets: persisting here would only write back what it just read.
-    if (this.hasParamValue && this.urlExpanded !== null) return this.applyExpanded(this.urlExpanded, 0)
+    if (this.urlExpanded !== null) return this.applyExpanded(this.urlExpanded, 0)
     if (this.hasStorageKeyValue) return this.applyExpanded(this.stored, 0)
 
     // The server can render the content open -- a panel whose state is part of the
@@ -44,8 +44,10 @@ export default class extends Controller {
       content.classList.contains('tw:hidden') || content.classList.contains('tw:hidden!'))
   }
 
-  // null when the param isn't in the URL, so the rendered state stands.
+  // null when there's no param to read, so the rendered state stands.
   get urlExpanded () {
+    if (!this.hasParamValue) return null
+
     const value = new URLSearchParams(window.location.search).get(this.paramValue)
     if (value === null) return null
 
@@ -79,8 +81,8 @@ export default class extends Controller {
     if (this.hasStorageKeyValue) localStorage.setItem(this.storageKeyValue, String(expanding))
     if (!this.hasParamValue) return
     const url = new URL(window.location)
-    // Collapsed writes 0 rather than dropping the param: a form that rebuilds the address
-    // bar from its own fields can only carry a state that's spelled out for it to copy.
+    // Collapsed writes 0 rather than dropping the param: a caller rebuilding the query
+    // string from its own fields can't copy an absent one forward.
     url.searchParams.set(this.paramValue, expanding ? '1' : '0')
     // replaceState (not pushState) so a toggle doesn't stack history entries.
     window.history.replaceState(window.history.state, '', url)

@@ -211,7 +211,8 @@ class BikesController < Bikes::BaseController
 
   private
 
-  # ui--collapse writes contact_owner=0 when the box is closed, which .present? reads as open
+  # The redesign page's ui--collapse leaves contact_owner=0 in a URL a viewer can carry
+  # here, and .present? would read that as open
   def contact_owner_param?
     Binxtils::InputNormalizer.boolean(params[:contact_owner])
   end

@@ -5,8 +5,8 @@
 
 <%= tag.div(data: table_wrapper_data_attributes) do %>
   <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-#{self.class.cache_digest}", render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
-    <%# A lambda, because a cell block is instance_exec'd against the table %>
-    <% hidden_html = -> { hidden_not_registered_tag } %>
+    <%# Called per cell rather than captured: each tooltip mints its own id %>
+    <% hidden_html = method(:hidden_not_registered_tag) %>
     <% email_hidden = translation(".email_hidden") %>
 
     <% table.column(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>
