@@ -7,7 +7,9 @@
     <% end %>
 
     <% if @form %>
-      <%= render(period_radios) %>
+      <% visible_periods.each do |p| %>
+        <%= period_radio(p) %>
+      <% end %>
     <% else %>
       <% visible_periods.each do |p| %>
         <%= render period_button(p[:key]) do %>

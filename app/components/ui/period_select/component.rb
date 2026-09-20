@@ -3,7 +3,7 @@
 module UI
   module PeriodSelect
     class Component < ApplicationComponent
-      # Template Dependency: UI::ButtonGroup::Component
+      # Template Dependency: UI::ButtonGroup::Component, UI::Forms::RadioButtonGroup::Component
       PERIODS = [
         {key: "next_week", prefix: "next", label: "seven_days", future: true},
         {key: "next_month", prefix: "next", label: "thirty_days", future: true},
@@ -63,9 +63,13 @@ module UI
         )
       end
 
-      def period_radios
-        UI::Forms::RadioButtonGroup::Component.new(name: "period", selected: @period, form: @form,
-          data: @data, entries: visible_periods.map { {value: it[:key], label: period_button_label(it)} })
+      # The chips share the row with the custom button, so they're rendered here rather than
+      # as a group of their own, which would wrap as one
+      def period_radio(period)
+        tag.label(class: UI::Forms::RadioButtonGroup::Component::CHIP_CLASSES) do
+          radio_button_tag("period", period[:key], @period == period[:key],
+            class: "tw:sr-only", form: @form, data: @data) + tag.span(period_button_label(period))
+        end
       end
 
       # The prefix drops below md, where the row has no room for it
