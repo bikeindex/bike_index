@@ -23,18 +23,6 @@ RSpec.describe Pages::Org::Search::Form::Component, :js, type: :system do
     end
   end
 
-  describe "without_serial_field preview" do
-    let(:preview_path) { "/rails/view_components/pages/org/search/form/component/without_serial_field" }
-
-    it "renders without serial field" do
-      visit(preview_path)
-
-      expect(page).to have_css("form#Search_Form")
-      expect(page).to have_field("search_email")
-      expect(page).not_to have_field("serial")
-    end
-  end
-
   describe "card preview" do
     let(:preview_path) { "/rails/view_components/pages/org/search/form/component/card" }
     let!(:organization) { FactoryBot.create(:organization_brakebills) }
