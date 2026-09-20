@@ -65,17 +65,17 @@
           </td>
 
           <td>
-            <% if klass.last_finished.present? %>
+            <% if last_started.present? %>
               <span class="localizeTime preciseTime">
-                <%= l Time.parse(klass.last_finished), format: :convert_time %>
+                <%= l last_started, format: :convert_time %>
               </span>
             <% end %>
           </td>
 
           <td>
-            <% if last_started.present? %>
+            <% if klass.last_finished.present? %>
               <span class="localizeTime preciseTime">
-                <%= l last_started, format: :convert_time %>
+                <%= l Time.parse(klass.last_finished), format: :convert_time %>
               </span>
             <% end %>
           </td>
