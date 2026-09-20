@@ -1,12 +1,8 @@
-<%# require inline CSS setting because of caching %>
 <% skip_item ||= false %>
 
+<%# require inline CSS setting because of caching %>
 <% if skip_item %>
   <style>.item-cell {display: none !important;}</style>
-<% end %>
-
-<% unless display_dev_info? %>
-  <style>.only-dev-visible {display: none !important;}</style>
 <% end %>
 
 <div class="full-screen-table">

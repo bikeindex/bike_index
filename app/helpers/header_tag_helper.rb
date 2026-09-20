@@ -11,7 +11,8 @@ module HeaderTagHelper
       controller_name:,
       controller_namespace:,
       action_name:,
-      request_url: request.url
+      request_url: request.url,
+      display_dev_info: display_dev_info?
     }
   end
 
