@@ -25,6 +25,7 @@ export default class extends Controller {
   // looks after itself - ui--collapse reconnects with it - but the chart is outside them.
   handleFrameRender = (event) => {
     this.syncResultView()
+    this.syncPeriodLabel()
     if (this.hasChartFrameTarget && event.target === this.chartFrameTarget) return
     this.reloadChart()
   }
@@ -78,7 +79,6 @@ export default class extends Controller {
 
   filterChanged () {
     this.syncFilterSummary()
-    this.syncPeriodLabel()
     const form = document.getElementById('Search_Form')
     if (form) {
       form.requestSubmit()
@@ -100,7 +100,8 @@ export default class extends Controller {
     this.filterSummaryTarget.hidden = active.length === 0
   }
 
-  // The chip the summary leaves out, for the same reason it reads the others' markup
+  // The chip the summary leaves out, for the same reason it reads the others' markup.
+  // ui--period-select owns the submit, so this runs off the search it came back from.
   syncPeriodLabel () {
     const picked = document.querySelector('input[type=radio][name=period][form="Search_Form"]:checked')
     if (!this.hasPeriodLabelTarget || !picked) return
