@@ -4136,9 +4136,6 @@ nl:
         member_of_organization: Lid van organisatie
         role_type: Roltype
     parking_notifications:
-      index:
-        parking_notifications: Verlaten records
-        matches_visible: Zichtbaar
       table:
         bike: Fiets
         by: Door
@@ -5795,6 +5792,10 @@ nl:
             only_user_registered: Alleen geregistreerde gebruikers
             status_records: "%{status} records"
             update_multiple_records: Meerdere records bijwerken
+        parking_notifications:
+          index:
+            matches_visible: Zichtbaar
+            parking_notifications: Verlaten records
       register:
         acknowledgment_check:
           i_name_html: Ik, %{name},

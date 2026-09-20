@@ -12,103 +12,66 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     it "renders" do
       get base_url
       expect(response.status).to eq(200)
-      expect(response).to render_template(:index)
+      expect(response.body).to match("No matching notifications")
     end
-    context "json" do
-      it "returns empty" do
-        get base_url, params: {format: :json}
-        expect(response.status).to eq(200)
-        expect(json_result).to eq("parking_notifications" => [])
-        expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
-        expect(response.headers["Access-Control-Request-Method"]).not_to be_present
-        expect(response.headers["Vary"]).to eq "Accept,Accept-Encoding"
-      end
-      context "with an impound_record" do
-        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization) }
-        let!(:parking_notification1) do
-          FactoryBot.create(:parking_notification_organized,
-            organization: current_organization,
-            bike: bike,
-            created_at: Time.current - 1.hour,
-            impound_record: impound_record)
-        end
-        let(:target) do
-          {
-            id: parking_notification1.id,
-            kind: "parked_incorrectly_notification",
-            kind_humanized: "Parked incorrectly",
-            status: "impounded",
-            created_at: parking_notification1.created_at.to_i,
-            lat: parking_notification1.latitude,
-            lng: parking_notification1.longitude,
-            user_id: parking_notification1.user_id,
-            user_display_name: parking_notification1.user.display_name,
-            impound_record_id: impound_record&.id,
-            message: parking_notification1.message,
-            internal_notes: parking_notification1.internal_notes,
-            image_url: nil,
-            resolved_at: parking_notification1.resolved_at&.to_i,
-            unregistered_bike: false,
-            notification_number: 1,
-            bike: {
-              id: bike.id,
-              title: bike.title_string
-            }
-          }
-        end
-        it "renders json, no cors present" do
-          get base_url, params: {search_status: "all", format: :json}
-          expect(response.status).to eq(200)
-          parking_notifications = json_result["parking_notifications"]
-          expect(parking_notifications.count).to eq 1
-          expect(parking_notifications.first).to eq target.as_json
-          expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
-          expect(response.headers["Access-Control-Request-Method"]).not_to be_present
+    context "with parking notifications" do
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:) }
+      let!(:parking_notification_retrieved) { FactoryBot.create(:parking_notification_organized, :retrieved, organization: current_organization) }
+      let(:bounding_box_params) { {search_southwest_coords: "40.7,-74.1", search_northeast_coords: "40.8,-73.9"} }
+      def notification_path(notification) = organization_parking_notification_path(notification, organization_id: current_organization.id)
 
-          # Also test that current is default scope
-          get base_url, params: {format: :json}
-          expect(response.status).to eq(200)
-          parking_notifications = json_result["parking_notifications"]
-          expect(parking_notifications.count).to eq 0
-        end
+      it "renders the current ones for the map" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response.body).to include(notification_path(parking_notification))
+        expect(response.body).to include(%(data-latitude="#{parking_notification.latitude}"))
+        expect(response.body).not_to include(notification_path(parking_notification_retrieved))
+        expect(response.body).to include(%(data-org--parking-notifications-index-bounding-box-value="[]"))
+
+        get base_url, params: bounding_box_params.merge(search_status: "all", map_location: "New York")
+        expect(response.status).to eq(200)
+        expect(response.body).to include(notification_path(parking_notification_retrieved))
+        expect(response.body).to include(%(data-org--parking-notifications-index-bounding-box-value="[40.7,-74.1,40.8,-73.9]"))
+        expect(response.body).to include(%(href="#{base_url}?search_status=all">search everywhere</a>))
+        # organization_id is the path's, so no link repeats it as a query param
+        expect(response.body).to include(%(href="#{base_url}?search_kind=appears_abandoned_notification&amp;search_northeast_coords=40.8%2C-73.9))
+        expect(response.body).not_to match(/parking_notifications\?[^"]*organization_id=/)
+        expect(response.body).to match(/data-org--parking-notifications-index-place-value="\[-?[\d.]+,-?[\d.]+\]"/)
       end
     end
     context "with searched bike" do
       let(:coords1) { [40.79426110344111, -77.86604158369109] }
       let(:coords2) { [40.69908378081713, -77.76302033475155] }
-      let(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords1.first, longitude: coords1.last) }
-      let(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords2.first, longitude: coords2.last) }
+      let!(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords1.first, longitude: coords1.last) }
+      let!(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords2.first, longitude: coords2.last) }
       let(:bike) { parking_notification2.bike }
-      it "renders", vcr: true do
+      def notification_rows = response.body.scan(%r{/parking_notifications/(\d+)"}).flatten.map(&:to_i).uniq
+
+      it "renders" do
         expect(parking_notification1.to_coordinates).to eq coords1
         expect(parking_notification2.to_coordinates).to eq coords2
         expect(bike.owner_email).to_not eq parking_notification1.bike.owner_email
-        get base_url, params: {search_bike_id: bike.id, per_page: 250}, headers: json_headers
+        get base_url, params: {search_bike_id: bike.id}
         expect(response.status).to eq(200)
-        expect(json_result["parking_notifications"].count).to eq 1
-        expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
-        expect(response.header["Per-Page"]).to eq "250"
+        expect(notification_rows).to eq([parking_notification2.id])
 
-        get base_url, params: {search_email: bike.owner_email, per_page: 500}, headers: json_headers
-        expect(response.status).to eq(200)
-        expect(json_result["parking_notifications"].count).to eq 1
-        expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
-        expect(response.header["Per-Page"]).to eq "250" # Because it's over the max permitted
+        get base_url, params: {search_email: bike.owner_email}
+        expect(notification_rows).to eq([parking_notification2.id])
 
-        # Pagination tests
-        get "#{base_url}?per_page=1&page=2", headers: json_headers
-        expect(response.status).to eq(200)
-        expect(response.header["Total"]).to eq("2")
-        expect(response.header["Per-Page"]).to eq "1"
-        expect(response.header["Link"].match('page=1&per_page=1>; rel=\"prev\"')).to be_present
-        expect(json_result[:parking_notifications].count).to eq 1
-        expect(json_result[:parking_notifications].first[:id]).to eq parking_notification1.id # Because it was created last
+        # Newest first, and per_page caps what's loaded
+        get base_url, params: {per_page: 1}
+        expect(notification_rows).to eq([parking_notification2.id])
+        expect(response.body).to include(%(<span class="">2</span> total matches))
+        expect(response.body).to include(%(first <span class="">1</span> loaded))
 
-        # location tests
-        get "#{base_url}?search_southwest_coords=40.79184719166159,-77.87257982819405&search_northeast_coords=40.80632036997267,-77.85346084130906", headers: json_headers
-        expect(json_result[:parking_notifications].count).to eq 1
-        expect(json_result[:parking_notifications].first[:id]).to eq parking_notification1.id
-        expect(response.header["Per-Page"]).to eq "200"
+        get base_url, params: {search_southwest_coords: "40.79184719166159,-77.87257982819405", search_northeast_coords: "40.80632036997267,-77.85346084130906"}
+        expect(notification_rows).to eq([parking_notification1.id])
+      end
+    end
+    context "json" do
+      it "isn't served" do
+        get base_url, params: {format: :json}
+        expect(response.status).to eq(406)
       end
     end
   end

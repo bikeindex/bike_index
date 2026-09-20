@@ -1,0 +1,213 @@
+<div class="organized-page-header">
+  <%= render(UI::Header::Component.new(text: translation(".parking_notifications"))) %>
+</div>
+
+<%= render partial: "organized/parking_notifications/repeated_updates_information", locals: {notifications_failed_resolved: @notifications_failed_resolved, repeated_kind: @repeated_kind} %>
+
+<%# TODO: add translations %>
+
+<%= tag.div(data: controller_data) do %>
+  <div class="new-unregistered-btn-wrap">
+    <%= link_to "New notification for unregistered bike", new_organization_bike_path(organization_id: @organization, parking_notification: true), class: "btn btn-sm btn-outline-primary" %>
+  </div>
+
+  <div
+    class="
+      tw:relative tw:h-100 tw:w-full tw:overflow-hidden tw:rounded-sm
+      tw:bg-gray-100 tw:dark:bg-gray-900
+    "
+  >
+    <div
+      data-org--parking-notifications-index-target="canvas"
+      class="tw:h-full tw:w-full"
+    ></div>
+
+    <template data-org--parking-notifications-index-target="pin">
+      <%= render UI::Button::Component.new(color: :link, html_class: "tw:opacity-75 tw:transition-opacity tw:hover:opacity-100 tw:aria-[current=true]:z-1 tw:aria-[current=true]:opacity-100 tw:*:origin-bottom tw:*:transition-[scale] tw:aria-[current=true]:*:scale-125", title: "Show notification") do %>
+        <%= helpers.inline_svg_tag("kelsey/registration_show/map-pin-solid.svg", class: "tw:h-8 tw:drop-shadow-md", aria_hidden: true) %>
+      <% end %>
+    </template>
+
+    <template data-org--parking-notifications-index-target="placePin">
+      <%= helpers.inline_svg_tag("kelsey/registration_show/map-target.svg", class: "tw:h-10 tw:w-10 tw:drop-shadow-md", aria_hidden: true) %>
+    </template>
+
+    <%# Mounted as a map control, so it comes along when the map expands %>
+    <template data-org--parking-notifications-index-target="placeForm">
+      <form
+        data-action="org--parking-notifications-index#searchPlace"
+        class="maplibregl-ctrl tw:w-72 tw:max-w-[45vw]"
+      >
+        <%= label_tag :map_location, "Search map", class: "twlabel tw:sr-only" %>
+        <%= search_field_tag :map_location, @map_location, placeholder: "Search map", autocomplete: "off", class: "twinput tw:shadow-md", data: {"org--parking-notifications-index-target": "placeInput"} %>
+      </form>
+    </template>
+
+    <%= render UI::Button::Component.new(
+      text: "redo search in current location",
+      size: :sm,
+      html_class: "tw:absolute tw:bottom-8 tw:left-2 tw:z-10 tw:shadow-md tw:hidden!",
+      data: {"org--parking-notifications-index-target": "redo", action: "org--parking-notifications-index#redoSearch"}
+    ) %>
+
+    <p
+      hidden
+      data-org--parking-notifications-index-target="unavailable"
+      class="
+        tw:absolute tw:inset-0 tw:flex tw:items-center tw:justify-center
+        tw:p-8 tw:text-center tw:text-sm tw:opacity-65
+      "
+    >
+      The map couldn't be loaded — your browser or device may not support it.
+    </p>
+  </div>
+
+  <div class="row mt-2 mb-4">
+    <div class="col-xs-4">
+      <span data-org--parking-notifications-index-target="visibleCount"><%= number_display(@parking_notifications.size) %></span>
+      <%= translation(".matches_visible") %>
+    </div>
+
+    <div class="col-xs-8">
+      <div class="less-strong text-right">
+        <%= number_display(@total_count) %> total matches
+        <% if @search_bounding_box.present? %>
+          in this area &middot;
+          <%= link_to "search everywhere", index_path(search_southwest_coords: nil, search_northeast_coords: nil) %>
+        <% end %>
+        <% if @parking_notifications.size >= @per_page %>
+          <em>- first <%= number_display(@per_page) %> loaded</em>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="tw:mt-2 tw:mb-6 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+    <%= render(UI::Dropdown::Component.new(name: kind_display(@search_kind), button_size: :sm, active: @search_kind != "all")) do |dropdown| %>
+      <% (["all"] + ParkingNotification.kinds).each do |kind| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display(kind), path: toggle_path(:search_kind, kind, @search_kind), match_params: {search_kind: (kind == "all") ? nil : kind}) } %>
+
+        <%# Divider after "all" %>
+        <% dropdown.with_entry_divider if kind == "all" %>
+      <% end %>
+    <% end %>
+
+    <%= render(UI::Dropdown::Component.new(name: UNREGISTERED_DISPLAY[@search_unregistered], button_size: :sm, active: @search_unregistered != "all")) do |dropdown| %>
+      <% UNREGISTERED_DISPLAY.each do |value, text| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text:, path: toggle_path(:search_unregistered, value, @search_unregistered), match_params: {search_unregistered: (value == "all") ? [nil, "all"] : value}) } %>
+        <% dropdown.with_entry_divider if value == "all" %>
+      <% end %>
+    <% end %>
+
+    <%= render(UI::Dropdown::Component.new(name: current_status[:m], button_size: :sm, active: @search_status != "current")) do |dropdown| %>
+      <%# NOTE! this list does not include resolved_otherwise - because that's a failure state, which shouldn't happen. If there start being multiple notifications in that state, revisit this decision %>
+      <% status_display_hash.each do |status, display_hash| %>
+        <% dropdown.with_entry_item do %>
+          <%= render UI::ActiveLink::Component.new(path: toggle_path(:search_status, status, @search_status), match_params: {search_status: (status == :current) ? [nil, "current"] : status}) do %>
+            <%= display_hash[:m] %>
+
+            <% if display_hash[:s].present? %>
+              <small class="less-strong"><%= display_hash[:s] %></small>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <%# Divider after "all" %>
+        <% dropdown.with_entry_divider if status == :all %>
+      <% end %>
+    <% end %>
+
+    <%= render UI::Button::Component.new(
+      text: "Fit map to notifications",
+      color: :link,
+      html_class: "tw:hidden!",
+      data: {"org--parking-notifications-index-target": "fit", action: "org--parking-notifications-index#fit"}
+    ) %>
+  </div>
+
+  <div class="tw:flex tw:justify-end">
+    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params: @search_params) %>
+  </div>
+
+  <div class="mt-4">
+    <%= render(Pages::Org::Search::Form::Component.new(target_search_path: organization_parking_notifications_path(organization_id: @organization.to_param), interpreted_params: @interpreted_params)) %>
+  </div>
+
+  <div class="row mt-4 mb-2">
+    <div class="col-sm-6">
+      <% if @search_bike_id.present? %>
+        <%= pluralize number_with_delimiter(@total_count), "parking notification" %>
+        for
+        <% if searched_bike.present? %>
+          <%= link_to searched_bike.title_string, bike_path(searched_bike) %>
+        <% else %>
+          <em>unknown bike #<%= @search_bike_id %></em>
+        <% end %>
+        <em class="less-strong">
+          view notifications
+          <%= link_to "for all bikes", index_path(search_bike_id: nil) %>
+        </em>
+      <% end %>
+
+      <% if @filtered_user_id.present? %>
+        Only notifications created by
+        <strong><%= @filtered_user&.display_name&.truncate(20) %></strong>
+        <span class="less-strong"><%= link_to "(view by all)", index_path(user_id: nil) %></span>
+      <% end %>
+    </div>
+
+    <div class="col-md-6 col-xs-12">
+      <%# Hide the repeat notification interface because the checks don't display on mobile %>
+      <div class="text-right hidden-md-down">
+        <%= render UI::Button::Component.new(
+          text: "retrieve/send repeat notification",
+          size: :sm,
+          data: {action: "org--parking-notifications-index#showMultiselect"}
+        ) %>
+      </div>
+    </div>
+  </div>
+
+  <%# Form needs to wrap the table too %>
+  <%= form_for ParkingNotification.new, url: organization_parking_notifications_path(organization_id: @organization), html: {data: {controller: "table-multi-checkbox"}} do |f| %>
+    <div
+      class="tw:hidden"
+      data-org--parking-notifications-index-target="repeatForm"
+    >
+      <%# similar form on parking notification show %>
+      <div class="row">
+        <div class="mt-4 mb-4 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
+          <div class="card">
+            <div class="card-block">
+              <div class="card-title">
+                <h3 class="uncap">
+                  Mark retrieved or send follow up notifications
+                  <br>
+                  <em class="small less-strong">For table rows with checks</em>
+                </h3>
+              </div>
+
+              <div class="card-body">
+                <%# Matching form is on parking notification index %>
+                <div class="row">
+                  <div class="col-xs-6">
+                    <%= select_tag :kind, options_for_select(helpers.parking_notification_repeat_kinds), prompt: "...", class: "form-control", required: true, data: {action: "org--parking-notifications-index#updateSubmitText"} %>
+                  </div>
+
+                  <div class="col-xs-6 text-center">
+                    <%= submit_tag "Create notifications", class: "btn btn-success btn-md-lg", data: {"org--parking-notifications-index-target": "submit"} %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="full-screen-table">
+      <%# only hide status on current - because otherwise it displays the time things were resolved %>
+      <%= render partial: "organized/parking_notifications/table", locals: {parking_notifications: @parking_notifications, hide_status: @search_status == "current", render_sortable: true, map_rows: true} %>
+    </div>
+  <% end %>
+<% end %>

@@ -57,6 +57,22 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.status(Bike.all, "stolen").pluck(:id)).to eq([bike_stolen.id])
       expect(described_class.status(Bike.all, "not_impounded").pluck(:id)).to match_array([bike_with_sticker.id, bike_stolen.id])
       expect(described_class.status(Bike.all, "all").count).to eq 3
+
+      # The panel offers street; none and with still arrive from older links
+      expect(described_class.address(Bike.all, "none").to_sql).to_not eq(Bike.all.to_sql)
+      expect(described_class.address(Bike.all, "with").to_sql).to_not eq(Bike.all.to_sql)
+
+      # Each filter maps its values to scopes by hand, so a value added to the panel's table
+      # without a branch here would be selectable and then quietly return every bike
+      ComponentStructs::OrgSearchSettings::FILTER_GROUPS.each do |param, group|
+        filter = param.to_s.delete_prefix("search_")
+        next unless described_class.respond_to?(filter) # some filters scope in the controller
+
+        group[:values].each_key do |value|
+          expect(described_class.public_send(filter, Bike.all, value.to_s).to_sql)
+            .to_not(eq(Bike.all.to_sql), "#{param} #{value} left the search alone")
+        end
+      end
     end
   end
 end

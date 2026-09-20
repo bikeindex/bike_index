@@ -66,6 +66,7 @@ module OrganizedHelper
   end
 
   def organized_include_javascript_pack?
+    return false if [controller_name, action_name] == %w[parking_notifications index]
     return true if organized_container == "container-fluid"
 
     [

@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      org:
+        parking_notifications:
+          index:
+            matches_visible: visible
+            parking_notifications: Parking notifications
