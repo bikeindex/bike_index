@@ -102,6 +102,8 @@ export default class extends Controller {
 
   // The chip the summary leaves out, for the same reason it reads the others' markup.
   // ui--period-select owns the submit, so this runs off the search it came back from.
+  // Its text, not the span the summary reuses: the server's own label carries the prefix
+  // that the chip hides below md.
   syncPeriodLabel () {
     const picked = document.querySelector('input[type=radio][name=period][form="Search_Form"]:checked')
     if (!this.hasPeriodLabelTarget || !picked) return
