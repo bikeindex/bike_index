@@ -29,10 +29,28 @@ module Pages
           end
 
           def hidden_not_registered_tag
-            @hidden_not_registered_tag ||= tag.em(
-              translation(".hidden_not_registered", org_name: @organization.short_name),
-              class: "less-strong tw:leading-snug tw:text-xs"
-            )
+            safe_join([hidden_label, hidden_tooltip], " ")
+          end
+
+          def hidden_label
+            @hidden_label ||= tag.em(translation(".hidden"), class: "less-strong tw:leading-snug tw:text-xs")
+          end
+
+          # Rendered per cell rather than memoized with its text: the trigger points at its
+          # own tooltip by id
+          def hidden_tooltip
+            render(UI::Tooltip::Component.new(text: hidden_tooltip_text)) do |tooltip|
+              tooltip.with_tooltip_button(class: hidden_tooltip_button_class)
+            end
+          end
+
+          # As quiet as the word it sits beside
+          def hidden_tooltip_button_class
+            @hidden_tooltip_button_class ||= "#{UI::Tooltip::Component::BUTTON_CLASS} tw:opacity-60"
+          end
+
+          def hidden_tooltip_text
+            @hidden_tooltip_text ||= translation(".not_registered_with", org_name: @organization.short_name)
           end
 
           def table_wrapper_data_attributes

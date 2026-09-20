@@ -102,7 +102,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       let(:propulsion_type) { "pedal-assist" }
 
       it "renders the e-vehicle as hidden" do
-        expect(component).to have_css("td.acknowledgment_cell", text: "hidden, not registered")
+        expect(component).to have_css("td.acknowledgment_cell", text: "hidden")
+        expect(component).to have_css("td.acknowledgment_cell [role=tooltip]", text: "Hidden because it is not registered", visible: :all)
       end
 
       context "that isn't an e-vehicle" do
@@ -149,10 +150,11 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).not_to have_text("stranger@example.com")
       expect(component).not_to have_text("555-555-1212")
       expect(component).not_to have_text("SECRET-EXTRA")
-      hidden_text = "hidden, not registered with #{organization.short_name}"
-      expect(component).to have_css(".owner_email_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".reg_phone_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".reg_extra_registration_number_cell em.less-strong", text: hidden_text)
+      hidden_text = "Hidden because it is not registered with #{organization.short_name}"
+      %w[owner_email_cell reg_phone_cell reg_extra_registration_number_cell].each do |cell|
+        expect(component).to have_css(".#{cell} em.less-strong", text: "hidden")
+        expect(component).to have_css(".#{cell} [role=tooltip]", text: hidden_text, visible: :all)
+      end
     end
   end
 

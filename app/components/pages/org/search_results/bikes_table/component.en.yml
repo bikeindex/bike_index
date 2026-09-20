@@ -7,5 +7,6 @@ en:
           bikes_table:
             assign_bike_sticker: Assign sticker
             email_hidden: email hidden
-            hidden_not_registered: hidden, not registered with %{org_name}
+            hidden: hidden
             link_sticker: link sticker
+            not_registered_with: Hidden because it is not registered with %{org_name}
