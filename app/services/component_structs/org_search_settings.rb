@@ -39,9 +39,10 @@ module ComponentStructs
 
     ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
 
-    # Each filter's values and their labels, once — `filter_groups` lays them out and
-    # `active_search_filter_descriptions` names the ones in force. feature gates the
-    # whole row, value_feature an individual option; blank is the row's "not filtering".
+    # Each filter's values and their labels, once — `filter_groups` lays them out,
+    # `filter_values` is the set the controller permits, and `active_search_filter_descriptions`
+    # names the ones in force. feature gates the whole row, value_feature an individual
+    # option; blank is the row's "not filtering".
     FILTER_GROUPS = {
       search_stickers: {label: :stickers, feature: "bike_stickers",
                         values: {with: :filter_with_stickers_html, none: :filter_no_sticker_html}},
@@ -66,6 +67,18 @@ module ComponentStructs
       propulsion_type_cell status_cell].freeze
 
     attr_reader :organization
+
+    # The values an organization's panel offers for a filter, blank first — empty if the
+    # whole row is gated off. The search permits these and nothing else
+    def self.filter_values(name, organization)
+      group = FILTER_GROUPS.fetch(name)
+      enabled = ->(feature) { feature.nil? || organization.enabled?(feature) }
+      return [] unless enabled.call(group[:feature])
+
+      [group[:blank] || ""] + group[:values].keys.filter_map do |value|
+        value.to_s if enabled.call(group[:value_feature]&.dig(value))
+      end
+    end
 
     def initialize(organization:, interpreted_params: {}, sortable_search_params: {}, params: {},
       search_stickers: nil, search_address: nil, search_status: "all", search_unregisteredness: nil,
