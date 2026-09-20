@@ -39,9 +39,10 @@ module ComponentStructs
 
     ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
 
-    # Each filter's values and their labels, once — `filter_groups` lays them out and
-    # `active_search_filter_descriptions` names the ones in force. feature gates the
-    # whole row, value_feature an individual option; blank is the row's "not filtering".
+    # Each filter's values and their labels, once — `filter_groups` lays them out,
+    # `filter_values` is the set the controller permits, and `active_search_filter_descriptions`
+    # names the ones in force. feature gates the whole row, value_feature an individual
+    # option; blank is the row's "not filtering".
     FILTER_GROUPS = {
       search_stickers: {label: :stickers, feature: "bike_stickers",
                         values: {with: :filter_with_stickers_html, none: :filter_no_sticker_html}},
@@ -64,6 +65,18 @@ module ComponentStructs
 
     attr_reader :organization
 
+    # The values an organization's panel offers for a filter, blank first — empty if the
+    # whole row is gated off. The search permits these and nothing else
+    def self.filter_values(name, organization)
+      group = FILTER_GROUPS.fetch(name)
+      enabled = ->(feature) { feature.nil? || organization.enabled?(feature) }
+      return [] unless enabled.call(group[:feature])
+
+      [group[:blank] || ""] + group[:values].keys.filter_map do |value|
+        value.to_s if enabled.call(group[:value_feature]&.dig(value))
+      end
+    end
+
     def initialize(organization:, interpreted_params: {}, sortable_search_params: {}, params: {},
       search_stickers: nil, search_address: nil, search_status: "all")
       @organization = organization
@@ -75,12 +88,13 @@ module ComponentStructs
 
     def filter_groups
       FILTER_GROUPS.filter_map do |name, group|
-        next unless enabled_filter?(group[:feature])
+        blank, *values = self.class.filter_values(name, @organization)
+        next if blank.nil?
 
-        blank = group[:blank] || ""
         {name:, label: translation(group[:label]),
          selected: @filter_values[name].presence || blank,
-         entries: [{value: blank, label: translation(:all)}] + group_entries(group)}
+         entries: [{value: blank, label: translation(:all)}] +
+           values.map { |value| {value:, label: translation(group[:values][value.to_sym])} }}
       end
     end
 
@@ -141,18 +155,6 @@ module ComponentStructs
     end
 
     private
-
-    def enabled_filter?(feature)
-      feature.nil? || @organization.enabled?(feature)
-    end
-
-    def group_entries(group)
-      group[:values].filter_map do |value, key|
-        next unless enabled_filter?(group[:value_feature]&.dig(value))
-
-        {value: value.to_s, label: translation(key)}
-      end
-    end
 
     def translation(key)
       ActiveSupport::HtmlSafeTranslation.translate(key, scope: TRANSLATION_SCOPE)

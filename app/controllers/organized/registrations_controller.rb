@@ -185,8 +185,7 @@ module Organized
     def search_status
       return @search_status if defined?(@search_status)
 
-      valid_statuses = %w[with_owner stolen all]
-      valid_statuses += %w[impounded not_impounded] if current_organization.enabled?("impound_bikes")
+      valid_statuses = ComponentStructs::OrgSearchSettings.filter_values(:search_status, current_organization)
       @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : default_status
     end
 
