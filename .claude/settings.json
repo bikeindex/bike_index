@@ -3,7 +3,6 @@
   "permissions": {
     "allow": [
       "Bash(bin/workspace_setup:*)",
-      "Bash(bin/setup:*)",
       "Bash(bin/env:*)",
       "Bash(ruby bin/env:*)",
       "Bash(bin/lint:*)",

@@ -6,7 +6,7 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
-**A spawned `.claude/worktrees/…` checkout runs `bin/workspace_setup --without_seeds` before anything else** — it allocates the workspace ID and symlinks `node_modules` from the root checkout. Until it has, there's no `.workspace_id` for `bin/env` to read and its fallback is the *main* checkout's port, database and Redis.
+**A spawned `.claude/worktrees/…` checkout runs `bin/workspace_setup --without_seeds` before anything else** — until it has, `bin/env` falls back to the *main* checkout's port, database and Redis. The `sandbox-test-setup` skill has it.
 
 **A workspace's database generally starts empty** — created and migrated, but not seeded, so `Bike.count` is 0 and real pages render nothing. Run `bundle exec rails db:seed` when you need records to try something in development; `bikeindex_development_$WORKSPACE_ID` is a per-workspace throwaway, so seeding or re-seeding it is safe and never needs asking.
 
