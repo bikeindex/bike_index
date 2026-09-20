@@ -112,6 +112,7 @@ gem "turbo-rails" # Hotwire's SPA-like page accelerator [https://turbo.hotwired.
 gem "stimulus-rails" # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "tailwindcss-rails" # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
 gem "view_component" # view components!
+gem "lookbook" # view_component preview
 gem "inline_svg" # render SVGs inline and give them classes
 gem "hotwire_combobox" # accessible autocomplete/combobox
 
@@ -121,12 +122,6 @@ end
 
 group :sandbox, :production do
   gem "honeybadger" # Error monitoring
-end
-
-# view_component previews. Not production: previews render real records, and the
-# mount they'd be reachable through has no authentication
-group :development, :test, :sandbox do
-  gem "lookbook"
 end
 
 group :sandbox do
