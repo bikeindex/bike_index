@@ -45,6 +45,14 @@ FileUtils.chdir APP_ROOT do
       FileUtils.cp env_dev, ".env.development"
     end
 
+    # A worktree is its own Claude project root, so it inherits none of the root's
+    # permission rules; symlinked so an approval granted anywhere reaches every checkout
+    claude_settings = File.join(root, ".claude/settings.local.json")
+    if File.exist?(claude_settings)
+      puts "Symlinking .claude/settings.local.json from #{root}..."
+      FileUtils.ln_sf claude_settings, ".claude/settings.local.json"
+    end
+
     # Symlink storage directory for Active Storage
     root_storage = File.join(root, "storage")
     if Dir.exist?(root_storage)
