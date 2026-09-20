@@ -27,8 +27,8 @@
           </td>
 
           <td>
-            <small class="localizeTime">
-              <%= l stolen_notification.updated_at, format: :convert_time %>
+            <small>
+              <%= render UI::Time::Component.new(time: stolen_notification.updated_at) %>
             </small>
           </td>
 

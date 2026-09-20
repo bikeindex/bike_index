@@ -132,11 +132,11 @@ RSpec.describe Admin::DashboardController, type: :request do
         Organization.example && Cgroup.additional_parts && Ctype.other # Read replica
         FactoryBot.create(:manufacturer, name: "other")
         BParam.create(creator_id: current_user.id)
-        component = FactoryBot.create(:component, manufacturer: Manufacturer.other, ctype: FactoryBot.create(:ctype, name: "Wheel"))
+        FactoryBot.create(:component, manufacturer: Manufacturer.other, ctype: FactoryBot.create(:ctype, name: "Wheel"))
         get "/admin/maintenance"
         expect(response.code).to eq "200"
         expect(response).to render_template(:maintenance)
-        expect(response.body).to include(component.ctype.name)
+        expect(response.body).to include("Wheel")
       end
     end
 

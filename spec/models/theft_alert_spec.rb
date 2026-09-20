@@ -219,7 +219,6 @@ RSpec.describe TheftAlert, type: :model do
       expect(theft_alert.activateable?).to be_falsey
       theft_alert.facebook_data = {activating_at: Time.current.to_i}
       expect(theft_alert.notify?).to be_truthy
-      expect(TheftAlert.cities_count).to eq([["Canada", "Vancouver", nil, 1]])
     end
     context "admin" do
       let(:admin) { true }
@@ -236,8 +235,7 @@ RSpec.describe TheftAlert, type: :model do
     let(:vancouver) { FactoryBot.create(:stolen_record, :in_vancouver) }
     let(:nyc) { FactoryBot.create(:stolen_record, :in_nyc) }
 
-    # The country and state rows here are created after the first call, so a lookup
-    # memoized on the class reads them back as nil
+    # The places are created after the first call, which a memoized lookup reads back as nil
     it "names the places created since an earlier call" do
       FactoryBot.create(:theft_alert, stolen_record: vancouver)
       expect(described_class.cities_count).to eq([["Canada", "Vancouver", nil, 1]])

@@ -91,8 +91,7 @@ class TheftAlert < ApplicationRecord
       Time.current - 2.days
     end
 
-    # The name lookups are per call, not memoized on the class - a class ivar outlives
-    # every row it was built from, so an id added later reads back nil
+    # Not memoized: an id created after the first call would read back nil
     def cities_count
       countries = Country.pluck(:id, :name).to_h
       states = State.pluck(:id, :name).to_h
