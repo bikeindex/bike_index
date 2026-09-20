@@ -6,7 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 // Pins every loaded notification on the map, and narrows the table to the ones in view
 export default class extends Controller {
   static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeForm', 'placeInput', 'redo', 'fit',
-    'visibleCount', 'row', 'empty', 'repeatForm', 'submit']
+    'visibleCount', 'mapButton', 'empty', 'repeatForm', 'submit']
 
   static values = {
     latitude: Number,
@@ -102,10 +102,12 @@ export default class extends Controller {
     this.popup = new maplibregl.Popup({ offset: 32, maxWidth: 'min(90vw, 60rem)', closeOnClick: false, focusAfterOpen: false })
     this.popup.on('close', () => this.#markCurrentPin(null))
 
-    // rowTargets re-queries the DOM on every read, and every moveend reads it
-    this.rows = this.rowTargets
-    this.markers = new Map(this.rows.filter((row) => row.dataset.latitude && row.dataset.longitude)
-      .map((row) => [row, this.#addMarker(maplibregl, row)]))
+    // Each row is reached through its map button — targetTargets re-query the DOM on
+    // every read, and every moveend reads these
+    const buttons = this.mapButtonTargets
+    this.rows = buttons.map((button) => button.closest('tr'))
+    this.markers = new Map(buttons.filter((button) => button.dataset.latitude && button.dataset.longitude)
+      .map((button) => [button.closest('tr'), this.#addMarker(maplibregl, button)]))
 
     if (this.placeValue.length) {
       const [latitude, longitude] = this.placeValue
@@ -126,11 +128,12 @@ export default class extends Controller {
     })
   }
 
-  #addMarker (maplibregl, row) {
+  #addMarker (maplibregl, button) {
+    const row = button.closest('tr')
     const element = this.pinTarget.content.firstElementChild.cloneNode(true)
     element.addEventListener('click', () => this.#openPopup(row))
     return new maplibregl.Marker({ element, anchor: 'bottom' })
-      .setLngLat([Number(row.dataset.longitude), Number(row.dataset.latitude)])
+      .setLngLat([Number(button.dataset.longitude), Number(button.dataset.latitude)])
       .addTo(this.map)
   }
 

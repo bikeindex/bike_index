@@ -4,10 +4,15 @@
 <% message_notes_cell = method(:message_notes) %>
 
 <%= render(UI::Table::Component.new(records: @parking_notifications, sort_state: @sort_state,
-  render_sortable: @render_sortable, row_data:)) do |table| %>
+  render_sortable: @render_sortable)) do |table| %>
   <% if @map_rows %>
+    <%# The index's map controller reaches each row through this button %>
     <% table.column(label: "", classes: "map-cell") do |parking_notification| %>
-      <%= render UI::Button::Component.new(text: "↑", color: :link, title: "Show on map", data: {action: "org--parking-notifications-index#showOnMap"}) %>
+      <%= render UI::Button::Component.new(text: "↑", color: :link, title: "Show on map", data: {
+        action: "org--parking-notifications-index#showOnMap",
+        "org--parking-notifications-index-target": "mapButton",
+        latitude: parking_notification.latitude, longitude: parking_notification.longitude
+      }) %>
     <% end %>
   <% end %>
 

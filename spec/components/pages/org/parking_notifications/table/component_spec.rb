@@ -29,9 +29,9 @@ RSpec.describe Pages::Org::ParkingNotifications::Table::Component, type: :compon
     expect(component).to have_link(href: routes.bike_path(parking_notification.bike))
     expect(component).to have_content(parking_notification.kind_humanized)
     expect(component).to have_css("td", text: /Notes: called twice.*Message: Move it/)
-    # The map columns and their per-row coordinates only come with map_rows
+    # The map column and its coordinates only come with map_rows
     expect(component).not_to have_css(".map-cell")
-    expect(component).not_to have_css("tr[data-latitude]")
+    expect(component).not_to have_css("[data-latitude]")
     expect(component).not_to have_css(".multiselect-cell")
   end
 
@@ -39,9 +39,10 @@ RSpec.describe Pages::Org::ParkingNotifications::Table::Component, type: :compon
     let(:options) { {map_rows: true, render_multiselect: true} }
 
     it "hooks the rows and the checkboxes up to the index controller" do
-      expect(component).to have_css("tr[data-org--parking-notifications-index-target='row']" \
+      # The controller reaches the row through this button, so the coordinates ride on it
+      expect(component).to have_css("td.map-cell button[data-action~='org--parking-notifications-index#showOnMap']" \
+        "[data-org--parking-notifications-index-target='mapButton']" \
         "[data-latitude='#{parking_notification.latitude}'][data-longitude='#{parking_notification.longitude}']")
-      expect(component).to have_css("td.map-cell button[data-action~='org--parking-notifications-index#showOnMap']")
 
       # Hidden until "retrieve/send repeat notification" reveals the column
       expect(component).to have_css("th.multiselect-cell.tw\\:hidden button[data-action~='table-multi-checkbox#toggleAll']", visible: :all)

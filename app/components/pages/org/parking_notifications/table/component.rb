@@ -22,16 +22,6 @@ module Pages
 
           private
 
-          # The index's map controller pins each row and narrows the table to what's in view
-          def row_data
-            return nil unless @map_rows
-
-            ->(parking_notification) {
-              {"org--parking-notifications-index-target": "row",
-               latitude: parking_notification.latitude, longitude: parking_notification.longitude}
-            }
-          end
-
           def message_notes(parking_notification)
             safe_join([["Notes", parking_notification.internal_notes], ["Message", parking_notification.message]]
               .filter_map { |label, text| safe_join([tag.strong("#{label}:"), " ", text]) if text.present? }, tag.br)

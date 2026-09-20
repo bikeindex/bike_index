@@ -17,13 +17,13 @@
     <tbody>
       <% @records.each do |record| %>
         <% cache_if(@cache_key, [@cache_key, record]) do %>
-          <%= tag.tr(data: @row_data&.call(record)) do %>
+          <tr>
             <% @columns.each do |col| %>
               <td class="<%= col.td_classes(bordered: @bordered) %>">
                 <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
               </td>
             <% end %>
-          <% end %>
+          </tr>
         <% end %>
       <% end %>
     </tbody>
