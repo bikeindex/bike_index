@@ -11,8 +11,10 @@ en:
             export_unavailable: >-
               You can only export your organization's registrations. Uncheck "Search
               all %{cycle_type}" to export.
-            matching_html: "%{count} matching %{cycle_type}"
-            over_count_matching_html: Over %{count} matching %{cycle_type}
+            matching_html:
+              one: "%{number} match"
+              other: "%{number} matches"
+            over_count_matching_html: Over %{number} matches
             per_page: Results per page
             showing_html: showing %{from}–%{to} of %{count}
             view_as: View as

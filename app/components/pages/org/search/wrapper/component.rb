@@ -4,10 +4,10 @@ module Pages
   module Org
     module Search
       module Wrapper
-        # A card of org registrations: the match count, the column-visibility panel, the
-        # table and the pagination footer. On the registrations search (search_page) it also
-        # carries the row of actions across the top, and renders inside the results
-        # turbo-frame, so every search brings the whole card back.
+        # A card of org registrations: the match count and the column settings button, the
+        # column-visibility panel, the table and the pagination footer. On the registrations
+        # search (search_page) the header also carries the view switcher and the export, and
+        # the card renders inside the results turbo-frame, so every search brings it back whole.
         class Component < ApplicationComponent
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[spreadsheet thumbnail].freeze
@@ -54,21 +54,23 @@ module Pages
             @model_audit = model_audit
             @settings = settings
             @result_view = self.class.permitted_result_view(result_view)
-            # The search page brings its own Stimulus controllers and opens the column panel
-            # from this card's header; everywhere else the card is on its own
+            # The search page brings its own Stimulus controllers, and the row of actions
+            # across this card's header; everywhere else the card is on its own
             @search_page = search_page
           end
 
           private
 
           # Two sentences rather than a count interpolated into one, so a translation can
-          # order "over" however it reads
+          # order "over" however it reads. count picks the plural; number is what it renders,
+          # which number_display has already marked up
           def count_html
-            cycle_type = settings.cycle_type.pluralize(@pagy.count)
-            return translation(".matching_html", count: number_display(@pagy.count), cycle_type:) unless count_stopped?
+            unless count_stopped?
+              return translation(".matching_html", count: @pagy.count, number: number_display(@pagy.count))
+            end
 
             translation(".over_count_matching_html",
-              count: number_display(BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT), cycle_type:)
+              number: number_display(BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT))
           end
 
           def count_stopped?
@@ -89,9 +91,10 @@ module Pages
             )
           end
 
+          # Every card opens the panel from its own header, so the panel never carries a button
           def settings_component
             @settings_component ||= Pages::Org::Search::Settings::Component
-              .new(settings:, toggle_button: !@search_page)
+              .new(settings:, toggle_button: false)
           end
 
           # On the search page the .twwiderow holding the card supplies the gap above it, and
