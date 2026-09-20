@@ -68,8 +68,13 @@ module UI
       def period_radio(period)
         tag.label(class: UI::Forms::RadioButtonGroup::Component::CHIP_CLASSES) do
           radio_button_tag("period", period[:key], @period == period[:key],
-            class: "tw:sr-only", form: @form, data: @data) + tag.span(period_button_label(period))
+            class: "tw:sr-only", form: @form, data: radio_data) + tag.span(period_button_label(period))
         end
+      end
+
+      # Picking a chip is picking a range, so the custom panel it replaces closes with it
+      def radio_data
+        @radio_data ||= @data.merge(action: ["change->ui--collapse#hide", @data[:action]].compact.join(" "))
       end
 
       # The prefix drops below md, where the row has no room for it

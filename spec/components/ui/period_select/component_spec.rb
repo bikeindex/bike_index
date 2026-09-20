@@ -48,6 +48,25 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
         expect(component).not_to have_css("a[data-period]")
         # No chip stands for a custom range, so a search would drop it
         expect(component).not_to have_css("input[type=hidden][name='period']", visible: :all)
+        # Picking a range closes the custom panel it replaces
+        expect(component).to have_css("input[type=radio][data-action='change->ui--collapse#hide']", visible: :all, count: 6)
+      end
+    end
+
+    context "with a form and the caller's own action" do
+      let(:form) { "search_form" }
+      let(:component) do
+        with_request_url("/admin/bikes") do
+          render_inline(described_class.new(period: "week", start_time: Time.current - 1.week,
+            end_time: Time.current, form:, data: {action: "change->org--search#filterChanged"}))
+        end
+      end
+
+      it "keeps it, rather than replacing it with the collapse's" do
+        expect(component).to have_css(
+          "input[type=radio][value='week'][data-action='change->ui--collapse#hide change->org--search#filterChanged']",
+          visible: :all
+        )
       end
     end
 
