@@ -49,12 +49,11 @@ module UI
           .map { I18n.t("components.ui.period_select.#{it}") }.join(" ")
       end
 
-      # form/data: as UI::Forms::RadioButtonGroup takes them - the periods become that form's
-      # radios rather than links, so a search carries the period without a page of their own
+      # form: the id of the search this belongs to - the periods become its radios rather
+      # than links, and picking one submits it
       def initialize(period:, start_time:, end_time:, sortable_search_params: {}, include_future: false,
-        prepend_text: nil, form: nil, data: {}, size: :sm)
+        prepend_text: nil, form: nil, size: :sm)
         @form = form
-        @data = data
         @size = size
         raise_if_invalid_value!(:size, size, UI::Button::Component::SIZES.keys)
         @include_future = include_future
@@ -75,13 +74,14 @@ module UI
         @include_future ? PERIODS : PERIODS.reject { |p| p[:future] }
       end
 
-      def period_button(period_key)
+      def period_button(period)
         UI::ButtonLink::Component.new(
-          href: period_url(period_key),
+          href: period_url(period[:key]),
+          text: tag.span(period_button_label(period)),
           size: @size,
-          active: @period == period_key,
+          active: @period == period[:key],
           html_class: period_button_class,
-          data: {period: period_key, turbo_action: "advance"}
+          data: {period: period[:key], turbo_action: "advance"}
         )
       end
 
@@ -89,8 +89,9 @@ module UI
       # as a group of their own, which would wrap as one
       def period_radio(period)
         tag.label(class: chip_classes) do
-          radio_button_tag("period", period[:key], @period == period[:key],
-            class: "tw:sr-only", form: @form, data: radio_data.merge(period_range_data(period[:key]))) +
+          radio_button_tag("period", period[:key], @period == period[:key], class: "tw:sr-only", form: @form,
+            data: {action: "change->ui--collapse#hide change->ui--period-select#rangePicked",
+                   **period_range_data(period[:key])}) +
             tag.span(period_button_label(period))
         end
       end
@@ -104,14 +105,10 @@ module UI
         {start_time: range.first.strftime(INPUT_TIME_FORMAT), end_time: range.last.strftime(INPUT_TIME_FORMAT)}
       end
 
+      # RadioButtonGroup's chip, at this component's size rather than its fixed one
       def chip_classes
         @chip_classes ||= [UI::Button::Component.build_classes(color: :secondary, size: @size),
           UI::Forms::RadioButtonGroup::Component::LABEL_CLASSES].join(" ")
-      end
-
-      def radio_data
-        @radio_data ||= @data.merge(action: ["change->ui--collapse#hide",
-          "change->ui--period-select#rangePicked", @data[:action]].compact.join(" "))
       end
 
       # The prefix drops below md, where the row has no room for it
@@ -123,7 +120,8 @@ module UI
       def custom_button
         UI::Button::Component.new(text: translation(".custom"), active: @period == "custom",
           size: @size, html_class: (period_button_class unless @form),
-          data: {period: "custom", action: "click->ui--collapse#toggle"})
+          data: {period: "custom", action: "click->ui--collapse#toggle",
+                 "ui--period-select-target": "customButton"})
       end
 
       def period_button_class

@@ -68,6 +68,11 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
         expect(component).to have_css("input[type=radio][value='week'][checked]", visible: :all)
         expect(component).not_to have_css("a[data-period]")
         expect(component).to have_css("label", class: small.split, visible: :all)
+        # Picking one closes the custom panel it replaces, and submits the search
+        expect(component).to have_css(
+          "input[type=radio][value='week'][data-action='change->ui--collapse#hide change->ui--period-select#rangePicked']",
+          visible: :all
+        )
         # No chip stands for a custom range, so there's nothing to outrank the one picked
         expect(component).not_to have_css("input[type=hidden][name='period']", visible: :all)
       end
@@ -79,25 +84,15 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
         expect(component).to have_css("input[value='all']:not([data-start-time])", visible: :all)
       end
 
-      context "with the caller's own action" do
-        let(:options) { super().merge(data: {action: "change->org--search#filterChanged"}) }
-
-        it "keeps it, rather than replacing it with the collapse's" do
-          expect(component).to have_css(
-            "input[type=radio][value='week'][data-action='change->ui--collapse#hide change->ui--period-select#rangePicked change->org--search#filterChanged']",
-            visible: :all
-          )
-        end
-      end
-
       context "over a custom range" do
         let(:period) { "custom" }
 
-        it "carries the custom period in a hidden field, for ui--period-select to disable" do
+        it "carries the custom period in a hidden field, and marks what a pick unpicks" do
           expect(component).to have_css(
             "input[type=hidden][name='period'][value='custom'][form='search_form'][data-ui--period-select-target='customPeriod']",
             visible: :all
           )
+          expect(component).to have_css("button[data-active='true'][data-ui--period-select-target='customButton']")
         end
       end
     end

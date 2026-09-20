@@ -1,5 +1,6 @@
 <%# The radios belong to a form elsewhere on the page, which is how the org search renders them %>
-<%= form_with(url: "#", method: :get, id: "period_preview_form") do %>
-<% end %>
-
 <%= render(component) %>
+
+<%= form_with(url: "#", method: :get, id: "period_preview_form", class: "tw:mt-6") do %>
+  <%= render(UI::Button::Component.new(text: "Search", color: :primary, size: :sm, type: "submit")) %>
+<% end %>
