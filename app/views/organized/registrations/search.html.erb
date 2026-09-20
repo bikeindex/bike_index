@@ -56,19 +56,18 @@
           <%# Same, for the view the spreadsheet/thumbnail chips advance to %>
           <%= hidden_field_tag :search_result_view, @result_view %>
 
+          <%# Inline, so the organization's name wraps with the rest of the sentence %>
           <% form.with_below_submit do %>
-            <div class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
-              <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
+            <div class="tw:mt-3">
+              <label class="tw:mb-0! tw:cursor-pointer">
                 <%= check_box_tag :search_all, "true", @search_all, form: "Search_Form",
-                  disabled: @search_all_locked,
-                  data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll"} %>
-
-                <%= t(".search_all_html", cycle_type: settings.cycle_type.pluralize(2),
-                  org_name: current_organization.short_name) %>
+                  class: "tw:mr-1 tw:align-middle", disabled: @search_all_locked,
+                  data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll"} %><%= t(".search_all_html", cycle_type: settings.cycle_type.pluralize(2),
+                    org_name: current_organization.short_name) %>
               </label>
 
               <%= tag.span(render(UI::Tooltip::Component.new(text: t(".search_all_email_disabled"))),
-                class: "tw:leading-none", hidden: !@search_all_locked,
+                class: "tw:ml-1 tw:align-middle", hidden: !@search_all_locked,
                 data: {"org--search-target": "searchAllHint"}) %>
             </div>
           <% end %>

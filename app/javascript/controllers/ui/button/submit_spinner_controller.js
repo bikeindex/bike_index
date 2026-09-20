@@ -12,6 +12,8 @@ export default class extends Controller {
     // Cached, because a detached button's .form is null - disconnect couldn't find it to unsubscribe
     this.form = this.element.form
     this.form?.addEventListener('submit', this.start)
+    // A frame submit leaves the page where it is, so the spinner ends with the submission
+    this.form?.addEventListener('turbo:submit-end', this.reset)
     // A bfcache restore resumes the page without reconnecting, so the reset
     // needs pageshow as well as connect (which covers Turbo cache restores)
     window.addEventListener('pageshow', this.reset)
@@ -22,6 +24,7 @@ export default class extends Controller {
 
   disconnect () {
     this.form?.removeEventListener('submit', this.start)
+    this.form?.removeEventListener('turbo:submit-end', this.reset)
     this.form = null
     window.removeEventListener('pageshow', this.reset)
     this.element.removeEventListener('spinner:reset', this.reset)
