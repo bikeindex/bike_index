@@ -1,0 +1,84 @@
+<%# Cell blocks are instance_exec'd against UI::Table, so locals rather than ivars %>
+<% current_organization = @current_organization %>
+<% render_sortable = @render_sortable %>
+<% search_params = @sort_state.search_params %>
+<% message_notes_cell = ->(parking_notification) { message_notes(parking_notification) } %>
+
+<%= render(UI::Table::Component.new(records: @parking_notifications, sort_state: @sort_state,
+  render_sortable: @render_sortable, data: table_data, row_data:)) do |table| %>
+  <% if @map_rows %>
+    <% table.column(label: "", classes: "map-cell") do |parking_notification| %>
+      <%= render UI::Button::Component.new(text: "↑", color: :link, title: "Show on map", data: {action: "org--parking-notifications-index#showOnMap"}) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "created_at", label: created_label) do |parking_notification| %>
+    <%= link_to organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) do %>
+      <%= render UI::Time::Component.new(time: parking_notification.created_at, format: :localize_time_precise) %>
+    <% end %>
+  <% end %>
+
+  <% if @render_address %>
+    <% table.column(label: translation(".address")) do |parking_notification| %>
+      <small><%= parking_notification.formatted_address_string %></small>
+    <% end %>
+  <% end %>
+
+  <% unless @skip_bike %>
+    <% table.column(label: translation(".bike")) do |parking_notification| %>
+      <% if parking_notification.bike.present? %>
+        <%= link_to helpers.organized_bike_text(parking_notification.bike), bike_path(parking_notification.bike) %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "kind", label: "Type") do |parking_notification| %>
+    <em><%= parking_notification.kind_humanized %></em>
+  <% end %>
+
+  <% table.column(label: translation(".by")) do |parking_notification| %>
+    <% name = parking_notification.user&.display_name&.truncate(20) %>
+
+    <% if render_sortable && parking_notification.user.present? %>
+      <%= link_to name, organization_parking_notifications_path(**search_params, user_id: parking_notification.user_id, organization_id: current_organization.to_param) %>
+    <% else %>
+      <%= name %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "repeat_number", label: translation(".notification_number"), classes: "tw:text-sm") do |parking_notification| %>
+    <%= parking_notification.notification_number if parking_notification.repeat_record? %>
+  <% end %>
+
+  <% unless @skip_status %>
+    <% table.column(label: "Status") do |parking_notification| %>
+      <%= helpers.status_display(parking_notification.status) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Message/Notes") do |parking_notification| %>
+    <%= "📷" if parking_notification.image_url.present? %>
+    <small><%= message_notes_cell.call(parking_notification) %></small>
+  <% end %>
+
+  <% unless @skip_resolved %>
+    <% table.column(label: translation(".resolved"), classes: "tw:text-sm") do |parking_notification| %>
+      <% resolved_at = parking_notification.resolved_at %>
+
+      <% if parking_notification.impound_record_id.present? %>
+        <%= link_to organization_impound_record_path("pkey-#{parking_notification.impound_record_id}", organization_id: parking_notification.organization_id) do %>
+          <%= resolved_at.present? ? render(UI::Time::Component.new(time: resolved_at, format: :localize_time_precise)) : "impounded" %>
+        <% end %>
+      <% elsif resolved_at.present? %>
+        <%= render UI::Time::Component.new(time: resolved_at, format: :localize_time_precise) %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if @render_multiselect %>
+    <% select_all = render UI::Button::Component.new(text: check_mark, color: :link, title: "Select all", data: {action: "table-multi-checkbox#toggleAll"}) %>
+    <% table.column(label: select_all, classes: "multiselect-cell table-cell-check tw:hidden") do |parking_notification| %>
+      <%= check_box_tag "ids[#{parking_notification.id}]", parking_notification.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
+    <% end %>
+  <% end %>
+<% end %>

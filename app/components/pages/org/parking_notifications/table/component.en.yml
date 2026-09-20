@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    pages:
+      org:
+        parking_notifications:
+          table:
+            address: Address
+            bike: Bike
+            by: By
+            created: Created
+            notification_number: Notification#
+            resolved: Resolved

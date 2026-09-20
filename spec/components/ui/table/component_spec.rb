@@ -278,6 +278,20 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
+  context "with data and row_data" do
+    it "writes the table's attributes once, and the row's on every tr" do
+      result = render_inline(described_class.new(records:, data: {controller: "roster"},
+        row_data: ->(r) { {"roster-target": "row", email: r.email} })) do |table|
+        table.column(label: "Name") { |r| r.name }
+      end
+
+      expect(result).to have_css("table[data-controller='roster']")
+      expect(result).to have_css("tbody tr[data-roster-target='row']", count: 2)
+      expect(result).to have_css("tr[data-email='alice@example.com']")
+      expect(result).not_to have_css("thead tr[data-roster-target]")
+    end
+  end
+
   context "with empty records" do
     let(:records) { [] }
 

@@ -6,7 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 // Pins every loaded notification on the map, and narrows the table to the ones in view
 export default class extends Controller {
   static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeForm', 'placeInput', 'redo', 'fit',
-    'visibleCount', 'table', 'row', 'emptyRow', 'repeatForm', 'submit']
+    'visibleCount', 'table', 'row', 'empty', 'repeatForm', 'submit']
 
   static values = {
     latitude: Number,
@@ -75,7 +75,7 @@ export default class extends Controller {
   showMultiselect (event) {
     collapse('hide', event.currentTarget)
     collapse('show', this.repeatFormTarget)
-    this.tableTarget.classList.add('show-multiselect')
+    this.tableTarget.querySelectorAll('.multiselect-cell').forEach((cell) => cell.classList.remove('tw:hidden'))
   }
 
   updateSubmitText (event) {
@@ -188,7 +188,7 @@ export default class extends Controller {
       const checkbox = row.querySelector('input[type=checkbox]')
       if (checkbox) checkbox.disabled = !visibleRows.has(row)
     })
-    collapse(visibleRows.size ? 'hide' : 'show', this.emptyRowTarget, 0)
+    collapse(visibleRows.size ? 'hide' : 'show', this.emptyTarget, 0)
     this.visibleCountTarget.textContent = visibleRows.size.toLocaleString()
 
     const allVisible = visibleRows.size === this.markers.size && !this.#nothingAtLocation

@@ -24,15 +24,16 @@ module Pages
           }.freeze
 
           def initialize(organization:, parking_notifications:, total_count:, per_page:, search_params:,
-            interpreted_params:, search_kind:, search_status:, search_unregistered:, unpermitted_statuses:,
-            period:, start_time:, end_time:, search_bounding_box: nil, map_place: nil, map_location: nil,
-            search_bike_id: nil, filtered_user_id: nil, filtered_user: nil,
-            notifications_failed_resolved: nil, repeated_kind: nil)
+            sort_state:, interpreted_params:, search_kind:, search_status:, search_unregistered:,
+            unpermitted_statuses:, period:, start_time:, end_time:, search_bounding_box: nil,
+            map_place: nil, map_location: nil, search_bike_id: nil, filtered_user_id: nil,
+            filtered_user: nil, notifications_failed_resolved: nil, repeated_kind: nil)
             @organization = organization
             @parking_notifications = parking_notifications
             @total_count = total_count
             @per_page = per_page
             @search_params = search_params
+            @sort_state = sort_state
             @interpreted_params = interpreted_params
             @search_kind = search_kind
             @search_status = search_status
@@ -86,6 +87,9 @@ module Pages
           def current_status
             status_display_hash[@search_status.to_sym] || {m: @search_status}
           end
+
+          # Every notification on this view is current and unresolved, so both columns are noise
+          def viewing_current? = @search_status == "current"
 
           def searched_bike
             @searched_bike ||= Bike.unscoped.find_by_id(@search_bike_id)
