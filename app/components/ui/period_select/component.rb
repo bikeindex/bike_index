@@ -3,6 +3,7 @@
 module UI
   module PeriodSelect
     class Component < ApplicationComponent
+      # Template Dependency: UI::ButtonGroup::Component
       PERIODS = [
         {key: "next_week", prefix: "next", label: "seven_days", future: true},
         {key: "next_month", prefix: "next", label: "thirty_days", future: true},
@@ -37,6 +38,11 @@ module UI
       end
 
       private
+
+      # The chips are this component's own size; only the row is shared
+      def row_classes
+        UI::ButtonGroup::Component::ROW_CLASSES
+      end
 
       def visible_periods
         @include_future ? PERIODS : PERIODS.reject { |p| p[:future] }

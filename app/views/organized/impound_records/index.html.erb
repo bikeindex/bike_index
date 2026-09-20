@@ -33,7 +33,7 @@
 
 <%= render Pages::SearchResults::Frame::Component.new(frame_id: :impound_records_results_frame,
   render_results: @render_results, current_path: request.original_fullpath) do %>
-  <div class="tw:mt-4">
+  <div class="tw:mt-4 tw:flex tw:justify-end">
     <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
   </div>
 
