@@ -6,8 +6,7 @@
     "
   >
     <p class="tw:mb-0">
-      <%= translation(".matching_html", count: count_display,
-        cycle_type: settings.cycle_type.pluralize(@pagy.count)) %>
+      <%= count_html %>
     </p>
 
     <% if @search_page %>

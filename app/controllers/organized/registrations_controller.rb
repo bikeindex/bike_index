@@ -239,7 +239,7 @@ module Organized
     def search_all_count
       return {} unless @search_all
 
-      {count: @available_bikes.limit(Pages::Org::Search::Wrapper::Component::SEARCH_ALL_COUNT_LIMIT).count}
+      {count: @available_bikes.limit(BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT).count}
     end
 
     def search_order(organization)

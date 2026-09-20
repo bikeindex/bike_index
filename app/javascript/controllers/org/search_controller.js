@@ -26,6 +26,7 @@ export default class extends Controller {
   handleFrameRender = (event) => {
     this.syncResultView()
     this.syncPeriodLabel()
+    this.endSubmitSpinner()
     if (this.hasChartFrameTarget && event.target === this.chartFrameTarget) return
     this.reloadChart()
   }
@@ -109,6 +110,16 @@ export default class extends Controller {
     if (!this.hasPeriodLabelTarget || !picked) return
 
     this.periodLabelTarget.textContent = picked.closest('label').textContent.replace(/\s+/g, ' ').trim()
+  }
+
+  // The search submits into a frame, so the page it spun on is still here - register--retry
+  // raises the same event for a submit that ended without going anywhere
+  endSubmitSpinner () {
+    const form = document.getElementById('Search_Form')
+    if (!form) return
+
+    ;[...form.elements].filter(element => element.type === 'submit')
+      .forEach(element => element.dispatchEvent(new Event('spinner:reset')))
   }
 
   perPageChanged () {

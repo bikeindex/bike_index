@@ -160,7 +160,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       it "counts and pages only as far as the card counts" do
         FactoryBot.create(:bike_organized, creation_organization: current_organization)
-        stub_const("Pages::Org::Search::Wrapper::Component::SEARCH_ALL_COUNT_LIMIT", 1)
+        stub_const("BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT", 1)
 
         get base_url, params: {search_no_js: true, search_all: true, per_page: 1}
         expect(assigns(:pagy).count).to eq 1

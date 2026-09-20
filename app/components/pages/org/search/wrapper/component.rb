@@ -9,8 +9,6 @@ module Pages
         # carries the row of actions across the top, and renders inside the results
         # turbo-frame, so every search brings the whole card back.
         class Component < ApplicationComponent
-          SEARCH_ALL_COUNT_LIMIT = 1_000
-
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[spreadsheet thumbnail].freeze
 
@@ -63,11 +61,18 @@ module Pages
 
           private
 
-          # The search stops counting - and paging - at the limit, so the count is it at most
-          def count_display
-            return number_display(@pagy.count) unless @search_all && @pagy.count >= SEARCH_ALL_COUNT_LIMIT
+          # Two sentences rather than a count interpolated into one, so a translation can
+          # order "over" however it reads
+          def count_html
+            cycle_type = settings.cycle_type.pluralize(@pagy.count)
+            return translation(".matching_html", count: number_display(@pagy.count), cycle_type:) unless count_stopped?
 
-            translation(".over_count_html", count: number_display(SEARCH_ALL_COUNT_LIMIT))
+            translation(".over_count_matching_html",
+              count: number_display(BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT), cycle_type:)
+          end
+
+          def count_stopped?
+            @search_all && @pagy.count >= BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT
           end
 
           def settings
