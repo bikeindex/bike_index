@@ -241,6 +241,14 @@ body.with-org-sidebar main > :only-child {
   width: 100%;
 }
 
+/* The flash is fixed to the viewport, so body's margin doesn't hold it clear of the
+   sidebar the way it does the content -- inset it by the same width, transitioned to
+   match, so the toast tracks the column as it collapses instead of sliding under it */
+body.with-org-sidebar #flash-messages {
+  left: var(--org-sidebar-width, 266px);
+  transition: left 0.18s ease;
+}
+
 /* SharedBlocks::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
    a top bar in the flow -- which takes its own space, so there's nothing to hold
    open for it. `width <` rather than a max-width of 759px, so a fractional viewport
@@ -254,6 +262,10 @@ body.with-org-sidebar main > :only-child {
 
   body.with-org-sidebar main {
     min-height: 0;
+  }
+
+  body.with-org-sidebar #flash-messages {
+    left: 0;
   }
 }
 
