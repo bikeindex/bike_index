@@ -110,6 +110,24 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
+  describe "filter_entries" do
+    it "leads each filter with the option that clears it, and withholds the impound statuses" do
+      expect(instance.filter_entries(:search_stickers).map { |e| e[:value] }).to eq(["", "with", "none"])
+      expect(instance.filter_entries(:search_address).map { |e| e[:value] }).to eq(["", "with_street", "without_street"])
+      expect(instance.filter_entries(:search_status).map { |e| e[:value] }).to eq(%w[all with_owner stolen])
+      expect(instance.filter_entries(:search_status).first).to eq({value: "all", label: "all"})
+    end
+
+    context "with impound_bikes" do
+      let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+
+      it "offers the impound statuses behind all" do
+        expect(instance.filter_entries(:search_status).map { |e| e[:value] })
+          .to eq(%w[all not_impounded impounded with_owner stolen])
+      end
+    end
+  end
+
   describe "initially_checked_columns" do
     it "returns default columns" do
       cols = instance.initially_checked_columns

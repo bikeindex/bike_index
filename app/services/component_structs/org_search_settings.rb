@@ -65,6 +65,16 @@ module ComponentStructs
       @search_status = search_status
     end
 
+    # The panel's radio entries for a filter, leading with the option that clears it - which
+    # status spells "all" rather than blank, since every registration has one
+    def filter_entries(param)
+      permitted = BikeServices::OrganizedSearch.filter_values(@organization)[param]
+      [{value: (param == :search_status) ? "all" : "", label: translation(:all)},
+        *FILTER_DESCRIPTION_KEYS[param].filter_map { |value, key|
+          {value: value.to_s, label: translation(key)} if permitted.include?(value.to_s)
+        }]
+    end
+
     def active_search_filter_descriptions
       @active_search_filter_descriptions ||= FILTER_DESCRIPTION_KEYS.filter_map do |param, mapping|
         value = public_send(param)

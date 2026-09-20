@@ -178,16 +178,19 @@ module Organized
       else
         false
       end
-      @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
+      @search_address = permitted_filter_value(:search_address) || false
       search_status
     end
 
     def search_status
       return @search_status if defined?(@search_status)
 
-      valid_statuses = %w[with_owner stolen all]
-      valid_statuses += %w[impounded not_impounded] if current_organization.enabled?("impound_bikes")
-      @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : valid_statuses.last
+      @search_status = permitted_filter_value(:search_status) ||
+        BikeServices::OrganizedSearch.default_status(current_organization)
+    end
+
+    def permitted_filter_value(param)
+      params[param] if BikeServices::OrganizedSearch.filter_values(current_organization)[param].include?(params[param])
     end
 
     def create_export?

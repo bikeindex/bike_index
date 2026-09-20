@@ -59,4 +59,25 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.status(Bike.all, "all").count).to eq 3
     end
   end
+
+  describe "filter_values" do
+    let(:organization) { FactoryBot.create(:organization) }
+
+    it "withholds the impound statuses, and defaults to every status" do
+      expect(described_class.filter_values(organization)[:search_status]).to eq(%w[with_owner stolen all])
+      expect(described_class.default_status(organization)).to eq "all"
+    end
+
+    context "with impound_bikes" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes])
+      end
+
+      it "adds the impound statuses, and defaults to leaving impounded bikes out" do
+        expect(described_class.filter_values(organization)[:search_status])
+          .to match_array(%w[with_owner stolen all not_impounded impounded])
+        expect(described_class.default_status(organization)).to eq "not_impounded"
+      end
+    end
+  end
 end
