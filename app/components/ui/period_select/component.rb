@@ -20,8 +20,6 @@ module UI
       # What a datetime_local_field reads
       INPUT_TIME_FORMAT = "%Y-%m-%dT%H:%M"
 
-      RADIO_DATA = {action: "change->ui--collapse#hide change->ui--period-select#rangePicked"}.freeze
-
       # Binxtils::SetPeriod's ranges, mirrored: a controller computes only the period it was
       # asked for. `all` is nil - it starts at the controller's own earliest_period_date.
       # ::Time, not the UI::Time component this namespace resolves first
@@ -76,13 +74,14 @@ module UI
         @include_future ? PERIODS : PERIODS.reject { |p| p[:future] }
       end
 
-      def period_button(period_key)
+      def period_button(period)
         UI::ButtonLink::Component.new(
-          href: period_url(period_key),
+          href: period_url(period[:key]),
+          text: tag.span(period_button_label(period)),
           size: @size,
-          active: @period == period_key,
+          active: @period == period[:key],
           html_class: period_button_class,
-          data: {period: period_key, turbo_action: "advance"}
+          data: {period: period[:key], turbo_action: "advance"}
         )
       end
 
@@ -90,8 +89,9 @@ module UI
       # as a group of their own, which would wrap as one
       def period_radio(period)
         tag.label(class: chip_classes) do
-          radio_button_tag("period", period[:key], @period == period[:key],
-            class: "tw:sr-only", form: @form, data: RADIO_DATA.merge(period_range_data(period[:key]))) +
+          radio_button_tag("period", period[:key], @period == period[:key], class: "tw:sr-only", form: @form,
+            data: {action: "change->ui--collapse#hide change->ui--period-select#rangePicked",
+                   **period_range_data(period[:key])}) +
             tag.span(period_button_label(period))
         end
       end
@@ -105,6 +105,7 @@ module UI
         {start_time: range.first.strftime(INPUT_TIME_FORMAT), end_time: range.last.strftime(INPUT_TIME_FORMAT)}
       end
 
+      # RadioButtonGroup's chip, at this component's size rather than its fixed one
       def chip_classes
         @chip_classes ||= [UI::Button::Component.build_classes(color: :secondary, size: @size),
           UI::Forms::RadioButtonGroup::Component::LABEL_CLASSES].join(" ")

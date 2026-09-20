@@ -5,22 +5,19 @@
     <% end %>
 
     <% visible_periods.each do |p| %>
-      <% if @form %>
-        <%= period_radio(p) %>
-      <% else %>
-        <%= render(period_button(p[:key])) { tag.span(period_button_label(p)) } %>
-      <% end %>
+      <%= @form ? period_radio(p) : render(period_button(p)) %>
     <% end %>
 
     <%= render(custom_button) %>
 
     <%#
-      None of the chips is the custom range, so a search would drop it otherwise. Disabled
-      as soon as one is picked: both reach the form, and the last of them wins
+      None of the chips is the custom range, so a search would drop it otherwise. It
+      renders after them, so it outranks a picked chip until ui--period-select disables it
     %>
 
-    <%= hidden_field_tag :period, "custom", form: @form,
-      data: {"ui--period-select-target": "customPeriod"} if @form && @period == "custom" %>
+    <% if @form && @period == "custom" %>
+      <%= hidden_field_tag :period, "custom", form: @form, data: {"ui--period-select-target": "customPeriod"} %>
+    <% end %>
   </div>
 
   <%= form_with(
