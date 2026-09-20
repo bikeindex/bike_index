@@ -5,9 +5,9 @@ module UI
     class Component < ApplicationComponent
       NBSP = "\u00A0"
 
-      attr_reader :sortable, :cell_block
+      attr_reader :sortable, :cell_block, :footer
 
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, footer: nil, &block)
         @label = label
         @sortable = sortable
         @sort_indicator = sort_indicator
@@ -15,6 +15,7 @@ module UI
         @header_classes = header_classes
         @lower_right = lower_right
         @cell_block = block
+        @footer = footer
       end
 
       # Renders cell content for a record. The block should yield the captured
@@ -43,11 +44,13 @@ module UI
         end
       end
 
-      def th_classes(bordered:)
+      # A plain header beside sortable ones is normal weight, so the sort links stand out
+      def th_classes(bordered:, sortable_table: false)
         classes = ["tw:px-1 tw:py-2"]
         if bordered
           classes << "tw:border-b tw:border-l tw:border-t tw:border-gray-200 tw:dark:border-gray-600"
         end
+        classes << "tw:font-normal" if sortable_table && sortable.blank?
         classes << @classes if @classes
         classes << @header_classes if @header_classes
         classes.join(" ")
@@ -62,6 +65,10 @@ module UI
         end
         classes << @classes if @classes
         classes.join(" ")
+      end
+
+      def tfoot_classes(bordered:)
+        [td_classes(bordered:), "tw:border-t-2 tw:border-t-gray-200 tw:font-bold tw:dark:border-t-gray-600"].join(" ")
       end
 
       private

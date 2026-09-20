@@ -1,8 +1,4 @@
 <%# require inline CSS setting because of caching %>
-<% unless @display_dev_info %>
-  <style>.only-dev-visible {display: none !important;} </style>
-<% end %>
-
 <% if @skip_manufacturer_link %>
   <style>.display-mnfg-link {display: none !important;}</style>
 <% end %>

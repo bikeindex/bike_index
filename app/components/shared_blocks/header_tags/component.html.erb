@@ -7,6 +7,11 @@
 <meta name="description" content="<%= @page_description %>">
 <meta http-equiv="Content-Language" content="<%= I18n.locale %>">
 
+<%# Cached fragments serve dev and non-dev viewers alike, so dev markup is hidden here %>
+<% unless @display_dev_info %>
+  <style>.only-dev-visible {display: none !important;}</style>
+<% end %>
+
 <% if @display_auto_discovery %>
   <%= auto_discovery_link_tag(
     :atom,
