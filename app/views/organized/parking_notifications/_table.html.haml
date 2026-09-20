@@ -1,4 +1,4 @@
-- skip_map_cell ||= false
+- map_rows ||= false
 - skip_bike ||= false
 - skip_repeat ||= false
 - render_address ||= false
@@ -9,11 +9,12 @@
 
 - # TODO: add translations
 :css
-  #recordsTable.hide-status .status-cell { display: none; }
+  .parking-notifications-table.hide-status .status-cell { display: none; }
+  .parking-notifications-table.show-multiselect .multiselect-cell { display: table-cell; }
 
-%table.table.table-striped.table-bordered.table-sm.without-exterior-border.parking-notifications-table#recordsTable{ class: hide_status ? "hide-status" : "" }
+%table.table.table-striped.table-bordered.table-sm.without-exterior-border.parking-notifications-table{ class: hide_status ? "hide-status" : "", data: ({ "org--parking-notifications-index-target" => "table" } if map_rows) }
   %thead.small-header.hidden-md-down
-    - unless skip_map_cell
+    - if map_rows
       %th.map-cell
     %th
       - if render_sortable
@@ -46,9 +47,11 @@
         %small=t(".resolved")
     - unless skip_multiselect
       %th.multiselect-cell.table-cell-check.collapse
-        %a#selectAllSelector{ href: "#" }
-          = check_mark
+        = render UI::Button::Component.new(text: check_mark, color: :link, title: "Select all", data: { action: "table-multi-checkbox#toggleAll" })
   %tbody
+    - if map_rows
+      %tr{ class: ("tw:hidden" if parking_notifications.any?), data: { "org--parking-notifications-index-target" => "emptyRow" } }
+        %td{ colspan: 10 } No matching notifications
     - parking_notifications.each do |parking_notification|
       - message_notes_cell = capture_haml do
         - if parking_notification.internal_notes.present?
@@ -61,9 +64,11 @@
           %strong
             Message:
           = parking_notification.message
-      %tr
-        - unless skip_map_cell
-          %td
+      - map_row_data = { "org--parking-notifications-index-target" => "row", latitude: parking_notification.latitude, longitude: parking_notification.longitude } if map_rows
+      %tr{ data: map_row_data }
+        - if map_rows
+          %td.map-cell
+            = render UI::Button::Component.new(text: "↑", color: :link, title: "Show on map", data: { action: "org--parking-notifications-index#showOnMap" })
         %td
           %a.localizeTime.preciseTime{ href: organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) }
             = l(parking_notification.created_at, format: :convert_time)
@@ -104,7 +109,7 @@
             = parking_notification.kind_humanized
         %td.hidden-sm-cells
           - if render_sortable && parking_notification.user.present?
-            = link_to parking_notification.user&.display_name&.truncate(20), organization_parking_notifications_path(sortable_search_params.merge(user_id: parking_notification.user_id)), class: "linkWithSortableSearchParams", "data-urlparams" => "user_id,#{parking_notification.user_id}"
+            = link_to parking_notification.user&.display_name&.truncate(20), organization_parking_notifications_path(sortable_search_params.to_h.symbolize_keys.merge(user_id: parking_notification.user_id))
           - else
             = parking_notification.user&.display_name&.truncate(20)
 
@@ -135,5 +140,5 @@
 
         - unless skip_multiselect
           %td.multiselect-cell.table-cell-check.collapse
-            = check_box_tag "ids[#{parking_notification.id}]", parking_notification.id
+            = check_box_tag "ids[#{parking_notification.id}]", parking_notification.id, false, data: { "table-multi-checkbox-target" => "checkbox" }
 
