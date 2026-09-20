@@ -39,6 +39,7 @@ module ComponentStructs
 
     ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
 
+    # Ordered as the panel offers them - filter_entries renders them in this order
     FILTER_DESCRIPTION_KEYS = {
       search_stickers: {with: :filter_with_stickers_html, none: :filter_no_sticker_html},
       search_address: {with_street: :filter_with_address_html, without_street: :filter_no_address_html},
@@ -65,10 +66,10 @@ module ComponentStructs
       @search_status = search_status
     end
 
-    # The panel's radio entries for a filter, leading with the option that clears it - which
-    # status spells "all" rather than blank, since every registration has one
+    # Status spells the option that clears it "all" rather than blank, since every
+    # registration has a status
     def filter_entries(param)
-      permitted = BikeServices::OrganizedSearch.filter_values(@organization)[param]
+      permitted = filter_values[param]
       [{value: (param == :search_status) ? "all" : "", label: translation(:all)},
         *FILTER_DESCRIPTION_KEYS[param].filter_map { |value, key|
           {value: value.to_s, label: translation(key)} if permitted.include?(value.to_s)
@@ -132,6 +133,10 @@ module ComponentStructs
     end
 
     private
+
+    def filter_values
+      @filter_values ||= BikeServices::OrganizedSearch.filter_values(@organization)
+    end
 
     def translation(key)
       ActiveSupport::HtmlSafeTranslation.translate(key, scope: TRANSLATION_SCOPE)

@@ -11,8 +11,7 @@ module BikeServices
     STATUS_VALUES = %w[with_owner stolen all].freeze
     IMPOUND_STATUS_VALUES = %w[not_impounded impounded].freeze
 
-    # Every filter's permitted values, keyed by the param it arrives in - the settings panel
-    # offers these, and the controller narrows anything else away
+    # Every filter's permitted values, keyed by the param it arrives in
     def filter_values(organization)
       statuses = organization.enabled?("impound_bikes") ? STATUS_VALUES + IMPOUND_STATUS_VALUES : STATUS_VALUES
       {search_stickers: STICKER_VALUES, search_address: ADDRESS_VALUES, search_status: statuses}

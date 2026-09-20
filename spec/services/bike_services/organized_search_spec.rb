@@ -60,12 +60,24 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
     end
   end
 
-  describe "filter_values" do
+  describe "the filters' permitted values" do
     let(:organization) { FactoryBot.create(:organization) }
 
     it "withholds the impound statuses, and defaults to every status" do
       expect(described_class.filter_values(organization)[:search_status]).to eq(%w[with_owner stolen all])
       expect(described_class.default_status(organization)).to eq "all"
+    end
+
+    # Each filter maps its values to scopes by hand, so a value permitted without a branch
+    # would be offered, accepted, and then quietly return every bike
+    it "narrows the search for every value it permits" do
+      described_class.filter_values(organization).each do |param, values|
+        filter = param.to_s.delete_prefix("search_")
+        (values - ["all"]).each do |value|
+          expect(described_class.public_send(filter, Bike.all, value).to_sql)
+            .to_not(eq(Bike.all.to_sql), "#{param} #{value} left the search alone")
+        end
+      end
     end
 
     context "with impound_bikes" do

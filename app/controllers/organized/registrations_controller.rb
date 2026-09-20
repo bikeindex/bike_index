@@ -173,6 +173,7 @@ module Organized
 
     # The shell render and the search both read the filters normalized here
     def set_search_filter_params
+      # Stickers coerce rather than whitelist - links elsewhere ask for them by other names
       @search_stickers = if params[:search_stickers].present?
         (params[:search_stickers] == "none") ? "none" : "with"
       else
