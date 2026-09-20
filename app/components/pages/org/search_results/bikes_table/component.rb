@@ -28,11 +28,18 @@ module Pages
             @settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
           end
 
+          # Rendered per row rather than memoized: the trigger points at its own tooltip by id
           def hidden_not_registered_tag
-            @hidden_not_registered_tag ||= tag.em(
-              translation(".hidden_not_registered", org_name: @organization.short_name),
-              class: "less-strong tw:leading-snug tw:text-xs"
-            )
+            safe_join([tag.em(translation(".hidden"), class: "less-strong tw:leading-snug tw:text-xs"),
+              hidden_tooltip], " ")
+          end
+
+          # As quiet as the word it sits beside
+          def hidden_tooltip
+            render(UI::Tooltip::Component.new(text: translation(".not_registered_with",
+              org_name: @organization.short_name))) do |tooltip|
+              tooltip.with_tooltip_button(class: "#{UI::Tooltip::Component::BUTTON_CLASS} tw:opacity-60")
+            end
           end
 
           def table_wrapper_data_attributes
