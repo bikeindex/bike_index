@@ -4,15 +4,16 @@ module UI
   module PeriodSelect
     class Component < ApplicationComponent
       # Template Dependency: UI::ButtonGroup::Component, UI::Forms::RadioButtonGroup::Component
+      # Widest first: the row reads as narrowing from everything
       PERIODS = [
+        {key: "all", prefix: nil, label: "all"},
         {key: "next_week", prefix: "next", label: "seven_days", future: true},
         {key: "next_month", prefix: "next", label: "thirty_days", future: true},
         {key: "hour", prefix: "past", label: "hour"},
         {key: "day", prefix: "past", label: "day"},
         {key: "week", prefix: "past", label: "seven_days"},
         {key: "month", prefix: "past", label: "thirty_days"},
-        {key: "year", prefix: "past", label: "year"},
-        {key: "all", prefix: nil, label: "all"}
+        {key: "year", prefix: "past", label: "year"}
       ].freeze
 
       # What a datetime_local_field reads
