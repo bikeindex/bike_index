@@ -76,10 +76,20 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   context "without search_page" do
     let(:search_page) { false }
 
-    it "renders the table with no header actions, and brings its own controllers" do
+    it "renders the column settings button without the search's actions, and brings its own controllers" do
       expect(component).to have_css("table")
       expect(component).to have_css("[data-controller~='org--search-column-toggle']")
-      expect(component).not_to have_button("Column settings", visible: :all)
+      expect(component).to have_button("Column settings", visible: :all)
+      # the header's button is the only one - the panel doesn't carry the legacy one
+      expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)
+    end
+
+    context "with csv_exports enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+      it "renders no export, since this page's params aren't a search of what's shown" do
+        expect(component).not_to have_text("Export CSV")
+      end
     end
   end
 

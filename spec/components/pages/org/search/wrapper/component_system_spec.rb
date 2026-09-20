@@ -19,11 +19,11 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, :js, type: :system do
     settings_selector = "[data-ui--collapse-target='content']"
     expect(page).not_to have_css(settings_selector, visible: true, wait: 2)
 
-    click_button "settings"
+    click_button "Column settings"
     expect(page).to have_css(settings_selector, visible: true, wait: 5)
     sleep 0.3 # wait for show animation to complete before toggling again
 
-    click_button "settings"
+    click_button "Column settings"
     expect(page).not_to have_css(settings_selector, visible: true, wait: 5)
   end
 
@@ -42,7 +42,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, :js, type: :system do
     expect(page).to have_css("th.url_cell", visible: :hidden)
 
     # Open settings and check the URL column
-    click_button "settings"
+    click_button "Column settings"
     check "url_cell"
 
     expect(page).to have_css("th.url_cell", visible: true)
@@ -54,7 +54,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, :js, type: :system do
 
   it "persists column selection in localStorage" do
     # Open settings and check URL column
-    click_button "settings"
+    click_button "Column settings"
     check "url_cell"
 
     # Wait for the JS change handler to update the column visibility before reading localStorage
