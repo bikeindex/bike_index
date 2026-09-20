@@ -9,12 +9,11 @@ module Pages
         # render_sortable to enable sort links, render_multi_check for the delete
         # checkboxes, and skip_user to drop the owner column.
         class Component < ApplicationComponent
-          def initialize(bikes:, sort_state: ComponentStructs::SortState.new, display_dev_info: false, no_show_header: false,
+          def initialize(bikes:, sort_state: ComponentStructs::SortState.new, no_show_header: false,
             show_serial: false, skip_manufacturer_link: false, render_sortable: false,
             skip_user: false, render_multi_check: false)
             @bikes = bikes
             @sort_state = sort_state
-            @display_dev_info = display_dev_info
             @no_show_header = no_show_header
             @show_serial = show_serial
             @skip_manufacturer_link = skip_manufacturer_link

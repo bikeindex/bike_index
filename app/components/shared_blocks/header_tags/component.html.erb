@@ -4,6 +4,12 @@
 <meta content="ie=edge" http-equiv="x-ua-compatible">
 <meta name="handheldfriendly" content="true">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<%# Fragment caches are shared by dev and non-dev viewers, so dev markup is hidden per request here %>
+<% unless @display_dev_info %>
+  <style>.only-dev-visible {display: none !important;}</style>
+<% end %>
+
 <meta name="description" content="<%= @page_description %>">
 <meta http-equiv="Content-Language" content="<%= I18n.locale %>">
 
