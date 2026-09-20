@@ -9,35 +9,36 @@
       <%= count_html %>
     </p>
 
-    <% if @search_page %>
-      <% if render_result_view? %>
-        <div class="tw:flex tw:items-center tw:gap-2">
-          <span
-            class="
-              tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400
-              tw:uppercase
-            "
-          >
-            <%= translation(".view_as") %>
-          </span>
+    <% if @search_page && render_result_view? %>
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <span
+          class="
+            tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400
+            tw:uppercase
+          "
+        >
+          <%= translation(".view_as") %>
+        </span>
 
-          <%= render(UI::ButtonGroup::Component.new(entries: result_view_entries, kind: :toggle)) %>
-        </div>
+        <%= render(UI::ButtonGroup::Component.new(entries: result_view_entries, kind: :toggle)) %>
+      </div>
+    <% end %>
+
+    <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+      <%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},
+        data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
+        <%= translation(".column_settings") %>
+
+        <span
+          data-ui--collapse-target="chevron"
+          class="tw:inline-flex tw:transition-transform"
+        >
+          <%= render(UI::IconChevron::Component.new) %>
+        </span>
       <% end %>
 
-      <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},
-          data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
-          <%= translation(".column_settings") %>
-
-          <span
-            data-ui--collapse-target="chevron"
-            class="tw:inline-flex tw:transition-transform"
-          >
-            <%= render(UI::IconChevron::Component.new) %>
-          </span>
-        <% end %>
-
+      <%# Only the search's own params describe an export of what's on the page %>
+      <% if @search_page %>
         <% if settings.render_export? && settings.export_disabled? %>
           <%= render(UI::Tooltip::Component.new) do |tooltip| %>
             <%# The checkbox it names reads the same way %>
@@ -50,14 +51,11 @@
           <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
             color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
         <% end %>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 
-  <%# The panel is a band across the card here; opened from its own button it's a box %>
-  <%= tag.div(class: ("tw:px-4" unless @search_page)) do %>
-    <%= render(settings_component) %>
-  <% end %>
+  <%= render(settings_component) %>
 
   <%# Only on the search: the model audit's own page already names the audit above this %>
   <% if @search_page && @model_audit.present? %>

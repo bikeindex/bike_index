@@ -5,8 +5,9 @@ en:
       org:
         search:
           chart_card:
-            caption_search: Chart · current search
-            caption_year: Chart · Last year overview
+            caption_search: Current search
+            caption_year: Last year overview
+            chart: Chart
             chart_motorized: E-vehicle
             chart_registrations: Registrations
             chart_stolen: Stolen

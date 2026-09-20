@@ -24,6 +24,9 @@ module Organized
         @search_all_locked = params[:search_email].present?
         @search_all = !@search_all_locked && Binxtils::InputNormalizer.boolean(params[:search_all])
         @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
+        # ui--collapse's, not the server's - normalized only so the form's hidden field
+        # carries 1/0 rather than the blank a rider who never touched the card would send
+        @chart_open = Binxtils::InputNormalizer.boolean(params[:chart_open]) ? "1" : "0"
         @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)

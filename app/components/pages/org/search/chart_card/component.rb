@@ -6,12 +6,19 @@ module Pages
       module ChartCard
         # The chart and headline counts beside the org registrations search.
         #
-        # Everything lives inside the turbo-frame, header included, so a scope switch or a
-        # new search brings the caption and the numbers back in step in one response — which
-        # is why this renders its own frame rather than UI::ChartAsyncFrame's, whose wrapper
-        # holds only the chart. `src` renders the placeholder, `chart`/`stats` the response.
+        # The caption lives inside the turbo-frame, so a scope switch or a new search brings
+        # it back in step with the numbers in one response — which is why this renders its
+        # own frame rather than UI::ChartAsyncFrame's, whose wrapper holds only the chart.
+        # `src` renders the placeholder, `chart`/`stats` the response.
+        #
+        # The collapse trigger stays outside the frame: a frame render replaces what's in it,
+        # and while the card is collapsed the lazy frame has nothing to load yet.
         class Component < ApplicationComponent
           FRAME_ID = :registrations_chart_frame
+
+          # The open state is part of the address rather than a stored preference; the scope
+          # links carry it, since update-cached-sortable-links rebuilds them from the URL
+          COLLAPSE_PARAM = "chart_open"
 
           # Display order, per Kelsey's redesign
           SCOPES = %w[year search].freeze

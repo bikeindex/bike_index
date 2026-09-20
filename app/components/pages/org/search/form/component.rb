@@ -33,8 +33,10 @@ module Pages
 
           def form_data
             if turbo?
-              {:turbo_frame => @target_frame, :turbo_action => "advance",
-               :turbo => true, "search--form-target" => "form"}
+              # The submit rebuilds the address bar from these fields, so the hidden ones
+              # catch up with it first - a chart card collapsed since the last render
+              {:turbo_frame => @target_frame, :turbo_action => "advance", :turbo => true,
+               "search--form-target" => "form", :action => "search--form#syncHiddenFieldsFromUrl"}
             else
               {turbo: false}
             end
