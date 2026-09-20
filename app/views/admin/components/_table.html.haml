@@ -41,19 +41,18 @@
           %td
             = component.year
           %td
-            - if component.ctype_id = ctype_other_id
+            - if component.ctype_id == ctype_other_id
               %span.stolen-color= component.ctype_other.presence || "-"
             - else
               = component.ctype.name
-          %td
-            %span{class: (component.manufacturer_id = manufacturer_other_id ? "stolen-color" : "")}
-              = component.mnfg_name
           %td
             - if component.front
               front
             - if component.rear
               rear
-
+          %td
+            %span{class: (component.manufacturer_id == manufacturer_other_id ? "stolen-color" : "")}
+              = component.mnfg_name
           %td
             - if component.bike_id.present?
               = render Pages::Admin::Bikes::Cell::Component.new(bike: component.bike, bike_id: component.bike_id)

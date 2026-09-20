@@ -4798,9 +4798,6 @@ es:
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
     parking_notifications:
-      index:
-        matches_visible: visible
-        parking_notifications: notificaciones de estacionamiento
       table:
         address: DIRECCIÓN
         bike: Bicicleta
@@ -5889,6 +5886,10 @@ es:
             only_user_registered: Solo usuarios registrados
             status_records: Registros %{status}
             update_multiple_records: Actualizar varios registros
+        parking_notifications:
+          index:
+            matches_visible: visible
+            parking_notifications: notificaciones de estacionamiento
       register:
         acknowledgment_check:
           i_name_html: Yo, %{name},
