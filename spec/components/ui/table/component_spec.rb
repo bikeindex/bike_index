@@ -212,6 +212,29 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(rewritten.first).to include(users.first.cache_key_with_version)
     end
 
+    # A row renders records besides its own, and nothing about the markup says which -
+    # so an association the key misses serves stale until the record itself changes
+    it "busts a row when a record from cache_records changes" do
+      organization = FactoryBot.create(:organization, name: "Original name")
+      render_with_org = lambda do
+        with_controller_class(ApplicationController) do
+          render_inline(described_class.new(records: users, cache_key: "test",
+            cache_records: ->(_user) { organization })) do |table|
+            table.column(label: "Org") { |_u| organization.name }
+          end
+        end
+      end
+
+      keys = fragments_written { render_with_org.call }
+      expect(keys.count).to eq 2
+      expect(keys.first).to include(organization.cache_key_with_version)
+      expect(fragments_written { render_with_org.call }).to eq([])
+
+      organization.update(name: "Renamed")
+      expect(fragments_written { render_with_org.call }.count).to eq 2
+      expect(render_with_org.call).to have_css("td", text: "Renamed")
+    end
+
     context "in another locale" do
       it "keys the rows to that locale" do
         keys = I18n.with_locale(:nl) { fragments_written { render_table } }

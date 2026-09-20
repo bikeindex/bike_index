@@ -31,16 +31,17 @@ RSpec.describe Admin::PaymentsController, type: :request do
       expect(response.body).to include(subject.amount_formatted)
     end
 
-    # A cache() inside a UI::Table cell digests the table's template, so an unprefixed key
-    # would share this fragment with every admin table caching the same user
+    # The row key has to carry this partial, or the fragment is shared with every other
+    # admin table caching the same payment - and the user, or an email change serves stale
     context "with caching", :caching do
       include_context :caching_basic
 
-      it "keys the user cell to this partial and the payment's email" do
+      it "keys the row to this partial, the payment and the records the row renders" do
         subject
         keys = fragments_written { get base_url }
         expect(keys.count).to eq 1
-        expect(keys.first).to include("admin/payments/_table", current_user.cache_key_with_version, subject.email)
+        expect(keys.first).to include("admin/payments/_table", subject.cache_key_with_version,
+          current_user.cache_key_with_version)
       end
     end
   end

@@ -5,7 +5,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_sales.includes(:seller, :ownership).reorder(sortable_opts),
+        matching_sales.includes(:seller, :buyer, :ownership).reorder(sortable_opts),
         limit: @per_page,
         page: permitted_page)
     end

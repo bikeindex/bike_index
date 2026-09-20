@@ -1,51 +1,54 @@
 <%# locals: (collection:, render_sortable: false, skip_user: false, render_deleted: @render_deleted) %>
 
-<% user_cell_cache = cache_fragment_name("user_cell") %>
-
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
-  <% table.column(sortable: "created_at", lower_right: ->(record) { content_tag(:span, record.id, class: "only-dev-visible") }) do |superuser_ability| %>
-    <%= link_to edit_admin_superuser_ability_path(superuser_ability.to_param), class: "twlink" do %>
-      <%= render UI::Time::Component.new(time: superuser_ability.created_at) %>
+<div
+  data-controller="update-cached-sortable-links"
+  data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
+>
+  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
+        cache_key: cache_fragment_name(["admin_superuser_abilities", render_sortable, skip_user, render_deleted]),
+        cache_records: ->(superuser_ability) { superuser_ability.user })) do |table| %>
+    <% table.column(sortable: "created_at", lower_right: ->(record) { content_tag(:span, record.id, class: "only-dev-visible") }) do |superuser_ability| %>
+      <%= link_to edit_admin_superuser_ability_path(superuser_ability.to_param), class: "twlink" do %>
+        <%= render UI::Time::Component.new(time: superuser_ability.created_at) %>
+      <% end %>
     <% end %>
-  <% end %>
 
-  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |superuser_ability| %>
-    <%= render UI::Time::Component.new(time: superuser_ability.updated_at) %>
-  <% end %>
+    <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |superuser_ability| %>
+      <%= render UI::Time::Component.new(time: superuser_ability.updated_at) %>
+    <% end %>
 
-  <% unless skip_user %>
-    <% table.column(sortable: "user_id") do |superuser_ability| %>
-      <% if superuser_ability.user_id.present? %>
-        <% cache([user_cell_cache, superuser_ability.user_id, superuser_ability.user, render_sortable], skip_digest: true) do %>
+    <% unless skip_user %>
+      <% table.column(sortable: "user_id") do |superuser_ability| %>
+        <% if superuser_ability.user_id.present? %>
           <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user_id: superuser_ability.user_id, user: superuser_ability.user, render_search: render_sortable) %>
         <% end %>
       <% end %>
     <% end %>
-  <% end %>
 
-  <% table.column(sortable: "kind") do |superuser_ability| %>
-    <%= superuser_ability.kind.titleize %>
-  <% end %>
+    <% table.column(sortable: "kind") do |superuser_ability| %>
+      <%= superuser_ability.kind.titleize %>
+    <% end %>
 
-  <% table.column(sortable: "controller_name") do |superuser_ability| %>
-    <%= superuser_ability.controller_name %>
-  <% end %>
+    <% table.column(sortable: "controller_name") do |superuser_ability| %>
+      <%= superuser_ability.controller_name %>
+    <% end %>
 
-  <% table.column(sortable: "action_name") do |superuser_ability| %>
-    <%= superuser_ability.action_name %>
-  <% end %>
+    <% table.column(sortable: "action_name") do |superuser_ability| %>
+      <%= superuser_ability.action_name %>
+    <% end %>
 
-  <% table.column(label: "Options") do |superuser_ability| %>
-    <%= superuser_ability.su_options.join(", ") %>
-  <% end %>
+    <% table.column(label: "Options") do |superuser_ability| %>
+      <%= superuser_ability.su_options.join(", ") %>
+    <% end %>
 
-  <% if render_deleted %>
-    <% table.column(sortable: "deleted_at") do |superuser_ability| %>
-      <% if superuser_ability.deleted_at.present? %>
-        <span class="text-danger">
-          <%= render UI::Time::Component.new(time: superuser_ability.deleted_at, format: :localize_time_precise) %>
-        </span>
+    <% if render_deleted %>
+      <% table.column(sortable: "deleted_at") do |superuser_ability| %>
+        <% if superuser_ability.deleted_at.present? %>
+          <span class="text-danger">
+            <%= render UI::Time::Component.new(time: superuser_ability.deleted_at, format: :localize_time_precise) %>
+          </span>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>
-<% end %>
+</div>
