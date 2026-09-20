@@ -1,14 +1,14 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
-/* global localStorage */
+/* global localStorage, Event */
 
 // Connects to data-controller='ui--collapse'
 // Animates [data-ui--collapse-target=content] open/closed. Optionally rotates a
 // [data-ui--collapse-target=chevron] and keeps [data-ui--collapse-target=trigger]'s
 // aria-expanded and data-active (the is-active variant) in sync. With
 // data-ui--collapse-param-value set, the open state persists to the URL query
-// (?param=1) so it survives reloads and navigation; with
+// (?param=1, ?param=0 collapsed) so it survives reloads and navigation; with
 // data-ui--collapse-storage-key-value it persists to localStorage instead, for a panel
 // whose state is the rider's preference rather than part of the address.
 export default class extends Controller {
@@ -16,9 +16,10 @@ export default class extends Controller {
   static values = { param: String, storageKey: String }
 
   connect () {
-    // Restore the open state without animating on load.
-    if (this.hasParamValue && this.paramInUrl) return this.setExpanded(true, 0)
-    if (this.hasStorageKeyValue) return this.setExpanded(this.stored, 0)
+    // Restore the persisted state without animating on load, and without persisting it
+    // back -- that would only write what it just read.
+    const restored = this.restoredExpanded
+    if (restored !== null) return this.applyExpanded(restored, 0)
 
     // The server can render the content open -- a panel whose state is part of the
     // response rather than a preference. Only the trigger needs catching up, and it
@@ -43,8 +44,21 @@ export default class extends Controller {
       content.classList.contains('tw:hidden') || content.classList.contains('tw:hidden!'))
   }
 
-  get paramInUrl () {
-    return new URLSearchParams(window.location.search).has(this.paramValue)
+  // null when nothing has been persisted, so the rendered state stands.
+  get restoredExpanded () {
+    if (this.hasParamValue && this.urlExpanded !== null) return this.urlExpanded
+    if (this.hasStorageKeyValue) return this.stored
+
+    return null
+  }
+
+  // The param is written collapsed as well as open, so an empty or 0 value is the rider
+  // having closed the panel rather than never having touched it.
+  get urlExpanded () {
+    const value = new URLSearchParams(window.location.search).get(this.paramValue)
+    if (value === null) return null
+
+    return !['', '0', 'false'].includes(value)
   }
 
   get stored () {
@@ -53,9 +67,13 @@ export default class extends Controller {
 
   // duration 0 restores state without animating
   setExpanded (expanding, duration) {
+    this.applyExpanded(expanding, duration)
+    this.persist(expanding)
+  }
+
+  applyExpanded (expanding, duration) {
     collapse(expanding ? 'show' : 'hide', this.contentTargets, duration)
     this.syncTriggers(expanding)
-    this.persist(expanding)
   }
 
   syncTriggers (expanding) {
@@ -70,12 +88,13 @@ export default class extends Controller {
     if (this.hasStorageKeyValue) localStorage.setItem(this.storageKeyValue, String(expanding))
     if (!this.hasParamValue) return
     const url = new URL(window.location)
-    if (expanding) {
-      url.searchParams.set(this.paramValue, '1')
-    } else {
-      url.searchParams.delete(this.paramValue)
-    }
+    // Collapsed writes 0 rather than dropping the param: a form that rebuilds the address
+    // bar from its own fields can only carry a state that's spelled out for it to copy.
+    url.searchParams.set(this.paramValue, expanding ? '1' : '0')
     // replaceState (not pushState) so a toggle doesn't stack history entries.
     window.history.replaceState(window.history.state, '', url)
+    // replaceState raises no event, so anything keeping step with the address bar (a
+    // form's hidden field) hears it here.
+    window.dispatchEvent(new Event('collapse:persisted'))
   }
 }

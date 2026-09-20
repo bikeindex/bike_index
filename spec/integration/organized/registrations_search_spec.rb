@@ -349,9 +349,25 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     page.refresh
     expect(page).to have_link("Last year", wait: 10)
 
+    # A search rebuilds the address bar from the form's fields, so one of them carries it
+    fill_in "search_email", with: "alice@example.com"
+    click_button "Search registrations"
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_current_path(/chart_open=1/)
+
+    # Collapsing spells the state out rather than dropping the param, so the search
+    # carries the collapse the same way - and a reload comes back collapsed
     click_button "Chart"
     expect(page).to have_no_link("Last year")
-    expect(page).to have_no_current_path(/chart_open/)
+    expect(page).to have_current_path(/chart_open=0/)
+
+    fill_in "search_email", with: "bob@example.com"
+    click_button "Search registrations"
+    expect(page).to have_current_path(/search_email=bob/, wait: 10)
+    expect(page).to have_current_path(/chart_open=0/)
+    page.refresh
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    expect(page).to have_no_link("Last year")
   end
 
   it "moves the result view through the address bar, and back from localStorage" do

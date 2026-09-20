@@ -53,6 +53,10 @@
           %>
           <%= hidden_field_tag :chart_scope, @chart_scope %>
 
+          <%# Same, for the card's open state, which ui--collapse advances as it toggles %>
+          <%= hidden_field_tag Pages::Org::Search::ChartCard::Component::COLLAPSE_PARAM,
+            params[:chart_open] %>
+
           <%# Same, for the view the spreadsheet/thumbnail chips advance to %>
           <%= hidden_field_tag :search_result_view, @result_view %>
 

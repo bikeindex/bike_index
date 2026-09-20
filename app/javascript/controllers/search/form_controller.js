@@ -40,6 +40,9 @@ export default class extends Controller {
     document.addEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.addEventListener('search:rate-limited', this.showRateLimited)
     window.addEventListener('popstate', this.handlePopstate)
+    // A collapse outside the form writes its state to the address bar, which this form
+    // rebuilds when it submits - so its hidden field has to hear about the toggle.
+    window.addEventListener('collapse:persisted', this.syncHiddenFieldsFromUrl)
     // The results frame renders outside this controller's element, so its retry
     // button can't reach us by data-action
     document.addEventListener('click', this.handleRetryClick)
@@ -53,6 +56,7 @@ export default class extends Controller {
     document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.removeEventListener('search:rate-limited', this.showRateLimited)
     window.removeEventListener('popstate', this.handlePopstate)
+    window.removeEventListener('collapse:persisted', this.syncHiddenFieldsFromUrl)
     document.removeEventListener('click', this.handleRetryClick)
   }
 
@@ -119,11 +123,11 @@ export default class extends Controller {
     return first.pathname === second.pathname && this.resultsSearch(first) !== this.resultsSearch(second)
   }
 
-  // The org chart's scope rides in the address bar so a reload keeps it, but the results
-  // are the same under either scope - switching it mustn't re-run the search.
+  // The org chart's scope and open state ride in the address bar so a reload keeps them,
+  // but the results are the same under either - moving them mustn't re-run the search.
   resultsSearch (url) {
     const params = new URLSearchParams(url.search)
-    params.delete('chart_scope')
+    ;['chart_scope', 'chart_open'].forEach(name => params.delete(name))
 
     return params.toString()
   }
@@ -237,7 +241,7 @@ export default class extends Controller {
   // The form sits outside the results frame, so frame-nav period clicks advance
   // the URL but leave its hidden fields stale. Sync from the URL so the next
   // submit doesn't drop the period the user just chose.
-  syncHiddenFieldsFromUrl () {
+  syncHiddenFieldsFromUrl = () => {
     const params = new URLSearchParams(window.location.search)
     this.formTarget.querySelectorAll('input[type="hidden"]').forEach(input => {
       // Skip array fields (eg query_items[]) - the combobox owns those, and
