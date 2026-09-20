@@ -21,12 +21,13 @@ Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just c
 ```bash
 { rtk proxy git diff --name-only origin/main...HEAD
   rtk proxy git diff --name-only HEAD
+  git ls-files --others --exclude-standard
 } | sort -u | xargs bin/lint
 ```
 
 `xargs` rather than `bin/lint $(…)` — command substitution splits on spaces in filenames. `rtk proxy` for the same reason the greps below need it: the hook rewrites these into a stat whose trailing `Changes:` line then arrives as a filename.
 
-**Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` just edited the tree — a file it touched that the branch hadn't committed yet is invisible to that range and goes unlinted. Same union applies to the spec scoping and the audits below, which also run before the commit.
+**All three are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` just edited the tree — a file it touched that the branch hadn't committed yet is invisible to that range and goes unlinted. `git diff HEAD` in turn sees only *tracked* files, so a file the branch adds is in neither until it's staged: a new component template lints clean by never being linted, and CI's `lint_and_scan` is what finds it. `--exclude-standard` keeps the gitignored paths out. Same union applies to the spec scoping and the audits below, which also run before the commit.
 
 **Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (it falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
 
