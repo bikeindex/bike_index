@@ -83,10 +83,6 @@
     </div>
   <% end %>
 
-  <% unless display_dev_info? %>
-    <style>.only-dev-visible {display: none !important;} </style>
-  <% end %>
-
   <%= render partial: "/admin/bulk_imports/table", locals: {collection: @bulk_imports, render_sortable: true} %>
 <% end %>
 
