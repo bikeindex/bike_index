@@ -20,7 +20,7 @@
   .mt-4
   = render(UI::Chart::Component.new(series: claimed_ownerships, time_range: @time_range, stacked: true, colors: ["#88a2e0", "#178813"]))
 
-%div{ style: "margin-top: 50px;" }
+%div{ style: "margin-top: 50px;", class: "tw:flex tw:justify-end" }
   = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:)
 
 = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do

@@ -4,6 +4,20 @@ import { Controller } from '@hotwired/stimulus'
 // non-period filters (e.g. search_email) survive — the form itself only carries
 // start_time_selector / end_time_selector, so a default GET would drop them.
 export default class extends Controller {
+  static targets = ['startTime', 'endTime', 'customPeriod']
+
+  // The custom panel opens on whichever chip is picked, so a range narrowed from there
+  // starts where that chip did rather than wherever the panel was last left.
+  rangePicked (event) {
+    // Its period reaches the same form as the chip's, and would outrank it
+    if (this.hasCustomPeriodTarget) this.customPeriodTarget.disabled = true
+
+    const { startTime, endTime } = event.currentTarget.dataset
+    if (!startTime || !this.hasStartTimeTarget) return
+    this.startTimeTarget.value = startTime
+    this.endTimeTarget.value = endTime
+  }
+
   submit (event) {
     event.preventDefault()
     const form = event.currentTarget
