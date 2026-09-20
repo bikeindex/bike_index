@@ -241,14 +241,6 @@ body.with-org-sidebar main > :only-child {
   width: 100%;
 }
 
-/* The flash is fixed to the viewport, so body's margin doesn't reach it -- it takes the
-   same inset as its own left instead. The general alert escapes this by sitting in the
-   content column (layouts/application), which a toast pinned to the window can't do */
-body.with-org-sidebar #flash-messages {
-  left: var(--org-sidebar-width, 266px);
-  transition: left 0.18s ease;
-}
-
 /* SharedBlocks::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
    a top bar in the flow -- which takes its own space, so there's nothing to hold
    open for it. `width <` rather than a max-width of 759px, so a fractional viewport
@@ -257,9 +249,7 @@ body.with-org-sidebar #flash-messages {
   body.with-org-sidebar {
     --nav-gap: 16px;
 
-    /* Zeroed at the source rather than per-consumer: this shadows what the controller
-       writes on the document, so body's margin and the flash's inset both follow */
-    --org-sidebar-width: 0px;
+    margin-left: 0;
   }
 
   body.with-org-sidebar main {
