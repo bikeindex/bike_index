@@ -31,38 +31,13 @@
   }
 }
 
-// Wherever this table is, it has multiple lines and looks stupid with line-height 2
-.parking-notifications-table td {
-  line-height: 1.5em;
-}
-
-// We don't want to display extended-col-info except on the main table, when the screen is small
+// Only bikes/_owner_bike_status_alerts still stacks its cells on a small screen
 .extended-col-info {
-  &,
-  &.d-block {
-    display: none !important;
-  }
+  display: none !important;
 }
-// For small tables, we want to just have two cells, so that it isn't too wide for the page
-// This is outside of the above scope because it is also shown on non-organized pages
 @include media-breakpoint-down(md) {
-  // For small tables, we want to make the line-height not stupid for the expanded cell
-  .parking-notifications-table td {
-    line-height: 1.25;
-  }
-
   .extended-col-info {
     display: inline !important;
-    &.d-block {
-      display: block !important;
-    }
-    &.d-inline-block {
-      display: inline-block !important;
-    }
-  }
-
-  .msgbikelink {
-    display: block !important;
   }
 
   .hidden-sm-cells {
