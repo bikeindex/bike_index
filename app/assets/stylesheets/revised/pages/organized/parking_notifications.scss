@@ -33,20 +33,11 @@
 
 // Only bikes/_owner_bike_status_alerts still stacks its cells on a small screen
 .extended-col-info {
-  &,
-  &.d-block {
-    display: none !important;
-  }
+  display: none !important;
 }
 @include media-breakpoint-down(md) {
   .extended-col-info {
     display: inline !important;
-    &.d-block {
-      display: block !important;
-    }
-    &.d-inline-block {
-      display: inline-block !important;
-    }
   }
 
   .hidden-sm-cells {

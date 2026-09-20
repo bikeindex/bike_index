@@ -8,9 +8,8 @@ module UI
       attr_reader :sort_state
 
       # Pass cache_key (normally self.class.cache_digest) to enable per-row fragment caching.
-      # row_data is called per record for that row's data attributes - so it's part of what
-      # cache_key caches.
-      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false, data: nil, row_data: nil)
+      # row_data is per-row data attributes, so cache_key caches those too.
+      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false, row_data: nil)
         @records = records
         @sort_state = sort_state
         @cache_key = cache_key
@@ -18,8 +17,7 @@ module UI
         @bordered = !unbordered
         @render_sortable = render_sortable
         @sticky = sticky
-        @data = data || {}
-        @row_data = row_data || ->(_record) { {} }
+        @row_data = row_data
         @columns = []
       end
 

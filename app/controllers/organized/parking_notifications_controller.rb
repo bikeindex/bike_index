@@ -109,15 +109,13 @@ module Organized
         matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
           .includes(:user).limit(@per_page).load
       )
-      # Symbol keys, or organization_id repeats as a query param beside the path segment
-      search_params = sort_state.search_params.to_h.symbolize_keys
       Pages::Org::ParkingNotifications::Index::Component.new(
         organization: current_organization,
         parking_notifications:,
         total_count: (parking_notifications.size < @per_page) ? parking_notifications.size : matching_parking_notifications.count,
         per_page: @per_page,
-        search_params:,
-        sort_state: sort_state.with(search_params:),
+        # Symbol keys, or organization_id repeats as a query param beside the path segment
+        sort_state: sort_state.with(search_params: sort_state.search_params.to_h.symbolize_keys),
         interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact,
         search_kind: @search_kind,
         search_status: @search_status,

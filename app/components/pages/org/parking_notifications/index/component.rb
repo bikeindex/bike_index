@@ -23,17 +23,17 @@ module Pages
             "not_unregistered" => "Registered bikes only"
           }.freeze
 
-          def initialize(organization:, parking_notifications:, total_count:, per_page:, search_params:,
-            sort_state:, interpreted_params:, search_kind:, search_status:, search_unregistered:,
-            unpermitted_statuses:, period:, start_time:, end_time:, search_bounding_box: nil,
-            map_place: nil, map_location: nil, search_bike_id: nil, filtered_user_id: nil,
-            filtered_user: nil, notifications_failed_resolved: nil, repeated_kind: nil)
+          def initialize(organization:, parking_notifications:, total_count:, per_page:, sort_state:,
+            interpreted_params:, search_kind:, search_status:, search_unregistered:, unpermitted_statuses:,
+            period:, start_time:, end_time:, search_bounding_box: nil, map_place: nil, map_location: nil,
+            search_bike_id: nil, filtered_user_id: nil, filtered_user: nil,
+            notifications_failed_resolved: nil, repeated_kind: nil)
             @organization = organization
             @parking_notifications = parking_notifications
             @total_count = total_count
             @per_page = per_page
-            @search_params = search_params
             @sort_state = sort_state
+            @search_params = sort_state.search_params
             @interpreted_params = interpreted_params
             @search_kind = search_kind
             @search_status = search_status

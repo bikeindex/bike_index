@@ -32,15 +32,6 @@ module Pages
             }
           end
 
-          def table_data
-            {"org--parking-notifications-index-target": "table"} if @map_rows
-          end
-
-          # The localizer writes the viewer's zone into the empty small
-          def created_label
-            safe_join([translation(".created"), " ", tag.small(class: "localizeTimezone")])
-          end
-
           def message_notes(parking_notification)
             safe_join([["Notes", parking_notification.internal_notes], ["Message", parking_notification.message]]
               .filter_map { |label, text| safe_join([tag.strong("#{label}:"), " ", text]) if text.present? }, tag.br)

@@ -6,7 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 // Pins every loaded notification on the map, and narrows the table to the ones in view
 export default class extends Controller {
   static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeForm', 'placeInput', 'redo', 'fit',
-    'visibleCount', 'table', 'row', 'empty', 'repeatForm', 'submit']
+    'visibleCount', 'row', 'empty', 'repeatForm', 'submit']
 
   static values = {
     latitude: Number,
@@ -75,7 +75,9 @@ export default class extends Controller {
   showMultiselect (event) {
     collapse('hide', event.currentTarget)
     collapse('show', this.repeatFormTarget)
-    this.tableTarget.querySelectorAll('.multiselect-cell').forEach((cell) => cell.classList.remove('tw:hidden'))
+    this.element.querySelectorAll('.multiselect-cell').forEach((cell) => cell.classList.remove('tw:hidden'))
+    // Revealing a column changes which cell is last-visible, which ui--table styles
+    window.dispatchEvent(new Event('ui-table:refresh'))
   }
 
   updateSubmitText (event) {
@@ -149,8 +151,9 @@ export default class extends Controller {
 
   // The row, under the table's header, without the map and checkbox columns
   #popupContent (row) {
-    const table = this.tableTarget.cloneNode(false)
-    const head = this.tableTarget.tHead.cloneNode(true)
+    const source = row.closest('table')
+    const table = source.cloneNode(false)
+    const head = source.tHead.cloneNode(true)
     // The sort links would re-sort the page from inside a popup
     head.querySelectorAll('a').forEach((link) => link.replaceWith(...link.childNodes))
     table.append(head)
@@ -159,8 +162,8 @@ export default class extends Controller {
     table.createTBody().append(clone)
     table.querySelectorAll('.map-cell, .multiselect-cell').forEach((cell) => cell.remove())
 
-    const wrapper = document.createElement('div')
-    wrapper.className = 'tw:overflow-x-auto'
+    // ui--table's wrapper, so it connects on the clone and restyles the edges it just lost
+    const wrapper = source.parentElement.cloneNode(false)
     wrapper.append(table)
     // Clones inside the controller would register as its targets
     wrapper.querySelectorAll('[data-org--parking-notifications-index-target]')

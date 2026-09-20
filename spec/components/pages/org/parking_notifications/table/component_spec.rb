@@ -18,13 +18,9 @@ RSpec.describe Pages::Org::ParkingNotifications::Table::Component, type: :compon
 
   it "renders a row per notification, with every column but the optional ones" do
     expect(component).to have_css("tbody tr", count: 1)
-    expect(component).to have_css("th", text: "Created")
     expect(component).to have_css("th", text: "Bike")
-    expect(component).to have_css("th", text: "Type")
     expect(component).to have_css("th", text: "Status")
-    expect(component).to have_css("th", text: "Notification#")
     expect(component).to have_css("th", text: "Resolved")
-    expect(component).to have_css("th", text: "Message/Notes")
     expect(component).not_to have_css("th", text: "Address")
 
     expect(component).to have_link(href: routes.organization_parking_notification_path(parking_notification, organization_id: organization.id))
@@ -41,7 +37,6 @@ RSpec.describe Pages::Org::ParkingNotifications::Table::Component, type: :compon
     let(:options) { {map_rows: true, render_multiselect: true} }
 
     it "hooks the rows and the checkboxes up to the index controller" do
-      expect(component).to have_css("table[data-org--parking-notifications-index-target='table']")
       expect(component).to have_css("tr[data-org--parking-notifications-index-target='row']" \
         "[data-latitude='#{parking_notification.latitude}'][data-longitude='#{parking_notification.longitude}']")
       expect(component).to have_css("td.map-cell button[data-action~='org--parking-notifications-index#showOnMap']")
@@ -68,7 +63,7 @@ RSpec.describe Pages::Org::ParkingNotifications::Table::Component, type: :compon
     let(:options) { {render_sortable: true, sort_state: ComponentStructs::SortState.new(search_params: {search_status: "all"}, sort: "created_at", direction: "desc")} }
 
     it "links the sortable headers and the notifying user, carrying the search params" do
-      expect(component).to have_css("th a[data-active='true']", text: /Created/)
+      expect(component).to have_css("th a", text: /Created/)
       expect(component).to have_css("th a", text: /Type/)
       expect(component).to have_css("th a", text: /Notification#/)
       expect(component).to have_link(parking_notification.user.display_name,

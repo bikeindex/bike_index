@@ -1,18 +1,18 @@
 <%# Cell blocks are instance_exec'd against UI::Table, so locals rather than ivars %>
 <% current_organization = @current_organization %>
 <% render_sortable = @render_sortable %>
-<% search_params = @sort_state.search_params %>
-<% message_notes_cell = ->(parking_notification) { message_notes(parking_notification) } %>
+<% message_notes_cell = method(:message_notes) %>
 
 <%= render(UI::Table::Component.new(records: @parking_notifications, sort_state: @sort_state,
-  render_sortable: @render_sortable, data: table_data, row_data:)) do |table| %>
+  render_sortable: @render_sortable, row_data:)) do |table| %>
   <% if @map_rows %>
     <% table.column(label: "", classes: "map-cell") do |parking_notification| %>
       <%= render UI::Button::Component.new(text: "↑", color: :link, title: "Show on map", data: {action: "org--parking-notifications-index#showOnMap"}) %>
     <% end %>
   <% end %>
 
-  <% table.column(sortable: "created_at", label: created_label) do |parking_notification| %>
+  <%# The localizer writes the viewer's zone into the empty small %>
+  <% table.column(sortable: "created_at", label: safe_join([translation(".created"), " ", tag.small(class: "localizeTimezone")])) do |parking_notification| %>
     <%= link_to organization_parking_notification_path(parking_notification, organization_id: parking_notification.organization_id) do %>
       <%= render UI::Time::Component.new(time: parking_notification.created_at, format: :localize_time_precise) %>
     <% end %>
@@ -40,14 +40,14 @@
     <% name = parking_notification.user&.display_name&.truncate(20) %>
 
     <% if render_sortable && parking_notification.user.present? %>
-      <%= link_to name, organization_parking_notifications_path(**search_params, user_id: parking_notification.user_id, organization_id: current_organization.to_param) %>
+      <%= link_to name, organization_parking_notifications_path(**sort_state.search_params, user_id: parking_notification.user_id, organization_id: current_organization.to_param) %>
     <% else %>
       <%= name %>
     <% end %>
   <% end %>
 
   <% table.column(sortable: "repeat_number", label: translation(".notification_number"), classes: "tw:text-sm") do |parking_notification| %>
-    <%= parking_notification.notification_number if parking_notification.repeat_record? %>
+    <%= number_display(parking_notification.notification_number) if parking_notification.repeat_record? %>
   <% end %>
 
   <% unless @skip_status %>
