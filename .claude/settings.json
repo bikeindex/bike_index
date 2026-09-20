@@ -1,17 +1,3 @@
 {
-  "enabledMcpjsonServers": ["playwright"],
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq --arg root \"$CLAUDE_PROJECT_DIR\" -c 'if ((.tool_input.file_path // \"\") == \"\" or ((.tool_input.file_path) | startswith($root + \"/\"))) then empty else {hookSpecificOutput:{hookEventName:\"PreToolUse\",permissionDecision:\"deny\",permissionDecisionReason:(\"Refusing to write \" + .tool_input.file_path + \" -- it is outside this checkout (\" + $root + \"). In a worktree, the main checkout is a sibling you must not edit; use a path inside this one.\")}} end'",
-            "statusMessage": "Checking the path is inside this checkout"
-          }
-        ]
-      }
-    ]
-  }
+  "enabledMcpjsonServers": ["playwright"]
 }

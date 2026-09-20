@@ -1,7 +1,4 @@
-# Local macOS (Conductor workspace or spawned worktree)
-
-In a `.claude/worktrees/…` checkout, `bin/workspace_setup --without_seeds` comes before
-everything below — see SKILL.md. Everything here assumes it has run.
+# Local macOS (Conductor workspace)
 
 Ruby 4.0.6 is installed via [mise](https://mise.jdx.dev/), but Claude
 Code's shell sometimes spawns subprocesses without the mise shim on
