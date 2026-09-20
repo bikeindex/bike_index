@@ -30,16 +30,14 @@
               class: "twinput tw:flex-1 fieldResetsCounts",
               data: {action: "input->org--search#emailChanged"} %>
 
-            <% if render_serial_field? %>
-              <%= label_tag :serial,
-                translation(".search_for_serial_number"),
-                class: "twlabel tw:sr-only" %>
+            <%= label_tag :serial,
+              translation(".search_for_serial_number"),
+              class: "twlabel tw:sr-only" %>
 
-              <%= text_field_tag :serial,
-                @interpreted_params[:raw_serial],
-                placeholder: translation(".search_for_serial_number"),
-                class: "twinput tw:flex-1 fieldResetsCounts" %>
-            <% end %>
+            <%= text_field_tag :serial,
+              @interpreted_params[:raw_serial],
+              placeholder: translation(".search_for_serial_number"),
+              class: "twinput tw:flex-1 fieldResetsCounts" %>
 
             <% if render_notes_field? %>
               <div
@@ -72,7 +70,7 @@
         <% end %>
       </div>
 
-      <% if render_serial_field? && serial_looks_like_not_a_serial? %>
+      <% if serial_looks_like_not_a_serial? %>
         <%= render(
           UI::Alerts::Base::Component.new(
             text: translation(".doesnt_look_like_serial"),

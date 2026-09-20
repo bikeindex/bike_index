@@ -14,10 +14,6 @@ module Pages
             render(Pages::Org::Search::Form::Component.new(**default_options(interpreted_params)))
           end
 
-          def without_serial_field
-            render(Pages::Org::Search::Form::Component.new(**default_options.merge(skip_serial_field: true)))
-          end
-
           # The registrations search: a card, with the filters and a full-width submit
           def card
             render(Pages::Org::Search::Form::Component.new(**default_options.merge(
