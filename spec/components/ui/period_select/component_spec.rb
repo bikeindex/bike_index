@@ -84,4 +84,38 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
       end
     end
   end
+
+  describe "size" do
+    let(:component) do
+      with_request_url("/admin/bikes") do
+        render_inline(described_class.new(period: "week", start_time: Time.current - 1.week,
+          end_time: Time.current, form: "search_form", **options))
+      end
+    end
+    let(:options) { {} }
+    let(:small) { UI::Button::Component::SIZES[:sm] }
+
+    it "sizes the chips and the custom button small" do
+      expect(component).to have_css("label", class: small.split, visible: :all)
+      expect(component).to have_button("custom", class: small.split)
+    end
+
+    context "with size: :md" do
+      let(:options) { {size: :md} }
+      let(:medium) { UI::Button::Component::SIZES[:md] }
+
+      it "sizes both medium instead" do
+        expect(component).to have_css("label", class: medium.split, visible: :all)
+        expect(component).to have_button("custom", class: medium.split)
+      end
+    end
+
+    context "with a size it doesn't have" do
+      let(:options) { {size: :xl} }
+
+      it "raises" do
+        expect { component }.to raise_error(ArgumentError, /size/)
+      end
+    end
+  end
 end
