@@ -110,6 +110,30 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
+  describe "filter_groups" do
+    def group(name) = instance.filter_groups.find { |g| g[:name] == name }
+
+    it "withholds the rows whose features are off, and clears status to all" do
+      expect(instance.filter_groups.map { |g| g[:name] }).to_not include(:search_stickers, :search_address)
+      expect(group(:search_status)[:selected]).to eq "all"
+      expect(group(:search_status)[:entries].map { |e| e[:value] }).to eq(%w[all with_owner stolen])
+    end
+
+    context "with the filters' features" do
+      let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes] }
+      let(:search_address) { "with_street" }
+
+      it "adds their rows and the impound statuses, and marks the address value selected" do
+        expect(instance.filter_groups.map { |g| g[:name] })
+          .to include(:search_stickers, :search_address, :search_status)
+        expect(group(:search_stickers)[:selected]).to eq ""
+        expect(group(:search_address)[:selected]).to eq "with_street"
+        expect(group(:search_status)[:entries].map { |e| e[:value] })
+          .to eq(%w[all not_impounded impounded with_owner stolen])
+      end
+    end
+  end
+
   describe "initially_checked_columns" do
     it "returns default columns" do
       cols = instance.initially_checked_columns
