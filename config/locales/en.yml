@@ -4559,14 +4559,6 @@ en:
           By default, emails to unclaimed bikes are sent to your organization to review
           and forward to the final user, because those users haven't opted in to Bike
           Index notifications.
-    parking_notifications:
-      table:
-        address: Address
-        bike: Bike
-        by: By
-        created: Created
-        notification_number: Notification#
-        resolved: Resolved
     registrations:
       search:
         render_chart: Render chart

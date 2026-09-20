@@ -6,7 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 // Pins every loaded notification on the map, and narrows the table to the ones in view
 export default class extends Controller {
   static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeForm', 'placeInput', 'redo', 'fit',
-    'visibleCount', 'table', 'row', 'emptyRow', 'repeatForm', 'submit']
+    'visibleCount', 'mapButton', 'empty', 'repeatForm', 'submit']
 
   static values = {
     latitude: Number,
@@ -75,7 +75,9 @@ export default class extends Controller {
   showMultiselect (event) {
     collapse('hide', event.currentTarget)
     collapse('show', this.repeatFormTarget)
-    this.tableTarget.classList.add('show-multiselect')
+    this.element.querySelectorAll('.multiselect-cell').forEach((cell) => cell.classList.remove('tw:hidden'))
+    // Revealing a column changes which cell is last-visible, which ui--table styles
+    window.dispatchEvent(new Event('ui-table:refresh'))
   }
 
   updateSubmitText (event) {
@@ -100,10 +102,12 @@ export default class extends Controller {
     this.popup = new maplibregl.Popup({ offset: 32, maxWidth: 'min(90vw, 60rem)', closeOnClick: false, focusAfterOpen: false })
     this.popup.on('close', () => this.#markCurrentPin(null))
 
-    // rowTargets re-queries the DOM on every read, and every moveend reads it
-    this.rows = this.rowTargets
-    this.markers = new Map(this.rows.filter((row) => row.dataset.latitude && row.dataset.longitude)
-      .map((row) => [row, this.#addMarker(maplibregl, row)]))
+    // mapButtonTargets re-queries the DOM on every read, and every moveend reads these
+    const mapped = this.mapButtonTargets.map((button) => ({ button, row: button.closest('tr') }))
+    this.rows = mapped.map(({ row }) => row)
+    this.markers = new Map(mapped
+      .filter(({ button }) => button.dataset.latitude && button.dataset.longitude)
+      .map(({ button, row }) => [row, this.#addMarker(maplibregl, button, row)]))
 
     if (this.placeValue.length) {
       const [latitude, longitude] = this.placeValue
@@ -124,11 +128,11 @@ export default class extends Controller {
     })
   }
 
-  #addMarker (maplibregl, row) {
+  #addMarker (maplibregl, button, row) {
     const element = this.pinTarget.content.firstElementChild.cloneNode(true)
     element.addEventListener('click', () => this.#openPopup(row))
     return new maplibregl.Marker({ element, anchor: 'bottom' })
-      .setLngLat([Number(row.dataset.longitude), Number(row.dataset.latitude)])
+      .setLngLat([Number(button.dataset.longitude), Number(button.dataset.latitude)])
       .addTo(this.map)
   }
 
@@ -149,8 +153,9 @@ export default class extends Controller {
 
   // The row, under the table's header, without the map and checkbox columns
   #popupContent (row) {
-    const table = this.tableTarget.cloneNode(false)
-    const head = this.tableTarget.tHead.cloneNode(true)
+    const source = row.closest('table')
+    const table = source.cloneNode(false)
+    const head = source.tHead.cloneNode(true)
     // The sort links would re-sort the page from inside a popup
     head.querySelectorAll('a').forEach((link) => link.replaceWith(...link.childNodes))
     table.append(head)
@@ -159,12 +164,12 @@ export default class extends Controller {
     table.createTBody().append(clone)
     table.querySelectorAll('.map-cell, .multiselect-cell').forEach((cell) => cell.remove())
 
+    // ui--table restyles the edges the stripped columns left, but not its wrapper's
+    // page-gutter bleed, which would overhang the popup's padded box
     const wrapper = document.createElement('div')
     wrapper.className = 'tw:overflow-x-auto'
+    wrapper.dataset.controller = 'ui--table'
     wrapper.append(table)
-    // Clones inside the controller would register as its targets
-    wrapper.querySelectorAll('[data-org--parking-notifications-index-target]')
-      .forEach((element) => element.removeAttribute('data-org--parking-notifications-index-target'))
     return wrapper
   }
 
@@ -188,7 +193,7 @@ export default class extends Controller {
       const checkbox = row.querySelector('input[type=checkbox]')
       if (checkbox) checkbox.disabled = !visibleRows.has(row)
     })
-    collapse(visibleRows.size ? 'hide' : 'show', this.emptyRowTarget, 0)
+    collapse(visibleRows.size ? 'hide' : 'show', this.emptyTarget, 0)
     this.visibleCountTarget.textContent = visibleRows.size.toLocaleString()
 
     const allVisible = visibleRows.size === this.markers.size && !this.#nothingAtLocation

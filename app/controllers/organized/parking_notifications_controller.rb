@@ -115,7 +115,7 @@ module Organized
         total_count: (parking_notifications.size < @per_page) ? parking_notifications.size : matching_parking_notifications.count,
         per_page: @per_page,
         # Symbol keys, or organization_id repeats as a query param beside the path segment
-        search_params: sort_state.search_params.to_h.symbolize_keys,
+        sort_state: sort_state.with(search_params: sort_state.search_params.to_h.symbolize_keys),
         interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact,
         search_kind: @search_kind,
         search_status: @search_status,

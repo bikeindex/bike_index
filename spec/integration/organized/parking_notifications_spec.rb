@@ -34,7 +34,8 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
   def row_for(notification) = "tr:has(> td > a[href$='/parking_notifications/#{notification.id}'])"
 
-  let(:rows) { "tr[data-org--parking-notifications-index-target='row']" }
+  # The rows the map controller tracks - which excludes the popup's clone, stripped of its map cell
+  let(:rows) { "tr:has([data-org--parking-notifications-index-target='mapButton'])" }
 
   it "creates a parking notification through the redesigned registration show page" do
     # The redesign is desktop-first; the mobile resize above is only for the
