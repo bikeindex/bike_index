@@ -15,6 +15,25 @@ module UI
         {key: "all", prefix: nil, label: "all"}
       ].freeze
 
+      # What a datetime_local_field reads
+      INPUT_TIME_FORMAT = "%Y-%m-%dT%H:%M"
+
+      # Binxtils::SetPeriod's ranges, which a controller only computes for the period it was
+      # asked for - the chips carry the rest, so the custom panel opens on whichever is picked.
+      # `all` is nil: it starts at the controller's own earliest_period_date.
+      # ::Time, not the UI::Time component this namespace resolves first
+      def self.period_range(period, now: ::Time.current)
+        case period.to_s
+        when "hour" then (now - 1.hour)..now
+        when "day" then (now.beginning_of_day - 1.day)..now
+        when "week" then (now.beginning_of_day - 1.week)..now
+        when "month" then (now.beginning_of_day - 30.days)..now
+        when "year" then (now.beginning_of_day - 1.year)..now
+        when "next_week" then now..(now.beginning_of_day + 1.week)
+        when "next_month" then now..(now.beginning_of_day + 30.days)
+        end
+      end
+
       # What a time_range_column reads as in prose - "created", "subscription ends"
       def self.column_label(time_range_column)
         time_range_column.to_s.delete_suffix("_at").humanize.downcase
@@ -70,8 +89,18 @@ module UI
       def period_radio(period)
         tag.label(class: chip_classes) do
           radio_button_tag("period", period[:key], @period == period[:key],
-            class: "tw:sr-only", form: @form, data: radio_data) + tag.span(period_button_label(period))
+            class: "tw:sr-only", form: @form, data: radio_data.merge(period_range_data(period[:key]))) +
+            tag.span(period_button_label(period))
         end
+      end
+
+      # Read by ui--period-select, which fills the custom panel's inputs from whichever
+      # chip is picked - the same format they take
+      def period_range_data(period_key)
+        range = self.class.period_range(period_key)
+        return {} if range.nil?
+
+        {start_time: range.first.strftime(INPUT_TIME_FORMAT), end_time: range.last.strftime(INPUT_TIME_FORMAT)}
       end
 
       # RadioButtonGroup's chip, at this component's size rather than its fixed one
@@ -80,9 +109,11 @@ module UI
           UI::Forms::RadioButtonGroup::Component::LABEL_CLASSES].join(" ")
       end
 
-      # Picking a chip is picking a range, so the custom panel it replaces closes with it
+      # Picking a chip is picking a range: the custom panel it replaces closes, and takes
+      # that range with it
       def radio_data
-        @radio_data ||= @data.merge(action: ["change->ui--collapse#hide", @data[:action]].compact.join(" "))
+        @radio_data ||= @data.merge(action: ["change->ui--collapse#hide",
+          "change->ui--period-select#rangePicked", @data[:action]].compact.join(" "))
       end
 
       # The prefix drops below md, where the row has no room for it

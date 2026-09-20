@@ -49,7 +49,7 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
         # No chip stands for a custom range, so a search would drop it
         expect(component).not_to have_css("input[type=hidden][name='period']", visible: :all)
         # Picking a range closes the custom panel it replaces
-        expect(component).to have_css("input[type=radio][data-action='change->ui--collapse#hide']", visible: :all, count: 6)
+        expect(component).to have_css("input[type=radio][data-action*='ui--collapse#hide']", visible: :all, count: 6)
       end
     end
 
@@ -64,7 +64,7 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
 
       it "keeps it, rather than replacing it with the collapse's" do
         expect(component).to have_css(
-          "input[type=radio][value='week'][data-action='change->ui--collapse#hide change->org--search#filterChanged']",
+          "input[type=radio][value='week'][data-action='change->ui--collapse#hide change->ui--period-select#rangePicked change->org--search#filterChanged']",
           visible: :all
         )
       end
@@ -116,6 +116,21 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
       it "raises" do
         expect { component }.to raise_error(ArgumentError, /size/)
       end
+    end
+  end
+
+  describe "the chips' ranges" do
+    let(:component) do
+      with_request_url("/admin/bikes") do
+        render_inline(described_class.new(period: "week", start_time: Time.current - 1.week,
+          end_time: Time.current, form: "search_form"))
+      end
+    end
+
+    it "carries each period's range, for the custom panel to open on" do
+      expect(component).to have_css("input[value='year'][data-start-time='#{1.year.ago.beginning_of_day.strftime(described_class::INPUT_TIME_FORMAT)}']", visible: :all)
+      # `all` starts at the controller's own earliest_period_date, which the chip can't know
+      expect(component).to have_css("input[value='all']:not([data-start-time])", visible: :all)
     end
   end
 end

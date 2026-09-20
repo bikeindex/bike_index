@@ -42,7 +42,8 @@
           form_builder: f,
           attribute: :start_time_selector,
           kind: :datetime_local_field,
-          html_options: {value: @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60}
+          html_options: {value: @start_time.strftime(INPUT_TIME_FORMAT), step: 60,
+                         data: {"ui--period-select-target": "startTime"}}
         ) %>
       </div>
 
@@ -53,7 +54,8 @@
           form_builder: f,
           attribute: :end_time_selector,
           kind: :datetime_local_field,
-          html_options: {value: @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60}
+          html_options: {value: @end_time.strftime(INPUT_TIME_FORMAT), step: 60,
+                         data: {"ui--period-select-target": "endTime"}}
         ) %>
       </div>
 
