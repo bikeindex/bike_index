@@ -6,16 +6,19 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static targets = ['startTime', 'endTime', 'customPeriod']
 
-  // The custom panel opens on whichever chip is picked, so a range narrowed from there
-  // starts where that chip did rather than wherever the panel was last left.
+  // A chip is a search: it submits the form it belongs to, and leaves the custom panel it
+  // replaces opening on the range it picked rather than wherever the panel was last left.
   rangePicked (event) {
+    const radio = event.currentTarget
     // Its period reaches the same form as the chip's, and would outrank it
     if (this.hasCustomPeriodTarget) this.customPeriodTarget.disabled = true
 
-    const { startTime, endTime } = event.currentTarget.dataset
-    if (!startTime || !this.hasStartTimeTarget) return
-    this.startTimeTarget.value = startTime
-    this.endTimeTarget.value = endTime
+    const { startTime, endTime } = radio.dataset
+    if (startTime && this.hasStartTimeTarget) {
+      this.startTimeTarget.value = startTime
+      this.endTimeTarget.value = endTime
+    }
+    radio.form?.requestSubmit()
   }
 
   submit (event) {
