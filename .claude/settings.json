@@ -1,3 +1,16 @@
 {
-  "enabledMcpjsonServers": ["playwright"]
+  "enabledMcpjsonServers": ["playwright"],
+  "permissions": {
+    "allow": [
+      "Bash(bin/workspace_setup:*)",
+      "Bash(bin/setup:*)",
+      "Bash(bin/env:*)",
+      "Bash(ruby bin/env:*)",
+      "Bash(bin/lint:*)",
+      "Bash(bin/char_count:*)",
+      "Bash(bin/rails:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(bundle exec rails:*)"
+    ]
+  }
 }
