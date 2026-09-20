@@ -50,6 +50,8 @@ RSpec.describe Pages::Admin::Users::Cell::Component, type: :component do
       expect(component.text).to include("Missing user")
       expect(component.text).to include("888")
       expect(component.css("code.small")).to be_present
+      # There is no email to label it with, so a link would read as its own href
+      expect(component.css("a.text-link")).to be_blank
     end
   end
 

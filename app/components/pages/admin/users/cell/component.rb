@@ -66,7 +66,7 @@ module Pages
           end
 
           def show_user_link?
-            user_link_path.present?
+            user_link_path.present? && @email.present?
           end
 
           def show_email_only?
