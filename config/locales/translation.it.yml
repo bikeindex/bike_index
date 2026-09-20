@@ -4818,14 +4818,6 @@ it:
           reclamate vengono inviate alla vostra organizzazione per essere esaminate
           e inoltrate all'utente finale, poiché tali utenti non hanno attivato le
           notifiche di Bike Index.
-    parking_notifications:
-      table:
-        address: Indirizzo
-        bike: Bicicletta
-        by: Di
-        created: Creato
-        notification_number: Notifica#
-        resolved: Risolto
     stickers:
       edit:
         bike: Bicicletta
@@ -5902,6 +5894,13 @@ it:
           index:
             matches_visible: visibile
             parking_notifications: Notifiche di parcheggio
+          table:
+            address: Indirizzo
+            bike: Bicicletta
+            by: Di
+            created: Creato
+            notification_number: Notifica#
+            resolved: Risolto
       register:
         acknowledgment_check:
           i_name_html: Io, %{name},
