@@ -62,13 +62,15 @@ module Pages
           private
 
           # Two sentences rather than a count interpolated into one, so a translation can
-          # order "over" however it reads
+          # order "over" however it reads. count picks the plural; number is what it renders,
+          # which number_display has already marked up
           def count_html
-            cycle_type = settings.cycle_type.pluralize(@pagy.count)
-            return translation(".matching_html", count: number_display(@pagy.count), cycle_type:) unless count_stopped?
+            unless count_stopped?
+              return translation(".matching_html", count: @pagy.count, number: number_display(@pagy.count))
+            end
 
             translation(".over_count_matching_html",
-              count: number_display(BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT), cycle_type:)
+              number: number_display(BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT))
           end
 
           def count_stopped?

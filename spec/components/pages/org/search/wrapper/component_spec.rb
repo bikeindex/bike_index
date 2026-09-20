@@ -109,15 +109,23 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     it "disables the export, which would reach past the organization, and says why" do
       expect(component).to have_css("[data-controller='ui--tooltip'] button a[aria-disabled='true']:not([href])", text: "Export CSV")
       expect(component).to have_css("[role=tooltip]", text: 'Uncheck "Search all registrations"', visible: :all)
-      expect(component).to have_text("25 matching registrations")
+      expect(component).to have_text("25 matches")
     end
 
     context "with the count at its limit" do
       let(:pagy) { Pagy::Offset.new(count: 1_000, page: 1, limit: 10) }
 
       it "says it stopped counting there" do
-        expect(component).to have_text("Over 1,000 matching registrations")
+        expect(component).to have_text("Over 1,000 matches")
       end
+    end
+  end
+
+  context "with a single match" do
+    let(:pagy) { Pagy::Offset.new(count: 1, page: 1, limit: 10) }
+
+    it "counts it in the singular" do
+      expect(component).to have_text(/1 match\b/)
     end
   end
 
@@ -125,7 +133,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     let(:pagy) { Pagy::Offset.new(count: 1_001, page: 1, limit: 10) }
 
     it "shows the count" do
-      expect(component).to have_text("1,001 matching registrations")
+      expect(component).to have_text("1,001 matches")
     end
   end
 
