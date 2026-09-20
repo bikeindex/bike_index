@@ -4797,14 +4797,6 @@ es:
           no reclamadas se envían a su organización para su revisión y posterior reenvío
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
-    parking_notifications:
-      table:
-        address: DIRECCIÓN
-        bike: Bicicleta
-        by: Por
-        created: Creado
-        notification_number: Notificación#
-        resolved: Resuelto
     stickers:
       edit:
         bike: Bicicleta
@@ -5890,6 +5882,13 @@ es:
           index:
             matches_visible: visible
             parking_notifications: notificaciones de estacionamiento
+          table:
+            address: DIRECCIÓN
+            bike: Bicicleta
+            by: Por
+            created: Creado
+            notification_number: Notificación#
+            resolved: Resuelto
       register:
         acknowledgment_check:
           i_name_html: Yo, %{name},

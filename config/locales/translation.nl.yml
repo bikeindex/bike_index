@@ -4135,14 +4135,6 @@ nl:
           niet bewerken
         member_of_organization: Lid van organisatie
         role_type: Roltype
-    parking_notifications:
-      table:
-        bike: Fiets
-        by: Door
-        created: Gemaakt
-        address: Adres
-        notification_number: Kennisgeving#
-        resolved: Vastbesloten
     manages:
       location_fields:
         address: Adres
@@ -5796,6 +5788,13 @@ nl:
           index:
             matches_visible: Zichtbaar
             parking_notifications: Verlaten records
+          table:
+            address: Adres
+            bike: Fiets
+            by: Door
+            created: Gemaakt
+            notification_number: Kennisgeving#
+            resolved: Vastbesloten
       register:
         acknowledgment_check:
           i_name_html: Ik, %{name},
