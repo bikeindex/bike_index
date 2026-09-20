@@ -56,8 +56,6 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
 
   it "persists the open state to localStorage, leaving the URL alone" do
     visit "/rails/view_components/ui/collapse/component/with_storage_key"
-    page.execute_script("localStorage.removeItem('collapsePreviewOpen')")
-    visit "/rails/view_components/ui/collapse/component/with_storage_key"
     expect(page).to have_no_content("Stored panel body")
 
     click_button("Toggle stored panel")

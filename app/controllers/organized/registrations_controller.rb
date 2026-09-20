@@ -154,9 +154,9 @@ module Organized
         bikes = Bike.search(@interpreted_params)
       end
       set_search_filter_params
-      bikes = sticker_scoped(bikes)
-      bikes = address_scoped(bikes)
-      bikes = status_scoped(bikes)
+      bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
+      bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
+      bikes = BikeServices::OrganizedSearch.status(bikes, search_status)
       if params[:search_model_audit_id].present?
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
@@ -173,8 +173,7 @@ module Organized
       RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)
     end
 
-    # Every filter normalizes here and applies in its own *_scoped, so the shell render (which
-    # only needs the values, to draw the settings panel) and the search can't drift apart
+    # The shell render and the search both read the filters normalized here
     def set_search_filter_params
       @search_stickers = if params[:search_stickers].present?
         (params[:search_stickers] == "none") ? "none" : "with"
@@ -183,31 +182,6 @@ module Organized
       end
       @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
       search_status
-    end
-
-    def sticker_scoped(bikes)
-      return bikes unless @search_stickers
-
-      (@search_stickers == "none") ? bikes.no_bike_sticker : bikes.bike_sticker
-    end
-
-    # none and with are removed in favour of street - it reflects people's expectations better
-    def address_scoped(bikes)
-      case @search_address
-      when "none" then bikes.without_location
-      when "without_street" then bikes.without_street
-      when "with_street" then bikes.with_street
-      when "with" then bikes.with_location
-      else bikes
-      end
-    end
-
-    def status_scoped(bikes)
-      case search_status
-      when "all" then bikes
-      when "not_impounded" then bikes.where.not(status: "status_impounded")
-      else bikes.where(status: "status_#{search_status}")
-      end
     end
 
     def search_status
