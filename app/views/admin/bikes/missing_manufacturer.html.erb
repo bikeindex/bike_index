@@ -39,9 +39,7 @@
   </li>
 <% end %>
 
-<div class="tw:flex tw:justify-end">
-  <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
-</div>
+<%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
 
 <% if current_organization.present? %>
   <p>

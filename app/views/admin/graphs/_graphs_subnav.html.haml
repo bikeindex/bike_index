@@ -22,5 +22,5 @@
           = link_to kind.humanize, kind_path, class: @kind == kind ? " nav-link active" : "nav-link"
 
   - if !["general", ""].include?(@kind) # General and location tables don't have period select :/
-    .col-12.mt-4{class: "tw:flex tw:justify-end"}
+    .col-12.mt-4
       = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:)

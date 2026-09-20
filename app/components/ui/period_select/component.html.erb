@@ -1,7 +1,12 @@
 <div data-controller="ui--collapse ui--period-select">
-  <div class="<%= row_classes %>" role="group">
+  <div
+    class="text-right tw:flex tw:flex-wrap tw:justify-end tw:gap-1 tw:sm:gap-2"
+    role="group"
+  >
     <% if @prepend_text.present? %>
-      <span class="mr-2 less-strong"><%= @prepend_text %></span>
+      <span class="mr-2 less-strong d-block d-lg-inline-block">
+        <%= @prepend_text %>
+      </span>
     <% end %>
 
     <% visible_periods.each do |p| %>
@@ -31,7 +36,7 @@
     builder: BikeIndexFormBuilder,
     html: {class: custom_form_classes, data: {"ui--collapse-target": "content", action: "submit->ui--period-select#submit"}}
   ) do |f| %>
-    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-3">
       <div class="tw:flex tw:items-center tw:gap-2">
         <%= f.label :start_time_selector, translation(".from"), class: "twlabel tw:m-0" %>
 
