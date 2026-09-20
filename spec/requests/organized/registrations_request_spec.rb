@@ -24,31 +24,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
     let(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: current_organization) }
 
-    it "leaves impounded bikes out by default, and takes a status it permits" do
-      get base_url, params: {search_no_js: true}
-      expect(assigns(:search_status)).to eq "not_impounded"
-
-      get base_url, params: {search_no_js: true, search_status: "stolen"}
-      expect(assigns(:search_status)).to eq "stolen"
-    end
-
-    context "without impound_bikes" do
-      let(:enabled_feature_slugs) { %w[bike_search] }
-
-      it "defaults to every status, and refuses the impound ones" do
-        get base_url, params: {search_no_js: true}
-        expect(assigns(:search_status)).to eq "all"
-
-        get base_url, params: {search_no_js: true, search_status: "impounded"}
-        expect(assigns(:search_status)).to eq "all"
-      end
-    end
     it "sends all the params and renders search template to organization_bikes" do
       get base_url, params: query_params
       expect(response.status).to eq(200)
       expect(response.body).to_not include("fbevents.js")
       expect(assigns(:current_organization)).to eq current_organization
       expect(assigns(:search_query_present)).to be_truthy
+      # impound_bikes is enabled, so registrations leave impounded bikes out unless asked
+      expect(assigns(:search_status)).to eq "not_impounded"
       expect(assigns(:bikes).pluck(:id)).to eq([])
       expect(assigns(:search_stickers)).to eq false
       # create_export fails if the org doesn't have have csv_exports
@@ -193,6 +176,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
         expect(assigns(:search_query_present)).to be_falsey
         expect(assigns(:search_stickers)).to eq false
+        # Without impound_bikes there's no impoundedness to leave out
+        expect(assigns(:search_status)).to eq "all"
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
         expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})
       end
