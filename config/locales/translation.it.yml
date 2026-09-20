@@ -5865,8 +5865,9 @@ it:
           bikes_table:
             assign_bike_sticker: Collegamento
             email_hidden: email nascosto
-            hidden_not_registered: nascosto, non registrato con %{org_name}
             link_sticker: adesivo di collegamento
+            hidden: nascosto
+            not_registered_with: Nascosto perché non è registrato con %{org_name}
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:

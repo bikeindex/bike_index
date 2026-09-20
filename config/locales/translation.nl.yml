@@ -5758,8 +5758,9 @@ nl:
           bikes_table:
             assign_bike_sticker: Sticker toewijzen
             email_hidden: email verborgen
-            hidden_not_registered: verborgen, niet geregistreerd bij %{org_name}
             link_sticker: link sticker
+            hidden: verborgen
+            not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:

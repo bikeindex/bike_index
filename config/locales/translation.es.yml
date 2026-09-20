@@ -5853,8 +5853,9 @@ es:
           bikes_table:
             assign_bike_sticker: Asignar pegatina
             email_hidden: Correo electrónico oculto
-            hidden_not_registered: oculto, no registrado con %{org_name}
             link_sticker: pegatina de enlace
+            hidden: oculto
+            not_registered_with: Oculto porque no está registrado con %{org_name}
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
