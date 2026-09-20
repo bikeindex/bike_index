@@ -41,12 +41,11 @@ bin/workspace_setup --without_seeds
 ```
 
 It allocates the ID from the `dev_workspaces` registry, writes `.workspace_id`, then
-runs `bin/setup` — which symlinks `storage` from the root checkout, installs
-`node_modules` and creates this workspace's databases. `--without_seeds` is what
-Conductor's initial setup passes; `bundle exec rails db:seed` when you need records
-(AGENTS.md). `bin/setup` symlinks `node_modules` from the root checkout too, but its
-own later `npm install` replaces that symlink with a real directory — expect the
-install, not a shared one.
+runs `bin/setup` — which symlinks `storage` from the root checkout and creates this
+workspace's databases. `--without_seeds` is what Conductor's initial setup passes;
+`bundle exec rails db:seed` when you need records (AGENTS.md). Expect a full
+`npm install`: `bin/setup` symlinks `node_modules` from the root checkout, then its
+own later install replaces that symlink with a real directory.
 
 **Never write `.workspace_id` yourself.** `bin/workspace_setup` skips allocation when
 the file already exists, leaving the checkout on an ID the registry never handed out.
