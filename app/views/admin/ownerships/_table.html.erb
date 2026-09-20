@@ -1,7 +1,5 @@
 <%# locals: (ownerships:, render_sortable: false, skip_bike: false) %>
 
-<% render_dev_info = display_dev_info? %>
-
 <div class="tw:mt-4">
   <%= render(UI::Table::Component.new(records: ownerships, render_sortable:, sort_state:)) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(ownership) { content_tag(:code, ownership.id, class: "tw:hidden tw:md:inline") }) do |ownership| %>
@@ -29,9 +27,7 @@
 
       <% if creator.blank? %>
         <em class="text-warning">user deleted</em>
-        <% if render_dev_info %>
-          <span class="only-dev-visible">#<%= ownership.creator_id %></span>
-        <% end %>
+        <span class="only-dev-visible">#<%= ownership.creator_id %></span>
       <% else %>
         <%= creator.display_name %>
       <% end %>
@@ -45,10 +41,8 @@
       <%= ownership.owner_email %>
     <% end %>
 
-    <% if render_dev_info %>
-      <% table.column(label: "send email?", classes: "only-dev-visible", header_classes: "tw:text-xs") do |ownership| %>
-        <%= check_mark if ownership.send_email %>
-      <% end %>
+    <% table.column(label: "send email?", classes: "only-dev-visible", header_classes: "tw:text-xs") do |ownership| %>
+      <%= check_mark if ownership.send_email %>
     <% end %>
 
     <% table.column(sortable: "organization_id") do |ownership| %>

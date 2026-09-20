@@ -26,10 +26,8 @@ end %>
 
 <div class="mt-4">
   <%= render(UI::Table::Component.new(records: jobs)) do |table| %>
-    <% if display_dev_info? %>
-      <% table.column(label: "", classes: "only-dev-visible") do |(klass)| %>
-        <code class="small"><%= klass %></code>
-      <% end %>
+    <% table.column(label: "", classes: "only-dev-visible") do |(klass)| %>
+      <code class="small"><%= klass %></code>
     <% end %>
 
     <% table.column(label: "Job") do |(klass)| %>

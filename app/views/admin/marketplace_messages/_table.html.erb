@@ -3,7 +3,7 @@
 <% user_cell_cache = cache_fragment_name("user_cell") %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
-  <% table.column(sortable: "created_at", lower_right: (->(record) { tag.span(record.id, class: "only-dev-visible") } if display_dev_info?)) do |marketplace_message| %>
+  <% table.column(sortable: "created_at", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |marketplace_message| %>
     <%= link_to admin_marketplace_message_path(marketplace_message), class: "twlink" do %>
       <%= render UI::Time::Component.new(time: marketplace_message.created_at) %>
     <% end %>

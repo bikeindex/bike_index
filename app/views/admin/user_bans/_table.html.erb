@@ -1,7 +1,7 @@
 <%# locals: (collection:, render_sortable: false, viewing_deleted: @viewing_deleted) %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
-  <% table.column(sortable: "created_at", lower_right: (->(record) { tag.span(record.id, class: "only-dev-visible") } if display_dev_info?)) do |user_ban| %>
+  <% table.column(sortable: "created_at", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |user_ban| %>
     <%= render UI::Time::Component.new(time: user_ban.created_at) %>
   <% end %>
 

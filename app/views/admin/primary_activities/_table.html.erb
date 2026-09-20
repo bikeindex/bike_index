@@ -11,10 +11,8 @@
     <%= primary_activity.name %>
   <% end %>
 
-  <% if display_dev_info? %>
-    <% table.column(label: "slug", classes: "only-dev-visible tw:text-xs") do |primary_activity| %>
-      <%= primary_activity.slug %>
-    <% end %>
+  <% table.column(label: "slug", classes: "only-dev-visible tw:text-xs") do |primary_activity| %>
+    <%= primary_activity.slug %>
   <% end %>
 
   <% table.column(label: "Display name", classes: "tw:text-xs") do |primary_activity| %>

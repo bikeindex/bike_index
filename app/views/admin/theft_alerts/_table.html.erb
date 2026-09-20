@@ -1,7 +1,5 @@
 <%# locals: (theft_alerts:, render_sortable: false, skip_bike: false) %>
 
-<% render_dev_info = display_dev_info? %>
-
 <% user_cell_cache = cache_fragment_name("user_cell") %>
 
 <%= render(UI::Table::Component.new(records: theft_alerts, render_sortable:, sort_state:)) do |table| %>
@@ -76,19 +74,17 @@
     <%= render UI::Time::Component.new(time: theft_alert.end_at) %>
   <% end %>
 
-  <% if render_dev_info %>
-    <% table.column(label: "FB updated", classes: "only-dev-visible tw:text-xs") do |theft_alert| %>
-      <%= render UI::Time::Component.new(time: theft_alert.facebook_updated_at) %>
-    <% end %>
+  <% table.column(label: "FB updated", classes: "only-dev-visible tw:text-xs") do |theft_alert| %>
+    <%= render UI::Time::Component.new(time: theft_alert.facebook_updated_at) %>
+  <% end %>
 
-    <% table.column(label: "FB objective", classes: "only-dev-visible") do |theft_alert| %>
-      <% if theft_alert.objective_adset.present? %>
-        <small
-          title="Campaign: <%= theft_alert.objective_campaign %>&#10;Adset: <%= theft_alert.objective_adset %>&#10;"
-        >
-          <%= theft_alert.objective_campaign.humanize.downcase.gsub("outcome", "").strip %>
-        </small>
-      <% end %>
+  <% table.column(label: "FB objective", classes: "only-dev-visible") do |theft_alert| %>
+    <% if theft_alert.objective_adset.present? %>
+      <small
+        title="Campaign: <%= theft_alert.objective_campaign %>&#10;Adset: <%= theft_alert.objective_adset %>&#10;"
+      >
+        <%= theft_alert.objective_campaign.humanize.downcase.gsub("outcome", "").strip %>
+      </small>
     <% end %>
   <% end %>
 

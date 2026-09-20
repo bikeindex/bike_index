@@ -6,11 +6,10 @@ module Pages
       module Form
         # The invoice form, on both new and edit
         class Component < ApplicationComponent
-          def initialize(organization:, invoice:, organization_features:, display_dev_info: false)
+          def initialize(organization:, invoice:, organization_features:)
             @organization = organization
             @invoice = invoice
             @organization_features = organization_features
-            @display_dev_info = display_dev_info
           end
 
           # Named individually rather than as an array, so the ids ride in a hidden field the
@@ -24,7 +23,7 @@ module Pages
           end
 
           def show_feature_slugs?(organization_feature)
-            @display_dev_info && organization_feature.feature_slugs_string.present?
+            organization_feature.feature_slugs_string.present?
           end
 
           private

@@ -99,9 +99,7 @@
       <small>Editing</small>
       <%= @user.display_name %>
 
-      <% if @display_dev_info %>
-        <em class="small less-strong only-dev-visible">id: <%= @user.id %></em>
-      <% end %>
+      <em class="small less-strong only-dev-visible">id: <%= @user.id %></em>
     </h1>
 
     <table class="table-list">
@@ -146,19 +144,17 @@
           </td>
         </tr>
 
-        <% if @display_dev_info %>
-          <tr class="only-dev-visible">
-            <td>No Address</td>
+        <tr class="only-dev-visible">
+          <td>No Address</td>
 
-            <td>
-              <% if @user.no_address? %>
-                <strong class="text-success">TRUE</strong>
-              <% else %>
-                <small class="less-strong">address permitted</small>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
+          <td>
+            <% if @user.no_address? %>
+              <strong class="text-success">TRUE</strong>
+            <% else %>
+              <small class="less-strong">address permitted</small>
+            <% end %>
+          </td>
+        </tr>
 
         <tr>
           <td>Superuser</td>
@@ -552,15 +548,13 @@
       <div class="col-md-6">
         <table class="table-list">
           <tbody>
-            <% if @display_dev_info %>
-              <tr
-                class="only-dev-visible tw:hidden"
-                data-ui--collapse-target="content"
-              >
-                <td class="small">ID</td>
-                <td class="small"><%= mailchimp_datum.id %></td>
-              </tr>
-            <% end %>
+            <tr
+              class="only-dev-visible tw:hidden"
+              data-ui--collapse-target="content"
+            >
+              <td class="small">ID</td>
+              <td class="small"><%= mailchimp_datum.id %></td>
+            </tr>
 
             <tr>
               <td>Status</td>
