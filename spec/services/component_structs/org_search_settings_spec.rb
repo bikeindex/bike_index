@@ -110,19 +110,21 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
-  describe "filter_entries" do
-    it "leads each filter with the option that clears it, and withholds the impound statuses" do
-      expect(instance.filter_entries(:search_stickers).map { |e| e[:value] }).to eq(["", "with", "none"])
-      expect(instance.filter_entries(:search_address).map { |e| e[:value] }).to eq(["", "with_street", "without_street"])
-      expect(instance.filter_entries(:search_status).map { |e| e[:value] }).to eq(%w[all with_owner stolen])
-      expect(instance.filter_entries(:search_status).first).to eq({value: "all", label: "all"})
+  describe "filter_groups" do
+    it "offers only status, cleared to all, without the filters' features" do
+      expect(instance.filter_groups.map { |g| g[:name] }).to eq([:search_status])
+      expect(instance.filter_groups.first).to include(name: :search_status, selected: "all")
+      expect(instance.filter_groups.first[:entries].map { |e| e[:value] }).to eq(%w[all with_owner stolen])
     end
 
-    context "with impound_bikes" do
-      let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    context "with the filters' features" do
+      let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes] }
+      let(:search_address) { "with_street" }
 
-      it "offers the impound statuses behind all" do
-        expect(instance.filter_entries(:search_status).map { |e| e[:value] })
+      it "adds their rows and the impound statuses, and marks the address value selected" do
+        expect(instance.filter_groups.map { |g| g[:name] }).to eq(%i[search_stickers search_address search_status])
+        expect(instance.filter_groups.map { |g| g[:selected] }).to eq(["", "with_street", "all"])
+        expect(instance.filter_groups.last[:entries].map { |e| e[:value] })
           .to eq(%w[all not_impounded impounded with_owner stolen])
       end
     end

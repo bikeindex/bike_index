@@ -173,25 +173,26 @@ module Organized
 
     # The shell render and the search both read the filters normalized here
     def set_search_filter_params
-      # Stickers coerce rather than whitelist - links elsewhere ask for them by other names
       @search_stickers = if params[:search_stickers].present?
         (params[:search_stickers] == "none") ? "none" : "with"
       else
         false
       end
-      @search_address = permitted_filter_value(:search_address) || false
+      @search_address = %w[none with with_street without_street].include?(params[:search_address]) ? params[:search_address] : false
       search_status
     end
 
     def search_status
       return @search_status if defined?(@search_status)
 
-      @search_status = permitted_filter_value(:search_status) ||
-        BikeServices::OrganizedSearch.default_status(current_organization)
+      valid_statuses = %w[with_owner stolen all]
+      valid_statuses += %w[impounded not_impounded] if current_organization.enabled?("impound_bikes")
+      @search_status = valid_statuses.include?(params[:search_status]) ? params[:search_status] : default_status
     end
 
-    def permitted_filter_value(param)
-      params[param] if BikeServices::OrganizedSearch.filter_values(current_organization)[param].include?(params[param])
+    # An impound-enabled organization's registrations leave impounded bikes out unless asked
+    def default_status
+      current_organization.enabled?("impound_bikes") ? "not_impounded" : "all"
     end
 
     def create_export?
