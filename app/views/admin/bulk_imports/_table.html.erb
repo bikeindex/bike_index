@@ -1,7 +1,9 @@
 <%# locals: (collection:, render_sortable: false) %>
 
 <div class="pt-2">
-  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name("admin_bulk_import"))) do |table| %>
+  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
+        cache_key: cache_fragment_name("admin_bulk_import"),
+        cache_records: ->(bulk_import) { [bulk_import.organization, bulk_import.user, bulk_import.ownerships.size] })) do |table| %>
     <% table.column(sortable: "created_at") do |bulk_import| %>
       <%= link_to render(UI::Time::Component.new(time: bulk_import.created_at)), admin_bulk_import_url(bulk_import), class: "twlink" %>
 

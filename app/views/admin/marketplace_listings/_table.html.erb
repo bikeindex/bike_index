@@ -4,7 +4,9 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_marketplace_listing", skip_item]))) do |table| %>
+  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
+        cache_key: cache_fragment_name(["admin_marketplace_listing", skip_item]),
+        cache_records: ->(listing) { [listing.seller, listing.buyer, listing.item, listing.address_record] })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |marketplace_listing| %>
       <%= link_to admin_marketplace_listing_path(marketplace_listing), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: marketplace_listing.created_at) %>

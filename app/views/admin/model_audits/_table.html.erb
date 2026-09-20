@@ -3,7 +3,9 @@
 <% org_ids = OrganizationModelAudit.distinct.pluck(:organization_id) %>
 <% org_names_hash = Organization.where(id: org_ids).pluck(:id, :short_name).to_h %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name("admin_model_audit"))) do |table| %>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
+    cache_key: cache_fragment_name("admin_model_audit"),
+    cache_records: ->(model_audit) { [*model_audit.organization_model_audits, model_audit.model_attestations.size] })) do |table| %>
   <% table.column(sortable: "created_at", header_classes: "tw:text-xs", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |model_audit| %>
     <%= render UI::Time::Component.new(time: model_audit.created_at) %>
   <% end %>

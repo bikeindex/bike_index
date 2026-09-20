@@ -4,7 +4,8 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_public_image", render_sortable, render_size]))) do |table| %>
+  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_public_image", render_sortable, render_size]),
+        cache_records: ->(public_image) { public_image.imageable })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(public_image) { content_tag(:span, public_image.id, class: "only-dev-visible") }) do |public_image| %>
       <%= render UI::Time::Component.new(time: public_image.created_at) %>
     <% end %>

@@ -4,7 +4,8 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: notifications, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_notifications_table", render_sortable, skip_user, skip_bike, skip_sender, skip_error, show_message_preview]))) do |table| %>
+  <%= render(UI::Table::Component.new(records: notifications, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_notifications_table", render_sortable, skip_user, skip_bike, skip_sender, skip_error, show_message_preview]),
+        cache_records: ->(notification) { [notification.user, notification.bike, notification.notifiable] })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |notification| %>
       <%= render UI::Time::Component.new(time: notification.created_at) %>
     <% end %>
