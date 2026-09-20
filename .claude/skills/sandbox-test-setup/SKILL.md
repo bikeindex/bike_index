@@ -41,8 +41,8 @@ bin/workspace_setup --without_seeds
 ```
 
 It allocates the ID from the `dev_workspaces` registry, writes `.workspace_id`, then
-runs `bin/setup` — which symlinks `storage` and `.claude/settings.local.json` from the
-root checkout, installs `node_modules` and creates this workspace's databases. `--without_seeds` is what
+runs `bin/setup` — which symlinks `storage` from the root checkout, installs
+`node_modules` and creates this workspace's databases. `--without_seeds` is what
 Conductor's initial setup passes; `bundle exec rails db:seed` when you need records
 (AGENTS.md). `bin/setup` symlinks `node_modules` from the root checkout too, but its
 own later `npm install` replaces that symlink with a real directory — expect the
