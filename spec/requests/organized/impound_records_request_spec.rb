@@ -24,7 +24,10 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(assigns(:impound_records).count).to eq 0
       expect(assigns(:available_statuses)).to eq available_statuses
 
-      get "#{base_url}?render_chart=true&chart_only=1"
+      # The card holds the chart, so its frame asks with chart_only alone
+      expect(response.body).to include("impound_records_chart_frame")
+
+      get "#{base_url}?chart_only=1"
       expect(response.status).to eq(200)
       expect(assigns(:impound_records)).to be_nil
       expect(assigns(:pagy)).to be_nil

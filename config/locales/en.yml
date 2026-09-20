@@ -4511,8 +4511,9 @@ en:
         view_avery_labels: View Avery Labels
     impound_records:
       index:
+        find_an_impound_record: Find an impound record
         impound_records: Impound Records
-        render_chart: Render chart
+        search_impound_records: Search impound records
     manage_impoundings:
       edit:
         impound_settings_html: Manage <em>%{org_name}</em> impound settings
@@ -4561,8 +4562,10 @@ en:
           Index notifications.
     parking_notifications:
       index:
+        find_a_parking_notification: Find a parking notification
         matches_visible: visible
         parking_notifications: Parking notifications
+        search_parking_notifications: Search parking notifications
       table:
         address: Address
         bike: Bike

@@ -56,18 +56,6 @@
             <% end %>
           </div>
         </div>
-
-        <%# shrink-0: the fields column would otherwise squeeze this to a sliver on phones %>
-        <% unless card? %>
-          <div class="tw:w-20 tw:shrink-0">
-            <%= render UI::Button::Component.new(color: :primary, type: "submit", html_class: "tw:w-full tw:h-full#{" tw:disabled:cursor-wait" if turbo?}") do %>
-              <%= helpers.inline_svg_tag "icons/searcher.svg",
-                id: "search-button",
-                class: "tw:text-white tw:w-full tw:h-auto",
-                title: "searcher" %>
-            <% end %>
-          </div>
-        <% end %>
       </div>
 
       <% if serial_looks_like_not_a_serial? %>
@@ -99,26 +87,21 @@
   <%# Outside the form: the settings panel holds the custom date range, which is a form of its own %>
   <%= render(@filters_component) if @filters_component %>
 
-  <% if card? %>
-    <%#
-      data-turbo: Drive is off app-wide, and a submitter outside the form it submits carries
-      its own opt-in - without it the search is a full page load rather than a frame one
-    %>
-    <%= render(UI::Button::Component.new(text: @submit_text, color: :primary, size: :lg, type: "submit",
-      form: "Search_Form", data: ({turbo: true} if turbo?), spinner: turbo?,
-      html_class: "tw:mt-3 tw:w-full#{" tw:disabled:cursor-wait" if turbo?}")) %>
+  <%#
+    data-turbo: Drive is off app-wide, and a submitter outside the form it submits carries
+    its own opt-in - without it the search is a full page load rather than a frame one
+  %>
 
-    <%= below_submit %>
-  <% end %>
+  <%= render(UI::Button::Component.new(text: @submit_text, color: :primary, size: :lg, type: "submit",
+    form: "Search_Form", data: ({turbo: true} if turbo?), spinner: turbo?,
+    html_class: "tw:mt-3 tw:w-full#{" tw:disabled:cursor-wait" if turbo?}")) %>
+
+  <%= below_submit %>
 <% end %>
 
-<% if card? %>
-  <%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:h-full")) do %>
-    <%# .organized-body h2 carries a 40px top margin, unlayered, so a plain mt-0 loses %>
-    <%= render(UI::Header::Component.new(text: @heading, tag: :h2, html_class: "uncap tw:mt-0! tw:mb-3!")) %>
+<%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:h-full")) do %>
+  <%# .organized-body h2 carries a 40px top margin, unlayered, so a plain mt-0 loses %>
+  <%= render(UI::Header::Component.new(text: @heading, tag: :h2, html_class: "uncap tw:mt-0! tw:mb-3!")) %>
 
-    <%= body %>
-  <% end %>
-<% else %>
   <%= body %>
 <% end %>

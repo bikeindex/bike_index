@@ -1,3 +1,8 @@
 <%= turbo_stream.update :graduated_notifications_results_frame do %>
   <%= render partial: "results" %>
 <% end %>
+
+<%# The chart sits outside the results frame, so the search reaches it through its own stream %>
+<%= turbo_stream.replace :graduated_notifications_chart_frame do %>
+  <%= render partial: "chart_frame" %>
+<% end %>

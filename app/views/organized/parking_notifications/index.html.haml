@@ -96,8 +96,9 @@
             Fit map to notifications
   %div{class: "tw:flex tw:justify-end"}
     = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:)
-  .mt-4
-    = render(Pages::Org::Search::Form::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact))
+  -# twwiderow is what the card's full_bleed reads to meet the gutter
+  %div{class: "twwiderow tw:mt-4"}
+    = render(Pages::Org::Search::Form::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact, heading: t(".find_a_parking_notification"), submit_text: t(".search_parking_notifications")))
 
   .row.mt-4.mb-2
     .col-sm-6

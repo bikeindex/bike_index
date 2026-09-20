@@ -5,6 +5,7 @@ module Pages
     module Search
       module Form
         class ComponentPreview < ApplicationComponentPreview
+          # The impound records, graduated notifications and parking notifications searches
           def default
             render(Pages::Org::Search::Form::Component.new(**default_options))
           end
@@ -14,12 +15,9 @@ module Pages
             render(Pages::Org::Search::Form::Component.new(**default_options(interpreted_params)))
           end
 
-          # The registrations search: a card, with the filters and a full-width submit
-          def card
-            render(Pages::Org::Search::Form::Component.new(**default_options.merge(
-              heading: "Find a bike", submit_text: "Search registrations",
-              filters_component:
-            )))
+          # The registrations search, which brings the filters
+          def with_filters
+            render(Pages::Org::Search::Form::Component.new(**default_options.merge(filters_component:)))
           end
 
           private
@@ -38,7 +36,9 @@ module Pages
           def default_options(interpreted_params = {})
             {
               target_search_path:,
-              interpreted_params:
+              interpreted_params:,
+              heading: "Find a registration",
+              submit_text: "Search registrations"
             }
           end
         end
