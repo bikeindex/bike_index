@@ -1,12 +1,16 @@
 ---
 name: sandbox-test-setup
 description: >-
-  Bike Index Ruby + RSpec environment setup, for the three environments this repo
-  actually runs in: a local macOS Conductor workspace, the Conductor cloud sandbox,
-  and Claude Code's Linux web sandbox. Identifies which one you're in by path and
-  points at its reference; each covers getting `ruby`, `bundle`, `bin/lint`, a
-  database and a browser working there. Read it whenever a session runs RSpec,
+  Bike Index Ruby + RSpec environment setup, for the environments this repo actually
+  runs in: a local macOS Conductor workspace, a spawned `.claude/worktrees/…` git
+  worktree, the Conductor cloud sandbox, and Claude Code's Linux web sandbox.
+  Identifies which one you're in by path and points at its reference; each covers
+  getting `ruby`, `bundle`, `bin/lint`, a database and a browser working there.
+  **Read it before the first command in a spawned worktree** — that one starts with
+  `bin/workspace_setup`, without which `bin/env` hands back the main checkout's port,
+  database and Redis. Read it whenever a session runs RSpec,
   `bundle` or `bin/lint`, needs a running dev server, or hits any of these:
+  a missing `.workspace_id` or `node_modules`, a `$BASE_URL` serving another branch,
   `env: 'ruby': No such file or directory`, `Could not find 'bundler' (4.0.x)`, `command not found: rspec`,
   `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a `bin/` script,
   `Sprockets::Rails::Helper::AssetNotFound`, `tailwind.css is not present`,
@@ -17,16 +21,39 @@ description: >-
 
 # Running Ruby + RSpec for Bike Index
 
-Three environments, told apart by the path you're working in. Read the one that
-matches; the other two won't apply and are the bulk of the material.
+Environments are told apart by the path you're working in. Read the one that
+matches; the others won't apply and are the bulk of the material.
 
 | Path | Environment | Read |
 | --- | --- | --- |
 | `/Users/…/conductor/workspaces/…` | local macOS Conductor workspace | `references/local-macos.md` |
+| `…/.claude/worktrees/…` | spawned git worktree — set it up first, below | `references/local-macos.md` |
 | `/home/vercel-sandbox/workspace` (Amazon Linux 2023) | Conductor cloud sandbox | `references/conductor-cloud.md` |
 | `/home/user/bike_index` | Claude Code web sandbox | `references/web-sandbox.md` |
 
-Two things hold in all three.
+## A spawned worktree sets itself up first
+
+In a `.claude/worktrees/…` checkout this comes before the first `rspec`, `bundle`,
+`bin/lint`, `bin/env` or dev server:
+
+```bash
+bin/workspace_setup --without_seeds
+```
+
+It allocates the ID from the `dev_workspaces` registry, writes `.workspace_id`, then
+runs `bin/setup` — which symlinks `node_modules` and `storage` from the root checkout
+and creates this workspace's databases. `--without_seeds` is what Conductor's initial
+setup passes; `bundle exec rails db:seed` when you need records (AGENTS.md).
+
+**Never write `.workspace_id` yourself.** `bin/workspace_setup` skips allocation when
+the file already exists, leaving the checkout on an ID the registry never handed out.
+
+Skip the setup entirely and `bin/env` falls through to `DEV_PORT=3042` and Redis db 0 —
+the *main checkout's* port, database and cache. Nothing errors; `$BASE_URL` just serves
+another branch, and `bin/setup` run from there would load the schema over the
+production-derived `bikeindex_development`.
+
+Two things hold everywhere.
 
 ## Tailwind build (every environment)
 
