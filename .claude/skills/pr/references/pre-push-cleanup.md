@@ -12,6 +12,8 @@ Skip it when the diff has no code in it — a docs- or skill-only branch gives i
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
+**The previous run's merge from the base names that commit** — `rtk proxy git log --merges -1 --format=%h origin/main..HEAD`, since **Prepare the branch** merges before it cleans. A run that had nothing to merge left no commit, so the range can reach back further than the last run; that costs a re-triage, not a wrong scope.
+
 **That range breaks when earlier branch work was split into its own PRs and merged.** Those commits return through a merge from the base, so `<last-simplify-commit>..HEAD` includes all of them plus everything else the base gained — hundreds of files, none of it yours. Check `git log --oneline <last-simplify-commit>..HEAD`; if it lists the base's merges, scope to your own commits (`git show` each) instead. `--no-merges` doesn't rescue it — it hides the merge commits, not the commits they brought in.
 
 Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just changed). Always `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo:
