@@ -65,9 +65,9 @@
           here its rows line up with the chip groups above
         %>
 
-        <div class="tw:min-w-0 tw:flex-1 tw:**:justify-start!">
+        <div class="tw:min-w-0 tw:flex-1">
           <%= render(UI::PeriodSelect::Component.new(period: @period, start_time: @start_time,
-            end_time: @end_time, sortable_search_params: @sortable_search_params,
+            end_time: @end_time, sortable_search_params: @sortable_search_params, size: :md,
             form: "Search_Form", data: {action: "change->org--search#filterChanged"})) %>
         </div>
       </div>
