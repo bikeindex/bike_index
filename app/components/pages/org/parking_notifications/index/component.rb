@@ -23,7 +23,7 @@ module Pages
             "not_unregistered" => "Registered bikes only"
           }.freeze
 
-          def initialize(organization:, parking_notifications:, total_count:, per_page:, search_params:,
+          def initialize(organization:, parking_notifications:, total_count:, per_page:, sort_state:,
             interpreted_params:, search_kind:, search_status:, search_unregistered:, unpermitted_statuses:,
             period:, start_time:, end_time:, search_bounding_box: nil, map_place: nil, map_location: nil,
             search_bike_id: nil, filtered_user_id: nil, filtered_user: nil,
@@ -32,7 +32,7 @@ module Pages
             @parking_notifications = parking_notifications
             @total_count = total_count
             @per_page = per_page
-            @search_params = search_params
+            @sort_state = sort_state
             @interpreted_params = interpreted_params
             @search_kind = search_kind
             @search_status = search_status
@@ -65,8 +65,10 @@ module Pages
             }
           end
 
+          def search_params = @sort_state.search_params
+
           def index_path(**changes)
-            organization_parking_notifications_path({**@search_params, **changes, organization_id: @organization.to_param})
+            organization_parking_notifications_path({**search_params, **changes, organization_id: @organization.to_param})
           end
 
           # An entry that's already applied links to clearing it
@@ -86,6 +88,9 @@ module Pages
           def current_status
             status_display_hash[@search_status.to_sym] || {m: @search_status}
           end
+
+          # Every notification on this view is current and unresolved, so both columns are noise
+          def viewing_current? = @search_status == "current"
 
           def searched_bike
             @searched_bike ||= Bike.unscoped.find_by_id(@search_bike_id)

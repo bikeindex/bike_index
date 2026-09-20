@@ -126,7 +126,7 @@
   </div>
 
   <div class="tw:flex tw:justify-end">
-    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params: @search_params) %>
+    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params: search_params) %>
   </div>
 
   <div class="mt-4">
@@ -157,8 +157,7 @@
     </div>
 
     <div class="col-md-6 col-xs-12">
-      <%# Hide the repeat notification interface because the checks don't display on mobile %>
-      <div class="text-right hidden-md-down">
+      <div class="text-right">
         <%= render UI::Button::Component.new(
           text: "retrieve/send repeat notification",
           size: :sm,
@@ -205,9 +204,17 @@
       </div>
     </div>
 
-    <div class="full-screen-table">
-      <%# only hide status on current - because otherwise it displays the time things were resolved %>
-      <%= render partial: "organized/parking_notifications/table", locals: {parking_notifications: @parking_notifications, hide_status: @search_status == "current", render_sortable: true, map_rows: true} %>
-    </div>
+    <%= render Pages::Org::ParkingNotifications::Table::Component.new(
+      parking_notifications: @parking_notifications, current_organization: @organization, sort_state: @sort_state,
+      skip_status: viewing_current?, skip_resolved: viewing_current?,
+      render_sortable: true, render_multiselect: true, map_rows: true
+    ) %>
+
+    <p
+      class="tw:mb-4 <%= "tw:hidden" if @parking_notifications.any? %>"
+      data-org--parking-notifications-index-target="empty"
+    >
+      No matching notifications
+    </p>
   <% end %>
 <% end %>
