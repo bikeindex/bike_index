@@ -1,6 +1,4 @@
+<%# The search page's twwiderow grid holds the form and chart too, so the card stands alone here %>
 <%= tag.div(class: "org-search-component", data: Pages::Org::Search::Settings::Component.column_toggle_data_attributes(settings)) do %>
-  <%# twwiderow is what the card's full_bleed reads to meet the gutter %>
-  <div class="twwiderow tw:gap-y-4">
-    <%= render(component) %>
-  </div>
+  <%= render(component) %>
 <% end %>
