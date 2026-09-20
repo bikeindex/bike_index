@@ -21,7 +21,6 @@ module Organized
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
         @search_query_present = permitted_org_registration_search_params.except(:stolenness, :timezone, :period).values.reject(&:blank?).any?
         @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
-        @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
         @per_page = permitted_per_page(default: 10)
 
         if create_export?
@@ -152,31 +151,10 @@ module Organized
       else
         bikes = Bike.search(@interpreted_params)
       end
-      if params[:search_stickers].present?
-        @search_stickers = (params[:search_stickers] == "none") ? "none" : "with"
-        bikes = (@search_stickers == "none") ? bikes.no_bike_sticker : bikes.bike_sticker
-      else
-        @search_stickers = false
-      end
-      if %w[none with with_street without_street].include?(params[:search_address])
-        @search_address = params[:search_address]
-        # Currently removed none and with - instead using street - I think that reflects people's expectations
-        bikes = case @search_address
-        when "none" then bikes.without_location
-        when "without_street" then bikes.without_street
-        when "with_street" then bikes.with_street
-        when "with" then bikes.with_location
-        end
-      else
-        @search_address = false
-      end
-      if search_status != "all"
-        bikes = if search_status == "not_impounded"
-          bikes.where.not(status: "status_impounded")
-        else
-          bikes.where(status: "status_#{search_status}")
-        end
-      end
+      set_search_filter_params
+      bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
+      bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
+      bikes = BikeServices::OrganizedSearch.status(bikes, search_status)
       if params[:search_model_audit_id].present?
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
         bikes = bikes.where(model_audit_id: params[:search_model_audit_id])
@@ -193,7 +171,7 @@ module Organized
       RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)
     end
 
-    # Set filter params for settings component on initial (non-turbo) page load
+    # The shell render and the search both read the filters normalized here
     def set_search_filter_params
       @search_stickers = if params[:search_stickers].present?
         (params[:search_stickers] == "none") ? "none" : "with"
