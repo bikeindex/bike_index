@@ -88,7 +88,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
   end
 
   it "lays a flash beside the sidebar, and tells the two add-a-bike rows apart by the param" do
-    # A code the organization has no sticker for redirects back to the index saying so
+    # An unknown code redirects back to the index with the flash
     visit "/o/#{slug}/stickers/missing-code/edit"
 
     expect(page).to have_css "#flash-messages [role='alert']"
@@ -100,7 +100,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
     expect(flash_left).to be >= sidebar_right
 
-    # The toast is pointer-events-auto, so it would swallow the clicks below
+    # pointer-events-auto, so it would swallow the clicks below
     dismiss_flash_messages
 
     visit "/o/#{slug}/registrations/new"
