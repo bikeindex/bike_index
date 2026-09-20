@@ -38,6 +38,7 @@
     <tbody>
       <% ScheduledJobRunner.scheduled_jobs.sort_by { |klass| klass.name.downcase }.each do |klass| %>
         <% last_started = klass.last_started && Time.parse(klass.last_started) %>
+        <% last_finished = klass.last_finished.presence && Time.parse(klass.last_finished) %>
 
         <tr>
           <% if display_dev_info? %>
@@ -65,24 +66,16 @@
           </td>
 
           <td>
-            <% if klass.last_finished.present? %>
-              <span class="localizeTime preciseTime">
-                <%= l Time.parse(klass.last_finished), format: :convert_time %>
-              </span>
-            <% end %>
+            <%= render UI::Time::Component.new(time: last_started, format: :localize_time_precise) %>
           </td>
 
           <td>
-            <% if last_started.present? %>
-              <span class="localizeTime preciseTime">
-                <%= l last_started, format: :convert_time %>
-              </span>
-            <% end %>
+            <%= render UI::Time::Component.new(time: last_finished, format: :localize_time_precise) %>
           </td>
 
           <td>
-            <% if klass.last_finished.present? && last_started.present? %>
-              <%= period_in_words(Time.parse(klass.last_finished) - last_started) %>
+            <% if last_finished.present? && last_started.present? %>
+              <%= period_in_words(last_finished - last_started) %>
             <% end %>
           </td>
         </tr>
