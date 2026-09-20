@@ -33,8 +33,6 @@ module Pages
             search_status: "all",
             search_unregisteredness: nil,
             search_all: false,
-            time_range: nil,
-            period: nil,
             bike_sticker: nil,
             model_audit: nil,
             settings: nil,
@@ -54,8 +52,6 @@ module Pages
             @search_status = search_status
             @search_unregisteredness = search_unregisteredness
             @search_all = search_all
-            @time_range = time_range
-            @period = period
             @bike_sticker = bike_sticker
             @model_audit = model_audit
             @settings = settings
@@ -67,10 +63,11 @@ module Pages
 
           private
 
+          # The search stops counting - and paging - at the limit, so the count is it at most
           def count_display
-            return number_display(@pagy.count) unless @search_all && @pagy.count > SEARCH_ALL_COUNT_LIMIT
+            return number_display(@pagy.count) unless @search_all && @pagy.count >= SEARCH_ALL_COUNT_LIMIT
 
-            safe_join(["> ", number_display(SEARCH_ALL_COUNT_LIMIT)])
+            translation(".over_count_html", count: number_display(SEARCH_ALL_COUNT_LIMIT))
           end
 
           def settings

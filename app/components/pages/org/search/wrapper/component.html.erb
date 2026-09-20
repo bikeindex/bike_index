@@ -8,8 +8,6 @@
     <p class="tw:mb-0">
       <%= translation(".matching_html", count: count_display,
         cycle_type: settings.cycle_type.pluralize(@pagy.count)) %>
-
-      <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
     </p>
 
     <% if @search_page %>
@@ -43,7 +41,8 @@
 
         <% if settings.render_export? && settings.export_disabled? %>
           <%= render(UI::Tooltip::Component.new) do |tooltip| %>
-            <% tooltip.with_body { translation(".export_unavailable") } %>
+            <%# The checkbox it names reads the same way %>
+            <% tooltip.with_body { translation(".export_unavailable", cycle_type: settings.cycle_type.pluralize(2)) } %>
 
             <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
               color: :primary, size: :sm, disabled: true)) %>

@@ -13,9 +13,7 @@ module Pages
               pagy:,
               bikes:,
               per_page: 10,
-              params: {},
-              time_range: (Time.current - 1.year)..Time.current,
-              period: "year"
+              params: {}
             )
           end
 
