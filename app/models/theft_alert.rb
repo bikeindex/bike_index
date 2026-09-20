@@ -91,18 +91,16 @@ class TheftAlert < ApplicationRecord
       Time.current - 2.days
     end
 
-    def flatten_city(counted)
-      @countries ||= Country.pluck(:id, :name).to_h
-      @states ||= State.pluck(:id, :name).to_h
-
-      [@countries[counted[0][0]], counted[0][1], @states[counted[0][2]], counted[1]]
-    end
-
+    # The name lookups are per call, not memoized on the class - a class ivar outlives
+    # every row it was built from, so an id added later reads back nil
     def cities_count
+      countries = Country.pluck(:id, :name).to_h
+      states = State.pluck(:id, :name).to_h
+
       joins(:stolen_record)
         .group("stolen_records.country_id", "stolen_records.city", "stolen_records.region_record_id")
         .count
-        .map { |c| flatten_city(c) }
+        .map { |(country_id, city, region_record_id), count| [countries[country_id], city, states[region_record_id], count] }
         .sort_by { |c| -c[3] }
     end
 
