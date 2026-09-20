@@ -102,12 +102,12 @@ export default class extends Controller {
     this.popup = new maplibregl.Popup({ offset: 32, maxWidth: 'min(90vw, 60rem)', closeOnClick: false, focusAfterOpen: false })
     this.popup.on('close', () => this.#markCurrentPin(null))
 
-    // Each row is reached through its map button — targetTargets re-query the DOM on
-    // every read, and every moveend reads these
-    const buttons = this.mapButtonTargets
-    this.rows = buttons.map((button) => button.closest('tr'))
-    this.markers = new Map(buttons.filter((button) => button.dataset.latitude && button.dataset.longitude)
-      .map((button) => [button.closest('tr'), this.#addMarker(maplibregl, button)]))
+    // mapButtonTargets re-queries the DOM on every read, and every moveend reads these
+    const mapped = this.mapButtonTargets.map((button) => ({ button, row: button.closest('tr') }))
+    this.rows = mapped.map(({ row }) => row)
+    this.markers = new Map(mapped
+      .filter(({ button }) => button.dataset.latitude && button.dataset.longitude)
+      .map(({ button, row }) => [row, this.#addMarker(maplibregl, button, row)]))
 
     if (this.placeValue.length) {
       const [latitude, longitude] = this.placeValue
@@ -128,8 +128,7 @@ export default class extends Controller {
     })
   }
 
-  #addMarker (maplibregl, button) {
-    const row = button.closest('tr')
+  #addMarker (maplibregl, button, row) {
     const element = this.pinTarget.content.firstElementChild.cloneNode(true)
     element.addEventListener('click', () => this.#openPopup(row))
     return new maplibregl.Marker({ element, anchor: 'bottom' })
@@ -171,9 +170,6 @@ export default class extends Controller {
     wrapper.className = 'tw:overflow-x-auto'
     wrapper.dataset.controller = 'ui--table'
     wrapper.append(table)
-    // Clones inside the controller would register as its targets
-    wrapper.querySelectorAll('[data-org--parking-notifications-index-target]')
-      .forEach((element) => element.removeAttribute('data-org--parking-notifications-index-target'))
     return wrapper
   }
 

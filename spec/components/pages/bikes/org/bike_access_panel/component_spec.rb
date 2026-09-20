@@ -108,17 +108,18 @@ RSpec.describe Pages::Bikes::Org::BikeAccessPanel::Component, type: :component d
       end
     end
 
-    # The panel renders both tables, and each takes current_organization - a kwarg
-    # a sweeping edit dropped, 500ing the page for every org with either feature
+    # A sweeping edit dropped current_organization from the graduated table's render, which
+    # raises rather than degrading - and only for a bike that actually has one
     context "with a graduated notification and a parking notification" do
       let(:enabled_feature_slugs) { %w[graduated_notifications parking_notifications] }
       let!(:graduated_notification) { FactoryBot.create(:graduated_notification, organization:, bike:) }
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization:, bike:, user: current_user) }
 
-      it "renders both tables" do
-        component_text = whitespace_normalized_body_text(component.to_html)
-        expect(component_text).to match(/graduated notification/i)
-        expect(component_text).to match(/#{parking_notification.kind_humanized}/i)
+      it "renders a row in each table" do
+        expect(component).to have_css("table.ui-table", count: 2)
+        expect(component).to have_css("table.ui-table tbody tr", count: 2)
+        expect(component).to have_content(graduated_notification.bike.title_string)
+        expect(component).to have_content(parking_notification.kind_humanized)
       end
     end
 
