@@ -20,11 +20,11 @@ module UI
       # What a datetime_local_field reads
       INPUT_TIME_FORMAT = "%Y-%m-%dT%H:%M"
 
-      # Binxtils::SetPeriod's ranges, which a controller only computes for the period it was
-      # asked for - the chips carry the rest, so the custom panel opens on whichever is picked.
-      # `all` is nil: it starts at the controller's own earliest_period_date.
+      # Binxtils::SetPeriod's ranges, mirrored: a controller computes only the period it was
+      # asked for. `all` is nil - it starts at the controller's own earliest_period_date.
       # ::Time, not the UI::Time component this namespace resolves first
-      def self.period_range(period, now: ::Time.current)
+      def self.period_range(period)
+        now = ::Time.current
         case period.to_s
         when "hour" then (now - 1.hour)..now
         when "day" then (now.beginning_of_day - 1.day)..now
@@ -67,7 +67,6 @@ module UI
 
       private
 
-      # The chips are this component's own size; only the row is shared
       def row_classes
         UI::ButtonGroup::Component::ROW_CLASSES
       end
@@ -105,14 +104,11 @@ module UI
         {start_time: range.first.strftime(INPUT_TIME_FORMAT), end_time: range.last.strftime(INPUT_TIME_FORMAT)}
       end
 
-      # RadioButtonGroup's chip, at this component's size rather than its fixed one
       def chip_classes
-        [UI::Button::Component.build_classes(color: :secondary, size: @size),
+        @chip_classes ||= [UI::Button::Component.build_classes(color: :secondary, size: @size),
           UI::Forms::RadioButtonGroup::Component::LABEL_CLASSES].join(" ")
       end
 
-      # Picking a chip is picking a range: the custom panel it replaces closes, and takes
-      # that range with it
       def radio_data
         @radio_data ||= @data.merge(action: ["change->ui--collapse#hide",
           "change->ui--period-select#rangePicked", @data[:action]].compact.join(" "))

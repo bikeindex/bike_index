@@ -25,87 +25,29 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
     end
   end
 
-  describe "form" do
+  describe "rendering" do
     let(:component) do
       with_request_url("/admin/bikes") do
-        render_inline(described_class.new(period: "week", start_time: Time.current - 1.week,
-          end_time: Time.current, form:))
+        render_inline(described_class.new(period:, start_time: Time.current - 1.week,
+          end_time: Time.current, **options))
       end
     end
-    let(:form) { nil }
-
-    it "navigates, each period its own link" do
-      expect(component).to have_css("a[data-period='week'][data-active='true']")
-      expect(component).not_to have_css("input[type=radio]", visible: :all)
-    end
-
-    context "with a form" do
-      let(:form) { "search_form" }
-
-      it "submits that form instead, the checked radio carrying the period" do
-        expect(component).to have_css("input[type=radio][name='period'][value='week'][form='search_form']", visible: :all, count: 1)
-        expect(component).to have_css("input[type=radio][value='week'][checked]", visible: :all)
-        expect(component).not_to have_css("a[data-period]")
-        # No chip stands for a custom range, so a search would drop it
-        expect(component).not_to have_css("input[type=hidden][name='period']", visible: :all)
-        # Picking a range closes the custom panel it replaces
-        expect(component).to have_css("input[type=radio][data-action*='ui--collapse#hide']", visible: :all, count: 6)
-      end
-    end
-
-    context "with a form and the caller's own action" do
-      let(:form) { "search_form" }
-      let(:component) do
-        with_request_url("/admin/bikes") do
-          render_inline(described_class.new(period: "week", start_time: Time.current - 1.week,
-            end_time: Time.current, form:, data: {action: "change->org--search#filterChanged"}))
-        end
-      end
-
-      it "keeps it, rather than replacing it with the collapse's" do
-        expect(component).to have_css(
-          "input[type=radio][value='week'][data-action='change->ui--collapse#hide change->ui--period-select#rangePicked change->org--search#filterChanged']",
-          visible: :all
-        )
-      end
-    end
-
-    context "with a form, over a custom range" do
-      let(:form) { "search_form" }
-      let(:component) do
-        with_request_url("/admin/bikes") do
-          render_inline(described_class.new(period: "custom", start_time: Time.current - 1.week,
-            end_time: Time.current, form:))
-        end
-      end
-
-      it "carries the custom period in a hidden field" do
-        expect(component).to have_css("input[type=hidden][name='period'][value='custom'][form='search_form']", visible: :all)
-      end
-    end
-  end
-
-  describe "size" do
-    let(:component) do
-      with_request_url("/admin/bikes") do
-        render_inline(described_class.new(period: "week", start_time: Time.current - 1.week,
-          end_time: Time.current, form: "search_form", **options))
-      end
-    end
+    let(:period) { "week" }
     let(:options) { {} }
     let(:small) { UI::Button::Component::SIZES[:sm] }
 
-    it "sizes the chips and the custom button small" do
-      expect(component).to have_css("label", class: small.split, visible: :all)
+    it "navigates, each period its own link, sized small" do
+      expect(component).to have_css("a[data-period='week'][data-active='true']", class: small.split)
       expect(component).to have_button("custom", class: small.split)
+      expect(component).not_to have_css("input[type=radio]", visible: :all)
     end
 
     context "with size: :md" do
       let(:options) { {size: :md} }
       let(:medium) { UI::Button::Component::SIZES[:md] }
 
-      it "sizes both medium instead" do
-        expect(component).to have_css("label", class: medium.split, visible: :all)
+      it "sizes the links and the custom button medium instead" do
+        expect(component).to have_css("a[data-period='week']", class: medium.split)
         expect(component).to have_button("custom", class: medium.split)
       end
     end
@@ -117,20 +59,47 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
         expect { component }.to raise_error(ArgumentError, /size/)
       end
     end
-  end
 
-  describe "the chips' ranges" do
-    let(:component) do
-      with_request_url("/admin/bikes") do
-        render_inline(described_class.new(period: "week", start_time: Time.current - 1.week,
-          end_time: Time.current, form: "search_form"))
+    context "with a form" do
+      let(:options) { {form: "search_form"} }
+
+      it "submits that form instead, the checked radio carrying the period" do
+        expect(component).to have_css("input[type=radio][name='period'][value='week'][form='search_form']", visible: :all, count: 1)
+        expect(component).to have_css("input[type=radio][value='week'][checked]", visible: :all)
+        expect(component).not_to have_css("a[data-period]")
+        expect(component).to have_css("label", class: small.split, visible: :all)
+        # No chip stands for a custom range, so there's nothing to outrank the one picked
+        expect(component).not_to have_css("input[type=hidden][name='period']", visible: :all)
       end
-    end
 
-    it "carries each period's range, for the custom panel to open on" do
-      expect(component).to have_css("input[value='year'][data-start-time='#{1.year.ago.beginning_of_day.strftime(described_class::INPUT_TIME_FORMAT)}']", visible: :all)
-      # `all` starts at the controller's own earliest_period_date, which the chip can't know
-      expect(component).to have_css("input[value='all']:not([data-start-time])", visible: :all)
+      it "carries each period's range, for the custom panel to open on" do
+        year = 1.year.ago.beginning_of_day.strftime(described_class::INPUT_TIME_FORMAT)
+        expect(component).to have_css("input[value='year'][data-start-time='#{year}']", visible: :all)
+        # `all` starts at the controller's own earliest_period_date, which the chip can't know
+        expect(component).to have_css("input[value='all']:not([data-start-time])", visible: :all)
+      end
+
+      context "with the caller's own action" do
+        let(:options) { super().merge(data: {action: "change->org--search#filterChanged"}) }
+
+        it "keeps it, rather than replacing it with the collapse's" do
+          expect(component).to have_css(
+            "input[type=radio][value='week'][data-action='change->ui--collapse#hide change->ui--period-select#rangePicked change->org--search#filterChanged']",
+            visible: :all
+          )
+        end
+      end
+
+      context "over a custom range" do
+        let(:period) { "custom" }
+
+        it "carries the custom period in a hidden field, for ui--period-select to disable" do
+          expect(component).to have_css(
+            "input[type=hidden][name='period'][value='custom'][form='search_form'][data-ui--period-select-target='customPeriod']",
+            visible: :all
+          )
+        end
+      end
     end
   end
 end
