@@ -232,6 +232,22 @@ RSpec.describe TheftAlert, type: :model do
     end
   end
 
+  describe "cities_count" do
+    let(:vancouver) { FactoryBot.create(:stolen_record, :in_vancouver) }
+    let(:nyc) { FactoryBot.create(:stolen_record, :in_nyc) }
+
+    # The country and state rows here are created after the first call, so a lookup
+    # memoized on the class reads them back as nil
+    it "names the places created since an earlier call" do
+      FactoryBot.create(:theft_alert, stolen_record: vancouver)
+      expect(described_class.cities_count).to eq([["Canada", "Vancouver", nil, 1]])
+
+      FactoryBot.create(:theft_alert, stolen_record: nyc)
+      expect(described_class.cities_count)
+        .to match_array([["Canada", "Vancouver", nil, 1], ["United States", "New York", "New York", 1]])
+    end
+  end
+
   describe "stolen_record scoping" do
     let(:payment_unpaid) { FactoryBot.create(:payment, paid_at: nil) }
     let(:theft_alert_unpaid) { FactoryBot.create(:theft_alert, payment: payment_unpaid, user: payment_unpaid.user) }
