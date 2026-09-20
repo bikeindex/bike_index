@@ -241,9 +241,9 @@ body.with-org-sidebar main > :only-child {
   width: 100%;
 }
 
-/* The flash is fixed to the viewport, so body's margin doesn't hold it clear of the
-   sidebar the way it does the content -- inset it by the same width, transitioned to
-   match, so the toast tracks the column as it collapses instead of sliding under it */
+/* The flash is fixed to the viewport, so body's margin doesn't reach it -- it takes the
+   same inset as its own left instead. The general alert escapes this by sitting in the
+   content column (layouts/application), which a toast pinned to the window can't do */
 body.with-org-sidebar #flash-messages {
   left: var(--org-sidebar-width, 266px);
   transition: left 0.18s ease;
@@ -257,15 +257,13 @@ body.with-org-sidebar #flash-messages {
   body.with-org-sidebar {
     --nav-gap: 16px;
 
-    margin-left: 0;
+    /* Zeroed at the source rather than per-consumer: this shadows what the controller
+       writes on the document, so body's margin and the flash's inset both follow */
+    --org-sidebar-width: 0px;
   }
 
   body.with-org-sidebar main {
     min-height: 0;
-  }
-
-  body.with-org-sidebar #flash-messages {
-    left: 0;
   }
 }
 

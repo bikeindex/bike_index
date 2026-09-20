@@ -15,11 +15,12 @@ end
 # Conductor names it; a git worktree's is the directory holding the common .git, which
 # `--git-common-dir` answers relatively (".git") from the main checkout itself
 def shared_root
-  conductor = ENV["CONDUCTOR_ROOT_PATH"]
-  return conductor if conductor && !conductor.empty?
+  conductor = ENV["CONDUCTOR_ROOT_PATH"].to_s
+  return conductor unless conductor.empty?
 
+  # Empty in exactly the failure case, stderr being discarded
   common_dir = `git rev-parse --git-common-dir 2>/dev/null`.strip
-  return nil unless $?.success? && !common_dir.empty?
+  return nil if common_dir.empty?
 
   root = File.expand_path(File.dirname(common_dir))
   root unless root == APP_ROOT

@@ -87,9 +87,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(scroller_top).to be > 0
   end
 
-  # The flash is fixed to the viewport, which the sidebar is part of, so body's margin --
-  # what holds the content clear of the column -- doesn't reach it
-  it "lays a flash message out beside the sidebar rather than under it" do
+  it "lays a flash beside the sidebar, and tells the two add-a-bike rows apart by the param" do
     # A code the organization has no sticker for redirects back to the index saying so
     visit "/o/#{slug}/stickers/missing-code/edit"
 
@@ -101,9 +99,10 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     JS
 
     expect(flash_left).to be >= sidebar_right
-  end
 
-  it "tells the two add-a-bike rows apart by the param" do
+    # The toast is pointer-events-auto, so it would swallow the clicks below
+    dismiss_flash_messages
+
     visit "/o/#{slug}/registrations/new"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
