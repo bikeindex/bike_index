@@ -11,11 +11,27 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
+# The checkout this one borrows its untracked files from, or nil when there isn't one.
+# Conductor names it; a git worktree's is the directory holding the common .git, which
+# `--git-common-dir` answers relatively (".git") from the main checkout itself
+def shared_root
+  conductor = ENV["CONDUCTOR_ROOT_PATH"]
+  return conductor if conductor && !conductor.empty?
+
+  common_dir = `git rev-parse --git-common-dir 2>/dev/null`.strip
+  return nil unless $?.success? && !common_dir.empty?
+
+  root = File.expand_path(File.dirname(common_dir))
+  root unless root == APP_ROOT
+end
+
 FileUtils.chdir APP_ROOT do
-  # Conductor workspace setup
-  if ENV["CONDUCTOR_ROOT_PATH"]
-    root = ENV["CONDUCTOR_ROOT_PATH"]
-    puts "== Setting up Conductor workspace =="
+  # A Conductor workspace or a git worktree is one of several checkouts sharing a
+  # machine, so the untracked things too big or too stateful to duplicate -- the node
+  # install, Active Storage, the .env files, the cassettes git won't carry -- come from
+  # the root checkout rather than being rebuilt per workspace
+  if (root = shared_root)
+    puts "== Setting up workspace against #{root} =="
 
     # Copy .env.test from root repo
     env_test = File.join(root, ".env.test")
