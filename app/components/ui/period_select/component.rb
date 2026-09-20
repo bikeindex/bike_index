@@ -3,7 +3,7 @@
 module UI
   module PeriodSelect
     class Component < ApplicationComponent
-      # Template Dependency: UI::ButtonGroup::Component
+      # Template Dependency: UI::ButtonGroup::Component, UI::Forms::RadioButtonGroup::Component
       PERIODS = [
         {key: "next_week", prefix: "next", label: "seven_days", future: true},
         {key: "next_month", prefix: "next", label: "thirty_days", future: true},
@@ -28,7 +28,12 @@ module UI
           .map { I18n.t("components.ui.period_select.#{it}") }.join(" ")
       end
 
-      def initialize(period:, start_time:, end_time:, sortable_search_params: {}, include_future: false, prepend_text: nil)
+      # form/data: as UI::Forms::RadioButtonGroup takes them - the periods become that form's
+      # radios rather than links, so a search carries the period without a page of their own
+      def initialize(period:, start_time:, end_time:, sortable_search_params: {}, include_future: false,
+        prepend_text: nil, form: nil, data: {})
+        @form = form
+        @data = data
         @include_future = include_future
         @prepend_text = prepend_text
         @period = period
@@ -56,6 +61,28 @@ module UI
           html_class: period_button_class,
           data: {period: period_key, turbo_action: "advance"}
         )
+      end
+
+      # The chips share the row with the custom button, so they're rendered here rather than
+      # as a group of their own, which would wrap as one
+      def period_radio(period)
+        tag.label(class: UI::Forms::RadioButtonGroup::Component::CHIP_CLASSES) do
+          radio_button_tag("period", period[:key], @period == period[:key],
+            class: "tw:sr-only", form: @form, data: @data) + tag.span(period_button_label(period))
+        end
+      end
+
+      # The prefix drops below md, where the row has no room for it
+      def period_button_label(period)
+        safe_join([(tag.span(translation(".#{period[:prefix]}"), class: "d-none d-md-inline") if period[:prefix]),
+          " ", translation(".#{period[:label]}")].compact)
+      end
+
+      # Sized to whatever sits beside it: the radio chips are UI::ButtonGroup's default
+      def custom_button
+        UI::Button::Component.new(text: translation(".custom"), active: @period == "custom",
+          size: @form ? :md : :sm, html_class: (period_button_class unless @form),
+          data: {period: "custom", action: "click->ui--collapse#toggle"})
       end
 
       def period_button_class

@@ -24,4 +24,45 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
       expect(described_class.period_label("custom")).to eq "custom"
     end
   end
+
+  describe "form" do
+    let(:component) do
+      with_request_url("/admin/bikes") do
+        render_inline(described_class.new(period: "week", start_time: Time.current - 1.week,
+          end_time: Time.current, form:))
+      end
+    end
+    let(:form) { nil }
+
+    it "navigates, each period its own link" do
+      expect(component).to have_css("a[data-period='week'][data-active='true']")
+      expect(component).not_to have_css("input[type=radio]", visible: :all)
+    end
+
+    context "with a form" do
+      let(:form) { "search_form" }
+
+      it "submits that form instead, the checked radio carrying the period" do
+        expect(component).to have_css("input[type=radio][name='period'][value='week'][form='search_form']", visible: :all, count: 1)
+        expect(component).to have_css("input[type=radio][value='week'][checked]", visible: :all)
+        expect(component).not_to have_css("a[data-period]")
+        # No chip stands for a custom range, so a search would drop it
+        expect(component).not_to have_css("input[type=hidden][name='period']", visible: :all)
+      end
+    end
+
+    context "with a form, over a custom range" do
+      let(:form) { "search_form" }
+      let(:component) do
+        with_request_url("/admin/bikes") do
+          render_inline(described_class.new(period: "custom", start_time: Time.current - 1.week,
+            end_time: Time.current, form:))
+        end
+      end
+
+      it "carries the custom period in a hidden field" do
+        expect(component).to have_css("input[type=hidden][name='period'][value='custom'][form='search_form']", visible: :all)
+      end
+    end
+  end
 end
