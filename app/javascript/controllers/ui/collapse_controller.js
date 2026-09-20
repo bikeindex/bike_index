@@ -18,8 +18,7 @@ export default class extends Controller {
   connect () {
     // Restore the persisted state without animating on load. Restoring applies rather than
     // sets: persisting here would only write back what it just read.
-    const urlExpanded = this.hasParamValue ? this.urlExpanded : null
-    if (urlExpanded !== null) return this.applyExpanded(urlExpanded, 0)
+    if (this.urlExpanded !== null) return this.applyExpanded(this.urlExpanded, 0)
     if (this.hasStorageKeyValue) return this.applyExpanded(this.stored, 0)
 
     // The server can render the content open -- a panel whose state is part of the
@@ -45,8 +44,10 @@ export default class extends Controller {
       content.classList.contains('tw:hidden') || content.classList.contains('tw:hidden!'))
   }
 
-  // null when the param isn't in the URL, so the rendered state stands.
+  // null when there's no param to read, so the rendered state stands.
   get urlExpanded () {
+    if (!this.hasParamValue) return null
+
     const value = new URLSearchParams(window.location.search).get(this.paramValue)
     if (value === null) return null
 

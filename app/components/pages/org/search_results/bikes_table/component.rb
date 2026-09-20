@@ -37,11 +37,16 @@ module Pages
           end
 
           # Rendered per cell rather than memoized with its text: the trigger points at its
-          # own tooltip by id. As quiet as the word it sits beside
+          # own tooltip by id
           def hidden_tooltip
             render(UI::Tooltip::Component.new(text: hidden_tooltip_text)) do |tooltip|
-              tooltip.with_tooltip_button(class: "#{UI::Tooltip::Component::BUTTON_CLASS} tw:opacity-60")
+              tooltip.with_tooltip_button(class: hidden_tooltip_button_class)
             end
+          end
+
+          # As quiet as the word it sits beside
+          def hidden_tooltip_button_class
+            @hidden_tooltip_button_class ||= "#{UI::Tooltip::Component::BUTTON_CLASS} tw:opacity-60"
           end
 
           def hidden_tooltip_text
