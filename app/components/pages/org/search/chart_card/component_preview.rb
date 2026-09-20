@@ -16,6 +16,7 @@ module Pages
           end
 
           # What the card shows until the lazy frame answers
+          # @display javascript_off true
           def loading
             in_row(Pages::Org::Search::ChartCard::Component.new(src: scope_paths[:year], scope_paths:))
           end

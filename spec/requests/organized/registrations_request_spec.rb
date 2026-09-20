@@ -34,11 +34,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     let!(:non_organization_bike) { FactoryBot.create(:bike) }
     let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
     let(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: current_organization) }
+
     it "sends all the params and renders search template to organization_bikes" do
       get base_url, params: query_params
       expect(response.status).to eq(200)
       expect(response.body).to_not include("fbevents.js")
       expect(assigns(:current_organization)).to eq current_organization
+      # impound_bikes is enabled, so registrations leave impounded bikes out unless asked
+      expect(assigns(:search_status)).to eq "not_impounded"
       expect(assigns(:bikes).pluck(:id)).to eq([])
       expect(assigns(:search_stickers)).to eq false
       # create_export fails if the org doesn't have have csv_exports
@@ -307,8 +310,15 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
         expect(assigns(:search_stickers)).to eq false
+        # Without impound_bikes there's no impoundedness to leave out
+        expect(assigns(:search_status)).to eq "all"
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
         expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})
+
+        # ... and no filtering by it either, the panel doesn't offer the impound statuses
+        get base_url, params: {search_no_js: true, search_status: "impounded"}
+        expect(assigns(:search_status)).to eq "all"
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
       end
     end
 

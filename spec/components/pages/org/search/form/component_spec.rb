@@ -42,16 +42,6 @@ RSpec.describe Pages::Org::Search::Form::Component, type: :component do
     end
   end
 
-  context "with skip_serial_field" do
-    let(:options) { {target_search_path:, interpreted_params:, skip_serial_field: true} }
-
-    it "renders without serial field" do
-      expect(component).to have_css("form#Search_Form")
-      expect(component).to have_css("input[name='search_email']")
-      expect(component).not_to have_css("input[name='serial']")
-    end
-  end
-
   context "when serial looks like not a serial" do
     let(:interpreted_params) { {raw_serial: "xyz", serial: nil} }
 

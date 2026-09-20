@@ -176,10 +176,14 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
 
     context "with no optional features" do
       let(:enabled_feature_slugs) { %w[bike_search] }
+      let(:search_status) { "all" }
 
-      it "returns only the ungated ones" do
-        expect(instance.filter_groups.map { it[:name] })
-          .to eq %i[search_status search_unregisteredness]
+      it "returns only the ungated ones, without the impound statuses" do
+        groups = instance.filter_groups
+        expect(groups.map { it[:name] }).to eq %i[search_status search_unregisteredness]
+        expect(groups.find { it[:name] == :search_status }[:selected]).to eq "all"
+        expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
+          .to eq %w[all with_owner stolen]
       end
     end
   end
