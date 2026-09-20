@@ -5595,8 +5595,9 @@ nb:
           bikes_table:
             assign_bike_sticker: Tildel klistremerke
             email_hidden: e-post skjult
-            hidden_not_registered: skjult, ikke registrert hos %{org_name}
             link_sticker: lenkeklistremerke
+            hidden: skjult
+            not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
           multi_result_chip:
             no_results: ingen treff
           multi_results:
