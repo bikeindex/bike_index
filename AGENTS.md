@@ -6,6 +6,8 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
+**A workspace's database generally starts empty** — created and migrated, but not seeded, so `Bike.count` is 0 and real pages render nothing. Run `bundle exec rails db:seed` when you need records to try something in development; `bikeindex_development_$WORKSPACE_ID` is a per-workspace throwaway, so seeding or re-seeding it is safe and never needs asking.
+
 **`bin/rails restart` for anything a reload misses** — a renamed initializer, a pin dropped from `config/importmap.rb`, a Lookbook registry that's stopped listing new scenarios, a gem a merge bumped. It bounces puma alone, so bin/dev's watchers survive and dev Sidekiq doesn't (`rerun` watches `app,db,lib`, not `config`). Fine to run against a server someone else started; starting or killing `bin/dev` isn't.
 
 **A renamed initializer is the one that reads as anything but a stale boot**: `config/routes.rb` reloads, dies partway through its draw on the missing constant, and everything below that line 404s while the page itself raises a bare `NameError` on a route helper.
@@ -90,7 +92,7 @@ Delegate the enumeration rather than eyeballing a grep — a hand-written grep a
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.
 
-**Verify with `bundle exec rspec` over the spec files covering what you changed — usually one to three.** Not `bin/turbo_tests`, `bin/ci`, or a whole directory (`spec/integration`, `spec/components`) — that's a suite run by another name. "It renders on every page, so anything could break" is the rationalization to watch for. A red example is a reason to re-run that example, not its directory. **Redesigning a page means running that page's own integration spec**, whose filename names the route rather than anything you edited — `registrations_search_spec.rb` drove markup this branch had replaced weeks earlier, and nothing else failed. Say which specs you ran and why those. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
+**Verify with `bundle exec rspec` over the spec files covering what you changed — usually one to three.** Not `bin/turbo_tests`, `bin/ci`, or a whole directory (`spec/integration`, `spec/components`) — that's a suite run by another name. "It renders on every page, so anything could break" is the rationalization to watch for. A red example is a reason to re-run that example, not its directory. **Redesigning a page means running that page's own integration spec**, whose filename names the route rather than anything you edited — `registrations_search_spec.rb` drove markup #4268 had replaced weeks earlier, and nothing else failed. Say which specs you ran and why those. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
 
 **A spec that lands on `/admin` seeds `Organization.example` in a `before`.** The dashboard reads it
 under the reading role, so a superuser login that redirects there raises `ActiveRecord::ReadOnlyError`
@@ -140,4 +142,5 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 ```bash
 bundle install # install ruby dependencies
 bundle exec rails db:create db:migrate # create the databases
+bundle exec rails db:seed # populate them (test users, organizations, bikes)
 ```
