@@ -6,7 +6,7 @@ const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'chartFollowsSearch', 'filterSummary', 'resultsFrame', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'chartFollowsSearch', 'filterSummary', 'periodLabel', 'resultsFrame', 'searchAll', 'searchAllHint']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
   static values = { resultView: String }
 
@@ -78,6 +78,7 @@ export default class extends Controller {
 
   filterChanged () {
     this.syncFilterSummary()
+    this.syncPeriodLabel()
     const form = document.getElementById('Search_Form')
     if (form) {
       form.requestSubmit()
@@ -97,6 +98,14 @@ export default class extends Controller {
 
     this.filterSummaryTarget.innerHTML = active.join(' · ')
     this.filterSummaryTarget.hidden = active.length === 0
+  }
+
+  // The chip the summary leaves out, for the same reason it reads the others' markup
+  syncPeriodLabel () {
+    const picked = document.querySelector('input[type=radio][name=period][form="Search_Form"]:checked')
+    if (!this.hasPeriodLabelTarget || !picked) return
+
+    this.periodLabelTarget.textContent = picked.closest('label').textContent.replace(/\s+/g, ' ').trim()
   }
 
   perPageChanged () {
