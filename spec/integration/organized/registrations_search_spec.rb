@@ -216,19 +216,19 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     chart_src = chart_frame[:src]
     choose("period_year", allow_label_click: true, visible: :all)
     expect(page).to have_current_path(/period=year/, wait: 10)
-    expect(page).to have_text("0 matching registrations")
+    expect(page).to have_text("0 matches")
     # The date range is the search's, and the year chart isn't - so it stays as it was
     expect(chart_frame[:src]).to eq chart_src
 
     fill_in "search_notes", with: ""
     click_button "Search registrations"
     expect(page).to have_current_path(/period=year/, wait: 10)
-    expect(page).to have_text("11 matching registrations", wait: 10)
+    expect(page).to have_text("11 matches", wait: 10)
 
     # "past day" additionally excludes bike2 (3 days ago)
     choose("period_day", allow_label_click: true, visible: :all)
     expect(page).to have_current_path(/period=day/, wait: 10)
-    expect(page).to have_text("10 matching registrations")
+    expect(page).to have_text("10 matches")
 
     # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago).
     # Search on the page (no URL navigation): switch to past year, then submit the email filter.
@@ -304,7 +304,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # replaces. Wait for the swap to finish (count reflects the cleared email)
     # before toggling it -- otherwise Playwright grabs the old button and it
     # detaches mid-click ("Element is not attached to the DOM").
-    expect(page).to have_text("11 matching registrations", wait: 10)
+    expect(page).to have_text("11 matches", wait: 10)
 
     click_button "custom"
     start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
@@ -322,6 +322,52 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     click_button "Search registrations"
     expect(page).to have_current_path(/period=custom/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
+  end
+
+  it "collapses the chart card once the row is a single column, keeping the state in the URL" do
+    # Narrow enough that the card stands below the form rather than beside it
+    page.current_window.resize_to(390, 900)
+    visit bikes_path
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+
+    # Collapsed, so the lazy frame has nothing to fetch and the scope toggle is away
+    expect(page).to have_no_link("Last year")
+    expect(page).to have_no_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas")
+
+    click_button "Chart"
+    expect(page).to have_current_path(/chart_open=1/, wait: 5)
+    # The trigger names the chart, so the caption below it is the scope alone
+    # (the caption is uppercased in CSS, hence the insensitive match)
+    expect(page).to have_text(/last year overview/i)
+    expect(page).to have_no_text(/chart ·/i)
+    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas", wait: 10)
+    expect_axe_clean("select-name")
+
+    # The scope links carry the open state, and so does a reload
+    click_link "Current search"
+    expect(page).to have_current_path(/chart_open=1/, wait: 10)
+    page.refresh
+    expect(page).to have_link("Last year", wait: 10)
+
+    # A search rebuilds the address bar from the form's fields, so one of them carries it
+    fill_in "search_email", with: "alice@example.com"
+    click_button "Search registrations"
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_current_path(/chart_open=1/)
+
+    # Collapsing spells the state out rather than dropping the param, so the search
+    # carries the collapse the same way - and a reload comes back collapsed
+    click_button "Chart"
+    expect(page).to have_no_link("Last year")
+    expect(page).to have_current_path(/chart_open=0/)
+
+    fill_in "search_email", with: "bob@example.com"
+    click_button "Search registrations"
+    expect(page).to have_current_path(/search_email=bob/, wait: 10)
+    expect(page).to have_current_path(/chart_open=0/)
+    page.refresh
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    expect(page).to have_no_link("Last year")
   end
 
   it "moves the result view through the address bar, and back from localStorage" do
@@ -389,7 +435,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_current_path(/search_status=stolen/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
-      expect(page).to have_text("1 matching registration")
+      expect(page).to have_text("1 match")
       expect(page).to have_text("only stolen")
       # Column choices persist after the search
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
@@ -605,7 +651,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_current_path(/search_address=with_street/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
-      expect(page).to have_text("1 matching registration")
+      expect(page).to have_text("1 match")
       expect(page).to have_text("only with address")
 
       expect_filters_open
@@ -622,7 +668,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_current_path(/search_stickers=with/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 0)
-      expect(page).to have_text("0 matching registrations")
+      expect(page).to have_text("0 matches")
       expect(page).to have_text("only with address")
       expect(page).to have_text("only with stickers")
 

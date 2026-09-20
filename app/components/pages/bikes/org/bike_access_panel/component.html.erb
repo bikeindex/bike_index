@@ -618,7 +618,7 @@
     <% current_impound_notification = parking_notifications.impound_notification.where(impound_record_id: impound_record&.id).first %>
 
     <% if current_impound_notification.present? %>
-      <%= render partial: "/organized/parking_notifications/table", locals: {parking_notifications: [current_impound_notification], skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true, hide_status: true} %>
+      <%= render partial: "/organized/parking_notifications/table", locals: {parking_notifications: [current_impound_notification], skip_bike: true, render_address: true, skip_resolved: true, hide_status: true} %>
       <div class="mt-4" style="padding-bottom: 12px;"></div>
     <% end %>
 
@@ -639,13 +639,13 @@
     </p>
 
     <% if parking_notifications.current.any? %>
-      <%= render partial: "/organized/parking_notifications/table", locals: {parking_notifications: parking_notifications.current, skip_bike: true, skip_map_cell: true, render_address: true, skip_resolved: true} %>
+      <%= render partial: "/organized/parking_notifications/table", locals: {parking_notifications: parking_notifications.current, skip_bike: true, render_address: true, skip_resolved: true} %>
     <% end %>
 
     <% if resolved_notifications.any? %>
       <div class="collapse" id="resolvedParkingNotificationTable">
         <p class="mb-0"><strong>Resolved notifications</strong></p>
-        <%= render partial: "/organized/parking_notifications/table", locals: {parking_notifications: resolved_notifications.limit(10), skip_bike: true, skip_map_cell: true, render_address: true} %>
+        <%= render partial: "/organized/parking_notifications/table", locals: {parking_notifications: resolved_notifications.limit(10), skip_bike: true, render_address: true} %>
       </div>
     <% end %>
 

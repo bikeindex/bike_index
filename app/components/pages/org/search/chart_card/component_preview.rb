@@ -6,22 +6,33 @@ module Pages
       module ChartCard
         class ComponentPreview < ApplicationComponentPreview
           def default
-            render(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
+            in_row(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
               chart:, stats:))
           end
 
           def search_scope
-            render(Pages::Org::Search::ChartCard::Component.new(scope: "search", scope_paths:,
+            in_row(Pages::Org::Search::ChartCard::Component.new(scope: "search", scope_paths:,
               chart:, stats:))
           end
 
           # What the card shows until the lazy frame answers
           # @display javascript_off true
           def loading
-            render(Pages::Org::Search::ChartCard::Component.new(src: scope_paths[:year], scope_paths:))
+            in_row(Pages::Org::Search::ChartCard::Component.new(src: scope_paths[:year], scope_paths:))
+          end
+
+          # The row too narrow for a second column, where the card opens from its own trigger
+          def single_column
+            in_row(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
+              chart:, stats:), narrow: true)
           end
 
           private
+
+          def in_row(card, narrow: false)
+            {template: "pages/org/search/chart_card/component_preview/in_row",
+             locals: {card:, narrow:}}
+          end
 
           def scope_paths
             {search: "?chart_scope=search", year: "?chart_scope=year"}

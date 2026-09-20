@@ -4590,9 +4590,6 @@ nb:
           er gjort krav på, til organisasjonen din for å gjennomgå og videresende
           til sluttbrukeren, fordi disse brukerne ikke har meldt seg på Bike Index-varsler.
     parking_notifications:
-      index:
-        matches_visible: synlig
-        parking_notifications: Parkeringsmeldinger
       table:
         address: Adresse
         bike: Sykkel
@@ -5631,6 +5628,10 @@ nb:
             only_user_registered: Kun bruker registrert
             status_records: "%{status} poster"
             update_multiple_records: Oppdater flere poster
+        parking_notifications:
+          index:
+            matches_visible: synlig
+            parking_notifications: Parkeringsmeldinger
       register:
         acknowledgment_check:
           i_name_html: Jeg, %{name},

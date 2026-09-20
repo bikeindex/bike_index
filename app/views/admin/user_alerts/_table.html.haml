@@ -28,17 +28,7 @@
           %td= user_alert.kind_humanized
           - unless skip_user
             %td
-              - if user_alert.user_id.present?
-                - if user_alert.user.present?
-                  = link_to user_alert.user.email, admin_user_path(user_alert.user_id)
-                - else # Handle deleted users
-                  - user = User.unscoped.find_by_id(user_alert.user_id)
-                  - if user.present?
-                    = link_to user.email, admin_user_path(user_alert.user_id)
-                    %small.text-danger user deleted
-                  - else
-                    %small.text-danger missing user: #{user_alert.user_id}
-                = link_to "alerts", url_for(sortable_search_params.merge(user_id: user_alert.user_id)), class: "small gray-link"
+              = render Pages::Admin::Users::Cell::Component.new(user: user_alert.user, user_id: user_alert.user_id, sort_state:, render_search: true)
           %td
             - if user_alert.bike_id.present?
               %span.d-block

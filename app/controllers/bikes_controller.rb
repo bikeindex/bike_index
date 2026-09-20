@@ -13,12 +13,12 @@ class BikesController < Bikes::BaseController
 
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
-      @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
+      @contact_owner_open = @bike.contact_owner?(current_user) && contact_owner_param?
       @stolen_record = @bike.current_stolen_record
     end
     if current_user.present? && BikeServices::Displayer.display_impound_claim?(@bike, current_user)
       impound_claims = @bike.impound_claims_claimed.where(user_id: current_user.id)
-      @contact_owner_open = params[:contact_owner].present?
+      @contact_owner_open = contact_owner_param?
       @impound_claim = impound_claims.not_rejected.last
       @impound_claim ||= @bike.current_impound_record&.impound_claims&.build
       @submitted_impound_claims = impound_claims.where.not(id: @impound_claim.id).submitted
@@ -210,6 +210,11 @@ class BikesController < Bikes::BaseController
   end
 
   private
+
+  # ui--collapse writes contact_owner=0 when the box is closed, which .present? reads as open
+  def contact_owner_param?
+    Binxtils::InputNormalizer.boolean(params[:contact_owner])
+  end
 
   # no_redesign reaches the classic page without changing the viewer's preference
   def show_redesign?

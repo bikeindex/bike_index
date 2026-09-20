@@ -23,8 +23,8 @@ RSpec.describe Pages::Org::Search::Form::Component, :js, type: :system do
     end
   end
 
-  describe "card preview" do
-    let(:preview_path) { "/rails/view_components/pages/org/search/form/component/card" }
+  describe "with_filters preview" do
+    let(:preview_path) { "/rails/view_components/pages/org/search/form/component/with_filters" }
     let!(:organization) { FactoryBot.create(:organization_brakebills) }
     let(:panel) { "[data-ui--collapse-target='content']" }
 

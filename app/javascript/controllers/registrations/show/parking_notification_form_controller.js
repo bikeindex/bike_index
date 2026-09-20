@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
-import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION, showMapUnavailable } from 'utils/maplibre'
 
 /* global navigator */
 
@@ -267,21 +267,15 @@ export default class extends Controller {
         this.renderDeviceLocation() // a fix that landed before the style was ready
       })
     } catch (error) {
-      this.mapUnavailable(error)
+      // The coordinates are already stamped, so the form still submits
+      showMapUnavailable(error, {
+        source: this.identifier,
+        map: this.map,
+        canvas: this.mapFrameTarget,
+        message: this.hasMapUnavailableTarget ? this.mapUnavailableTarget : null
+      })
+      this.map = null
     }
-  }
-
-  // WebGL/MapLibre can be unavailable (crawlers, headless browsers, disabled GPU,
-  // blocked CDN). The coordinates are already stamped, so the form still submits;
-  // just reveal a message instead of a blank box
-  mapUnavailable (error) {
-    console.warn('Parking-notification map failed to render:', error)
-    // A control may have thrown after the map was built — dispose it, or its WebGL
-    // context and our controls' document listeners outlive the page
-    this.map?.remove()
-    this.map = null
-    if (this.hasMapFrameTarget) this.mapFrameTarget.hidden = true
-    if (this.hasMapUnavailableTarget) this.mapUnavailableTarget.hidden = false
   }
 
   disconnect () {

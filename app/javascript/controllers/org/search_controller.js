@@ -141,11 +141,12 @@ export default class extends Controller {
     this.chartFrameTarget.setAttribute('src', window.location.href)
   }
 
-  // A page turn, a sort or a per-page change returns the same chart, so they don't count
-  // as the address bar having moved.
+  // A page turn, a sort, a per-page change or opening the card itself returns the same
+  // chart, so they don't count as the address bar having moved.
   chartParams () {
     const params = new URLSearchParams(window.location.search);
-    ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view'].forEach(name => params.delete(name))
+    ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view', 'chart_open']
+      .forEach(name => params.delete(name))
 
     return params.toString()
   }
