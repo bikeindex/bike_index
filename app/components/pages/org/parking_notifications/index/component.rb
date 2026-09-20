@@ -33,7 +33,6 @@ module Pages
             @total_count = total_count
             @per_page = per_page
             @sort_state = sort_state
-            @search_params = sort_state.search_params
             @interpreted_params = interpreted_params
             @search_kind = search_kind
             @search_status = search_status
@@ -66,8 +65,10 @@ module Pages
             }
           end
 
+          def search_params = @sort_state.search_params
+
           def index_path(**changes)
-            organization_parking_notifications_path({**@search_params, **changes, organization_id: @organization.to_param})
+            organization_parking_notifications_path({**search_params, **changes, organization_id: @organization.to_param})
           end
 
           # An entry that's already applied links to clearing it

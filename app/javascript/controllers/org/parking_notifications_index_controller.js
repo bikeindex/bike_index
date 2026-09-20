@@ -162,8 +162,11 @@ export default class extends Controller {
     table.createTBody().append(clone)
     table.querySelectorAll('.map-cell, .multiselect-cell').forEach((cell) => cell.remove())
 
-    // ui--table's wrapper, so it connects on the clone and restyles the edges it just lost
-    const wrapper = source.parentElement.cloneNode(false)
+    // ui--table restyles the edges the stripped columns left, but not its wrapper's
+    // page-gutter bleed, which would overhang the popup's padded box
+    const wrapper = document.createElement('div')
+    wrapper.className = 'tw:overflow-x-auto'
+    wrapper.dataset.controller = 'ui--table'
     wrapper.append(table)
     // Clones inside the controller would register as its targets
     wrapper.querySelectorAll('[data-org--parking-notifications-index-target]')

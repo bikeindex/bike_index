@@ -18,6 +18,8 @@ RSpec.describe Pages::Org::ParkingNotifications::Table::Component, type: :compon
 
   it "renders a row per notification, with every column but the optional ones" do
     expect(component).to have_css("tbody tr", count: 1)
+    # The empty small is where the localizer writes the viewer's timezone
+    expect(component).to have_css("th .localizeTimezone")
     expect(component).to have_css("th", text: "Bike")
     expect(component).to have_css("th", text: "Status")
     expect(component).to have_css("th", text: "Resolved")
@@ -63,7 +65,7 @@ RSpec.describe Pages::Org::ParkingNotifications::Table::Component, type: :compon
     let(:options) { {render_sortable: true, sort_state: ComponentStructs::SortState.new(search_params: {search_status: "all"}, sort: "created_at", direction: "desc")} }
 
     it "links the sortable headers and the notifying user, carrying the search params" do
-      expect(component).to have_css("th a", text: /Created/)
+      expect(component).to have_css("th a[data-active='true']", text: /Created/)
       expect(component).to have_css("th a", text: /Type/)
       expect(component).to have_css("th a", text: /Notification#/)
       expect(component).to have_link(parking_notification.user.display_name,
