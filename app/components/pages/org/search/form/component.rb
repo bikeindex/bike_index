@@ -9,12 +9,11 @@ module Pages
           # reach the search with form: "Search_Form"
           renders_one :below_submit
 
-          def initialize(target_search_path:, interpreted_params:, target_frame: nil, skip_serial_field: false,
+          def initialize(target_search_path:, interpreted_params:, target_frame: nil,
             filters_component: nil, heading: nil, submit_text: nil)
             @target_search_path = target_search_path
             @interpreted_params = interpreted_params
             @target_frame = target_frame
-            @skip_serial_field = skip_serial_field
             @filters_component = filters_component
             # A heading turns the form into a card, submit spanning it rather than an icon
             @heading = heading
@@ -39,10 +38,6 @@ module Pages
             else
               {turbo: false}
             end
-          end
-
-          def render_serial_field?
-            !@skip_serial_field
           end
 
           def serial_looks_like_not_a_serial?
