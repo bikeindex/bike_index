@@ -7,6 +7,17 @@ RSpec.describe Organized::RegistrationsController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
   describe "index" do
+    # UI::PeriodSelect's chips fill the custom panel from their own ranges, so they have to
+    # be the ranges the controller computes for the same period
+    it "computes the ranges the period chips carry" do
+      %w[hour day week month year].each do |period|
+        get base_url, params: {search_no_js: true, period:}
+        range = UI::PeriodSelect::Component.period_range(period)
+        expect(assigns(:start_time)).to be_within(5.seconds).of(range.first)
+        expect(assigns(:end_time)).to be_within(5.seconds).of(range.last)
+      end
+    end
+
     let(:query_params) do
       {
         search_no_js: true,

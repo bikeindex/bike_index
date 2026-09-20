@@ -94,7 +94,8 @@
         %li.nav-item
           %a#FitMapTrigger{href: "#", class: (@page_data[:default_location] ? "currently-hidden" : "")}
             Fit map to notifications
-  = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:)
+  %div{class: "tw:flex tw:justify-end"}
+    = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:)
   .mt-4
     = render(Pages::Org::Search::Form::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact))
 
