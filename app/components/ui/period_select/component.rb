@@ -119,7 +119,8 @@ module UI
       def custom_button
         UI::Button::Component.new(text: translation(".custom"), active: @period == "custom",
           size: @size, html_class: (period_button_class unless @form),
-          data: {period: "custom", action: "click->ui--collapse#toggle"})
+          data: {period: "custom", action: "click->ui--collapse#toggle",
+                 "ui--period-select-target": "customButton"})
       end
 
       def period_button_class

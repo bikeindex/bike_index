@@ -87,11 +87,13 @@ RSpec.describe UI::PeriodSelect::Component, type: :component do
       context "over a custom range" do
         let(:period) { "custom" }
 
-        it "carries the custom period in a hidden field, for ui--period-select to disable" do
+        it "carries the custom period in a hidden field, and marks what a pick unpicks" do
           expect(component).to have_css(
             "input[type=hidden][name='period'][value='custom'][form='search_form'][data-ui--period-select-target='customPeriod']",
             visible: :all
           )
+          expect(component).to have_button("custom", class: %w[tw:is-active:bg-purple-500])
+          expect(component).to have_css("button[data-active='true'][data-ui--period-select-target='customButton']")
         end
       end
     end

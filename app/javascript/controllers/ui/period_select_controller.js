@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 // non-period filters (e.g. search_email) survive — the form itself only carries
 // start_time_selector / end_time_selector, so a default GET would drop them.
 export default class extends Controller {
-  static targets = ['startTime', 'endTime', 'customPeriod']
+  static targets = ['startTime', 'endTime', 'customPeriod', 'customButton']
 
   // A chip is a search: it submits the form it belongs to, and leaves the custom panel it
   // replaces opening on the range it picked rather than wherever the panel was last left.
@@ -12,6 +12,8 @@ export default class extends Controller {
     const radio = event.currentTarget
     // Its period reaches the same form as the chip's, and would outrank it
     if (this.hasCustomPeriodTarget) this.customPeriodTarget.disabled = true
+    // The row renders outside the frame the search replaces, so nothing else unpicks it
+    this.customButtonTarget.dataset.active = 'false'
 
     const { startTime, endTime } = radio.dataset
     if (startTime && this.hasStartTimeTarget) {
