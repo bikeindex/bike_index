@@ -14,7 +14,7 @@
         <% table.column(label: "Name") do |organization_feature| %>
           <%= link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature), class: "twlink" %>
 
-          <% if component.show_feature_slugs?(organization_feature) %>
+          <% if organization_feature.feature_slugs.any? %>
             <code class="only-dev-visible tw:text-xs"><%= organization_feature.feature_slugs.join(" ") %></code>
           <% end %>
         <% end %>

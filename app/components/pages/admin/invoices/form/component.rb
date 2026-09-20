@@ -22,10 +22,6 @@ module Pages
                      recurring: !organization_feature.one_time?}
           end
 
-          def show_feature_slugs?(organization_feature)
-            organization_feature.feature_slugs_string.present?
-          end
-
           private
 
           # Memoized - read once per checkbox otherwise, and it's a query each time
