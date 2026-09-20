@@ -9,9 +9,10 @@ en:
             e_vehicles_for_audit: 'E-Vehicles for audit:'
             export_csv: Export CSV
             export_unavailable: >-
-              Exports only include your organization's registrations. Turn off searching
-              all registrations to export.
+              You can only export your organization's registrations. Uncheck "Search
+              all %{cycle_type}" to export.
             matching_html: "%{count} matching %{cycle_type}"
+            over_count_html: Over %{count}
             per_page: Results per page
             showing_html: showing %{from}–%{to} of %{count}
             view_as: View as

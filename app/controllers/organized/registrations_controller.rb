@@ -230,7 +230,16 @@ module Organized
       @available_bikes = @searched_bikes.where(created_at: @time_range)
       return if chart_only?
 
-      @pagy, @bikes = pagy(:countish, @available_bikes.reorder(search_order(org)), limit: @per_page, page: permitted_page)
+      @pagy, @bikes = pagy(:countish, @available_bikes.reorder(search_order(org)),
+        limit: @per_page, page: permitted_page, **search_all_count)
+    end
+
+    # Searching past the organization reaches most of the index, so it counts - and pages -
+    # only as far as the card says it counted
+    def search_all_count
+      return {} unless @search_all
+
+      {count: @available_bikes.limit(Pages::Org::Search::Wrapper::Component::SEARCH_ALL_COUNT_LIMIT).count}
     end
 
     def search_order(organization)

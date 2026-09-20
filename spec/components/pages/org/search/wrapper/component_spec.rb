@@ -29,9 +29,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       search_stickers:,
       search_address:,
       search_status:,
-      search_page:,
-      time_range: (Time.current - 1.year)..Time.current,
-      period: "year"
+      search_page:
     }
   end
 
@@ -100,15 +98,15 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
     it "disables the export, which would reach past the organization, and says why" do
       expect(component).to have_css("[data-controller='ui--tooltip'] button a[aria-disabled='true']:not([href])", text: "Export CSV")
-      expect(component).to have_css("[role=tooltip]", text: "Turn off searching all registrations", visible: :all)
+      expect(component).to have_css("[role=tooltip]", text: 'Uncheck "Search all registrations"', visible: :all)
       expect(component).to have_text("25 matching registrations")
     end
 
-    context "with over 1,000 matches" do
-      let(:pagy) { Pagy::Offset.new(count: 1_001, page: 1, limit: 10) }
+    context "with the count at its limit" do
+      let(:pagy) { Pagy::Offset.new(count: 1_000, page: 1, limit: 10) }
 
-      it "caps the count" do
-        expect(component).to have_text("> 1,000 matching registrations")
+      it "says it stopped counting there" do
+        expect(component).to have_text("Over 1,000 matching registrations")
       end
     end
   end
@@ -166,11 +164,11 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).not_to have_text("stranger@example.com")
       expect(component).not_to have_text("555-555-1212")
       expect(component).not_to have_text("SECRET-EXTRA")
-      hidden_text = "hidden, not registered with #{organization.short_name}"
-      expect(component).to have_css(".owner_email_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".owner_name_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".reg_phone_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".reg_extra_registration_number_cell em.less-strong", text: hidden_text)
+      hidden_text = "Hidden because it is not registered with #{organization.short_name}"
+      %w[owner_email_cell owner_name_cell reg_phone_cell reg_extra_registration_number_cell].each do |cell|
+        expect(component).to have_css(".#{cell} em.less-strong", text: "hidden")
+        expect(component).to have_css(".#{cell} [role=tooltip]", text: hidden_text, visible: :all)
+      end
     end
   end
 end
