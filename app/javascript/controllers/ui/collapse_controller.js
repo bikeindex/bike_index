@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
-/* global localStorage, Event */
+/* global localStorage */
 
 // Connects to data-controller='ui--collapse'
 // Animates [data-ui--collapse-target=content] open/closed. Optionally rotates a
@@ -16,10 +16,10 @@ export default class extends Controller {
   static values = { param: String, storageKey: String }
 
   connect () {
-    // Restore the persisted state without animating on load, and without persisting it
-    // back -- that would only write what it just read.
-    const restored = this.restoredExpanded
-    if (restored !== null) return this.applyExpanded(restored, 0)
+    // Restore the persisted state without animating on load. Restoring applies rather than
+    // sets: persisting here would only write back what it just read.
+    if (this.hasParamValue && this.urlExpanded !== null) return this.applyExpanded(this.urlExpanded, 0)
+    if (this.hasStorageKeyValue) return this.applyExpanded(this.stored, 0)
 
     // The server can render the content open -- a panel whose state is part of the
     // response rather than a preference. Only the trigger needs catching up, and it
@@ -44,16 +44,7 @@ export default class extends Controller {
       content.classList.contains('tw:hidden') || content.classList.contains('tw:hidden!'))
   }
 
-  // null when nothing has been persisted, so the rendered state stands.
-  get restoredExpanded () {
-    if (this.hasParamValue && this.urlExpanded !== null) return this.urlExpanded
-    if (this.hasStorageKeyValue) return this.stored
-
-    return null
-  }
-
-  // The param is written collapsed as well as open, so an empty or 0 value is the rider
-  // having closed the panel rather than never having touched it.
+  // null when the param isn't in the URL, so the rendered state stands.
   get urlExpanded () {
     const value = new URLSearchParams(window.location.search).get(this.paramValue)
     if (value === null) return null
@@ -93,8 +84,5 @@ export default class extends Controller {
     url.searchParams.set(this.paramValue, expanding ? '1' : '0')
     // replaceState (not pushState) so a toggle doesn't stack history entries.
     window.history.replaceState(window.history.state, '', url)
-    // replaceState raises no event, so anything keeping step with the address bar (a
-    // form's hidden field) hears it here.
-    window.dispatchEvent(new Event('collapse:persisted'))
   }
 }

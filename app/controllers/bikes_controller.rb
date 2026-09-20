@@ -211,8 +211,7 @@ class BikesController < Bikes::BaseController
 
   private
 
-  # ui--collapse writes the param collapsed as well as open, so 0 is a viewer who closed
-  # the box rather than one who never opened it
+  # ui--collapse writes contact_owner=0 when the box is closed, which .present? reads as open
   def contact_owner_param?
     Binxtils::InputNormalizer.boolean(params[:contact_owner])
   end
