@@ -11,12 +11,11 @@ module UI
       # Template Dependency: UI::Button::Component
       KINDS = %i[button toggle].freeze
 
-      # Chip line height and row gaps come from kelsey_redesign/new-org-search/, not the type scale
-      CHIP_CLASSES = "#{UI::Button::Component.build_classes(color: :secondary, size: :md)} tw:leading-4".freeze
+      CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
 
       # UI::PeriodSelect lays its own buttons out with these, so a period row and a chip
       # group line up where they're stacked
-      ROW_CLASSES = "tw:flex tw:flex-wrap tw:gap-x-1 tw:gap-y-2"
+      ROW_CLASSES = "tw:flex tw:flex-wrap tw:gap-1"
 
       # auto-fit needs a definite minimum to count repetitions
       FULL_WIDTH_ROW_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2"

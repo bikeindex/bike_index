@@ -18,9 +18,9 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
     expect(render_inline(described_class.new(entries: [{label: "only <strong>not</strong> impounded", href: "/x"}]))).to have_css("a span strong", text: "not")
   end
 
-  # Equality, not include: any utility beyond the tighter line height is a visual difference from the button
-  it "styles the chips as UI::Button's secondary, with a tighter line height" do
-    expect(component.css("a").first["class"]).to eq("#{UI::Button::Component.build_classes(color: :secondary, size: :md)} tw:leading-4")
+  # Equality, not include: an extra utility here is a visual difference from the button
+  it "styles the chips as UI::Button's secondary" do
+    expect(component.css("a").first["class"]).to eq(UI::Button::Component.build_classes(color: :secondary, size: :md))
   end
 
   it "raises on a kind it doesn't have" do
