@@ -70,6 +70,22 @@ RSpec.describe SharedBlocks::HeaderTags::Component, type: :component do
     end
   end
 
+  describe "only-dev-visible" do
+    let(:controller_name) { "welcome" }
+
+    it "hides it" do
+      expect(component.css("style").text).to include ".only-dev-visible {display: none !important;}"
+    end
+
+    context "with display_dev_info" do
+      let(:options) { super().merge(display_dev_info: true) }
+
+      it "doesn't hide it" do
+        expect(component.css("style").text).not_to include "only-dev-visible"
+      end
+    end
+  end
+
   context "welcome controller" do
     let(:controller_name) { "welcome" }
 
