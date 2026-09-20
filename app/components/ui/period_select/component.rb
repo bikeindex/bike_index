@@ -3,7 +3,8 @@
 module UI
   module PeriodSelect
     class Component < ApplicationComponent
-      # Template Dependency: UI::ButtonGroup::Component, UI::Forms::RadioButtonGroup::Component
+      # Template Dependency: UI::ButtonGroup::Component
+      # Template Dependency: UI::Forms::RadioButtonGroup::Component
       # Widest first: the row reads as narrowing from everything
       PERIODS = [
         {key: "all", prefix: nil, label: "all"},
