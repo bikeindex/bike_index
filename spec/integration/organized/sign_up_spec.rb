@@ -41,9 +41,6 @@ RSpec.describe "Organized sign up", :js, type: :system do
     expect(rider.confirmed?).to be_truthy
     expect(rider.accepted_vendor_terms_of_service?).to be_falsey
 
-    # That flash sits over the agree bar, so a reader clears it before reaching the box
-    dismiss_flash_messages
-
     # The organization sidebar covers the left of the viewport, so an agree bar laid out
     # against the viewport rather than the content column puts this checkbox behind it
     check "I agree to Bike Index's Terms of Service for Organizations."
