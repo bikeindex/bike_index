@@ -82,50 +82,55 @@
     </div>
   </div>
 
-  <div class="tw:mt-2 tw:mb-6 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-    <%= render(UI::Dropdown::Component.new(name: kind_display(@search_kind), button_size: :sm, active: @search_kind != "all")) do |dropdown| %>
-      <% (["all"] + ParkingNotification.kinds).each do |kind| %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display(kind), path: toggle_path(:search_kind, kind, @search_kind), match_params: {search_kind: (kind == "all") ? nil : kind}) } %>
+  <div
+    class="
+      tw:mt-2 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
+      tw:gap-2
+    "
+  >
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+      <%= render(UI::Dropdown::Component.new(name: kind_display(@search_kind), active: @search_kind != "all")) do |dropdown| %>
+        <% (["all"] + ParkingNotification.kinds).each do |kind| %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display(kind), path: toggle_path(:search_kind, kind, @search_kind), match_params: {search_kind: (kind == "all") ? nil : kind}) } %>
 
-        <%# Divider after "all" %>
-        <% dropdown.with_entry_divider if kind == "all" %>
+          <%# Divider after "all" %>
+          <% dropdown.with_entry_divider if kind == "all" %>
+        <% end %>
       <% end %>
-    <% end %>
 
-    <%= render(UI::Dropdown::Component.new(name: UNREGISTERED_DISPLAY[@search_unregistered], button_size: :sm, active: @search_unregistered != "all")) do |dropdown| %>
-      <% UNREGISTERED_DISPLAY.each do |value, text| %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text:, path: toggle_path(:search_unregistered, value, @search_unregistered), match_params: {search_unregistered: (value == "all") ? [nil, "all"] : value}) } %>
-        <% dropdown.with_entry_divider if value == "all" %>
+      <%= render(UI::Dropdown::Component.new(name: UNREGISTERED_DISPLAY[@search_unregistered], active: @search_unregistered != "all")) do |dropdown| %>
+        <% UNREGISTERED_DISPLAY.each do |value, text| %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text:, path: toggle_path(:search_unregistered, value, @search_unregistered), match_params: {search_unregistered: (value == "all") ? [nil, "all"] : value}) } %>
+          <% dropdown.with_entry_divider if value == "all" %>
+        <% end %>
       <% end %>
-    <% end %>
 
-    <%= render(UI::Dropdown::Component.new(name: current_status[:m], button_size: :sm, active: @search_status != "current")) do |dropdown| %>
-      <%# NOTE! this list does not include resolved_otherwise - because that's a failure state, which shouldn't happen. If there start being multiple notifications in that state, revisit this decision %>
-      <% status_display_hash.each do |status, display_hash| %>
-        <% dropdown.with_entry_item do %>
-          <%= render UI::ActiveLink::Component.new(path: toggle_path(:search_status, status, @search_status), match_params: {search_status: (status == :current) ? [nil, "current"] : status}) do %>
-            <%= display_hash[:m] %>
+      <%= render(UI::Dropdown::Component.new(name: current_status[:m], active: @search_status != "current")) do |dropdown| %>
+        <%# NOTE! this list does not include resolved_otherwise - because that's a failure state, which shouldn't happen. If there start being multiple notifications in that state, revisit this decision %>
+        <% status_display_hash.each do |status, display_hash| %>
+          <% dropdown.with_entry_item do %>
+            <%= render UI::ActiveLink::Component.new(path: toggle_path(:search_status, status, @search_status), match_params: {search_status: (status == :current) ? [nil, "current"] : status}) do %>
+              <%= display_hash[:m] %>
 
-            <% if display_hash[:s].present? %>
-              <small class="less-strong"><%= display_hash[:s] %></small>
+              <% if display_hash[:s].present? %>
+                <small class="less-strong"><%= display_hash[:s] %></small>
+              <% end %>
             <% end %>
           <% end %>
+
+          <%# Divider after "all" %>
+          <% dropdown.with_entry_divider if status == :all %>
         <% end %>
-
-        <%# Divider after "all" %>
-        <% dropdown.with_entry_divider if status == :all %>
       <% end %>
-    <% end %>
 
-    <%= render UI::Button::Component.new(
-      text: "Fit map to notifications",
-      color: :link,
-      html_class: "tw:hidden!",
-      data: {"org--parking-notifications-index-target": "fit", action: "org--parking-notifications-index#fit"}
-    ) %>
-  </div>
+      <%= render UI::Button::Component.new(
+        text: "Fit map to notifications",
+        color: :link,
+        html_class: "tw:hidden!",
+        data: {"org--parking-notifications-index-target": "fit", action: "org--parking-notifications-index#fit"}
+      ) %>
+    </div>
 
-  <div class="tw:flex tw:justify-end">
     <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params: search_params) %>
   </div>
 
