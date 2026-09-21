@@ -1,5 +1,8 @@
 <%= render(Pages::Org::Search::Form::Component.new(**options)) do |form| %>
   <% form.with_below_submit do %>
-    <%= render "organized/registrations/search_all", settings:, search_all_locked: false %>
+    <div class="tw:mt-3">
+      <%= render "organized/registrations/search_all", settings:, locked: false,
+        locked_hint: t("organized.registrations.search.search_all_email_disabled") %>
+    </div>
   <% end %>
 <% end %>

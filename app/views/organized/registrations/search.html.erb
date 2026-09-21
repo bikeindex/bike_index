@@ -62,7 +62,10 @@
           <%= hidden_field_tag :search_result_view, @result_view %>
 
           <% form.with_below_submit do %>
-            <%= render "search_all", settings:, search_all_locked: @search_all_locked %>
+            <div class="tw:mt-3">
+              <%= render "search_all", settings:, locked: @search_all_locked,
+                locked_hint: t(".search_all_email_disabled") %>
+            </div>
           <% end %>
         <% end %>
       </div>
