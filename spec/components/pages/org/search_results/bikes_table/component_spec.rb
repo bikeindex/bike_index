@@ -28,6 +28,16 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component).to have_css("tbody td.color_cell", text: bike.primary_frame_color.name)
   end
 
+  context "with a pedal bike and an e-bike" do
+    let(:e_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
+    let(:bikes) { [bike, e_bike] }
+
+    it "leaves pedal blank in the e-vehicle column" do
+      expect(bike.propulsion_type).to eq "foot-pedal"
+      expect(component.css("td.propulsion_type_cell").map { |td| td.text.strip }).to eq ["", e_bike.propulsion_titleize]
+    end
+  end
+
   it "renders plain headers when not sortable" do
     expect(component).to have_css("th", text: "Registered")
     expect(component).not_to have_css("th a")

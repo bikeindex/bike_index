@@ -104,9 +104,7 @@
     <% end %>
 
     <% table.column(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
-      <span class="<%= 'tw:text-gray-400' if bike.propulsion_type == 'foot-pedal' %>">
-        <%= bike.propulsion_titleize %>
-      </span>
+      <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
     <% end %>
 
     <% table.column(sortable: "cycle_type", label: settings.column_renames[:cycle_type_cell], classes: "hideableColumn cycle_type_cell") do |bike| %>
