@@ -5,9 +5,10 @@ module UI
     class Component < ApplicationComponent
       NBSP = "\u00A0"
 
-      attr_reader :sortable, :cell_block, :footer
+      attr_reader :sortable, :cell_block, :footer, :header_tooltip
 
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, footer: nil, sort_link_class: "twlink", &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, sort_link_class: "twlink", &block)
+        @header_tooltip = header_tooltip
         @sort_link_class = sort_link_class
         @label = label
         @sortable = sortable

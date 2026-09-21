@@ -3,7 +3,7 @@ module Organized
     include Binxtils::SortableTable
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type
-      acknowledged_at]
+      acknowledged_at occurred_at]
 
     helper_method :chart_scope_paths
 
@@ -248,6 +248,8 @@ module Organized
     end
 
     def search_order(organization)
+      # Most registrations have no status time, and Postgres sorts nulls first descending
+      return Arel.sql("bikes.occurred_at #{sort_direction} NULLS LAST") if sort_column == "occurred_at"
       return "bikes.#{sort_column} #{sort_direction}" if sort_column != "acknowledged_at"
 
       RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)

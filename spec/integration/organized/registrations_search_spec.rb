@@ -421,7 +421,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       # Default columns are visible
       expect(page).to have_css("th.manufacturer_cell", visible: :visible)
       expect(page).to have_css("th.owner_email_cell", visible: :visible)
-      expect(page).to have_css("th.stolen_cell", visible: :visible)
+      expect(page).to have_css("th.occurred_at_cell", visible: :visible)
       # Non-default columns are hidden
       expect(page).to have_css("th.serial_number_cell", visible: :hidden)
       expect(page).to have_css("th.url_cell", visible: :hidden)

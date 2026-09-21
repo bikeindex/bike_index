@@ -30,6 +30,7 @@ en:
             model_cell: Model
             none: none
             notes_cell_html: Registration Notes <em>by %{org_name}</em>
+            occurred_at_cell: Status at
             owner_email_cell: Sent to
             owner_name_cell: Owner name
             photo_cell: Photo
@@ -45,7 +46,6 @@ en:
             status_cell: Status
             sticker_cell: Sticker
             stickers: 'Stickers:'
-            stolen_cell: Stolen
             unregistered: 'Unregistered:'
             updated_at_cell: Updated
             url_cell: URL

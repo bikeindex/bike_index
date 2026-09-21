@@ -93,8 +93,9 @@
       <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
     <% end %>
 
-    <% table.column(label: settings.column_renames[:stolen_cell], classes: "hideableColumn stolen_cell") do |bike| %>
-      <%= check_mark if bike.status_stolen? %>
+    <% table.column(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell",
+      header_tooltip: translation(".occurred_at_tooltip")) do |bike| %>
+      <%= render(UI::Time::Component.new(time: bike.occurred_at)) %>
     <% end %>
 
     <% table.column(sortable: "updated_by_user_at", label: settings.column_renames[:updated_at_cell], classes: "hideableColumn updated_at_cell") do |bike| %>
