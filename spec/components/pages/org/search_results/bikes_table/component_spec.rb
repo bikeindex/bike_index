@@ -109,7 +109,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike:) }
 
     it "renders when each bike was acknowledged" do
-      expect(component).to have_css("th.acknowledgment_cell", visible: :all, normalize_ws: true, exact_text: "Registration sequence acknowledgment")
+      expect(component).to have_css("th.acknowledgment_cell span[title='Registration sequence acknowledgment at']",
+        visible: :all, normalize_ws: true, exact_text: "Reg acknowledgment")
       expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
     end
 
