@@ -1,4 +1,7 @@
-<div class="tw:hidden! <%= PANEL_CLASSES %>" data-ui--collapse-target="content">
+<div
+  class="<%= "tw:hidden!" unless @open %> <%= PANEL_CLASSES %>"
+  data-ui--collapse-target="content"
+>
   <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
     <%= render(UI::Header::Component.new(text: translation(".visible_columns"), tag: :h3, html_class: "header-font-alt uncap tw:mb-0! tw:pr-1")) %>
 
