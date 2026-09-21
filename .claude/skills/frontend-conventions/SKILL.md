@@ -30,6 +30,7 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 
 - Tailwind classes have the prefix `tw:` (e.g. `tw:text-blue`, `tw:flex`, `tw:gap-4`).
   - The `tw:` prefix comes **before** variant modifiers, not after. Use `tw:dark:bg-gray-800`, `tw:hover:bg-blue-600`, `tw:sm:flex`, `tw:focus-visible:ring-2`. Never `dark:tw:bg-gray-800` — variant prefixes layer on top of `tw:`.
+  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and nothing in the app sets that class — so `prefers-color-scheme: dark` renders the light page, and a dark-mode check means adding `.dark` to `<html>` by hand. Keep writing the variants; just don't read a light screenshot as a missing one.
 - Form fields should use the `twinput` class.
 - Labels should use the `twlabel` class.
 - Basic links should use the `twlink` class.

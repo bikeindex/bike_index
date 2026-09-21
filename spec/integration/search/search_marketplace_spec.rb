@@ -87,20 +87,12 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     find("#search-button").click
   end
 
-  # Hold back the unfiltered results the frame eager-loads on arrival. Returns the
-  # release, so the example decides when they land rather than racing a timer.
+  # Hold back the unfiltered results the frame eager-loads on arrival, so the example
+  # decides when they land rather than racing a timer
   def hold_initial_results_load
-    held = Queue.new
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.route("**/search/marketplace*", ->(route, request) {
-        # Pushing the token back leaves the gate open, so a later unfiltered
-        # request doesn't hang on the drained queue.
-        held.push(held.pop) if request.headers["turbo-frame"] == "marketplace_results_frame" &&
-          !request.url.include?("primary_activity=")
-        route.continue
-      })
+    hold_requests("**/search/marketplace*") do |request|
+      request.headers["turbo-frame"] == "marketplace_results_frame" && !request.url.include?("primary_activity=")
     end
-    -> { held.push(:release) }
   end
 
   # defaultPrevented read inside the listener only reports preventDefault from listeners
@@ -139,7 +131,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   end
 
   it "fills the kind counts on load, and keeps a search made before the results arrive" do
-    release_initial_results_load = hold_initial_results_load
+    initial_results_load = hold_initial_results_load
     visit_marketplace_via_nav
 
     # Counts populate from /search/marketplace/counts once the search--kind-select-fields
@@ -160,7 +152,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # The unfiltered results are only now allowed to arrive - they mustn't take over. The
     # wait covers a round trip the release only now starts, for this file's slowest response.
     watch_for_superseded_results
-    release_initial_results_load.call
+    initial_results_load.release
     # Arrival and verdict assert separately so a failure says which happened: no marker at
     # all means the released response never reached the page, ='false' means it did and
     # Turbo was allowed to render it

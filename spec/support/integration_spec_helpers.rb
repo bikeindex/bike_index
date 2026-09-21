@@ -302,6 +302,40 @@ module IntegrationSpecHelpers
     end
   end
 
+  # Holds requests matching `pattern` (and the block, when given) until the example calls
+  # `release`, so a race runs in the order the example needs every time -- a timed delay only
+  # wins it some of the time. Released stays released, so later requests don't hang.
+  def hold_requests(pattern, &filter)
+    RequestHold.new.tap do |hold|
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route(pattern, ->(route, request) {
+          hold.wait if filter.nil? || filter.call(request)
+          route.continue
+        })
+      end
+    end
+  end
+
+  # The route handler runs on Playwright's thread, so the gate is a Queue
+  class RequestHold
+    def initialize
+      @gate = Queue.new
+      @held = false
+    end
+
+    def wait
+      @held = true
+      # Pushing the token back leaves the gate open for the next one
+      @gate.push(@gate.pop)
+    end
+
+    # A pattern that stops matching holds nothing, leaving the example green against no race
+    def release
+      raise "hold_requests held nothing - has the pattern stopped matching?" unless @held
+      @gate.push(:release)
+    end
+  end
+
   # Flash messages are fixed position, so an undismissed one intercepts clicks on
   # whatever it overlays. ui--alert wires the close button in `connect` and
   # application.js lazy loads controllers, so a click landing before that module
