@@ -12,15 +12,9 @@ module Pages
           # Owner email only searches the organization's own registrations, so the field folds
           # away while search_all is checked - stacked or in the lg row, its gap taken back too
           EMAIL_FOLDS_WITH_SEARCH_ALL = "tw:transition-all tw:duration-200 tw:max-h-20 tw:min-w-0 " \
-            "tw:group-has-[[data-org--search-target=searchAll]:checked]/search-form:invisible " \
-            "tw:group-has-[[data-org--search-target=searchAll]:checked]/search-form:opacity-0 " \
-            "tw:group-has-[[data-org--search-target=searchAll]:checked]/search-form:max-h-0 " \
-            "tw:group-has-[[data-org--search-target=searchAll]:checked]/search-form:grow-0 " \
-            "tw:group-has-[[data-org--search-target=searchAll]:checked]/search-form:p-0! " \
-            "tw:group-has-[[data-org--search-target=searchAll]:checked]/search-form:border-0! " \
-            "tw:group-has-[[data-org--search-target=searchAll]:checked]/search-form:-mb-2 " \
-            "tw:lg:group-has-[[data-org--search-target=searchAll]:checked]/search-form:mb-0 " \
-            "tw:lg:group-has-[[data-org--search-target=searchAll]:checked]/search-form:-mr-2"
+            "tw:search-all-checked:invisible tw:search-all-checked:opacity-0 tw:search-all-checked:max-h-0 " \
+            "tw:search-all-checked:grow-0 tw:search-all-checked:p-0! tw:search-all-checked:border-0! " \
+            "tw:search-all-checked:-mb-2 tw:lg:search-all-checked:mb-0 tw:lg:search-all-checked:-mr-2"
 
           def initialize(target_search_path:, interpreted_params:, heading:, submit_text:,
             target_frame: nil, settings_and_filters_component: nil)

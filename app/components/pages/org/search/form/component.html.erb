@@ -1,5 +1,4 @@
-<%# The group reaches below_submit too, where the registrations search puts search_all %>
-<%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:h-full tw:group/search-form")) do %>
+<%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:h-full")) do %>
   <%# .organized-body h2 carries a 40px top margin, unlayered, so a plain mt-0 loses %>
   <%= render(UI::Header::Component.new(text: @heading, tag: :h2, html_class: "uncap tw:mt-0! tw:mb-3!")) %>
 
