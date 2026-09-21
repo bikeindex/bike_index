@@ -45,10 +45,11 @@
                 tw:@min-[672px]/twwiderow:flex-wrap
               "
             >
+              <%# The page's size where there's room; 2xs only below the width the card collapses at %>
               <span
                 class="
-                  tw:text-2xs tw:font-bold tw:tracking-wider
-                  tw:text-gray-400 tw:uppercase
+                  tw:font-bold tw:tracking-wider tw:text-gray-400
+                  tw:uppercase tw:@max-[672px]/twwiderow:text-2xs
                 "
               >
                 <span class="tw:hidden tw:@min-[672px]/twwiderow:inline"><%= translation(".chart") %> ·</span>
