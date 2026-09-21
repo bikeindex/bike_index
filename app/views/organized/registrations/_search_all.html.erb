@@ -1,7 +1,11 @@
 <%# locals: (settings:, locked:, locked_hint:) %>
 
 <%# Targets both searches' controllers, so the search and multi search render the same checkbox %>
-<% label = capture do %>
+<%= render(UI::Forms::Checkbox::Component.new(name: :search_all, value: "true", checked: settings.search_all?,
+  class_name: "tw:mb-0!",
+  html_options: {form: "Search_Form", disabled: locked,
+                 data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll",
+                        "org--multi-search-target": "searchAll"}})) do %>
   <%= t("organized.registrations.search.search_all_html", cycle_type: settings.cycle_type.pluralize(2),
     org_name: settings.organization.short_name) %>
 
@@ -9,9 +13,3 @@
     class: "tw:leading-none", hidden: !locked,
     data: {"org--search-target": "searchAllHint", "org--multi-search-target": "searchAllHint"}) %>
 <% end %>
-
-<%= render(UI::Forms::Checkbox::Component.new(name: :search_all, value: "true", checked: settings.search_all?,
-  label:, class_name: "tw:mb-0!",
-  html_options: {form: "Search_Form", disabled: locked,
-                 data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll",
-                        "org--multi-search-target": "searchAll"}})) %>

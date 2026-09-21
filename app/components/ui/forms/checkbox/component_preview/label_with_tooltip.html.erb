@@ -1,8 +1,6 @@
-<% label = capture do %>
+<%= render(UI::Forms::Checkbox::Component.new(name: :search_all, class_name: "tw:mb-0!")) do %>
   Search all registrations
   <span class="twless-strong">(not just Brakebills)</span> - and also some extra
   text to make this label really long
   <%= render(UI::Tooltip::Component.new(text: "Sticker search always searches all registrations")) %>
 <% end %>
-
-<%= render(UI::Forms::Checkbox::Component.new(name: :search_all, label:, class_name: "tw:mb-0!")) %>
