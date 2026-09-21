@@ -1,0 +1,5 @@
+<%= render(Pages::Org::Search::Form::Component.new(**options)) do |form| %>
+  <% form.with_below_submit do %>
+    <%= render "organized/registrations/search_all", settings:, search_all_locked: false %>
+  <% end %>
+<% end %>

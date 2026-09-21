@@ -115,8 +115,10 @@ module ComponentStructs
 
     def render_export? = @organization.enabled?("csv_exports")
 
+    def search_all? = @search_all
+
     # An export past the organization would carry other organizations' registrations
-    def export_disabled? = @search_all
+    def export_disabled? = search_all?
 
     def initially_checked_columns
       @initially_checked_columns ||= [

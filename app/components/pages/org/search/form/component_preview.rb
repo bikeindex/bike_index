@@ -30,8 +30,8 @@ module Pages
               settings:, period: "week", start_time: Time.current - 1.week, end_time: Time.current
             )
 
-            {template: "pages/org/search/form/component_preview/with_filters",
-             locals: {settings:, search_all:,
+            {template: "pages/org/search/form/component_preview/registrations_search",
+             locals: {settings:,
                       options: default_options(interpreted_params).merge(settings_and_filters_component:)}}
           end
 

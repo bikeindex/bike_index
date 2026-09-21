@@ -62,8 +62,7 @@
           <%= hidden_field_tag :search_result_view, @result_view %>
 
           <% form.with_below_submit do %>
-            <%= render "search_all", search_all: @search_all, search_all_locked: @search_all_locked,
-              cycle_type: settings.cycle_type, org_name: current_organization.short_name %>
+            <%= render "search_all", settings:, search_all_locked: @search_all_locked %>
           <% end %>
         <% end %>
       </div>
