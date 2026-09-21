@@ -16,10 +16,13 @@
 
     <tbody>
       <% @records.each do |record| %>
+        <%# Once per row: cache_records reads associations, and every cell wants the same ones %>
+        <% row_records = cache_records_for(record) %>
+
         <tr>
           <% @columns.each_with_index do |col, column_index| %>
             <td class="<%= col.td_classes(bordered: @bordered) %>">
-              <% cache_if(@cache_key && col.cached, cell_cache_key(column_index, record)) do %>
+              <% cache_if(@cache_key && col.cached, cell_cache_key(column_index, record, row_records)) do %>
                 <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
               <% end %>
             </td>

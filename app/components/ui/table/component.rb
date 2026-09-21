@@ -56,11 +56,10 @@ module UI
 
       def cache_records_for(record) = Array(@cache_records&.call(record))
 
-      # The column index rather than the column: two columns of the same record would
-      # otherwise share a fragment, and the flags that change which columns render are
-      # already folded into cache_key
-      def cell_cache_key(column_index, record)
-        [@cache_key, column_index, record, *cache_records_for(record)]
+      # The index rather than the column: two cells of one record would otherwise share a
+      # fragment. It holds only because the flags that change the column set are in cache_key
+      def cell_cache_key(column_index, record, cache_records)
+        [@cache_key, column_index, record, *cache_records]
       end
 
       def footer?

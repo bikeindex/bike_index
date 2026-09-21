@@ -4,6 +4,8 @@
 # the cell key carries the component's digest of them instead. Hosts define the record a
 # row renders; cell_cache_key defaults to the component's digest.
 #
+# That one fragment crosses tables is spec/requests/admin/user_cell_caching_request_spec.rb.
+#
 # That the digest covers the whole tree is spec/components/application_component_spec.rb.
 RSpec.shared_examples "cached_table_cells" do
   include_context :caching_basic

@@ -30,9 +30,9 @@ module Pages
 
           private
 
-          # Every table renders this cell the same way, so the key holds nothing about the
-          # table around it and one fragment serves them all. The search link stays outside
-          # the fragment: its href carries the request's own params
+          # Nothing about the table around it, so one fragment serves every table rendering
+          # this user. The arguments it leaves out are the search link's alone - that link
+          # sits outside the fragment, since its href carries the request's own params
           def cache_key
             [self.class.cache_digest, @user&.cache_key_with_version || @user_id, @email, user_link_path]
           end
