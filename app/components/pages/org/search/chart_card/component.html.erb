@@ -25,14 +25,13 @@
       "
     >
       <%= helpers.turbo_frame_tag(FRAME_ID, src: @src, loading: (:lazy if @src),
-        class: "tw:block tw:pt-3 tw:@min-[672px]/twwiderow:pt-0",
-        data: {"org--search-target": "chartFrame"}) do %>
+        class: "tw:block tw:pt-3 tw:@min-[672px]/twwiderow:pt-0") do %>
         <%#
           org--search refetches the card only while this is in it: the year scope's counts
           don't move with the search
         %>
 
-        <%= tag.div(data: {"org--search-target": ("chartFollowsSearch" if follows_search?)}) do %>
+        <%= tag.div(data: {chart_follows_search: (true if follows_search?)}) do %>
           <% if @src %>
             <div class="<%= PLACEHOLDER_CLASSES %>">
               <%= render UI::LoadingSpinner::Component.new(text: translation(".loading_chart")) %>

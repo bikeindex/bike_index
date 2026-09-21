@@ -6,7 +6,7 @@ const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'chartFollowsSearch', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'notesField', 'notesCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
   static values = { resultView: String }
 
@@ -27,7 +27,7 @@ export default class extends Controller {
     this.syncResultView()
     this.syncPeriodLabel()
     this.endSubmitSpinner()
-    if (this.hasChartFrameTarget && event.target === this.chartFrameTarget) return
+    if (event.target === this.chartFrame) return
     this.reloadChart()
   }
 
@@ -49,6 +49,11 @@ export default class extends Controller {
     // Replacing rather than pushing: the rider didn't navigate here.
     window.history.replaceState(window.history.state, '', url)
     frame.setAttribute('src', url)
+  }
+
+  // Pages::Org::Search::ChartCard::FRAME_ID - the card also renders where there's no org--search
+  get chartFrame () {
+    return this.element.querySelector('turbo-frame#chart_card_frame')
   }
 
   // Pages::SearchResults::Frame's, which the loading overlay's CSS reaches the same way
@@ -76,8 +81,9 @@ export default class extends Controller {
     if (this.hasNotesCheckboxTarget) this.notesCheckboxTarget.checked = open
   }
 
+  // Bubbled from any field, so it picks out the one it's for
   emailChanged (event) {
-    if (!this.hasSearchAllTarget) return
+    if (event.target.name !== 'search_email' || !this.hasSearchAllTarget) return
     const hasEmail = event.target.value.trim() !== ''
     this.searchAllTarget.disabled = hasEmail
     if (hasEmail) this.searchAllTarget.checked = false
@@ -140,11 +146,12 @@ export default class extends Controller {
   // on the search itself having moved, or the first results render would refetch the chart
   // the frame is already fetching. The URL carries the scope, so it's the search.
   reloadChart () {
-    if (!this.hasChartFrameTarget || !this.hasChartFollowsSearchTarget) return
+    const frame = this.chartFrame
+    if (!frame?.querySelector('[data-chart-follows-search]')) return
     if (this.chartParams() === this.chartSearch) return
-    if (!this.chartFrameTarget.getAttribute('src')) return
+    if (!frame.getAttribute('src')) return
     this.chartSearch = this.chartParams()
-    this.chartFrameTarget.setAttribute('src', window.location.href)
+    frame.setAttribute('src', window.location.href)
   }
 
   // A page turn, a sort, a per-page change or opening the card itself returns the same
