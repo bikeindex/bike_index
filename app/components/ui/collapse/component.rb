@@ -4,10 +4,8 @@ module UI
   module Collapse
     # The trigger for a ui--collapse controller on an ancestor. The controller keeps
     # aria-expanded and the chevron's rotation in sync, so expanded: is only the
-    # rendered state. Everything else is passed through to UI::Button.
+    # rendered state.
     class Component < ApplicationComponent
-      CHEVRON_CLASSES = "tw:inline-block tw:transition-transform tw:duration-200"
-
       def initialize(text: nil, chevron: false, expanded: false, aria: {}, data: {}, **button_options)
         @text = text
         @chevron = chevron
@@ -19,7 +17,7 @@ module UI
 
       def call
         render(UI::Button::Component.new(**@button_options, aria: @aria, data: @data)) do
-          safe_join([chevron_span, @text || content].compact)
+          safe_join([chevron_span, @text].compact)
         end
       end
 
@@ -29,7 +27,7 @@ module UI
         return unless @chevron
 
         tag.span(tag.span(render(UI::IconChevron::Component.new), class: "tw:flex"),
-          class: class_names(CHEVRON_CLASSES, "tw:rotate-90": @expanded),
+          class: class_names("tw:inline-block tw:transition-transform tw:duration-200", "tw:rotate-90": @expanded),
           data: {"ui--collapse-target": "chevron"})
       end
     end
