@@ -11,6 +11,7 @@ end
 
 # NOTE: this does not seed manufacturers, primary_activities or components, those are pulled via rake task
 require File.expand_path("db/seeds/seed_helpers", Rails.root)
+SeedHelpers.start_clock
 require File.expand_path("db/seeds/seed_wheel_sizes", Rails.root)
 require File.expand_path("db/seeds/seed_bike_associations", Rails.root)
 require File.expand_path("db/seeds/seed_countries_and_states", Rails.root)
@@ -25,6 +26,7 @@ require File.expand_path("db/seeds/seed_organized_emails", Rails.root)
 require File.expand_path("db/seeds/seed_registration_sequence_template", Rails.root)
 require File.expand_path("db/seeds/seed_counts", Rails.root)
 require File.expand_path("db/seeds/seed_oauth_app", Rails.root)
+SeedHelpers.stop_clock
 
 # Load the search autocomplete (Redis) from the seeded manufacturers/colors/etc.
 # so it matches the database. Without this, a freshly seeded app (e.g. a review

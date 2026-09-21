@@ -23,6 +23,7 @@ def bike_params(owner_email:, manufacturer_id: nil)
 end
 
 def seed_bike(creator:, user:, params:, origin: nil, label: "bike")
+  SeedHelpers.tick
   b_param = BParam.create!(creator: user, params:)
   b_param.origin = origin if origin
   bike = creator.create_bike(b_param)

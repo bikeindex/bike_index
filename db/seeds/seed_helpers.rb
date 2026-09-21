@@ -1,6 +1,24 @@
+require "active_support/testing/time_helpers"
+
 # Shared helpers for the seed scripts
 module SeedHelpers
   extend Functionable
+  extend ActiveSupport::Testing::TimeHelpers
+
+  # Seeded records are timestamped across the last hour, rather than all at once:
+  # the clock starts an hour ago and each tick moves it forward, stopping at now
+  def start_clock
+    @clock_end = Time.current
+    travel_to(@clock_end - 1.hour)
+  end
+
+  def tick
+    travel_to([Time.current + rand(20..45).seconds, @clock_end].min)
+  end
+
+  def stop_clock
+    travel_back
+  end
 
   # Pick a frame maker weighted by priority (popular manufacturers chosen most
   # often), with the long tail of unprioritized makers appearing ~8% of the
