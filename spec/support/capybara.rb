@@ -35,7 +35,8 @@ Capybara.server_host = "localhost"
 Capybara.always_include_port = true
 
 # The application layout pulls Google Fonts and analytics from external hosts
-# (app/views/layouts/application.html.erb and shared/_analytics.html). Playwright's
+# (app/views/layouts/application.html.erb and shared/_analytics.html), and the share
+# buttons pull Twitter and Facebook widgets (shared/_share_this). Playwright's
 # `visit` waits for the page `load` event, which stalls for the full navigation
 # timeout when those hosts are unreachable from CI -- a flaky `visit` failure on
 # any page. Abort the requests so `load` fires on the app's own assets. Spec-level
@@ -45,6 +46,9 @@ BLOCKED_EXTERNAL_HOSTS = %w[
   fonts.gstatic.com
   www.googletagmanager.com
   www.google-analytics.com
+  platform.twitter.com
+  connect.facebook.net
+  www.facebook.com
 ].freeze
 
 # Point BASE_URL at Capybara's server for `:js` specs, so `*_url` helpers rendered
