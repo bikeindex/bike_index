@@ -40,7 +40,7 @@ module Admin
         flash[:success] = "Recovery display saved!"
         redirect_to admin_recovery_displays_path
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -50,7 +50,7 @@ module Admin
         flash[:success] = "Recovery display created!"
         redirect_to admin_recoveries_path
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

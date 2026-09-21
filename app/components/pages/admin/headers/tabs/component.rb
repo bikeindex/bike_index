@@ -14,16 +14,12 @@ module Pages
 
           # tabs: what UI::Tabs takes; links: what this screen offers besides them, already
           # rendered - e.g. "New Invoice"
-          #
-          # turbo: Drive is off app-wide, so a section opts in only when every screen it links
-          # to survives a snapshot restore
-          def initialize(title:, tabs:, nav_label:, subtitle: nil, links: [], turbo: false)
+          def initialize(title:, tabs:, nav_label:, subtitle: nil, links: [])
             @title = title
             @tabs = tabs
             @nav_label = nav_label
             @subtitle = subtitle
             @links = links
-            @turbo = turbo
           end
         end
       end

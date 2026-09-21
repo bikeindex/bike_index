@@ -26,7 +26,7 @@ module Admin
         flash[:success] = "Saved!"
         redirect_to admin_primary_activities_url
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 

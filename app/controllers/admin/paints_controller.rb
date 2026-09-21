@@ -28,7 +28,7 @@ module Admin
         flash[:success] = "Paint updating!"
         redirect_to admin_paints_url
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 

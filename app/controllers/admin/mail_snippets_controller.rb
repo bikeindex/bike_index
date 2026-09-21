@@ -23,7 +23,7 @@ module Admin
         flash[:success] = "Snippet Saved!"
         redirect_to edit_admin_mail_snippet_url(@mail_snippet)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -38,7 +38,7 @@ module Admin
         flash[:success] = "Snippet Created!"
         redirect_to edit_admin_mail_snippet_url(@mail_snippet)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

@@ -20,7 +20,7 @@ module Admin
         flash[:success] = "Superuser Ability created!"
         redirect_to edit_admin_superuser_ability_path(@superuser_ability)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 
@@ -32,7 +32,7 @@ module Admin
         flash[:success] = "Superuser Ability saved!"
         redirect_to edit_admin_superuser_ability_path(@superuser_ability)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
