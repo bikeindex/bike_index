@@ -102,9 +102,14 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
     expect(chart_frame[:src]).to eq chart_src
 
-    # Owner email only searches the organization's registrations, so it locks "search all"
+    # Owner email only searches the organization's registrations: it goes while "search all"
+    # is on, and locks it once filled in
     check "search_all"
     expect(page).to have_current_path(/search_all=true/, wait: 10)
+    expect(page).to have_no_field("search_email")
+    uncheck "search_all"
+    expect(page).to have_no_current_path(/search_all=true/, wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
     fill_in "serial", with: ""
     fill_in "search_email", with: "alice@example.com"
     expect(page).to have_field("search_all", checked: false, disabled: true)
