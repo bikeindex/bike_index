@@ -6,10 +6,13 @@ RSpec.describe Admin::NewsController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
+    let!(:blog_content_tag) { FactoryBot.create(:blog_content_tag) }
+
     it "renders" do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(response.body).to include(blog_content_tag.blog.title, blog_content_tag.content_tag.name)
     end
   end
 

@@ -114,6 +114,8 @@ Then run specs for the merged area, **including the browser ones**. The base ren
 
 `bin/rails db:migrate` too, when the merge brought migrations — the test database is maintained from the schema, so the specs stay green while every page in the browser is an `ActiveRecord::PendingMigrationError`.
 
+**`bin/rails tailwindcss:build` when the merge brought `app/assets/tailwind/**`**, before the browser specs — they read `app/assets/builds/tailwind.css`, so a rule the base added is missing until it's rebuilt and the failure names the assertion (a border width, a radius) rather than the build.
+
 ## Never force-push
 
 No exceptions, even on a personal branch. If history has already diverged from the remote and you're tempted to force-push, stop and merge `origin/<branch>` back in — then add follow-up work as new commits and push normally.

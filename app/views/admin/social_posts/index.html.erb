@@ -55,7 +55,7 @@
 <% end %>
 
 <% table_view = capture do %>
-  <%= render partial: "/admin/social_posts/table", locals: {social_posts: @social_posts, render_sortable: true, skip_total: true} %>
+  <%= render partial: "/admin/social_posts/table", locals: {social_posts: @social_posts, render_sortable: true} %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(

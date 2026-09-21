@@ -13,8 +13,8 @@ description: >-
   date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
   controllers, Tailwind classes, or any frontend code that touches styling
-  or interactivity — including admin screens, whose unlayered legacy CSS and
-  prebuilt jQuery bundle invert several of these rules. Stimulus.js is the
+  or interactivity — including admin screens, whose unlayered legacy CSS
+  inverts several of these rules. Stimulus.js is the
   JavaScript framework; SCSS and CoffeeScript files exist but are deprecated.
 ---
 
@@ -121,10 +121,11 @@ Only add an `id` or non-utility `class` when something concrete consumes it — 
 
 When deleting an `id`/`class`, grep the repo for the name before deciding what to do with it:
 
-**On admin, grep `public/vendored_assets/*.js` as well as `app/`.** `application_standalone.js` still binds
-behaviour by id and class, and its source left the repo with the webpack config, so it can't be rebuilt or
-searched from source — a hook with no consumer in `app/` is routinely live. Its handlers are guarded on a hook being present — minified, so grep the id itself rather than
-`$(`— and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
+**On a page that loads a vendored bundle, grep `public/vendored_assets/*.js` as well as `app/`.** The
+organization pages load `application.js` and the Doorkeeper layout `application_standalone.js`; both bind
+behaviour by id and class, and their source left the repo with the webpack config, so they can't be rebuilt —
+a hook with no consumer in `app/` is routinely live. Each `.js.map` still carries the original source in
+`sourcesContent`, which reads far better than the minified bundle. Handlers are guarded on a hook being present, and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
 that binds `#infoCheck`. So removing an id silently disables behaviour, sometimes behaviour attached
 to another id entirely.
 Grep for what a module *assigns*, not only the hooks it binds — a guarded init publishes globals and
@@ -164,7 +165,8 @@ This project uses the ViewComponent gem to render components.
 - **`skip_digest: true` and components outside `ApplicationComponent` bypass the digest.** A `skip_digest` key carries the component's `cache_digest` itself — `welcome/index.html.erb` is the pattern.
 - **Change a component's signature, then open its `component_preview.rb`** — nothing renders previews in the suite, so a stale one raises `ArgumentError: unknown keyword` on its Lookbook page with the whole suite green. `curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/rails/view_components/<path>/component/<scenario>"` is the check.
 - **A `UI::Table` cell block is `instance_exec`'d against the component.** Inside `table.column ... do`, bare calls and `@ivar`s resolve on `UI::Table::Component`, not the view. A bare call raises, but **an `@ivar` fails silently** — it reads `nil`, or worse, an identically-named ivar the table happens to hold. Reach state through the readers the table exposes (`sort_state.search_params`, not `sortable_search_params`), and for anything else assign a local above the block, the way `Pages::Org::ImpoundRecords::Table` carries `current_organization` and `current_user`. Above the `UI::Table::Component.new` block the view's own helpers work; rewriting those too is churn.
-- **Dev-only markup inside a fragment cache renders unconditionally, classed `only-dev-visible`** — `SharedBlocks::HeaderTags` hides that class per request, so one cached fragment serves dev and non-dev viewers both. Never put `display_dev_info?` in a cache key, and never inject a `<style>` to hide it; `admin/notifications/_table.html.haml` is the pattern. The class only hides: a dev payload a non-dev shouldn't hold in their page source at all — `Pages::Org::BulkImportError`'s raw `import_errors` — keeps its `display_dev_info?` gate.
+- **Dev-only admin markup renders unconditionally, classed `only-dev-visible`** — `SharedBlocks::HeaderTags` hides that class in the page head per request, which is what lets one fragment-cached row serve dev and non-dev viewers both. Never put `display_dev_info?` in a cache key, and never inject a second, local `<style>` to hide it; `admin/notifications/_table.html.erb` is the pattern. The class hides, it does not omit, so three things keep a `display_dev_info?` gate: a payload a non-dev should not hold in page source at all (`Pages::Org::BulkImportError`'s raw `import_errors`), a form input, whose params would otherwise submit (`Pages::Admin::Users::Edit`'s `developer` checkbox), and a decision about whether something *exists* rather than whether it shows (`Organizations::Tabs#render_tab?` on `custom_layouts`).
+- **Cache rows, never cells.** A `cache(...)` inside a cell digests `UI::Table`'s template rather than the calling partial's, so it needs a `cache_fragment_name` prefix to avoid sharing a fragment with every other table caching that record. Pass `cache_key:` and `cache_records:` to `UI::Table` instead — `admin/payments/_table.html.erb` is the pattern. A row key has three inputs and one exclusion: the record (automatic), every flag fixed for the render (`cache_key: cache_fragment_name([name, *flags])`), every *other* record the row renders (`cache_records:`, which mirrors the controller's `includes` — a cell reading an association the controller doesn't preload is an N+1 and a stale row at once; one that *can't* be preloaded, because a method re-queries over it like `TheftAlert#bike`, stays out of the key rather than costing a query per row on every hit), and **never** `sort_state.search_params`, which varies per request: wrap the table in `update-cached-sortable-links` and let it rewrite those hrefs client-side.
 - **A component that `include`s a helper is coupled to whatever ivars that helper reads.** `GraphingHelper#time_range_counts` falls back to `@time_range` off the object it's mixed into, so moving that ivar out of the component silently returns nil rather than failing. Pass the value as an argument when converting a component to explicit arguments.
 - **Moving a view into a component turns its locals into methods.** A `<% x = … %>` computed once per template becomes a method run once per *call site* — which is how a single pluck becomes one per table row. Memoize anything that queries as you move it.
 - **Converting a partial — to a component, or from haml to ERB — is a faithful move, not a cleanup.** Carry the markup over verbatim, including comments and commented-out code: those are often a deliberate stash (a link temporarily disabled, a snippet someone expects to restore). The only changes a conversion introduces are the ones the move requires — `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it. Dead code worth removing goes in its own commit.
@@ -208,23 +210,6 @@ pattern — rather than restated in each view.
 param starting with `search_`, plus the sort and period keys — which is how a filter link keeps the
 rest of the table's state. Reach it through the reader, not the bare helper:
 `url_for(@index.sortable_search_params.merge(search_kind: "x"))`.
-
-### Admin pages that carry legacy JS can't be Turbo-visited
-
-`application_standalone.js` is a plain `<script src>` in the admin layout, and everything it
-sets up binds once inside one `$(document).ready` gated on `#admin-content` — the per-page
-select, the selectize filters, the nested location fields. Turbo Drive
-doesn't re-execute an unchanged script tag, and a back/forward restoration hands back a
-*clone* of its snapshot, so that markup comes back looking live with nothing bound to it.
-
-Two things follow. `turbo-cache-control` doesn't help — a restoration that re-fetches still
-renders through Drive, and the admin layout doesn't yield `:header` to set it with anyway.
-And it's the page you navigate *away from* that breaks, not just the one you land on.
-
-So a screen carrying any of it passes `turbo: false` — `Pages::Admin::Headers::Tabs` takes it, and
-`Pages::Admin::Organizations::CustomLayouts::Form::Wrapper` is the one that does. Before opting a new section in,
-check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields` and
-`#multipleUserSelect`.
 
 ## Screenshots
 
