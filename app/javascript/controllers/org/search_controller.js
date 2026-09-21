@@ -40,14 +40,15 @@ export default class extends Controller {
     if (inUrl) return localStorage.setItem(RESULT_VIEW_KEY, inUrl)
 
     const stored = localStorage.getItem(RESULT_VIEW_KEY)
-    if (!stored || stored === this.resultViewValue || !this.resultsFrame) return
+    const frame = this.resultsFrame
+    if (!stored || stored === this.resultViewValue || !frame) return
 
     params.set('search_result_view', stored)
     const url = `${window.location.pathname}?${params}`
     // The address bar moves first, so search--form doesn't read the two as out of step.
     // Replacing rather than pushing: the rider didn't navigate here.
     window.history.replaceState(window.history.state, '', url)
-    this.resultsFrame.setAttribute('src', url)
+    frame.setAttribute('src', url)
   }
 
   // Pages::SearchResults::Frame's, which the loading overlay's CSS reaches the same way
