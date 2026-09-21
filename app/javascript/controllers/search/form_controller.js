@@ -69,6 +69,17 @@ export default class extends Controller {
   refreshResults () {
     this.clearStaleFrameBusy()
     this.reloadFrameIfUrlStale()
+    this.loadFrameIfIdle()
+  }
+
+  // The frame's eager fetch starts before this controller connects, so one that failed or
+  // was cancelled by then went unheard, leaving the placeholder spinning. A frame that's
+  // neither loaded nor loading has nothing coming - ask again, now that a failure is caught.
+  loadFrameIfIdle () {
+    const frame = this.frameElement
+    if (!frame?.getAttribute('src') || frame.hasAttribute('complete') || frame.hasAttribute('busy')) return
+
+    frame.reload()
   }
 
   // The visible text filters live outside the results frame, so a back/forward
