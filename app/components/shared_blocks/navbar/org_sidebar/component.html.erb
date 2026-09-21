@@ -173,13 +173,10 @@
             %>
             <% open = item == first_group %>
 
-            <div
-              data-controller="ui--collapse"
-              class="tw:group/nav-group tw:contents"
-            >
+            <div data-controller="ui--collapse" class="tw:contents">
               <button
                 type="button"
-                class="<%= group_row_class %>"
+                class="<%= row_class %>"
                 aria-expanded="<%= open %>"
                 aria-controls="org_sidebar_group_<%= item[:key] %>"
                 data-ui--collapse-target="trigger"
