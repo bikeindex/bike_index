@@ -23,28 +23,13 @@ RSpec.describe "Organization embed registration", :js, type: :system do
     fill_in "bike[owner_email]", with: owner_email
   end
 
-  # Hold the blob's PUT open until the example releases it, so the submit is guaranteed to
-  # land mid-upload. A timed delay would let a slow form fill outrun it, and the example
-  # would still pass while testing nothing.
-  def hold_the_upload
-    held = Queue.new
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.route("**/rails/active_storage/disk/**", ->(route, _request) {
-        # Pushing the token back leaves the gate open, so a later request doesn't
-        # hang on the drained queue
-        held.push(held.pop)
-        route.continue
-      })
-    end
-    -> { held.push(:release) }
-  end
-
   # This form submits itself from its own handler rather than from the click, so an upload
   # still in flight is what proves the two work together
   it "uploads the photo straight to storage, holding the submit until the blob lands" do
     visit "/organizations/#{organization.slug}/embed"
 
-    release_upload = hold_the_upload
+    # Held open until released, so the submit is guaranteed to land mid-upload
+    upload = hold_requests("**/rails/active_storage/disk/**")
 
     attach_file("bike_image", Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg"), make_visible: true)
     expect(page).to have_content("uploading")
@@ -57,7 +42,7 @@ RSpec.describe "Organization embed registration", :js, type: :system do
     expect(page).to have_current_path("/organizations/#{organization.slug}/embed", ignore_query: true)
 
     # ...and once the blob lands the held submit goes through, carrying the photo
-    release_upload.call
+    upload.release
     expect(page).to have_content("has been added to Bike Index", wait: 15)
     bike = Bike.last
     expect(bike).to have_attributes(owner_email:, serial_number: "EMBED1234")

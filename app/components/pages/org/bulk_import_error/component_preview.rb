@@ -22,32 +22,30 @@ module Pages
 
         # @display legacy_stylesheet true
         def default
-          render(Pages::Org::BulkImportError::Component.new(bulk_import: bulk_import(LINE_ERRORS)))
+          render_errors(LINE_ERRORS)
         end
 
         # One line of it, as the organization's imports table shows in a row
         # @display legacy_stylesheet true
         def short_display
-          render(Pages::Org::BulkImportError::Component.new(
-            bulk_import: bulk_import(LINE_ERRORS), short_display: true
-          ))
+          render_errors(LINE_ERRORS, short_display: true)
         end
 
         # A file the importer couldn't read, with the line each error stopped on
         # @display legacy_stylesheet true
         def file_errors
-          render(Pages::Org::BulkImportError::Component.new(bulk_import: bulk_import(FILE_ERRORS)))
+          render_errors(FILE_ERRORS)
         end
 
         # @display legacy_stylesheet true
         def unrecognized_errors
-          render(Pages::Org::BulkImportError::Component.new(bulk_import: bulk_import(OTHER_ERRORS)))
+          render_errors(OTHER_ERRORS)
         end
 
         private
 
-        def bulk_import(import_errors)
-          ::BulkImport.new(import_errors:)
+        def render_errors(import_errors, **)
+          render(Pages::Org::BulkImportError::Component.new(bulk_import: ::BulkImport.new(import_errors:), **))
         end
       end
     end
