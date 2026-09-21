@@ -27,12 +27,12 @@ module Pages
             "tw:group-data-overflowing/bikes-table:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
 
           # [&>div] is UI::Table's scroller, whose bottom margin and padding would part the table
-          # from what follows it. The after: box casts the View column's shadow back over the right
-          # edge while there's more to scroll to - the search card's clip hides the box - except in
-          # a full-bleed row, where the table runs off the page's edge
+          # from what follows it. The after: strip shades the right edge inset while there's more to
+          # scroll to - negative spread keeps it to that side - except in a full-bleed row, where
+          # the table runs off the page's edge
           WRAPPER_CLASSES = "tw:group/bikes-table tw:relative tw:[&>div]:mb-0 tw:[&>div]:pb-0 tw:data-overflowing:after:absolute " \
-            "tw:data-overflowing:after:inset-y-0 tw:data-overflowing:after:left-full tw:data-overflowing:after:z-2 " \
-            "tw:data-overflowing:after:w-4 tw:data-overflowing:after:shadow-[-2px_0_6px_rgba(26,26,31,0.04)] " \
+            "tw:data-overflowing:after:inset-y-0 tw:data-overflowing:after:right-0 tw:data-overflowing:after:z-2 " \
+            "tw:data-overflowing:after:w-4 tw:data-overflowing:after:shadow-[inset_-8px_0_8px_-8px_rgba(26,26,31,0.06)] " \
             "tw:@max-[672px]/twwiderow:after:hidden"
 
           def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
