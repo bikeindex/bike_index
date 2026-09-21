@@ -36,6 +36,8 @@ module Organized
           search_organization_bikes
           create_export_and_redirect
         elsif chart_only?
+          # The card counts the organization's own registrations, even while the search reaches past them
+          @search_all = false
           search_organization_bikes
           render chart_card_component, layout: false
         elsif @render_results

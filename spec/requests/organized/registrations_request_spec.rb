@@ -258,6 +258,10 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         # The searched scope answers the search as it is, so it isn't held
         get base_url, params: {chart_scope: "search"}, headers: frame_headers
         expect(assigns(:registrations_stats).first.count).to eq 2
+
+        # ...but only ever over the organization's own, whatever search_all asks
+        get base_url, params: {chart_scope: "search", search_all: true}, headers: frame_headers
+        expect(assigns(:registrations_stats).first.count).to eq 2
       end
     end
 
