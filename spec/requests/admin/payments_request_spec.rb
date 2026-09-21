@@ -31,17 +31,23 @@ RSpec.describe Admin::PaymentsController, type: :request do
       expect(response.body).to include(subject.amount_formatted)
     end
 
-    # The row key has to carry this partial, or the fragment is shared with every other
-    # admin table caching the same payment - and the user, or an email change serves stale
+    # A cell key has to carry this partial, or the fragment is shared with every other
+    # admin table caching the same payment. The user cell is the exception: it caches
+    # itself on the user alone, which is what lets every admin table read the one fragment
     context "with caching", :caching do
       include_context :caching_basic
 
-      it "keys the row to this partial, the payment and the records the row renders" do
+      it "keys each cell to this partial and the payment, and the user cell to the user" do
         subject
         keys = fragments_written { get base_url }
-        expect(keys.count).to eq 1
-        expect(keys.first).to include("admin/payments/_table", subject.cache_key_with_version,
-          current_user.cache_key_with_version)
+        table_keys = keys.select { it.include?("admin/payments/_table") }
+
+        expect(table_keys.count).to be > 1
+        expect(table_keys).to all(include(subject.cache_key_with_version))
+
+        user_keys = keys - table_keys
+        expect(user_keys.count).to eq 1
+        expect(user_keys.first).to include(current_user.cache_key_with_version)
       end
     end
   end
