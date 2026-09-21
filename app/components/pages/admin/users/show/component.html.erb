@@ -540,8 +540,7 @@
   <div data-controller="ui--collapse">
     <h4>
       Mailchimp data
-      <em class="small"><%= render(UI::Button::Component.new(text: "show raw data", color: :link, html_class: "small", aria: {expanded: false},
-              data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"})) %></em>
+      <em class="small"><%= render(UI::Collapse::Component.new(text: "show raw data", color: :link, html_class: "small")) %></em>
     </h4>
 
     <div class="row">
