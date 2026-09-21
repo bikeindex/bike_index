@@ -2,9 +2,9 @@
 
 module UI
   module Collapse
-    # The collapse controller has no component; this previews its markup contract
-    # (content + chevron targets), and its ?param=1 URL and localStorage persistence. The
-    # URL panel is tall enough to reach over what follows it while it opens.
+    # Previews the trigger against the controller's content target, and its ?param=1 URL
+    # and localStorage persistence. The URL panel is tall enough to reach over what
+    # follows it while it opens.
     class ComponentPreview < ApplicationComponentPreview
       # @!group Persistence
       def with_url_param

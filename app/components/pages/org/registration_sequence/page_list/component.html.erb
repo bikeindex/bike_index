@@ -1,22 +1,6 @@
 <%# Shared by the pages and the acknowledgment below them %>
-<% collapse_toggle = capture do %>
-  <button
-    type="button"
-    data-action="ui--collapse#toggle"
-    data-ui--collapse-target="trigger"
-    aria-expanded="true"
-    class="tw:cursor-pointer tw:text-gray-400 tw:hover:text-gray-600"
-  >
-    <span class="tw:sr-only">Toggle details</span>
-
-    <span
-      data-ui--collapse-target="chevron"
-      class="tw:inline-block tw:rotate-90 tw:transition-transform tw:duration-200"
-    >
-      <span class="tw:flex"><%= render UI::IconChevron::Component.new %></span>
-    </span>
-  </button>
-<% end %>
+<% collapse_toggle = render(UI::Collapse::Component.new(chevron: true, expanded: true, color: :link,
+     html_class: "tw:text-gray-400 tw:hover:text-gray-600", aria: {label: "Toggle details"})) %>
 
 <%= render UI::Card::Component.new do %>
   <%= tag.div(class: "tw:-my-1.5 tw:divide-y tw:divide-gray-200", data: list_data) do %>
