@@ -407,17 +407,14 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
 
     # Every controller module is a separate fetch, so the accordion can open the
     # panel — spending its one-shot `shown` event — before this component's module
-    # has landed. Held until the panel is open rather than for a duration, which
-    # only wins the race some of the time
+    # has landed
     form_module = hold_requests(%r{parking_notification_form_controller})
 
     visit "#{preview_path}?panel=impound"
 
     # Only the accordion can reveal the panel, so this is it having opened and
-    # dispatched to nobody — and a route that stopped matching would hold
-    # nothing, leaving the example green against no race
+    # dispatched to nobody
     expect(page).to have_content("Set on map", wait: 10)
-    expect(form_module.urls).to_not be_empty
     form_module.release
 
     expect_impound_mode

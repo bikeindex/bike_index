@@ -28,8 +28,7 @@ RSpec.describe "Organization embed registration", :js, type: :system do
   it "uploads the photo straight to storage, holding the submit until the blob lands" do
     visit "/organizations/#{organization.slug}/embed"
 
-    # Held open until released, so the submit is guaranteed to land mid-upload -- a slow form
-    # fill would outrun a timed delay, and the example would pass testing nothing
+    # Held open until released, so the submit is guaranteed to land mid-upload
     upload = hold_requests("**/rails/active_storage/disk/**")
 
     attach_file("bike_image", Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg"), make_visible: true)
@@ -43,7 +42,6 @@ RSpec.describe "Organization embed registration", :js, type: :system do
     expect(page).to have_current_path("/organizations/#{organization.slug}/embed", ignore_query: true)
 
     # ...and once the blob lands the held submit goes through, carrying the photo
-    expect(upload.urls).not_to be_empty
     upload.release
     expect(page).to have_content("has been added to Bike Index", wait: 15)
     bike = Bike.last

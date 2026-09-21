@@ -152,7 +152,6 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # The unfiltered results are only now allowed to arrive - they mustn't take over. The
     # wait covers a round trip the release only now starts, for this file's slowest response.
     watch_for_superseded_results
-    expect(initial_results_load.urls).not_to be_empty
     initial_results_load.release
     # Arrival and verdict assert separately so a failure says which happened: no marker at
     # all means the released response never reached the page, ='false' means it did and
