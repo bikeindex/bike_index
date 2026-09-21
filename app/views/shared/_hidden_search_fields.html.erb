@@ -1,5 +1,9 @@
 <% kind ||= "admin" %>
 <% skip_organization ||= false %>
+
+<%# A caller whose own period control belongs to this form sends the period itself %>
+<% skip_period ||= false %>
+
 <% include_primary_activity ||= false %>
 
 <%# Sortable %>
@@ -14,7 +18,7 @@
 
 <%# Period %>
 <%= hidden_field_tag :render_chart, @render_chart %>
-<%= hidden_field_tag :period, params[:period] %>
+<%= hidden_field_tag :period, params[:period] unless skip_period %>
 <%= hidden_field_tag :end_time, params[:end_time] %>
 <%= hidden_field_tag :start_time, params[:start_time] %>
 <%= hidden_field_tag :user_id, params[:user_id] %>

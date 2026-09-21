@@ -2,14 +2,16 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global localStorage */
 
-// Connects to data-controller='org--search-column-toggle'
+// Connects to data-controller='org--search-column-settings'
 export default class extends Controller {
   static targets = ['checkboxes']
   static values = { enabledColumns: Array, defaultColumns: Array, assignBikeSticker: Boolean }
 
   connect () {
     this.refreshEnabledColumns()
-    this.selectStoredVisibleColumns()
+    // The registrations search renders the checkboxes inside the results frame, which
+    // hasn't loaded yet - the frame's own render is what applies the stored selection there
+    if (this.hasCheckboxesTarget) this.selectStoredVisibleColumns()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
 
@@ -17,10 +19,12 @@ export default class extends Controller {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
   }
 
+  // The checkboxes render inside the results frame, so a search replaces them unchecked -
+  // re-read the stored selection rather than applying what's in the DOM
   handleFrameRender = (event) => {
-    if (!this.element.contains(event.target)) return
+    if (!this.element.contains(event.target) || !this.hasCheckboxesTarget) return
     this.refreshEnabledColumns()
-    this.updateVisibleColumns()
+    this.selectStoredVisibleColumns()
   }
 
   refreshEnabledColumns () {

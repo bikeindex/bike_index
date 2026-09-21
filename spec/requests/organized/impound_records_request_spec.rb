@@ -24,11 +24,14 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(assigns(:impound_records).count).to eq 0
       expect(assigns(:available_statuses)).to eq available_statuses
 
-      get "#{base_url}?render_chart=true&chart_only=1"
+      # The card holds the chart, so its frame asks with chart_only alone
+      expect(response.body).to include("chart_only=1")
+
+      get "#{base_url}?chart_only=1"
       expect(response.status).to eq(200)
       expect(assigns(:impound_records)).to be_nil
       expect(assigns(:pagy)).to be_nil
-      expect(response.body).to include("impound_records_chart_frame")
+      expect(response.body).to include(Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s)
     end
     context "multiple impound_records" do
       let!(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike2) }

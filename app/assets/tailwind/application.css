@@ -18,6 +18,10 @@
  * ancestor activates tw:dark:* utilities. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Below anything holding the org registrations search's checked search_all: the owner email
+ * field and the chart card fold away on it */
+@custom-variant search-all-checked (&:where(:has([data-org--search-target=searchAll]:checked) *));
+
 /* The selected/pressed state of a button, link or menu item, however it's flagged —
  * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration

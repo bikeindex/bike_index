@@ -6,17 +6,13 @@ RSpec.describe Pages::Org::Search::Form::Component, :js, type: :system do
   let(:preview_path) { "/rails/view_components/pages/org/search/form/component/default" }
 
   describe "default preview" do
-    it "renders the search form" do
+    it "renders the search form, and submits it" do
       visit(preview_path)
 
       expect(page).to have_css("form#Search_Form")
       expect_axe_clean
       expect(page).to have_field("search_email")
       expect(page).to have_field("serial")
-    end
-
-    it "submits the form" do
-      visit(preview_path)
 
       fill_in "search_email", with: "test@example.com"
       fill_in "serial", with: "ABC123"
@@ -27,15 +23,28 @@ RSpec.describe Pages::Org::Search::Form::Component, :js, type: :system do
     end
   end
 
-  describe "without_serial_field preview" do
-    let(:preview_path) { "/rails/view_components/pages/org/search/form/component/without_serial_field" }
+  describe "with_filters preview" do
+    let(:preview_path) { "/rails/view_components/pages/org/search/form/component/with_filters" }
+    let!(:organization) { FactoryBot.create(:organization_brakebills) }
+    let(:panel) { "[data-ui--collapse-target='content']" }
 
-    it "renders without serial field" do
+    it "opens the search settings from the gear, and keeps it open across a reload" do
+      visit(preview_path)
+      expect(page).to have_css("form#Search_Form", wait: 5)
+      page.execute_script("localStorage.removeItem('orgRegistrationFiltersOpen')")
       visit(preview_path)
 
-      expect(page).to have_css("form#Search_Form")
-      expect(page).to have_field("search_email")
-      expect(page).not_to have_field("serial")
+      expect(page).not_to have_css(panel, visible: true, wait: 2)
+
+      click_button "Search settings and filters"
+      expect(page).to have_css(panel, visible: true, wait: 5)
+      expect(page).to have_text("Status:")
+
+      page.refresh
+      expect(page).to have_css(panel, visible: true, wait: 5)
+
+      click_button "Search settings and filters"
+      expect(page).not_to have_css(panel, visible: true, wait: 5)
     end
   end
 

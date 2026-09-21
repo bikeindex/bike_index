@@ -135,6 +135,8 @@ module Pages
             @other_registrations_count ||= other_registrations.count
           end
 
+          def other_registrations? = other_registrations_count.positive?
+
           # The rest are reachable through the org search link below them
           def recent_other_registrations
             @recent_other_registrations ||= other_registrations.reorder(id: :desc).limit(OTHER_REGISTRATIONS_LIMIT)

@@ -16,7 +16,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   let(:search_stickers) { nil }
   let(:search_address) { nil }
   let(:search_status) { "all" }
-  let(:skip_search_and_filters) { false }
+  let(:search_page) { true }
   let(:bikes) { [bike] }
   let(:options) do
     {
@@ -29,78 +29,111 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       search_stickers:,
       search_address:,
       search_status:,
-      skip_search_and_filters:,
-      stolenness: "all"
+      search_page:
     }
   end
 
-  it "renders table with form, checkboxes, and bike data" do
+  it "renders the card header, column panel, table and footer" do
     expect(component).to have_css("table")
     expect(component).to have_css("tbody tr", count: 1)
-    expect(component).to have_css("[data-org--search-target='settings']", visible: :all)
-    # Search form
-    expect(component).to have_css("#Search_Form")
-    # checkboxes
-    expect(component).to have_css("[data-org--search-target='settings'].tw\\:hidden\\!", visible: :all)
+    # the column panel ships collapsed, opened from the header button
+    expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='checkbox']", visible: :all)
-    # pagination
-    expect(component).to have_css(".paginate-container")
+    expect(component).to have_button("Column settings", visible: :all)
+    # footer
+    expect(component).to have_text("showing 1–10 of 25")
     expect(component).to have_css("select#per_page_select")
     # bike data in cells
     expect(component).to have_text(bike.mnfg_name)
   end
 
-  context "with skip_search_and_filters" do
-    let(:skip_search_and_filters) { true }
+  context "with result_view thumbnail" do
+    let(:sort_state) { ComponentStructs::SortState.new(search_params: {serial: "xyz"}) }
+    let(:options) { super().merge(result_view: "thumbnail", sort_state:) }
 
-    it "renders table without search form" do
-      expect(component).to have_css("table")
-      expect(component).not_to have_css("#Search_Form")
+    it "renders no chips until the flag is on" do
+      expect(component).to_not have_link("Spreadsheet")
+      expect(component).to_not have_text("View as")
+    end
+
+    it "marks the chip active and carries the search into the other one's link" do
+      Flipper.enable(:organization_registration_view_switcher)
+      expect(component).to have_css("a[data-active='true']", text: "Thumbnail")
+      expect(component).to have_link("Spreadsheet", href: /search_result_view=spreadsheet/)
+      expect(component).to have_link("Spreadsheet", href: /serial=xyz/)
+    end
+
+    context "with an unknown view" do
+      let(:options) { super().merge(result_view: "nonsense") }
+      before { Flipper.enable(:organization_registration_view_switcher) }
+
+      it "falls back to the spreadsheet" do
+        expect(component).to have_css("a[data-active='true']", text: "Spreadsheet")
+      end
     end
   end
 
-  context "with bike_stickers enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
+  context "without search_page" do
+    let(:search_page) { false }
 
-    it "renders sticker filter radios" do
-      expect(component).to have_text("Stickers")
-      expect(component).to have_css("input[type='radio'][name='search_stickers']", visible: :all)
+    it "renders the column settings button without the search's actions, and brings its own controllers" do
+      expect(component).to have_css("table")
+      expect(component).to have_css("[data-controller~='org--search-column-settings']")
+      expect(component).to have_button("Column settings", visible: :all)
+      # the header's button is the only one - the panel doesn't carry the legacy one
+      expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)
+    end
+
+    context "with csv_exports enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+      it "renders no export, since this page's params aren't a search of what's shown" do
+        expect(component).not_to have_text("Export CSV")
+      end
     end
   end
 
   context "with impound_bikes enabled" do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
-    it "renders impound status filter radios and impound columns" do
-      expect(component).to have_text("Status")
-      expect(component).to have_css("input[type='radio'][name='search_status'][value='not_impounded']", visible: :all)
+    it "renders impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
       expect(component).to have_css("th.impounded_cell", visible: :all, text: "Impounded")
     end
   end
 
-  context "with search_stickers filter active" do
-    let(:enabled_feature_slugs) { %w[bike_search bike_stickers] }
-    let(:search_stickers) { "with" }
+  context "with search_all" do
+    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+    let(:options) { super().merge(search_all: true) }
 
-    it "displays active filter description" do
-      expect(component).to have_text("with stickers")
+    it "disables the export, which would reach past the organization, and says why" do
+      expect(component).to have_css("[data-controller='ui--tooltip'] button a[aria-disabled='true']:not([href])", text: "Export CSV")
+      expect(component).to have_css("[role=tooltip]", text: 'Uncheck "Search all registrations"', visible: :all)
+      expect(component).to have_text("25 matches")
+    end
+
+    context "with the count at its limit" do
+      let(:pagy) { Pagy::Offset.new(count: 1_000, page: 1, limit: 10) }
+
+      it "says it stopped counting there" do
+        expect(component).to have_text("Over 1,000 matches")
+      end
     end
   end
 
-  context "with search_address filter active" do
-    let(:search_address) { "without_street" }
+  context "with a single match" do
+    let(:pagy) { Pagy::Offset.new(count: 1, page: 1, limit: 10) }
 
-    it "displays active filter description" do
-      expect(component).to have_text("no address")
+    it "counts it in the singular" do
+      expect(component).to have_text(/1 match\b/)
     end
   end
 
-  context "with search_status filter active" do
-    let(:search_status) { "stolen" }
+  context "with over 1,000 matches, not searching all" do
+    let(:pagy) { Pagy::Offset.new(count: 1_001, page: 1, limit: 10) }
 
-    it "displays active filter description" do
-      expect(component).to have_text("only stolen")
+    it "shows the count" do
+      expect(component).to have_text("1,001 matches")
     end
   end
 
@@ -126,8 +159,9 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   context "with csv_exports enabled" do
     let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
-    it "renders export link" do
-      expect(component).to have_link(text: /Create export/, visible: :all)
+    it "renders the export in the header, beside the column settings button" do
+      expect(component).to have_link("Export CSV", visible: :all)
+      expect(component).not_to have_css("[data-ui--collapse-target='content'] a", text: "Export CSV", visible: :all)
     end
   end
 
