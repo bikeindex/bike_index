@@ -57,7 +57,9 @@ module UI
       def cache_records_for(record) = Array(@cache_records&.call(record))
 
       # The index rather than the column: two cells of one record would otherwise share a
-      # fragment. It holds only because the flags that change the column set are in cache_key
+      # fragment. It holds only because the flags that change the column set are in cache_key.
+      # The shift-proof alternative isn't `cell_block.source_location` - a loop emits several
+      # columns from the one block, and they'd all collide on it
       def cell_cache_key(column_index, record, cache_records)
         [@cache_key, column_index, record, *cache_records]
       end
