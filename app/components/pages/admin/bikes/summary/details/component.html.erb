@@ -144,7 +144,7 @@
 
           <td>
             <% if @bike.user.present? %>
-              <%= render(Pages::Admin::Users::Cell::Component.new(user: @bike.user)) %>
+              <%= render(Atoms::Admin::TableCells::User::Component.new(user: @bike.user)) %>
             <% else %>
               Unclaimed
             <% end %>

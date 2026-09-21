@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Admin::Organizations::Cell::Component, type: :component do
+RSpec.describe Atoms::Admin::TableCells::Organization::Component, type: :component do
   let(:component) { with_request_url("/admin") { render_inline(described_class.new(**options)) } }
   let(:options) { {organization:, organization_id:, render_search:, sort_state: ComponentStructs::SortState.new(search_params: {period: "all"})} }
   let(:organization) { nil }
