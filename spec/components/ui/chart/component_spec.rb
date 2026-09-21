@@ -14,6 +14,11 @@ RSpec.describe UI::Chart::Component, type: :component do
     end
   end
 
+  it "gives each render its own element id" do
+    ids = 2.times.map { render_inline(described_class.new(series: [{name: "Test", data: {}}])).at_css("[id^='chart-']")["id"] }
+    expect(ids.uniq.size).to eq 2
+  end
+
   context "with custom colors" do
     let(:custom_colors) { %w[#111111 #222222] }
     let(:instance) { described_class.new(series: [{name: "Test", data: {}}], time_range:, colors: custom_colors) }

@@ -20,13 +20,13 @@ RSpec.describe Admin::BikesController, type: :request do
       it "renders the chart" do
         get base_url, params: {render_chart: true, search_email: "somethingcool@bikeindex.org", period: "year"}
         expect(response.code).to eq("200")
-        expect(response.body).to include("chart-1")
+        expect(response.body).to include('data-controller="ui--chart"')
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
 
         # Also works with user.id
         get base_url, params: {render_chart: true, user_id: user.id, period: "year"}
         expect(response.code).to eq("200")
-        expect(response.body).to include("chart-1")
+        expect(response.body).to include('data-controller="ui--chart"')
         expect(assigns(:user_subject)).to eq user
       end
     end

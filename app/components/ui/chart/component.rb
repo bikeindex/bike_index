@@ -52,8 +52,10 @@ module UI
         @empty_buckets ||= self.class.empty_time_range_counts(@time_range)
       end
 
+      # Chartkick counts ids per view, and every frame response and Lookbook example is a
+      # fresh one - so two on a page would both be chart-1, and draw into the first
       def chart_options
-        {thousands: ",", colors: chart_colors, stacked: @stacked,
+        {id: "chart-#{SecureRandom.hex(4)}", thousands: ",", colors: chart_colors, stacked: @stacked,
          prefix: @prefix, round: @round, height: @height, library: @library}.compact
       end
 
