@@ -39,6 +39,11 @@
       <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
     <% end %>
 
+    <% table.column(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell",
+      header_tooltip: translation(".occurred_at_tooltip")) do |bike| %>
+      <%= render(UI::Time::Component.new(time: bike.occurred_at)) %>
+    <% end %>
+
     <% table.column(sortable: "mnfg_name", label: settings.column_renames[:manufacturer_cell], classes: "hideableColumn manufacturer_cell") do |bike| %>
       <strong class="tw:text-gray-900 tw:dark:text-gray-100"><%= bike.mnfg_name %></strong>
     <% end %>
@@ -91,11 +96,6 @@
 
     <% table.column(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
       <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
-    <% end %>
-
-    <% table.column(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell",
-      header_tooltip: translation(".occurred_at_tooltip")) do |bike| %>
-      <%= render(UI::Time::Component.new(time: bike.occurred_at)) %>
     <% end %>
 
     <% table.column(sortable: "updated_by_user_at", label: settings.column_renames[:updated_at_cell], classes: "hideableColumn updated_at_cell") do |bike| %>
