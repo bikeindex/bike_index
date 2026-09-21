@@ -1,0 +1,26 @@
+<%= render(UI::Table::Component.new(records: rows)) do |table| %>
+  <% table.column(label: "", footer: "Total") do |row| %>
+    <%= row.name %>
+    <small><%= MoneyFormatter.money_format(row.amount_cents_facebook) %></small>
+  <% end %>
+
+  <% table.column(label: "Count", footer: number_display(totals[:alert_count])) do |row| %>
+    <%= number_display(row.alert_count) %>
+  <% end %>
+
+  <% table.column(label: "Fbook Reach", footer: number_display(totals[:fbook_reach])) do |row| %>
+    <%= number_display(row.fbook_reach) %>
+  <% end %>
+
+  <% table.column(label: "Fbook Spend", footer: MoneyFormatter.money_format(totals[:fbook_cents])) do |row| %>
+    <%= MoneyFormatter.money_format(row.fbook_cents) %>
+  <% end %>
+
+  <% table.column(label: "Revenue", classes: "tw:text-xs", footer: MoneyFormatter.money_format(totals[:revenue_cents])) do |row| %>
+    <%= MoneyFormatter.money_format(row.revenue_cents) %>
+  <% end %>
+
+  <% table.column(label: "Recovered", classes: "tw:text-xs", header_classes: "tw:font-normal", footer: number_display(totals[:recovered_count])) do |row| %>
+    <%= number_display(row.recovered_count) %>
+  <% end %>
+<% end %>

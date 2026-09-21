@@ -5,12 +5,13 @@ module Pages
     module Organizations
       module Cell
         class Component < ApplicationComponent
-          def initialize(organization: nil, organization_id: nil, search_url: nil, sort_state: ComponentStructs::SortState.new, render_search: false)
+          def initialize(organization: nil, organization_id: nil, search_url: nil, sort_state: ComponentStructs::SortState.new, render_search: false, short_name: false)
             @organization = organization
             @organization_id = organization_id || organization&.id
             @search_url = search_url
             @sort_state = sort_state
             @render_search = render_search
+            @short_name = short_name
           end
 
           private
@@ -31,6 +32,10 @@ module Pages
 
             @organization_subject = @organization.presence ||
               (Organization.unscoped.find_by(id: @organization_id) if @organization_id.present?)
+          end
+
+          def display_name
+            @short_name ? organization_subject.short_name : organization_subject.name
           end
 
           def error_text_class

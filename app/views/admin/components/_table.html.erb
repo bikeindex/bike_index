@@ -1,0 +1,53 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<% ctype_other_id = Ctype.other.id %>
+<% manufacturer_other_id = Manufacturer.other.id %>
+
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(record) { content_tag(:span, record.id, class: "only-dev-visible") }) do |component| %>
+    <%= render UI::Time::Component.new(time: component.created_at) %>
+  <% end %>
+
+  <% table.column(label: "Model, description, serial") do |component| %>
+    <%= component.model_name %>
+
+    <% if component.description.present? %>
+      <small title="<%= component.description %>">
+        <%= component.description.truncate(100) %>
+      </small>
+    <% end %>
+
+    <% if component.serial_number.present? %>
+      <small class="d-block">serial: <%= component.serial_number %></small>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Year") do |component| %>
+    <%= component.year %>
+  <% end %>
+
+  <% table.column(label: "Type") do |component| %>
+    <% if component.ctype_id == ctype_other_id %>
+      <span class="stolen-color"><%= component.ctype_other.presence || "-" %></span>
+    <% else %>
+      <%= component.ctype&.name %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Front/Rear") do |component| %>
+    <%= "front" if component.front %>
+    <%= "rear" if component.rear %>
+  <% end %>
+
+  <% table.column(sortable: "manufacturer_id") do |component| %>
+    <span class="<%= (component.manufacturer_id == manufacturer_other_id ? "stolen-color" : "") %>">
+      <%= component.mnfg_name %>
+    </span>
+  <% end %>
+
+  <% table.column(sortable: "bike_id") do |component| %>
+    <% if component.bike_id.present? %>
+      <%= render Pages::Admin::Bikes::Cell::Component.new(bike: component.bike, bike_id: component.bike_id) %>
+    <% end %>
+  <% end %>
+<% end %>

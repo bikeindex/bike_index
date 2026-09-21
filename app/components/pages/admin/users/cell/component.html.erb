@@ -1,9 +1,6 @@
 <span class="tw:inline-flex tw:items-baseline tw:gap-x-2">
   <% if show_missing_user? %>
-    <small
-      class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"
-      title="<%= @user_id %>"
-    >
+    <small class="<%= error_text_class %>" title="<%= @user_id %>">
       Missing user
     </small>
     <% if show_email_for_missing_user? %>
@@ -18,7 +15,7 @@
   <% end %>
 
   <% if deleted_user? %>
-    <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">user deleted</small>
+    <small class="<%= error_text_class %>">user deleted</small>
   <% end %>
 
   <%= render(Atoms::Admin::Badges::User::Component.new(user: @user)) %>

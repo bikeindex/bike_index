@@ -63,7 +63,7 @@
   <% end %>
 
   <% table.column(sortable: "kind") do |update| %>
-    <small><%= update.kind.gsub("_claim", "").humanize %></small>
+    <small><%= update.kind&.gsub("_claim", "")&.humanize %></small>
   <% end %>
 
   <% table.column(sortable: "creator_kind") do |update| %>

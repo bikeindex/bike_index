@@ -44,6 +44,16 @@ RSpec.describe Pages::Admin::Organizations::Cell::Component, type: :component do
       expect(component).to have_css("a[href*='/admin/organizations/']")
       expect(component.text).not_to include("deleted!")
     end
+
+    context "with short_name" do
+      let(:organization) { FactoryBot.create(:organization, name: "Test Organization", short_name: "TestOrg") }
+      let(:options) { super().merge(short_name: true) }
+
+      it "renders the short name" do
+        expect(component).to have_css("a", text: "TestOrg")
+        expect(component.text).not_to include("Test Organization")
+      end
+    end
   end
 
   context "with deleted organization" do

@@ -1,0 +1,66 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(email_domain) { content_tag(:span, email_domain.id, class: "only-dev-visible") }) do |email_domain| %>
+    <%= link_to admin_email_domain_path(email_domain), class: "twlink" do %>
+      <%= render UI::Time::Component.new(time: email_domain.created_at) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |email_domain| %>
+    <%= render UI::Time::Component.new(time: email_domain.updated_at) %>
+  <% end %>
+
+  <% table.column(sortable: "status_changed_at", classes: "tw:text-xs") do |email_domain| %>
+    <% if email_domain.status_changed_after_create? %>
+      <%= render UI::Time::Component.new(time: email_domain.updated_at) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "domain") do |email_domain| %>
+    <%= email_domain.domain %>
+  <% end %>
+
+  <% table.column(sortable: "status") do |email_domain| %>
+    <% status_class = "text-danger" if email_domain.status.match?("ban") %>
+    <% status_class = "text-warning font-weight-bold" if email_domain.ignored? %>
+
+    <span class="<%= status_class %>">
+      <%= email_domain.status_humanized %>
+    </span>
+
+    <% if email_domain&.no_auto_assign_status? %>
+      <small class="tw:ml-1 tw:text-sky-400">no auto status</small>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "creator_id") do |email_domain| %>
+    <%= render Pages::Admin::Users::Cell::Component.new(user: email_domain.creator, user_id: email_domain.creator_id) %>
+  <% end %>
+
+  <% table.column(sortable: "user_count", label: "Users") do |email_domain| %>
+    <%= link_to number_display(email_domain.user_count), admin_users_path(search_domain: email_domain.domain, render_chart: true), class: "twlink" %>
+  <% end %>
+
+  <% table.column(sortable: "bike_count", label: "Bikes", header_classes: "tw:text-xs") do |email_domain| %>
+    <% if email_domain.bike_count > 0 %>
+      <%= link_to number_display(email_domain.bike_count), admin_bikes_path(search_domain: email_domain.domain, render_chart: true), class: "twlink" %>
+    <% else %>
+      <%= number_display(email_domain.bike_count) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Notifications", header_classes: "tw:text-xs") do |email_domain| %>
+    <%= number_display(email_domain.notification_count) %>
+  <% end %>
+
+  <% table.column(sortable: "spam_score", header_classes: "tw:text-xs") do |email_domain| %>
+    <span class="<%= helpers.admin_email_domain_spam_color(email_domain.spam_score.round(0)) %>">
+      <%= email_domain.spam_score.round(0) %>
+    </span>
+  <% end %>
+
+  <% table.column(label: "") do |email_domain| %>
+    <%= render partial: "admin/email_domains/data_details", locals: {email_domain:} %>
+  <% end %>
+<% end %>

@@ -73,6 +73,10 @@ module Pages
             @email.present? && @user.blank?
           end
 
+          def error_text_class
+            UI::Alerts::Base::Component::TEXT_CLASSES[:error]
+          end
+
           def deleted_user?
             @user&.deleted?
           end
