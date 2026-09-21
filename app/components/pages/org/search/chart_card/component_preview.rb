@@ -16,11 +16,11 @@ module Pages
               chart:, stats:))
           end
 
-          # The impound records search's card, which holds only the chart
+          # The impound records search's card: its own search only, so no scope toggle or stats
           def chart_only
-            chart = UI::Chart::Component.new(stacked: true,
+            chart = UI::Chart::Component.new(stacked: true, height: "180px",
               series: [{name: "Impounded", data: months.map { [it, rand(5..40)] }.to_h}])
-            {template: "pages/org/search/chart_card/component_preview/chart_only", locals: {chart:}}
+            in_row(Pages::Org::Search::ChartCard::Component.new(scope: "search", chart:))
           end
 
           # The row too narrow for a second column, where the card opens from its own trigger

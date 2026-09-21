@@ -31,6 +31,16 @@ RSpec.describe Pages::Org::Search::ChartCard::Component, type: :component do
     end
   end
 
+  context "with no scope paths" do
+    let(:scope) { "search" }
+    let(:scope_paths) { {} }
+
+    it "captions its one scope, without the toggle" do
+      expect(component).to have_text("Chart · Current search", normalize_ws: true)
+      expect(component).to have_no_link("Last year")
+    end
+  end
+
   it "collapses from a trigger outside the frame, keeping the open state in the URL" do
     expect(component).to have_css("[data-ui--collapse-param-value='chart_open']", visible: :all)
     expect(component).to have_button("Chart", visible: :all)
