@@ -1,6 +1,6 @@
 <%# Shared by the pages and the acknowledgment below them %>
-<% collapse_toggle = render(UI::Collapse::Component.new(chevron: true, expanded: true, color: :link,
-     html_class: "tw:text-gray-400 tw:hover:text-gray-600", aria: {label: "Toggle details"})) %>
+<% collapse_toggle = render(UI::Collapse::Component.new(chevron: true, expanded: true, size: :sm,
+     aria: {label: "Toggle details"})) %>
 
 <%= render UI::Card::Component.new do %>
   <%= tag.div(class: "tw:-my-1.5 tw:divide-y tw:divide-gray-200", data: list_data) do %>
@@ -27,7 +27,7 @@
             <% if page.subtitle.present? %>
               <p
                 data-ui--collapse-target="content"
-                class="tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600"
+                class="tw:mt-1 tw:mb-0 tw:pl-10.5 tw:text-sm tw:text-gray-600"
               >
                 <%= page.subtitle %>
               </p>
@@ -67,7 +67,7 @@
             <% if @registration_sequence.faq_url.present? %>
               <p
                 data-ui--collapse-target="content"
-                class="tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600"
+                class="tw:mt-1 tw:mb-0 tw:pl-10.5 tw:text-sm tw:text-gray-600"
               >
                 <%= link_to "FAQ link", @registration_sequence.faq_url, class: "twlink" %>
               </p>
