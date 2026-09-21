@@ -34,7 +34,7 @@ module Admin
         redirect_to redirect || admin_recoveries_url
       else
         @recovery = @stolen_record
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 

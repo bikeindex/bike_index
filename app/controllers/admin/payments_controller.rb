@@ -53,7 +53,7 @@ module Admin
         else
           "Not able to create #{permitted_create_parameters[:payment_method]} method of payments"
         end
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 

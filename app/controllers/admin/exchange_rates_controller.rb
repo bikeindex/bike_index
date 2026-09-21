@@ -22,7 +22,7 @@ module Admin
         redirect_to admin_exchange_rates_url
       else
         flash.now[:error] = @exchange_rate.errors.full_messages.to_sentence
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -34,7 +34,7 @@ module Admin
         redirect_to admin_exchange_rates_url
       else
         flash.now[:error] = @exchange_rate.errors.full_messages.join("\n")
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     end
 

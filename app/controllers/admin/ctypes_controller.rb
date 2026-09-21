@@ -26,7 +26,7 @@ module Admin
         flash[:success] = "Component Type Saved!"
         redirect_to admin_ctypes_url
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -36,7 +36,7 @@ module Admin
         flash[:success] = "Component type created!"
         redirect_to admin_ctypes_url
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

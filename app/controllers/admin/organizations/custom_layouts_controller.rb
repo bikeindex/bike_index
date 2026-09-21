@@ -23,7 +23,7 @@ module Admin
           flash[:success] = "Layout Saved!"
           redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
         else
-          render action: :edit, id: params[:id]
+          render action: :edit, id: params[:id], status: :unprocessable_entity
         end
       end
 

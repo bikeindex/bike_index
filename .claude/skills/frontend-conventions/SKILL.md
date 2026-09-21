@@ -104,7 +104,7 @@ Four of those carry a rule beyond "use the component":
 
 Any time you show, hide, or toggle an element in response to interaction, go through the shared collapse helpers. **Never** hand-roll it with the `hidden` attribute, `element.style.display`, `element.hidden = true`, or ad-hoc `classList.add('tw:hidden')` — those skip the shared show/hide animation and the `tw:hidden!`/`tw:hidden` class contract the rest of the app depends on.
 
-- **Markup-only toggle** (a trigger reveals/collapses a panel, no other logic): add `data-controller="ui--collapse"`, mark the collapsible element `data-ui--collapse-target="content"`, and wire the trigger's `data-action` to `ui--collapse#toggle` / `ui--collapse#show` / `ui--collapse#hide` (`app/javascript/controllers/ui/collapse_controller.js`).
+- **Markup-only toggle** (a trigger reveals/collapses a panel, no other logic): add `data-controller="ui--collapse"`, mark the collapsible element `data-ui--collapse-target="content"`, and render the trigger with `UI::Collapse::Component` (`chevron: true` for the rotating chevron) — never a hand-wired button (`app/javascript/controllers/ui/collapse_controller.js`).
 - **Inside your own Stimulus controller** (you have extra logic — a redirect branch, a query-param check, etc.): import `collapse_utils` and call it directly:
 
   ```js

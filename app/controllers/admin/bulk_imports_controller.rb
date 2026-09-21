@@ -37,7 +37,7 @@ module Admin
         redirect_to admin_bulk_imports_url
       else
         flash[:error] = "Unable to create bulk import"
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

@@ -30,7 +30,7 @@ module Admin
         flash[:notice] = "Post saved!"
         redirect_to edit_admin_social_post_url
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -59,7 +59,7 @@ module Admin
         redirect_to edit_admin_social_post_url(id: @social_post.id)
       else
         flash[:error] ||= "Unable to create post"
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

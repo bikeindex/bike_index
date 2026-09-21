@@ -34,7 +34,7 @@ module Admin
         redirect_to RegistrationSequencePaths.edit_page(@page, admin: true)
       else
         flash[:error] = "Unable to update: #{@page.errors.full_messages.to_sentence}"
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     end
 

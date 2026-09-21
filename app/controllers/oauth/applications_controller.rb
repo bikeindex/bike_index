@@ -41,7 +41,7 @@ module Oauth
 
         redirect_to oauth_application_url(@application)
       else
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
