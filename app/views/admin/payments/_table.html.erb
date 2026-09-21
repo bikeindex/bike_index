@@ -8,7 +8,7 @@
 >
   <%= render(UI::Table::Component.new(records: payments, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["admin_payments", render_sortable, skip_user, skip_paid_at, skip_kind, render_method, render_organization_search]),
-        cache_records: ->(payment) { [payment.user, payment.organization, payment.invoice] })) do |table| %>
+        cache_records: ->(payment) { [payment.organization, payment.invoice] })) do |table| %>
     <% table.column(sortable: "created_at") do |payment| %>
       <%= link_to render(UI::Time::Component.new(time: payment.created_at)), edit_admin_payment_path(payment), class: "twlink" %>
     <% end %>
@@ -20,7 +20,7 @@
     <% end %>
 
     <% unless skip_user %>
-      <% table.column(sortable: "user_id") do |payment| %>
+      <% table.column(sortable: "user_id", cached: false) do |payment| %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, email: payment.email, user: payment.user, render_search: render_sortable) %>
       <% end %>
     <% end %>

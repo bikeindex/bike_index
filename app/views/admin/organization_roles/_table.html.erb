@@ -8,12 +8,12 @@
 >
   <%= render(UI::Table::Component.new(records: organization_roles, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["admin_organization_roles", render_sortable, skip_organization, render_deleted, render_organization_search]),
-        cache_records: ->(organization_role) { [organization_role.user, organization_role.organization, organization_role.sender] })) do |table| %>
+        cache_records: ->(organization_role) { organization_role.organization })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(organization_role) { organization_role.id }) do |organization_role| %>
       <%= link_to render(UI::Time::Component.new(time: organization_role.created_at)), admin_organization_role_url(organization_role), class: "twlink" %>
     <% end %>
 
-    <% table.column(sortable: "invited_email", label: "Recipient") do |organization_role| %>
+    <% table.column(sortable: "invited_email", label: "Recipient", cached: false) do |organization_role| %>
       <% if organization_role.user.present? %>
         <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.user) %>
       <% else %>
@@ -31,7 +31,7 @@
       <%= render UI::Time::Component.new(time: organization_role.claimed_at) %>
     <% end %>
 
-    <% table.column(sortable: "sender_id", label: "Sender", header_classes: "tw:text-xs") do |organization_role| %>
+    <% table.column(sortable: "sender_id", label: "Sender", header_classes: "tw:text-xs", cached: false) do |organization_role| %>
       <% if organization_role.sender.present? %>
         <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.sender) %>
       <% else %>

@@ -16,5 +16,5 @@ RSpec.describe Pages::Admin::Bikes::Table::Component, type: :component do
     expect(component).to have_css("td", text: bike.owner_email)
   end
 
-  it_behaves_like "cached_table_rows"
+  it_behaves_like "cached_table_cells"
 end

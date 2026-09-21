@@ -6,7 +6,7 @@
 >
   <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["admin_marketplace_messages", render_sortable, skip_marketplace_listing, truncate_length]),
-        cache_records: ->(marketplace_message) { [marketplace_message.sender, marketplace_message.marketplace_listing] })) do |table| %>
+        cache_records: ->(marketplace_message) { marketplace_message.marketplace_listing })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |marketplace_message| %>
       <%= link_to admin_marketplace_message_path(marketplace_message), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: marketplace_message.created_at) %>
@@ -46,7 +46,7 @@
       <%= number_display(marketplace_message.messages_prior_count) %>
     <% end %>
 
-    <% table.column(sortable: "sender_id") do |marketplace_message| %>
+    <% table.column(sortable: "sender_id", cached: false) do |marketplace_message| %>
       <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_message.sender, render_search: render_sortable) %>
     <% end %>
   <% end %>

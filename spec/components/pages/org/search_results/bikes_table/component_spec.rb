@@ -159,5 +159,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   let(:cached_record) { bike }
-  it_behaves_like("cached_table_rows") { let(:row_cache_key) { "org-#{organization.id}-#{described_class.cache_digest}" } }
+  it_behaves_like("cached_table_cells") do
+    let(:cell_cache_key) { ["org", organization.id, *organization.enabled_feature_slugs, described_class.cache_digest].join("-") }
+  end
 end

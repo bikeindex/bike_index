@@ -108,6 +108,47 @@ RSpec.describe Pages::Admin::Users::Cell::Component, type: :component do
     end
   end
 
+  context "with caching", :caching do
+    include_context :caching_basic
+
+    let(:user) { FactoryBot.create(:user, email: "test@example.com") }
+
+    def render_cell(**overrides)
+      with_controller_class(ApplicationController) { render_inline(described_class.new(user:, **overrides)) }
+    end
+
+    it "writes one fragment that every table's cell reads" do
+      keys = fragments_written { render_cell }
+
+      expect(keys.count).to eq 1
+      expect(keys.first).to include(user.cache_key_with_version, "locale/en")
+
+      # Nothing about the table around it is in the key, so a table passing its own
+      # sort_state and search_url still reads the fragment the bare render wrote
+      expect(fragments_written {
+        render_cell(sort_state: ComponentStructs::SortState.new(sort: "user_id"), render_search: true)
+      }).to eq([])
+
+      user.update(email: "changed@example.com")
+      expect(fragments_written { render_cell }.count).to eq 1
+    end
+
+    it "renders the search link outside the fragment" do
+      render_cell
+      result = render_cell(search_url: "/admin/users?user_id=#{user.id}", render_search: true)
+
+      expect(result).to have_css("a.display-sortable-link[href='/admin/users?user_id=#{user.id}']")
+    end
+
+    context "without a user" do
+      let(:user) { nil }
+
+      it "writes no fragment" do
+        expect(fragments_written { render_cell(email: "orphaned@example.com") }).to eq([])
+      end
+    end
+  end
+
   context "with render_search false" do
     let(:user) { FactoryBot.create(:user) }
     let(:options) { {user:, render_search: false} }

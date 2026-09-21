@@ -173,7 +173,7 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  # Every part of a row's key serves a stale row if it drops out, and nothing about the
+  # Every part of a cell's key serves a stale cell if it drops out, and nothing about the
   # rendered markup shows which parts are there — so these assert on the keys written
   context "with cache_key", :caching do
     include_context :caching_basic
@@ -189,32 +189,35 @@ RSpec.describe UI::Table::Component, type: :component do
       end
     end
 
-    it "writes a fragment per row, scoped to the record, the cache_key and the locale" do
+    it "writes a fragment per cell, scoped to the record, the cache_key and the locale" do
       result = nil
       keys = fragments_written { result = render_table }
 
       expect(result).to have_css("td", text: users.first.name)
       expect(result).to have_css("td div small", text: users.first.id.to_s)
-      expect(keys.count).to eq 2
+      expect(keys.count).to eq 4
       expect(keys.first).to include("test", users.first.cache_key_with_version, "locale/en")
-      expect(keys.second).to include(users.second.cache_key_with_version)
+      expect(keys.third).to include(users.second.cache_key_with_version)
+
+      # Two cells of one record, so the column has to be in the key
+      expect(keys.first).not_to eq(keys.second)
 
       expect(fragments_written { render_table }).to eq([])
 
-      # cache_key namespaces the rows, so another table rendering the same records
-      # doesn't serve this one's cells
-      expect(fragments_written { render_table(cache_key: "other") }.count).to eq 2
+      # cache_key namespaces the cells, so another table rendering the same records
+      # doesn't serve this one's
+      expect(fragments_written { render_table(cache_key: "other") }.count).to eq 4
 
-      # The version in each record's key is what busts that row when the record changes
+      # The version in each record's key is what busts its cells when the record changes
       users.first.update(name: "Changed name")
       rewritten = fragments_written { render_table }
-      expect(rewritten.count).to eq 1
-      expect(rewritten.first).to include(users.first.cache_key_with_version)
+      expect(rewritten.count).to eq 2
+      expect(rewritten).to all(include(users.first.cache_key_with_version))
     end
 
-    # A row renders records besides its own, and nothing about the markup says which -
-    # so an association the key misses serves stale until the record itself changes
-    it "busts a row when a record from cache_records changes" do
+    # A cell renders records besides its row's own, and nothing about the markup says
+    # which - so an association the key misses serves stale until the record itself changes
+    it "busts a cell when a record from cache_records changes" do
       organization = FactoryBot.create(:organization, name: "Original name")
       render_with_org = lambda do
         with_controller_class(ApplicationController) do
@@ -235,8 +238,24 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(render_with_org.call).to have_css("td", text: "Renamed")
     end
 
+    context "with cached: false" do
+      it "renders that column's cells uncached" do
+        keys = with_controller_class(ApplicationController) do
+          fragments_written do
+            render_inline(described_class.new(records: users, cache_key: "test")) do |table|
+              table.column(label: "Name") { |u| u.name }
+              table.column(label: "Email", cached: false) { |u| u.email }
+            end
+          end
+        end
+
+        expect(keys.count).to eq 2
+        expect(keys).to all(include("test"))
+      end
+    end
+
     context "in another locale" do
-      it "keys the rows to that locale" do
+      it "keys the cells to that locale" do
         keys = I18n.with_locale(:nl) { fragments_written { render_table } }
 
         expect(keys.first).to include("locale/nl")
@@ -244,7 +263,7 @@ RSpec.describe UI::Table::Component, type: :component do
     end
 
     context "without a cache_key" do
-      it "renders every row uncached" do
+      it "renders every cell uncached" do
         result = nil
         keys = fragments_written { result = render_table(cache_key: nil) }
 

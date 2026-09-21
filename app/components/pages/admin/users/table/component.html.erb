@@ -22,7 +22,7 @@
     </span>
   <% end %>
 
-  <% table.column(sortable: "email", lower_right: ->(user) { user.id }) do |user| %>
+  <% table.column(sortable: "email", lower_right: ->(user) { user.id }, cached: false) do |user| %>
     <%= render Pages::Admin::Users::Cell::Component.new(email: user.email, user:, render_search: false) %>
   <% end %>
 

@@ -22,6 +22,12 @@ module Pages
 
           private
 
+          # The enabled features, because they add and drop columns - a cell keyed without
+          # them is served under whichever column has since taken its position
+          def table_cache_key
+            ["org", @organization.id, *@organization.enabled_feature_slugs, self.class.cache_digest].join("-")
+          end
+
           # Column labels and additional fields derive from the organization alone, so bare
           # settings are enough when a caller (e.g. Wrapper) doesn't pass its own in.
           def settings
