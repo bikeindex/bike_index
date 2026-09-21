@@ -21,6 +21,13 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component).to have_text(bike.mnfg_name)
   end
 
+  it "leads with a frozen view link to the bike, then its photo" do
+    expect(component).to have_css("tbody td:first-child a[href='/bikes/#{bike.id}?organization_id=#{organization.to_param}']", text: "View")
+    expect(component.css("th").first["class"]).to include("tw:sticky")
+    expect(component).to have_css("th:nth-child(2).photo_cell", text: "Photo")
+    expect(component).to have_css("tbody td.color_cell", text: bike.primary_frame_color.name)
+  end
+
   it "renders plain headers when not sortable" do
     expect(component).to have_css("th", text: "Registered")
     expect(component).not_to have_css("th a.twlink")

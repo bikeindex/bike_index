@@ -64,7 +64,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   def rendered_bike_ids
-    page.all("tbody tr a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
+    page.all("tbody tr td:first-child a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
   end
 
   it "searches by email and serial" do
@@ -184,7 +184,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
 
     # clicking a bike navigates to the bike show page with organized panel
-    first("a[aria-label='View bike']").click
+    click_link "View", match: :first
 
     expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
 

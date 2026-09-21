@@ -8,7 +8,7 @@ module Pages
         # ComponentStructs::OrgSearchSettings names — the column labels and the filters.
         class Component < ApplicationComponent
           # A band the width of the card the caller opens it from, per Kelsey's redesign
-          PANEL_CLASSES = "tw:border-b tw:border-gray-100 tw:px-4 tw:py-4 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900"
+          PANEL_CLASSES = "tw:border-b tw:border-gray-100 tw:px-5 tw:py-5 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900"
 
           # Whoever renders the collapse element declares it, so the key has one home
           COLLAPSE_DATA = {controller: "ui--collapse",

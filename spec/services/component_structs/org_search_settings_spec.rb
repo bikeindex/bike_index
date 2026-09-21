@@ -113,7 +113,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   describe "initially_checked_columns" do
     it "returns default columns" do
       cols = instance.initially_checked_columns
-      expect(cols).to include("created_at_cell", "manufacturer_cell", "model_cell",
+      expect(cols).to include("photo_cell", "created_at_cell", "manufacturer_cell", "model_cell",
         "color_cell", "owner_email_cell", "owner_name_cell", "creation_description_cell")
       expect(cols).not_to include("sticker_cell")
     end

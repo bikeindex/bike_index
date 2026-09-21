@@ -10,6 +10,7 @@ en:
             all: all
             avery_cell: Avery Exportable
             bike: registration
+            close: Close
             color_cell: Color
             created_at_cell: Registered
             creation_description_cell: Source
@@ -33,6 +34,7 @@ en:
             notes_cell: Registration Notes
             owner_email_cell: Sent to
             owner_name_cell: Owner name
+            photo_cell: Photo
             propulsion_type_cell: E-vehicle (propulsion)
             reg_address_cell: Address
             reg_extra_registration_number_cell: Secondary#

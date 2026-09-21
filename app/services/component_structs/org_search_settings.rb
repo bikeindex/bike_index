@@ -10,6 +10,7 @@ module ComponentStructs
     TRANSLATION_SCOPE = %i[components pages org search column_settings].freeze
 
     COLUMN_RENAME_KEYS = %i[
+      photo_cell
       created_at_cell
       updated_at_cell
       stolen_cell
@@ -60,7 +61,7 @@ module ComponentStructs
                                          only_registered: :filter_not_unregistered_html}}
     }.freeze
 
-    DEFAULT_COLUMNS = %w[created_at_cell stolen_cell manufacturer_cell model_cell
+    DEFAULT_COLUMNS = %w[photo_cell created_at_cell stolen_cell manufacturer_cell model_cell
       color_cell owner_email_cell owner_name_cell creation_description_cell].freeze
 
     ALWAYS_ENABLED_COLUMNS = %w[url_cell updated_at_cell serial_number_cell cycle_type_cell

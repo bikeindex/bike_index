@@ -9,6 +9,22 @@ module Pages
         # the search form, column settings, or pagination (e.g. a user's other
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
+          # Kelsey's redesign: a quiet uppercase header over white rows that light up on hover.
+          # Descendant selectors, so they outrank the cell classes UI::Table gives every column
+          TABLE_CLASSES = [
+            "tw:[&_th]:whitespace-nowrap tw:[&_th]:border-b tw:[&_th]:border-gray-100 tw:[&_th]:bg-gray-50",
+            "tw:[&_th]:px-4 tw:[&_th]:py-2.5 tw:[&_th]:text-2xs tw:[&_th]:font-bold tw:[&_th]:tracking-wider",
+            "tw:[&_th]:text-gray-400 tw:[&_th]:uppercase tw:[&_th_a]:text-inherit",
+            "tw:[&_th_a:hover]:text-gray-700 tw:[&_th_a[data-active]]:text-gray-700",
+            "tw:[&_td]:bg-white tw:[&_td]:px-4 tw:[&_td]:py-3 tw:[&_td]:text-sm tw:[&_tr:hover_td]:bg-amber-50",
+            "tw:dark:[&_th]:border-gray-700 tw:dark:[&_th]:bg-gray-800 tw:dark:[&_td]:bg-gray-900",
+            "tw:dark:[&_tr:hover_td]:bg-gray-800"
+          ].join(" ").freeze
+
+          # Frozen against the table's horizontal scroll, with a shadow once there's any to scroll
+          VIEW_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
+            "tw:group-data-overflowing/bikes-table:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
+
           def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
             sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
@@ -54,9 +70,9 @@ module Pages
           end
 
           def table_wrapper_data_attributes
-            return {} unless @render_sortable
+            return {controller: "org--bikes-table-overflow"} unless @render_sortable
             attrs = {
-              controller: "update-cached-sortable-links org--assign-bike-sticker",
+              controller: "org--bikes-table-overflow update-cached-sortable-links org--assign-bike-sticker",
               "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params.merge(organization_id: @organization.to_param))
             }
             if @bike_sticker.present?
