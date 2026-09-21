@@ -210,7 +210,7 @@ expect(page).to have_content("Set on map", wait: 10)
 release << :continue
 ```
 
-Blocking the handler doesn't stall the driver, so Capybara still polls while it waits.
+Blocking the handler doesn't stall the driver, so Capybara still polls while it waits. `wait_for_stimulus` never returns while a module is held, since it waits on every controller first — wait on the one that has to arrive first with `wait_for_controller` (`spec/integration/organized/sidebar_spec.rb` holds `ui--collapse` until the sidebar connects).
 
 Caveat when measuring locally: after a heavy record-creating run (seeding,
 probe scripts, a big suite), `:js` specs fail spuriously for a while. Re-measure
