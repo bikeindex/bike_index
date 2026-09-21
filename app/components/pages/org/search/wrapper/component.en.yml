@@ -7,9 +7,9 @@ en:
           wrapper:
             e_vehicles_for_audit: 'E-Vehicles for audit:'
             export_csv: Export CSV
-            export_unavailable: >-
+            export_unavailable_search_all: >-
               You can only export your organization's registrations. Uncheck "Search
-              all %{cycle_type}" to export.
+              all registrations" to export.
             matching_html:
               one: "%{number} match"
               other: "%{number} matches"

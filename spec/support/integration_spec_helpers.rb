@@ -100,9 +100,11 @@ module IntegrationSpecHelpers
 
   # Type into a field with real keystrokes. Capybara's `set`/`fill_in` go through
   # Playwright's fill, which dispatches only an `input` event; JS that opens on
-  # keydown (e.g. hotwire_combobox's async dropdown) needs real key events.
+  # keydown (e.g. hotwire_combobox's async dropdown) needs real key events. A combobox
+  # typed into before its controller connects never searches, so that waits first.
   def type_into(locator, text)
     field = locator.is_a?(Capybara::Node::Element) ? locator : find(locator)
+    wait_for_stimulus("hw-combobox") if field.matches_css?("[data-controller~='hw-combobox'] *", wait: 0)
     field.set("")
     field.send_keys(text)
     field

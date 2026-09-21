@@ -69,7 +69,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("th.avery_cell", normalize_ws: true, exact_text: "Avery Exportable")
       expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "E-vehicle (propulsion)")
       expect(component).to have_css("th.notes_cell", normalize_ws: true,
-        exact_text: "#{organization.short_name} Registration Notes")
+        exact_text: "Registration Notes by #{organization.short_name}")
     end
   end
 

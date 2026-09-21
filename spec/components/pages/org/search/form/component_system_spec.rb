@@ -48,13 +48,19 @@ RSpec.describe Pages::Org::Search::Form::Component, :js, type: :system do
     end
   end
 
-  describe "with_serial_value preview" do
-    let(:preview_path) { "/rails/view_components/pages/org/search/form/component/with_serial_value" }
+  describe "searching_all_registrations preview" do
+    let(:preview_path) { "/rails/view_components/pages/org/search/form/component/searching_all_registrations" }
+    let!(:organization) { FactoryBot.create(:organization_brakebills) }
 
-    it "renders with serial value prefilled" do
+    it "folds away the owner email while searching all, and shows it again when unchecked" do
       visit(preview_path)
 
       expect(page).to have_field("serial", with: "ABC123")
+      expect(page).to have_checked_field("search_all")
+      expect(page).not_to have_field("search_email", wait: 2)
+
+      uncheck "search_all"
+      expect(page).to have_field("search_email", wait: 5)
     end
   end
 end

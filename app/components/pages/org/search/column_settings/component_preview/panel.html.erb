@@ -2,6 +2,6 @@
   <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
 
   <div class="tw:mt-3">
-    <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:)) %>
+    <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:, open: true)) %>
   </div>
 <% end %>

@@ -19,7 +19,11 @@ module Pages
 
             def checkbox_field(attribute, label, note: nil, ambassador: false)
               render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute:,
-                label: label_with_note(label, note), class_name: "tw:mb-4", **(ambassador ? AMBASSADOR_TARGETS : {})))
+                label: label_with_note(label, note), class_name: "tw:mb-4", **(ambassador ? ambassador_checkbox_targets : {})))
+            end
+
+            def ambassador_checkbox_targets
+              {data: AMBASSADOR_TARGETS[:data], html_options: {data: AMBASSADOR_TARGETS[:input_data]}}
             end
 
             # The target goes on the grid cell, since UI::Forms::Group renders the label itself
