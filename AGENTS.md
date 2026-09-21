@@ -6,9 +6,11 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
+**A spawned `.claude/worktrees/…` checkout runs `bin/workspace_setup --without_seeds` before anything else** — until it has, `bin/env` falls back to the *main* checkout's port, database and Redis. The `sandbox-test-setup` skill has it.
+
 **A workspace's database generally starts empty** — created and migrated, but not seeded, so `Bike.count` is 0 and real pages render nothing. Run `bundle exec rails db:seed` when you need records to try something in development; `bikeindex_development_$WORKSPACE_ID` is a per-workspace throwaway, so seeding or re-seeding it is safe and never needs asking.
 
-**`bin/rails restart` for anything a reload misses** — a renamed initializer, a pin dropped from `config/importmap.rb`, a Lookbook registry that's stopped listing new scenarios, a gem a merge bumped. It bounces puma alone, so bin/dev's watchers survive and dev Sidekiq doesn't (`rerun` watches `app,db,lib`, not `config`). Fine to run against a server someone else started; starting or killing `bin/dev` isn't.
+**`bin/rails restart` for anything a reload misses** — a renamed initializer, a pin dropped from `config/importmap.rb`, a Lookbook registry that's stopped listing new scenarios, a gem a merge bumped. It bounces puma alone, so bin/dev's watchers survive and dev Sidekiq doesn't (`rerun` watches `app,db,lib`, not `config`). Fine to run against a server someone else started; starting or killing `bin/dev` isn't — **except in a spawned `.claude/worktrees/…` checkout, which is yours alone: start it there yourself.** The `sandbox-test-setup` skill has which checkout is whose.
 
 **A renamed initializer is the one that reads as anything but a stale boot**: `config/routes.rb` reloads, dies partway through its draw on the missing constant, and everything below that line 404s while the page itself raises a bare `NameError` on a route helper.
 
@@ -110,7 +112,7 @@ both do it.
 
 Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScript files exist but are deprecated. The `bin/dev` command handles Tailwind and JS builds. The `frontend-conventions` skill has the conventions.
 
-Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work.
+Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work — or, in a spawned `.claude/worktrees/…` checkout, start it yourself.
 
 **`app/views` holds more `.haml` than `.erb`** — deprecated, but 301 files against 266, so a grep for call sites that passes `--include='*.erb'` and stops there misses the majority of the directory. Anything a view can reach needs `*.haml` in the pathspec too; the miss surfaces as a `NoMethodError` at render, caught only by a spec that renders that page.
 
