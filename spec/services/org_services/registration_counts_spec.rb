@@ -43,6 +43,16 @@ RSpec.describe OrgServices::RegistrationCounts do
       end
     end
 
+    context "with a bike registered at the window's start" do
+      let(:time_range) { Time.zone.parse("2026-01-08")..Time.zone.parse("2026-01-15") }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, created_at: time_range.first) }
+
+      it "counts it in the window, not the one before" do
+        expect(stats.first.count).to eq 1
+        expect(stats.first.previous_count).to eq 0
+      end
+    end
+
     context "with a stolen bike" do
       let!(:bike) do
         FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization,

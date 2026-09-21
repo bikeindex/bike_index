@@ -28,7 +28,8 @@ module OrgServices
     end
 
     def previous_range(time_range)
-      (time_range.first - UI::Chart::Component.time_range_length(time_range))..time_range.first
+      # Ends short of the window's start, which the window itself counts
+      (time_range.first - UI::Chart::Component.time_range_length(time_range))...time_range.first
     end
 
     conceal :counts, :previous_range
