@@ -12,10 +12,13 @@ module UI
       #
       # html_options go on the input, as with UI::Forms::Input - a class there joins the
       # component's own. The checkbox sits on the label's first line when it wraps.
+      # A block renders in place of label, for one with markup.
       class Component < ApplicationComponent
-        INPUT_CLASSES = "tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer tw:disabled:cursor-not-allowed"
+        # Centered on the label's first line: half the line height it doesn't fill
+        INPUT_CLASSES = "tw:h-4 tw:w-4 tw:shrink-0 tw:mt-[calc((1lh_-_1rem)/2)] tw:cursor-pointer " \
+          "tw:disabled:cursor-not-allowed"
 
-        def initialize(label:, form_builder: nil, attribute: nil, name: nil, checked: nil, value: "1",
+        def initialize(label: nil, form_builder: nil, attribute: nil, name: nil, checked: nil, value: "1",
           class_name: nil, required: false, data: {}, html_options: {})
           scoped = form_builder && attribute
           raise ArgumentError, "pass form_builder + attribute, or name" unless scoped || name
@@ -33,8 +36,8 @@ module UI
         end
 
         def call
-          tag.label(class: ["twlabel tw:flex tw:cursor-pointer tw:items-baseline tw:gap-2 tw:has-disabled:cursor-not-allowed", @class_name].compact.join(" "), data: @data) do
-            checkbox_input + tag.span(@label)
+          tag.label(class: ["twlabel tw:flex tw:cursor-pointer tw:items-start tw:gap-2 tw:has-disabled:cursor-not-allowed", @class_name].compact.join(" "), data: @data) do
+            checkbox_input + tag.span(content || @label)
           end
         end
 

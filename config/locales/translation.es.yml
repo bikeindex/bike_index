@@ -4900,12 +4900,10 @@ es:
         search_impound_records: Buscar registros de incautación
     registrations:
       search:
-        find_a_registration_html: Encuentra un %{cycle_type}
         search_all_email_disabled: Solo puedes buscar los registros de tu organización
           con el correo electrónico o el nombre del propietario.
-        search_all_html: Buscar en todos los %{cycle_type} <span class="less-strong">(no
-          solo en %{org_name})</span>
         search_registrations: Buscar registros
+        find_a_registration: Encuentra un registro
   organized_mailer:
     custom_message:
       subject: "%{org_name} - la ubicación de su %{mnfg_name}"
@@ -5806,8 +5804,6 @@ es:
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
             view_matching_any_audit: ver coincidencia con cualquier auditoría
             export_csv: Exportar CSV
-            export_unavailable: Solo puedes exportar los registros de tu organización.
-              Desmarca la opción "Buscar todo %{cycle_type}" para exportar.
             matching_html:
               one: "%{number} coincidencia"
               other: "%{number} coincide"
@@ -5817,6 +5813,8 @@ es:
             view_as: Ver como
             view_spreadsheet: Hoja de cálculo
             view_thumbnail: Uña del pulgar
+            export_unavailable_search_all: Solo puedes exportar los registros de tu
+              organización. Desmarca la opción "Buscar todos los registros" para exportarlos.
           chart_card:
             caption_search: Búsqueda actual
             caption_year: Resumen del año pasado
@@ -5835,7 +5833,6 @@ es:
             address: 'DIRECCIÓN:'
             all: todo
             avery_cell: Exportable de Avery
-            bike: registro
             color_cell: Color
             created_at_cell: Registrado
             creation_description_cell: Fuente
@@ -5856,15 +5853,12 @@ es:
             manufacturer_cell: Fabricante
             model_cell: Modelo
             none: ninguno
-            notes_cell: Notas de registro
             owner_email_cell: Enviado a
             owner_name_cell: Nombre del propietario
             propulsion_type_cell: Vehículo eléctrico (propulsión)
             reg_address_cell: DIRECCIÓN
             reg_extra_registration_number_cell: Secundario#
-            reg_organization_affiliation_cell: Afiliación
             reg_phone_cell: Teléfono
-            reg_student_id_cell: Carné de estudiante
             serial_number_cell: De serie
             show_notes_search: mostrar notas de búsqueda
             status: 'Estado:'
@@ -5875,14 +5869,19 @@ es:
             unregistered: 'No registrado:'
             updated_at_cell: Actualizado
             url_cell: URL
-            vehicle: registro
             visible_columns: Columnas visibles
+            notes_cell_html: Notas de registro <em>de %{org_name}</em>
+            reg_organization_affiliation_cell_html: Afiliación <em>en %{org_name}</em>
+            reg_student_id_cell_html: Número de identificación del estudiante <em>%{org_name}</em>
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
             date_range: 'Rango de fechas:'
             search_settings: Configuración de búsqueda
             search_settings_and_filters: Configuración y filtros de búsqueda
+          search_all:
+            search_all_html: Buscar en todos los registros <span class="twless-strong">(no
+              solo en %{org_name})</span>
         search_results:
           bikes_table:
             assign_bike_sticker: Asignar pegatina

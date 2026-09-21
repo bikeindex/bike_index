@@ -13,6 +13,14 @@ RSpec.describe UI::Forms::Checkbox::Component, type: :component do
     expect(component).to_not have_css("input[required]")
   end
 
+  context "with a block" do
+    let(:component) { render_inline(described_class.new(name: :subscribe)) { "<em>Email</em> me".html_safe } }
+
+    it "renders it as the label" do
+      expect(component).to have_css("label span em", text: "Email")
+    end
+  end
+
   context "when required" do
     let(:options) { {name: :subscribe, label: "Email me updates", required: true} }
 

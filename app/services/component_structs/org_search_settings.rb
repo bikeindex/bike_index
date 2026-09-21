@@ -38,7 +38,8 @@ module ComponentStructs
       url_cell
     ].freeze
 
-    ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
+    # Their labels name the organization, italicized with its preposition
+    ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
 
     # Each filter's values and their labels, once — `filter_groups` lays them out,
     # `filter_values` is the set the controller permits, and `active_search_filter_descriptions`
@@ -115,8 +116,10 @@ module ComponentStructs
 
     def render_export? = @organization.enabled?("csv_exports")
 
+    def search_all? = @search_all
+
     # An export past the organization would carry other organizations' registrations
-    def export_disabled? = @search_all
+    def export_disabled? = search_all?
 
     def initially_checked_columns
       @initially_checked_columns ||= [
@@ -128,9 +131,9 @@ module ComponentStructs
 
     def column_renames
       @column_renames ||= COLUMN_RENAME_KEYS.to_h { |key|
-        name = translation(key)
-        name = "#{@organization.short_name} #{name}" if ORG_PREFIXED_COLUMNS.include?(key)
-        [key, name]
+        next [key, translation(key)] unless ORG_NAMED_COLUMNS.include?(key)
+
+        [key, translation(:"#{key}_html", org_name: @organization.short_name)]
       }
     end
 
@@ -148,12 +151,6 @@ module ComponentStructs
 
     def additional_registration_fields
       @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
-    end
-
-    def cycle_type
-      @cycle_type ||= translation(
-        BikeServices::Displayer.vehicle_search?(@params.merge(@interpreted_params)) ? :vehicle : :bike
-      )
     end
 
     def search_params
@@ -175,8 +172,8 @@ module ComponentStructs
       end
     end
 
-    def translation(key)
-      ActiveSupport::HtmlSafeTranslation.translate(key, scope: TRANSLATION_SCOPE)
+    def translation(key, **)
+      ActiveSupport::HtmlSafeTranslation.translate(key, scope: TRANSLATION_SCOPE, **)
     end
   end
 end

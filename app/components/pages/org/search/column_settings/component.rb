@@ -25,9 +25,11 @@ module Pages
           end
 
           # Opened from a Search::ColumnSettingsToggle the caller renders, inside the
-          # element it gives COLLAPSE_DATA
-          def initialize(settings:)
+          # element it gives COLLAPSE_DATA. open: renders it expanded, for a collapse without
+          # a storage key (which would restore the stored state over it)
+          def initialize(settings:, open: false)
             @settings = settings
+            @open = open
           end
         end
       end
