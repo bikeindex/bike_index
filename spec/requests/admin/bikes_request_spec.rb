@@ -241,7 +241,7 @@ RSpec.describe Admin::BikesController, type: :request do
             "0" => {
               street: "Cortland and Ashland",
               city: "Chicago",
-              zipcode: "60622"
+              postal_code: "60622"
             }
           }
         }

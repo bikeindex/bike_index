@@ -208,7 +208,8 @@ class BulkImport < ApplicationRecord
   def stolen_record_attrs
     return {} unless stolen? && data&.dig("stolen_record").present?
 
-    data["stolen_record"].merge(proof_of_ownership: true, receive_notifications: true)
+    StolenRecord.legacy_attrs_renamed(data["stolen_record"])
+      .merge(proof_of_ownership: true, receive_notifications: true)
   end
 
   def set_calculated_attributes

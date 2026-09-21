@@ -147,8 +147,8 @@ module Organized
     end
 
     def stolen_attributes
-      {data: {stolen_record:
-        params.require(:stolen_record).permit(*BikeServices::StolenRecordUpdator.old_attr_accessible)}}
+      {data: {stolen_record: params.require(:stolen_record)
+        .permit(*BikeServices::StolenRecordUpdator.old_attr_accessible, *StolenRecord::LEGACY_ATTRS.keys)}}
     end
   end
 end
