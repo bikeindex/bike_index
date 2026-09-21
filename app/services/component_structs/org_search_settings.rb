@@ -63,11 +63,11 @@ module ComponentStructs
                                          only_registered: :filter_not_unregistered_html}}
     }.freeze
 
-    DEFAULT_COLUMNS = %w[photo_cell created_at_cell occurred_at_cell manufacturer_cell model_cell
+    DEFAULT_COLUMNS = %w[photo_cell created_at_cell status_cell manufacturer_cell model_cell
       color_cell owner_email_cell owner_name_cell creation_description_cell].freeze
 
     ALWAYS_ENABLED_COLUMNS = %w[url_cell updated_at_cell serial_number_cell cycle_type_cell
-      propulsion_type_cell status_cell].freeze
+      propulsion_type_cell occurred_at_cell].freeze
 
     # Listed in the panel, but checked and disabled - the table always shows them
     ALWAYS_VISIBLE_COLUMNS = %w[view_cell].freeze

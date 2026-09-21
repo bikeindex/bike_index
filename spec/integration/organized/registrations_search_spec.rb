@@ -421,9 +421,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       # Default columns are visible
       expect(page).to have_css("th.manufacturer_cell", visible: :visible)
       expect(page).to have_css("th.owner_email_cell", visible: :visible)
-      expect(page).to have_css("th.occurred_at_cell", visible: :visible)
+      expect(page).to have_css("th.status_cell", visible: :visible)
       # Non-default columns are hidden
       expect(page).to have_css("th.serial_number_cell", visible: :hidden)
+      expect(page).to have_css("th.occurred_at_cell", visible: :hidden)
       expect(page).to have_css("th.url_cell", visible: :hidden)
       expect(page).to have_css("th.impounded_cell", visible: :hidden)
       # "none" hides every column but View, which can't be unchecked
