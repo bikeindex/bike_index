@@ -133,6 +133,28 @@ RSpec.describe Pages::Admin::Users::Cell::Component, type: :component do
       expect(fragments_written { render_cell }.count).to eq 1
     end
 
+    # `cached: false` is what leaves the cell's own fragment reachable: a table wrapping
+    # the cell in a fragment of its own would namespace it back to that one table
+    it "shares its fragment between tables with different cache_keys" do
+      cell = described_class
+      render_table = lambda do |cache_key|
+        with_controller_class(ApplicationController) do
+          render_inline(UI::Table::Component.new(records: [user], cache_key:)) do |table|
+            table.column(label: "Name") { |u| u.name }
+            table.column(label: "User", cached: false) { |u| render(cell.new(user: u)) }
+          end
+        end
+      end
+
+      keys = fragments_written { render_table.call("first-table") }
+      expect(keys.count).to eq 2
+
+      keys = fragments_written { render_table.call("second-table") }
+      expect(keys.count).to eq 1
+      expect(keys.first).to include("second-table")
+      expect(keys.first).not_to include(described_class.cache_digest)
+    end
+
     it "renders the search link outside the fragment" do
       render_cell
       result = render_cell(search_url: "/admin/users?user_id=#{user.id}", render_search: true)
