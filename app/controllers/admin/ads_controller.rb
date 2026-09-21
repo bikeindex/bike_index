@@ -22,7 +22,7 @@ module Admin
         flash[:success] = "Ad Saved!"
         redirect_to admin_ad_url(@ad)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -36,7 +36,7 @@ module Admin
         flash[:success] = "Ad Created!"
         redirect_to edit_admin_ad_url(@ad)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

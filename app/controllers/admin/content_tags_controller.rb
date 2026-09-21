@@ -35,7 +35,7 @@ module Admin
         redirect_to admin_content_tags_path
       else
         flash[:error] = "Unable to create"
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 

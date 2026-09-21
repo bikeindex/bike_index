@@ -30,7 +30,7 @@ module Admin
         flash[:success] = "Membership Created!"
         redirect_to admin_membership_url(@membership)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 
@@ -60,7 +60,7 @@ module Admin
         flash[:success] = "Membership Saved!"
         redirect_to admin_membership_url(@membership)
       else
-        render action: :show
+        render action: :show, status: :unprocessable_entity
       end
     end
 

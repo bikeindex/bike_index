@@ -68,7 +68,7 @@ module Admin
         UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
         redirect_to form_tab_url
       else
-        render action: form_tab || "edit"
+        render action: form_tab || "edit", status: :unprocessable_entity
       end
     end
 
@@ -79,7 +79,7 @@ module Admin
         flash[:success] = "Organization Created!"
         redirect_to edit_admin_organization_url(@organization)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

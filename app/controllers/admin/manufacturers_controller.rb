@@ -25,7 +25,7 @@ module Admin
         AutocompleteLoaderJob.perform_async
         redirect_to admin_manufacturer_url(@manufacturer)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -36,7 +36,7 @@ module Admin
         AutocompleteLoaderJob.perform_async
         redirect_to admin_manufacturer_url(@manufacturer)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

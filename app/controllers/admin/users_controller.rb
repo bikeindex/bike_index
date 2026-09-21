@@ -59,7 +59,7 @@ module Admin
           redirect_to admin_users_url, notice: "User Updated"
         else
           calculate_user_bikes
-          render action: :edit
+          render action: :edit, status: :unprocessable_entity
         end
       end
     end

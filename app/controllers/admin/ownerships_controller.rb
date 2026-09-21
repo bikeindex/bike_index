@@ -38,7 +38,7 @@ module Admin
         else
           flash[:notice] = "No information updated"
         end
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 

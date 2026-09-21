@@ -28,7 +28,7 @@ module Admin
       else
         flash.now[:error] = @email_domain.errors.full_messages.to_sentence
       end
-      render :new
+      render :new, status: :unprocessable_entity
     end
 
     def show
@@ -58,7 +58,7 @@ module Admin
         end
       end
 
-      render action: :show
+      render action: :show, status: :unprocessable_entity
     end
 
     private

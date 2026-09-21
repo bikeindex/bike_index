@@ -34,7 +34,7 @@ module Admin
         redirect_to admin_bike_stickers_path(search_bike_sticker_batch_id: @bike_sticker_batch.id)
       else
         @organizations = Organization.all
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
