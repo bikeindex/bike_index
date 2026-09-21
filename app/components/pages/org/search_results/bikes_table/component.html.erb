@@ -3,7 +3,7 @@
 <% organization = @organization %>
 <% current_user = @current_user %>
 
-<%= tag.div(class: "tw:group/bikes-table", data: table_wrapper_data_attributes) do %>
+<%= tag.div(class: WRAPPER_CLASSES, data: table_wrapper_data_attributes) do %>
   <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-#{self.class.cache_digest}", render_sortable: @render_sortable, sort_state: @sort_state, classes: TABLE_CLASSES, unbordered: true, sort_link_class: "twlink-underlined")) do |table| %>
     <%# Called per cell rather than captured: each tooltip mints its own id %>
     <% hidden_html = method(:hidden_not_registered_tag) %>
