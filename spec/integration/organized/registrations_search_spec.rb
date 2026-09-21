@@ -60,7 +60,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   def chart_frame
-    find("turbo-frame#registrations_chart_frame", visible: :all)
+    find("turbo-frame#chart_card_frame", visible: :all)
   end
 
   def rendered_bike_ids
@@ -90,7 +90,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("tbody tr", minimum: 2)
 
     # Search by serial number
-    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas", wait: 10)
+    expect(page).to have_css("turbo-frame#chart_card_frame [id^='chart-'] canvas", wait: 10)
     chart_src = chart_frame[:src]
 
     fill_in "serial", with: bike1.serial_number
@@ -129,7 +129,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/search_email=bob/, wait: 10)
     expect(page).to have_current_path(/chart_scope=search/)
     # ... and on that scope it follows the search
-    expect(page).to have_css("turbo-frame#registrations_chart_frame[src*='search_email=bob']",
+    expect(page).to have_css("turbo-frame#chart_card_frame[src*='search_email=bob']",
       visible: :all, wait: 10)
 
     # submits when enter is pressed twice
@@ -281,9 +281,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_current_path(/chart_scope=search/, wait: 10)
     # Chart loads async via a lazy turbo-frame; wait for the frame to be the searched one
     # before checking the inline init data - the previous scope's canvas answers that wait
-    expect(page).to have_css("turbo-frame#registrations_chart_frame[src*='chart_scope=search'][complete]",
+    expect(page).to have_css("turbo-frame#chart_card_frame[src*='chart_scope=search'][complete]",
       visible: :all, wait: 10)
-    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas", wait: 10)
+    expect(page).to have_css("turbo-frame#chart_card_frame [id^='chart-'] canvas", wait: 10)
     # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket is empty (null)
     expect(page.html).to include(%(["#{la_date_key}",1]))
     expect(page.html).to include(%(["#{cdt_date_key}",null]))
@@ -332,7 +332,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # Collapsed, so the lazy frame has nothing to fetch and the scope toggle is away
     expect(page).to have_no_link("Last year")
-    expect(page).to have_no_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas")
+    expect(page).to have_no_css("turbo-frame#chart_card_frame [id^='chart-'] canvas")
 
     click_button "Chart"
     expect(page).to have_current_path(/chart_open=1/, wait: 5)
@@ -340,7 +340,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # (the caption is uppercased in CSS, hence the insensitive match)
     expect(page).to have_text(/last year overview/i)
     expect(page).to have_no_text(/chart ·/i)
-    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-'] canvas", wait: 10)
+    expect(page).to have_css("turbo-frame#chart_card_frame [id^='chart-'] canvas", wait: 10)
     expect_axe_clean("select-name")
 
     # The scope links carry the open state, and so does a reload

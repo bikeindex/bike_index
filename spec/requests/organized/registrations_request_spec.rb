@@ -226,7 +226,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "the chart frame asking" do
-      let(:frame_headers) { {"Turbo-Frame" => "registrations_chart_frame"} }
+      let(:frame_headers) { {"Turbo-Frame" => "chart_card_frame"} }
 
       it "answers the year scope unless asked for the search, linking both at the page's URL" do
         get base_url, params: {serial: "no-match-at-all"}, headers: frame_headers

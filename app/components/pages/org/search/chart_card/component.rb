@@ -14,7 +14,7 @@ module Pages
         # The collapse trigger stays outside the frame: a frame render replaces what's in it,
         # and while the card is collapsed the lazy frame has nothing to load yet.
         class Component < ApplicationComponent
-          FRAME_ID = :registrations_chart_frame
+          FRAME_ID = :chart_card_frame
 
           # The open state is part of the address rather than a stored preference; the scope
           # links carry it, since update-cached-sortable-links rebuilds them from the URL
