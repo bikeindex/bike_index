@@ -4562,7 +4562,7 @@ en:
           Index notifications.
     registrations:
       search:
-        find_a_registration_html: Find a %{cycle_type}
+        find_a_registration: Find a registration
         search_all_email_disabled: You can only search your organization's registrations
           with owner email or name
         search_registrations: Search registrations

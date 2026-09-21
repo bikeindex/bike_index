@@ -35,7 +35,7 @@
           target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
           target_frame: :organized_bikes_results_frame,
           interpreted_params: form_interpreted_params,
-          heading: t(".find_a_registration_html", cycle_type: settings.cycle_type),
+          heading: t(".find_a_registration"),
           submit_text: t(".search_registrations"),
           settings_and_filters_component: Pages::Org::Search::SettingsAndFilters::Component.new(
             settings:,

@@ -68,7 +68,6 @@ RSpec.describe "Editing a registration", :js, type: :system do
     # logged in user (owner_email defaults to their email)
     find("#primary_nav_hamburgler").click
     click_link "Register a new bike"
-    wait_for_stimulus("hw-combobox")
 
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")

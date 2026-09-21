@@ -152,12 +152,6 @@ module ComponentStructs
       @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
     end
 
-    def cycle_type
-      @cycle_type ||= translation(
-        BikeServices::Displayer.vehicle_search?(@params.merge(@interpreted_params)) ? :vehicle : :bike
-      )
-    end
-
     def search_params
       @search_params ||= @sortable_search_params
         .merge(@interpreted_params.merge(organization_id: @organization.to_param))

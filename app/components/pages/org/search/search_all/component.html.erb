@@ -3,8 +3,7 @@
   html_options: {form: "Search_Form", disabled: @locked,
                  data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll",
                         "org--multi-search-target": "searchAll"}})) do %>
-  <%= translation(".search_all_html", cycle_type: @settings.cycle_type.pluralize(2),
-    org_name: @settings.organization.short_name) %>
+  <%= translation(".search_all_html", org_name: @settings.organization.short_name) %>
 
   <%= tag.span(render(UI::Tooltip::Component.new(text: @locked_hint)),
     class: "tw:leading-none", hidden: !@locked,

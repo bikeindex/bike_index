@@ -5,5 +5,5 @@ en:
       org:
         search:
           search_all:
-            search_all_html: Search all %{cycle_type} <span class="less-strong">(not
-              just %{org_name})</span>
+            search_all_html: >-
+              Search all registrations <span class="twless-strong">(not just %{org_name})</span>
