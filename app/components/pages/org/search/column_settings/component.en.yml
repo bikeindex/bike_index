@@ -4,7 +4,7 @@ en:
     pages:
       org:
         search:
-          settings:
+          column_settings:
             acknowledgment_cell: Registration sequence acknowledgment
             address: 'Address:'
             all: all
@@ -15,8 +15,6 @@ en:
             creation_description_cell: Source
             cycle_type_cell: Vehicle type
             default: default
-            export_csv: Export CSV
-            export_unavailable: Can't create export of this
             filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address
             filter_no_sticker_html: only <strong>no</strong> sticker
@@ -42,7 +40,6 @@ en:
             reg_phone_cell: Phone
             reg_student_id_cell: Student ID
             serial_number_cell: Serial
-            settings: settings
             show_notes_search: show notes search
             status: 'Status:'
             status_cell: Status

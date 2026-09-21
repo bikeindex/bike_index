@@ -20,7 +20,7 @@
   search_notes: params[:search_notes]
 ).compact %>
 
-<%= tag.div(class: "org-search-component", data: Pages::Org::Search::Settings::Component
+<%= tag.div(class: "org-search-component", data: Pages::Org::Search::ColumnSettings::Component
   .column_toggle_data_attributes(settings)
   .merge("org--search-column-toggle-assign-bike-sticker-value": @bike_sticker.present?,
     "org--search-result-view-value": @result_view)) do %>

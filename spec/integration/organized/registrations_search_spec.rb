@@ -441,6 +441,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("th.serial_number_cell", visible: :visible)
       expect(page).to have_css("th.impounded_cell", visible: :visible)
+      # ...and a reload, from localStorage
+      page.refresh
+      expect(page).to have_css("th.serial_number_cell", visible: :visible, wait: 10)
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
 
       # Settings persisted open via localStorage; choose "only impounded"
       expect_filters_open

@@ -91,12 +91,6 @@ module Pages
             )
           end
 
-          # Every card opens the panel from its own header, so the panel never carries a button
-          def settings_component
-            @settings_component ||= Pages::Org::Search::Settings::Component
-              .new(settings:, toggle_button: false)
-          end
-
           # On the search page the .twwiderow holding the card supplies the gap above it, and
           # is the container twfullbleed reads; elsewhere the card stands on its own
           def card_classes
@@ -132,12 +126,9 @@ module Pages
           # The search page declares org--search itself, on a div spanning the form and the
           # chart as well as this card
           def card_data_attributes
-            collapse = Pages::Org::Search::Settings::Component::COLLAPSE_DATA
-            return collapse if @search_page
+            return Pages::Org::Search::ColumnSettings::Component::COLLAPSE_DATA if @search_page
 
-            Pages::Org::Search::Settings::Component
-              .column_toggle_data_attributes(settings, controllers: collapse[:controller])
-              .merge(collapse.except(:controller))
+            Pages::Org::Search::ColumnSettings::Component.column_toggle_data_attributes(settings, collapse: true)
           end
         end
       end

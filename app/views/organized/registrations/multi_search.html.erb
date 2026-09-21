@@ -16,8 +16,8 @@
 <% end %>
 
 <%# to_str on the two markup values: a SafeBuffer would land raw in the attribute %>
-<%= tag.div(data: Pages::Org::Search::Settings::Component
-  .column_toggle_data_attributes(settings, controllers: "org--multi-search")
+<%= tag.div(data: Pages::Org::Search::ColumnSettings::Component
+  .column_toggle_data_attributes(settings, controllers: "org--multi-search", collapse: true)
   .merge(
     "org--multi-search-url-value": multi_search_response_organization_registrations_path(organization_id: current_organization.to_param),
     "org--multi-search-search-kind-value": search_kind,
@@ -92,7 +92,13 @@
     class="tw:mb-4 tw:flex tw:flex-wrap tw:gap-3"
   ></div>
 
-  <%= render Pages::Org::Search::Settings::Component.new(settings:) %>
+  <div class="tw:mb-3 tw:flex tw:justify-end">
+    <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
+  </div>
+
+  <div class="tw:mb-3">
+    <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:)) %>
+  </div>
 
   <div id="multi_serial_results" data-org--multi-search-target="results"></div>
 <% end %>

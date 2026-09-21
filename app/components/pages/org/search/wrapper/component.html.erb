@@ -25,17 +25,7 @@
     <% end %>
 
     <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-      <%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},
-        data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
-        <%= translation(".column_settings") %>
-
-        <span
-          data-ui--collapse-target="chevron"
-          class="tw:inline-flex tw:transition-transform"
-        >
-          <%= render(UI::IconChevron::Component.new) %>
-        </span>
-      <% end %>
+      <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
 
       <%# Only the search's own params describe an export of what's on the page %>
       <% if @search_page %>
@@ -55,7 +45,7 @@
     </div>
   </div>
 
-  <%= render(settings_component) %>
+  <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:)) %>
 
   <%# Only on the search: the model audit's own page already names the audit above this %>
   <% if @search_page && @model_audit.present? %>

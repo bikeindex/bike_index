@@ -2,12 +2,12 @@
 
 module ComponentStructs
   # The column set, its labels and the active filters of an organization's registration
-  # search. Everything around the panel Pages::Org::Search::Settings renders reads the same
-  # values, so it's built once and passed whole.
+  # search. Everything around the panel Pages::Org::Search::ColumnSettings renders reads the
+  # same values, so it's built once and passed whole.
   #
   # Its copy sits in that panel's sidecar — the only home the component's cache digest reaches.
   class OrgSearchSettings
-    TRANSLATION_SCOPE = %i[components pages org search settings].freeze
+    TRANSLATION_SCOPE = %i[components pages org search column_settings].freeze
 
     COLUMN_RENAME_KEYS = %i[
       created_at_cell

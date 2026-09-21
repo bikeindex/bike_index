@@ -1,0 +1,11 @@
+<%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},
+  data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
+  <%= translation(".column_settings") %>
+
+  <span
+    data-ui--collapse-target="chevron"
+    class="tw:inline-flex tw:transition-transform"
+  >
+    <%= render(UI::IconChevron::Component.new) %>
+  </span>
+<% end %>
