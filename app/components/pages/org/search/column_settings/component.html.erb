@@ -35,7 +35,7 @@
         <%= check_box_tag cell_name, cell_name, false,
           data: { action: "change->org--search-column-settings#columnToggled" } %>
 
-        <%= @settings.column_renames[cell_name.to_sym] %>
+        <span><%= @settings.column_renames[cell_name.to_sym] %></span>
       </label>
     <% end %>
   </div>

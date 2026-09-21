@@ -140,8 +140,8 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
 
     it "names the organization in its own columns" do
       expect(instance.column_renames[:color_cell]).to eq "Color"
-      expect(instance.column_renames[:notes_cell]).to eq "Registration Notes by #{organization.short_name}"
-      expect(instance.column_renames[:reg_student_id_cell]).to eq "Student ID for #{organization.short_name}"
+      expect(instance.column_renames[:notes_cell]).to eq "Registration Notes <em>by #{organization.short_name}</em>"
+      expect(instance.column_renames[:reg_student_id_cell]).to eq "Student ID <em>for #{organization.short_name}</em>"
     end
   end
 

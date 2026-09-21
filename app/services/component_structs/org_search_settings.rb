@@ -37,6 +37,9 @@ module ComponentStructs
       url_cell
     ].freeze
 
+    # Their labels name the organization, italicized with its preposition
+    ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
+
     # Each filter's values and their labels, once — `filter_groups` lays them out,
     # `filter_values` is the set the controller permits, and `active_search_filter_descriptions`
     # names the ones in force. feature gates the whole row, value_feature an individual
@@ -125,7 +128,9 @@ module ComponentStructs
 
     def column_renames
       @column_renames ||= COLUMN_RENAME_KEYS.to_h { |key|
-        [key, translation(key, org_name: @organization.short_name)]
+        next [key, translation(key)] unless ORG_NAMED_COLUMNS.include?(key)
+
+        [key, translation(:"#{key}_html", org_name: @organization.short_name)]
       }
     end
 
