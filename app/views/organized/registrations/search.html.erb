@@ -62,25 +62,8 @@
           <%= hidden_field_tag :search_result_view, @result_view %>
 
           <% form.with_below_submit do %>
-            <div class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
-              <label
-                class="
-                  tw:mb-0! tw:flex tw:cursor-pointer tw:items-center
-                  tw:gap-2 tw:has-disabled:cursor-not-allowed
-                "
-              >
-                <%= check_box_tag :search_all, "true", @search_all, form: "Search_Form",
-                  disabled: @search_all_locked, class: "tw:disabled:cursor-not-allowed!",
-                  data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll"} %>
-
-                <span><%= t(".search_all_html", cycle_type: settings.cycle_type.pluralize(2),
-                  org_name: current_organization.short_name) %></span>
-              </label>
-
-              <%= tag.span(render(UI::Tooltip::Component.new(text: t(".search_all_email_disabled"))),
-                class: "tw:leading-none", hidden: !@search_all_locked,
-                data: {"org--search-target": "searchAllHint"}) %>
-            </div>
+            <%= render "search_all", search_all: @search_all, search_all_locked: @search_all_locked,
+              cycle_type: settings.cycle_type, org_name: current_organization.short_name %>
           <% end %>
         <% end %>
       </div>

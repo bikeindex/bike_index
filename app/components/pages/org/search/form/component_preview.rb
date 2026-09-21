@@ -9,7 +9,7 @@ module Pages
           # The registrations search, which brings the filters. First, since the group shares a
           # page and form: "Search_Form" finds the first form on it
           def with_filters
-            render(Pages::Org::Search::Form::Component.new(**default_options.merge(settings_and_filters_component:)))
+            registrations_search(search_all: false)
           end
 
           # The impound records, graduated notifications and parking notifications searches
@@ -17,19 +17,22 @@ module Pages
             render(Pages::Org::Search::Form::Component.new(**default_options))
           end
 
-          def with_serial_value
-            interpreted_params = {raw_serial: "ABC123", serial: "ABC123", query: nil}
-            render(Pages::Org::Search::Form::Component.new(**default_options(interpreted_params)))
+          def searching_all_registrations
+            registrations_search(search_all: true, interpreted_params: {raw_serial: "ABC123", serial: "ABC123", query: nil})
           end
           # @!endgroup
 
           private
 
-          def settings_and_filters_component
-            Pages::Org::Search::SettingsAndFilters::Component.new(
-              settings: ComponentStructs::OrgSearchSettings.new(organization: lookbook_organization),
-              period: "week", start_time: Time.current - 1.week, end_time: Time.current
+          def registrations_search(search_all:, interpreted_params: {})
+            settings = ComponentStructs::OrgSearchSettings.new(organization: lookbook_organization, search_all:)
+            settings_and_filters_component = Pages::Org::Search::SettingsAndFilters::Component.new(
+              settings:, period: "week", start_time: Time.current - 1.week, end_time: Time.current
             )
+
+            {template: "pages/org/search/form/component_preview/with_filters",
+             locals: {settings:, search_all:,
+                      options: default_options(interpreted_params).merge(settings_and_filters_component:)}}
           end
 
           def target_search_path
