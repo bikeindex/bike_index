@@ -33,7 +33,7 @@ module Admin
         redirect_to admin_organization_features_path
       else
         flash[:error] = "Unable to create"
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 

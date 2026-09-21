@@ -24,7 +24,7 @@ module Admin
         flash[:notice] = "Social account saved!"
         redirect_to admin_social_account_url(@social_account)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
