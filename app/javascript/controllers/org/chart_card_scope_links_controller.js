@@ -14,10 +14,12 @@ export default class extends Controller {
   }
 
   updateLinks = () => {
+    const base = new URL(window.location.href)
+    // The server's scope paths leave page out, so the address bar's goes too
+    base.searchParams.delete('page')
+
     this.element.querySelectorAll('a').forEach((link) => {
-      const url = new URL(window.location.href)
-      // The server's scope paths leave page out, so the address bar's goes too
-      url.searchParams.delete('page')
+      const url = new URL(base)
       url.searchParams.set('chart_scope', new URL(link.href).searchParams.get('chart_scope'))
       link.href = url.pathname + url.search
     })

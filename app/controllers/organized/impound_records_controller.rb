@@ -54,9 +54,6 @@ module Organized
 
     private
 
-    # The card holds the chart now, so the frame's ask isn't gated on render_chart
-    def chart_only? = Binxtils::InputNormalizer.boolean(params[:chart_only])
-
     def impound_records
       current_organization.impound_records
     end
@@ -72,7 +69,7 @@ module Organized
         series: UI::Chart::Component.time_range_counts(collection: available_impound_records, time_range: @time_range),
         time_range: @time_range,
         stacked: true,
-        height: "180px"
+        height: Pages::Org::Search::ChartCard::Component::CHART_HEIGHT
       )
     end
 

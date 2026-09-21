@@ -4,17 +4,20 @@ module Pages
   module Org
     module Search
       module ChartCard
-        # The chart and headline counts beside the org registrations search.
+        # The chart and headline counts beside an org search - the registrations one with
+        # both scopes and the stats, the others on their own search alone.
         #
         # The caption lives inside the turbo-frame, so a scope switch or a new search brings
-        # it back in step with the numbers in one response — which is why this renders its
-        # own frame rather than UI::ChartAsyncFrame's, whose wrapper holds only the chart.
+        # it back in step with the numbers in one response.
         # `src` renders the placeholder, `chart`/`stats` the response.
         #
         # The collapse trigger stays outside the frame: a frame render replaces what's in it,
         # and while the card is collapsed the lazy frame has nothing to load yet.
         class Component < ApplicationComponent
           FRAME_ID = :chart_card_frame
+          CHART_HEIGHT = "180px"
+          # Holds the space a loaded card takes, so the page doesn't shift when it lands
+          PLACEHOLDER_CLASSES = "tw:flex tw:min-h-[300px] tw:items-center tw:justify-center"
 
           # The open state is part of the address rather than a stored preference; the scope
           # links carry it, since org--chart-card-scope-links rebuilds them from the URL

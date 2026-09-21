@@ -1,5 +1,0 @@
-<%# The search's stream replaces this whole card, so it comes back as the lazy placeholder %>
-<div id="graduated_notifications_chart" class="tw:h-full">
-  <%= render(Pages::Org::Search::ChartCard::Component.new(scope: "search",
-    src: organization_graduated_notifications_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1")))) %>
-</div>

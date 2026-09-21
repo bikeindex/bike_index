@@ -175,7 +175,7 @@ module Organized
         series: chart_band_counts.map { |key, data| {name: t("components.pages.org.search.chart_card.chart_#{key}"), data:} },
         time_range: chart_time_range,
         colors: Pages::Org::Search::ChartCard::Component::BANDS.values.map { it[:hex] },
-        height: "180px",
+        height: Pages::Org::Search::ChartCard::Component::CHART_HEIGHT,
         stacked: true
       )
     end

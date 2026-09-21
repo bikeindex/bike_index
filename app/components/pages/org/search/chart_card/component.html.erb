@@ -42,8 +42,8 @@
 
         <%= tag.div(data: {"org--search-target": ("chartFollowsSearch" if follows_search?)}) do %>
           <% if @src %>
-            <div class="<%= UI::ChartAsyncFrame::Component::WRAPPER_CLASSES %>">
-              <%= render UI::LoadingSpinner::Component.new(text: t("components.ui.chart_async_frame.loading_chart")) %>
+            <div class="<%= PLACEHOLDER_CLASSES %>">
+              <%= render UI::LoadingSpinner::Component.new(text: translation(".loading_chart")) %>
             </div>
           <% else %>
             <%# Standing alone the caption shares this row with the toggle, under the trigger %>
@@ -64,7 +64,6 @@
               </span>
 
               <% if @scope_paths.any? %>
-                <%# The card renders outside the search form, so a search leaves its hrefs behind %>
                 <div data-controller="org--chart-card-scope-links">
                   <%= render(UI::ButtonGroup::Component.new(entries: scope_entries, kind: :toggle)) %>
                 </div>

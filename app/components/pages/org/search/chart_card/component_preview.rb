@@ -18,7 +18,7 @@ module Pages
 
           # The impound records search's card: its own search only, so no scope toggle or stats
           def chart_only
-            chart = UI::Chart::Component.new(stacked: true, height: "180px",
+            chart = UI::Chart::Component.new(stacked: true, height: Component::CHART_HEIGHT,
               series: [{name: "Impounded", data: months.map { [it, rand(5..40)] }.to_h}])
             in_row(Pages::Org::Search::ChartCard::Component.new(scope: "search", chart:))
           end
@@ -59,7 +59,7 @@ module Pages
           end
 
           def chart
-            UI::Chart::Component.new(stacked: true, height: "180px", colors: %w[#2563eb #a855f7 #dc2626],
+            UI::Chart::Component.new(stacked: true, height: Component::CHART_HEIGHT, colors: %w[#2563eb #a855f7 #dc2626],
               series: [{name: "Registrations", data: months.map { [it, rand(300..500)] }.to_h},
                 {name: "E-bike", data: months.map { [it, rand(40..120)] }.to_h},
                 {name: "Stolen", data: months.map { [it, rand(5..30)] }.to_h}])

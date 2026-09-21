@@ -32,9 +32,6 @@ module Organized
 
     private
 
-    # The card holds the chart now, so the frame's ask isn't gated on render_chart
-    def chart_only? = Binxtils::InputNormalizer.boolean(params[:chart_only])
-
     def graduated_notifications
       current_organization.graduated_notifications
     end
@@ -54,7 +51,7 @@ module Organized
         ),
         time_range: @time_range,
         stacked: true,
-        height: "180px"
+        height: Pages::Org::Search::ChartCard::Component::CHART_HEIGHT
       )
     end
 
