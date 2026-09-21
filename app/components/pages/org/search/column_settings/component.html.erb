@@ -1,6 +1,6 @@
 <div class="tw:hidden! <%= PANEL_CLASSES %>" data-ui--collapse-target="content">
   <div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-3 tw:gap-y-2">
-    <%= render(UI::Header::Component.new(text: translation(".visible_columns"), tag: :h3, html_class: "uncap tw:mb-0! tw:pr-1 tw:text-2xl tw:font-extrabold tw:tracking-tight")) %>
+    <%= render(UI::Header::Component.new(text: translation(".visible_columns"), tag: :h3, html_class: "uncap tw:mb-0! tw:pr-1")) %>
 
     <%= render UI::Button::Component.new(text: translation(".all"), color: :link,
         data: { action: "click->org--search-column-settings#selectAll" }) %>
@@ -25,7 +25,6 @@
     data-org--search-column-settings-target="checkboxes"
   >
     <% @settings.enabled_columns.each do |cell_name| %>
-      <%# Unchecked columns read quieter than the ones showing %>
       <%= render(UI::Forms::Checkbox::Component.new(name: cell_name, value: cell_name, checked: false,
         label: @settings.column_renames[cell_name.to_sym],
         class_name: "tw:mb-0! tw:leading-[1.25]! tw:text-gray-400 tw:has-checked:text-gray-900 tw:dark:has-checked:text-gray-100",

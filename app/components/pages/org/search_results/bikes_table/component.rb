@@ -9,7 +9,6 @@ module Pages
         # the search form, column settings, or pagination (e.g. a user's other
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
-          # Kelsey's redesign: a quiet uppercase header over white rows that light up on hover.
           # Descendant selectors, so they outrank the cell classes UI::Table gives every column
           TABLE_CLASSES = [
             "tw:[&_th]:whitespace-nowrap tw:[&_th]:border-b tw:[&_th]:border-gray-100 tw:[&_th]:bg-gray-50",
