@@ -188,7 +188,7 @@
 
   <% if show_other_registrations? %>
     <%= render(UI::Card::Component.new) do %>
-      <%= tag.div(class: "org-search-component", data: (Pages::Org::Search::ColumnSettings::Component.column_toggle_data_attributes(other_registrations_settings, collapse: true) if other_registrations_count.positive?)) do %>
+      <%= tag.div(class: "org-search-component", data: (Pages::Org::Search::ColumnSettings::Component.column_toggle_data_attributes(other_registrations_settings, collapse: true) if other_registrations?)) do %>
         <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
           <h2
             class="
@@ -201,20 +201,20 @@
 
           <div class="tw:flex tw:items-center tw:gap-3">
             <span class="tw:text-xs tw:opacity-65">
-              <% if other_registrations_count.positive? %>
+              <% if other_registrations? %>
                 <%= translation(".other_registrations_count_html", count: helpers.number_display(other_registrations_count)) %>
               <% else %>
                 <%= translation(".no_other_registrations") %>
               <% end %>
             </span>
 
-            <% if other_registrations_count.positive? %>
+            <% if other_registrations? %>
               <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
             <% end %>
           </div>
         </div>
 
-        <% if other_registrations_count.positive? %>
+        <% if other_registrations? %>
           <div class="tw:mt-3">
             <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings: other_registrations_settings)) %>
           </div>
