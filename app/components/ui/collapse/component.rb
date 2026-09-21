@@ -4,6 +4,7 @@ module UI
   module Collapse
     # The trigger for a ui--collapse controller on an ancestor, which keeps
     # aria-expanded and the chevron's rotation in sync with its content.
+    # chevron: true leads the label with it, :trailing follows. A block renders in place of text.
     class Component < ApplicationComponent
       def initialize(text: nil, chevron: false, aria: {}, data: {}, **button_options)
         @text = text
@@ -14,8 +15,9 @@ module UI
       end
 
       def call
+        label = content || @text
         render(UI::Button::Component.new(**@button_options, aria: @aria, data: @data)) do
-          safe_join([chevron_span, @text].compact)
+          safe_join(((@chevron == :trailing) ? [label, chevron_span] : [chevron_span, label]).compact)
         end
       end
 
