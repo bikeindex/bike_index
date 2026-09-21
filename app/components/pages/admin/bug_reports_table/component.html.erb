@@ -26,7 +26,7 @@
           admin_bug_report_path(bug_report), class: "tw:text-xs" %>
       <% end %>
 
-      <% table.column(sortable: "email", label: "Sender", cached: false) do |bug_report| %>
+      <% table.column(sortable: "email", label: "Sender") do |bug_report| %>
         <% if bug_report.user_id.present? %>
           <%= render Pages::Admin::Users::Cell::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
         <% else %>

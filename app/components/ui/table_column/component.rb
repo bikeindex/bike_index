@@ -5,11 +5,9 @@ module UI
     class Component < ApplicationComponent
       NBSP = "\u00A0"
 
-      attr_reader :sortable, :cell_block, :footer, :cached
+      attr_reader :sortable, :cell_block, :footer
 
-      # cached: false for a cell whose content caches itself - the table's key namespaces a
-      # fragment to one table, so a shared cell wrapped in one can't be reused by another
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, footer: nil, cached: true, &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, footer: nil, &block)
         @label = label
         @sortable = sortable
         @sort_indicator = sort_indicator
@@ -18,7 +16,6 @@ module UI
         @lower_right = lower_right
         @cell_block = block
         @footer = footer
-        @cached = cached
       end
 
       # Renders cell content for a record. The block should yield the captured

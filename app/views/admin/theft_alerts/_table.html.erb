@@ -51,7 +51,7 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: "User", cached: false) do |theft_alert| %>
+    <% table.column(label: "User") do |theft_alert| %>
       <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: theft_alert.user, render_search: true, user_id: theft_alert.user_id) %>
     <% end %>
 

@@ -31,11 +31,11 @@
       <% end %>
     <% end %>
 
-    <% table.column(sortable: "seller_id", label: "Seller", cached: false) do |sale| %>
+    <% table.column(sortable: "seller_id", label: "Seller") do |sale| %>
       <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: sale.seller, render_search: true) %>
     <% end %>
 
-    <% table.column(label: "Buyer", cached: false) do |sale| %>
+    <% table.column(label: "Buyer") do |sale| %>
       <% if sale.buyer.present? %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: sale.buyer, render_search: true) %>
       <% else %>

@@ -58,7 +58,7 @@
       <%= render Pages::Admin::Organizations::Cell::Component.new(organization: logged_search.organization, organization_id: logged_search.organization_id, search_url: url_for(sort_state.search_params.merge(organization_id: logged_search.organization_id)), render_search: true, short_name: true) %>
     <% end %>
 
-    <% table.column(sortable: "user_id", cached: false) do |logged_search| %>
+    <% table.column(sortable: "user_id") do |logged_search| %>
       <% if logged_search.user_id.present? %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: logged_search.user, render_search: true, user_id: logged_search.user_id) %>
       <% end %>

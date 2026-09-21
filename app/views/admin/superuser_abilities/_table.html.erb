@@ -17,7 +17,7 @@
     <% end %>
 
     <% unless skip_user %>
-      <% table.column(sortable: "user_id", cached: false) do |superuser_ability| %>
+      <% table.column(sortable: "user_id") do |superuser_ability| %>
         <% if superuser_ability.user_id.present? %>
           <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user_id: superuser_ability.user_id, user: superuser_ability.user, render_search: render_sortable) %>
         <% end %>

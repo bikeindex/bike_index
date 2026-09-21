@@ -11,7 +11,7 @@
     <% end %>
 
     <% unless skip_user %>
-      <% table.column(sortable: "user_id", cached: false) do |membership| %>
+      <% table.column(sortable: "user_id") do |membership| %>
         <%= render Pages::Admin::Users::Cell::Component.new(user: membership.user, user_id: membership.user_id) %>
       <% end %>
     <% end %>
@@ -28,7 +28,7 @@
       <%= membership.level_humanized %>
     <% end %>
 
-    <% table.column(sortable: "creator", cached: false) do |membership| %>
+    <% table.column(sortable: "creator") do |membership| %>
       <% if membership.stripe_managed? %>
         <%= link_to "Stripe", membership.stripe_admin_url, class: "twlink" %>
       <% else %>

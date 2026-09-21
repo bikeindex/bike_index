@@ -20,7 +20,7 @@
     <% end %>
 
     <% unless skip_user %>
-      <% table.column(sortable: "user_id", cached: false) do |payment| %>
+      <% table.column(sortable: "user_id") do |payment| %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, email: payment.email, user: payment.user, render_search: render_sortable) %>
       <% end %>
     <% end %>

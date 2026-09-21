@@ -35,7 +35,7 @@
       <%= render UI::Time::Component.new(time: stripe_subscription.end_at) %>
     <% end %>
 
-    <% table.column(sortable: "user_id", cached: false) do |stripe_subscription| %>
+    <% table.column(sortable: "user_id") do |stripe_subscription| %>
       <% if stripe_subscription.user_id.present? %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: stripe_subscription.user, render_search: true) %>
       <% else %>

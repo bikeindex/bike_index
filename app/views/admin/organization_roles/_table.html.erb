@@ -13,7 +13,7 @@
       <%= link_to render(UI::Time::Component.new(time: organization_role.created_at)), admin_organization_role_url(organization_role), class: "twlink" %>
     <% end %>
 
-    <% table.column(sortable: "invited_email", label: "Recipient", cached: false) do |organization_role| %>
+    <% table.column(sortable: "invited_email", label: "Recipient") do |organization_role| %>
       <% if organization_role.user.present? %>
         <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.user) %>
       <% else %>
@@ -31,7 +31,7 @@
       <%= render UI::Time::Component.new(time: organization_role.claimed_at) %>
     <% end %>
 
-    <% table.column(sortable: "sender_id", label: "Sender", header_classes: "tw:text-xs", cached: false) do |organization_role| %>
+    <% table.column(sortable: "sender_id", label: "Sender", header_classes: "tw:text-xs") do |organization_role| %>
       <% if organization_role.sender.present? %>
         <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.sender) %>
       <% else %>

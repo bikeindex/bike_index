@@ -20,7 +20,7 @@
       <%= render Pages::Admin::Bikes::Cell::Component.new(bike: bike_version.bike, bike_id: bike_version.bike_id) %>
     <% end %>
 
-    <% table.column(sortable: "owner_id", label: "Owner", cached: false) do |bike_version| %>
+    <% table.column(sortable: "owner_id", label: "Owner") do |bike_version| %>
       <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: bike_version.owner, render_search: render_sortable) %>
     <% end %>
 

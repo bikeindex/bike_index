@@ -15,7 +15,7 @@
     <% end %>
 
     <% unless skip_user %>
-      <% table.column(label: "User", cached: false) do |feedback| %>
+      <% table.column(label: "User") do |feedback| %>
         <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, email: feedback.email, user: feedback.user, render_search: render_sortable) %>
       <% end %>
 

@@ -27,6 +27,13 @@ class ApplicationComponent < ViewComponent::Base
 
   private
 
+  # cache_if for a fragment keyed to nothing about the page, so every page reads one copy.
+  # An enclosing UI::Table leaves the cell out of its own cache
+  def shared_cache_if(condition, name, &block)
+    UI::Table::Component.shared_fragment_rendered!
+    cache_if(condition, name, &block)
+  end
+
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.
   #

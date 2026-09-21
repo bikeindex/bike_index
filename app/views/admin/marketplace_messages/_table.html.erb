@@ -46,7 +46,7 @@
       <%= number_display(marketplace_message.messages_prior_count) %>
     <% end %>
 
-    <% table.column(sortable: "sender_id", cached: false) do |marketplace_message| %>
+    <% table.column(sortable: "sender_id") do |marketplace_message| %>
       <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_message.sender, render_search: render_sortable) %>
     <% end %>
   <% end %>

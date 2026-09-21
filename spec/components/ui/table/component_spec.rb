@@ -238,19 +238,29 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(render_with_org.call).to have_css("td", text: "Renamed")
     end
 
-    context "with cached: false" do
-      it "renders that column's cells uncached" do
-        keys = with_controller_class(ApplicationController) do
-          fragments_written do
-            render_inline(described_class.new(records: users, cache_key: "test")) do |table|
-              table.column(label: "Name") { |u| u.name }
-              table.column(label: "Email", cached: false) { |u| u.email }
-            end
+    context "with a cell rendering a shared fragment" do
+      def render_shared(cache_key)
+        with_controller_class(ApplicationController) do
+          render_inline(described_class.new(records: users, cache_key:)) do |table|
+            table.column(label: "Name") { |u| u.name }
+            table.column(label: "Email") { |u| shared_cache_if(true, ["shared", u]) { concat u.email } }
           end
         end
+      end
 
+      it "leaves that column out of the table's cache" do
+        result = nil
+        keys = fragments_written { result = render_shared("test") }
+
+        expect(result).to have_css("td", text: users.first.email)
+        expect(keys.count).to eq 4
+        expect(keys.count { it.include?("test") }).to eq 2
+        expect(fragments_written { render_shared("test") }).to eq([])
+
+        # Another table writes its own name cells, and reads the shared ones
+        keys = fragments_written { render_shared("other") }
         expect(keys.count).to eq 2
-        expect(keys).to all(include("test"))
+        expect(keys).to all(include("other"))
       end
     end
 
