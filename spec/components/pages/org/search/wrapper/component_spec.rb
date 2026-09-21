@@ -80,10 +80,8 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).to have_css("table")
       expect(component).to have_css("[data-controller~='org--search-column-settings']")
       expect(component).to have_button("Column settings", visible: :all)
-      # the header's button opens the panel, and the panel's own Close is the only other trigger
-      expect(component).to have_button("Column settings", count: 1, visible: :all)
-      expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 2, visible: :all)
-      expect(component).to have_button("Close", visible: :all)
+      # the header's button is the only one - the panel doesn't carry the legacy one
+      expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)
     end
 
     context "with csv_exports enabled" do

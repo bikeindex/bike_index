@@ -9,7 +9,6 @@ en:
             address: 'Address:'
             all: all
             avery_cell: Avery Exportable
-            close: Close
             color_cell: Color
             created_at_cell: Registered
             creation_description_cell: Source
