@@ -26,17 +26,9 @@
     data-org--search-column-settings-target="checkboxes"
   >
     <% @settings.enabled_columns.each do |cell_name| %>
-      <label
-        class="
-          tw:mb-0! tw:flex tw:cursor-pointer tw:items-baseline tw:gap-1
-          tw:leading-[1.25]!
-        "
-      >
-        <%= check_box_tag cell_name, cell_name, false,
-          data: { action: "change->org--search-column-settings#columnToggled" } %>
-
-        <span><%= @settings.column_renames[cell_name.to_sym] %></span>
-      </label>
+      <%= render(UI::Forms::Checkbox::Component.new(name: cell_name, value: cell_name, checked: false,
+        label: @settings.column_renames[cell_name.to_sym], class_name: "tw:mb-0! tw:leading-[1.25]!",
+        html_options: {data: {action: "change->org--search-column-settings#columnToggled"}})) %>
     <% end %>
   </div>
 </div>

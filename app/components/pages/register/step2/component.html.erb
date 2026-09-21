@@ -165,7 +165,7 @@
 
         <%= render UI::Forms::Checkbox::Component.new(name: :serial_missing, value: true,
             checked: serial_missing, label: translation(".missing_serial"), class_name: "tw:mt-2",
-            input_data: {"register--serial-target": "missing", action: "change->register--serial#toggleMissing"}) %>
+            html_options: {data: {"register--serial-target": "missing", action: "change->register--serial#toggleMissing"}}) %>
 
         <div
           class="tw:mt-1.5 <%= "tw:hidden" unless serial_missing %>"
@@ -183,7 +183,7 @@
       >
         <%= render UI::Forms::Checkbox::Component.new(name: :made_without_serial_checkbox, value: true,
             checked: made_without_serial, label: translation(".without_serial", cycle_type:), class_name: "tw:mt-2",
-            input_data: {"register--serial-target": "madeWithoutCheckbox", action: "change->register--serial#toggleMadeWithout"}) %>
+            html_options: {data: {"register--serial-target": "madeWithoutCheckbox", action: "change->register--serial#toggleMadeWithout"}}) %>
       </div>
 
       <%= render UI::Modal::Component.new(id: "made-without-serial-modal", title: translation(".are_you_certain")) do |modal| %>
@@ -324,8 +324,8 @@
         <%= render UI::Forms::Checkbox::Component.new(name: :register_with_organization,
             checked: organization.present?,
             label: translation(".register_with_org", org_name: auto_organization.short_name),
-            input_data: {"register--organization-target": "checkbox",
-              action: "change->register--organization#toggle"}) %>
+            html_options: {data: {"register--organization-target": "checkbox",
+              action: "change->register--organization#toggle"}}) %>
 
         <p
           class="

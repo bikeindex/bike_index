@@ -1,23 +1,17 @@
 <%# locals: (settings:, locked:, locked_hint:) %>
 
 <%# Targets both searches' controllers, so the search and multi search render the same checkbox %>
-<div class="tw:flex tw:items-center tw:gap-2">
-  <label
-    class="
-      tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2
-      tw:has-disabled:cursor-not-allowed
-    "
-  >
-    <%= check_box_tag :search_all, "true", settings.search_all?, form: "Search_Form",
-      disabled: locked, class: "tw:disabled:cursor-not-allowed!",
-      data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll",
-             "org--multi-search-target": "searchAll"} %>
-
-    <span><%= t("organized.registrations.search.search_all_html", cycle_type: settings.cycle_type.pluralize(2),
-      org_name: settings.organization.short_name) %></span>
-  </label>
+<% label = capture do %>
+  <%= t("organized.registrations.search.search_all_html", cycle_type: settings.cycle_type.pluralize(2),
+    org_name: settings.organization.short_name) %>
 
   <%= tag.span(render(UI::Tooltip::Component.new(text: locked_hint)),
     class: "tw:leading-none", hidden: !locked,
     data: {"org--search-target": "searchAllHint", "org--multi-search-target": "searchAllHint"}) %>
-</div>
+<% end %>
+
+<%= render(UI::Forms::Checkbox::Component.new(name: :search_all, value: "true", checked: settings.search_all?,
+  label:, class_name: "tw:mb-0!",
+  html_options: {form: "Search_Form", disabled: locked,
+                 data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll",
+                        "org--multi-search-target": "searchAll"}})) %>
