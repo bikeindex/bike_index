@@ -4915,10 +4915,16 @@ it:
     impound_records:
       index:
         impound_records: Registri di sequestro
-        render_chart: Grafico di rendering
+        find_an_impound_record: Trovare un registro dei sequestri
+        search_impound_records: Consultare i registri dei sequestri
     registrations:
       search:
-        render_chart: Grafico di rendering
+        find_a_registration_html: Trova un %{cycle_type}
+        search_all_email_disabled: È possibile cercare le registrazioni della propria
+          organizzazione solo tramite l'indirizzo email o il nome del proprietario.
+        search_all_html: Cerca tutti i %{cycle_type} <span class="less-strong">(non
+          solo %{org_name})</span>
+        search_registrations: Cerca registrazioni
   organized_mailer:
     custom_message:
       subject: "%{org_name} - la posizione del tuo %{mnfg_name}"
@@ -5642,8 +5648,6 @@ it:
         to: A
         update: Aggiorna
         year: anno
-      chart_async_frame:
-        loading_chart: Caricamento del grafico...
       forms:
         legacy_form_well:
           address_record:
@@ -5810,13 +5814,42 @@ it:
             search_for_serial_number: Cerca il numero di serie
             search_notes: Note di ricerca
             search_owner_email_or_name: Cerca l'indirizzo email o il nome del proprietario
-          settings:
+          wrapper:
+            e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
+            view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
+            export_csv: Esporta in formato CSV
+            export_unavailable: È possibile esportare solo le registrazioni della
+              propria organizzazione. Deselezionare "Cerca tutto %{cycle_type}" per
+              esportare.
+            matching_html:
+              one: "%{number} corrispondenza"
+              other: "%{number} corrispondenze"
+            over_count_matching_html: Oltre %{number} partite
+            per_page: Risultati per pagina
+            showing_html: che mostra %{from}–%{to} di %{count}
+            view_as: Visualizza come
+            view_spreadsheet: Foglio di calcolo
+            view_thumbnail: Miniatura
+          chart_card:
+            caption_search: Ricerca attuale
+            caption_year: Riepilogo dell'anno scorso
+            chart: Grafico
+            chart_motorized: veicolo elettrico
+            chart_registrations: Iscrizioni
+            chart_stolen: Rubata
+            loading_chart: Caricamento del grafico...
+            scope_search: Ricerca attuale
+            scope_year: L'anno scorso
+            stat_motorized: Registrazioni dei veicoli elettrici
+            stat_registrations: Iscrizioni totali
+            stat_stolen: Segnalato come rubato
+          column_settings:
+            acknowledgment_cell: Conferma della sequenza di registrazione
             address: 'Indirizzo:'
             all: Tutti
             avery_cell: Avery Esportabile
             bike: registrazione
             color_cell: Colore
-            create_export_of_vehicles: Crea l'esportazione della ricerca %{cycle_type}
             created_at_cell: Registrato
             creation_description_cell: Fonte
             cycle_type_cell: Tipo di veicolo
@@ -5826,6 +5859,8 @@ it:
             filter_no_sticker_html: solo <strong>senza</strong> adesivo
             filter_not_impounded_html: solo <strong>non</strong> sequestrato
             filter_not_stolen_or_impounded_html: non rubato o sequestrato
+            filter_not_unregistered_html: "<strong>non non</strong> registrato"
+            filter_only_unregistered_html: solo <strong>non registrato</strong>
             filter_stolen_html: solo rubato
             filter_with_address_html: solo <strong>con</strong> indirizzo
             filter_with_stickers_html: solo <strong>con</strong> adesivi
@@ -5844,23 +5879,23 @@ it:
             reg_phone_cell: Telefono
             reg_student_id_cell: Tessera studentesca
             serial_number_cell: Seriale
-            settings: impostazioni
             show_notes_search: mostra le note cerca
             status: 'Stato:'
             status_cell: Stato
             sticker_cell: Adesivo
             stickers: 'Adesivi:'
             stolen_cell: Rubata
+            unregistered: 'Non registrato:'
             updated_at_cell: Fatto
             url_cell: URL
             vehicle: registrazione
             visible_columns: Colonne visibili
-            acknowledgment_cell: Conferma della sequenza di registrazione
-          wrapper:
-            e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
-            matching_bikes_html: "%{count} %{cycle_type} corrispondente"
-            registered_bikes_html: "%{count} %{cycle_type} corrispondente a %{org_name}"
-            view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
+          column_settings_toggle:
+            column_settings: Impostazioni della colonna
+          settings_and_filters:
+            date_range: 'Intervallo di date:'
+            search_settings: Impostazioni di ricerca
+            search_settings_and_filters: Impostazioni e filtri di ricerca
         search_results:
           bikes_table:
             assign_bike_sticker: Collegamento
@@ -5895,6 +5930,8 @@ it:
           index:
             matches_visible: visibile
             parking_notifications: Notifiche di parcheggio
+            find_a_parking_notification: Trova una notifica di parcheggio
+            search_parking_notifications: Cerca notifiche di parcheggio
           table:
             address: Indirizzo
             bike: Bicicletta
