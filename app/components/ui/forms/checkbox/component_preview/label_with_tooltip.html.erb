@@ -1,0 +1,9 @@
+<% label = capture do %>
+  Search all registrations
+  <span class="twless-strong">(not just Brakebills)</span>
+  <%= render(UI::Tooltip::Component.new(text: "Sticker search always searches all bikes")) %>
+<% end %>
+
+<div class="tw:max-w-60">
+  <%= render(UI::Forms::Checkbox::Component.new(name: :search_all, label:, class_name: "tw:mb-0!")) %>
+</div>
