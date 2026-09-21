@@ -11,12 +11,9 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
-# The checkout a workspace or worktree borrows untracked files from, nil when there is
-# none: `--git-common-dir` answers ".git" from a main checkout, and "" outside a repo,
-# both of which expand to APP_ROOT
+# ".git" from the main checkout and "" outside a repo both expand to APP_ROOT
 def shared_root
-  common_dir = `git rev-parse --git-common-dir 2>/dev/null`.strip
-  root = File.expand_path(File.dirname(common_dir), APP_ROOT)
+  root = File.expand_path(File.dirname(`git rev-parse --git-common-dir 2>/dev/null`.strip), APP_ROOT)
   root unless root == APP_ROOT
 end
 

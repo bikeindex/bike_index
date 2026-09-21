@@ -53,7 +53,7 @@ the file already exists, leaving the checkout on an ID the registry never handed
 Skip the setup entirely and `bin/env` falls through to `DEV_PORT=3042` and Redis db 0 —
 the *main checkout's* port, database and cache. Nothing errors; `$BASE_URL` just serves
 another branch, and `bin/setup` run from there would load the schema over the main
-checkout's own `bikeindex_development`.
+checkout's `bikeindex_development`.
 
 Two things hold everywhere.
 
@@ -97,9 +97,7 @@ live without it.
 ## Whose checkout it is decides who starts `bin/dev`
 
 `AGENTS.md` says to stop and ask rather than starting a dev server. That holds
-where a human is working — a Conductor workspace, and the base checkout.
+where a human is working — a Conductor workspace, and the main checkout.
 
 **Start it yourself in a spawned `.claude/worktrees/…` checkout**, and in the web
-sandbox (`references/web-sandbox.md` covers that one). Both are yours alone: nobody
-else has a server on that port, so there's nothing to interrupt and no one to ask.
-Run `bin/workspace_setup` first, or it binds the base checkout's port.
+sandbox (`references/web-sandbox.md` covers that one). Both are yours alone.
