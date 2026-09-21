@@ -34,7 +34,7 @@ RSpec.describe UI::Chart::Component, type: :component do
     let(:start_time) { Time.at(1568052985) }
     let(:time_range) { start_time..(start_time + 3.minutes) }
     let(:buckets) { %([[" 1:16 PM",0],[" 1:17 PM",0],[" 1:18 PM",0],[" 1:19 PM",0]]) }
-    before { Time.zone = "America/Chicago" }
+    around { |example| Time.use_zone("America/Chicago") { example.run } }
 
     it "fills the buckets a series is missing" do
       expect(render_inline(instance).css("script").text).to include(buckets)
