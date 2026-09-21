@@ -16,7 +16,7 @@
 
     <tbody>
       <% @records.each do |record| %>
-        <% cache_if(@cache_key, [@cache_key, record]) do %>
+        <% cache_if(@cache_key, [@cache_key, record, *cache_records_for(record)]) do %>
           <tr>
             <% @columns.each do |col| %>
               <td class="<%= col.td_classes(bordered: @bordered) %>">
