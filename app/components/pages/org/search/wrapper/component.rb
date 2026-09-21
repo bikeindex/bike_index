@@ -9,10 +9,10 @@ module Pages
         # search (search_page) the header also carries the view switcher and the export, and
         # the card renders inside the results turbo-frame, so every search brings it back whole.
         class Component < ApplicationComponent
-          # Out to the page's edges while the table overflows (org--bikes-table-overflow flags it).
-          # 15px is the org layout's .container-fluid padding; forced like twfullbleed, over the card's own
-          OVERFLOW_BLEED_CLASSES = "tw:has-[[data-overflowing]]:-mx-[15px] tw:has-[[data-overflowing]]:border-x-0! " \
-            "tw:has-[[data-overflowing]]:rounded-none!"
+          # The table out to the page's edges while it overflows (org--bikes-table-overflow flags it):
+          # past the org layout's 15px .container-fluid padding and the card's border, which
+          # twfullbleed drops once the row is one column
+          TABLE_BLEED_CLASSES = "tw:has-[[data-overflowing]]:-mx-[16px] tw:@max-[672px]/twwiderow:has-[[data-overflowing]]:-mx-[15px]"
 
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[spreadsheet thumbnail].freeze
@@ -100,7 +100,11 @@ module Pages
           # is the container twfullbleed reads; elsewhere the card stands on its own
           def card_classes
             ["org-search-component tw:rounded-xl", UI::Card::Component::BASE_CLASSES,
-              @search_page ? "tw:twfullbleed #{OVERFLOW_BLEED_CLASSES}" : "tw:mt-4"].join(" ")
+              @search_page ? "tw:twfullbleed" : "tw:mt-4"].join(" ")
+          end
+
+          def table_clip_classes
+            ["tw:overflow-hidden", (TABLE_BLEED_CLASSES if @search_page)].compact.join(" ")
           end
 
           # Built here rather than on the settings struct, which route helpers never reach
