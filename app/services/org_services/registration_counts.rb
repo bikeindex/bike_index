@@ -3,7 +3,7 @@
 module OrgServices
   # The counts behind the org registrations chart card: each metric over the window,
   # and over the window of the same length before it, which the card renders as a delta.
-  module RegistrationStats
+  module RegistrationCounts
     extend Functionable
 
     # compare: false for `all`, whose window starts at the epoch - there's no earlier one

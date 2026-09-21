@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe OrgServices::RegistrationStats do
+RSpec.describe OrgServices::RegistrationCounts do
   let(:organization) { FactoryBot.create(:organization) }
   let(:bikes) { organization.bikes }
   let(:time_range) { (Time.current - 1.week)..Time.current }

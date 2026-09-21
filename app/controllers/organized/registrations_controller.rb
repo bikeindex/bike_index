@@ -165,7 +165,7 @@ module Organized
 
     def registrations_stats
       @registrations_stats ||= cache_year_chart(:stats) do
-        OrgServices::RegistrationStats.for_range(chart_bikes, chart_time_range,
+        OrgServices::RegistrationCounts.for_range(chart_bikes, chart_time_range,
           compare: chart_scope_year? || @period != "all")
       end
     end
