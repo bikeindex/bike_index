@@ -26,7 +26,7 @@ module Pages
             organization = ::Organization.new(short_name: "Preview", enabled_feature_slugs:)
             settings = ComponentStructs::OrgSearchSettings.new(organization:)
 
-            {template: "pages/org/search/column_settings/component_preview/default",
+            {template: "pages/org/search/column_settings/component_preview/panel",
              locals: {settings:, data: Component.column_settings_data_attributes(settings, collapse: true)}}
           end
         end
