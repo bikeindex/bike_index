@@ -21,15 +21,18 @@ module UI
         tag.button(**trigger_attrs(class: BUTTON_CLASS, **attrs)) { block ? capture(&block) : "?" }
       }
 
-      def initialize(text: nil)
+      # placement: where the tooltip opens against its trigger (the controller defaults to top)
+      def initialize(text: nil, placement: nil)
         @text = text
+        @placement = placement
       end
 
       # The controller and its hover/focus actions live on the wrapping span so
       # the trigger and the tooltip are siblings — a link in the tooltip body
       # can't be nested inside the trigger button.
       def call
-        tag.span(class: "tw:inline-block", data: {controller: "ui--tooltip", action: TRIGGER_ACTIONS}) do
+        tag.span(class: "tw:inline-block", data: {controller: "ui--tooltip", action: TRIGGER_ACTIONS,
+                                                  "ui--tooltip-placement-value": @placement}.compact) do
           safe_join([trigger, tooltip_span], " ")
         end
       end
