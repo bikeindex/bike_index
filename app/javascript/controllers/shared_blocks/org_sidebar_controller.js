@@ -32,6 +32,7 @@ export default class extends Controller {
     this.override = null
     this.render()
     this.watchForReaderScroll()
+    this.flagCurrentGroup()
     // ui--active-link may have marked the current row before this controller existed to
     // hear it say so
     const current = this.element.querySelector('[aria-current]')
@@ -77,8 +78,9 @@ export default class extends Controller {
   }
 
   // ui--collapse flags its trigger data-active while the group is open, which is the
-  // is-active variant the current row is styled with -- so restated after each toggle as
-  // what that styling means on a group: it holds the current row, open or not
+  // is-active variant the current row is styled with -- so restated after each toggle, and
+  // as each group connects, as what that styling means on a group: it holds the current
+  // row, open or not
   flagCurrentGroup () {
     this.element.querySelectorAll(GROUP_TRIGGER).forEach((trigger) => {
       const group = trigger.closest('[data-controller~="ui--collapse"]')

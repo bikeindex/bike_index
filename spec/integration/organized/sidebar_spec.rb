@@ -126,14 +126,36 @@ RSpec.describe "Organization sidebar", :js, type: :system do
   # The sidebar stands in for the navbar on every page a member sees, including ones no
   # row points at — where the design's default of the first group open stands
   it "opens the first group on a page no row matches, and leaves the organization from it" do
+    # ui--collapse flags its open trigger data-active as it connects, so the sidebar has to
+    # clear that whenever the group lands after it -- held here so it always does
+    held = []
+    release = Queue.new
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.route(%r{ui/collapse_controller}, ->(route, request) {
+        release.pop if held.empty?
+        held << request.url
+        route.continue
+      })
+    end
+
     visit "/my_account"
+
+    wait_for do
+      page.evaluate_script(<<~JS)
+        (() => {
+          const element = document.querySelector('[data-controller~="shared-blocks--org-sidebar"]')
+          return !!(element && window.Stimulus?.getControllerForElementAndIdentifier(element, 'shared-blocks--org-sidebar'))
+        })()
+      JS
+    end
+    release << :continue
 
     # Alone among these examples, everything asserted below is an absence -- and the row
     # count `expect_open` waits for is the template's, not a controller's. So without this
-    # they'd all pass on a page that has connected nothing, then fail whenever the run
-    # lands between ui--collapse flagging the open group data-active and
-    # shared-blocks--org-sidebar clearing it
+    # they'd all pass on a page that has connected nothing
     wait_for_stimulus
+    # A route that never fired would pass vacuously
+    expect(held).not_to be_empty
 
     expect_open("#{organization.short_name} Registrations")
     # The scroller holds the menu rows -- the account block below it points at /my_account,
