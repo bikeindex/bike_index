@@ -61,8 +61,8 @@
           tw:sm:items-center tw:sm:justify-between
         "
       >
-        <%= render "search_all", settings:, locked: false,
-          locked_hint: "Sticker search always searches all registrations" %>
+        <%= render(Pages::Org::Search::SearchAll::Component.new(settings:, locked: false,
+          locked_hint: "Sticker search always searches all registrations")) %>
 
         <%# Searching is JS-only, so org--multi-search enables this on connect %>
         <%= render UI::Button::Component.new(

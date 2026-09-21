@@ -4565,8 +4565,6 @@ en:
         find_a_registration_html: Find a %{cycle_type}
         search_all_email_disabled: You can only search your organization's registrations
           with owner email or name
-        search_all_html: Search all %{cycle_type} <span class="less-strong">(not just
-          %{org_name})</span>
         search_registrations: Search registrations
     stickers:
       edit:
