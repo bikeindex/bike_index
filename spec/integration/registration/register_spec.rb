@@ -455,13 +455,9 @@ RSpec.describe "Register flow", :js, type: :system do
 
     it "holds the submit until the blob lands, then sends it" do
       start_registration
-      # Held just long enough to submit against it; the upload finishes on its own after
-      page.driver.with_playwright_page do |playwright_page|
-        playwright_page.route(upload_url_pattern, ->(route, _request) {
-          sleep 3
-          route.continue
-        })
-      end
+      # Held until the submit has landed against it -- a slow form fill would outrun a timed
+      # delay, and the example would pass testing nothing
+      upload = hold_requests(upload_url_pattern)
 
       attach_file("bike_image", image_path, make_visible: true)
       expect(page).to have_content("uploading")
@@ -473,6 +469,8 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_current_path(/step=2/, url: true)
 
       # ...and once the blob lands the held submit goes through, carrying the photo
+      expect(upload.urls).not_to be_empty
+      upload.release
       expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_present
     end
