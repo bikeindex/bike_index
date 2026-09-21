@@ -27,7 +27,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Sticker org", header_classes: "tw:font-normal") do |update| %>
+  <% table.column(label: "Sticker org") do |update| %>
     <% if update.bike_sticker.organization.present? %>
       <small><%= update.bike_sticker.organization.short_name %></small>
     <% end %>
@@ -63,7 +63,7 @@
   <% end %>
 
   <% table.column(sortable: "kind") do |update| %>
-    <small><%= update.kind.gsub("_claim", "").humanize %></small>
+    <small><%= update.kind&.gsub("_claim", "")&.humanize %></small>
   <% end %>
 
   <% table.column(sortable: "creator_kind") do |update| %>

@@ -4135,17 +4135,6 @@ nl:
           niet bewerken
         member_of_organization: Lid van organisatie
         role_type: Roltype
-    parking_notifications:
-      index:
-        parking_notifications: Verlaten records
-        matches_visible: Zichtbaar
-      table:
-        bike: Fiets
-        by: Door
-        created: Gemaakt
-        address: Adres
-        notification_number: Kennisgeving#
-        resolved: Vastbesloten
     manages:
       location_fields:
         address: Adres
@@ -5769,8 +5758,9 @@ nl:
           bikes_table:
             assign_bike_sticker: Sticker toewijzen
             email_hidden: email verborgen
-            hidden_not_registered: verborgen, niet geregistreerd bij %{org_name}
             link_sticker: link sticker
+            hidden: verborgen
+            not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
@@ -5795,6 +5785,17 @@ nl:
             only_user_registered: Alleen geregistreerde gebruikers
             status_records: "%{status} records"
             update_multiple_records: Meerdere records bijwerken
+        parking_notifications:
+          index:
+            matches_visible: Zichtbaar
+            parking_notifications: Verlaten records
+          table:
+            address: Adres
+            bike: Fiets
+            by: Door
+            created: Gemaakt
+            notification_number: Kennisgeving#
+            resolved: Vastbesloten
       register:
         acknowledgment_check:
           i_name_html: Ik, %{name},

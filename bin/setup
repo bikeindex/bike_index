@@ -11,11 +11,17 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
+# ".git" from the main checkout and "" outside a repo both expand to APP_ROOT
+def shared_root
+  root = File.expand_path(File.dirname(`git rev-parse --git-common-dir 2>/dev/null`.strip), APP_ROOT)
+  root unless root == APP_ROOT
+end
+
 FileUtils.chdir APP_ROOT do
-  # Conductor workspace setup
-  if ENV["CONDUCTOR_ROOT_PATH"]
-    root = ENV["CONDUCTOR_ROOT_PATH"]
-    puts "== Setting up Conductor workspace =="
+  # Untracked state too big or too stateful to duplicate comes from the root
+  # checkout rather than being rebuilt per workspace
+  if (root = shared_root)
+    puts "== Setting up workspace against #{root} =="
 
     # Copy .env.test from root repo
     env_test = File.join(root, ".env.test")

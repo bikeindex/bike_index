@@ -39,11 +39,22 @@ module ComponentStructs
 
     ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
 
-    FILTER_DESCRIPTION_KEYS = {
-      search_stickers: {with: :filter_with_stickers_html, none: :filter_no_sticker_html},
-      search_address: {with_street: :filter_with_address_html, without_street: :filter_no_address_html},
-      search_status: {not_impounded: :filter_not_impounded_html, impounded: :filter_impounded_html,
-                      with_owner: :filter_not_stolen_or_impounded_html, stolen: :filter_stolen_html}
+    # Each filter's values and their labels, once — `filter_groups` lays them out,
+    # `filter_values` is the set the controller permits, and `active_search_filter_descriptions`
+    # names the ones in force. feature gates the whole row, value_feature an individual
+    # option; blank is the row's "not filtering".
+    FILTER_GROUPS = {
+      search_stickers: {label: :stickers, feature: "bike_stickers",
+                        values: {with: :filter_with_stickers_html, none: :filter_no_sticker_html}},
+      search_address: {label: :address, feature: "reg_address",
+                       values: {with_street: :filter_with_address_html,
+                                without_street: :filter_no_address_html}},
+      search_status: {label: :status, blank: "all",
+                      value_feature: {not_impounded: "impound_bikes", impounded: "impound_bikes"},
+                      values: {not_impounded: :filter_not_impounded_html,
+                               impounded: :filter_impounded_html,
+                               with_owner: :filter_not_stolen_or_impounded_html,
+                               stolen: :filter_stolen_html}}
     }.freeze
 
     DEFAULT_COLUMNS = %w[created_at_cell stolen_cell manufacturer_cell model_cell
@@ -52,7 +63,19 @@ module ComponentStructs
     ALWAYS_ENABLED_COLUMNS = %w[url_cell updated_at_cell serial_number_cell cycle_type_cell
       propulsion_type_cell status_cell].freeze
 
-    attr_reader :organization, :search_stickers, :search_address, :search_status
+    attr_reader :organization
+
+    # The values an organization's panel offers for a filter, blank first — empty if the
+    # whole row is gated off. The search permits these and nothing else
+    def self.filter_values(name, organization)
+      group = FILTER_GROUPS.fetch(name)
+      enabled = ->(feature) { feature.nil? || organization.enabled?(feature) }
+      return [] unless enabled.call(group[:feature])
+
+      [group[:blank] || ""] + group[:values].keys.filter_map do |value|
+        value.to_s if enabled.call(group[:value_feature]&.dig(value))
+      end
+    end
 
     def initialize(organization:, interpreted_params: {}, sortable_search_params: {}, params: {},
       search_stickers: nil, search_address: nil, search_status: "all")
@@ -60,15 +83,25 @@ module ComponentStructs
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
       @params = params
-      @search_stickers = search_stickers
-      @search_address = search_address
-      @search_status = search_status
+      @filter_values = {search_stickers:, search_address:, search_status:}
+    end
+
+    def filter_groups
+      FILTER_GROUPS.filter_map do |name, group|
+        blank, *values = self.class.filter_values(name, @organization)
+        next if blank.nil?
+
+        {name:, label: translation(group[:label]),
+         selected: @filter_values[name].presence || blank,
+         entries: [{value: blank, label: translation(:all)}] +
+           values.map { |value| {value:, label: translation(group[:values][value.to_sym])} }}
+      end
     end
 
     def active_search_filter_descriptions
-      @active_search_filter_descriptions ||= FILTER_DESCRIPTION_KEYS.filter_map do |param, mapping|
-        value = public_send(param)
-        key = mapping[value.to_sym] if value.is_a?(String)
+      @active_search_filter_descriptions ||= FILTER_GROUPS.filter_map do |name, group|
+        value = @filter_values[name]
+        key = group[:values][value.to_sym] if value.is_a?(String)
         translation(key) if key
       end
     end
@@ -112,7 +145,7 @@ module ComponentStructs
     end
 
     def default_open?
-      @search_stickers.present? || @search_address.present? ||
+      @filter_values[:search_stickers].present? || @filter_values[:search_address].present? ||
         @params[:search_impoundedness].present? || Binxtils::InputNormalizer.boolean(@params[:search_open])
     end
 

@@ -35,6 +35,10 @@
   --breakpoint-xs: 23rem; /* 368px (iphone mini is 375px) */
   --breakpoint-navbar: 62rem; /* 992px, the $grid-breakpoint-lg the navbar switches at */
 
+  /* 11px, below tailwind's own xs; the line box stays xs's 1rem */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: calc(1 / 0.6875);
+
   /* OG Bike Index brand palettes (formerly config/tailwind.config.js) */
   /* Blue 500 and up carry the redesign's saturation (kelsey_styles.css's
    * --redesign-blue-500/-800 are 500 and 600 here). Same hue and lightness as
@@ -124,16 +128,16 @@
   .ui-table thead tr th:last-child {
     @apply tw:rounded-tr-sm;
   }
-  .ui-table tbody tr:last-child td:first-child {
+  .ui-table :is(tbody:last-child, tfoot) tr:last-child td:first-child {
     @apply tw:rounded-bl-sm;
   }
-  .ui-table tbody tr:last-child td:last-child {
+  .ui-table :is(tbody:last-child, tfoot) tr:last-child td:last-child {
     @apply tw:rounded-br-sm;
   }
-  .ui-table-bordered tbody tr td:first-child {
+  .ui-table-bordered :is(tbody, tfoot) tr td:first-child {
     @apply tw:ui-table-bordered-td-first;
   }
-  .ui-table-bordered tbody tr td:last-child {
+  .ui-table-bordered :is(tbody, tfoot) tr td:last-child {
     @apply tw:ui-table-bordered-td-last;
   }
   .ui-table-bordered thead tr th:first-child {
@@ -241,6 +245,12 @@ body.with-org-sidebar main > :only-child {
   width: 100%;
 }
 
+/* Fixed to the viewport, which body's margin doesn't reach */
+body.with-org-sidebar #flash-messages {
+  left: var(--org-sidebar-width, 266px);
+  transition: left 0.18s ease;
+}
+
 /* SharedBlocks::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
    a top bar in the flow -- which takes its own space, so there's nothing to hold
    open for it. `width <` rather than a max-width of 759px, so a fractional viewport
@@ -249,7 +259,8 @@ body.with-org-sidebar main > :only-child {
   body.with-org-sidebar {
     --nav-gap: 16px;
 
-    margin-left: 0;
+    /* Shadows what the controller writes on the document, so every reader of it follows */
+    --org-sidebar-width: 0px;
   }
 
   body.with-org-sidebar main {

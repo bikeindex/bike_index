@@ -4589,17 +4589,6 @@ nb:
         why_no_direct_by_default: Som standard sendes e-poster til sykler som ikke
           er gjort krav på, til organisasjonen din for å gjennomgå og videresende
           til sluttbrukeren, fordi disse brukerne ikke har meldt seg på Bike Index-varsler.
-    parking_notifications:
-      index:
-        matches_visible: synlig
-        parking_notifications: Parkeringsmeldinger
-      table:
-        address: Adresse
-        bike: Sykkel
-        by: Av
-        created: Opprettet
-        notification_number: Melding#
-        resolved: Løst
     stickers:
       edit:
         bike: Sykkel
@@ -5606,8 +5595,9 @@ nb:
           bikes_table:
             assign_bike_sticker: Tildel klistremerke
             email_hidden: e-post skjult
-            hidden_not_registered: skjult, ikke registrert hos %{org_name}
             link_sticker: lenkeklistremerke
+            hidden: skjult
+            not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
           multi_result_chip:
             no_results: ingen treff
           multi_results:
@@ -5631,6 +5621,17 @@ nb:
             only_user_registered: Kun bruker registrert
             status_records: "%{status} poster"
             update_multiple_records: Oppdater flere poster
+        parking_notifications:
+          index:
+            matches_visible: synlig
+            parking_notifications: Parkeringsmeldinger
+          table:
+            address: Adresse
+            bike: Sykkel
+            by: Av
+            created: Opprettet
+            notification_number: Melding#
+            resolved: Løst
       register:
         acknowledgment_check:
           i_name_html: Jeg, %{name},

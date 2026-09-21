@@ -39,7 +39,7 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-**Confirm the page renders what changed, before capturing it.** A page that looks like the obvious home for a component often isn't, and a shot that turns out not to contain the change wastes a whole capture round, base branch included. One `browser_evaluate` counting the component's own marker class settles it; a component with a preview is the reliable fallback.
+**Confirm the page renders what changed, before capturing it.** A page that looks like the obvious home for a component often isn't, and a shot that turns out not to contain the change wastes a whole capture round, base branch included. One `browser_evaluate` counting the component's own marker class settles it — filter on `offsetParent !== null`, or a closed tab panel's copy counts as on-screen (`/o/:slug/registrations/multi_search`'s `?` button is behind the Registration Stickers tab). A component with a preview is the reliable fallback.
 
 ## 2. Capture branch screenshots
 

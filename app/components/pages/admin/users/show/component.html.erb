@@ -99,9 +99,7 @@
       <small>Editing</small>
       <%= @user.display_name %>
 
-      <% if @display_dev_info %>
-        <em class="small less-strong only-dev-visible">id: <%= @user.id %></em>
-      <% end %>
+      <em class="small less-strong only-dev-visible">id: <%= @user.id %></em>
     </h1>
 
     <table class="table-list">
@@ -146,19 +144,17 @@
           </td>
         </tr>
 
-        <% if @display_dev_info %>
-          <tr class="only-dev-visible">
-            <td>No Address</td>
+        <tr class="only-dev-visible">
+          <td>No Address</td>
 
-            <td>
-              <% if @user.no_address? %>
-                <strong class="text-success">TRUE</strong>
-              <% else %>
-                <small class="less-strong">address permitted</small>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
+          <td>
+            <% if @user.no_address? %>
+              <strong class="text-success">TRUE</strong>
+            <% else %>
+              <small class="less-strong">address permitted</small>
+            <% end %>
+          </td>
+        </tr>
 
         <tr>
           <td>Superuser</td>
@@ -428,7 +424,7 @@
 </h4>
 
 <% if @bikes_count > 0 %>
-  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, display_dev_info: @display_dev_info, skip_user: true) %>
+  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, skip_user: true) %>
 <% end %>
 
 <h4 class="mt-4">
@@ -506,55 +502,35 @@
 
 <h4 class="mt-4">User emails</h4>
 
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered table-sm">
-    <thead>
-      <th>Created&nbsp;<small class="localizeTimezone"></small></th>
-      <th></th>
-      <th>Confirmed</th>
-      <th>Primary</th>
-      <th>Old User Id</th>
-    </thead>
+<%= render(UI::Table::Component.new(records: @user.user_emails)) do |table| %>
+  <% table.column(label: "Created", lower_right: ->(user_email) { user_email.id }) do |user_email| %>
+    <%= render UI::Time::Component.new(time: user_email.created_at) %>
+  <% end %>
 
-    <tbody>
-      <% @user.user_emails.each do |user_email| %>
-        <tr>
-          <td>
-            <div class="less-strong-hold">
-              <span class="less-strong-right medium-screens">
-                <%= user_email.id %>
-              </span>
+  <% table.column(label: "") do |user_email| %>
+    <%= user_email.email %>
+  <% end %>
 
-              <span class="localizeTime">
-                <%= l user_email.created_at, format: :convert_time %>
-              </span>
-            </div>
-          </td>
+  <% table.column(label: "Confirmed") do |user_email| %>
+    <% if user_email.confirmed? %>
+      <%= check_mark %>
+    <% else %>
+      <small class="less-strong">false</small>
+    <% end %>
+  <% end %>
 
-          <td><%= user_email.email %></td>
+  <% table.column(label: "Primary") do |user_email| %>
+    <% if user_email.primary? %>
+      <%= check_mark %>
+    <% else %>
+      <small class="less-strong">false</small>
+    <% end %>
+  <% end %>
 
-          <td>
-            <% if user_email.confirmed? %>
-              <%= check_mark %>
-            <% else %>
-              <small class="less-strong">false</small>
-            <% end %>
-          </td>
-
-          <td>
-            <% if user_email.primary? %>
-              <%= check_mark %>
-            <% else %>
-              <small class="less-strong">false</small>
-            <% end %>
-          </td>
-
-          <td><%= user_email.old_user_id %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column(label: "Old User Id") do |user_email| %>
+    <%= user_email.old_user_id %>
+  <% end %>
+<% end %>
 
 <hr class="mt-4">
 
@@ -572,15 +548,13 @@
       <div class="col-md-6">
         <table class="table-list">
           <tbody>
-            <% if @display_dev_info %>
-              <tr
-                class="only-dev-visible tw:hidden"
-                data-ui--collapse-target="content"
-              >
-                <td class="small">ID</td>
-                <td class="small"><%= mailchimp_datum.id %></td>
-              </tr>
-            <% end %>
+            <tr
+              class="only-dev-visible tw:hidden"
+              data-ui--collapse-target="content"
+            >
+              <td class="small">ID</td>
+              <td class="small"><%= mailchimp_datum.id %></td>
+            </tr>
 
             <tr>
               <td>Status</td>

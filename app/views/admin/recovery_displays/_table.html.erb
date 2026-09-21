@@ -1,61 +1,37 @@
-<% collection ||= @recovery_displays %>
+<%# locals: (collection:, render_sortable: true) %>
 
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered padded table-sm">
-    <thead class="thead-light">
-      <th><%= sortable "recovered_at" %></th>
-      <th class="small less-strong"><%= sortable "created_at" %></th>
-      <th class="small"><%= sortable "updated_at" %></th>
-      <th>Quote</th>
-      <th>Quoter</th>
-      <th>Location</th>
-      <th class="small">image?</th>
-      <th class="large-screens small">Association?</th>
-    </thead>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "recovered_at", lower_right: ->(recovery_display) { content_tag(:code, recovery_display.id) }) do |recovery_display| %>
+    <%= link_to edit_admin_recovery_display_url(recovery_display), class: "twlink" do %>
+      <%= render UI::Time::Component.new(time: recovery_display.recovered_at) %>
+    <% end %>
+  <% end %>
 
-    <tbody>
-      <% collection.each do |recovery_display| %>
-        <tr>
-          <td>
-            <div class="less-strong-hold">
-              <a
-                class="localizeTime mr-2"
-                href="<%= edit_admin_recovery_display_url(recovery_display) %>"
-              >
-                <%= l recovery_display.recovered_at, format: :convert_time %>
-              </a>
+  <% table.column(sortable: "created_at", classes: "tw:text-xs", header_classes: "less-strong") do |recovery_display| %>
+    <%= render UI::Time::Component.new(time: recovery_display.created_at) %>
+  <% end %>
 
-              <code class="small less-strong-right">
-                <%= recovery_display.id %>
-              </code>
-            </div>
-          </td>
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |recovery_display| %>
+    <span class="less-strong"><%= render UI::Time::Component.new(time: recovery_display.updated_at) %></span>
+  <% end %>
 
-          <td>
-            <small class="localizeTime">
-              <%= l recovery_display.created_at, format: :convert_time %>
-            </small>
-          </td>
+  <% table.column(label: "Quote") do |recovery_display| %>
+    <%= truncate(recovery_display.quote, length: 140) %>
+  <% end %>
 
-          <td>
-            <small class="localizeTime less-strong">
-              <%= l recovery_display.updated_at, format: :convert_time %>
-            </small>
-          </td>
+  <% table.column(label: "Quoter") do |recovery_display| %>
+    <%= recovery_display.quote_by %>
+  <% end %>
 
-          <td><%= truncate(recovery_display.quote, length: 140) %></td>
-          <td><%= recovery_display.quote_by %></td>
-          <td><%= recovery_display.location_string %></td>
+  <% table.column(label: "Location") do |recovery_display| %>
+    <%= recovery_display.location_string %>
+  <% end %>
 
-          <td class="table-cell-check">
-            <%= check_mark if recovery_display.photo_processed? %>
-          </td>
+  <% table.column(label: "image?", header_classes: "tw:text-xs", classes: "tw:text-center") do |recovery_display| %>
+    <%= check_mark if recovery_display.photo_processed? %>
+  <% end %>
 
-          <td class="large-screens table-cell-check">
-            <%= check_mark if recovery_display.stolen_record_id.present? %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column(label: "Association?", header_classes: "tw:text-xs", classes: "tw:hidden tw:lg:table-cell tw:text-center") do |recovery_display| %>
+    <%= check_mark if recovery_display.stolen_record_id.present? %>
+  <% end %>
+<% end %>

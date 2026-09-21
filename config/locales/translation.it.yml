@@ -4818,17 +4818,6 @@ it:
           reclamate vengono inviate alla vostra organizzazione per essere esaminate
           e inoltrate all'utente finale, poiché tali utenti non hanno attivato le
           notifiche di Bike Index.
-    parking_notifications:
-      index:
-        matches_visible: visibile
-        parking_notifications: Notifiche di parcheggio
-      table:
-        address: Indirizzo
-        bike: Bicicletta
-        by: Di
-        created: Creato
-        notification_number: Notifica#
-        resolved: Risolto
     stickers:
       edit:
         bike: Bicicletta
@@ -5876,8 +5865,9 @@ it:
           bikes_table:
             assign_bike_sticker: Collegamento
             email_hidden: email nascosto
-            hidden_not_registered: nascosto, non registrato con %{org_name}
             link_sticker: adesivo di collegamento
+            hidden: nascosto
+            not_registered_with: Nascosto perché non è registrato con %{org_name}
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:
@@ -5901,6 +5891,17 @@ it:
             only_user_registered: Solo utenti registrati
             status_records: "%{status} record"
             update_multiple_records: Aggiorna più record
+        parking_notifications:
+          index:
+            matches_visible: visibile
+            parking_notifications: Notifiche di parcheggio
+          table:
+            address: Indirizzo
+            bike: Bicicletta
+            by: Di
+            created: Creato
+            notification_number: Notifica#
+            resolved: Risolto
       register:
         acknowledgment_check:
           i_name_html: Io, %{name},

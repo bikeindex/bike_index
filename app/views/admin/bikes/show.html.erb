@@ -24,7 +24,7 @@
     </div>
 
     <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
-          display_dev_info: display_dev_info?, no_show_header: true, show_serial: true) %>
+          no_show_header: true, show_serial: true) %>
   <% end %>
 
   <% if duplicate_groups.none? %>

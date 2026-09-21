@@ -25,6 +25,22 @@ RSpec.describe UI::Table::Component, type: :component do
     expect(component).to have_css("td", text: "Alice")
     expect(component).to have_css("td", text: "bob@example.com")
     expect(component).to have_css("table.ui-table")
+    expect(component).not_to have_css("tfoot")
+  end
+
+  context "with a footer" do
+    let(:component) do
+      render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Name", footer: "Total") { |r| r.name }
+        table.column(label: "Email") { |r| r.email }
+      end
+    end
+
+    it "renders one footer cell per column, after the rows" do
+      expect(component).to have_css("tfoot tr td", count: 2)
+      expect(component).to have_css("tfoot td:first-child", text: "Total")
+      expect(component).not_to have_css("tbody td", text: "Total")
+    end
   end
 
   context "with custom classes" do
@@ -196,6 +212,29 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(rewritten.first).to include(users.first.cache_key_with_version)
     end
 
+    # A row renders records besides its own, and nothing about the markup says which -
+    # so an association the key misses serves stale until the record itself changes
+    it "busts a row when a record from cache_records changes" do
+      organization = FactoryBot.create(:organization, name: "Original name")
+      render_with_org = lambda do
+        with_controller_class(ApplicationController) do
+          render_inline(described_class.new(records: users, cache_key: "test",
+            cache_records: ->(_user) { organization })) do |table|
+            table.column(label: "Org") { |_u| organization.name }
+          end
+        end
+      end
+
+      keys = fragments_written { render_with_org.call }
+      expect(keys.count).to eq 2
+      expect(keys.first).to include(organization.cache_key_with_version)
+      expect(fragments_written { render_with_org.call }).to eq([])
+
+      organization.update(name: "Renamed")
+      expect(fragments_written { render_with_org.call }.count).to eq 2
+      expect(render_with_org.call).to have_css("td", text: "Renamed")
+    end
+
     context "in another locale" do
       it "keys the rows to that locale" do
         keys = I18n.with_locale(:nl) { fragments_written { render_table } }
@@ -249,11 +288,11 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with header_classes font-normal" do
-    it "adds font-normal class to th" do
+  context "with a sortable column" do
+    it "sets only the plain headers to normal weight" do
       result = render_inline(described_class.new(records:)) do |table|
-        table.column(label: "Name") { |r| r.name }
-        table.column(label: "Email", header_classes: "tw:font-normal") { |r| r.email }
+        table.column(sortable: "name") { |r| r.name }
+        table.column(label: "Email") { |r| r.email }
       end
 
       headers = result.css("th")

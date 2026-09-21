@@ -4797,17 +4797,6 @@ es:
           no reclamadas se envían a su organización para su revisión y posterior reenvío
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
-    parking_notifications:
-      index:
-        matches_visible: visible
-        parking_notifications: notificaciones de estacionamiento
-      table:
-        address: DIRECCIÓN
-        bike: Bicicleta
-        by: Por
-        created: Creado
-        notification_number: Notificación#
-        resolved: Resuelto
     stickers:
       edit:
         bike: Bicicleta
@@ -5864,8 +5853,9 @@ es:
           bikes_table:
             assign_bike_sticker: Asignar pegatina
             email_hidden: Correo electrónico oculto
-            hidden_not_registered: oculto, no registrado con %{org_name}
             link_sticker: pegatina de enlace
+            hidden: oculto
+            not_registered_with: Oculto porque no está registrado con %{org_name}
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
@@ -5889,6 +5879,17 @@ es:
             only_user_registered: Solo usuarios registrados
             status_records: Registros %{status}
             update_multiple_records: Actualizar varios registros
+        parking_notifications:
+          index:
+            matches_visible: visible
+            parking_notifications: notificaciones de estacionamiento
+          table:
+            address: DIRECCIÓN
+            bike: Bicicleta
+            by: Por
+            created: Creado
+            notification_number: Notificación#
+            resolved: Resuelto
       register:
         acknowledgment_check:
           i_name_html: Yo, %{name},

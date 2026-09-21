@@ -108,6 +108,21 @@ RSpec.describe Admin::BikesController, type: :request do
       get "#{base_url}/#{bike.id}?active_tab=party"
       expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
     end
+
+    context "with an alert from a soft-deleted user" do
+      let(:alert_user) { FactoryBot.create(:user_confirmed, email: "gone@example.com") }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user: alert_user, bike:) }
+
+      # The alerts table is a partial rendered from a component, so its user cell reaches
+      # sort_state through a view context the index doesn't share
+      it "names the deleted user in the alerts table" do
+        alert_user.destroy
+        get "#{base_url}/#{bike.id}?active_tab=messages"
+        expect(response.code).to eq("200")
+        expect(response.body).to include("gone@example.com")
+        expect(response.body).to include("user deleted")
+      end
+    end
   end
 
   describe "update" do

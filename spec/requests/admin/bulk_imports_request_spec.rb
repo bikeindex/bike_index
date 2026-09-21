@@ -11,6 +11,10 @@ RSpec.describe Admin::BulkImportsController, type: :request do
       expect(response).to be_ok
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
+
+      get base_url, params: {search_org_count: true}
+      expect(response).to be_ok
+      expect(response.body).to include("missing org!")
     end
   end
 
