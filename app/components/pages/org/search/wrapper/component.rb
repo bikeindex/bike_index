@@ -9,10 +9,9 @@ module Pages
         # search (search_page) the header also carries the view switcher and the export, and
         # the card renders inside the results turbo-frame, so every search brings it back whole.
         class Component < ApplicationComponent
-          # The table out to the page's edges while it overflows (org--bikes-table-overflow flags it):
-          # past the org layout's 15px .container-fluid padding and the card's border, which
-          # twfullbleed drops once the row is one column
-          TABLE_BLEED_CLASSES = "tw:has-[[data-overflowing]]:-mx-[16px] tw:@max-[672px]/twwiderow:has-[[data-overflowing]]:-mx-[15px]"
+          # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
+          # .container-fluid padding to the page's edges
+          TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:-mx-[15px]"
 
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[spreadsheet thumbnail].freeze

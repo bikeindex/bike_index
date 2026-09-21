@@ -45,7 +45,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(component).to have_css("select#per_page_select")
     # bike data in cells
     expect(component).to have_text(bike.mnfg_name)
-    # the table bleeds to the page's edges once it overflows
+    # the table bleeds to the page's edges once the card is full bleed
     expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
       .to include(*described_class::TABLE_BLEED_CLASSES.split)
   end
