@@ -26,8 +26,10 @@
     data-org--search-column-settings-target="checkboxes"
   >
     <% @settings.enabled_columns.each do |cell_name| %>
+      <%# Unchecked columns read quieter than the ones showing %>
       <%= render(UI::Forms::Checkbox::Component.new(name: cell_name, value: cell_name, checked: false,
-        label: @settings.column_renames[cell_name.to_sym], class_name: "tw:mb-0! tw:leading-[1.25]!",
+        label: @settings.column_renames[cell_name.to_sym],
+        class_name: "tw:mb-0! tw:leading-[1.25]! tw:text-gray-400 tw:has-checked:text-gray-900 tw:dark:has-checked:text-gray-100",
         html_options: {data: {action: "change->org--search-column-settings#columnToggled"}})) %>
     <% end %>
   </div>
