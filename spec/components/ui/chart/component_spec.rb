@@ -6,23 +6,16 @@ RSpec.describe UI::Chart::Component, type: :component do
   let(:time_range) { 1.week.ago..Time.current }
   let(:instance) { described_class.new(series: [{name: "Test", data: {}}], time_range:) }
 
-  it "renders with default colors" do
-    script_content = render_inline(instance).css("script").text
-    expect(script_content).to be_present
-    described_class::COLORS.each do |color|
-      expect(script_content).to include(color)
-    end
-  end
+  it "renders the default colors, no legend for a single series, and its own element id each time" do
+    rendered = render_inline(instance)
+    script_content = rendered.css("script").text
+    described_class::COLORS.each { |color| expect(script_content).to include(color) }
+    expect(script_content).to include('"legend":false')
 
-  it "gives each render its own element id" do
-    ids = 2.times.map { render_inline(described_class.new(series: [{name: "Test", data: {}}])).at_css("[id^='chart-']")["id"] }
-    expect(ids.uniq.size).to eq 2
-  end
+    rerendered = render_inline(described_class.new(series: [{name: "Test", data: {}}], time_range:))
+    expect(rerendered.at_css("[id^='chart-']")["id"]).not_to eq rendered.at_css("[id^='chart-']")["id"]
 
-  it "drops the legend for a single series, keeping it for several" do
-    single = render_inline(described_class.new(series: [{name: "Test", data: {}}])).css("script").text
-    expect(single).to include('"legend":false')
-
+    # Several series keep the legend that tells them apart
     several = render_inline(described_class.new(series: [{name: "A", data: {}}, {name: "B", data: {}}])).css("script").text
     expect(several).not_to include('"legend"')
   end
