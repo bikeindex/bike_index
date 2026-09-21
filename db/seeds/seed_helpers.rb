@@ -7,17 +7,16 @@ module SeedHelpers
 
   # Seeded records are timestamped across the last hour, rather than all at once:
   # the clock starts an hour ago and each tick moves it forward, stopping at now
-  def start_clock
+  def with_clock
     @clock_end = Time.current
     travel_to(@clock_end - 1.hour)
+    yield
+  ensure
+    travel_back
   end
 
   def tick
     travel_to([Time.current + rand(20..45).seconds, @clock_end].min)
-  end
-
-  def stop_clock
-    travel_back
   end
 
   # Pick a frame maker weighted by priority (popular manufacturers chosen most
