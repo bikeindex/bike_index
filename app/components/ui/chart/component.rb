@@ -52,10 +52,16 @@ module UI
         @empty_buckets ||= self.class.empty_time_range_counts(@time_range)
       end
 
+      # Chartkick counts ids per view, and every frame response and Lookbook example is a
+      # fresh one - so two on a page would both be chart-1, and draw into the first
       def chart_options
-        {thousands: ",", colors: chart_colors, stacked: @stacked,
-         prefix: @prefix, round: @round, height: @height, library: @library}.compact
+        {id: "chart-#{SecureRandom.hex(4)}", thousands: ",", colors: chart_colors, stacked: @stacked,
+         prefix: @prefix, round: @round, height: @height, library: @library,
+         legend: (false if single_series?)}.compact
       end
+
+      # A pie's legend names its slices, so it keeps one
+      def single_series? = @kind != :pie && @series.is_a?(Array) && @series.one?
 
       # Chartkick paints single-series column bars per-color from a flat array;
       # collapse to one so bars are uniform.
