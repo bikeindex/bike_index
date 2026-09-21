@@ -16,8 +16,7 @@ module Pages
           # rendered - e.g. "New Invoice"
           #
           # turbo: Drive is off app-wide, so a section opts in only when every screen it links
-          # to survives a snapshot restore - not the ones carrying legacy admin bundle JS,
-          # which a Drive visit never re-runs
+          # to survives a snapshot restore
           def initialize(title:, tabs:, nav_label:, subtitle: nil, links: [], turbo: false)
             @title = title
             @tabs = tabs

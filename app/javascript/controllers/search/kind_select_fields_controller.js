@@ -18,7 +18,7 @@ export default class extends Controller {
     this.form?.addEventListener('hw-combobox:selection', this.onComboboxSelection)
     this.form?.addEventListener('hw-combobox:removal', this.onComboboxSelection)
 
-    // Add function to window so it can be called by select2 callback
+    // On window so search--everything-combobox can call it
     window.kindControllerUpdateAfterComboboxChange = this.updateAfterComboboxChange.bind(this)
     // Load counts on connect. The eager turbo-frame flow no longer submits the
     // form on initial render (which used to fire setKindCounts via
