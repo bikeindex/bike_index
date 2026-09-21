@@ -11,9 +11,6 @@ const READER_SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
 // Gap below whatever is revealed, so a fractional row height can't leave it a subpixel
 // short of the fold
 const REVEAL_MARGIN = 8
-// Matched by the panel it opens rather than by ui--collapse's target, so a collapse
-// nested in the sidebar keeps the data-active that controller gives it
-const GROUP_TRIGGER = '[aria-controls^="org_sidebar_group_"]'
 
 // Connects to data-controller="shared-blocks--org-sidebar"
 //
@@ -32,7 +29,6 @@ export default class extends Controller {
     this.override = null
     this.render()
     this.watchForReaderScroll()
-    this.flagCurrentGroup()
     // ui--active-link may have marked the current row before this controller existed to
     // hear it say so
     const current = this.element.querySelector('[aria-current]')
@@ -73,18 +69,7 @@ export default class extends Controller {
       group.show()
     }
 
-    this.flagCurrentGroup()
     this.revealGroup(trigger)
-  }
-
-  // ui--collapse flags its trigger data-active while the group is open, which is the
-  // is-active variant the current row is styled with -- so restated after each toggle and
-  // each group connect as what it means on a group: it holds the current row, open or not
-  flagCurrentGroup () {
-    this.element.querySelectorAll(GROUP_TRIGGER).forEach((trigger) => {
-      const group = trigger.closest('[data-controller~="ui--collapse"]')
-      trigger.dataset.active = String(group?.querySelector('[aria-current]') != null)
-    })
   }
 
   groupFor (trigger) {
@@ -106,8 +91,8 @@ export default class extends Controller {
   // than skipped, and the row is read from the DOM in case its event fired first
   openGroupFor (link, attempt = 0) {
     const group = link.closest('[data-controller~="ui--collapse"]')
-    // A top-level row has no group to open, but is still a row to settle around
-    if (!group) return this.settleCurrentRow()
+    // A top-level row has no group to open, but is still a row to reveal
+    if (!group) return this.revealCurrentRow()
 
     const collapse = this.collapseFor(group)
     if (!collapse) {
@@ -123,11 +108,6 @@ export default class extends Controller {
       if (open) this.groupFor(open)?.setExpanded(false, 0)
     }
 
-    this.settleCurrentRow()
-  }
-
-  settleCurrentRow () {
-    this.flagCurrentGroup()
     this.revealCurrentRow()
   }
 

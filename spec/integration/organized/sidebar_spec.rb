@@ -26,9 +26,25 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_css("#org_sidebar_nav button[aria-expanded='true']", text: label)
   end
 
-  # data-active is what the is-active variant colors the row with
+  # Current is a color, set by CSS off the group's own contents, so it's read off the
+  # rendered toggles: one colored apart from every other group, or none
+  def group_toggle_colors
+    page.evaluate_script(<<~JS)
+      Object.fromEntries([...document.querySelectorAll('#org_sidebar_nav button[aria-controls^="org_sidebar_group_"]')]
+        .map((button) => [button.textContent.trim(), getComputedStyle(button).color]))
+    JS
+  end
+
   def expect_current_group(label)
-    expect(page).to have_css("#org_sidebar_nav button[data-active='true']", text: label, count: 1)
+    wait_for do
+      colors = group_toggle_colors
+      others = colors.except(label).values.uniq
+      others.one? && colors[label] != others.first
+    end
+  end
+
+  def expect_no_current_group
+    wait_for { group_toggle_colors.values.uniq.one? }
   end
 
   let(:scroller) { "[data-shared-blocks--org-sidebar-target='scroller']" }
@@ -126,36 +142,19 @@ RSpec.describe "Organization sidebar", :js, type: :system do
   # The sidebar stands in for the navbar on every page a member sees, including ones no
   # row points at — where the design's default of the first group open stands
   it "opens the first group on a page no row matches, and leaves the organization from it" do
-    # ui--collapse flags its open trigger data-active as it connects, so the sidebar has to
-    # clear that whenever the group lands after it -- held here so it always does
-    held = []
-    release = Queue.new
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.route(%r{ui/collapse_controller}, ->(route, request) {
-        release.pop if held.empty?
-        held << request.url
-        route.continue
-      })
-    end
-
     visit "/my_account"
-
-    wait_for_controller("shared-blocks--org-sidebar")
-    release << :continue
 
     # Alone among these examples, everything asserted below is an absence -- and the row
     # count `expect_open` waits for is the template's, not a controller's. So without this
     # they'd all pass on a page that has connected nothing
     wait_for_stimulus
-    # A route that never fired would pass vacuously
-    expect(held).not_to be_empty
 
     expect_open("#{organization.short_name} Registrations")
     # The scroller holds the menu rows -- the account block below it points at /my_account,
     # so one of its own rows is current here
     expect(page).to have_no_css "[data-shared-blocks--org-sidebar-target='scroller'] a[aria-current]", visible: :all
     # Open, but no more the page than any other group
-    expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
+    expect_no_current_group
 
     # Leaving the organization shouldn't also leave the page, anywhere the page survives it
     expect(leave_link[:href]).to eq "#{page.server_url}/my_account?organization_id=false"

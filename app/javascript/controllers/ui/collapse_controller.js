@@ -16,12 +16,6 @@ export default class extends Controller {
   static values = { param: String, storageKey: String }
 
   connect () {
-    this.restore()
-    // A parent restating the triggers' data-active has to hear it was just overwritten
-    this.dispatch('connected')
-  }
-
-  restore () {
     // Restore the persisted state without animating on load. Restoring applies rather than
     // sets: persisting here would only write back what it just read.
     if (this.urlExpanded !== null) return this.applyExpanded(this.urlExpanded, 0)
