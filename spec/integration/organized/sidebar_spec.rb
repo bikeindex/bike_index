@@ -140,14 +140,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
     visit "/my_account"
 
-    wait_for do
-      page.evaluate_script(<<~JS)
-        (() => {
-          const element = document.querySelector('[data-controller~="shared-blocks--org-sidebar"]')
-          return !!(element && window.Stimulus?.getControllerForElementAndIdentifier(element, 'shared-blocks--org-sidebar'))
-        })()
-      JS
-    end
+    wait_for_controller("shared-blocks--org-sidebar")
     release << :continue
 
     # Alone among these examples, everything asserted below is an absence -- and the row

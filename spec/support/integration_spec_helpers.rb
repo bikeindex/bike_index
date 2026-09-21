@@ -193,8 +193,11 @@ module IntegrationSpecHelpers
             window.Stimulus?.getControllerForElementAndIdentifier(element, identifier)))
       JS
     end
-    return if identifier.blank?
+    wait_for_controller(identifier, timeout:) if identifier.present?
+  end
 
+  # Just this one, for a spec holding another controller's module back
+  def wait_for_controller(identifier, timeout: Capybara.default_max_wait_time)
     wait_for(timeout:) do
       page.evaluate_script(<<~JS)
         (() => {

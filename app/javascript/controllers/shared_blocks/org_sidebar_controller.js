@@ -78,9 +78,8 @@ export default class extends Controller {
   }
 
   // ui--collapse flags its trigger data-active while the group is open, which is the
-  // is-active variant the current row is styled with -- so restated after each toggle, and
-  // as each group connects, as what that styling means on a group: it holds the current
-  // row, open or not
+  // is-active variant the current row is styled with -- so restated after each toggle and
+  // each group connect as what it means on a group: it holds the current row, open or not
   flagCurrentGroup () {
     this.element.querySelectorAll(GROUP_TRIGGER).forEach((trigger) => {
       const group = trigger.closest('[data-controller~="ui--collapse"]')
