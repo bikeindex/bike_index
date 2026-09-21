@@ -12,12 +12,12 @@ RSpec.describe UI::Collapse::Component, type: :component do
     expect(component).not_to have_css("[data-ui--collapse-target='chevron']")
   end
 
-  context "with chevron and expanded" do
-    let(:options) { {text: "Toggle details", chevron: true, expanded: true, color: :link, aria: {label: "Details"}} }
+  context "with chevron" do
+    let(:options) { {text: "Toggle details", chevron: true, color: :link, aria: {label: "Details"}} }
 
-    it "renders an open trigger with a rotated chevron, keeping the passed aria" do
-      expect(component).to have_css("button.twlink[aria-expanded='true'][aria-label='Details']", text: "Toggle details")
-      expect(component).to have_css("button [data-ui--collapse-target='chevron'].tw\\:rotate-90 svg")
+    it "renders the chevron target, keeping the passed aria" do
+      expect(component).to have_css("button.twlink[aria-expanded='false'][aria-label='Details']", text: "Toggle details")
+      expect(component).to have_css("button [data-ui--collapse-target='chevron'] svg")
     end
   end
 end
