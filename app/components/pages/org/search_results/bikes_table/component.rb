@@ -16,6 +16,8 @@ module Pages
             # ! over twlink-underlined's bold for the sorted column
             "tw:[&_th]:uppercase tw:[&_th_a]:font-normal!",
             "tw:[&_td]:bg-white tw:[&_td]:px-4 tw:[&_td]:py-3 tw:[&_td]:text-sm tw:[&_tr:hover_td]:bg-amber-50",
+            # Whatever follows the table draws the line under it
+            "tw:[&_tbody_tr:last-child_td]:border-b-0",
             "tw:dark:[&_th]:border-gray-700 tw:dark:[&_th]:bg-gray-800 tw:dark:[&_td]:bg-gray-900",
             "tw:dark:[&_tr:hover_td]:bg-gray-800"
           ].join(" ").freeze
@@ -24,10 +26,11 @@ module Pages
           VIEW_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
             "tw:group-data-overflowing/bikes-table:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
 
-          # Mirrored on the right edge while there's more to scroll to: cast by a box just past the
-          # edge, which the search card's clip hides, as the View column casts it. Not in a full-bleed
-          # row, where the table runs off the page's edge
-          WRAPPER_CLASSES = "tw:group/bikes-table tw:relative tw:data-overflowing:after:absolute " \
+          # [&>div] is UI::Table's scroller, whose bottom margin and padding would part the table
+          # from what follows it. The after: box casts the View column's shadow back over the right
+          # edge while there's more to scroll to - the search card's clip hides the box - except in
+          # a full-bleed row, where the table runs off the page's edge
+          WRAPPER_CLASSES = "tw:group/bikes-table tw:relative tw:[&>div]:mb-0 tw:[&>div]:pb-0 tw:data-overflowing:after:absolute " \
             "tw:data-overflowing:after:inset-y-0 tw:data-overflowing:after:left-full tw:data-overflowing:after:z-2 " \
             "tw:data-overflowing:after:w-4 tw:data-overflowing:after:shadow-[-2px_0_6px_rgba(26,26,31,0.04)] " \
             "tw:@max-[672px]/twwiderow:after:hidden"
