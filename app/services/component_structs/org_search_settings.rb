@@ -37,7 +37,7 @@ module ComponentStructs
       url_cell
     ].freeze
 
-    ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
+    ORG_SUFFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
 
     # Each filter's values and their labels, once — `filter_groups` lays them out,
     # `filter_values` is the set the controller permits, and `active_search_filter_descriptions`
@@ -128,7 +128,7 @@ module ComponentStructs
     def column_renames
       @column_renames ||= COLUMN_RENAME_KEYS.to_h { |key|
         name = translation(key)
-        name = "#{@organization.short_name} #{name}" if ORG_PREFIXED_COLUMNS.include?(key)
+        name = org_suffixed(name) if ORG_SUFFIXED_COLUMNS.include?(key)
         [key, name]
       }
     end
@@ -164,6 +164,11 @@ module ComponentStructs
 
     def enabled_filter?(feature)
       feature.nil? || @organization.enabled?(feature)
+    end
+
+    def org_suffixed(name)
+      helpers = ActionController::Base.helpers
+      helpers.safe_join([name, helpers.tag.em(@organization.short_name)], " · ")
     end
 
     def group_entries(group)

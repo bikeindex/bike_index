@@ -22,7 +22,7 @@ module Pages
           private
 
           def render_panel(enabled_feature_slugs:)
-            organization = ::Organization.new(short_name: "Preview", enabled_feature_slugs:)
+            organization = ::Organization.new(short_name: "Preview org", enabled_feature_slugs:)
             settings = ComponentStructs::OrgSearchSettings.new(organization:)
 
             {template: "pages/org/search/column_settings/component_preview/panel",
