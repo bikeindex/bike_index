@@ -17,7 +17,7 @@
 
 <%# to_str on the two markup values: a SafeBuffer would land raw in the attribute %>
 <%= tag.div(data: Pages::Org::Search::ColumnSettings::Component
-  .column_toggle_data_attributes(settings, controllers: "org--multi-search", collapse: true)
+  .column_settings_data_attributes(settings, controllers: "org--multi-search", collapse: true)
   .merge(
     "org--multi-search-url-value": multi_search_response_organization_registrations_path(organization_id: current_organization.to_param),
     "org--multi-search-search-kind-value": search_kind,

@@ -188,7 +188,7 @@
 
   <% if show_other_registrations? %>
     <%= render(UI::Card::Component.new) do %>
-      <%= tag.div(class: "org-search-component", data: (Pages::Org::Search::ColumnSettings::Component.column_toggle_data_attributes(other_registrations_settings, collapse: true) if other_registrations?)) do %>
+      <%= tag.div(class: "org-search-component", data: (Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(other_registrations_settings, collapse: true) if other_registrations?)) do %>
         <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
           <h2
             class="

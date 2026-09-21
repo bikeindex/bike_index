@@ -78,7 +78,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
     it "renders the column settings button without the search's actions, and brings its own controllers" do
       expect(component).to have_css("table")
-      expect(component).to have_css("[data-controller~='org--search-column-toggle']")
+      expect(component).to have_css("[data-controller~='org--search-column-settings']")
       expect(component).to have_button("Column settings", visible: :all)
       # the header's button is the only one - the panel doesn't carry the legacy one
       expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)

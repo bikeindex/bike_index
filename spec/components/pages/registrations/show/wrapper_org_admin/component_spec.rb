@@ -67,7 +67,7 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
       it "renders the column settings inside the card" do
         render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
 
-        expect(page).to have_css("[data-controller~='org--search-column-toggle']")
+        expect(page).to have_css("[data-controller~='org--search-column-settings']")
         expect(page).to have_text("Visible columns")
         expect(page).to have_button("Column settings", visible: :all)
       end

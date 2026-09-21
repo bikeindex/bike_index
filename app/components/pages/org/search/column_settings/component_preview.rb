@@ -12,7 +12,7 @@ module Pages
             return missing_notice("an organization") if lookbook_organization.blank?
 
             {template: "pages/org/search/column_settings/component_preview/default",
-             locals: {settings:, data: Component.column_toggle_data_attributes(settings, collapse: true)}}
+             locals: {settings:, data: Component.column_settings_data_attributes(settings, collapse: true)}}
           end
 
           private

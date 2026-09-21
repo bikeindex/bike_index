@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global localStorage */
 
-// Connects to data-controller='org--search-column-toggle'
+// Connects to data-controller='org--search-column-settings'
 export default class extends Controller {
   static targets = ['checkboxes']
   static values = { enabledColumns: Array, defaultColumns: Array, assignBikeSticker: Boolean }

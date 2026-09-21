@@ -530,11 +530,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response).to render_template :multi_search
     end
 
-    it "wires up multi-search, the column toggle and its collapse on one element" do
+    it "wires up multi-search, the column settings and its collapse on one element" do
       get "#{base_url}/multi_search"
       wrapper = Nokogiri::HTML(response.body).at_css("[data-org--multi-search-url-value]")
-      expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search ui--collapse org--search org--search-column-toggle])
-      expect(JSON.parse(wrapper["data-org--search-column-toggle-default-columns-value"])).to include("created_at_cell")
+      expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search ui--collapse org--search org--search-column-settings])
+      expect(JSON.parse(wrapper["data-org--search-column-settings-default-columns-value"])).to include("created_at_cell")
     end
   end
 

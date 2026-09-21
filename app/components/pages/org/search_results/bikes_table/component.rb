@@ -6,7 +6,7 @@ module Pages
       module BikesTable
         # The organization registrations table: bike rows with every org column.
         # Extracted from Pages::Org::Search::Wrapper so it can render on its own, without
-        # the search form, column-toggle settings, or pagination (e.g. a user's other
+        # the search form, column settings, or pagination (e.g. a user's other
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
           def initialize(organization:, bikes:, current_user: nil, render_sortable: false,

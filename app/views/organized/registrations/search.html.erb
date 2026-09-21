@@ -21,8 +21,8 @@
 ).compact %>
 
 <%= tag.div(class: "org-search-component", data: Pages::Org::Search::ColumnSettings::Component
-  .column_toggle_data_attributes(settings)
-  .merge("org--search-column-toggle-assign-bike-sticker-value": @bike_sticker.present?,
+  .column_settings_data_attributes(settings)
+  .merge("org--search-column-settings-assign-bike-sticker-value": @bike_sticker.present?,
     "org--search-result-view-value": @result_view)) do %>
   <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
   <div class="twwiderow tw:gap-y-4">

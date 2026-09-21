@@ -126,7 +126,7 @@ export default class extends Controller {
     // Wait a frame for Turbo stream DOM updates to complete
     await new Promise(resolve => requestAnimationFrame(resolve))
     this.sortAndFilterResults()
-    // Trigger column toggle to apply stored column visibility to new tables
+    // Trigger column settings to apply stored column visibility to new tables
     this.element.dispatchEvent(new Event('turbo:frame-render', { bubbles: true }))
     this.alignTableColumns()
     window.timeLocalizer?.localize()

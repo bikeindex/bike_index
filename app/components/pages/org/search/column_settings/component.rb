@@ -17,10 +17,10 @@ module Pages
           # Goes on the element wrapping this panel, which the caller renders — so class-level,
           # not an instance built only to read off. collapse: when the ColumnSettingsToggle is
           # inside it too
-          def self.column_toggle_data_attributes(settings, controllers: nil, collapse: false)
-            controllers = [controllers, (COLLAPSE_DATA[:controller] if collapse), "org--search org--search-column-toggle"]
+          def self.column_settings_data_attributes(settings, controllers: nil, collapse: false)
+            controllers = [controllers, (COLLAPSE_DATA[:controller] if collapse), "org--search org--search-column-settings"]
             {controller: controllers.compact.join(" "),
-             "org--search-column-toggle-default-columns-value": settings.initially_checked_columns.to_json}
+             "org--search-column-settings-default-columns-value": settings.initially_checked_columns.to_json}
               .merge(collapse ? COLLAPSE_DATA.except(:controller) : {})
           end
 
