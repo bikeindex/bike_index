@@ -17,7 +17,7 @@ module Pages
           FRAME_ID = :chart_card_frame
 
           # The open state is part of the address rather than a stored preference; the scope
-          # links carry it, since update-cached-sortable-links rebuilds them from the URL
+          # links carry it, since org--chart-card-scope-links rebuilds them from the URL
           COLLAPSE_PARAM = "chart_open"
 
           # Display order, per Kelsey's redesign

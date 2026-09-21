@@ -65,11 +65,7 @@
 
               <% if @scope_paths.any? %>
                 <%# The card renders outside the search form, so a search leaves its hrefs behind %>
-                <div
-                  data-controller="update-cached-sortable-links"
-                  data-update-cached-sortable-links-selector-value="a[data-turbo-frame]"
-                  data-update-cached-sortable-links-link-params-value='["chart_scope"]'
-                >
+                <div data-controller="org--chart-card-scope-links">
                   <%= render(UI::ButtonGroup::Component.new(entries: scope_entries, kind: :toggle)) %>
                 </div>
               <% end %>
