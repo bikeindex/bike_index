@@ -62,6 +62,12 @@ module Pages
             UI::Badge::Component.new(text: stat.delta_display, size: :xs,
               color: stat.positive? ? :success : :error)
           end
+
+          def delta_tooltip(stat)
+            # The body rather than text:, which would replace the badge as the button's name
+            UI::Tooltip::Component.new.with_body_content(translation(".previous_#{@scope}",
+              previous_count: number_with_delimiter(stat.previous_count)))
+          end
         end
       end
     end
