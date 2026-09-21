@@ -17,10 +17,12 @@ module SharedBlocks
         ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
         # A link goes current off the aria-current the is-active variant already reads
         ROW_CURRENT = "tw:is-active:bg-blue-50 tw:is-active:text-blue-600 tw:is-active:dark:bg-gray-700"
-        # A group toggle goes current while its group holds that link, open or not. Not
-        # is-active: ui--collapse flags an open group's toggle data-active, which it also reads
-        GROUP_CURRENT = "tw:group-has-[[aria-current]]/nav-group:bg-blue-50 " \
-          "tw:group-has-[[aria-current]]/nav-group:text-blue-600 tw:group-has-[[aria-current]]/nav-group:dark:bg-gray-700"
+        # A group toggle goes current while its group holds that link, open or not -- not
+        # is-active, which an open group's toggle also gets. Important so hover can't gray it,
+        # the way is-active's sort order keeps it from graying a link
+        GROUP_CURRENT = "tw:group-has-[[aria-current]]/nav-group:bg-blue-50! " \
+          "tw:group-has-[[aria-current]]/nav-group:text-blue-600 tw:group-has-[[aria-current]]/nav-group:dark:bg-gray-700! " \
+          "tw:active:bg-blue-50 tw:active:text-blue-600 tw:active:dark:bg-gray-700"
         ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-300"
 
         # A row inside a group, indented past its parent's icon

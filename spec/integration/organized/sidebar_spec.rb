@@ -27,7 +27,8 @@ RSpec.describe "Organization sidebar", :js, type: :system do
   end
 
   # Current is a color, set by CSS off the group's own contents, so it's read off the
-  # rendered toggles: one colored apart from every other group, or none
+  # rendered toggles: one colored apart from every other group, or none. Text color only --
+  # the toggle just clicked is still under the mouse, and hover grays its background
   def group_toggle_colors
     page.evaluate_script(<<~JS)
       Object.fromEntries([...document.querySelectorAll('#org_sidebar_nav button[aria-controls^="org_sidebar_group_"]')]
@@ -35,16 +36,22 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     JS
   end
 
+  def expect_group_colors(expected)
+    colors = nil
+    wait_for { yield(colors = group_toggle_colors) }
+  rescue RuntimeError
+    raise "expected #{expected}, got #{colors}"
+  end
+
   def expect_current_group(label)
-    wait_for do
-      colors = group_toggle_colors
+    expect_group_colors("only #{label} colored current") do |colors|
       others = colors.except(label).values.uniq
       others.one? && colors[label] != others.first
     end
   end
 
   def expect_no_current_group
-    wait_for { group_toggle_colors.values.uniq.one? }
+    expect_group_colors("no group colored current") { |colors| colors.values.uniq.one? }
   end
 
   let(:scroller) { "[data-shared-blocks--org-sidebar-target='scroller']" }
