@@ -15,7 +15,7 @@
         data: { action: "click->org--search-column-settings#selectDefault" }) %>
   </div>
 
-  <% column_rows = (@settings.enabled_columns.size / 3.0).ceil %>
+  <% column_rows = (@settings.panel_columns.size / 3.0).ceil %>
 
   <div
     class="
@@ -25,12 +25,14 @@
     style="grid-template-rows: repeat(<%= column_rows %>, auto)"
     data-org--search-column-settings-target="checkboxes"
   >
-    <% @settings.enabled_columns.each do |cell_name| %>
+    <% @settings.panel_columns.each do |cell_name| %>
+      <% always_visible = ComponentStructs::OrgSearchSettings::ALWAYS_VISIBLE_COLUMNS.include?(cell_name) %>
+
       <%# Unchecked columns read quieter than the ones showing %>
-      <%= render(UI::Forms::Checkbox::Component.new(name: cell_name, value: cell_name, checked: false,
+      <%= render(UI::Forms::Checkbox::Component.new(name: cell_name, value: cell_name, checked: always_visible,
         label: @settings.column_renames[cell_name.to_sym],
         class_name: "tw:mb-0! tw:leading-[1.25]! tw:text-gray-400 tw:has-checked:text-gray-900 tw:dark:has-checked:text-gray-100",
-        html_options: {class: "tw:accent-blue-600",
+        html_options: {class: "tw:accent-blue-600", disabled: always_visible,
                        data: {action: "change->org--search-column-settings#columnToggled"}})) %>
     <% end %>
   </div>

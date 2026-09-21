@@ -426,8 +426,15 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("th.serial_number_cell", visible: :hidden)
       expect(page).to have_css("th.url_cell", visible: :hidden)
       expect(page).to have_css("th.impounded_cell", visible: :hidden)
-      # Uncheck a default column — it hides
+      # "none" hides every column but View, which can't be unchecked
       open_columns_if_not
+      within(panel_for("orgRegistrationColumnsOpen")) { click_button "none" }
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
+      expect(page).to have_field("view_cell", checked: true, disabled: true)
+      expect(page).to have_link("View", minimum: 1)
+      within(panel_for("orgRegistrationColumnsOpen")) { click_button "default" }
+      expect(page).to have_css("th.manufacturer_cell", visible: :visible)
+      # Uncheck a default column — it hides
       uncheck "manufacturer_cell"
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("td.manufacturer_cell", visible: :hidden, minimum: 1)

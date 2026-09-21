@@ -11,7 +11,7 @@
     <% view_label = translation(".view") %>
     <% thumb_classes = "tw:block tw:h-8 tw:w-11 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700" %>
 
-    <% table.column(label: view_label, classes: VIEW_COLUMN_CLASSES) do |bike| %>
+    <% table.column(label: settings.column_renames[:view_cell], classes: VIEW_COLUMN_CLASSES) do |bike| %>
       <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
     <% end %>
 

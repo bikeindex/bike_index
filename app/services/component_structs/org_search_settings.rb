@@ -10,6 +10,7 @@ module ComponentStructs
     TRANSLATION_SCOPE = %i[components pages org search column_settings].freeze
 
     COLUMN_RENAME_KEYS = %i[
+      view_cell
       photo_cell
       created_at_cell
       updated_at_cell
@@ -67,6 +68,9 @@ module ComponentStructs
 
     ALWAYS_ENABLED_COLUMNS = %w[url_cell updated_at_cell serial_number_cell cycle_type_cell
       propulsion_type_cell status_cell].freeze
+
+    # Listed in the panel, but checked and disabled - the table always shows them
+    ALWAYS_VISIBLE_COLUMNS = %w[view_cell].freeze
 
     attr_reader :organization
 
@@ -147,6 +151,10 @@ module ComponentStructs
         ("avery_cell" if @organization.enabled?("avery_export")),
         ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
       ].compact.uniq.sort_by { |cell| column_renames[cell.to_sym] }
+    end
+
+    def panel_columns
+      @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| column_renames[cell.to_sym] }
     end
 
     def additional_registration_fields
