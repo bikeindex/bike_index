@@ -94,7 +94,7 @@
                       <%= number_display(stat.count) %>
 
                       <% if stat.delta_display %>
-                        <%= render(delta_tooltip(stat)) { render(delta_badge(stat)) } %>
+                        <%= render(delta_badge(stat)) %>
                       <% end %>
                     </dd>
                   </div>
