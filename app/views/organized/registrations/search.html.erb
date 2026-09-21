@@ -35,7 +35,7 @@
           interpreted_params: form_interpreted_params,
           heading: t(".find_a_registration_html", cycle_type: settings.cycle_type),
           submit_text: t(".search_registrations"),
-          filters_component: Pages::Org::Search::Filters::Component.new(
+          filters_component: Pages::Org::Search::SettingsAndFilters::Component.new(
             settings:,
             period: @period,
             start_time: @start_time,

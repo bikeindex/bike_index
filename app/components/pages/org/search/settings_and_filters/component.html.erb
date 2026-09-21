@@ -4,11 +4,11 @@
 >
   <div class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
     <%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},
-      title: translation(".search_settings"),
+      title: translation(".search_settings_and_filters"),
       data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
       <%# aria_hidden, not aria: - inline_svg drops the hash and leaves role="img" unlabelled %>
       <%= helpers.inline_svg_tag "icons/gear.svg", class: "tw:inline tw:h-4 tw:w-4", aria_hidden: true %>
-      <span class="tw:sr-only"><%= translation(".search_settings") %></span>
+      <span class="tw:sr-only"><%= translation(".search_settings_and_filters") %></span>
 
       <span
         data-ui--collapse-target="chevron"

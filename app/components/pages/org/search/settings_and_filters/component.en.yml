@@ -4,6 +4,7 @@ en:
     pages:
       org:
         search:
-          filters:
+          settings_and_filters:
             date_range: 'Date range:'
             search_settings: Search settings
+            search_settings_and_filters: Search settings and filters

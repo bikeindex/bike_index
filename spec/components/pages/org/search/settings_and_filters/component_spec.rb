@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
+RSpec.describe Pages::Org::Search::SettingsAndFilters::Component, type: :component do
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
       render_inline(described_class.new(**options))
@@ -19,7 +19,7 @@ RSpec.describe Pages::Org::Search::Filters::Component, type: :component do
   end
 
   it "renders the settings trigger, the period, the collapsed panel and its radios" do
-    expect(component).to have_button("Search settings")
+    expect(component).to have_button("Search settings and filters")
     expect(component).to have_text("past 7 days")
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
     expect(component).to have_css("input[type='radio'][name='search_stickers'][form='Search_Form']", visible: :all)

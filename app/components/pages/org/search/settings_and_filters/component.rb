@@ -3,7 +3,7 @@
 module Pages
   module Org
     module Search
-      module Filters
+      module SettingsAndFilters
         # The row under the search fields - the gear, the date range, and what the search is
         # filtered to - and the settings panel the gear opens. Every label comes from
         # ComponentStructs::OrgSearchSettings, which the table reads its column names out of too.

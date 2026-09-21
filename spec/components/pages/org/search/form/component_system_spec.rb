@@ -36,14 +36,14 @@ RSpec.describe Pages::Org::Search::Form::Component, :js, type: :system do
 
       expect(page).not_to have_css(panel, visible: true, wait: 2)
 
-      click_button "Search settings"
+      click_button "Search settings and filters"
       expect(page).to have_css(panel, visible: true, wait: 5)
       expect(page).to have_text("Status:")
 
       page.refresh
       expect(page).to have_css(panel, visible: true, wait: 5)
 
-      click_button "Search settings"
+      click_button "Search settings and filters"
       expect(page).not_to have_css(panel, visible: true, wait: 5)
     end
   end

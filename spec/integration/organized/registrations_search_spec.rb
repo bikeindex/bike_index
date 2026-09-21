@@ -48,11 +48,11 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
   def expect_filters_open
     expect(panel_for("orgRegistrationFiltersOpen")["class"]).not_to include("tw:hidden!")
-    expect(page).to have_css("button[title='Search settings'][data-active='true']")
+    expect(page).to have_css("button[title='Search settings and filters'][data-active='true']")
   end
 
   def open_filters_if_not
-    click_button "Search settings" if panel_for("orgRegistrationFiltersOpen")["class"].include?("tw:hidden!")
+    click_button "Search settings and filters" if panel_for("orgRegistrationFiltersOpen")["class"].include?("tw:hidden!")
   end
 
   def open_columns_if_not

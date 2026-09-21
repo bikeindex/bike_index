@@ -26,7 +26,7 @@ module Pages
           private
 
           def filters_component
-            Pages::Org::Search::Filters::Component.new(
+            Pages::Org::Search::SettingsAndFilters::Component.new(
               settings: ComponentStructs::OrgSearchSettings.new(organization: lookbook_organization),
               period: "week", start_time: Time.current - 1.week, end_time: Time.current
             )
