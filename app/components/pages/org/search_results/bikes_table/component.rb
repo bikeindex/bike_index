@@ -12,9 +12,7 @@ module Pages
           # Descendant selectors, so they outrank the cell classes UI::Table gives every column
           TABLE_CLASSES = [
             "tw:[&_th]:whitespace-nowrap tw:[&_th]:border-b tw:[&_th]:border-gray-100 tw:[&_th]:bg-gray-50",
-            "tw:[&_th]:px-4 tw:[&_th]:py-2.5 tw:[&_th]:text-2xs tw:[&_th]:font-bold tw:[&_th]:tracking-wider",
-            "tw:[&_th]:text-gray-400 tw:[&_th]:uppercase tw:[&_th_a]:text-inherit",
-            "tw:[&_th_a:hover]:text-gray-700 tw:[&_th_a[data-active]]:text-gray-700",
+            "tw:[&_th]:px-4 tw:[&_th]:py-2.5 tw:[&_th]:text-gray-400 tw:[&_th]:uppercase",
             "tw:[&_td]:bg-white tw:[&_td]:px-4 tw:[&_td]:py-3 tw:[&_td]:text-sm tw:[&_tr:hover_td]:bg-amber-50",
             "tw:dark:[&_th]:border-gray-700 tw:dark:[&_th]:bg-gray-800 tw:dark:[&_td]:bg-gray-900",
             "tw:dark:[&_tr:hover_td]:bg-gray-800"

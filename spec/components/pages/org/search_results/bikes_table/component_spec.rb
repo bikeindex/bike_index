@@ -30,7 +30,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
   it "renders plain headers when not sortable" do
     expect(component).to have_css("th", text: "Registered")
-    expect(component).not_to have_css("th a.twlink")
+    expect(component).not_to have_css("th a")
   end
 
   context "with a hidden-serial bike and an authorized org member" do
@@ -127,7 +127,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     let(:options) { {organization:, bikes:, render_sortable: true} }
 
     it "renders sortable header links" do
-      expect(component).to have_css("th a.twlink")
+      expect(component).to have_css("th a.twlink-underlined")
     end
   end
 
