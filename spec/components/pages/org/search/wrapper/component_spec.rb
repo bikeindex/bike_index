@@ -45,6 +45,8 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(component).to have_css("select#per_page_select")
     # bike data in cells
     expect(component).to have_text(bike.mnfg_name)
+    # bleeds to the page's edges once its table overflows
+    expect(component.at_css(".org-search-component")[:class].split).to include(*described_class::OVERFLOW_BLEED_CLASSES.split)
   end
 
   context "with result_view thumbnail" do
@@ -82,6 +84,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).to have_button("Column settings", visible: :all)
       # the header's button is the only one - the panel doesn't carry the legacy one
       expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)
+      expect(component.at_css(".org-search-component")[:class].split).not_to include(*described_class::OVERFLOW_BLEED_CLASSES.split)
     end
 
     context "with csv_exports enabled" do
