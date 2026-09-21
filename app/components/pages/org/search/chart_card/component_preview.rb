@@ -16,6 +16,10 @@ module Pages
               chart:, stats:))
           end
 
+          def chart_only
+            in_row(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:, chart:))
+          end
+
           # The row too narrow for a second column, where the card opens from its own trigger
           def mobile_view
             in_row(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
