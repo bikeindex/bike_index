@@ -5,18 +5,10 @@
       exactly while it stands alone full-width - beside the form it's always open
     %>
 
-    <%= render(UI::Button::Component.new(color: :link, aria: {expanded: false},
-      html_class: "tw:w-full tw:@min-[672px]/twwiderow:hidden!",
-      data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
+    <%= render(UI::Collapse::Component.new(chevron: :trailing, color: :link,
+      html_class: "tw:w-full tw:@min-[672px]/twwiderow:hidden!")) do %>
       <%# The button centres its content, so the label takes the row and leaves the chevron %>
       <span class="tw:flex-1 tw:text-left"><%= translation(".chart") %></span>
-
-      <span
-        data-ui--collapse-target="chevron"
-        class="tw:inline-flex tw:transition-transform"
-      >
-        <%= render(UI::IconChevron::Component.new) %>
-      </span>
     <% end %>
 
     <%#
