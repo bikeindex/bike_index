@@ -16,8 +16,11 @@ module Pages
               chart:, stats:))
           end
 
+          # The impound records search's card, which holds only the chart
           def chart_only
-            in_row(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:, chart:))
+            chart = UI::Chart::Component.new(stacked: true,
+              series: [{name: "Impounded", data: months.map { [it, rand(5..40)] }.to_h}])
+            {template: "pages/org/search/chart_card/component_preview/chart_only", locals: {chart:}}
           end
 
           # The row too narrow for a second column, where the card opens from its own trigger
@@ -51,8 +54,11 @@ module Pages
               ComponentStructs::RegistrationStat.new(key: :stolen, count: 46, previous_count: 43)]
           end
 
+          def months
+            12.downto(1).map { (Time.current.beginning_of_month - it.months).to_date }
+          end
+
           def chart
-            months = 12.downto(1).map { (Time.current.beginning_of_month - it.months).to_date }
             UI::Chart::Component.new(stacked: true, height: "180px", colors: %w[#2563eb #a855f7 #dc2626],
               series: [{name: "Registrations", data: months.map { [it, rand(300..500)] }.to_h},
                 {name: "E-bike", data: months.map { [it, rand(40..120)] }.to_h},
