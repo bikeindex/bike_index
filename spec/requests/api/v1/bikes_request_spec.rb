@@ -296,7 +296,7 @@ RSpec.describe API::V1::BikesController, type: :request do
         ]
         ActionMailer::Base.deliveries = []
         Sidekiq::Job.clear_all
-        VCR.use_cassette("v1_bikes_create-images", match_requests_on: [:path]) do
+        VCR.use_cassette("v1_bikes_create-images", match_requests_on: [:path], re_record_interval: 1.month) do
           Sidekiq::Testing.inline! do
             expect {
               post base_url, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos}
@@ -354,7 +354,7 @@ RSpec.describe API::V1::BikesController, type: :request do
           "http://i.imgur.com/lybYl1l.jpg",
           "http://bikeindex.org/not_actually_a_thing_404_and_shit"
         ]
-        VCR.use_cassette("v1_bikes_create-images2", match_requests_on: [:path]) do
+        VCR.use_cassette("v1_bikes_create-images2", match_requests_on: [:path], re_record_interval: 1.month) do
           post base_url, params: {bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos}
         end
         expect(Bike.unscoped.where(serial_number: "69 photo-test").count).to eq 1
