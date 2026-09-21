@@ -3,6 +3,6 @@
 <% end %>
 
 <%# The chart sits outside the results frame, so the search reaches it through its own stream %>
-<%= turbo_stream.replace :graduated_notifications_chart_frame do %>
+<%= turbo_stream.replace :graduated_notifications_chart do %>
   <%= render partial: "chart_frame" %>
 <% end %>
