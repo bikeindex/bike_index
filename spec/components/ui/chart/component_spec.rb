@@ -20,19 +20,6 @@ RSpec.describe UI::Chart::Component, type: :component do
     expect(several).not_to include('"legend"')
   end
 
-  it "gives each render its own element id" do
-    ids = 2.times.map { render_inline(described_class.new(series: [{name: "Test", data: {}}])).at_css("[id^='chart-']")["id"] }
-    expect(ids.uniq.size).to eq 2
-  end
-
-  it "drops the legend for a single series, keeping it for several" do
-    single = render_inline(described_class.new(series: [{name: "Test", data: {}}])).css("script").text
-    expect(single).to include('"legend":false')
-
-    several = render_inline(described_class.new(series: [{name: "A", data: {}}, {name: "B", data: {}}])).css("script").text
-    expect(several).not_to include('"legend"')
-  end
-
   context "with custom colors" do
     let(:custom_colors) { %w[#111111 #222222] }
     let(:instance) { described_class.new(series: [{name: "Test", data: {}}], time_range:, colors: custom_colors) }
