@@ -36,7 +36,7 @@ module Admin
         redirect_to admin_theft_alerts_path
       else
         flash[:error] = @theft_alert.errors.full_messages.to_sentence
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     end
 
@@ -66,7 +66,7 @@ module Admin
         flash[:success] = "Promoted alert created!"
         redirect_to edit_admin_theft_alert_path(@theft_alert)
       else
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 

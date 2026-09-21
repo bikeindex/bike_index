@@ -114,7 +114,7 @@ module Admin
         flash[:success] = "Bike was successfully updated."
         redirect_to(edit_admin_bike_url(@bike)) && return
       else
-        render action: "edit"
+        render action: "edit", status: :unprocessable_entity
       end
     end
 

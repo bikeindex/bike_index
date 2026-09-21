@@ -48,7 +48,7 @@ module Admin
         flash[:success] = "#{@blog.info? ? "Info post" : "Blog"} saved!"
         redirect_to edit_admin_news_url(@blog)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 

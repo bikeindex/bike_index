@@ -31,7 +31,7 @@ module Admin
         flash[:success] = "Organization Role Saved!"
         redirect_to admin_organization_role_url(@organization_role)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -41,7 +41,7 @@ module Admin
         flash[:success] = "Organization Role Created!"
         redirect_to admin_organization_role_url(@organization_role)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 
