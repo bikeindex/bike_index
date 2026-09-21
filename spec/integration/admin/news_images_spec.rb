@@ -43,8 +43,7 @@ RSpec.describe "Admin news images", :js, type: :system do
     expect(blog.reload.index_image_id).to eq uploaded.id
     within("#image-#{uploaded.id}") { expect(page).to have_checked_field("primary image") }
     # Turbo swaps the page in place, so clear this flash for the next Save's to be the one found
-    click_button "Close"
-    expect(page).to have_no_content("Blog saved!")
+    dismiss_flash_messages
 
     # one radio group across the form and the list, so choosing this clears the image's
     choose "No primary image"
