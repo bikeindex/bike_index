@@ -28,7 +28,8 @@
   <div class="twwiderow tw:gap-y-4">
     <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
     <% unless turbo_frame_request? %>
-      <div class="tw:min-w-0">
+      <%# Across the row while search_all hides the chart beside it %>
+      <div class="tw:min-w-0 tw:search-all-checked:col-span-full">
         <%= render(Pages::Org::Search::Form::Component.new(
           target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
           target_frame: :organized_bikes_results_frame,
@@ -83,7 +84,14 @@
         <% end %>
       </div>
 
-      <div class="tw:min-w-0">
+      <%# The chart counts the organization's own registrations, so it fades out with search_all %>
+      <div
+        class="
+          tw:min-w-0 tw:transition-all tw:transition-discrete
+          tw:duration-200 tw:starting:opacity-0 tw:search-all-checked:hidden
+          tw:search-all-checked:opacity-0
+        "
+      >
         <%= render(Pages::Org::Search::ChartCard::Component.new(
           src: chart_scope_paths[@chart_scope.to_sym], scope: @chart_scope, scope_paths: chart_scope_paths
         )) %>

@@ -104,11 +104,16 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # Owner email only searches the organization's registrations: it goes while "search all"
     # is on, and locks it once filled in
+    chart_card = "[data-ui--collapse-param-value='chart_open']"
+    expect(page).to have_css(chart_card)
     check "search_all"
     expect(page).to have_current_path(/search_all=true/, wait: 10)
     expect(page).to have_no_field("search_email")
+    # ...and so does the chart, which counts the organization's own
+    expect(page).to have_no_css(chart_card)
     uncheck "search_all"
     expect(page).to have_no_current_path(/search_all=true/, wait: 10)
+    expect(page).to have_css(chart_card)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
     fill_in "serial", with: ""
     fill_in "search_email", with: "alice@example.com"
