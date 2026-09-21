@@ -394,13 +394,13 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     context "sorted by status at" do
       let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: current_organization, date_stolen: 3.days.ago) }
 
-      it "sorts by occurred_at, with the registrations that have none last either way" do
+      it "sorts by occurred_at" do
         impounded_bike
         expect(bike.reload.occurred_at).to be_nil
         expect(stolen_bike.reload.occurred_at).to be < impounded_bike.reload.occurred_at
 
         get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "desc"}
-        expect(assigns(:bikes).map(&:id)).to eq([impounded_bike.id, stolen_bike.id, bike.id])
+        expect(assigns(:bikes).map(&:id)).to eq([bike.id, impounded_bike.id, stolen_bike.id])
 
         get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "asc"}
         expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, impounded_bike.id, bike.id])

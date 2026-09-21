@@ -248,8 +248,6 @@ module Organized
     end
 
     def search_order(organization)
-      # Most registrations have no status time, and Postgres sorts nulls first descending
-      return Arel.sql("bikes.occurred_at #{sort_direction} NULLS LAST") if sort_column == "occurred_at"
       return "bikes.#{sort_column} #{sort_direction}" if sort_column != "acknowledged_at"
 
       RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)
