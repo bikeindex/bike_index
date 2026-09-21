@@ -5,6 +5,13 @@ module Pages
     module Search
       module Form
         class ComponentPreview < ApplicationComponentPreview
+          # @!group Variants
+          # The registrations search, which brings the filters. First, since the group shares a
+          # page and form: "Search_Form" finds the first form on it
+          def with_filters
+            render(Pages::Org::Search::Form::Component.new(**default_options.merge(filters_component:)))
+          end
+
           # The impound records, graduated notifications and parking notifications searches
           def default
             render(Pages::Org::Search::Form::Component.new(**default_options))
@@ -14,11 +21,7 @@ module Pages
             interpreted_params = {raw_serial: "ABC123", serial: "ABC123", query: nil}
             render(Pages::Org::Search::Form::Component.new(**default_options(interpreted_params)))
           end
-
-          # The registrations search, which brings the filters
-          def with_filters
-            render(Pages::Org::Search::Form::Component.new(**default_options.merge(filters_component:)))
-          end
+          # @!endgroup
 
           private
 
