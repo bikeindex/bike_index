@@ -5,6 +5,7 @@ module Pages
     module Search
       module ChartCard
         class ComponentPreview < ApplicationComponentPreview
+          # @!group Variants
           def default
             in_row(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
               chart:, stats:))
@@ -15,16 +16,18 @@ module Pages
               chart:, stats:))
           end
 
-          # What the card shows until the lazy frame answers
+          # The row too narrow for a second column, where the card opens from its own trigger
+          def mobile_view
+            in_row(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
+              chart:, stats:), narrow: true)
+          end
+          # @!endgroup
+
+          # What the card shows until the lazy frame answers. Kept out of the group:
+          # it turns off the JS the charts need
           # @display javascript_off true
           def loading
             in_row(Pages::Org::Search::ChartCard::Component.new(src: scope_paths[:year], scope_paths:))
-          end
-
-          # The row too narrow for a second column, where the card opens from its own trigger
-          def single_column
-            in_row(Pages::Org::Search::ChartCard::Component.new(scope: "year", scope_paths:,
-              chart:, stats:), narrow: true)
           end
 
           private

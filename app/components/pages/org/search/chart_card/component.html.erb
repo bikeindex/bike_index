@@ -33,7 +33,8 @@
       "
     >
       <%= helpers.turbo_frame_tag(FRAME_ID, src: @src, loading: (:lazy if @src),
-        class: "tw:block", data: {"org--search-target": "chartFrame"}) do %>
+        class: "tw:block tw:pt-3 tw:@min-[672px]/twwiderow:pt-0",
+        data: {"org--search-target": "chartFrame"}) do %>
         <%#
           org--search refetches the card only while this is in it: the year scope's counts
           don't move with the search
