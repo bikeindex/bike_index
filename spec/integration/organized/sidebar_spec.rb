@@ -26,9 +26,25 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_css("#org_sidebar_nav button[aria-expanded='true']", text: label)
   end
 
-  # data-active is what the is-active variant colors the row with
+  # Current is a color, set by CSS off the group's own contents, so it's read off the
+  # rendered toggles: one colored apart from every other group, or none
+  def group_toggle_colors
+    page.evaluate_script(<<~JS)
+      Object.fromEntries([...document.querySelectorAll('#org_sidebar_nav button[aria-controls^="org_sidebar_group_"]')]
+        .map((button) => [button.textContent.trim(), getComputedStyle(button).color]))
+    JS
+  end
+
   def expect_current_group(label)
-    expect(page).to have_css("#org_sidebar_nav button[data-active='true']", text: label, count: 1)
+    wait_for do
+      colors = group_toggle_colors
+      others = colors.except(label).values.uniq
+      others.one? && colors[label] != others.first
+    end
+  end
+
+  def expect_no_current_group
+    wait_for { group_toggle_colors.values.uniq.one? }
   end
 
   let(:scroller) { "[data-shared-blocks--org-sidebar-target='scroller']" }
@@ -130,9 +146,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
     # Alone among these examples, everything asserted below is an absence -- and the row
     # count `expect_open` waits for is the template's, not a controller's. So without this
-    # they'd all pass on a page that has connected nothing, then fail whenever the run
-    # lands between ui--collapse flagging the open group data-active and
-    # shared-blocks--org-sidebar clearing it
+    # they'd all pass on a page that has connected nothing
     wait_for_stimulus
 
     expect_open("#{organization.short_name} Registrations")
@@ -140,7 +154,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # so one of its own rows is current here
     expect(page).to have_no_css "[data-shared-blocks--org-sidebar-target='scroller'] a[aria-current]", visible: :all
     # Open, but no more the page than any other group
-    expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
+    expect_no_current_group
 
     # Leaving the organization shouldn't also leave the page, anywhere the page survives it
     expect(leave_link[:href]).to eq "#{page.server_url}/my_account?organization_id=false"
