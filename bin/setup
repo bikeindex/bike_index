@@ -11,17 +11,12 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
-# The checkout this one borrows its untracked files from, or nil when there isn't one.
-# Conductor names it; a git worktree's is the directory holding the common .git, which
-# `--git-common-dir` answers relatively (".git") from the main checkout itself
+# The checkout a workspace or worktree borrows untracked files from, nil when there is
+# none: `--git-common-dir` answers ".git" from a main checkout, and "" outside a repo,
+# both of which expand to APP_ROOT
 def shared_root
-  conductor = ENV["CONDUCTOR_ROOT_PATH"].to_s
-  root = if conductor.empty?
-    # A failed rev-parse gives "", whose dirname expands to APP_ROOT and falls out below
-    File.expand_path(File.dirname(`git rev-parse --git-common-dir 2>/dev/null`.strip), APP_ROOT)
-  else
-    conductor
-  end
+  common_dir = `git rev-parse --git-common-dir 2>/dev/null`.strip
+  root = File.expand_path(File.dirname(common_dir), APP_ROOT)
   root unless root == APP_ROOT
 end
 
