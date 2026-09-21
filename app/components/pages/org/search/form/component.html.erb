@@ -74,9 +74,9 @@
       <%= content %>
 
       <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search",
-        skip_organization: true, skip_period: @filters_component.present?} %>
+        skip_organization: true, skip_period: @settings_and_filters_component.present?} %>
 
-      <% unless @filters_component %>
+      <% unless @settings_and_filters_component %>
         <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>
         <%= hidden_field_tag :search_address, @interpreted_params[:search_address] %>
         <%= hidden_field_tag :search_status, @interpreted_params[:search_status] %>
@@ -88,7 +88,7 @@
   </div>
 
   <%# Outside the form: the settings panel holds the custom date range, which is a form of its own %>
-  <%= render(@filters_component) if @filters_component %>
+  <%= render(@settings_and_filters_component) if @settings_and_filters_component %>
 
   <%#
     data-turbo: Drive is off app-wide, and a submitter outside the form it submits carries

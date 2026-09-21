@@ -9,7 +9,7 @@ module Pages
           # The registrations search, which brings the filters. First, since the group shares a
           # page and form: "Search_Form" finds the first form on it
           def with_filters
-            render(Pages::Org::Search::Form::Component.new(**default_options.merge(filters_component:)))
+            render(Pages::Org::Search::Form::Component.new(**default_options.merge(settings_and_filters_component:)))
           end
 
           # The impound records, graduated notifications and parking notifications searches
@@ -25,7 +25,7 @@ module Pages
 
           private
 
-          def filters_component
+          def settings_and_filters_component
             Pages::Org::Search::SettingsAndFilters::Component.new(
               settings: ComponentStructs::OrgSearchSettings.new(organization: lookbook_organization),
               period: "week", start_time: Time.current - 1.week, end_time: Time.current
