@@ -16,7 +16,7 @@
     <% end %>
   </div>
 
-  <%= helpers.turbo_frame_tag @frame_id, src: @src, data: @data do %>
+  <%= helpers.turbo_frame_tag @frame_id, src: @src do %>
     <% if @render_results %>
       <%= content %>
     <% else %>

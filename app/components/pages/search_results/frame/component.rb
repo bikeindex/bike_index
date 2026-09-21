@@ -16,12 +16,11 @@ module Pages
       # address-bar URL. Every search page opts out of Turbo's snapshot cache (via
       # the no-cache meta) so back/forward re-fetch the page and reload fresh.
       class Component < ApplicationComponent
-        def initialize(frame_id:, render_results:, current_path:, loading_text: "Loading results...", data: {})
+        def initialize(frame_id:, render_results:, current_path:, loading_text: "Loading results...")
           @frame_id = frame_id
           @render_results = render_results
           @src = (current_path unless render_results)
           @loading_text = loading_text
-          @data = data
         end
       end
     end

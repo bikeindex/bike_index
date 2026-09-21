@@ -6,7 +6,7 @@ const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'chartFollowsSearch', 'filterSummary', 'periodLabel', 'resultsFrame', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'notesField', 'notesCheckbox', 'chartFrame', 'chartFollowsSearch', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
   static values = { resultView: String }
 
@@ -40,14 +40,19 @@ export default class extends Controller {
     if (inUrl) return localStorage.setItem(RESULT_VIEW_KEY, inUrl)
 
     const stored = localStorage.getItem(RESULT_VIEW_KEY)
-    if (!stored || stored === this.resultViewValue || !this.hasResultsFrameTarget) return
+    if (!stored || stored === this.resultViewValue || !this.resultsFrame) return
 
     params.set('search_result_view', stored)
     const url = `${window.location.pathname}?${params}`
     // The address bar moves first, so search--form doesn't read the two as out of step.
     // Replacing rather than pushing: the rider didn't navigate here.
     window.history.replaceState(window.history.state, '', url)
-    this.resultsFrameTarget.setAttribute('src', url)
+    this.resultsFrame.setAttribute('src', url)
+  }
+
+  // Pages::SearchResults::Frame's, which the loading overlay's CSS reaches the same way
+  get resultsFrame () {
+    return this.element.querySelector('.search-results-frame-wrapper > turbo-frame')
   }
 
   initNotesSearch () {
