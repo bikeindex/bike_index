@@ -16,15 +16,20 @@ bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh              
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh --dev-server # + boot bin/dev
 ```
 
+It puts the toolchain in place and then runs `bin/workspace_setup --without_seeds`,
+the same entry point a spawned worktree uses — so the gems, `node_modules` and the
+four databases come from `bin/setup` rather than from anything sandbox-specific, and
+this checkout gets a `.workspace_id` like any other. `--without_seeds` because
+`db:seed` wants `setup:import_spreadsheets` and a network this sandbox doesn't have.
+
 It downloads a prebuilt Ruby, gem tree and `node_modules` from the
 `web-sandbox-prebuilt` release (published by
 `.github/workflows/web-sandbox-prebuild.yml`), and falls back to the source build
 below whenever an asset is missing or fails its checksum. A `Gemfile.lock` your
 branch changed misses its exact gem tarball and gets the fixed `-latest-` one
 instead, so `bundle install` reconciles a handful of gems rather than fetching all
-341. `node_modules` is exact-match only — without it, `bin/lint` and `:js` specs
-want an `npm install` first. Budget ~1 min warm-cache, ~7 min when the Ruby half
-misses too. Set `BINX_SKIP_PREBUILT=1` to force the source path. The sections below
+341. `node_modules` is exact-match only; on a miss `bin/setup`'s own `npm install`
+covers it. Budget ~1 min warm-cache, ~7 min when the Ruby half misses too. Set `BINX_SKIP_PREBUILT=1` to force the source path. The sections below
 are what it automates — read them when a step fails, or when you need only part of
 it.
 
@@ -153,13 +158,12 @@ service redis-server start
 # Once per machine:
 sudo -u postgres psql -c "CREATE USER rails WITH SUPERUSER PASSWORD 'password';"
 
+bin/workspace_setup --without_seeds      # .workspace_id, bundle, npm, all four databases
 eval "$(ruby bin/env --export)"
-bundle exec rails db:create              # all four; run it in development, not RAILS_ENV=test
-export RAILS_ENV=test CI=1
-bundle exec rails db:migrate db:test:prepare
 ```
 
-`db:create db:migrate` on an empty database loads `db/structure.sql` rather than
+`bin/setup`'s `db:create db:schema:load:… db:migrate` on an empty database loads
+`db/structure.sql` rather than
 replaying the 162 files in `db/migrate` (this app is `schema_format = :sql`) — a
 fresh `bikeindex_development` comes up with all 692 of that file's
 `schema_migrations` rows. It takes seconds; if you see it stepping through migrations
@@ -169,18 +173,16 @@ one by one, something already half-created the database.
 
 Start it yourself here — nobody else is in this container (SKILL.md).
 
-Two things beyond Toolchain + Services above. Development databases, which the
-test setup doesn't create — and which don't take `database.yml`'s `CI=1` branch,
-so the credentials have to be passed as `PG*`. And a UTF-8 locale: foreman reads
-`.env` in the process's external encoding, and an unset locale makes that
-US-ASCII, which dies on the file's non-ASCII bytes with `invalid byte sequence
-in US-ASCII`.
+Two things beyond Toolchain + Services above. The development databases don't take
+`database.yml`'s `CI=1` branch, so the credentials have to be passed as `PG*`. And a
+UTF-8 locale: foreman reads `.env` in the process's external encoding, and an unset
+locale makes that US-ASCII, which dies on the file's non-ASCII bytes with `invalid
+byte sequence in US-ASCII`.
 
 ```bash
 export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password
 export LANG=C.UTF-8 LC_ALL=C.UTF-8
 eval "$(ruby bin/env --export)"
-bundle exec rails db:create db:migrate   # bikeindex_development + its analytics database
 nohup bin/dev > /tmp/dev_server.log 2>&1 &   # it never returns, so background it
 ```
 
@@ -192,8 +194,9 @@ until curl -fs -o /dev/null "$BASE_URL/"; do sleep 5; done
 
 `bin/dev` needs no node: the app is importmap-based and the tailwind/dartsass
 watchers are the gems' standalone binaries. So the image's node (22.x, against
-`.tool-versions`' 24.x pin) doesn't matter here, and `npm install` is only worth
-paying for `:js` system specs, which drive the playwright npm package.
+`.tool-versions`' 24.x pin) doesn't matter here. `node_modules` still has to exist
+for `bin/lint` and the `:js` specs' playwright package, which is why
+`bin/workspace_setup` runs `npm install`.
 
 **A backgrounded process outlives the tool call that started it, and the call
 reports success immediately.** `nohup … &` returns exit 0 while the build or
@@ -421,13 +424,9 @@ export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
 service postgresql start && service redis-server start
 apt-get install -y libvips42   # ruby-vips loads at boot; without it every rails/rspec run dies
 cd /home/user/bike_index
-bundle install --jobs "$(nproc)"
-npm install                    # only for :js specs - the driver is the playwright npm package
+bin/workspace_setup --without_seeds   # bundle, npm, and all four databases
 eval "$(ruby bin/env --export)"
-bundle exec rails db:create    # development env: makes dev + test, primary + analytics
-export RAILS_ENV=test CI=1
-bundle exec rails db:migrate db:test:prepare
-bundle exec rails tailwindcss:build           # only if specs render the layout
+bundle exec rails tailwindcss:build dartsass:build   # bin/setup skips these without seeds
 
 bundle exec rspec spec/models spec/requests   # plain
 LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration   # system; CDN proxy rarely needed

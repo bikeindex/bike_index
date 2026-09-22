@@ -3,9 +3,10 @@
 #
 #   bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh [--dev-server]
 #
-# Everything that can overlap does: the prebuilt downloads, the apt/services/chrome
-# work that needs no Ruby, and (when no prebuilt Ruby is reachable) the source build
-# all run at once, and the CSS build runs alongside the database work.
+# Gets the toolchain in place, then hands off to `bin/workspace_setup --without_seeds`
+# for the gems, node_modules and databases. Everything that can overlap does: the
+# prebuilt downloads, the apt/services/chrome work that needs no Ruby, and (when no
+# prebuilt Ruby is reachable) the source build all run at once.
 # Idempotent: re-running it after a container idle period just restarts the
 # services. Pass --dev-server to also boot bin/dev in the background.
 #
@@ -156,7 +157,6 @@ fi
 
 # The gem tree extracts over the Ruby's own GEM_HOME, so it waits on whichever
 # Ruby path won - but the download has been running since the top either way.
-GEMS_PREBUILT=false
 install_prebuilt_gems() {
   local resolved
   resolved=$(resolved_asset "$BUNDLE_TARBALL")
@@ -165,7 +165,6 @@ install_prebuilt_gems() {
   # Only when nothing has claimed the prefix yet: after a source build it's a real
   # directory that $TOOLCACHE/x64 points AT, and relinking would chase its own tail.
   ruby_is_built || link_ruby_prefix
-  GEMS_PREBUILT=true
   case "$resolved" in
     "$BUNDLE_TARBALL") say "prebuilt gems for Gemfile.lock ${LOCK_SHA} installed" ;;
     *) say "no bundle for Gemfile.lock ${LOCK_SHA}; unpacked the latest one, bundle install will reconcile" ;;
@@ -182,40 +181,38 @@ wait "$BUNDLE_DL_PID"
 install_prebuilt_gems
 
 cd "$REPO"
-BUNDLER_VERSION=$(awk '/BUNDLED WITH/{getline; print $1}' Gemfile.lock)
-gem list -i bundler -v "$BUNDLER_VERSION" >/dev/null 2>&1 ||
-  gem install bundler -v "$BUNDLER_VERSION" --no-document
-if [ "$GEMS_PREBUILT" = true ] && bundle check >/dev/null 2>&1; then
-  say "gems satisfied by the prebuilt bundle"
-else
-  say "bundle install"
-  bundle install --jobs "$(nproc)" || exit 1
-fi
 
-# node_modules is what `bin/lint` (herb-format, standard) and the :js specs'
-# playwright package need. Exact match only - a stale tree is worse than none.
+# Unpacked before bin/setup's `npm install`, which then reconciles a near-miss
+# instead of fetching all 292 packages. bin/lint (herb-format, standard) and the
+# :js specs' playwright package both need this tree.
 wait "$NODE_DL_PID"
 if [ -n "$(resolved_asset "$NODE_TARBALL")" ] && tar -C "$REPO" -xzf "$STAGE/$NODE_TARBALL"; then
   say "prebuilt node_modules for package-lock ${NPM_SHA} installed"
-elif [ ! -d "$REPO/node_modules" ]; then
-  say "no prebuilt node_modules - run 'npm install' before bin/lint or a :js spec"
 fi
 
+# workspace_setup wants postgres up and the rails role in place before it can
+# allocate an ID out of the dev_workspaces database.
 wait "$SYSTEM_PID" || say "system setup had a problem - see /tmp/system_setup.log"
 
+# bin/workspace_setup assigns .workspace_id, then hands off to bin/setup for
+# bundler, `bundle install`, `npm install` and the databases (db:create,
+# schema:load on primary AND analytics, db:migrate). Everything above exists to
+# make its steps no-ops: a prebuilt Ruby for its version check, prebuilt gems for
+# its `bundle check`, a prebuilt node_modules for its `npm install`. --without_seeds
+# skips db:seed, which needs `setup:import_spreadsheets` and so a network this
+# sandbox doesn't have.
+say "bin/workspace_setup --without_seeds"
+bin/workspace_setup --without_seeds || exit 1
+
+# After workspace_setup, not before: .workspace_id is what gives BASE_URL its port.
 eval "$(ruby bin/env --export)"
 
-# Independent of the database, and ~15s of it. Without them anything rendering the
-# application layout - a request spec on an html format, any :js system spec - dies
-# on AssetNotFound. bin/dev's watchers keep them current afterwards.
-say "building tailwind + dartsass alongside the database setup"
-bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 &
-CSS_PID=$!
-
-say "creating + migrating databases (all four: dev/test x primary/analytics)"
-bundle exec rails db:create db:migrate || exit 1
-
-wait "$CSS_PID" ||
+# bin/setup builds dartsass only on the seeding path, and tailwind not at all.
+# Without them anything rendering the application layout - a request spec on an
+# html format, any :js system spec - dies on AssetNotFound. ~15s; bin/dev's
+# watchers keep them current afterwards.
+say "building tailwind + dartsass"
+bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
   say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
 
 if [ "${1:-}" = "--dev-server" ]; then
