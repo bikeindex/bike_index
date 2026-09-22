@@ -10,15 +10,14 @@ import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_ind
 //                     focus moving to another element in the page
 // The tooltip is visible whenever either flag is true.
 
-// The arrow sits on the tooltip edge facing the trigger - keyed by that edge,
-// its outward two borders (top right bottom left)
-const ARROW_BORDERS = {
-  top: '1px 0 0 1px',
-  right: '1px 1px 0 0',
-  bottom: '0 1px 1px 0',
-  left: '0 0 1px 1px'
+// Keyed by placement side: the tooltip edge the arrow sits on, and the
+// arrow's two outward borders (top right bottom left)
+const ARROW_SIDES = {
+  top: { edge: 'bottom', borderWidth: '0 1px 1px 0' },
+  right: { edge: 'left', borderWidth: '0 0 1px 1px' },
+  bottom: { edge: 'top', borderWidth: '1px 0 0 1px' },
+  left: { edge: 'right', borderWidth: '1px 1px 0 0' }
 }
-const OPPOSITE_SIDE = { top: 'bottom', right: 'left', bottom: 'top', left: 'right' }
 
 export default class extends Controller {
   static targets = ['trigger', 'tooltip', 'arrow']
@@ -125,15 +124,16 @@ export default class extends Controller {
       position: 'absolute'
     })
 
-    const edge = OPPOSITE_SIDE[placement.split('-')[0]]
+    const { edge, borderWidth } = ARROW_SIDES[placement.split('-')[0]]
     const { x: arrowX, y: arrowY } = middlewareData.arrow
+    // -5px: half the 8px arrow, plus the tooltip's 1px border
     Object.assign(this.arrowTarget.style, {
       left: arrowX != null ? `${arrowX}px` : '',
       top: arrowY != null ? `${arrowY}px` : '',
       right: '',
       bottom: '',
       [edge]: '-5px',
-      borderWidth: ARROW_BORDERS[edge]
+      borderWidth
     })
   }
 }
