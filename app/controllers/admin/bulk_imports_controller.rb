@@ -10,7 +10,7 @@ module Admin
       @render_chart = true
       @org_count = Binxtils::InputNormalizer.boolean(params[:search_org_count])
       @pagy, @bulk_imports = pagy(:countish, matching_bulk_imports.includes(:organization, :user, :ownerships)
-        .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
+        .reorder(sortable_order(BulkImport)), limit: @per_page, page: permitted_page)
     end
 
     def show

@@ -59,8 +59,15 @@ module Pages
           end
 
           def delta_badge(stat)
-            UI::Badge::Component.new(text: stat.delta_display, size: :xs,
+            UI::Badge::Component.new(text: stat.delta_display, size: :xs, title: delta_title(stat),
               color: stat.positive? ? :success : :error)
+          end
+
+          # Only the year scope's earlier window is last year
+          def delta_title(stat)
+            return if follows_search?
+
+            translation(".previous_year", number: helpers.number_with_delimiter(stat.previous_count))
           end
         end
       end

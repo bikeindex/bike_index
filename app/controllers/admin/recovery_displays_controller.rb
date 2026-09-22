@@ -9,7 +9,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @recovery_displays = pagy(:countish, matching_recovery_displays
-        .order(@time_range_column => sort_direction), limit: @per_page, page: permitted_page)
+        .order(sortable_order(RecoveryDisplay)), limit: @per_page, page: permitted_page)
     end
 
     def new

@@ -5,7 +5,7 @@ module Admin
     before_action :find_organization_feature, only: %i[edit update]
 
     def index
-      @organization_features = OrganizationFeature.order(sort_column + " " + sort_direction)
+      @organization_features = OrganizationFeature.order(sortable_order(OrganizationFeature))
     end
 
     def new

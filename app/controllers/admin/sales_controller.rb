@@ -24,7 +24,7 @@ module Admin
     end
 
     def sortable_opts
-      "sales.#{sort_column} #{sort_direction}"
+      sortable_order(Sale)
     end
 
     def earliest_period_date

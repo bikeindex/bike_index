@@ -8,9 +8,9 @@ module Admin
       @cgroups = Cgroup.commonness
       @ctype_counts = Ctype.group(:cgroup_id).count
       @ctypes = if sort_column == "cgroup"
-        Ctype.includes(:cgroup).joins(:cgroup).reorder("cgroups.name #{sort_direction}")
+        Ctype.includes(:cgroup).joins(:cgroup).reorder(sortable_order(Cgroup.arel_table[:name]))
       else
-        Ctype.includes(:cgroup).reorder("ctypes.#{sort_column} #{sort_direction}")
+        Ctype.includes(:cgroup).reorder(sortable_order(Ctype))
       end
     end
 

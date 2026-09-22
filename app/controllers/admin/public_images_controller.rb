@@ -12,7 +12,7 @@ module Admin
       @render_size = Binxtils::InputNormalizer.boolean(params[:search_size])
       @pagy, @collection = pagy(:countish,
         matching_public_images.includes(:imageable, file_attachment: :blob)
-          .reorder("public_images.#{sort_column} #{sort_direction}"),
+          .reorder(sortable_order(PublicImage)),
         limit: @per_page,
         page: permitted_page)
     end
