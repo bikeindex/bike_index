@@ -32,5 +32,14 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     expect(component).to have_css("input[type='checkbox']", visible: :all)
     expect(component).not_to have_button(visible: :all, text: /settings/i)
     expect(component).not_to have_text("Export CSV")
+    expect(component.at_css("[data-ui--collapse-target='content']")[:class]).to include("tw:hidden!")
+  end
+
+  context "with open: true" do
+    let(:instance) { described_class.new(settings:, open: true) }
+
+    it "renders the panel expanded" do
+      expect(component.at_css("[data-ui--collapse-target='content']")[:class]).not_to include("tw:hidden!")
+    end
   end
 end

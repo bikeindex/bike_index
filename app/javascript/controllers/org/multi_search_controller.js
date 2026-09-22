@@ -76,11 +76,11 @@ export default class extends Controller {
     if (this.searchKindValue === 'stickers') {
       this.searchAllTarget.checked = true
       this.searchAllTarget.disabled = true
-      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.remove('tw:hidden')
+      this.searchAllHintTarget.hidden = false
     } else if (this.searchAllTarget.disabled) {
       this.searchAllTarget.checked = false
       this.searchAllTarget.disabled = false
-      if (this.hasSearchAllHintTarget) this.searchAllHintTarget.classList.add('tw:hidden')
+      this.searchAllHintTarget.hidden = true
     }
   }
 
