@@ -65,21 +65,10 @@ export default class extends Controller {
   }
 
   // Clear any stale loading state, then bring the results frame in line with the
-  // address bar - or load it, if nothing is. Runs on connect and every Turbo page load.
+  // address bar. Runs on initial connect and after every Turbo page load.
   refreshResults () {
     this.clearStaleFrameBusy()
-    // Turbo marks the frame busy only after an await, so the idle check would restart a fetch just begun
-    if (!this.reloadFrameIfUrlStale()) this.loadFrameIfIdle()
-  }
-
-  // The frame's eager fetch starts before this controller connects, so one that failed or
-  // was cancelled by then went unheard, leaving the placeholder spinning. A frame that's
-  // neither loaded nor loading has nothing coming - ask again, now handleFetchError listens.
-  loadFrameIfIdle () {
-    const frame = this.frameElement
-    if (!frame?.getAttribute('src') || frame.hasAttribute('complete') || frame.hasAttribute('busy')) return
-
-    frame.reload()
+    this.reloadFrameIfUrlStale()
   }
 
   // The visible text filters live outside the results frame, so a back/forward
@@ -107,14 +96,13 @@ export default class extends Controller {
   // address bar, not the form, so it's immune to combobox/form restore races.
   reloadFrameIfUrlStale () {
     const frame = this.frameElement
-    if (!this.differentSearchOnSamePage(frame?.getAttribute('src'), window.location.href)) return false
+    if (!this.differentSearchOnSamePage(frame?.getAttribute('src'), window.location.href)) return
     // Turbo advances the address bar only once a frame navigation has rendered, so a
     // frame already asking for a different search is ahead of the URL rather than
     // stale, and a turbo:load landing in that window would throw the rider's search away.
-    if (this.differentSearchOnSamePage(this.requestedURL, window.location.href)) return true
+    if (this.differentSearchOnSamePage(this.requestedURL, window.location.href)) return
 
     frame.setAttribute('src', window.location.href)
-    return true
   }
 
   // Two URLs asking the same search page for different results. Pairs on different

@@ -71,23 +71,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Create enough bikes to trigger pagination (default per_page is 10)
     FactoryBot.create_list(:bike_organized, 10, creation_organization: organization)
 
-    # The frame's eager fetch fails before search--form connects to hear it
-    failed_frame_fetch = false
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.route(%r{/registrations}, ->(route, request) {
-        next route.continue if failed_frame_fetch || request.headers["turbo-frame"] != "organized_bikes_results_frame"
-        failed_frame_fetch = true
-        route.abort
-      })
-    end
-    form_controller = hold_requests(%r{controllers/search/form_controller})
-
     # Visit a different page first to establish history, then navigate to bikes
     visit "/"
     visit bikes_path
-    wait_for { failed_frame_fetch }
-    form_controller.release
-    # Results load via the eager turbo-frame, which search--form asks again for once it connects
+    # Results load via the eager turbo-frame (src fetched once the frame connects)
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
     expect(page).to have_css("tbody tr", minimum: 2)
     expect_axe_clean("select-name")
