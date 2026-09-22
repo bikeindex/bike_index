@@ -5,7 +5,10 @@ description: >-
   asks to create/open/make a PR, or to edit/update/rewrite/fix the PR
   description, body, summary, or title — including bare phrasings like "update
   pr" or "update the PR" with no other object — for both new PRs and existing
-  ones. Note this runs `/simplify`, `bin/lint`, an AGENTS.md conformance pass and
+  ones. Also trigger when the ask is to re-host, recreate, or duplicate an
+  existing PR under this repo (e.g. "close this PR and open a new one of the
+  same changes, not a fork") — that's still creating a PR even with no new diff
+  to write. Note this runs `/simplify`, `bin/lint`, an AGENTS.md conformance pass and
   a merge from the base before writing the body — skipped when the ask is only to
   reword the description — and pushes the result. For
   frontend diffs, delegates the screenshot phase to `references/screenshots.md`,
