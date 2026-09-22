@@ -25,7 +25,7 @@ npx -y playwright open --save-storage="$HOME/.cache/ms-playwright/mcp-auth.json"
 ```
 ````
 
-This is a login helper, not a screenshot path: screenshots still go only through the MCP. If it errors that Chromium isn't installed, the fix is appending `--channel chrome`. Never type the user's credentials.
+If it errors that Chromium isn't installed, the fix is appending `--channel chrome`.
 
 ## Pick up the new state
 
@@ -35,4 +35,4 @@ This is a login helper, not a screenshot path: screenshots still go only through
 
 ## Mid-task
 
-If you hit a 404 / login screen mid-task, **stop**, regenerate the state file as above, pick up the new state, then resume the task.
+Once the user says they've logged in, pick up the new state and resume where the task stopped.
