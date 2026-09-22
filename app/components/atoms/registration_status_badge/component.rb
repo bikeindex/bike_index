@@ -44,10 +44,10 @@ module Atoms
 
       def label = @label ||= Bike.status_humanized_translated(status_humanized).titleize
 
-      # Non-breaking, since the badge is flex and would collapse a plain space beside the time
+      # Plain spaces, so they collapse into the space the localizer puts before a time of day
       def time_suffix
         return [] if @time.blank?
-        [" · ", render(UI::Time::Component.new(time: @time))]
+        [" · ", render(UI::Time::Component.new(time: @time))]
       end
 
       def status_humanized
