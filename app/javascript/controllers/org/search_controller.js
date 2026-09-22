@@ -16,15 +16,13 @@ export default class extends Controller {
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
-    document.addEventListener('turbo:before-fetch-response', this.handleFetchResponse)
-    document.addEventListener('turbo:fetch-request-error', this.handleFetchError)
+    window.addEventListener('search:results-failed', this.stopChartSpinner)
   }
 
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:before-fetch-request', this.handleFetchRequest)
-    document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
-    document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
+    window.removeEventListener('search:results-failed', this.stopChartSpinner)
   }
 
   // The column panel renders inside the results frame, but the chart is outside it - so it
@@ -48,22 +46,12 @@ export default class extends Controller {
     this.chartAwaitingResults = true
   }
 
-  // search--form shows the error; the chart just stops spinning on the search it has
-  handleFetchResponse = (event) => {
-    if (!event.detail.fetchResponse.response.ok) this.cancelChartSpinner(event)
-  }
-
-  handleFetchError = (event) => this.cancelChartSpinner(event)
-
-  cancelChartSpinner (event) {
-    if (!this.chartAwaitingResults || !this.ownsResultsFetch(event)) return
+  // search--form shows the error; the chart stays on the search it has. Only the spinner
+  // set above - Turbo marks the frame busy for its own fetches too.
+  stopChartSpinner = () => {
+    if (!this.chartAwaitingResults) return
     this.chartAwaitingResults = false
     this.chartFrame?.removeAttribute('busy')
-  }
-
-  // Turbo targets the frame for its src fetch and the form for a submit
-  ownsResultsFetch (event) {
-    return event.target === this.resultsFrame || event.target.id === 'Search_Form'
   }
 
   // The view is the server's choice, so restoring the stored one means asking the frame
@@ -179,12 +167,8 @@ export default class extends Controller {
   // The card sits outside the results frame, so a search leaves it answering the previous
   // one - when its scope is the search, which the card says by rendering the target.
   reloadChart () {
-    const spinning = this.chartAwaitingResults
-    this.chartAwaitingResults = false
-    if (!this.chartFollowsSearch()) {
-      if (spinning) this.chartFrame?.removeAttribute('busy')
-      return
-    }
+    this.stopChartSpinner()
+    if (!this.chartFollowsSearch()) return
     this.chartSearch = this.chartParams()
     this.chartFrame.setAttribute('src', window.location.href)
   }
