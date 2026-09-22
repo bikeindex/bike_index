@@ -401,6 +401,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     click_link "Spreadsheet"
     expect(page).to have_current_path(/search_result_view=spreadsheet/, wait: 10)
+    # Turbo moves the address bar before the frame renders, and the render is what stores it
+    expect(page).to have_css("a[data-active='true']", text: "Spreadsheet", wait: 10)
 
     # Back to the default, which the address bar has nothing to say about
     visit bikes_path
