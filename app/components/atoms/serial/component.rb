@@ -60,13 +60,24 @@ module Atoms
       def explanation_block
         return render(UI::Tooltip::Component.new(text: explanation_text)) if @explanation == :tooltip
 
-        content_tag(:em, explanation_text, class: "small less-less-strong")
+        em = content_tag(:em, explanation_text, class: "small less-less-strong")
+        return em unless authorized?
+
+        safe_join([em, render(UI::Tooltip::Component.new(text: status_text))], " ")
       end
 
       def explanation_text
-        return translation(".hidden_for_unauthorized_users") if @bike.authorized?(@user)
+        authorized? ? translation(".hidden_for_unauthorized_users") : status_text
+      end
 
+      def status_text
         translation(".hidden_because_status", bike_type: @bike.type, status: @bike.status_humanized_translated)
+      end
+
+      def authorized?
+        return @authorized if defined?(@authorized)
+
+        @authorized = @bike.authorized?(@user)
       end
     end
   end

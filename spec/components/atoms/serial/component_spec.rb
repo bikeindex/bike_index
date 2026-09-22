@@ -51,9 +51,10 @@ RSpec.describe Atoms::Serial::Component, type: :component do
     context "for a user who may see it" do
       let(:options) { {user: FactoryBot.create(:superuser)} }
 
-      it "shows the serial with the unauthorized-users note" do
-        expect(component.to_html.strip)
-          .to eq '<span class="serial-span">FFF333</span> <em class="small less-less-strong">hidden for unauthorized users</em>'
+      it "shows the serial with the unauthorized-users note, and why in a tooltip" do
+        expect(component.css("span.serial-span").text).to eq "FFF333"
+        expect(component.css("em").text).to eq "hidden for unauthorized users"
+        expect(component.css("[role=tooltip]").text).to eq "because tandem is impounded"
       end
 
       context "with explanation: :tooltip" do
