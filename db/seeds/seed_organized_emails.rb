@@ -149,17 +149,7 @@ if GraduatedNotification.where(organization: brakebills).none?
   SeedHelpers.tick
   graduated_bike = BikeServices::Creator.new.create_bike(
     BParam.create!(creator: user, params: {
-      bike: {
-        cycle_type: "bike",
-        propulsion_type: "foot-pedal",
-        serial_number: "GRADUATED01",
-        manufacturer_id: SeedHelpers.weighted_frame_maker_id,
-        primary_frame_color_id: Color.pluck(:id).sample,
-        rear_tire_narrow: "true",
-        handlebar_type: HandlebarType.slugs.first,
-        owner_email: user.email,
-        creation_organization_id: brakebills.id.to_s
-      }
+      bike: org_bike_params(owner_email: user.email, creation_organization_id: brakebills.id).merge(serial_number: "GRADUATED01")
     })
   )
   raise "Graduated bike creation failed" if graduated_bike.errors.any?
