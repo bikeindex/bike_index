@@ -46,6 +46,20 @@
       </small>
     <% end %>
 
+    <% if organization.enabled?("registration_sequences") %>
+      <% table.column(sortable: "acknowledged_at", label: tag.span(translation(".acknowledgment"), title: translation(".acknowledgment_title")), classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
+        <% if bike.motorized? %>
+          <% if bike.organized?(organization) %>
+            <small>
+              <%= render(UI::Time::Component.new(time: RegistrationSequenceAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>
+            </small>
+          <% else %>
+            <%= hidden_html.call %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
     <% table.column(label: settings.column_renames[:status_cell], classes: "hideableColumn status_cell tw:text-xs") do |bike| %>
       <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
     <% end %>
@@ -164,20 +178,6 @@
     <% if organization.enabled?("avery_export") %>
       <% table.column(label: settings.column_renames[:avery_cell], classes: "hideableColumn avery_cell") do |bike| %>
         <% check_mark if bike.organized?(organization) && bike.avery_exportable? %>
-      <% end %>
-    <% end %>
-
-    <% if organization.enabled?("registration_sequences") %>
-      <% table.column(sortable: "acknowledged_at", label: tag.span(translation(".acknowledgment"), title: translation(".acknowledgment_title")), classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
-        <% if bike.motorized? %>
-          <% if bike.organized?(organization) %>
-            <small>
-              <%= render(UI::Time::Component.new(time: RegistrationSequenceAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>
-            </small>
-          <% else %>
-            <%= hidden_html.call %>
-          <% end %>
-        <% end %>
       <% end %>
     <% end %>
 

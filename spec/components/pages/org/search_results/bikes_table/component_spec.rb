@@ -67,11 +67,11 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   context "with the phone field enabled" do
-    let(:enabled_feature_slugs) { %w[bike_search reg_phone reg_student_id registration_notes bike_stickers] }
+    let(:enabled_feature_slugs) { %w[bike_search reg_phone reg_student_id registration_notes bike_stickers registration_sequences] }
 
-    it "puts URL beside Photo, Updated beside Registered, Owner name then Phone beside Sent to, and Propulsion beside Vehicle type" do
+    it "puts URL beside Photo, Updated then Reg acknowledgment beside Registered, Owner name then Phone beside Sent to, and Propulsion beside Vehicle type" do
       cells = component.css("th.hideableColumn").map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
-      expect(cells.each_cons(2)).to include(%w[photo_cell url_cell], %w[created_at_cell updated_at_cell],
+      expect(cells.each_cons(2)).to include(%w[photo_cell url_cell], %w[created_at_cell updated_at_cell], %w[updated_at_cell acknowledgment_cell],
         %w[owner_email_cell owner_name_cell], %w[owner_name_cell reg_phone_cell], %w[cycle_type_cell propulsion_type_cell])
       # The organization's other fields keep their place further along
       expect(cells.index("reg_student_id_cell")).to be > cells.index("propulsion_type_cell")
