@@ -108,6 +108,10 @@ module Pages
               @search_page ? "tw:twfullbleed" : "tw:mt-4"].join(" ")
           end
 
+          # Marks the rows for the frame's loading swap, which only the search page's card
+          # renders inside; elsewhere nothing sets [busy] above it
+          def results_body_class = ("search-results-body" if @search_page)
+
           def table_clip_classes
             ["tw:overflow-hidden", (TABLE_BLEED_CLASSES if @search_page)].compact.join(" ")
           end

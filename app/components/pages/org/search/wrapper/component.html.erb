@@ -81,29 +81,42 @@
     </p>
   <% end %>
 
-  <% if result_component %>
-    <ul class="tw:m-0 tw:list-none tw:py-4 <%= result_component::LIST_CLASSES %> <%= padding_x_class %>">
-      <% @bikes.each do |bike| %>
-        <%= render(result_component.new(bike:, organization: @organization, current_user: @current_user,
-          search_all: @search_all)) %>
-      <% end %>
-    </ul>
-  <% else %>
-    <%#
-      The table bleeds a gutter past each side; clipping it here rather than on the card
-      leaves the header's tooltips free to open over the card's edge
-    %>
-    <div class="<%= table_clip_classes %>">
-      <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
-        organization: @organization,
-        bikes: @bikes,
-        current_user: @current_user,
-        render_sortable: true,
-        sort_state: @sort_state,
-        bike_sticker: @bike_sticker,
-        settings:
-      )) %>
-    </div>
+  <%#
+    Inside the results frame this is what a search in flight swaps for the spinner, so
+    the card around it - header, view switcher, pagination - stays put while it loads
+  %>
+
+  <%= tag.div(class: results_body_class) do %>
+    <% if @search_page %>
+      <div class="search-results-loading">
+        <%= render(UI::LoadingSpinner::Component.new(text: translation(".loading_results"))) %>
+      </div>
+    <% end %>
+
+    <% if result_component %>
+      <ul class="tw:m-0 tw:list-none tw:py-4 <%= result_component::LIST_CLASSES %> <%= padding_x_class %>">
+        <% @bikes.each do |bike| %>
+          <%= render(result_component.new(bike:, organization: @organization, current_user: @current_user,
+            search_all: @search_all)) %>
+        <% end %>
+      </ul>
+    <% else %>
+      <%#
+        The table bleeds a gutter past each side; clipping it here rather than on the card
+        leaves the header's tooltips free to open over the card's edge
+      %>
+      <div class="<%= table_clip_classes %>">
+        <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
+          organization: @organization,
+          bikes: @bikes,
+          current_user: @current_user,
+          render_sortable: true,
+          sort_state: @sort_state,
+          bike_sticker: @bike_sticker,
+          settings:
+        )) %>
+      </div>
+    <% end %>
   <% end %>
 
   <div

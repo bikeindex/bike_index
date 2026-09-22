@@ -158,20 +158,38 @@
 
   /* Turbo sets [busy] on the results frame during requests. Hide the existing
      results and overlay a spinner; min-height gives the spinner a place to
-     land on the initial auto-submit when the frame is still empty. */
+     land on the initial auto-submit when the frame is still empty.
+
+     Frame contents that mark a .search-results-body swap only that region (below),
+     so the whole-frame overlay stands down for them. */
   .search-results-frame-wrapper {
     @apply tw:relative;
   }
-  .search-results-frame-wrapper > turbo-frame[busy] {
+  .search-results-frame-wrapper > turbo-frame[busy]:not(:has(.search-results-body)) {
     @apply tw:opacity-0 tw:pointer-events-none;
   }
   .search-results-frame-wrapper > .search-loading-overlay {
     @apply tw:hidden tw:absolute tw:top-0 tw:left-0 tw:right-0 tw:pointer-events-none tw:z-1;
   }
-  .search-results-frame-wrapper:has(> turbo-frame[busy]) {
+  .search-results-frame-wrapper:has(> turbo-frame[busy]:not(:has(.search-results-body))) {
     @apply tw:min-h-48;
   }
-  .search-results-frame-wrapper:has(> turbo-frame[busy]) > .search-loading-overlay {
+  .search-results-frame-wrapper:has(> turbo-frame[busy]:not(:has(.search-results-body))) > .search-loading-overlay {
+    @apply tw:block;
+  }
+
+  /* A results card marks the rows it renders, so a search in flight leaves the card
+     itself standing - its header, view switcher and pagination - and swaps only the
+     rows for the spinner. min-height keeps the card from collapsing around it. */
+  .search-results-body > .search-results-loading {
+    @apply tw:hidden tw:min-h-48;
+  }
+  /* Important: the rows carry their own display utility (the cards view's grid),
+     and the utilities layer beats this one */
+  turbo-frame[busy] .search-results-body > :not(.search-results-loading) {
+    @apply tw:hidden!;
+  }
+  turbo-frame[busy] .search-results-body > .search-results-loading {
     @apply tw:block;
   }
 }

@@ -49,6 +49,11 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     # the table bleeds to the page's edges once the card is full bleed
     expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
       .to include(*described_class::TABLE_BLEED_CLASSES.split)
+    # only the rows swap for the spinner while a search is in flight - CSS reveals it
+    # off the frame's [busy], so the header and footer above stay put
+    expect(component).to have_css(".search-results-body > .search-results-loading", visible: :all)
+    expect(component).to have_css(".search-results-body table")
+    expect(component).to have_text("Loading results...")
   end
 
   context "with result_view cards" do
@@ -110,6 +115,9 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
     it "renders the column settings button without the search's actions, and brings its own controllers" do
       expect(component).to have_css("table")
+      # no results frame above this card, so nothing sets [busy] and there's no loading swap
+      expect(component).not_to have_css(".search-results-body", visible: :all)
+      expect(component).not_to have_css(".search-results-loading", visible: :all)
       expect(component).to have_css("[data-controller~='org--search-column-settings']")
       expect(component).to have_button("Column settings", visible: :all)
       # the header's button is the only one - the panel doesn't carry the legacy one
