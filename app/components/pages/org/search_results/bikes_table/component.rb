@@ -26,9 +26,12 @@ module Pages
           VIEW_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
             "tw:group-data-overflowing/bikes-table:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
 
-          # Registration fields, in the order they follow the owner's name, and the serial
-          OWNER_FIELDS = %w[reg_phone reg_student_id reg_organization_affiliation].freeze
-          SERIAL_FIELDS = %w[reg_extra_registration_number].freeze
+          # The organization's registration fields that follow a column, in order. The rest come
+          # after the columns every organization has
+          REG_FIELDS_AFTER = {
+            owner_name: %w[reg_phone reg_student_id reg_organization_affiliation],
+            serial_number: %w[reg_extra_registration_number]
+          }.freeze
 
           THUMB_CLASSES = "tw:block tw:h-8 tw:w-11 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700"
 
@@ -58,6 +61,14 @@ module Pages
           # settings are enough when a caller (e.g. Wrapper) doesn't pass its own in.
           def settings
             @settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
+          end
+
+          # The organization's fields placed after column, or with :rest the ones placed nowhere
+          def reg_fields_after(column)
+            fields = settings.additional_registration_fields
+            return fields - REG_FIELDS_AFTER.values.flatten if column == :rest
+
+            REG_FIELDS_AFTER.fetch(column) & fields
           end
 
           def hidden_not_registered_tag

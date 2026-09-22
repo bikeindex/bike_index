@@ -88,7 +88,7 @@
       </span>
     <% end %>
 
-    <%# OWNER_FIELDS and SERIAL_FIELDS sit beside what they relate to; the organization's other fields keep their place %>
+    <%# Called where REG_FIELDS_AFTER places each of the organization's fields %>
     <% reg_field_column = lambda do |reg_field| %>
       <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
         <% if !bike.organized?(organization) %>
@@ -126,7 +126,7 @@
       <% end %>
     <% end %>
 
-    <% (OWNER_FIELDS & settings.additional_registration_fields).each { |reg_field| reg_field_column.call(reg_field) } %>
+    <% reg_fields_after(:owner_name).each(&reg_field_column) %>
 
     <% table.column(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
       <% if bike.creation_kind %>
@@ -140,7 +140,7 @@
       <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
     <% end %>
 
-    <% (SERIAL_FIELDS & settings.additional_registration_fields).each { |reg_field| reg_field_column.call(reg_field) } %>
+    <% reg_fields_after(:serial_number).each(&reg_field_column) %>
 
     <% table.column(sortable: "cycle_type", label: settings.column_renames[:cycle_type_cell], classes: "hideableColumn cycle_type_cell") do |bike| %>
       <span class="<%= 'tw:text-gray-400' if bike.cycle_type == 'bike' %>">
@@ -152,7 +152,7 @@
       <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
     <% end %>
 
-    <% (settings.additional_registration_fields - OWNER_FIELDS - SERIAL_FIELDS).each { |reg_field| reg_field_column.call(reg_field) } %>
+    <% reg_fields_after(:rest).each(&reg_field_column) %>
 
     <% if organization.enabled?("impound_bikes") %>
       <% table.column(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
