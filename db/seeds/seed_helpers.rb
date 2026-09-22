@@ -10,9 +10,10 @@ module SeedHelpers
   # Later seeds and jobs touch earlier records, so updated_at is reset to match
   def with_clock
     @clock_end = Time.current
-    travel_to(@clock_end - 1.hour)
+    clock_start = (@clock_end - 1.hour).change(usec: 0) # travel_to drops usec
+    travel_to(clock_start)
     yield
-    sync_updated_at
+    sync_updated_at(since: clock_start)
   ensure
     travel_back
   end
@@ -21,13 +22,19 @@ module SeedHelpers
     travel_to([Time.current + rand(20..45).seconds, @clock_end].min)
   end
 
-  def sync_updated_at
+  def sync_updated_at(since:)
     connection = ActiveRecord::Base.connection
-    connection.tables.each do |table|
-      next unless (%w[created_at updated_at] - connection.columns(table).map(&:name)).empty?
-
-      connection.execute("UPDATE #{connection.quote_table_name(table)} SET updated_at = created_at WHERE updated_at IS DISTINCT FROM created_at")
-    end
+    tables = connection.select_values(<<~SQL)
+      SELECT c.table_name FROM information_schema.columns c
+      JOIN information_schema.tables t USING (table_schema, table_name)
+      WHERE c.table_schema = current_schema() AND t.table_type = 'BASE TABLE'
+        AND c.column_name IN ('created_at', 'updated_at')
+      GROUP BY c.table_name HAVING count(*) = 2
+    SQL
+    connection.execute(tables.map { |table|
+      "UPDATE #{connection.quote_table_name(table)} SET updated_at = created_at " \
+        "WHERE created_at >= #{connection.quote(since)} AND updated_at IS DISTINCT FROM created_at;"
+    }.join("\n"))
   end
 
   # Pick a frame maker weighted by priority (popular manufacturers chosen most
