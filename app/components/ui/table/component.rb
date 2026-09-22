@@ -8,12 +8,14 @@ module UI
       attr_reader :sort_state
 
       # Pass cache_key (normally self.class.cache_digest) to enable per-cell fragment caching.
-      # cache_records: mirror the controller's `includes`, or the cells serve those records stale
-      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
+      # cache_records: mirror the controller's `includes`, or the cells serve those records stale.
+      # cache_rows: one fragment per row instead - for a column set cache_key can't enumerate
+      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, cache_rows: false, classes: nil, unbordered: false, render_sortable: false, sticky: false)
         @records = records
         @sort_state = sort_state
         @cache_key = cache_key
         @cache_records = cache_records
+        @cache_rows = cache_rows
         @classes = classes
         @bordered = !unbordered
         @render_sortable = render_sortable
@@ -84,8 +86,10 @@ module UI
       def cache_cells?
         return @cache_cells if defined?(@cache_cells)
 
-        @cache_cells = @cache_key.present? && controller.respond_to?(:perform_caching) && controller.perform_caching
+        @cache_cells = @cache_key.present? && !@cache_rows && controller.respond_to?(:perform_caching) && controller.perform_caching
       end
+
+      def cache_rows? = @cache_rows && @cache_key.present?
 
       # The index rather than the column, so two cells of one record don't share a fragment.
       # It puts every flag that adds or drops a column in cache_key, or later cells read

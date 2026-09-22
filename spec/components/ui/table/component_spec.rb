@@ -230,6 +230,24 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(fragments_written { render_table(cache_records:) }.count).to eq 4
     end
 
+    context "with cache_rows" do
+      it "writes a fragment per row, scoped to the record, the cache_key and cache_records" do
+        organization = FactoryBot.create(:organization)
+        keys = fragments_written do
+          with_controller_class(ApplicationController) do
+            render_inline(described_class.new(records: users, cache_key: "test", cache_rows: true, cache_records: ->(_u) { organization })) do |table|
+              table.column(label: "Name") { |u| u.name }
+              table.column(label: "Email") { |u| u.email }
+            end
+          end
+        end
+
+        expect(keys.count).to eq 2
+        expect(keys.first).to include("test", users.first.cache_key_with_version, organization.cache_key_with_version, "locale/en")
+        expect(keys.second).to include(users.second.cache_key_with_version)
+      end
+    end
+
     context "with a cell rendering a shared fragment" do
       def render_shared(cache_key, shared: true)
         with_controller_class(ApplicationController) do

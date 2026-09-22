@@ -19,13 +19,15 @@
         <%# Once per row: cache_records reads associations, and every cell wants the same ones %>
         <% row_records = cache_records_for(record) %>
 
-        <tr>
-          <% @columns.each_with_index do |col, column_index| %>
-            <td class="<%= col.td_classes(bordered: @bordered) %>">
-              <%= render_cell(col, column_index, record, row_records) %>
-            </td>
-          <% end %>
-        </tr>
+        <% cache_if(cache_rows?, [@cache_key, record, *row_records]) do %>
+          <tr>
+            <% @columns.each_with_index do |col, column_index| %>
+              <td class="<%= col.td_classes(bordered: @bordered) %>">
+                <%= render_cell(col, column_index, record, row_records) %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
       <% end %>
     </tbody>
 
