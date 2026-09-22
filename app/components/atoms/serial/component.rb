@@ -25,7 +25,7 @@ module Atoms
       def call
         return serial_block unless explanation?
 
-        safe_join([serial_block, " ", explanation])
+        safe_join([serial_block, " ", explanation_block])
       end
 
       private
@@ -57,7 +57,7 @@ module Atoms
         @bike&.serial_hidden? && @explanation != :none
       end
 
-      def explanation
+      def explanation_block
         return render(UI::Tooltip::Component.new(text: explanation_text)) if @explanation == :tooltip
 
         content_tag(:em, explanation_text, class: "small less-less-strong")
