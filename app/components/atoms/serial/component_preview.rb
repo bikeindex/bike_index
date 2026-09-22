@@ -34,11 +34,6 @@ module Atoms
         render(Atoms::Serial::Component.new(bike: hidden_bike, explanation: :tooltip))
       end
 
-      # @label hidden, reason skipped
-      def hidden_no_explanation
-        render(Atoms::Serial::Component.new(bike: hidden_bike, explanation: :none))
-      end
-
       # @label hidden, shown to a viewer who may see it
       def hidden_authorized
         render(Atoms::Serial::Component.new(bike: hidden_bike, user: lookbook_user))

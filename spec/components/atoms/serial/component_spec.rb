@@ -48,14 +48,6 @@ RSpec.describe Atoms::Serial::Component, type: :component do
       end
     end
 
-    context "with explanation: :none" do
-      let(:options) { {explanation: :none} }
-
-      it "hides the serial without the explanation" do
-        expect(component.to_html.strip).to eq '<span class="less-strong">hidden</span>'
-      end
-    end
-
     context "for a user who may see it" do
       let(:options) { {user: FactoryBot.create(:superuser)} }
 
@@ -70,14 +62,6 @@ RSpec.describe Atoms::Serial::Component, type: :component do
         it "shows the serial with the note in a tooltip" do
           expect(component.css("span.serial-span").text).to eq "FFF333"
           expect(component.css("[role=tooltip]").text).to eq "hidden for unauthorized users"
-        end
-      end
-
-      context "with explanation: :none" do
-        let(:options) { super().merge(explanation: :none) }
-
-        it "shows the serial alone" do
-          expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
         end
       end
     end
