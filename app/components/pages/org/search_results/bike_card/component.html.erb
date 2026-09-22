@@ -34,10 +34,14 @@
   <% end %>
 
   <% if @layout == :list %>
-    <li class="tw:relative tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-l-4 tw:border-gray-200 tw:bg-white tw:p-3 tw:transition tw:focus-within:z-10 tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:@xl:flex-nowrap tw:@xl:gap-4 tw:dark:border-gray-700 tw:dark:bg-gray-800 <%= row_border_class %>">
+    <%#
+      Narrow: photo and details, then the serial and the status each across the row.
+      Wide: the serial under the details, the status in a column at the right
+    %>
+    <li class="tw:relative tw:grid tw:grid-cols-[auto_1fr] tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-l-4 tw:border-gray-200 tw:bg-white tw:p-3 tw:transition tw:focus-within:z-10 tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:@xl:grid-cols-[auto_1fr_auto] tw:@xl:gap-x-4 tw:@xl:gap-y-1.5 tw:dark:border-gray-700 tw:dark:bg-gray-800 <%= row_border_class %>">
       <div
         class="
-          tw:h-16 tw:w-24 tw:flex-none tw:rounded-lg tw:bg-gray-100
+          tw:h-16 tw:w-24 tw:rounded-lg tw:bg-gray-100 tw:@xl:row-span-2
           tw:@xl:h-24 tw:@xl:w-36 tw:dark:bg-gray-900
         "
       >
@@ -48,7 +52,7 @@
         <% end %>
       </div>
 
-      <div class="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1.5">
+      <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5 tw:@xl:self-end">
         <%= title %>
 
         <div
@@ -72,29 +76,35 @@
             <%= type_badges %>
           </span>
         </div>
-
-        <div class="tw:relative tw:z-20 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-          <span
-            class="
-              tw:rounded-md tw:border tw:border-gray-100 tw:bg-gray-50
-              tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs
-              tw:dark:border-gray-700 tw:dark:bg-gray-900
-            "
-          >
-            <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip)) %>
-          </span>
-
-          <% if @search_all %>
-            <%= render(UI::Badge::Component.new(text: org_badge_text, color: organized? ? :notice : :gray)) %>
-          <% end %>
-        </div>
       </div>
 
-      <%# Its own line on narrow screens %>
       <div
         class="
-          tw:flex tw:w-full tw:flex-none tw:items-center tw:justify-between
-          tw:gap-2 tw:@xl:w-auto tw:@xl:flex-col tw:@xl:items-end
+          tw:relative tw:z-20 tw:col-span-2 tw:flex tw:flex-wrap
+          tw:items-center tw:gap-2 tw:@xl:col-span-1 tw:@xl:col-start-2
+          tw:@xl:self-start
+        "
+      >
+        <span
+          class="
+            tw:rounded-md tw:border tw:border-gray-100 tw:bg-gray-50
+            tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs
+            tw:dark:border-gray-700 tw:dark:bg-gray-900
+          "
+        >
+          <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip)) %>
+        </span>
+
+        <% if @search_all %>
+          <%= render(UI::Badge::Component.new(text: org_badge_text, color: organized? ? :notice : :gray)) %>
+        <% end %>
+      </div>
+
+      <div
+        class="
+          tw:col-span-2 tw:flex tw:items-center tw:justify-between tw:gap-2
+          tw:@xl:col-span-1 tw:@xl:col-start-3 tw:@xl:row-span-2
+          tw:@xl:row-start-1 tw:@xl:flex-col tw:@xl:items-end
         "
       >
         <span
