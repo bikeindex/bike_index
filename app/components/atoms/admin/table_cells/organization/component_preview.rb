@@ -12,7 +12,7 @@ module Atoms
           end
 
           def with_organization_id
-            render(Atoms::Admin::TableCells::Organization::Component.new(organization_id: Organization.deleted.first.id))
+            render(Atoms::Admin::TableCells::Organization::Component.new(organization_id: ::Organization.deleted.first.id))
           end
 
           def with_search_link
