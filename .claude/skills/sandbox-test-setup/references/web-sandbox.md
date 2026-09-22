@@ -255,10 +255,11 @@ ln -sfn /opt/pw-browsers/chromium_headless_shell-MMMM/chrome-linux \
 ln -sfn headless_shell /opt/pw-browsers/chromium_headless_shell-MMMM/chrome-linux/chrome-headless-shell
 ```
 
-This browser gets no `--host-resolver-rules`, so the jsdelivr pins (jquery, select2,
-honeybadger) fail to load and every page logs `ERR_TUNNEL_CONNECTION_FAILED` for them,
-plus Google Fonts / GTM / Facebook. **Those console errors are the sandbox, not the
-app** — read past them and treat an app-origin error as the signal.
+This browser gets no `--host-resolver-rules`, so the jsdelivr pin
+(`@honeybadger-io/js`, the only one left) fails to load and every page logs
+`ERR_TUNNEL_CONNECTION_FAILED` for it, plus Google Fonts / GTM / Facebook. **Those
+console errors are the sandbox, not the app** — read past them and treat an
+app-origin error as the signal.
 
 It also can't reach anything outside localhost: it doesn't trust the egress proxy's CA,
 so github.com fails with `ERR_CERT_AUTHORITY_INVALID` (`curl` is fine — it reads

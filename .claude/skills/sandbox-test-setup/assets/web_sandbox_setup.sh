@@ -11,7 +11,7 @@
 # Logs: /tmp/ruby_build.log, /tmp/dev_server.log
 set -uo pipefail
 
-REPO=/home/user/bike_index
+REPO="${CLAUDE_PROJECT_DIR:-/home/user/bike_index}"
 RUBYVER=$(awk '$1=="ruby"{print $2}' "$REPO/.tool-versions")
 LOCK_SHA=$(sha256sum "$REPO/Gemfile.lock" | cut -c1-12)
 # rbconfig bakes the prefix in, so the tarball has to land where it was built:
@@ -40,7 +40,11 @@ fetch_prebuilt() { # <tarball name>
     mkdir -p "$TOOLCACHE" &&
     tar -C "$TOOLCACHE" -xzf "$tmp/$tarball" || { rm -rf "$tmp"; return 1; }
   rm -rf "$tmp"
-  [ -e "$RUBY_PREFIX" ] || { mkdir -p "$(dirname "$RUBY_PREFIX")"; ln -sfn "$TOOLCACHE/x64" "$RUBY_PREFIX"; }
+  # A half-built prefix left by a timed-out session would shadow what we just
+  # unpacked, so move it aside rather than letting the rebuild path win.
+  [ -L "$RUBY_PREFIX" ] || [ ! -e "$RUBY_PREFIX" ] || mv "$RUBY_PREFIX" "$RUBY_PREFIX.broken.$$"
+  mkdir -p "$(dirname "$RUBY_PREFIX")"
+  ln -sfn "$TOOLCACHE/x64" "$RUBY_PREFIX"
 }
 
 ruby_is_built() { "$RUBY_PREFIX/bin/ruby" --version 2>/dev/null | grep -q "^ruby ${RUBYVER}"; }
@@ -113,11 +117,16 @@ sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='rails'" | grep 
 
 # Playwright MCP's chrome: fixed path, --no-sandbox (we are root), auth file
 say "wiring up chrome for playwright MCP"
-CHROME_BIN="$(ls -d /opt/pw-browsers/chromium-*/chrome-linux 2>/dev/null | sort -V | tail -1)/chrome"
-mkdir -p /opt/google/chrome /root/.cache/ms-playwright
-printf '#!/bin/bash\nexec "%s" --no-sandbox --disable-dev-shm-usage "$@"\n' "$CHROME_BIN" \
-  > /opt/google/chrome/chrome
-chmod +x /opt/google/chrome/chrome
+CHROME_DIR="$(ls -d /opt/pw-browsers/chromium-*/chrome-linux 2>/dev/null | sort -V | tail -1)"
+mkdir -p /root/.cache/ms-playwright
+if [ -x "$CHROME_DIR/chrome" ]; then
+  mkdir -p /opt/google/chrome
+  printf '#!/bin/bash\nexec "%s" --no-sandbox --disable-dev-shm-usage "$@"\n' "$CHROME_DIR/chrome" \
+    > /opt/google/chrome/chrome
+  chmod +x /opt/google/chrome/chrome
+else
+  say "no chromium under /opt/pw-browsers - MCP screenshots will not work"
+fi
 [ -s /root/.cache/ms-playwright/mcp-auth.json ] ||
   printf '{"cookies":[],"origins":[]}' > /root/.cache/ms-playwright/mcp-auth.json
 
@@ -154,8 +163,15 @@ bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
 if [ "${1:-}" = "--dev-server" ]; then
   say "starting bin/dev -> /tmp/dev_server.log"
   nohup bin/dev > /tmp/dev_server.log 2>&1 &
-  until curl -fs -o /dev/null "$BASE_URL/"; do sleep 5; done
-  say "dev server up at $BASE_URL"
+  # First boot compiles assets, ~40s. Bounded, so a server that dies on boot
+  # reports its log instead of hanging the session hook until its timeout.
+  for _ in $(seq 1 48); do curl -fs -o /dev/null "$BASE_URL/" && break; sleep 5; done
+  if curl -fs -o /dev/null "$BASE_URL/"; then
+    say "dev server up at $BASE_URL"
+  else
+    say "dev server never answered on $BASE_URL - see /tmp/dev_server.log"
+    tail -20 /tmp/dev_server.log
+  fi
 fi
 
 ENV_EXPORTS=$(cat <<EOF
@@ -169,7 +185,7 @@ EOF
 
 # Set by the SessionStart hook: everything written here is exported into the
 # session's shells, so later commands need no `export PATH=...` preamble.
-if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+if [ -n "${CLAUDE_ENV_FILE:-}" ] && ! grep -qF "$RUBY_PREFIX/bin" "$CLAUDE_ENV_FILE" 2>/dev/null; then
   printf '%s\n' "$ENV_EXPORTS" >> "$CLAUDE_ENV_FILE"
   say "wrote the toolchain env to \$CLAUDE_ENV_FILE"
 fi
