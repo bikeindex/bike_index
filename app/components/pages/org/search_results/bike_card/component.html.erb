@@ -1,14 +1,24 @@
+<%#
+  No overflow-hidden, which would clip the status tooltip - so the photo rounds its own
+  corners, and the hovered card rises over the next row for the tooltip to show
+%>
+
 <li
   class="
-    tw:relative tw:flex tw:flex-col tw:overflow-hidden tw:rounded-xl
-    tw:border tw:border-gray-200 tw:bg-white tw:transition
-    tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:dark:border-gray-700
-    tw:dark:bg-gray-800
+    tw:relative tw:flex tw:flex-col tw:rounded-xl tw:border
+    tw:border-gray-200 tw:bg-white tw:transition tw:focus-within:z-10
+    tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg
+    tw:dark:border-gray-700 tw:dark:bg-gray-800
   "
 >
-  <div class="tw:relative tw:h-40 tw:bg-gray-100 tw:dark:bg-gray-900">
+  <div
+    class="
+      tw:relative tw:h-40 tw:rounded-t-[11px] tw:bg-gray-100
+      tw:dark:bg-gray-900
+    "
+  >
     <% if thumb_image_url.present? %>
-      <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:h-full tw:w-full tw:object-cover") %>
+      <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:h-full tw:w-full tw:rounded-t-[11px] tw:object-cover") %>
     <% else %>
       <%= image_tag(bike_placeholder_image_path, alt: @bike.title_string, class: "tw:h-full tw:w-full tw:object-contain tw:p-8") %>
     <% end %>

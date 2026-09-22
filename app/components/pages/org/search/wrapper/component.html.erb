@@ -2,7 +2,7 @@
   <div
     class="
       tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:py-3
-      <%= header_padding_class %>
+      <%= padding_x_class %>
     "
   >
     <%#
@@ -81,8 +81,8 @@
   <% if thumbnail_view? %>
     <ul
       class="
-        tw:m-0 tw:grid tw:list-none
-        tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4 tw:p-4
+        tw:m-0 tw:grid tw:list-none tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4 tw:py-4
+        <%= padding_x_class %>
       "
     >
       <% @bikes.each do |bike| %>
