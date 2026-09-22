@@ -33,13 +33,10 @@ module Atoms
       def render? = status_humanized.present?
 
       def call
-        render(UI::Badge::Component.new(
-          text: Bike.status_humanized_translated(status_humanized).titleize,
-          title: translation(".#{status_key}"),
-          color: COLORS[status_key],
-          size: @size,
-          indicator: true
-        ))
+        text = Bike.status_humanized_translated(status_humanized).titleize
+        render(UI::Badge::Component.new(text:, title: translation(".#{status_key}"), color: COLORS[status_key], size: @size)) do
+          tag.span(text, class: "tw:uppercase tw:whitespace-nowrap")
+        end
       end
 
       private
