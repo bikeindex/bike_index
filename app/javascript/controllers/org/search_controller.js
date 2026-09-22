@@ -16,27 +16,54 @@ export default class extends Controller {
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
+    document.addEventListener('turbo:before-fetch-response', this.handleFetchResponse)
+    document.addEventListener('turbo:fetch-request-error', this.handleFetchError)
   }
 
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:before-fetch-request', this.handleFetchRequest)
-  }
-
-  handleFrameRender = () => {
-    this.syncResultView()
-    this.syncPeriodLabel()
-    this.endSubmitSpinner()
+    document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
+    document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
   }
 
   // The column panel renders inside the results frame, but the chart is outside it - so it
-  // fetches alongside the results rather than after them. A form submit's target is the
-  // form, so the header is what names the frame. A hover's prefetch isn't a search yet.
+  // fetches once the results land, from the address bar they moved.
+  handleFrameRender = (event) => {
+    this.syncResultView()
+    this.syncPeriodLabel()
+    this.endSubmitSpinner()
+    if (event.target === this.resultsFrame) this.reloadChart()
+  }
+
+  // The chart spins from the submit, though it waits for the results to fetch. A form
+  // submit's target is the form, so the header is what names the frame. A hover's
+  // prefetch isn't a search yet.
   handleFetchRequest = (event) => {
     const { headers } = event.detail.fetchOptions
     if (!headers['Turbo-Frame'] || headers['X-Sec-Purpose'] === 'prefetch') return
     if (headers['Turbo-Frame'] !== this.resultsFrame?.id) return
-    this.reloadChart(new URL(event.detail.url, window.location.href))
+    if (!this.chartFollowsSearch(new URL(event.detail.url, window.location.href))) return
+    this.chartFrame.setAttribute('busy', '')
+    this.chartAwaitingResults = true
+  }
+
+  // search--form shows the error; the chart just stops spinning on the search it has
+  handleFetchResponse = (event) => {
+    if (!event.detail.fetchResponse.response.ok) this.cancelChartSpinner(event)
+  }
+
+  handleFetchError = (event) => this.cancelChartSpinner(event)
+
+  cancelChartSpinner (event) {
+    if (!this.chartAwaitingResults || !this.ownsResultsFetch(event)) return
+    this.chartAwaitingResults = false
+    this.chartFrame?.removeAttribute('busy')
+  }
+
+  // Turbo targets the frame for its src fetch and the form for a submit
+  ownsResultsFetch (event) {
+    return event.target === this.resultsFrame || event.target.id === 'Search_Form'
   }
 
   // Spreadsheet or thumbnail is the server's choice, so restoring the stored one means
@@ -150,16 +177,24 @@ export default class extends Controller {
   }
 
   // The card sits outside the results frame, so a search leaves it answering the previous
-  // one - when its scope is the search, which the card says by rendering the target. Gated
-  // on the search itself having moved, or the first results fetch would refetch the chart
-  // the frame is already fetching. The URL carries the scope, so it's the search.
-  reloadChart (url) {
+  // one - when its scope is the search, which the card says by rendering the target.
+  reloadChart () {
+    const spinning = this.chartAwaitingResults
+    this.chartAwaitingResults = false
+    if (!this.chartFollowsSearch()) {
+      if (spinning) this.chartFrame?.removeAttribute('busy')
+      return
+    }
+    this.chartSearch = this.chartParams()
+    this.chartFrame.setAttribute('src', window.location.href)
+  }
+
+  // Gated on the search itself having moved, or the first results render would refetch
+  // the chart the frame is already fetching. The URL carries the scope, so it's the search.
+  chartFollowsSearch (url = window.location) {
     const frame = this.chartFrame
-    if (!frame?.getAttribute('src') || !frame.querySelector('[data-chart-follows-search]')) return
-    const search = this.chartParams(url)
-    if (search === this.chartSearch) return
-    this.chartSearch = search
-    frame.setAttribute('src', url.href)
+    if (!frame?.getAttribute('src') || !frame.querySelector('[data-chart-follows-search]')) return false
+    return this.chartParams(url) !== this.chartSearch
   }
 
   // A page turn, a sort, a per-page change or opening the card itself returns the same
