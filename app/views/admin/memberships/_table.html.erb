@@ -13,7 +13,7 @@
 
     <% unless skip_user %>
       <% table.column(sortable: "user_id") do |membership| %>
-        <%= render Pages::Admin::Users::Cell::Component.new(user: membership.user, user_id: membership.user_id) %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(user: membership.user, user_id: membership.user_id) %>
       <% end %>
     <% end %>
 
@@ -34,7 +34,7 @@
         <%= link_to "Stripe", membership.stripe_admin_url, class: "twlink" %>
       <% else %>
         <div class="less-strong">
-          <%= render Pages::Admin::Users::Cell::Component.new(user: membership.creator, user_id: membership.creator_id) %>
+          <%= render Atoms::Admin::TableCells::User::Component.new(user: membership.creator, user_id: membership.creator_id) %>
         </div>
       <% end %>
     <% end %>

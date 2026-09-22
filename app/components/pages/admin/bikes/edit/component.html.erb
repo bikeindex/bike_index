@@ -215,7 +215,7 @@
 
     <%= render(UI::Table::Component.new(records: bike_organizations)) do |table| %>
       <% table.column(label: "Organizations") do |bike_organization| %>
-        <%= render(Pages::Admin::Organizations::Cell::Component.new(organization: bike_organization.organization,
+        <%= render(Atoms::Admin::TableCells::Organization::Component.new(organization: bike_organization.organization,
               organization_id: bike_organization.organization_id)) %>
       <% end %>
 

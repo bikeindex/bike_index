@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Atoms::Admin::AddressRecordCell::Component, type: :component do
+RSpec.describe Atoms::Admin::TableCells::AddressRecord::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {address_record:} }

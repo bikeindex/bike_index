@@ -21,7 +21,7 @@
 
     <% unless skip_user %>
       <% table.column(sortable: "user_id") do |payment| %>
-        <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, email: payment.email, user: payment.user, render_search: render_sortable) %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, email: payment.email, user: payment.user, render_search: render_sortable) %>
       <% end %>
     <% end %>
 
@@ -49,7 +49,7 @@
     <% end %>
 
     <% table.column(sortable: "organization_id") do |payment| %>
-      <%= render Pages::Admin::Organizations::Cell::Component.new(organization: payment.organization, organization_id: payment.organization_id, search_url: (url_for(sort_state.search_params.merge(organization_id: payment.organization_id)) if render_organization_search), render_search: render_organization_search, short_name: true) %>
+      <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: payment.organization, organization_id: payment.organization_id, search_url: (url_for(sort_state.search_params.merge(organization_id: payment.organization_id)) if render_organization_search), render_search: render_organization_search, short_name: true) %>
     <% end %>
 
     <% table.column(sortable: "invoice_id") do |payment| %>

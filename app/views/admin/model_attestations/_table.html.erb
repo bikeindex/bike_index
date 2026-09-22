@@ -39,7 +39,7 @@
   <% end %>
 
   <% table.column(sortable: "user_id") do |model_attestation| %>
-    <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: model_attestation.user, render_search: true) %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: model_attestation.user, render_search: true) %>
   <% end %>
 
   <% table.column(label: "File/URL") do |model_attestation| %>

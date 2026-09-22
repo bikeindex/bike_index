@@ -52,7 +52,7 @@
   <% end %>
 
   <% table.column(label: "Location") do |recovery| %>
-    <%= render Atoms::Admin::AddressRecordCell::Component.new(address_record: recovery) %>
+    <%= render Atoms::Admin::TableCells::AddressRecord::Component.new(address_record: recovery) %>
   <% end %>
 
   <% table.column(label: "Helped", classes: "tw:text-center") do |recovery| %>
