@@ -40,7 +40,7 @@ module ComponentStructs
     ].freeze
 
     # The panel groups the time columns under "Time - "; the table headers keep the short names
-    PANEL_LABELED_COLUMNS = %i[created_at_cell updated_at_cell acknowledgment_cell].freeze
+    PANEL_LABELED_COLUMNS = %i[created_at_cell updated_at_cell occurred_at_cell acknowledgment_cell].freeze
 
     # Their labels name the organization, italicized with its preposition
     ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
