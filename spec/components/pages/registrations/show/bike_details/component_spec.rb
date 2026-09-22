@@ -25,11 +25,12 @@ RSpec.describe Pages::Registrations::Show::BikeDetails::Component, type: :compon
 
   context "hidden serial rendered for the public (nil user)" do
     let(:bike) { FactoryBot.create(:impound_record).bike.reload }
-    it "shows hidden rather than the serial" do
+    it "shows hidden rather than the serial, with the reason in a tooltip" do
       expect(bike.serial_hidden?).to be_truthy
       render_inline(component)
       expect(page).to have_text("hidden")
       expect(page).not_to have_text(bike.serial_number.upcase)
+      expect(page).to have_css("[role=tooltip]", text: "because bike is found", visible: :all)
     end
   end
 end
