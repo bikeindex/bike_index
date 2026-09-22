@@ -33,7 +33,9 @@ module Atoms
           # Nothing about the table around it, so one fragment serves every table rendering
           # this user. The search link's arguments stay out, its href being per-request
           def cache_key
-            [self.class.cache_digest, @user, @email, user_link_path]
+            # The render's own lookup_context: the default allocates one per call, and this
+            # is called per cell rather than per page
+            [self.class.cache_digest(finder: lookup_context), @user, @email, user_link_path]
           end
 
           def computed_search_url
@@ -51,12 +53,16 @@ module Atoms
           end
 
           def user_link_path
-            # user_link_path can be false to not link
-            return if @user_link_path_arg == false
-            return @user_link_path_arg if @user_link_path_arg.present?
-            return admin_user_path(@user_id) if @user_id.present?
+            return @user_link_path if defined?(@user_link_path)
 
-            nil
+            # user_link_path can be false to not link
+            @user_link_path = if @user_link_path_arg == false
+              nil
+            elsif @user_link_path_arg.present?
+              @user_link_path_arg
+            elsif @user_id.present?
+              admin_user_path(@user_id)
+            end
           end
 
           def email_display
