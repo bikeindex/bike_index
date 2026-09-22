@@ -31,8 +31,7 @@ module Atoms
           private
 
           # Nothing about the table around it, so one fragment serves every table rendering
-          # this user. The arguments it leaves out are the search link's alone - that link
-          # sits outside the fragment, since its href carries the request's own params
+          # this user. The search link's arguments stay out, its href being per-request
           def cache_key
             [self.class.cache_digest, @user&.cache_key_with_version, @email, user_link_path]
           end

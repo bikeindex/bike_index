@@ -970,11 +970,9 @@ class Bike < ApplicationRecord
     (u.organization_roles.pluck(:organization_id) & bike_organizations.pluck(:organization_id)).any?
   end
 
-  # Stands in for any member of the organization, so a page cached for the organization
-  # renders the one serial its members all see
+  # Stands in for its members, so a page cached for the organization renders one serial
   def organization_can_see_hidden_serial?(organization)
-    bike_organizations.pluck(:organization_id).include?(organization.id) ||
-      authorized_by_organization?(org: organization)
+    organized?(organization) || authorized_by_organization?(org: organization)
   end
 
   def calculated_current_ownership
