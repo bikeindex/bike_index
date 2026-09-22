@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    pages:
+      org:
+        search_results:
+          bike_card:
+            e_vehicle: E-vehicle
+            not_registered_with: Not registered with %{org_name}
+            registered_with: Registered with %{org_name}

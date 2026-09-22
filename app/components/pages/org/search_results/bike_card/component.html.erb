@@ -1,0 +1,82 @@
+<li
+  class="
+    tw:relative tw:flex tw:flex-col tw:overflow-hidden tw:rounded-xl
+    tw:border tw:border-gray-200 tw:bg-white tw:transition
+    tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:dark:border-gray-700
+    tw:dark:bg-gray-800
+  "
+>
+  <div class="tw:relative tw:h-40 tw:bg-gray-100 tw:dark:bg-gray-900">
+    <% if thumb_image_url.present? %>
+      <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:h-full tw:w-full tw:object-cover") %>
+    <% else %>
+      <%= image_tag(bike_placeholder_image_path, alt: @bike.title_string, class: "tw:h-full tw:w-full tw:object-contain tw:p-8") %>
+    <% end %>
+
+    <% if for_sale_listing&.amount_cents.present? %>
+      <span
+        class="
+          tw:absolute tw:top-2 tw:left-2 tw:rounded-full tw:bg-gray-900/80
+          tw:px-2 tw:py-1 tw:text-xs tw:font-extrabold tw:text-white
+        "
+      >
+        <%= amount_display(for_sale_listing) %>
+      </span>
+    <% end %>
+
+    <%# Above the card's link, so its tooltip opens rather than the bike %>
+    <span class="tw:absolute tw:top-2 tw:right-2 tw:z-20">
+      <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, time: status_time, size: :md)) %>
+    </span>
+  </div>
+
+  <div class="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-3.5">
+    <h3 class="tw:m-0 tw:base-font tw:text-base tw:leading-snug">
+      <%= link_to bike_path_for_org, class: "tw:hover:underline", data: {turbo_frame: "_top"} do %>
+        <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
+        <%= @bike.frame_model_truncated %>
+        <span class="tw:absolute tw:inset-0 tw:z-10"></span>
+      <% end %>
+    </h3>
+
+    <% if colors.any? %>
+      <div
+        class="
+          tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-sm
+          tw:text-gray-500
+        "
+      >
+        <span class="tw:flex tw:gap-0.5">
+          <% colors.each do |color| %>
+            <%= render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm)) %>
+          <% end %>
+        </span>
+
+        <%= colors.map(&:name).join(" / ") %>
+      </div>
+    <% end %>
+
+    <%# Above the card's link too, for the e-vehicle tooltip %>
+    <div class="tw:relative tw:z-20 tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">
+      <% if @bike.motorized? %>
+        <%= render(UI::Badge::Component.new(text: "⚡", title: translation(".e_vehicle"), color: :purple)) %>
+      <% end %>
+
+      <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: @bike.motorized? ? :purple : :gray)) %>
+    </div>
+
+    <% if location.present? %>
+      <p class="tw:m-0 tw:text-xs tw:text-gray-400"><%= location %></p>
+    <% end %>
+
+    <p class="tw:m-0 tw:font-mono tw:text-xs tw:text-gray-400">
+      <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, skip_explanation: true)) %>
+    </p>
+
+    <% if @search_all %>
+      <div>
+        <%= render(UI::Badge::Component.new(text: org_badge_text, color: organized? ? :notice : :gray)) %>
+      </div>
+    <% end %>
+  </div>
+</li>

@@ -1,0 +1,10 @@
+<ul
+  class="
+    tw:m-0 tw:grid tw:list-none
+    tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4 tw:p-4
+  "
+>
+  <% bikes.each do |bike| %>
+    <%= render(Pages::Org::SearchResults::BikeCard::Component.new(bike:, organization:, search_all:)) %>
+  <% end %>
+</ul>

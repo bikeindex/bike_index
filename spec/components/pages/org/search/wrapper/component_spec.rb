@@ -51,24 +51,30 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     let(:sort_state) { ComponentStructs::SortState.new(search_params: {serial: "xyz"}) }
     let(:options) { super().merge(result_view: "thumbnail", sort_state:) }
 
-    it "renders no chips until the flag is on" do
-      expect(component).to_not have_link("Spreadsheet")
-      expect(component).to_not have_text("View as")
-    end
-
-    it "marks the chip active and carries the search into the other one's link" do
-      Flipper.enable(:organization_registration_view_switcher)
+    it "marks the chip active, carries the search into the other one's link, and renders cards" do
       expect(component).to have_css("a[data-active='true']", text: "Thumbnail")
       expect(component).to have_link("Spreadsheet", href: /search_result_view=spreadsheet/)
       expect(component).to have_link("Spreadsheet", href: /serial=xyz/)
+      expect(component).to have_css("ul li", text: bike.mnfg_name)
+      expect(component).not_to have_css("table")
+      expect(component).not_to have_button("Column settings", visible: :all)
     end
 
     context "with an unknown view" do
       let(:options) { super().merge(result_view: "nonsense") }
-      before { Flipper.enable(:organization_registration_view_switcher) }
 
       it "falls back to the spreadsheet" do
         expect(component).to have_css("a[data-active='true']", text: "Spreadsheet")
+        expect(component).to have_css("table")
+      end
+    end
+
+    context "without search_page" do
+      let(:search_page) { false }
+
+      it "renders the table" do
+        expect(component).to have_css("table")
+        expect(component).not_to have_text("View as")
       end
     end
   end
