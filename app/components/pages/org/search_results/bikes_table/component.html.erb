@@ -126,14 +126,14 @@
       <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
     <% end %>
 
-    <% table.column(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
-      <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
-    <% end %>
-
     <% table.column(sortable: "cycle_type", label: settings.column_renames[:cycle_type_cell], classes: "hideableColumn cycle_type_cell") do |bike| %>
       <span class="<%= 'tw:text-gray-400' if bike.cycle_type == 'bike' %>">
         <%= bike.type_titleize %>
       </span>
+    <% end %>
+
+    <% table.column(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
+      <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
     <% end %>
 
     <% if organization.enabled?("registration_notes") %>
