@@ -66,6 +66,18 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
+  context "with the phone field enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search reg_phone reg_student_id] }
+
+    it "puts Updated beside Registered, and Owner name then Phone beside Sent to" do
+      cells = component.css("th.hideableColumn").map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
+      expect(cells.each_cons(2)).to include(%w[created_at_cell updated_at_cell],
+        %w[owner_email_cell owner_name_cell], %w[owner_name_cell reg_phone_cell])
+      # The organization's other fields keep their place further along
+      expect(cells.index("reg_student_id_cell")).to be > cells.index("url_cell")
+    end
+  end
+
   context "with every column's feature enabled" do
     let(:enabled_feature_slugs) do
       %w[bike_search avery_export bike_stickers impound_bikes registration_notes registration_sequences

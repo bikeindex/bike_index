@@ -34,6 +34,12 @@
       </a>
     <% end %>
 
+    <% table.column(sortable: "updated_by_user_at", label: settings.column_renames[:updated_at_cell], classes: "hideableColumn updated_at_cell") do |bike| %>
+      <small>
+        <%= render(UI::Time::Component.new(time: bike.updated_by_user_fallback)) %>
+      </small>
+    <% end %>
+
     <% table.column(label: settings.column_renames[:status_cell], classes: "hideableColumn status_cell tw:text-xs") do |bike| %>
       <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
     <% end %>
@@ -62,6 +68,21 @@
       </span>
     <% end %>
 
+    <%# Phone sits beside the owner's name; the organization's other fields keep their place %>
+    <% reg_field_column = lambda do |reg_field| %>
+      <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
+        <% if !bike.organized?(organization) %>
+          <%= hidden_html.call %>
+        <% elsif reg_field != "reg_address" %>
+          <%= OrgServices::RegistrationFields.value(bike:, organization:, reg_field:) %>
+        <% else %>
+          <small>
+            <%= render UI::AddressDisplay::Component.new(address_record: bike.mailing_address_record, visible_attribute: :street) %>
+          </small>
+        <% end %>
+      <% end %>
+    <% end %>
+
     <% table.column(sortable: "owner_email", label: settings.column_renames[:owner_email_cell], classes: "hideableColumn owner_email_cell tw:leading-none") do |bike| %>
       <% if !bike.organized?(organization) %>
         <%= hidden_html.call %>
@@ -75,14 +96,6 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
-      <% if bike.creation_kind %>
-        <small class="tw:text-gray-400">
-          <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
-        </small>
-      <% end %>
-    <% end %>
-
     <% table.column(label: settings.column_renames[:owner_name_cell], classes: "hideableColumn owner_name_cell tw:leading-none") do |bike| %>
       <% if bike.organized?(organization) %>
         <% if bike.owner_name.present? %>
@@ -93,14 +106,18 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
-      <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
+    <% reg_field_column.call("reg_phone") if settings.additional_registration_fields.include?("reg_phone") %>
+
+    <% table.column(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
+      <% if bike.creation_kind %>
+        <small class="tw:text-gray-400">
+          <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
+        </small>
+      <% end %>
     <% end %>
 
-    <% table.column(sortable: "updated_by_user_at", label: settings.column_renames[:updated_at_cell], classes: "hideableColumn updated_at_cell") do |bike| %>
-      <small>
-        <%= render(UI::Time::Component.new(time: bike.updated_by_user_fallback)) %>
-      </small>
+    <% table.column(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
+      <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
     <% end %>
 
     <% table.column(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
@@ -127,19 +144,7 @@
       <% end %>
     <% end %>
 
-    <% settings.additional_registration_fields.each do |reg_field| %>
-      <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
-        <% if !bike.organized?(organization) %>
-          <%= hidden_html.call %>
-        <% elsif reg_field != "reg_address" %>
-          <%= OrgServices::RegistrationFields.value(bike:, organization:, reg_field:) %>
-        <% else %>
-          <small>
-            <%= render UI::AddressDisplay::Component.new(address_record: bike.mailing_address_record, visible_attribute: :street) %>
-          </small>
-        <% end %>
-      <% end %>
-    <% end %>
+    <% (settings.additional_registration_fields - ["reg_phone"]).each { |reg_field| reg_field_column.call(reg_field) } %>
 
     <% if organization.enabled?("impound_bikes") %>
       <% table.column(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
