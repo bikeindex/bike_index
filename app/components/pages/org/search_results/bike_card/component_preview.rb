@@ -7,14 +7,13 @@ module Pages
         class ComponentPreview < ApplicationComponentPreview
           # @param search_all toggle
           def default(search_all: false)
-            organization = Organization.first || Organization.new(name: "Brakebills University", short_name: "Brakebills")
+            organization = lookbook_organization || Organization.new(name: "Brakebills University", short_name: "Brakebills")
             render_with_template(template: "pages/org/search_results/bike_card/component_preview/default",
               locals: {organization:, search_all:, bikes: Pages::SearchResults::BikeBox::ComponentPreview.vehicles + vehicle_types})
           end
 
           private
 
-          # Two non-bike cycle types, then two e-vehicles
           def vehicle_types
             [
               {id: 36, mnfg_name: "Co-Motion", frame_model: "Periscope", cycle_type: "tandem", color: "Red",
