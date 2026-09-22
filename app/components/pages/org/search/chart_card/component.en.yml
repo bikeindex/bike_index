@@ -12,6 +12,7 @@ en:
             chart_registrations: Registrations
             chart_stolen: Stolen
             loading_chart: Loading chart...
+            previous_year: "%{number} last year"
             scope_search: Current search
             scope_year: Last year
             stat_motorized: E-vehicle registrations

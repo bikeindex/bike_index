@@ -68,6 +68,7 @@ if brakebills.present?
   # All but one of the e-vehicles, so a registration shows both with and without an acknowledgment
   acknowledged = brakebills.bikes.motorized.order(:id).to_a[0...-1]
   acknowledged.each do |bike|
+    SeedHelpers.tick
     RegistrationSequenceAcknowledgment.create!(registration_sequence: sequence, bike:, user: bike.creator,
       owner_email: bike.owner_email)
   end

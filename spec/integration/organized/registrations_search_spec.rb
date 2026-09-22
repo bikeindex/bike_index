@@ -64,7 +64,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   def rendered_bike_ids
-    page.all("tbody tr a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
+    page.all("tbody tr td:first-child a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
   end
 
   it "searches by email and serial" do
@@ -184,7 +184,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
 
     # clicking a bike navigates to the bike show page with organized panel
-    first("a[aria-label='View bike']").click
+    click_link "View", match: :first
 
     expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
 
@@ -380,29 +380,88 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_no_link("Last year")
   end
 
+  # Answers the search requests in the browser, so the results can be held mid-flight or
+  # turned away. Collects which frame asked, the chart's included.
+  def intercept_searches(asked, &answer)
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.route(%r{/o/.+/registrations\?}, ->(route, request) {
+        asked << request.headers["turbo-frame"]
+        answer.call(route, request.headers["turbo-frame"])
+      })
+    end
+  end
+
+  def chart_busy?
+    page.evaluate_script("document.getElementById('chart_card_frame').hasAttribute('busy')")
+  end
+
+  it "spins the chart with the search, and leaves it on the last one a failed search" do
+    visit bikes_path
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    # The year scope counts the organization rather than the search, so the chart follows
+    # the search only once this is picked
+    click_link "Current search"
+    expect(page).to have_css("turbo-frame#chart_card_frame:not([busy]) [id^='chart-'] canvas",
+      visible: :all, wait: 10)
+    chart_src = chart_frame[:src]
+
+    asked = []
+    held = []
+    intercept_searches(asked) { |route, frame| (frame == "chart_card_frame") ? route.continue : held << route }
+    fill_in "search_email", with: "bob@example.com"
+    click_button "Search registrations"
+
+    # The chart spins from the submit, but waits for the results: it can't ask for a search
+    # the results haven't come back from
+    Timeout.timeout(10) { sleep 0.05 until held.any? }
+    expect(chart_busy?).to be true
+    expect(asked).to eq(["organized_bikes_results_frame"])
+
+    # Turned away, the chart stops spinning and stays on the search it's answering
+    held.shift.fulfill(status: 429, contentType: "text/plain", body: "Slow down")
+    expect(page).to have_css("[data-search-notice='rate-limited']", wait: 10)
+    expect(chart_busy?).to be false
+    expect(asked).to eq(["organized_bikes_results_frame"])
+    expect(chart_frame[:src]).to eq chart_src
+
+    # Retrying gets both, and the chart lands on the search the results came back with
+    page.driver.with_playwright_page { |playwright_page| playwright_page.unroute(%r{/o/.+/registrations\?}) }
+    click_button "Search registrations"
+    expect(page).to have_current_path(/search_email=bob/, wait: 10)
+    expect(page).to have_css("turbo-frame#chart_card_frame[src*='search_email=bob']:not([busy])",
+      visible: :all, wait: 10)
+
+    # A sort returns the same chart, so it neither spins nor refetches
+    chart_src = chart_frame[:src]
+    first("thead a[href*='sort=']").click
+    expect(page).to have_current_path(/sort=/, wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+    expect(chart_frame[:src]).to eq chart_src
+  end
+
   it "moves the result view through the address bar, and back from localStorage" do
-    Flipper.enable(:organization_registration_view_switcher)
     visit bikes_path
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
 
-    click_link "Thumbnail"
-    expect(page).to have_current_path(/search_result_view=thumbnail/, wait: 10)
-    expect(page).to have_css("a[data-active='true']", text: "Thumbnail", wait: 10)
+    click_link "Cards"
+    expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
+    expect(page).to have_css("a[data-active='true']", text: "Cards", wait: 10)
+    expect(page).to have_no_css("turbo-frame#organized_bikes_results_frame table")
 
     fill_in "search_email", with: "alice@example.com"
     click_button "Search registrations"
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
-    expect(page).to have_current_path(/search_result_view=thumbnail/)
+    expect(page).to have_current_path(/search_result_view=cards/)
 
     # Stored like the column choices, so arriving without the param brings it back
     visit bikes_path
-    expect(page).to have_current_path(/search_result_view=thumbnail/, wait: 10)
-    expect(page).to have_css("a[data-active='true']", text: "Thumbnail", wait: 10)
+    expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
+    expect(page).to have_css("a[data-active='true']", text: "Cards", wait: 10)
 
-    click_link "Spreadsheet"
-    expect(page).to have_current_path(/search_result_view=spreadsheet/, wait: 10)
+    click_link "Table"
+    expect(page).to have_current_path(/search_result_view=table/, wait: 10)
     # Turbo moves the address bar before the frame renders, and the render is what stores it
-    expect(page).to have_css("a[data-active='true']", text: "Spreadsheet", wait: 10)
+    expect(page).to have_css("a[data-active='true']", text: "Table", wait: 10)
 
     # Back to the default, which the address bar has nothing to say about
     visit bikes_path
@@ -423,13 +482,20 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       # Default columns are visible
       expect(page).to have_css("th.manufacturer_cell", visible: :visible)
       expect(page).to have_css("th.owner_email_cell", visible: :visible)
-      expect(page).to have_css("th.stolen_cell", visible: :visible)
+      expect(page).to have_css("th.status_cell", visible: :visible)
       # Non-default columns are hidden
       expect(page).to have_css("th.serial_number_cell", visible: :hidden)
+      expect(page).to have_css("th.occurred_at_cell", visible: :hidden)
       expect(page).to have_css("th.url_cell", visible: :hidden)
-      expect(page).to have_css("th.impounded_cell", visible: :hidden)
-      # Uncheck a default column — it hides
+      # "none" hides every column but View, which can't be unchecked
       open_columns_if_not
+      within(panel_for("orgRegistrationColumnsOpen")) { click_button "none" }
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
+      expect(page).to have_field("view_cell", checked: true, disabled: true)
+      expect(page).to have_link("View", minimum: 1)
+      within(panel_for("orgRegistrationColumnsOpen")) { click_button "default" }
+      expect(page).to have_css("th.manufacturer_cell", visible: :visible)
+      # Uncheck a default column — it hides
       uncheck "manufacturer_cell"
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("td.manufacturer_cell", visible: :hidden, minimum: 1)
@@ -437,9 +503,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       check "serial_number_cell"
       expect(page).to have_css("th.serial_number_cell", visible: :visible)
       expect(page).to have_css("td.serial_number_cell", visible: :visible, minimum: 1)
-      # Show impounded column
-      check "impounded_cell"
-      expect(page).to have_css("th.impounded_cell", visible: :visible)
+      # Show the status-at column
+      check "occurred_at_cell"
+      expect(page).to have_css("th.occurred_at_cell", visible: :visible)
 
       # Choose "only stolen"
       open_filters_if_not
@@ -452,7 +518,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       # Column choices persist after the search
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("th.serial_number_cell", visible: :visible)
-      expect(page).to have_css("th.impounded_cell", visible: :visible)
+      expect(page).to have_css("th.occurred_at_cell", visible: :visible)
       # ...and a reload, from localStorage
       page.refresh
       expect(page).to have_css("th.serial_number_cell", visible: :visible, wait: 10)
@@ -484,7 +550,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       # Column choices still persist
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("th.serial_number_cell", visible: :visible)
-      expect(page).to have_css("th.impounded_cell", visible: :visible)
+      expect(page).to have_css("th.occurred_at_cell", visible: :visible)
     end
   end
 

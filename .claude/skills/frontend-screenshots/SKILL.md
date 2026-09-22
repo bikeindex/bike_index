@@ -38,6 +38,8 @@ get back local PNG paths.
   unmigrated, and `CheckPending` only re-raises once the evented file watcher notices `db/migrate`
   moved — so a passing curl can be followed by `ActiveRecord::PendingMigrationError` on every page.
   `bundle exec rails db:migrate`, and read `log/development.log` before blaming the capture.
+  A gem the merge bumped does the same: the running server keeps the version it booted with, so a
+  method the new one adds is a `NoMethodError` until `bin/rails restart`.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
 - **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
   back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the

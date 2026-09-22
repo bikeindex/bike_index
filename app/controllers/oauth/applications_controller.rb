@@ -58,9 +58,9 @@ module Oauth
     def ordered_applications
       if params[:sort] == "tokens_count"
         admin_oauth_applications.left_joins(:access_tokens).group(:id)
-          .order("count(oauth_applications.id) #{sort_direction}")
+          .order(sortable_order("count(oauth_applications.id)", nulls_last: false))
       else
-        admin_oauth_applications.reorder("#{sort_column} #{sort_direction}")
+        admin_oauth_applications.reorder(sortable_order(Doorkeeper::Application))
       end
     end
 

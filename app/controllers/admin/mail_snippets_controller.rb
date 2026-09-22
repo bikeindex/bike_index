@@ -6,7 +6,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page
-      @pagy, @mail_snippets = pagy(:countish, matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
+      @pagy, @mail_snippets = pagy(:countish, matching_mail_snippets.reorder(sortable_order(MailSnippet))
         .includes(:organization), limit: @per_page, page: permitted_page)
     end
 

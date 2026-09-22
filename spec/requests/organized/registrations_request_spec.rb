@@ -152,6 +152,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         end
       end
     end
+    it "renders the cards view" do
+      get base_url, params: {search_no_js: true, search_result_view: "cards"}
+      expect(response.status).to eq(200)
+      expect(response.body).to include(bike.mnfg_name)
+      expect(response.body).to_not include("Column settings")
+      expect(response.body).to include("Ordered by Registered, descending")
+    end
+
     context "with search_all" do
       it "reaches past the organization's own registrations, and refuses an export" do
         get base_url, params: {search_no_js: true}
@@ -265,21 +273,31 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {chart_scope: "search", search_all: true}, headers: frame_headers
         expect(assigns(:registrations_stats).first.count).to eq 2
       end
+
+      it "compares the year scope with the year before only once the organization is a year old" do
+        get base_url, headers: frame_headers
+        expect(assigns(:registrations_stats).map(&:previous_count)).to eq [nil, nil, nil]
+
+        Rails.cache.clear
+        current_organization.update_column(:created_at, 13.months.ago)
+        get base_url, headers: frame_headers
+        expect(assigns(:registrations_stats).map(&:previous_count)).to eq [0, 0, 0]
+      end
     end
 
     context "search_result_view" do
-      it "defaults to the spreadsheet, and carries what it's given into the next search" do
+      it "defaults to the table, and carries what it's given into the next search" do
         get base_url, params: {search_no_js: true}
-        expect(assigns(:result_view)).to eq :spreadsheet
+        expect(assigns(:result_view)).to eq :table
 
         get base_url, params: {search_no_js: true, search_result_view: "nonsense"}
-        expect(assigns(:result_view)).to eq :spreadsheet
+        expect(assigns(:result_view)).to eq :table
 
-        get base_url, params: {search_no_js: true, search_result_view: "thumbnail"}
-        expect(assigns(:result_view)).to eq :thumbnail
+        get base_url, params: {search_no_js: true, search_result_view: "cards"}
+        expect(assigns(:result_view)).to eq :cards
         # The view rides in the address bar, so a new search has to carry it
         expect(Capybara.string(response.body))
-          .to have_css("#Search_Form input[name=search_result_view][value=thumbnail]", visible: :all)
+          .to have_css("#Search_Form input[name=search_result_view][value=cards]", visible: :all)
       end
     end
 
@@ -390,6 +408,22 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
         get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "asc"}
         expect(assigns(:bikes).map(&:id)).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, bike.id])
+      end
+    end
+
+    context "sorted by status at" do
+      let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: current_organization, date_stolen: 3.days.ago) }
+
+      it "sorts by occurred_at" do
+        impounded_bike
+        expect(bike.reload.occurred_at).to be_nil
+        expect(stolen_bike.reload.occurred_at).to be < impounded_bike.reload.occurred_at
+
+        get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "desc"}
+        expect(assigns(:bikes).map(&:id)).to eq([impounded_bike.id, stolen_bike.id, bike.id])
+
+        get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "asc"}
+        expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, impounded_bike.id, bike.id])
       end
     end
 

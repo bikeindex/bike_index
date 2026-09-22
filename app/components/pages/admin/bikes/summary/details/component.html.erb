@@ -37,7 +37,7 @@
           <td>Serial number</td>
 
           <td>
-            <%= render(Atoms::Serial::Component.new(bike: @bike, user: @user, skip_explanation: true)) %>
+            <%= render(Atoms::Serial::Component.new(bike: @bike, user: @user, explanation: :tooltip)) %>
           </td>
         </tr>
 

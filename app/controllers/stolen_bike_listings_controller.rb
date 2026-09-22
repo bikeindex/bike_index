@@ -11,7 +11,7 @@ class StolenBikeListingsController < ApplicationController
     end
     per_page ||= params[:per_page] || 25
     @pagy, @stolen_bike_listings = pagy(:countish, matching_stolen_bike_listings
-      .reorder("stolen_bike_listings.#{sort_column} #{sort_direction}"), limit: per_page, page: permitted_page)
+      .reorder(sortable_order(StolenBikeListing)), limit: per_page, page: permitted_page)
 
     @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
   end

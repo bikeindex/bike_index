@@ -5553,10 +5553,14 @@ nb:
             per_page: Resultater per side
             showing_html: viser %{from}–%{to} av %{count}
             view_as: Vis som
-            view_spreadsheet: Regneark
-            view_thumbnail: Miniatyrbilde
             export_unavailable_search_all: Du kan bare eksportere organisasjonens
               registreringer. Fjern merket for «Søk i alle registreringer» for å eksportere.
+            ordered_by_asc: Sortert etter %{column}, stigende
+            ordered_by_desc: Sortert etter %{column}, synkende
+            ordered_by_tooltip: Bytt til tabellvisning for å endre rekkefølgen
+            view_cards: Kort
+            view_list: Liste
+            view_table: Bord
           chart_card:
             caption_search: Nåværende søk
             caption_year: Oversikt over fjoråret
@@ -5570,6 +5574,7 @@ nb:
             stat_motorized: Registrering av elbiler
             stat_registrations: Totalt antall registreringer
             stat_stolen: Meldt stjålet
+            previous_year: "%{number} i fjor"
           column_settings:
             acknowledgment_cell: Bekreftelse av registreringssekvens
             address: 'Adresse:'
@@ -5591,7 +5596,6 @@ nb:
             filter_with_address_html: bare <strong>med</strong> adresse
             filter_with_stickers_html: bare <strong>med</strong> klistremerker
             impound_id_cell: Beslags-ID
-            impounded_cell: Beslaglagt
             manufacturer_cell: Produsent
             model_cell: Modell
             none: ingen
@@ -5607,7 +5611,6 @@ nb:
             status_cell: Status
             sticker_cell: Klistremerke
             stickers: 'Klistremerker:'
-            stolen_cell: Stjålet
             unregistered: 'Uregistrert:'
             updated_at_cell: Oppdatert
             url_cell: URL-adresse
@@ -5615,12 +5618,20 @@ nb:
             notes_cell_html: Registreringsnotater <em>av %{org_name}</em>
             reg_organization_affiliation_cell_html: Tilknytning <em>i %{org_name}</em>
             reg_student_id_cell_html: Studentbevis <em>for %{org_name}</em>
+            occurred_at_cell: Status på
+            photo_cell: Foto
+            view_cell: Utsikt
+            acknowledgment_cell_panel: Tid - Registreringssekvens bekreftet
+            created_at_cell_panel: Tid - registrert
+            occurred_at_cell_panel: Tid - status
+            updated_at_cell_panel: Tid - oppdatert
+            filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
             date_range: 'Datoperiode:'
-            search_settings: Søkeinnstillinger
             search_settings_and_filters: Søkeinnstillinger og filtre
+            filters: Filtre
           search_all:
             search_all_html: Søk i alle registreringer <span class="twless-strong">(ikke
               bare %{org_name})</span>
@@ -5631,6 +5642,10 @@ nb:
             link_sticker: lenkeklistremerke
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
+            acknowledgment_title: Bekreftelse på registreringssekvens kl.
+            occurred_at_tooltip: Når den ble stjålet, beslaglagt, funnet eller lagt
+              ut for salg
+            view: Utsikt
           multi_result_chip:
             no_results: ingen treff
           multi_results:
@@ -5641,6 +5656,10 @@ nb:
             serial_label: 'Serie:'
             sticker_label: 'Klistremerke:'
             view_all: se alle
+          bike_card:
+            e_vehicle: Elbil
+            not_registered_with: Ikke registrert hos %{org_name}
+            registered_with: Registrert hos %{org_name}
         impound_records:
           index:
             all_bikes: Alle sykler

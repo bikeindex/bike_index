@@ -19,13 +19,13 @@
     <div
       data-ui--collapse-target="content"
       class="
-        tw:hidden! tw:@min-[672px]/twwiderow:block!
+        tw:relative tw:hidden! tw:@min-[672px]/twwiderow:block!
         tw:@min-[672px]/twwiderow:h-auto!
         tw:@min-[672px]/twwiderow:scale-y-100!
       "
     >
       <%= helpers.turbo_frame_tag(FRAME_ID, src: @src, loading: (:lazy if @src),
-        class: "tw:block tw:pt-3 tw:@min-[672px]/twwiderow:pt-0") do %>
+        class: "tw:peer tw:block tw:pt-3 tw:@min-[672px]/twwiderow:pt-0 #{LOADING_FRAME_CLASSES}") do %>
         <%#
           org--search refetches the card only while this is in it: the year scope's counts
           don't move with the search
@@ -33,15 +33,13 @@
 
         <%= tag.div(data: {chart_follows_search: (true if follows_search?)}) do %>
           <% if @src %>
-            <div class="<%= PLACEHOLDER_CLASSES %>">
-              <%= render UI::LoadingSpinner::Component.new(text: translation(".loading_chart")) %>
-            </div>
+            <div class="<%= PLACEHOLDER_CLASSES %>"></div>
           <% else %>
             <%# Standing alone the caption shares this row with the toggle, under the trigger %>
             <div
               class="
-                tw:mb-2 tw:flex tw:items-center tw:justify-between tw:gap-2
-                tw:@min-[672px]/twwiderow:flex-wrap
+                tw:mb-2 tw:flex tw:items-baseline tw:justify-between
+                tw:gap-2 tw:@min-[672px]/twwiderow:flex-wrap
               "
             >
               <%# The page's size where there's room; 2xs only below the width the card collapses at %>
@@ -104,6 +102,10 @@
           <% end %>
         <% end %>
       <% end %>
+
+      <div class="<%= LOADING_OVERLAY_CLASSES %>">
+        <%= render UI::LoadingSpinner::Component.new(text: translation(".loading_chart")) %>
+      </div>
     </div>
   <% end %>
 <% end %>

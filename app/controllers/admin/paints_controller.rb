@@ -6,7 +6,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 100)
-      @pagy, @paints = pagy(:countish, matching_paints.reorder("paints.#{sort_column} #{sort_direction}")
+      @pagy, @paints = pagy(:countish, matching_paints.reorder(sortable_order(Paint))
         .includes(:color, :secondary_color, :tertiary_color), limit: @per_page, page: permitted_page)
     end
 

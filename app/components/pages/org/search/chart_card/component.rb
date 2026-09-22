@@ -17,7 +17,11 @@ module Pages
           FRAME_ID = :chart_card_frame
           CHART_HEIGHT = "180px"
           # Holds the space a loaded card takes, so the page doesn't shift when it lands
-          PLACEHOLDER_CLASSES = "tw:flex tw:min-h-[300px] tw:items-center tw:justify-center"
+          PLACEHOLDER_CLASSES = "tw:min-h-[300px]"
+          # Turbo marks the frame busy while it loads or reloads, so whatever's in it hides under a spinner
+          LOADING_FRAME_CLASSES = "tw:[&[busy]]:opacity-0"
+          LOADING_OVERLAY_CLASSES = "tw:pointer-events-none tw:absolute tw:inset-0 tw:hidden tw:items-center " \
+            "tw:justify-center tw:peer-[[busy]]:flex"
 
           # The open state is part of the address rather than a stored preference; the scope
           # links carry it, since org--chart-card-scope-links rebuilds them from the URL
@@ -59,8 +63,15 @@ module Pages
           end
 
           def delta_badge(stat)
-            UI::Badge::Component.new(text: stat.delta_display, size: :xs,
+            UI::Badge::Component.new(text: stat.delta_display, size: :xs, title: delta_title(stat),
               color: stat.positive? ? :success : :error)
+          end
+
+          # Only the year scope's earlier window is last year
+          def delta_title(stat)
+            return if follows_search?
+
+            translation(".previous_year", number: helpers.number_with_delimiter(stat.previous_count))
           end
         end
       end

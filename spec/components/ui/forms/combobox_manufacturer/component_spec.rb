@@ -41,7 +41,7 @@ RSpec.describe UI::Forms::ComboboxManufacturer::Component, type: :component do
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
     let(:manufacturer_other) { nil }
     let(:form) { BikeIndexFormBuilder.new("bike", bike, vc_test_controller.view_context, {}) }
-    let(:options) { {form:} }
+    let(:options) { {html_options: {form:}} }
 
     it "renders the manufacturer's name and id" do
       expect(component).to have_css("input[type='hidden'][name='bike[manufacturer_id]'][value='#{manufacturer.id}']", visible: :all)
@@ -60,7 +60,7 @@ RSpec.describe UI::Forms::ComboboxManufacturer::Component, type: :component do
   end
 
   context "with forwarded options" do
-    let(:options) { {name: :cmp_manufacturer_id, placeholder: "Choose"} }
+    let(:options) { {name: :cmp_manufacturer_id, html_options: {placeholder: "Choose"}} }
 
     it "forwards name, but keeps its own placeholder" do
       expect(component).to have_css("input[type='hidden'][name='cmp_manufacturer_id']", visible: :all)

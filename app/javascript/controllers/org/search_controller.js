@@ -11,29 +11,52 @@ export default class extends Controller {
   static values = { resultView: String }
 
   connect () {
-    this.chartSearch = this.chartParams()
     this.initNotesSearch()
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
+    document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
+    window.addEventListener('search:results-failed', this.stopChartSpinner)
   }
 
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
+    document.removeEventListener('turbo:before-fetch-request', this.handleFetchRequest)
+    window.removeEventListener('search:results-failed', this.stopChartSpinner)
   }
 
-  // The column panel and the chart render inside frames the search replaces. The panel
-  // looks after itself - ui--collapse reconnects with it - but the chart is outside them.
+  // The column panel renders inside the results frame, but the chart is outside it - so it
+  // fetches once the results land, from the address bar they moved.
   handleFrameRender = (event) => {
     this.syncResultView()
     this.syncPeriodLabel()
     this.endSubmitSpinner()
-    if (event.target === this.chartFrame) return
-    this.reloadChart()
+    if (event.target === this.resultsFrame) this.reloadChart()
   }
 
-  // Spreadsheet or thumbnail is the server's choice, so restoring the stored one means
-  // asking the frame for it again - only when the address bar names no view, which every
-  // search and every chip leaves it doing.
+  // The chart spins from the submit, though it waits for the results to fetch. A form
+  // submit's target is the form, so the header is what names the frame. A hover's
+  // prefetch isn't a search yet.
+  handleFetchRequest = (event) => {
+    const { headers } = event.detail.fetchOptions
+    if (!headers['Turbo-Frame'] || headers['X-Sec-Purpose'] === 'prefetch') return
+    if (headers['Turbo-Frame'] !== this.resultsFrame?.id) return
+    const chart = this.searchChart
+    if (!chart || this.chartParams(new URL(event.detail.url, window.location.href)) === this.chartShows(chart)) return
+    chart.setAttribute('busy', '')
+    this.chartAwaitingResults = true
+  }
+
+  // search--form shows the error; the chart stays on the search it has. Only the spinner
+  // set above - Turbo marks the frame busy for its own fetches too.
+  stopChartSpinner = () => {
+    if (!this.chartAwaitingResults) return
+    this.chartAwaitingResults = false
+    this.chartFrame?.removeAttribute('busy')
+  }
+
+  // The view is the server's choice, so restoring the stored one means asking the frame
+  // for it again - only when the address bar names no view, which every search and every
+  // chip leaves it doing.
   syncResultView () {
     const params = new URLSearchParams(window.location.search)
     const inUrl = params.get('search_result_view')
@@ -142,25 +165,37 @@ export default class extends Controller {
   }
 
   // The card sits outside the results frame, so a search leaves it answering the previous
-  // one - when its scope is the search, which the card says by rendering the target. Gated
-  // on the search itself having moved, or the first results render would refetch the chart
-  // the frame is already fetching. The URL carries the scope, so it's the search.
+  // one. Gated on the search itself having moved, or the first results render would refetch
+  // the chart the frame is already fetching.
   reloadChart () {
-    const frame = this.chartFrame
-    if (!frame?.querySelector('[data-chart-follows-search]')) return
-    if (this.chartParams() === this.chartSearch) return
-    if (!frame.getAttribute('src')) return
-    this.chartSearch = this.chartParams()
-    frame.setAttribute('src', window.location.href)
+    this.stopChartSpinner()
+    const chart = this.searchChart
+    if (!chart || this.chartParams() === this.chartShows(chart)) return
+    chart.setAttribute('src', window.location.href)
   }
 
-  // A page turn, a sort, a per-page change or opening the card itself returns the same
-  // chart, so they don't count as the address bar having moved.
-  chartParams () {
-    const params = new URLSearchParams(window.location.search);
-    ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view', 'chart_open']
+  // The chart frame, when its scope is the search - which the card says by rendering the
+  // target. Switching scope navigates the frame itself, so the scope isn't part of a search.
+  get searchChart () {
+    const frame = this.chartFrame
+    if (!frame?.getAttribute('src') || !frame.querySelector('[data-chart-follows-search]')) return null
+    return frame
+  }
+
+  // What the chart is showing: its src is the record of it, holding the search the frame
+  // last asked for, including one still in flight.
+  chartShows (frame) {
+    return this.chartParams(new URL(frame.getAttribute('src'), window.location.href))
+  }
+
+  // The same search, written by a link and by the address bar, differs in order and in
+  // which empty fields it carries - so compare a canonical form. A page turn, a sort, a
+  // per-page change or opening the card returns the same chart, so they're left out too.
+  chartParams (url = window.location) {
+    const params = new URLSearchParams(url.search);
+    ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view', 'chart_open', 'chart_scope']
       .forEach(name => params.delete(name))
 
-    return params.toString()
+    return [...params].filter(([, value]) => value !== '').sort().join('&')
   }
 }

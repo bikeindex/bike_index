@@ -6,7 +6,7 @@ module OrgServices
   module RegistrationCounts
     extend Functionable
 
-    # compare: false for `all`, whose window starts at the epoch - there's no earlier one
+    # compare: false where there's no earlier window - `all`, or a year before the org existed
     def for_range(bikes, time_range, compare: true)
       earlier = compare ? counts(bikes, previous_range(time_range)) : {}
 
