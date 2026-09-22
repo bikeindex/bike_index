@@ -5,7 +5,7 @@ require "rails_helper"
 # The user cell is rendered by two dozen admin tables, and caches itself rather than
 # letting each of them cache it: one fragment, read wherever the user appears. Two real
 # tables here, because nothing in one table's own spec can show the fragment crossing.
-RSpec.describe Pages::Admin::Users::Cell::Component, type: :request do
+RSpec.describe Atoms::Admin::TableCells::User::Component, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   let(:user) { FactoryBot.create(:user_confirmed, email: "shared@example.com") }
