@@ -2,7 +2,7 @@
   <div class="row align-items-end">
     <div class="col-md-4">
       <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0")) do %>
-        <%= render UI::Forms::Combobox::Component.new(name: :tags, free_text: true, options: @searchable_tags, placeholder: "Select or create a tag") %>
+        <%= render UI::Forms::Combobox::Component.new(name: :tags, options: @searchable_tags, free_text: true, html_options: {placeholder: "Select or create a tag"}) %>
       <% end %>
     </div>
 

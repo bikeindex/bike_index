@@ -29,6 +29,17 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
     expect(utilities_for(label, "has-[:focus-visible]")).to eq(utilities_for(button, "focus"))
   end
 
+  context "html_options" do
+    let(:component) do
+      render_inline(described_class.new(name: :status, entries:,
+        html_options: {form: "Search_Form", class: "extra", data: {action: "change->x#y"}}))
+    end
+
+    it "applies them to each radio, keeping it sr-only" do
+      expect(component).to have_css("input.tw\\:sr-only.extra[form='Search_Form'][data-action='change->x#y']", count: 2, visible: :all)
+    end
+  end
+
   context "kind: toggle" do
     let(:component) { render_inline(described_class.new(name: :status, entries:, selected: "active", kind: :toggle)) }
     let(:segment) { UI::ButtonGroup::Component::SEGMENT_CLASSES }

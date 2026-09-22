@@ -7,7 +7,7 @@
   data-ui--forms--files--upload-multiple-failed-value="<%= translation(".upload_failed") %>"
   data-action="ui--forms--files--picker:picked->ui--forms--files--upload-multiple#picked"
 >
-  <%= render(UI::Forms::Files::Picker::Component.new(input_options: @input_options, accept: @accept)) do |picker| %>
+  <%= render(UI::Forms::Files::Picker::Component.new(html_options: @html_options, accept: @accept)) do |picker| %>
     <% picker.with_attached do %>
       <%= tag.ul(content, **@list_html_options.deep_merge(data: {"ui--forms--files--upload-multiple-target": "list"})) %>
     <% end %>

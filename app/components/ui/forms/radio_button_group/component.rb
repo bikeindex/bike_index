@@ -17,15 +17,15 @@ module UI
 
         # full_width: chips share the row evenly (the frame-size XS-XL selector),
         # rather than each taking only the width of its label.
-        # kind: :toggle renders UI::ButtonGroup's segmented control, with a radio per segment
-        def initialize(name:, entries:, selected: nil, form: nil, full_width: false, kind: :button, data: {})
+        # kind: :toggle renders UI::ButtonGroup's segmented control, with a radio per segment.
+        # html_options go on each radio
+        def initialize(name:, entries:, selected: nil, full_width: false, kind: :button, html_options: {})
           @group_classes = UI::ButtonGroup::Component.group_classes(kind:, full_width:)
           @label_classes = (kind == :toggle) ? SEGMENT_CLASSES : CHIP_CLASSES
           @name = name
           @entries = entries
           @selected = selected.to_s
-          @form = form
-          @data = data
+          @html_options = html_options.merge(class: ["tw:sr-only", html_options[:class]].compact.join(" "))
         end
 
         def call
@@ -40,7 +40,7 @@ module UI
           value = option[:value].to_s
 
           tag.label(class: @label_classes) do
-            radio_button_tag(@name, value, value == @selected, class: "tw:sr-only", form: @form, data: @data) +
+            radio_button_tag(@name, value, value == @selected, @html_options) +
               tag.span(option[:label].html_safe)
           end
         end
