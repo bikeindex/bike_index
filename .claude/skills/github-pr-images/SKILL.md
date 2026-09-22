@@ -6,11 +6,12 @@ description: >-
   with an existing PR (by #number, URL, branch name, or "the open PR"), regardless of verb —
   attach, embed, add, put, post, drop, show, document. Also covers visually documenting test runs,
   bug repros, UI states, or CI failures on an existing PR. The `gh` CLI cannot upload images;
-  this skill drives a real browser to GitHub's user-attachments uploader. It also owns the PR's
+  this skill drives a real browser to GitHub's user-attachments uploader — except in the Claude Code
+  web sandbox, which has neither and hosts images through the PR branch's history instead. It also owns the PR's
   one `## Screenshots` comment — finding, creating, editing and verifying it — so other workflows
   (the `pr` skill's screenshot phase) call it to host images and get URLs back, then hand it a
   composed body to post.
-allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read, Write, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_snapshot, mcp__playwright__browser_find, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_close
+allowed-tools: Bash(gh:*), Bash(cp:*), Bash(bash .claude/skills/github-pr-images/assets/commit_images.sh:*), Bash(curl:*), ToolSearch, Read, Write, mcp__github__list_pull_requests, mcp__github__get_me, mcp__github__issue_read, mcp__github__add_issue_comment, mcp__github__update_issue_comment, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_snapshot, mcp__playwright__browser_find, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_close
 ---
 
 # Upload Image to PR
@@ -21,11 +22,15 @@ Browser-driven workflow for embedding local images in a GitHub PR — the GitHub
 
 Since the GitHub API does not support direct image uploads, this skill uses the **PR comment textarea as a staging area for GitHub's image hosting** — uploading files there to obtain persistent `user-attachments/assets/` URLs, then updating the PR description or posting a comment via the `gh` CLI.
 
-## Preflight: this needs `gh` and a signed-in browser
+## Preflight: which route this run takes
 
-Both, or nothing works — the upload is a real browser session against github.com, and the posting is `gh`. **Stop before uploading anything if either is missing**, say which one, and return without posting. Don't half-run it: images hosted with nowhere to go are wasted, and a comment posted through some other route is one the next run can't find.
+Two routes, and `$CLAUDE_CODE_REMOTE` decides between them before anything else happens here.
 
-The Claude Code web sandbox has neither: no GitHub CLI, and a browser that rejects the egress proxy's CA, so github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`. Callers should have skipped before reaching you — the `pr` skill's screenshot phase gates on exactly this — but check anyway, since a direct request won't have.
+The default one needs `gh` **and** a signed-in browser — the upload is a real browser session against github.com, and the posting is `gh`. **Stop before uploading anything if either is missing**, say which one, and return without posting. Don't half-run it: images hosted with nowhere to go are wasted, and a comment posted through some other route is one the next run can't find.
+
+**The Claude Code web sandbox has neither, and takes a different route entirely** — it hosts images in the PR branch's own history and posts through the GitHub MCP tools. Check `$CLAUDE_CODE_REMOTE` first, before anything else here: when it's `true`, [references/web-sandbox.md](references/web-sandbox.md) replaces steps 2 through 7, and step 8's `gh` calls have MCP equivalents there. Don't try the browser there — github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`, and its uploader needs a logged-in session no headless browser can get.
+
+Anywhere else, missing either one is still a stop.
 
 ## Step 1: Resolve PR context
 
