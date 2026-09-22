@@ -5596,7 +5596,6 @@ nb:
             filter_with_address_html: bare <strong>med</strong> adresse
             filter_with_stickers_html: bare <strong>med</strong> klistremerker
             impound_id_cell: Beslags-ID
-            impounded_cell: Beslaglagt
             manufacturer_cell: Produsent
             model_cell: Modell
             none: ingen
@@ -5622,6 +5621,11 @@ nb:
             occurred_at_cell: Status på
             photo_cell: Foto
             view_cell: Utsikt
+            acknowledgment_cell_panel: Tid - Registreringssekvens bekreftet
+            created_at_cell_panel: Tid - registrert
+            occurred_at_cell_panel: Tid - status
+            updated_at_cell_panel: Tid - oppdatert
+            filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
@@ -5638,7 +5642,6 @@ nb:
             link_sticker: lenkeklistremerke
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
-            acknowledgment: Reg. bekreftelse
             acknowledgment_title: Bekreftelse på registreringssekvens kl.
             occurred_at_tooltip: Når den ble stjålet, beslaglagt, funnet eller lagt
               ut for salg

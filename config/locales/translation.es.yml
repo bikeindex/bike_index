@@ -5854,7 +5854,6 @@ es:
             filter_with_address_html: solo <strong>con</strong> dirección
             filter_with_stickers_html: solo <strong>con</strong> pegatinas
             impound_id_cell: ID del depósito
-            impounded_cell: Incautado
             manufacturer_cell: Fabricante
             model_cell: Modelo
             none: ninguno
@@ -5880,6 +5879,11 @@ es:
             occurred_at_cell: Estado en
             photo_cell: Foto
             view_cell: Vista
+            acknowledgment_cell_panel: Tiempo - Secuencia de registro reconocida
+            created_at_cell_panel: Hora - registrada
+            occurred_at_cell_panel: Hora - estado
+            updated_at_cell_panel: Hora - actualizada
+            filter_stolen_or_impounded_html: solo <strong>robado</strong> o <strong>confiscado</strong>
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -5896,7 +5900,6 @@ es:
             link_sticker: pegatina de enlace
             hidden: oculto
             not_registered_with: Oculto porque no está registrado con %{org_name}
-            acknowledgment: Reconocimiento de registro
             acknowledgment_title: Confirmación de la secuencia de registro en
             occurred_at_tooltip: Cuando fue robado, confiscado, encontrado o puesto
               a la venta

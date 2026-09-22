@@ -5868,7 +5868,6 @@ it:
             filter_with_address_html: solo <strong>con</strong> indirizzo
             filter_with_stickers_html: solo <strong>con</strong> adesivi
             impound_id_cell: ID del sequestro
-            impounded_cell: Sequestrato
             manufacturer_cell: Produttore
             model_cell: Modello
             none: nessuno
@@ -5894,6 +5893,11 @@ it:
             occurred_at_cell: Volare a
             photo_cell: Foto
             view_cell: Visualizzazione
+            acknowledgment_cell_panel: Sequenza di registrazione temporale confermata
+            created_at_cell_panel: Tempo - registrato
+            occurred_at_cell_panel: Tempo - stato
+            updated_at_cell_panel: Ora - aggiornato
+            filter_stolen_or_impounded_html: solo <strong>rubati</strong> o <strong>sequestrati</strong>
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
@@ -5910,7 +5914,6 @@ it:
             link_sticker: adesivo di collegamento
             hidden: nascosto
             not_registered_with: Nascosto perché non è registrato con %{org_name}
-            acknowledgment: Conferma di ricezione
             acknowledgment_title: Conferma della sequenza di registrazione a
             occurred_at_tooltip: Quando è stato rubato, sequestrato, ritrovato o messo
               in vendita

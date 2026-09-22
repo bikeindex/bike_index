@@ -5761,7 +5761,6 @@ nl:
             filter_with_address_html: alleen <strong>met</strong> adres
             filter_with_stickers_html: alleen <strong>met</strong> stickers
             impound_id_cell: Inbeslagname-ID
-            impounded_cell: In beslag genomen bij
             manufacturer_cell: Fabrikant
             model_cell: Model
             none: geen
@@ -5787,6 +5786,12 @@ nl:
             occurred_at_cell: Status bij
             photo_cell: Foto
             view_cell: Weergave
+            acknowledgment_cell_panel: Tijd - Registratievolgorde bevestigd
+            created_at_cell_panel: Tijd - geregistreerd
+            occurred_at_cell_panel: Tijd - status
+            updated_at_cell_panel: Tijd - bijgewerkt
+            filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
+              beslag genomen</strong>
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -5803,7 +5808,6 @@ nl:
             link_sticker: link sticker
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
-            acknowledgment: Registratiebevestiging
             acknowledgment_title: Bevestiging van de registratieprocedure bij
             occurred_at_tooltip: Wanneer het gestolen, in beslag genomen, teruggevonden
               of te koop aangeboden werd
