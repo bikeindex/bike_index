@@ -33,7 +33,7 @@ module Atoms
           # Nothing about the table around it, so one fragment serves every table rendering
           # this user. The search link's arguments stay out, its href being per-request
           def cache_key
-            [self.class.cache_digest, @user&.cache_key_with_version, @email, user_link_path]
+            [self.class.cache_digest, @user, @email, user_link_path]
           end
 
           def computed_search_url

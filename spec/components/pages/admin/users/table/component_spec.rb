@@ -16,5 +16,6 @@ RSpec.describe Pages::Admin::Users::Table::Component, type: :component do
   end
 
   let(:cached_record) { user }
-  it_behaves_like "cached_table_rows"
+  # The user cell caches itself, on the user this row is
+  it_behaves_like("cached_table_rows") { let(:nested_fragments) { 1 } }
 end

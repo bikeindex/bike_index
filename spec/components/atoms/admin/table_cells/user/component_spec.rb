@@ -117,7 +117,7 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
       with_controller_class(ApplicationController) { render_inline(described_class.new(user:, **overrides)) }
     end
 
-    it "writes one fragment that every table's cell reads" do
+    it "writes one fragment, keyed to nothing about the table around it" do
       keys = fragments_written { render_cell }
 
       expect(keys.count).to eq 1
@@ -131,27 +131,6 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
 
       user.update(email: "changed@example.com")
       expect(fragments_written { render_cell }.count).to eq 1
-    end
-
-    # Each table caches its own rows, and a row miss reads the user's fragment
-    it "shares its fragment between tables with different cache_keys" do
-      cell = described_class
-      render_table = lambda do |cache_key|
-        with_controller_class(ApplicationController) do
-          render_inline(UI::Table::Component.new(records: [user], cache_key:)) do |table|
-            table.column(label: "Name") { |u| u.name }
-            table.column(label: "User") { |u| render(cell.new(user: u)) }
-          end
-        end
-      end
-
-      keys = fragments_written { render_table.call("first-table") }
-      expect(keys.count).to eq 2
-
-      keys = fragments_written { render_table.call("second-table") }
-      expect(keys.count).to eq 1
-      expect(keys.first).to include("second-table")
-      expect(keys.first).not_to include(described_class.cache_digest)
     end
 
     it "renders the search link outside the fragment" do
