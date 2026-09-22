@@ -11,10 +11,6 @@ const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365
 export default class extends Controller {
   static values = { organizationId: Number }
 
-  close () {
-    this.hide()
-  }
-
   dismissForever () {
     this.persist()
     this.hide()

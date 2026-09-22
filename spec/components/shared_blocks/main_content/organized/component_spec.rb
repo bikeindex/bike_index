@@ -47,23 +47,24 @@ RSpec.describe SharedBlocks::MainContent::Organized::Component, type: :component
 
     context "when the organization's callout was dismissed" do
       let(:component) do
-        vc_test_controller.request.cookies["dismissed_pos_callout_organization_ids"] = organization.id.to_s
+        vc_test_controller.request.cookies["dismissed_pos_callout_organization_ids"] = dismissed_organization_ids
         render_inline(described_class.new(**options)) { "content" }
       end
 
-      it "does not render the callout" do
-        expect(component.text).to_not include "Register bikes automatically from your point of sale"
-      end
-    end
+      context "with this organization's id" do
+        let(:dismissed_organization_ids) { organization.id.to_s }
 
-    context "when a different organization's callout was dismissed" do
-      let(:component) do
-        vc_test_controller.request.cookies["dismissed_pos_callout_organization_ids"] = "0"
-        render_inline(described_class.new(**options)) { "content" }
+        it "does not render the callout" do
+          expect(component.text).to_not include "Register bikes automatically from your point of sale"
+        end
       end
 
-      it "still renders this organization's callout" do
-        expect(component.text).to include "Register bikes automatically from your point of sale"
+      context "with a different organization's id" do
+        let(:dismissed_organization_ids) { "0" }
+
+        it "still renders this organization's callout" do
+          expect(component.text).to include "Register bikes automatically from your point of sale"
+        end
       end
     end
   end
