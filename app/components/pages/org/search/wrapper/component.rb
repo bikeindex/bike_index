@@ -7,8 +7,8 @@ module Pages
         # A card of org registrations: the match count and the column settings button, the
         # column-visibility panel, the table and the pagination footer. On the registrations
         # search (search_page) the header also carries the view switcher and the export, the
-        # cards and list views swap the columns for cards or rows, and the card renders inside the results
-        # turbo-frame, so every search brings it back whole.
+        # cards and list views swap the table for cards or rows, and the card renders inside
+        # the results turbo-frame, so every search brings it back whole.
         class Component < ApplicationComponent
           # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
           # .container-fluid padding to the page's edges
@@ -115,10 +115,12 @@ module Pages
             organization_registrations_path(settings.search_params.merge(create_export: true))
           end
 
-          # Only the search page offers the view switcher, so it's the only place cards render.
-          # BikeCard's layouts are named for the views
-          def card_layout
-            @result_view if @search_page && @result_view != :table
+          # Only the search page offers the view switcher, so it's the only place cards render
+          def card_component
+            return unless @search_page
+
+            {cards: Pages::Org::SearchResults::BikeCard::Component,
+             list: Pages::Org::SearchResults::BikeListItem::Component}[@result_view]
           end
 
           def result_view_entries

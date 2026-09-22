@@ -7,22 +7,16 @@ module Pages
         class ComponentPreview < ApplicationComponentPreview
           # @param search_all toggle
           def default(search_all: false)
-            render_layout(:cards, search_all:)
-          end
-
-          # @param search_all toggle
-          def list(search_all: false)
-            render_layout(:list, search_all:)
+            organization = lookbook_organization || Organization.new(name: "Brakebills University", short_name: "Brakebills")
+            render_with_template(template: "pages/org/search_results/bike_card/component_preview/default",
+              locals: {organization:, search_all:, component_class:,
+                       bikes: Pages::SearchResults::BikeBox::ComponentPreview.vehicles + vehicle_types})
           end
 
           private
 
-          def render_layout(layout, search_all:)
-            organization = lookbook_organization || Organization.new(name: "Brakebills University", short_name: "Brakebills")
-            render_with_template(template: "pages/org/search_results/bike_card/component_preview/default",
-              locals: {organization:, search_all:, layout:,
-                       bikes: Pages::SearchResults::BikeBox::ComponentPreview.vehicles + vehicle_types})
-          end
+          # BikeListItem's preview renders the same bikes
+          def component_class = Component
 
           def vehicle_types
             [

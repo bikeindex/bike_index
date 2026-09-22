@@ -31,9 +31,9 @@ export default class extends Controller {
     this.reloadChart()
   }
 
-  // The view is the server's choice, so restoring the stored one means
-  // asking the frame for it again - only when the address bar names no view, which every
-  // search and every chip leaves it doing.
+  // The view is the server's choice, so restoring the stored one means asking the frame
+  // for it again - only when the address bar names no view, which every search and every
+  // chip leaves it doing.
   syncResultView () {
     const params = new URLSearchParams(window.location.search)
     const inUrl = params.get('search_result_view')

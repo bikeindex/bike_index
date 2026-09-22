@@ -38,7 +38,7 @@
 
     <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
       <%# Columns are the table's alone %>
-      <% unless card_layout %>
+      <% unless card_component %>
         <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
       <% end %>
 
@@ -62,7 +62,7 @@
     </div>
   </div>
 
-  <% unless card_layout %>
+  <% unless card_component %>
     <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:)) %>
   <% end %>
 
@@ -78,11 +78,11 @@
     </p>
   <% end %>
 
-  <% if card_layout %>
-    <ul class="tw:m-0 tw:list-none tw:py-4 <%= Pages::Org::SearchResults::BikeCard::Component::LIST_CLASSES[card_layout] %> <%= padding_x_class %>">
+  <% if card_component %>
+    <ul class="tw:m-0 tw:list-none tw:py-4 <%= card_component::LIST_CLASSES %> <%= padding_x_class %>">
       <% @bikes.each do |bike| %>
-        <%= render(Pages::Org::SearchResults::BikeCard::Component.new(bike:, organization: @organization,
-          current_user: @current_user, search_all: @search_all, layout: card_layout)) %>
+        <%= render(card_component.new(bike:, organization: @organization, current_user: @current_user,
+          search_all: @search_all)) %>
       <% end %>
     </ul>
   <% else %>

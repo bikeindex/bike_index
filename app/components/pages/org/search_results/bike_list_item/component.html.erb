@@ -1,0 +1,111 @@
+<%#
+  No overflow-hidden, which would clip the status tooltip - so the photo rounds its own
+  corners, and the hovered row rises over the next for the tooltip to show
+%>
+
+<% cache(cache_key) do %>
+  <%#
+    Narrow: photo and details, then the serial and the status each across the row.
+    Wide: the serial under the details, the status in a column at the right
+  %>
+
+  <li class="tw:relative tw:grid tw:grid-cols-[auto_1fr] tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-l-4 tw:border-gray-200 tw:bg-white tw:p-3 tw:transition tw:focus-within:z-10 tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:@xl:grid-cols-[auto_1fr_auto] tw:@xl:gap-x-4 tw:@xl:gap-y-1.5 tw:dark:border-gray-700 tw:dark:bg-gray-800 <%= row_border_class %>">
+    <div
+      class="
+        tw:h-16 tw:w-24 tw:rounded-lg tw:bg-gray-100 tw:@xl:row-span-2
+        tw:@xl:h-24 tw:@xl:w-36 tw:dark:bg-gray-900
+      "
+    >
+      <% if thumb_image_url.present? %>
+        <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:h-full tw:w-full tw:rounded-lg tw:object-cover") %>
+      <% else %>
+        <%= image_tag(bike_placeholder_image_path, alt: @bike.title_string, class: "tw:h-full tw:w-full tw:object-contain tw:p-4") %>
+      <% end %>
+    </div>
+
+    <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5 tw:@xl:self-end">
+      <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
+        <%= link_to bike_path_for_org, class: "tw:twtext-color tw:hover:underline", data: {turbo_frame: "_top"} do %>
+          <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
+          <%= @bike.frame_model_truncated %>
+          <span class="tw:absolute tw:inset-0 tw:z-10"></span>
+        <% end %>
+      </h3>
+
+      <div
+        class="
+          tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1.5
+          tw:text-sm tw:text-gray-500
+        "
+      >
+        <% if colors.any? %>
+          <span class="tw:flex tw:items-center tw:gap-1.5">
+            <span class="tw:flex tw:gap-0.5">
+              <% colors.each do |color| %>
+                <%= render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm)) %>
+              <% end %>
+            </span>
+
+            <%= colors.map(&:name).join(" / ") %>
+          </span>
+        <% end %>
+
+        <% if location.present? %>
+          <span><%= location %></span>
+        <% end %>
+
+        <%# Above the row's link, for the e-vehicle tooltip %>
+        <span class="tw:relative tw:z-20 tw:inline-flex tw:items-center tw:gap-1.5">
+          <% if @bike.motorized? %>
+            <%= render(UI::Badge::Component.new(text: "⚡", title: translation(".e_vehicle"), color: :purple)) %>
+          <% end %>
+
+          <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: @bike.motorized? ? :purple : :gray)) %>
+        </span>
+      </div>
+    </div>
+
+    <div
+      class="
+        tw:relative tw:z-20 tw:col-span-2 tw:flex tw:flex-wrap
+        tw:items-center tw:gap-2 tw:@xl:col-span-1 tw:@xl:self-start
+      "
+    >
+      <span
+        class="
+          tw:rounded-md tw:border tw:border-gray-100 tw:bg-gray-50 tw:px-1.5
+          tw:py-0.5 tw:font-mono tw:text-xs tw:dark:border-gray-700
+          tw:dark:bg-gray-900
+        "
+      >
+        <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip)) %>
+      </span>
+
+      <% if @search_all %>
+        <%= render(UI::Badge::Component.new(text: org_badge_text, color: organized? ? :notice : :gray)) %>
+      <% end %>
+    </div>
+
+    <div
+      class="
+        tw:col-span-2 tw:flex tw:items-center tw:justify-between tw:gap-2
+        tw:@xl:col-span-1 tw:@xl:col-start-3 tw:@xl:row-span-2
+        tw:@xl:row-start-1 tw:@xl:flex-col tw:@xl:items-end
+      "
+    >
+      <span
+        class="
+          tw:font-mono tw:text-lg tw:font-semibold tw:text-gray-900
+          tw:dark:text-gray-100
+        "
+      >
+        <%= amount_display(for_sale_listing) if for_sale_listing&.amount_cents.present? %>
+      </span>
+
+      <%# Above the row's link, so its tooltip opens rather than the bike %>
+      <span class="tw:relative tw:z-20">
+        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, time: status_time)) %>
+      </span>
+    </div>
+  </li>
+<% end %>

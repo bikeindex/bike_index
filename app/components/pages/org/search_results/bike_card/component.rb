@@ -4,34 +4,20 @@ module Pages
   module Org
     module SearchResults
       module BikeCard
-        # One registration in the org search's cards or list view: the photo, price and
-        # status, title, colors, vehicle type, location and serial. Per the Bike Thumbnails
-        # design doc - layout :cards is 1c, :list the dense row (1d). search_all adds whether it's
-        # registered with the organization.
+        # One registration in the org search's cards view: the photo carrying its price and
+        # status, then title, colors, vehicle type, location and serial. Per the Bike Thumbnails
+        # design doc (1c). search_all adds whether it's registered with the organization.
         class Component < ApplicationComponent
           include BikeHelper
 
-          # The layouts, and the classes for the list holding them. The rows wrap against their
-          # list, so they fit a narrow card too
-          LIST_CLASSES = {
-            cards: "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4",
-            list: "tw:@container tw:flex tw:flex-col tw:gap-3"
-          }.freeze
+          # For the list holding them
+          LIST_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4"
 
-          ROW_BORDER_CLASSES = {
-            success: "tw:border-l-green-600",
-            purple: "tw:border-l-purple-500",
-            error: "tw:border-l-red-600",
-            warning: "tw:border-l-amber-500",
-            pink: "tw:border-l-pink-400"
-          }.freeze
-
-          def initialize(bike:, organization:, current_user: nil, search_all: false, layout: :cards)
+          def initialize(bike:, organization:, current_user: nil, search_all: false)
             @bike = bike
             @organization = organization
             @current_user = current_user
             @search_all = search_all
-            @layout = layout
           end
 
           private
@@ -39,11 +25,7 @@ module Pages
           # Like the table's rows, not per viewer. The listing because a price change doesn't
           # touch the bike
           def cache_key
-            [self.class.cache_digest, @organization.id, @search_all, @layout, @bike, for_sale_listing]
-          end
-
-          def row_border_class
-            ROW_BORDER_CLASSES.fetch(Atoms::RegistrationStatusBadge::Component.color(@bike), "tw:border-l-gray-300")
+            [self.class.cache_digest, @organization.id, @search_all, @bike, for_sale_listing]
           end
 
           def bike_path_for_org

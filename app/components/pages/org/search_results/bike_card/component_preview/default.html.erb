@@ -1,5 +1,5 @@
-<ul class="tw:m-0 tw:list-none tw:p-4 <%= Pages::Org::SearchResults::BikeCard::Component::LIST_CLASSES[layout] %>">
+<ul class="tw:m-0 tw:list-none tw:p-4 <%= component_class::LIST_CLASSES %>">
   <% bikes.each do |bike| %>
-    <%= render(Pages::Org::SearchResults::BikeCard::Component.new(bike:, organization:, search_all:, layout:)) %>
+    <%= render(component_class.new(bike:, organization:, search_all:)) %>
   <% end %>
 </ul>
