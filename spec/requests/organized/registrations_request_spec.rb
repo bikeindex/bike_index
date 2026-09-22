@@ -150,6 +150,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         end
       end
     end
+    it "renders the thumbnail view as cards, with what they read preloaded" do
+      get base_url, params: {search_no_js: true, search_result_view: "thumbnail"}
+      expect(response.status).to eq(200)
+      expect(assigns(:bikes).first.association(:primary_frame_color)).to be_loaded
+      expect(response.body).to include(bike.mnfg_name)
+      expect(response.body).to_not include("Column settings")
+    end
+
     context "with search_all" do
       it "reaches past the organization's own registrations, and refuses an export" do
         get base_url, params: {search_no_js: true}

@@ -5,6 +5,9 @@ module Organized
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type
       acknowledged_at]
 
+    THUMBNAIL_INCLUDES = %i[primary_frame_color secondary_frame_color tertiary_frame_color
+      current_stolen_record current_impound_record address_record].freeze
+
     helper_method :chart_scope_paths
 
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response]
@@ -237,6 +240,8 @@ module Organized
 
       @pagy, @bikes = pagy(:countish, @available_bikes.reorder(search_order(org)),
         limit: @per_page, page: permitted_page, **search_all_count)
+      # The spreadsheet caches its rows; the cards render everything each time
+      @bikes = @bikes.includes(*THUMBNAIL_INCLUDES) if @result_view == :thumbnail
     end
 
     # Searching past the organization reaches most of the index, so it counts - and pages -

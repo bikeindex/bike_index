@@ -15,6 +15,7 @@ module Pages
             @organization = organization
             @current_user = current_user
             @search_all = search_all
+            @organized = search_all && bike.organized?(organization)
           end
 
           private
@@ -37,21 +38,15 @@ module Pages
           end
 
           def colors
-            [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
+            @colors ||= [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
           end
 
           def location
             @location ||= (@bike.current_event_record || @bike).formatted_address_string
           end
 
-          def organized?
-            return @organized if defined?(@organized)
-
-            @organized = @bike.organized?(@organization)
-          end
-
           def org_badge_text
-            return translation(".registered_with", org_name: @organization.short_name) if organized?
+            return translation(".registered_with", org_name: @organization.short_name) if @organized
 
             translation(".not_registered_with", org_name: @organization.short_name)
           end

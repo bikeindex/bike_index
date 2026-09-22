@@ -46,7 +46,7 @@ module Atoms
 
       private
 
-      def label = Bike.status_humanized_translated(status_humanized).titleize
+      def label = @label ||= Bike.status_humanized_translated(status_humanized).titleize
 
       def label_with_time
         safe_join([label, " · ", render(UI::Time::Component.new(time: @time))])
