@@ -63,7 +63,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).not_to have_css("table")
       expect(component).not_to have_button("Column settings", visible: :all)
       expect(component).to have_text("Ordered by Manufacturer, ascending")
-      expect(component).to have_css("button[aria-label='Switch back to the spreadsheet view to change ordering']", text: "?")
+      expect(component).to have_css("button[aria-label='Switch to the table view to change ordering']", text: "?")
     end
 
     context "with csv_exports enabled" do
