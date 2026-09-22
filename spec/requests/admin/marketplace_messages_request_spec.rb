@@ -15,22 +15,16 @@ RSpec.describe Admin::MarketplaceMessagesController, type: :request do
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
       expect(assigns(:collection).pluck(:id)).to eq([marketplace_message.id])
-    end
 
-    context "sorted by listing amount" do
-      let!(:marketplace_message_pricier) do
-        FactoryBot.create(:marketplace_message, marketplace_listing: FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 9_000))
-      end
+      marketplace_message_pricier = FactoryBot.create(:marketplace_message,
+        marketplace_listing: FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 9_000))
+      get base_url, params: {sort: "amount_cents", direction: "asc"}
+      expect(response.status).to eq(200)
+      expect(assigns(:collection).pluck(:id)).to eq([marketplace_message.id, marketplace_message_pricier.id])
 
-      it "orders by the listing's amount" do
-        get base_url, params: {sort: "amount_cents", direction: "asc"}
-        expect(response.status).to eq(200)
-        expect(assigns(:collection).pluck(:id)).to eq([marketplace_message.id, marketplace_message_pricier.id])
-
-        get base_url, params: {sort: "amount_cents", direction: "desc", search_bike_id: marketplace_message_pricier.item.id}
-        expect(response.status).to eq(200)
-        expect(assigns(:collection).pluck(:id)).to eq([marketplace_message_pricier.id])
-      end
+      get base_url, params: {sort: "amount_cents", direction: "desc", search_bike_id: marketplace_message_pricier.item.id}
+      expect(response.status).to eq(200)
+      expect(assigns(:collection).pluck(:id)).to eq([marketplace_message_pricier.id])
     end
   end
 
