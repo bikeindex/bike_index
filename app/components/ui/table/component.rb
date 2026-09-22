@@ -9,7 +9,7 @@ module UI
 
       # Pass cache_key (normally self.class.cache_digest) to enable per-row fragment caching.
       # cache_records: mirror the controller's `includes`, or the row serves those records stale
-      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false, sort_link_class: "twlink")
+      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
         @records = records
         @sort_state = sort_state
         @cache_key = cache_key
@@ -18,7 +18,6 @@ module UI
         @bordered = !unbordered
         @render_sortable = render_sortable
         @sticky = sticky
-        @sort_link_class = sort_link_class
         @columns = []
       end
 
@@ -26,7 +25,7 @@ module UI
       # methods - a caller that needs one binds it to a local first
       # header_tooltip renders beside the header rather than in it, which a sort link would swallow
       def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, &block)
-        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, header_tooltip:, lower_right:, footer:, sort_link_class: @sort_link_class, &block)
+        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, header_tooltip:, lower_right:, footer:, &block)
         nil
       end
 

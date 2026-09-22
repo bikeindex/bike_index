@@ -21,6 +21,16 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
     end
   end
 
+  context "with time" do
+    let(:bike) { FactoryBot.create(:stolen_bike) }
+    let(:component) { described_class.new(bike:, time: bike.occurred_at) }
+    it "renders the time after the status" do
+      render_inline(component)
+      expect(page).to have_text("Stolen\u00A0·")
+      expect(page).to have_css("span.localizeTime")
+    end
+  end
+
   context "abandoned" do
     let(:bike) { FactoryBot.create(:bike, status: "status_abandoned") }
     it "shows abandoned" do

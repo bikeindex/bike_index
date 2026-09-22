@@ -97,17 +97,6 @@ RSpec.describe UI::Table::Component, type: :component do
       end
     end
 
-    context "with sort_link_class" do
-      it "classes the sort links with it in place of twlink" do
-        result = render_inline(described_class.new(records:, render_sortable: true, sort_link_class: "twlink-underlined")) do |table|
-          table.column(sortable: "name") { |r| r.name }
-        end
-
-        expect(result).to have_css("th a.twlink-underlined", text: /Name/)
-        expect(result).not_to have_css("th a.twlink")
-      end
-    end
-
     context "with custom label" do
       it "uses label instead of derived title" do
         result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStructs::SortState.new(sort: "bike_sticker_batch_id"))) do |table|

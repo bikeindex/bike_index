@@ -7,9 +7,8 @@ module UI
 
       attr_reader :sortable, :cell_block, :footer, :header_tooltip
 
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, sort_link_class: "twlink", &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, &block)
         @header_tooltip = header_tooltip
-        @sort_link_class = sort_link_class
         @label = label
         @sortable = sortable
         @sort_indicator = sort_indicator
@@ -93,7 +92,7 @@ module UI
         end
 
         # data-active rather than an `active` class: that's what the is-active variant matches
-        link_to(sortable_url.call(@sortable, direction), class: "#{@sort_link_class} tw:group",
+        link_to(sortable_url.call(@sortable, direction), class: "twlink tw:group",
           data: {active: sorted_by_this || nil}) do
           safe_join([title, NBSP, *arrow_spans])
         end
