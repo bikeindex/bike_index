@@ -93,7 +93,6 @@ module Pages
               organization: @organization,
               interpreted_params: @interpreted_params,
               sortable_search_params: @sort_state.search_params,
-              params: @params,
               search_stickers: @search_stickers,
               search_address: @search_address,
               search_status: @search_status,

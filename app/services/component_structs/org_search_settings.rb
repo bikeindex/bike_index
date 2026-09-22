@@ -30,7 +30,6 @@ module ComponentStructs
       notes_cell
       sticker_cell
       impound_id_cell
-      impounded_cell
       avery_cell
       acknowledgment_cell
       cycle_type_cell
@@ -38,6 +37,9 @@ module ComponentStructs
       status_cell
       url_cell
     ].freeze
+
+    # The panel groups the time columns under "Time - "; the table headers keep the short names
+    PANEL_LABELED_COLUMNS = %i[created_at_cell updated_at_cell occurred_at_cell acknowledgment_cell].freeze
 
     # Their labels name the organization, italicized with its preposition
     ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
@@ -100,13 +102,12 @@ module ComponentStructs
       end
     end
 
-    def initialize(organization:, interpreted_params: {}, sortable_search_params: {}, params: {},
+    def initialize(organization:, interpreted_params: {}, sortable_search_params: {},
       search_stickers: nil, search_address: nil, search_status: "all", search_unregisteredness: nil,
       search_all: false)
       @organization = organization
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
-      @params = params
       @filter_values = {search_stickers:, search_address:, search_status:, search_unregisteredness:}
       @search_all = search_all
     end
@@ -142,8 +143,7 @@ module ComponentStructs
     def initially_checked_columns
       @initially_checked_columns ||= [
         *DEFAULT_COLUMNS,
-        ("sticker_cell" if @organization.enabled?("bike_stickers")),
-        ("impounded_cell" if @params[:search_impoundedness] == "impounded")
+        ("sticker_cell" if @organization.enabled?("bike_stickers"))
       ].compact
     end
 
@@ -153,6 +153,10 @@ module ComponentStructs
 
         [key, translation(:"#{key}_html", org_name: @organization.short_name)]
       }
+    end
+
+    def panel_labels
+      @panel_labels ||= column_renames.merge(PANEL_LABELED_COLUMNS.to_h { [it, translation(:"#{it}_panel")] })
     end
 
     def sort_column_label(sort)
@@ -166,16 +170,16 @@ module ComponentStructs
         *ALWAYS_ENABLED_COLUMNS,
         *additional_registration_fields.map { |field| "#{field}_cell" },
         ("notes_cell" if @organization.enabled?("registration_notes")),
-        *(%w[impound_id_cell impounded_cell] if @organization.enabled?("impound_bikes")),
+        ("impound_id_cell" if @organization.enabled?("impound_bikes")),
         ("avery_cell" if @organization.enabled?("avery_export")),
         ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
-      ].compact.uniq.sort_by { |cell| column_renames[cell.to_sym] }
+      ].compact.uniq
     end
 
     def always_visible?(cell_name) = ALWAYS_VISIBLE_COLUMNS.include?(cell_name)
 
     def panel_columns
-      @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| column_renames[cell.to_sym] }
+      @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| panel_labels[cell.to_sym] }
     end
 
     def additional_registration_fields

@@ -426,7 +426,6 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("th.serial_number_cell", visible: :hidden)
       expect(page).to have_css("th.occurred_at_cell", visible: :hidden)
       expect(page).to have_css("th.url_cell", visible: :hidden)
-      expect(page).to have_css("th.impounded_cell", visible: :hidden)
       # "none" hides every column but View, which can't be unchecked
       open_columns_if_not
       within(panel_for("orgRegistrationColumnsOpen")) { click_button "none" }
@@ -443,9 +442,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       check "serial_number_cell"
       expect(page).to have_css("th.serial_number_cell", visible: :visible)
       expect(page).to have_css("td.serial_number_cell", visible: :visible, minimum: 1)
-      # Show impounded column
-      check "impounded_cell"
-      expect(page).to have_css("th.impounded_cell", visible: :visible)
+      # Show the status-at column
+      check "occurred_at_cell"
+      expect(page).to have_css("th.occurred_at_cell", visible: :visible)
 
       # Choose "only stolen"
       open_filters_if_not
@@ -458,7 +457,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       # Column choices persist after the search
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("th.serial_number_cell", visible: :visible)
-      expect(page).to have_css("th.impounded_cell", visible: :visible)
+      expect(page).to have_css("th.occurred_at_cell", visible: :visible)
       # ...and a reload, from localStorage
       page.refresh
       expect(page).to have_css("th.serial_number_cell", visible: :visible, wait: 10)
@@ -490,7 +489,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       # Column choices still persist
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("th.serial_number_cell", visible: :visible)
-      expect(page).to have_css("th.impounded_cell", visible: :visible)
+      expect(page).to have_css("th.occurred_at_cell", visible: :visible)
     end
   end
 
