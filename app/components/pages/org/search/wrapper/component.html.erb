@@ -1,10 +1,5 @@
 <%= tag.div(class: card_classes, data: card_data_attributes) do %>
-  <div
-    class="
-      tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:py-3
-      <%= padding_x_class %>
-    "
-  >
+  <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-4 tw:gap-y-2 tw:py-3 <%= padding_x_class %>">
     <%#
       Sized to its content, so the count grows only once the toggle wraps under it - which
       puts the toggle at the right
@@ -12,7 +7,7 @@
 
     <div
       class="
-        tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-x-4
+        tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-x-4
         tw:gap-y-2
       "
     >
@@ -21,7 +16,7 @@
       </p>
 
       <% if @search_page %>
-        <div class="tw:flex tw:items-center tw:gap-2">
+        <div class="tw:flex tw:items-baseline tw:gap-2">
           <span
             class="
               tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400
@@ -36,30 +31,38 @@
       <% end %>
     </div>
 
-    <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-      <%# Columns are the spreadsheet's alone %>
-      <% unless thumbnail_view? %>
+    <% if thumbnail_view? %>
+      <%# Without ml-auto, justify-between leaves it at the left once it wraps %>
+      <% if ordered_by_text %>
+        <p class="tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+          <%= ordered_by_text %>
+          <%= render(UI::Tooltip::Component.new(text: translation(".ordered_by_tooltip"))) %>
+        </p>
+      <% end %>
+    <% else %>
+      <%# Columns and the export are the spreadsheet's alone %>
+      <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
         <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
-      <% end %>
 
-      <%# Only the search's own params describe an export of what's on the page %>
-      <% if @search_page && settings.render_export? %>
-        <div class="tw:hidden tw:sm:block">
-          <% if settings.export_disabled? %>
-            <%= render(UI::Tooltip::Component.new) do |tooltip| %>
-              <%# The checkbox it names reads the same way %>
-              <% tooltip.with_body { translation(".export_unavailable_search_all") } %>
+        <%# Only the search's own params describe an export of what's on the page %>
+        <% if @search_page && settings.render_export? %>
+          <div class="tw:hidden tw:sm:block">
+            <% if settings.export_disabled? %>
+              <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+                <%# The checkbox it names reads the same way %>
+                <% tooltip.with_body { translation(".export_unavailable_search_all") } %>
 
-              <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
-                color: :primary, size: :sm, disabled: true)) %>
+                <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
+                  color: :primary, size: :sm, disabled: true)) %>
+              <% end %>
+            <% else %>
+              <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
+                color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
             <% end %>
-          <% else %>
-            <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
-              color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
   <% unless thumbnail_view? %>

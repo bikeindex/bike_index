@@ -5828,6 +5828,10 @@ it:
             export_unavailable_search_all: È possibile esportare solo le registrazioni
               della propria organizzazione. Deselezionare "Cerca tutte le registrazioni"
               per esportare.
+            ordered_by_asc: Ordinato per %{column}, in ordine crescente
+            ordered_by_desc: Ordinato per %{column}, in ordine decrescente
+            ordered_by_tooltip: Passa alla visualizzazione tabella per modificare
+              l'ordinamento
           chart_card:
             caption_search: Ricerca attuale
             caption_year: Riepilogo dell'anno scorso

@@ -35,6 +35,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
   it "renders the card header, column panel, table and footer" do
     expect(component).to have_css("table")
+    expect(component).not_to have_text("Ordered by")
     expect(component).to have_css("tbody tr", count: 1)
     # the column panel ships collapsed, opened from the header button
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
@@ -51,7 +52,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "with result_view thumbnail" do
-    let(:sort_state) { ComponentStructs::SortState.new(search_params: {serial: "xyz"}) }
+    let(:sort_state) { ComponentStructs::SortState.new(search_params: {serial: "xyz"}, sort: "mnfg_name", direction: "asc") }
     let(:options) { super().merge(result_view: "thumbnail", sort_state:) }
 
     it "marks the chip active, carries the search into the other one's link, and renders cards" do
@@ -61,6 +62,17 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).to have_css("ul li", text: bike.mnfg_name)
       expect(component).not_to have_css("table")
       expect(component).not_to have_button("Column settings", visible: :all)
+      expect(component).to have_text("Ordered by Manufacturer, ascending")
+      expect(component).to have_css("button[aria-label='Switch to the table view to change ordering']", text: "?")
+    end
+
+    context "with csv_exports enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+      it "renders no export" do
+        expect(component).to have_css("ul li", text: bike.mnfg_name)
+        expect(component).not_to have_link("Export CSV", visible: :all)
+      end
     end
 
     context "with an unknown view" do

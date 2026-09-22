@@ -164,6 +164,14 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
+  describe "sort_column_label" do
+    it "labels a permitted sort by its column, and nothing else" do
+      expect(instance.sort_column_label("id")).to eq "Registered"
+      expect(instance.sort_column_label("serial_number")).to be_nil
+      expect(instance.sort_column_label(nil)).to be_nil
+    end
+  end
+
   describe "enabled_columns" do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
