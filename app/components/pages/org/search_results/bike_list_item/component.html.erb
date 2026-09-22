@@ -5,11 +5,11 @@
 
 <% cache(cache_key) do %>
   <%#
-    Narrow: photo and details, then the serial and the status each across the row.
+    Narrow: photo and details, then the serial and the status on one line under them.
     Wide: the serial under the details, the status in a column at the right
   %>
 
-  <li class="tw:relative tw:grid tw:grid-cols-[auto_1fr] tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-l-4 tw:border-gray-200 tw:bg-white tw:p-3 tw:transition tw:focus-within:z-10 tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:@xl:grid-cols-[auto_1fr_auto] tw:@xl:gap-x-4 tw:@xl:gap-y-1.5 tw:dark:border-gray-700 tw:dark:bg-gray-800 <%= row_border_class %>">
+  <li class="tw:relative tw:grid tw:grid-cols-[auto_1fr_auto] tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-l-4 tw:border-gray-200 tw:bg-white tw:p-3 tw:transition tw:focus-within:z-10 tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:@xl:gap-x-4 tw:@xl:gap-y-1.5 tw:dark:border-gray-700 tw:dark:bg-gray-800 <%= row_border_class %>">
     <div
       class="
         tw:h-16 tw:w-24 tw:rounded-lg tw:bg-gray-100 tw:@xl:row-span-2
@@ -23,7 +23,12 @@
       <% end %>
     </div>
 
-    <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5 tw:@xl:self-end">
+    <div
+      class="
+        tw:col-span-2 tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5
+        tw:@xl:col-span-1 tw:@xl:self-end
+      "
+    >
       <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
         <%= link_to bike_path_for_org, class: "tw:twtext-color tw:hover:underline", data: {turbo_frame: "_top"} do %>
           <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
@@ -68,7 +73,8 @@
     <div
       class="
         tw:relative tw:z-20 tw:col-span-2 tw:flex tw:flex-wrap
-        tw:items-center tw:gap-2 tw:@xl:col-span-1 tw:@xl:self-start
+        tw:items-center tw:gap-2 tw:self-baseline tw:@xl:col-span-1
+        tw:@xl:self-start
       "
     >
       <span
@@ -88,9 +94,9 @@
 
     <div
       class="
-        tw:col-span-2 tw:flex tw:items-center tw:justify-between tw:gap-2
-        tw:@xl:col-span-1 tw:@xl:col-start-3 tw:@xl:row-span-2
-        tw:@xl:row-start-1 tw:@xl:flex-col tw:@xl:items-end
+        tw:flex tw:items-baseline tw:justify-end tw:gap-2 tw:self-baseline
+        tw:@xl:col-start-3 tw:@xl:row-span-2 tw:@xl:row-start-1
+        tw:@xl:flex-col tw:@xl:items-end tw:@xl:self-center
       "
     >
       <span
