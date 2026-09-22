@@ -284,12 +284,14 @@ in under a second or two; sample from inside one `browser_evaluate` instead.
 
 ## No `gh` here
 
-The GitHub CLI isn't installed. Anything the `pr` skill (or any other) expresses as
-`gh pr …` goes through the GitHub MCP tools instead — `mcp__github__list_pull_requests`
-(filter with `head: "<owner>:<branch>"`), `create_pull_request`, `update_pull_request`,
-`pull_request_read`. Check for an existing PR before creating one: a push to a branch can
-open a PR by itself, so the branch may already have one whose body wants updating rather
-than a second PR.
+The GitHub CLI isn't installed. **This is a translation table for the `pr` skill's
+commands, not a way to skip it** — opening a PR still starts by invoking that skill,
+and a `PreToolUse` hook denies `create_pull_request` until you have. Anything it (or
+any other skill) expresses as `gh pr …` goes through the GitHub MCP tools instead —
+`mcp__github__list_pull_requests` (filter with `head: "<owner>:<branch>"`),
+`create_pull_request`, `update_pull_request`, `pull_request_read`. Check for an
+existing PR before creating one: a push to a branch can open a PR by itself, so the
+branch may already have one whose body wants updating rather than a second PR.
 
 `list_pull_requests` returns `merged: false` on PRs that are merged — the underlying list
 endpoint doesn't populate it. Pass `state: "open"` when you want live PRs; when you need a
