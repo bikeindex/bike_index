@@ -5734,6 +5734,7 @@ nl:
             stat_motorized: Registratie van elektrische voertuigen
             stat_registrations: Totaal aantal registraties
             stat_stolen: Gemeld als gestolen
+            previous_year: "%{number} vorig jaar"
           column_settings:
             acknowledgment_cell: Bevestiging van de registratieprocedure
             address: 'Adres:'
