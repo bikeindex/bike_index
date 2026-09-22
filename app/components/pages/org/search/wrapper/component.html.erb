@@ -32,7 +32,7 @@
         <% if settings.render_export? && settings.export_disabled? %>
           <%= render(UI::Tooltip::Component.new) do |tooltip| %>
             <%# The checkbox it names reads the same way %>
-            <% tooltip.with_body { translation(".export_unavailable", cycle_type: settings.cycle_type.pluralize(2)) } %>
+            <% tooltip.with_body { translation(".export_unavailable_search_all") } %>
 
             <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
               color: :primary, size: :sm, disabled: true)) %>
@@ -97,7 +97,7 @@
     <div class="tw:ml-auto">
       <%= select_tag :per_page_select,
           options_for_select(
-            [10, 25, 50, 100].map { |i| ["#{i} #{settings.cycle_type.pluralize(10)} per page", i] },
+            [10, 25, 50, 100].map { |i| ["#{i} registrations per page", i] },
             selected: @per_page
           ),
           class: "form-control tw:m-0! tw:w-auto!",
