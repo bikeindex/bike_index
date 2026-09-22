@@ -12,7 +12,7 @@ module Pages
           end
 
           def render?
-            frame_color_records.any?
+            @bike.frame_color_records.any?
           end
 
           def call
@@ -23,18 +23,14 @@ module Pages
 
           private
 
-          def frame_color_records
-            [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
-          end
-
           def label
-            translation(".primary_color", count: frame_color_records.count)
+            translation(".primary_color", count: @bike.frame_color_records.count)
           end
 
           # A non-breaking space keeps the swatch with the first word; the rest of a
           # long color name wraps, and the " and " between colors still breaks.
           def color_swatches
-            frame_color_records.map do |color|
+            @bike.frame_color_records.map do |color|
               swatch = render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm, align: :baseline))
               safe_join([swatch, "\u00a0", color.name])
             end

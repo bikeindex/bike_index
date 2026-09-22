@@ -74,11 +74,11 @@ module BikeAttributable
   end
 
   def frame_colors
-    [
-      primary_frame_color&.name,
-      secondary_frame_color&.name,
-      tertiary_frame_color&.name
-    ].compact
+    frame_color_records.map(&:name)
+  end
+
+  def frame_color_records
+    [primary_frame_color, secondary_frame_color, tertiary_frame_color].compact
   end
 
   # When displaying the cycle_type, generally this is what you want

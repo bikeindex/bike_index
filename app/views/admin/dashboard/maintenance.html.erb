@@ -20,7 +20,7 @@
   <% end %>
 
   <% table.column(label: "Bike") do |bike| %>
-    <%= render Pages::Admin::Bikes::Cell::Component.new(bike:) %>
+    <%= render Atoms::Admin::TableCells::Bike::Component.new(bike:) %>
   <% end %>
 <% end %>
 
