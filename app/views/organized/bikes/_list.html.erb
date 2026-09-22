@@ -44,7 +44,6 @@
     <% first_owner_email = bike.first_owner_email %>
     <%= claimed_ownerships ? bike.owner_email : first_owner_email %>
 
-    <%# Muted by color, not .less-strong - its opacity would carry into the tooltip %>
     <small class="tw:text-gray-400">
       <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
 
