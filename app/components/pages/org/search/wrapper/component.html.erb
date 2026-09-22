@@ -36,30 +36,30 @@
       <% end %>
     </div>
 
-    <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-      <%# Columns and the export are the spreadsheet's alone %>
-      <% unless thumbnail_view? %>
+    <%# Columns and the export are the spreadsheet's alone %>
+    <% unless thumbnail_view? %>
+      <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
         <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
-      <% end %>
 
-      <%# Only the search's own params describe an export of what's on the page %>
-      <% if @search_page && !thumbnail_view? && settings.render_export? %>
-        <div class="tw:hidden tw:sm:block">
-          <% if settings.export_disabled? %>
-            <%= render(UI::Tooltip::Component.new) do |tooltip| %>
-              <%# The checkbox it names reads the same way %>
-              <% tooltip.with_body { translation(".export_unavailable_search_all") } %>
+        <%# Only the search's own params describe an export of what's on the page %>
+        <% if @search_page && settings.render_export? %>
+          <div class="tw:hidden tw:sm:block">
+            <% if settings.export_disabled? %>
+              <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+                <%# The checkbox it names reads the same way %>
+                <% tooltip.with_body { translation(".export_unavailable_search_all") } %>
 
-              <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
-                color: :primary, size: :sm, disabled: true)) %>
+                <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: nil,
+                  color: :primary, size: :sm, disabled: true)) %>
+              <% end %>
+            <% else %>
+              <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
+                color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
             <% end %>
-          <% else %>
-            <%= render(UI::ButtonLink::Component.new(text: translation(".export_csv"), href: export_path,
-              color: :primary, size: :sm, data: {turbo_frame: "_top"})) %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
   <% unless thumbnail_view? %>
