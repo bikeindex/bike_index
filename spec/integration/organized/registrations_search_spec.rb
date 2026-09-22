@@ -196,9 +196,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Go back
     page.go_back
     expect(page).to have_css("tbody tr", count: 10, wait: 10)
-    # go_back re-renders the results frame, and while it's busy the wrapper grows
-    # a min-height -- the table lands over the link and swallows the click. The
-    # click then waits out a full page navigation, which also outruns the 2s default.
+    # go_back re-renders the results frame, and the click has to wait out a full page
+    # navigation, which outruns the 2s default.
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
     using_wait_time(10) { click_link "Export CSV" }
 

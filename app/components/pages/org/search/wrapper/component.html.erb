@@ -81,18 +81,14 @@
     </p>
   <% end %>
 
-  <%#
-    Inside the results frame this is what a search in flight swaps for the spinner, so
-    the card around it - header, view switcher, pagination - stays put while it loads
-  %>
+  <% if @search_page %>
+    <div class="search-results-loading">
+      <%= render(UI::LoadingSpinner::Component.new(text: translation(".loading_results"))) %>
+    </div>
+  <% end %>
 
-  <%= tag.div(class: results_body_class) do %>
-    <% if @search_page %>
-      <div class="search-results-loading">
-        <%= render(UI::LoadingSpinner::Component.new(text: translation(".loading_results"))) %>
-      </div>
-    <% end %>
-
+  <%# Hidden for the spinner above while the results frame is busy %>
+  <%= tag.div(class: ("search-results-body" if @search_page)) do %>
     <% if result_component %>
       <ul class="tw:m-0 tw:list-none tw:py-4 <%= result_component::LIST_CLASSES %> <%= padding_x_class %>">
         <% @bikes.each do |bike| %>
