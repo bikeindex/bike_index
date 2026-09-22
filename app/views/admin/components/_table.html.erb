@@ -47,7 +47,7 @@
 
   <% table.column(sortable: "bike_id") do |component| %>
     <% if component.bike_id.present? %>
-      <%= render Pages::Admin::Bikes::Cell::Component.new(bike: component.bike, bike_id: component.bike_id) %>
+      <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: component.bike, bike_id: component.bike_id) %>
     <% end %>
   <% end %>
 <% end %>

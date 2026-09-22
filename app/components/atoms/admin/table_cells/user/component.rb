@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Pages
+module Atoms
   module Admin
-    module Users
-      module Cell
+    module TableCells
+      module User
         class Component < ApplicationComponent
           # Template Dependency: UI::Alerts::Base::Component
           def initialize(
@@ -16,7 +16,7 @@ module Pages
             render_search: false
           )
             @user_id = user_id || user&.id
-            @user = user || (User.unscoped.find_by(id: @user_id) if @user_id.present?)
+            @user = user || (::User.unscoped.find_by(id: @user_id) if @user_id.present?)
             @email = email || @user&.email
             @search_url = search_url
             @sort_state = sort_state
