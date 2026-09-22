@@ -94,7 +94,7 @@ VCR.configure do |config|
   %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
     MAXMIND_KEY R2_TEST_ACCESS_KEY R2_TEST_ACCESS_KEY_SECRET R2_TEST_ENDPOINT SENDGRID_EMAIL_VALIDATION_KEY
     LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN CLOUDFLARE_TURNSTILE_SECRET_KEY
-    STRAVA_TEST_REFRESH_TOKEN].each do |key|
+    STRAVA_TEST_REFRESH_TOKEN BIKEFLIGHTS_EMAIL BIKEFLIGHTS_PASSWORD].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
   end
 
@@ -106,6 +106,12 @@ VCR.configure do |config|
     i.response.headers.delete("Set-Cookie")
     i.request.headers.delete("Authorization")
     i.request.headers.delete("X-Stripe-Client-User-Agent")
+    # BikeFlights login sends credentials in the body, json-escaped, and returns its token in the
+    # body - neither is a header, and the token isn't known until the response arrives
+    if i.request.uri.end_with?("/api/Authentication/login")
+      i.request.body = i.request.body.gsub(/"(email|password)":"(?:[^"\\]|\\.)*"/) { %("#{$1}":"<BIKEFLIGHTS_#{$1.upcase}>") }
+      i.response.body = i.response.body.gsub(/"token":"[^"]*"/, '"token":"<BIKEFLIGHTS_TOKEN>"')
+    end
   end
 end
 

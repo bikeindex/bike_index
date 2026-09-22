@@ -1,0 +1,39 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://sandbox.bikeflights.com/api/Authentication/login
+    body:
+      encoding: UTF-8
+      string: '{"email":"<BIKEFLIGHTS_EMAIL>","password":"<BIKEFLIGHTS_PASSWORD>"}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Server:
+      - nginx/1.18.0 (Ubuntu)
+      Date:
+      - Tue, 22 Sep 2026 21:28:46 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=2592000
+    body:
+      encoding: UTF-8
+      string: '{"TypeName":"System.Exception","Message":"Unable to login","StackTrace":null}'
+  recorded_at: Tue, 22 Sep 2026 21:28:46 GMT
+recorded_with: VCR 6.4.0
