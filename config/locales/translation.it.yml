@@ -4919,12 +4919,10 @@ it:
         search_impound_records: Consultare i registri dei sequestri
     registrations:
       search:
-        find_a_registration_html: Trova un %{cycle_type}
         search_all_email_disabled: È possibile cercare le registrazioni della propria
           organizzazione solo tramite l'indirizzo email o il nome del proprietario.
-        search_all_html: Cerca tutti i %{cycle_type} <span class="less-strong">(non
-          solo %{org_name})</span>
         search_registrations: Cerca registrazioni
+        find_a_registration: Trova una registrazione
   organized_mailer:
     custom_message:
       subject: "%{org_name} - la posizione del tuo %{mnfg_name}"
@@ -5818,9 +5816,6 @@ it:
             e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
             view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
             export_csv: Esporta in formato CSV
-            export_unavailable: È possibile esportare solo le registrazioni della
-              propria organizzazione. Deselezionare "Cerca tutto %{cycle_type}" per
-              esportare.
             matching_html:
               one: "%{number} corrispondenza"
               other: "%{number} corrispondenze"
@@ -5830,6 +5825,9 @@ it:
             view_as: Visualizza come
             view_spreadsheet: Foglio di calcolo
             view_thumbnail: Miniatura
+            export_unavailable_search_all: È possibile esportare solo le registrazioni
+              della propria organizzazione. Deselezionare "Cerca tutte le registrazioni"
+              per esportare.
           chart_card:
             caption_search: Ricerca attuale
             caption_year: Riepilogo dell'anno scorso
@@ -5848,7 +5846,6 @@ it:
             address: 'Indirizzo:'
             all: Tutti
             avery_cell: Avery Esportabile
-            bike: registrazione
             color_cell: Colore
             created_at_cell: Registrato
             creation_description_cell: Fonte
@@ -5869,15 +5866,12 @@ it:
             manufacturer_cell: Produttore
             model_cell: Modello
             none: nessuno
-            notes_cell: Note
             owner_email_cell: Inviato a
             owner_name_cell: Nome del proprietario
             propulsion_type_cell: Veicolo elettrico (propulsione)
             reg_address_cell: Indirizzo
             reg_extra_registration_number_cell: Secondario#
-            reg_organization_affiliation_cell: Affiliazione
             reg_phone_cell: Telefono
-            reg_student_id_cell: Tessera studentesca
             serial_number_cell: Seriale
             show_notes_search: mostra le note cerca
             status: 'Stato:'
@@ -5888,14 +5882,19 @@ it:
             unregistered: 'Non registrato:'
             updated_at_cell: Fatto
             url_cell: URL
-            vehicle: registrazione
             visible_columns: Colonne visibili
+            notes_cell_html: Note di registrazione <em>di %{org_name}</em>
+            reg_organization_affiliation_cell_html: Affiliazione <em>in %{org_name}</em>
+            reg_student_id_cell_html: Numero di matricola dello studente <em>%{org_name}</em>
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
             date_range: 'Intervallo di date:'
             search_settings: Impostazioni di ricerca
             search_settings_and_filters: Impostazioni e filtri di ricerca
+          search_all:
+            search_all_html: Cerca tutte le registrazioni <span class="twless-strong">(non
+              solo %{org_name})</span>
         search_results:
           bikes_table:
             assign_bike_sticker: Collegamento

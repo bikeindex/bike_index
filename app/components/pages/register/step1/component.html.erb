@@ -59,7 +59,7 @@
       <%= render UI::Forms::Checkbox::Component.new(name: :propulsion_type_motorized, value: true,
           checked: @b_param.motorized?, label: translation(".electric_motorized"), class_name: "tw:mt-3",
           data: {"register--propulsion-target": "motorizedWrapper"},
-          input_data: {"register--propulsion-target": "motorized", action: "change->register--propulsion#update"}) %>
+          html_options: {data: {"register--propulsion-target": "motorized", action: "change->register--propulsion#update"}}) %>
 
       <p class="tw:mt-1.5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
         <%= translation(".electric_helper") %>

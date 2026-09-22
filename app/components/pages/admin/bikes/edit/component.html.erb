@@ -31,13 +31,13 @@
     <div class="tw:self-center">
       <%= render(UI::Forms::Checkbox::Component.new(name: :has_no_serial, label: "Unknown serial",
             checked: @bike.serial_unknown?, class_name: "tw:mb-1",
-            input_data: {"admin--bike-edit-form-target": "noSerial", serial: "unknown",
-                         action: "change->admin--bike-edit-form#serialChanged"})) %>
+            html_options: {data: {"admin--bike-edit-form-target": "noSerial", serial: "unknown",
+                         action: "change->admin--bike-edit-form#serialChanged"}})) %>
 
       <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :made_without_serial,
             label: Bike.human_attribute_name(:made_without_serial),
-            input_data: {"admin--bike-edit-form-target": "noSerial", serial: "made_without_serial",
-                         action: "change->admin--bike-edit-form#serialChanged"})) %>
+            html_options: {data: {"admin--bike-edit-form-target": "noSerial", serial: "made_without_serial",
+                         action: "change->admin--bike-edit-form#serialChanged"}})) %>
     </div>
   </div>
 
@@ -168,8 +168,8 @@
             <%# no longer an attribute on bikes (PR#1875) - unchecking it expands the recovery fields, and filling those in is what recovers the bike %>
             <div class="tw:self-center">
               <%= render(UI::Forms::Checkbox::Component.new(name: :stolen, label: "Bike is stolen", checked: true,
-                    input_data: {"admin--bike-edit-form-target": "stolen",
-                                 action: "change->admin--bike-edit-form#stolenChanged"})) %>
+                    html_options: {data: {"admin--bike-edit-form-target": "stolen",
+                                 action: "change->admin--bike-edit-form#stolenChanged"}})) %>
             </div>
           </div>
         </div>
