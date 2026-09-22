@@ -3,11 +3,26 @@
 <% organization = @organization %>
 <% current_user = @current_user %>
 
-<%= tag.div(data: table_wrapper_data_attributes) do %>
-  <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-#{self.class.cache_digest}", render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+<%= tag.div(class: WRAPPER_CLASSES, data: table_wrapper_data_attributes) do %>
+  <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-#{self.class.cache_digest}", render_sortable: @render_sortable, sort_state: @sort_state, classes: TABLE_CLASSES, unbordered: true)) do |table| %>
     <%# Called per cell rather than captured: each tooltip mints its own id %>
     <% hidden_html = method(:hidden_not_registered_tag) %>
     <% email_hidden = translation(".email_hidden") %>
+    <% view_label = translation(".view") %>
+
+    <% table.column(label: settings.column_renames[:view_cell], classes: VIEW_COLUMN_CLASSES) do |bike| %>
+      <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
+    <% end %>
+
+    <% table.column(label: settings.column_renames[:photo_cell], classes: "hideableColumn photo_cell") do |bike| %>
+      <% thumb_url = BikeServices::Displayer.thumb_image_url(bike) %>
+
+      <% if thumb_url.present? %>
+        <%= image_tag(thumb_url, alt: "", loading: "lazy", skip_pipeline: true, class: "#{THUMB_CLASSES} tw:object-cover") %>
+      <% else %>
+        <span class="tw:bg-gray-100 tw:dark:bg-gray-800 <%= THUMB_CLASSES %>"></span>
+      <% end %>
+    <% end %>
 
     <% table.column(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>
       <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
@@ -17,33 +32,75 @@
 
     <% table.column(sortable: "id", label: settings.column_renames[:created_at_cell], classes: "hideableColumn created_at_cell") do |bike| %>
       <a
-        class="twlink localizeTime"
+        class="twlink tw:font-bold tw:whitespace-nowrap"
         href="<%= bike_path(bike, organization_id: organization.to_param) %>"
         data-turbo-frame="_top"
-        aria-label="View bike"
       >
-        <%= l bike.created_at, format: :convert_time %>
+        <%= render(UI::Time::Component.new(time: bike.created_at)) %>
       </a>
     <% end %>
 
     <% table.column(sortable: "updated_by_user_at", label: settings.column_renames[:updated_at_cell], classes: "hideableColumn updated_at_cell") do |bike| %>
-      <small class="localizeTime">
-        <%= l bike.updated_by_user_fallback, format: :convert_time %>
+      <small>
+        <%= render(UI::Time::Component.new(time: bike.updated_by_user_fallback)) %>
       </small>
     <% end %>
 
-    <% table.column(label: settings.column_renames[:stolen_cell], classes: "hideableColumn stolen_cell") do |bike| %>
-      <%= check_mark if bike.status_stolen? %>
+    <% if organization.enabled?("registration_sequences") %>
+      <% table.column(sortable: "acknowledged_at", label: tag.span(translation(".acknowledgment"), title: translation(".acknowledgment_title")), classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
+        <% if bike.motorized? %>
+          <% if bike.organized?(organization) %>
+            <small>
+              <%= render(UI::Time::Component.new(time: RegistrationSequenceAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>
+            </small>
+          <% else %>
+            <%= hidden_html.call %>
+          <% end %>
+        <% end %>
+      <% end %>
     <% end %>
 
-    <% table.column(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
-      <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
+    <% table.column(label: settings.column_renames[:status_cell], classes: "hideableColumn status_cell tw:text-xs") do |bike| %>
+      <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
     <% end %>
 
-    <% table.column(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
-      <span class="<%= 'tw:text-gray-400' if bike.propulsion_type == 'foot-pedal' %>">
-        <%= bike.propulsion_titleize %>
+    <% table.column(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell",
+      header_tooltip: translation(".occurred_at_tooltip")) do |bike| %>
+      <%= render(UI::Time::Component.new(time: bike.occurred_at)) %>
+    <% end %>
+
+    <% table.column(sortable: "mnfg_name", label: settings.column_renames[:manufacturer_cell], classes: "hideableColumn manufacturer_cell") do |bike| %>
+      <strong class="tw:text-gray-900 tw:dark:text-gray-100"><%= bike.mnfg_name %></strong>
+    <% end %>
+
+    <% table.column(sortable: "frame_model", label: settings.column_renames[:model_cell], classes: "hideableColumn model_cell") do |bike| %>
+      <%= bike.frame_model %>
+    <% end %>
+
+    <% table.column(label: settings.column_renames[:color_cell], classes: "hideableColumn color_cell") do |bike| %>
+      <span class="tw:whitespace-nowrap tw:text-gray-500 tw:dark:text-gray-400">
+        <% bike.frame_color_records.each do |color| %>
+          <span class="tw:mr-2 tw:inline-flex tw:items-center tw:gap-1.5">
+            <%= render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm)) %>
+            <%= color.name %>
+          </span>
+        <% end %>
       </span>
+    <% end %>
+
+    <%# Called where REG_FIELDS_AFTER places each of the organization's fields %>
+    <% reg_field_column = lambda do |reg_field| %>
+      <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
+        <% if !bike.organized?(organization) %>
+          <%= hidden_html.call %>
+        <% elsif reg_field != "reg_address" %>
+          <%= OrgServices::RegistrationFields.value(bike:, organization:, reg_field:) %>
+        <% else %>
+          <small>
+            <%= render UI::AddressDisplay::Component.new(address_record: bike.mailing_address_record, visible_attribute: :street) %>
+          </small>
+        <% end %>
+      <% end %>
     <% end %>
 
     <% table.column(sortable: "cycle_type", label: settings.column_renames[:cycle_type_cell], classes: "hideableColumn cycle_type_cell") do |bike| %>
@@ -52,16 +109,22 @@
       </span>
     <% end %>
 
-    <% table.column(sortable: "mnfg_name", label: settings.column_renames[:manufacturer_cell], classes: "hideableColumn manufacturer_cell") do |bike| %>
-      <%= bike.mnfg_name %>
+    <% table.column(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
+      <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
     <% end %>
 
-    <% table.column(sortable: "frame_model", label: settings.column_renames[:model_cell], classes: "hideableColumn model_cell") do |bike| %>
-      <%= bike.frame_model %>
+    <% table.column(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
+      <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
     <% end %>
 
-    <% table.column(label: settings.column_renames[:color_cell], classes: "hideableColumn color_cell") do |bike| %>
-      <span class="tw:text-gray-400"><%= bike.frame_colors.join(", ") %></span>
+    <% reg_fields_after(:serial_number).each(&reg_field_column) %>
+
+    <% table.column(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
+      <% if bike.creation_kind %>
+        <small class="tw:text-gray-400">
+          <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
+        </small>
+      <% end %>
     <% end %>
 
     <% table.column(sortable: "owner_email", label: settings.column_renames[:owner_email_cell], classes: "hideableColumn owner_email_cell tw:leading-none") do |bike| %>
@@ -77,14 +140,6 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
-      <% if bike.creation_kind %>
-        <small class="tw:text-gray-400">
-          <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
-        </small>
-      <% end %>
-    <% end %>
-
     <% table.column(label: settings.column_renames[:owner_name_cell], classes: "hideableColumn owner_name_cell tw:leading-none") do |bike| %>
       <% if bike.organized?(organization) %>
         <% if bike.owner_name.present? %>
@@ -95,31 +150,9 @@
       <% end %>
     <% end %>
 
-    <% table.column(label: settings.column_renames[:status_cell], classes: "hideableColumn status_cell tw:text-xs") do |bike| %>
-      <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
-    <% end %>
+    <% reg_fields_after(:owner_name).each(&reg_field_column) %>
 
-    <% if organization.enabled?("registration_notes") %>
-      <% table.column(label: settings.column_renames[:notes_cell], classes: "hideableColumn notes_cell tw:leading-none") do |bike| %>
-        <small>
-          <%= BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: organization.id)&.body %>
-        </small>
-      <% end %>
-    <% end %>
-
-    <% settings.additional_registration_fields.each do |reg_field| %>
-      <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
-        <% if !bike.organized?(organization) %>
-          <%= hidden_html.call %>
-        <% elsif reg_field != "reg_address" %>
-          <%= OrgServices::RegistrationFields.value(bike:, organization:, reg_field:) %>
-        <% else %>
-          <small>
-            <%= render UI::AddressDisplay::Component.new(address_record: bike.mailing_address_record, visible_attribute: :street) %>
-          </small>
-        <% end %>
-      <% end %>
-    <% end %>
+    <% reg_fields_after(:rest).each(&reg_field_column) %>
 
     <% if organization.enabled?("impound_bikes") %>
       <% table.column(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
@@ -134,8 +167,8 @@
       <% table.column(label: settings.column_renames[:impounded_cell], classes: "hideableColumn impounded_cell tw:leading-none") do |bike| %>
         <% if bike.organized?(organization) %>
           <% if bike.status_impounded? && bike.current_impound_record&.created_at&.present? %>
-            <small class="localizeTime">
-              <%= l bike.current_impound_record.created_at, format: :convert_time %>
+            <small>
+              <%= render(UI::Time::Component.new(time: bike.current_impound_record.created_at)) %>
             </small>
           <% end %>
         <% else %>
@@ -147,20 +180,6 @@
     <% if organization.enabled?("avery_export") %>
       <% table.column(label: settings.column_renames[:avery_cell], classes: "hideableColumn avery_cell") do |bike| %>
         <% check_mark if bike.organized?(organization) && bike.avery_exportable? %>
-      <% end %>
-    <% end %>
-
-    <% if organization.enabled?("registration_sequences") %>
-      <% table.column(sortable: "acknowledged_at", label: settings.column_renames[:acknowledgment_cell], classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
-        <% if bike.motorized? %>
-          <% if bike.organized?(organization) %>
-            <small>
-              <%= render(UI::Time::Component.new(time: RegistrationSequenceAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>
-            </small>
-          <% else %>
-            <%= hidden_html.call %>
-          <% end %>
-        <% end %>
       <% end %>
     <% end %>
 
@@ -181,6 +200,14 @@
           <a data-bike-id="<%= bike.id %>">
             <%= t("components.pages.org.search_results.bikes_table.link_sticker") %>
           </a>
+        </small>
+      <% end %>
+    <% end %>
+
+    <% if organization.enabled?("registration_notes") %>
+      <% table.column(label: settings.column_renames[:notes_cell], classes: "hideableColumn notes_cell tw:leading-none") do |bike| %>
+        <small>
+          <%= BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: organization.id)&.body %>
         </small>
       <% end %>
     <% end %>

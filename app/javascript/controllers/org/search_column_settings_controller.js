@@ -46,6 +46,11 @@ export default class extends Controller {
     this.updateVisibleColumns()
   }
 
+  // An always-visible column's checkbox is disabled, and stays checked through all/none/default
+  get toggleableCheckboxes () {
+    return this.checkboxesTarget.querySelectorAll('input[type=checkbox]:not(:disabled)')
+  }
+
   selectAll () {
     this.setAllCheckboxes(true)
   }
@@ -56,14 +61,14 @@ export default class extends Controller {
 
   selectDefault () {
     const defaults = this.defaultColumnsValue
-    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    this.toggleableCheckboxes.forEach(cb => {
       cb.checked = defaults.includes(cb.name)
     })
     this.updateVisibleColumns()
   }
 
   setAllCheckboxes (checked) {
-    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    this.toggleableCheckboxes.forEach(cb => {
       cb.checked = checked
     })
     this.updateVisibleColumns()
@@ -76,7 +81,7 @@ export default class extends Controller {
       try { columns = JSON.parse(stored) } catch { localStorage.removeItem('orgRegistrationColumns') }
     }
 
-    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    this.toggleableCheckboxes.forEach(cb => {
       cb.checked = columns.includes(cb.name)
     })
     this.updateVisibleColumns()
@@ -84,7 +89,7 @@ export default class extends Controller {
 
   updateVisibleColumns () {
     const checked = []
-    this.checkboxesTarget.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    this.toggleableCheckboxes.forEach(cb => {
       if (cb.checked) checked.push(cb.name)
     })
     localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))

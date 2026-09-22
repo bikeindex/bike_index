@@ -95,7 +95,7 @@
       The table bleeds a gutter past each side; clipping it here rather than on the card
       leaves the header's tooltips free to open over the card's edge
     %>
-    <div class="tw:overflow-hidden">
+    <div class="<%= table_clip_classes %>">
       <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
         organization: @organization,
         bikes: @bikes,

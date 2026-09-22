@@ -21,9 +21,26 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component).to have_text(bike.mnfg_name)
   end
 
+  it "leads with a frozen view link to the bike, then its photo" do
+    expect(component).to have_css("tbody td:first-child a[href='/bikes/#{bike.id}?organization_id=#{organization.to_param}']", text: "View")
+    expect(component.css("th").first["class"]).to include("tw:sticky")
+    expect(component).to have_css("th:nth-child(2).photo_cell", text: "Photo")
+    expect(component).to have_css("tbody td.color_cell", text: bike.primary_frame_color.name)
+  end
+
+  context "with a pedal bike and an e-bike" do
+    let(:e_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
+    let(:bikes) { [bike, e_bike] }
+
+    it "leaves pedal blank in the e-vehicle column" do
+      expect(bike.propulsion_type).to eq "foot-pedal"
+      expect(component.css("td.propulsion_type_cell").map { |td| td.text.strip }).to eq ["", e_bike.propulsion_titleize]
+    end
+  end
+
   it "renders plain headers when not sortable" do
     expect(component).to have_css("th", text: "Registered")
-    expect(component).not_to have_css("th a.twlink")
+    expect(component).not_to have_css("th a")
   end
 
   context "with a hidden-serial bike and an authorized org member" do
@@ -58,11 +75,20 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     # only ever reveals a column whose cell class matches a checked one
     let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
 
-    it "heads one column per settings checkbox, and no others" do
-      headers = component.css("th.hideableColumn")
-        .map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
+    let(:header_cells) do
+      component.css("th.hideableColumn").map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
+    end
 
-      expect(headers).to match_array(settings.enabled_columns)
+    it "heads one column per settings checkbox, and no others" do
+      expect(header_cells).to match_array(settings.enabled_columns)
+    end
+
+    it "places the organization's registration fields beside the columns they relate to" do
+      expect(header_cells.each_cons(2)).to include(%w[owner_name_cell reg_phone_cell],
+        %w[reg_phone_cell reg_student_id_cell], %w[reg_student_id_cell reg_organization_affiliation_cell],
+        %w[serial_number_cell reg_extra_registration_number_cell])
+      # Placed nowhere, so after the columns every organization has
+      expect(header_cells.index("reg_address_cell")).to be > header_cells.index("propulsion_type_cell")
     end
 
     it "heads the columns with the shared labels" do
@@ -92,7 +118,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike:) }
 
     it "renders when each bike was acknowledged" do
-      expect(component).to have_css("th.acknowledgment_cell", visible: :all, normalize_ws: true, exact_text: "Registration sequence acknowledgment")
+      expect(component).to have_css("th.acknowledgment_cell span[title='Registration sequence acknowledgment at']",
+        visible: :all, normalize_ws: true, exact_text: "Reg acknowledgment")
       expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
     end
 

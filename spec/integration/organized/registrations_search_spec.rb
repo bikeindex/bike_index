@@ -64,7 +64,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   def rendered_bike_ids
-    page.all("tbody tr a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
+    page.all("tbody tr td:first-child a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
   end
 
   it "searches by email and serial" do
@@ -184,7 +184,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
 
     # clicking a bike navigates to the bike show page with organized panel
-    first("a[aria-label='View bike']").click
+    click_link "View", match: :first
 
     expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
 
@@ -421,13 +421,21 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       # Default columns are visible
       expect(page).to have_css("th.manufacturer_cell", visible: :visible)
       expect(page).to have_css("th.owner_email_cell", visible: :visible)
-      expect(page).to have_css("th.stolen_cell", visible: :visible)
+      expect(page).to have_css("th.status_cell", visible: :visible)
       # Non-default columns are hidden
       expect(page).to have_css("th.serial_number_cell", visible: :hidden)
+      expect(page).to have_css("th.occurred_at_cell", visible: :hidden)
       expect(page).to have_css("th.url_cell", visible: :hidden)
       expect(page).to have_css("th.impounded_cell", visible: :hidden)
-      # Uncheck a default column — it hides
+      # "none" hides every column but View, which can't be unchecked
       open_columns_if_not
+      within(panel_for("orgRegistrationColumnsOpen")) { click_button "none" }
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
+      expect(page).to have_field("view_cell", checked: true, disabled: true)
+      expect(page).to have_link("View", minimum: 1)
+      within(panel_for("orgRegistrationColumnsOpen")) { click_button "default" }
+      expect(page).to have_css("th.manufacturer_cell", visible: :visible)
+      # Uncheck a default column — it hides
       uncheck "manufacturer_cell"
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
       expect(page).to have_css("td.manufacturer_cell", visible: :hidden, minimum: 1)

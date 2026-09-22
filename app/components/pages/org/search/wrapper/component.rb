@@ -10,6 +10,10 @@ module Pages
         # thumbnail view swaps the columns for cards, and the card renders inside the results
         # turbo-frame, so every search brings it back whole.
         class Component < ApplicationComponent
+          # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
+          # .container-fluid padding to the page's edges
+          TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:-mx-[15px]"
+
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[spreadsheet thumbnail].freeze
 
@@ -97,6 +101,10 @@ module Pages
           def card_classes
             ["org-search-component tw:rounded-xl", UI::Card::Component::BASE_CLASSES,
               @search_page ? "tw:twfullbleed" : "tw:mt-4"].join(" ")
+          end
+
+          def table_clip_classes
+            ["tw:overflow-hidden", (TABLE_BLEED_CLASSES if @search_page)].compact.join(" ")
           end
 
           # Full bleed drops the card's gutter, so the header and cards meet the chart's edge
