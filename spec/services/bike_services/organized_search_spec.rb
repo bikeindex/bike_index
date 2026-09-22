@@ -46,6 +46,8 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true)).to eq(Bike.all)
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
           search_status: "impounded").pluck(:id)).to match_array([bike_nyc.id, stolen_nyc.id])
+        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
+          search_status: "stolen_or_impounded").pluck(:id)).to match_array([bike_nyc.id, stolen_nyc.id])
       end
     end
 

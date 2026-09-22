@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 // BikeServices::OrganizedSearch::LOCATIONABLE_STATUSES
-const LOCATIONABLE_STATUSES = ['stolen', 'impounded']
+const LOCATIONABLE_STATUSES = ['stolen', 'impounded', 'stolen_or_impounded']
 
 // Connects to data-controller='org--search'
 export default class extends Controller {

@@ -28,7 +28,7 @@ module BikeServices
 
     # A stolen or impounded bike is where it was taken or impounded; any other is at its
     # registration address - which only an organization's own, address-collecting search can reach
-    LOCATIONABLE_STATUSES = %w[stolen impounded].freeze
+    LOCATIONABLE_STATUSES = %w[stolen impounded stolen_or_impounded].freeze
 
     def location_searchable?(organization:, search_all:, search_status:)
       LOCATIONABLE_STATUSES.include?(search_status) || (!search_all && organization.enabled?("reg_address"))
