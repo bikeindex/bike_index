@@ -1,7 +1,7 @@
 <ul class="tw:flex tw:flex-col tw:items-start tw:gap-3">
-  <% bikes.each_with_index do |bike, index| %>
+  <% badges.each do |badge| %>
     <li>
-      <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, time: times[index])) %>
+      <%= render(Atoms::RegistrationStatusBadge::Component.new(**badge)) %>
     </li>
   <% end %>
 </ul>
