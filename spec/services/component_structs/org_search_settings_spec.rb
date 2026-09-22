@@ -114,7 +114,17 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     it "lists the always-visible view column with the toggleable ones, in label order" do
       expect(instance.panel_columns).to include("view_cell")
       expect(instance.enabled_columns).not_to include("view_cell")
-      expect(instance.panel_columns).to eq(instance.panel_columns.sort_by { |cell| instance.column_renames[cell.to_sym] })
+      expect(instance.panel_columns).to eq(instance.panel_columns.sort_by { |cell| instance.panel_labels[cell.to_sym] })
+    end
+  end
+
+  describe "panel_labels" do
+    it "prefixes the time columns, leaving the table headers short" do
+      expect(instance.panel_labels[:created_at_cell]).to eq "Time - registered"
+      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - updated"
+      expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Registration sequence acknowledged"
+      expect(instance.column_renames[:created_at_cell]).to eq "Registered"
+      expect(instance.panel_labels[:color_cell]).to eq "Color"
     end
   end
 

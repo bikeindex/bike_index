@@ -32,12 +32,15 @@ module ComponentStructs
       impound_id_cell
       impounded_cell
       avery_cell
-      acknowledgment_cell
       cycle_type_cell
       propulsion_type_cell
       status_cell
       url_cell
     ].freeze
+
+    # The panel groups the time columns under "Time - "; the table headers keep the short names
+    PANEL_LABEL_KEYS = {created_at_cell: :created_at_panel_label, updated_at_cell: :updated_at_panel_label,
+                        acknowledgment_cell: :acknowledgment_panel_label}.freeze
 
     # Their labels name the organization, italicized with its preposition
     ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
@@ -141,6 +144,10 @@ module ComponentStructs
       }
     end
 
+    def panel_labels
+      @panel_labels ||= column_renames.merge(PANEL_LABEL_KEYS.transform_values { translation(it) })
+    end
+
     def enabled_columns
       @enabled_columns ||= [
         *initially_checked_columns,
@@ -150,13 +157,13 @@ module ComponentStructs
         *(%w[impound_id_cell impounded_cell] if @organization.enabled?("impound_bikes")),
         ("avery_cell" if @organization.enabled?("avery_export")),
         ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
-      ].compact.uniq.sort_by { |cell| column_renames[cell.to_sym] }
+      ].compact.uniq.sort_by { |cell| panel_labels[cell.to_sym] }
     end
 
     def always_visible?(cell_name) = ALWAYS_VISIBLE_COLUMNS.include?(cell_name)
 
     def panel_columns
-      @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| column_renames[cell.to_sym] }
+      @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| panel_labels[cell.to_sym] }
     end
 
     def additional_registration_fields

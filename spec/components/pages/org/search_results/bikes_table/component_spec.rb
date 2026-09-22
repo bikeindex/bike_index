@@ -119,7 +119,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
     it "renders when each bike was acknowledged" do
       expect(component).to have_css("th.acknowledgment_cell span[title='Registration sequence acknowledgment at']",
-        visible: :all, normalize_ws: true, exact_text: "Reg acknowledgment")
+        visible: :all, normalize_ws: true, exact_text: "Reg acknowledged")
       expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
     end
 
