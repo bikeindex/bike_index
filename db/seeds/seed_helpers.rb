@@ -5,12 +5,12 @@ module SeedHelpers
   extend Functionable
   extend ActiveSupport::Testing::TimeHelpers
 
-  # Seeded records are timestamped across the last hour, rather than all at once:
-  # the clock starts an hour ago and each tick moves it forward, stopping at now.
+  # Seeded records are timestamped across the last week, rather than all at once:
+  # the clock starts a week ago and each tick moves it forward, stopping at now.
   # Later seeds and jobs touch earlier records, so updated_at is reset to match
   def with_clock
     @clock_end = Time.current
-    clock_start = (@clock_end - 1.hour).change(usec: 0) # travel_to drops usec
+    clock_start = (@clock_end - 1.week).change(usec: 0) # travel_to drops usec
     travel_to(clock_start)
     yield
     sync_updated_at(since: clock_start)
@@ -19,7 +19,7 @@ module SeedHelpers
   end
 
   def tick
-    travel_to([Time.current + rand(20..45).seconds, @clock_end].min)
+    travel_to([Time.current + rand(60..130).minutes, @clock_end].min)
   end
 
   def sync_updated_at(since:)
