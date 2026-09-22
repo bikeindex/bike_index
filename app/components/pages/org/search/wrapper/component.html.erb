@@ -1,10 +1,5 @@
 <%= tag.div(class: card_classes, data: card_data_attributes) do %>
-  <div
-    class="
-      tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:py-3
-      <%= padding_x_class %>
-    "
-  >
+  <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-4 tw:gap-y-2 tw:py-3 <%= padding_x_class %>">
     <%#
       Sized to its content, so the count grows only once the toggle wraps under it - which
       puts the toggle at the right
@@ -37,13 +32,9 @@
     </div>
 
     <% if thumbnail_view? %>
+      <%# Without ml-auto, justify-between leaves it at the left once it wraps %>
       <% if ordered_by_text %>
-        <p
-          class="
-            tw:mb-0 tw:ml-auto tw:text-sm tw:text-gray-500
-            tw:dark:text-gray-400
-          "
-        >
+        <p class="tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
           <%= ordered_by_text %>
           <%= render(UI::Tooltip::Component.new(text: translation(".ordered_by_tooltip"))) %>
         </p>
