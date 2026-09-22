@@ -9,10 +9,14 @@ module Pages
           def default(search_all: false)
             organization = lookbook_organization || Organization.new(name: "Brakebills University", short_name: "Brakebills")
             render_with_template(template: "pages/org/search_results/bike_card/component_preview/default",
-              locals: {organization:, search_all:, bikes: Pages::SearchResults::BikeBox::ComponentPreview.vehicles + vehicle_types})
+              locals: {organization:, search_all:, component_class:,
+                       bikes: Pages::SearchResults::BikeBox::ComponentPreview.vehicles + vehicle_types})
           end
 
           private
+
+          # BikeListItem's preview renders the same bikes
+          def component_class = Component
 
           def vehicle_types
             [

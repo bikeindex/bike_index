@@ -4,11 +4,14 @@ module Pages
   module Org
     module SearchResults
       module BikeCard
-        # One registration in the org search's thumbnail view: the photo carrying its price and
+        # One registration in the org search's cards view: the photo carrying its price and
         # status, then title, colors, vehicle type, location and serial. Per the Bike Thumbnails
         # design doc (1c). search_all adds whether it's registered with the organization.
         class Component < ApplicationComponent
           include BikeHelper
+
+          # For the list holding them
+          LIST_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4"
 
           def initialize(bike:, organization:, current_user: nil, search_all: false)
             @bike = bike
@@ -19,7 +22,7 @@ module Pages
 
           private
 
-          # Like the spreadsheet's rows, not per viewer. The listing because a price change doesn't
+          # Like the table's rows, not per viewer. The listing because a price change doesn't
           # touch the bike
           def cache_key
             [self.class.cache_digest, @organization.id, @search_all, @bike, for_sale_listing]

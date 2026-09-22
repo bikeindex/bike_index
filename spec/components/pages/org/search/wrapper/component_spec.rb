@@ -51,14 +51,14 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       .to include(*described_class::TABLE_BLEED_CLASSES.split)
   end
 
-  context "with result_view thumbnail" do
+  context "with result_view cards" do
     let(:sort_state) { ComponentStructs::SortState.new(search_params: {serial: "xyz"}, sort: "mnfg_name", direction: "asc") }
-    let(:options) { super().merge(result_view: "thumbnail", sort_state:) }
+    let(:options) { super().merge(result_view: "cards", sort_state:) }
 
     it "marks the chip active, carries the search into the other one's link, and renders cards" do
-      expect(component).to have_css("a[data-active='true']", text: "Thumbnail")
-      expect(component).to have_link("Spreadsheet", href: /search_result_view=spreadsheet/)
-      expect(component).to have_link("Spreadsheet", href: /serial=xyz/)
+      expect(component).to have_css("a[data-active='true']", text: "Cards")
+      expect(component).to have_link("Table", href: /search_result_view=table/)
+      expect(component).to have_link("Table", href: /serial=xyz/)
       expect(component).to have_css("ul li", text: bike.mnfg_name)
       expect(component).not_to have_css("table")
       expect(component).not_to have_button("Column settings", visible: :all)
@@ -75,11 +75,22 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       end
     end
 
+    context "with result_view list" do
+      let(:options) { super().merge(result_view: "list") }
+
+      it "renders rows" do
+        expect(component).to have_css("a[data-active='true']", text: "List")
+        expect(component).to have_css("ul li.tw\\:border-l-4", text: bike.mnfg_name)
+        expect(component).not_to have_css("table")
+        expect(component).not_to have_button("Column settings", visible: :all)
+      end
+    end
+
     context "with an unknown view" do
       let(:options) { super().merge(result_view: "nonsense") }
 
-      it "falls back to the spreadsheet" do
-        expect(component).to have_css("a[data-active='true']", text: "Spreadsheet")
+      it "falls back to the table" do
+        expect(component).to have_css("a[data-active='true']", text: "Table")
         expect(component).to have_css("table")
       end
     end

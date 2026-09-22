@@ -5823,8 +5823,6 @@ it:
             per_page: Risultati per pagina
             showing_html: che mostra %{from}–%{to} di %{count}
             view_as: Visualizza come
-            view_spreadsheet: Foglio di calcolo
-            view_thumbnail: Miniatura
             export_unavailable_search_all: È possibile esportare solo le registrazioni
               della propria organizzazione. Deselezionare "Cerca tutte le registrazioni"
               per esportare.
@@ -5832,6 +5830,9 @@ it:
             ordered_by_desc: Ordinato per %{column}, in ordine decrescente
             ordered_by_tooltip: Passa alla visualizzazione tabella per modificare
               l'ordinamento
+            view_cards: Carte
+            view_list: Lista
+            view_table: Tavolo
           chart_card:
             caption_search: Ricerca attuale
             caption_year: Riepilogo dell'anno scorso

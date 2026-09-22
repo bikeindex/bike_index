@@ -7,15 +7,21 @@ module Pages
         # A card of org registrations: the match count and the column settings button, the
         # column-visibility panel, the table and the pagination footer. On the registrations
         # search (search_page) the header also carries the view switcher and the export, the
-        # thumbnail view swaps the columns for cards, and the card renders inside the results
-        # turbo-frame, so every search brings it back whole.
+        # cards and list views swap the table for cards or rows, and the card renders inside
+        # the results turbo-frame, so every search brings it back whole.
         class Component < ApplicationComponent
           # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
           # .container-fluid padding to the page's edges
           TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:-mx-[15px]"
 
           # Display order, and the first is what search_result_view falls back to
-          RESULT_VIEWS = %i[spreadsheet thumbnail].freeze
+          RESULT_VIEWS = %i[table list cards].freeze
+
+          # The table's is BikesTable, rendered with its column settings
+          RESULT_COMPONENTS = {
+            list: Pages::Org::SearchResults::BikeListItem::Component,
+            cards: Pages::Org::SearchResults::BikeCard::Component
+          }.freeze
 
           def self.permitted_result_view(result_view)
             view = result_view&.to_sym
@@ -115,10 +121,12 @@ module Pages
             organization_registrations_path(settings.search_params.merge(create_export: true))
           end
 
-          # Only the search page offers the view switcher, so it's the only place cards render
-          def thumbnail_view? = @search_page && @result_view == :thumbnail
+          # Only the search page offers the view switcher, so it's the only place cards or rows render
+          def result_component
+            RESULT_COMPONENTS[@result_view] if @search_page
+          end
 
-          # The cards have no headers to sort by, so the thumbnail view names the order
+          # The cards and rows have no headers to sort by, so their views name the order
           def ordered_by_text
             return @ordered_by_text if defined?(@ordered_by_text)
 
