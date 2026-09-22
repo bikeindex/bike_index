@@ -2,11 +2,15 @@
   <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-4 tw:gap-y-2 tw:py-3 <%= padding_x_class %>">
     <%#
       Sized to its content, so the count grows only once the toggle wraps under it - which
-      puts the toggle at the right. Beside "Ordered by" it grows, so the toggle stays at the
-      right once that wraps under it
+      puts the toggle at the right
     %>
 
-    <div class="tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-x-4 tw:gap-y-2 <%= "tw:grow" if result_component %>">
+    <div
+      class="
+        tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-x-4
+        tw:gap-y-2
+      "
+    >
       <p class="tw:mb-0 tw:grow">
         <%= count_html %>
       </p>
