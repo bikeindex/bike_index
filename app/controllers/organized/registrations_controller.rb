@@ -2,8 +2,7 @@ module Organized
   class RegistrationsController < Organized::BaseController
     include Binxtils::SortableTable
 
-    SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type
-      acknowledged_at occurred_at]
+    SORTABLE_COLUMNS = ComponentStructs::OrgSearchSettings::SORTABLE_COLUMN_CELLS.keys.freeze
 
     helper_method :chart_scope_paths
 
