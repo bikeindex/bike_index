@@ -5619,8 +5619,8 @@ nb:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
             date_range: 'Datoperiode:'
-            search_settings: Søkeinnstillinger
             search_settings_and_filters: Søkeinnstillinger og filtre
+            filters: Filtre
           search_all:
             search_all_html: Søk i alle registreringer <span class="twless-strong">(ikke
               bare %{org_name})</span>
