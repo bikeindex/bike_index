@@ -7,12 +7,6 @@ module UI
       # Cell blocks are instance_exec'd, so this is how they reach the sort state
       attr_reader :sort_state
 
-      # Called by shared_cache_if. A cell rendering a shared fragment stays out of the table's
-      # cache, whose key would pin a copy of that fragment per table
-      def self.shared_fragment_rendered!
-        ActiveSupport::IsolatedExecutionState[:ui_table_shared_fragment] = true
-      end
-
       # Pass cache_key (normally self.class.cache_digest) to enable per-cell fragment caching.
       # cache_records: mirror the controller's `includes`, or the cells serve those records stale
       def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
@@ -63,18 +57,19 @@ module UI
 
       def cache_records_for(record) = Array(@cache_records&.call(record))
 
-      # A miss that renders a shared fragment isn't written, and the rest of its column
+      # A cell rendering a shared_cache_if fragment stays out of the table's cache, whose key
+      # would pin a copy per table - so that miss isn't written, and the rest of its column
       # skips the read
       def render_cell(col, column_index, record, row_records)
         return render_cell_content(col, record) unless cache_cells? && @shared_fragment_columns.exclude?(column_index)
 
-        # The locale as ApplicationComponentHelper#cache adds it
-        name = cache_fragment_name([cell_cache_key(column_index, record, row_records), locale: I18n.locale])
+        name = cache_fragment_name(localized_cache_key(cell_cache_key(column_index, record, row_records)))
         fragment = controller.read_fragment(name)
         return fragment.html_safe if fragment
 
-        content, shared_fragment = tracking_shared_fragment { render_cell_content(col, record) }
-        if shared_fragment
+        shared_before = ApplicationComponent.shared_fragments_rendered
+        content = ActionView::Helpers::CacheHelper::CachingRegistry.track_caching { render_cell_content(col, record) }
+        if ApplicationComponent.shared_fragments_rendered > shared_before
           @shared_fragment_columns << column_index
         else
           controller.write_fragment(name, content.to_s)
@@ -87,19 +82,9 @@ module UI
       end
 
       def cache_cells?
-        @cache_key.present? && controller.respond_to?(:perform_caching) && controller.perform_caching
-      end
+        return @cache_cells if defined?(@cache_cells)
 
-      # Restores the outer value, so a table nested in a cell still marks that cell
-      def tracking_shared_fragment
-        state = ActiveSupport::IsolatedExecutionState
-        outer = state[:ui_table_shared_fragment]
-        state[:ui_table_shared_fragment] = false
-        content = ActionView::Helpers::CacheHelper::CachingRegistry.track_caching { yield }
-        shared_fragment = state[:ui_table_shared_fragment]
-        [content, shared_fragment]
-      ensure
-        state[:ui_table_shared_fragment] = outer || shared_fragment
+        @cache_cells = @cache_key.present? && controller.respond_to?(:perform_caching) && controller.perform_caching
       end
 
       # The index rather than the column, so two cells of one record don't share a fragment.

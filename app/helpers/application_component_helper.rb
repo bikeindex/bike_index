@@ -6,8 +6,10 @@ module ApplicationComponentHelper
   # key. Lives here (rather than ApplicationHelper) so both views and view
   # components get it; otherwise a component's `cache` would skip the locale.
   def cache(key = {}, options = {}, &block)
-    super([key, locale: I18n.locale], options, &block)
+    super(localized_cache_key(key), options, &block)
   end
+
+  def localized_cache_key(key) = [key, locale: I18n.locale]
 
   def number_display(number)
     content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))

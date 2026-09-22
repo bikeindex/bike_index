@@ -11,11 +11,12 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     # be the ranges the controller computes for the same period
     it "computes the ranges the period chips carry" do
       %w[hour day week month year].each do |period|
-        # Before the request: the controller reads the clock ahead of the render, which is slow cold
-        range = UI::PeriodSelect::Component.period_range(period)
+        # Bracketed, since a cold request can take seconds
+        range_before = UI::PeriodSelect::Component.period_range(period)
         get base_url, params: {search_no_js: true, period:}
-        expect(assigns(:start_time)).to be_within(5.seconds).of(range.first)
-        expect(assigns(:end_time)).to be_within(5.seconds).of(range.last)
+        range_after = UI::PeriodSelect::Component.period_range(period)
+        expect(assigns(:start_time)).to be_between(range_before.first, range_after.first)
+        expect(assigns(:end_time)).to be_between(range_before.last, range_after.last)
       end
     end
 

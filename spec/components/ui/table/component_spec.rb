@@ -231,11 +231,11 @@ RSpec.describe UI::Table::Component, type: :component do
     end
 
     context "with a cell rendering a shared fragment" do
-      def render_shared(cache_key)
+      def render_shared(cache_key, shared: true)
         with_controller_class(ApplicationController) do
           render_inline(described_class.new(records: users, cache_key:)) do |table|
             table.column(label: "Name") { |u| u.name }
-            table.column(label: "Email") { |u| shared_cache_if(true, ["shared", u]) { concat u.email } }
+            table.column(label: "Email") { |u| shared_cache_if(shared, ["shared", u]) { concat u.email } }
           end
         end
       end
@@ -253,6 +253,14 @@ RSpec.describe UI::Table::Component, type: :component do
         keys = fragments_written { render_shared("other") }
         expect(keys.count).to eq 2
         expect(keys).to all(include("other"))
+      end
+
+      # Like the user cell for a missing user, which leaves nothing shared to read
+      it "caches the cell itself when the shared fragment isn't cached" do
+        keys = fragments_written { render_shared("test", shared: false) }
+
+        expect(keys.count).to eq 4
+        expect(keys).to all(include("test"))
       end
     end
 
