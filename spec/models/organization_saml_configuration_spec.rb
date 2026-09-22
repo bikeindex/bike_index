@@ -121,6 +121,30 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
     end
   end
 
+  describe "organization slug while active" do
+    # Not invoiced, which would block the short_name edit on its own
+    let(:organization) { FactoryBot.create(:organization, user_email_domain: "example.edu") }
+    let(:active) { true }
+    before { FactoryBot.create(:organization_saml_configuration, :configured, organization:, active:) }
+
+    it "blocks a short_name change, and permits one that keeps the slug" do
+      expect(organization.block_short_name_edit?).to be_truthy
+      expect(organization.update(short_name: "something-else")).to be_falsey
+      expect(organization.errors.attribute_names).to eq([:short_name])
+      expect(organization.reload.update(name: "Renamed")).to be_truthy
+    end
+
+    context "when the SAML configuration is inactive" do
+      let(:active) { false }
+
+      it "permits the change" do
+        expect(organization.block_short_name_edit?).to be_falsey
+        expect(organization.update(short_name: "something-else")).to be_truthy
+        expect(organization.reload.slug).to eq "something-else"
+      end
+    end
+  end
+
   describe "after_commit" do
     let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration) }
     it "touches the organization" do
