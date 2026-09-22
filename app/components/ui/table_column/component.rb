@@ -7,9 +7,8 @@ module UI
 
       attr_reader :sortable, :cell_block, :footer, :header_tooltip
 
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, sort_link_class: "twlink", &block)
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, &block)
         @header_tooltip = header_tooltip
-        @sort_link_class = sort_link_class
         @label = label
         @sortable = sortable
         @sort_indicator = sort_indicator
@@ -36,9 +35,9 @@ module UI
         end
       end
 
-      def render_header(render_sortable:, current_sort:, current_direction:, sortable_url:, sort_icon:)
+      def render_header(render_sortable:, current_sort:, current_direction:, sortable_url:, sort_icon:, sort_link_class:)
         if sortable.present? && render_sortable
-          render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:)
+          render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:, sort_link_class:)
         elsif @sort_indicator.present? && @sort_indicator == current_sort
           safe_join([header_label, NBSP, sort_icon.call(current_direction)])
         else
@@ -80,7 +79,7 @@ module UI
         @sortable&.gsub(/_(id|at)\z/, "")&.titleize
       end
 
-      def render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:)
+      def render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:, sort_link_class:)
         title = header_label
         sorted_by_this = @sortable == current_sort
         direction = (sorted_by_this && current_direction == "desc") ? "asc" : "desc"
@@ -93,7 +92,7 @@ module UI
         end
 
         # data-active rather than an `active` class: that's what the is-active variant matches
-        link_to(sortable_url.call(@sortable, direction), class: "#{@sort_link_class} tw:group",
+        link_to(sortable_url.call(@sortable, direction), class: "#{sort_link_class} tw:group",
           data: {active: sorted_by_this || nil}) do
           safe_join([title, NBSP, *arrow_spans])
         end
