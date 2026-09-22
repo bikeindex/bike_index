@@ -37,13 +37,13 @@
     </div>
 
     <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-      <%# Columns are the spreadsheet's alone %>
+      <%# Columns and the export are the spreadsheet's alone %>
       <% unless thumbnail_view? %>
         <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
       <% end %>
 
       <%# Only the search's own params describe an export of what's on the page %>
-      <% if @search_page && settings.render_export? %>
+      <% if @search_page && !thumbnail_view? && settings.render_export? %>
         <div class="tw:hidden tw:sm:block">
           <% if settings.export_disabled? %>
             <%= render(UI::Tooltip::Component.new) do |tooltip| %>

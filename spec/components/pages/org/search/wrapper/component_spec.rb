@@ -63,6 +63,15 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).not_to have_button("Column settings", visible: :all)
     end
 
+    context "with csv_exports enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+      it "renders no export" do
+        expect(component).to have_css("ul li", text: bike.mnfg_name)
+        expect(component).not_to have_link("Export CSV", visible: :all)
+      end
+    end
+
     context "with an unknown view" do
       let(:options) { super().merge(result_view: "nonsense") }
 
