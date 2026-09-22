@@ -11,7 +11,6 @@ export default class extends Controller {
   static values = { resultView: String }
 
   connect () {
-    this.chartSearch = this.chartParams()
     this.initNotesSearch()
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
@@ -41,8 +40,9 @@ export default class extends Controller {
     const { headers } = event.detail.fetchOptions
     if (!headers['Turbo-Frame'] || headers['X-Sec-Purpose'] === 'prefetch') return
     if (headers['Turbo-Frame'] !== this.resultsFrame?.id) return
-    if (!this.chartFollowsSearch(new URL(event.detail.url, window.location.href))) return
-    this.chartFrame.setAttribute('busy', '')
+    const chart = this.searchChart
+    if (!chart || this.chartParams(new URL(event.detail.url, window.location.href)) === this.chartShows(chart)) return
+    chart.setAttribute('busy', '')
     this.chartAwaitingResults = true
   }
 
@@ -165,29 +165,37 @@ export default class extends Controller {
   }
 
   // The card sits outside the results frame, so a search leaves it answering the previous
-  // one - when its scope is the search, which the card says by rendering the target.
+  // one. Gated on the search itself having moved, or the first results render would refetch
+  // the chart the frame is already fetching.
   reloadChart () {
     this.stopChartSpinner()
-    if (!this.chartFollowsSearch()) return
-    this.chartSearch = this.chartParams()
-    this.chartFrame.setAttribute('src', window.location.href)
+    const chart = this.searchChart
+    if (!chart || this.chartParams() === this.chartShows(chart)) return
+    chart.setAttribute('src', window.location.href)
   }
 
-  // Gated on the search itself having moved, or the first results render would refetch
-  // the chart the frame is already fetching. The URL carries the scope, so it's the search.
-  chartFollowsSearch (url = window.location) {
+  // The chart frame, when its scope is the search - which the card says by rendering the
+  // target. Switching scope navigates the frame itself, so the scope isn't part of a search.
+  get searchChart () {
     const frame = this.chartFrame
-    if (!frame?.getAttribute('src') || !frame.querySelector('[data-chart-follows-search]')) return false
-    return this.chartParams(url) !== this.chartSearch
+    if (!frame?.getAttribute('src') || !frame.querySelector('[data-chart-follows-search]')) return null
+    return frame
   }
 
-  // A page turn, a sort, a per-page change or opening the card itself returns the same
-  // chart, so they don't count as the search having moved.
+  // What the chart is showing: its src is the record of it, holding the search the frame
+  // last asked for, including one still in flight.
+  chartShows (frame) {
+    return this.chartParams(new URL(frame.getAttribute('src'), window.location.href))
+  }
+
+  // The same search, written by a link and by the address bar, differs in order and in
+  // which empty fields it carries - so compare a canonical form. A page turn, a sort, a
+  // per-page change or opening the card returns the same chart, so they're left out too.
   chartParams (url = window.location) {
     const params = new URLSearchParams(url.search);
-    ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view', 'chart_open']
+    ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view', 'chart_open', 'chart_scope']
       .forEach(name => params.delete(name))
 
-    return params.toString()
+    return [...params].filter(([, value]) => value !== '').sort().join('&')
   }
 }

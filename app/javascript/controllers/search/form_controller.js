@@ -159,10 +159,15 @@ export default class extends Controller {
       event.preventDefault() // stop Turbo's default handling of the throttled response
       this.showRateLimited()
       this.hideLoading() // drop the in-frame placeholder so it doesn't spin forever
-      window.dispatchEvent(new CustomEvent('search:results-failed'))
     } else if (event.target === this.frameElement && this.frameResponseSuperseded(response?.url)) {
       event.preventDefault()
     }
+    // What's outside the frame follows the results, so it waits on this rather than watching
+    if (!response?.ok && this.ownsFetch(event)) this.announceFailure()
+  }
+
+  announceFailure () {
+    window.dispatchEvent(new CustomEvent('search:results-failed'))
   }
 
   // The frame's eager src fetch and a search submitted while it's still in flight
@@ -198,7 +203,7 @@ export default class extends Controller {
     this.failedSubmit = event.target === this.formTarget
     this.hideLoading()
     this.showNotice('fetch-failed')
-    window.dispatchEvent(new CustomEvent('search:results-failed'))
+    this.announceFailure()
   }
 
   handleRetryClick = (event) => {
