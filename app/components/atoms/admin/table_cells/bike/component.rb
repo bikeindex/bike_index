@@ -64,7 +64,7 @@ module Atoms
                 concat(render(UI::Badge::Component.new(text: "V", title: "Bike Version", color: :purple, size: :sm)))
               elsif @bike.creation_kind.present? && !@bike.unregistered_parking_notification?
                 concat(", ")
-                concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(ownership: @bike.current_ownership)), class: "less-strong"))
+                concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(ownership: @bike.current_ownership)), class: "tw:text-gray-400"))
               end
             end
           end

@@ -200,7 +200,7 @@
                     </em>
 
                     <% if display_original_ownership? %>
-                      <small class="less-strong ml-2">
+                      <small class="ml-2 tw:text-gray-400">
                         <%= translation(".initial_registration") %>
 
                         <em>
@@ -465,7 +465,7 @@
                     </td>
 
                     <td>
-                      <em class="less-strong">
+                      <em class="tw:text-gray-400">
                         <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: current_ownership)) %>
                       </em>
                     </td>

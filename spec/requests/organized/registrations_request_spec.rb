@@ -150,8 +150,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         end
       end
     end
-    it "renders the thumbnail view as cards" do
-      get base_url, params: {search_no_js: true, search_result_view: "thumbnail"}
+    it "renders the cards view" do
+      get base_url, params: {search_no_js: true, search_result_view: "cards"}
       expect(response.status).to eq(200)
       expect(response.body).to include(bike.mnfg_name)
       expect(response.body).to_not include("Column settings")
@@ -284,18 +284,18 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "search_result_view" do
-      it "defaults to the spreadsheet, and carries what it's given into the next search" do
+      it "defaults to the table, and carries what it's given into the next search" do
         get base_url, params: {search_no_js: true}
-        expect(assigns(:result_view)).to eq :spreadsheet
+        expect(assigns(:result_view)).to eq :table
 
         get base_url, params: {search_no_js: true, search_result_view: "nonsense"}
-        expect(assigns(:result_view)).to eq :spreadsheet
+        expect(assigns(:result_view)).to eq :table
 
-        get base_url, params: {search_no_js: true, search_result_view: "thumbnail"}
-        expect(assigns(:result_view)).to eq :thumbnail
+        get base_url, params: {search_no_js: true, search_result_view: "cards"}
+        expect(assigns(:result_view)).to eq :cards
         # The view rides in the address bar, so a new search has to carry it
         expect(Capybara.string(response.body))
-          .to have_css("#Search_Form input[name=search_result_view][value=thumbnail]", visible: :all)
+          .to have_css("#Search_Form input[name=search_result_view][value=cards]", visible: :all)
       end
     end
 

@@ -5823,8 +5823,6 @@ it:
             per_page: Risultati per pagina
             showing_html: che mostra %{from}–%{to} di %{count}
             view_as: Visualizza come
-            view_spreadsheet: Foglio di calcolo
-            view_thumbnail: Miniatura
             export_unavailable_search_all: È possibile esportare solo le registrazioni
               della propria organizzazione. Deselezionare "Cerca tutte le registrazioni"
               per esportare.
@@ -5832,6 +5830,9 @@ it:
             ordered_by_desc: Ordinato per %{column}, in ordine decrescente
             ordered_by_tooltip: Passa alla visualizzazione tabella per modificare
               l'ordinamento
+            view_cards: Carte
+            view_list: Lista
+            view_table: Tavolo
           chart_card:
             caption_search: Ricerca attuale
             caption_year: Riepilogo dell'anno scorso
@@ -5867,7 +5868,6 @@ it:
             filter_with_address_html: solo <strong>con</strong> indirizzo
             filter_with_stickers_html: solo <strong>con</strong> adesivi
             impound_id_cell: ID del sequestro
-            impounded_cell: Sequestrato
             manufacturer_cell: Produttore
             model_cell: Modello
             none: nessuno
@@ -5893,6 +5893,10 @@ it:
             occurred_at_cell: Volare a
             photo_cell: Foto
             view_cell: Visualizzazione
+            acknowledgment_cell_panel: Sequenza di registrazione temporale confermata
+            created_at_cell_panel: Tempo - registrato
+            occurred_at_cell_panel: Tempo - stato
+            updated_at_cell_panel: Ora - aggiornato
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
@@ -5909,7 +5913,6 @@ it:
             link_sticker: adesivo di collegamento
             hidden: nascosto
             not_registered_with: Nascosto perché non è registrato con %{org_name}
-            acknowledgment: Conferma di ricezione
             acknowledgment_title: Conferma della sequenza di registrazione a
             occurred_at_tooltip: Quando è stato rubato, sequestrato, ritrovato o messo
               in vendita
