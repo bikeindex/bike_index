@@ -6,13 +6,13 @@ const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
   static values = { resultView: String }
 
   connect () {
     this.chartSearch = this.chartParams()
-    this.initNotesSearch()
+    this.initOptionalFields()
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
@@ -61,24 +61,32 @@ export default class extends Controller {
     return this.element.querySelector('.search-results-frame-wrapper > turbo-frame')
   }
 
-  initNotesSearch () {
-    if (!this.hasNotesFieldTarget) return
-    const input = this.notesFieldTarget.querySelector('input')
-    const hasValue = input && input.value.length > 0
-    if (hasValue || localStorage.getItem('orgRegistrationNotesSearchOpen') === 'true') {
-      this.setNotesSearch(true)
-    }
+  // The notes and location fields, each named by data-field. One opens with a value in it,
+  // or if it was left open
+  initOptionalFields () {
+    this.optionalFieldTargets.forEach(field => {
+      const hasValue = [...field.querySelectorAll('input[type=text]')].some(input => input.value.length > 0)
+      if (hasValue || localStorage.getItem(this.optionalFieldKey(field.dataset.field)) === 'true') {
+        this.setOptionalField(field.dataset.field, true)
+      }
+    })
   }
 
-  toggleNotesSearch () {
-    if (!this.hasNotesFieldTarget) return
-    this.setNotesSearch(this.notesFieldTarget.classList.contains('tw:hidden'))
+  toggleOptionalField (event) {
+    this.setOptionalField(event.target.dataset.field, event.target.checked)
   }
 
-  setNotesSearch (open) {
-    this.notesFieldTarget.classList.toggle('tw:hidden', !open)
-    localStorage.setItem('orgRegistrationNotesSearchOpen', String(open))
-    if (this.hasNotesCheckboxTarget) this.notesCheckboxTarget.checked = open
+  setOptionalField (name, open) {
+    const field = this.optionalFieldTargets.find(target => target.dataset.field === name)
+    if (!field) return
+    field.classList.toggle('tw:hidden', !open)
+    localStorage.setItem(this.optionalFieldKey(name), String(open))
+    const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === name)
+    if (checkbox) checkbox.checked = open
+  }
+
+  optionalFieldKey (name) {
+    return `orgRegistration${name.charAt(0).toUpperCase()}${name.slice(1)}SearchOpen`
   }
 
   // Bubbled from any field, so it picks out the one it's for

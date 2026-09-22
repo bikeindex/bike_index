@@ -84,7 +84,7 @@ export default class extends Controller {
     // here it can't mean the frame is ahead of the address bar
     this.requestedURL = null
     const params = new URLSearchParams(window.location.search)
-    ;['search_email', 'serial', 'search_notes'].forEach(name => {
+    ;['search_email', 'serial', 'search_notes', 'location'].forEach(name => {
       const input = this.formTarget.querySelector(`input[name="${name}"]`)
       if (input) input.value = params.get(name) || ''
     })

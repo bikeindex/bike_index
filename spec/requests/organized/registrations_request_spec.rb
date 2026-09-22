@@ -54,6 +54,29 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
+    describe "location search" do
+      include_context :geocoder_stubbed_bounding_box
+      let(:enabled_feature_slugs) { %w[bike_search reg_address] }
+      let!(:bike) { FactoryBot.create(:bike_organized, :with_address_record, creation_organization: current_organization) }
+      let!(:bike_chicago) do
+        FactoryBot.create(:bike_organized, :with_address_record, address_in: :chicago, creation_organization: current_organization)
+      end
+      let!(:stolen_bike) do
+        bike = FactoryBot.create(:bike_organized, creation_organization: current_organization)
+        FactoryBot.create(:stolen_record, :in_nyc, bike:)
+        bike
+      end
+
+      it "searches within the distance of the location" do
+        get base_url, params: {search_no_js: true, location: "New York", distance: "50"}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, stolen_bike.id])
+        expect(response.body).to include("show_location_search")
+
+        get base_url, params: {search_no_js: true, location: "", distance: "50"}
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_chicago.id, stolen_bike.id])
+      end
+    end
     context "member_no_bike_edit" do
       let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization, role: "member_no_bike_edit") }
       it "allows viewing" do
@@ -107,7 +130,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
             end_time: nil, start_time: nil, user_id: nil, search_bike_id: nil, render_chart: false,
             search_marketplace_listing_id: nil, search_status: nil, search_kind: nil, search_ignored: nil,
             stolenness: "all", search_stickers: nil, search_address: nil, search_secondary: nil,
-            sort: "id", sort_direction: "desc", create_export: true
+            location: "", distance: "100", sort: "id", sort_direction: "desc", create_export: true
           }
         end
         it "redirects to export new" do

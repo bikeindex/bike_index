@@ -132,6 +132,8 @@ module ComponentStructs
 
     def notes_search_label = translation(:show_notes_search)
 
+    def location_search_label = translation(:show_location_search)
+
     def render_export? = @organization.enabled?("csv_exports")
 
     def search_all? = @search_all

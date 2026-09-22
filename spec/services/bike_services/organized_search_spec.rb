@@ -20,6 +20,40 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
     end
   end
 
+  describe ".location" do
+    include_context :geocoder_stubbed_bounding_box
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
+    let(:enabled_feature_slugs) { [] }
+    let!(:bike_nyc) { FactoryBot.create(:bike, :with_address_record, address_in: :new_york) }
+    let!(:bike_chicago) { FactoryBot.create(:bike, :with_address_record, address_in: :chicago) }
+    let!(:stolen_nyc) { FactoryBot.create(:stolen_bike_in_nyc) }
+    let!(:stolen_chicago) { FactoryBot.create(:stolen_bike_in_chicago) }
+
+    it "matches only stolen bikes" do
+      expect(described_class.location(Bike.all, "New York", "50", organization:).pluck(:id)).to eq([stolen_nyc.id])
+      expect(described_class.location(Bike.all, "", "50", organization:)).to eq(Bike.all)
+    end
+
+    context "with reg_address" do
+      let(:enabled_feature_slugs) { %w[reg_address] }
+
+      it "matches registration addresses too, except searching all" do
+        expect(described_class.location(Bike.all, "New York", "50", organization:).pluck(:id))
+          .to match_array([bike_nyc.id, stolen_nyc.id])
+        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true).pluck(:id))
+          .to eq([stolen_nyc.id])
+      end
+    end
+
+    context "unknown location" do
+      let(:bounding_box) { [66.0, -84.22, 67.0, (0.0 / 0)] }
+
+      it "matches nothing" do
+        expect(described_class.location(Bike.all, "Nowhere", "50", organization:).pluck(:id)).to eq([])
+      end
+    end
+  end
+
   describe ".notes" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization) }

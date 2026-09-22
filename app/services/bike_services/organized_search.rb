@@ -26,6 +26,19 @@ module BikeServices
         .where("bike_organization_notes.body ILIKE ?", query_string)
     end
 
+    # A stolen or impounded bike is where it was taken or impounded; any other is at its
+    # registration address - only matched where the organization collects that, and only
+    # among its own registrations
+    def location(bikes, location, distance, organization:, search_all: false)
+      return bikes if location.blank?
+
+      bounding_box = GeocodeHelper.bounding_box(location, GeocodeHelper.permitted_distance(distance))
+      return bikes.none if bounding_box.empty?
+
+      bikes = bikes.stolen_or_impounded if search_all || !organization.enabled?("reg_address")
+      bikes.within_bounding_box(bounding_box)
+    end
+
     def stickers(bikes, value)
       case value
       when "none" then bikes.no_bike_sticker

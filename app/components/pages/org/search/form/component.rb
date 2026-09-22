@@ -51,6 +51,14 @@ module Pages
           def render_notes_field?
             @settings_and_filters_component&.notes_search?
           end
+
+          def render_location_fields?
+            @settings_and_filters_component.present?
+          end
+
+          def distance
+            GeocodeHelper.permitted_distance(@interpreted_params[:distance])
+          end
         end
       end
     end

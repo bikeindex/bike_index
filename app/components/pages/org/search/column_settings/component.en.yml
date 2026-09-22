@@ -41,6 +41,7 @@ en:
             reg_phone_cell: Phone
             reg_student_id_cell_html: Student ID <em>for %{org_name}</em>
             serial_number_cell: Serial
+            show_location_search: show location search
             show_notes_search: show notes search
             status: 'Status:'
             status_cell: Status

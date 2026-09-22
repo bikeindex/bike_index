@@ -67,18 +67,27 @@
       </div>
     </div>
 
-    <% if notes_search? %>
-      <label
-        class="
-          tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2
-          tw:border-t tw:border-gray-200 tw:pt-3 tw:dark:border-gray-700
-        "
-      >
-        <%= check_box_tag :show_notes_search, "1", false,
-        data: {action: "change->org--search#toggleNotesSearch", "org--search-target": "notesCheckbox"} %>
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-gray-200 tw:pt-3
+        tw:dark:border-gray-700
+      "
+    >
+      <% if notes_search? %>
+        <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
+          <%= check_box_tag :show_notes_search, "1", false, data: {field: "notes",
+            action: "change->org--search#toggleOptionalField", "org--search-target": "optionalFieldCheckbox"} %>
 
-        <%= notes_search_label %>
+          <%= notes_search_label %>
+        </label>
+      <% end %>
+
+      <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
+        <%= check_box_tag :show_location_search, "1", false, data: {field: "location",
+          action: "change->org--search#toggleOptionalField", "org--search-target": "optionalFieldCheckbox"} %>
+
+        <%= location_search_label %>
       </label>
-    <% end %>
+    </div>
   </div>
 </div>
