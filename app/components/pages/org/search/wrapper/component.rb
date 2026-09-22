@@ -7,7 +7,7 @@ module Pages
         # A card of org registrations: the match count and the column settings button, the
         # column-visibility panel, the table and the pagination footer. On the registrations
         # search (search_page) the header also carries the view switcher and the export, the
-        # thumbnail view swaps the columns for cards, and the card renders inside the results
+        # thumbnail and list views swap the columns for cards or rows, and the card renders inside the results
         # turbo-frame, so every search brings it back whole.
         class Component < ApplicationComponent
           # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
@@ -15,7 +15,7 @@ module Pages
           TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:-mx-[15px]"
 
           # Display order, and the first is what search_result_view falls back to
-          RESULT_VIEWS = %i[spreadsheet thumbnail].freeze
+          RESULT_VIEWS = %i[spreadsheet list thumbnail].freeze
 
           def self.permitted_result_view(result_view)
             view = result_view&.to_sym
@@ -116,7 +116,11 @@ module Pages
           end
 
           # Only the search page offers the view switcher, so it's the only place cards render
-          def thumbnail_view? = @search_page && @result_view == :thumbnail
+          def card_layout
+            return unless @search_page
+
+            {thumbnail: :card, list: :row}[@result_view]
+          end
 
           def result_view_entries
             RESULT_VIEWS.map do |view|

@@ -1,10 +1,5 @@
-<ul
-  class="
-    tw:m-0 tw:grid tw:list-none
-    tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4 tw:p-4
-  "
->
+<ul class="tw:m-0 tw:list-none tw:p-4 <%= Pages::Org::SearchResults::BikeCard::Component::LIST_CLASSES[layout] %>">
   <% bikes.each do |bike| %>
-    <%= render(Pages::Org::SearchResults::BikeCard::Component.new(bike:, organization:, search_all:)) %>
+    <%= render(Pages::Org::SearchResults::BikeCard::Component.new(bike:, organization:, search_all:, layout:)) %>
   <% end %>
 </ul>

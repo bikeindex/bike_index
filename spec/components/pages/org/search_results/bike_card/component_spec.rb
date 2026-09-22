@@ -25,6 +25,19 @@ RSpec.describe Pages::Org::SearchResults::BikeCard::Component, type: :component 
     expect(component).not_to have_text("Registered with")
   end
 
+  context "with layout row" do
+    let(:component) { render_inline(described_class.new(bike:, organization:, layout: :row)) }
+
+    it "renders the same bike, edged in its status's color" do
+      expect(component).to have_css("li.tw\\:border-l-red-600")
+      expect(component).to have_link(href: "/bikes/#{bike.id}?organization_id=#{organization.to_param}")
+      expect(component).to have_css("strong", text: "Surly")
+      expect(component).to have_text("Stolen ·")
+      expect(component).to have_text("Purple")
+      expect(component).to have_text("SUR-77120934")
+    end
+  end
+
   context "with search_all" do
     let(:search_all) { true }
 

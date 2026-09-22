@@ -63,6 +63,17 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       expect(component).not_to have_button("Column settings", visible: :all)
     end
 
+    context "with result_view list" do
+      let(:options) { super().merge(result_view: "list") }
+
+      it "renders rows" do
+        expect(component).to have_css("a[data-active='true']", text: "List")
+        expect(component).to have_css("ul li.tw\\:border-l-4", text: bike.mnfg_name)
+        expect(component).not_to have_css("table")
+        expect(component).not_to have_button("Column settings", visible: :all)
+      end
+    end
+
     context "with an unknown view" do
       let(:options) { super().merge(result_view: "nonsense") }
 

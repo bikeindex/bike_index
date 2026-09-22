@@ -17,6 +17,7 @@ en:
             per_page: Results per page
             showing_html: showing %{from}–%{to} of %{count}
             view_as: View as
+            view_list: List
             view_matching_any_audit: view matching any audit
             view_spreadsheet: Spreadsheet
             view_thumbnail: Thumbnail
