@@ -23,8 +23,8 @@ en:
             filter_not_stolen_or_impounded_html: not stolen or impounded
             filter_not_unregistered_html: "<strong>not</strong> unregistered"
             filter_only_unregistered_html: only <strong>unregistered</strong>
-            filter_stolen_html: only stolen
-            filter_stolen_or_impounded_html: only stolen or impounded
+            filter_stolen_html: only <strong>stolen</strong>
+            filter_stolen_or_impounded_html: only <strong>stolen</strong> or <strong>impounded</strong>
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_id_cell: Impound ID

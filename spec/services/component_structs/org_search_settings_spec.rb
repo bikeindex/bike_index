@@ -103,7 +103,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       let(:search_status) { "stolen_or_impounded" }
 
       it "returns stolen or impounded filter description" do
-        expect(instance.active_search_filter_descriptions).to eq(["only stolen or impounded"])
+        expect(instance.active_search_filter_descriptions).to eq(["only <strong>stolen</strong> or <strong>impounded</strong>"])
       end
     end
 
