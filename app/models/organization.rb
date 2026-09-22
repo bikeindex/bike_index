@@ -142,6 +142,7 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
   validate :user_email_domain_format
+  validate :slug_unchanged_while_saml_active
   # Two SSO orgs on one domain would make saml_email_matching's pick arbitrary (name order),
   # silently sending logins to the wrong org's IdP. Non-SSO orgs may still share a domain.
   validates_uniqueness_of :user_email_domain, allow_blank: true,
@@ -494,7 +495,7 @@ class Organization < ApplicationRecord
   end
 
   def block_short_name_edit?
-    is_invoiced? # Prevent url changes breaking landing pages, etc
+    is_invoiced? || saml_active? # Prevent url changes breaking landing pages, SSO, etc
   end
 
   def bike_actions?
@@ -639,6 +640,15 @@ class Organization < ApplicationRecord
     return new_slug if holder.nil? || holder.slug != new_slug
 
     (2..).lazy.map { "#{new_slug}-#{it}" }.find { |candidate| !orgs.exists?(slug: candidate) }
+  end
+
+  def saml_active? = organization_saml_configuration&.active?
+
+  # The IdP registered the SP entity ID and callback URL, which are built from the slug
+  def slug_unchanged_while_saml_active
+    return unless slug_changed? && slug_was.present? && saml_active?
+
+    errors.add(:short_name, "can't change while SAML SSO is active - it would break every SSO sign in. Deactivate SAML first")
   end
 
   def user_email_domain_format

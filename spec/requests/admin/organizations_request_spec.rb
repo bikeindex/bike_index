@@ -420,6 +420,22 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(saml_configuration.configured?).to be_truthy
       end
     end
+
+    context "renaming an organization with active SAML SSO" do
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active) }
+      let(:organization) { saml_configuration.organization }
+
+      it "refuses until SAML is deactivated" do
+        original_slug = organization.slug
+        put "#{base_url}/#{organization.to_param}", params: {organization: {short_name: "something-else"}}
+        expect(response.status).to eq(422)
+        expect(organization.reload.slug).to eq original_slug
+
+        put "#{base_url}/#{organization.to_param}", params: {organization: {organization_saml_configuration_attributes: {id: saml_configuration.id, active: "0"}}}
+        put "#{base_url}/#{organization.to_param}", params: {organization: {short_name: "something-else"}}
+        expect(organization.reload.slug).to eq "something-else"
+      end
+    end
     context "updating graduated notifications" do
       it "updates graduated_notification_interval_days" do
         organization.update(registration_field_labels: {reg_student_id: "Cool label"})
