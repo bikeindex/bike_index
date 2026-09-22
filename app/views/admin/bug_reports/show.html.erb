@@ -108,9 +108,9 @@
       <% end %>
 
       <%= render(UI::Forms::Group::Component.new(attribute: :tags, form_builder: f)) do %>
-        <%= render UI::Forms::Combobox::Component.new(name: :tags, form: f, free_text: true,
-          options: searchable_tags, multiselect_chip_src: tag_chips_admin_bug_reports_path,
-          placeholder: "Select or create tags") %>
+        <%= render UI::Forms::Combobox::Component.new(name: :tags,
+          options: searchable_tags, free_text: true, multiselect_chip_src: tag_chips_admin_bug_reports_path,
+          html_options: {form: f, placeholder: "Select or create tags"}) %>
       <% end %>
 
       <%= render(UI::Forms::Group::Component.new(attribute: :github_pull_request, form_builder: f, kind: :number_field)) %>

@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe UI::Forms::Files::Picker::Component, type: :component do
   let(:options) { {} }
-  let(:component) { render_inline(described_class.new(input_options: {id: "picker"}, **options)) }
+  let(:component) { render_inline(described_class.new(html_options: {id: "picker"}, **options)) }
 
   it "labels the input it's given, whatever renders above and below" do
     expect(component).to have_css("input#picker[type='file'].tw\\:sr-only")
@@ -20,18 +20,18 @@ RSpec.describe UI::Forms::Files::Picker::Component, type: :component do
 
   # Files::Upload adds its own target to the input - replacing the data would leave the picker unwired
   it "keeps its own data on the input alongside the caller's" do
-    rendered = render_inline(described_class.new(input_options: {id: "x", data: {"ui--forms--files--upload-target": "input"}}))
+    rendered = render_inline(described_class.new(html_options: {id: "x", data: {"ui--forms--files--upload-target": "input"}}))
 
     expect(rendered).to have_css("input#x[data-ui--forms--files--picker-target='input'][data-ui--forms--files--upload-target='input']")
     expect(rendered).to have_css("input#x[data-action='ui--forms--files--picker#display']")
   end
 
   it "accepts a string, an array, or nothing" do
-    expect(render_inline(described_class.new(input_options: {id: "x"}, accept: "image/png,image/jpeg")))
+    expect(render_inline(described_class.new(html_options: {id: "x"}, accept: "image/png,image/jpeg")))
       .to have_css("input[type='file'][accept='image/png,image/jpeg']")
-    expect(render_inline(described_class.new(input_options: {id: "x"}, accept: %w[.png .jpg])))
+    expect(render_inline(described_class.new(html_options: {id: "x"}, accept: %w[.png .jpg])))
       .to have_css("input[type='file'][accept='.png,.jpg']")
-    expect(render_inline(described_class.new(input_options: {id: "x"})))
+    expect(render_inline(described_class.new(html_options: {id: "x"})))
       .to have_no_css("input[type='file'][accept]")
   end
 

@@ -16,8 +16,8 @@ module UI
           renders_one :attached
           renders_one :status
 
-          # Without a form_builder the input is a bare one, and input_options needs an id for its label
-          def initialize(form_builder: nil, attribute: nil, input_options: {}, accept: nil, camera: nil)
+          # Without a form_builder the input is a bare one, and html_options needs an id for its label
+          def initialize(form_builder: nil, attribute: nil, html_options: {}, accept: nil, camera: nil)
             @form_builder = form_builder
             @attribute = attribute
             accept_list = Array(accept).flat_map { it.to_s.split(",") }.filter_map { it.strip.presence }
@@ -25,12 +25,12 @@ module UI
             # but images are accepted -- never on a CSV or PDF field.
             @camera = camera.nil? ? accept_list.any? && accept_list.all? { image?(it) } : camera
             @placeholder = translation(".no_file_chosen")
-            @input_options = {
+            @html_options = {
               class: "tw:peer tw:sr-only",
               accept: accept_list.join(",").presence,
               data: {"ui--forms--files--picker-target": "input", action: "ui--forms--files--picker#display"}
-            }.deep_merge(input_options)
-            @input_id = @input_options[:id] || form_builder&.field_id(attribute)
+            }.deep_merge(html_options)
+            @input_id = @html_options[:id] || form_builder&.field_id(attribute)
 
             # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.
             @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: LABEL_CLASSES)
@@ -40,9 +40,9 @@ module UI
 
           # A form field goes through its builder, which is what makes the form multipart
           def file_input
-            return tag.input(type: "file", **@input_options) unless @form_builder
+            return tag.input(type: "file", **@html_options) unless @form_builder
 
-            @form_builder.file_field(@attribute, @input_options)
+            @form_builder.file_field(@attribute, @html_options)
           end
 
           # The button's gap-1.5 spaces these; the icon is decorative, the text names it.

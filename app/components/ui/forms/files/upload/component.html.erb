@@ -7,7 +7,7 @@
   data-action="ui--forms--files--picker:picked->ui--forms--files--upload#picked"
 >
   <%= render(UI::Forms::Files::Picker::Component.new(form_builder: @form_builder, attribute: @attribute,
-        input_options: @html_options.deep_merge(data: {"ui--forms--files--upload-target": "input"}), accept: @accept, camera: @camera)) do |picker| %>
+        html_options: @html_options.deep_merge(data: {"ui--forms--files--upload-target": "input"}), accept: @accept, camera: @camera)) do |picker| %>
     <% picker.with_attached do %>
       <%#
         A pick previews here from a local object url, without waiting on a round trip - so the

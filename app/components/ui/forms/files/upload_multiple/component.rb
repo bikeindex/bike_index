@@ -17,7 +17,7 @@ module UI
             @list_html_options = list_html_options
             # No name: nothing submits it, the controller posts its files itself. The id is random so
             # two on a page don't hand both labels the same input
-            @input_options = {id: "files_upload_multiple_#{SecureRandom.hex(4)}", multiple: true}
+            @html_options = {id: "files_upload_multiple_#{SecureRandom.hex(4)}", multiple: true}
           end
         end
       end

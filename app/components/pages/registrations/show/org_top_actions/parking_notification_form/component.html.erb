@@ -30,7 +30,7 @@
 
         <% if new_parking_notification.can_be_repeat? %>
           <div class="tw:mb-4">
-            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[is_repeat]", selected: new_parking_notification.is_repeat, entries: [{value: true, label: "Repeat ##{new_parking_notification.earlier_bike_notifications.count} of earlier notification"}, {value: false, label: "First notice"}], data: {action: "registrations--show--parking-notification-form#selectRepeat"})) %>
+            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[is_repeat]", selected: new_parking_notification.is_repeat, entries: [{value: true, label: "Repeat ##{new_parking_notification.earlier_bike_notifications.count} of earlier notification"}, {value: false, label: "First notice"}], html_options: {data: {action: "registrations--show--parking-notification-form#selectRepeat"}})) %>
           </div>
         <% end %>
 
@@ -39,7 +39,7 @@
           data-registrations--show--parking-notification-form-target="locationSection"
         >
           <div class="tw:mb-3">
-            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", kind: :toggle, selected: "current", entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}], data: {action: "registrations--show--parking-notification-form#selectLocationMode", "registrations--show--parking-notification-form-target": "locationMode"})) %>
+            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", kind: :toggle, selected: "current", entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}], html_options: {data: {action: "registrations--show--parking-notification-form#selectLocationMode", "registrations--show--parking-notification-form-target": "locationMode"}})) %>
           </div>
 
           <div
