@@ -147,7 +147,7 @@ module Organized
       else
         @sort_column = "id" unless %w[id email].include?(sort_column)
 
-        b_params.order("b_params.#{sort_column} #{sort_direction}")
+        b_params.order(sortable_order(BParam))
       end
     end
 

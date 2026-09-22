@@ -4797,17 +4797,6 @@ es:
           no reclamadas se envían a su organización para su revisión y posterior reenvío
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
-    parking_notifications:
-      index:
-        matches_visible: visible
-        parking_notifications: notificaciones de estacionamiento
-      table:
-        address: DIRECCIÓN
-        bike: Bicicleta
-        by: Por
-        created: Creado
-        notification_number: Notificación#
-        resolved: Resuelto
     stickers:
       edit:
         bike: Bicicleta
@@ -4907,10 +4896,14 @@ es:
     impound_records:
       index:
         impound_records: Registros de decomiso
-        render_chart: Gráfico de renderizado
+        find_an_impound_record: Encontrar un registro de depósito
+        search_impound_records: Buscar registros de incautación
     registrations:
       search:
-        render_chart: Gráfico de renderizado
+        search_all_email_disabled: Solo puedes buscar los registros de tu organización
+          con el correo electrónico o el nombre del propietario.
+        search_registrations: Buscar registros
+        find_a_registration: Encuentra un registro
   organized_mailer:
     custom_message:
       subject: "%{org_name} - la ubicación de su %{mnfg_name}"
@@ -5640,8 +5633,6 @@ es:
         to: A
         update: Actualizar
         year: año
-      chart_async_frame:
-        loading_chart: Cargando gráfico...
       forms:
         legacy_form_well:
           address_record:
@@ -5696,6 +5687,8 @@ es:
           upload_multiple:
             upload_failed: Falló la carga
             uploading: subir
+        required_marker:
+          required: requerido
       alerts:
         base:
           error: Error
@@ -5807,13 +5800,41 @@ es:
             search_notes: Notas de búsqueda
             search_owner_email_or_name: Buscar el correo electrónico o el nombre del
               propietario
-          settings:
+          wrapper:
+            e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
+            view_matching_any_audit: ver coincidencia con cualquier auditoría
+            export_csv: Exportar CSV
+            matching_html:
+              one: "%{number} coincidencia"
+              other: "%{number} coincide"
+            over_count_matching_html: Más de %{number} coincidencias
+            per_page: Resultados por página
+            showing_html: mostrando %{from}–%{to} de %{count}
+            view_as: Ver como
+            view_spreadsheet: Hoja de cálculo
+            view_thumbnail: Uña del pulgar
+            export_unavailable_search_all: Solo puedes exportar los registros de tu
+              organización. Desmarca la opción "Buscar todos los registros" para exportarlos.
+          chart_card:
+            caption_search: Búsqueda actual
+            caption_year: Resumen del año pasado
+            chart: Cuadro
+            chart_motorized: Vehículo eléctrico
+            chart_registrations: Registros
+            chart_stolen: Robado
+            loading_chart: Cargando gráfico...
+            scope_search: Búsqueda actual
+            scope_year: El año pasado
+            stat_motorized: Registro de vehículos eléctricos
+            stat_registrations: Inscripciones totales
+            stat_stolen: Denunciado como robado
+            previous_year: "%{number} el año pasado"
+          column_settings:
+            acknowledgment_cell: Confirmación de la secuencia de registro
             address: 'DIRECCIÓN:'
             all: todo
             avery_cell: Exportable de Avery
-            bike: registro
             color_cell: Color
-            create_export_of_vehicles: Crear exportación de la búsqueda %{cycle_type}
             created_at_cell: Registrado
             creation_description_cell: Fuente
             cycle_type_cell: Tipo de vehículo
@@ -5823,6 +5844,8 @@ es:
             filter_no_sticker_html: "<strong>Sin</strong> pegatina"
             filter_not_impounded_html: solo que <strong>no</strong> fue confiscado
             filter_not_stolen_or_impounded_html: no robado ni confiscado
+            filter_not_unregistered_html: "<strong>no no</strong> registrado"
+            filter_only_unregistered_html: solo <strong>no registrados</strong>
             filter_stolen_html: solo robado
             filter_with_address_html: solo <strong>con</strong> dirección
             filter_with_stickers_html: solo <strong>con</strong> pegatinas
@@ -5831,39 +5854,42 @@ es:
             manufacturer_cell: Fabricante
             model_cell: Modelo
             none: ninguno
-            notes_cell: Notas de registro
             owner_email_cell: Enviado a
             owner_name_cell: Nombre del propietario
             propulsion_type_cell: Vehículo eléctrico (propulsión)
             reg_address_cell: DIRECCIÓN
             reg_extra_registration_number_cell: Secundario#
-            reg_organization_affiliation_cell: Afiliación
             reg_phone_cell: Teléfono
-            reg_student_id_cell: Carné de estudiante
             serial_number_cell: De serie
-            settings: ajustes
             show_notes_search: mostrar notas de búsqueda
             status: 'Estado:'
             status_cell: Estado
             sticker_cell: Etiqueta engomada
             stickers: 'Pegatinas:'
             stolen_cell: Robado
+            unregistered: 'No registrado:'
             updated_at_cell: Actualizado
             url_cell: URL
-            vehicle: registro
             visible_columns: Columnas visibles
-            acknowledgment_cell: Confirmación de la secuencia de registro
-          wrapper:
-            e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
-            matching_bikes_html: "%{count} %{cycle_type} coincidentes"
-            registered_bikes_html: "%{count} %{cycle_type} coincidente para %{org_name}"
-            view_matching_any_audit: ver coincidencia con cualquier auditoría
+            notes_cell_html: Notas de registro <em>de %{org_name}</em>
+            reg_organization_affiliation_cell_html: Afiliación <em>en %{org_name}</em>
+            reg_student_id_cell_html: Número de identificación del estudiante <em>%{org_name}</em>
+          column_settings_toggle:
+            column_settings: Configuración de columnas
+          settings_and_filters:
+            date_range: 'Rango de fechas:'
+            search_settings_and_filters: Configuración y filtros de búsqueda
+            filters: Filtros
+          search_all:
+            search_all_html: Buscar en todos los registros <span class="twless-strong">(no
+              solo en %{org_name})</span>
         search_results:
           bikes_table:
             assign_bike_sticker: Asignar pegatina
             email_hidden: Correo electrónico oculto
-            hidden_not_registered: oculto, no registrado con %{org_name}
             link_sticker: pegatina de enlace
+            hidden: oculto
+            not_registered_with: Oculto porque no está registrado con %{org_name}
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
@@ -5887,6 +5913,19 @@ es:
             only_user_registered: Solo usuarios registrados
             status_records: Registros %{status}
             update_multiple_records: Actualizar varios registros
+        parking_notifications:
+          index:
+            matches_visible: visible
+            parking_notifications: notificaciones de estacionamiento
+            find_a_parking_notification: Encontrar una notificación de estacionamiento
+            search_parking_notifications: Buscar notificaciones de estacionamiento
+          table:
+            address: DIRECCIÓN
+            bike: Bicicleta
+            by: Por
+            created: Creado
+            notification_number: Notificación#
+            resolved: Resuelto
       register:
         acknowledgment_check:
           i_name_html: Yo, %{name},
@@ -6304,7 +6343,6 @@ es:
             share: Compartir
             share_my_page: Comparte mi página
             audience_marketplace_preview: Vista previa del anuncio
-            nickname: 'apodo: %{name}'
           wrapper_org_admin:
             about_this_bike: Acerca de esto %{bike_type}
             assign_sticker: Asignar pegatina
@@ -6377,6 +6415,8 @@ es:
               visible arriba.
             update_note: Nota de actualización
             updated_by: Actualizado por %{user}
+          subtitle:
+            nickname: 'apodo: %{name}'
       search:
         everything_combobox:
           made_by: hecho por

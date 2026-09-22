@@ -70,6 +70,8 @@ class Organization < ApplicationRecord
 
   USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS = [36, 1].freeze # SBR and BikeIndex
 
+  ORGANIZATION_AFFILIATIONS = %w[student graduate_student postdoc employee community_member].freeze
+
   POS_KIND_ENUM = {
     no_pos: 0,
     other_pos: 1,
@@ -487,7 +489,7 @@ class Organization < ApplicationRecord
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
-    %w[student graduate_student postdoc employee community_member]
+    ORGANIZATION_AFFILIATIONS
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 

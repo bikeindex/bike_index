@@ -6,7 +6,7 @@ module Pages
       module BikesTable
         # The organization registrations table: bike rows with every org column.
         # Extracted from Pages::Org::Search::Wrapper so it can render on its own, without
-        # the search form, column-toggle settings, or pagination (e.g. a user's other
+        # the search form, column settings, or pagination (e.g. a user's other
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
           def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
@@ -29,10 +29,15 @@ module Pages
           end
 
           def hidden_not_registered_tag
-            @hidden_not_registered_tag ||= tag.em(
-              translation(".hidden_not_registered", org_name: @organization.short_name),
-              class: "less-strong tw:leading-snug tw:text-xs"
-            )
+            render(UI::Tooltip::Component.new(text: hidden_tooltip_text)) { hidden_label }
+          end
+
+          def hidden_label
+            @hidden_label ||= tag.em(translation(".hidden"), class: "less-strong tw:leading-snug tw:text-xs")
+          end
+
+          def hidden_tooltip_text
+            @hidden_tooltip_text ||= translation(".not_registered_with", org_name: @organization.short_name)
           end
 
           def table_wrapper_data_attributes

@@ -7,7 +7,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page
-      @pagy, @collection = pagy(:countish, matching_users.reorder("users.#{sort_column} #{sort_direction}")
+      @pagy, @collection = pagy(:countish, matching_users.reorder(sortable_order(User))
         .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :organization_roles, :ambassador_tasks, :email_bans_active),
         limit: @per_page, page: permitted_page)
     end
@@ -59,7 +59,7 @@ module Admin
           redirect_to admin_users_url, notice: "User Updated"
         else
           calculate_user_bikes
-          render action: :edit
+          render action: :edit, status: :unprocessable_entity
         end
       end
     end

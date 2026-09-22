@@ -25,14 +25,17 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     sign_in(user)
   end
 
-  def click_filter(text)
-    link = find("a.linkWithSortableSearchParams", text: text, visible: :all)
-    # Bootstrap dropdowns hide menu items until the parent toggle is clicked.
-    link.find(:xpath, "ancestor::li[contains(@class,'nav-item')][1]").find("a.dropdown-toggle").click
-    link.click
+  # Each filter loads a new page, and a click before ui--dropdown connects doesn't open it
+  def click_filter(menu, text)
+    wait_for_stimulus("ui--dropdown")
+    click_button "Open #{menu} menu"
+    click_link text
   end
 
-  def row_for(notification) = "tr[data-recordid='#{notification.id}']"
+  def row_for(notification) = "tr:has(> td > a[href$='/parking_notifications/#{notification.id}'])"
+
+  # The rows the map controller tracks - which excludes the popup's clone, stripped of its map cell
+  let(:rows) { "tr:has([data-org--parking-notifications-index-target='mapButton'])" }
 
   it "creates a parking notification through the redesigned registration show page" do
     # The redesign is desktop-first; the mobile resize above is only for the
@@ -146,52 +149,108 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     end
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
 
-    # Default view (status=current) loads three current notifications via JSON.
+    # Default view (status=current) lists the three current notifications
     expect(page).to have_css(row_for(registered), wait: 20)
     expect(page).to have_css(row_for(unregistered))
     expect(page).to have_css(row_for(abandoned))
-    expect(page).to have_css("tr.record-row", count: 3)
+    expect(page).to have_css(rows, count: 3)
 
-    # Regression: the click handler reads data-urlparams (not href), so this used to apply
-    # only_unregistered due to a copy-paste in the template.
-    click_filter("Registered bikes only")
+    click_filter("All bikes", "Registered bikes only")
     expect(page).to have_css(row_for(registered), wait: 20)
     expect(page).to have_css(row_for(abandoned))
     expect(page).not_to have_css(row_for(unregistered))
-    expect(page).to have_css("tr.record-row", count: 2)
+    expect(page).to have_css(rows, count: 2)
 
     # Clicking the active item toggles it off — unregistered comes back.
-    click_filter("Registered bikes only")
+    click_filter("Registered bikes only", "Registered bikes only")
     expect(page).to have_css(row_for(unregistered), wait: 20)
-    expect(page).to have_css("tr.record-row", count: 3)
+    expect(page).to have_css(rows, count: 3)
 
     # "Only unregistered bikes" hides the registered ones.
-    click_filter("Only unregistered bikes")
+    click_filter("All bikes", "Only unregistered bikes")
     expect(page).to have_css(row_for(unregistered), wait: 20)
     expect(page).not_to have_css(row_for(registered))
     expect(page).not_to have_css(row_for(abandoned))
-    expect(page).to have_css("tr.record-row", count: 1)
+    expect(page).to have_css(rows, count: 1)
 
     # "All bikes" shows everything again.
-    click_filter("All bikes")
-    expect(page).to have_css("tr.record-row", count: 3, wait: 20)
+    click_filter("Only unregistered bikes", "All bikes")
+    expect(page).to have_css(rows, count: 3, wait: 20)
 
     # Status dropdown: "Resolved" shows the retrieved notification.
-    click_filter("Resolved notifications")
+    click_filter("Current notifications", "Resolved notifications")
     expect(page).to have_css(row_for(retrieved), wait: 20)
     expect(page).not_to have_css(row_for(registered))
-    expect(page).to have_css("tr.record-row", count: 1)
+    expect(page).to have_css(rows, count: 1)
 
     # Toggle the active status off — back to the three current notifications.
-    click_filter("Resolved notifications")
+    click_filter("Resolved notifications", "Resolved notifications")
     expect(page).to have_css(row_for(registered), wait: 20)
-    expect(page).to have_css("tr.record-row", count: 3)
+    expect(page).to have_css(rows, count: 3)
     expect(page).not_to have_css(row_for(retrieved))
 
     # Kind dropdown narrows to a single kind.
-    click_filter("Appears abandoned notifications")
+    click_filter("All types", "Appears abandoned notifications")
     expect(page).to have_css(row_for(abandoned), wait: 20)
     expect(page).not_to have_css(row_for(registered))
-    expect(page).to have_css("tr.record-row", count: 1)
+    expect(page).to have_css(rows, count: 1)
+  end
+
+  it "maps the notifications, and resolves only the checked ones in view" do
+    # In Chicago, while the others are at the geocoder stub's New York
+    far_away = FactoryBot.create(:parking_notification_organized, organization:, user:, latitude: 41.8781, longitude: -87.6298)
+    # As when the geocoder fails: the address alone passes validation
+    ungeocoded = FactoryBot.create(:parking_notification_organized, organization:, user:, latitude: nil, longitude: nil, skip_geocoding: true, street: "1 Main St")
+    page.current_window.resize_to(1400, 2000)
+    page.driver.with_playwright_page do |playwright_page|
+      # Serve an empty MapLibre style so the map builds without fetching basemap tiles
+      playwright_page.context.route("https://maps.bikeindex.org/**", proc { |route, _request|
+        route.fulfill(status: 200, json: {version: 8, sources: {}, layers: []})
+      })
+    end
+    # An area around both New York and Chicago
+    visit "#{base_url}?search_southwest_coords=40,-88&search_northeast_coords=42.5,-73"
+    expect(page).to have_link("search everywhere")
+
+    # Every current notification gets a pin, and the map fits to them all
+    expect(page).to have_css(".maplibregl-marker", count: 3, wait: 15)
+    expect(page).to have_css(rows, count: 3)
+    expect(page).to have_content("3 visible")
+
+    within(row_for(abandoned)) { click_button "Show on map" }
+    within(".maplibregl-popup") do
+      expect(page).to have_content("Appears abandoned")
+      expect(page).not_to have_link("Created")
+    end
+    expect(page).to have_css(".maplibregl-marker[aria-current='true']", count: 1)
+    find("body").send_keys(:escape)
+    expect(page).not_to have_css(".maplibregl-popup")
+    expect(page).not_to have_css(".maplibregl-marker[aria-current]")
+
+    fill_in "Search map", with: "New York"
+    find_field("Search map").send_keys(:enter)
+    expect(page).to have_content("2 visible", wait: 15)
+    # A place search drops the searched area
+    expect(page).not_to have_link("search everywhere")
+    expect(page).to have_css(row_for(far_away), visible: :hidden)
+
+    click_button "retrieve/send repeat notification"
+    click_button "Select all"
+    select "Mark retrieved/resolved", from: "kind"
+    expect {
+      click_button "Resolve notifications"
+      expect(page).to have_css(rows, count: 2, visible: :all, wait: 10)
+    }.to change { [unregistered, abandoned].map { it.reload.status } }.to(%w[retrieved retrieved])
+    expect([far_away, ungeocoded].map { it.reload.status }).to eq %w[current current]
+
+    # Back on the searched place, with only the far away notification left. Fitting to it
+    # leaves the place, so the URL stops reopening there
+    expect(page).to have_current_path(/map_location=New/)
+    click_button "Fit map to notifications"
+    # The count updates when the fly from New York to Chicago lands, a few seconds out
+    expect(page).to have_content("1 visible", wait: 10)
+    expect(page).not_to have_current_path(/map_location/)
+    # The ungeocoded row has no pin to bring into view
+    expect(page).not_to have_button("Fit map to notifications")
   end
 end

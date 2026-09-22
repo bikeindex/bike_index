@@ -5,7 +5,8 @@
 
 <%= tag.div(data: table_wrapper_data_attributes) do %>
   <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-#{self.class.cache_digest}", render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
-    <% hidden_html = hidden_not_registered_tag %>
+    <%# Called per cell rather than captured: each tooltip mints its own id %>
+    <% hidden_html = method(:hidden_not_registered_tag) %>
     <% email_hidden = translation(".email_hidden") %>
 
     <% table.column(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>
@@ -65,11 +66,11 @@
 
     <% table.column(sortable: "owner_email", label: settings.column_renames[:owner_email_cell], classes: "hideableColumn owner_email_cell tw:leading-none") do |bike| %>
       <% if !bike.organized?(organization) %>
-        <%= hidden_html %>
+        <%= hidden_html.call %>
       <% elsif bike.email_visible_for?(organization) %>
         <%= bike.owner_email %>
         <small>
-          <%= link_to "\u{1F50E}", organization_registrations_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
+          <%= link_to search_emoji, organization_registrations_path(organization_id: organization.to_param, search_email: bike.owner_email), class: "display-sortable-link", data: {turbo_frame: "_top"} %>
         </small>
       <% else %>
         <em class="tw:text-gray-400"><%= email_hidden %></em>
@@ -90,7 +91,7 @@
           <em><%= bike.owner_name %></em>
         <% end %>
       <% else %>
-        <%= hidden_html %>
+        <%= hidden_html.call %>
       <% end %>
     <% end %>
 
@@ -109,7 +110,7 @@
     <% settings.additional_registration_fields.each do |reg_field| %>
       <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
         <% if !bike.organized?(organization) %>
-          <%= hidden_html %>
+          <%= hidden_html.call %>
         <% elsif reg_field != "reg_address" %>
           <%= OrgServices::RegistrationFields.value(bike:, organization:, reg_field:) %>
         <% else %>
@@ -127,7 +128,7 @@
             <%= number_display(bike.current_impound_record.id) %>
           <% end %>
         <% else %>
-          <%= hidden_html %>
+          <%= hidden_html.call %>
         <% end %>
       <% end %>
       <% table.column(label: settings.column_renames[:impounded_cell], classes: "hideableColumn impounded_cell tw:leading-none") do |bike| %>
@@ -138,7 +139,7 @@
             </small>
           <% end %>
         <% else %>
-          <%= hidden_html %>
+          <%= hidden_html.call %>
         <% end %>
       <% end %>
     <% end %>
@@ -157,7 +158,7 @@
               <%= render(UI::Time::Component.new(time: RegistrationSequenceAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>
             </small>
           <% else %>
-            <%= hidden_html %>
+            <%= hidden_html.call %>
           <% end %>
         <% end %>
       <% end %>

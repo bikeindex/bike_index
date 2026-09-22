@@ -4818,17 +4818,6 @@ it:
           reclamate vengono inviate alla vostra organizzazione per essere esaminate
           e inoltrate all'utente finale, poiché tali utenti non hanno attivato le
           notifiche di Bike Index.
-    parking_notifications:
-      index:
-        matches_visible: visibile
-        parking_notifications: Notifiche di parcheggio
-      table:
-        address: Indirizzo
-        bike: Bicicletta
-        by: Di
-        created: Creato
-        notification_number: Notifica#
-        resolved: Risolto
     stickers:
       edit:
         bike: Bicicletta
@@ -4926,10 +4915,14 @@ it:
     impound_records:
       index:
         impound_records: Registri di sequestro
-        render_chart: Grafico di rendering
+        find_an_impound_record: Trovare un registro dei sequestri
+        search_impound_records: Consultare i registri dei sequestri
     registrations:
       search:
-        render_chart: Grafico di rendering
+        search_all_email_disabled: È possibile cercare le registrazioni della propria
+          organizzazione solo tramite l'indirizzo email o il nome del proprietario.
+        search_registrations: Cerca registrazioni
+        find_a_registration: Trova una registrazione
   organized_mailer:
     custom_message:
       subject: "%{org_name} - la posizione del tuo %{mnfg_name}"
@@ -5653,8 +5646,6 @@ it:
         to: A
         update: Aggiorna
         year: anno
-      chart_async_frame:
-        loading_chart: Caricamento del grafico...
       forms:
         legacy_form_well:
           address_record:
@@ -5708,6 +5699,8 @@ it:
           upload_multiple:
             upload_failed: caricamento non riuscito
             uploading: caricamento
+        required_marker:
+          required: richiesto
       alerts:
         base:
           error: Errore
@@ -5819,13 +5812,42 @@ it:
             search_for_serial_number: Cerca il numero di serie
             search_notes: Note di ricerca
             search_owner_email_or_name: Cerca l'indirizzo email o il nome del proprietario
-          settings:
+          wrapper:
+            e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
+            view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
+            export_csv: Esporta in formato CSV
+            matching_html:
+              one: "%{number} corrispondenza"
+              other: "%{number} corrispondenze"
+            over_count_matching_html: Oltre %{number} partite
+            per_page: Risultati per pagina
+            showing_html: che mostra %{from}–%{to} di %{count}
+            view_as: Visualizza come
+            view_spreadsheet: Foglio di calcolo
+            view_thumbnail: Miniatura
+            export_unavailable_search_all: È possibile esportare solo le registrazioni
+              della propria organizzazione. Deselezionare "Cerca tutte le registrazioni"
+              per esportare.
+          chart_card:
+            caption_search: Ricerca attuale
+            caption_year: Riepilogo dell'anno scorso
+            chart: Grafico
+            chart_motorized: veicolo elettrico
+            chart_registrations: Iscrizioni
+            chart_stolen: Rubata
+            loading_chart: Caricamento del grafico...
+            scope_search: Ricerca attuale
+            scope_year: L'anno scorso
+            stat_motorized: Registrazioni dei veicoli elettrici
+            stat_registrations: Iscrizioni totali
+            stat_stolen: Segnalato come rubato
+            previous_year: "%{number} l'anno scorso"
+          column_settings:
+            acknowledgment_cell: Conferma della sequenza di registrazione
             address: 'Indirizzo:'
             all: Tutti
             avery_cell: Avery Esportabile
-            bike: registrazione
             color_cell: Colore
-            create_export_of_vehicles: Crea l'esportazione della ricerca %{cycle_type}
             created_at_cell: Registrato
             creation_description_cell: Fonte
             cycle_type_cell: Tipo di veicolo
@@ -5835,6 +5857,8 @@ it:
             filter_no_sticker_html: solo <strong>senza</strong> adesivo
             filter_not_impounded_html: solo <strong>non</strong> sequestrato
             filter_not_stolen_or_impounded_html: non rubato o sequestrato
+            filter_not_unregistered_html: "<strong>non non</strong> registrato"
+            filter_only_unregistered_html: solo <strong>non registrato</strong>
             filter_stolen_html: solo rubato
             filter_with_address_html: solo <strong>con</strong> indirizzo
             filter_with_stickers_html: solo <strong>con</strong> adesivi
@@ -5843,39 +5867,42 @@ it:
             manufacturer_cell: Produttore
             model_cell: Modello
             none: nessuno
-            notes_cell: Note
             owner_email_cell: Inviato a
             owner_name_cell: Nome del proprietario
             propulsion_type_cell: Veicolo elettrico (propulsione)
             reg_address_cell: Indirizzo
             reg_extra_registration_number_cell: Secondario#
-            reg_organization_affiliation_cell: Affiliazione
             reg_phone_cell: Telefono
-            reg_student_id_cell: Tessera studentesca
             serial_number_cell: Seriale
-            settings: impostazioni
             show_notes_search: mostra le note cerca
             status: 'Stato:'
             status_cell: Stato
             sticker_cell: Adesivo
             stickers: 'Adesivi:'
             stolen_cell: Rubata
+            unregistered: 'Non registrato:'
             updated_at_cell: Fatto
             url_cell: URL
-            vehicle: registrazione
             visible_columns: Colonne visibili
-            acknowledgment_cell: Conferma della sequenza di registrazione
-          wrapper:
-            e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
-            matching_bikes_html: "%{count} %{cycle_type} corrispondente"
-            registered_bikes_html: "%{count} %{cycle_type} corrispondente a %{org_name}"
-            view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
+            notes_cell_html: Note di registrazione <em>di %{org_name}</em>
+            reg_organization_affiliation_cell_html: Affiliazione <em>in %{org_name}</em>
+            reg_student_id_cell_html: Numero di matricola dello studente <em>%{org_name}</em>
+          column_settings_toggle:
+            column_settings: Impostazioni della colonna
+          settings_and_filters:
+            date_range: 'Intervallo di date:'
+            search_settings_and_filters: Impostazioni e filtri di ricerca
+            filters: Filtri
+          search_all:
+            search_all_html: Cerca tutte le registrazioni <span class="twless-strong">(non
+              solo %{org_name})</span>
         search_results:
           bikes_table:
             assign_bike_sticker: Collegamento
             email_hidden: email nascosto
-            hidden_not_registered: nascosto, non registrato con %{org_name}
             link_sticker: adesivo di collegamento
+            hidden: nascosto
+            not_registered_with: Nascosto perché non è registrato con %{org_name}
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:
@@ -5899,6 +5926,19 @@ it:
             only_user_registered: Solo utenti registrati
             status_records: "%{status} record"
             update_multiple_records: Aggiorna più record
+        parking_notifications:
+          index:
+            matches_visible: visibile
+            parking_notifications: Notifiche di parcheggio
+            find_a_parking_notification: Trova una notifica di parcheggio
+            search_parking_notifications: Cerca notifiche di parcheggio
+          table:
+            address: Indirizzo
+            bike: Bicicletta
+            by: Di
+            created: Creato
+            notification_number: Notifica#
+            resolved: Risolto
       register:
         acknowledgment_check:
           i_name_html: Io, %{name},
@@ -6322,7 +6362,6 @@ it:
             share: Condividere
             share_my_page: Condividi la mia pagina
             audience_marketplace_preview: Anteprima dell'inserzione
-            nickname: 'soprannome: %{name}'
           wrapper_org_admin:
             about_this_bike: Informazioni su questo %{bike_type}
             assign_sticker: Collegamento
@@ -6394,6 +6433,8 @@ it:
               sarà visibile qui sopra.
             update_note: Nota di aggiornamento
             updated_by: Aggiornato da %{user}
+          subtitle:
+            nickname: 'soprannome: %{name}'
       search:
         everything_combobox:
           made_by: realizzato da

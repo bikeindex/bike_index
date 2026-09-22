@@ -14,7 +14,7 @@
     <% if registration_sequence.template? %>
       <span class="twless-strong"><%= registration_sequence.badge_name %></span>
     <% else %>
-      <%= render(Pages::Admin::Organizations::Cell::Component.new(organization: registration_sequence.organization,
+      <%= render(Atoms::Admin::TableCells::Organization::Component.new(organization: registration_sequence.organization,
         organization_id: registration_sequence.organization_id, render_search: true,
         search_url: admin_registration_sequences_path(sort_state.search_params.to_h.merge(organization_id: registration_sequence.organization_id)))) %>
     <% end %>

@@ -17,8 +17,6 @@
       type="text/css"
     >
 
-    <script src="/vendored_assets/application_standalone.js"></script>
-
     <%= stylesheet_link_tag "tailwind", "admin", "data-turbo-track": "reload" %>
     <%= hw_combobox_style_tag %>
     <%= javascript_importmap_tags %>
@@ -35,7 +33,7 @@
   <% admin_body_class = "vendor-signup-page" if current_page?(:vendor_signup) %>
   <% admin_body_class = "news-page" if controller_name == "news" %>
 
-  <%= body_tag(html_class: admin_body_class) do %>
+  <%= body_tag(html_class: admin_body_class, data: {turbo: true}) do %>
     <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
     <%= render(Pages::Admin::Navbar::Component.new(current_user:, user_root_url:, search_filtered: admin_search_filtered?)) %>

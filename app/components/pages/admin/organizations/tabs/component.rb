@@ -17,7 +17,7 @@ module Pages
 
           # active: is passed rather than read off the route because a failed update renders the
           # tab it was submitted from, while the action is still "update"
-          def initialize(organization:, active:, subtitle: nil, additional_link: nil, turbo: true,
+          def initialize(organization:, active:, subtitle: nil, additional_link: nil,
             display_dev_info: false)
             raise_if_invalid_value!(:active, active, TABS)
 
@@ -25,7 +25,6 @@ module Pages
             @active = active
             @subtitle = subtitle
             @additional_link = additional_link
-            @turbo = turbo
             @display_dev_info = display_dev_info
           end
 

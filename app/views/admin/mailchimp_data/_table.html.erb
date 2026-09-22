@@ -41,24 +41,7 @@
     <% collection.each do |mailchimp_datum| %>
       <tr>
         <td>
-          <% if mailchimp_datum.user_id.present? %>
-            <% if mailchimp_datum.user.present? %>
-              <%= link_to mailchimp_datum.email, admin_user_path(mailchimp_datum.user) %>
-            <% else %>
-              <% user = User.unscoped.find_by_id(mailchimp_datum.user_id) %>
-              <% if user.present? %>
-                <%= link_to user.display_name, admin_user_path(user.to_param) %>
-                <small class="text-danger">user deleted</small>
-              <% else %>
-                <%= mailchimp_datum.email %>
-                <small class="text-danger">
-                  missing user: <%= mailchimp_datum.user_id %>
-                </small>
-              <% end %>
-            <% end %>
-          <% else %>
-            <%= mailchimp_datum.email %>
-          <% end %>
+          <%= render Atoms::Admin::TableCells::User::Component.new(user: mailchimp_datum.user, user_id: mailchimp_datum.user_id, email: mailchimp_datum.email) %>
         </td>
 
         <td>

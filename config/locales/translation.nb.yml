@@ -4589,17 +4589,6 @@ nb:
         why_no_direct_by_default: Som standard sendes e-poster til sykler som ikke
           er gjort krav på, til organisasjonen din for å gjennomgå og videresende
           til sluttbrukeren, fordi disse brukerne ikke har meldt seg på Bike Index-varsler.
-    parking_notifications:
-      index:
-        matches_visible: synlig
-        parking_notifications: Parkeringsmeldinger
-      table:
-        address: Adresse
-        bike: Sykkel
-        by: Av
-        created: Opprettet
-        notification_number: Melding#
-        resolved: Løst
     stickers:
       edit:
         bike: Sykkel
@@ -4696,10 +4685,14 @@ nb:
     impound_records:
       index:
         impound_records: Beslaglegg poster
-        render_chart: Gjengi diagram
+        find_an_impound_record: Finn en beslaglagt registrering
+        search_impound_records: Søk i beslaglagte poster
     registrations:
       search:
-        render_chart: Gjengi diagram
+        search_all_email_disabled: Du kan bare søke i organisasjonens registreringer
+          med eierens e-postadresse eller navn.
+        search_registrations: Søk etter registreringer
+        find_a_registration: Finn en registrering
   organized_mailer:
     custom_message:
       subject: "%{org_name} - plasseringen av din %{mnfg_name}"
@@ -5388,8 +5381,6 @@ nb:
         to: Til
         update: Oppdater
         year: år
-      chart_async_frame:
-        loading_chart: Laster inn diagrammet ...
       forms:
         legacy_form_well:
           address_record:
@@ -5443,6 +5434,8 @@ nb:
           upload_multiple:
             upload_failed: opplastingen mislyktes
             uploading: opplasting
+        required_marker:
+          required: nødvendig
       alerts:
         base:
           error: Feil
@@ -5549,13 +5542,41 @@ nb:
             search_for_serial_number: Søk etter serienummer
             search_notes: Søk i notater
             search_owner_email_or_name: Søk etter eierens e-postadresse eller navn
-          settings:
+          wrapper:
+            e_vehicles_for_audit: 'Elbiler for revisjon:'
+            view_matching_any_audit: visning som samsvarer med enhver revisjon
+            export_csv: Eksporter CSV
+            matching_html:
+              one: "%{number}-treff"
+              other: "%{number} treff"
+            over_count_matching_html: Over %{number} treff
+            per_page: Resultater per side
+            showing_html: viser %{from}–%{to} av %{count}
+            view_as: Vis som
+            view_spreadsheet: Regneark
+            view_thumbnail: Miniatyrbilde
+            export_unavailable_search_all: Du kan bare eksportere organisasjonens
+              registreringer. Fjern merket for «Søk i alle registreringer» for å eksportere.
+          chart_card:
+            caption_search: Nåværende søk
+            caption_year: Oversikt over fjoråret
+            chart: Diagram
+            chart_motorized: Elbil
+            chart_registrations: Registreringer
+            chart_stolen: Stjålet
+            loading_chart: Laster inn diagrammet ...
+            scope_search: Nåværende søk
+            scope_year: I fjor
+            stat_motorized: Registrering av elbiler
+            stat_registrations: Totalt antall registreringer
+            stat_stolen: Meldt stjålet
+            previous_year: "%{number} i fjor"
+          column_settings:
+            acknowledgment_cell: Bekreftelse av registreringssekvens
             address: 'Adresse:'
             all: Alle
             avery_cell: Avery eksporterbar
-            bike: registrering
             color_cell: Farge
-            create_export_of_vehicles: Opprett eksport av søkte %{cycle_type}
             created_at_cell: Registrert
             creation_description_cell: Kilde
             cycle_type_cell: Bil type
@@ -5565,6 +5586,8 @@ nb:
             filter_no_sticker_html: bare <strong>uten</strong> klistremerke
             filter_not_impounded_html: bare <strong>ikke</strong> beslaglagt
             filter_not_stolen_or_impounded_html: ikke stjålet eller beslaglagt
+            filter_not_unregistered_html: "<strong>ikke</strong> uregistrert"
+            filter_only_unregistered_html: kun <strong>uregistrerte</strong>
             filter_stolen_html: bare stjålet
             filter_with_address_html: bare <strong>med</strong> adresse
             filter_with_stickers_html: bare <strong>med</strong> klistremerker
@@ -5573,39 +5596,42 @@ nb:
             manufacturer_cell: Produsent
             model_cell: Modell
             none: ingen
-            notes_cell: Notater
             owner_email_cell: Sendt til
             owner_name_cell: Eiers navn
             propulsion_type_cell: Elbil (fremdrift)
             reg_address_cell: Adresse
             reg_extra_registration_number_cell: Sekundærnr.
-            reg_organization_affiliation_cell: Tilknytning
             reg_phone_cell: Telefon
-            reg_student_id_cell: Student ID
             serial_number_cell: Serienummer
-            settings: innstillinger
             show_notes_search: vis notatsøk
             status: 'Status:'
             status_cell: Status
             sticker_cell: Klistremerke
             stickers: 'Klistremerker:'
             stolen_cell: Stjålet
+            unregistered: 'Uregistrert:'
             updated_at_cell: Oppdatert
             url_cell: URL-adresse
-            vehicle: registrering
             visible_columns: Synlige kolonner
-            acknowledgment_cell: Bekreftelse av registreringssekvens
-          wrapper:
-            e_vehicles_for_audit: 'Elbiler for revisjon:'
-            matching_bikes_html: "%{count} %{cycle_type} samsvarende"
-            registered_bikes_html: "%{count} %{cycle_type} samsvarer med %{org_name}"
-            view_matching_any_audit: visning som samsvarer med enhver revisjon
+            notes_cell_html: Registreringsnotater <em>av %{org_name}</em>
+            reg_organization_affiliation_cell_html: Tilknytning <em>i %{org_name}</em>
+            reg_student_id_cell_html: Studentbevis <em>for %{org_name}</em>
+          column_settings_toggle:
+            column_settings: Kolonneinnstillinger
+          settings_and_filters:
+            date_range: 'Datoperiode:'
+            search_settings_and_filters: Søkeinnstillinger og filtre
+            filters: Filtre
+          search_all:
+            search_all_html: Søk i alle registreringer <span class="twless-strong">(ikke
+              bare %{org_name})</span>
         search_results:
           bikes_table:
             assign_bike_sticker: Tildel klistremerke
             email_hidden: e-post skjult
-            hidden_not_registered: skjult, ikke registrert hos %{org_name}
             link_sticker: lenkeklistremerke
+            hidden: skjult
+            not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
           multi_result_chip:
             no_results: ingen treff
           multi_results:
@@ -5629,6 +5655,19 @@ nb:
             only_user_registered: Kun bruker registrert
             status_records: "%{status} poster"
             update_multiple_records: Oppdater flere poster
+        parking_notifications:
+          index:
+            matches_visible: synlig
+            parking_notifications: Parkeringsmeldinger
+            find_a_parking_notification: Finn et parkeringsvarsel
+            search_parking_notifications: Søk etter parkeringsvarsler
+          table:
+            address: Adresse
+            bike: Sykkel
+            by: Av
+            created: Opprettet
+            notification_number: Melding#
+            resolved: Løst
       register:
         acknowledgment_check:
           i_name_html: Jeg, %{name},
@@ -6036,7 +6075,6 @@ nb:
             share: Dele
             share_my_page: Del siden min
             audience_marketplace_preview: Forhåndsvisning av oppføring
-            nickname: 'kallenavn: %{name}'
           wrapper_org_admin:
             about_this_bike: Om dette %{bike_type}
             assign_sticker: Tildel klistremerke
@@ -6107,6 +6145,8 @@ nb:
               dine vil være synlig ovenfor.
             update_note: Oppdater merknad
             updated_by: Oppdatert av %{user}
+          subtitle:
+            nickname: 'kallenavn: %{name}'
       search:
         everything_combobox:
           made_by: laget av

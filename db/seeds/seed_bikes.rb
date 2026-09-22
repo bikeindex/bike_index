@@ -23,6 +23,7 @@ def bike_params(owner_email:, manufacturer_id: nil)
 end
 
 def seed_bike(creator:, user:, params:, origin: nil, label: "bike")
+  SeedHelpers.tick
   b_param = BParam.create!(creator: user, params:)
   b_param.origin = origin if origin
   bike = creator.create_bike(b_param)
@@ -65,7 +66,7 @@ stolen_locations.each_with_index do |loc, i|
     creator:, user:, label: "Stolen bike",
     params: {
       bike: bike_params(owner_email: "testuser+#{i + 50}@bikeindex.org")
-        .merge(status: "status_stolen", date_stolen: (Time.current - rand(1..30).days).to_s),
+        .merge(status: "status_stolen", date_stolen: (Time.current - rand(4..24).hours).to_s),
       stolen_record: {
         latitude: loc[:latitude].to_s,
         longitude: loc[:longitude].to_s,
@@ -242,7 +243,7 @@ trek_bike = seed_bike(
       rear_wheel_size_id: seven_hundred_c_id,
       description: "OCLV Mountain Carbon, 120mm travel, RockShox Pike Ultimate fork and Deluxe Ultimate shock, SRAM XX SL Eagle AXS T-Type, Bontrager Line Pro 30 carbon wheels.",
       status: "status_stolen",
-      date_stolen: (Time.current - 14.days).to_s
+      date_stolen: (Time.current - rand(4..24).hours).to_s
     ),
     stolen_record: {
       latitude: trek_location[:latitude].to_s,

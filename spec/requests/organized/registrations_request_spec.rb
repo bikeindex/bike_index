@@ -7,6 +7,17 @@ RSpec.describe Organized::RegistrationsController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
   describe "index" do
+    # UI::PeriodSelect's chips fill the custom panel from their own ranges, so they have to
+    # be the ranges the controller computes for the same period
+    it "computes the ranges the period chips carry" do
+      %w[hour day week month year].each do |period|
+        get base_url, params: {search_no_js: true, period:}
+        range = UI::PeriodSelect::Component.period_range(period)
+        expect(assigns(:start_time)).to be_within(5.seconds).of(range.first)
+        expect(assigns(:end_time)).to be_within(5.seconds).of(range.last)
+      end
+    end
+
     let(:query_params) do
       {
         search_no_js: true,
@@ -23,12 +34,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     let!(:non_organization_bike) { FactoryBot.create(:bike) }
     let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
     let(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: current_organization) }
+
     it "sends all the params and renders search template to organization_bikes" do
       get base_url, params: query_params
       expect(response.status).to eq(200)
       expect(response.body).to_not include("fbevents.js")
       expect(assigns(:current_organization)).to eq current_organization
-      expect(assigns(:search_query_present)).to be_truthy
+      # impound_bikes is enabled, so registrations leave impounded bikes out unless asked
+      expect(assigns(:search_status)).to eq "not_impounded"
       expect(assigns(:bikes).pluck(:id)).to eq([])
       expect(assigns(:search_stickers)).to eq false
       # create_export fails if the org doesn't have have csv_exports
@@ -39,7 +52,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       get base_url, params: {search_no_js: true, search_address: "without_street"}
       expect(response.status).to eq(200)
-      expect(assigns(:search_query_present)).to be_falsey
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
     context "member_no_bike_edit" do
@@ -49,7 +61,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: query_params
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
-        expect(assigns(:search_query_present)).to be_truthy
         expect(assigns(:bikes).pluck(:id)).to eq([])
       end
     end
@@ -139,6 +150,147 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         end
       end
     end
+    context "with search_all" do
+      it "reaches past the organization's own registrations, and refuses an export" do
+        get base_url, params: {search_no_js: true}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        get base_url, params: {search_no_js: true, search_all: true}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_all)).to be_truthy
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, non_organization_bike.id])
+      end
+
+      it "counts and pages only as far as the card counts" do
+        FactoryBot.create(:bike_organized, creation_organization: current_organization)
+        stub_const("BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT", 1)
+
+        get base_url, params: {search_no_js: true, search_all: true, per_page: 1}
+        expect(assigns(:pagy).count).to eq 1
+        expect(assigns(:pagy).last).to eq 1
+
+        # The organization's own registrations are countable, so they aren't capped
+        get base_url, params: {search_no_js: true, per_page: 1}
+        expect(assigns(:pagy).count).to eq 2
+        expect(assigns(:pagy).last).to eq 2
+      end
+
+      context "with search_email" do
+        let!(:non_organization_bike) { FactoryBot.create(:bike, owner_email: bike.owner_email) }
+
+        it "only searches the organization's registrations" do
+          get base_url, params: {search_no_js: true, search_all: true, search_email: bike.owner_email}
+          expect(response.status).to eq(200)
+          expect(assigns(:search_all)).to be_falsey
+          expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+        end
+      end
+
+      context "with csv_exports" do
+        let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+        it "doesn't create an export" do
+          expect {
+            get base_url, params: {search_no_js: true, search_all: true, create_export: true, serial: bike.serial_number}
+          }.to_not change(Export, :count)
+          expect(response.status).to eq(200)
+        end
+      end
+    end
+
+    context "with search_unregisteredness" do
+      let!(:unregistered_bike) do
+        FactoryBot.create(:bike_organized, creation_organization: current_organization,
+          status: "unregistered_parking_notification")
+      end
+
+      it "filters on the bike's own status" do
+        get base_url, params: {search_no_js: true, search_unregisteredness: "only_unregistered"}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_unregisteredness)).to eq "only_unregistered"
+        expect(assigns(:bikes).pluck(:id)).to eq([unregistered_bike.id])
+
+        get base_url, params: {search_no_js: true, search_unregisteredness: "only_registered"}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+
+        # and an unrecognized value doesn't filter
+        get base_url, params: {search_no_js: true, search_unregisteredness: "whatever"}
+        expect(assigns(:search_unregisteredness)).to eq false
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, unregistered_bike.id])
+
+        # nor does a malformed one
+        get base_url, params: {search_no_js: true, search_unregisteredness: ["only_unregistered"]}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_unregisteredness)).to eq false
+      end
+    end
+
+    context "the chart frame asking" do
+      let(:frame_headers) { {"Turbo-Frame" => "chart_card_frame"} }
+
+      it "answers the year scope unless asked for the search, linking both at the page's URL" do
+        get base_url, params: {serial: "no-match-at-all"}, headers: frame_headers
+        expect(response.status).to eq(200)
+        expect(assigns(:chart_scope)).to eq "year"
+
+        get base_url, params: {chart_scope: "search"}, headers: frame_headers
+        expect(response.status).to eq(200)
+        expect(assigns(:chart_scope)).to eq "search"
+
+        # The scope links advance the address bar, so what they put there has to be the page
+        get base_url, params: {period: "week"}, headers: frame_headers
+        expect(assigns(:chart_scope_paths)[:year]).to eq "#{base_url}?chart_scope=year&period=week"
+
+        # Sorting is a different question than which scope the chart is answering
+        get base_url, params: {search_no_js: true, chart_scope: "year"}
+        expect(assigns(:sort_state).search_params[:chart_scope]).to eq "year"
+      end
+
+      it "counts whole months for the year scope, and holds them for the hour" do
+        get base_url, headers: frame_headers
+        expect(assigns(:chart_time_range).first).to eq(Time.current.beginning_of_month - 1.year)
+        expect(assigns(:registrations_stats).first.count).to eq 1
+
+        FactoryBot.create(:bike_organized, creation_organization: current_organization)
+        get base_url, headers: frame_headers
+        expect(assigns(:registrations_stats).first.count).to eq 1
+
+        # The searched scope answers the search as it is, so it isn't held
+        get base_url, params: {chart_scope: "search"}, headers: frame_headers
+        expect(assigns(:registrations_stats).first.count).to eq 2
+
+        # ...but only ever over the organization's own, whatever search_all asks
+        get base_url, params: {chart_scope: "search", search_all: true}, headers: frame_headers
+        expect(assigns(:registrations_stats).first.count).to eq 2
+      end
+
+      it "compares the year scope with the year before only once the organization is a year old" do
+        get base_url, headers: frame_headers
+        expect(assigns(:registrations_stats).map(&:previous_count)).to eq [nil, nil, nil]
+
+        Rails.cache.clear
+        current_organization.update_column(:created_at, 13.months.ago)
+        get base_url, headers: frame_headers
+        expect(assigns(:registrations_stats).map(&:previous_count)).to eq [0, 0, 0]
+      end
+    end
+
+    context "search_result_view" do
+      it "defaults to the spreadsheet, and carries what it's given into the next search" do
+        get base_url, params: {search_no_js: true}
+        expect(assigns(:result_view)).to eq :spreadsheet
+
+        get base_url, params: {search_no_js: true, search_result_view: "nonsense"}
+        expect(assigns(:result_view)).to eq :spreadsheet
+
+        get base_url, params: {search_no_js: true, search_result_view: "thumbnail"}
+        expect(assigns(:result_view)).to eq :thumbnail
+        # The view rides in the address bar, so a new search has to carry it
+        expect(Capybara.string(response.body))
+          .to have_css("#Search_Form input[name=search_result_view][value=thumbnail]", visible: :all)
+      end
+    end
+
     context "turbo_stream" do
       it "renders with update action" do
         get base_url, as: :turbo_stream
@@ -171,10 +323,16 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {search_no_js: true}
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
-        expect(assigns(:search_query_present)).to be_falsey
         expect(assigns(:search_stickers)).to eq false
+        # Without impound_bikes there's no impoundedness to leave out
+        expect(assigns(:search_status)).to eq "all"
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
         expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})
+
+        # ... and no filtering by it either, the panel doesn't offer the impound statuses
+        get base_url, params: {search_no_js: true, search_status: "impounded"}
+        expect(assigns(:search_status)).to eq "all"
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id, impounded_bike.id])
       end
     end
 
@@ -386,11 +544,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response).to render_template :multi_search
     end
 
-    it "wires up multi-search and the column toggle on one element" do
+    it "wires up multi-search, the column settings and its collapse on one element" do
       get "#{base_url}/multi_search"
       wrapper = Nokogiri::HTML(response.body).at_css("[data-org--multi-search-url-value]")
-      expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search org--search org--search-column-toggle])
-      expect(JSON.parse(wrapper["data-org--search-column-toggle-default-columns-value"])).to include("created_at_cell")
+      expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search ui--collapse org--search org--search-column-settings])
+      expect(JSON.parse(wrapper["data-org--search-column-settings-default-columns-value"])).to include("created_at_cell")
     end
   end
 
@@ -420,14 +578,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:search_all)).to eq true
         expect(assigns(:bikes).pluck(:id)).to eq([other_bike.id])
-        expect(response.body).to include("hidden, not registered with #{current_organization.short_name}")
+        expect(response.body).to include("Hidden because it is not registered with #{current_organization.short_name}")
         expect(response.body).not_to include(other_bike.owner_email)
 
         # Own-org bike: full data renders, no redaction marker
         get "#{base_url}/multi_search_response", params: {serial: "ABCD1234", search_all: "1"}, headers: turbo_headers
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
         expect(response.body).to include(bike.owner_email)
-        expect(response.body).not_to include("hidden, not registered")
+        expect(response.body).not_to include("Hidden because it is not registered")
       end
     end
 
@@ -464,7 +622,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "ZZ999"}, headers: turbo_headers
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([other_bike.id])
-      expect(response.body).to include("hidden, not registered with #{current_organization.short_name}")
+      expect(response.body).to include("Hidden because it is not registered with #{current_organization.short_name}")
       expect(response.body).not_to include(other_bike.owner_email)
 
       # Missing query → bad request

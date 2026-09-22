@@ -10,7 +10,7 @@
       = render(UI::Alerts::ObjectError::Component.new(object: @organization_role))
 
       = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: OrganizationRole.human_attribute_name(:organization), required: true)) do
-        = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, placeholder: "Please select an organization", required: true, include_blank: true, options: @organizations.pluck(:name, :id))
+        = render UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Please select an organization", required: true})
 
       .form-group
         = f.label :invited_email

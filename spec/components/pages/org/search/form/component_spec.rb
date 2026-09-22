@@ -5,8 +5,10 @@ require "rails_helper"
 RSpec.describe Pages::Org::Search::Form::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
-  let(:options) { {target_search_path:, interpreted_params:} }
+  let(:options) { {target_search_path:, interpreted_params:, heading:, submit_text:} }
   let(:target_search_path) { "/bikes" }
+  let(:heading) { "Find a registration" }
+  let(:submit_text) { "Search registrations" }
   let(:interpreted_params) { {} }
 
   it "renders form with search fields" do
@@ -19,8 +21,9 @@ RSpec.describe Pages::Org::Search::Form::Component, type: :component do
     expect(component).to have_css("input[name='search_model_audit_id']", visible: :hidden)
     expect(component).not_to have_css("input[name='search_location']")
     expect(component).not_to have_css("input[name='search_proximity']")
-    # The icon is the button's only content, so an unsized one leaves a blank blue box
-    expect(component).to have_css("#search-button[width='29'].tw\\:w-full.tw\\:h-auto")
+    expect(component).to have_css("h2", text: "Find a registration")
+    # Outside the form, so it reaches it by id
+    expect(component).to have_css("button[type='submit'][form='Search_Form']", text: "Search registrations")
   end
 
   context "with interpreted_params values" do
@@ -42,16 +45,6 @@ RSpec.describe Pages::Org::Search::Form::Component, type: :component do
     end
   end
 
-  context "with skip_serial_field" do
-    let(:options) { {target_search_path:, interpreted_params:, skip_serial_field: true} }
-
-    it "renders without serial field" do
-      expect(component).to have_css("form#Search_Form")
-      expect(component).to have_css("input[name='search_email']")
-      expect(component).not_to have_css("input[name='serial']")
-    end
-  end
-
   context "when serial looks like not a serial" do
     let(:interpreted_params) { {raw_serial: "xyz", serial: nil} }
 
@@ -69,7 +62,10 @@ RSpec.describe Pages::Org::Search::Form::Component, type: :component do
   end
 
   context "with target_frame" do
-    let(:options) { {target_search_path:, interpreted_params:, target_frame: :organized_bikes_results_frame} }
+    let(:options) do
+      {target_search_path:, interpreted_params:, heading:, submit_text:,
+       target_frame: :organized_bikes_results_frame}
+    end
 
     it "renders turbo form with search--form controller" do
       expect(component).to have_css("[data-controller='search--form']")

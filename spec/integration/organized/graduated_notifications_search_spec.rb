@@ -59,7 +59,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     type_into(".hw-combobox__input", "Black")
     expect(page).to have_css(".hw-combobox__option", text: "Black", wait: 10)
     click_combobox_option("Black")
-    find("#search-button").click
+    click_button "Search graduated notifications"
 
     expect(page).to have_current_path(/query_items/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame", wait: 10)
@@ -80,7 +80,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     # regression still fails here rather than being retried away.
     fill_in "search_email", with: "alice@example.com"
     expect(page).to have_field("search_email", with: "alice@example.com", wait: 10)
-    find("#search-button").click
+    click_button "Search graduated notifications"
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
@@ -97,7 +97,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
 
     # Re-apply alice filter for click-row/back-nav steps
     fill_in "search_email", with: "alice@example.com"
-    find("#search-button").click
+    click_button "Search graduated notifications"
 
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
@@ -136,7 +136,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
 
     # Clear email filter for status-dropdown test
     fill_in "search_email", with: ""
-    find("#search-button").click
+    click_button "Search graduated notifications"
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
     expect(page).to have_content("alice@example.com")
     expect(page).to have_content("bob@example.com")
@@ -164,7 +164,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).not_to have_content("bob@example.com")
 
     # Submit again — hidden search_status field preserves the selection
-    find("#search-button").click
+    click_button "Search graduated notifications"
     expect(page).to have_current_path(/search_status=marked_remaining/, wait: 10)
     expect(page).to have_content("carol@example.com")
 
@@ -172,7 +172,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     visit "#{graduated_notifications_path}?search_secondary=true"
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     fill_in "search_email", with: "alice@example.com"
-    find("#search-button").click
+    click_button "Search graduated notifications"
     expect(page).to have_current_path(/search_secondary=true/, wait: 10)
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
   end

@@ -49,10 +49,6 @@ module Atoms
         def per_pages
           [10, 25, 50, 100, @index.per_page.to_i].uniq.sort
         end
-
-        def per_page_select_id
-          "per_page_select#{"-skiptotal" if @skip_total}"
-        end
       end
     end
   end

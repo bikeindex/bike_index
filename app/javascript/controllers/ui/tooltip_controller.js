@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom'
+import { computePosition, flip, shift, offset, arrow, autoUpdate } from '@floating-ui/dom'
 import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_index'
 
 // Connects to data-controller="ui--tooltip"
@@ -9,8 +9,18 @@ import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_ind
 //   persistentActive  set by focus or a click / cleared by a press outside or
 //                     focus moving to another element in the page
 // The tooltip is visible whenever either flag is true.
+
+// Keyed by placement side: the tooltip edge the arrow sits on, and the
+// arrow's two outward borders (top right bottom left)
+const ARROW_SIDES = {
+  top: { edge: 'bottom', borderWidth: '0 1px 1px 0' },
+  right: { edge: 'left', borderWidth: '0 0 1px 1px' },
+  bottom: { edge: 'top', borderWidth: '1px 0 0 1px' },
+  left: { edge: 'right', borderWidth: '1px 1px 0 0' }
+}
+
 export default class extends Controller {
-  static targets = ['trigger', 'tooltip']
+  static targets = ['trigger', 'tooltip', 'arrow']
   static values = {
     placement: { type: String, default: 'top' }
   }
@@ -104,14 +114,26 @@ export default class extends Controller {
   }
 
   async updatePosition () {
-    const { x, y } = await computePosition(this.triggerTarget, this.tooltipTarget, {
+    const { x, y, placement, middlewareData } = await computePosition(this.triggerTarget, this.tooltipTarget, {
       placement: this.placementValue,
-      middleware: [offset(6), flip(), shift({ padding: 4 })]
+      middleware: [offset(8), flip(), shift({ padding: 4 }), arrow({ element: this.arrowTarget, padding: 4 })]
     })
     Object.assign(this.tooltipTarget.style, {
       left: `${x}px`,
       top: `${y}px`,
       position: 'absolute'
+    })
+
+    const { edge, borderWidth } = ARROW_SIDES[placement.split('-')[0]]
+    const { x: arrowX, y: arrowY } = middlewareData.arrow
+    // -5px: half the 8px arrow, plus the tooltip's 1px border
+    Object.assign(this.arrowTarget.style, {
+      left: arrowX != null ? `${arrowX}px` : '',
+      top: arrowY != null ? `${arrowY}px` : '',
+      right: '',
+      bottom: '',
+      [edge]: '-5px',
+      borderWidth
     })
   }
 }

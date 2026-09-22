@@ -47,12 +47,7 @@
       data-controller="ui--collapse"
       data-ui--collapse-param-value="contact_owner"
     >
-      <%= render(UI::Button::Component.new(
-          text: claim_button_text,
-          color: :purple,
-          aria: {expanded: false},
-          data: {"ui--collapse-target": "trigger", action: "ui--collapse#toggle"}
-        )) %>
+      <%= render(UI::Collapse::Component.new(text: claim_button_text, color: :purple)) %>
 
       <div data-ui--collapse-target="content" class="tw:hidden">
         <%= form_with(model: new_impound_claim, url: impound_claims_path, builder: BikeIndexFormBuilder, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |form| %>

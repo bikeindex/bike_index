@@ -64,12 +64,12 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
     context "with another registration" do
       let!(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: bike.user) }
 
-      it "renders the column-toggle settings inside the card" do
+      it "renders the column settings inside the card" do
         render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
 
-        expect(page).to have_css("[data-controller~='org--search-column-toggle']")
+        expect(page).to have_css("[data-controller~='org--search-column-settings']")
         expect(page).to have_text("Visible columns")
-        expect(page).to have_button("settings", visible: :all)
+        expect(page).to have_button("Column settings", visible: :all)
       end
 
       context "on a bike registered elsewhere, viewed by a limited member" do

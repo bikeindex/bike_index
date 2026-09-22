@@ -137,7 +137,7 @@ GEM
     bcrypt (3.1.22)
     benchmark (0.5.0)
     bigdecimal (4.1.3)
-    binxtils (0.7.0)
+    binxtils (0.8.1)
       functionable
       loofah
       rails
@@ -521,7 +521,7 @@ GEM
       money (~> 6.13)
       railties (>= 3.0)
     msgpack (1.8.4)
-    multi_json (1.21.1)
+    multi_json (1.21.2)
     multipart-post (2.4.1)
     mustermann (4.0.0)
     mustermann-grape (1.1.0)

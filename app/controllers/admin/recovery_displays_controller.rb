@@ -9,7 +9,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @recovery_displays = pagy(:countish, matching_recovery_displays
-        .order(@time_range_column => sort_direction), limit: @per_page, page: permitted_page)
+        .order(sortable_order(RecoveryDisplay)), limit: @per_page, page: permitted_page)
     end
 
     def new
@@ -40,7 +40,7 @@ module Admin
         flash[:success] = "Recovery display saved!"
         redirect_to admin_recovery_displays_path
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -50,7 +50,7 @@ module Admin
         flash[:success] = "Recovery display created!"
         redirect_to admin_recoveries_path
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

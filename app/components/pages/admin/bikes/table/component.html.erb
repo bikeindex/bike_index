@@ -1,8 +1,4 @@
 <%# require inline CSS setting because of caching %>
-<% unless @display_dev_info %>
-  <style>.only-dev-visible {display: none !important;} </style>
-<% end %>
-
 <% if @skip_manufacturer_link %>
   <style>.display-mnfg-link {display: none !important;}</style>
 <% end %>
@@ -49,7 +45,7 @@
         <div class="tw:relative">
           <%# Pass in search_url because caching breaks with url_for %>
           <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
-          <%= render Pages::Admin::Users::Cell::Component.new(email: bike.owner_email, user: bike.user, search_url:, render_search: true) %>
+          <%= render Atoms::Admin::TableCells::User::Component.new(email: bike.owner_email, user: bike.user, search_url:, render_search: true) %>
 
           <% if bike.claimed? %>
             <span

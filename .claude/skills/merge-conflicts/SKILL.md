@@ -56,6 +56,10 @@ That makes your side byte-identical to what the squash put on `main`, so the add
 
 The branch is usually deleted locally *and* on the remote by then, so don't look for `origin/<base>`; `headRefOid` and `refs/pull/<n>/head` are how you reach the commit.
 
+### Part of this branch already shipped as its own PR
+
+Same cause the other way round: work split off this branch into its own PR lands on `main` as one squash commit, so every file both touched conflicts. `main`'s side is the reviewed version of your own change — take it, then check that `git diff origin/main` lists only the work that PR left out.
+
 ## Keep the merge commit to *just* the merge
 
 A merge commit should contain **only** the reconciliation of the two histories — nothing else. Don't fold in lint fixes, refactors, renames, or "while I'm here" cleanups; buried inside a merge they're invisible in most diff views. Land them as separate commits *after* the merge.
@@ -113,6 +117,8 @@ A dependency bump arriving in the merge leaves the lockfile ahead of what's inst
 Then run specs for the merged area, **including the browser ones**. The base renaming or moving something your branch calls produces no conflict marker at all: a method that moved to a service, a route reshaped into a query param, copy your specs assert on. Those only surface at runtime.
 
 `bin/rails db:migrate` too, when the merge brought migrations — the test database is maintained from the schema, so the specs stay green while every page in the browser is an `ActiveRecord::PendingMigrationError`.
+
+**`bin/rails tailwindcss:build` when the merge brought `app/assets/tailwind/**`**, before the browser specs — they read `app/assets/builds/tailwind.css`, so a rule the base added is missing until it's rebuilt and the failure names the assertion (a border width, a radius) rather than the build.
 
 ## Never force-push
 

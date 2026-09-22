@@ -31,7 +31,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
 
   # The listing reads the same to the seller previewing it and to the buyer who found it
   def expect_listing_shown
-    expect(page).to have_content("For Sale")
+    expect(page).to have_content("FOR SALE")
     expect(page).to have_content("$450")
     expect(page).to have_content("price is negotiable")
     expect(page).to have_content("lightly ridden")

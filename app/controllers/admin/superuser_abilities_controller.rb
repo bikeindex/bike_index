@@ -6,7 +6,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
-      @pagy, @collection = pagy(:countish, searched_superuser_abilities.reorder("superuser_abilities.#{sort_column} #{sort_direction}")
+      @pagy, @collection = pagy(:countish, searched_superuser_abilities.reorder(sortable_order(SuperuserAbility))
         .includes(:user), limit: @per_page, page: permitted_page)
     end
 
@@ -20,7 +20,7 @@ module Admin
         flash[:success] = "Superuser Ability created!"
         redirect_to edit_admin_superuser_ability_path(@superuser_ability)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 
@@ -32,7 +32,7 @@ module Admin
         flash[:success] = "Superuser Ability saved!"
         redirect_to edit_admin_superuser_ability_path(@superuser_ability)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 

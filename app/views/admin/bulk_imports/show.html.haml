@@ -101,7 +101,7 @@
 
 
 - if @bulk_import.ownerships.count < 1 || params[:show_reprocess]
-  = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary float-right"
+  = render UI::ButtonLink::Component.new(text: "Reprocess Import", href: admin_bulk_import_path(@bulk_import, reprocess: true), method: :put, form: {class: "float-right"})
 
 %h2.mt-4
   Bikes - #{number_display(@bulk_import.bikes.count)}
@@ -114,4 +114,4 @@
           = link_to "organization view", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
           for paginated list
 
-= render Pages::Admin::Bikes::Table::Component.new(bikes: @bulk_import.bikes.reorder(id: :desc).limit(25), sort_state:, display_dev_info: display_dev_info?)
+= render Pages::Admin::Bikes::Table::Component.new(bikes: @bulk_import.bikes.reorder(id: :desc).limit(25), sort_state:)

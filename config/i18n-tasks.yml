@@ -165,7 +165,7 @@ ignore_unused:
   - "activerecord.errors.*"
   - "activerecord.models.*"
   - "controllers.*" # our translation helper component blocks detection
-  - "components.pages.org.search.settings.*" # used dynamically by ComponentStructs::OrgSearchSettings
+  - "components.pages.org.search.column_settings.*" # used dynamically by ComponentStructs::OrgSearchSettings
   - "shared.menu_items_account.*" # used dynamically by UserServices::MenuItemsAccount
   - "shared.menu_items_org.*" # used dynamically by UserServices::MenuItemsOrg
   - "shared.register_flow.*" # used dynamically by BikeServices::Register

@@ -74,8 +74,12 @@ RSpec.describe Admin::UsersController, type: :request do
       end
     end
     it "renders" do
+      FactoryBot.create(:membership, user: user_subject)
+      FactoryBot.create(:organization_role_claimed, user: user_subject)
+      user_email = FactoryBot.create(:user_email, user: user_subject)
       get "#{base_url}/#{user_subject.id}/edit"
       expect(response).to render_template :edit
+      expect(response.body).to include(user_email.email)
     end
 
     # It rendered a link with ?method=delete, so deleting quietly did nothing but show the user again

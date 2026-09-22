@@ -13,6 +13,8 @@ RSpec.describe HeaderTagHelper, type: :helper do
     end
     let(:controller_namespace) { nil }
     let(:action_name) { "index" }
+    # A controller helper_method, so these examples are its receiver
+    let(:display_dev_info?) { false }
     let(:target) do
       {
         page_title:,
@@ -22,7 +24,8 @@ RSpec.describe HeaderTagHelper, type: :helper do
         controller_name:,
         controller_namespace:,
         action_name:,
-        request_url: "http://test.host"
+        request_url: "http://test.host",
+        display_dev_info: false
       }
     end
     let(:page_title) { nil }

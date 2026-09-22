@@ -5,7 +5,7 @@ module Admin
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
     def index
-      @manufacturers = searched_manufacturers.reorder("manufacturers.#{sort_column} #{sort_direction}")
+      @manufacturers = searched_manufacturers.reorder(sortable_order(Manufacturer))
     end
 
     def show
@@ -25,7 +25,7 @@ module Admin
         AutocompleteLoaderJob.perform_async
         redirect_to admin_manufacturer_url(@manufacturer)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -36,7 +36,7 @@ module Admin
         AutocompleteLoaderJob.perform_async
         redirect_to admin_manufacturer_url(@manufacturer)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

@@ -15,9 +15,14 @@ module SharedBlocks
         ROW = "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] " \
           "tw:text-sm tw:leading-tight tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:max-[760px]:py-3.5"
         ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
-        # A link goes current off the aria-current the is-active variant already reads; a group
-        # toggle off the data-active shared-blocks--org-sidebar puts on the one holding that link
+        # A link goes current off the aria-current the is-active variant already reads
         ROW_CURRENT = "tw:is-active:bg-blue-50 tw:is-active:text-blue-600 tw:is-active:dark:bg-gray-700"
+        # A group toggle goes current while its group holds that link, open or not -- not
+        # is-active, which an open group's toggle also gets. Important so hover can't gray it,
+        # the way is-active's sort order keeps it from graying a link
+        GROUP_CURRENT = "tw:group-has-[[aria-current]]/nav-group:bg-blue-50! " \
+          "tw:group-has-[[aria-current]]/nav-group:text-blue-600 tw:group-has-[[aria-current]]/nav-group:dark:bg-gray-700! " \
+          "tw:active:bg-blue-50 tw:active:text-blue-600 tw:active:dark:bg-gray-700"
         ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-300"
 
         # A row inside a group, indented past its parent's icon
@@ -61,6 +66,10 @@ module SharedBlocks
 
         def row_class
           [ROW, ROW_HOVER, "tw:no-underline", ROW_RESTING, ROW_CURRENT].join(" ")
+        end
+
+        def group_row_class
+          [ROW, ROW_HOVER, ROW_RESTING, GROUP_CURRENT].join(" ")
         end
 
         def child_class

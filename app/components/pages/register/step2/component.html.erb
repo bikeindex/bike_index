@@ -46,10 +46,10 @@
           label_text: translation(".color"), required: true) do |group| %>
         <% group.with_label_note { render UI::Badge::Component.new(text: translation(".up_to_3"), size: :xs) } %>
 
-        <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f,
-          value: @b_param.primary_frame_color_id, options: color_combobox_options,
-          placeholder: translation(".primary_color_blank"), required: true, rich_display: :inline,
-          dialog_label: translation(".color"), no_js: true) %>
+        <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, options: color_combobox_options,
+          rich_display: :inline, no_js: true,
+          dialog_label: translation(".color"),
+          html_options: {form: f, value: @b_param.primary_frame_color_id, placeholder: translation(".primary_color_blank"), required: true}) %>
 
         <% {secondary_frame_color_id: translation(".second_color_blank"), tertiary_frame_color_id: translation(".third_color_blank")}.each do |field, blank_label| %>
           <% value = bike[field.to_s] %>
@@ -59,9 +59,9 @@
             data-register--additional-colors-target="row"
           >
             <div class="tw:flex-1">
-              <%= render UI::Forms::Combobox::Component.new(name: field, form: f,
-                value:, options: color_combobox_options, placeholder: blank_label,
-                rich_display: :inline, dialog_label: blank_label, no_js: true) %>
+              <%= render UI::Forms::Combobox::Component.new(name: field, options: color_combobox_options,
+                rich_display: :inline, no_js: true,
+                dialog_label: blank_label, html_options: {form: f, value:, placeholder: blank_label}) %>
             </div>
 
             <%= render UI::Button::Component.new(text: "×", color: :link,
@@ -92,7 +92,7 @@
       <div class="tw:mt-2 tw:mb-2">
         <%= render UI::Forms::RadioButtonGroup::Component.new(name: "bike[frame_size]", full_width: true,
             selected: bike["frame_size"],
-            data: {"register--frame-size-target": "chip", action: "change->register--frame-size#pickChip"},
+            html_options: {data: {"register--frame-size-target": "chip", action: "change->register--frame-size#pickChip"}},
             entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} }) %>
       </div>
 
@@ -141,20 +141,8 @@
           <%= render UI::Forms::RequiredMarker::Component.new %>
         <% end %>
 
-        <%= render UI::Button::Component.new(color: :link, html_class: "tw:text-xs tw:font-bold",
-            data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"},
-            aria: {expanded: "false"}) do %>
-          <span
-            data-ui--collapse-target="chevron"
-            class="tw:inline-block tw:transition-transform tw:duration-200"
-          >
-            <span class="tw:flex">
-              <%= render UI::IconChevron::Component.new %>
-            </span>
-          </span>
-
-          <%= translation(".wheres_my_serial") %>
-        <% end %>
+        <%= render UI::Collapse::Component.new(text: translation(".wheres_my_serial"), chevron: true,
+            color: :link, html_class: "tw:text-xs tw:font-bold") %>
       </div>
 
       <% made_without_serial = bike["serial_number"] == "made_without_serial" %>
@@ -177,7 +165,7 @@
 
         <%= render UI::Forms::Checkbox::Component.new(name: :serial_missing, value: true,
             checked: serial_missing, label: translation(".missing_serial"), class_name: "tw:mt-2",
-            input_data: {"register--serial-target": "missing", action: "change->register--serial#toggleMissing"}) %>
+            html_options: {data: {"register--serial-target": "missing", action: "change->register--serial#toggleMissing"}}) %>
 
         <div
           class="tw:mt-1.5 <%= "tw:hidden" unless serial_missing %>"
@@ -195,7 +183,7 @@
       >
         <%= render UI::Forms::Checkbox::Component.new(name: :made_without_serial_checkbox, value: true,
             checked: made_without_serial, label: translation(".without_serial", cycle_type:), class_name: "tw:mt-2",
-            input_data: {"register--serial-target": "madeWithoutCheckbox", action: "change->register--serial#toggleMadeWithout"}) %>
+            html_options: {data: {"register--serial-target": "madeWithoutCheckbox", action: "change->register--serial#toggleMadeWithout"}}) %>
       </div>
 
       <%= render UI::Modal::Component.new(id: "made-without-serial-modal", title: translation(".are_you_certain")) do |modal| %>
@@ -314,9 +302,9 @@
 
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :status,
         label_text: translation(".registration_type"), required: true)) do %>
-      <%= render UI::Forms::Combobox::Component.new(name: :status, form: f, required: true,
-          value: @b_param.status, options: status_options, rich_display: :stacked,
-          dialog_label: translation(".registration_type"), no_js: true) %>
+      <%= render UI::Forms::Combobox::Component.new(name: :status, options: status_options,
+          rich_display: :stacked, no_js: true, dialog_label: translation(".registration_type"),
+          html_options: {form: f, required: true, value: @b_param.status}) %>
     <% end %>
 
     <%= render Pages::Register::SectionLabel::Component.new(text: contact_section_label, divider: true) %>
@@ -336,8 +324,8 @@
         <%= render UI::Forms::Checkbox::Component.new(name: :register_with_organization,
             checked: organization.present?,
             label: translation(".register_with_org", org_name: auto_organization.short_name),
-            input_data: {"register--organization-target": "checkbox",
-              action: "change->register--organization#toggle"}) %>
+            html_options: {data: {"register--organization-target": "checkbox",
+              action: "change->register--organization#toggle"}}) %>
 
         <p
           class="

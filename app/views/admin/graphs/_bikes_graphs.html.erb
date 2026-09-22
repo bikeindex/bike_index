@@ -1,0 +1,169 @@
+<% show_search_statuses = !@ignored_only && @kind == "bikes" %>
+<% bikes = matching_bikes %>
+
+<ul class="nav justify-content-end small">
+  <% unless @ignored_only %>
+    <li class="nav-item">
+      <%= link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "nav-link" %>
+    </li>
+  <% end %>
+</ul>
+
+<div class="row mt-4 mb-4">
+  <div class="col-md-6 order-2 order-md-1">
+    <% if params[:search_manufacturer].present? %>
+      Bikes
+      <% if @manufacturer.present? %>
+        made by
+        <%= link_to @manufacturer.name, admin_manufacturer_path(@manufacturer) %>
+      <% else %>
+        No manufacturer found for
+        <code><%= params[:search_manufacturer] %></code>
+      <% end %>
+      <%= link_to "view all manufacturer bikes", url_for(sortable_params.merge(search_manufacturer: nil)), class: "gray-link small" %>
+    <% end %>
+
+    <% if @ignored_only %>
+      <p>
+        Viewing only <strong>ignored</strong> bikes
+        <em>(deleted, test, spam)</em>
+        <%= link_to "view not ignored bikes", url_for(sortable_params.merge(search_ignored: false)), class: "gray-link small" %>
+      </p>
+    <% end %>
+
+    <% if @total_count.present? %>
+      <p class="mt-4">
+        <%= number_display(@total_count) %> matching <%= @kind %>
+        <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
+      </p>
+    <% end %>
+  </div>
+
+  <div class="col-md-6 order-1 order-md-2">
+    <% if show_search_statuses %>
+      <%= form_tag admin_graphs_path(search_kind: "bikes"), method: :get, data: {controller: "ui--collapse"} do %>
+        <%= render partial: "/shared/hidden_search_fields" %>
+
+        <%= render(Pages::Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state, searched_statuses: @searched_statuses, default_statuses: @default_statuses, not_default_statuses: @not_default_statuses)) %>
+
+        <div class="form-inline mt-2">
+          <div class="mr-auto"></div>
+
+          <%= render(UI::Collapse::Component.new(text: "Search statuses", chevron: true, size: :sm, active: @not_default_statuses)) %>
+
+          <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2 ml-2" %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @ignored_only %>
+    <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "ignored")), stacked: true)) %>
+  <% end %>
+</div>
+
+<div class="mt-4"></div>
+
+<%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params))) %>
+
+<div class="text-center mb-4">
+  <small class="less-strong">
+    <strong>Note:</strong> Columns are separate because they are independent
+    counts: total registrations &amp; stolen records created for those
+    registrations
+    <em class="d-block">This is different from other graphs showing counts of nonstolen &amp; stolen (which add up to the total registrations). This is done here so that this graph includes recovered bikes.</em>
+  </small>
+</div>
+
+<%# Don't render all the extra stuff if looking at a period that is longer than 1 year %>
+<% render_other_bike_graphs = time_range_length(@time_range) < 367.days.to_i %>
+
+<% if render_other_bike_graphs %>
+  <% shown_bike_graph_kinds.each do |graph_kind| %>
+    <%# stolen is already rendered above %>
+    <% next if graph_kind == "stolen" %>
+
+    <% if graph_kind == "pos" %>
+      <div class="col-sm-6 offset-sm-3 mt-4">
+        <%= render(UI::Table::Component.new(records: pos_search_kinds)) do |table| %>
+          <% table.column(label: "Kind") do |pos_kind| %>
+            <%= pos_kind.humanize %>
+            <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_pos: pos_kind)) %>
+          <% end %>
+
+          <% table.column(label: "Bikes", classes: "tw:text-right") do |pos_kind| %>
+            <%= number_display(bikes.send(pos_kind).count) %>
+          <% end %>
+        <% end %>
+      </div>
+    <% elsif graph_kind == "origin" %>
+      <%# TODO: make this actually work %>
+      <%# ["Transferred pre-registration", Ownership.transferred_pre_registration.joins(:bike).merge(matching_bikes).count] %>
+      <% origin_rows = origin_bike_counts + [
+        ["Stolen records", StolenRecord.unscoped.where(created_at: @time_range).joins(:bike).merge(bikes).count],
+        ["Recoveries", StolenRecord.unscoped.where(recovered_at: @time_range).joins(:bike).merge(bikes).count]
+      ] %>
+      <% colors = origin_colors %>
+
+      <div class="col-sm-6 offset-sm-3 mt-4">
+        <%= render(UI::Table::Component.new(records: origin_rows)) do |table| %>
+          <% table.column(label: "Origin") do |(origin)| %>
+            <% if colors.key?(origin) %>
+              <%# Chartkick fills its columns at half opacity and outlines them; the swatch matches %>
+              <span
+                class="d-inline-block mr-1"
+                style="width: .75rem; height: .75rem; border: 1px solid <%= colors[origin] %>; background-color: <%= colors[origin] %>80;"
+              ></span>
+              <%= origin.humanize %>
+              <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_origin: origin)) %>
+            <% else %>
+              <%= origin %>
+            <% end %>
+          <% end %>
+
+          <% table.column(label: "Bikes", classes: "tw:text-right") do |_origin, bike_count| %>
+            <%= number_display(bike_count) %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="mt-4"></div>
+    <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: graph_kind)), stacked: true)) %>
+  <% end %>
+
+  <% organization_counts = bikes.group(:creation_organization_id).count.sort_by { |_org_id, bike_count| -bike_count } %>
+  <% organizations = Organization.unscoped.where(id: organization_counts.map(&:first)).index_by(&:id) %>
+  <% organization_rows = organization_counts.map { |org_id, bike_count| [org_id, organizations[org_id], bike_count] } %>
+
+  <div class="col-sm-8 offset-sm-2 mt-4">
+    <%= render(UI::Table::Component.new(records: organization_rows)) do |table| %>
+      <% table.column(label: "Organization") do |org_id, organization| %>
+        <% if organization.present? %>
+          <%= link_to organization.name, admin_bikes_path(sortable_params.merge(organization_id: org_id, render_chart: true)), class: "twlink" %>
+          <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(organization_id: org_id)) %>
+        <% else %>
+          <a
+            class="gray-link"
+            href="<%= admin_bikes_path(sortable_params.merge(organization_id: "false", render_chart: true)) %>"
+            title="(id: <%= org_id %>)"
+          >
+            no organization
+          </a>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: "Kind") do |_org_id, organization| %>
+        <%= organization&.kind&.humanize %>
+      <% end %>
+
+      <% table.column(label: "Integration", header_classes: "tw:font-normal tw:text-xs") do |_org_id, organization| %>
+        <%= organization&.pos_kind&.humanize %>
+      <% end %>
+
+      <% table.column(label: "Bikes", classes: "tw:text-right") do |_org_id, _organization, bike_count| %>
+        <%= number_display(bike_count) %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

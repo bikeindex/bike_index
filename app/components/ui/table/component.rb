@@ -8,10 +8,12 @@ module UI
       attr_reader :sort_state
 
       # Pass cache_key (normally self.class.cache_digest) to enable per-row fragment caching.
-      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
+      # cache_records: mirror the controller's `includes`, or the row serves those records stale
+      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
         @records = records
         @sort_state = sort_state
         @cache_key = cache_key
+        @cache_records = cache_records
         @classes = classes
         @bordered = !unbordered
         @render_sortable = render_sortable
@@ -21,8 +23,9 @@ module UI
 
       # A cell block is instance_exec'd here, so it can't reach the calling component's
       # methods - a caller that needs one binds it to a local first
-      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
-        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, lower_right:, &block)
+      # header_tooltip renders beside the header rather than in it, which a sort link would swallow
+      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, &block)
+        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, header_tooltip:, lower_right:, footer:, &block)
         nil
       end
 
@@ -50,6 +53,16 @@ module UI
 
       def sortable_columns
         @columns.filter_map(&:sortable)
+      end
+
+      def cache_records_for(record) = Array(@cache_records&.call(record))
+
+      def footer?
+        @columns.any?(&:footer)
+      end
+
+      def sortable_table
+        sortable_columns.any?
       end
 
       # Stacking + background so the header paints over scrolled rows.

@@ -16,6 +16,11 @@ module UI
         def form_builder
           {template: "ui/forms/checkbox/component_preview/form_builder"}
         end
+
+        # Long, so the label wraps under the checkbox's first line
+        def label_with_tooltip
+          {template: "ui/forms/checkbox/component_preview/label_with_tooltip"}
+        end
         # @!endgroup
       end
     end

@@ -1,10 +1,3 @@
-<% if @render_chart && @available_bikes.present? %>
-  <%= render(UI::ChartAsyncFrame::Component.new(
-    id: :registrations_chart_frame,
-    src: organization_registrations_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1"))
-  )) %>
-<% end %>
-
 <%= render(Pages::Org::Search::Wrapper::Component.new(
   organization: current_organization,
   current_user:,
@@ -17,13 +10,11 @@
   search_stickers: @search_stickers,
   search_address: @search_address,
   search_status: @search_status,
-  search_query_present: @search_query_present,
-  time_range: @time_range,
-  period: @period,
-  stolenness: @stolenness,
+  search_unregisteredness: @search_unregisteredness,
+  search_all: @search_all,
   bike_sticker: @bike_sticker,
   model_audit: @model_audit,
   settings: local_assigns[:settings],
-  skip_search_and_filters: true,
-  skip_settings: true
+  result_view: @result_view,
+  search_page: true
 )) %>

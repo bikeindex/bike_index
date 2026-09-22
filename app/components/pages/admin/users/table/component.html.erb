@@ -2,12 +2,6 @@
   <style>.deleted-cell {display: none !important;}</style>
 <% end %>
 
-<% unless @display_dev_info %>
-  <style>
-    .only-dev-visible {display: none !important;}
-  </style>
-<% end %>
-
 <%# prevent double borders %>
 <style>
   tbody td.only-dev-visible {border-top: 0px;}
@@ -29,24 +23,24 @@
   <% end %>
 
   <% table.column(sortable: "email", lower_right: ->(user) { user.id }) do |user| %>
-    <%= render Pages::Admin::Users::Cell::Component.new(email: user.email, user:, render_search: false) %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(email: user.email, user:, render_search: false) %>
   <% end %>
 
-  <% table.column(label: "Secondary Emails", header_classes: "tw:font-normal") do |user| %>
+  <% table.column(label: "Secondary Emails") do |user| %>
     <small class="tw:text-gray-400">
       <%= user.secondary_emails.join(", ") %>
     </small>
   <% end %>
 
-  <% table.column(label: "Name", header_classes: "tw:font-normal") do |user| %>
+  <% table.column(label: "Name") do |user| %>
     <%= user.name if user.name? %>
   <% end %>
 
-  <% table.column(label: "Bikes", header_classes: "tw:font-normal") do |user| %>
+  <% table.column(label: "Bikes") do |user| %>
     <%= number_display(user.ownerships.count) %>
   <% end %>
 
-  <% table.column(label: "OrganizationRoles", header_classes: "tw:font-normal") do |user| %>
+  <% table.column(label: "OrganizationRoles") do |user| %>
     <% if user.organization_roles.present? %>
       <% visible_roles = user.organization_roles.reject { |or_role| or_role.organization.ambassador? } %>
       <% visible_roles.each_with_index do |organization_role, i| %>
@@ -59,13 +53,13 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Ambassador tasks", classes: "tw:text-xs", header_classes: "tw:font-normal") do |user| %>
+  <% table.column(label: "Ambassador tasks", classes: "tw:text-xs") do |user| %>
     <% if user.ambassador? %>
       <%= number_display(Ambassador.find(user.id).progress_count) %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Admin?", header_classes: "tw:font-normal") do |user| %>
+  <% table.column(label: "Admin?") do |user| %>
     <small>
       <%= "super" if user.superuser? %>
       <%= "developer" if user.developer? %>
@@ -76,7 +70,7 @@
     </small>
   <% end %>
 
-  <% table.column(label: "Confirmed", classes: "tw:text-xs", header_classes: "tw:font-normal") do |user| %>
+  <% table.column(label: "Confirmed", classes: "tw:text-xs") do |user| %>
     <%= check_mark if user.confirmed %>
   <% end %>
 <% end %>

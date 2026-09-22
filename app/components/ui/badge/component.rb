@@ -6,10 +6,10 @@ module UI
       BASE_CLASSES = "tw:inline-flex tw:border tw:items-center tw:leading-4 tw:rounded-full"
 
       SIZES = {
-        xs: "tw:text-[11px] tw:font-semibold tw:px-[7px] tw:py-px",
+        xs: "tw:text-2xs tw:font-semibold tw:px-[7px] tw:py-px",
         sm: "tw:text-xs tw:font-medium tw:px-1 tw:py-px",
         md: "tw:text-xs tw:font-bold tw:px-2 tw:py-1",
-        lg: "tw:text-md tw:font-extrabold tw:px-3 tw:py-1"
+        lg: "tw:text-sm tw:font-extrabold tw:px-3 tw:py-1"
       }
 
       # Soft tinted pills matching the redesign: light background + saturated text

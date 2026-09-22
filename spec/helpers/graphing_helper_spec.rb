@@ -7,10 +7,8 @@ RSpec.describe GraphingHelper, type: :helper do
     let(:start_time) { Time.at(1568052985) }
     let(:payment_time) { start_time + 1.minute }
     let!(:payment) { FactoryBot.create(:payment, created_at: payment_time, amount_cents: 1001) }
-    before do
-      Time.zone = "America/Chicago"
-      @time_range = start_time..(start_time + 3.minutes)
-    end
+    around { |example| Time.use_zone("America/Chicago") { example.run } }
+    before { @time_range = start_time..(start_time + 3.minutes) }
     describe "time_range_counts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 1, " 1:18 PM" => 0, " 1:19 PM" => 0} }
       it "buckets in the current Time.zone" do

@@ -13,14 +13,14 @@
   <% end %>
 
   <% table.column(sortable: "user_id") do |user_registration_organization| %>
-    <%= render Pages::Admin::Users::Cell::Component.new(user: user_registration_organization.user, user_id: user_registration_organization.user_id, sort_state:, render_search: render_user_search) %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(user: user_registration_organization.user, user_id: user_registration_organization.user_id, sort_state:, render_search: render_user_search) %>
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Organization") do |user_registration_organization| %>
-    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: user_registration_organization.organization, organization_id: user_registration_organization.organization_id, sort_state:, render_search: render_organization_search) %>
+    <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: user_registration_organization.organization, organization_id: user_registration_organization.organization_id, sort_state:, render_search: render_organization_search) %>
   <% end %>
 
-  <% table.column(label: "Registration info", header_classes: "tw:font-normal") do |user_registration_organization| %>
+  <% table.column(label: "Registration info") do |user_registration_organization| %>
     <%= render UI::JsonDisplay::Component.new(data: user_registration_organization.registration_info, small: true, max_width: :table_cell) %>
   <% end %>
 

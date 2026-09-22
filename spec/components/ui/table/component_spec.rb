@@ -25,6 +25,22 @@ RSpec.describe UI::Table::Component, type: :component do
     expect(component).to have_css("td", text: "Alice")
     expect(component).to have_css("td", text: "bob@example.com")
     expect(component).to have_css("table.ui-table")
+    expect(component).not_to have_css("tfoot")
+  end
+
+  context "with a footer" do
+    let(:component) do
+      render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Name", footer: "Total") { |r| r.name }
+        table.column(label: "Email") { |r| r.email }
+      end
+    end
+
+    it "renders one footer cell per column, after the rows" do
+      expect(component).to have_css("tfoot tr td", count: 2)
+      expect(component).to have_css("tfoot td:first-child", text: "Total")
+      expect(component).not_to have_css("tbody td", text: "Total")
+    end
   end
 
   context "with custom classes" do
@@ -67,6 +83,18 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(result).to have_css("th a.twlink[data-active='true']", text: /Name/)
       expect(result).to have_css("th a.twlink", text: /Email/)
       expect(result).not_to have_css("th a[data-active]", text: /Email/)
+    end
+
+    context "with header_tooltip" do
+      it "renders the tooltip beside the sort link, not inside it" do
+        result = render_inline(described_class.new(records:, render_sortable: true)) do |table|
+          table.column(sortable: "name", header_tooltip: "Their full name") { |r| r.name }
+        end
+
+        expect(result).to have_css("th a", text: /Name/)
+        expect(result).to have_css("th", text: /Their full name/)
+        expect(result).not_to have_css("th a [role=tooltip], th a button")
+      end
     end
 
     context "with custom label" do
@@ -164,9 +192,9 @@ RSpec.describe UI::Table::Component, type: :component do
 
     let(:users) { FactoryBot.create_list(:user, 2) }
 
-    def render_table(cache_key: "test")
+    def render_table(cache_key: "test", cache_records: nil)
       with_controller_class(ApplicationController) do
-        render_inline(described_class.new(records: users, cache_key:)) do |table|
+        render_inline(described_class.new(records: users, cache_key:, cache_records:)) do |table|
           table.column(label: "Name") { |u| u.name }
           table.column(label: "Email", lower_right: ->(u) { u.id }) { |u| u.email }
         end
@@ -194,6 +222,19 @@ RSpec.describe UI::Table::Component, type: :component do
       rewritten = fragments_written { render_table }
       expect(rewritten.count).to eq 1
       expect(rewritten.first).to include(users.first.cache_key_with_version)
+    end
+
+    it "busts a row when a record from cache_records changes" do
+      organization = FactoryBot.create(:organization)
+      cache_records = ->(_user) { organization }
+
+      keys = fragments_written { render_table(cache_records:) }
+      expect(keys.count).to eq 2
+      expect(keys.first).to include(organization.cache_key_with_version)
+      expect(fragments_written { render_table(cache_records:) }).to eq([])
+
+      organization.update(name: "Renamed")
+      expect(fragments_written { render_table(cache_records:) }.count).to eq 2
     end
 
     context "in another locale" do
@@ -249,11 +290,11 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with header_classes font-normal" do
-    it "adds font-normal class to th" do
+  context "with a sortable column" do
+    it "sets only the plain headers to normal weight" do
       result = render_inline(described_class.new(records:)) do |table|
-        table.column(label: "Name") { |r| r.name }
-        table.column(label: "Email", header_classes: "tw:font-normal") { |r| r.email }
+        table.column(sortable: "name") { |r| r.name }
+        table.column(label: "Email") { |r| r.email }
       end
 
       headers = result.css("th")

@@ -15,10 +15,10 @@ module Admin
       @per_page = permitted_per_page
       organizations = if sort_column == "bikes"
         matching_organizations.left_joins(:bikes).group(:id)
-          .order("COUNT(bikes.id) #{sort_direction}")
+          .order(sortable_order("COUNT(bikes.id)", nulls_last: false))
       else
         matching_organizations
-          .reorder("organizations.#{sort_column} #{sort_direction}")
+          .reorder(sortable_order(Organization))
       end
       @pagy, @organizations = pagy(:countish, organizations, limit: @per_page, page: permitted_page)
     end
@@ -68,7 +68,7 @@ module Admin
         UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
         redirect_to form_tab_url
       else
-        render action: form_tab || "edit"
+        render action: form_tab || "edit", status: :unprocessable_entity
       end
     end
 
@@ -79,7 +79,7 @@ module Admin
         flash[:success] = "Organization Created!"
         redirect_to edit_admin_organization_url(@organization)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

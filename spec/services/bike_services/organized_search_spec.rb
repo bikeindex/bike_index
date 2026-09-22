@@ -38,4 +38,41 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.notes(Bike.all, "", organization)).to eq(Bike.all)
     end
   end
+
+  describe "the settings panel's filters" do
+    let(:bike_with_sticker) { FactoryBot.create(:bike, :with_address_record) }
+    let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }
+    let!(:bike_stolen) { FactoryBot.create(:bike, :with_stolen_record) }
+    let!(:bike_impounded) { FactoryBot.create(:bike, :impounded) }
+
+    it "narrows by each value, and leaves the search alone for any other" do
+      expect(described_class.stickers(Bike.all, "with").pluck(:id)).to eq([bike_with_sticker.id])
+      expect(described_class.stickers(Bike.all, "none").pluck(:id)).to match_array([bike_stolen.id, bike_impounded.id])
+      expect(described_class.stickers(Bike.all, false).count).to eq 3
+
+      expect(described_class.address(Bike.all, "with_street").pluck(:id)).to eq([bike_with_sticker.id])
+      expect(described_class.address(Bike.all, "without_street").pluck(:id)).to match_array([bike_stolen.id, bike_impounded.id])
+      expect(described_class.address(Bike.all, false).count).to eq 3
+
+      expect(described_class.status(Bike.all, "stolen").pluck(:id)).to eq([bike_stolen.id])
+      expect(described_class.status(Bike.all, "not_impounded").pluck(:id)).to match_array([bike_with_sticker.id, bike_stolen.id])
+      expect(described_class.status(Bike.all, "all").count).to eq 3
+
+      # The panel offers street; none and with still arrive from older links
+      expect(described_class.address(Bike.all, "none").to_sql).to_not eq(Bike.all.to_sql)
+      expect(described_class.address(Bike.all, "with").to_sql).to_not eq(Bike.all.to_sql)
+
+      # Each filter maps its values to scopes by hand, so a value added to the panel's table
+      # without a branch here would be selectable and then quietly return every bike
+      ComponentStructs::OrgSearchSettings::FILTER_GROUPS.each do |param, group|
+        filter = param.to_s.delete_prefix("search_")
+        next unless described_class.respond_to?(filter) # some filters scope in the controller
+
+        group[:values].each_key do |value|
+          expect(described_class.public_send(filter, Bike.all, value.to_s).to_sql)
+            .to_not(eq(Bike.all.to_sql), "#{param} #{value} left the search alone")
+        end
+      end
+    end
+  end
 end
