@@ -4,23 +4,31 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--bikes-table-overflow'
 // Flags data-overflowing while the table is wider than its scroll container, which is what
-// the frozen view column's shadow keys off. Toggling columns resizes the table, so it's observed too.
+// the frozen view column's shadow keys off, and data-scrolled-end once it's scrolled all the way,
+// which drops the right edge's. Toggling columns resizes the table, so it's observed too.
 export default class extends Controller {
   connect () {
     this.table = this.element.querySelector('table')
     if (!this.table) return
 
-    this.resizeObserver = new ResizeObserver(() => this.#sync())
-    this.resizeObserver.observe(this.table.parentElement)
+    this.scroller = this.table.parentElement
+    this.boundSync = () => this.#sync()
+    this.scroller.addEventListener('scroll', this.boundSync, { passive: true })
+    this.resizeObserver = new ResizeObserver(this.boundSync)
+    this.resizeObserver.observe(this.scroller)
     this.resizeObserver.observe(this.table)
   }
 
   disconnect () {
     this.resizeObserver?.disconnect()
+    this.scroller?.removeEventListener('scroll', this.boundSync)
   }
 
   #sync () {
-    const scroller = this.table.parentElement
-    this.element.toggleAttribute('data-overflowing', scroller.scrollWidth > scroller.clientWidth)
+    const { scrollWidth, clientWidth, scrollLeft } = this.scroller
+    const overflowing = scrollWidth > clientWidth
+    this.element.toggleAttribute('data-overflowing', overflowing)
+    // Scroll positions come back fractional, so within a pixel counts as the end
+    this.element.toggleAttribute('data-scrolled-end', overflowing && scrollLeft + clientWidth >= scrollWidth - 1)
   }
 }

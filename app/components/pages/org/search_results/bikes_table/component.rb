@@ -33,7 +33,7 @@ module Pages
             "tw:data-overflowing:after:inset-y-0 tw:data-overflowing:after:left-[calc(100%-1px)] tw:data-overflowing:after:z-2 " \
             "tw:data-overflowing:after:w-4 tw:data-overflowing:after:border-l tw:data-overflowing:after:border-gray-100 " \
             "tw:data-overflowing:after:shadow-[-2px_0_6px_rgba(26,26,31,0.04)] tw:dark:data-overflowing:after:border-gray-700 " \
-            "tw:@max-[672px]/twwiderow:after:hidden"
+            "tw:data-scrolled-end:after:hidden tw:@max-[672px]/twwiderow:after:hidden"
 
           def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
             sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
