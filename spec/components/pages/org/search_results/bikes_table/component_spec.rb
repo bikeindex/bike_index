@@ -138,7 +138,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     let(:options) { {organization:, bikes:, render_sortable: true} }
 
     it "renders sortable header links" do
-      expect(component).to have_css("th a.twlink-underlined")
+      expect(component).to have_css("th a.twlink")
     end
   end
 
