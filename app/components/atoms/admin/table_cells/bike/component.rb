@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Pages
+module Atoms
   module Admin
-    module Bikes
-      module Cell
+    module TableCells
+      module Bike
         class Component < ApplicationComponent
           def initialize(
             bike: nil,
@@ -16,7 +16,7 @@ module Pages
           )
             @bike = bike
             @bike_id = bike_id || bike&.id
-            @bike = Bike.unscoped.find_by(id: @bike_id) if @bike.blank? && @bike_id.present?
+            @bike = ::Bike.unscoped.find_by(id: @bike_id) if @bike.blank? && @bike_id.present?
 
             # Store the raw bike_link_path value (can be false, nil, or a path)
             @bike_link_path_arg = bike_link_path

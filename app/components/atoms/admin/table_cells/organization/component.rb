@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Pages
+module Atoms
   module Admin
-    module Organizations
-      module Cell
+    module TableCells
+      module Organization
         class Component < ApplicationComponent
           def initialize(organization: nil, organization_id: nil, search_url: nil, sort_state: ComponentStructs::SortState.new, render_search: false, short_name: false)
             @organization = organization
@@ -31,7 +31,7 @@ module Pages
             return @organization_subject if defined?(@organization_subject)
 
             @organization_subject = @organization.presence ||
-              (Organization.unscoped.find_by(id: @organization_id) if @organization_id.present?)
+              (::Organization.unscoped.find_by(id: @organization_id) if @organization_id.present?)
           end
 
           def display_name

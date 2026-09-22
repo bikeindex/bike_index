@@ -12,7 +12,7 @@
   <% end %>
 
   <% table.column(sortable: "user_id") do |user_ban| %>
-    <%= render Pages::Admin::Users::Cell::Component.new(user: user_ban.user) %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(user: user_ban.user) %>
   <% end %>
 
   <% table.column(sortable: "reason") do |user_ban| %>
@@ -20,7 +20,7 @@
   <% end %>
 
   <% table.column(sortable: "creator_id") do |user_ban| %>
-    <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: user_ban.creator, render_search: render_sortable) %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: user_ban.creator, render_search: render_sortable) %>
   <% end %>
 
   <% table.column(label: "Description") do |user_ban| %>
