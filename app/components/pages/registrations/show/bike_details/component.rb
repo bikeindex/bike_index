@@ -7,10 +7,10 @@ module Pages
         # The "Bike details" spec-sheet card. The serial is rendered for the given
         # user, so the public view passes nil to keep a hidden serial hidden.
         class Component < ApplicationComponent
-          def initialize(bike:, serial_user: nil, skip_serial_explanation: false)
+          def initialize(bike:, serial_user: nil, serial_explanation: :inline)
             @bike = bike
             @serial_user = serial_user
-            @skip_serial_explanation = skip_serial_explanation
+            @serial_explanation = serial_explanation
           end
 
           private

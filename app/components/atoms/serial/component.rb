@@ -4,17 +4,17 @@ module Atoms
   module Serial
     # Renders a bike's serial as seen by the given user. A hidden, unknown or
     # absent serial renders that word in place of the number, and a hidden serial
-    # is followed by why it's hidden unless skip_explanation.
+    # is followed by why it's hidden - inline, in a tooltip, or not at all (emails).
     # Pass a bike, or a raw serial string.
     class Component < ApplicationComponent
       # What serial_display returns in place of a number
       PLACEHOLDERS = ["hidden", "unknown", "made without serial"].freeze
 
-      def initialize(bike: nil, serial: nil, user: nil, skip_explanation: false, html_class: nil)
+      def initialize(bike: nil, serial: nil, user: nil, explanation: :inline, html_class: nil)
         @bike = bike
         @serial = serial
         @user = user
-        @skip_explanation = skip_explanation
+        @explanation = explanation
         @html_class = html_class
       end
 
@@ -54,10 +54,12 @@ module Atoms
       end
 
       def explanation?
-        @bike&.serial_hidden? && !@skip_explanation
+        @bike&.serial_hidden? && @explanation != :none
       end
 
       def explanation
+        return render(UI::Tooltip::Component.new(text: explanation_text)) if @explanation == :tooltip
+
         content_tag(:em, explanation_text, class: "small less-less-strong")
       end
 

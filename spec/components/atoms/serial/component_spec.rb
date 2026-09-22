@@ -37,8 +37,19 @@ RSpec.describe Atoms::Serial::Component, type: :component do
         .to eq '<span class="less-strong">hidden</span> <em class="small less-less-strong">because tandem is impounded</em>'
     end
 
-    context "with skip_explanation" do
-      let(:options) { {skip_explanation: true} }
+    context "with explanation: :tooltip" do
+      let(:options) { {explanation: :tooltip} }
+
+      it "hides the serial with the explanation in a tooltip" do
+        expect(component.css("span.less-strong").text).to eq "hidden"
+        expect(component.css("em")).to be_blank
+        expect(component.css("button").text).to eq "?"
+        expect(component.css("[role=tooltip]").text).to eq "because tandem is impounded"
+      end
+    end
+
+    context "with explanation: :none" do
+      let(:options) { {explanation: :none} }
 
       it "hides the serial without the explanation" do
         expect(component.to_html.strip).to eq '<span class="less-strong">hidden</span>'
@@ -53,8 +64,17 @@ RSpec.describe Atoms::Serial::Component, type: :component do
           .to eq '<span class="serial-span">FFF333</span> <em class="small less-less-strong">hidden for unauthorized users</em>'
       end
 
-      context "with skip_explanation" do
-        let(:options) { super().merge(skip_explanation: true) }
+      context "with explanation: :tooltip" do
+        let(:options) { super().merge(explanation: :tooltip) }
+
+        it "shows the serial with the note in a tooltip" do
+          expect(component.css("span.serial-span").text).to eq "FFF333"
+          expect(component.css("[role=tooltip]").text).to eq "hidden for unauthorized users"
+        end
+      end
+
+      context "with explanation: :none" do
+        let(:options) { super().merge(explanation: :none) }
 
         it "shows the serial alone" do
           expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
