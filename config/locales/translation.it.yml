@@ -5841,6 +5841,7 @@ it:
             stat_motorized: Registrazioni dei veicoli elettrici
             stat_registrations: Iscrizioni totali
             stat_stolen: Segnalato come rubato
+            previous_year: "%{number} l'anno scorso"
           column_settings:
             acknowledgment_cell: Conferma della sequenza di registrazione
             address: 'Indirizzo:'

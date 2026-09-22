@@ -146,6 +146,7 @@ OrganizationStolenMessage.for(brakebills).update!(
 brakebills.update!(graduated_notification_interval: 1.year.to_i) if brakebills.graduated_notification_interval.blank?
 
 if GraduatedNotification.where(organization: brakebills).none?
+  SeedHelpers.tick
   graduated_bike = BikeServices::Creator.new.create_bike(
     BParam.create!(creator: user, params: {
       bike: {
@@ -218,6 +219,7 @@ transferred_bike_exists = Bike.left_joins(:current_ownership)
   .where.not(ownerships: {previous_ownership_id: nil}).exists?
 
 unless transferred_bike_exists
+  SeedHelpers.tick
   bike = BikeServices::Creator.new.create_bike(
     BParam.create!(creator: user, params: {
       bike: {

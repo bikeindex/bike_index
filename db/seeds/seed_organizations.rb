@@ -74,6 +74,7 @@ feature_name_and_slugs.each do |attrs|
 end
 
 # --- Brakebills: every feature except brakebills_skipped_feature_names, on an is_endless invoice ---
+SeedHelpers.tick
 brakebills = Organization.find_by_name("Brakebills") || Organization.create!(name: "Brakebills")
 brakebills_invoice = Invoice.create(organization: brakebills, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
 brakebills_invoice.update(organization_feature_ids: brakebills_feature_ids)
@@ -94,10 +95,12 @@ OrganizationLandingPage.find_or_initialize_by(organization_id: brakebills.id).ta
 end
 
 # --- Ike's Bikes ---
+SeedHelpers.tick
 ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
 ikes.save
 
 # --- Cannondale ---
+SeedHelpers.tick
 cannondale = Organization.find_by_name("Cannondale") || Organization.create!(name: "Cannondale", manufacturer_id: Manufacturer.find_by_name("Cannondale")&.id)
 cannondale_invoice = Invoice.create(organization: cannondale, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
 cannondale_invoice.update(organization_feature_ids: [official_manufacturer_feature_id].compact)
@@ -110,6 +113,7 @@ OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user
 
 # --- Bike Recovery Team: Law Enforcement functionality ---
 # phoneable_by?'s police check reads Organization.law_enforcement — the kind, not the feature slugs
+SeedHelpers.tick
 recovery_team = Organization.find_by_name("Bike Recovery Team") || Organization.create!(name: "Bike Recovery Team")
 recovery_team.update(kind: :law_enforcement)
 recovery_team_invoice = Invoice.create(organization: recovery_team, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
