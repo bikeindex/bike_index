@@ -49,6 +49,7 @@ module BikeServices
       case value
       when "all" then bikes
       when "not_impounded" then bikes.where.not(status: "status_impounded")
+      when "stolen_or_impounded" then bikes.where(status: %w[status_stolen status_impounded])
       else bikes.where(status: "status_#{value}")
       end
     end
