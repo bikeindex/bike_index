@@ -498,6 +498,8 @@ class Organization < ApplicationRecord
     is_invoiced? || saml_active? # Prevent url changes breaking landing pages, SSO, etc
   end
 
+  def saml_active? = organization_saml_configuration&.active?
+
   def bike_actions?
     any_enabled?(OrganizationFeature::BIKE_ACTIONS)
   end
@@ -641,8 +643,6 @@ class Organization < ApplicationRecord
 
     (2..).lazy.map { "#{new_slug}-#{it}" }.find { |candidate| !orgs.exists?(slug: candidate) }
   end
-
-  def saml_active? = organization_saml_configuration&.active?
 
   # The IdP registered the SP entity ID and callback URL, which are built from the slug
   def slug_unchanged_while_saml_active

@@ -24,7 +24,11 @@
 <div class="twwiderow">
   <div>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :short_name, label_text: "Short name (30 letters or less)")) do |group| %>
-      <% if @organization.block_short_name_edit? %>
+      <% if @organization.saml_active? %>
+        <% group.with_helper_text do %>
+          <span class="em text-danger">locked while SAML SSO is active - deactivate it first</span>
+        <% end %>
+      <% elsif @organization.block_short_name_edit? %>
         <% group.with_helper_text do %>
           <span class="em text-danger">warning - will change org URLs (landing pages, embeds)</span>
         <% end %>
