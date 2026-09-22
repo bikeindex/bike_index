@@ -67,8 +67,8 @@ RSpec.describe Atoms::Admin::TableCells::Bike::Component, type: :component do
 
       it "renders origin with tooltip" do
         expect(bike.creation_kind).to eq :lightspeed_pos
-        expect(component.css("small.less-strong").text).to include("lightspeed")
-        expect(component.css("small.less-strong [role=tooltip]").text).to eq "automatically registered by bike shop point of sale (Lightspeed POS)"
+        expect(component.css("small").text).to include("lightspeed")
+        expect(component.css("small [role=tooltip]").text).to eq "automatically registered by bike shop point of sale (Lightspeed POS)"
       end
     end
   end
