@@ -95,6 +95,7 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
 
       expect(described_class.status(Bike.all, "stolen").pluck(:id)).to eq([bike_stolen.id])
       expect(described_class.status(Bike.all, "not_impounded").pluck(:id)).to match_array([bike_with_sticker.id, bike_stolen.id])
+      expect(described_class.status(Bike.all, "stolen_or_impounded").pluck(:id)).to match_array([bike_stolen.id, bike_impounded.id])
       expect(described_class.status(Bike.all, "all").count).to eq 3
 
       # The panel offers street; none and with still arrive from older links
