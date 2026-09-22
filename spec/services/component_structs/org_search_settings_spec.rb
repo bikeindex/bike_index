@@ -99,6 +99,14 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       end
     end
 
+    context "with search_status: stolen_or_impounded" do
+      let(:search_status) { "stolen_or_impounded" }
+
+      it "returns stolen or impounded filter description" do
+        expect(instance.active_search_filter_descriptions).to eq(["only <strong>stolen</strong> or <strong>impounded</strong>"])
+      end
+    end
+
     context "with multiple filters active" do
       let(:search_stickers) { "with" }
       let(:search_address) { "with_street" }
@@ -191,6 +199,8 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       expect(groups.find { it[:name] == :search_status }[:selected]).to eq "impounded"
       expect(groups.find { it[:name] == :search_stickers }[:entries].map { it[:value] })
         .to eq ["", "with", "none"]
+      expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
+        .to eq %w[all not_impounded impounded stolen stolen_or_impounded with_owner]
     end
 
     context "with no optional features" do
@@ -202,7 +212,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
         expect(groups.map { it[:name] }).to eq %i[search_status search_unregisteredness]
         expect(groups.find { it[:name] == :search_status }[:selected]).to eq "all"
         expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
-          .to eq %w[all with_owner stolen]
+          .to eq %w[all stolen with_owner]
       end
     end
   end
