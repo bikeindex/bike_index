@@ -155,28 +155,6 @@
   .ui-table td:has(.keep-with-previous) {
     @apply tw:whitespace-nowrap;
   }
-
-  /* Turbo sets [busy] on the results frame during requests. A card that marks itself
-     .search-results-card swaps its own rows for a spinner off the frame's tw:group,
-     keeping its header and pagination; anything else has nothing to keep, so the whole
-     frame hides under the overlay and min-height gives the spinner somewhere to land.
-     The card exemption hangs off the frame itself: :has() can't nest inside :has(). */
-  .search-results-frame-wrapper {
-    @apply tw:relative;
-  }
-  .search-results-frame-wrapper > .search-loading-overlay {
-    @apply tw:hidden tw:absolute tw:top-0 tw:left-0 tw:right-0 tw:pointer-events-none tw:z-1;
-  }
-  .search-results-frame-wrapper:has(> turbo-frame[busy]) {
-    @apply tw:min-h-48;
-  }
-  .search-results-frame-wrapper > turbo-frame[busy]:not(:has(> .search-results-card)) {
-    @apply tw:opacity-0 tw:pointer-events-none;
-
-    & ~ .search-loading-overlay {
-      @apply tw:block;
-    }
-  }
 }
 
 /* Create utility classes for the sides of the table so that it can be applied in JS when columns are hidden */
