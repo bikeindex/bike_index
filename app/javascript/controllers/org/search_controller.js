@@ -31,10 +31,11 @@ export default class extends Controller {
 
   // The column panel renders inside the results frame, but the chart is outside it - so it
   // fetches alongside the results rather than after them. A form submit's target is the
-  // form, so the header is what names the frame.
+  // form, so the header is what names the frame. A hover's prefetch isn't a search yet.
   handleFetchRequest = (event) => {
-    const frameId = event.detail.fetchOptions.headers['Turbo-Frame']
-    if (!frameId || frameId !== this.resultsFrame?.id) return
+    const { headers } = event.detail.fetchOptions
+    if (!headers['Turbo-Frame'] || headers['X-Sec-Purpose'] === 'prefetch') return
+    if (headers['Turbo-Frame'] !== this.resultsFrame?.id) return
     this.reloadChart(new URL(event.detail.url, window.location.href))
   }
 
@@ -154,10 +155,9 @@ export default class extends Controller {
   // the frame is already fetching. The URL carries the scope, so it's the search.
   reloadChart (url) {
     const frame = this.chartFrame
-    if (!frame?.querySelector('[data-chart-follows-search]')) return
+    if (!frame?.getAttribute('src') || !frame.querySelector('[data-chart-follows-search]')) return
     const search = this.chartParams(url)
     if (search === this.chartSearch) return
-    if (!frame.getAttribute('src')) return
     this.chartSearch = search
     frame.setAttribute('src', url.href)
   }
