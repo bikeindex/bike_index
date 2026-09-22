@@ -103,6 +103,30 @@
       <% end %>
     <% end %>
 
+    <% table.column(sortable: "cycle_type", label: settings.column_renames[:cycle_type_cell], classes: "hideableColumn cycle_type_cell") do |bike| %>
+      <span class="<%= 'tw:text-gray-400' if bike.cycle_type == 'bike' %>">
+        <%= bike.type_titleize %>
+      </span>
+    <% end %>
+
+    <% table.column(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
+      <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
+    <% end %>
+
+    <% table.column(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
+      <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
+    <% end %>
+
+    <% reg_fields_after(:serial_number).each(&reg_field_column) %>
+
+    <% table.column(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
+      <% if bike.creation_kind %>
+        <small class="tw:text-gray-400">
+          <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
+        </small>
+      <% end %>
+    <% end %>
+
     <% table.column(sortable: "owner_email", label: settings.column_renames[:owner_email_cell], classes: "hideableColumn owner_email_cell tw:leading-none") do |bike| %>
       <% if !bike.organized?(organization) %>
         <%= hidden_html.call %>
@@ -127,30 +151,6 @@
     <% end %>
 
     <% reg_fields_after(:owner_name).each(&reg_field_column) %>
-
-    <% table.column(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
-      <% if bike.creation_kind %>
-        <small class="tw:text-gray-400">
-          <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
-        </small>
-      <% end %>
-    <% end %>
-
-    <% table.column(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
-      <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
-    <% end %>
-
-    <% reg_fields_after(:serial_number).each(&reg_field_column) %>
-
-    <% table.column(sortable: "cycle_type", label: settings.column_renames[:cycle_type_cell], classes: "hideableColumn cycle_type_cell") do |bike| %>
-      <span class="<%= 'tw:text-gray-400' if bike.cycle_type == 'bike' %>">
-        <%= bike.type_titleize %>
-      </span>
-    <% end %>
-
-    <% table.column(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
-      <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
-    <% end %>
 
     <% reg_fields_after(:rest).each(&reg_field_column) %>
 
