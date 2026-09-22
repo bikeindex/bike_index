@@ -5772,7 +5772,6 @@ nl:
             status_cell: Toestand
             sticker_cell: Sticker
             stickers: 'stickers:'
-            stolen_cell: Gestolen
             unregistered: 'Niet geregistreerd:'
             updated_at_cell: Bijgewerkt
             url_cell: URL
@@ -5780,6 +5779,9 @@ nl:
             notes_cell_html: Registratienotities <em>door %{org_name}</em>
             reg_organization_affiliation_cell_html: Affiliatie <em>in %{org_name}</em>
             reg_student_id_cell_html: Studentnummer <em>voor %{org_name}</em>
+            occurred_at_cell: Status bij
+            photo_cell: Foto
+            view_cell: Weergave
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -5796,6 +5798,11 @@ nl:
             link_sticker: link sticker
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
+            acknowledgment: Registratiebevestiging
+            acknowledgment_title: Bevestiging van de registratieprocedure bij
+            occurred_at_tooltip: Wanneer het gestolen, in beslag genomen, teruggevonden
+              of te koop aangeboden werd
+            view: Weergave
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
