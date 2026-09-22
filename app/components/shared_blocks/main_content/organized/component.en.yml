@@ -18,11 +18,12 @@ en:
           integration_card_body: Automatically register the bikes you sell to your
             customers.
           lightspeed_card_title: Lightspeed Retail POS
-          other_system_body: No integration needed — register bikes by hand in a
-            few seconds.
+          other_system_body: No integration needed — register bikes by hand in a few
+            seconds.
           other_system_card_title: Other system - please email us
-          pos_callout_subhead: Connect your POS and every bike you sell is registered
-            to your customer on Bike Index.
+          pos_callout_subhead: >-
+            Connect your POS and every bike you sell is registered to your customer
+            on Bike Index.
           pos_callout_title: Register bikes automatically from your point of sale
           subscription_expired_html: >-
             Your subscription to Bike Index has expired. Please contact %{email_link}
