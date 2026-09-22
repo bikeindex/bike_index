@@ -24,10 +24,21 @@ no `ruby` directive) and
 `Gemfile.lock` pins `BUNDLED WITH 4.0.15`. No prebuilt binary for that
 version is reachable (`cache.ruby-lang.org` is 403'd, `ruby/ruby-builder`'s
 toolcache tops out at `3.5.0-preview1`), so build from the GitHub source
-tag — about 8–10 min on a 4-core sandbox. Don't fall back to 3.x and patch
+tag — budget half an hour or so on a 4-core sandbox, and don't panic at
+what look like restarts in the log (miniruby, then the real build, then
+each ext's own `configure`). Don't fall back to 3.x and patch
 the Gemfile; Bundler 4.x's resolver behaves differently and you'll waste
 time chasing fake regressions. Once `/opt/ruby-<version>/x64/` exists,
 `bundle install` works as-is.
+
+Run it in the background and **poll for the binary, not for a duration** —
+`sleep 300; …` has come back in well under 300s of wall clock here, and
+`date` drifts from real time, so neither paces a wait:
+
+```bash
+# Foreground, exits the moment it lands (or after ~20 min)
+for i in $(seq 1 60); do [ -x /opt/ruby-4.0.6/x64/bin/ruby ] && break; sleep 20; done
+```
 
 You also need **libvips** on the box — the app loads `ruby-vips` at boot,
 so without it every Ruby entry point (`db:migrate`, `rspec`, `rails`) dies
@@ -226,7 +237,9 @@ bundle exec rspec spec/models spec/requests spec/jobs
 
 ## Running `:js, type: :system` specs (integration / component system)
 
-Two extra hurdles in the sandbox:
+One hurdle in the sandbox — a browser to launch. Try the spec before
+setting up anything else; the jsdelivr workaround below is a fallback that
+is usually not needed any more.
 
 ### 1. A Chromium the Playwright driver can launch
 
@@ -256,6 +269,19 @@ this repo doesn't have.
   `npx playwright install chromium` instead: Chromium's only download URL is
   `cdn.playwright.dev` (no fallbacks, unlike firefox/webkit), which is the
   class of CDN this sandbox blocks.
+- `capybara-playwright-driver` launches the **headless shell**, not the full
+  browser, so it's the `chromium_headless_shell-*` half of that symlink pair
+  that matters and the error names `chrome-headless-shell`. The MCP section's
+  `/opt/google/chrome` link is for the MCP server's `chrome` channel and isn't
+  needed here. Ran against an image shipping 1194 with the pin wanting 1223:
+  ```bash
+  ln -sfn /opt/pw-browsers/chromium-1194 /opt/pw-browsers/chromium-1223
+  mkdir -p /opt/pw-browsers/chromium_headless_shell-1223
+  ln -sfn /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux \
+          /opt/pw-browsers/chromium_headless_shell-1223/chrome-headless-shell-linux64
+  ln -sfn headless_shell \
+          /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/chrome-headless-shell
+  ```
 - `spec/support/local_chrome.rb` re-registers the `:playwright` driver with
   the flags Chromium needs as root in a container (`--no-sandbox`,
   `--disable-dev-shm-usage`) plus the jsdelivr host-resolver rule below,
@@ -263,14 +289,25 @@ this repo doesn't have.
   specs; the default registration in `spec/support/capybara.rb` passes none
   of them.
 
-### 2. `cdn.jsdelivr.net` is firewalled
+### 2. `cdn.jsdelivr.net` is firewalled — usually harmless
 
-The importmap pins three modules (jquery, select2, @honeybadger-io/js)
-from `cdn.jsdelivr.net` (403'd) — without them, pages render empty.
-Everything else is vendored under `vendor/javascript` and served by the
-app itself. Fetch these from `registry.npmjs.org` (allowed) and serve
-locally over TLS at the same path layout. Versions below mirror
-`config/importmap.rb`; bump when that changes.
+**Check `config/importmap.rb` before building anything here.** As of this
+writing the only CDN-pinned module left is `@honeybadger-io/js`, which
+`application.js` loads through a guarded dynamic `import()` precisely so a
+blocked fetch can't take the page down — everything else is vendored under
+`vendor/javascript` and served by the app. So `:js` specs pass with nothing
+listening on :8443: `spec/integration/organized/registrations_search_spec.rb`
+and the org component system specs all ran green that way. The
+`--host-resolver-rules` flag in `local_chrome.rb` just sends that one import
+at a closed port.
+
+Build the shim below only if a spec actually needs a CDN module — jquery and
+select2 were pinned here once and could return. Note the `openssl` step stands
+up a TLS server impersonating a public host, which auto mode may refuse as a
+containment escape; ask rather than working around it. Fetch the packages from
+`registry.npmjs.org` (allowed) and serve them over TLS at the same path layout.
+Versions below mirror an older `config/importmap.rb`; take them from the pins
+you actually need.
 
 ```bash
 mkdir -p /tmp/cdn
@@ -326,7 +363,7 @@ bundle exec rails db:migrate db:test:prepare
 bundle exec rails tailwindcss:build           # only if specs render the layout
 
 bundle exec rspec spec/models spec/requests   # plain
-LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration   # system; CDN proxy must be running
+LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration   # system; CDN proxy rarely needed
 ```
 
 ## Sandbox network: what's allowed vs. blocked
