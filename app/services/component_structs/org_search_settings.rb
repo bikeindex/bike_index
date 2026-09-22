@@ -30,7 +30,6 @@ module ComponentStructs
       notes_cell
       sticker_cell
       impound_id_cell
-      impounded_cell
       avery_cell
       acknowledgment_cell
       cycle_type_cell
@@ -103,13 +102,12 @@ module ComponentStructs
       end
     end
 
-    def initialize(organization:, interpreted_params: {}, sortable_search_params: {}, params: {},
+    def initialize(organization:, interpreted_params: {}, sortable_search_params: {},
       search_stickers: nil, search_address: nil, search_status: "all", search_unregisteredness: nil,
       search_all: false)
       @organization = organization
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
-      @params = params
       @filter_values = {search_stickers:, search_address:, search_status:, search_unregisteredness:}
       @search_all = search_all
     end
@@ -145,8 +143,7 @@ module ComponentStructs
     def initially_checked_columns
       @initially_checked_columns ||= [
         *DEFAULT_COLUMNS,
-        ("sticker_cell" if @organization.enabled?("bike_stickers")),
-        ("impounded_cell" if @params[:search_impoundedness] == "impounded")
+        ("sticker_cell" if @organization.enabled?("bike_stickers"))
       ].compact
     end
 
@@ -173,7 +170,7 @@ module ComponentStructs
         *ALWAYS_ENABLED_COLUMNS,
         *additional_registration_fields.map { |field| "#{field}_cell" },
         ("notes_cell" if @organization.enabled?("registration_notes")),
-        *(%w[impound_id_cell impounded_cell] if @organization.enabled?("impound_bikes")),
+        ("impound_id_cell" if @organization.enabled?("impound_bikes")),
         ("avery_cell" if @organization.enabled?("avery_export")),
         ("acknowledgment_cell" if @organization.enabled?("registration_sequences"))
       ].compact.uniq

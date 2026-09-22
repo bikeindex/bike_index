@@ -156,7 +156,6 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
     it "renders the impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
-      expect(component).to have_css("th.impounded_cell", visible: :all, text: "Impounded")
     end
   end
 

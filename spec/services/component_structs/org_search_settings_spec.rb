@@ -144,14 +144,6 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
         expect(instance.initially_checked_columns).to include("sticker_cell")
       end
     end
-
-    context "with search_impoundedness impounded" do
-      let(:options) { super().merge(params: {search_impoundedness: "impounded"}) }
-
-      it "includes impounded_cell" do
-        expect(instance.initially_checked_columns).to include("impounded_cell")
-      end
-    end
   end
 
   describe "column_renames" do
@@ -176,7 +168,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
     it "adds the feature's columns" do
-      expect(instance.enabled_columns).to include("impound_id_cell", "impounded_cell", "url_cell")
+      expect(instance.enabled_columns).to include("impound_id_cell", "url_cell")
     end
 
     context "without impound_bikes" do

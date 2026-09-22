@@ -121,7 +121,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
     it "renders impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
-      expect(component).to have_css("th.impounded_cell", visible: :all, text: "Impounded")
     end
   end
 
