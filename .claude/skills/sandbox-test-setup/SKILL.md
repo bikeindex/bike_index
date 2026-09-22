@@ -32,8 +32,10 @@ matches; the others won't apply and are the bulk of the material.
 | `/home/vercel-sandbox/workspace` (Amazon Linux 2023) | Conductor cloud sandbox | `references/conductor-cloud.md` |
 | `/home/user/bike_index` | Claude Code web sandbox | `references/web-sandbox.md` |
 
-In the web sandbox, run the setup rather than hand-typing it — it starts the ~6 min
-Ruby build first and does the apt/services/postgres/browser work while that compiles:
+In the web sandbox a `SessionStart` hook has usually done all of this before your
+first turn — check with `ruby -v` before setting anything up. When it hasn't (an
+older branch, a container that idled and lost postgres), run the setup rather than
+hand-typing it; it fetches a prebuilt Ruby + gems and falls back to building:
 
 ```bash
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh --dev-server
