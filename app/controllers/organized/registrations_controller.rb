@@ -3,7 +3,7 @@ module Organized
     include Binxtils::SortableTable
 
     SORTABLE_COLUMNS = %w[id updated_by_user_at owner_email mnfg_name frame_model cycle_type propulsion_type
-      acknowledged_at]
+      acknowledged_at occurred_at]
 
     helper_method :chart_scope_paths
 
