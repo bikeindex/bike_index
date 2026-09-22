@@ -90,7 +90,7 @@
     <% end %>
 
     <% table.column(sortable: "organization_id") do |organization_status| %>
-      <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: organization_status.organization, organization_id: organization_status.organization_id, render_search:) %>
+      <%= render Atoms::Admin::TableCells::Organization::Component.new(sort_state:, organization: organization_status.organization, organization_id: organization_status.organization_id, render_search:) %>
     <% end %>
 
     <% table.column(sortable: "pos_kind", label: "POS kind") do |organization_status| %>

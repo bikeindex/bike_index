@@ -16,7 +16,7 @@
 
     <% unless skip_user %>
       <% table.column(label: "User") do |feedback| %>
-        <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, email: feedback.email, user: feedback.user, render_search: render_sortable) %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, email: feedback.email, user: feedback.user, render_search: render_sortable) %>
       <% end %>
 
       <% table.column(label: "Name") do |feedback| %>
@@ -35,7 +35,7 @@
     <% unless skip_bike %>
       <% table.column(label: "Bike") do |feedback| %>
         <% if feedback.bike_id.present? %>
-          <%= render Pages::Admin::Bikes::Cell::Component.new(sort_state:, bike: feedback.bike, bike_id: feedback.bike_id, bike_link_path: admin_bike_path(feedback.bike_id, active_tab: "messages"), render_search: true) %>
+          <%= render Atoms::Admin::TableCells::Bike::Component.new(sort_state:, bike: feedback.bike, bike_id: feedback.bike_id, bike_link_path: admin_bike_path(feedback.bike_id, active_tab: "messages"), render_search: true) %>
         <% end %>
       <% end %>
     <% end %>

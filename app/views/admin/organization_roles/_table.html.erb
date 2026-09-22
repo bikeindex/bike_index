@@ -15,7 +15,7 @@
 
     <% table.column(sortable: "invited_email", label: "Recipient") do |organization_role| %>
       <% if organization_role.user.present? %>
-        <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.user) %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(user: organization_role.user) %>
       <% else %>
         <%= organization_role.invited_email %>
       <% end %>
@@ -23,7 +23,7 @@
 
     <% unless skip_organization %>
       <% table.column(sortable: "organization_id") do |organization_role| %>
-        <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: render_organization_search) %>
+        <%= render Atoms::Admin::TableCells::Organization::Component.new(sort_state:, organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: render_organization_search) %>
       <% end %>
     <% end %>
 
@@ -33,7 +33,7 @@
 
     <% table.column(sortable: "sender_id", label: "Sender", header_classes: "tw:text-xs") do |organization_role| %>
       <% if organization_role.sender.present? %>
-        <%= render Pages::Admin::Users::Cell::Component.new(user: organization_role.sender) %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(user: organization_role.sender) %>
       <% else %>
         <%= organization_role.sender_id %>
       <% end %>

@@ -29,7 +29,7 @@ module Pages
               return self_registered if @bike.creator == @bike.user
               return tag.small("Creator missing", class: error_classes) if @bike.creator.blank?
 
-              render(Pages::Admin::Users::Cell::Component.new(user: @bike.creator,
+              render(Atoms::Admin::TableCells::User::Component.new(user: @bike.creator,
                 search_url: admin_bikes_path(user_id: @bike.creator_id), render_search: true))
             end
 

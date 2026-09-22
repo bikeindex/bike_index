@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Admin::Users::Cell::Component, type: :component do
+RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {user:} }

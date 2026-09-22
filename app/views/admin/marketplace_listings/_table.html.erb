@@ -31,7 +31,7 @@
 
     <% unless skip_item %>
       <% table.column(label: "Item") do |marketplace_listing| %>
-        <%= render Pages::Admin::Bikes::Cell::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, view_as: "marketplace_preview"), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)) %>
+        <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, view_as: "marketplace_preview"), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)) %>
       <% end %>
     <% end %>
 
@@ -44,16 +44,16 @@
     <% end %>
 
     <% table.column(label: "City") do |marketplace_listing| %>
-      <%= render Atoms::Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record) %>
+      <%= render Atoms::Admin::TableCells::AddressRecord::Component.new(address_record: marketplace_listing.address_record) %>
     <% end %>
 
     <% table.column(sortable: "seller_id") do |marketplace_listing| %>
-      <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_listing.seller, render_search: true) %>
+      <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: marketplace_listing.seller, render_search: true) %>
     <% end %>
 
     <% table.column(sortable: "buyer_id") do |marketplace_listing| %>
       <% if marketplace_listing.buyer_id.present? %>
-        <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_listing.buyer, user_id: marketplace_listing.buyer_id, render_search: true) %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: marketplace_listing.buyer, user_id: marketplace_listing.buyer_id, render_search: true) %>
       <% end %>
     <% end %>
 

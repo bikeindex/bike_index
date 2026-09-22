@@ -17,11 +17,11 @@
     <% end %>
 
     <% table.column(sortable: "bike_id", label: "Bike") do |bike_version| %>
-      <%= render Pages::Admin::Bikes::Cell::Component.new(bike: bike_version.bike, bike_id: bike_version.bike_id) %>
+      <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: bike_version.bike, bike_id: bike_version.bike_id) %>
     <% end %>
 
     <% table.column(sortable: "owner_id", label: "Owner") do |bike_version| %>
-      <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: bike_version.owner, render_search: render_sortable) %>
+      <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: bike_version.owner, render_search: render_sortable) %>
     <% end %>
 
     <% table.column(sortable: "visibility") do |bike_version| %>

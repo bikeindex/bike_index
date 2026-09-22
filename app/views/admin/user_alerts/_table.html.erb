@@ -16,7 +16,7 @@
 
   <% unless skip_user %>
     <% table.column(sortable: "user_id") do |user_alert| %>
-      <%= render Pages::Admin::Users::Cell::Component.new(user: user_alert.user, user_id: user_alert.user_id, search_url: url_for(sort_state.search_params.merge(user_id: user_alert.user_id)), render_search: true) %>
+      <%= render Atoms::Admin::TableCells::User::Component.new(user: user_alert.user, user_id: user_alert.user_id, search_url: url_for(sort_state.search_params.merge(user_id: user_alert.user_id)), render_search: true) %>
     <% end %>
   <% end %>
 
@@ -24,7 +24,7 @@
     <% if user_alert.bike_id.present? %>
       <span class="d-block">
         <small>bike:</small>
-        <%= render Pages::Admin::Bikes::Cell::Component.new(bike: user_alert.bike, bike_id: user_alert.bike_id, search_url: url_for(sort_state.search_params.merge(search_bike_id: user_alert.bike_id)), render_search: true) %>
+        <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: user_alert.bike, bike_id: user_alert.bike_id, search_url: url_for(sort_state.search_params.merge(search_bike_id: user_alert.bike_id)), render_search: true) %>
       </span>
     <% end %>
 
@@ -38,7 +38,7 @@
     <% if user_alert.organization_id.present? %>
       <span class="d-block">
         <small>organization:</small>
-        <%= render Pages::Admin::Organizations::Cell::Component.new(organization: user_alert.organization, organization_id: user_alert.organization_id, search_url: url_for(sort_state.search_params.merge(organization_id: user_alert.organization_id)), render_search: true) %>
+        <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: user_alert.organization, organization_id: user_alert.organization_id, search_url: url_for(sort_state.search_params.merge(organization_id: user_alert.organization_id)), render_search: true) %>
       </span>
     <% end %>
   <% end %>
