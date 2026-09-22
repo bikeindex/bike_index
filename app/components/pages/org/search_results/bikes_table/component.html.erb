@@ -88,7 +88,7 @@
       </span>
     <% end %>
 
-    <%# Phone sits beside the owner's name; the organization's other fields keep their place %>
+    <%# OWNER_FIELDS sit beside the owner's name; the organization's other fields keep their place %>
     <% reg_field_column = lambda do |reg_field| %>
       <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
         <% if !bike.organized?(organization) %>
@@ -126,7 +126,7 @@
       <% end %>
     <% end %>
 
-    <% reg_field_column.call("reg_phone") if settings.additional_registration_fields.include?("reg_phone") %>
+    <% (OWNER_FIELDS & settings.additional_registration_fields).each { |reg_field| reg_field_column.call(reg_field) } %>
 
     <% table.column(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
       <% if bike.creation_kind %>
@@ -150,7 +150,7 @@
       <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
     <% end %>
 
-    <% (settings.additional_registration_fields - ["reg_phone"]).each { |reg_field| reg_field_column.call(reg_field) } %>
+    <% (settings.additional_registration_fields - OWNER_FIELDS).each { |reg_field| reg_field_column.call(reg_field) } %>
 
     <% if organization.enabled?("impound_bikes") %>
       <% table.column(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
