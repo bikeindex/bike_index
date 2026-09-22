@@ -63,7 +63,7 @@ class StolenNotification < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.receiver_email ||= sender_organization.present? ? bike&.owner_email : bike&.contact_owner_email(sender)
+    self.receiver_email ||= organization_message? ? bike.owner_email : bike&.contact_owner_email(sender)
     self.receiver ||= bike.owner
     self.send_dates ||= [].to_json
     self.kind ||= calculated_kind
@@ -76,11 +76,15 @@ class StolenNotification < ApplicationRecord
     STR
   end
 
-  # An org messaging a bike registered with it isn't reporting it stolen
   def sender_organization
     return @sender_organization if defined?(@sender_organization)
 
     @sender_organization = sender&.organizations&.find_by(id: bike&.bike_organization_ids)
+  end
+
+  # An org messaging a bike registered with it isn't reporting it stolen
+  def organization_message?
+    !bike.status_stolen? && sender_organization.present?
   end
 
   def mail_snippet
@@ -101,7 +105,7 @@ class StolenNotification < ApplicationRecord
     else
       return "unstolen_blocked" unless permitted_send?
 
-      if sender_organization.present?
+      if organization_message?
         "unstolen_organization_permitted"
       elsif bike&.claimed?
         "unstolen_claimed_permitted"

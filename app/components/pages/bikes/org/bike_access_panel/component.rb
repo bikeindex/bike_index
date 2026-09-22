@@ -46,6 +46,14 @@ module Pages
             @bike.status_with_owner? && @organization.enabled?("unstolen_notifications")
           end
 
+          def stolen_notification
+            @stolen_notification ||= StolenNotification.new(bike: @bike, sender: @user)
+          end
+
+          def organization_message?
+            stolen_notification.organization_message?
+          end
+
           def show_sticker_modal?
             @organization.enabled?("bike_stickers")
           end

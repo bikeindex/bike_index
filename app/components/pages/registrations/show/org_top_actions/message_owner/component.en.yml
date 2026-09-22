@@ -9,10 +9,13 @@ en:
               know_something_about_this_bike_type: Know something about this %{bike_type}?
               know_who_has_this_bike_type: Know who has this %{bike_type}?
               link_url: Link url
+              message_the_owner_of_this_bike_type: Message the owner of this %{bike_type}
               send_message: Send message
               what_do_you_need_to_ask: >-
                 What do you need to ask about this %{bike_type}? Include a link in
                 the field below if there's one that helps
+              what_do_you_want_to_tell_the_owner: What do you want to tell the owner
+                of this %{bike_type}?
               where_did_you_see_this_bike: >-
                 Where did you see this %{bike_type}? If you're contacting about an
                 ad you found online, include a link in the field below

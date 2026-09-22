@@ -65,5 +65,17 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
 
       expect(page).to have_link("718-391-4410", href: "tel:718-391-4410")
     end
+
+    context "registered with the viewer's organization" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: owner, creation_organization: organization, cycle_type: "e-scooter") }
+
+      it "asks for a message to the owner, not a sighting" do
+        render_inline(described_class.new(bike:, current_user:))
+
+        expect(page).to have_text("Message the owner of this e-scooter")
+        expect(page).to_not have_text("Know something about this e-scooter")
+        expect(page).to have_css("textarea[placeholder='What do you want to tell the owner of this e-scooter?']", visible: :all)
+      end
+    end
   end
 end
