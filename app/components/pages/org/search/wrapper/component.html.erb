@@ -87,8 +87,8 @@
     </div>
   <% end %>
 
-  <%# Hidden for the spinner above while the results frame is busy %>
-  <%= tag.div(class: ("search-results-body" if @search_page)) do %>
+  <%# Hidden for the spinner above while the results frame is busy; inert outside one %>
+  <div class="search-results-body">
     <% if result_component %>
       <ul class="tw:m-0 tw:list-none tw:py-4 <%= result_component::LIST_CLASSES %> <%= padding_x_class %>">
         <% @bikes.each do |bike| %>
@@ -113,7 +113,7 @@
         )) %>
       </div>
     <% end %>
-  <% end %>
+  </div>
 
   <div
     class="

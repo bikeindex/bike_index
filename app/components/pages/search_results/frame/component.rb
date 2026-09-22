@@ -11,6 +11,10 @@ module Pages
       # for the no-JS path instead of one that can never resolve. The caller's
       # block is the frame body, rendered once the results are present.
       #
+      # A body with chrome worth keeping - a card's header and pagination - marks itself
+      # .search-results-card and swaps its own .search-results-body for
+      # .search-results-loading, standing the whole-frame overlay down while it's there.
+      #
       # The form lives outside the frame and submits with turbo_action="advance",
       # so a restored snapshot can leave the frame's results stale against the
       # address-bar URL. Every search page opts out of Turbo's snapshot cache (via
