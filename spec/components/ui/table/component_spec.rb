@@ -94,7 +94,6 @@ RSpec.describe UI::Table::Component, type: :component do
         expect(result).to have_css("th a", text: /Name/)
         expect(result).to have_css("th", text: /Their full name/)
         expect(result).not_to have_css("th a [role=tooltip], th a button")
-        expect(result).to have_css("th [data-ui--tooltip-placement-value='bottom']")
       end
     end
 

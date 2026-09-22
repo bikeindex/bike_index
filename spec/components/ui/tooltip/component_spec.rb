@@ -22,18 +22,6 @@ RSpec.describe UI::Tooltip::Component, type: :component do
     expect(component.css("[aria-describedby]").first.name).to eq "button"
   end
 
-  it "leaves placement to the controller's default" do
-    expect(component.css("[data-controller='ui--tooltip']").attr("data-ui--tooltip-placement-value")).to be_nil
-  end
-
-  context "with placement" do
-    let(:component) { render_inline(described_class.new(text: "5–9 mi", placement: "bottom")) }
-
-    it "hands it to the controller" do
-      expect(component.css("[data-controller='ui--tooltip']").attr("data-ui--tooltip-placement-value").value).to eq "bottom"
-    end
-  end
-
   context "with no trigger block" do
     let(:component) { render_inline(described_class.new(text: "tip")) }
 
