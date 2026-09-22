@@ -66,12 +66,22 @@ module UI
       # The controller drops pointer-events-none once the tooltip is held open
       def tooltip_span
         tag.span(
-          tooltip_body,
+          safe_join([tooltip_body, arrow_span]),
           role: "tooltip",
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
           class: "tw:twtext-color tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded " \
             "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:font-normal tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
+            "tw:dark:bg-gray-800 tw:dark:border-gray-700"
+        )
+      end
+
+      # The controller positions it and picks which two borders show
+      def arrow_span
+        tag.span(
+          "aria-hidden": true,
+          data: {"ui--tooltip-target": "arrow"},
+          class: "tw:absolute tw:h-2 tw:w-2 tw:rotate-45 tw:bg-white tw:border-solid tw:border-gray-200 " \
             "tw:dark:bg-gray-800 tw:dark:border-gray-700"
         )
       end

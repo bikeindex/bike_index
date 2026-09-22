@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom'
+import { computePosition, flip, shift, offset, arrow, autoUpdate } from '@floating-ui/dom'
 import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_index'
 
 // Connects to data-controller="ui--tooltip"
@@ -9,8 +9,19 @@ import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_ind
 //   persistentActive  set by focus or a click / cleared by a press outside or
 //                     focus moving to another element in the page
 // The tooltip is visible whenever either flag is true.
+
+// The arrow sits on the tooltip edge facing the trigger - keyed by that edge,
+// its outward two borders (top right bottom left)
+const ARROW_BORDERS = {
+  top: '1px 0 0 1px',
+  right: '1px 1px 0 0',
+  bottom: '0 1px 1px 0',
+  left: '0 0 1px 1px'
+}
+const OPPOSITE_SIDE = { top: 'bottom', right: 'left', bottom: 'top', left: 'right' }
+
 export default class extends Controller {
-  static targets = ['trigger', 'tooltip']
+  static targets = ['trigger', 'tooltip', 'arrow']
   static values = {
     placement: { type: String, default: 'top' }
   }
@@ -104,14 +115,25 @@ export default class extends Controller {
   }
 
   async updatePosition () {
-    const { x, y } = await computePosition(this.triggerTarget, this.tooltipTarget, {
+    const { x, y, placement, middlewareData } = await computePosition(this.triggerTarget, this.tooltipTarget, {
       placement: this.placementValue,
-      middleware: [offset(6), flip(), shift({ padding: 4 })]
+      middleware: [offset(8), flip(), shift({ padding: 4 }), arrow({ element: this.arrowTarget, padding: 4 })]
     })
     Object.assign(this.tooltipTarget.style, {
       left: `${x}px`,
       top: `${y}px`,
       position: 'absolute'
+    })
+
+    const edge = OPPOSITE_SIDE[placement.split('-')[0]]
+    const { x: arrowX, y: arrowY } = middlewareData.arrow
+    Object.assign(this.arrowTarget.style, {
+      left: arrowX != null ? `${arrowX}px` : '',
+      top: arrowY != null ? `${arrowY}px` : '',
+      right: '',
+      bottom: '',
+      [edge]: '-5px',
+      borderWidth: ARROW_BORDERS[edge]
     })
   }
 }
