@@ -68,6 +68,19 @@ RSpec.describe Atoms::Serial::Component, type: :component do
     end
   end
 
+  context "owner of a bike impounded by an organization" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, serial_number: "FFF333") }
+    let(:options) { {user: bike.user} }
+    before { FactoryBot.create(:impound_record_with_organization, bike:) }
+
+    it "shows the serial with the unauthorized-users note, although not authorized" do
+      expect(bike.reload.authorized?(bike.user)).to be_falsey
+      expect(component.css("span.serial-span").text).to eq "FFF333"
+      expect(component.css("em").text).to eq "hidden for unauthorized users"
+      expect(component.css("[role=tooltip]").text).to eq "because bike is impounded"
+    end
+  end
+
   context "no serial" do
     let(:bike) { Bike.new }
 
