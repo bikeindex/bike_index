@@ -69,16 +69,17 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   context "with the phone field enabled" do
     let(:enabled_feature_slugs) do
       %w[bike_search reg_phone reg_student_id reg_organization_affiliation reg_extra_registration_number
-        registration_notes bike_stickers registration_sequences]
+        reg_address registration_notes bike_stickers registration_sequences]
     end
 
     it "puts each column beside the one it relates to" do
       cells = component.css("th.hideableColumn").map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
       expect(cells.each_cons(2)).to include(%w[photo_cell url_cell], %w[created_at_cell updated_at_cell], %w[updated_at_cell acknowledgment_cell],
         %w[owner_email_cell owner_name_cell], %w[owner_name_cell reg_phone_cell],
-        %w[reg_phone_cell reg_student_id_cell], %w[reg_student_id_cell reg_organization_affiliation_cell], %w[cycle_type_cell propulsion_type_cell])
+        %w[reg_phone_cell reg_student_id_cell], %w[reg_student_id_cell reg_organization_affiliation_cell],
+        %w[serial_number_cell reg_extra_registration_number_cell], %w[cycle_type_cell propulsion_type_cell])
       # The organization's other fields keep their place further along
-      expect(cells.index("reg_extra_registration_number_cell")).to be > cells.index("propulsion_type_cell")
+      expect(cells.index("reg_address_cell")).to be > cells.index("propulsion_type_cell")
       expect(cells.last).to eq "notes_cell"
     end
   end

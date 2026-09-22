@@ -26,8 +26,9 @@ module Pages
           VIEW_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
             "tw:group-data-overflowing/bikes-table:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
 
-          # Registration fields, in the order they follow the owner's name
+          # Registration fields, in the order they follow the owner's name, and the serial
           OWNER_FIELDS = %w[reg_phone reg_student_id reg_organization_affiliation].freeze
+          SERIAL_FIELDS = %w[reg_extra_registration_number].freeze
 
           THUMB_CLASSES = "tw:block tw:h-8 tw:w-11 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700"
 
