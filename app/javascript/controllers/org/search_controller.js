@@ -61,12 +61,12 @@ export default class extends Controller {
     return this.element.querySelector('.search-results-frame-wrapper > turbo-frame')
   }
 
-  // The notes and location fields, each named by data-field. One opens with a value in it,
-  // or if it was left open
+  // The notes and location fields, each named by data-field. One opens if a text input in it
+  // has a value - not the distance, which always does - or if it was left open
   initOptionalFields () {
     this.optionalFieldTargets.forEach(field => {
       const hasValue = [...field.querySelectorAll('input[type=text]')].some(input => input.value.length > 0)
-      if (hasValue || localStorage.getItem(this.optionalFieldKey(field.dataset.field)) === 'true') {
+      if (hasValue || localStorage.getItem(field.dataset.storageKey) === 'true') {
         this.setOptionalField(field.dataset.field, true)
       }
     })
@@ -80,13 +80,9 @@ export default class extends Controller {
     const field = this.optionalFieldTargets.find(target => target.dataset.field === name)
     if (!field) return
     field.classList.toggle('tw:hidden', !open)
-    localStorage.setItem(this.optionalFieldKey(name), String(open))
+    localStorage.setItem(field.dataset.storageKey, String(open))
     const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === name)
     if (checkbox) checkbox.checked = open
-  }
-
-  optionalFieldKey (name) {
-    return `orgRegistration${name.charAt(0).toUpperCase()}${name.slice(1)}SearchOpen`
   }
 
   // Bubbled from any field, so it picks out the one it's for

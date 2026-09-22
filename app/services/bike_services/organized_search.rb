@@ -29,14 +29,15 @@ module BikeServices
     # A stolen or impounded bike is where it was taken or impounded; any other is at its
     # registration address - only matched where the organization collects that, and only
     # among its own registrations
-    def location(bikes, location, distance, organization:, search_all: false)
+    def location(bikes, location, distance, organization:, search_all: false, ip_address: nil)
       return bikes if location.blank?
 
-      bounding_box = GeocodeHelper.bounding_box(location, GeocodeHelper.permitted_distance(distance))
-      return bikes.none if bounding_box.empty?
+      proximity = BikeSearchable.proximity_bounding_box(location, distance, ip_address)
+      return bikes if proximity.nil? && location.match?(/anywhere/i)
+      return bikes.none if proximity.nil?
 
       bikes = bikes.stolen_or_impounded if search_all || !organization.enabled?("reg_address")
-      bikes.within_bounding_box(bounding_box)
+      bikes.within_bounding_box(proximity[:bounding_box])
     end
 
     def stickers(bikes, value)

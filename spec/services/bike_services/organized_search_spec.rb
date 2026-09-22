@@ -32,6 +32,7 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
     it "matches only stolen bikes" do
       expect(described_class.location(Bike.all, "New York", "50", organization:).pluck(:id)).to eq([stolen_nyc.id])
       expect(described_class.location(Bike.all, "", "50", organization:)).to eq(Bike.all)
+      expect(described_class.location(Bike.all, "Anywhere", "50", organization:)).to eq(Bike.all)
     end
 
     context "with reg_address" do

@@ -216,7 +216,7 @@ module IntegrationSpecHelpers
 
   # search--form#handlePopstate reconciles these to the address bar on a
   # back/forward; the results frame reloads separately and faster.
-  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes location].freeze
+  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes location distance].freeze
 
   # Navigate back, then wait for the filters to settle to the address bar so
   # callers don't read or fill against the restoration preview.

@@ -228,7 +228,7 @@ module Organized
       bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
       if org.present?
         bikes = BikeServices::OrganizedSearch.location(bikes, params[:location], params[:distance],
-          organization: org, search_all: @search_all)
+          organization: org, search_all: @search_all, ip_address: forwarded_ip_address)
       end
       bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
       bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
