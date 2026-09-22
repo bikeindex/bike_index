@@ -150,6 +150,11 @@
   .ui-table-bordered thead tr th:last-child {
     @apply tw:ui-table-bordered-th-last;
   }
+  /* A 🔎 or tooltip "?" stays on the line of what it follows. Only the whole cell
+     works: Chromium still breaks after a preceding element that wraps */
+  .ui-table td:has(.keep-with-previous) {
+    @apply tw:whitespace-nowrap;
+  }
 
   /* Turbo sets [busy] on the results frame during requests. Hide the existing
      results and overlay a spinner; min-height gives the spinner a place to
