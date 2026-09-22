@@ -3,22 +3,32 @@
 #
 #   bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh [--dev-server]
 #
-# Builds the pinned Ruby if it isn't built, and does everything that doesn't
-# depend on it (apt, services, postgres role, chrome wrapper) WHILE that runs.
+# Everything that can overlap does: the prebuilt downloads, the apt/services/chrome
+# work that needs no Ruby, and (when no prebuilt Ruby is reachable) the source build
+# all run at once, and the CSS build runs alongside the database work.
 # Idempotent: re-running it after a container idle period just restarts the
 # services. Pass --dev-server to also boot bin/dev in the background.
 #
-# Logs: /tmp/ruby_build.log, /tmp/dev_server.log
+# Logs: /tmp/ruby_build.log, /tmp/system_setup.log, /tmp/css_build.log, /tmp/dev_server.log
 set -uo pipefail
 
 REPO="${CLAUDE_PROJECT_DIR:-/home/user/bike_index}"
 RUBYVER=$(awk '$1=="ruby"{print $2}' "$REPO/.tool-versions")
 LOCK_SHA=$(sha256sum "$REPO/Gemfile.lock" | cut -c1-12)
+NPM_SHA=$(sha256sum "$REPO/package-lock.json" | cut -c1-12)
 # rbconfig bakes the prefix in, so the tarball has to land where it was built:
 # ruby/setup-ruby's toolcache path. /opt/ruby-<ver>/x64 stays as a symlink to it.
 TOOLCACHE="/opt/hostedtoolcache/Ruby/${RUBYVER}"
 RUBY_PREFIX="/opt/ruby-${RUBYVER}/x64"
 PREBUILT_BASE="${BINX_PREBUILT_BASE:-https://github.com/bikeindex/bike_index/releases/download/web-sandbox-prebuilt}"
+
+RUBY_TARBALL="ruby-${RUBYVER}-ubuntu24.04-x86_64.tar.gz"
+BUNDLE_TARBALL="bundle-${RUBYVER}-${LOCK_SHA}-ubuntu24.04-x86_64.tar.gz"
+# main's Gemfile.lock moves often enough that an exact miss is the common case, so
+# fall back to the newest published bundle: `bundle install` then fetches the few
+# gems that differ instead of all of them.
+BUNDLE_LATEST="bundle-${RUBYVER}-latest-ubuntu24.04-x86_64.tar.gz"
+NODE_TARBALL="node_modules-${NPM_SHA}-ubuntu24.04.tar.gz"
 
 export PATH="$RUBY_PREFIX/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
 export LD_LIBRARY_PATH="$RUBY_PREFIX/lib:${LD_LIBRARY_PATH:-}"
@@ -28,23 +38,40 @@ export LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 say() { echo "==> $*"; }
 
+STAGE=$(mktemp -d)
+trap 'rm -rf "$STAGE"' EXIT
+
 # ------------------------------------------------------------ prebuilt assets
 # .github/workflows/web-sandbox-prebuild.yml publishes these; every failure here
 # is non-fatal, because building from source is always still an option.
-fetch_prebuilt() { # <tarball name>
-  local tarball="$1" tmp
-  tmp=$(mktemp -d)
-  curl -sfL --max-time 600 -o "$tmp/$tarball" "$PREBUILT_BASE/$tarball" &&
-    curl -sfL --max-time 60 -o "$tmp/$tarball.sha256" "$PREBUILT_BASE/$tarball.sha256" &&
-    (cd "$tmp" && sha256sum -c "$tarball.sha256" >/dev/null) &&
-    mkdir -p "$TOOLCACHE" &&
-    tar -C "$TOOLCACHE" -xzf "$tmp/$tarball" || { rm -rf "$tmp"; return 1; }
-  rm -rf "$tmp"
+download_asset() { # <tarball>... — first one that resolves wins, verified into $STAGE
+  [ "${BINX_SKIP_PREBUILT:-}" != "1" ] || return 1
+  local tarball
+  for tarball in "$@"; do
+    curl -sfL --max-time 600 -o "$STAGE/$tarball" "$PREBUILT_BASE/$tarball" &&
+      curl -sfL --max-time 60 -o "$STAGE/$tarball.sha256" "$PREBUILT_BASE/$tarball.sha256" &&
+      (cd "$STAGE" && sha256sum -c "$tarball.sha256" >/dev/null) &&
+      { printf '%s' "$tarball" > "$STAGE/$1.resolved"; return 0; }
+    rm -f "$STAGE/$tarball" "$STAGE/$tarball.sha256"
+  done
+  return 1
+}
+
+# Which name a download job settled on (its fallback, or nothing at all). The jobs
+# are subshells, so the filesystem is how they report back.
+resolved_asset() { cat "$STAGE/$1.resolved" 2>/dev/null; }
+
+link_ruby_prefix() {
   # A half-built prefix left by a timed-out session would shadow what we just
   # unpacked, so move it aside rather than letting the rebuild path win.
   [ -L "$RUBY_PREFIX" ] || [ ! -e "$RUBY_PREFIX" ] || mv "$RUBY_PREFIX" "$RUBY_PREFIX.broken.$$"
   mkdir -p "$(dirname "$RUBY_PREFIX")"
   ln -sfn "$TOOLCACHE/x64" "$RUBY_PREFIX"
+}
+
+unpack_ruby_tree() { # <tarball> — both Ruby and bundle assets extract over $TOOLCACHE
+  [ -s "$STAGE/$1" ] || return 1
+  mkdir -p "$TOOLCACHE" && tar -C "$TOOLCACHE" -xzf "$STAGE/$1"
 }
 
 ruby_is_built() { "$RUBY_PREFIX/bin/ruby" --version 2>/dev/null | grep -q "^ruby ${RUBYVER}"; }
@@ -70,73 +97,89 @@ build_ruby() {
   make -j"$(nproc)"
   SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt make install
   # Some shebangs assume the GitHub-Actions hostedtoolcache layout
-  mkdir -p "/opt/hostedtoolcache/Ruby/${RUBYVER}"
-  [ -e "/opt/hostedtoolcache/Ruby/${RUBYVER}/x64" ] || \
-    ln -s "$RUBY_PREFIX" "/opt/hostedtoolcache/Ruby/${RUBYVER}/x64"
+  mkdir -p "$TOOLCACHE"
+  [ -e "$TOOLCACHE/x64" ] || ln -s "$RUBY_PREFIX" "$TOOLCACHE/x64"
   "$RUBY_PREFIX/bin/ruby" --version
 }
 
-# Keyed on Gemfile.lock, so it misses on a branch that changed it - `bundle
-# install` then fills the gaps against whatever this Ruby already has.
-GEMS_PREBUILT=false
-fetch_prebuilt_gems() {
-  [ "$GEMS_PREBUILT" = false ] && [ "${BINX_SKIP_PREBUILT:-}" != "1" ] || return 0
-  if fetch_prebuilt "bundle-${RUBYVER}-${LOCK_SHA}-ubuntu24.04-x86_64.tar.gz"; then
-    say "prebuilt gems for Gemfile.lock ${LOCK_SHA} installed"
-    GEMS_PREBUILT=true
+# ------------------------------------- everything that needs no Ruby, in parallel
+setup_system() {
+  # ruby-vips loads at boot, so without libvips every rails/rspec run dies
+  if ! ldconfig -p | grep -q libvips.so.42; then
+    apt-get install -y libvips42 ||
+      { apt-get update && apt-get install -y libvips42; }
   fi
+
+  service postgresql start >/dev/null   # redis logs a benign ulimit warning
+  service redis-server start 2>&1 | grep -v ulimit
+  sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='rails'" | grep -q 1 ||
+    sudo -u postgres psql -c "CREATE USER rails WITH SUPERUSER PASSWORD 'password';"
+
+  # Playwright MCP's chrome: fixed path, --no-sandbox (we are root), auth file
+  local chrome_dir
+  chrome_dir="$(ls -d /opt/pw-browsers/chromium-*/chrome-linux 2>/dev/null | sort -V | tail -1)"
+  mkdir -p /root/.cache/ms-playwright
+  if [ -x "$chrome_dir/chrome" ]; then
+    mkdir -p /opt/google/chrome
+    printf '#!/bin/bash\nexec "%s" --no-sandbox --disable-dev-shm-usage "$@"\n' "$chrome_dir/chrome" \
+      > /opt/google/chrome/chrome
+    chmod +x /opt/google/chrome/chrome
+  else
+    echo "no chromium under /opt/pw-browsers - MCP screenshots will not work"
+  fi
+  [ -s /root/.cache/ms-playwright/mcp-auth.json ] ||
+    printf '{"cookies":[],"origins":[]}' > /root/.cache/ms-playwright/mcp-auth.json
 }
 
+say "starting system setup, prebuilt downloads and (if needed) the ruby build together"
+setup_system > /tmp/system_setup.log 2>&1 &
+SYSTEM_PID=$!
+
+RUBY_DL_PID=""
+ruby_is_built || { download_asset "$RUBY_TARBALL" & RUBY_DL_PID=$!; }
+download_asset "$BUNDLE_TARBALL" "$BUNDLE_LATEST" &
+BUNDLE_DL_PID=$!
+download_asset "$NODE_TARBALL" &
+NODE_DL_PID=$!
+
+# ---------------------------------------------------------------------- ruby
 RUBY_PID=""
 if ruby_is_built; then
   say "ruby ${RUBYVER} already installed"
-  fetch_prebuilt_gems
-elif [ "${BINX_SKIP_PREBUILT:-}" != "1" ] &&
-  fetch_prebuilt "ruby-${RUBYVER}-ubuntu24.04-x86_64.tar.gz" && ruby_is_built; then
+elif wait "$RUBY_DL_PID" && unpack_ruby_tree "$RUBY_TARBALL" && link_ruby_prefix && ruby_is_built; then
   say "prebuilt ruby ${RUBYVER} installed"
-  fetch_prebuilt_gems
 else
   say "no prebuilt ruby - building from source in the background (~6 min on 4 cores) -> /tmp/ruby_build.log"
   build_ruby > /tmp/ruby_build.log 2>&1 &
   RUBY_PID=$!
 fi
 
-# ------------------------------------------- everything that doesn't need ruby
-# ruby-vips loads at boot, so without libvips every rails/rspec run dies
-say "installing libvips42"
-if ! ldconfig -p | grep -q libvips.so.42; then
-  apt-get install -y libvips42 >/tmp/apt_vips.log 2>&1 ||
-    { apt-get update >>/tmp/apt_vips.log 2>&1 && apt-get install -y libvips42 >>/tmp/apt_vips.log 2>&1; }
-fi
+# The gem tree extracts over the Ruby's own GEM_HOME, so it waits on whichever
+# Ruby path won - but the download has been running since the top either way.
+GEMS_PREBUILT=false
+install_prebuilt_gems() {
+  local resolved
+  resolved=$(resolved_asset "$BUNDLE_TARBALL")
+  [ -n "$resolved" ] || return 0
+  unpack_ruby_tree "$resolved" || return 0
+  # Only when nothing has claimed the prefix yet: after a source build it's a real
+  # directory that $TOOLCACHE/x64 points AT, and relinking would chase its own tail.
+  ruby_is_built || link_ruby_prefix
+  GEMS_PREBUILT=true
+  case "$resolved" in
+    "$BUNDLE_TARBALL") say "prebuilt gems for Gemfile.lock ${LOCK_SHA} installed" ;;
+    *) say "no bundle for Gemfile.lock ${LOCK_SHA}; unpacked the latest one, bundle install will reconcile" ;;
+  esac
+}
 
-say "starting postgres + redis"   # redis logs a benign ulimit warning
-service postgresql start >/dev/null
-service redis-server start 2>&1 | grep -v ulimit
-sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='rails'" | grep -q 1 ||
-  sudo -u postgres psql -c "CREATE USER rails WITH SUPERUSER PASSWORD 'password';"
-
-# Playwright MCP's chrome: fixed path, --no-sandbox (we are root), auth file
-say "wiring up chrome for playwright MCP"
-CHROME_DIR="$(ls -d /opt/pw-browsers/chromium-*/chrome-linux 2>/dev/null | sort -V | tail -1)"
-mkdir -p /root/.cache/ms-playwright
-if [ -x "$CHROME_DIR/chrome" ]; then
-  mkdir -p /opt/google/chrome
-  printf '#!/bin/bash\nexec "%s" --no-sandbox --disable-dev-shm-usage "$@"\n' "$CHROME_DIR/chrome" \
-    > /opt/google/chrome/chrome
-  chmod +x /opt/google/chrome/chrome
-else
-  say "no chromium under /opt/pw-browsers - MCP screenshots will not work"
-fi
-[ -s /root/.cache/ms-playwright/mcp-auth.json ] ||
-  printf '{"cookies":[],"origins":[]}' > /root/.cache/ms-playwright/mcp-auth.json
-
-# ------------------------------------------------------------ back to ruby
 if [ -n "$RUBY_PID" ]; then
   say "waiting on the ruby build"
   wait "$RUBY_PID" || { echo "ruby build FAILED - see /tmp/ruby_build.log"; tail -20 /tmp/ruby_build.log; exit 1; }
   say "ruby $("$RUBY_PREFIX/bin/ruby" -e 'print RUBY_VERSION') built"
-  fetch_prebuilt_gems # the gem tarball is usable even when only the Ruby half missed
 fi
+
+wait "$BUNDLE_DL_PID"
+install_prebuilt_gems
 
 cd "$REPO"
 BUNDLER_VERSION=$(awk '/BUNDLED WITH/{getline; print $1}' Gemfile.lock)
@@ -149,15 +192,30 @@ else
   bundle install --jobs "$(nproc)" || exit 1
 fi
 
+# node_modules is what `bin/lint` (herb-format, standard) and the :js specs'
+# playwright package need. Exact match only - a stale tree is worse than none.
+wait "$NODE_DL_PID"
+if [ -n "$(resolved_asset "$NODE_TARBALL")" ] && tar -C "$REPO" -xzf "$STAGE/$NODE_TARBALL"; then
+  say "prebuilt node_modules for package-lock ${NPM_SHA} installed"
+elif [ ! -d "$REPO/node_modules" ]; then
+  say "no prebuilt node_modules - run 'npm install' before bin/lint or a :js spec"
+fi
+
+wait "$SYSTEM_PID" || say "system setup had a problem - see /tmp/system_setup.log"
+
 eval "$(ruby bin/env --export)"
+
+# Independent of the database, and ~15s of it. Without them anything rendering the
+# application layout - a request spec on an html format, any :js system spec - dies
+# on AssetNotFound. bin/dev's watchers keep them current afterwards.
+say "building tailwind + dartsass alongside the database setup"
+bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 &
+CSS_PID=$!
+
 say "creating + migrating databases (all four: dev/test x primary/analytics)"
 bundle exec rails db:create db:migrate || exit 1
 
-# ~15s, and without them anything rendering the application layout - a request
-# spec on an html format, any :js system spec - dies on AssetNotFound. bin/dev's
-# watchers keep them current afterwards.
-say "building tailwind + dartsass"
-bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
+wait "$CSS_PID" ||
   say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
 
 if [ "${1:-}" = "--dev-server" ]; then

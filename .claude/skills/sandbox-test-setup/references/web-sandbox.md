@@ -16,13 +16,17 @@ bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh              
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh --dev-server # + boot bin/dev
 ```
 
-It downloads a prebuilt Ruby and gem tree from the `web-sandbox-prebuilt` release
-(published by `.github/workflows/web-sandbox-prebuild.yml`) and falls back to the
-source build below whenever an asset is missing or fails its checksum — a
-`Gemfile.lock` your branch changed misses the gem half, so `bundle install` runs.
-Budget ~1 min warm-cache, ~10 min when both halves miss (~6 of it Ruby). Set
-`BINX_SKIP_PREBUILT=1` to force the source path. The sections below are what it
-automates — read them when a step fails, or when you need only part of it.
+It downloads a prebuilt Ruby, gem tree and `node_modules` from the
+`web-sandbox-prebuilt` release (published by
+`.github/workflows/web-sandbox-prebuild.yml`), and falls back to the source build
+below whenever an asset is missing or fails its checksum. A `Gemfile.lock` your
+branch changed misses its exact gem tarball and gets the fixed `-latest-` one
+instead, so `bundle install` reconciles a handful of gems rather than fetching all
+341. `node_modules` is exact-match only — without it, `bin/lint` and `:js` specs
+want an `npm install` first. Budget ~1 min warm-cache, ~7 min when the Ruby half
+misses too. Set `BINX_SKIP_PREBUILT=1` to force the source path. The sections below
+are what it automates — read them when a step fails, or when you need only part of
+it.
 
 Longest of the three, so here's the order: build Ruby, put the toolchain on
 PATH, start postgres/redis and create the databases. Everything after that is
