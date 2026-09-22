@@ -410,7 +410,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(stolen_bike.reload.occurred_at).to be < impounded_bike.reload.occurred_at
 
         get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "desc"}
-        expect(assigns(:bikes).map(&:id)).to eq([bike.id, impounded_bike.id, stolen_bike.id])
+        expect(assigns(:bikes).map(&:id)).to eq([impounded_bike.id, stolen_bike.id, bike.id])
 
         get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "asc"}
         expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, impounded_bike.id, bike.id])
