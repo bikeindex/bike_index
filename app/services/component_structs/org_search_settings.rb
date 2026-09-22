@@ -63,6 +63,20 @@ module ComponentStructs
                                          only_registered: :filter_not_unregistered_html}}
     }.freeze
 
+    # Each sort the registrations search permits, and the column it's labelled by. The first is
+    # the default sort
+    SORTABLE_COLUMN_CELLS = {
+      "id" => :created_at_cell,
+      "updated_by_user_at" => :updated_at_cell,
+      "owner_email" => :owner_email_cell,
+      "mnfg_name" => :manufacturer_cell,
+      "frame_model" => :model_cell,
+      "cycle_type" => :cycle_type_cell,
+      "propulsion_type" => :propulsion_type_cell,
+      "acknowledged_at" => :acknowledgment_cell,
+      "occurred_at" => :occurred_at_cell
+    }.freeze
+
     DEFAULT_COLUMNS = %w[photo_cell created_at_cell status_cell manufacturer_cell model_cell
       color_cell owner_email_cell owner_name_cell creation_description_cell].freeze
 
@@ -139,6 +153,11 @@ module ComponentStructs
 
         [key, translation(:"#{key}_html", org_name: @organization.short_name)]
       }
+    end
+
+    def sort_column_label(sort)
+      cell = SORTABLE_COLUMN_CELLS[sort]
+      column_renames[cell] if cell
     end
 
     def enabled_columns

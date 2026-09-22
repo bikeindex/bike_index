@@ -118,6 +118,20 @@ module Pages
           # Only the search page offers the view switcher, so it's the only place cards render
           def thumbnail_view? = @search_page && @result_view == :thumbnail
 
+          # The cards have no headers to sort by, so the thumbnail view names the order
+          def ordered_by_text
+            return @ordered_by_text if defined?(@ordered_by_text)
+
+            column = settings.sort_column_label(@sort_state.sort)
+            @ordered_by_text = if column.nil?
+              nil
+            elsif @sort_state.direction == "asc"
+              translation(".ordered_by_asc", column:)
+            else
+              translation(".ordered_by_desc", column:)
+            end
+          end
+
           def result_view_entries
             RESULT_VIEWS.map do |view|
               ComponentStructs::Shapes.entry(translation(".view_#{view}"), href: result_view_path(view),

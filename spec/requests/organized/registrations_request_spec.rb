@@ -155,6 +155,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response.body).to include(bike.mnfg_name)
       expect(response.body).to_not include("Column settings")
+      expect(response.body).to include("Ordered by Registered, descending")
     end
 
     context "with search_all" do
