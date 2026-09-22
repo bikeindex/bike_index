@@ -271,6 +271,16 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {chart_scope: "search", search_all: true}, headers: frame_headers
         expect(assigns(:registrations_stats).first.count).to eq 2
       end
+
+      it "compares the year scope with the year before only once the organization is a year old" do
+        get base_url, headers: frame_headers
+        expect(assigns(:registrations_stats).map(&:previous_count)).to eq [nil, nil, nil]
+
+        Rails.cache.clear
+        current_organization.update_column(:created_at, 13.months.ago)
+        get base_url, headers: frame_headers
+        expect(assigns(:registrations_stats).map(&:previous_count)).to eq [0, 0, 0]
+      end
     end
 
     context "search_result_view" do

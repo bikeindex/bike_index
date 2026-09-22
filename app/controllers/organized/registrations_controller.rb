@@ -171,8 +171,13 @@ module Organized
     def registrations_stats
       @registrations_stats ||= cache_year_chart(:stats) do
         OrgServices::RegistrationCounts.for_range(chart_bikes, chart_time_range,
-          compare: chart_scope_year? || @period != "all")
+          compare: chart_scope_year? ? year_comparable? : @period != "all")
       end
+    end
+
+    # An organization younger than a year has no last year to compare against
+    def year_comparable?
+      current_organization.created_at < 1.year.ago
     end
 
     def registrations_chart
@@ -253,7 +258,7 @@ module Organized
     end
 
     def search_order(organization)
-      return "bikes.#{sort_column} #{sort_direction}" if sort_column != "acknowledged_at"
+      return sortable_order(Bike) if sort_column != "acknowledged_at"
 
       RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)
     end

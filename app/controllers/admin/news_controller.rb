@@ -6,7 +6,7 @@ module Admin
     before_action :set_dignified_name
 
     def index
-      @blogs = available_blogs.reorder(sort_column + " " + sort_direction)
+      @blogs = available_blogs.reorder(sortable_order(Blog))
         .includes(:user, :content_tags)
     end
 

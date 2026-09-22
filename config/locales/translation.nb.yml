@@ -5570,6 +5570,7 @@ nb:
             stat_motorized: Registrering av elbiler
             stat_registrations: Totalt antall registreringer
             stat_stolen: Meldt stjålet
+            previous_year: "%{number} i fjor"
           column_settings:
             acknowledgment_cell: Bekreftelse av registreringssekvens
             address: 'Adresse:'
@@ -5619,8 +5620,8 @@ nb:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
             date_range: 'Datoperiode:'
-            search_settings: Søkeinnstillinger
             search_settings_and_filters: Søkeinnstillinger og filtre
+            filters: Filtre
           search_all:
             search_all_html: Søk i alle registreringer <span class="twless-strong">(ikke
               bare %{org_name})</span>

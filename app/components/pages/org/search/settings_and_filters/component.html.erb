@@ -5,9 +5,11 @@
   <div class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
     <%= render(UI::Collapse::Component.new(chevron: :trailing, size: :sm,
       title: translation(".search_settings_and_filters"))) do %>
+      <span class="tw:sm:hidden"><%= translation(".filters") %></span>
+      <span class="tw:hidden tw:sm:inline"><%= translation(".search_settings_and_filters") %></span>
+
       <%# aria_hidden, not aria: - inline_svg drops the hash and leaves role="img" unlabelled %>
       <%= helpers.inline_svg_tag "icons/gear.svg", class: "tw:inline tw:h-4 tw:w-4", aria_hidden: true %>
-      <span class="tw:sr-only"><%= translation(".search_settings_and_filters") %></span>
     <% end %>
 
     <span class="tw:text-sm">
@@ -35,7 +37,7 @@
     "
     data-ui--collapse-target="content"
   >
-    <%= render(UI::Header::Component.new(text: translation(".search_settings"), tag: :h3, html_class: "uncap tw:mb-0!")) %>
+    <%= render(UI::Header::Component.new(text: translation(".search_settings_and_filters"), tag: :h3, html_class: "uncap tw:mb-0!")) %>
 
     <div class="tw:flex tw:flex-col tw:gap-6">
       <% filter_groups.each do |group| %>

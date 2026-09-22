@@ -5,7 +5,7 @@ module Admin
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
     def index
-      @manufacturers = searched_manufacturers.reorder("manufacturers.#{sort_column} #{sort_direction}")
+      @manufacturers = searched_manufacturers.reorder(sortable_order(Manufacturer))
     end
 
     def show

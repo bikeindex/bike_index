@@ -10,11 +10,13 @@ module UI
       TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
 
-      BUTTON_CLASS = "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+      BUTTON_CLASS = "keep-with-previous tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
         "tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 " \
         "tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600 " \
         "tw:text-2xs tw:font-bold tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+
+      SURFACE_CLASS = "tw:bg-white tw:border-gray-200 tw:dark:bg-gray-800 tw:dark:border-gray-700"
 
       renders_one :body
       renders_one :tooltip_button, ->(**attrs, &block) {
@@ -66,13 +68,21 @@ module UI
       # The controller drops pointer-events-none once the tooltip is held open
       def tooltip_span
         tag.span(
-          tooltip_body,
+          safe_join([tooltip_body, arrow_span]),
           role: "tooltip",
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
           class: "tw:twtext-color tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded " \
-            "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:font-normal tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
-            "tw:dark:bg-gray-800 tw:dark:border-gray-700"
+            "tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:normal-case tw:border tw:shadow-lg tw:z-50 #{SURFACE_CLASS}"
+        )
+      end
+
+      # The controller positions it and picks which two borders show
+      def arrow_span
+        tag.span(
+          "aria-hidden": true,
+          data: {"ui--tooltip-target": "arrow"},
+          class: "tw:absolute tw:h-2 tw:w-2 tw:rotate-45 tw:border-solid #{SURFACE_CLASS}"
         )
       end
     end

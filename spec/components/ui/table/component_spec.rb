@@ -85,6 +85,18 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(result).not_to have_css("th a[data-active]", text: /Email/)
     end
 
+    context "with header_tooltip" do
+      it "renders the tooltip beside the sort link, not inside it" do
+        result = render_inline(described_class.new(records:, render_sortable: true)) do |table|
+          table.column(sortable: "name", header_tooltip: "Their full name") { |r| r.name }
+        end
+
+        expect(result).to have_css("th a", text: /Name/)
+        expect(result).to have_css("th", text: /Their full name/)
+        expect(result).not_to have_css("th a [role=tooltip], th a button")
+      end
+    end
+
     context "with custom label" do
       it "uses label instead of derived title" do
         result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStructs::SortState.new(sort: "bike_sticker_batch_id"))) do |table|

@@ -5828,6 +5828,7 @@ es:
             stat_motorized: Registro de vehículos eléctricos
             stat_registrations: Inscripciones totales
             stat_stolen: Denunciado como robado
+            previous_year: "%{number} el año pasado"
           column_settings:
             acknowledgment_cell: Confirmación de la secuencia de registro
             address: 'DIRECCIÓN:'
@@ -5877,8 +5878,8 @@ es:
             column_settings: Configuración de columnas
           settings_and_filters:
             date_range: 'Rango de fechas:'
-            search_settings: Configuración de búsqueda
             search_settings_and_filters: Configuración y filtros de búsqueda
+            filters: Filtros
           search_all:
             search_all_html: Buscar en todos los registros <span class="twless-strong">(no
               solo en %{org_name})</span>

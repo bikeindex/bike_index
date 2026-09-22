@@ -6,7 +6,7 @@ module Admin
       @per_page = permitted_per_page(default: 10)
       @pagy, @logged_searches =
         pagy(:countish, matching_logged_searches
-          .reorder("logged_searches.#{sort_column} #{sort_direction}")
+          .reorder(sortable_order(LoggedSearch))
           .includes(:organization, :user), limit: @per_page, page: permitted_page)
     end
 

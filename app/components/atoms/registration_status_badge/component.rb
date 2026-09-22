@@ -35,22 +35,19 @@ module Atoms
       def render? = status_humanized.present?
 
       def call
-        render(UI::Badge::Component.new(
-          text: label,
-          title: translation(".#{status_key}"),
-          color: COLORS[status_key],
-          size: @size,
-          indicator: true
-        )) { label_with_time if @time.present? }
+        render(UI::Badge::Component.new(text: label, title: translation(".#{status_key}"), color: COLORS[status_key], size: @size)) do
+          tag.span(safe_join([tag.span(label, class: "tw:uppercase"), *time_suffix]), class: "tw:whitespace-nowrap")
+        end
       end
 
       private
 
       def label = @label ||= Bike.status_humanized_translated(status_humanized).titleize
 
-      def label_with_time
-        # Non-breaking, since the badge is flex and would collapse a plain space beside the time
-        safe_join([label, "\u00A0·\u00A0", render(UI::Time::Component.new(time: @time))])
+      # Plain spaces, so they collapse into the space the localizer puts before a time of day
+      def time_suffix
+        return [] if @time.blank?
+        [" · ", render(UI::Time::Component.new(time: @time))]
       end
 
       def status_humanized

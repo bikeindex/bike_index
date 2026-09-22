@@ -73,9 +73,9 @@
             Tags <small class="less-strong">at least one required</small>
           <% end %>
 
-          <%= render UI::Forms::Combobox::Component.new(name: :content_tag_names, form: @form_builder, dialog_label: "Tags",
-                placeholder: "Add tag", options: content_tag_options, required: true,
-                multiselect_chip_src: content_tag_chips_admin_news_index_path) %>
+          <%= render UI::Forms::Combobox::Component.new(name: :content_tag_names, options: content_tag_options,
+                dialog_label: "Tags", multiselect_chip_src: content_tag_chips_admin_news_index_path,
+                html_options: {form: @form_builder, placeholder: "Add tag", required: true}) %>
         </div>
       </div>
 

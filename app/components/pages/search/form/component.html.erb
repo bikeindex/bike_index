@@ -42,10 +42,9 @@
                 <%= render(::UI::Forms::Combobox::Component.new(
                   name: :primary_activity,
                   options: primary_activity_combobox_options,
-                  value: @interpreted_params[:primary_activity],
                   include_blank: true,
-                  placeholder: primary_activity_label,
                   dialog_label: primary_activity_label,
+                  html_options: {value: @interpreted_params[:primary_activity], placeholder: primary_activity_label},
                 )) %>
               </div>
             <% end %>

@@ -6,5 +6,5 @@ en:
         search:
           settings_and_filters:
             date_range: 'Date range:'
-            search_settings: Search settings
+            filters: Filters
             search_settings_and_filters: Search settings and filters

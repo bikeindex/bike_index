@@ -99,6 +99,9 @@ module Pages
               @search_page ? "tw:twfullbleed" : "tw:mt-4"].join(" ")
           end
 
+          # Full bleed drops the card's gutter, so the header meets the chart's edge
+          def header_padding_class = @search_page ? "tw:@min-[672px]/twwiderow:px-4" : "tw:px-4"
+
           # Built here rather than on the settings struct, which route helpers never reach
           def export_path
             organization_registrations_path(settings.search_params.merge(create_export: true))

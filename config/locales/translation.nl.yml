@@ -5734,6 +5734,7 @@ nl:
             stat_motorized: Registratie van elektrische voertuigen
             stat_registrations: Totaal aantal registraties
             stat_stolen: Gemeld als gestolen
+            previous_year: "%{number} vorig jaar"
           column_settings:
             acknowledgment_cell: Bevestiging van de registratieprocedure
             address: 'Adres:'
@@ -5783,8 +5784,8 @@ nl:
             column_settings: Kolominstellingen
           settings_and_filters:
             date_range: 'Datumbereik:'
-            search_settings: Zoekinstellingen
             search_settings_and_filters: Zoekinstellingen en filters
+            filters: Filters
           search_all:
             search_all_html: Zoek in alle registraties <span class="twless-strong">(niet
               alleen %{org_name})</span>
