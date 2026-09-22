@@ -42,4 +42,31 @@ RSpec.describe Pages::Org::SearchResults::BikeCard::Component, type: :component 
       end
     end
   end
+
+  context "with caching", :caching do
+    include_context :caching_basic
+
+    let(:listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+    let(:bike) { listing.item }
+
+    def render_card(search_all: false)
+      with_controller_class(ApplicationController) do
+        render_inline(described_class.new(bike: bike.reload, organization:, search_all:))
+      end
+    end
+
+    it "caches the card per organization and search_all, and rewrites it when the price changes" do
+      keys = fragments_written { render_card }
+      expect(keys.count).to eq 1
+      expect(keys.first).to include(bike.cache_key_with_version, listing.reload.cache_key_with_version)
+      expect(fragments_written { render_card }).to eq([])
+      expect(fragments_written { render_card(search_all: true) }.count).to eq 1
+
+      # A price change doesn't touch the bike
+      bike_updated_at = bike.reload.updated_at
+      listing.update(amount_cents: 7_500)
+      expect(bike.reload.updated_at).to eq bike_updated_at
+      expect(fragments_written { render_card }.count).to eq 1
+    end
+  end
 end

@@ -15,10 +15,15 @@ module Pages
             @organization = organization
             @current_user = current_user
             @search_all = search_all
-            @organized = search_all && bike.organized?(organization)
           end
 
           private
+
+          # Like the spreadsheet's rows, not per viewer. The listing because a price change doesn't
+          # touch the bike
+          def cache_key
+            [self.class.cache_digest, @organization.id, @search_all, @bike, for_sale_listing]
+          end
 
           def bike_path_for_org
             bike_path(@bike, organization_id: @organization.to_param)
@@ -45,8 +50,15 @@ module Pages
             @location ||= (@bike.current_event_record || @bike).formatted_address_string
           end
 
+          # Lazily, so a cached card doesn't query it
+          def organized?
+            return @organized if defined?(@organized)
+
+            @organized = @bike.organized?(@organization)
+          end
+
           def org_badge_text
-            return translation(".registered_with", org_name: @organization.short_name) if @organized
+            return translation(".registered_with", org_name: @organization.short_name) if organized?
 
             translation(".not_registered_with", org_name: @organization.short_name)
           end
