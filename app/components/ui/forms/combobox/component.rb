@@ -44,8 +44,10 @@ module UI
           @options_or_src = src || options
           @rich_display = RICH_DISPLAYS.detect { |display| display.to_s == rich_display.to_s }
           @no_js = no_js
-          @dialog_label = dialog_label || name.to_s.humanize
-          @combobox_options = {free_text:, include_blank:, multiselect_chip_src:, open:}.compact
+          # Names the input in the full screen dialog the gem opens on mobile, which hides the
+          # Group's label -- pass it when that label isn't the humanized name
+          @combobox_options = {dialog_label: dialog_label || name.to_s.humanize, free_text:, include_blank:,
+                               multiselect_chip_src:, open:}.compact
           @html_options = html_options
         end
 
@@ -57,7 +59,7 @@ module UI
 
         def combobox
           # customize_ (rather than the input: kwarg) appends to the gem's own classes
-          helpers.hw_combobox_tag(@name, @options_or_src, **@combobox_options, **defaults, **combobox_attrs) do |component|
+          helpers.hw_combobox_tag(@name, @options_or_src, **@combobox_options, **default_id, **combobox_attrs) do |component|
             component.customize_input(class: STACKED_INPUT_CLASSES) if stacked?
           end
         end
@@ -81,7 +83,7 @@ module UI
           return if @no_js.blank?
 
           render UI::Forms::NoJsField::Component.new(name: no_js_name,
-            label: @dialog_label,
+            label: @combobox_options[:dialog_label],
             value: @no_js.is_a?(Hash) ? @no_js[:value] : @html_options[:value],
             options: no_js_options, required: @html_options[:required], text: no_js_text?)
         end
@@ -133,12 +135,9 @@ module UI
           [OVERLAY_CLASSES, stacked? ? STACKED_OVERLAY_CLASSES : "tw:truncate"].join(" ")
         end
 
-        # id: without a form builder the gem ids the input with a uuid, which a Group
-        # label's `for` can't target. dialog_label: names the input in the full screen
-        # dialog the gem opens on mobile, which hides the Group's label -- pass it
-        # explicitly when that label isn't the humanized name.
-        def defaults
-          {dialog_label: @dialog_label, id: (@name unless @html_options[:form])}.compact
+        # Without a form builder the gem ids the input with a uuid, which a Group label's `for` can't target
+        def default_id
+          @html_options[:form] ? {} : {id: @name}
         end
       end
     end

@@ -69,8 +69,6 @@ RSpec.describe "Editing a registration", :js, type: :system do
     find("#primary_nav_hamburgler").click
     click_link "Register a new bike"
 
-    # A Turbo visit, so typing can land before the lazy-loaded combobox connects and never opens it
-    wait_for_stimulus("hw-combobox")
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
     click_button "Next"
