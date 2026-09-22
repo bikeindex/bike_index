@@ -503,10 +503,10 @@ class Bike < ApplicationRecord
     updated_by_user_at || updated_at
   end
 
-  def serial_display(u = nil)
+  def serial_display(u = nil, organization: nil)
     if serial_hidden?
       # show the serial to the user, even if authorization_requires_impound_organization?
-      return "Hidden" unless can_see_hidden_serial?(u)
+      return "Hidden" unless can_see_hidden_serial?(u, organization:)
     end
     return serial_number.humanize if no_serial?
 
@@ -960,13 +960,21 @@ class Bike < ApplicationRecord
     current_impound_record.present? && current_impound_record.organized?
   end
 
-  def can_see_hidden_serial?(u = nil)
+  def can_see_hidden_serial?(u = nil, organization: nil)
+    return true if organization.present? && organization_can_see_hidden_serial?(organization)
     return false if u.blank?
     return true if authorized?(u) || u.id.present? && u.id == user&.id ||
       current_impound_record.present? && current_impound_record.authorized?(u)
 
     # Seeing serial doesn't require edit access to bike
     (u.organization_roles.pluck(:organization_id) & bike_organizations.pluck(:organization_id)).any?
+  end
+
+  # Stands in for any member of the organization, so a page cached for the organization
+  # renders the one serial its members all see
+  def organization_can_see_hidden_serial?(organization)
+    bike_organizations.pluck(:organization_id).include?(organization.id) ||
+      authorized_by_organization?(org: organization)
   end
 
   def calculated_current_ownership

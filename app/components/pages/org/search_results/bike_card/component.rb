@@ -13,10 +13,9 @@ module Pages
           # For the list holding them
           LIST_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4"
 
-          def initialize(bike:, organization:, current_user: nil, search_all: false)
+          def initialize(bike:, organization:, search_all: false)
             @bike = bike
             @organization = organization
-            @current_user = current_user
             @search_all = search_all
           end
 

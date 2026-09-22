@@ -84,8 +84,7 @@
   <% if result_component %>
     <ul class="tw:m-0 tw:list-none tw:py-4 <%= result_component::LIST_CLASSES %> <%= padding_x_class %>">
       <% @bikes.each do |bike| %>
-        <%= render(result_component.new(bike:, organization: @organization, current_user: @current_user,
-          search_all: @search_all)) %>
+        <%= render(result_component.new(bike:, organization: @organization, search_all: @search_all)) %>
       <% end %>
     </ul>
   <% else %>
@@ -97,7 +96,6 @@
       <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
         organization: @organization,
         bikes: @bikes,
-        current_user: @current_user,
         render_sortable: true,
         sort_state: @sort_state,
         bike_sticker: @bike_sticker,

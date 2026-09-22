@@ -43,12 +43,11 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component).not_to have_css("th a")
   end
 
-  context "with a hidden-serial bike and an authorized org member" do
-    let(:current_user) { FactoryBot.create(:organization_role_claimed, organization:).user }
-    let(:options) { super().merge(current_user:) }
+  # The organization rather than the viewer, so every member reads the one cached row
+  context "with a hidden-serial bike registered with the organization" do
     let(:bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization).reload }
 
-    it "passes the current user through so the hidden serial is revealed" do
+    it "reveals the serial to the organization" do
       expect(bike.serial_hidden?).to be_truthy
       expect(component).to have_css(".serial_number_cell .serial-span", text: bike.serial_number.upcase)
       expect(component).to have_no_css(".serial_number_cell", text: "Hidden")
