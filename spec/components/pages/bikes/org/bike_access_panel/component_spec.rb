@@ -123,19 +123,21 @@ RSpec.describe Pages::Bikes::Org::BikeAccessPanel::Component, type: :component d
       end
     end
 
-    context "unstolen_notifications and duplicate bikes" do
+    context "phoneable by and duplicate bikes" do
       let(:enabled_feature_slugs) { %w[additional_registrations_information unstolen_notifications] }
       let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike) }
 
-      it "shows duplicate bikes, but not the unstolen notification form" do
+      it "shows phone link and duplicate bikes" do
         expect(organization.reload.enabled_feature_slugs).to eq(enabled_feature_slugs)
         duplicate_bike_ids = duplicate_bike_group.reload.bikes.pluck(:id).sort
         bike_duplicate_id = duplicate_bike_ids.last
         expect(duplicate_bike_ids).to eq([bike.id, bike_duplicate_id])
 
-        expect(bike.reload.message_owner?(current_user)).to be_falsey
+        expect(bike.reload.phoneable_by?(current_user)).to be_truthy
+        expect(bike.contact_owner?(current_user)).to be_truthy
 
-        expect(component).to_not have_css(".unstolen-notification-box")
+        expect(component).to have_content("111-222-3333")
+        expect(component).to have_css("a[href='tel:111-222-3333']")
         expect(component).to have_css("a[href='/bikes/#{bike_duplicate_id}']")
 
         component_text = whitespace_normalized_body_text(component.to_html)
@@ -157,19 +159,6 @@ RSpec.describe Pages::Bikes::Org::BikeAccessPanel::Component, type: :component d
 
       it "renders the notes form" do
         expect(component).to have_button("Save note")
-      end
-    end
-
-    context "with unstolen_notifications" do
-      let(:enabled_feature_slugs) { %w[unstolen_notifications] }
-      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, phone: "1112223333") }
-
-      it "shows the unstolen notification form and phone link" do
-        expect(bike.reload.message_owner?(current_user)).to be_truthy
-        expect(bike.phoneable_by?(current_user)).to be_truthy
-
-        expect(component).to have_button("Send message")
-        expect(component).to have_css("a[href='tel:111-222-3333']")
       end
     end
   end

@@ -84,6 +84,11 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.stolen_notification_email(stolen_notification)
   end
 
+  def stolen_notification_organization_email
+    stolen_notification = StolenNotification.unstolen_organization_permitted.last
+    CustomerMailer.stolen_notification_email(stolen_notification)
+  end
+
   def updated_terms_email
     CustomerMailer.updated_terms_email(User.find(85))
   end

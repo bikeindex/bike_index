@@ -10,6 +10,10 @@
       - link = link_to t(".html.stolen_bike_type", bike_type: @bike.type), bike_url(@bike)
       = t(".html.sender_email_sent_you_a_message_html", sender_email: sender_email, link: link)
 
+    - elsif @stolen_notification.unstolen_organization_permitted?
+      - organization_name = @stolen_notification.sender_organization.short_name
+      = t(".html.sender_email_from_organization_sent_you_a_message_html", sender_email:, organization_name:, link: link_to(@bike.type, bike_url(@bike)))
+
     - else
       - if @bike.contact_owner_user?(@stolen_notification.sender)
         = t(".html.sender_email_sent_you_a_message_html", sender_email: sender_email, link: link_to(@bike.type, bike_url(@bike)))
@@ -59,6 +63,7 @@
 
 = render partial: 'shared/email_bike_box'
 
-.less-strong{style: "line-height: 1.25em; text-align: center;"}
-  %em
-    = t(".html.no_one_should_be_extorted", bike_type: @bike.type)
+- unless @stolen_notification.unstolen_organization_permitted?
+  .less-strong{style: "line-height: 1.25em; text-align: center;"}
+    %em
+      = t(".html.no_one_should_be_extorted", bike_type: @bike.type)

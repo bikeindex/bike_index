@@ -83,16 +83,31 @@ RSpec.describe StolenNotificationsController, type: :request do
           expect(stolen_notification.receiver_email).to eq owner_email
         end
       end
-      context "unstolen notification to the sender's own organization's registration" do
-        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
+      context "unstolen notification to the sender's organization's registration" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications], short_name: "UCLA") }
         let(:current_user) { FactoryBot.create(:organization_user, organization:) }
-        let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
-        it "doesn't create" do
-          expect(bike.reload.contact_owner?(current_user)).to be_truthy
+        let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "owner@bikeindex.org") }
+        it "sends an organization message to the owner" do
+          expect(bike.reload.current_ownership.claimed?).to be_falsey
+          expect(bike.current_ownership.organization_direct_unclaimed_notifications?).to be_falsey
+          Sidekiq::Job.clear_all
+          ActionMailer::Base.deliveries = []
           expect {
             post base_url, params: {stolen_notification: stolen_notification_attributes}
-          }.to_not change(StolenNotification, :count)
-          expect(flash[:error]).to be_present
+            expect(flash[:success]).to be_present
+          }.to change(StolenNotification, :count).by(1)
+          stolen_notification = StolenNotification.last
+          expect(stolen_notification.kind).to eq "unstolen_organization_permitted"
+          expect(stolen_notification.receiver_email).to eq "owner@bikeindex.org"
+
+          EmailJobs::StolenNotificationJob.drain
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+          mail = ActionMailer::Base.deliveries.last
+          expect(mail.to).to eq(["owner@bikeindex.org"])
+          expect(mail.subject).to eq("Message from UCLA about your bike")
+          mail_text = mail.text_part.body.to_s
+          expect(mail_text).to match(/from UCLA sent you a message/)
+          expect(mail_text).to_not match(/stolen/i)
         end
       end
       context "not permitted notification" do

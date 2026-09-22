@@ -24,11 +24,12 @@ class StolenNotification < ApplicationRecord
     unstolen_blocked: 2,
     unstolen_claimed_permitted: 3,
     unstolen_unclaimed_permitted: 4,
-    unstolen_unclaimed_permitted_direct: 5
+    unstolen_unclaimed_permitted_direct: 5,
+    unstolen_organization_permitted: 6
   }.freeze
 
   # Kind enum was added to track how often various types of messages were sent
-  # in #2275 - it isn't currently used for logic, just data analysis
+  # in #2275 - the email reads unstolen_organization_permitted, nothing else does
   enum :kind, KIND_ENUM
 
   belongs_to :bike
@@ -48,7 +49,7 @@ class StolenNotification < ApplicationRecord
   end
 
   def permitted_send?
-    return false unless bike&.message_owner?(sender)
+    return false unless bike&.contact_owner?(sender)
     return true if sender.enabled?("unstolen_notifications") || doorkeeper_app_id.present?
 
     (sender.sent_stolen_notifications.count < 2) || sender.can_send_many_stolen_notifications
@@ -62,7 +63,7 @@ class StolenNotification < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.receiver_email ||= bike&.contact_owner_email(sender)
+    self.receiver_email ||= sender_organization.present? ? bike&.owner_email : bike&.contact_owner_email(sender)
     self.receiver ||= bike.owner
     self.send_dates ||= [].to_json
     self.kind ||= calculated_kind
@@ -73,6 +74,13 @@ class StolenNotification < ApplicationRecord
       Hi, this is #{sender&.name} with Bike Index.
       Is this your missing #{bike.type}?
     STR
+  end
+
+  # An org messaging a bike registered with it isn't reporting it stolen
+  def sender_organization
+    return @sender_organization if defined?(@sender_organization)
+
+    @sender_organization = sender&.organizations&.find_by(id: bike&.bike_organization_ids)
   end
 
   def mail_snippet
@@ -93,7 +101,9 @@ class StolenNotification < ApplicationRecord
     else
       return "unstolen_blocked" unless permitted_send?
 
-      if bike&.claimed?
+      if sender_organization.present?
+        "unstolen_organization_permitted"
+      elsif bike&.claimed?
         "unstolen_claimed_permitted"
       elsif bike&.current_ownership&.organization_direct_unclaimed_notifications?
         "unstolen_unclaimed_permitted_direct"

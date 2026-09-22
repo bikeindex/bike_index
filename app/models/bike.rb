@@ -617,13 +617,6 @@ class Bike < ApplicationRecord
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)
   end
 
-  # Unstolen notifications are for bikes found away from the org - orgs were
-  # using them to message their own registrants
-  def message_owner?(u = nil, organization = nil)
-    contact_owner?(u, organization) &&
-      (status_stolen? || contactable_away_from_owner?(u, organization) || unstolen_notifier?(u, organization))
-  end
-
   def contact_owner_user?(u = nil, organization = nil)
     return true if user? || status_stolen? || u&.superuser?
 
@@ -827,14 +820,6 @@ class Bike < ApplicationRecord
   # organizations we already trust with unstolen registrations - never for a registration
   # of their own, which they reach the ordinary way. Passed organization overrides the
   # user's own trust, like the unstolen branch it sits above
-  def unstolen_notifier?(u, organization)
-    return !organized?(organization) if organization.present?
-    return true if u.superuser?
-
-    u.organizations.with_enabled_feature_slugs("unstolen_notifications")
-      .where.not(id: bike_organization_ids).limit(1).any?
-  end
-
   def contactable_away_from_owner?(u = nil, organization = nil)
     return false unless u.present? && status_abandoned_or_impounded?
     return u.contact_impounded? unless organization.present?

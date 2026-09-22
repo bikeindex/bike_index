@@ -636,33 +636,6 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "message_owner?" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
-    let(:user) { FactoryBot.create(:organization_user, organization:) }
-    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
-
-    it "is falsey for the unstolen_notifications org the bike is registered with" do
-      expect(bike.reload.owner.notification_unstolen).to be_truthy
-      expect(bike.contact_owner?(user)).to be_truthy
-      expect(bike.message_owner?(user)).to be_falsey
-      expect(bike.message_owner?(user, organization)).to be_falsey
-
-      other_organization = FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications])
-      FactoryBot.create(:organization_role_claimed, user:, organization: other_organization)
-      expect(bike.message_owner?(user.reload)).to be_truthy
-      expect(bike.message_owner?(user, other_organization)).to be_truthy
-    end
-
-    context "stolen" do
-      let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, creation_organization: organization) }
-
-      it "is truthy" do
-        expect(bike.reload.message_owner?(user)).to be_truthy
-        expect(bike.message_owner?(user, organization)).to be_truthy
-      end
-    end
-  end
-
   describe "contactable_away_from_owner?" do
     let(:bike) { FactoryBot.create(:bike, :impounded) }
     let(:organization_role) { FactoryBot.create(:organization_role_claimed) }

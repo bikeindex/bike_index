@@ -41,10 +41,9 @@ module Pages
             @bike.authorized?(@user)
           end
 
-          # Only for a bike that's with_owner (ie, not found), and not one this org registered
+          # Only show the unstolen notification form if bike is with_owner (ie, not if bike is found)
           def display_unstolen_notification_form?
-            @bike.status_with_owner? && @organization.enabled?("unstolen_notifications") &&
-              !@bike.organized?(@organization)
+            @bike.status_with_owner? && @organization.enabled?("unstolen_notifications")
           end
 
           def show_sticker_modal?

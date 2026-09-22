@@ -13,7 +13,7 @@ class BikesController < Bikes::BaseController
 
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
-      @contact_owner_open = @bike.message_owner?(current_user) && contact_owner_param?
+      @contact_owner_open = @bike.contact_owner?(current_user) && contact_owner_param?
       @stolen_record = @bike.current_stolen_record
     end
     if current_user.present? && BikeServices::Displayer.display_impound_claim?(@bike, current_user)

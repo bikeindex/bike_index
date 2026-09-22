@@ -336,7 +336,7 @@
               <strong><%= translation(".believe_it_is_anyway") %></strong>
             </p>
 
-            <% if @bike.message_owner?(@user) %>
+            <% if @bike.contact_owner?(@user) %>
               <% redirect = new_session_url(return_to: bike_path(@bike, params: {contact_owner: true})) unless @user.present? %>
               <div
                 id="write_them_a_message"

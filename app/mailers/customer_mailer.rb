@@ -149,14 +149,21 @@ class CustomerMailer < ApplicationMailer
     @stolen_notification = stolen_notification
     @user = stolen_notification.receiver
     @mail_snippet = stolen_notification.mail_snippet
+    bike_type = stolen_notification.bike.type
 
     I18n.with_locale(@user&.preferred_language) do
+      subject = if stolen_notification.unstolen_organization_permitted?
+        t(".organization_subject", bike_type:, organization: stolen_notification.sender_organization.short_name)
+      else
+        default_i18n_subject(bike_type:)
+      end
+
       mail(
         to: @stolen_notification.receiver_email,
         cc: ["bryan@bikeindex.org", "gavin@bikeindex.org"],
         reply_to: @stolen_notification.sender.email,
         from: "bryan@bikeindex.org",
-        subject: @stolen_notification.subject || default_i18n_subject(bike_type: @stolen_notification.bike.type),
+        subject: @stolen_notification.subject || subject,
         tag: __callee__
       )
     end
