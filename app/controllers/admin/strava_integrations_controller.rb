@@ -25,7 +25,7 @@ module Admin
     end
 
     def sortable_opts
-      "strava_integrations.#{sort_column} #{sort_direction}"
+      sortable_order(StravaIntegration)
     end
 
     def permission_levels

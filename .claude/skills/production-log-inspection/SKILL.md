@@ -36,7 +36,7 @@ Both need mise's Ruby ahead of the system one (`undefined method 'filter_map'` o
 
 **Review both by default.** A question framed around requests ("why are we 500ing") usually has half its answer in the worker log: the job that poisoned the cache, the Honeybadger client silently dropping error reports, a worker process crash-looping. Only skip a server when the user explicitly scopes to one.
 
-**Use `rg`, not `grep`.** On a day of web logs `rg` is roughly 4× faster (a `-o` aggregation over 1.3M lines: 1.4s vs 5.5s). Flag translation is nearly one-to-one — `grep -oE 'x'` → `rg -o 'x'` (rg is always regex, so drop `-E`), `-c`/`-n`/`-A`/`-B` are the same, and `-F` still means literal. `rg` exits 1 on no matches, same as `grep`.
+**Use `rg`, not `grep`.** On a day of web logs `rg` is roughly 4× faster (a `-o` aggregation over 1.3M lines: 1.4s vs 5.5s). Flag translation is nearly one-to-one — `grep -oE 'x'` → `rg -o 'x'` (rg is always regex, so drop `-E`), `-c`/`-n`/`-A`/`-B` are the same, and `-F` still means literal. `rg` exits 1 on no matches, same as `grep`. Pass `-M0` when a later step reads the whole line (a JSON parse, a `params` extraction): `~/.ripgreprc` sets `--max-columns=300`, which cuts every Lograge line to a preview ending `[... omitted end of long line]`.
 
 Rules for both servers:
 

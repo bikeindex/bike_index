@@ -170,7 +170,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).not_to have_text("SECRET-EXTRA")
       hidden_text = "Hidden because it is not registered with #{organization.short_name}"
       %w[owner_email_cell reg_phone_cell reg_extra_registration_number_cell].each do |cell|
-        expect(component).to have_css(".#{cell} em.less-strong", text: "hidden")
+        expect(component).to have_css(".#{cell} button em.less-strong", text: "hidden")
         expect(component).to have_css(".#{cell} [role=tooltip]", text: hidden_text, visible: :all)
       end
     end

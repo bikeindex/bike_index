@@ -15,19 +15,19 @@ module UI
 
         # Limited to manufacturers that make frames
         def frame_makers
-          render(UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, id: "frame_makers_manufacturer_id"))
+          render(UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, html_options: {id: "frame_makers_manufacturer_id"}))
         end
 
         # Only an indexed manufacturer is selectable
         def no_manufacturer_other
           render(UI::Forms::ComboboxManufacturer::Component.new(no_manufacturer_other: true,
-            id: "no_manufacturer_other_manufacturer_id"))
+            html_options: {id: "no_manufacturer_other_manufacturer_id"}))
         end
 
         # Pre-selected manufacturer
         def preselected
           render(UI::Forms::ComboboxManufacturer::Component.new(
-            form: bike_form("preselected_bike", Bike.new(manufacturer: Manufacturer.frame_makers.first))
+            html_options: {form: bike_form("preselected_bike", Bike.new(manufacturer: Manufacturer.frame_makers.first))}
           ))
         end
 
@@ -35,7 +35,7 @@ module UI
         # displayed, since Manufacturer.other isn't selectable
         def unknown_manufacturer
           render(UI::Forms::ComboboxManufacturer::Component.new(
-            form: bike_form("unknown_bike", Bike.new(manufacturer: Manufacturer.other, manufacturer_other: "Bikes by Seth"))
+            html_options: {form: bike_form("unknown_bike", Bike.new(manufacturer: Manufacturer.other, manufacturer_other: "Bikes by Seth"))}
           ))
         end
 

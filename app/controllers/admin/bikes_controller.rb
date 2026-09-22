@@ -13,7 +13,7 @@ module Admin
       @per_page = permitted_per_page(default: 100)
 
       @pagy, @bikes = pagy(:countish, available_bikes.includes(:creation_organization, :current_ownership, :current_impound_record, :paint)
-        .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+        .reorder(sortable_order(Bike)), limit: @per_page, page: permitted_page)
     end
 
     def missing_manufacturer

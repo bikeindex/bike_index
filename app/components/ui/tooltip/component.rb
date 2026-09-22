@@ -10,7 +10,7 @@ module UI
       TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
 
-      BUTTON_CLASS = "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+      BUTTON_CLASS = "keep-with-previous tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
         "tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 " \
         "tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600 " \
         "tw:text-2xs tw:font-bold tw:cursor-help " \
@@ -71,7 +71,7 @@ module UI
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
           class: "tw:twtext-color tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded " \
-            "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:font-normal tw:normal-case tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
+            "tw:bg-white tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:normal-case tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
             "tw:dark:bg-gray-800 tw:dark:border-gray-700"
         )
       end

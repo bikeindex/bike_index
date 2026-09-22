@@ -5890,8 +5890,8 @@ it:
             column_settings: Impostazioni della colonna
           settings_and_filters:
             date_range: 'Intervallo di date:'
-            search_settings: Impostazioni di ricerca
             search_settings_and_filters: Impostazioni e filtri di ricerca
+            filters: Filtri
           search_all:
             search_all_html: Cerca tutte le registrazioni <span class="twless-strong">(non
               solo %{org_name})</span>

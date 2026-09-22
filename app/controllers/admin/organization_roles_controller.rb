@@ -10,7 +10,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_organization_roles.includes(:user, :sender, :organization).reorder("organization_roles.#{sort_column} #{sort_direction}"),
+        matching_organization_roles.includes(:user, :sender, :organization).reorder(sortable_order(OrganizationRole)),
         limit: @per_page,
         page: permitted_page)
     end

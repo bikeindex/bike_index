@@ -16,7 +16,7 @@ module Organized
       if chart_only?
         render Pages::Org::Search::ChartCard::Component.new(scope: "search", chart: graduated_notifications_chart), layout: false
       elsif @render_results
-        @pagy, @graduated_notifications = pagy(:countish, available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
+        @pagy, @graduated_notifications = pagy(:countish, available_graduated_notifications.reorder(sortable_order(GraduatedNotification))
           .includes(:user, :bike, :secondary_notifications), limit: @per_page, page: permitted_page)
         respond_to do |format|
           format.html

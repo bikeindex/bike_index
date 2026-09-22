@@ -6,7 +6,7 @@ module Admin
 
     def index
       @social_accounts = matching_social_accounts
-        .reorder(sort_column + " " + sort_direction)
+        .reorder(sortable_order(SocialAccount))
     end
 
     def show

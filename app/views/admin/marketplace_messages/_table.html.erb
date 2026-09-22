@@ -18,8 +18,8 @@
     <% end %>
 
     <% unless skip_marketplace_listing %>
-      <% table.column(sortable: "marketplace_listing") do |marketplace_message| %>
-        <%= render Pages::Admin::Bikes::Cell::Component.new(bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"), search_url: url_for(sort_state.search_params.merge(search_marketplace_listing_id: marketplace_message.marketplace_listing_id)), render_search: render_sortable) %>
+      <% table.column(sortable: "marketplace_listing_id") do |marketplace_message| %>
+        <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: marketplace_message.item, bike_id: marketplace_message.item_id, bike_link_path: admin_bike_path(marketplace_message.item_id, active_tab: "messages"), search_url: url_for(sort_state.search_params.merge(search_marketplace_listing_id: marketplace_message.marketplace_listing_id)), render_search: render_sortable) %>
       <% end %>
     <% end %>
 
@@ -47,7 +47,7 @@
     <% end %>
 
     <% table.column(sortable: "sender_id") do |marketplace_message| %>
-      <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_message.sender, render_search: render_sortable) %>
+      <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: marketplace_message.sender, render_search: render_sortable) %>
     <% end %>
   <% end %>
 </div>

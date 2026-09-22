@@ -19,7 +19,7 @@ module Admin
       # Only the JSON serializes images
       bug_reports = bug_reports.with_attached_images if request.format.json?
       @pagy, @collection = pagy(:countish,
-        bug_reports.reorder("bug_reports.#{sort_column} #{sort_direction}"),
+        bug_reports.reorder(sortable_order(BugReport)),
         limit: @per_page,
         page: permitted_page)
 

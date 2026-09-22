@@ -5,7 +5,7 @@ module Admin
     def index
       params[:page] || 1
       @per_page = permitted_per_page(default: 50)
-      @pagy, @feedbacks = pagy(:countish, available_feedbacks.includes(:user).reorder("feedbacks.#{sort_column} #{sort_direction}"),
+      @pagy, @feedbacks = pagy(:countish, available_feedbacks.includes(:user).reorder(sortable_order(Feedback)),
         limit: @per_page, page: permitted_page)
       @render_kind_counts = Binxtils::InputNormalizer.boolean(params[:search_kind_counts])
     end

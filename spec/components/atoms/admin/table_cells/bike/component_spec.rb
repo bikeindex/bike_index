@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Admin::Bikes::Cell::Component, type: :component do
+RSpec.describe Atoms::Admin::TableCells::Bike::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) { {bike:, bike_id:, bike_link_path:, search_url:, render_search:} }

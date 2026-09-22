@@ -5783,8 +5783,8 @@ nl:
             column_settings: Kolominstellingen
           settings_and_filters:
             date_range: 'Datumbereik:'
-            search_settings: Zoekinstellingen
             search_settings_and_filters: Zoekinstellingen en filters
+            filters: Filters
           search_all:
             search_all_html: Zoek in alle registraties <span class="twless-strong">(niet
               alleen %{org_name})</span>

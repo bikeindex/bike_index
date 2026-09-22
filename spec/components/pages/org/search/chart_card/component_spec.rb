@@ -18,6 +18,7 @@ RSpec.describe Pages::Org::Search::ChartCard::Component, type: :component do
     expect(component).to have_link("Current search", href: scope_paths[:search])
     expect(component).to have_text("Total registrations")
     expect(component).to have_text("+100%")
+    expect(component).to have_css("[role='tooltip']", text: "6 last year", visible: :all)
     expect(component).to have_text("Reported stolen")
     expect(component).to have_css("dl div", count: 2)
   end
@@ -28,6 +29,8 @@ RSpec.describe Pages::Org::Search::ChartCard::Component, type: :component do
     it "captions the search" do
       expect(component).to have_text("Chart · Current search", normalize_ws: true)
       expect(component).to have_css("a[aria-current='true']", text: "Current search")
+      expect(component).to have_text("+100%")
+      expect(component).to have_no_css("[role='tooltip']", visible: :all)
     end
   end
 
