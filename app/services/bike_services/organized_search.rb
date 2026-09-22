@@ -27,16 +27,21 @@ module BikeServices
     end
 
     # A stolen or impounded bike is where it was taken or impounded; any other is at its
-    # registration address - only matched where the organization collects that, and only
-    # among its own registrations
-    def location(bikes, location, distance, organization:, search_all: false, ip_address: nil)
-      return bikes if location.blank?
+    # registration address - which only an organization's own, address-collecting search can reach
+    LOCATIONABLE_STATUSES = %w[stolen impounded].freeze
+
+    def location_searchable?(organization:, search_all:, search_status:)
+      LOCATIONABLE_STATUSES.include?(search_status) || (!search_all && organization.enabled?("reg_address"))
+    end
+
+    # Ignored where it isn't searchable, as the disabled field is
+    def location(bikes, location, distance, organization:, search_all: false, search_status: nil, ip_address: nil)
+      return bikes if location.blank? || !location_searchable?(organization:, search_all:, search_status:)
 
       proximity = BikeSearchable.proximity_bounding_box(location, distance, ip_address)
       return bikes if proximity.nil? && location.match?(/anywhere/i)
       return bikes.none if proximity.nil?
 
-      bikes = bikes.stolen_or_impounded if search_all || !organization.enabled?("reg_address")
       bikes.within_bounding_box(proximity[:bounding_box])
     end
 

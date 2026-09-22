@@ -135,6 +135,18 @@ module ComponentStructs
 
     def location_search_label = translation(:show_location_search)
 
+    def location_search_disabled?
+      !BikeServices::OrganizedSearch.location_searchable?(organization: @organization,
+        search_all: @search_all, search_status: @filter_values[:search_status])
+    end
+
+    # Why it's disabled - with registration addresses, only because the search reaches past them
+    def location_search_disabled_hint
+      return translation(:location_search_disabled_search_all) if @organization.enabled?("reg_address")
+
+      translation(:location_search_disabled_no_address, org_name: @organization.short_name)
+    end
+
     def render_export? = @organization.enabled?("csv_exports")
 
     def search_all? = @search_all

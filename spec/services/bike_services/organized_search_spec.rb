@@ -29,20 +29,23 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
     let!(:stolen_nyc) { FactoryBot.create(:stolen_bike_in_nyc) }
     let!(:stolen_chicago) { FactoryBot.create(:stolen_bike_in_chicago) }
 
-    it "matches only stolen bikes" do
-      expect(described_class.location(Bike.all, "New York", "50", organization:).pluck(:id)).to eq([stolen_nyc.id])
-      expect(described_class.location(Bike.all, "", "50", organization:)).to eq(Bike.all)
-      expect(described_class.location(Bike.all, "Anywhere", "50", organization:)).to eq(Bike.all)
+    it "is ignored without a locationable status" do
+      expect(described_class.location(Bike.all, "New York", "50", organization:)).to eq(Bike.all)
+      expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen").pluck(:id))
+        .to match_array([bike_nyc.id, stolen_nyc.id])
+      expect(described_class.location(Bike.all, "", "50", organization:, search_status: "stolen")).to eq(Bike.all)
+      expect(described_class.location(Bike.all, "Anywhere", "50", organization:, search_status: "stolen")).to eq(Bike.all)
     end
 
     context "with reg_address" do
       let(:enabled_feature_slugs) { %w[reg_address] }
 
-      it "matches registration addresses too, except searching all" do
+      it "matches any status, except searching all" do
         expect(described_class.location(Bike.all, "New York", "50", organization:).pluck(:id))
           .to match_array([bike_nyc.id, stolen_nyc.id])
-        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true).pluck(:id))
-          .to eq([stolen_nyc.id])
+        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true)).to eq(Bike.all)
+        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
+          search_status: "impounded").pluck(:id)).to match_array([bike_nyc.id, stolen_nyc.id])
       end
     end
 
@@ -50,7 +53,8 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       let(:bounding_box) { [66.0, -84.22, 67.0, (0.0 / 0)] }
 
       it "matches nothing" do
-        expect(described_class.location(Bike.all, "Nowhere", "50", organization:).pluck(:id)).to eq([])
+        expect(described_class.location(Bike.all, "Nowhere", "50", organization:, search_status: "stolen").pluck(:id))
+          .to eq([])
       end
     end
   end

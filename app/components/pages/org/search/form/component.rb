@@ -56,6 +56,10 @@ module Pages
             @settings_and_filters_component.present?
           end
 
+          def location_search_disabled?
+            @settings_and_filters_component.location_search_disabled?
+          end
+
           def distance
             GeocodeHelper.permitted_distance(@interpreted_params[:distance])
           end

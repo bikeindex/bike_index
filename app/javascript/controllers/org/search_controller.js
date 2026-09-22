@@ -3,16 +3,19 @@ import { Controller } from '@hotwired/stimulus'
 /* global localStorage */
 
 const RESULT_VIEW_KEY = 'orgRegistrationResultView'
+// BikeServices::OrganizedSearch::LOCATIONABLE_STATUSES
+const LOCATIONABLE_STATUSES = ['stolen', 'impounded']
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
   static values = { resultView: String }
 
   connect () {
     this.chartSearch = this.chartParams()
     this.initOptionalFields()
+    this.syncLocationSearch()
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
@@ -26,6 +29,7 @@ export default class extends Controller {
   handleFrameRender = (event) => {
     this.syncResultView()
     this.syncPeriodLabel()
+    this.syncLocationSearch()
     this.endSubmitSpinner()
     if (event.target === this.chartFrame) return
     this.reloadChart()
@@ -85,6 +89,23 @@ export default class extends Controller {
     if (checkbox) checkbox.checked = open
   }
 
+  // BikeServices::OrganizedSearch.location_searchable? - disabled, the fields hide and stop
+  // submitting, but the checkbox keeps whether they were open
+  syncLocationSearch () {
+    const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === 'location')
+    const field = this.optionalFieldTargets.find(target => target.dataset.field === 'location')
+    if (!checkbox || !field) return
+
+    const status = document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
+    const searchAll = this.hasSearchAllTarget && this.searchAllTarget.checked
+    const searchable = LOCATIONABLE_STATUSES.includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
+
+    checkbox.disabled = !searchable
+    if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
+    field.classList.toggle('tw:hidden', !(searchable && checkbox.checked))
+    field.querySelectorAll('input').forEach(input => { input.disabled = !searchable })
+  }
+
   // Bubbled from any field, so it picks out the one it's for
   emailChanged (event) {
     if (event.target.name !== 'search_email' || !this.hasSearchAllTarget) return
@@ -96,6 +117,8 @@ export default class extends Controller {
 
   filterChanged () {
     this.syncFilterSummary()
+    // Before the submit, so a disabled location isn't searched
+    this.syncLocationSearch()
     const form = document.getElementById('Search_Form')
     if (form) {
       form.requestSubmit()
