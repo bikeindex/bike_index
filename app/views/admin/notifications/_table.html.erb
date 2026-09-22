@@ -33,7 +33,7 @@
     <% unless skip_user %>
       <% table.column(sortable: "user_id") do |notification| %>
         <% if notification.user_id.present? %>
-          <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable) %>
+          <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable) %>
         <% else %>
           <%= notification.message_channel_target %>
           <small class="less-strong">no user</small>
@@ -44,7 +44,7 @@
     <% unless skip_bike %>
       <% table.column(sortable: "bike_id") do |notification| %>
         <% if notification.bike_id.present? %>
-          <%= render Pages::Admin::Bikes::Cell::Component.new(sort_state:, bike: notification.bike, bike_id: notification.bike_id, bike_link_path: admin_bike_path(notification.bike_id, active_tab: "messages"), render_search: true) %>
+          <%= render Atoms::Admin::TableCells::Bike::Component.new(sort_state:, bike: notification.bike, bike_id: notification.bike_id, bike_link_path: admin_bike_path(notification.bike_id, active_tab: "messages"), render_search: true) %>
         <% end %>
       <% end %>
     <% end %>

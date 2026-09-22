@@ -23,7 +23,7 @@
   <% end %>
 
   <% table.column(sortable: "email", lower_right: ->(user) { user.id }) do |user| %>
-    <%= render Pages::Admin::Users::Cell::Component.new(email: user.email, user:, render_search: false) %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(email: user.email, user:, render_search: false) %>
   <% end %>
 
   <% table.column(label: "Secondary Emails") do |user| %>

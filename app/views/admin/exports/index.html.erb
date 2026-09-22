@@ -85,7 +85,7 @@
     <% end %>
 
     <% table.column(label: "Organization") do |export| %>
-      <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: export.organization, render_search: true) %>
+      <%= render Atoms::Admin::TableCells::Organization::Component.new(sort_state:, organization: export.organization, render_search: true) %>
     <% end %>
 
     <% table.column(label: "File") do |export| %>
