@@ -93,7 +93,7 @@
         <em>To add regional organizations rather than child/parent relationships, enable it through an invoice for the organization. All organizations with a location in the same area will automatically be associated.</em>
       <% end %>
 
-      <%= render UI::Forms::Combobox::Component.new(name: :parent_organization_id, options: parent_organization_options, include_blank: true, html_options: {form: @form_builder, placeholder: "Choose organization", aria: {describedby: group.helper_text_id}, data: AMBASSADOR_TARGETS[:input_data]}) %>
+      <%= render UI::Forms::Combobox::Component.new(name: :parent_organization_id, options: parent_organization_options, include_blank: true, html_options: {form: @form_builder, placeholder: "Choose organization", aria: {describedby: group.helper_text_id}, data: AMBASSADOR_FIELD_DATA}) %>
     <% end %>
   </div>
 

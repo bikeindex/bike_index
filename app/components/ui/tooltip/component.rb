@@ -73,7 +73,7 @@ module UI
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
           class: "tw:twtext-color tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded " \
-            "tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:border tw:shadow-lg tw:z-50 #{SURFACE_CLASS}"
+            "tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:normal-case tw:border tw:shadow-lg tw:z-50 #{SURFACE_CLASS}"
         )
       end
 
