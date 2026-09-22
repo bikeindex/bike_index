@@ -1,0 +1,150 @@
+name: Web sandbox prebuild
+
+# Publishes the prebuilt Ruby + installed gems that Claude Code web sessions download
+# instead of building from source. Without them a cold web sandbox spends ~6 minutes
+# compiling the pinned Ruby (no prebuilt binary for it is reachable from inside that
+# sandbox) plus a few more on `bundle install`; with them it's a ~20s download.
+#
+# Both assets hang off one long-lived pre-release, `web-sandbox-prebuilt`, and are
+# keyed by content in their filenames, so several Ruby/lockfile combinations can
+# coexist while a branch lags main. The consumer is
+# .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh, which falls back to
+# building from source whenever an asset is missing — so a failed or skipped run here
+# costs time, never correctness.
+#
+# runs-on MUST match the web sandbox image (Ubuntu 24.04, glibc 2.39, OpenSSL 3.0),
+# and the tarballs MUST extract to the same absolute path they were built at:
+# rbconfig bakes the prefix in, so a relocated Ruby can't find its own stdlib.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .tool-versions
+      - Gemfile.lock
+      - .github/workflows/web-sandbox-prebuild.yml
+  # Build (but don't publish) when the workflow itself changes, so a broken edit
+  # fails on the PR rather than silently stopping the publishes.
+  pull_request:
+    paths:
+      - .github/workflows/web-sandbox-prebuild.yml
+  workflow_dispatch:
+
+concurrency:
+  group: web-sandbox-prebuild
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  RELEASE_TAG: web-sandbox-prebuilt
+
+jobs:
+  prebuild:
+    name: Build and publish
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # creates/updates the release holding the assets
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Resolve the cache keys
+        id: keys
+        run: |
+          ruby_version=$(awk '$1=="ruby"{print $2}' .tool-versions)
+          echo "ruby_version=$ruby_version" >> "$GITHUB_OUTPUT"
+          echo "lock_sha=$(sha256sum Gemfile.lock | cut -c1-12)" >> "$GITHUB_OUTPUT"
+
+      # Installs to $RUNNER_TOOL_CACHE/Ruby/<version>/x64, the path the sandbox
+      # extracts to. Version comes from .tool-versions; bundler from Gemfile.lock.
+      - name: Set up Ruby
+        id: ruby
+        uses: ruby/setup-ruby@v1
+
+      # Packed before `bundle install`, so this asset is a pristine Ruby - it keeps
+      # the default and bundled gems (bundler among them) that the sandbox needs
+      # when the lockfile has moved and only this half of the pair matches.
+      - name: Pack Ruby
+        id: pack_ruby
+        env:
+          PREFIX: ${{ steps.ruby.outputs.ruby-prefix }}
+          RUBY_VERSION: ${{ steps.keys.outputs.ruby_version }}
+        run: |
+          set -euo pipefail
+          test "$PREFIX" = "/opt/hostedtoolcache/Ruby/$RUBY_VERSION/x64" # the sandbox extracts to this path
+          mkdir -p artifacts
+          tarball="ruby-${RUBY_VERSION}-ubuntu24.04-x86_64.tar.gz"
+          tar -C "$(dirname "$PREFIX")" -czf "artifacts/$tarball" x64
+          (cd artifacts && sha256sum "$tarball" > "${tarball}.sha256")
+          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
+
+      # No bundler-cache / BUNDLE_PATH: the gems have to land in the Ruby's own
+      # GEM_HOME, which is what makes the tarball work with no bundler config
+      # on the other side.
+      - name: Install gems
+        run: bundle install --jobs "$(nproc)"
+
+      # Just the gem tree, extracted over the Ruby above. Two assets rather than
+      # one because a Gemfile.lock bump shouldn't republish 30MB of unchanged Ruby.
+      # `bin` rides along for the gems' executables; what it shares with the Ruby
+      # tarball is byte-identical, so extraction order is moot.
+      - name: Pack gems
+        id: pack_bundle
+        env:
+          PREFIX: ${{ steps.ruby.outputs.ruby-prefix }}
+          RUBY_VERSION: ${{ steps.keys.outputs.ruby_version }}
+          LOCK_SHA: ${{ steps.keys.outputs.lock_sha }}
+        run: |
+          set -euo pipefail
+          tarball="bundle-${RUBY_VERSION}-${LOCK_SHA}-ubuntu24.04-x86_64.tar.gz"
+          tar -C "$(dirname "$PREFIX")" -czf "artifacts/$tarball" x64/lib/ruby/gems x64/bin
+          (cd artifacts && sha256sum "$tarball" > "${tarball}.sha256")
+          ls -lh artifacts
+          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
+
+      # Proves the tarballs are complete and the Ruby still works from that path,
+      # which a `tar tzf` wouldn't. The unpack target is a throwaway prefix, so
+      # `ruby -v` is the only thing that can run - `bundle check` needs the real one.
+      - name: Verify the tarballs unpack
+        env:
+          RUBY_VERSION: ${{ steps.keys.outputs.ruby_version }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/verify
+          tar -C /tmp/verify -xzf "artifacts/${{ steps.pack_ruby.outputs.tarball }}"
+          tar -C /tmp/verify -xzf "artifacts/${{ steps.pack_bundle.outputs.tarball }}"
+          test -x /tmp/verify/x64/bin/ruby
+          test -d "/tmp/verify/x64/lib/ruby/gems"
+          "/opt/hostedtoolcache/Ruby/$RUBY_VERSION/x64/bin/ruby" -v
+          bundle check
+
+      - name: Publish to the prebuilt release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --title "Web sandbox prebuilt toolchain" --prerelease --notes \
+              "Prebuilt Ruby and gems for Claude Code web sandbox sessions. Built by .github/workflows/web-sandbox-prebuild.yml; consumed by .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh. Not a product release."
+          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --clobber artifacts/*
+
+      # Bundle tarballs accumulate one per Gemfile.lock; keep the newest three (six
+      # assets, each tarball plus its checksum) so a branch that hasn't merged main
+      # still finds its key.
+      - name: Prune superseded bundles
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json assets --jq '.assets | map(select(.name | startswith("bundle-")))
+              | sort_by(.createdAt) | reverse | .[6:] | .[].name' |
+            while read -r asset; do
+              echo "deleting superseded $asset"
+              gh release delete-asset "$RELEASE_TAG" "$asset" --repo "$GITHUB_REPOSITORY" --yes
+            done

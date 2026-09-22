@@ -13,7 +13,12 @@ set -uo pipefail
 
 REPO=/home/user/bike_index
 RUBYVER=$(awk '$1=="ruby"{print $2}' "$REPO/.tool-versions")
+LOCK_SHA=$(sha256sum "$REPO/Gemfile.lock" | cut -c1-12)
+# rbconfig bakes the prefix in, so the tarball has to land where it was built:
+# ruby/setup-ruby's toolcache path. /opt/ruby-<ver>/x64 stays as a symlink to it.
+TOOLCACHE="/opt/hostedtoolcache/Ruby/${RUBYVER}"
 RUBY_PREFIX="/opt/ruby-${RUBYVER}/x64"
+PREBUILT_BASE="${BINX_PREBUILT_BASE:-https://github.com/bikeindex/bike_index/releases/download/web-sandbox-prebuilt}"
 
 export PATH="$RUBY_PREFIX/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
 export LD_LIBRARY_PATH="$RUBY_PREFIX/lib:${LD_LIBRARY_PATH:-}"
@@ -22,6 +27,23 @@ export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password
 export LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 say() { echo "==> $*"; }
+
+# ------------------------------------------------------------ prebuilt assets
+# .github/workflows/web-sandbox-prebuild.yml publishes these; every failure here
+# is non-fatal, because building from source is always still an option.
+fetch_prebuilt() { # <tarball name>
+  local tarball="$1" tmp
+  tmp=$(mktemp -d)
+  curl -sfL --max-time 600 -o "$tmp/$tarball" "$PREBUILT_BASE/$tarball" &&
+    curl -sfL --max-time 60 -o "$tmp/$tarball.sha256" "$PREBUILT_BASE/$tarball.sha256" &&
+    (cd "$tmp" && sha256sum -c "$tarball.sha256" >/dev/null) &&
+    mkdir -p "$TOOLCACHE" &&
+    tar -C "$TOOLCACHE" -xzf "$tmp/$tarball" || { rm -rf "$tmp"; return 1; }
+  rm -rf "$tmp"
+  [ -e "$RUBY_PREFIX" ] || { mkdir -p "$(dirname "$RUBY_PREFIX")"; ln -sfn "$TOOLCACHE/x64" "$RUBY_PREFIX"; }
+}
+
+ruby_is_built() { "$RUBY_PREFIX/bin/ruby" --version 2>/dev/null | grep -q "^ruby ${RUBYVER}"; }
 
 # ---------------------------------------------------------------- ruby build
 build_ruby() {
@@ -50,11 +72,27 @@ build_ruby() {
   "$RUBY_PREFIX/bin/ruby" --version
 }
 
-if "$RUBY_PREFIX/bin/ruby" --version 2>/dev/null | grep -q "^ruby ${RUBYVER}"; then
-  say "ruby ${RUBYVER} already built"
-  RUBY_PID=""
+# Keyed on Gemfile.lock, so it misses on a branch that changed it - `bundle
+# install` then fills the gaps against whatever this Ruby already has.
+GEMS_PREBUILT=false
+fetch_prebuilt_gems() {
+  [ "$GEMS_PREBUILT" = false ] && [ "${BINX_SKIP_PREBUILT:-}" != "1" ] || return 0
+  if fetch_prebuilt "bundle-${RUBYVER}-${LOCK_SHA}-ubuntu24.04-x86_64.tar.gz"; then
+    say "prebuilt gems for Gemfile.lock ${LOCK_SHA} installed"
+    GEMS_PREBUILT=true
+  fi
+}
+
+RUBY_PID=""
+if ruby_is_built; then
+  say "ruby ${RUBYVER} already installed"
+  fetch_prebuilt_gems
+elif [ "${BINX_SKIP_PREBUILT:-}" != "1" ] &&
+  fetch_prebuilt "ruby-${RUBYVER}-ubuntu24.04-x86_64.tar.gz" && ruby_is_built; then
+  say "prebuilt ruby ${RUBYVER} installed"
+  fetch_prebuilt_gems
 else
-  say "building ruby ${RUBYVER} in the background (~6 min on 4 cores) -> /tmp/ruby_build.log"
+  say "no prebuilt ruby - building from source in the background (~6 min on 4 cores) -> /tmp/ruby_build.log"
   build_ruby > /tmp/ruby_build.log 2>&1 &
   RUBY_PID=$!
 fi
@@ -88,23 +126,52 @@ if [ -n "$RUBY_PID" ]; then
   say "waiting on the ruby build"
   wait "$RUBY_PID" || { echo "ruby build FAILED - see /tmp/ruby_build.log"; tail -20 /tmp/ruby_build.log; exit 1; }
   say "ruby $("$RUBY_PREFIX/bin/ruby" -e 'print RUBY_VERSION') built"
+  fetch_prebuilt_gems # the gem tarball is usable even when only the Ruby half missed
 fi
 
 cd "$REPO"
-gem list -i bundler -v "$(awk '/BUNDLED WITH/{getline; print $1}' Gemfile.lock)" >/dev/null 2>&1 ||
-  gem install bundler -v "$(awk '/BUNDLED WITH/{getline; print $1}' Gemfile.lock)" --no-document
-say "bundle install"
-bundle install --jobs "$(nproc)" || exit 1
+BUNDLER_VERSION=$(awk '/BUNDLED WITH/{getline; print $1}' Gemfile.lock)
+gem list -i bundler -v "$BUNDLER_VERSION" >/dev/null 2>&1 ||
+  gem install bundler -v "$BUNDLER_VERSION" --no-document
+if [ "$GEMS_PREBUILT" = true ] && bundle check >/dev/null 2>&1; then
+  say "gems satisfied by the prebuilt bundle"
+else
+  say "bundle install"
+  bundle install --jobs "$(nproc)" || exit 1
+fi
 
 eval "$(ruby bin/env --export)"
 say "creating + migrating databases (all four: dev/test x primary/analytics)"
 bundle exec rails db:create db:migrate || exit 1
+
+# ~15s, and without them anything rendering the application layout - a request
+# spec on an html format, any :js system spec - dies on AssetNotFound. bin/dev's
+# watchers keep them current afterwards.
+say "building tailwind + dartsass"
+bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
+  say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
 
 if [ "${1:-}" = "--dev-server" ]; then
   say "starting bin/dev -> /tmp/dev_server.log"
   nohup bin/dev > /tmp/dev_server.log 2>&1 &
   until curl -fs -o /dev/null "$BASE_URL/"; do sleep 5; done
   say "dev server up at $BASE_URL"
+fi
+
+ENV_EXPORTS=$(cat <<EOF
+export PATH="$RUBY_PREFIX/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+export LD_LIBRARY_PATH="$RUBY_PREFIX/lib:\${LD_LIBRARY_PATH:-}"
+export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
+export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password
+export LANG=C.UTF-8 LC_ALL=C.UTF-8
+EOF
+)
+
+# Set by the SessionStart hook: everything written here is exported into the
+# session's shells, so later commands need no `export PATH=...` preamble.
+if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+  printf '%s\n' "$ENV_EXPORTS" >> "$CLAUDE_ENV_FILE"
+  say "wrote the toolchain env to \$CLAUDE_ENV_FILE"
 fi
 
 say "done. Shell env for later commands:"

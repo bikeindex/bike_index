@@ -1,19 +1,28 @@
 # Claude Code web sandbox
 
-**Run `assets/web_sandbox_setup.sh` rather than working through this by hand.**
-It does every setup step below, starting the Ruby build first and running the
-apt/services/postgres/chrome work while that compiles, and it's idempotent — after
-a container idle period it just restarts the services:
+**A `SessionStart` hook (`.claude/hooks/session-start.sh`) already ran all of this
+before your first turn**, so Ruby, gems, postgres, redis, the CSS builds and the
+Playwright browser are normally in place, and `$PATH` and the `PG*` variables are
+already exported into your shells. Check before setting anything up: `ruby -v` and
+`pg_isready`. The hook is remote-only — it exits immediately anywhere but the web
+sandbox.
+
+It calls `assets/web_sandbox_setup.sh`, which is also the thing to run by hand when
+the hook didn't run (an older branch), didn't finish, or the container has idled and
+dropped postgres/redis. It's idempotent, and does every step below:
 
 ```bash
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh              # setup only
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh --dev-server # + boot bin/dev
 ```
 
-Budget ~10 min on a cold container (~6 of it Ruby, the rest `bundle install`), 15s
-on a warm one. It prints the env exports to paste into later shells. The sections
-below are what it automates — read them when a step fails, or when you need only
-part of it.
+It downloads a prebuilt Ruby and gem tree from the `web-sandbox-prebuilt` release
+(published by `.github/workflows/web-sandbox-prebuild.yml`) and falls back to the
+source build below whenever an asset is missing or fails its checksum — a
+`Gemfile.lock` your branch changed misses the gem half, so `bundle install` runs.
+Budget ~1 min warm-cache, ~10 min when both halves miss (~6 of it Ruby). Set
+`BINX_SKIP_PREBUILT=1` to force the source path. The sections below are what it
+automates — read them when a step fails, or when you need only part of it.
 
 Longest of the three, so here's the order: build Ruby, put the toolchain on
 PATH, start postgres/redis and create the databases. Everything after that is
