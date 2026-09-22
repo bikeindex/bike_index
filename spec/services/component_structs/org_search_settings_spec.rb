@@ -200,7 +200,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       expect(groups.find { it[:name] == :search_stickers }[:entries].map { it[:value] })
         .to eq ["", "with", "none"]
       expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
-        .to eq %w[all not_impounded impounded with_owner stolen stolen_or_impounded]
+        .to eq %w[all not_impounded impounded stolen stolen_or_impounded with_owner]
     end
 
     context "with no optional features" do
@@ -212,7 +212,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
         expect(groups.map { it[:name] }).to eq %i[search_status search_unregisteredness]
         expect(groups.find { it[:name] == :search_status }[:selected]).to eq "all"
         expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
-          .to eq %w[all with_owner stolen]
+          .to eq %w[all stolen with_owner]
       end
     end
   end

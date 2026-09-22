@@ -59,9 +59,9 @@ module ComponentStructs
                                       stolen_or_impounded: "impound_bikes"},
                       values: {not_impounded: :filter_not_impounded_html,
                                impounded: :filter_impounded_html,
-                               with_owner: :filter_not_stolen_or_impounded_html,
                                stolen: :filter_stolen_html,
-                               stolen_or_impounded: :filter_stolen_or_impounded_html}},
+                               stolen_or_impounded: :filter_stolen_or_impounded_html,
+                               with_owner: :filter_not_stolen_or_impounded_html}},
       search_unregisteredness: {label: :unregistered,
                                 values: {only_unregistered: :filter_only_unregistered_html,
                                          only_registered: :filter_not_unregistered_html}}
