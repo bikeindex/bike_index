@@ -5883,6 +5883,7 @@ es:
             created_at_cell_panel: Hora - registrada
             occurred_at_cell_panel: Hora - estado
             updated_at_cell_panel: Hora - actualizada
+            filter_stolen_or_impounded_html: solo <strong>robado</strong> o <strong>confiscado</strong>
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:

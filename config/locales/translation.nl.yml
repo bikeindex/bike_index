@@ -5790,6 +5790,8 @@ nl:
             created_at_cell_panel: Tijd - geregistreerd
             occurred_at_cell_panel: Tijd - status
             updated_at_cell_panel: Tijd - bijgewerkt
+            filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
+              beslag genomen</strong>
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
