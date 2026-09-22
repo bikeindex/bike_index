@@ -5920,6 +5920,10 @@ it:
             serial_label: 'Seriale:'
             sticker_label: 'Adesivo:'
             view_all: visualizza tutto
+          bike_card:
+            e_vehicle: veicolo elettrico
+            not_registered_with: Non registrato con %{org_name}
+            registered_with: Registrato con %{org_name}
         impound_records:
           index:
             all_bikes: Tutte le biciclette

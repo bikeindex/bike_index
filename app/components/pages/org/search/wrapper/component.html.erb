@@ -2,7 +2,7 @@
   <div
     class="
       tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:py-3
-      <%= header_padding_class %>
+      <%= padding_x_class %>
     "
   >
     <%#
@@ -20,7 +20,7 @@
         <%= count_html %>
       </p>
 
-      <% if @search_page && render_result_view? %>
+      <% if @search_page %>
         <div class="tw:flex tw:items-center tw:gap-2">
           <span
             class="
@@ -37,7 +37,10 @@
     </div>
 
     <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-      <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
+      <%# Columns are the spreadsheet's alone %>
+      <% unless thumbnail_view? %>
+        <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
+      <% end %>
 
       <%# Only the search's own params describe an export of what's on the page %>
       <% if @search_page && settings.render_export? %>
@@ -59,7 +62,9 @@
     </div>
   </div>
 
-  <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:)) %>
+  <% unless thumbnail_view? %>
+    <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:)) %>
+  <% end %>
 
   <%# Only on the search: the model audit's own page already names the audit above this %>
   <% if @search_page && @model_audit.present? %>
@@ -73,22 +78,35 @@
     </p>
   <% end %>
 
-  <%#
-    The table bleeds a gutter past each side; clipping it here rather than on the card
-    leaves the header's tooltips free to open over the card's edge
-  %>
-
-  <div class="<%= table_clip_classes %>">
-    <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
-      organization: @organization,
-      bikes: @bikes,
-      current_user: @current_user,
-      render_sortable: true,
-      sort_state: @sort_state,
-      bike_sticker: @bike_sticker,
-      settings:
-    )) %>
-  </div>
+  <% if thumbnail_view? %>
+    <ul
+      class="
+        tw:m-0 tw:grid tw:list-none tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4 tw:py-4
+        <%= padding_x_class %>
+      "
+    >
+      <% @bikes.each do |bike| %>
+        <%= render(Pages::Org::SearchResults::BikeCard::Component.new(bike:, organization: @organization,
+          current_user: @current_user, search_all: @search_all)) %>
+      <% end %>
+    </ul>
+  <% else %>
+    <%#
+      The table bleeds a gutter past each side; clipping it here rather than on the card
+      leaves the header's tooltips free to open over the card's edge
+    %>
+    <div class="<%= table_clip_classes %>">
+      <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
+        organization: @organization,
+        bikes: @bikes,
+        current_user: @current_user,
+        render_sortable: true,
+        sort_state: @sort_state,
+        bike_sticker: @bike_sticker,
+        settings:
+      )) %>
+    </div>
+  <% end %>
 
   <div
     class="

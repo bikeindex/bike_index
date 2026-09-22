@@ -6,8 +6,9 @@ module Pages
       module Wrapper
         # A card of org registrations: the match count and the column settings button, the
         # column-visibility panel, the table and the pagination footer. On the registrations
-        # search (search_page) the header also carries the view switcher and the export, and
-        # the card renders inside the results turbo-frame, so every search brings it back whole.
+        # search (search_page) the header also carries the view switcher and the export, the
+        # thumbnail view swaps the columns for cards, and the card renders inside the results
+        # turbo-frame, so every search brings it back whole.
         class Component < ApplicationComponent
           # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
           # .container-fluid padding to the page's edges
@@ -106,18 +107,17 @@ module Pages
             ["tw:overflow-hidden", (TABLE_BLEED_CLASSES if @search_page)].compact.join(" ")
           end
 
-          # Full bleed drops the card's gutter, so the header meets the chart's edge
-          def header_padding_class = @search_page ? "tw:@min-[672px]/twwiderow:px-4" : "tw:px-4"
+          # Full bleed drops the card's gutter, so the header and cards meet the chart's edge
+          def padding_x_class = @search_page ? "tw:@min-[672px]/twwiderow:px-4" : "tw:px-4"
 
           # Built here rather than on the settings struct, which route helpers never reach
           def export_path
             organization_registrations_path(settings.search_params.merge(create_export: true))
           end
 
-          def render_result_view? = Flipper.enabled?(:organization_registration_view_switcher)
+          # Only the search page offers the view switcher, so it's the only place cards render
+          def thumbnail_view? = @search_page && @result_view == :thumbnail
 
-          # TODO: the chips move search_result_view through the URL, but nothing renders the
-          # thumbnail view behind it yet - see the Bike Thumbnails design doc
           def result_view_entries
             RESULT_VIEWS.map do |view|
               ComponentStructs::Shapes.entry(translation(".view_#{view}"), href: result_view_path(view),

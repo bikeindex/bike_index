@@ -381,13 +381,13 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   end
 
   it "moves the result view through the address bar, and back from localStorage" do
-    Flipper.enable(:organization_registration_view_switcher)
     visit bikes_path
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
 
     click_link "Thumbnail"
     expect(page).to have_current_path(/search_result_view=thumbnail/, wait: 10)
     expect(page).to have_css("a[data-active='true']", text: "Thumbnail", wait: 10)
+    expect(page).to have_no_css("turbo-frame#organized_bikes_results_frame table")
 
     fill_in "search_email", with: "alice@example.com"
     click_button "Search registrations"
