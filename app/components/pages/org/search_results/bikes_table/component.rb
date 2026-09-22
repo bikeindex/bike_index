@@ -24,11 +24,11 @@ module Pages
           VIEW_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
             "tw:group-data-overflowing/bikes-table:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
 
-          # [&>div] is UI::Table's scroller, whose bottom margin and padding would part the table
-          # from what follows it. The after: box mirrors the View column over the right edge while
-          # there's more to scroll to - its border the divider line, its shadow falling on the rows,
-          # the rest of it past the edge in the search card's clip - except in a full-bleed row,
-          # where the table runs off the page's edge
+          THUMB_CLASSES = "tw:block tw:h-8 tw:w-11 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700"
+
+          # [&>div] is UI::Table's scroller, whose bottom spacing would part the table from what
+          # follows it. The after: box mirrors the View column's divider and shadow on the right
+          # edge while there's more to scroll, except in a full-bleed row that runs off the page
           WRAPPER_CLASSES = "tw:group/bikes-table tw:relative tw:[&>div]:mb-0 tw:[&>div]:pb-0 tw:data-overflowing:after:absolute " \
             "tw:data-overflowing:after:inset-y-0 tw:data-overflowing:after:left-[calc(100%-1px)] tw:data-overflowing:after:z-2 " \
             "tw:data-overflowing:after:w-4 tw:data-overflowing:after:border-l tw:data-overflowing:after:border-gray-100 " \

@@ -153,6 +153,8 @@ module ComponentStructs
       ].compact.uniq.sort_by { |cell| column_renames[cell.to_sym] }
     end
 
+    def always_visible?(cell_name) = ALWAYS_VISIBLE_COLUMNS.include?(cell_name)
+
     def panel_columns
       @panel_columns ||= (enabled_columns + ALWAYS_VISIBLE_COLUMNS).sort_by { |cell| column_renames[cell.to_sym] }
     end

@@ -26,7 +26,7 @@
     data-org--search-column-settings-target="checkboxes"
   >
     <% @settings.panel_columns.each do |cell_name| %>
-      <% always_visible = ComponentStructs::OrgSearchSettings::ALWAYS_VISIBLE_COLUMNS.include?(cell_name) %>
+      <% always_visible = @settings.always_visible?(cell_name) %>
 
       <%# Unchecked columns read quieter than the ones showing %>
       <%= render(UI::Forms::Checkbox::Component.new(name: cell_name, value: cell_name, checked: always_visible,
