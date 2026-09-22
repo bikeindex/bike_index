@@ -55,9 +55,9 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     let(:options) { super().merge(result_view: "thumbnail", sort_state:) }
 
     it "marks the chip active, carries the search into the other one's link, and renders cards" do
-      expect(component).to have_css("a[data-active='true']", text: "Thumbnail")
-      expect(component).to have_link("Spreadsheet", href: /search_result_view=spreadsheet/)
-      expect(component).to have_link("Spreadsheet", href: /serial=xyz/)
+      expect(component).to have_css("a[data-active='true']", text: "Cards")
+      expect(component).to have_link("Table", href: /search_result_view=spreadsheet/)
+      expect(component).to have_link("Table", href: /serial=xyz/)
       expect(component).to have_css("ul li", text: bike.mnfg_name)
       expect(component).not_to have_css("table")
       expect(component).not_to have_button("Column settings", visible: :all)
@@ -78,7 +78,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
       let(:options) { super().merge(result_view: "nonsense") }
 
       it "falls back to the spreadsheet" do
-        expect(component).to have_css("a[data-active='true']", text: "Spreadsheet")
+        expect(component).to have_css("a[data-active='true']", text: "Table")
         expect(component).to have_css("table")
       end
     end

@@ -19,5 +19,5 @@ en:
             view_as: View as
             view_list: List
             view_matching_any_audit: view matching any audit
-            view_spreadsheet: Spreadsheet
-            view_thumbnail: Thumbnail
+            view_spreadsheet: Table
+            view_thumbnail: Cards
