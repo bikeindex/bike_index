@@ -26,10 +26,9 @@ module UI
             @camera = camera.nil? ? accept_list.any? && accept_list.all? { image?(it) } : camera
             @placeholder = translation(".no_file_chosen")
             @html_options = {
-              class: "tw:peer tw:sr-only",
               accept: accept_list.join(",").presence,
               data: {"ui--forms--files--picker-target": "input", action: "ui--forms--files--picker#display"}
-            }.deep_merge(html_options)
+            }.deep_merge(html_options).merge(class: ["tw:peer tw:sr-only", html_options[:class]].compact.join(" "))
             @input_id = @html_options[:id] || form_builder&.field_id(attribute)
 
             # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.

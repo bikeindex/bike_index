@@ -18,12 +18,14 @@ RSpec.describe UI::Forms::Files::Picker::Component, type: :component do
     expect(component).to have_no_css("button[data-action='ui--forms--files--picker#takePicture']")
   end
 
-  # Files::Upload adds its own target to the input - replacing the data would leave the picker unwired
-  it "keeps its own data on the input alongside the caller's" do
-    rendered = render_inline(described_class.new(html_options: {id: "x", data: {"ui--forms--files--upload-target": "input"}}))
+  # Files::Upload adds its own target to the input - replacing the data would leave the picker unwired,
+  # and replacing the class would unhide the input and drop the label's peer focus ring
+  it "keeps its own data and classes on the input alongside the caller's" do
+    rendered = render_inline(described_class.new(html_options: {id: "x", class: "extra", data: {"ui--forms--files--upload-target": "input"}}))
 
     expect(rendered).to have_css("input#x[data-ui--forms--files--picker-target='input'][data-ui--forms--files--upload-target='input']")
     expect(rendered).to have_css("input#x[data-action='ui--forms--files--picker#display']")
+    expect(rendered).to have_css("input#x.tw\\:peer.tw\\:sr-only.extra")
   end
 
   it "accepts a string, an array, or nothing" do
