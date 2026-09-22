@@ -5866,7 +5866,6 @@ es:
             status_cell: Estado
             sticker_cell: Etiqueta engomada
             stickers: 'Pegatinas:'
-            stolen_cell: Robado
             unregistered: 'No registrado:'
             updated_at_cell: Actualizado
             url_cell: URL
@@ -5874,6 +5873,9 @@ es:
             notes_cell_html: Notas de registro <em>de %{org_name}</em>
             reg_organization_affiliation_cell_html: Afiliación <em>en %{org_name}</em>
             reg_student_id_cell_html: Número de identificación del estudiante <em>%{org_name}</em>
+            occurred_at_cell: Estado en
+            photo_cell: Foto
+            view_cell: Vista
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -5890,6 +5892,11 @@ es:
             link_sticker: pegatina de enlace
             hidden: oculto
             not_registered_with: Oculto porque no está registrado con %{org_name}
+            acknowledgment: Reconocimiento de registro
+            acknowledgment_title: Confirmación de la secuencia de registro en
+            occurred_at_tooltip: Cuando fue robado, confiscado, encontrado o puesto
+              a la venta
+            view: Vista
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
