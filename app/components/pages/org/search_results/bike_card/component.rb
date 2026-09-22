@@ -4,9 +4,9 @@ module Pages
   module Org
     module SearchResults
       module BikeCard
-        # One registration in the org search's thumbnail or list view: the photo, price and
+        # One registration in the org search's cards or list view: the photo, price and
         # status, title, colors, vehicle type, location and serial. Per the Bike Thumbnails
-        # design doc - layout :thumbnail is 1c, :list the dense row (1d). search_all adds whether it's
+        # design doc - layout :cards is 1c, :list the dense row (1d). search_all adds whether it's
         # registered with the organization.
         class Component < ApplicationComponent
           include BikeHelper
@@ -14,7 +14,7 @@ module Pages
           # The layouts, and the classes for the list holding them. The rows wrap against their
           # list, so they fit a narrow card too
           LIST_CLASSES = {
-            thumbnail: "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4",
+            cards: "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4",
             list: "tw:@container tw:flex tw:flex-col tw:gap-3"
           }.freeze
 
@@ -26,7 +26,7 @@ module Pages
             pink: "tw:border-l-pink-400"
           }.freeze
 
-          def initialize(bike:, organization:, current_user: nil, search_all: false, layout: :thumbnail)
+          def initialize(bike:, organization:, current_user: nil, search_all: false, layout: :cards)
             @bike = bike
             @organization = organization
             @current_user = current_user
@@ -36,7 +36,7 @@ module Pages
 
           private
 
-          # Like the spreadsheet's rows, not per viewer. The listing because a price change doesn't
+          # Like the table's rows, not per viewer. The listing because a price change doesn't
           # touch the bike
           def cache_key
             [self.class.cache_digest, @organization.id, @search_all, @layout, @bike, for_sale_listing]

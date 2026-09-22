@@ -31,7 +31,7 @@ export default class extends Controller {
     this.reloadChart()
   }
 
-  // Spreadsheet or thumbnail is the server's choice, so restoring the stored one means
+  // The view is the server's choice, so restoring the stored one means
   // asking the frame for it again - only when the address bar names no view, which every
   // search and every chip leaves it doing.
   syncResultView () {

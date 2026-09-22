@@ -7,7 +7,7 @@ module Pages
         class ComponentPreview < ApplicationComponentPreview
           # @param search_all toggle
           def default(search_all: false)
-            render_layout(:thumbnail, search_all:)
+            render_layout(:cards, search_all:)
           end
 
           # @param search_all toggle

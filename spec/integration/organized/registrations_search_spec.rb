@@ -385,22 +385,22 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
 
     click_link "Cards"
-    expect(page).to have_current_path(/search_result_view=thumbnail/, wait: 10)
+    expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
     expect(page).to have_css("a[data-active='true']", text: "Cards", wait: 10)
     expect(page).to have_no_css("turbo-frame#organized_bikes_results_frame table")
 
     fill_in "search_email", with: "alice@example.com"
     click_button "Search registrations"
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
-    expect(page).to have_current_path(/search_result_view=thumbnail/)
+    expect(page).to have_current_path(/search_result_view=cards/)
 
     # Stored like the column choices, so arriving without the param brings it back
     visit bikes_path
-    expect(page).to have_current_path(/search_result_view=thumbnail/, wait: 10)
+    expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
     expect(page).to have_css("a[data-active='true']", text: "Cards", wait: 10)
 
     click_link "Table"
-    expect(page).to have_current_path(/search_result_view=spreadsheet/, wait: 10)
+    expect(page).to have_current_path(/search_result_view=table/, wait: 10)
 
     # Back to the default, which the address bar has nothing to say about
     visit bikes_path
