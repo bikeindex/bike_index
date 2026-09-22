@@ -25,7 +25,7 @@ module Admin
     end
 
     def sortable_columns
-      %w[created_at organization_id updated_at status user_id impound_record resolved_at]
+      %w[created_at organization_id updated_at status user_id impound_record_id resolved_at]
     end
 
     def earliest_period_date

@@ -5,7 +5,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_marketplace_messages.includes(:marketplace_listing, :sender, :receiver).reorder(sortable_opts),
+        ordered_marketplace_messages.includes(:marketplace_listing, :sender, :receiver),
         limit: @per_page,
         page: permitted_page)
     end
@@ -25,15 +25,16 @@ module Admin
     end
 
     def sortable_columns
-      %w[created_at marketplace_listing kind amount_cents initial_record_id sender_id receiver_id
+      %w[created_at marketplace_listing_id kind amount_cents initial_record_id sender_id receiver_id
         messages_prior_count]
     end
 
-    def sortable_opts
+    def ordered_marketplace_messages
       if sort_column == "amount_cents"
-        sortable_order("marketplace_listing.#{sort_column}")
+        matching_marketplace_messages.left_joins(:marketplace_listing)
+          .reorder(sortable_order(MarketplaceListing))
       else
-        sortable_order(MarketplaceMessage)
+        matching_marketplace_messages.reorder(sortable_order(MarketplaceMessage))
       end
     end
 
