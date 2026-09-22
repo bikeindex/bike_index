@@ -7,12 +7,12 @@ module Pages
         class ComponentPreview < ApplicationComponentPreview
           # @param search_all toggle
           def default(search_all: false)
-            render_layout(:card, search_all:)
+            render_layout(:thumbnail, search_all:)
           end
 
           # @param search_all toggle
-          def row(search_all: false)
-            render_layout(:row, search_all:)
+          def list(search_all: false)
+            render_layout(:list, search_all:)
           end
 
           private

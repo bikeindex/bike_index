@@ -22,9 +22,9 @@ module Atoms
         (skip_with_owner && status == "with owner") ? "" : status
       end
 
-      def self.color(bike, override_status: nil)
-        COLORS[status_humanized(bike, override_status:).tr(" ", "_").to_sym]
-      end
+      def self.status_key(status_humanized) = status_humanized.tr(" ", "_").to_sym
+
+      def self.color(bike) = COLORS[status_key(status_humanized(bike))]
 
       # override_status: the marketplace preview, where the listing is still a draft
       # time: when the status began, rendered after the label
@@ -59,7 +59,7 @@ module Atoms
           skip_with_owner: @skip_with_owner)
       end
 
-      def status_key = status_humanized.tr(" ", "_").to_sym
+      def status_key = self.class.status_key(status_humanized)
     end
   end
 end

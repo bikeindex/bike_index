@@ -25,8 +25,8 @@ RSpec.describe Pages::Org::SearchResults::BikeCard::Component, type: :component 
     expect(component).not_to have_text("Registered with")
   end
 
-  context "with layout row" do
-    let(:component) { render_inline(described_class.new(bike:, organization:, layout: :row)) }
+  context "with layout list" do
+    let(:component) { render_inline(described_class.new(bike:, organization:, layout: :list)) }
 
     it "renders the same bike, edged in its status's color" do
       expect(component).to have_css("li.tw\\:border-l-red-600")

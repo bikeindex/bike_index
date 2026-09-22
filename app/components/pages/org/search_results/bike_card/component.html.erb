@@ -4,7 +4,36 @@
 %>
 
 <% cache(cache_key) do %>
-  <% if row? %>
+  <%# Shared by both layouts %>
+  <% title = capture do %>
+    <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
+      <%= link_to bike_path_for_org, class: "tw:twtext-color tw:hover:underline", data: {turbo_frame: "_top"} do %>
+        <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
+        <%= @bike.frame_model_truncated %>
+        <span class="tw:absolute tw:inset-0 tw:z-10"></span>
+      <% end %>
+    </h3>
+  <% end %>
+
+  <% swatches = capture do %>
+    <span class="tw:flex tw:gap-0.5">
+      <% colors.each do |color| %>
+        <%= render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm)) %>
+      <% end %>
+    </span>
+
+    <%= colors.map(&:name).join(" / ") %>
+  <% end %>
+
+  <% type_badges = capture do %>
+    <% if @bike.motorized? %>
+      <%= render(UI::Badge::Component.new(text: "⚡", title: translation(".e_vehicle"), color: :purple)) %>
+    <% end %>
+
+    <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: @bike.motorized? ? :purple : :gray)) %>
+  <% end %>
+
+  <% if @layout == :list %>
     <li class="tw:relative tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-l-4 tw:border-gray-200 tw:bg-white tw:p-3 tw:transition tw:focus-within:z-10 tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:@xl:flex-nowrap tw:@xl:gap-4 tw:dark:border-gray-700 tw:dark:bg-gray-800 <%= row_border_class %>">
       <div
         class="
@@ -20,13 +49,7 @@
       </div>
 
       <div class="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1.5">
-        <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
-          <%= link_to bike_path_for_org, class: "tw:twtext-color tw:hover:underline", data: {turbo_frame: "_top"} do %>
-            <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
-            <%= @bike.frame_model_truncated %>
-            <span class="tw:absolute tw:inset-0 tw:z-10"></span>
-          <% end %>
-        </h3>
+        <%= title %>
 
         <div
           class="
@@ -36,13 +59,7 @@
         >
           <% if colors.any? %>
             <span class="tw:flex tw:items-center tw:gap-1.5">
-              <span class="tw:flex tw:gap-0.5">
-                <% colors.each do |color| %>
-                  <%= render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm)) %>
-                <% end %>
-              </span>
-
-              <%= colors.map(&:name).join(" / ") %>
+              <%= swatches %>
             </span>
           <% end %>
 
@@ -52,11 +69,7 @@
 
           <%# Above the row's link, for the e-vehicle tooltip %>
           <span class="tw:relative tw:z-20 tw:inline-flex tw:items-center tw:gap-1.5">
-            <% if @bike.motorized? %>
-              <%= render(UI::Badge::Component.new(text: "⚡", title: translation(".e_vehicle"), color: :purple)) %>
-            <% end %>
-
-            <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: @bike.motorized? ? :purple : :gray)) %>
+            <%= type_badges %>
           </span>
         </div>
 
@@ -77,7 +90,7 @@
         </div>
       </div>
 
-      <%# Beside the photo on narrow screens, where it wraps to its own line %>
+      <%# Its own line on narrow screens %>
       <div
         class="
           tw:flex tw:w-full tw:flex-none tw:items-center tw:justify-between
@@ -139,13 +152,7 @@
       </div>
 
       <div class="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-3.5">
-        <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
-          <%= link_to bike_path_for_org, class: "tw:twtext-color tw:hover:underline", data: {turbo_frame: "_top"} do %>
-            <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
-            <%= @bike.frame_model_truncated %>
-            <span class="tw:absolute tw:inset-0 tw:z-10"></span>
-          <% end %>
-        </h3>
+        <%= title %>
 
         <% if colors.any? %>
           <div
@@ -154,13 +161,7 @@
               tw:text-gray-500
             "
           >
-            <span class="tw:flex tw:gap-0.5">
-              <% colors.each do |color| %>
-                <%= render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm)) %>
-              <% end %>
-            </span>
-
-            <%= colors.map(&:name).join(" / ") %>
+            <%= swatches %>
           </div>
         <% end %>
 
@@ -171,11 +172,7 @@
             tw:gap-1.5
           "
         >
-          <% if @bike.motorized? %>
-            <%= render(UI::Badge::Component.new(text: "⚡", title: translation(".e_vehicle"), color: :purple)) %>
-          <% end %>
-
-          <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: @bike.motorized? ? :purple : :gray)) %>
+          <%= type_badges %>
         </div>
 
         <% if location.present? %>

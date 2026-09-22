@@ -115,11 +115,10 @@ module Pages
             organization_registrations_path(settings.search_params.merge(create_export: true))
           end
 
-          # Only the search page offers the view switcher, so it's the only place cards render
+          # Only the search page offers the view switcher, so it's the only place cards render.
+          # BikeCard's layouts are named for the views
           def card_layout
-            return unless @search_page
-
-            {thumbnail: :card, list: :row}[@result_view]
+            @result_view if @search_page && @result_view != :spreadsheet
           end
 
           def result_view_entries

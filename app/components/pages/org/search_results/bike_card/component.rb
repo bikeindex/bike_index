@@ -6,20 +6,18 @@ module Pages
       module BikeCard
         # One registration in the org search's thumbnail or list view: the photo, price and
         # status, title, colors, vehicle type, location and serial. Per the Bike Thumbnails
-        # design doc - layout :card is 1c, :row the dense row (1d). search_all adds whether it's
+        # design doc - layout :thumbnail is 1c, :list the dense row (1d). search_all adds whether it's
         # registered with the organization.
         class Component < ApplicationComponent
           include BikeHelper
 
-          LAYOUTS = %i[card row].freeze
-
-          # For the list holding them. The rows wrap against their list, so they fit a narrow card too
+          # The layouts, and the classes for the list holding them. The rows wrap against their
+          # list, so they fit a narrow card too
           LIST_CLASSES = {
-            card: "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4",
-            row: "tw:@container tw:flex tw:flex-col tw:gap-3"
+            thumbnail: "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4",
+            list: "tw:@container tw:flex tw:flex-col tw:gap-3"
           }.freeze
 
-          # The row's left edge, in its status badge's color
           ROW_BORDER_CLASSES = {
             success: "tw:border-l-green-600",
             purple: "tw:border-l-purple-500",
@@ -28,12 +26,12 @@ module Pages
             pink: "tw:border-l-pink-400"
           }.freeze
 
-          def initialize(bike:, organization:, current_user: nil, search_all: false, layout: :card)
+          def initialize(bike:, organization:, current_user: nil, search_all: false, layout: :thumbnail)
             @bike = bike
             @organization = organization
             @current_user = current_user
             @search_all = search_all
-            @layout = LAYOUTS.include?(layout) ? layout : LAYOUTS.first
+            @layout = layout
           end
 
           private
@@ -43,8 +41,6 @@ module Pages
           def cache_key
             [self.class.cache_digest, @organization.id, @search_all, @layout, @bike, for_sale_listing]
           end
-
-          def row? = @layout == :row
 
           def row_border_class
             ROW_BORDER_CLASSES.fetch(Atoms::RegistrationStatusBadge::Component.color(@bike), "tw:border-l-gray-300")
