@@ -24,6 +24,12 @@
       <% end %>
     <% end %>
 
+    <% table.column(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>
+      <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
+        <%= bike.html_url %>
+      </code>
+    <% end %>
+
     <% table.column(sortable: "id", label: settings.column_renames[:created_at_cell], classes: "hideableColumn created_at_cell") do |bike| %>
       <a
         class="twlink tw:font-bold tw:whitespace-nowrap"
@@ -128,12 +134,6 @@
       <span class="<%= 'tw:text-gray-400' if bike.cycle_type == 'bike' %>">
         <%= bike.type_titleize %>
       </span>
-    <% end %>
-
-    <% table.column(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>
-      <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
-        <%= bike.html_url %>
-      </code>
     <% end %>
 
     <% if organization.enabled?("registration_notes") %>
