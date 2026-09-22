@@ -617,9 +617,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
         expect(page).to have_field("search_all", checked: true, disabled: true)
 
         # The locked checkbox gets an info tooltip explaining why; it appears on hover
-        expect(page).to have_css("button[aria-label='Sticker search always searches all bikes']")
-        find("button[aria-label='Sticker search always searches all bikes']").hover
-        expect(page).to have_css("[role=tooltip]", text: "Sticker search always searches all bikes")
+        expect(page).to have_css("button[aria-label='Sticker search always searches all registrations']")
+        find("button[aria-label='Sticker search always searches all registrations']").hover
+        expect(page).to have_css("[role=tooltip]", text: "Sticker search always searches all registrations")
 
         find("textarea#serials").set("STKR200, STKR100, STKR300")
         click_button "Search stickers"
@@ -637,7 +637,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
         # "Search all" is interactive again on serial search, with the sticker tooltip hidden
         expect(page).to have_field("search_all", checked: false, disabled: false)
-        expect(page).not_to have_css("button[aria-label='Sticker search always searches all bikes']")
+        expect(page).not_to have_css("button[aria-label='Sticker search always searches all registrations']")
 
         # Previous results cleared
         expect(page).not_to have_css(".multi-search-serial-result")
