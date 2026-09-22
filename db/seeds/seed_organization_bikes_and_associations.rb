@@ -58,7 +58,6 @@ def org_bike_params(owner_email:, creation_organization_id: Organization.find_by
   }.merge(org_registration_info(owner_email:))
 end
 
-# The registration fields a Brakebills owner fills in, for ~69% of bikes
 def org_registration_info(owner_email:)
   return {} unless rand < 0.69
 
@@ -67,7 +66,7 @@ def org_registration_info(owner_email:)
     user_name: "#{owner_email.split("@").first.capitalize} #{last_name}",
     phone: "415#{rand(1_000_000..9_999_999)}",
     student_id: "BB#{rand(100_000..999_999)}",
-    organization_affiliation: %w[student graduate_student postdoc employee community_member].sample
+    organization_affiliation: Organization::ORGANIZATION_AFFILIATIONS.sample
   }
 end
 
