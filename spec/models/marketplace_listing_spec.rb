@@ -163,6 +163,41 @@ RSpec.describe MarketplaceListing, type: :model do
     end
   end
 
+  describe "shippable?" do
+    let(:marketplace_listing) { FactoryBot.build(:marketplace_listing, item: bike) }
+    let(:bike) { FactoryBot.build(:bike, cycle_type:, propulsion_type:) }
+    let(:cycle_type) { "bike" }
+    let(:propulsion_type) { "foot-pedal" }
+
+    it "is shippable" do
+      expect(marketplace_listing.shippable?).to be_truthy
+    end
+
+    context "motorized" do
+      let(:propulsion_type) { "pedal-assist" }
+
+      it "is not shippable" do
+        expect(marketplace_listing.shippable?).to be_falsey
+      end
+    end
+
+    context "cargo" do
+      let(:cycle_type) { "cargo" }
+
+      it "is not shippable" do
+        expect(marketplace_listing.shippable?).to be_falsey
+      end
+    end
+
+    context "no item" do
+      let(:marketplace_listing) { MarketplaceListing.new }
+
+      it "is not shippable" do
+        expect(marketplace_listing.shippable?).to be_falsey
+      end
+    end
+  end
+
   describe "search" do
     let!(:marketplace_listing_low) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 10_00) }
     let!(:marketplace_listing_mid) { FactoryBot.create(:marketplace_listing, amount_cents: 100_00) }
