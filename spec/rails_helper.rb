@@ -74,6 +74,8 @@ RSpec.configure do |config|
   # metadata an example overrides it with. Without this, untagged `type: :system`
   # specs fall back to Rails' default :selenium driver, which no longer loads.
   config.before(:each, type: :system) { driven_by(Capybara.current_driver) }
+  # Specs that assign Time.zone mid-example would otherwise leak it into later ones
+  config.after(:each) { Time.zone = Time.zone_default }
 end
 
 require "vcr"

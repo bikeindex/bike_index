@@ -18,7 +18,7 @@
     <div>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cycle_type, required: true)) do %>
         <%# cycle_type is an integer-backed enum: pass enum *labels* as option values and an explicit value: to override hotwire_combobox's enum branch (which would emit cycle_type_before_type_cast) %>
-        <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, value: @bike.cycle_type, required: true, options: CycleType.select_options) %>
+        <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, options: CycleType.select_options, html_options: {form: f, value: @bike.cycle_type, required: true}) %>
       <% end %>
     </div>
 
@@ -49,7 +49,7 @@
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id, label_text: "Manufacturer", required: true)) do |group| %>
         <% group.with_label_note { tag.em(link_to("mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name))) } %>
 
-        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, form: f, required: true) %>
+        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, html_options: {form: f, required: true}) %>
 
         <%= tag.small("Manufacturer is <em>Other</em>, this isn't a listed manufacturer".html_safe,
               class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning], hidden: !@bike.manufacturer&.other?,
@@ -63,7 +63,7 @@
 
     <div>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :primary_frame_color_id, label_text: Bike.human_attribute_name(:primary_frame_color_id), required: true)) do %>
-        <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f, placeholder: "Choose color", required: true, include_blank: true, options: Color.all.pluck(:name, :id)) %>
+        <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, options: Color.all.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose color", required: true}) %>
       <% end %>
     </div>
 
@@ -73,7 +73,7 @@
 
     <div>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :primary_activity_id)) do %>
-        <%= render UI::Forms::Combobox::Component.new(name: :primary_activity_id, form: f, placeholder: "Choose activity", include_blank: true, options: primary_activity_options) %>
+        <%= render UI::Forms::Combobox::Component.new(name: :primary_activity_id, options: primary_activity_options, include_blank: true, html_options: {form: f, placeholder: "Choose activity"}) %>
       <% end %>
     </div>
   </div>
@@ -95,14 +95,15 @@
     <% if organization_options.any? %>
       <div>
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creation_organization_id, label_text: Bike.human_attribute_name(:creation_organization_id))) do %>
-          <%= render UI::Forms::Combobox::Component.new(name: :creation_organization_id, form: f, placeholder: "Choose organization", include_blank: true, options: organization_options) %>
+          <%= render UI::Forms::Combobox::Component.new(name: :creation_organization_id, options: organization_options, include_blank: true, html_options: {form: f, placeholder: "Choose organization"}) %>
         <% end %>
       </div>
 
       <div>
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_organization_ids, label_text: "Current orgs")) do %>
-          <%= render UI::Forms::Combobox::Component.new(name: :bike_organization_ids, form: f, placeholder: "Add organization",
-                multiselect_chip_src: organization_chips_admin_bikes_path, options: organization_options) %>
+          <%= render UI::Forms::Combobox::Component.new(name: :bike_organization_ids, options: organization_options,
+                multiselect_chip_src: organization_chips_admin_bikes_path,
+                html_options: {form: f, placeholder: "Add organization"}) %>
         <% end %>
       </div>
     <% end %>
@@ -119,13 +120,13 @@
           <div class="twfieldrow">
             <div>
               <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :country_id)) do %>
-                <%= render UI::Forms::Combobox::Component.new(name: :country_id, form: s, placeholder: "Choose country", include_blank: true, options: Country.select_options) %>
+                <%= render UI::Forms::Combobox::Component.new(name: :country_id, options: Country.select_options, include_blank: true, html_options: {form: s, placeholder: "Choose country"}) %>
               <% end %>
             </div>
 
             <div>
               <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :region_record_id, label_text: "State")) do %>
-                <%= render UI::Forms::Combobox::Component.new(name: :region_record_id, form: s, dialog_label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id)) %>
+                <%= render UI::Forms::Combobox::Component.new(name: :region_record_id, options: State.united_states.pluck(:name, :id), dialog_label: "State", include_blank: true, html_options: {form: s, placeholder: "State"}) %>
               <% end %>
             </div>
           </div>
@@ -215,7 +216,7 @@
 
     <%= render(UI::Table::Component.new(records: bike_organizations)) do |table| %>
       <% table.column(label: "Organizations") do |bike_organization| %>
-        <%= render(Pages::Admin::Organizations::Cell::Component.new(organization: bike_organization.organization,
+        <%= render(Atoms::Admin::TableCells::Organization::Component.new(organization: bike_organization.organization,
               organization_id: bike_organization.organization_id)) %>
       <% end %>
 

@@ -206,7 +206,7 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
           render(UI::Forms::Group::Component.new(attribute: :cycle_type)) do |group|
             group.with_helper_text { "pick the closest match" }
             render(UI::Forms::Combobox::Component.new(name: :cycle_type, options: %w[Bike Tandem],
-              "aria-describedby": group.helper_text_id))
+              html_options: {"aria-describedby": group.helper_text_id}))
           end
         end
       end

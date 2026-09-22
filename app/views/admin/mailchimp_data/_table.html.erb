@@ -41,7 +41,7 @@
     <% collection.each do |mailchimp_datum| %>
       <tr>
         <td>
-          <%= render Pages::Admin::Users::Cell::Component.new(user: mailchimp_datum.user, user_id: mailchimp_datum.user_id, email: mailchimp_datum.email) %>
+          <%= render Atoms::Admin::TableCells::User::Component.new(user: mailchimp_datum.user, user_id: mailchimp_datum.user_id, email: mailchimp_datum.email) %>
         </td>
 
         <td>
