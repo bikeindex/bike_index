@@ -37,6 +37,23 @@
       ),
     ) %>
 
+    <% if show_shipping? %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".shipping"))) do %>
+        <%= @marketplace_listing.shippable? ? translation(".shipping_true") : translation(".shipping_false") %>
+
+        <% case @marketplace_listing.shipping_unavailable_reason %>
+        <% when :cycle_type %>
+          <em class="less-strong tw:text-sm">
+            <%= translation(".shipping_cycle_type", bike_type: @marketplace_listing.item_type_sentence) %>
+          </em>
+        <% when :motorized %>
+          <em class="less-strong tw:text-sm">
+            <%= translation(".shipping_motorized", bike_type: @marketplace_listing.item_type_sentence) %>
+          </em>
+        <% end %>
+      <% end %>
+    <% end %>
+
     <%= render(
       UI::DefinitionList::Row::Component.new(
         label: translation(".first_posted_at"),
