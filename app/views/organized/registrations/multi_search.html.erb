@@ -39,6 +39,7 @@
       <div class="tw:mb-4">
         <%= render UI::Forms::RadioButtonGroup::Component.new(
           name: :search_kind,
+          kind: :toggle,
           selected: search_kind,
           entries: [
             {value: "serials", label: "Serials"},
