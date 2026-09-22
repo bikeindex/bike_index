@@ -91,7 +91,7 @@
 
           <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :is_endless,
             label: "Coverage never ends",
-            input_data: {"admin--invoice-form-target": "isEndless", action: "change->admin--invoice-form#toggleEndsAt"})) %>
+            html_options: {data: {"admin--invoice-form-target": "isEndless", action: "change->admin--invoice-form#toggleEndsAt"}})) %>
         </div>
       </div>
 

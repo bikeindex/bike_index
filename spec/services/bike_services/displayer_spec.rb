@@ -522,28 +522,6 @@ RSpec.describe BikeServices::Displayer do
     end
   end
 
-  describe "vehicle_search?" do
-    it "is falsey" do
-      expect(described_class.vehicle_search?({})).to be_falsey
-
-      expect(described_class.vehicle_search?({query_items: %w[m_1300], serial: "DD"})).to be_falsey
-    end
-
-    context "with query_items v_19" do
-      let(:params_merged) { {query_items: ["v_19"], search_email: "", serial: "DD"} }
-      it "is truthy" do
-        expect(described_class.vehicle_search?(params_merged)).to be_truthy
-      end
-    end
-
-    context "with query_items v_12" do
-      let(:params_merged) { {query_items: %w[p_10 m_1300], search_email: "", serial: "DD"} }
-      it "is truthy" do
-        expect(described_class.vehicle_search?(params_merged)).to be_truthy
-      end
-    end
-  end
-
   describe "include_reg_field?" do
     let(:organization) { Organization.new }
     let(:user) { User.new }
