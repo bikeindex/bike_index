@@ -35,9 +35,9 @@ module UI
         end
       end
 
-      def render_header(render_sortable:, current_sort:, current_direction:, sortable_url:, sort_icon:, sort_link_class:)
+      def render_header(render_sortable:, current_sort:, current_direction:, sortable_url:, sort_icon:)
         if sortable.present? && render_sortable
-          render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:, sort_link_class:)
+          render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:)
         elsif @sort_indicator.present? && @sort_indicator == current_sort
           safe_join([header_label, NBSP, sort_icon.call(current_direction)])
         else
@@ -79,7 +79,7 @@ module UI
         @sortable&.gsub(/_(id|at)\z/, "")&.titleize
       end
 
-      def render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:, sort_link_class:)
+      def render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:)
         title = header_label
         sorted_by_this = @sortable == current_sort
         direction = (sorted_by_this && current_direction == "desc") ? "asc" : "desc"
@@ -92,7 +92,7 @@ module UI
         end
 
         # data-active rather than an `active` class: that's what the is-active variant matches
-        link_to(sortable_url.call(@sortable, direction), class: "#{sort_link_class} tw:group",
+        link_to(sortable_url.call(@sortable, direction), class: "twlink tw:group",
           data: {active: sorted_by_this || nil}) do
           safe_join([title, NBSP, *arrow_spans])
         end
