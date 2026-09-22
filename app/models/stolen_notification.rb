@@ -48,7 +48,7 @@ class StolenNotification < ApplicationRecord
   end
 
   def permitted_send?
-    return false unless bike&.contact_owner?(sender)
+    return false unless bike&.message_owner?(sender)
     return true if sender.enabled?("unstolen_notifications") || doorkeeper_app_id.present?
 
     (sender.sent_stolen_notifications.count < 2) || sender.can_send_many_stolen_notifications

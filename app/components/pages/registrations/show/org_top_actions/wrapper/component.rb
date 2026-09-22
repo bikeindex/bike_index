@@ -82,7 +82,7 @@ module Pages
               return @contactable if defined?(@contactable)
 
               @contactable = !impounded_by_organization? &&
-                @bike.contact_owner?(@current_user, @organization)
+                @bike.message_owner?(@current_user, @organization)
             end
 
             def show_impound?

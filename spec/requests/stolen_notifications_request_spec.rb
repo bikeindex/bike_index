@@ -83,6 +83,18 @@ RSpec.describe StolenNotificationsController, type: :request do
           expect(stolen_notification.receiver_email).to eq owner_email
         end
       end
+      context "unstolen notification to the sender's own organization's registration" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
+        let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+        let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+        it "doesn't create" do
+          expect(bike.reload.contact_owner?(current_user)).to be_truthy
+          expect {
+            post base_url, params: {stolen_notification: stolen_notification_attributes}
+          }.to_not change(StolenNotification, :count)
+          expect(flash[:error]).to be_present
+        end
+      end
       context "not permitted notification" do
         let(:bike) { FactoryBot.create(:bike) }
         it "fails to create if the user isn't permitted to send a stolen_notification" do
