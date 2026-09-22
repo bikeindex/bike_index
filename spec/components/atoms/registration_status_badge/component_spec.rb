@@ -26,7 +26,7 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
     let(:component) { described_class.new(bike:, time: bike.occurred_at) }
     it "renders the time after the status" do
       render_inline(component)
-      expect(page).to have_text("Stolen ·")
+      expect(page).to have_text("Stolen\u00A0·")
       expect(page).to have_css("span.localizeTime")
     end
   end

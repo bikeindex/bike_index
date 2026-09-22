@@ -17,7 +17,7 @@ RSpec.describe Pages::Org::SearchResults::BikeCard::Component, type: :component 
     expect(component).to have_link(href: "/bikes/#{bike.id}?organization_id=#{organization.to_param}")
     expect(component).to have_css("strong", text: "Surly")
     expect(component).to have_text("Midnight Special")
-    expect(component).to have_text("Stolen ·")
+    expect(component).to have_text("Stolen\u00A0·")
     expect(component).to have_css("span.localizeTime")
     expect(component).to have_text("Purple")
     expect(component).to have_text("Bike")

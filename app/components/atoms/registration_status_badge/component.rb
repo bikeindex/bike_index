@@ -49,7 +49,8 @@ module Atoms
       def label = @label ||= Bike.status_humanized_translated(status_humanized).titleize
 
       def label_with_time
-        safe_join([label, " · ", render(UI::Time::Component.new(time: @time))])
+        # Non-breaking, since the badge is flex and would collapse a plain space beside the time
+        safe_join([label, "\u00A0·\u00A0", render(UI::Time::Component.new(time: @time))])
       end
 
       def status_humanized

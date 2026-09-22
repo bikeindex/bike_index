@@ -31,8 +31,13 @@
   </div>
 
   <div class="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-3.5">
-    <h3 class="tw:m-0 tw:base-font tw:text-base tw:leading-snug">
-      <%= link_to bike_path_for_org, class: "tw:hover:underline", data: {turbo_frame: "_top"} do %>
+    <h3
+      class="
+        tw:m-0 tw:base-font tw:text-base tw:leading-snug tw:font-normal
+        tw:normal-case
+      "
+    >
+      <%= link_to bike_path_for_org, class: "tw:twtext-color! tw:hover:underline", data: {turbo_frame: "_top"} do %>
         <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
         <%= @bike.frame_model_truncated %>
         <span class="tw:absolute tw:inset-0 tw:z-10"></span>
@@ -69,8 +74,9 @@
       <p class="tw:m-0 tw:text-xs tw:text-gray-400"><%= location %></p>
     <% end %>
 
-    <p class="tw:m-0 tw:font-mono tw:text-xs tw:text-gray-400">
-      <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, skip_explanation: true)) %>
+    <p class="tw:m-0">
+      <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, skip_explanation: true,
+        html_class: "tw:text-xs! tw:text-gray-400!")) %>
     </p>
 
     <% if @search_all %>
