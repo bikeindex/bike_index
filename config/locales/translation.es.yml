@@ -5811,13 +5811,14 @@ es:
             per_page: Resultados por página
             showing_html: mostrando %{from}–%{to} de %{count}
             view_as: Ver como
-            view_spreadsheet: Hoja de cálculo
-            view_thumbnail: Uña del pulgar
             export_unavailable_search_all: Solo puedes exportar los registros de tu
               organización. Desmarca la opción "Buscar todos los registros" para exportarlos.
             ordered_by_asc: Ordenado por %{column}, ascendente
             ordered_by_desc: Ordenado por %{column}, descendente
             ordered_by_tooltip: Cambia a la vista de tabla para modificar el orden.
+            view_cards: Tarjetas
+            view_list: Lista
+            view_table: Mesa
           chart_card:
             caption_search: Búsqueda actual
             caption_year: Resumen del año pasado

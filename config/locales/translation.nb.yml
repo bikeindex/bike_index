@@ -5553,13 +5553,14 @@ nb:
             per_page: Resultater per side
             showing_html: viser %{from}–%{to} av %{count}
             view_as: Vis som
-            view_spreadsheet: Regneark
-            view_thumbnail: Miniatyrbilde
             export_unavailable_search_all: Du kan bare eksportere organisasjonens
               registreringer. Fjern merket for «Søk i alle registreringer» for å eksportere.
             ordered_by_asc: Sortert etter %{column}, stigende
             ordered_by_desc: Sortert etter %{column}, synkende
             ordered_by_tooltip: Bytt til tabellvisning for å endre rekkefølgen
+            view_cards: Kort
+            view_list: Liste
+            view_table: Bord
           chart_card:
             caption_search: Nåværende søk
             caption_year: Oversikt over fjoråret
