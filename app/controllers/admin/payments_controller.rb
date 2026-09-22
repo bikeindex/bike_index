@@ -7,7 +7,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @payments = pagy(:countish, matching_payments.includes(:user, :organization, :invoice)
-        .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
+        .order(sortable_order(Payment)), limit: @per_page, page: permitted_page)
     end
 
     def new

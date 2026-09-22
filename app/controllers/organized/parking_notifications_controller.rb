@@ -106,7 +106,7 @@ module Organized
 
     def index_component
       parking_notifications = ParkingNotification.preload_bikes(
-        matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+        matching_parking_notifications.reorder(sortable_order(ParkingNotification))
           .includes(:user).limit(@per_page).load
       )
       Pages::Org::ParkingNotifications::Index::Component.new(

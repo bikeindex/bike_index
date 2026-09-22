@@ -31,9 +31,9 @@ module Admin
 
     def sortable_opts
       if sort_column == "amount_cents"
-        "marketplace_listing.#{sort_column} #{sort_direction}"
+        sortable_order("marketplace_listing.#{sort_column}")
       else
-        "marketplace_messages.#{sort_column} #{sort_direction}"
+        sortable_order(MarketplaceMessage)
       end
     end
 

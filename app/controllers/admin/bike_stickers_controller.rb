@@ -139,7 +139,7 @@ module Admin
 
     def scoped_bike_stickers(stickers)
       @per_page = permitted_per_page
-      pagy(:countish, stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
+      pagy(:countish, stickers.reorder(sortable_order(BikeSticker))
         .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike), limit: @per_page, page: permitted_page)
     end
 

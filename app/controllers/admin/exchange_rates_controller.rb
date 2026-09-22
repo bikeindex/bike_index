@@ -8,7 +8,7 @@ module Admin
 
     def index
       @exchange_rates =
-        ExchangeRate.where(filter_params).order(sort_column => sort_direction)
+        ExchangeRate.where(filter_params).order(sortable_order(ExchangeRate))
     end
 
     def new
