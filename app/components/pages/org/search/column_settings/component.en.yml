@@ -5,13 +5,14 @@ en:
       org:
         search:
           column_settings:
-            acknowledgment_panel_label: Time - Registration sequence acknowledged
+            acknowledgment_cell: Reg acknowledged
+            acknowledgment_cell_panel: Time - Registration sequence acknowledged
             address: 'Address:'
             all: all
             avery_cell: Avery Exportable
             color_cell: Color
             created_at_cell: Registered
-            created_at_panel_label: Time - registered
+            created_at_cell_panel: Time - registered
             creation_description_cell: Source
             cycle_type_cell: Vehicle type
             default: default
@@ -49,7 +50,7 @@ en:
             stickers: 'Stickers:'
             unregistered: 'Unregistered:'
             updated_at_cell: Updated
-            updated_at_panel_label: Time - updated
+            updated_at_cell_panel: Time - updated
             url_cell: URL
             view_cell: View
             visible_columns: Visible columns

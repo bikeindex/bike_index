@@ -5,7 +5,6 @@ en:
       org:
         search_results:
           bikes_table:
-            acknowledgment: Reg acknowledged
             acknowledgment_title: Registration sequence acknowledgment at
             assign_bike_sticker: Assign sticker
             email_hidden: email hidden
