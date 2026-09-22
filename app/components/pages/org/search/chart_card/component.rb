@@ -18,6 +18,10 @@ module Pages
           CHART_HEIGHT = "180px"
           # Holds the space a loaded card takes, so the page doesn't shift when it lands
           PLACEHOLDER_CLASSES = "tw:flex tw:min-h-[300px] tw:items-center tw:justify-center"
+          # Turbo marks the frame busy for a reload, so the old chart hides under a spinner
+          RELOADING_FRAME_CLASSES = "tw:[&[busy][complete]]:opacity-0"
+          RELOADING_OVERLAY_CLASSES = "tw:pointer-events-none tw:absolute tw:inset-0 tw:hidden tw:items-center " \
+            "tw:justify-center tw:peer-[[busy][complete]]:flex"
 
           # The open state is part of the address rather than a stored preference; the scope
           # links carry it, since org--chart-card-scope-links rebuilds them from the URL

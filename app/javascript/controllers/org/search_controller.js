@@ -15,20 +15,27 @@ export default class extends Controller {
     this.initNotesSearch()
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
+    document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
   }
 
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
+    document.removeEventListener('turbo:before-fetch-request', this.handleFetchRequest)
   }
 
-  // The column panel and the chart render inside frames the search replaces. The panel
-  // looks after itself - ui--collapse reconnects with it - but the chart is outside them.
-  handleFrameRender = (event) => {
+  handleFrameRender = () => {
     this.syncResultView()
     this.syncPeriodLabel()
     this.endSubmitSpinner()
-    if (event.target === this.chartFrame) return
-    this.reloadChart()
+  }
+
+  // The column panel renders inside the results frame, but the chart is outside it - so it
+  // fetches alongside the results rather than after them. A form submit's target is the
+  // form, so the header is what names the frame.
+  handleFetchRequest = (event) => {
+    const frameId = event.detail.fetchOptions.headers['Turbo-Frame']
+    if (!frameId || frameId !== this.resultsFrame?.id) return
+    this.reloadChart(new URL(event.detail.url, window.location.href))
   }
 
   // Spreadsheet or thumbnail is the server's choice, so restoring the stored one means
@@ -143,21 +150,22 @@ export default class extends Controller {
 
   // The card sits outside the results frame, so a search leaves it answering the previous
   // one - when its scope is the search, which the card says by rendering the target. Gated
-  // on the search itself having moved, or the first results render would refetch the chart
+  // on the search itself having moved, or the first results fetch would refetch the chart
   // the frame is already fetching. The URL carries the scope, so it's the search.
-  reloadChart () {
+  reloadChart (url) {
     const frame = this.chartFrame
     if (!frame?.querySelector('[data-chart-follows-search]')) return
-    if (this.chartParams() === this.chartSearch) return
+    const search = this.chartParams(url)
+    if (search === this.chartSearch) return
     if (!frame.getAttribute('src')) return
-    this.chartSearch = this.chartParams()
-    frame.setAttribute('src', window.location.href)
+    this.chartSearch = search
+    frame.setAttribute('src', url.href)
   }
 
   // A page turn, a sort, a per-page change or opening the card itself returns the same
-  // chart, so they don't count as the address bar having moved.
-  chartParams () {
-    const params = new URLSearchParams(window.location.search);
+  // chart, so they don't count as the search having moved.
+  chartParams (url = window.location) {
+    const params = new URLSearchParams(url.search);
     ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view', 'chart_open']
       .forEach(name => params.delete(name))
 
