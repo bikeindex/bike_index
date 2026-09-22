@@ -156,11 +156,11 @@
     @apply tw:whitespace-nowrap;
   }
 
-  /* Turbo sets [busy] on the results frame during requests. A card that marks
-     itself .search-results-card swaps its own rows below, keeping its header and
-     pagination; anything else has nothing to keep, so the whole frame hides under
-     the overlay and min-height gives the spinner somewhere to land. The card
-     exemption hangs off the frame itself: :has() can't nest inside :has(). */
+  /* Turbo sets [busy] on the results frame during requests. A card that marks itself
+     .search-results-card swaps its own rows for a spinner off the frame's tw:group,
+     keeping its header and pagination; anything else has nothing to keep, so the whole
+     frame hides under the overlay and min-height gives the spinner somewhere to land.
+     The card exemption hangs off the frame itself: :has() can't nest inside :has(). */
   .search-results-frame-wrapper {
     @apply tw:relative;
   }
@@ -176,19 +176,6 @@
     & ~ .search-loading-overlay {
       @apply tw:block;
     }
-  }
-
-  /* The card's own swap. .search-results-body wraps the rows rather than carrying
-     their classes, so hiding it can't collide with the display utility the cards
-     view's grid brings. Note search--form's spinner is [data-search-loading]. */
-  .search-results-loading {
-    @apply tw:hidden tw:min-h-48;
-  }
-  turbo-frame[busy] > .search-results-card > .search-results-body {
-    @apply tw:hidden;
-  }
-  turbo-frame[busy] > .search-results-card > .search-results-loading {
-    @apply tw:block;
   }
 }
 

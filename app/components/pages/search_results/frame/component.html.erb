@@ -16,7 +16,8 @@
     <% end %>
   </div>
 
-  <%= helpers.turbo_frame_tag @frame_id, src: @src do %>
+  <%# tw:group so a body that keeps its chrome can swap its own rows off the frame's [busy] %>
+  <%= helpers.turbo_frame_tag @frame_id, src: @src, class: "tw:group" do %>
     <% if @render_results %>
       <%= content %>
     <% else %>

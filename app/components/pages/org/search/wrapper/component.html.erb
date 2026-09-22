@@ -82,38 +82,35 @@
   <% end %>
 
   <% if @search_page %>
-    <div class="search-results-loading">
+    <div class="tw:hidden tw:min-h-48 tw:group-[[busy]]:block">
       <%= render(UI::LoadingSpinner::Component.new(text: translation(".loading_results"))) %>
     </div>
   <% end %>
 
-  <%# Hidden for the spinner above while the results frame is busy; inert outside one %>
-  <div class="search-results-body">
-    <% if result_component %>
-      <ul class="tw:m-0 tw:list-none tw:py-4 <%= result_component::LIST_CLASSES %> <%= padding_x_class %>">
-        <% @bikes.each do |bike| %>
-          <%= render(result_component.new(bike:, organization: @organization, current_user: @current_user,
-            search_all: @search_all)) %>
-        <% end %>
-      </ul>
-    <% else %>
-      <%#
-        The table bleeds a gutter past each side; clipping it here rather than on the card
-        leaves the header's tooltips free to open over the card's edge
-      %>
-      <div class="<%= table_clip_classes %>">
-        <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
-          organization: @organization,
-          bikes: @bikes,
-          current_user: @current_user,
-          render_sortable: true,
-          sort_state: @sort_state,
-          bike_sticker: @bike_sticker,
-          settings:
-        )) %>
-      </div>
-    <% end %>
-  </div>
+  <% if result_component %>
+    <ul class="tw:m-0 tw:list-none tw:py-4 <%= results_swap_class %> <%= result_component::LIST_CLASSES %> <%= padding_x_class %>">
+      <% @bikes.each do |bike| %>
+        <%= render(result_component.new(bike:, organization: @organization, current_user: @current_user,
+          search_all: @search_all)) %>
+      <% end %>
+    </ul>
+  <% else %>
+    <%#
+      The table bleeds a gutter past each side; clipping it here rather than on the card
+      leaves the header's tooltips free to open over the card's edge
+    %>
+    <div class="<%= table_clip_classes %>">
+      <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
+        organization: @organization,
+        bikes: @bikes,
+        current_user: @current_user,
+        render_sortable: true,
+        sort_state: @sort_state,
+        bike_sticker: @bike_sticker,
+        settings:
+      )) %>
+    </div>
+  <% end %>
 
   <div
     class="

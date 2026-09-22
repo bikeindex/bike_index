@@ -12,8 +12,8 @@ module Pages
       # block is the frame body, rendered once the results are present.
       #
       # A body with chrome worth keeping - a card's header and pagination - marks itself
-      # .search-results-card and swaps its own .search-results-body for
-      # .search-results-loading, standing the whole-frame overlay down while it's there.
+      # .search-results-card, which stands the whole-frame overlay down; it swaps its own
+      # rows for a spinner off this frame's tw:group instead.
       #
       # The form lives outside the frame and submits with turbo_action="advance",
       # so a restored snapshot can leave the frame's results stale against the
