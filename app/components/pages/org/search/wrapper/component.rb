@@ -101,10 +101,9 @@ module Pages
             )
           end
 
-          # On the search page the .twwiderow holding the card supplies the gap above it, and
-          # is the container twfullbleed reads; elsewhere the card stands on its own
-          # search-results-card is what the results frame reads to leave this card standing
-          # while it loads; off the search page nothing sets [busy] above it
+          # On the search page the .twwiderow holding the card supplies the gap above it and is
+          # the container twfullbleed reads, and search-results-card is what the results frame
+          # reads to leave this card standing while it loads; elsewhere the card stands alone
           def card_classes
             ["org-search-component tw:rounded-xl", UI::Card::Component::BASE_CLASSES,
               @search_page ? "search-results-card tw:twfullbleed" : "tw:mt-4"].join(" ")
