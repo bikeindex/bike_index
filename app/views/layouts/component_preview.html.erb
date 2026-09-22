@@ -19,7 +19,11 @@
 
     <%= stylesheet_link_tag "tailwind" %>
     <%= hw_combobox_style_tag %>
-    <%= javascript_importmap_tags %>
+
+    <%# A lazy turbo-frame placeholder only survives with Turbo off - see ChartCard's loading %>
+    <% unless Binxtils::InputNormalizer.boolean(params.dig(:lookbook, :display, :javascript_off)) %>
+      <%= javascript_importmap_tags %>
+    <% end %>
 
     <script>window.inComponentPreview = true</script>
 

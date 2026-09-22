@@ -1,3 +1,9 @@
 <%= turbo_stream.update :graduated_notifications_results_frame do %>
   <%= render partial: "results" %>
 <% end %>
+
+<%# The chart sits outside the results frame, so the search reaches it through its own stream %>
+<%= turbo_stream.replace :graduated_notifications_chart do %>
+  <%= render("organized/search_chart_card", id: :graduated_notifications_chart,
+    src: organization_graduated_notifications_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1"))) %>
+<% end %>

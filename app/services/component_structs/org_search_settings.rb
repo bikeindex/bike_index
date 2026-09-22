@@ -2,12 +2,12 @@
 
 module ComponentStructs
   # The column set, its labels and the active filters of an organization's registration
-  # search. Everything around the panel Pages::Org::Search::Settings renders reads the same
-  # values, so it's built once and passed whole.
+  # search. Everything around the panel Pages::Org::Search::ColumnSettings renders reads the
+  # same values, so it's built once and passed whole.
   #
   # Its copy sits in that panel's sidecar — the only home the component's cache digest reaches.
   class OrgSearchSettings
-    TRANSLATION_SCOPE = %i[components pages org search settings].freeze
+    TRANSLATION_SCOPE = %i[components pages org search column_settings].freeze
 
     COLUMN_RENAME_KEYS = %i[
       created_at_cell
@@ -37,7 +37,8 @@ module ComponentStructs
       url_cell
     ].freeze
 
-    ORG_PREFIXED_COLUMNS = %i[reg_organization_affiliation_cell reg_student_id_cell notes_cell].freeze
+    # Their labels name the organization, italicized with its preposition
+    ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
 
     # Each filter's values and their labels, once — `filter_groups` lays them out,
     # `filter_values` is the set the controller permits, and `active_search_filter_descriptions`
@@ -54,7 +55,10 @@ module ComponentStructs
                       values: {not_impounded: :filter_not_impounded_html,
                                impounded: :filter_impounded_html,
                                with_owner: :filter_not_stolen_or_impounded_html,
-                               stolen: :filter_stolen_html}}
+                               stolen: :filter_stolen_html}},
+      search_unregisteredness: {label: :unregistered,
+                                values: {only_unregistered: :filter_only_unregistered_html,
+                                         only_registered: :filter_not_unregistered_html}}
     }.freeze
 
     DEFAULT_COLUMNS = %w[created_at_cell stolen_cell manufacturer_cell model_cell
@@ -78,24 +82,14 @@ module ComponentStructs
     end
 
     def initialize(organization:, interpreted_params: {}, sortable_search_params: {}, params: {},
-      search_stickers: nil, search_address: nil, search_status: "all")
+      search_stickers: nil, search_address: nil, search_status: "all", search_unregisteredness: nil,
+      search_all: false)
       @organization = organization
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
       @params = params
-      @filter_values = {search_stickers:, search_address:, search_status:}
-    end
-
-    def filter_groups
-      FILTER_GROUPS.filter_map do |name, group|
-        blank, *values = self.class.filter_values(name, @organization)
-        next if blank.nil?
-
-        {name:, label: translation(group[:label]),
-         selected: @filter_values[name].presence || blank,
-         entries: [{value: blank, label: translation(:all)}] +
-           values.map { |value| {value:, label: translation(group[:values][value.to_sym])} }}
-      end
+      @filter_values = {search_stickers:, search_address:, search_status:, search_unregisteredness:}
+      @search_all = search_all
     end
 
     def active_search_filter_descriptions
@@ -105,6 +99,26 @@ module ComponentStructs
         translation(key) if key
       end
     end
+
+    def filter_groups
+      FILTER_GROUPS.filter_map do |name, group|
+        next unless enabled_filter?(group[:feature])
+
+        blank = group[:blank] || ""
+        {name:, label: translation(group[:label]),
+         selected: @filter_values[name].presence || blank,
+         entries: [{value: blank, label: translation(:all)}] + group_entries(group)}
+      end
+    end
+
+    def notes_search_label = translation(:show_notes_search)
+
+    def render_export? = @organization.enabled?("csv_exports")
+
+    def search_all? = @search_all
+
+    # An export past the organization would carry other organizations' registrations
+    def export_disabled? = search_all?
 
     def initially_checked_columns
       @initially_checked_columns ||= [
@@ -116,9 +130,9 @@ module ComponentStructs
 
     def column_renames
       @column_renames ||= COLUMN_RENAME_KEYS.to_h { |key|
-        name = translation(key)
-        name = "#{@organization.short_name} #{name}" if ORG_PREFIXED_COLUMNS.include?(key)
-        [key, name]
+        next [key, translation(key)] unless ORG_NAMED_COLUMNS.include?(key)
+
+        [key, translation(:"#{key}_html", org_name: @organization.short_name)]
       }
     end
 
@@ -138,17 +152,6 @@ module ComponentStructs
       @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
     end
 
-    def cycle_type
-      @cycle_type ||= translation(
-        BikeServices::Displayer.vehicle_search?(@params.merge(@interpreted_params)) ? :vehicle : :bike
-      )
-    end
-
-    def default_open?
-      @filter_values[:search_stickers].present? || @filter_values[:search_address].present? ||
-        @params[:search_impoundedness].present? || Binxtils::InputNormalizer.boolean(@params[:search_open])
-    end
-
     def search_params
       @search_params ||= @sortable_search_params
         .merge(@interpreted_params.merge(organization_id: @organization.to_param))
@@ -156,8 +159,20 @@ module ComponentStructs
 
     private
 
-    def translation(key)
-      ActiveSupport::HtmlSafeTranslation.translate(key, scope: TRANSLATION_SCOPE)
+    def enabled_filter?(feature)
+      feature.nil? || @organization.enabled?(feature)
+    end
+
+    def group_entries(group)
+      group[:values].filter_map do |value, key|
+        next unless enabled_filter?(group[:value_feature]&.dig(value))
+
+        {value: value.to_s, label: translation(key)}
+      end
+    end
+
+    def translation(key, **)
+      ActiveSupport::HtmlSafeTranslation.translate(key, scope: TRANSLATION_SCOPE, **)
     end
   end
 end

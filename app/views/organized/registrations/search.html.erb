@@ -7,7 +7,9 @@
   params:,
   search_stickers: @search_stickers,
   search_address: @search_address,
-  search_status: @search_status
+  search_status: @search_status,
+  search_unregisteredness: @search_unregisteredness,
+  search_all: @search_all
 ) %>
 
 <% form_interpreted_params = @interpreted_params.merge(
@@ -18,38 +20,76 @@
   search_notes: params[:search_notes]
 ).compact %>
 
-<%= tag.div(class: "org-search-component", data: Pages::Org::Search::Settings::Component
-  .column_toggle_data_attributes(settings)
-  .merge("org--search-column-toggle-assign-bike-sticker-value": @bike_sticker.present?)) do %>
-  <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
-  <% unless turbo_frame_request? %>
-    <div class="mb-4">
-      <%= render(Pages::Org::Search::Form::Component.new(
-        target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
-        target_frame: :organized_bikes_results_frame,
-        interpreted_params: form_interpreted_params,
-        settings:
-      )) do %>
-        <% if @bike_sticker.present? %>
-          <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
+<%= tag.div(class: "org-search-component", data: Pages::Org::Search::ColumnSettings::Component
+  .column_settings_data_attributes(settings)
+  .merge("org--search-column-settings-assign-bike-sticker-value": @bike_sticker.present?,
+    "org--search-result-view-value": @result_view,
+    action: "input->org--search#emailChanged")) do %>
+  <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
+  <div class="twwiderow tw:gap-y-4">
+    <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
+    <% unless turbo_frame_request? %>
+      <%# Across the row while search_all hides the chart beside it %>
+      <div class="tw:min-w-0 tw:search-all-checked:col-span-full">
+        <%= render(Pages::Org::Search::Form::Component.new(
+          target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
+          target_frame: :organized_bikes_results_frame,
+          interpreted_params: form_interpreted_params,
+          heading: t(".find_a_registration"),
+          submit_text: t(".search_registrations"),
+          settings_and_filters_component: Pages::Org::Search::SettingsAndFilters::Component.new(
+            settings:,
+            period: @period,
+            start_time: @start_time,
+            end_time: @end_time,
+            sortable_search_params:
+          )
+        )) do |form| %>
+          <% if @bike_sticker.present? %>
+            <%= hidden_field_tag :bike_sticker, @bike_sticker.code %>
+          <% end %>
+
+          <%#
+            Carries the chart's scope into the searched URL; search--form keeps it in step
+            with the address bar, which the scope links advance
+          %>
+          <%= hidden_field_tag :chart_scope, @chart_scope %>
+
+          <%# Same, for the card's open state, which ui--collapse advances as it toggles %>
+          <%= hidden_field_tag :chart_open, @chart_open %>
+
+          <%# Same, for the view the spreadsheet/thumbnail chips advance to %>
+          <%= hidden_field_tag :search_result_view, @result_view %>
+
+          <% form.with_below_submit do %>
+            <div class="tw:mt-3">
+              <%= render(Pages::Org::Search::SearchAll::Component.new(settings:, locked: @search_all_locked,
+                locked_hint: t(".search_all_email_disabled"))) %>
+            </div>
+          <% end %>
         <% end %>
+      </div>
+
+      <%# The chart counts the organization's own registrations, so it fades out with search_all %>
+      <div
+        class="
+          tw:min-w-0 tw:transition-all tw:transition-discrete
+          tw:duration-200 tw:starting:opacity-0 tw:search-all-checked:hidden
+          tw:search-all-checked:opacity-0
+        "
+      >
+        <%= render(Pages::Org::Search::ChartCard::Component.new(
+          src: chart_scope_paths[@chart_scope.to_sym], scope: @chart_scope, scope_paths: chart_scope_paths
+        )) %>
+      </div>
+    <% end %>
+
+    <%# In the row for the container query full_bleed reads, but across both its columns %>
+    <div class="tw:col-span-full tw:min-w-0">
+      <%= render Pages::SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
+        render_results: @render_results, current_path: request.original_fullpath) do %>
+        <%= render partial: "results", locals: {settings:} %>
       <% end %>
     </div>
-  <% end %>
-
-  <%= render Pages::SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
-    render_results: @render_results, current_path: request.original_fullpath) do %>
-    <div class="tw:flex tw:justify-end">
-      <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
-    </div>
-
-    <div class="tw:mt-2 tw:text-right">
-      <%= link_to t(".render_chart", default: "Render chart"),
-        organization_registrations_path(sortable_search_params.merge(organization_id: current_organization.to_param, render_chart: !@render_chart)),
-        class: "btn btn-sm btn-outline-secondary #{"active" if @render_chart}",
-        data: {turbo_action: "advance"} %>
-    </div>
-
-    <%= render partial: "results", locals: {settings:} %>
-  <% end %>
+  </div>
 <% end %>

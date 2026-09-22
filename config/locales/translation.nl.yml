@@ -4183,10 +4183,14 @@ nl:
     impound_records:
       index:
         impound_records: Inbeslagnamegegevens
-        render_chart: Rendergrafiek
+        find_an_impound_record: Zoek een inbeslagnameverslag
+        search_impound_records: Zoek in de inbeslagnamegegevens.
     registrations:
       search:
-        render_chart: Rendergrafiek
+        search_all_email_disabled: Je kunt de registraties van je organisatie alleen
+          doorzoeken op e-mailadres of naam van de eigenaar.
+        search_registrations: Zoek registraties
+        find_a_registration: Zoek een registratie
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -5534,8 +5538,6 @@ nl:
         to: Naar
         update: Bijwerken
         year: jaar
-      chart_async_frame:
-        loading_chart: Grafiek laden...
       forms:
         legacy_form_well:
           address_record:
@@ -5703,13 +5705,41 @@ nl:
             search_notes: Zoeknotities
             search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de
               eigenaar.
-          settings:
+          wrapper:
+            e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
+            view_matching_any_audit: weergave die overeenkomt met elke audit
+            export_csv: Exporteer naar CSV
+            matching_html:
+              one: "%{number} match"
+              other: "%{number} overeenkomsten"
+            over_count_matching_html: Meer dan %{number} wedstrijden
+            per_page: Resultaten per pagina
+            showing_html: "%{from}–%{to} van %{count} weergeven"
+            view_as: Bekijken als
+            view_spreadsheet: Spreadsheet
+            view_thumbnail: Miniatuurweergave
+            export_unavailable_search_all: U kunt alleen de registraties van uw organisatie
+              exporteren. Schakel de optie 'Alle registraties doorzoeken' uit om te
+              exporteren.
+          chart_card:
+            caption_search: Huidige zoekopdracht
+            caption_year: Overzicht van vorig jaar
+            chart: Grafiek
+            chart_motorized: E-voertuig
+            chart_registrations: Registraties
+            chart_stolen: Gestolen
+            loading_chart: Grafiek laden...
+            scope_search: Huidige zoekopdracht
+            scope_year: Vorig jaar
+            stat_motorized: Registratie van elektrische voertuigen
+            stat_registrations: Totaal aantal registraties
+            stat_stolen: Gemeld als gestolen
+          column_settings:
+            acknowledgment_cell: Bevestiging van de registratieprocedure
             address: 'Adres:'
             all: Alle
             avery_cell: Avery Exporteerbaar
-            bike: Registratie
             color_cell: Kleur
-            create_export_of_vehicles: Export maken van gezochte %{cycle_type}
             created_at_cell: Geregistreerd
             creation_description_cell: Bron
             cycle_type_cell: 'Voertuigtype:'
@@ -5719,6 +5749,8 @@ nl:
             filter_no_sticker_html: alleen <strong>geen</strong> sticker
             filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
             filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
+            filter_not_unregistered_html: "<strong>niet niet</strong> geregistreerd"
+            filter_only_unregistered_html: alleen <strong>niet-geregistreerd</strong>
             filter_stolen_html: alleen gestolen
             filter_with_address_html: alleen <strong>met</strong> adres
             filter_with_stickers_html: alleen <strong>met</strong> stickers
@@ -5727,33 +5759,35 @@ nl:
             manufacturer_cell: Fabrikant
             model_cell: Model
             none: geen
-            notes_cell: Notes
             owner_email_cell: Verzonden naar
             owner_name_cell: Eigenaar naam
             propulsion_type_cell: Elektrisch voertuig (aandrijving)
             reg_address_cell: Adres
             reg_extra_registration_number_cell: Secundair#
-            reg_organization_affiliation_cell: Aansluiting
             reg_phone_cell: Telefoon
-            reg_student_id_cell: Student-ID
             serial_number_cell: Serie
-            settings: Instellingen
             show_notes_search: notities weergeven zoeken
             status: 'Toestand:'
             status_cell: Toestand
             sticker_cell: Sticker
             stickers: 'stickers:'
             stolen_cell: Gestolen
+            unregistered: 'Niet geregistreerd:'
             updated_at_cell: Bijgewerkt
             url_cell: URL
-            vehicle: Registratie
             visible_columns: Zichtbare kolommen
-            acknowledgment_cell: Bevestiging van de registratieprocedure
-          wrapper:
-            e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
-            matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
-            registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
-            view_matching_any_audit: weergave die overeenkomt met elke audit
+            notes_cell_html: Registratienotities <em>door %{org_name}</em>
+            reg_organization_affiliation_cell_html: Affiliatie <em>in %{org_name}</em>
+            reg_student_id_cell_html: Studentnummer <em>voor %{org_name}</em>
+          column_settings_toggle:
+            column_settings: Kolominstellingen
+          settings_and_filters:
+            date_range: 'Datumbereik:'
+            search_settings: Zoekinstellingen
+            search_settings_and_filters: Zoekinstellingen en filters
+          search_all:
+            search_all_html: Zoek in alle registraties <span class="twless-strong">(niet
+              alleen %{org_name})</span>
         search_results:
           bikes_table:
             assign_bike_sticker: Sticker toewijzen
@@ -5789,6 +5823,8 @@ nl:
           index:
             matches_visible: Zichtbaar
             parking_notifications: Verlaten records
+            find_a_parking_notification: Zoek een parkeermelding
+            search_parking_notifications: Zoek naar parkeermeldingen
           table:
             address: Adres
             bike: Fiets

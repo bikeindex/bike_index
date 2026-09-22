@@ -16,8 +16,8 @@
 <% end %>
 
 <%# to_str on the two markup values: a SafeBuffer would land raw in the attribute %>
-<%= tag.div(data: Pages::Org::Search::Settings::Component
-  .column_toggle_data_attributes(settings, controllers: "org--multi-search")
+<%= tag.div(data: Pages::Org::Search::ColumnSettings::Component
+  .column_settings_data_attributes(settings, controllers: "org--multi-search", collapse: true)
   .merge(
     "org--multi-search-url-value": multi_search_response_organization_registrations_path(organization_id: current_organization.to_param),
     "org--multi-search-search-kind-value": search_kind,
@@ -55,24 +55,14 @@
         class: "twinput tw:w-full tw:font-mono tw:h-32 tw:resize-none",
         data: {"org--multi-search-target": "textarea"} %>
 
-      <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-3">
-        <div class="tw:flex tw:items-center tw:gap-2">
-          <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
-            <%= check_box_tag :search_all, "1", false,
-              data: {"org--multi-search-target": "searchAll"} %>
-
-            <span>
-              Search all bikes (not just <%= current_organization.short_name %>)
-            </span>
-          </label>
-
-          <span
-            data-org--multi-search-target="searchAllHint"
-            class="tw:hidden tw:leading-none"
-          >
-            <%= render(UI::Tooltip::Component.new(text: "Sticker search always searches all bikes")) %>
-          </span>
-        </div>
+      <div
+        class="
+          tw:mt-2 tw:flex tw:flex-col tw:items-start tw:gap-3 tw:sm:flex-row
+          tw:sm:items-center tw:sm:justify-between
+        "
+      >
+        <%= render(Pages::Org::Search::SearchAll::Component.new(settings:, locked: false,
+          locked_hint: "Sticker search always searches all registrations")) %>
 
         <%# Searching is JS-only, so org--multi-search enables this on connect %>
         <%= render UI::Button::Component.new(
@@ -81,6 +71,7 @@
           size: :lg,
           type: "submit",
           disabled: true,
+          html_class: "tw:self-end tw:sm:self-auto",
           data: {"org--multi-search-target": "button"}
         ) %>
       </div>
@@ -92,7 +83,13 @@
     class="tw:mb-4 tw:flex tw:flex-wrap tw:gap-3"
   ></div>
 
-  <%= render Pages::Org::Search::Settings::Component.new(settings:, skip_search_and_filters: true) %>
+  <div class="tw:mb-3 tw:flex tw:justify-end">
+    <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
+  </div>
+
+  <div class="tw:mb-3">
+    <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:)) %>
+  </div>
 
   <div id="multi_serial_results" data-org--multi-search-target="results"></div>
 <% end %>

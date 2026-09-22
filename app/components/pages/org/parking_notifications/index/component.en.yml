@@ -5,5 +5,7 @@ en:
       org:
         parking_notifications:
           index:
+            find_a_parking_notification: Find a parking notification
             matches_visible: visible
             parking_notifications: Parking notifications
+            search_parking_notifications: Search parking notifications

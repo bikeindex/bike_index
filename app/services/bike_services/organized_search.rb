@@ -4,6 +4,10 @@ module BikeServices
   module OrganizedSearch
     extend Functionable
 
+    # Reaching past the organization matches most of the index, so the count - and the
+    # pagination, and what the results card says it found - stop here
+    SEARCH_ALL_COUNT_LIMIT = 1_000
+
     def email_and_name(bikes, query)
       return bikes unless query.present?
 

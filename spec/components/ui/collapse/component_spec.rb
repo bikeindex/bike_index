@@ -20,4 +20,13 @@ RSpec.describe UI::Collapse::Component, type: :component do
       expect(component).to have_css("button [data-ui--collapse-target='chevron'] svg")
     end
   end
+
+  context "with a trailing chevron and a block" do
+    let(:component) { render_inline(described_class.new(chevron: :trailing)) { "<em>Columns</em>".html_safe } }
+
+    it "renders the block, then the chevron" do
+      expect(component).to have_css("button > em + [data-ui--collapse-target='chevron']", text: "")
+      expect(component).to have_css("button em", text: "Columns")
+    end
+  end
 end

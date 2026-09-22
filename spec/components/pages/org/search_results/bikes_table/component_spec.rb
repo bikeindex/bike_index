@@ -54,7 +54,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       %w[bike_search avery_export bike_stickers impound_bikes registration_notes registration_sequences
         reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
     end
-    # The panel builds a checkbox per enabled_columns entry, and org--search-column-toggle
+    # The panel builds a checkbox per enabled_columns entry, and org--search-column-settings
     # only ever reveals a column whose cell class matches a checked one
     let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
 
@@ -69,7 +69,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).to have_css("th.avery_cell", normalize_ws: true, exact_text: "Avery Exportable")
       expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "E-vehicle (propulsion)")
       expect(component).to have_css("th.notes_cell", normalize_ws: true,
-        exact_text: "#{organization.short_name} Registration Notes")
+        exact_text: "Registration Notes by #{organization.short_name}")
     end
   end
 
