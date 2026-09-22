@@ -5649,6 +5649,10 @@ nb:
             serial_label: 'Serie:'
             sticker_label: 'Klistremerke:'
             view_all: se alle
+          bike_card:
+            e_vehicle: Elbil
+            not_registered_with: Ikke registrert hos %{org_name}
+            registered_with: Registrert hos %{org_name}
         impound_records:
           index:
             all_bikes: Alle sykler

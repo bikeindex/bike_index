@@ -5907,6 +5907,10 @@ es:
             serial_label: 'De serie:'
             sticker_label: 'Etiqueta engomada:'
             view_all: ver todo
+          bike_card:
+            e_vehicle: Vehículo eléctrico
+            not_registered_with: No está registrado con %{org_name}
+            registered_with: Registrado con %{org_name}
         impound_records:
           index:
             all_bikes: Todas las bicicletas

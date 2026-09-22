@@ -5814,6 +5814,10 @@ nl:
             serial_label: 'Serial:'
             sticker_label: 'Sticker:'
             view_all: alles bekijken
+          bike_card:
+            e_vehicle: E-voertuig
+            not_registered_with: Niet geregistreerd bij %{org_name}
+            registered_with: Geregistreerd bij %{org_name}
         impound_records:
           index:
             all_bikes: Alle fietsen
