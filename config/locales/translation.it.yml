@@ -5879,7 +5879,6 @@ it:
             status_cell: Stato
             sticker_cell: Adesivo
             stickers: 'Adesivi:'
-            stolen_cell: Rubata
             unregistered: 'Non registrato:'
             updated_at_cell: Fatto
             url_cell: URL
@@ -5887,6 +5886,9 @@ it:
             notes_cell_html: Note di registrazione <em>di %{org_name}</em>
             reg_organization_affiliation_cell_html: Affiliazione <em>in %{org_name}</em>
             reg_student_id_cell_html: Numero di matricola dello studente <em>%{org_name}</em>
+            occurred_at_cell: Volare a
+            photo_cell: Foto
+            view_cell: Visualizzazione
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
@@ -5903,6 +5905,11 @@ it:
             link_sticker: adesivo di collegamento
             hidden: nascosto
             not_registered_with: Nascosto perché non è registrato con %{org_name}
+            acknowledgment: Conferma di ricezione
+            acknowledgment_title: Conferma della sequenza di registrazione a
+            occurred_at_tooltip: Quando è stato rubato, sequestrato, ritrovato o messo
+              in vendita
+            view: Visualizzazione
           multi_result_chip:
             no_results: nessuna corrispondenza
           multi_results:

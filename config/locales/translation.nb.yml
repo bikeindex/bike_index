@@ -5608,7 +5608,6 @@ nb:
             status_cell: Status
             sticker_cell: Klistremerke
             stickers: 'Klistremerker:'
-            stolen_cell: Stjålet
             unregistered: 'Uregistrert:'
             updated_at_cell: Oppdatert
             url_cell: URL-adresse
@@ -5616,6 +5615,9 @@ nb:
             notes_cell_html: Registreringsnotater <em>av %{org_name}</em>
             reg_organization_affiliation_cell_html: Tilknytning <em>i %{org_name}</em>
             reg_student_id_cell_html: Studentbevis <em>for %{org_name}</em>
+            occurred_at_cell: Status på
+            photo_cell: Foto
+            view_cell: Utsikt
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
@@ -5632,6 +5634,11 @@ nb:
             link_sticker: lenkeklistremerke
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
+            acknowledgment: Reg. bekreftelse
+            acknowledgment_title: Bekreftelse på registreringssekvens kl.
+            occurred_at_tooltip: Når den ble stjålet, beslaglagt, funnet eller lagt
+              ut for salg
+            view: Utsikt
           multi_result_chip:
             no_results: ingen treff
           multi_results:
