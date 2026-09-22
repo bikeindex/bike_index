@@ -3,7 +3,7 @@ import { Controller } from '@hotwired/stimulus'
 /* global document */
 
 // Cookie name is shared with the read side in
-// SharedBlocks::MainContent::Organized::Component#dismissed_pos_callout_organization_ids
+// SharedBlocks::MainContent::Organized::Component#pos_callout_dismissed?
 const COOKIE_NAME = 'dismissed_pos_callout_organization_ids'
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365
 
