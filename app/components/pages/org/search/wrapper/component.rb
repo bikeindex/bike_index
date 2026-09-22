@@ -14,6 +14,19 @@ module Pages
           # .container-fluid padding to the page's edges
           TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:-mx-[15px]"
 
+          # Each sortable column's label in the settings panel
+          SORT_COLUMN_CELLS = {
+            "id" => :created_at_cell,
+            "updated_by_user_at" => :updated_at_cell,
+            "owner_email" => :owner_email_cell,
+            "mnfg_name" => :manufacturer_cell,
+            "frame_model" => :model_cell,
+            "cycle_type" => :cycle_type_cell,
+            "propulsion_type" => :propulsion_type_cell,
+            "acknowledged_at" => :acknowledgment_cell,
+            "occurred_at" => :occurred_at_cell
+          }.freeze
+
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[spreadsheet thumbnail].freeze
 
@@ -117,6 +130,19 @@ module Pages
 
           # Only the search page offers the view switcher, so it's the only place cards render
           def thumbnail_view? = @search_page && @result_view == :thumbnail
+
+          # The cards have no headers to sort by, so the thumbnail view names the order
+          def ordered_by_text
+            cell = SORT_COLUMN_CELLS[@sort_state.sort]
+            return if cell.blank?
+
+            column = settings.column_renames[cell]
+            if @sort_state.direction == "asc"
+              translation(".ordered_by_asc", column:)
+            else
+              translation(".ordered_by_desc", column:)
+            end
+          end
 
           def result_view_entries
             RESULT_VIEWS.map do |view|

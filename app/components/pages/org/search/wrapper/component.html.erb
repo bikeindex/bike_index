@@ -36,8 +36,20 @@
       <% end %>
     </div>
 
-    <%# Columns and the export are the spreadsheet's alone %>
-    <% unless thumbnail_view? %>
+    <% if thumbnail_view? %>
+      <% if ordered_by_text.present? %>
+        <p
+          class="
+            tw:mb-0 tw:ml-auto tw:text-sm tw:text-gray-500
+            tw:dark:text-gray-400
+          "
+        >
+          <%= ordered_by_text %>
+          <%= render(UI::Tooltip::Component.new(text: translation(".ordered_by_tooltip"))) %>
+        </p>
+      <% end %>
+    <% else %>
+      <%# Columns and the export are the spreadsheet's alone %>
       <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
         <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
 

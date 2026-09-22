@@ -13,6 +13,9 @@ en:
             matching_html:
               one: "%{number} match"
               other: "%{number} matches"
+            ordered_by_asc: Ordered by %{column}, ascending
+            ordered_by_desc: Ordered by %{column}, descending
+            ordered_by_tooltip: Switch back to the spreadsheet view to change ordering
             over_count_matching_html: Over %{number} matches
             per_page: Results per page
             showing_html: showing %{from}–%{to} of %{count}
