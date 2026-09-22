@@ -3,7 +3,7 @@ module Admin
     include Binxtils::SortableTable
 
     def index
-      @mailchimp_values = matching_mailchimp_values.order(sort_column + " " + sort_direction)
+      @mailchimp_values = matching_mailchimp_values.order(sortable_order(MailchimpValue))
     end
 
     def create

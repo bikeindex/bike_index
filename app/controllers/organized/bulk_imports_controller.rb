@@ -11,7 +11,7 @@ module Organized
     def index
       @per_page = permitted_per_page
       @pagy, @bulk_imports = pagy(:countish, available_bulk_imports.includes(:ownerships)
-        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+        .reorder(sortable_order(BulkImport)), limit: @per_page, page: permitted_page)
       @show_kind = bulk_imports.distinct.pluck(:kind).count > 1
     end
 

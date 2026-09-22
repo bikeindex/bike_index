@@ -5,7 +5,7 @@ module Admin
     def index
       params[:page] || 1
       @per_page = permitted_per_page(default: 50)
-      @pagy, @notifications = pagy(:countish, matching_notifications.reorder("notifications.#{sort_column} #{sort_direction}")
+      @pagy, @notifications = pagy(:countish, matching_notifications.reorder(sortable_order(Notification))
         .includes(:bike, :notifiable, :user), limit: @per_page, page: permitted_page)
       @render_kind_counts = Binxtils::InputNormalizer.boolean(params[:search_kind_counts])
     end

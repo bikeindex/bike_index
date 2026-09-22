@@ -74,15 +74,15 @@ module Admin
 
     def ordered_email_domains
       order_sql = if sort_column == "bike_count"
-        Arel.sql("COALESCE((data -> 'bike_count')::integer, 0) #{sort_direction}")
+        sortable_order("COALESCE((data -> 'bike_count')::integer, 0)", nulls_last: false)
       elsif sort_column == "spam_score"
-        Arel.sql("COALESCE((data -> 'spam_score')::integer, 0) #{sort_direction}")
+        sortable_order("COALESCE((data -> 'spam_score')::integer, 0)", nulls_last: false)
       elsif sort_column == "domain"
-        Arel.sql("REVERSE(domain) #{sort_direction}")
+        sortable_order("REVERSE(domain)")
       elsif sort_column == "domain_length"
         Arel.sql("LENGTH(domain) ASC")
       else
-        "email_domains.#{sort_column} #{sort_direction}"
+        sortable_order(EmailDomain)
       end
       matching_email_domains.includes(:creator).reorder(order_sql)
     end

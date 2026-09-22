@@ -248,7 +248,7 @@ module Organized
     end
 
     def search_order(organization)
-      return "bikes.#{sort_column} #{sort_direction}" if sort_column != "acknowledged_at"
+      return sortable_order(Bike) if sort_column != "acknowledged_at"
 
       RegistrationSequenceAcknowledgment.bikes_order(organization:, direction: sort_direction)
     end
