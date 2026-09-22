@@ -126,6 +126,20 @@ module Pages
             RESULT_COMPONENTS[@result_view] if @search_page
           end
 
+          # The cards and rows have no headers to sort by, so their views name the order
+          def ordered_by_text
+            return @ordered_by_text if defined?(@ordered_by_text)
+
+            column = settings.sort_column_label(@sort_state.sort)
+            @ordered_by_text = if column.nil?
+              nil
+            elsif @sort_state.direction == "asc"
+              translation(".ordered_by_asc", column:)
+            else
+              translation(".ordered_by_desc", column:)
+            end
+          end
+
           def result_view_entries
             RESULT_VIEWS.map do |view|
               ComponentStructs::Shapes.entry(translation(".view_#{view}"), href: result_view_path(view),

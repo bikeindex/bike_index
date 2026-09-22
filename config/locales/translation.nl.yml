@@ -5721,6 +5721,10 @@ nl:
             export_unavailable_search_all: U kunt alleen de registraties van uw organisatie
               exporteren. Schakel de optie 'Alle registraties doorzoeken' uit om te
               exporteren.
+            ordered_by_asc: Gesorteerd op %{column}, oplopend
+            ordered_by_desc: Gesorteerd op %{column}, aflopend
+            ordered_by_tooltip: Schakel over naar de tabelweergave om de sorteervolgorde
+              te wijzigen.
           chart_card:
             caption_search: Huidige zoekopdracht
             caption_year: Overzicht van vorig jaar

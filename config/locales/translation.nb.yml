@@ -5557,6 +5557,9 @@ nb:
             view_thumbnail: Miniatyrbilde
             export_unavailable_search_all: Du kan bare eksportere organisasjonens
               registreringer. Fjern merket for «Søk i alle registreringer» for å eksportere.
+            ordered_by_asc: Sortert etter %{column}, stigende
+            ordered_by_desc: Sortert etter %{column}, synkende
+            ordered_by_tooltip: Bytt til tabellvisning for å endre rekkefølgen
           chart_card:
             caption_search: Nåværende søk
             caption_year: Oversikt over fjoråret
