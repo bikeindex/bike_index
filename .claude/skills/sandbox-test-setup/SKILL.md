@@ -71,6 +71,10 @@ the sandboxes AND a fresh Conductor workspace where `bin/dev` /
 bundle exec rails tailwindcss:build
 ```
 
+The SCSS builds are the same story for anything that renders an email — including
+`db:seed`, whose inline jobs send them — failing with `The asset "email.css" is not
+present in the asset pipeline`: `bundle exec rails dartsass:build`.
+
 (See the `integration-testing` skill — same rule applies to
 layout-rendering request specs, not just system specs.)
 

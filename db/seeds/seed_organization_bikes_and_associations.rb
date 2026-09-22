@@ -59,6 +59,7 @@ def org_bike_params(owner_email:, creation_organization_id: Organization.find_by
 end
 
 def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Brakebills").id, **bike_attrs)
+  SeedHelpers.tick
   b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, creation_organization_id:).merge(bike_attrs)})
   b_param.origin = "organization_form"
   bike = creator.create_bike(b_param)
@@ -69,6 +70,7 @@ end
 # Register an unknown-serial bike together with its parking notification, the way
 # the organized "unregistered" flow does (no ProcessParkingNotificationJob email).
 def seed_unregistered_parking_notification(creator:, member:, owner_email:, loc:, kind:, region_record_id:, country_id:)
+  SeedHelpers.tick
   b_param = BParam.create!(
     creator: member,
     params: {
@@ -111,6 +113,7 @@ end
 
 # Create 2 impound notifications (ProcessParkingNotificationJob creates the impound records)
 2.times do |i|
+  SeedHelpers.tick
   initial = initial_notifications[i]
   loc = sf_locations[i]
   pn = ParkingNotification.create!(
@@ -162,6 +165,7 @@ end
 puts "Creating 5 impound records in San Francisco for Brakebills..."
 
 5.times do |i|
+  SeedHelpers.tick
   loc = sf_locations[i]
   b_param = BParam.create!(
     creator: member,
