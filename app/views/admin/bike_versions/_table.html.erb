@@ -5,7 +5,8 @@
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
   <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
-        cache_key: cache_fragment_name(["admin_bike_versions", render_sortable]))) do |table| %>
+        cache_key: cache_fragment_name(["admin_bike_versions", render_sortable]),
+        cache_records: ->(bike_version) { bike_version.owner })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |bike_version| %>
       <%= link_to admin_bike_version_path(bike_version), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: bike_version.created_at) %>

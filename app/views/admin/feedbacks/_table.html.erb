@@ -7,7 +7,8 @@
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
   <%= render(UI::Table::Component.new(records: feedbacks, render_sortable:, sort_state:,
-        cache_key: cache_fragment_name(["admin_feedbacks", render_sortable, skip_bike, skip_user, render_kind_search]))) do |table| %>
+        cache_key: cache_fragment_name(["admin_feedbacks", render_sortable, skip_bike, skip_user, render_kind_search]),
+        cache_records: ->(feedback) { feedback.user })) do |table| %>
     <% table.column(sortable: "created_at") do |feedback| %>
       <%= link_to admin_feedback_url(feedback), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: feedback.created_at) %>

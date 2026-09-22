@@ -1,5 +1,5 @@
 <span class="tw:inline-flex tw:items-baseline tw:gap-x-2">
-  <% shared_cache_if(@user, cache_key) do %>
+  <% cache_if(@user, cache_key) do %>
     <% if show_missing_user? %>
       <small class="<%= error_text_class %>" title="<%= @user_id %>">
         Missing user

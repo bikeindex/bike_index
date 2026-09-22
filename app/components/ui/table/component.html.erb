@@ -16,14 +16,11 @@
 
     <tbody>
       <% @records.each do |record| %>
-        <%# Once per row: cache_records reads associations, and every cell wants the same ones %>
-        <% row_records = cache_records_for(record) %>
-
-        <% cache_if(cache_rows?, [@cache_key, record, *row_records]) do %>
+        <% cache_if(@cache_key, [@cache_key, record, *cache_records_for(record)]) do %>
           <tr>
-            <% @columns.each_with_index do |col, column_index| %>
+            <% @columns.each do |col| %>
               <td class="<%= col.td_classes(bordered: @bordered) %>">
-                <%= render_cell(col, column_index, record, row_records) %>
+                <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
               </td>
             <% end %>
           </tr>

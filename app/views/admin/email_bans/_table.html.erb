@@ -5,7 +5,8 @@
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
   <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
-        cache_key: cache_fragment_name(["admin_email_bans", render_sortable]))) do |table| %>
+        cache_key: cache_fragment_name(["admin_email_bans", render_sortable]),
+        cache_records: ->(email_ban) { email_ban.user })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(email_ban) { email_ban.id }) do |email_ban| %>
       <%= render UI::Time::Component.new(time: email_ban.created_at) %>
     <% end %>

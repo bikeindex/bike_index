@@ -133,8 +133,7 @@ RSpec.describe Atoms::Admin::TableCells::User::Component, type: :component do
       expect(fragments_written { render_cell }.count).to eq 1
     end
 
-    # The table leaves the cell out of its own cache - a fragment of its own would
-    # namespace the user's back to that one table
+    # Each table caches its own rows, and a row miss reads the user's fragment
     it "shares its fragment between tables with different cache_keys" do
       cell = described_class
       render_table = lambda do |cache_key|

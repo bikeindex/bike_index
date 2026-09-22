@@ -10,9 +10,6 @@ class ApplicationComponent < ViewComponent::Base
   include ViewComponent::ExperimentallyCacheable
   include ApplicationComponentHelper
 
-  # Counts shared_cache_if fragments, so a container caching around one can tell
-  def self.shared_fragments_rendered = ActiveSupport::IsolatedExecutionState[:shared_fragments_rendered].to_i
-
   def raise_if_invalid_value!(attribute, value, options = {})
     return if options.include?(value)
 
@@ -29,12 +26,6 @@ class ApplicationComponent < ViewComponent::Base
   end
 
   private
-
-  # cache_if for a fragment keyed to nothing about the page, so every page reads one copy
-  def shared_cache_if(condition, name, &block)
-    ActiveSupport::IsolatedExecutionState[:shared_fragments_rendered] = ApplicationComponent.shared_fragments_rendered + 1 if condition
-    cache_if(condition, name, &block)
-  end
 
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.

@@ -5,7 +5,8 @@
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
   <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
-        cache_key: cache_fragment_name(["admin_superuser_abilities", render_sortable, skip_user, render_deleted]))) do |table| %>
+        cache_key: cache_fragment_name(["admin_superuser_abilities", render_sortable, skip_user, render_deleted]),
+        cache_records: ->(superuser_ability) { superuser_ability.user })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(record) { content_tag(:span, record.id, class: "only-dev-visible") }) do |superuser_ability| %>
       <%= link_to edit_admin_superuser_ability_path(superuser_ability.to_param), class: "twlink" do %>
         <%= render UI::Time::Component.new(time: superuser_ability.created_at) %>

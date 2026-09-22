@@ -34,5 +34,5 @@ RSpec.describe Pages::Admin::Organizations::Table::Component, type: :component d
   end
 
   let(:cached_record) { organization }
-  it_behaves_like "cached_table_cells"
+  it_behaves_like "cached_table_rows"
 end

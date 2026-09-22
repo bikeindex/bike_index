@@ -6,7 +6,7 @@
 >
   <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["admin_stripe_subscriptions", render_sortable]),
-        cache_records: ->(stripe_subscription) { [stripe_subscription.stripe_price, *stripe_subscription.payments] })) do |table| %>
+        cache_records: ->(stripe_subscription) { [stripe_subscription.user, stripe_subscription.stripe_price, *stripe_subscription.payments] })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(stripe_subscription) { stripe_subscription.id }) do |stripe_subscription| %>
       <% if stripe_subscription.membership_id.present? %>
         <%= link_to render(UI::Time::Component.new(time: stripe_subscription.created_at)), admin_membership_path(stripe_subscription.membership_id), class: "twlink" %>

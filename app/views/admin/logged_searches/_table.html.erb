@@ -1,9 +1,6 @@
 <%# locals: (logged_searches:) %>
 
-<%#
-  Locals, not the conditions inline: each one both gates a column and keys the cells,
-  and a column the cache_key misses shifts every cell after it
-%>
+<%# Locals: each gates a column, so each keys the rows %>
 <% render_created_at = sort_state.sort == "created_at" %>
 <% render_serial = sort_state.sort == "serial_normalized" %>
 
@@ -13,7 +10,7 @@
 >
   <%= render(UI::Table::Component.new(records: logged_searches, render_sortable: true, sort_state:,
         cache_key: cache_fragment_name(["admin_logged_searches", render_created_at, render_serial]),
-        cache_records: ->(logged_search) { logged_search.organization })) do |table| %>
+        cache_records: ->(logged_search) { [logged_search.user, logged_search.organization] })) do |table| %>
     <% table.column(sortable: "request_at") do |logged_search| %>
       <%= render UI::Time::Component.new(time: logged_search.request_at, format: :localize_time_precise_seconds) %>
     <% end %>

@@ -16,5 +16,5 @@ RSpec.describe Pages::Admin::Users::Table::Component, type: :component do
   end
 
   let(:cached_record) { user }
-  it_behaves_like "cached_table_cells"
+  it_behaves_like "cached_table_rows"
 end

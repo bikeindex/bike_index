@@ -158,8 +158,10 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     end
   end
 
-  # Which columns render follows the organization's features and fields, so rows cache whole
-  # and key on the organization's version rather than a column index
+  let(:cached_record) { bike }
+  it_behaves_like "cached_table_rows"
+
+  # Which columns render follows the organization's features and fields
   context "with caching", :caching do
     include_context :caching_basic
 
@@ -167,12 +169,8 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options)) }
     end
 
-    it "writes a fragment per row, keyed to the organization and the bike" do
-      keys = fragments_written { render_table }
-
-      expect(keys.count).to eq 1
-      expect(keys.first).to include(described_class.cache_digest, organization.cache_key_with_version,
-        bike.cache_key_with_version, "locale/en")
+    it "keys each row to the organization's version" do
+      expect(fragments_written { render_table }.first).to include(organization.cache_key_with_version)
       expect(fragments_written { render_table }).to eq([])
 
       organization.update(name: "Renamed org")

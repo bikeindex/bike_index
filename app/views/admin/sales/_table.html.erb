@@ -6,7 +6,7 @@
 >
   <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["admin_sales", render_sortable]),
-        cache_records: ->(sale) { sale.ownership })) do |table| %>
+        cache_records: ->(sale) { [sale.seller, sale.buyer, sale.ownership] })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(sale) { content_tag(:span, sale.id, class: "only-dev-visible") }) do |sale| %>
       <%= link_to render(UI::Time::Component.new(time: sale.created_at)), admin_sale_path(sale), class: "twlink" %>
     <% end %>

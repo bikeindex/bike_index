@@ -34,7 +34,7 @@ module Atoms
           # this user. The arguments it leaves out are the search link's alone - that link
           # sits outside the fragment, since its href carries the request's own params
           def cache_key
-            [self.class.cache_digest, @user&.cache_key_with_version || @user_id, @email, user_link_path]
+            [self.class.cache_digest, @user&.cache_key_with_version, @email, user_link_path]
           end
 
           def computed_search_url

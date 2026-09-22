@@ -17,5 +17,5 @@ RSpec.describe Pages::Admin::BugReportsTable::Component, type: :component do
   end
 
   let(:cached_record) { bug_report }
-  it_behaves_like "cached_table_cells"
+  it_behaves_like "cached_table_rows"
 end
