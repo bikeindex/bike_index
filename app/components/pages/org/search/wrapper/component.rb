@@ -17,6 +17,12 @@ module Pages
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[table list cards].freeze
 
+          # The table's is BikesTable, rendered with its column settings
+          RESULT_COMPONENTS = {
+            list: Pages::Org::SearchResults::BikeListItem::Component,
+            cards: Pages::Org::SearchResults::BikeCard::Component
+          }.freeze
+
           def self.permitted_result_view(result_view)
             view = result_view&.to_sym
             RESULT_VIEWS.include?(view) ? view : RESULT_VIEWS.first
@@ -115,12 +121,9 @@ module Pages
             organization_registrations_path(settings.search_params.merge(create_export: true))
           end
 
-          # Only the search page offers the view switcher, so it's the only place cards render
-          def card_component
-            return unless @search_page
-
-            {cards: Pages::Org::SearchResults::BikeCard::Component,
-             list: Pages::Org::SearchResults::BikeListItem::Component}[@result_view]
+          # Only the search page offers the view switcher, so it's the only place cards or rows render
+          def result_component
+            RESULT_COMPONENTS[@result_view] if @search_page
           end
 
           def result_view_entries
