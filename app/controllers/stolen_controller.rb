@@ -8,8 +8,7 @@ class StolenController < ApplicationController
   def index
     render Pages::Stolen::Index::Component.new(recoveries_count: Counts.recoveries,
       recoveries_value: Counts.recoveries_value, organizations_count: Counts.organizations,
-      recovery_displays: RecoveryDisplay.includes(photo_processed_attachment: :blob)
-        .limit(Pages::Stolen::Index::Component::STORY_COUNT))
+      recovery_displays: RecoveryDisplay.includes(photo_processed_attachment: :blob))
   end
 
   def current_tsv
@@ -22,10 +21,6 @@ class StolenController < ApplicationController
 
   def show
     redirect_to stolen_index_url
-  end
-
-  def multi_serial_search
-    render layout: "multi_serial"
   end
 
   private

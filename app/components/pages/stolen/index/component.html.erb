@@ -9,20 +9,8 @@
     >
       <div class="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-3.5 tw:lg:gap-5">
         <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
-          <span
-            class="
-              tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full
-              tw:bg-red-100 tw:px-3 tw:py-1.5 tw:text-[10.5px]
-              tw:font-extrabold tw:tracking-wider tw:text-red-600
-              tw:uppercase tw:lg:text-[11.5px]
-            "
-          >
-            <span
-              class="tw:size-[0.55em] tw:rounded-full tw:bg-red-600"
-              aria-hidden="true"
-            ></span>
-
-            <%= translation(".bike_stolen") %>
+          <span class="tw:tracking-wider tw:uppercase">
+            <%= render(UI::Badge::Component.new(text: translation(".bike_stolen"), color: :error, size: :lg, indicator: true)) %>
           </span>
 
           <span class="tw:hidden tw:text-xs tw:sm:inline">
@@ -169,13 +157,8 @@
                     <%= step[:title] %>
                   </span>
 
-                  <span
-                    class="
-                      tw:hidden tw:rounded-full tw:border tw:px-2.5 tw:py-1 tw:font-sans tw:text-[11.5px] tw:font-bold tw:uppercase tw:sm:inline-block
-                      <%= step_tag_classes(priority) %>
-                    "
-                  >
-                    <%= step[:tag] %>
+                  <span class="tw:hidden tw:font-sans tw:uppercase tw:sm:inline-flex">
+                    <%= render(UI::Badge::Component.new(text: step[:tag], color: priority ? :notice : :gray)) %>
                   </span>
                 </h3>
 
@@ -381,7 +364,7 @@
           <%= translation(".questions_people_ask_at_2am") %>
         </h2>
 
-        <% faqs.each_with_index do |faq, index| %>
+        <% faqs.each_with_index do |(question, answer), index| %>
           <%= tag.details(name: "stolen-faq", open: index.zero?, class: "tw:group tw:border-b tw:border-gray-200 tw:py-4") do %>
             <summary
               class="
@@ -390,7 +373,7 @@
                 tw:text-slate-900 tw:[&::-webkit-details-marker]:hidden
               "
             >
-              <%= faq[:question] %>
+              <%= question %>
 
               <span
                 class="
@@ -409,7 +392,7 @@
             </summary>
 
             <p class="tw:m-0 tw:mt-2.5 tw:pr-11 tw:text-base tw:leading-relaxed">
-              <%= faq[:answer] %>
+              <%= answer %>
             </p>
           <% end %>
         <% end %>
@@ -430,7 +413,7 @@
           <% resources.each do |label, href| %>
             <li>
               <%= link_to(label, href,
-                class: "tw:block tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:px-4 tw:py-3.25 tw:text-[15px] tw:font-semibold tw:text-gray-700! tw:no-underline! tw:transition-colors tw:hover:border-blue-200 tw:hover:bg-blue-100") %>
+                class: "tw:block tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:px-4 tw:py-3.25 tw:text-[15px] tw:font-semibold tw:text-gray-700 tw:no-underline tw:transition-colors tw:hover:border-blue-200 tw:hover:bg-blue-100") %>
             </li>
           <% end %>
         </ul>
@@ -463,7 +446,7 @@
 
       <%= render(UI::ButtonLink::Component.new(href: register_stolen_path,
         text: translation(".register_your_stolen_bike"), color: :primary,
-        html_class: "#{CTA} tw:shrink-0 tw:py-4.25! tw:px-7! tw:bg-[#ffd660]! tw:border-[#ffd660]! tw:text-blue-600!")) %>
+        html_class: "#{CTA} tw:shrink-0 tw:bg-[#ffd660]! tw:border-[#ffd660]! tw:text-blue-600!")) %>
     </div>
   </section>
 </div>

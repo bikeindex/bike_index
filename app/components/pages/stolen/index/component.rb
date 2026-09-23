@@ -3,19 +3,18 @@
 module Pages
   module Stolen
     module Index
-      # The first page someone reaches after a theft. Below lg it's the design's mobile
-      # layout, which drops the promoted alerts band, the FAQ and the resources
+      # Below lg it's the design's mobile layout, which drops the promoted alerts band,
+      # the FAQ and the resources
       class Component < ApplicationComponent
         PILL = "tw:rounded-full! tw:font-semibold! tw:transition-all!"
         CTA = "#{PILL} tw:px-6! tw:py-4! tw:text-[15.5px]! tw:uppercase tw:tracking-wider " \
           "tw:hover:-translate-y-0.5 tw:hover:brightness-110"
-        STORY_COUNT = 4
 
         def initialize(recoveries_count:, recoveries_value:, organizations_count:, recovery_displays:)
           @recoveries_count = recoveries_count
           @recoveries_value = recoveries_value
           @organizations_count = organizations_count
-          @recovery_displays = recovery_displays.first(STORY_COUNT)
+          @recovery_displays = recovery_displays.first(4)
         end
 
         private
@@ -58,13 +57,9 @@ module Pages
           priority ? "tw:bg-blue-100 tw:border-blue-200" : "tw:bg-white tw:border-gray-200 tw:hover:border-blue-200"
         end
 
-        def step_tag_classes(priority)
-          priority ? "tw:bg-blue-100 tw:border-blue-200 tw:text-blue-600" : "tw:bg-gray-100 tw:border-gray-200 tw:text-gray-500"
-        end
-
         def step_action(step, priority)
           UI::ButtonLink::Component.new(href: step[:href], text: step[:action], color: :primary,
-            html_class: [PILL, "tw:px-4! tw:py-2! tw:text-[13.5px]! tw:lg:px-5! tw:lg:py-2.5! tw:lg:text-sm!",
+            size: :lg, html_class: [PILL, "tw:text-[13.5px]! tw:lg:px-5! tw:lg:py-2.5! tw:lg:text-sm!",
               ("tw:bg-blue-100! tw:border-blue-200! tw:text-blue-600! tw:hover:bg-blue-200!" unless priority)].compact.join(" "))
         end
 
@@ -78,11 +73,11 @@ module Pages
         end
 
         def faqs
-          [{question: translation(".faq_serial_question"), answer: translation(".faq_serial_answer")},
-            {question: translation(".faq_unregistered_question"), answer: translation(".faq_unregistered_answer")},
-            {question: translation(".faq_confront_question"), answer: translation(".faq_confront_answer")},
-            {question: translation(".faq_other_city_question"), answer: translation(".faq_other_city_answer")},
-            {question: translation(".faq_cost_question"), answer: translation(".faq_cost_answer")}]
+          [[translation(".faq_serial_question"), translation(".faq_serial_answer")],
+            [translation(".faq_unregistered_question"), translation(".faq_unregistered_answer")],
+            [translation(".faq_confront_question"), translation(".faq_confront_answer")],
+            [translation(".faq_other_city_question"), translation(".faq_other_city_answer")],
+            [translation(".faq_cost_question"), translation(".faq_cost_answer")]]
         end
 
         def resources
