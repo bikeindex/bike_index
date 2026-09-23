@@ -24,8 +24,14 @@ bash .claude/skills/github-pr-images/assets/commit_images.sh tmp/pr_screenshots/
 
 ```
 hosted at 9691ad9c48a924fcc42be3e384f9801ce7b79d1f (branch claude/…)
-![probe-desktop.png](https://raw.githubusercontent.com/bikeindex/bike_index/9691ad9…/tmp/pr_screenshots/probe-desktop.png)
+<img alt="probe-desktop.png" src="https://raw.githubusercontent.com/bikeindex/bike_index/9691ad9…/tmp/pr_screenshots/probe-desktop.png" />
 ```
+
+**Post those `<img>` tags as they are — never rewrap them as `![](url)`.** The MCP
+server neutralizes a markdown image by wrapping its URL in double backticks, so the
+comment renders an `<img>` with no `src` and an empty box; it leaves ordinary links
+and HTML `<img>` alone. Add `width="900"` (or `300` for a mobile capture) when a
+full-page shot would otherwise render enormous.
 
 A blob stays reachable through the branch's history after the file is deleted, so
 those URLs keep serving `image/png` — which is what GitHub's camo needs to render

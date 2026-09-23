@@ -56,6 +56,8 @@ git push -q -u origin "$BRANCH"
 
 REPO=$(git remote get-url origin | sed -E 's#^.*github\.com[:/]##; s#\.git$##')
 echo "hosted at $SHA (branch $BRANCH)"
+# HTML rather than `![](url)`: the GitHub MCP server neutralizes a markdown image
+# by backticking its URL, which posts an <img> with no src. Links and <img> survive.
 for image in "$@"; do
-  echo "![$(basename "$image")](https://raw.githubusercontent.com/$REPO/$SHA/$image)"
+  echo "<img alt=\"$(basename "$image")\" src=\"https://raw.githubusercontent.com/$REPO/$SHA/$image\" />"
 done
