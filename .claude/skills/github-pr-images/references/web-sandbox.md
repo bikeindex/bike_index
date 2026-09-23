@@ -9,6 +9,11 @@ is where the browser's limits are described; don't re-derive them here.
 So this route hosts the images **in the branch's own history** instead, and posts
 through the GitHub MCP tools rather than `gh`, which isn't installed here.
 
+It stands in for the whole of SKILL.md, not just the upload: step 1's PR lookup and
+step 8's posting are the MCP calls in the table below, steps 2 to 7 are the one
+script, and step 9 verifies with `curl` rather than the browser — which can't load
+github.com at all.
+
 Use it only when `$CLAUDE_CODE_REMOTE` is `true`. Everywhere else the browser
 uploader is better: its `user-attachments/assets/` URLs are permanent and leave no
 commits behind.
@@ -38,9 +43,20 @@ those URLs keep serving `image/png` — which is what GitHub's camo needs to ren
 them in a comment. The two commits cancel out, so the PR's **Files changed** stays
 empty; only the commit list shows the pair.
 
+**Call it once, after every capture is done** — including a base-branch set. Each
+call costs two commits and a push, and hosting early buys nothing here: the browser
+session that the default route front-loads for doesn't exist. It also refuses on a
+detached HEAD, so it can't run during a base-branch checkout anyway.
+
 The script pushes once, for both commits. It also:
 
 - refuses outside the sandbox, on `main`, and on a detached HEAD
+- refuses when the index has staged changes, which would otherwise ride into the
+  screenshot commit and survive the cleanup one
+- refuses when the branch has unpushed commits: the push carries them all under a
+  skip-ci tip, so CI would skip real code. Push, then host
+- leaves the PR's head on a skip-ci commit, so it shows **no checks** until the next
+  code push — say so rather than letting a reviewer read it as a CI failure
 - refuses a **tracked** path, which its cleanup commit would leave deleted
 - `git rm --cached`, so the images stay on disk for a caller mid-sequence (the
   base-branch recapture in the `pr` skill's screenshot phase needs them)

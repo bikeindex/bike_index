@@ -11,7 +11,7 @@ description: >-
   one `## Screenshots` comment — finding, creating, editing and verifying it — so other workflows
   (the `pr` skill's screenshot phase) call it to host images and get URLs back, then hand it a
   composed body to post.
-allowed-tools: Bash(gh:*), Bash(cp:*), Bash(bash .claude/skills/github-pr-images/assets/commit_images.sh:*), Bash(curl:*), ToolSearch, Read, Write, mcp__github__list_pull_requests, mcp__github__get_me, mcp__github__issue_read, mcp__github__add_issue_comment, mcp__github__update_issue_comment, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_snapshot, mcp__playwright__browser_find, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_close
+allowed-tools: Bash(gh:*), Bash(cp:*), Bash(bash .claude/skills/github-pr-images/assets/commit_images.sh:*), Bash(curl -sI https://raw.githubusercontent.com/:*), ToolSearch, Read, Write, mcp__github__list_pull_requests, mcp__github__get_me, mcp__github__issue_read, mcp__github__add_issue_comment, mcp__github__update_issue_comment, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_snapshot, mcp__playwright__browser_find, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_close
 ---
 
 # Upload Image to PR
@@ -28,7 +28,7 @@ Two routes, and `$CLAUDE_CODE_REMOTE` decides between them before anything else 
 
 The default one needs `gh` **and** a signed-in browser — the upload is a real browser session against github.com, and the posting is `gh`. **Stop before uploading anything if either is missing**, say which one, and return without posting. Don't half-run it: images hosted with nowhere to go are wasted, and a comment posted through some other route is one the next run can't find.
 
-**The Claude Code web sandbox has neither, and takes a different route entirely** — it hosts images in the PR branch's own history and posts through the GitHub MCP tools. Check `$CLAUDE_CODE_REMOTE` first, before anything else here: when it's `true`, [references/web-sandbox.md](references/web-sandbox.md) replaces steps 2 through 7, and step 8's `gh` calls have MCP equivalents there. Don't try the browser there — github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`, and its uploader needs a logged-in session no headless browser can get.
+**The Claude Code web sandbox has neither, and takes a different route entirely** — it hosts images in the PR branch's own history and posts through the GitHub MCP tools. Check `$CLAUDE_CODE_REMOTE` first, before anything else here: when it's `true`, [references/web-sandbox.md](references/web-sandbox.md) is the whole flow — **every step below, not just the upload**. Step 1's `gh pr view` and step 8's `gh` calls have MCP equivalents there, steps 2 to 7 are replaced by one script, and step 9 verifies with `curl` instead of the browser. Don't try the browser there — github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`, and its uploader needs a logged-in session no headless browser can get.
 
 Anywhere else, missing either one is still a stop.
 
@@ -43,7 +43,7 @@ gh pr view --json number,url -q '"\(.number) \(.url)"'
 
 If multiple repos or branches are involved, confirm with the user which PR to target.
 
-Also, normalize the image paths to absolute paths. If a path contains special characters (e.g., Unicode narrow spaces from CleanShot X), copy the file into the project's `tmp/` first — not the system `/tmp`, which is where scratch files go to be lost:
+Also, normalize the image paths to absolute paths. **In the sandbox they must instead sit inside the repository** — the hosting URL is built from the path relative to the repo root, so anything outside it is refused. If a path contains special characters (e.g., Unicode narrow spaces from CleanShot X), copy the file into the project's `tmp/` first — not the system `/tmp`, which is where scratch files go to be lost:
 
 ```bash
 # e.g., to handle glob-matched paths with special chars
@@ -198,7 +198,7 @@ If `$EXISTING_BODY` already contains a `## Screenshots` heading (e.g., on re-run
 
 ## Step 9: Verify the result
 
-Reload the page in the Playwright browser and confirm the images render. **Do not** verify with `curl` — `user-attachments/assets/` URLs return HTTP 302 to a session-signed S3 URL that 403s for unauthenticated clients. The 302 alone confirms the asset exists; only the browser can say it displayed.
+Reload the page in the Playwright browser and confirm the images render. **Do not** verify with `curl` — `user-attachments/assets/` URLs return HTTP 302 to a session-signed S3 URL that 403s for unauthenticated clients. (**The sandbox route is the exception**: its `raw.githubusercontent.com` URLs are plain public files, its browser can't load github.com at all, and `curl` is how it verifies — see the reference.) The 302 alone confirms the asset exists; only the browser can say it displayed.
 
 **The rendered `src` is not the URL you posted.** GitHub rewrites `github.com/user-attachments/assets/…` to `private-user-images.githubusercontent.com`, so a DOM query for the posted URL finds nothing on a comment that is rendering perfectly. Check the images under the heading instead:
 
