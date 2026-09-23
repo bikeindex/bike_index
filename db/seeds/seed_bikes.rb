@@ -33,6 +33,30 @@ def seed_bike(creator:, user:, params:, origin: nil, label: "bike")
   bike
 end
 
+# Marks a seeded stolen bike recovered and builds the display the homepage showcase renders
+def seed_recovery_display(bike:, location:, photo_filename:, recovered_at:, recovered_description:, quote_by:, location_string:, quote:)
+  stolen_record = bike.current_stolen_record
+  stolen_record.update_columns(latitude: location[:latitude], longitude: location[:longitude])
+
+  photo_path = Rails.root.join("db/seeds/images", photo_filename)
+  public_image = PublicImage.new(imageable: bike, listing_order: 1)
+  File.open(photo_path) { |file| public_image.image = file }
+  public_image.save!
+
+  stolen_record.add_recovery_information(recovered_at:, recovered_description:,
+    index_helped_recovery: true, can_share_recovery: true)
+
+  recovery_display = RecoveryDisplay.new(stolen_record:, recovered_at:, quote_by:, location_string:, quote:)
+  # save! goes inside the block - ActiveStorage re-reads the io to upload it
+  File.open(photo_path) do |file|
+    recovery_display.photo.attach(io: file, filename: photo_path.basename.to_s)
+    recovery_display.save!
+  end
+  # Inline, so photo_url exists without sidekiq running - the homepage filters on it
+  ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
+  recovery_display
+end
+
 # --- 25 registered bikes ---
 25.times do |i|
   bike = seed_bike(
@@ -287,7 +311,6 @@ puts "  Created stolen Trek at #{trek_location[:street]}, #{trek_location[:city]
 puts "Creating recovered Trek Marlin in Calgary..."
 silver = Color.friendly_find("Silver, gray or bare metal")
 calgary_location = {latitude: 51.0512, longitude: -114.0631, street: "917 Centre Ave NE", city: "Calgary", zipcode: "T2E 0C6"}
-recovery_photo_path = Rails.root.join("db/seeds/images/trek_marlin_recovery.jpg")
 
 recovered_bike = seed_bike(
   creator:, user:, label: "Recovered Trek bike",
@@ -324,35 +347,117 @@ recovered_bike = seed_bike(
   }
 )
 
-recovered_stolen_record = recovered_bike.current_stolen_record
-recovered_stolen_record.update_columns(latitude: calgary_location[:latitude], longitude: calgary_location[:longitude])
-recovery_public_image = PublicImage.new(imageable: recovered_bike, listing_order: 1)
-File.open(recovery_photo_path) { |file| recovery_public_image.image = file }
-recovery_public_image.save!
-
-recovered_at = Time.current - 4.days
-recovered_stolen_record.add_recovery_information(
-  recovered_at:,
+recovery_display = seed_recovery_display(
+  bike: recovered_bike,
+  location: calgary_location,
+  photo_filename: "trek_marlin_recovery.jpg",
+  recovered_at: Time.current - 4.days,
   recovered_description: "A rider recognized it from the Bike Index listing and messaged me the same night.",
-  index_helped_recovery: true,
-  can_share_recovery: true
-)
-
-recovery_display = RecoveryDisplay.new(
-  stolen_record: recovered_stolen_record,
-  recovered_at:,
   quote_by: "Kara",
   location_string: "Calgary, AB",
   quote: "My Trek went missing out of the garage and I assumed that was the end of it. Someone matched the serial to my Bike Index listing, messaged me that night, and a few days later I was riding it home along the Bow River."
 )
-# save! goes inside the block - ActiveStorage re-reads the io to upload it
-File.open(recovery_photo_path) do |file|
-  recovery_display.photo.attach(io: file, filename: recovery_photo_path.basename.to_s)
-  recovery_display.save!
-end
-# Inline, so photo_url exists without sidekiq running - the homepage filters on it
-ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
 puts "  Created recovered Trek in #{calgary_location[:city]} with recovery display ##{recovery_display.id}"
+
+# --- Specific recovered bike: Riese & Müller Load4 cargo e-bike recovered in Portland ---
+puts "Creating recovered Riese & Müller Load4 in Portland..."
+or_state = State.find_by_abbreviation("OR")
+portland_location = {latitude: 45.5231, longitude: -122.6765, street: "1120 SW 5th Ave", city: "Portland", zipcode: "97204"}
+
+recovered_cargo_bike = seed_bike(
+  creator:, user:, label: "Recovered Riese & Müller bike",
+  params: {
+    bike: bike_params(owner_email: "user_4@gmail.com", manufacturer_id: Manufacturer.friendly_find("Riese & Müller")&.id).merge(
+      cycle_type: "cargo",
+      propulsion_type: "pedal-assist",
+      primary_frame_color_id: silver&.id,
+      year: 2023,
+      frame_model: "Load4 75 rohloff",
+      frame_material_slug: "aluminum",
+      handlebar_type: "flat",
+      rear_tire_narrow: "false",
+      front_tire_narrow: "false",
+      front_wheel_size_id: WheelSize.id_for_bsd(406),
+      rear_wheel_size_id: WheelSize.id_for_bsd(559),
+      description: "Bosch Cargo Line mid-drive with a 725Wh PowerPack, Rohloff Speedhub and a Gates belt drive. Blue rain canopy over the front box.",
+      status: "status_stolen",
+      date_stolen: (Time.current - 9.days).to_s
+    ),
+    stolen_record: {
+      latitude: portland_location[:latitude].to_s,
+      longitude: portland_location[:longitude].to_s,
+      street: portland_location[:street],
+      city: portland_location[:city],
+      zipcode: portland_location[:zipcode],
+      state_id: or_state&.id.to_s,
+      country_id: us&.id.to_s,
+      skip_geocoding: true,
+      estimated_value: "7500",
+      theft_description: "Taken out of the bike room of our building downtown - it's too big to carry upstairs, so it lives on the ground floor",
+      locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
+      lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
+    }
+  }
+)
+
+cargo_recovery_display = seed_recovery_display(
+  bike: recovered_cargo_bike,
+  location: portland_location,
+  photo_filename: "riese_muller_load4_with_passenger.jpg",
+  recovered_at: Time.current - 2.days,
+  recovered_description: "A shop ran the serial when someone brought it in for a tune-up and found our listing.",
+  quote_by: "Devon",
+  location_string: "Portland, OR",
+  quote: "It is how both kids get to school, so losing it upended every morning. A shop ran the serial when it came in for a tune-up, found our Bike Index listing, and called us that afternoon."
+)
+puts "  Created recovered Riese & Müller in #{portland_location[:city]} with recovery display ##{cargo_recovery_display.id}"
+
+# --- Specific recovered bike: 1975 Viner Special Professional recovered in Chicago ---
+puts "Creating recovered Viner Special Professional in Chicago..."
+il_state = State.find_by_abbreviation("IL")
+chicago_location = {latitude: 41.9103, longitude: -87.6773, street: "1800 N Milwaukee Ave", city: "Chicago", zipcode: "60647"}
+
+recovered_viner_bike = seed_bike(
+  creator:, user:, label: "Recovered Viner bike",
+  params: {
+    bike: bike_params(owner_email: "user_5@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
+      primary_frame_color_id: orange&.id,
+      year: 1975,
+      frame_model: "Special Professional",
+      frame_material_slug: "steel",
+      frame_size: "54cm",
+      description: "Campagnolo Nuovo Record throughout, orange with chrome lugs and a Brooks Professional saddle.",
+      status: "status_stolen",
+      date_stolen: (Time.current - 7.weeks).to_s
+    ),
+    stolen_record: {
+      latitude: chicago_location[:latitude].to_s,
+      longitude: chicago_location[:longitude].to_s,
+      street: chicago_location[:street],
+      city: chicago_location[:city],
+      zipcode: chicago_location[:zipcode],
+      state_id: il_state&.id.to_s,
+      country_id: us&.id.to_s,
+      skip_geocoding: true,
+      estimated_value: "2200",
+      theft_description: "Locked to a rack outside the Blue Line stop at Damen and gone by the time I came back up",
+      locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
+      lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
+    }
+  }
+)
+
+viner_recovery_display = seed_recovery_display(
+  bike: recovered_viner_bike,
+  location: chicago_location,
+  photo_filename: "viner_108243_2.jpg",
+  recovered_at: Time.current - 11.days,
+  recovered_description: "Spotted in a swap meet listing by another rider, who matched the frame number to Bike Index.",
+  quote_by: "Marisol",
+  location_string: "Chicago, IL",
+  quote: "I had owned that frame for twenty years and figured a bike that old was gone for good. Someone browsing a swap meet listing matched the number to my Bike Index page and got in touch."
+)
+puts "  Created recovered Viner in #{chicago_location[:city]} with recovery display ##{viner_recovery_display.id}"
 
 # --- Specific real bike: Riese & Müller Load4 75 rohloff cargo e-bike (child carrying) ---
 puts "Creating Riese & Müller Load4 75 rohloff cargo bike..."
