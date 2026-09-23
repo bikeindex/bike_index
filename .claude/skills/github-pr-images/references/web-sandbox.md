@@ -38,14 +38,9 @@ two commits and a push, and it refuses on a detached HEAD, so it can't run mid-c
 anyway.
 
 It also refuses outside the sandbox, on `main`, on a **tracked** path (the cleanup
-commit would leave that deleted), on a **dirty index** (staged changes ride into the
-screenshot commit and survive the cleanup), and on **unpushed commits** (the push
-carries them under a skip-ci tip, so CI skips real code). `git rm --cached` keeps the
-files on disk for a later recapture.
-
-Both commits carry `[skip ci]`, since `ci.yml` is `on: push` with no branch filter.
-That leaves the PR's head on a skip-ci commit showing **no checks** until the next
-code push — say so, or a reviewer reads it as a CI failure.
+commit would leave that deleted), and on a **dirty index** (staged changes ride into
+the screenshot commit and survive the cleanup). `git rm --cached` keeps the files on
+disk for a later recapture.
 
 ## What it costs
 
