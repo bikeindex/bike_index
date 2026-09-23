@@ -3,12 +3,12 @@
 module MarketplaceFees
   extend Functionable
 
+  # Taken from the item price only, and deducted from the seller's payout
   PLATFORM_FEE_RATE = Rational(9, 100)
   # The same number in every currency, not converted from USD
   PLATFORM_FEE_CAP_CENTS = 69_00
+  # A service fee on item + shipping + boxing, added to the buyer's total on every payment method
   PROCESSING_FEE_RATE = Rational(3, 100)
-  # 3% + 30¢ rather than a bare 3%: it still covers Stripe's 2.9% + 30¢, which is taken from the whole charge
-  PROCESSING_FEE_FIXED_CENTS = 30
 
   def calculate(item_amount_cents:, shipping_amount_cents: 0, boxing_amount_cents: 0, currency: nil)
     currency_slug = Currency.new(currency || Currency.default.slug).slug
@@ -18,9 +18,8 @@ module MarketplaceFees
     raise ArgumentError, "Amounts can't be negative" if [item, shipping, boxing].any?(&:negative?)
 
     subtotal_cents = item + shipping + boxing
-    processing_fee_cents = (subtotal_cents * PROCESSING_FEE_RATE).round + PROCESSING_FEE_FIXED_CENTS
-    buyer_total_cents = subtotal_cents + processing_fee_cents
-    platform_fee_cents = [(buyer_total_cents * PLATFORM_FEE_RATE).round, PLATFORM_FEE_CAP_CENTS].min
+    processing_fee_cents = (subtotal_cents * PROCESSING_FEE_RATE).round
+    platform_fee_cents = [(item * PLATFORM_FEE_RATE).round, PLATFORM_FEE_CAP_CENTS].min
 
     {
       currency: currency_slug,
@@ -28,7 +27,7 @@ module MarketplaceFees
       shipping_amount_cents: shipping,
       boxing_amount_cents: boxing,
       processing_fee_cents:,
-      buyer_total_cents:,
+      buyer_total_cents: subtotal_cents + processing_fee_cents,
       platform_fee_cents:,
       seller_payout_cents: item - platform_fee_cents,
       shop_payout_cents: boxing,
