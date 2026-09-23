@@ -27,7 +27,9 @@ export default class extends Controller {
     // Show new slide
     this.slideTargets[this.currentIndexValue].classList.remove('tw:hidden')
 
-    // Update bike photo
-    this.bikePhotoTarget.src = this.slideTargets[this.currentIndexValue].dataset.imageUrl
+    // Update bike photo - absent when there are no recovery displays to photograph
+    if (this.hasBikePhotoTarget) {
+      this.bikePhotoTarget.src = this.slideTargets[this.currentIndexValue].dataset.imageUrl
+    }
   }
 }

@@ -609,11 +609,11 @@ class Organization < ApplicationRecord
 
   def set_auto_user
     if embedable_user_email.present?
-      u = User.fuzzy_email_find(embedable_user_email)
-      self.auto_user_id = u.id if u&.member_of?(self)
-      if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
-        OrganizationRole.create(user_id: u.id, organization_id: id, role: "member")
-        self.auto_user_id = u.id
+      user = User.fuzzy_email_find(embedable_user_email)
+      self.auto_user_id = user.id if user&.member_of?(self)
+      if user.present? && auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
+        OrganizationRole.create(user_id: user.id, organization_id: id, role: "member")
+        self.auto_user_id = user.id
       end
     elsif auto_user_id.blank?
       return nil unless users.any?
