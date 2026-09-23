@@ -57,15 +57,22 @@ if [ "$current_branch" != "$TRANSLATION_BRANCH" ]; then
   else
     git fetch origin "$TRANSLATION_BRANCH"
   fi
+  # Assigned before the merge: a merge with nothing to do leaves no ORIG_HEAD
+  pre_merge_head="$(git rev-parse HEAD)"
   # Conflicts can only be in config/locales, which the sync rewrites wholesale
   git merge --no-edit -X ours FETCH_HEAD
-  # The image's gems came from this branch's lockfile, so a bump the merge brought
-  # in isn't installed and every `bundle exec` below raises GemNotFound
-  bundle check >/dev/null 2>&1 || bundle install --quiet
+  # Gems are baked into the image from this branch's lockfile, and its final stage
+  # carries no compiler for a bump the merge just brought in — so the sync, which
+  # reads translation keys rather than gems, runs against what's installed
+  git show "$pre_merge_head:Gemfile" > Gemfile
+  git show "$pre_merge_head:Gemfile.lock" > Gemfile.lock
 fi
 
 echo bundle exec rake translation:sync_and_purge prepare_translations
 bundle exec rake translation:sync_and_purge prepare_translations
+
+# Back to the merged pair, so the diff below reads as translations alone
+git checkout HEAD -- Gemfile Gemfile.lock
 
 output "${YELLOW}" "Stashing translation.io timestamp file"
 set -x
