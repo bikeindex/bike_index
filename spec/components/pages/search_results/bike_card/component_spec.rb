@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Org::SearchResults::BikeCard::Component, type: :component do
+RSpec.describe Pages::SearchResults::BikeCard::Component, type: :component do
   let(:component) { render_inline(described_class.new(bike:, organization:, search_all:)) }
   let(:organization) { FactoryBot.create(:organization) }
   let(:search_all) { false }
@@ -39,6 +39,33 @@ RSpec.describe Pages::Org::SearchResults::BikeCard::Component, type: :component 
         expect(component).to have_text("Not registered with #{organization.short_name}")
         expect(component).to have_css("[role=tooltip]", text: "E-vehicle", visible: :all)
         expect(component).to have_text("Cargo")
+      end
+    end
+  end
+
+  context "without an organization" do
+    let(:organization) { nil }
+    let(:seller) { FactoryBot.create(:user_confirmed) }
+    let(:listing) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, amount_cents: 420_00) }
+    let(:bike) { listing.item.reload }
+
+    it "links to the public bike page and renders the price" do
+      expect(component).to have_link(href: bike.html_url)
+      expect(component).to have_text("420")
+      expect(component).to have_text("For Sale ·")
+      expect(component).not_to have_text("Bike Index member")
+    end
+
+    # search_all is the org badge's, so it has nothing to say without an organization
+    context "with a member's listing, and search_all passed" do
+      let(:search_all) { true }
+      let(:membership) { FactoryBot.create(:membership) }
+      let(:seller) { membership.user }
+
+      it "badges the listing as a member's" do
+        expect(listing.reload.seller_member).to be true
+        expect(component).to have_text("Bike Index member")
+        expect(component).not_to have_text("Registered with")
       end
     end
   end

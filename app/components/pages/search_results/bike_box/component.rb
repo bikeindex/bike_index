@@ -8,12 +8,11 @@ module Pages
 
         # NOTE: be cautious about passing in current_user and caching,
         # since current_user shows their hidden serials
-        def initialize(bike:, current_user: nil, event_record: nil, search_kind: nil, skip_cache: false, render_deleted: false)
+        def initialize(bike:, current_user: nil, event_record: nil, skip_cache: false, render_deleted: false)
           @render_deleted = render_deleted
           return if bike.blank? || !@render_deleted && bike.deleted?
 
           @bike = bike
-          @search_kind = Pages::SearchResults::Container::Component.permitted_search_kind(search_kind)
 
           # NOTE: passed event_record renders - even if it isn't the current_event_record
           @event_record = event_record || @bike.current_event_record

@@ -11,6 +11,7 @@
       tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg
       tw:dark:border-gray-700 tw:dark:bg-gray-800
     "
+    data-test-id="search-result-card-<%= @bike.id %>"
   >
     <div
       class="
@@ -43,7 +44,7 @@
 
     <div class="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-3.5">
       <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
-        <%= link_to bike_path_for_org, class: "tw:twtext-color tw:hover:underline", data: {turbo_frame: "_top"} do %>
+        <%= link_to bike_href, class: "tw:twtext-color tw:hover:underline", data: bike_link_data do %>
           <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
           <%= @bike.frame_model_truncated %>
           <span class="tw:absolute tw:inset-0 tw:z-10"></span>
@@ -74,6 +75,10 @@
         <% end %>
 
         <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: @bike.motorized? ? :purple : :gray)) %>
+
+        <% if render_member_badge? %>
+          <%= render(UI::Badge::Component.new(text: translation(".member"), color: :purple)) %>
+        <% end %>
       </div>
 
       <% if location.present? %>

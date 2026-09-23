@@ -4,6 +4,8 @@ module Pages
   module Search
     module ResultViewSelect
       class Component < ApplicationComponent
+        VIEW_ICONS = {cards: "icons/image.svg", list: "icons/list.svg"}.freeze
+
         def initialize(result_view: nil)
           @selected_result_view = Pages::SearchResults::Container::Component.permitted_result_view(result_view)
         end
@@ -23,9 +25,9 @@ module Pages
         private
 
         def view_entries
-          [[:bike_box, "icons/list.svg", translation(".bike_box_view")],
-            [:thumbnail, "icons/image.svg", translation(".thumbnail_view")]]
-            .map { |value, icon, label| {value:, label: icon_label(icon, label)} }
+          Pages::SearchResults::Container::Component::RESULT_VIEW_COMPONENT.keys.map do |view|
+            {value: view, label: icon_label(VIEW_ICONS.fetch(view), translation(".#{view}_view"))}
+          end
         end
 
         # The chip is icon-only, so title carries the hint a visible label would - but not

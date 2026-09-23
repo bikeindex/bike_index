@@ -3,47 +3,40 @@
 require "rails_helper"
 
 RSpec.describe Pages::SearchResults::Container::Component, type: :component do
-  let(:instance) { described_class.new(**options) }
-  let(:component) { render_inline(instance) }
-  let(:options) { {result_view:, search_kind:, vehicles:, skip_cache:, no_results:} }
-  let(:vehicles) { [FactoryBot.build(:bike, id: 42)] }
-  let(:result_view) { :thumbnail }
-  let(:search_kind) { :registration }
-  let(:skip_cache) { nil }
+  let(:component) { render_inline(described_class.new(result_view:, no_results:)) { results } }
+  let(:bike) { FactoryBot.create(:bike, id: 42) }
+  let(:results) { render_inline(Pages::SearchResults::BikeCard::Component.new(bike:)).to_html.html_safe }
+  let(:result_view) { nil }
   let(:no_results) { nil }
   let(:default_no_results_text) { "No registrations exactly matched your search" }
 
-  it "renders" do
-    expect(component).to be_present
-    expect(component.css("ul")).to be_present
+  it "renders the cards list" do
+    expect(component.css("ul").first["class"]).to match("grid-cols-")
     expect(component.css("li")).to be_present
     expect(component.css("a").first["href"]).to match("/bikes/42")
+    expect(component).to_not have_text default_no_results_text
   end
 
-  context "result_view :bike_box" do
-    let(:result_view) { :bike_box }
-    it "renders" do
-      expect(component).to be_present
-      expect(component.css("ul")).to be_present
-      expect(component.css("li")).to be_present
-      expect(component.css("a").first["href"]).to match("/bikes/42")
-      expect(component).to_not have_text default_no_results_text
+  context "result_view :list" do
+    let(:result_view) { :list }
+
+    it "renders the list's classes" do
+      expect(component.css("ul").first["class"]).to match("tw:@container")
     end
   end
 
-  context "no vehicles" do
-    let(:vehicles) { [] }
+  context "no results" do
+    let(:results) { "" }
 
-    it "renders" do
-      expect(component).to be_present
+    it "renders the no_results text in place of the list" do
       expect(component.css("ul")).to_not be_present
       expect(component).to have_text default_no_results_text
     end
 
     context "passed no_results" do
       let(:no_results) { "OH NO! There are no results" }
-      it "renders no_results text" do
-        expect(component).to be_present
+
+      it "renders it" do
         expect(component.css("ul")).to_not be_present
         expect(component).to have_text no_results
       end

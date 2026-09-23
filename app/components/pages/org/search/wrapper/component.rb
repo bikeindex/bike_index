@@ -19,8 +19,8 @@ module Pages
 
           # The table's is BikesTable, rendered with its column settings
           RESULT_COMPONENTS = {
-            list: Pages::Org::SearchResults::BikeListItem::Component,
-            cards: Pages::Org::SearchResults::BikeCard::Component
+            list: Pages::SearchResults::BikeListItem::Component,
+            cards: Pages::SearchResults::BikeCard::Component
           }.freeze
 
           def self.permitted_result_view(result_view)

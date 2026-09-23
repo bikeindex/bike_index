@@ -83,10 +83,8 @@ module Search
       end
 
       @page = permitted_page(max: MAX_INDEX_PAGE)
-      @search_kind = :marketplace
       @search_obj_name = "Listings"
-      @result_view = Pages::SearchResults::Container::Component
-        .permitted_result_view(params[:search_result_view], default: :thumbnail)
+      @result_view = Pages::SearchResults::Container::Component.permitted_result_view(params[:search_result_view])
     end
 
     def permitted_search_params
