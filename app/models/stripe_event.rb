@@ -3,11 +3,20 @@
 # Table name: stripe_events
 # Database name: primary
 #
-#  id         :bigint           not null, primary key
-#  name       :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  stripe_id  :string
+#  id                :bigint           not null, primary key
+#  name              :string
+#  payload           :jsonb
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  stripe_account_id :string
+#  stripe_event_id   :string
+#  stripe_id         :string
+#
+# Indexes
+#
+#  index_stripe_events_on_stripe_account_id  (stripe_account_id)
+#  index_stripe_events_on_stripe_event_id    (stripe_event_id) UNIQUE
+#  index_stripe_events_on_stripe_id          (stripe_id)
 #
 class StripeEvent < ApplicationRecord
   KNOWN_EVENTS = %w[checkout.session.completed customer.subscription.created
@@ -18,7 +27,11 @@ class StripeEvent < ApplicationRecord
   def self.create_from(event)
     data = event["data"]
 
-    stripe_event = create(name: event["type"], stripe_id: data["object"]["id"])
+    # Stripe redelivers an event until it gets a 2xx, so a retry finds the stored row
+    stripe_event = create_or_find_by!(stripe_event_id: event["id"]) do |new_event|
+      new_event.attributes = {name: event["type"], stripe_id: data["object"]["id"],
+                              stripe_account_id: event["account"], payload: event.to_hash}
+    end
     stripe_event.data = data
     stripe_event
   end
