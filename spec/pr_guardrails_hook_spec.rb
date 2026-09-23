@@ -3,6 +3,7 @@
 require "json"
 require "open3"
 require "tempfile"
+require "tmpdir"
 
 # The hook denies tool calls, so a mistake in it blocks work rather than failing
 # loudly - and the routes it has to cover (a wrapper command, the REST and GraphQL
@@ -14,16 +15,12 @@ RSpec.describe ".claude/hooks/pr-guardrails.sh" do
   let(:transcript_body) { "nothing here\n" }
   let(:pr_skill_loaded) { %({"message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"pr"}}]}}\n) }
 
-  # "deny" is either the JSON form or exit 2 with the reason on stderr, which is
-  # what the merge half falls back to when jq is the thing that's unavailable.
+  # Blocking is exit 2 with the reason on stderr; anything else is a pass.
   def verdict(tool_name, command = nil, env: {})
     payload = {tool_name:, tool_input: command ? {command:} : {}, transcript_path: transcript.path}
-    out, err, status = Open3.capture3(env, "/bin/bash", hook, stdin_data: payload.to_json)
-    reason = if status.exitstatus == 2 then err
-    elsif out.strip.empty? then return :allow
-    else JSON.parse(out).dig("hookSpecificOutput", "permissionDecisionReason")
-    end
-    reason.include?("never the agent") ? :merge_denied : :skill_required
+    _, err, status = Open3.capture3(env, "/bin/bash", hook, stdin_data: payload.to_json)
+    return :allow unless status.exitstatus == 2
+    err.include?("never the agent") ? :merge_denied : :skill_required
   end
 
   describe "merging" do
@@ -49,12 +46,6 @@ RSpec.describe ".claude/hooks/pr-guardrails.sh" do
         expect(verdict("mcp__github__merge_pull_request")).to eq :merge_denied
       end
     end
-
-    it "fails closed when jq is unavailable, where the authoring half fails open" do
-      no_jq = {"PATH" => "/nonexistent"}
-      expect(verdict("Bash", "#{subcommand} 1", env: no_jq)).to eq :merge_denied
-      expect(verdict("Bash", "gh pr create", env: no_jq)).to eq :allow
-    end
   end
 
   describe "authoring" do
@@ -77,6 +68,19 @@ RSpec.describe ".claude/hooks/pr-guardrails.sh" do
       transcript.flush
       expect(verdict("Bash", "gh pr create")).to eq :skill_required
     end
+  end
+
+  # The CI image is ruby:slim, which has no jq - and a guard that quietly stops
+  # guarding where a tool is missing is worse than no guard.
+  it "works with nothing on PATH but grep" do
+    bare = Dir.mktmpdir
+    grep = ["/bin/grep", "/usr/bin/grep"].find { File.executable?(it) }
+    File.symlink(grep, File.join(bare, "grep"))
+    only_grep = {"PATH" => bare}
+    expect(verdict("Bash", "#{subcommand} 4397", env: only_grep)).to eq :merge_denied
+    expect(verdict("Bash", "gh pr create --base main", env: only_grep)).to eq :skill_required
+    expect(verdict("mcp__github__create_pull_request", env: only_grep)).to eq :skill_required
+    expect(verdict("Bash", "git status", env: only_grep)).to eq :allow
   end
 
   it "leaves reads, comments and unrelated commands alone" do
