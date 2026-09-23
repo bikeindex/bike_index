@@ -10,6 +10,7 @@ en:
             export_unavailable_search_all: >-
               You can only export your organization's registrations. Uncheck "Search
               all registrations" to export.
+            loading_results: Loading results...
             matching_html:
               one: "%{number} match"
               other: "%{number} matches"
