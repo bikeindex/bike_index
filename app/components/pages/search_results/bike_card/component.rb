@@ -17,15 +17,19 @@ module Pages
           @bike = bike
           @organization = organization
           @current_user = current_user
-          @search_all = search_all && @organization.present?
+          # The badge vouches for a registration, so it's the credibility feature's - and
+          # an organization's alone, never the public marketplace's
+          @render_org_badge = search_all && @organization.present? &&
+            @organization.enabled?("credibility_badges")
         end
 
         private
 
         # Like the table's rows, not per viewer. The listing because a price change doesn't
-        # touch the bike
+        # touch the bike, and the badge because enabling the feature doesn't touch the
+        # organization's cards either
         def cache_key
-          [self.class.cache_digest, @organization&.id, @search_all, @bike, for_sale_listing]
+          [self.class.cache_digest, @organization&.id, @render_org_badge, @bike, for_sale_listing]
         end
 
         def bike_href

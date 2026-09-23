@@ -88,7 +88,7 @@
       <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip,
         html_class: "tw:text-xs! tw:text-gray-400!")) %>
 
-      <% if @search_all %>
+      <% if @render_org_badge %>
         <div>
           <%= render(UI::Badge::Component.new(text: org_badge_text, color: organized? ? :notice : :gray)) %>
         </div>

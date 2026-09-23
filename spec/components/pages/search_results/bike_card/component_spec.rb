@@ -4,7 +4,8 @@ require "rails_helper"
 
 RSpec.describe Pages::SearchResults::BikeCard::Component, type: :component do
   let(:component) { render_inline(described_class.new(bike:, organization:, search_all:)) }
-  let(:organization) { FactoryBot.create(:organization) }
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
+  let(:enabled_feature_slugs) { ["credibility_badges"] }
   let(:search_all) { false }
   let(:color) { FactoryBot.create(:color, name: "Purple", display: "#715eb2") }
   let(:bike) do
@@ -30,6 +31,16 @@ RSpec.describe Pages::SearchResults::BikeCard::Component, type: :component do
 
     it "says it's registered with the organization" do
       expect(component).to have_text("Registered with #{organization.short_name}")
+    end
+
+    # The badge vouches for the registration, so it's the credibility feature's
+    context "without credibility_badges" do
+      let(:enabled_feature_slugs) { ["bike_search"] }
+
+      it "renders no badge" do
+        expect(component).to have_no_text("Registered with")
+        expect(component).to have_no_text("Not registered with")
+      end
     end
 
     context "when it isn't registered with the organization" do
