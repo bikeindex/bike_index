@@ -591,7 +591,12 @@ class Organization < ApplicationRecord
   def ensure_auto_user
     return true if auto_user.present?
 
-    self.embedable_user_email = users.first && users.first.email || ENV["AUTO_ORG_MEMBER"]
+    email = users.first&.email || ENV["AUTO_ORG_MEMBER"]
+    # An address no account holds leaves auto_user blank, so every later call
+    # would save again and re-enqueue UpdateOrganizationAssociationsJob
+    return false if User.fuzzy_email_find(email).blank?
+
+    self.embedable_user_email = email
     save
   end
 
@@ -610,8 +615,10 @@ class Organization < ApplicationRecord
   def set_auto_user
     if embedable_user_email.present?
       user = User.fuzzy_email_find(embedable_user_email)
-      self.auto_user_id = user.id if user&.member_of?(self)
-      if user.present? && auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
+      return nil if user.blank?
+
+      self.auto_user_id = user.id if user.member_of?(self)
+      if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
         OrganizationRole.create(user_id: user.id, organization_id: id, role: "member")
         self.auto_user_id = user.id
       end

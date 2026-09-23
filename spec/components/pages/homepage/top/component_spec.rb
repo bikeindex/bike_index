@@ -16,6 +16,30 @@ RSpec.describe Pages::Homepage::Top::Component, type: :component do
     expect(component).to have_text("The bike registry that works")
   end
 
+  describe "recovery showcase" do
+    # The slider swaps the bikePhoto target on every arrow click, so it has to
+    # render even with no recoveries to show
+    it "renders a placeholder photo and an unhidden slide" do
+      expect(component).to have_css("img.bike-photo[data-homepage--recovery-showcase-target='bikePhoto']")
+      expect(component).to have_link("Read more recovery stories")
+      expect(component.css("li[data-slide-index='0']").attr("class").to_s).to_not include("tw:hidden")
+    end
+
+    context "with a recovery display" do
+      let(:recovery_display) { FactoryBot.create(:recovery_display) }
+      let(:recovery_displays) { [recovery_display] }
+      before do
+        recovery_display.photo_processed.attach(io: StringIO.new("processed image"),
+          filename: "processed.jpg", content_type: "image/jpeg")
+      end
+
+      it "photographs the first and hides the read-more slide" do
+        expect(component).to have_css("img.bike-photo[src='#{recovery_display.photo_url}']")
+        expect(component.css("li[data-slide-index='1']").attr("class").to_s).to include("tw:hidden")
+      end
+    end
+  end
+
   describe "recoveries_value" do
     it "unit tests for instance methods" do
       expect(instance.send(:recoveries_as_currency)).to eq "$11"

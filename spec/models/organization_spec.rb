@@ -855,10 +855,12 @@ RSpec.describe Organization, type: :model do
       end
     end
     context "no members and no AUTO_ORG_MEMBER account" do
-      it "leaves auto_user blank" do
-        organization.ensure_auto_user
+      it "assigns nothing, rather than an address that resolves to nobody" do
+        expect(organization).to be_present
+        expect { organization.ensure_auto_user }
+          .to_not change(UpdateOrganizationAssociationsJob.jobs, :count)
         organization.reload
-        expect(organization.embedable_user_email).to eq ENV["AUTO_ORG_MEMBER"]
+        expect(organization.embedable_user_email).to be_blank
         expect(organization.auto_user).to be_blank
       end
     end
