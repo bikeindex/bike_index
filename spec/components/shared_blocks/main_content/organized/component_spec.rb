@@ -6,14 +6,16 @@ RSpec.describe SharedBlocks::MainContent::Organized::Component, type: :component
   include Rails.application.routes.url_helpers
 
   let(:organization) { FactoryBot.create(:organization, kind: "bike_shop", pos_kind: "no_pos") }
+  let(:controller_name) { "dashboard" }
+  let(:action_name) { "index" }
   let(:options) do
     {
       current_organization: organization,
       current_user: nil,
       passive_organization: nil,
       show_general_alert: false,
-      controller_name: "dashboard",
-      action_name: "index"
+      controller_name:,
+      action_name:
     }
   end
   let(:component) { render_inline(described_class.new(**options)) { "content" } }
@@ -37,7 +39,8 @@ RSpec.describe SharedBlocks::MainContent::Organized::Component, type: :component
     end
 
     context "when viewing the streamlined add-a-bike page" do
-      let(:options) { super().merge(controller_name: "bikes", action_name: "new") }
+      let(:controller_name) { "bikes" }
+      let(:action_name) { "new" }
 
       it "shows a static message instead of linking to itself" do
         expect(component).to_not have_link "Add a bike"
