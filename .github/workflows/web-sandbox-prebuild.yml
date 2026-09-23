@@ -9,8 +9,13 @@ name: Web sandbox prebuild
 # The assets hang off one long-lived pre-release, `web-sandbox-prebuilt`, and are
 # keyed by content in their filenames, so several Ruby/lockfile combinations can
 # coexist while a branch lags main. The gem tarball is published a second time under
-# a fixed `-latest-` name, because the sandbox can't list the release to find a
-# near-miss: api.github.com is blocked in there. The consumer is
+# a fixed `-latest.txt` pointer naming the newest one, because the sandbox can't list
+# the release to find a near-miss: api.github.com is blocked in there.
+#
+# NOTE the sandbox has to be able to *reach* these. Release downloads redirect to
+# release-assets.githubusercontent.com, which is not on its documented allow list —
+# if that host is refused, every session silently falls back to the source build and
+# this workflow buys nothing. web_sandbox_setup.sh reports which assets resolved. The consumer is
 # .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh, which falls back to
 # building from source whenever an asset is missing — so a failed or skipped run here
 # costs time, never correctness.
@@ -107,12 +112,11 @@ jobs:
           tar -C "$(dirname "$PREFIX")" -czf "artifacts/$tarball" x64/lib/ruby/gems x64/bin
           (cd artifacts && sha256sum "$tarball" > "${tarball}.sha256")
           # The sandbox can't list the release to find a near-miss (api.github.com is
-          # blocked there), so publish the newest bundle under a fixed name too. A
-          # branch whose Gemfile.lock has moved unpacks this and lets `bundle install`
-          # fetch only the few gems that differ.
-          latest="bundle-${RUBY_VERSION}-latest-ubuntu24.04-x86_64.tar.gz"
-          cp "artifacts/$tarball" "artifacts/$latest"
-          (cd artifacts && sha256sum "$latest" > "${latest}.sha256")
+          # blocked there), so leave it a pointer naming the newest bundle. A branch
+          # whose Gemfile.lock has moved reads this, unpacks what it names, and lets
+          # `bundle install` fetch only the few gems that differ. A pointer rather than
+          # a second copy because the bundle is ~270MB.
+          echo "$tarball" > "artifacts/bundle-${RUBY_VERSION}-latest.txt"
           ls -lh artifacts
           echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
 
@@ -163,7 +167,7 @@ jobs:
 
       # These accumulate one per lockfile; keep the newest three of each (six assets,
       # each tarball plus its checksum) so a branch that hasn't merged main still finds
-      # its key. The fixed `-latest-` copy is exempt — it's the fallback.
+      # its key. The `-latest.txt` pointer is exempt — it names one of them.
       - name: Prune superseded bundles
         if: github.event_name != 'pull_request'
         continue-on-error: true
@@ -173,7 +177,7 @@ jobs:
           for prefix in bundle- node_modules-; do
             gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets |
               jq -r --arg prefix "$prefix" '.assets
-                | map(select((.name | startswith($prefix)) and (.name | contains("-latest-") | not)))
+                | map(select((.name | startswith($prefix)) and (.name | contains("-latest") | not)))
                 | sort_by(.createdAt) | reverse | .[6:] | .[].name' |
               while read -r asset; do
                 echo "deleting superseded $asset"

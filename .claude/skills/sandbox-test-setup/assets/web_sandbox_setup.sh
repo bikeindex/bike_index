@@ -27,8 +27,9 @@ RUBY_TARBALL="ruby-${RUBYVER}-ubuntu24.04-x86_64.tar.gz"
 BUNDLE_TARBALL="bundle-${RUBYVER}-${LOCK_SHA}-ubuntu24.04-x86_64.tar.gz"
 # main's Gemfile.lock moves often enough that an exact miss is the common case, so
 # fall back to the newest published bundle: `bundle install` then fetches the few
-# gems that differ instead of all of them.
-BUNDLE_LATEST="bundle-${RUBYVER}-latest-ubuntu24.04-x86_64.tar.gz"
+# gems that differ instead of all of them. This one names that tarball rather than
+# being a second copy of it - the bundle is ~270MB.
+BUNDLE_LATEST_POINTER="bundle-${RUBYVER}-latest.txt"
 NODE_TARBALL="node_modules-${NPM_SHA}-ubuntu24.04.tar.gz"
 
 export PATH="$RUBY_PREFIX/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
@@ -46,16 +47,38 @@ trap 'rm -rf "$STAGE"' EXIT
 # .github/workflows/web-sandbox-prebuild.yml publishes these; every failure here
 # is non-fatal, because building from source is always still an option.
 download_asset() { # <tarball>... — first one that resolves wins, verified into $STAGE
-  [ "${BINX_SKIP_PREBUILT:-}" != "1" ] || return 1
-  local tarball
+  [ "${BINX_SKIP_PREBUILT:-}" != "1" ] || { echo "BINX_SKIP_PREBUILT=1: skipping $1" >> "$STAGE/prebuilt.log"; return 1; }
+  local tarball code
   for tarball in "$@"; do
-    curl -sfL --max-time 600 -o "$STAGE/$tarball" "$PREBUILT_BASE/$tarball" &&
+    # -f decides; the code is only so the log can tell a blocked host from a 404.
+    code=$(curl -sfL --max-time 600 -o "$STAGE/$tarball" -w '%{http_code}' "$PREBUILT_BASE/$tarball") || code="${code:-000}"
+    if [ -s "$STAGE/$tarball" ] &&
       curl -sfL --max-time 60 -o "$STAGE/$tarball.sha256" "$PREBUILT_BASE/$tarball.sha256" &&
-      (cd "$STAGE" && sha256sum -c "$tarball.sha256" >/dev/null) &&
-      { printf '%s' "$tarball" > "$STAGE/$1.resolved"; return 0; }
+      (cd "$STAGE" && sha256sum -c "$tarball.sha256" >/dev/null); then
+      printf '%s' "$tarball" > "$STAGE/$1.resolved"
+      echo "hit  $tarball" >> "$STAGE/prebuilt.log"
+      return 0
+    fi
+    # 000 is the tell that matters: no HTTP answer at all, i.e. the egress proxy
+    # refused the host rather than the release not having the asset.
+    echo "miss $tarball (http $code)" >> "$STAGE/prebuilt.log"
     rm -f "$STAGE/$tarball" "$STAGE/$tarball.sha256"
   done
   return 1
+}
+
+# Release assets redirect to release-assets.githubusercontent.com, which is not on
+# the sandbox's allow list - so a blocked host makes every download miss and every
+# session pay the 6-minute source build. Say so rather than letting it look normal.
+report_prebuilt() {
+  say "prebuilt assets:"
+  sed 's/^/    /' "$STAGE/prebuilt.log" 2>/dev/null
+  if ! grep -q '^hit' "$STAGE/prebuilt.log" 2>/dev/null &&
+    grep -q 'http 000' "$STAGE/prebuilt.log" 2>/dev/null; then
+    say "NOTHING resolved and the host never answered - $PREBUILT_BASE looks unreachable"
+    say "  probe it: curl -sI -o /dev/null -w '%{http_code}\n' $PREBUILT_BASE/$RUBY_TARBALL"
+    say "  point BINX_PREBUILT_BASE at a reachable host to skip the source build"
+  fi
 }
 
 # Which name a download job settled on (its fallback, or nothing at all). The jobs
@@ -138,7 +161,14 @@ SYSTEM_PID=$!
 
 RUBY_DL_PID=""
 ruby_is_built || { download_asset "$RUBY_TARBALL" & RUBY_DL_PID=$!; }
-download_asset "$BUNDLE_TARBALL" "$BUNDLE_LATEST" &
+download_bundle() {
+  download_asset "$BUNDLE_TARBALL" && return 0
+  local latest
+  latest=$(curl -sfL --max-time 60 "$PREBUILT_BASE/$BUNDLE_LATEST_POINTER") || return 1
+  [ -n "$latest" ] && [ "$latest" != "$BUNDLE_TARBALL" ] || return 1
+  download_asset "$latest" && printf '%s' "$latest" > "$STAGE/$BUNDLE_TARBALL.resolved"
+}
+download_bundle &
 BUNDLE_DL_PID=$!
 download_asset "$NODE_TARBALL" &
 NODE_DL_PID=$!
@@ -193,6 +223,7 @@ fi
 # workspace_setup wants postgres up and the rails role in place before it can
 # allocate an ID out of the dev_workspaces database.
 wait "$SYSTEM_PID" || say "system setup had a problem - see /tmp/system_setup.log"
+report_prebuilt
 
 # bin/workspace_setup assigns .workspace_id, then hands off to bin/setup for
 # bundler, `bundle install`, `npm install` and the databases (db:create,
