@@ -6,15 +6,15 @@ RSpec.describe Pages::Donate::Page::Component, :js, type: :system do
   it "keeps the submit labels on the selected amount" do
     visit "/rails/view_components/pages/donate/page/component/default"
 
-    expect(page).to have_button("Become a member — $9.99/month", count: 2, wait: 10)
+    expect(page).to have_button("Become a member — $15/month", count: 2, wait: 10)
     expect_axe_clean
 
     choose "Patron membership", allow_label_click: true
-    expect(page).to have_button("Become a member — $49.99/month", count: 2)
+    expect(page).to have_button("Become a member — $50/month", count: 2)
 
     choose "One-time", allow_label_click: true
     expect(page).to have_button("Donate $50", count: 2)
-    expect(page).to have_no_button("Become a member — $49.99/month")
+    expect(page).to have_no_button("Become a member — $50/month")
 
     fill_in "Other amount", with: "37.5"
     expect(page).to have_button("Donate $37.50", count: 2)

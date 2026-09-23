@@ -7,8 +7,8 @@ module Pages
       # payment. The cadence radios switch between the two forms in CSS, so both submit
       # without javascript - the donate--page controller only keeps the labels in step.
       class Component < ApplicationComponent
-        # The monthly StripePrices; Pages::Memberships::ChooseMembership shows the same
-        MONTHLY_TIERS = {basic: 499, plus: 999, patron: 4999}.freeze
+        # Checkout charges the level's active monthly StripePrice, which has to match these
+        MONTHLY_TIERS = {basic: 500, plus: 1500, patron: 5000}.freeze
         ONE_TIME_AMOUNTS = [25, 50, 100].freeze
         MAJOR_AMOUNTS = [500, 1000].freeze
 
@@ -42,7 +42,7 @@ module Pages
 
         def money(cents) = MoneyFormatter.money_format_without_cents(cents, @currency)
 
-        def tier_amount(level) = MoneyFormatter.money_format(MONTHLY_TIERS[level], @currency)
+        def tier_amount(level) = money(MONTHLY_TIERS[level])
 
         def monthly_label(amount) = translation(".monthly_submit", amount:)
 

@@ -12,7 +12,7 @@ RSpec.describe Pages::Donate::Page::Component, type: :component do
     expect(component).to have_css("#donate-cadence-monthly[checked]")
     expect(component).to have_css("form[action='/membership'] input[name='membership[level]'][value='plus'][checked]")
     expect(component).to have_css("form[action='/membership'] input[name='referral_source'][value='newsletter']", visible: :all)
-    expect(component).to have_button("Become a member — $9.99/month", count: 2)
+    expect(component).to have_button("Become a member — $15/month", count: 2)
     expect(component).to have_css("input[name='payment[amount_cents]'][value='5000'][checked]")
     expect(component).to have_css("input[type='hidden'][name='payment[amount_cents]'][disabled]", visible: :all)
     expect(component).to have_css("img[src='#{described_class::WALL_PHOTOS.first}']", count: 1)
