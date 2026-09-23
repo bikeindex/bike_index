@@ -11,11 +11,21 @@ module Pages
       # for the no-JS path instead of one that can never resolve. The caller's
       # block is the frame body, rendered once the results are present.
       #
+      # A body with chrome worth keeping - a card's header and pagination - marks itself
+      # .search-results-card, which stands the whole-frame overlay down; it swaps its own
+      # rows for a spinner off this frame's tw:group instead.
+      #
       # The form lives outside the frame and submits with turbo_action="advance",
       # so a restored snapshot can leave the frame's results stale against the
       # address-bar URL. Every search page opts out of Turbo's snapshot cache (via
       # the no-cache meta) so back/forward re-fetch the page and reload fresh.
       class Component < ApplicationComponent
+        # Turbo's [busy], minus a frame holding a body that swaps its own rows. Written out
+        # per utility because tailwind scans for whole class names
+        FRAME_LOADING_CLASSES = "tw:[&[busy]:not(:has(>.search-results-card))]:opacity-0 " \
+          "tw:[&[busy]:not(:has(>.search-results-card))]:pointer-events-none"
+        OVERLAY_LOADING_CLASS = "tw:peer-[[busy]:not(:has(>.search-results-card))]:block"
+
         def initialize(frame_id:, render_results:, current_path:, loading_text: "Loading results...")
           @frame_id = frame_id
           @render_results = render_results

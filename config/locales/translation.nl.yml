@@ -5726,6 +5726,7 @@ nl:
             view_cards: Kaarten
             view_list: Lijst
             view_table: Tafel
+            loading_results: Resultaten laden...
           chart_card:
             caption_search: Huidige zoekopdracht
             caption_year: Overzicht van vorig jaar

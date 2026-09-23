@@ -1,8 +1,52 @@
 # Claude Code web sandbox
 
-Longest of the three, so here's the order: build Ruby, put the toolchain on
-PATH, start postgres/redis and create the databases. Everything after that is
-per-task. The Tailwind build in SKILL.md applies here too.
+**A `SessionStart` hook (`.claude/hooks/session-start.sh`) already ran all of this
+before your first turn**, so Ruby, gems, postgres, redis, the CSS builds and the
+Playwright browser are normally in place, and `$PATH` and the `PG*` variables are
+already exported into your shells. Check before setting anything up: `ruby -v` and
+`pg_isready`. The hook is remote-only — it exits immediately anywhere but the web
+sandbox.
+
+It calls `assets/web_sandbox_setup.sh`, which is also the thing to run by hand when
+the hook didn't run (an older branch), didn't finish, or the container has idled and
+dropped postgres/redis. It's idempotent, and does the setup steps below — not the
+chromium build-number symlinks or the jsdelivr shim:
+
+```bash
+bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh              # setup only
+bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh --dev-server # + boot bin/dev
+```
+
+It puts the toolchain in place and then runs `bin/workspace_setup --without_seeds`,
+the same entry point a spawned worktree uses — so the gems, `node_modules` and the
+four databases come from `bin/setup` rather than from anything sandbox-specific, and
+this checkout gets a `.workspace_id` like any other. `--without_seeds` because
+`db:seed` wants `setup:import_spreadsheets` and a network this sandbox doesn't have.
+
+It downloads a prebuilt Ruby (11MB), gem tree (the bulk of it) and `node_modules`
+from the `web-sandbox-prebuilt` release (published by
+`.github/workflows/web-sandbox-prebuild.yml`), and falls back to the source build
+below whenever an asset is missing or fails its checksum. A `Gemfile.lock` your
+branch changed misses its exact gem tarball and reads `bundle-<ver>-latest.txt` for
+the newest one instead, so `bundle install` reconciles a handful of gems rather than
+the whole lockfile. `node_modules` is exact-match only; on a miss `bin/setup`'s own
+`npm install` covers it. Both are stamped, so a re-run on a warm container
+re-downloads neither. Set `BINX_SKIP_PREBUILT=1` to force the source path. The
+sections below are what it automates — read them when a step fails, or when you need
+only part of it.
+
+**Ruby is either seconds or six minutes, with nothing in between** — an 11MB download
+against a from-source build — so the only thing worth tuning is whether that download
+lands. Release assets redirect to `release-assets.githubusercontent.com`, which is
+**not** on the allow list at the bottom of this file, and a refused host looks exactly
+like a missing asset. The script prints a `prebuilt assets:` block naming what
+resolved, with the probe command to re-check it; `http 000` there means the host
+never answered, rather than the release lacking the file. If it's blocked,
+`BINX_PREBUILT_BASE` repoints the whole set at any reachable host — and
+git-over-https to github.com *is* allowed, so a small separate repo holding the 11MB
+tarball is a workable channel where the release download isn't.
+
+The Tailwind build in SKILL.md applies here too.
 
 Setup, in order:
 [One-shot Ruby build](#one-shot-ruby-build) ·
@@ -21,12 +65,16 @@ Then, as the task needs them:
 `.tool-versions` pins the Ruby version (`ruby 4.0.6` at time of writing —
 **read the current pin from its `ruby` line**, it moves; the `Gemfile` has
 no `ruby` directive) and
-`Gemfile.lock` pins `BUNDLED WITH 4.0.15`. No prebuilt binary for that
+`Gemfile.lock` pins `BUNDLED WITH 4.0.15`. No *upstream* prebuilt binary for that
 version is reachable (`cache.ruby-lang.org` is 403'd, `ruby/ruby-builder`'s
-toolcache tops out at `3.5.0-preview1`), so build from the GitHub source
-tag — about 8–10 min on a 4-core sandbox. Don't fall back to 3.x and patch
-the Gemfile; Bundler 4.x's resolver behaves differently and you'll waste
-time chasing fake regressions. Once `/opt/ruby-<version>/x64/` exists,
+toolcache tops out at `3.5.0-preview1`) — ours is the release above, and when that
+misses too, build from the GitHub source
+tag — about 6 min on a 4-core sandbox (measured for 4.0.6: ~1 min clone,
+~1 min autogen/configure/gem-staging, ~3 min `make -j4`, ~1 min install), and
+don't panic at what look like restarts in the log (miniruby, then the real
+build, then each ext's own `configure`). Don't fall back to 3.x and patch the
+Gemfile; Bundler 4.x's resolver behaves differently and you'll waste time
+chasing fake regressions. Once `/opt/ruby-<version>/x64/` exists,
 `bundle install` works as-is.
 
 You also need **libvips** on the box — the app loads `ruby-vips` at boot,
@@ -61,13 +109,11 @@ cd "ruby-${RUBYVER}"
 # 2. Generate ./configure (the source tree doesn't ship it)
 ./autogen.sh
 
-# 3. Pre-stage every bundled gem (avoids the rubygems-cert MITM issue)
-while read name ver _; do
-  case "$name" in ''|'#'*) continue ;; esac
-  out="gems/${name}-${ver}.gem"
-  [ -s "$out" ] || curl -sfL --max-time 60 -o "$out" \
-    "https://rubygems.org/downloads/${name}-${ver}.gem"
-done < gems/bundled_gems
+# 3. Pre-stage every bundled gem (avoids the rubygems-cert MITM issue).
+#    46 gems, so fetch 8 at a time - serially this is a minute of pure latency.
+awk '$1 !~ /^#/ && NF {print $1, $2}' gems/bundled_gems \
+  | xargs -P8 -n2 bash -c '[ -s "gems/$0-$1.gem" ] || curl -sfL --max-time 60 \
+      -o "gems/$0-$1.gem" "https://rubygems.org/downloads/$0-$1.gem"'
 
 # 4. Configure + build + install (BASERUBY = preinstalled /opt/ruby-3.3.6)
 mkdir -p /tmp/ruby-build-src/build && cd /tmp/ruby-build-src/build
@@ -103,8 +149,10 @@ bundle install
 ## Services + DB
 
 Start postgres and redis once per session (redis logs a benign ulimit
-warning). Create the `rails` superuser + test DBs once per machine.
-`CI=1` makes `database.yml` use the rails/password creds at 127.0.0.1.
+warning). The only thing `psql` is needed for is the `rails` superuser — a
+development-env `db:create` makes all four databases (dev + test, primary +
+analytics), so don't hand-create them. `CI=1` makes `database.yml` use the
+rails/password creds at 127.0.0.1.
 
 ```bash
 service postgresql start
@@ -112,38 +160,53 @@ service redis-server start
 
 # Once per machine:
 sudo -u postgres psql -c "CREATE USER rails WITH SUPERUSER PASSWORD 'password';"
-sudo -u postgres psql -c "CREATE DATABASE bikeindex_test OWNER rails;"
-sudo -u postgres psql -c "CREATE DATABASE bikeindex_analytics_test OWNER rails;"
 
+bin/workspace_setup --without_seeds      # .workspace_id, bundle, npm, all four databases
 eval "$(ruby bin/env --export)"
-export RAILS_ENV=test CI=1
-bundle exec rails db:migrate db:test:prepare
 ```
+
+`bin/setup`'s `db:create db:schema:load:… db:migrate` on an empty database loads
+`db/structure.sql` rather than
+replaying the 162 files in `db/migrate` (this app is `schema_format = :sql`) — a
+fresh `bikeindex_development` comes up with all 692 of that file's
+`schema_migrations` rows. It takes seconds; if you see it stepping through migrations
+one by one, something already half-created the database.
 
 ## Starting the dev server
 
 Start it yourself here — nobody else is in this container (SKILL.md).
 
-Two things beyond Toolchain + Services above. Development databases, which the
-test setup doesn't create — and which don't take `database.yml`'s `CI=1` branch,
-so the credentials have to be passed as `PG*`. And a UTF-8 locale: foreman reads
-`.env` in the process's external encoding, and an unset locale makes that
-US-ASCII, which dies on the file's non-ASCII bytes with `invalid byte sequence
-in US-ASCII`.
+Two things beyond Toolchain + Services above. The development databases don't take
+`database.yml`'s `CI=1` branch, so the credentials have to be passed as `PG*`. And a
+UTF-8 locale: foreman reads `.env` in the process's external encoding, and an unset
+locale makes that US-ASCII, which dies on the file's non-ASCII bytes with `invalid
+byte sequence in US-ASCII`.
 
 ```bash
 export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password
 export LANG=C.UTF-8 LC_ALL=C.UTF-8
 eval "$(ruby bin/env --export)"
-bundle exec rails db:create db:migrate   # bikeindex_development + its analytics database
-bin/dev                                  # run it in the background - it doesn't return
+nohup bin/dev > /tmp/dev_server.log 2>&1 &   # it never returns, so background it
 ```
 
-Then wait for it rather than assuming — the first boot compiles assets:
+Then wait for it rather than assuming — the first boot compiles assets (~40s here):
 
 ```bash
 until curl -fs -o /dev/null "$BASE_URL/"; do sleep 5; done
 ```
+
+`bin/dev` needs no node: the app is importmap-based and the tailwind/dartsass
+watchers are the gems' standalone binaries. So the image's node (22.x, against
+`.tool-versions`' 24.x pin) doesn't matter here. `node_modules` still has to exist
+for `bin/lint` and the `:js` specs' playwright package, which is why
+`bin/workspace_setup` runs `npm install`.
+
+**A backgrounded process outlives the tool call that started it, and the call
+reports success immediately.** `nohup … &` returns exit 0 while the build or
+server is still going, so **poll the artifact, never a duration** (`$BASE_URL`, the
+log's last line, `/opt/ruby-*/x64/bin/ruby --version`) — `sleep 300` has come back
+in well under 300s of wall clock here, and `date` drifts from real time, so neither
+paces a wait.
 
 `bin/dev` runs foreman, so the tailwind and dartsass watchers come with it and a
 page you screenshot is styled. It starts its own redis, which exits harmlessly
@@ -151,8 +214,10 @@ when one is already listening. Postgres and redis don't survive a container idle
 period: a server answering `PG::ConnectionBad` wants `service postgresql start`
 and a restart, not debugging.
 
-A fresh development database is **empty**, and the app doesn't say so — it renders
-a combobox with no matches rather than an error. `bundle exec rails db:seed` needs
+A fresh development database is **empty**, and the app doesn't say so — the homepage
+renders fine with every counter at zero, and a combobox comes up with no matches
+rather than an error. Fine for a chrome/layout screenshot, misleading for anything
+about the data. `bundle exec rails db:seed` needs
 `setup:import_spreadsheets` (network), so for a single flow seed only what it asks
 for, via `rails runner`: the reference data from the relevant `db/seeds/seed_*.rb`
 (`seed_bike_associations` covers colors), a `Manufacturer` or two — and then
@@ -163,38 +228,52 @@ the database.
 ## Driving the app with Playwright MCP
 
 The MCP server is a different browser from the one `spec/support/local_chrome.rb`
-configures, and it comes up unconfigured. Three one-time fixes, each of which fails
-with a message that names the missing path:
+configures, and it comes up unconfigured. `web_sandbox_setup.sh` does the two fixes
+below; both fail with a message that names what's missing.
+
+**`/opt/google/chrome/chrome` has to be a wrapper script, not a symlink to the
+binary.** The repo's `.mcp.json` launches `@playwright/mcp` without `--no-sandbox`,
+and the session runs as root, so a plain symlink gets you a launch that dies with
+`Running as root without --no-sandbox is not supported` and a "Chromium sandboxing
+failed!" block — which reads like a missing browser rather than a missing flag.
+Wrap it instead, which fixes every caller without touching the shared `.mcp.json`
+(adding `--no-sandbox` there would change the flag on the human's Mac too):
 
 ```bash
-# 1. It looks for the `chrome` channel at a fixed path
+# 1. It looks for the `chrome` channel at a fixed path, and needs the root flags
 mkdir -p /opt/google/chrome
-ln -sfn "$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)/chrome" /opt/google/chrome/chrome
+printf '#!/bin/bash\nexec "%s" --no-sandbox --disable-dev-shm-usage "$@"\n' \
+  "$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)/chrome" \
+  > /opt/google/chrome/chrome
+chmod +x /opt/google/chrome/chrome
 
-# 2. The npm playwright pin wants a newer browser build than the image ships. Point the
-#    expected build number at the one that's there (NNNN from the error, MMMM from `ls`)
-ln -sfn /opt/pw-browsers/chromium-MMMM /opt/pw-browsers/chromium-NNNN
-mkdir -p /opt/pw-browsers/chromium_headless_shell-NNNN
-ln -sfn /opt/pw-browsers/chromium_headless_shell-MMMM/chrome-linux \
-        /opt/pw-browsers/chromium_headless_shell-NNNN/chrome-headless-shell-linux64
-ln -sfn headless_shell /opt/pw-browsers/chromium_headless_shell-MMMM/chrome-linux/chrome-headless-shell
-
-# 3. It reads a storage-state file that doesn't exist yet
+# 2. It reads a storage-state file that doesn't exist yet
 mkdir -p /root/.cache/ms-playwright
 printf '{"cookies":[],"origins":[]}' > /root/.cache/ms-playwright/mcp-auth.json
 ```
 
-This browser gets no `--host-resolver-rules`, so the jsdelivr pins (jquery, select2,
-honeybadger) fail to load and every page logs `ERR_TUNNEL_CONNECTION_FAILED` for them,
-plus Google Fonts / GTM / Facebook. **Those console errors are the sandbox, not the
-app** — read past them and treat an app-origin error as the signal.
+A third fix applies only when the error names a build number the image doesn't have
+(`@playwright/mcp@latest` moved ahead of the image's chromium). It didn't on
+2026-09-22 — the image shipped `chromium-1194` and the pin took it — so don't
+pre-emptively symlink; wait for the error, then use the recipe in the `:js` spec
+section below, which is the same mismatch.
+
+This browser gets no `--host-resolver-rules`, so the jsdelivr pin
+(`@honeybadger-io/js`, the only one left) fails to load and every page logs
+`ERR_TUNNEL_CONNECTION_FAILED` for it, plus Google Fonts / GTM / Facebook. **Those
+console errors are the sandbox, not the app** — read past them and treat an
+app-origin error as the signal.
 
 It also can't reach anything outside localhost: it doesn't trust the egress proxy's CA,
 so github.com fails with `ERR_CERT_AUTHORITY_INVALID` (`curl` is fine — it reads
 `/etc/ssl/certs`, Chromium reads its own NSS db, and `certutil` isn't installed). Local
-pages screenshot fine; `github-pr-images` and anything else driving a remote
-site does not work here, and a logged-in GitHub session can't be established headlessly
-either.
+pages screenshot fine; anything driving a remote site does not, and a logged-in GitHub
+session can't be established headlessly either.
+
+**That doesn't stop screenshots reaching a PR.** `github-pr-images` has a route for
+here that needs no browser and no `gh`: it commits the images to the PR's branch,
+deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com`
+URLs through the GitHub MCP tools — see that skill's `references/web-sandbox.md`.
 
 Two selector notes for driving pages here: a local `UI::Forms::Combobox` keeps all its
 options in the DOM and hides the non-matching ones, so `.hw-combobox__option` `.first()`
@@ -205,12 +284,13 @@ in under a second or two; sample from inside one `browser_evaluate` instead.
 
 ## No `gh` here
 
-The GitHub CLI isn't installed. Anything the `pr` skill (or any other) expresses as
-`gh pr …` goes through the GitHub MCP tools instead — `mcp__github__list_pull_requests`
-(filter with `head: "<owner>:<branch>"`), `create_pull_request`, `update_pull_request`,
-`pull_request_read`. Check for an existing PR before creating one: a push to a branch can
-open a PR by itself, so the branch may already have one whose body wants updating rather
-than a second PR.
+The GitHub CLI isn't installed, so anything a skill expresses as `gh pr …` goes
+through the GitHub MCP tools. **The `pr` skill's own appendix has that mapping** and
+the traps in it — reach for the skill rather than the tools directly; the
+`pr-guardrails` hook denies `create_pull_request` until you have, and
+`merge_pull_request` always. `pull_request_read` is the one the appendix doesn't
+list. Check for an existing PR before creating one: a push can open one by itself,
+so the branch may already have a PR whose body wants updating rather than a second.
 
 `list_pull_requests` returns `merged: false` on PRs that are merged — the underlying list
 endpoint doesn't populate it. Pass `state: "open"` when you want live PRs; when you need a
@@ -226,7 +306,9 @@ bundle exec rspec spec/models spec/requests spec/jobs
 
 ## Running `:js, type: :system` specs (integration / component system)
 
-Two extra hurdles in the sandbox:
+One hurdle in the sandbox — a browser to launch. Try the spec before
+setting up anything else; the jsdelivr workaround below is a fallback that
+is usually not needed any more.
 
 ### 1. A Chromium the Playwright driver can launch
 
@@ -256,6 +338,19 @@ this repo doesn't have.
   `npx playwright install chromium` instead: Chromium's only download URL is
   `cdn.playwright.dev` (no fallbacks, unlike firefox/webkit), which is the
   class of CDN this sandbox blocks.
+- `capybara-playwright-driver` launches the **headless shell**, not the full
+  browser, so it's the `chromium_headless_shell-*` half of that symlink pair
+  that matters and the error names `chrome-headless-shell`. The MCP section's
+  `/opt/google/chrome` link is for the MCP server's `chrome` channel and isn't
+  needed here. Ran against an image shipping 1194 with the pin wanting 1223:
+  ```bash
+  ln -sfn /opt/pw-browsers/chromium-1194 /opt/pw-browsers/chromium-1223
+  mkdir -p /opt/pw-browsers/chromium_headless_shell-1223
+  ln -sfn /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux \
+          /opt/pw-browsers/chromium_headless_shell-1223/chrome-headless-shell-linux64
+  ln -sfn headless_shell \
+          /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/chrome-headless-shell
+  ```
 - `spec/support/local_chrome.rb` re-registers the `:playwright` driver with
   the flags Chromium needs as root in a container (`--no-sandbox`,
   `--disable-dev-shm-usage`) plus the jsdelivr host-resolver rule below,
@@ -263,14 +358,25 @@ this repo doesn't have.
   specs; the default registration in `spec/support/capybara.rb` passes none
   of them.
 
-### 2. `cdn.jsdelivr.net` is firewalled
+### 2. `cdn.jsdelivr.net` is firewalled — usually harmless
 
-The importmap pins three modules (jquery, select2, @honeybadger-io/js)
-from `cdn.jsdelivr.net` (403'd) — without them, pages render empty.
-Everything else is vendored under `vendor/javascript` and served by the
-app itself. Fetch these from `registry.npmjs.org` (allowed) and serve
-locally over TLS at the same path layout. Versions below mirror
-`config/importmap.rb`; bump when that changes.
+**Check `config/importmap.rb` before building anything here.** As of this
+writing the only CDN-pinned module left is `@honeybadger-io/js`, which
+`application.js` loads through a guarded dynamic `import()` precisely so a
+blocked fetch can't take the page down — everything else is vendored under
+`vendor/javascript` and served by the app. So `:js` specs pass with nothing
+listening on :8443: `spec/integration/organized/registrations_search_spec.rb`
+and the org component system specs all ran green that way. The
+`--host-resolver-rules` flag in `local_chrome.rb` just sends that one import
+at a closed port.
+
+Build the shim below only if a spec actually needs a CDN module — jquery and
+select2 were pinned here once and could return. Note the `openssl` step stands
+up a TLS server impersonating a public host, which auto mode may refuse as a
+containment escape; ask rather than working around it. Fetch the packages from
+`registry.npmjs.org` (allowed) and serve them over TLS at the same path layout.
+Versions below mirror an older `config/importmap.rb`; take them from the pins
+you actually need.
 
 ```bash
 mkdir -p /tmp/cdn
@@ -308,25 +414,13 @@ trusts the self-signed cert.
 
 ## End-to-end recap
 
-Assumes the pinned Ruby is already built (paths below use 4.0.6 — swap for
-the current pin). Combines the steps above:
+`assets/web_sandbox_setup.sh` is the setup — run it rather than retyping the
+sections above. Then:
 
 ```bash
-export PATH="/opt/ruby-4.0.6/x64/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-export LD_LIBRARY_PATH="/opt/ruby-4.0.6/x64/lib:$LD_LIBRARY_PATH"
-export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
-service postgresql start && service redis-server start
-apt-get install -y libvips42   # ruby-vips loads at boot; without it every rails/rspec run dies
-cd /home/user/bike_index
-bundle install
-npm install                    # the :js driver is the playwright npm package, not chromedriver
 eval "$(ruby bin/env --export)"
-export RAILS_ENV=test CI=1
-bundle exec rails db:migrate db:test:prepare
-bundle exec rails tailwindcss:build           # only if specs render the layout
-
-bundle exec rspec spec/models spec/requests   # plain
-LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration   # system; CDN proxy must be running
+bundle exec rspec spec/models spec/requests                  # plain
+LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration   # system; CDN proxy rarely needed
 ```
 
 ## Sandbox network: what's allowed vs. blocked
