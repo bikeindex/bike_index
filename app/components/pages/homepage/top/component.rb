@@ -14,19 +14,6 @@ module Pages
 
         private
 
-        def placeholder_photo_url
-          image_path("revised/bike_photo_placeholder.svg")
-        end
-
-        def showcase_photo_url
-          @recovery_displays.first&.photo_url || placeholder_photo_url
-        end
-
-        # Empty rather than absent - the placeholder is decorative, and axe fails a bare img
-        def showcase_photo_alt
-          @recovery_displays.first&.image_alt.to_s
-        end
-
         def bike_tile_images
           (0..16).map { it.to_s.rjust(2, "0") }
             .map { image_url("kelsey/bike_tiles/bike-entry_00#{it}.png") }

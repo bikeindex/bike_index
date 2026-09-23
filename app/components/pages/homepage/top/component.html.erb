@@ -68,7 +68,9 @@
           <%= image_tag "kelsey/black-box.png", alt: "Bike recovery showcase", class: "black-box" %>
 
           <div class="bike-image-placeholder">
-            <%= image_tag showcase_photo_url, alt: showcase_photo_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
+            <% if @recovery_displays.any? %>
+              <%= image_tag @recovery_displays.first.photo_url, alt: @recovery_displays.first.image_alt, class: "bike-photo", "data-homepage--recovery-showcase-target" => "bikePhoto" %>
+            <% end %>
           </div>
         </div>
 
@@ -105,9 +107,9 @@
               <% end %>
 
               <li
-                class="<%= "tw:hidden" if @recovery_displays.any? %>"
+                class="tw:hidden"
                 data-slide-index="<%= @recovery_displays.count %>"
-                data-image-url="<%= placeholder_photo_url %>"
+                data-image-url="<%= image_path("revised/bike_photo_placeholder.svg") %>"
                 data-homepage--recovery-showcase-target="slide"
               >
                 <div class="testimonial-text">
