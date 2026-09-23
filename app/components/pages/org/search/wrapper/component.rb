@@ -101,16 +101,20 @@ module Pages
             )
           end
 
-          # On the search page the .twwiderow holding the card supplies the gap above it, and
-          # is the container twfullbleed reads; elsewhere the card stands on its own
+          # On the search page the .twwiderow holding the card supplies the gap above it and is
+          # the container twfullbleed reads, and search-results-card is what the results frame
+          # reads to leave this card standing while it loads; elsewhere the card stands alone
           def card_classes
             ["org-search-component tw:rounded-xl", UI::Card::Component::BASE_CLASSES,
-              @search_page ? "tw:twfullbleed" : "tw:mt-4"].join(" ")
+              @search_page ? "search-results-card tw:twfullbleed" : "tw:mt-4"].join(" ")
           end
 
           def table_clip_classes
-            ["tw:overflow-hidden", (TABLE_BLEED_CLASSES if @search_page)].compact.join(" ")
+            ["tw:overflow-hidden", results_swap_class, (TABLE_BLEED_CLASSES if @search_page)].compact.join(" ")
           end
+
+          # The rows hide for the spinner above them while the frame they render in is busy
+          def results_swap_class = ("tw:group-[[busy]]:hidden" if @search_page)
 
           # Full bleed drops the card's gutter, so the header and cards meet the chart's edge
           def padding_x_class = @search_page ? "tw:@min-[672px]/twwiderow:px-4" : "tw:px-4"
