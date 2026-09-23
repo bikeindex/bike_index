@@ -143,7 +143,7 @@ The one that talks itself into existence is the "still accurate" update — a la
 Two gates, either of which skips the section outright:
 
 - **Not a frontend diff** — per the classifier above. **Unless a `## Screenshots` comment already exists**: the user asked for those captures, so a commit since the last one that changes what they show stales them even here. Recapture only those pages.
-- **No `gh`, or no browser signed in to GitHub.** Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. The `gh`-less sandbox in the appendix is this case.
+- **No `gh`, or no browser signed in to GitHub** — *outside* the web sandbox. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The sandbox in the appendix is not this case**: it has neither, and still runs the section, because `github-pr-images` hosts through the PR branch's history there.
 
 **A dev server you believe is down is not a gate.** Run `curl -fs "$BASE_URL/"` now, whatever an earlier check in the session said — the user starts `bin/dev` whenever, and #4319 went out without screenshots on a stale "isn't running". Only a failing curl *this* run is a reason to stop and ask.
 
@@ -182,4 +182,4 @@ Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI;
 
 Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
-**There is no Screenshots row because the section doesn't run here.** No `gh` means no browser session either, so nothing can be hosted or posted; skip it and say so, rather than reaching for `add_issue_comment` to post something in its place.
+**Screenshots do run here**, though neither `gh` nor a usable browser does: `github-pr-images`' `references/web-sandbox.md` commits the images to the PR's branch, deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com` URLs through the MCP tools. Capture as normal and follow that reference for the hosting and posting steps. Those URLs live as long as the branch's objects do, so say in your summary that a merged PR's screenshots aren't archival.

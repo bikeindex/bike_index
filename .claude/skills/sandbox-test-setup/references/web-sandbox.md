@@ -192,9 +192,13 @@ app** — read past them and treat an app-origin error as the signal.
 It also can't reach anything outside localhost: it doesn't trust the egress proxy's CA,
 so github.com fails with `ERR_CERT_AUTHORITY_INVALID` (`curl` is fine — it reads
 `/etc/ssl/certs`, Chromium reads its own NSS db, and `certutil` isn't installed). Local
-pages screenshot fine; `github-pr-images` and anything else driving a remote
-site does not work here, and a logged-in GitHub session can't be established headlessly
-either.
+pages screenshot fine; anything driving a remote site does not, and a logged-in GitHub
+session can't be established headlessly either.
+
+**That doesn't stop screenshots reaching a PR.** `github-pr-images` has a route for
+here that needs no browser and no `gh`: it commits the images to the PR's branch,
+deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com`
+URLs through the GitHub MCP tools — see that skill's `references/web-sandbox.md`.
 
 Two selector notes for driving pages here: a local `UI::Forms::Combobox` keeps all its
 options in the DOM and hides the non-matching ones, so `.hw-combobox__option` `.first()`
