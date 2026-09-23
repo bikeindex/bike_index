@@ -15,6 +15,8 @@ RSpec.describe Pages::Bikes::MarketplaceListingPanel::Component, type: :componen
   end
 
   describe "shipping" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
     before { Flipper.enable_actor(:marketplace_shipping, marketplace_listing.seller) }
 
     it "says a standard bike can ship, with no reason to explain" do
@@ -24,7 +26,6 @@ RSpec.describe Pages::Bikes::MarketplaceListingPanel::Component, type: :componen
 
     context "motorized" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, propulsion_type: "throttle") }
-      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
 
       it "says local pickup only, and names the cycle type in lowercase" do
         expect(component.text).to include("Local pickup only")
@@ -34,7 +35,6 @@ RSpec.describe Pages::Bikes::MarketplaceListingPanel::Component, type: :componen
 
     context "a cycle type we don't ship" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: :cargo) }
-      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
 
       it "says we can't ship it yet, rather than blaming a battery it doesn't have" do
         expect(component.text).to include("Local pickup only")

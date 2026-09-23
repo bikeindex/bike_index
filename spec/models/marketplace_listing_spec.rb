@@ -170,14 +170,14 @@ RSpec.describe MarketplaceListing, type: :model do
     let(:propulsion_type) { "foot-pedal" }
 
     it "is shippable" do
-      expect(marketplace_listing.shippable?).to be_truthy
+      expect(marketplace_listing.shippable?).to be true
     end
 
     context "motorized" do
       let(:propulsion_type) { "pedal-assist" }
 
       it "is not shippable" do
-        expect(marketplace_listing.shippable?).to be_falsey
+        expect(marketplace_listing.shippable?).to be false
       end
     end
 
@@ -185,7 +185,7 @@ RSpec.describe MarketplaceListing, type: :model do
       let(:cycle_type) { "cargo" }
 
       it "is not shippable" do
-        expect(marketplace_listing.shippable?).to be_falsey
+        expect(marketplace_listing.shippable?).to be false
       end
     end
 
@@ -193,7 +193,7 @@ RSpec.describe MarketplaceListing, type: :model do
       let(:marketplace_listing) { MarketplaceListing.new }
 
       it "is not shippable" do
-        expect(marketplace_listing.shippable?).to be_falsey
+        expect(marketplace_listing.shippable?).to be false
       end
     end
   end
