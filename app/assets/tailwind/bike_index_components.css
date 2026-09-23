@@ -1,5 +1,5 @@
-/* Bike Index's own tw* classes. Rules that style one component's markup — .ui-table,
- * .search-results-frame-wrapper — stay in application.css */
+/* Bike Index's own tw* classes. Rules that style one component's markup, like
+ * .ui-table, stay in application.css */
 
 /* A plain custom property rather than @theme: a theme variable takes the tw prefix, and
  * is dropped unless a generated utility references it */

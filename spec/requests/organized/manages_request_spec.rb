@@ -67,6 +67,21 @@ RSpec.describe Organized::ManagesController, type: :request do
     end
   end
 
+  context "logged_in_as_superuser" do
+    include_context :request_spec_logged_in_as_superuser
+    let(:current_organization) { FactoryBot.create(:organization) }
+
+    describe "show" do
+      it "renders for an organization with no claimed members" do
+        expect(current_organization.users).to be_empty
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response).to render_template :show
+        expect(current_organization.reload.auto_user_id).to be_blank
+      end
+    end
+  end
+
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
     describe "show" do
