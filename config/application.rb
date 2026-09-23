@@ -42,8 +42,12 @@ module Bikeindex
     # builds them without a query - at the cost of only being able to count them from the bucket.
     config.active_storage.track_variants = false
 
-    # Use our custom error pages
-    config.exceptions_app = routes
+    # Use our custom error pages. They get the failed request's env, so malformed params
+    # would raise again and fall through to Rails' plain-text 500 - which isn't logged
+    config.exceptions_app = ->(env) {
+      routes.call(env.merge("action_dispatch.request.request_parameters" => {},
+        "action_dispatch.request.query_parameters" => {}))
+    }
 
     config.time_zone = "Central Time (US & Canada)"
 
