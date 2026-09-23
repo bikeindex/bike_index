@@ -4,13 +4,16 @@
 #   bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh [--dev-server]
 #
 # Gets the toolchain in place, then hands off to `bin/workspace_setup --without_seeds`
-# for the gems, node_modules and databases. Everything that can overlap does: the
-# prebuilt downloads, the apt/services/chrome work that needs no Ruby, and (when no
-# prebuilt Ruby is reachable) the source build all run at once.
+# for the gems, node_modules and databases, builds the css and seeds an empty
+# development database in the background (/tmp/seed.status says when it's done).
+# Everything that can overlap does: the prebuilt downloads, the apt/services/chrome
+# work that needs no Ruby, and (when no prebuilt Ruby is reachable) the source build
+# all run at once.
 # Idempotent: re-running it after a container idle period just restarts the
 # services. Pass --dev-server to also boot bin/dev in the background.
 #
-# Logs: /tmp/ruby_build.log, /tmp/system_setup.log, /tmp/css_build.log, /tmp/dev_server.log
+# Logs: /tmp/ruby_build.log, /tmp/system_setup.log, /tmp/css_build.log,
+#       /tmp/playwright_install.log, /tmp/seed.log (+ /tmp/seed.status), /tmp/dev_server.log
 set -uo pipefail
 
 REPO="${CLAUDE_PROJECT_DIR:-/home/user/bike_index}"
@@ -66,9 +69,9 @@ download_asset() { # <tarball> — verified into $STAGE
   return 1
 }
 
-# Release assets redirect to release-assets.githubusercontent.com, which is not on
-# the sandbox's allow list - so a blocked host makes every download miss and every
-# session pay the 6-minute source build. Say so rather than letting it look normal.
+# Release assets redirect to release-assets.githubusercontent.com; an environment
+# whose network policy refuses that host makes every download miss and every session
+# pay the 6-minute source build. Say so rather than letting it look normal.
 report_prebuilt() {
   say "prebuilt assets:"
   sed 's/^/    /' "$STAGE/prebuilt.log" 2>/dev/null
@@ -100,9 +103,11 @@ build_ruby() {
   set -e
   local src="/tmp/ruby-build-src/ruby-${RUBYVER}"
   mkdir -p /tmp/ruby-build-src
-  # The archive tarball endpoint 403s through the proxy; git-over-https works.
-  [ -d "$src" ] || git clone --depth 1 --branch "v${RUBYVER}" \
-    https://github.com/ruby/ruby.git "$src"
+  # The release tarball ships ./configure and the bundled gems; a network policy that
+  # refuses cache.ruby-lang.org still allows git-over-https, so fall back to the tag.
+  [ -d "$src" ] || curl -sfL --max-time 300 "https://cache.ruby-lang.org/pub/ruby/${RUBYVER%.*}/ruby-${RUBYVER}.tar.gz" \
+    | tar -C /tmp/ruby-build-src -xz || { rm -rf "$src"; false; } ||
+    git clone --depth 1 --branch "v${RUBYVER}" https://github.com/ruby/ruby.git "$src"
   cd "$src"
   [ -f configure ] || ./autogen.sh
   # Pre-stage the bundled gems `make install` would fetch through rubygems'
@@ -123,10 +128,14 @@ build_ruby() {
 
 # ------------------------------------- everything that needs no Ruby, in parallel
 setup_system() {
-  # ruby-vips loads at boot, so without libvips every rails/rspec run dies
-  if ! ldconfig -p | grep -q libvips.so.42; then
-    apt-get install -y libvips42 ||
-      { apt-get update && apt-get install -y libvips42; }
+  # ruby-vips loads at boot, so without libvips every rails/rspec run dies. mini_magick
+  # shells out to ImageMagick's `identify`, which db:seed's organization avatars need.
+  local pkgs=()
+  ldconfig -p | grep -q libvips.so.42 || pkgs+=(libvips42)
+  command -v identify >/dev/null || pkgs+=(imagemagick)
+  if [ "${#pkgs[@]}" -gt 0 ]; then
+    apt-get install -y --no-install-recommends "${pkgs[@]}" ||
+      { apt-get update && apt-get install -y --no-install-recommends "${pkgs[@]}"; }
   fi
 
   service postgresql start >/dev/null   # redis logs a benign ulimit warning
@@ -238,21 +247,58 @@ wait "$SYSTEM_PID" || say "system setup had a problem - see /tmp/system_setup.lo
 report_prebuilt
 
 # Everything above exists to make this a no-op: bin/setup checks the Ruby version,
-# runs `bundle check` and `npm install`. --without_seeds because db:seed needs
-# `setup:import_spreadsheets`, and so a network this sandbox doesn't have.
+# runs `bundle check` and `npm install`. --without_seeds because bin/setup seeds on
+# every run, and a re-run over a seeded database dies on duplicates - seeding is below.
 say "bin/workspace_setup --without_seeds"
 bin/workspace_setup --without_seeds || exit 1
 
 # After workspace_setup, not before: .workspace_id is what gives BASE_URL its port.
 eval "$(ruby bin/env --export)"
 
+# The pinned playwright can want a newer chromium build than the image ships under
+# /opt/pw-browsers; its CDN is reachable, so fetch the headless shell the :js specs
+# launch (~10s, a no-op when present) while the css builds.
+npx --no-install playwright install chromium-headless-shell >/tmp/playwright_install.log 2>&1 &
+PW_PID=$!
+
 # bin/setup builds dartsass only on the seeding path, and tailwind not at all, and
 # without them anything rendering the application layout - a request spec on an html
-# format, any :js system spec - dies on AssetNotFound. Under --dev-server it is
-# Procfile.dev's dartsass:watch and tailwindcss:watch that build them instead.
+# format, any :js system spec - dies on AssetNotFound. Built before seeding, because
+# db:seed's inline jobs render emails (email.css). bin/dev's watchers rebuild on top.
+say "building tailwind + dartsass"
+bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
+  say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
+
+wait "$PW_PID" || say "playwright browser install failed - see /tmp/playwright_install.log (:js specs need it)"
+
+# Seeding is ~95s of the run, and nothing the session starts with needs it (specs use
+# the test database), so it goes to the background rather than holding the session
+# up. Detached with every fd redirected, so the SessionStart hook doesn't wait on it.
+# Only into an empty database: bin/setup re-seeds unconditionally, and a second
+# db:seed over seeded records dies on duplicates. psql, not `rails runner`: each
+# Rails boot here is ~7s.
+SEED_STATUS=/tmp/seed.status
+DEV_DB="bikeindex_development_${WORKSPACE_ID}"
+SEEDED=$(psql -d "$DEV_DB" -tAc 'SELECT EXISTS (SELECT 1 FROM bikes)' 2>&1)
+if [ "$SEEDED" = "f" ]; then
+  say "seeding the development database in the background -> /tmp/seed.log"
+  say "  wait for it: until grep -qx 'done\|failed' $SEED_STATUS; do sleep 5; done"
+  echo running > "$SEED_STATUS"
+  # Status is written after the seed rather than redirected around it, which would
+  # truncate the file to empty for the whole run.
+  setsid nohup bash -c "if bundle exec rails db:seed; then s=done; else s=failed; fi; echo \$s > $SEED_STATUS" \
+    </dev/null >/tmp/seed.log 2>&1 &
+elif [ "$SEEDED" = "t" ]; then
+  echo done > "$SEED_STATUS"
+  say "development database already seeded"
+else
+  echo failed > "$SEED_STATUS"
+  say "couldn't tell whether $DEV_DB is seeded, so didn't seed it: $SEEDED"
+fi
+
 if [ "$DEV_SERVER" = 1 ]; then
-  say "starting bin/dev -> /tmp/dev_server.log; its watchers build the css"
-  nohup bin/dev > /tmp/dev_server.log 2>&1 &
+  say "starting bin/dev -> /tmp/dev_server.log"
+  setsid nohup bin/dev </dev/null >/tmp/dev_server.log 2>&1 &
   # First boot compiles assets, ~40s. Bounded, so a server that dies on boot
   # reports its log instead of hanging the session hook until its timeout.
   for _ in $(seq 1 48); do curl -fs -o /dev/null "$BASE_URL/" && break; sleep 5; done
@@ -262,10 +308,6 @@ if [ "$DEV_SERVER" = 1 ]; then
     say "dev server never answered on $BASE_URL - see /tmp/dev_server.log"
     tail -20 /tmp/dev_server.log
   fi
-else
-  say "building tailwind + dartsass"
-  bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
-    say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
 fi
 
 # Stamped here rather than at unpack, and unconditionally: what makes each tree

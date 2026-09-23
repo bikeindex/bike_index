@@ -2,15 +2,15 @@
 
 **A `SessionStart` hook (`.claude/hooks/session-start.sh`) already ran all of this
 before your first turn**, so Ruby, gems, postgres, redis, the CSS builds and the
-Playwright browser are normally in place, and `$PATH` and the `PG*` variables are
+Playwright browsers are normally in place, the development database is seeded or
+seeding, and `$PATH` and the `PG*` variables are
 already exported into your shells. Check before setting anything up: `ruby -v` and
 `pg_isready`. The hook is remote-only — it exits immediately anywhere but the web
 sandbox.
 
 It calls `assets/web_sandbox_setup.sh` — run that by hand when the hook didn't (an
 older branch), didn't finish, or the container idled and dropped postgres/redis. It's
-idempotent, and covers the setup sections below but not the chromium build-number
-symlinks or the jsdelivr shim:
+idempotent, and covers the setup sections below but not the jsdelivr shim:
 
 ```bash
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh              # setup only
@@ -20,10 +20,23 @@ bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh --dev-server 
 It puts the toolchain in place, then runs `bin/workspace_setup --without_seeds` — the
 same entry point a spawned worktree uses, so the gems, `node_modules`, the four
 databases and the `.workspace_id` all come from `bin/setup` rather than anything
-sandbox-specific. `--without_seeds` because `db:seed` wants `setup:import_spreadsheets`
-and a network this sandbox lacks.
+sandbox-specific. `--without_seeds` because `bin/setup` seeds on every run and a second
+`db:seed` dies on duplicates; the script seeds once itself, into an empty database only.
 
-It downloads a prebuilt Ruby (11MB), gem tree and `node_modules` from the
+**The seed runs in the background** — it's ~95s (30 of it `setup:import_spreadsheets`
+pulling `bike_data` from raw.githubusercontent.com), and nothing a session starts with
+needs it. Before anything that reads development data (a screenshot, `rails runner`,
+`$BASE_URL`), wait on its status file — `running`, then `done` or `failed`, log in
+`/tmp/seed.log`:
+
+```bash
+until grep -qx 'done\|failed' /tmp/seed.status; do sleep 5; done; cat /tmp/seed.status
+```
+
+A dozen `Google API error: request denied` lines in that log are the `.env` geocoder
+key being referer-restricted, not a failure.
+
+It downloads a prebuilt Ruby (50MB), gem tree and `node_modules` from the
 `web-sandbox-prebuilt` release (built by `.github/workflows/web-sandbox-prebuild.yml`),
 falling back to the source build below on any miss. A `Gemfile.lock` your branch
 changed misses its exact gem tarball and takes the newest via
@@ -32,31 +45,34 @@ changed misses its exact gem tarball and takes the newest via
 are stamped, so a warm container re-downloads neither. `BINX_SKIP_PREBUILT=1` forces
 the source path.
 
-**Ruby is either seconds or six minutes, nothing between** — that download against a
+**Ruby is either seconds or minutes, nothing between** — that download against a
 from-source build — so the only thing worth tuning is whether it lands. Release
-assets redirect to `release-assets.githubusercontent.com`, **not** on the allow list
-at the bottom of this file, and a refused host looks exactly like a missing asset:
+assets redirect to `release-assets.githubusercontent.com`; an environment whose
+network policy refuses it sees a refused host that looks exactly like a missing asset:
 the script's `prebuilt assets:` block names what resolved, and `http 000` there means
-the host never answered. `BINX_PREBUILT_BASE` repoints the set at any reachable host
-— git-over-https to github.com *is* allowed, so a small repo holding the tarball
-works where the release download doesn't.
+the host never answered. `BINX_PREBUILT_BASE` repoints the set at any reachable host.
 
 The sections below are what the script automates — read them when a step fails, or
 when you need only part of it. The Tailwind build in SKILL.md applies here too.
 
 **Read the Ruby pin from `.tool-versions`' `ruby` line; it moves** (the `Gemfile` has
-no `ruby` directive), and `Gemfile.lock` pins its bundler. No *upstream* prebuilt
-exists for it (`cache.ruby-lang.org` 403s, `ruby/ruby-builder` tops out at
-`3.5.0-preview1`), which is why the release above exists — and when that misses too,
-the source build takes about 6 min on 4 cores (for 4.0.6: ~1 clone, ~1
-autogen/configure/gem-staging, ~3 `make -j4`, ~1 install). Don't panic at what look
+no `ruby` directive), and `Gemfile.lock` pins its bundler. No *upstream prebuilt binary*
+exists for it (`ruby/ruby-builder` tops out at `3.5.0-preview1`), which is why the
+release above exists — and when that misses too, the script builds from the
+cache.ruby-lang.org source tarball (ships `configure` and the bundled gems), falling back
+to a git clone of the tag when that host is refused. About 6 min on 4 cores from the
+clone (for 4.0.6: ~1 clone, ~1 autogen/configure/gem-staging, ~3 `make -j4`, ~1
+install); the tarball skips the clone, `autogen.sh` and the gem staging. Don't panic at what look
 like restarts in its log — miniruby, then the real build, then each ext's own
 `configure`. Don't fall back to 3.x and patch the Gemfile; Bundler 4.x's resolver
 behaves differently and you'll chase fake regressions.
 
-**libvips** is separate from all of that: `ruby-vips` loads at boot, so without it
-every `rails`/`rspec`/`db:migrate` dies with `Could not open library 'vips.so.42'`.
-`apt-get install -y libvips42`, with an `apt-get update` first if a fetch 404s.
+**libvips and ImageMagick** are separate from all of that: `ruby-vips` loads at boot, so
+without it every `rails`/`rspec`/`db:migrate` dies with `Could not open library
+'vips.so.42'`; `mini_magick` shells out to `identify`, so without ImageMagick `db:seed`
+dies in `seed_organizations` with `executable not found: "identify"`. `apt-get install -y
+--no-install-recommends libvips42 imagemagick`, with an `apt-get update` first if a
+fetch 404s.
 
 ## One-shot Ruby build
 
@@ -178,14 +194,11 @@ when one is already listening. Postgres and redis don't survive a container idle
 period: a server answering `PG::ConnectionBad` wants `service postgresql start`
 and a restart, not debugging.
 
-A fresh development database is **empty and doesn't say so** — the homepage renders
-with every counter at zero, a combobox matches nothing rather than erroring. Fine for
-a layout screenshot, misleading for anything about the data. A full `bundle exec rails db:seed` needs
-`setup:import_spreadsheets` and a network this sandbox lacks, so seed one flow's worth
-by hand via `rails runner`: the relevant `db/seeds/seed_*.rb` reference data
-(`seed_bike_associations` covers colors), a `Manufacturer` or two, then
-`Autocomplete::Loader.load_all(%w[Manufacturer])` — the combobox reads Redis, so
-without that load it stays empty however many rows exist.
+A development database that hasn't finished seeding is **empty and doesn't say so** —
+the homepage renders with every counter at zero, a combobox matches nothing rather than
+erroring. Wait on `/tmp/seed.status` (above). To re-seed from scratch:
+`DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:reset` (~2 min). Its last
+step loads the autocomplete into Redis, which is what the combobox reads.
 
 ## Driving the app with Playwright MCP
 
@@ -217,8 +230,9 @@ printf '{"cookies":[],"origins":[]}' > /root/.cache/ms-playwright/mcp-auth.json
 A third fix applies only when the error names a build number the image doesn't have
 (`@playwright/mcp@latest` moved ahead of the image's chromium). It didn't on
 2026-09-22 — the image shipped `chromium-1194` and the pin took it — so don't
-pre-emptively symlink; wait for the error, then use the recipe in the `:js` spec
-section below, which is the same mismatch.
+pre-emptively fix it; wait for the error, then `npx playwright install chromium` (the
+full browser, which the MCP's `chrome` channel wraps) and repoint the wrapper above at
+the new build, or symlink per the `:js` spec section below where the CDN is refused.
 
 This browser gets no `--host-resolver-rules`, so the jsdelivr pin
 (`@honeybadger-io/js`, the only one left) fails to load and every page logs
@@ -291,14 +305,13 @@ this repo doesn't have.
   ```bash
   export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
   ```
-- If the build number it wants isn't the one the image ships, symlink — the
-  same mismatch the MCP section above resolves that way. Don't reach for
-  `npx playwright install chromium` instead: Chromium's only download URL is
-  `cdn.playwright.dev` (no fallbacks, unlike firefox/webkit), which is the
-  class of CDN this sandbox blocks.
+- If the build number it wants isn't the one the image ships (the pin wanted 1223
+  against the image's 1194 on 2026-09-23), install it:
+  `npx playwright install chromium-headless-shell` (~10s from `cdn.playwright.dev`).
+  The setup script already does. Symlink only where that CDN is refused.
 - `capybara-playwright-driver` launches the **headless shell**, not the full
-  browser, so it's the `chromium_headless_shell-*` half of that symlink pair
-  that matters and the error names `chrome-headless-shell`. The MCP section's
+  browser, so it's the `chromium_headless_shell-*` build (and half of the symlink
+  pair) that matters, and the error names `chrome-headless-shell`. The MCP section's
   `/opt/google/chrome` link is for the MCP server's `chrome` channel and isn't
   needed here. Ran against an image shipping 1194 with the pin wanting 1223:
   ```bash
@@ -380,13 +393,17 @@ LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration   # system; CDN proxy
 
 Quick probe: `curl -sIL --max-time 5 "https://<host>" -o /dev/null -w "%{http_code}\n"`.
 
-- **Allowed**: github.com (git-over-https clone/fetch), rubygems.org,
-  registry.npmjs.org, storage.googleapis.com, files.pythonhosted.org.
-- **Blocked**: cache.ruby-lang.org, cdn.jsdelivr.net, most generic CDNs,
-  download.ruby-lang.org, api.github.com. Also GitHub's codeload /
-  archive-tarball endpoints (`/archive/refs/tags/*.tar.gz`,
-  `codeload.github.com`) 403 through the proxy — `git clone` the tag
-  instead of downloading a tarball.
+What's reachable is the environment's network policy, so it moves; probe rather than
+trust this list. As of 2026-09-23:
+
+- **Allowed**: github.com (git-over-https, release downloads), api.github.com,
+  raw.githubusercontent.com (`setup:import_spreadsheets`), rubygems.org,
+  registry.npmjs.org, cache.ruby-lang.org, cdn.playwright.dev, storage.googleapis.com,
+  cdn.jsdelivr.net (for `curl` — the browsers still can't, see the Playwright MCP
+  section), api.mapbox.com.
+- **Blocked**: download.ruby-lang.org, and GitHub's codeload / archive-tarball
+  endpoints (`/archive/refs/tags/*.tar.gz`, `codeload.github.com`) 403 through the
+  proxy — `git clone` the tag instead.
 
 If a tool's default download URL is blocked, look for a GitHub or
 npm-registry alternative before giving up.
