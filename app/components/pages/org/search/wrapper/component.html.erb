@@ -81,8 +81,14 @@
     </p>
   <% end %>
 
+  <% if @search_page %>
+    <div class="tw:hidden tw:min-h-48 tw:group-[[busy]]:block">
+      <%= render(UI::LoadingSpinner::Component.new(text: translation(".loading_results"))) %>
+    </div>
+  <% end %>
+
   <% if result_component %>
-    <ul class="tw:m-0 tw:list-none tw:py-4 <%= result_component::LIST_CLASSES %> <%= padding_x_class %>">
+    <ul class="tw:m-0 tw:list-none tw:py-4 <%= results_swap_class %> <%= result_component::LIST_CLASSES %> <%= padding_x_class %>">
       <% @bikes.each do |bike| %>
         <%= render(result_component.new(bike:, organization: @organization, current_user: @current_user,
           search_all: @search_all)) %>

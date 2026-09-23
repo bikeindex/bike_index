@@ -282,6 +282,78 @@ trek_components.each do |component|
 end
 puts "  Created stolen Trek at #{trek_location[:street]}, #{trek_location[:city]} with #{trek_bike.components.count} components"
 
+# --- Specific recovered bike: Trek Marlin stolen and recovered in Calgary ---
+# Its recovery display is what the homepage showcase renders
+puts "Creating recovered Trek Marlin in Calgary..."
+silver = Color.friendly_find("Silver, gray or bare metal")
+calgary_location = {latitude: 51.0512, longitude: -114.0631, street: "917 Centre Ave NE", city: "Calgary", zipcode: "T2E 0C6"}
+recovery_photo_path = Rails.root.join("db/seeds/images/trek_marlin_recovery.jpg")
+
+recovered_bike = seed_bike(
+  creator:, user:, label: "Recovered Trek bike",
+  params: {
+    bike: bike_params(owner_email: "user_3@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
+      primary_frame_color_id: silver&.id,
+      year: 2019,
+      frame_model: "Marlin 6",
+      frame_material_slug: "aluminum",
+      handlebar_type: "flat",
+      frame_size: "l",
+      frame_size_unit: "ordinal",
+      rear_tire_narrow: "false",
+      front_tire_narrow: "false",
+      front_wheel_size_id: seven_hundred_c_id,
+      rear_wheel_size_id: seven_hundred_c_id,
+      description: "Matte quicksilver with blue decals, Bontrager XR2 tires and blue platform pedals.",
+      status: "status_stolen",
+      date_stolen: (Time.current - 3.weeks).to_s
+    ),
+    stolen_record: {
+      latitude: calgary_location[:latitude].to_s,
+      longitude: calgary_location[:longitude].to_s,
+      street: calgary_location[:street],
+      city: calgary_location[:city],
+      zipcode: calgary_location[:zipcode],
+      country_id: Country.canada_id.to_s,
+      skip_geocoding: true,
+      estimated_value: "750",
+      theft_description: "Cut out of the garage behind our place in Bridgeland while we were away for the weekend",
+      locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
+      lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
+    }
+  }
+)
+
+recovered_stolen_record = recovered_bike.current_stolen_record
+recovered_stolen_record.update_columns(latitude: calgary_location[:latitude], longitude: calgary_location[:longitude])
+recovery_public_image = PublicImage.new(imageable: recovered_bike, listing_order: 1)
+File.open(recovery_photo_path) { |file| recovery_public_image.image = file }
+recovery_public_image.save!
+
+recovered_at = Time.current - 4.days
+recovered_stolen_record.add_recovery_information(
+  recovered_at:,
+  recovered_description: "A rider recognized it from the Bike Index listing and messaged me the same night.",
+  index_helped_recovery: true,
+  can_share_recovery: true
+)
+
+recovery_display = RecoveryDisplay.new(
+  stolen_record: recovered_stolen_record,
+  recovered_at:,
+  quote_by: "Kara",
+  location_string: "Calgary, AB",
+  quote: "My Trek went missing out of the garage and I assumed that was the end of it. Someone matched the serial to my Bike Index listing, messaged me that night, and a few days later I was riding it home along the Bow River."
+)
+# save! goes inside the block - ActiveStorage re-reads the io to upload it
+File.open(recovery_photo_path) do |file|
+  recovery_display.photo.attach(io: file, filename: recovery_photo_path.basename.to_s)
+  recovery_display.save!
+end
+# Inline, so photo_url exists without sidekiq running - the homepage filters on it
+ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
+puts "  Created recovered Trek in #{calgary_location[:city]} with recovery display ##{recovery_display.id}"
+
 # --- Specific real bike: Riese & Müller Load4 75 rohloff cargo e-bike (child carrying) ---
 puts "Creating Riese & Müller Load4 75 rohloff cargo bike..."
 rm_manufacturer = Manufacturer.friendly_find("Riese & Müller")
