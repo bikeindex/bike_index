@@ -591,10 +591,8 @@ class Organization < ApplicationRecord
   def ensure_auto_user
     return true if auto_user.present?
 
-    email = users.first&.email || ENV["AUTO_ORG_MEMBER"]
-    # An address no account holds leaves auto_user blank, so every later call
-    # would save again and re-enqueue UpdateOrganizationAssociationsJob
-    return false if User.fuzzy_email_find(email).blank?
+    email = calculated_embedable_user_email
+    return false if email.blank?
 
     self.embedable_user_email = email
     save
@@ -636,6 +634,13 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  # Returning an address no account holds would leave auto_user blank, so every
+  # later ensure_auto_user would save again and re-enqueue UpdateOrganizationAssociationsJob
+  def calculated_embedable_user_email
+    email = users.first&.email || ENV["AUTO_ORG_MEMBER"]
+    email if User.fuzzy_email_find(email).present?
+  end
 
   def calculated_slug(new_slug)
     orgs = id.present? ? Organization.unscoped.where.not(id:) : Organization.unscoped.all
