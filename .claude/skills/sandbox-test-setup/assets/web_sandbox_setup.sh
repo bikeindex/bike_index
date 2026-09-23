@@ -3,12 +3,12 @@
 #
 #   bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh [--dev-server]
 #
-# Toolchain, then `bin/workspace_setup --without_seeds`, the css, and a background seed
+# Toolchain, then `bin/workspace_setup --without_seeds` and a background seed
 # of an empty development database (/tmp/seed.status). Idempotent; --dev-server also
 # boots bin/dev.
 #
-# Logs: /tmp/ruby_build.log, /tmp/system_setup.log, /tmp/css_build.log,
-#       /tmp/playwright_install.log, /tmp/seed.log (+ /tmp/seed.status), /tmp/dev_server.log
+# Logs: /tmp/ruby_build.log, /tmp/system_setup.log, /tmp/playwright_install.log,
+#       /tmp/seed.log (+ /tmp/seed.status), /tmp/dev_server.log
 set -uo pipefail
 
 REPO="${CLAUDE_PROJECT_DIR:-/home/user/bike_index}"
@@ -229,13 +229,6 @@ eval "$(ruby bin/env --export)"
 npx --no-install playwright install chromium-headless-shell >/tmp/playwright_install.log 2>&1 &
 PW_PID=$!
 
-# bin/setup builds neither under --without_seeds; db:seed's emails need email.css
-say "building tailwind + dartsass"
-bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
-  say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
-
-wait "$PW_PID" || say "playwright browser install failed - see /tmp/playwright_install.log (:js specs need it)"
-
 # ~95s nothing at session start needs, so detached with every fd redirected — else the
 # SessionStart hook waits on it. psql because a Rails boot is ~7s.
 SEED_STATUS=/tmp/seed.status
@@ -268,6 +261,8 @@ if [ "$DEV_SERVER" = 1 ]; then
     tail -20 /tmp/dev_server.log
   fi
 fi
+
+wait "$PW_PID" || say "playwright browser install failed - see /tmp/playwright_install.log (:js specs need it)"
 
 # Here, not at unpack: bin/setup's installs are what make the trees match their lockfiles
 printf '%s' "$LOCK_SHA" > "$GEM_STAMP"

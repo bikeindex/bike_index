@@ -37,8 +37,8 @@ bin/workspace_setup --without_seeds
 ```
 
 It allocates an ID from the `dev_workspaces` registry, writes `.workspace_id`, and runs
-`bin/setup`, which creates this workspace's databases. Run `bundle exec rails db:seed`
-when you need records. Expect a full `npm install`.
+`bin/setup`, which creates this workspace's databases and builds the CSS. Run `bundle
+exec rails db:seed` when you need records. Expect a full `npm install`.
 
 **Never write `.workspace_id` yourself** — `bin/workspace_setup` then skips allocation,
 leaving an ID the registry never handed out. And skipping setup entirely silently falls
@@ -48,9 +48,10 @@ and a `bin/setup` from there loads the schema over the main checkout's database.
 ## Build the CSS (every environment)
 
 `AssetNotFound` from any spec that renders the layout (an html request spec, any `:js`
-spec) means `app/assets/builds/tailwind.css` is missing — a fresh workspace where
-`bin/dev` hasn't run. It isn't pre-existing; build it. `The asset "email.css" is not
-present` (anything rendering an email, including `db:seed`) is the SCSS half:
+spec) means `app/assets/builds/tailwind.css` is missing — a checkout where neither
+`bin/setup` nor `bin/dev` has run. It isn't pre-existing; build it. `The asset
+"email.css" is not present` (anything rendering an email, including `db:seed`) is the
+SCSS half:
 
 ```bash
 bundle exec rails tailwindcss:build dartsass:build

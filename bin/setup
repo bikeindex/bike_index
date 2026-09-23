@@ -91,12 +91,12 @@ FileUtils.chdir APP_ROOT do
   # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
   system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
 
-  unless without_seeds
-    # Build stylesheets so seeding can render emails. Seeding delivers mailers
-    # without compilation Sprockets tries to compile email.scss and with sassc, but should use dartsass
-    puts "\n== Building stylesheets =="
-    system! "bin/rails dartsass:build"
+  # The layout needs tailwind.css and emails (which seeding sends) need email.css; without
+  # the build Sprockets tries compiling email.scss with sassc
+  puts "\n== Building stylesheets =="
+  system! "bin/rails tailwindcss:build dartsass:build"
 
+  unless without_seeds
     puts "\n== Seeding database =="
     system! "bin/rake db:seed"
 
