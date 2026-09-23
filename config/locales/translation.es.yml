@@ -5819,6 +5819,7 @@ es:
             view_cards: Tarjetas
             view_list: Lista
             view_table: Mesa
+            loading_results: Cargando resultados...
           chart_card:
             caption_search: Búsqueda actual
             caption_year: Resumen del año pasado
