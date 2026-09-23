@@ -10,7 +10,7 @@ sandbox.
 It calls `assets/web_sandbox_setup.sh`, which is also the thing to run by hand when
 the hook didn't run (an older branch), didn't finish, or the container has idled and
 dropped postgres/redis. It's idempotent, and does the setup steps below — not the
-chromium build-number symlinks or the jsdelivr shim, which are both wait-for-the-error:
+chromium build-number symlinks or the jsdelivr shim:
 
 ```bash
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh              # setup only
@@ -280,15 +280,13 @@ in under a second or two; sample from inside one `browser_evaluate` instead.
 
 ## No `gh` here
 
-The GitHub CLI isn't installed. **This is a translation table for the `pr` skill's
-commands, not a way to skip it** — opening a PR still starts by invoking that skill,
-and a `PreToolUse` hook denies `create_pull_request` until you have, and
-`merge_pull_request` always. Anything it (or
-any other skill) expresses as `gh pr …` goes through the GitHub MCP tools instead —
-`mcp__github__list_pull_requests` (filter with `head: "<owner>:<branch>"`),
-`create_pull_request`, `update_pull_request`, `pull_request_read`. Check for an
-existing PR before creating one: a push to a branch can open a PR by itself, so the
-branch may already have one whose body wants updating rather than a second PR.
+The GitHub CLI isn't installed, so anything a skill expresses as `gh pr …` goes
+through the GitHub MCP tools. **The `pr` skill's own appendix has that mapping** and
+the traps in it — reach for the skill rather than the tools directly; the
+`pr-guardrails` hook denies `create_pull_request` until you have, and
+`merge_pull_request` always. `pull_request_read` is the one the appendix doesn't
+list. Check for an existing PR before creating one: a push can open one by itself,
+so the branch may already have a PR whose body wants updating rather than a second.
 
 `list_pull_requests` returns `merged: false` on PRs that are merged — the underlying list
 endpoint doesn't populate it. Pass `state: "open"` when you want live PRs; when you need a
@@ -413,8 +411,7 @@ trusts the self-signed cert.
 ## End-to-end recap
 
 `assets/web_sandbox_setup.sh` is the setup — run it rather than retyping the
-sections above. It prints the shell env its own steps used, which is what the
-`eval` below stands in for. Then:
+sections above. Then:
 
 ```bash
 eval "$(ruby bin/env --export)"

@@ -150,6 +150,9 @@ setup_system() {
     printf '{"cookies":[],"origins":[]}' > /root/.cache/ms-playwright/mcp-auth.json
 }
 
+DEV_SERVER=0
+[ "${1:-}" != "--dev-server" ] || DEV_SERVER=1
+
 say "starting system setup, prebuilt downloads and (if needed) the ruby build together"
 setup_system > /tmp/system_setup.log 2>&1 &
 SYSTEM_PID=$!
@@ -158,11 +161,13 @@ SYSTEM_PID=$!
 BUNDLE_WON="$STAGE/bundle.name"
 
 download_bundle() {
-  download_asset "$BUNDLE_TARBALL" && { printf '%s' "$BUNDLE_TARBALL" > "$BUNDLE_WON"; return 0; }
-  local latest
-  latest=$(curl -sfL --max-time 60 "$PREBUILT_BASE/$BUNDLE_LATEST_POINTER") || return 1
-  [ -n "$latest" ] && [ "$latest" != "$BUNDLE_TARBALL" ] || return 1
-  download_asset "$latest" && printf '%s' "$latest" > "$BUNDLE_WON"
+  local won="$BUNDLE_TARBALL"
+  if ! download_asset "$won"; then
+    won=$(curl -sfL --max-time 60 "$PREBUILT_BASE/$BUNDLE_LATEST_POINTER")
+    [ -n "$won" ] && [ "$won" != "$BUNDLE_TARBALL" ] || return 1
+    download_asset "$won" || return 1
+  fi
+  printf '%s' "$won" > "$BUNDLE_WON"
 }
 
 # Stamps let a warm container - a resume, or a hand re-run - skip the download and
@@ -172,12 +177,21 @@ GEM_STAMP="$TOOLCACHE/x64/lib/ruby/gems/.binx_lock_sha"
 NPM_STAMP="$REPO/node_modules/.binx_npm_sha"
 stamped() { [ "$(cat "$1" 2>/dev/null)" = "$2" ]; }
 
+# Fused onto its own download below, because node_modules needs neither the Ruby
+# nor the gem tree - so on the source-build path it lands during those six minutes
+# rather than after them. bin/setup's `npm install` reconciles whatever it leaves
+# short; bin/lint and the :js specs' playwright package both need the tree.
+unpack_node() {
+  tar -C "$REPO" -xzf "$STAGE/$NODE_TARBALL" || return 1
+  say "prebuilt node_modules for package-lock ${NPM_SHA} installed"
+}
+
 RUBY_DL_PID=""
 BUNDLE_DL_PID=""
 NODE_DL_PID=""
 ruby_is_built || { download_asset "$RUBY_TARBALL" & RUBY_DL_PID=$!; }
 stamped "$GEM_STAMP" "$LOCK_SHA" || { download_bundle & BUNDLE_DL_PID=$!; }
-stamped "$NPM_STAMP" "$NPM_SHA" || { download_asset "$NODE_TARBALL" & NODE_DL_PID=$!; }
+stamped "$NPM_STAMP" "$NPM_SHA" || { download_asset "$NODE_TARBALL" && unpack_node & NODE_DL_PID=$!; }
 
 # ---------------------------------------------------------------------- ruby
 RUBY_PID=""
@@ -203,32 +217,20 @@ cd "$REPO"
 # over the Ruby's own GEM_HOME, which is why it waited for the Ruby to land.
 unpack_gems() {
   local won
-  won=$(cat "$BUNDLE_WON" 2>/dev/null) || return 0
+  won=$(cat "$BUNDLE_WON" 2>/dev/null)
   [ -n "$won" ] && unpack_ruby_tree "$won" || return 0
   # Only when nothing has claimed the prefix yet: after a source build it's a real
   # directory that $TOOLCACHE/x64 points AT, and relinking would chase its own tail.
   ruby_is_built || link_ruby_prefix
-  printf '%s' "$LOCK_SHA" > "$GEM_STAMP"
-  [ "$won" = "$BUNDLE_TARBALL" ] &&
-    say "prebuilt gems for Gemfile.lock ${LOCK_SHA} installed" ||
+  if [ "$won" = "$BUNDLE_TARBALL" ]; then
+    say "prebuilt gems for Gemfile.lock ${LOCK_SHA} installed"
+  else
     say "no bundle for Gemfile.lock ${LOCK_SHA}; unpacked ${won}, bundle install will reconcile"
+  fi
 }
 
-# bin/setup's `npm install` reconciles whatever this leaves short. bin/lint
-# (herb-format, standard) and the :js specs' playwright package both need it.
-unpack_node() {
-  tar -C "$REPO" -xzf "$STAGE/$NODE_TARBALL" || return 0
-  printf '%s' "$NPM_SHA" > "$NPM_STAMP"
-  say "prebuilt node_modules for package-lock ${NPM_SHA} installed"
-}
-
-UNPACK_PIDS=""
-[ -z "$BUNDLE_DL_PID" ] || { wait "$BUNDLE_DL_PID"; unpack_gems & UNPACK_PIDS="$UNPACK_PIDS $!"; }
-[ -z "$NODE_DL_PID" ] || { wait "$NODE_DL_PID"; unpack_node & UNPACK_PIDS="$UNPACK_PIDS $!"; }
-# Named PIDs, not a bare `wait` - that would reap setup_system too, and the
-# `wait "$SYSTEM_PID"` below would then report a problem that never happened.
-# shellcheck disable=SC2086
-[ -z "$UNPACK_PIDS" ] || wait $UNPACK_PIDS
+[ -z "$BUNDLE_DL_PID" ] || { wait "$BUNDLE_DL_PID"; unpack_gems; }
+[ -z "$NODE_DL_PID" ] || wait "$NODE_DL_PID"
 
 # workspace_setup wants postgres up and the rails role in place before it can
 # allocate an ID out of the dev_workspaces database.
@@ -244,21 +246,12 @@ bin/workspace_setup --without_seeds || exit 1
 # After workspace_setup, not before: .workspace_id is what gives BASE_URL its port.
 eval "$(ruby bin/env --export)"
 
-# bin/setup builds dartsass only on the seeding path, and tailwind not at all.
-# Without them anything rendering the application layout - a request spec on an
-# html format, any :js system spec - dies on AssetNotFound. Skipped under
-# --dev-server: Procfile.dev's dartsass:watch and tailwindcss:watch both build on
-# start, so this Rails boot would be redone seconds later.
-if [ "${1:-}" = "--dev-server" ]; then
-  say "leaving the css build to bin/dev's watchers"
-else
-  say "building tailwind + dartsass"
-  bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
-    say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
-fi
-
-if [ "${1:-}" = "--dev-server" ]; then
-  say "starting bin/dev -> /tmp/dev_server.log"
+# bin/setup builds dartsass only on the seeding path, and tailwind not at all, and
+# without them anything rendering the application layout - a request spec on an html
+# format, any :js system spec - dies on AssetNotFound. Under --dev-server it is
+# Procfile.dev's dartsass:watch and tailwindcss:watch that build them instead.
+if [ "$DEV_SERVER" = 1 ]; then
+  say "starting bin/dev -> /tmp/dev_server.log; its watchers build the css"
   nohup bin/dev > /tmp/dev_server.log 2>&1 &
   # First boot compiles assets, ~40s. Bounded, so a server that dies on boot
   # reports its log instead of hanging the session hook until its timeout.
@@ -269,7 +262,17 @@ if [ "${1:-}" = "--dev-server" ]; then
     say "dev server never answered on $BASE_URL - see /tmp/dev_server.log"
     tail -20 /tmp/dev_server.log
   fi
+else
+  say "building tailwind + dartsass"
+  bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
+    say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
 fi
+
+# Stamped here rather than at unpack, and unconditionally: what makes each tree
+# match its lockfile is bin/setup's `bundle install` and `npm install`, not which
+# prebuilt landed. A run that dies before this point re-downloads next time.
+printf '%s' "$LOCK_SHA" > "$GEM_STAMP"
+printf '%s' "$NPM_SHA" > "$NPM_STAMP"
 
 # Set by the SessionStart hook: everything written here is exported into the
 # session's shells, so later commands need no `export PATH=...` preamble.

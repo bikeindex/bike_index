@@ -14,13 +14,14 @@ name: Web sandbox prebuild
 #
 # NOTE the sandbox has to be able to *reach* these — release downloads redirect to
 # release-assets.githubusercontent.com, which is not on its documented allow list.
-# web_sandbox_setup.sh prints which assets resolved; a run where none did is this.
+# If a sandbox session reports that no prebuilt asset resolved, this is why.
 #
 # ci.yml's build_ci_image bakes the same three things keyed on the same lockfiles,
 # but can't be reused: it installs under `ruby:slim` with BUNDLE_PATH, and these
 # have to extract to setup-ruby's prefix because rbconfig bakes that path in. The consumer is
-# .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh — so a failed or
-# skipped run here costs time, never correctness.
+# .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh, which reports which
+# assets resolved and falls back to a source build — so a failed or skipped run here
+# costs time, never correctness.
 #
 # runs-on MUST match the web sandbox image (Ubuntu 24.04, glibc 2.39, OpenSSL 3.0),
 # and the tarballs MUST extract to the same absolute path they were built at:
@@ -137,9 +138,10 @@ jobs:
           tar -cf - node_modules | pigz > "artifacts/$tarball"
           (cd artifacts && sha256sum "$tarball" > "${tarball}.sha256")
 
-      # Decompresses every member and checks the CRCs without writing ~1GB to disk.
-      # The old form extracted, then ran `ruby -v` from the live toolcache rather
-      # than from what it had extracted — so it proved nothing about the tarball.
+      # A smoke check for a truncated or empty upload, nothing more: it decompresses
+      # every member and checks the CRCs without writing ~1GB. What actually matters
+      # — that the tree works at the consumer's absolute path — only the consumer can
+      # establish, and it does: sha256, then ruby_is_built, then the source fallback.
       - name: Verify the tarballs
         run: |
           set -euo pipefail
