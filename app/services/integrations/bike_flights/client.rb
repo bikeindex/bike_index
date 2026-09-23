@@ -32,11 +32,11 @@ module Integrations
 
       class Error < StandardError; end
 
-      # Both addresses take :first_name, :last_name, :phone, :address1, :city, :region, :postal_code
-      # and :country_iso, all required by their validation. Optional: :company, :address2, :residential.
+      # Both addresses take :first_name, :last_name, :phone, :address1, :city, :region and :postal_code,
+      # all required by their validation. Optional: :company, :address2, :residential, :country_iso (US).
       # Packages take :length, :width, :height (inches), :weight_pounds and :value (dollars).
       def shop_rate(origin:, destination:, packages:)
-        post(:shop_rate, "api/ShopRate", {
+        authorized_request(:shop_rate, :post, "api/ShopRate", {
           shopName: SHOP_NAME,
           stage: {from: address_params(origin), to: address_params(destination)},
           packages: packages.map { |package| package_params(package) }
@@ -46,21 +46,25 @@ module Integrations
       # Charges the account's saved payment method. requestId and rateSignature come from the
       # matching shop_rate response, and the requestId is single-use, which prevents double charges.
       def create_order(request_id:, rate_signature:, purchase_order: nil)
-        post(:create_order, "api/Order/create-shop-order",
+        authorized_request(:create_order, :post, "api/Order/create-shop-order",
           {requestId: request_id, rateSignature: rate_signature, purchaseOrder: purchase_order}.compact)
       end
 
-      def create_label(order_id) = post(:create_label, "api/Labels/create-shop-label/#{order_id}")
+      def create_label(order_id)
+        authorized_request(:create_label, :post, "api/Labels/create-shop-label/#{order_id}")
+      end
 
       # label_type is "laser" or "thermal"; the response is a PDF rather than JSON
       def label(tracking_number, label_type: "laser")
-        authorized_request(:label, :get, "api/Labels/shop-label/#{tracking_number}/#{label_type}").body
+        authorized_request(:label, :get, "api/Labels/shop-label/#{tracking_number}/#{label_type}")
       end
 
-      def package_location(tracking_number) = get(:package_location, "api/PackageLocation/#{tracking_number}")
+      def package_location(tracking_number)
+        authorized_request(:package_location, :get, "api/PackageLocation/#{tracking_number}")
+      end
 
       # Countries flagged active ship both ways. Says nothing about customs or duties.
-      def countries = get(:countries, "api/Data/countries")
+      def countries = authorized_request(:countries, :get, "api/Data/countries")
 
       #
       # private below here
@@ -80,27 +84,22 @@ module Integrations
             contentCode: CONTENT_CODE, insideDescription: DESCRIPTION, outsideDescription: DESCRIPTION)
       end
 
-      def token = Rails.cache.read(TOKEN_CACHE_KEY).presence || login
+      def token
+        Rails.cache.fetch(TOKEN_CACHE_KEY) do |_key, options|
+          body = logged_request(:login, :post, "api/Authentication/login", {email: EMAIL, password: PASSWORD})
+          raise Error, "login returned no token" unless body.is_a?(Hash) && body["token"].present?
 
-      def login
-        body = logged_request(:login, :post, "api/Authentication/login", {email: EMAIL, password: PASSWORD}).body
-        raise Error, "login returned no token" unless body.is_a?(Hash) && body["token"].present?
-
-        Rails.cache.write(TOKEN_CACHE_KEY, body["token"], expires_in: token_expires_in(body))
-        body["token"]
+          options.expires_in = token_expires_in(body)
+          body["token"]
+        end
       end
 
-      # They return the expiry rather than documenting a lifetime, so read it instead of guessing
       def token_expires_in(body)
         expires_at = Time.zone.parse(body["expiration"].to_s)
         return TOKEN_FALLBACK_EXPIRY if expires_at.blank?
 
         [expires_at - Time.current - TOKEN_EXPIRY_MARGIN, 1.minute].max
       end
-
-      def get(kind, path) = parsed(authorized_request(kind, :get, path))
-
-      def post(kind, path, params = nil) = parsed(authorized_request(kind, :post, path, params))
 
       def authorized_request(kind, method, path, params = nil)
         logged_request(kind, method, path, params, {"Authorization" => "Bearer #{token}"})
@@ -115,7 +114,7 @@ module Integrations
         Rails.cache.delete(TOKEN_CACHE_KEY) if response.status == 401
         raise Error, "#{kind} failed: #{response.status} #{response.body}" unless response.success?
 
-        response
+        response.body
       rescue Faraday::Error => e
         log(kind, path, params, started_at, error_message: e.message)
         raise Error, "#{kind} failed: #{e.message}"
@@ -135,10 +134,6 @@ module Integrations
         body if body.is_a?(Array) || response.headers["content-type"].to_s.start_with?("text/")
       end
 
-      def parsed(response)
-        response.body.is_a?(Hash) ? response.body.with_indifferent_access : response.body
-      end
-
       def connection
         Faraday.new(url: BASE_URL) do |con|
           con.request :json
@@ -148,8 +143,8 @@ module Integrations
         end
       end
 
-      conceal :address_params, :package_params, :token, :login, :token_expires_in, :get, :post,
-        :authorized_request, :logged_request, :log, :loggable_body, :parsed, :connection
+      conceal :address_params, :package_params, :token, :token_expires_in, :authorized_request,
+        :logged_request, :log, :loggable_body, :connection
     end
   end
 end

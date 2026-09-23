@@ -96,6 +96,13 @@ VCR.configure do |config|
     LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN CLOUDFLARE_TURNSTILE_SECRET_KEY
     STRAVA_TEST_REFRESH_TOKEN BIKEFLIGHTS_EMAIL BIKEFLIGHTS_PASSWORD].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
+    # A value sent in a json body is escaped, so the raw value misses one containing " or \
+    config.filter_sensitive_data("<#{key}>") { ENV[key]&.to_json&.slice(1..-2) }
+  end
+
+  # BikeFlights returns its token in the login response body, so it isn't known until then
+  config.filter_sensitive_data("<BIKEFLIGHTS_TOKEN>") do |i|
+    i.response.body[/"token":"([^"]+)"/, 1] if i.request.uri.end_with?("/api/Authentication/login")
   end
 
   # aws-sdk addresses R2 virtual-host style (bucket.<account>.r2...), so the endpoint never appears
@@ -106,12 +113,6 @@ VCR.configure do |config|
     i.response.headers.delete("Set-Cookie")
     i.request.headers.delete("Authorization")
     i.request.headers.delete("X-Stripe-Client-User-Agent")
-    # BikeFlights login sends credentials in the body, json-escaped, and returns its token in the
-    # body - neither is a header, and the token isn't known until the response arrives
-    if i.request.uri.end_with?("/api/Authentication/login")
-      i.request.body = i.request.body.gsub(/"(email|password)":"(?:[^"\\]|\\.)*"/) { %("#{$1}":"<BIKEFLIGHTS_#{$1.upcase}>") }
-      i.response.body = i.response.body.gsub(/"token":"[^"]*"/, '"token":"<BIKEFLIGHTS_TOKEN>"')
-    end
   end
 end
 

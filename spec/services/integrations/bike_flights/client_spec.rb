@@ -20,14 +20,14 @@ RSpec.describe Integrations::BikeFlights::Client, type: :service do
   describe "rating, ordering, labeling and tracking a shipment" do
     it "logs in once and logs every request", vcr: {cassette_name: "bike_flights-client-order_flow"} do
       rates = described_class.shop_rate(origin:, destination:, packages:)
-      expect(rates[:rates].map { it[:name] }).to eq(["UPS Next Day", "UPS 2nd Day", "UPS Ground"])
+      expect(rates["rates"].map { it["name"] }).to eq(["UPS Next Day", "UPS 2nd Day", "UPS Ground"])
 
-      ground = rates[:rates].last
-      order = described_class.create_order(request_id: rates[:requestId],
-        rate_signature: ground[:rateSignature], purchase_order: "bike-index-spec")
-      expect(order[:orderId]).to be_a(Integer)
+      ground = rates["rates"].last
+      order = described_class.create_order(request_id: rates["requestId"],
+        rate_signature: ground["rateSignature"], purchase_order: "bike-index-spec")
+      expect(order["orderId"]).to be_a(Integer)
 
-      labels = described_class.create_label(order[:orderId])
+      labels = described_class.create_label(order["orderId"])
       tracking_number = labels.dig(0, "labelResponse", "boxes", 0, "trackingNumber")
       expect(tracking_number).to start_with("1Z")
 
@@ -55,7 +55,7 @@ RSpec.describe Integrations::BikeFlights::Client, type: :service do
                         "linearUnit" => "IN", "weightUnit" => "LB", "contentCode" => "8000",
                         "insideDescription" => "Bicycle", "outsideDescription" => "Bicycle"}]
       })
-      expect(BikeFlightsRequest.create_order.first.response_body).to eq({"orderId" => order[:orderId]})
+      expect(BikeFlightsRequest.create_order.first.response_body).to eq({"orderId" => order["orderId"]})
       expect(BikeFlightsRequest.label.first.response_body).to be_nil
     end
   end
