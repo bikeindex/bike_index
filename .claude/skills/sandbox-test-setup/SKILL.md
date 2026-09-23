@@ -2,16 +2,15 @@
 name: sandbox-test-setup
 description: >-
   Bike Index Ruby + RSpec environment setup for each place this repo runs: a local
-  macOS Conductor workspace, a spawned `.claude/worktrees/…` git worktree, the Conductor
-  cloud sandbox, and Claude Code's Linux web sandbox — getting `ruby`, `bundle`,
-  `bin/lint`, a database, seeds, a dev server and a browser working there.
+  macOS Conductor workspace, a spawned `.claude/worktrees/…` git worktree, and Claude
+  Code's Linux web sandbox — getting `ruby`, `bundle`, `bin/lint`, a database, seeds, a
+  dev server and a browser working there.
   **Read it before the first command in a spawned worktree**, which starts with
   `bin/workspace_setup` (without it `bin/env` hands back the main checkout's port,
   database and Redis). Read it whenever a session runs RSpec, `bundle` or `bin/lint`,
   needs a dev server or seeded data, or hits: a missing `.workspace_id` or
-  `node_modules`, a `$BASE_URL` serving another branch, `env: 'ruby': No such file or
-  directory`, `Could not find 'bundler' (4.0.x)`, `command not found: rspec`,
-  `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a
+  `node_modules`, a `$BASE_URL` serving another branch, `Could not find 'bundler'
+  (4.0.x)`, `command not found: rspec`, `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a
   `bin/` script, `Sprockets::Rails::Helper::AssetNotFound`, `tailwind.css is not
   present`, `LoadError: Could not open library 'vips.so.42'`, `executable not found:
   "identify"`, or a Playwright browser-not-found, build-number mismatch or `Running as
@@ -27,7 +26,6 @@ Read the reference for the path you're in; the others don't apply.
 | --- | --- | --- |
 | `/Users/…/conductor/workspaces/…` | local macOS Conductor workspace | `references/local-macos.md` |
 | `…/.claude/worktrees/…` | spawned git worktree — set it up first, below | `references/local-macos.md` |
-| `/home/vercel-sandbox/workspace` (Amazon Linux 2023) | Conductor cloud sandbox | `references/conductor-cloud.md` |
 | `/home/user/bike_index` | Claude Code web sandbox | `references/web-sandbox.md` |
 
 ## A spawned worktree sets itself up first
