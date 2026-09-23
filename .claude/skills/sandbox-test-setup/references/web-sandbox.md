@@ -110,9 +110,10 @@ A different browser from the specs', configured by the script:
   and point the wrapper at the new build.
 
 It **can't reach anything off localhost** — it rejects the egress proxy's CA
-(`ERR_CERT_AUTHORITY_INVALID`, even with HTTPS errors ignored). So `github-pr-images`
-doesn't work here, and every page logs failures for jsdelivr, Google Fonts, GTM and
-Facebook. Those are the sandbox; an app-origin error is the signal.
+(`ERR_CERT_AUTHORITY_INVALID`, even with HTTPS errors ignored), so every page logs
+failures for jsdelivr, Google Fonts, GTM and Facebook. Those are the sandbox; an
+app-origin error is the signal. Screenshots still reach a PR: `github-pr-images` has a
+browserless route for here (its `references/web-sandbox.md`).
 
 Selectors: `UI::Forms::Combobox` hides non-matching options rather than removing them,
 so use `.hw-combobox__option:not([hidden])`. `browser_click` waits for the page to

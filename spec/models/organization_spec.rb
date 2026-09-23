@@ -819,6 +819,13 @@ RSpec.describe Organization, type: :model do
         organization.save
         expect(organization.reload.auto_user_id).not_to be_nil
       end
+      it "doesn't set the embedable user if the AUTO_ORG_MEMBER account doesn't exist" do
+        organization = FactoryBot.create(:organization)
+        expect(User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"])).to be_blank
+        organization.embedable_user_email = ENV["AUTO_ORG_MEMBER"]
+        organization.save
+        expect(organization.reload.auto_user_id).to be_nil
+      end
     end
   end
 
@@ -845,6 +852,16 @@ RSpec.describe Organization, type: :model do
         organization.ensure_auto_user
         organization.reload
         expect(organization.auto_user).to eq auto_user
+      end
+    end
+    context "no members and no AUTO_ORG_MEMBER account" do
+      it "assigns nothing, rather than an address that resolves to nobody" do
+        expect(organization).to be_present
+        expect { organization.ensure_auto_user }
+          .to_not change(UpdateOrganizationAssociationsJob.jobs, :count)
+        organization.reload
+        expect(organization.embedable_user_email).to be_blank
+        expect(organization.auto_user).to be_blank
       end
     end
   end

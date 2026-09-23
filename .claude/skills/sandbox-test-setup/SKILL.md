@@ -26,7 +26,7 @@ Read the reference for the path you're in; the others don't apply.
 | --- | --- | --- |
 | `/Users/…/conductor/workspaces/…` | local macOS Conductor workspace | `references/local-macos.md` |
 | `…/.claude/worktrees/…` | spawned git worktree — set it up first, below | `references/local-macos.md` |
-| `/home/user/bike_index` | Claude Code web sandbox | `references/web-sandbox.md` |
+| `/home/user/bike_index` (`$CLAUDE_CODE_REMOTE=true`) | Claude Code web sandbox | `references/web-sandbox.md` |
 
 ## A spawned worktree sets itself up first
 
