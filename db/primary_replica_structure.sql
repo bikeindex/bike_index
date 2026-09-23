@@ -4004,7 +4004,8 @@ CREATE TABLE public.stripe_events (
     updated_at timestamp(6) without time zone NOT NULL,
     payload jsonb,
     stripe_event_id character varying,
-    stripe_account_id character varying
+    stripe_account_id character varying,
+    processed_at timestamp(6) without time zone
 );
 
 

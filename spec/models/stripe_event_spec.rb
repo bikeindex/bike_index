@@ -216,6 +216,26 @@ RSpec.describe StripeEvent, type: :model do
           expect(membership.end_at).to be_within(1).of stripe_subscription.end_at
           expect(membership.status).to eq "ended"
         end
+
+        context "with the created event redelivered after the delete" do
+          let(:created_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-customer.subscription.created.json"))) }
+
+          def process_event(payload)
+            StripeEvent.create_from(Stripe::Event.construct_from(payload)).update_bike_index_record!
+          end
+
+          it "doesn't apply the created event again" do
+            process_event(created_payload)
+            expect(stripe_subscription.reload.stripe_status).to eq "incomplete"
+            stripe_event.update_bike_index_record!
+            expect(stripe_subscription.reload.stripe_status).to eq "canceled"
+            expect(stripe_event.reload.processed_at).to be_present
+
+            expect { process_event(created_payload) }.to_not change(StripeEvent, :count)
+            expect(stripe_subscription.reload.stripe_status).to eq "canceled"
+            expect(stripe_subscription.membership.status).to eq "ended"
+          end
+        end
       end
     end
 

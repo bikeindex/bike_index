@@ -49,6 +49,26 @@ RSpec.describe WebhooksController, type: :request do
           expect(stripe_subscription.payments.count).to eq 1
         end
       end
+
+      it "doesn't process a redelivered event again" do
+        Sidekiq::Job.drain_all
+        ActionMailer::Base.deliveries = []
+
+        VCR.use_cassette("WebhooksController-checkout_session-completed", **cassette_options) do
+          expect do
+            2.times do
+              post webhook_url,
+                params: payload,
+                headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
+              expect(response).to have_http_status(:ok)
+            end
+          end.to change(StripeEvent, :count).by(1)
+            .and change(Payment, :count).by(1)
+        end
+
+        Sidekiq::Job.drain_all
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+      end
     end
 
     context "with a stripe subscription created event" do

@@ -6,6 +6,7 @@
 #  id                :bigint           not null, primary key
 #  name              :string
 #  payload           :jsonb
+#  processed_at      :datetime
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  stripe_account_id :string
@@ -63,6 +64,9 @@ class StripeEvent < ApplicationRecord
   def update_bike_index_record!
     # Currently, only handle on creation, when the data object is assigned.
     raise "Stripe Data not assigned, unable to handle" unless @data.present?
+    # Stripe can deliver an event more than once, and a subscription event carries the
+    # subscription as it was then - applying it again could undo a later event
+    return if processed_at.present?
 
     if checkout?
       if data_object.subscription.present?
@@ -71,6 +75,7 @@ class StripeEvent < ApplicationRecord
     elsif subscription?
       update_stripe_subscription(data_object)
     end
+    update!(processed_at: Time.current)
   end
 
   private

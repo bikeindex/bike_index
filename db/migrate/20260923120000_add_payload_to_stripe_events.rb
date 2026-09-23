@@ -6,6 +6,8 @@ class AddPayloadToStripeEvents < ActiveRecord::Migration[8.1]
     add_column :stripe_events, :stripe_event_id, :string
     # Set on Stripe Connect events, which arrive on behalf of a connected account
     add_column :stripe_events, :stripe_account_id, :string
+    # Set once the event has updated Bike Index, so a redelivery isn't applied again
+    add_column :stripe_events, :processed_at, :datetime
     add_index :stripe_events, :stripe_id, algorithm: :concurrently
     add_index :stripe_events, :stripe_event_id, unique: true, algorithm: :concurrently
     add_index :stripe_events, :stripe_account_id, algorithm: :concurrently
