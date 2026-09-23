@@ -159,11 +159,10 @@ nohup python3 .claude/skills/sandbox-test-setup/assets/cdn_server.py >/dev/null 
 
 ## No `gh`
 
-Use the GitHub MCP tools, via the `pr` skill (its appendix maps `gh` to them). The
-`pr-guardrails` hook denies `create_pull_request` until that skill is loaded, and
-`merge_pull_request` always. A push can open a PR by itself, so check for one first.
-`list_pull_requests` reports `merged: false` on merged PRs; `pull_request_read`
-(`method: "get"`) is accurate.
+Use the GitHub MCP tools, via the `pr` skill — its appendix maps `gh` to them and
+lists their traps. The `pr-guardrails` hook denies `create_pull_request` until that
+skill is loaded, and `merge_pull_request` always. A push can open a PR by itself, so
+check for one first.
 
 ## Network
 

@@ -52,8 +52,8 @@ code push — say so, or a reviewer reads it as a CI failure.
 The images live only in that branch's history. This repo squash-merges, so they
 never reach `main` and no clone pays for them — but a deleted branch leaves them
 unreachable and eventually collectable. **Good for review, not an archive**: for
-permanence use a release asset uploaded by a workflow, since the API isn't reachable
-from here.
+permanence use a release asset uploaded by a workflow — the GitHub MCP tools this
+session goes through can't upload one.
 
 ## Posting, without `gh`
 
