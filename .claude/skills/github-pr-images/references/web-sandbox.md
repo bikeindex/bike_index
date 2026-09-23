@@ -70,12 +70,17 @@ place rather than duplicated — with the MCP tools in place of `gh`:
 | `gh pr view --json number` | `mcp__github__list_pull_requests` with `head: "bikeindex:<branch>"`, `state: "open"` |
 | `gh api user --jq .login` | `mcp__github__get_me` |
 | `gh api …/issues/N/comments` | `mcp__github__issue_read` with `method: "get_comments"` (paginate with `page`) |
-| `gh pr comment` | `mcp__github__add_issue_comment` |
+| `gh pr comment` | `mcp__github__add_issue_comment` (appends an attribution footer — see below) |
 | `gh api -X PATCH …/comments/ID` | `mcp__github__update_issue_comment` |
 
 Find the existing comment the same way — authored by `get_me`'s login, body
 starting `## Screenshots` — and page through `get_comments`, since on a busy PR it
 won't be on the first page.
+
+**`add_issue_comment` appends a Claude Code attribution footer** that the `pr`
+skill's rules don't allow, and which you never wrote — the tell is the session id
+in its link. `update_issue_comment` doesn't, so read the comment back after posting
+and strip the footer with an update.
 
 ## Verifying
 
