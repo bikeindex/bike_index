@@ -91,7 +91,7 @@ until curl -fs -o /dev/null "$BASE_URL/"; do sleep 5; done   # first boot ~40s
 ```
 
 It runs the tailwind/dartsass watchers and its own redis (which exits harmlessly when
-one is already up). It needs no node — the image's 22.x against the 24.x pin doesn't
+one is already up). It needs no node — the image's 20.x against the 24.x pin doesn't
 matter.
 
 **Poll the artifact, never a duration.** A backgrounded command returns exit 0
