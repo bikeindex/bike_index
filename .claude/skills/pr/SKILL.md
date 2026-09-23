@@ -171,7 +171,7 @@ Then return the PR URL.
 
 ## Appendix: the sandbox with no `gh`
 
-Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found", swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
+Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found", swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
 
 | Where | `gh` | MCP |
 | --- | --- | --- |

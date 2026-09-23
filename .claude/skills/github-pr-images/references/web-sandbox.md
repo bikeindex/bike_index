@@ -1,10 +1,10 @@
 # Hosting images from the Claude Code web sandbox
 
 SKILL.md's browser route can't run here, for two independent reasons: the MCP
-browser can't verify github.com (Chromium reads its own NSS store, not
-`/etc/ssl/certs`, and the egress proxy's CA isn't in it), and GitHub's uploader
-needs a logged-in web session, which can't be established headlessly. Fixing the
-first buys nothing while the second stands.
+browser can't verify github.com, and GitHub's uploader needs a logged-in web
+session that can't be established headlessly. Fixing the first buys nothing
+while the second stands. The `sandbox-test-setup` skill's `references/web-sandbox.md`
+is where the browser's limits are described; don't re-derive them here.
 
 So this route hosts the images **in the branch's own history** instead, and posts
 through the GitHub MCP tools rather than `gh`, which isn't installed here.
