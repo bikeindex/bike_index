@@ -13,17 +13,19 @@ Hitting a GitHub login screen — or a 404 on a private repo (GitHub returns 404
 
 ## Regenerate the storage state
 
-Run a one-shot headed browser that saves storage on close — no MCP config edits, no `/mcp` reconnect dance. This is a user-run login helper, not a screenshot path: screenshots still go only through the MCP, never the Playwright CLI.
+The user runs a one-shot headed browser that saves storage on close. Don't launch it yourself — stop and show exactly this, then end the turn:
+
+````markdown
+## You need to authenticate GitHub again in playwright browser
+
+Run this in your own terminal, log in, close the browser window and tell me you've done it
 
 ```bash
 npx -y playwright open --save-storage="$HOME/.cache/ms-playwright/mcp-auth.json" https://github.com/login
 ```
+````
 
-If Playwright's managed Chromium isn't installed, the command errors with an install hint — either run `npx playwright install chromium` first, or append `--channel chrome` to use the system Chrome instead.
-
-1. The command blocks until the browser is closed, so launch it in the background (or ask the user to run it in their own terminal).
-2. A visible browser window opens at the GitHub login page. The user signs in themselves — credentials, 2FA, passkey. **Do not type their credentials for them.**
-3. When the user closes the browser window, cookies and localStorage are written to `mcp-auth.json`.
+If it errors that Chromium isn't installed, the fix is appending `--channel chrome`.
 
 ## Pick up the new state
 
@@ -33,4 +35,4 @@ If Playwright's managed Chromium isn't installed, the command errors with an ins
 
 ## Mid-task
 
-If you hit a 404 / login screen mid-task, **stop**, regenerate the state file as above, pick up the new state, then resume the task.
+Once the user says they've logged in, pick up the new state and resume where the task stopped.

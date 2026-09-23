@@ -1,6 +1,12 @@
 <% helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
 
-<div class="search-results-frame-wrapper">
+<%# min-height gives the overlay's spinner somewhere to land while the frame is empty %>
+<div
+  class="
+    search-results-frame-wrapper tw:relative
+    tw:has-[>turbo-frame[busy]]:min-h-48
+  "
+>
   <%# Revealed by search--form when a search request comes back 429-throttled %>
   <div hidden data-search-notice="rate-limited">
     <%= render UI::Alerts::Base::Component.new(text: translation(".rate_limited"), kind: :warning) %>
@@ -16,7 +22,9 @@
     <% end %>
   </div>
 
-  <%= helpers.turbo_frame_tag @frame_id, src: @src do %>
+  <%# tw:group so a body that keeps its chrome can swap its own rows off the frame's [busy] %>
+  <%= helpers.turbo_frame_tag @frame_id, src: @src,
+    class: "tw:group tw:peer #{FRAME_LOADING_CLASSES}" do %>
     <% if @render_results %>
       <%= content %>
     <% else %>
@@ -26,7 +34,7 @@
     <% end %>
   <% end %>
 
-  <div class="search-loading-overlay">
+  <div class="search-loading-overlay tw:pointer-events-none tw:absolute tw:top-0 tw:right-0 tw:left-0 tw:z-1 tw:hidden <%= OVERLAY_LOADING_CLASS %>">
     <%= render UI::LoadingSpinner::Component.new(text: @loading_text) %>
   </div>
 </div>

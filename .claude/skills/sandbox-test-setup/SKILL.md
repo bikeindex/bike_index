@@ -33,13 +33,8 @@ matches; the others won't apply and are the bulk of the material.
 | `/home/user/bike_index` | Claude Code web sandbox | `references/web-sandbox.md` |
 
 In the web sandbox a `SessionStart` hook has usually done all of this before your
-first turn — check with `ruby -v` before setting anything up. When it hasn't (an
-older branch, a container that idled and lost postgres), run the setup rather than
-hand-typing it; it fetches a prebuilt Ruby + gems and falls back to building:
-
-```bash
-bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh --dev-server
-```
+first turn — check with `ruby -v` before setting anything up. When it hasn't, the
+reference opens with the script to run instead of hand-typing it.
 
 ## A spawned worktree sets itself up first
 
