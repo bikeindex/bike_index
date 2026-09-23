@@ -12,13 +12,15 @@ name: Web sandbox prebuild
 # a fixed `-latest.txt` pointer naming the newest one, because the sandbox can't list
 # the release to find a near-miss: api.github.com is blocked in there.
 #
-# NOTE the sandbox has to be able to *reach* these. Release downloads redirect to
-# release-assets.githubusercontent.com, which is not on its documented allow list —
-# if that host is refused, every session silently falls back to the source build and
-# this workflow buys nothing. web_sandbox_setup.sh reports which assets resolved. The consumer is
-# .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh, which falls back to
-# building from source whenever an asset is missing — so a failed or skipped run here
-# costs time, never correctness.
+# NOTE the sandbox has to be able to *reach* these — release downloads redirect to
+# release-assets.githubusercontent.com, which is not on its documented allow list.
+# web_sandbox_setup.sh prints which assets resolved; a run where none did is this.
+#
+# ci.yml's build_ci_image bakes the same three things keyed on the same lockfiles,
+# but can't be reused: it installs under `ruby:slim` with BUNDLE_PATH, and these
+# have to extract to setup-ruby's prefix because rbconfig bakes that path in. The consumer is
+# .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh — so a failed or
+# skipped run here costs time, never correctness.
 #
 # runs-on MUST match the web sandbox image (Ubuntu 24.04, glibc 2.39, OpenSSL 3.0),
 # and the tarballs MUST extract to the same absolute path they were built at:
@@ -86,7 +88,7 @@ jobs:
           test "$PREFIX" = "/opt/hostedtoolcache/Ruby/$RUBY_VERSION/x64" # the sandbox extracts to this path
           mkdir -p artifacts
           tarball="ruby-${RUBY_VERSION}-ubuntu24.04-x86_64.tar.gz"
-          tar -C "$(dirname "$PREFIX")" -czf "artifacts/$tarball" x64
+          tar -C "$(dirname "$PREFIX")" -cf - x64 | pigz > "artifacts/$tarball"
           (cd artifacts && sha256sum "$tarball" > "${tarball}.sha256")
           echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
 
@@ -109,7 +111,7 @@ jobs:
         run: |
           set -euo pipefail
           tarball="bundle-${RUBY_VERSION}-${LOCK_SHA}-ubuntu24.04-x86_64.tar.gz"
-          tar -C "$(dirname "$PREFIX")" -czf "artifacts/$tarball" x64/lib/ruby/gems x64/bin
+          tar -C "$(dirname "$PREFIX")" -cf - x64/lib/ruby/gems x64/bin | pigz > "artifacts/$tarball"
           (cd artifacts && sha256sum "$tarball" > "${tarball}.sha256")
           # The sandbox can't list the release to find a near-miss (api.github.com is
           # blocked there), so leave it a pointer naming the newest bundle. A branch
@@ -127,31 +129,26 @@ jobs:
       - run: npm ci
 
       - name: Pack node_modules
-        id: pack_node
         env:
           NPM_SHA: ${{ steps.keys.outputs.npm_sha }}
         run: |
           set -euo pipefail
           tarball="node_modules-${NPM_SHA}-ubuntu24.04.tar.gz"
-          tar -czf "artifacts/$tarball" node_modules
+          tar -cf - node_modules | pigz > "artifacts/$tarball"
           (cd artifacts && sha256sum "$tarball" > "${tarball}.sha256")
-          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
 
-      # Proves the tarballs are complete and the Ruby still works from that path,
-      # which a `tar tzf` wouldn't. The unpack target is a throwaway prefix, so
-      # `ruby -v` is the only thing that can run - `bundle check` needs the real one.
-      - name: Verify the tarballs unpack
-        env:
-          RUBY_VERSION: ${{ steps.keys.outputs.ruby_version }}
+      # Decompresses every member and checks the CRCs without writing ~1GB to disk.
+      # The old form extracted, then ran `ruby -v` from the live toolcache rather
+      # than from what it had extracted — so it proved nothing about the tarball.
+      - name: Verify the tarballs
         run: |
           set -euo pipefail
-          mkdir -p /tmp/verify
-          tar -C /tmp/verify -xzf "artifacts/${{ steps.pack_ruby.outputs.tarball }}"
-          tar -C /tmp/verify -xzf "artifacts/${{ steps.pack_bundle.outputs.tarball }}"
-          test -x /tmp/verify/x64/bin/ruby
-          test -d "/tmp/verify/x64/lib/ruby/gems"
-          "/opt/hostedtoolcache/Ruby/$RUBY_VERSION/x64/bin/ruby" -v
-          bundle check
+          for t in artifacts/*.tar.gz; do
+            echo "verifying $t"
+            tar -tzf "$t" > "/tmp/$(basename "$t").list"
+          done
+          grep -qx 'x64/bin/ruby' "/tmp/${{ steps.pack_ruby.outputs.tarball }}.list"
+          grep -q '^x64/lib/ruby/gems/' "/tmp/${{ steps.pack_bundle.outputs.tarball }}.list"
 
       - name: Publish to the prebuilt release
         if: github.event_name != 'pull_request'
@@ -174,11 +171,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets > /tmp/assets.json
           for prefix in bundle- node_modules-; do
-            gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets |
-              jq -r --arg prefix "$prefix" '.assets
+            jq -r --arg prefix "$prefix" '.assets
                 | map(select((.name | startswith($prefix)) and (.name | contains("-latest") | not)))
-                | sort_by(.createdAt) | reverse | .[6:] | .[].name' |
+                | sort_by(.createdAt) | reverse | .[6:] | .[].name' /tmp/assets.json |
               while read -r asset; do
                 echo "deleting superseded $asset"
                 gh release delete-asset "$RELEASE_TAG" "$asset" --repo "$GITHUB_REPOSITORY" --yes

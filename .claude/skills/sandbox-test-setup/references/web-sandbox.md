@@ -9,7 +9,8 @@ sandbox.
 
 It calls `assets/web_sandbox_setup.sh`, which is also the thing to run by hand when
 the hook didn't run (an older branch), didn't finish, or the container has idled and
-dropped postgres/redis. It's idempotent, and does every step below:
+dropped postgres/redis. It's idempotent, and does the setup steps below — not the
+chromium build-number symlinks or the jsdelivr shim, which are both wait-for-the-error:
 
 ```bash
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh              # setup only
@@ -22,14 +23,15 @@ four databases come from `bin/setup` rather than from anything sandbox-specific,
 this checkout gets a `.workspace_id` like any other. `--without_seeds` because
 `db:seed` wants `setup:import_spreadsheets` and a network this sandbox doesn't have.
 
-It downloads a prebuilt Ruby (11MB), gem tree (~270MB) and `node_modules` from the
-`web-sandbox-prebuilt` release (published by
+It downloads a prebuilt Ruby (11MB), gem tree (the bulk of it) and `node_modules`
+from the `web-sandbox-prebuilt` release (published by
 `.github/workflows/web-sandbox-prebuild.yml`), and falls back to the source build
 below whenever an asset is missing or fails its checksum. A `Gemfile.lock` your
 branch changed misses its exact gem tarball and reads `bundle-<ver>-latest.txt` for
 the newest one instead, so `bundle install` reconciles a handful of gems rather than
-fetching all 341. `node_modules` is exact-match only; on a miss `bin/setup`'s own
-`npm install` covers it. Set `BINX_SKIP_PREBUILT=1` to force the source path. The
+the whole lockfile. `node_modules` is exact-match only; on a miss `bin/setup`'s own
+`npm install` covers it. Both are stamped, so a re-run on a warm container
+re-downloads neither. Set `BINX_SKIP_PREBUILT=1` to force the source path. The
 sections below are what it automates — read them when a step fails, or when you need
 only part of it.
 
@@ -38,21 +40,13 @@ against a from-source build — so the only thing worth tuning is whether that d
 lands. Release assets redirect to `release-assets.githubusercontent.com`, which is
 **not** on the allow list at the bottom of this file, and a refused host looks exactly
 like a missing asset. The script prints a `prebuilt assets:` block naming what
-resolved; `http 000` there means the host never answered, rather than the release
-lacking the file. Check it before assuming the prebuild does anything:
+resolved, with the probe command to re-check it; `http 000` there means the host
+never answered, rather than the release lacking the file. If it's blocked,
+`BINX_PREBUILT_BASE` repoints the whole set at any reachable host — and
+git-over-https to github.com *is* allowed, so a small separate repo holding the 11MB
+tarball is a workable channel where the release download isn't.
 
-```bash
-curl -sI -o /dev/null -w '%{http_code}\n' \
-  https://github.com/bikeindex/bike_index/releases/download/web-sandbox-prebuilt/ruby-4.0.6-ubuntu24.04-x86_64.tar.gz
-```
-
-If it's blocked, `BINX_PREBUILT_BASE` repoints the whole set at any reachable host —
-and git-over-https to github.com *is* allowed, so a small separate repo holding the
-11MB tarball is a workable channel where the release download isn't.
-
-Longest of the three, so here's the order: build Ruby, put the toolchain on
-PATH, start postgres/redis and create the databases. Everything after that is
-per-task. The Tailwind build in SKILL.md applies here too.
+The Tailwind build in SKILL.md applies here too.
 
 Setup, in order:
 [One-shot Ruby build](#one-shot-ruby-build) ·
@@ -71,9 +65,10 @@ Then, as the task needs them:
 `.tool-versions` pins the Ruby version (`ruby 4.0.6` at time of writing —
 **read the current pin from its `ruby` line**, it moves; the `Gemfile` has
 no `ruby` directive) and
-`Gemfile.lock` pins `BUNDLED WITH 4.0.15`. No prebuilt binary for that
+`Gemfile.lock` pins `BUNDLED WITH 4.0.15`. No *upstream* prebuilt binary for that
 version is reachable (`cache.ruby-lang.org` is 403'd, `ruby/ruby-builder`'s
-toolcache tops out at `3.5.0-preview1`), so build from the GitHub source
+toolcache tops out at `3.5.0-preview1`) — ours is the release above, and when that
+misses too, build from the GitHub source
 tag — about 6 min on a 4-core sandbox (measured for 4.0.6: ~1 min clone,
 ~1 min autogen/configure/gem-staging, ~3 min `make -j4`, ~1 min install), and
 don't panic at what look like restarts in the log (miniruby, then the real
@@ -81,15 +76,6 @@ build, then each ext's own `configure`). Don't fall back to 3.x and patch the
 Gemfile; Bundler 4.x's resolver behaves differently and you'll waste time
 chasing fake regressions. Once `/opt/ruby-<version>/x64/` exists,
 `bundle install` works as-is.
-
-Run it in the background and **poll for the binary, not for a duration** —
-`sleep 300; …` has come back in well under 300s of wall clock here, and
-`date` drifts from real time, so neither paces a wait:
-
-```bash
-# Foreground, exits the moment it lands (or after ~20 min)
-for i in $(seq 1 60); do [ -x /opt/ruby-4.0.6/x64/bin/ruby ] && break; sleep 20; done
-```
 
 You also need **libvips** on the box — the app loads `ruby-vips` at boot,
 so without it every Ruby entry point (`db:migrate`, `rspec`, `rails`) dies
@@ -217,9 +203,10 @@ for `bin/lint` and the `:js` specs' playwright package, which is why
 
 **A backgrounded process outlives the tool call that started it, and the call
 reports success immediately.** `nohup … &` returns exit 0 while the build or
-server is still going, so poll the artifact (`$BASE_URL`, the log's last line,
-`/opt/ruby-*/x64/bin/ruby --version`) rather than reading that exit code as
-"finished".
+server is still going, so **poll the artifact, never a duration** (`$BASE_URL`, the
+log's last line, `/opt/ruby-*/x64/bin/ruby --version`) — `sleep 300` has come back
+in well under 300s of wall clock here, and `date` drifts from real time, so neither
+paces a wait.
 
 `bin/dev` runs foreman, so the tailwind and dartsass watchers come with it and a
 page you screenshot is styled. It starts its own redis, which exits harmlessly
@@ -268,16 +255,8 @@ printf '{"cookies":[],"origins":[]}' > /root/.cache/ms-playwright/mcp-auth.json
 A third fix applies only when the error names a build number the image doesn't have
 (`@playwright/mcp@latest` moved ahead of the image's chromium). It didn't on
 2026-09-22 — the image shipped `chromium-1194` and the pin took it — so don't
-pre-emptively symlink; wait for the error, then point the wanted build (NNNN) at
-the one that's there (MMMM):
-
-```bash
-ln -sfn /opt/pw-browsers/chromium-MMMM /opt/pw-browsers/chromium-NNNN
-mkdir -p /opt/pw-browsers/chromium_headless_shell-NNNN
-ln -sfn /opt/pw-browsers/chromium_headless_shell-MMMM/chrome-linux \
-        /opt/pw-browsers/chromium_headless_shell-NNNN/chrome-headless-shell-linux64
-ln -sfn headless_shell /opt/pw-browsers/chromium_headless_shell-MMMM/chrome-linux/chrome-headless-shell
-```
+pre-emptively symlink; wait for the error, then use the recipe in the `:js` spec
+section below, which is the same mismatch.
 
 This browser gets no `--host-resolver-rules`, so the jsdelivr pin
 (`@honeybadger-io/js`, the only one left) fails to load and every page logs
@@ -432,22 +411,13 @@ trusts the self-signed cert.
 
 ## End-to-end recap
 
-`assets/web_sandbox_setup.sh` is everything up to the specs — reach for the
-longhand only when a step of it fails. Assumes the pinned Ruby is already built
-(paths below use 4.0.6 — swap for the current pin). Combines the steps above:
+`assets/web_sandbox_setup.sh` is the setup — run it rather than retyping the
+sections above. It prints the shell env its own steps used, which is what the
+`eval` below stands in for. Then:
 
 ```bash
-export PATH="/opt/ruby-4.0.6/x64/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-export LD_LIBRARY_PATH="/opt/ruby-4.0.6/x64/lib:$LD_LIBRARY_PATH"
-export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
-service postgresql start && service redis-server start
-apt-get install -y libvips42   # ruby-vips loads at boot; without it every rails/rspec run dies
-cd /home/user/bike_index
-bin/workspace_setup --without_seeds   # bundle, npm, and all four databases
 eval "$(ruby bin/env --export)"
-bundle exec rails tailwindcss:build dartsass:build   # bin/setup skips these without seeds
-
-bundle exec rspec spec/models spec/requests   # plain
+bundle exec rspec spec/models spec/requests                  # plain
 LOCAL_CHROME_OVERRIDE=1 bundle exec rspec spec/integration   # system; CDN proxy rarely needed
 ```
 

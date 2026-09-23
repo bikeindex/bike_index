@@ -1,7 +1,5 @@
 {
-  "enabledMcpjsonServers": [
-    "playwright"
-  ],
+  "enabledMcpjsonServers": ["playwright"],
   "permissions": {
     "allow": [
       "Bash(bin/workspace_setup:*)",
@@ -39,6 +37,7 @@
     ],
     "SessionStart": [
       {
+        "matcher": "startup",
         "hooks": [
           {
             "type": "command",

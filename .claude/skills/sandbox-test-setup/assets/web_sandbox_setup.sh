@@ -32,11 +32,13 @@ BUNDLE_TARBALL="bundle-${RUBYVER}-${LOCK_SHA}-ubuntu24.04-x86_64.tar.gz"
 BUNDLE_LATEST_POINTER="bundle-${RUBYVER}-latest.txt"
 NODE_TARBALL="node_modules-${NPM_SHA}-ubuntu24.04.tar.gz"
 
-export PATH="$RUBY_PREFIX/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-export LD_LIBRARY_PATH="$RUBY_PREFIX/lib:${LD_LIBRARY_PATH:-}"
+# Authored once: used here, appended to $CLAUDE_ENV_FILE, and printed at the end.
+ENV_EXPORTS="export PATH=\"$RUBY_PREFIX/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin\"
+export LD_LIBRARY_PATH=\"$RUBY_PREFIX/lib:\${LD_LIBRARY_PATH:-}\"
 export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
 export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password
-export LANG=C.UTF-8 LC_ALL=C.UTF-8
+export LANG=C.UTF-8 LC_ALL=C.UTF-8"
+eval "$ENV_EXPORTS"
 
 say() { echo "==> $*"; }
 
@@ -46,24 +48,21 @@ trap 'rm -rf "$STAGE"' EXIT
 # ------------------------------------------------------------ prebuilt assets
 # .github/workflows/web-sandbox-prebuild.yml publishes these; every failure here
 # is non-fatal, because building from source is always still an option.
-download_asset() { # <tarball>... — first one that resolves wins, verified into $STAGE
-  [ "${BINX_SKIP_PREBUILT:-}" != "1" ] || { echo "BINX_SKIP_PREBUILT=1: skipping $1" >> "$STAGE/prebuilt.log"; return 1; }
-  local tarball code
-  for tarball in "$@"; do
-    # -f decides; the code is only so the log can tell a blocked host from a 404.
-    code=$(curl -sfL --max-time 600 -o "$STAGE/$tarball" -w '%{http_code}' "$PREBUILT_BASE/$tarball") || code="${code:-000}"
-    if [ -s "$STAGE/$tarball" ] &&
-      curl -sfL --max-time 60 -o "$STAGE/$tarball.sha256" "$PREBUILT_BASE/$tarball.sha256" &&
-      (cd "$STAGE" && sha256sum -c "$tarball.sha256" >/dev/null); then
-      printf '%s' "$tarball" > "$STAGE/$1.resolved"
-      echo "hit  $tarball" >> "$STAGE/prebuilt.log"
-      return 0
-    fi
-    # 000 is the tell that matters: no HTTP answer at all, i.e. the egress proxy
-    # refused the host rather than the release not having the asset.
-    echo "miss $tarball (http $code)" >> "$STAGE/prebuilt.log"
-    rm -f "$STAGE/$tarball" "$STAGE/$tarball.sha256"
-  done
+download_asset() { # <tarball> — verified into $STAGE
+  local tarball="$1" code
+  [ "${BINX_SKIP_PREBUILT:-}" != "1" ] || { echo "skip $tarball (BINX_SKIP_PREBUILT)" >> "$STAGE/prebuilt.log"; return 1; }
+  # -f decides; the code is only so the log can tell a blocked host from a 404.
+  code=$(curl -sfL --max-time 600 -o "$STAGE/$tarball" -w '%{http_code}' "$PREBUILT_BASE/$tarball") || code="${code:-000}"
+  if [ -s "$STAGE/$tarball" ] &&
+    curl -sfL --max-time 60 -o "$STAGE/$tarball.sha256" "$PREBUILT_BASE/$tarball.sha256" &&
+    (cd "$STAGE" && sha256sum -c "$tarball.sha256" >/dev/null); then
+    echo "hit  $tarball" >> "$STAGE/prebuilt.log"
+    return 0
+  fi
+  # 000 is the tell that matters: no HTTP answer at all, i.e. the egress proxy
+  # refused the host rather than the release not having the asset.
+  echo "miss $tarball (http $code)" >> "$STAGE/prebuilt.log"
+  rm -f "$STAGE/$tarball" "$STAGE/$tarball.sha256"
   return 1
 }
 
@@ -80,10 +79,6 @@ report_prebuilt() {
     say "  point BINX_PREBUILT_BASE at a reachable host to skip the source build"
   fi
 }
-
-# Which name a download job settled on (its fallback, or nothing at all). The jobs
-# are subshells, so the filesystem is how they report back.
-resolved_asset() { cat "$STAGE/$1.resolved" 2>/dev/null; }
 
 link_ruby_prefix() {
   # A half-built prefix left by a timed-out session would shadow what we just
@@ -159,23 +154,34 @@ say "starting system setup, prebuilt downloads and (if needed) the ruby build to
 setup_system > /tmp/system_setup.log 2>&1 &
 SYSTEM_PID=$!
 
-RUBY_DL_PID=""
-ruby_is_built || { download_asset "$RUBY_TARBALL" & RUBY_DL_PID=$!; }
+# Named by whichever bundle download won, so the unpack knows what to open.
+BUNDLE_WON="$STAGE/bundle.name"
+
 download_bundle() {
-  download_asset "$BUNDLE_TARBALL" && return 0
+  download_asset "$BUNDLE_TARBALL" && { printf '%s' "$BUNDLE_TARBALL" > "$BUNDLE_WON"; return 0; }
   local latest
   latest=$(curl -sfL --max-time 60 "$PREBUILT_BASE/$BUNDLE_LATEST_POINTER") || return 1
   [ -n "$latest" ] && [ "$latest" != "$BUNDLE_TARBALL" ] || return 1
-  download_asset "$latest" && printf '%s' "$latest" > "$STAGE/$BUNDLE_TARBALL.resolved"
+  download_asset "$latest" && printf '%s' "$latest" > "$BUNDLE_WON"
 }
-download_bundle &
-BUNDLE_DL_PID=$!
-download_asset "$NODE_TARBALL" &
-NODE_DL_PID=$!
+
+# Stamps let a warm container - a resume, or a hand re-run - skip the download and
+# extraction of trees that are already correct. Each lives inside the tree it
+# vouches for, so anything that removes the tree removes the claim with it.
+GEM_STAMP="$TOOLCACHE/x64/lib/ruby/gems/.binx_lock_sha"
+NPM_STAMP="$REPO/node_modules/.binx_npm_sha"
+stamped() { [ "$(cat "$1" 2>/dev/null)" = "$2" ]; }
+
+RUBY_DL_PID=""
+BUNDLE_DL_PID=""
+NODE_DL_PID=""
+ruby_is_built || { download_asset "$RUBY_TARBALL" & RUBY_DL_PID=$!; }
+stamped "$GEM_STAMP" "$LOCK_SHA" || { download_bundle & BUNDLE_DL_PID=$!; }
+stamped "$NPM_STAMP" "$NPM_SHA" || { download_asset "$NODE_TARBALL" & NODE_DL_PID=$!; }
 
 # ---------------------------------------------------------------------- ruby
 RUBY_PID=""
-if ruby_is_built; then
+if [ -z "$RUBY_DL_PID" ]; then
   say "ruby ${RUBYVER} already installed"
 elif wait "$RUBY_DL_PID" && unpack_ruby_tree "$RUBY_TARBALL" && link_ruby_prefix && ruby_is_built; then
   say "prebuilt ruby ${RUBYVER} installed"
@@ -185,53 +191,53 @@ else
   RUBY_PID=$!
 fi
 
-# The gem tree extracts over the Ruby's own GEM_HOME, so it waits on whichever
-# Ruby path won - but the download has been running since the top either way.
-install_prebuilt_gems() {
-  local resolved
-  resolved=$(resolved_asset "$BUNDLE_TARBALL")
-  [ -n "$resolved" ] || return 0
-  unpack_ruby_tree "$resolved" || return 0
-  # Only when nothing has claimed the prefix yet: after a source build it's a real
-  # directory that $TOOLCACHE/x64 points AT, and relinking would chase its own tail.
-  ruby_is_built || link_ruby_prefix
-  case "$resolved" in
-    "$BUNDLE_TARBALL") say "prebuilt gems for Gemfile.lock ${LOCK_SHA} installed" ;;
-    *) say "no bundle for Gemfile.lock ${LOCK_SHA}; unpacked the latest one, bundle install will reconcile" ;;
-  esac
-}
-
 if [ -n "$RUBY_PID" ]; then
   say "waiting on the ruby build"
   wait "$RUBY_PID" || { echo "ruby build FAILED - see /tmp/ruby_build.log"; tail -20 /tmp/ruby_build.log; exit 1; }
   say "ruby $("$RUBY_PREFIX/bin/ruby" -e 'print RUBY_VERSION') built"
 fi
 
-wait "$BUNDLE_DL_PID"
-install_prebuilt_gems
-
 cd "$REPO"
 
-# Unpacked before bin/setup's `npm install`, which then reconciles a near-miss
-# instead of fetching all 292 packages. bin/lint (herb-format, standard) and the
-# :js specs' playwright package both need this tree.
-wait "$NODE_DL_PID"
-if [ -n "$(resolved_asset "$NODE_TARBALL")" ] && tar -C "$REPO" -xzf "$STAGE/$NODE_TARBALL"; then
+# The two trees are disjoint, so they unpack at the same time. The gem one goes
+# over the Ruby's own GEM_HOME, which is why it waited for the Ruby to land.
+unpack_gems() {
+  local won
+  won=$(cat "$BUNDLE_WON" 2>/dev/null) || return 0
+  [ -n "$won" ] && unpack_ruby_tree "$won" || return 0
+  # Only when nothing has claimed the prefix yet: after a source build it's a real
+  # directory that $TOOLCACHE/x64 points AT, and relinking would chase its own tail.
+  ruby_is_built || link_ruby_prefix
+  printf '%s' "$LOCK_SHA" > "$GEM_STAMP"
+  [ "$won" = "$BUNDLE_TARBALL" ] &&
+    say "prebuilt gems for Gemfile.lock ${LOCK_SHA} installed" ||
+    say "no bundle for Gemfile.lock ${LOCK_SHA}; unpacked ${won}, bundle install will reconcile"
+}
+
+# bin/setup's `npm install` reconciles whatever this leaves short. bin/lint
+# (herb-format, standard) and the :js specs' playwright package both need it.
+unpack_node() {
+  tar -C "$REPO" -xzf "$STAGE/$NODE_TARBALL" || return 0
+  printf '%s' "$NPM_SHA" > "$NPM_STAMP"
   say "prebuilt node_modules for package-lock ${NPM_SHA} installed"
-fi
+}
+
+UNPACK_PIDS=""
+[ -z "$BUNDLE_DL_PID" ] || { wait "$BUNDLE_DL_PID"; unpack_gems & UNPACK_PIDS="$UNPACK_PIDS $!"; }
+[ -z "$NODE_DL_PID" ] || { wait "$NODE_DL_PID"; unpack_node & UNPACK_PIDS="$UNPACK_PIDS $!"; }
+# Named PIDs, not a bare `wait` - that would reap setup_system too, and the
+# `wait "$SYSTEM_PID"` below would then report a problem that never happened.
+# shellcheck disable=SC2086
+[ -z "$UNPACK_PIDS" ] || wait $UNPACK_PIDS
 
 # workspace_setup wants postgres up and the rails role in place before it can
 # allocate an ID out of the dev_workspaces database.
 wait "$SYSTEM_PID" || say "system setup had a problem - see /tmp/system_setup.log"
 report_prebuilt
 
-# bin/workspace_setup assigns .workspace_id, then hands off to bin/setup for
-# bundler, `bundle install`, `npm install` and the databases (db:create,
-# schema:load on primary AND analytics, db:migrate). Everything above exists to
-# make its steps no-ops: a prebuilt Ruby for its version check, prebuilt gems for
-# its `bundle check`, a prebuilt node_modules for its `npm install`. --without_seeds
-# skips db:seed, which needs `setup:import_spreadsheets` and so a network this
-# sandbox doesn't have.
+# Everything above exists to make this a no-op: bin/setup checks the Ruby version,
+# runs `bundle check` and `npm install`. --without_seeds because db:seed needs
+# `setup:import_spreadsheets`, and so a network this sandbox doesn't have.
 say "bin/workspace_setup --without_seeds"
 bin/workspace_setup --without_seeds || exit 1
 
@@ -240,11 +246,16 @@ eval "$(ruby bin/env --export)"
 
 # bin/setup builds dartsass only on the seeding path, and tailwind not at all.
 # Without them anything rendering the application layout - a request spec on an
-# html format, any :js system spec - dies on AssetNotFound. ~15s; bin/dev's
-# watchers keep them current afterwards.
-say "building tailwind + dartsass"
-bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
-  say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
+# html format, any :js system spec - dies on AssetNotFound. Skipped under
+# --dev-server: Procfile.dev's dartsass:watch and tailwindcss:watch both build on
+# start, so this Rails boot would be redone seconds later.
+if [ "${1:-}" = "--dev-server" ]; then
+  say "leaving the css build to bin/dev's watchers"
+else
+  say "building tailwind + dartsass"
+  bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
+    say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
+fi
 
 if [ "${1:-}" = "--dev-server" ]; then
   say "starting bin/dev -> /tmp/dev_server.log"
@@ -260,15 +271,6 @@ if [ "${1:-}" = "--dev-server" ]; then
   fi
 fi
 
-ENV_EXPORTS=$(cat <<EOF
-export PATH="$RUBY_PREFIX/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-export LD_LIBRARY_PATH="$RUBY_PREFIX/lib:\${LD_LIBRARY_PATH:-}"
-export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
-export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password
-export LANG=C.UTF-8 LC_ALL=C.UTF-8
-EOF
-)
-
 # Set by the SessionStart hook: everything written here is exported into the
 # session's shells, so later commands need no `export PATH=...` preamble.
 if [ -n "${CLAUDE_ENV_FILE:-}" ] && ! grep -qF "$RUBY_PREFIX/bin" "$CLAUDE_ENV_FILE" 2>/dev/null; then
@@ -277,10 +279,4 @@ if [ -n "${CLAUDE_ENV_FILE:-}" ] && ! grep -qF "$RUBY_PREFIX/bin" "$CLAUDE_ENV_F
 fi
 
 say "done. Shell env for later commands:"
-cat <<EOF
-  export PATH="$RUBY_PREFIX/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-  export LD_LIBRARY_PATH="$RUBY_PREFIX/lib:\$LD_LIBRARY_PATH"
-  export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
-  export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password LANG=C.UTF-8 LC_ALL=C.UTF-8
-  eval "\$(ruby bin/env --export)"
-EOF
+printf '%s\n' "$ENV_EXPORTS" 'eval "$(ruby bin/env --export)"' | sed 's/^/  /' 
