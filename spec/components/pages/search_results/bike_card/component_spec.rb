@@ -43,16 +43,38 @@ RSpec.describe Pages::SearchResults::BikeCard::Component, type: :component do
     end
   end
 
+  context "with a registration address" do
+    let(:bike) do
+      FactoryBot.create(:bike, :with_ownership_claimed,
+        address_record: FactoryBot.create(:address_record, :los_angeles, kind: :bike))
+    end
+
+    it "renders it for the organization" do
+      expect(component).to have_text("Los Angeles")
+    end
+
+    # The registration address is the owner's home, and nothing on the public page
+    # replaces the listing address a for-sale bike would have
+    context "without an organization" do
+      let(:organization) { nil }
+
+      it "renders no location" do
+        expect(component).to have_no_text("Los Angeles")
+      end
+    end
+  end
+
   context "without an organization" do
     let(:organization) { nil }
     let(:seller) { FactoryBot.create(:user_confirmed) }
     let(:listing) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, amount_cents: 420_00) }
     let(:bike) { listing.item.reload }
 
-    it "links to the public bike page and renders the price" do
+    it "links to the public bike page, with the price and the listing's location" do
       expect(component).to have_link(href: bike.html_url)
       expect(component).to have_text("420")
       expect(component).to have_text("For Sale ·")
+      expect(component).to have_text(listing.address_record.city)
       expect(component).not_to have_text("Bike Index member")
     end
 

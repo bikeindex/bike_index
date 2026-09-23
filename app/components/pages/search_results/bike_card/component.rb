@@ -61,8 +61,12 @@ module Pages
           for_sale_listing&.seller_member? || false
         end
 
+        # A bike's own address is its owner's registration address, which only an
+        # organization's search may show - publicly a result is placed by its listing
+        # or theft report alone
         def location
-          @location ||= (@bike.current_event_record || @bike).formatted_address_string
+          @location ||= (@bike.current_event_record || (@bike if @organization.present?))
+            &.formatted_address_string
         end
 
         # Lazily, so a cached card doesn't query it
