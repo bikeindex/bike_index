@@ -65,7 +65,8 @@ class Organization < ApplicationRecord
     property_management: 6,
     other: 7,
     ambassador: 8,
-    bike_depot: 9
+    bike_depot: 9,
+    municipality: 10
   }.freeze
 
   USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS = [36, 1].freeze # SBR and BikeIndex
