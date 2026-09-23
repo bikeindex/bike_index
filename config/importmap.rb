@@ -33,9 +33,9 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 pin_all_from "app/components", under: "components"
 pin_all_from "app/javascript/utils", under: "utils", to: "utils"
 
-# +esm build: the dist/browser UMD bundle's default export is undefined under import(),
-# which silently breaks Honeybadger.configure and leaves frontend errors unreported
-pin "@honeybadger-io/js", to: "https://cdn.jsdelivr.net/npm/@honeybadger-io/js@6.12.3/+esm"
+# Vendored (not CDN-pinned); see the file header to re-generate. preload: false because
+# application.js only import()s it when the page carries an api key.
+pin "@honeybadger-io/js", to: "@honeybadger-io--js.js", preload: false
 
 # Lexxy rich text editor (Action Text). Assets served by the lexxy/activestorage gems.
 pin "lexxy", to: "lexxy.js"
