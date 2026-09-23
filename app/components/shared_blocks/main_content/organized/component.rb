@@ -15,15 +15,6 @@ module SharedBlocks
           @controller_name = controller_name
           @action_name = action_name
         end
-
-        private
-
-        # Cookie name is shared with app/javascript/controllers/org/pos_callout_controller.js,
-        # which is what writes it
-        def pos_callout_dismissed?
-          request.cookies["dismissed_pos_callout_organization_ids"].to_s.split(",")
-            .include?(@current_organization.id.to_s)
-        end
       end
     end
   end
