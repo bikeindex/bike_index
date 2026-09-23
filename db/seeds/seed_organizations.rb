@@ -98,12 +98,13 @@ end
 
 # --- Craig's Bike Shop ---
 SeedHelpers.tick
-craigs = Organization.find_by_name("Craig's Bike Shop") || Organization.create(name: "Craig's Bike Shop", website: "", short_name: "Craig's", show_on_map: true)
-craigs.save
+Organization.find_by_name("Craig's Bike Shop") ||
+  Organization.create!(name: "Craig's Bike Shop", website: "", short_name: "Craig's", show_on_map: true, kind: :bike_shop)
 
 # --- Cannondale ---
 SeedHelpers.tick
-cannondale = Organization.find_by_name("Cannondale") || Organization.create!(name: "Cannondale", manufacturer_id: Manufacturer.find_by_name("Cannondale")&.id)
+cannondale = Organization.find_by_name("Cannondale") ||
+  Organization.create!(name: "Cannondale", kind: :bike_manufacturer, manufacturer_id: Manufacturer.find_by_name("Cannondale")&.id)
 cannondale_invoice = Invoice.create(organization: cannondale, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
 cannondale_invoice.update(organization_feature_ids: [official_manufacturer_feature_id].compact)
 
@@ -116,8 +117,8 @@ OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user
 # --- Bike Recovery Team: Law Enforcement functionality ---
 # phoneable_by?'s police check reads Organization.law_enforcement — the kind, not the feature slugs
 SeedHelpers.tick
-recovery_team = Organization.find_by_name("Bike Recovery Team") || Organization.create!(name: "Bike Recovery Team")
-recovery_team.update(kind: :law_enforcement)
+recovery_team = Organization.find_by_name("Bike Recovery Team") ||
+  Organization.create!(name: "Bike Recovery Team", kind: :law_enforcement)
 recovery_team_invoice = Invoice.create(organization: recovery_team, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
 recovery_team_invoice.update(organization_feature_ids: [law_enforcement_feature_id].compact)
 UpdateOrganizationAssociationsJob.new.perform(recovery_team.id)
