@@ -29,10 +29,12 @@ BRANCH=$(git symbolic-ref --quiet --short HEAD) ||
 
 for image in "$@"; do
   [ -f "$image" ] || { echo "no such file: $image" >&2; exit 1; }
-  # A tracked path would be left deleted by the cleanup commit, not restored
-  git ls-files --error-unmatch "$image" >/dev/null 2>&1 &&
-    { echo "$image is tracked - pass a throwaway copy under tmp/ instead" >&2; exit 1; }
 done
+
+# A tracked path would be left deleted by the cleanup commit, not restored
+TRACKED=$(git ls-files -- "$@")
+[ -z "$TRACKED" ] ||
+  { echo "already tracked - pass throwaway copies under tmp/ instead: $TRACKED" >&2; exit 1; }
 
 # [skip ci] on both: ci.yml is `on: push` with no branch filter, so without it
 # every screenshot post costs two full sharded runs.
