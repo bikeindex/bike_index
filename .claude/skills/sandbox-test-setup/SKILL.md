@@ -15,7 +15,8 @@ description: >-
   `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a `bin/` script,
   `Sprockets::Rails::Helper::AssetNotFound`, `tailwind.css is not present`,
   `LoadError: Could not open library 'vips.so.42'`, or a Playwright
-  browser-not-found or build-number mismatch. The fix is almost never a reinstall
+  browser-not-found, build-number mismatch or
+  `Running as root without --no-sandbox is not supported`. The fix is almost never a reinstall
   or a Gemfile edit — it's a PATH, an env var, or a service that isn't running.
 ---
 
@@ -30,6 +31,10 @@ matches; the others won't apply and are the bulk of the material.
 | `…/.claude/worktrees/…` | spawned git worktree — set it up first, below | `references/local-macos.md` |
 | `/home/vercel-sandbox/workspace` (Amazon Linux 2023) | Conductor cloud sandbox | `references/conductor-cloud.md` |
 | `/home/user/bike_index` | Claude Code web sandbox | `references/web-sandbox.md` |
+
+In the web sandbox a `SessionStart` hook has usually done all of this before your
+first turn — check with `ruby -v` before setting anything up. When it hasn't, the
+reference opens with the script to run instead of hand-typing it.
 
 ## A spawned worktree sets itself up first
 
