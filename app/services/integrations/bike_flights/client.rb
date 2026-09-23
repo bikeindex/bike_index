@@ -2,8 +2,6 @@
 
 module Integrations
   module BikeFlights
-    # Wraps the BikeFlights shipping API: authenticate, quote a rate, buy a label, track a package.
-    #
     # Their API is shop-shaped - it authenticates as a shop with an email and password rather than
     # an API key, and every operation is named for a shop. Whoever holds the account is the payer
     # of record, because creating an order charges that account's saved payment method.
@@ -77,7 +75,6 @@ module Integrations
          countryCode: address[:country_iso].presence || "US", isResidential: address[:residential]}.compact
       end
 
-      # They require both units rather than assuming inches and pounds
       def package_params(package)
         package.slice(:length, :width, :height, :value)
           .merge(weight: package[:weight_pounds], linearUnit: LINEAR_UNIT, weightUnit: WEIGHT_UNIT,
