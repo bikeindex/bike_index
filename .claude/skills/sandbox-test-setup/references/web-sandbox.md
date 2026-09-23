@@ -22,16 +22,33 @@ four databases come from `bin/setup` rather than from anything sandbox-specific,
 this checkout gets a `.workspace_id` like any other. `--without_seeds` because
 `db:seed` wants `setup:import_spreadsheets` and a network this sandbox doesn't have.
 
-It downloads a prebuilt Ruby, gem tree and `node_modules` from the
+It downloads a prebuilt Ruby (11MB), gem tree (~270MB) and `node_modules` from the
 `web-sandbox-prebuilt` release (published by
 `.github/workflows/web-sandbox-prebuild.yml`), and falls back to the source build
 below whenever an asset is missing or fails its checksum. A `Gemfile.lock` your
-branch changed misses its exact gem tarball and gets the fixed `-latest-` one
-instead, so `bundle install` reconciles a handful of gems rather than fetching all
-341. `node_modules` is exact-match only; on a miss `bin/setup`'s own `npm install`
-covers it. Budget ~1 min warm-cache, ~7 min when the Ruby half misses too. Set `BINX_SKIP_PREBUILT=1` to force the source path. The sections below
-are what it automates — read them when a step fails, or when you need only part of
-it.
+branch changed misses its exact gem tarball and reads `bundle-<ver>-latest.txt` for
+the newest one instead, so `bundle install` reconciles a handful of gems rather than
+fetching all 341. `node_modules` is exact-match only; on a miss `bin/setup`'s own
+`npm install` covers it. Set `BINX_SKIP_PREBUILT=1` to force the source path. The
+sections below are what it automates — read them when a step fails, or when you need
+only part of it.
+
+**Ruby is either seconds or six minutes, with nothing in between** — an 11MB download
+against a from-source build — so the only thing worth tuning is whether that download
+lands. Release assets redirect to `release-assets.githubusercontent.com`, which is
+**not** on the allow list at the bottom of this file, and a refused host looks exactly
+like a missing asset. The script prints a `prebuilt assets:` block naming what
+resolved; `http 000` there means the host never answered, rather than the release
+lacking the file. Check it before assuming the prebuild does anything:
+
+```bash
+curl -sI -o /dev/null -w '%{http_code}\n' \
+  https://github.com/bikeindex/bike_index/releases/download/web-sandbox-prebuilt/ruby-4.0.6-ubuntu24.04-x86_64.tar.gz
+```
+
+If it's blocked, `BINX_PREBUILT_BASE` repoints the whole set at any reachable host —
+and git-over-https to github.com *is* allowed, so a small separate repo holding the
+11MB tarball is a workable channel where the release download isn't.
 
 Longest of the three, so here's the order: build Ruby, put the toolchain on
 PATH, start postgres/redis and create the databases. Everything after that is
