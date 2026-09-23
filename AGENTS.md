@@ -104,6 +104,8 @@ both do it.
 
 **Assert on what a drain produces, not on the flag that precedes it.** A column a job reconciles when it runs records what was true at write time — `Ownership#skip_email` is one — so it answers a different question than the one you're asking.
 
+**A spec that shells out gets what `.github/ci/Dockerfile` installs, which is `ruby:slim` plus a short list — no `jq`, no `which`.** Locally they're both on PATH, so the spec passes here and fails on one CI shard with an assertion that names neither. Probe for the binary (`/bin/grep`, `/usr/bin/grep`) rather than asking `which`, and don't reach for `jq` to read JSON a Ruby spec could parse itself.
+
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded. To clear stale contents, `rm` the file and re-run the spec.
 
 **Name a cassette in lowercase, without the constant** — `stripe-update_prices_job`, not `StripeJobs::UpdatePricesJob`. A namespace rename then leaves every cassette alone, and the name greps to its own filename, which the constant form doesn't: VCR rewrites `::` and `.` to `_` on the way to disk.
