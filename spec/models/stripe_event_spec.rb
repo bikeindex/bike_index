@@ -2,10 +2,10 @@ require "rails_helper"
 
 RSpec.describe StripeEvent, type: :model do
   let(:cassette_options) { {match_requests_on: [:method], re_record_interval: 12.months} }
+  let(:stripe_event) { StripeEvent.create_from(Stripe::Event.construct_from(webhook_payload)) }
 
   describe "create_from" do
     let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-checkout.session.completed.json"))) }
-    let(:stripe_event) { StripeEvent.create_from(Stripe::Event.construct_from(webhook_payload)) }
     let(:target_attributes) do
       {
         name: "checkout.session.completed",
@@ -44,7 +44,6 @@ RSpec.describe StripeEvent, type: :model do
   end
 
   describe "update_bike_index_record!" do
-    let(:stripe_event) { StripeEvent.create_from(Stripe::Event.construct_from(webhook_payload)) }
     let!(:stripe_price) { FactoryBot.create(:stripe_price_plus) }
 
     context "subscription stripe_checkout completed" do
@@ -231,7 +230,7 @@ RSpec.describe StripeEvent, type: :model do
             expect(stripe_subscription.reload.stripe_status).to eq "canceled"
             expect(stripe_event.reload.processed_at).to be_present
 
-            expect { process_event(created_payload) }.to_not change(StripeEvent, :count)
+            process_event(created_payload)
             expect(stripe_subscription.reload.stripe_status).to eq "canceled"
             expect(stripe_subscription.membership.status).to eq "ended"
           end

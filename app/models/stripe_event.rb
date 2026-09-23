@@ -29,10 +29,9 @@ class StripeEvent < ApplicationRecord
     data = event["data"]
 
     # Stripe redelivers an event until it gets a 2xx, so a retry finds the stored row
-    stripe_event = create_or_find_by!(stripe_event_id: event["id"]) do |new_event|
-      new_event.attributes = {name: event["type"], stripe_id: data["object"]["id"],
-                              stripe_account_id: event["account"], payload: event.to_hash}
-    end
+    stripe_event = create_with(name: event["type"], stripe_id: data["object"]["id"],
+      stripe_account_id: event["account"], payload: event.to_hash)
+      .create_or_find_by!(stripe_event_id: event["id"])
     stripe_event.data = data
     stripe_event
   end
@@ -64,8 +63,9 @@ class StripeEvent < ApplicationRecord
   def update_bike_index_record!
     # Currently, only handle on creation, when the data object is assigned.
     raise "Stripe Data not assigned, unable to handle" unless @data.present?
-    # Stripe can deliver an event more than once, and a subscription event carries the
-    # subscription as it was then - applying it again could undo a later event
+    # Stripe can redeliver a processed event. A subscription event carries the subscription as
+    # it was then, so a redelivery could undo a later event. Out of order first deliveries
+    # still apply as they arrive
     return if processed_at.present?
 
     if checkout?
