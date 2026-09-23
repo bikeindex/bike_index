@@ -30,14 +30,14 @@ BRANCH=$(git symbolic-ref --quiet --short HEAD) ||
 # Resolve each argument against the CURRENT directory before moving to the root,
 # and carry it as a root-relative path: that is what the raw URL needs, so an
 # absolute path would otherwise produce `…/<sha>//home/user/…` and 404.
-PATHS=()
 for image in "$@"; do
   [ -f "$image" ] || { echo "no such file: $image" >&2; exit 1; }
-  relative=$(realpath --relative-to="$ROOT" -- "$image")
+done
+mapfile -t PATHS < <(realpath --relative-to="$ROOT" -- "$@")
+for relative in "${PATHS[@]}"; do
   case "$relative" in
-    ../*) echo "outside the repository: $image" >&2; exit 1 ;;
+    ../*) echo "outside the repository: $relative" >&2; exit 1 ;;
   esac
-  PATHS+=("$relative")
 done
 cd "$ROOT"
 
@@ -55,8 +55,8 @@ git diff --cached --quiet ||
 
 # The push below carries every unpushed commit, and its tip is a skip-ci one, so
 # CI would be skipped for real code riding along in the same push.
-if UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null); then
-  [ -z "$(git rev-list "$UPSTREAM"..HEAD)" ] ||
+if UNPUSHED=$(git rev-list '@{u}..HEAD' 2>/dev/null); then
+  [ -z "$UNPUSHED" ] ||
     { echo "unpushed commits on $BRANCH - push them first, or CI skips them too" >&2; exit 1; }
 else
   echo "$BRANCH has no upstream - push it first, or CI skips every commit on it" >&2
