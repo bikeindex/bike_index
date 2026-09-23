@@ -5833,6 +5833,7 @@ it:
             view_cards: Carte
             view_list: Lista
             view_table: Tavolo
+            loading_results: Caricamento dei risultati...
           chart_card:
             caption_search: Ricerca attuale
             caption_year: Riepilogo dell'anno scorso
