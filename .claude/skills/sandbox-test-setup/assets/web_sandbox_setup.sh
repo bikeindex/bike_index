@@ -91,8 +91,8 @@ build_ruby() {
   mkdir -p /tmp/ruby-build-src
   # The release tarball ships ./configure and the bundled gems; the tag is the fallback
   [ -d "$src" ] || curl -sfL --max-time 300 "https://cache.ruby-lang.org/pub/ruby/${RUBYVER%.*}/ruby-${RUBYVER}.tar.gz" \
-    | tar -C /tmp/ruby-build-src -xz || { rm -rf "$src"; false; } ||
-    git clone --depth 1 --branch "v${RUBYVER}" https://github.com/ruby/ruby.git "$src"
+    | tar -C /tmp/ruby-build-src -xz ||
+    { rm -rf "$src"; git clone --depth 1 --branch "v${RUBYVER}" https://github.com/ruby/ruby.git "$src"; }
   cd "$src"
   [ -f configure ] || ./autogen.sh
   # A git checkout lacks the bundled gems, and `make install` would fetch them through
@@ -213,21 +213,27 @@ unpack_gems() {
 }
 
 [ -z "$BUNDLE_DL_PID" ] || { wait "$BUNDLE_DL_PID"; unpack_gems; }
-[ -z "$NODE_DL_PID" ] || wait "$NODE_DL_PID"
+# The pin can want a newer build than /opt/pw-browsers ships; the :js specs launch this one
+install_playwright() { npx --no-install playwright install chromium-headless-shell >/tmp/playwright_install.log 2>&1; }
+
+# A tree matching the lockfile leaves bin/setup's npm install nothing to change, so the
+# browser download can overlap it
+PW_PID=""
+if { [ -z "$NODE_DL_PID" ] && stamped "$NPM_STAMP" "$NPM_SHA"; } || { [ -n "$NODE_DL_PID" ] && wait "$NODE_DL_PID"; }; then
+  install_playwright & PW_PID=$!
+fi
 
 wait "$SYSTEM_PID" || say "system setup had a problem - see /tmp/system_setup.log"
 report_prebuilt
 
-# bin/setup seeds on every run, and a second db:seed dies on duplicates
+# The seed runs below, in the background
 say "bin/workspace_setup --without_seeds"
 bin/workspace_setup --without_seeds || exit 1
 
 # After workspace_setup: .workspace_id gives BASE_URL its port
 eval "$(ruby bin/env --export)"
 
-# The pin can want a newer build than /opt/pw-browsers ships; the :js specs launch this one
-npx --no-install playwright install chromium-headless-shell >/tmp/playwright_install.log 2>&1 &
-PW_PID=$!
+[ -n "$PW_PID" ] || { install_playwright & PW_PID=$!; }
 
 # ~95s nothing at session start needs, so detached with every fd redirected — else the
 # SessionStart hook waits on it. psql because a Rails boot is ~7s.
@@ -239,7 +245,7 @@ if [ "$SEEDED" = "f" ]; then
   say "  wait for it: until grep -qx 'done\|failed' $SEED_STATUS; do sleep 5; done"
   echo running > "$SEED_STATUS"
   # Redirecting around the seed would truncate the status to empty while it runs
-  setsid nohup bash -c "if bundle exec rails db:seed; then s=done; else s=failed; fi; echo \$s > $SEED_STATUS" \
+  setsid nohup bash -c "bundle exec rails db:seed && s=done || s=failed; echo \$s > $SEED_STATUS" \
     </dev/null >/tmp/seed.log 2>&1 &
 elif [ "$SEEDED" = "t" ]; then
   echo done > "$SEED_STATUS"

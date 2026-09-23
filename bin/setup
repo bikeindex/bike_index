@@ -97,8 +97,13 @@ FileUtils.chdir APP_ROOT do
   system! "bin/rails tailwindcss:build dartsass:build"
 
   unless without_seeds
-    puts "\n== Seeding database =="
-    system! "bin/rake db:seed"
+    # db:seed isn't idempotent: a re-run over seeded records dies on duplicates
+    if system("bin/rails runner 'exit Bike.unscoped.exists?'")
+      puts "\n== Database already seeded =="
+    else
+      puts "\n== Seeding database =="
+      system! "bin/rake db:seed"
+    end
 
     puts "\n== Preparing test database (including parallelism) =="
     system! "bin/rake parallel:prepare"
