@@ -37,6 +37,7 @@ module CallbackJobs
       bike.current_marketplace_listing&.update(updated_at: Time.current)
       return true unless bike.status_stolen? # For now, only hooking on stolen bikes
 
+      unpublish_serial_matched_listings(bike)
       BikeJobs::AfterStolenRecordSaveJob.perform_async(bike.current_stolen_record_id)
       post_bike_to_webhook(serialized(bike))
     end
@@ -56,6 +57,19 @@ module CallbackJobs
         bike: BikeV2ShowSerializer.new(bike, root: false).as_json,
         update: bike.created_at > Time.current - 30.seconds
       }
+    end
+
+    # Inverse of Bike.matching_serial: listed bikes whose serial would match this stolen one.
+    # Bumping a listing re-runs MarketplaceListing#valid_publishable?, which returns it to draft
+    def unpublish_serial_matched_listings(bike)
+      return if bike.serial_normalized.blank?
+
+      matched_bikes = Bike.unscoped.where.not(id: bike.id).where(
+        "to_tsvector('simple', ?) @@ plainto_tsquery('simple', serial_normalized) OR serial_normalized_no_space = ?",
+        bike.serial_normalized, bike.serial_normalized_no_space
+      )
+      MarketplaceListing.for_sale.where(item_type: "Bike", item_id: matched_bikes.select(:id))
+        .find_each { |marketplace_listing| marketplace_listing.update(updated_at: Time.current) }
     end
 
     def update_matching_partial_registrations(bike)

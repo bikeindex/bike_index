@@ -176,6 +176,7 @@ class MarketplaceListing < ApplicationRecord
   def valid_publishable?
     return false if item.blank? || !item.current? || primary_activity.blank?
     return false if item.is_a?(Bike) && !item.status_with_owner?
+    return false if serial_matches_stolen_bike?
 
     amount_cents.present? && condition.present? && address_record&.address_present?
   end
@@ -195,6 +196,7 @@ class MarketplaceListing < ApplicationRecord
         errors.add(:base, :not_with_owner, item_type: item_type_display)
       end
     end
+    errors.add(:base, :serial_matches_stolen, item_type: item_type_display) if serial_matches_stolen_bike?
 
     errors.add(:base, :price_required) if amount_cents.blank?
     errors.add(:base, :condition_required) if condition.blank?
@@ -232,6 +234,13 @@ class MarketplaceListing < ApplicationRecord
   end
 
   private
+
+  def serial_matches_stolen_bike?
+    return false unless item.is_a?(Bike) && item.serial_normalized.present?
+
+    Bike.status_stolen.where.not(id: item_id)
+      .matching_serial(item.serial_normalized, item.serial_normalized_no_space).exists?
+  end
 
   def update_bike_for_sale
     return unless @updated_for_sale && item_type == "Bike"

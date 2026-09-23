@@ -52,6 +52,22 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
     end
   end
 
+  describe "stolen bike matching a listed serial" do
+    let(:listed_bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, serial_number: "ABC 123") }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: listed_bike) }
+    let!(:unmatched_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+    let(:bike) { FactoryBot.create(:stolen_bike, serial_number: "abc-123-xyz") }
+
+    it "returns the matching listing to draft" do
+      expect(marketplace_listing.reload.status).to eq "for_sale"
+      expect(listed_bike.reload.is_for_sale).to be_truthy
+      instance.perform(bike.id)
+      expect(marketplace_listing.reload).to have_attributes(status: "draft", published_at: nil)
+      expect(listed_bike.reload.is_for_sale).to be_falsey
+      expect(unmatched_listing.reload.status).to eq "for_sale"
+    end
+  end
+
   describe "download external_image_urls" do
     let(:external_image_urls) { ["https://files.bikeindex.org/email_assets/logo.png", "https://files.bikeindex.org/email_assets/logo.png", "https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"] }
     let(:passed_external_image_urls) { external_image_urls }
