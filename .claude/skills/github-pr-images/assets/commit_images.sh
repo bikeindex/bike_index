@@ -47,7 +47,9 @@ TRACKED=$(git ls-files -- "${PATHS[@]}")
   { echo "already tracked - pass throwaway copies under tmp/ instead: $TRACKED" >&2; exit 1; }
 
 # Anything already staged would ride into the screenshot commit, which the
-# cleanup commit then doesn't remove - it names only these paths.
+# cleanup commit then doesn't remove. A pathspec on the commits would scope them,
+# but `git commit -- <paths>` re-reads the working tree and so commits nothing
+# after `git rm --cached` below - a clean index is what keeps both honest.
 git diff --cached --quiet ||
   { echo "the index has staged changes - commit or reset them first" >&2; exit 1; }
 
@@ -67,7 +69,7 @@ git add -f -- "${PATHS[@]}"
 git commit -q -m "Add PR screenshots [skip ci]
 
 Deleted in the next commit; the URLs in the screenshots comment are pinned
-to this commit's sha, so they keep resolving." -- "${PATHS[@]}"
+to this commit's sha, so they keep resolving."
 SHA=$(git rev-parse HEAD)
 
 # --cached: drop them from the index but leave the files on disk, so a caller
@@ -75,7 +77,7 @@ SHA=$(git rev-parse HEAD)
 git rm -q --cached -- "${PATHS[@]}"
 git commit -q -m "Remove PR screenshots [skip ci]
 
-Keeps the PR's Files changed empty; the blobs stay reachable at ${SHA:0:12}." -- "${PATHS[@]}"
+Keeps the PR's Files changed empty; the blobs stay reachable at ${SHA:0:12}."
 
 git push -q origin "$BRANCH"
 
