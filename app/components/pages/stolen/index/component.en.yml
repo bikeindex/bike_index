@@ -93,6 +93,13 @@ en:
             a promoted alert to reach the blocks around the theft.
           step_alert_tag: 10 min
           step_alert_title: Send out your alert
+          step_google_alerts_action: Set up Google Alerts
+          step_google_alerts_body: >-
+            Set up multiple Google Alerts with details matching your bike (make, model,
+            distinctive components, color), so new listings and posts that mention
+            it come to you.
+          step_google_alerts_tag: 5 min
+          step_google_alerts_title: Set up Google Alerts
           step_listing_action: Edit your listing
           step_listing_body: >-
             A listing with the police report number, clear photos, and any identifying
@@ -113,12 +120,6 @@ en:
             and used-bike buyers check before they touch a secondhand frame.
           step_register_tag: 3 min · free
           step_register_title: Register it as stolen on Bike Index
-          step_resale_action: Search the marketplace
-          step_resale_body: >-
-            Most stolen bikes surface on Marketplace, Craigslist, and OfferUp within
-            two weeks. Save searches for your make, model, and color, and check daily.
-          step_resale_tag: Ongoing
-          step_resale_title: Watch the resale listings
           step_shops_action: Find partner shops
           step_shops_body: >-
             Thieves bring stolen bikes in for repairs and parts. Shops that check

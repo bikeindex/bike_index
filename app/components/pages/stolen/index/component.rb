@@ -20,7 +20,7 @@ module Pages
 
         private
 
-        def register_stolen_path = register_path(status: "stolen")
+        def register_stolen_path = new_bike_path(stolen: true)
 
         def recoveries_value_millions = (@recoveries_value / 100_000) / 10.0
 
@@ -46,9 +46,9 @@ module Pages
             {title: translation(".step_alert_title"), tag: translation(".step_alert_tag"),
              body: translation(".step_alert_body"), action: translation(".step_alert_action"),
              href: promoted_alerts_path},
-            {title: translation(".step_resale_title"), tag: translation(".step_resale_tag"),
-             body: translation(".step_resale_body"), action: translation(".step_resale_action"),
-             href: search_marketplace_path},
+            {title: translation(".step_google_alerts_title"), tag: translation(".step_google_alerts_tag"),
+             body: translation(".step_google_alerts_body"), action: translation(".step_google_alerts_action"),
+             href: "https://www.google.com/alerts"},
             {title: translation(".step_shops_title"), tag: translation(".step_shops_tag"),
              body: translation(".step_shops_body"), action: translation(".step_shops_action"),
              href: where_path}]

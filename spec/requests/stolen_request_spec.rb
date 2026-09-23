@@ -10,7 +10,7 @@ RSpec.describe StolenController, type: :request do
       expect(response.media_type).to eq "text/html"
       expect(response.body).to match("Your bike is gone.")
       expect(response.body).to match("Found it on my alert")
-      expect(response.body).to include(register_path(status: "stolen"))
+      expect(response.body).to include(new_bike_path(stolen: true))
     end
   end
 

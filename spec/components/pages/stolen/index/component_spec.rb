@@ -11,6 +11,7 @@ RSpec.describe Pages::Stolen::Index::Component, type: :component do
   it "renders the steps and stats" do
     expect(component).to have_css("h1", text: "Your bike is gone.")
     expect(component).to have_css("ol > li", count: 6)
+    expect(component).to have_link("Set up Google Alerts", href: "https://www.google.com/alerts")
     expect(component).to have_text("18,263")
     expect(component).to have_text("$38.4M")
     expect(component).to have_text("1,000+")
