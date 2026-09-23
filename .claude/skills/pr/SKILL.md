@@ -100,7 +100,7 @@ Record this as frontend true/false — it's what **Screenshots** gates on.
 
 ### Write the summary body
 
-Write the body to a temp file. Read the last few merged PRs first — `gh pr list --state merged --limit 5 --json title,body` — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
+Write the body to a file under the repo's own `tmp/` — a `PreToolUse` hook refuses writes outside the checkout, so the session scratchpad fails. Read the last few merged PRs first — `gh pr list --state merged --limit 5 --json title,body` — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
 
 Rules:
 
