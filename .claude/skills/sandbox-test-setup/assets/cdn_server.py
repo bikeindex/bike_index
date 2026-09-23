@@ -1,9 +1,5 @@
-"""Local TLS server that mimics cdn.jsdelivr.net for sandboxed system specs.
-
-Serves /tmp/cdn/serve over HTTPS on 127.0.0.1:8443 with a self-signed cert.
-Pair with Chrome's `--host-resolver-rules=MAP cdn.jsdelivr.net 127.0.0.1:8443`
-and `--ignore-certificate-errors` so importmap-pinned modules resolve locally
-when the egress proxy blocks the real jsdelivr.
+"""Serves /tmp/cdn/serve as cdn.jsdelivr.net on 127.0.0.1:8443 (self-signed), for the
+browser that can't reach the real one. spec/support/local_chrome.rb routes it here.
 """
 import http.server
 import os
