@@ -116,8 +116,8 @@ OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user
 # --- Bike Recovery Team: Law Enforcement functionality ---
 # phoneable_by?'s police check reads Organization.law_enforcement — the kind, not the feature slugs
 SeedHelpers.tick
-recovery_team = Organization.find_by_name("Bike Recovery Team") || Organization.create!(name: "Bike Recovery Team")
-recovery_team.update(kind: :law_enforcement)
+recovery_team = Organization.find_by_name("Bike Recovery Team") ||
+  Organization.create!(name: "Bike Recovery Team", kind: :law_enforcement)
 recovery_team_invoice = Invoice.create(organization: recovery_team, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
 recovery_team_invoice.update(organization_feature_ids: [law_enforcement_feature_id].compact)
 
