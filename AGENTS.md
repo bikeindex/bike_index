@@ -118,7 +118,8 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 
 ## Pull requests
 
-- When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs and captures desktop+mobile screenshots, which it posts as a `## Screenshots` comment (never in the body, so the summary stays first).
+- When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs and captures desktop+mobile screenshots, which it posts as a `## Screenshots` comment (never in the body, so the summary stays first). `.claude/hooks/pr-guardrails.sh` denies the authoring commands until that skill is loaded.
+- **Merging a PR is the human's, including when they ask you to do it in the moment.** The same hook denies it outright — the subcommand, `--auto`, and the `pulls/<n>/merge` API route — with nothing that clears it. Say the PR is ready and leave it.
 - To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, the `gh` CLI **cannot upload images** — use the `github-pr-images` skill, which drives a real browser to GitHub's user-attachments uploader.
 
 ## Architecture notes

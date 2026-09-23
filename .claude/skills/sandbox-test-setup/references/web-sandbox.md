@@ -282,7 +282,8 @@ in under a second or two; sample from inside one `browser_evaluate` instead.
 
 The GitHub CLI isn't installed. **This is a translation table for the `pr` skill's
 commands, not a way to skip it** — opening a PR still starts by invoking that skill,
-and a `PreToolUse` hook denies `create_pull_request` until you have. Anything it (or
+and a `PreToolUse` hook denies `create_pull_request` until you have, and
+`merge_pull_request` always. Anything it (or
 any other skill) expresses as `gh pr …` goes through the GitHub MCP tools instead —
 `mcp__github__list_pull_requests` (filter with `head: "<owner>:<branch>"`),
 `create_pull_request`, `update_pull_request`, `pull_request_read`. Check for an
