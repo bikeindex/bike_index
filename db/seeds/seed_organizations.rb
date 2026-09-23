@@ -1,4 +1,4 @@
-# Seed organizations: Brakebills, Ike's Bikes, Cannondale, Bike Recovery Team and City of Palo Alto
+# Seed organizations: Brakebills, Craig's Bike Shop, Cannondale, Bike Recovery Team and City of Palo Alto
 
 # --- Organization Features ---
 # This list was created with:
@@ -96,10 +96,10 @@ OrganizationLandingPage.find_or_initialize_by(organization_id: brakebills.id).ta
     enabled: landing_page.env_enabled?)
 end
 
-# --- Ike's Bikes ---
+# --- Craig's Bike Shop ---
 SeedHelpers.tick
-ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
-ikes.save
+craigs = Organization.find_by_name("Craig's Bike Shop") || Organization.create(name: "Craig's Bike Shop", website: "", short_name: "Craig's", show_on_map: true)
+craigs.save
 
 # --- Cannondale ---
 SeedHelpers.tick
@@ -144,4 +144,4 @@ OrganizationRole.create(organization_id: palo_alto.id, user_id: palo_alto_user.i
 # Make sure example organization exists
 Organization.example
 
-puts "Organizations seeded: Brakebills, Ikes Bike's, Cannondale, Bike Recovery Team, City of Palo Alto\n"
+puts "Organizations seeded: Brakebills, Craig's Bike Shop, Cannondale, Bike Recovery Team, City of Palo Alto\n"
