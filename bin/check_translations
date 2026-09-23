@@ -59,6 +59,9 @@ if [ "$current_branch" != "$TRANSLATION_BRANCH" ]; then
   fi
   # Conflicts can only be in config/locales, which the sync rewrites wholesale
   git merge --no-edit -X ours FETCH_HEAD
+  # The image's gems came from this branch's lockfile, so a bump the merge brought
+  # in isn't installed and every `bundle exec` below raises GemNotFound
+  bundle check >/dev/null 2>&1 || bundle install --quiet
 fi
 
 echo bundle exec rake translation:sync_and_purge prepare_translations
