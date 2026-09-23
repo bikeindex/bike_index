@@ -96,12 +96,14 @@ end
 
 # --- Ike's Bikes ---
 SeedHelpers.tick
-ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
-ikes.save
+# No short_name - "Ikes" is on OrganizationNameValidator::INVALID_NAMES, which rejects the record
+Organization.find_by_name("Ike's Bikes") ||
+  Organization.create!(name: "Ike's Bikes", website: "", show_on_map: true, kind: :bike_shop)
 
 # --- Cannondale ---
 SeedHelpers.tick
-cannondale = Organization.find_by_name("Cannondale") || Organization.create!(name: "Cannondale", manufacturer_id: Manufacturer.find_by_name("Cannondale")&.id)
+cannondale = Organization.find_by_name("Cannondale") ||
+  Organization.create!(name: "Cannondale", kind: :bike_manufacturer, manufacturer_id: Manufacturer.find_by_name("Cannondale")&.id)
 cannondale_invoice = Invoice.create(organization: cannondale, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
 cannondale_invoice.update(organization_feature_ids: [official_manufacturer_feature_id].compact)
 
@@ -127,4 +129,4 @@ OrganizationRole.create(organization_id: recovery_team.id, user_id: recovery_tea
 # Make sure example organization exists
 Organization.example
 
-puts "Organizations seeded: Brakebills, Ikes Bike's, Cannondale, Bike Recovery Team\n"
+puts "Organizations seeded: Brakebills, Ike's Bikes, Cannondale, Bike Recovery Team\n"
