@@ -3,11 +3,10 @@
 module MarketplaceFees
   extend Functionable
 
-  # Taken from the item price only, and deducted from the seller's payout
   PLATFORM_FEE_RATE = Rational(9, 100)
   # The same number in every currency, not converted from USD
   PLATFORM_FEE_CAP_CENTS = 69_00
-  # A service fee on item + shipping + boxing, added to the buyer's total on every payment method
+  # A service fee charged on every payment method
   PROCESSING_FEE_RATE = Rational(3, 100)
 
   def calculate(item_amount_cents:, shipping_amount_cents: 0, boxing_amount_cents: 0, currency: nil)
