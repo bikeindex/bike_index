@@ -63,8 +63,16 @@ class InfoController < ApplicationController
   end
 
   def donate
+    # amount is a fixed payment, which the payments page takes
+    return redirect_to(new_payment_path(amount: params[:amount])) if params[:amount].present?
+
     @page_title = "Support Bike Index"
-    render layout: "payments_layout"
+    render Pages::Donate::Page::Component.new(
+      recovery_displays: RecoveryDisplay.with_attached_photo_processed.limit(12),
+      initial_amount: params[:initial_amount],
+      referral_source: params[:source],
+      current_user:
+    )
   end
 
   def support_bike_index
