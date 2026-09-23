@@ -5,8 +5,8 @@ module Pages
     module Show
       module OrgTopActions
         module MessageOwner
-          # Org-admin "Know something about this bike?" panel — messages the owner via
-          # a stolen notification, or an organization message for its own registration. Rendered inside the org-admin action-panel
+          # Org-admin panel messaging the owner — a stolen notification, or an organization
+          # message for the org's own registration. Rendered inside the org-admin action-panel
           # accordion (data-panel-name="message")
           class Component < ApplicationComponent
             def initialize(bike:, current_user: nil)

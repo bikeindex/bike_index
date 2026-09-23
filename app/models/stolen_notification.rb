@@ -29,7 +29,7 @@ class StolenNotification < ApplicationRecord
   }.freeze
 
   # Kind enum was added to track how often various types of messages were sent
-  # in #2275 - the email reads unstolen_organization_permitted, nothing else does
+  # in #2275 - only unstolen_organization_permitted is used for logic (the email's copy)
   enum :kind, KIND_ENUM
 
   belongs_to :bike
@@ -79,7 +79,7 @@ class StolenNotification < ApplicationRecord
   def sender_organization
     return @sender_organization if defined?(@sender_organization)
 
-    @sender_organization = sender&.organizations&.find_by(id: bike&.bike_organization_ids)
+    @sender_organization = sender&.organizations&.find_by(id: bike&.bike_organizations&.select(:organization_id))
   end
 
   # An org messaging a bike registered with it isn't reporting it stolen
