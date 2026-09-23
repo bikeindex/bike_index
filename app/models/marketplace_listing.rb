@@ -176,9 +176,8 @@ class MarketplaceListing < ApplicationRecord
   def valid_publishable?
     return false if item.blank? || !item.current? || primary_activity.blank?
     return false if item.is_a?(Bike) && !item.status_with_owner?
-    return false if serial_matches_stolen_bike?
 
-    amount_cents.present? && condition.present? && address_record&.address_present?
+    amount_cents.present? && condition.present? && address_record&.address_present? && !serial_matches_stolen_bike?
   end
 
   # Validate here doesn't save, but it adds errors

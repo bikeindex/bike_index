@@ -246,13 +246,13 @@ RSpec.describe MarketplaceListing, type: :model do
         expect(marketplace_listing.errors.full_messages).to eq(["Stroller serial matches a registration reported " \
           "stolen - contact support@bikeindex.org if this is a mistake"])
       end
-      context "unknown serials" do
-        let(:serial_number) { "unknown" }
-        let!(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "unknown") }
-        it "is truthy" do
-          expect(marketplace_listing.valid_publishable?).to be_truthy
-          expect(marketplace_listing.validate_publishable!).to be_truthy
-        end
+    end
+    context "stolen registration with an unknown serial" do
+      let(:serial_number) { "unknown" }
+      let!(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "unknown") }
+      it "is truthy" do
+        expect(marketplace_listing.valid_publishable?).to be_truthy
+        expect(marketplace_listing.validate_publishable!).to be_truthy
       end
     end
     context "serial matches another registration that isn't stolen" do

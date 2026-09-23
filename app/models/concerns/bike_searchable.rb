@@ -253,7 +253,7 @@ module BikeSearchable
         :serial, :stolenness, colors: [], query_items: []].freeze
     end
 
-    # NOTE: This where query should exactly match not_matching_serial
+    # NOTE: This where query should exactly match not_matching_serial, and serial_matched_by reversed
     # This method is called from outside this class
     def matching_serial(serial, serial_no_space = nil)
       return all unless serial.present?
@@ -261,6 +261,14 @@ module BikeSearchable
       serial_no_space ||= SerialNormalizer.no_space(serial)
       # to_tsvector(...) @@ plainto_tsquery(...) matches index_bikes_on_serial_normalized_tsvector
       where("to_tsvector('simple', serial_normalized) @@ plainto_tsquery('simple', ?) OR serial_normalized_no_space = ?", serial, serial_no_space)
+    end
+
+    # NOTE: matching_serial reversed - bikes whose serial search would find this serial
+    def serial_matched_by(serial, serial_no_space)
+      return none unless serial.present?
+
+      where("to_tsvector('simple', ?) @@ plainto_tsquery('simple', bikes.serial_normalized) " \
+        "OR bikes.serial_normalized_no_space = ?", serial, serial_no_space)
     end
 
     # TODO: actually make private?
