@@ -105,8 +105,11 @@ FileUtils.chdir APP_ROOT do
       system! "bin/rake db:seed"
     end
 
-    puts "\n== Preparing test database (including parallelism) =="
-    system! "bin/rake parallel:prepare"
+    # Opt-in, matching lib/tasks/parallel_migrate.rake
+    unless ENV["PARALLEL_MIGRATIONS"].to_s.strip.empty?
+      puts "\n== Preparing parallel test databases =="
+      system! "bin/rake parallel:prepare"
+    end
 
     # Autocomplete (typeahead) is loaded by db:seed above; here we just load counts
     puts "\n== loading bike counts =="
