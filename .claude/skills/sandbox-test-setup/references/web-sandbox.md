@@ -7,95 +7,61 @@ already exported into your shells. Check before setting anything up: `ruby -v` a
 `pg_isready`. The hook is remote-only — it exits immediately anywhere but the web
 sandbox.
 
-It calls `assets/web_sandbox_setup.sh`, which is also the thing to run by hand when
-the hook didn't run (an older branch), didn't finish, or the container has idled and
-dropped postgres/redis. It's idempotent, and does the setup steps below — not the
-chromium build-number symlinks or the jsdelivr shim:
+It calls `assets/web_sandbox_setup.sh` — run that by hand when the hook didn't (an
+older branch), didn't finish, or the container idled and dropped postgres/redis. It's
+idempotent, and covers the setup sections below but not the chromium build-number
+symlinks or the jsdelivr shim:
 
 ```bash
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh              # setup only
 bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh --dev-server # + boot bin/dev
 ```
 
-It puts the toolchain in place and then runs `bin/workspace_setup --without_seeds`,
-the same entry point a spawned worktree uses — so the gems, `node_modules` and the
-four databases come from `bin/setup` rather than from anything sandbox-specific, and
-this checkout gets a `.workspace_id` like any other. `--without_seeds` because
-`db:seed` wants `setup:import_spreadsheets` and a network this sandbox doesn't have.
+It puts the toolchain in place, then runs `bin/workspace_setup --without_seeds` — the
+same entry point a spawned worktree uses, so the gems, `node_modules`, the four
+databases and the `.workspace_id` all come from `bin/setup` rather than anything
+sandbox-specific. `--without_seeds` because `db:seed` wants `setup:import_spreadsheets`
+and a network this sandbox lacks.
 
-It downloads a prebuilt Ruby (11MB), gem tree (the bulk of it) and `node_modules`
-from the `web-sandbox-prebuilt` release (published by
-`.github/workflows/web-sandbox-prebuild.yml`), and falls back to the source build
-below whenever an asset is missing or fails its checksum. A `Gemfile.lock` your
-branch changed misses its exact gem tarball and reads `bundle-<ver>-latest.txt` for
-the newest one instead, so `bundle install` reconciles a handful of gems rather than
-the whole lockfile. `node_modules` is exact-match only; on a miss `bin/setup`'s own
-`npm install` covers it. Both are stamped, so a re-run on a warm container
-re-downloads neither. Set `BINX_SKIP_PREBUILT=1` to force the source path. The
-sections below are what it automates — read them when a step fails, or when you need
-only part of it.
+It downloads a prebuilt Ruby (11MB), gem tree and `node_modules` from the
+`web-sandbox-prebuilt` release (built by `.github/workflows/web-sandbox-prebuild.yml`),
+falling back to the source build below on any miss. A `Gemfile.lock` your branch
+changed misses its exact gem tarball and takes the newest via
+`bundle-<ver>-latest.txt`, leaving `bundle install` a handful of gems to reconcile;
+`node_modules` is exact-match, and `bin/setup`'s `npm install` covers a miss. Both
+are stamped, so a warm container re-downloads neither. `BINX_SKIP_PREBUILT=1` forces
+the source path.
 
-**Ruby is either seconds or six minutes, with nothing in between** — an 11MB download
-against a from-source build — so the only thing worth tuning is whether that download
-lands. Release assets redirect to `release-assets.githubusercontent.com`, which is
-**not** on the allow list at the bottom of this file, and a refused host looks exactly
-like a missing asset. The script prints a `prebuilt assets:` block naming what
-resolved, with the probe command to re-check it; `http 000` there means the host
-never answered, rather than the release lacking the file. If it's blocked,
-`BINX_PREBUILT_BASE` repoints the whole set at any reachable host — and
-git-over-https to github.com *is* allowed, so a small separate repo holding the 11MB
-tarball is a workable channel where the release download isn't.
+**Ruby is either seconds or six minutes, nothing between** — that download against a
+from-source build — so the only thing worth tuning is whether it lands. Release
+assets redirect to `release-assets.githubusercontent.com`, **not** on the allow list
+at the bottom of this file, and a refused host looks exactly like a missing asset:
+the script's `prebuilt assets:` block names what resolved, and `http 000` there means
+the host never answered. `BINX_PREBUILT_BASE` repoints the set at any reachable host
+— git-over-https to github.com *is* allowed, so a small repo holding the tarball
+works where the release download doesn't.
 
-The Tailwind build in SKILL.md applies here too.
+The sections below are what the script automates — read them when a step fails, or
+when you need only part of it. The Tailwind build in SKILL.md applies here too.
 
-Setup, in order:
-[One-shot Ruby build](#one-shot-ruby-build) ·
-[Toolchain on PATH](#toolchain-on-path) ·
-[Services + DB](#services--db)
+**Read the Ruby pin from `.tool-versions`' `ruby` line; it moves** (the `Gemfile` has
+no `ruby` directive), and `Gemfile.lock` pins its bundler. No *upstream* prebuilt
+exists for it (`cache.ruby-lang.org` 403s, `ruby/ruby-builder` tops out at
+`3.5.0-preview1`), which is why the release above exists — and when that misses too,
+the source build takes about 6 min on 4 cores (for 4.0.6: ~1 clone, ~1
+autogen/configure/gem-staging, ~3 `make -j4`, ~1 install). Don't panic at what look
+like restarts in its log — miniruby, then the real build, then each ext's own
+`configure`. Don't fall back to 3.x and patch the Gemfile; Bundler 4.x's resolver
+behaves differently and you'll chase fake regressions.
 
-Then, as the task needs them:
-[Starting the dev server](#starting-the-dev-server) ·
-[Driving the app with Playwright MCP](#driving-the-app-with-playwright-mcp) ·
-[No `gh` here](#no-gh-here) ·
-[Running plain specs](#running-plain-specs) ·
-[Running `:js, type: :system` specs](#running-js-type-system-specs-integration--component-system) ·
-[End-to-end recap](#end-to-end-recap) ·
-[What's allowed vs. blocked](#sandbox-network-whats-allowed-vs-blocked)
-
-`.tool-versions` pins the Ruby version (`ruby 4.0.6` at time of writing —
-**read the current pin from its `ruby` line**, it moves; the `Gemfile` has
-no `ruby` directive) and
-`Gemfile.lock` pins `BUNDLED WITH 4.0.15`. No *upstream* prebuilt binary for that
-version is reachable (`cache.ruby-lang.org` is 403'd, `ruby/ruby-builder`'s
-toolcache tops out at `3.5.0-preview1`) — ours is the release above, and when that
-misses too, build from the GitHub source
-tag — about 6 min on a 4-core sandbox (measured for 4.0.6: ~1 min clone,
-~1 min autogen/configure/gem-staging, ~3 min `make -j4`, ~1 min install), and
-don't panic at what look like restarts in the log (miniruby, then the real
-build, then each ext's own `configure`). Don't fall back to 3.x and patch the
-Gemfile; Bundler 4.x's resolver behaves differently and you'll waste time
-chasing fake regressions. Once `/opt/ruby-<version>/x64/` exists,
-`bundle install` works as-is.
-
-You also need **libvips** on the box — the app loads `ruby-vips` at boot,
-so without it every Ruby entry point (`db:migrate`, `rspec`, `rails`) dies
-with `LoadError: Could not open library 'vips.so.42'`. It's not a build
-dep, so install it separately: `apt-get install -y libvips42` (run
-`apt-get update` first if a fetch 404s).
+**libvips** is separate from all of that: `ruby-vips` loads at boot, so without it
+every `rails`/`rspec`/`db:migrate` dies with `Could not open library 'vips.so.42'`.
+`apt-get install -y libvips42`, with an `apt-get update` first if a fetch 404s.
 
 ## One-shot Ruby build
 
-Set `RUBYVER` to the pin from `.tool-versions`. Skip if
-`/opt/ruby-$RUBYVER/x64/bin/ruby --version` already prints it. Three
-quirks the bash block handles: (1) GitHub's archive-tarball endpoint
-(`/archive/refs/tags/*.tar.gz`) **403s through the sandbox proxy** even
-though plain `git` over https to github.com works — so clone the tag
-shallowly instead of `curl`-ing a tarball; (2) the source tree ships no
-pre-generated `configure`, so `autogen.sh` runs first; (3) `make install`
-fetches ~30 bundled gems via `BASERUBY`, whose hardcoded CA bundle doesn't
-include the sandbox egress-proxy CA — so we pre-stage every bundled gem
-with `curl` (which honours `/etc/ssl/certs/ca-certificates.crt`) before
-`make install`.
+Skip if `/opt/ruby-$RUBYVER/x64/bin/ruby --version` already prints the pin. The
+three sandbox quirks are commented in the block itself.
 
 ```bash
 RUBYVER=$(awk '$1=="ruby"{print $2}' /home/user/bike_index/.tool-versions)
@@ -165,12 +131,10 @@ bin/workspace_setup --without_seeds      # .workspace_id, bundle, npm, all four 
 eval "$(ruby bin/env --export)"
 ```
 
-`bin/setup`'s `db:create db:schema:load:… db:migrate` on an empty database loads
-`db/structure.sql` rather than
-replaying the 162 files in `db/migrate` (this app is `schema_format = :sql`) — a
-fresh `bikeindex_development` comes up with all 692 of that file's
-`schema_migrations` rows. It takes seconds; if you see it stepping through migrations
-one by one, something already half-created the database.
+`bin/setup` loads `db/structure.sql` rather than replaying `db/migrate` (this app is
+`schema_format = :sql`), so a fresh database comes up with every one of that file's
+`schema_migrations` rows in seconds. Stepping through migrations one by one means
+something already half-created it.
 
 ## Starting the dev server
 
@@ -214,16 +178,14 @@ when one is already listening. Postgres and redis don't survive a container idle
 period: a server answering `PG::ConnectionBad` wants `service postgresql start`
 and a restart, not debugging.
 
-A fresh development database is **empty**, and the app doesn't say so — the homepage
-renders fine with every counter at zero, and a combobox comes up with no matches
-rather than an error. Fine for a chrome/layout screenshot, misleading for anything
-about the data. `bundle exec rails db:seed` needs
-`setup:import_spreadsheets` (network), so for a single flow seed only what it asks
-for, via `rails runner`: the reference data from the relevant `db/seeds/seed_*.rb`
-(`seed_bike_associations` covers colors), a `Manufacturer` or two — and then
-`Autocomplete::Loader.load_all(%w[Manufacturer])`, without which the manufacturer
-combobox stays empty however many rows exist, because it reads Redis rather than
-the database.
+A fresh development database is **empty and doesn't say so** — the homepage renders
+with every counter at zero, a combobox matches nothing rather than erroring. Fine for
+a layout screenshot, misleading for anything about the data. A full `bundle exec rails db:seed` needs
+`setup:import_spreadsheets` and a network this sandbox lacks, so seed one flow's worth
+by hand via `rails runner`: the relevant `db/seeds/seed_*.rb` reference data
+(`seed_bike_associations` covers colors), a `Manufacturer` or two, then
+`Autocomplete::Loader.load_all(%w[Manufacturer])` — the combobox reads Redis, so
+without that load it stays empty however many rows exist.
 
 ## Driving the app with Playwright MCP
 
@@ -356,23 +318,18 @@ this repo doesn't have.
 
 ### 2. `cdn.jsdelivr.net` is firewalled — usually harmless
 
-**Check `config/importmap.rb` before building anything here.** As of this
-writing the only CDN-pinned module left is `@honeybadger-io/js`, which
-`application.js` loads through a guarded dynamic `import()` precisely so a
-blocked fetch can't take the page down — everything else is vendored under
-`vendor/javascript` and served by the app. So `:js` specs pass with nothing
-listening on :8443: `spec/integration/organized/registrations_search_spec.rb`
-and the org component system specs all ran green that way. The
-`--host-resolver-rules` flag in `local_chrome.rb` just sends that one import
-at a closed port.
+**Check `config/importmap.rb` first.** The only CDN-pinned module left is
+`@honeybadger-io/js`, which `application.js` loads through a guarded dynamic
+`import()` so a blocked fetch can't take the page down; everything else is vendored
+under `vendor/javascript`. So `:js` specs pass with nothing on :8443 — `spec/integration/organized/registrations_search_spec.rb` and the org component
+system specs all ran green that way, with
+`local_chrome.rb`'s `--host-resolver-rules` pointing that one import at a closed port.
 
-Build the shim below only if a spec actually needs a CDN module — jquery and
-select2 were pinned here once and could return. Note the `openssl` step stands
-up a TLS server impersonating a public host, which auto mode may refuse as a
-containment escape; ask rather than working around it. Fetch the packages from
-`registry.npmjs.org` (allowed) and serve them over TLS at the same path layout.
-Versions below mirror an older `config/importmap.rb`; take them from the pins
-you actually need.
+Build the shim below **only if a spec actually needs a CDN module** (jquery and select2
+were pinned once and could return). Its `openssl` step stands up a TLS server
+impersonating a public host, which auto mode may refuse as a containment escape — ask
+rather than working around it. Versions below mirror an older importmap; take them
+from the pins you need.
 
 ```bash
 mkdir -p /tmp/cdn
