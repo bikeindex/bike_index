@@ -92,7 +92,8 @@ module GraphingHelper
 
   def collection_grouped(collection:, column: "created_at", time_range: nil)
     time_range ||= @time_range
-    collection.send(group_by_method(time_range), column, **grouping(time_range))
+    # A default_scope order (Organization's name) can't sit beside the GROUP BY
+    collection.unscope(:order).send(group_by_method(time_range), column, **grouping(time_range))
   end
 
   # Shared with empty_time_range_counts, whose whole contract is producing the same
