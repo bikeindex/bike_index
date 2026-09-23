@@ -255,6 +255,14 @@ RSpec.describe MarketplaceListing, type: :model do
         end
       end
     end
+    context "serial matches another registration that isn't stolen" do
+      let(:serial_number) { "wtu-0123-x" }
+      let!(:other_bike) { FactoryBot.create(:bike, serial_number: "WTU0123X") }
+      it "is truthy" do
+        expect(marketplace_listing.valid_publishable?).to be_truthy
+        expect(marketplace_listing.validate_publishable!).to be_truthy
+      end
+    end
   end
 
   describe "visible_by?" do

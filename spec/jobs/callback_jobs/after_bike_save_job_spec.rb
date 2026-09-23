@@ -53,18 +53,21 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
   end
 
   describe "stolen bike matching a listed serial" do
+    let(:bike) { FactoryBot.create(:stolen_bike, serial_number: "abc-123-xyz") }
     let(:listed_bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, serial_number: "ABC 123") }
     let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: listed_bike) }
+    let(:draft_bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, serial_number: "ABC123XYZ") }
+    let!(:draft_listing) { FactoryBot.create(:marketplace_listing, item: draft_bike, updated_at: Time.current - 1.hour) }
     let!(:unmatched_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
-    let(:bike) { FactoryBot.create(:stolen_bike, serial_number: "abc-123-xyz") }
 
-    it "returns the matching listing to draft" do
+    it "returns the matching for sale listing to draft, leaving the others alone" do
       expect(marketplace_listing.reload.status).to eq "for_sale"
       expect(listed_bike.reload.is_for_sale).to be_truthy
       instance.perform(bike.id)
       expect(marketplace_listing.reload).to have_attributes(status: "draft", published_at: nil)
       expect(listed_bike.reload.is_for_sale).to be_falsey
       expect(unmatched_listing.reload.status).to eq "for_sale"
+      expect(draft_listing.reload).to have_attributes(status: "draft", updated_at: be < Time.current - 50.minutes)
     end
   end
 

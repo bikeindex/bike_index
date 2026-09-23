@@ -59,17 +59,20 @@ module CallbackJobs
       }
     end
 
-    # Inverse of Bike.matching_serial: listed bikes whose serial would match this stolen one.
-    # Bumping a listing re-runs MarketplaceListing#valid_publishable?, which returns it to draft
+    # Returns listings to draft when MarketplaceListing#serial_matches_stolen_bike? now blocks them:
+    # Bike.matching_serial in reverse, the listed serials whose search would find this stolen bike.
+    # Batching the for-sale listings makes each query look up at most 1000 bikes by id - as one
+    # join, the planner seq scans bikes once there are enough listings. Saving a for_sale listing
+    # re-runs valid_publishable? (in set_calculated_attributes), which returns it to draft
     def unpublish_serial_matched_listings(bike)
       return if bike.serial_normalized.blank?
 
-      matched_bikes = Bike.unscoped.where.not(id: bike.id).where(
-        "to_tsvector('simple', ?) @@ plainto_tsquery('simple', serial_normalized) OR serial_normalized_no_space = ?",
-        bike.serial_normalized, bike.serial_normalized_no_space
-      )
-      MarketplaceListing.for_sale.where(item_type: "Bike", item_id: matched_bikes.select(:id))
-        .find_each { |marketplace_listing| marketplace_listing.update(updated_at: Time.current) }
+      MarketplaceListing.for_sale.where(item_type: "Bike").where.not(item_id: bike.id).in_batches do |listings|
+        listings.joins("INNER JOIN bikes ON bikes.id = marketplace_listings.item_id")
+          .where("to_tsvector('simple', ?) @@ plainto_tsquery('simple', bikes.serial_normalized) " \
+            "OR bikes.serial_normalized_no_space = ?", bike.serial_normalized, bike.serial_normalized_no_space)
+          .each { |marketplace_listing| marketplace_listing.update(updated_at: Time.current) }
+      end
     end
 
     def update_matching_partial_registrations(bike)
