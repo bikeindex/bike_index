@@ -100,7 +100,7 @@ Record this as frontend true/false — it's what **Screenshots** gates on.
 
 ### Write the summary body
 
-Write the body to a file under the repo's own `tmp/` — a `PreToolUse` hook refuses writes outside the checkout, so the session scratchpad fails. Read the last few merged PRs first — `gh pr list --state merged --limit 5 --json title,body` — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
+Write the body to a file under the repo's own `tmp/`; a `PreToolUse` hook refuses writes outside the checkout. Read the last few merged PRs first — `gh pr list --state merged --limit 5 --json title,body` — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
 
 Rules:
 
@@ -110,7 +110,7 @@ Rules:
 - **Reference branches by PR number.** A stacked base or a branch this builds on is `#3918`, not a branch name: `gh pr list --head <branch> --state all --json number --jq '.[0].number'`. Name the branch only when it has no PR.
 - **No "Test plan" section unless the user asks.** Never list what CI already covers. Only reviewer-facing manual verification ("click X, confirm Y appears") qualifies, and only on request.
 - **No generic "covered by tests" bullet.** That a change is tested is assumed, and naming test mechanics (a fixture, a cassette) goes stale. Mention tests only when *what* is verified is the reviewer-facing point ("adds a regression test for the UTF-8 download crash").
-- **No Claude Code attribution footer**, here or in any comment this workflow posts. It should read like the human author wrote it. **Leaving it out of what you write isn't enough where `gh` is missing**: `create_pull_request` and `add_issue_comment` append one server-side, after your body. `update_pull_request` and `update_issue_comment` don't — so read back what you just posted, and if a footer is there, strip it with the matching update call. The tell that it isn't yours: its link carries the session id.
+- **No Claude Code attribution footer**, here or in any comment this workflow posts. It should read like the human author wrote it. **Leaving it out isn't enough where `gh` is missing**: `create_pull_request` and `add_issue_comment` append one server-side (the tell is the session id in its link), while the `update_*` calls don't — so read back what you posted and strip it with an update.
 - **Link the issue when there is one.** If the branch name, a commit message, or the user's request names an issue, close it from the body — `Closes #4103` on its own line. Don't invent a number.
 
 If a bullet is turning into an essay, compress it to one sentence naming the *kind* of change.

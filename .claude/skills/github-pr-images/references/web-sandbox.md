@@ -1,112 +1,85 @@
 # Hosting images from the Claude Code web sandbox
 
-SKILL.md's browser route can't run here, for two independent reasons: the MCP
-browser can't verify github.com, and GitHub's uploader needs a logged-in web
-session that can't be established headlessly. Fixing the first buys nothing
-while the second stands. The `sandbox-test-setup` skill's `references/web-sandbox.md`
-is where the browser's limits are described; don't re-derive them here.
+SKILL.md's browser route can't run here: the MCP browser can't verify github.com,
+and the uploader needs a logged-in session no headless browser can get — fixing the
+first buys nothing while the second stands.
 
-So this route hosts the images **in the branch's own history** instead, and posts
-through the GitHub MCP tools rather than `gh`, which isn't installed here.
+So this route commits the images to the PR's branch instead, and posts through the
+GitHub MCP tools. It stands in for **all** of SKILL.md: step 1's PR lookup and step
+8's posting are the MCP calls below, steps 2 to 7 are one script, step 9 is `curl`.
 
-It stands in for the whole of SKILL.md, not just the upload: step 1's PR lookup and
-step 8's posting are the MCP calls in the table below, steps 2 to 7 are the one
-script, and step 9 verifies with `curl` rather than the browser — which can't load
-github.com at all.
+Use it only when `$CLAUDE_CODE_REMOTE` is `true`. Elsewhere the browser uploader's
+`user-attachments` URLs are permanent and leave no commits behind.
 
-Use it only when `$CLAUDE_CODE_REMOTE` is `true`. Everywhere else the browser
-uploader is better: its `user-attachments/assets/` URLs are permanent and leave no
-commits behind.
-
-## What it does
-
-`assets/commit_images.sh` commits the images to the PR's branch, then deletes them
-in a second commit, and prints raw URLs pinned to the **first** commit's sha:
+## Hosting
 
 ```bash
 bash .claude/skills/github-pr-images/assets/commit_images.sh tmp/pr_screenshots/*.png
 ```
 
+It commits the images, deletes them in a second commit, pushes once, and prints one
+`<img>` per file pinned to the **first** commit's sha:
+
 ```
-hosted at 9691ad9c48a924fcc42be3e384f9801ce7b79d1f (branch claude/…)
-<img alt="probe-desktop.png" src="https://raw.githubusercontent.com/bikeindex/bike_index/9691ad9…/tmp/pr_screenshots/probe-desktop.png" />
+hosted at 9223ff3fa4… (branch claude/…)
+<img alt="homepage-desktop.png" src="https://raw.githubusercontent.com/…/9223ff3fa4…/tmp/pr_screenshots/homepage-desktop.png" />
 ```
 
-**Post those `<img>` tags as they are — never rewrap them as `![](url)`.** The MCP
-server neutralizes a markdown image by wrapping its URL in double backticks, so the
-comment renders an `<img>` with no `src` and an empty box; it leaves ordinary links
-and HTML `<img>` alone. Add `width="900"` (or `300` for a mobile capture) when a
-full-page shot would otherwise render enormous.
+The blob stays reachable through the branch's history, so those URLs keep serving
+after the deletion while the PR's **Files changed** stays empty.
 
-A blob stays reachable through the branch's history after the file is deleted, so
-those URLs keep serving `image/png` — which is what GitHub's camo needs to render
-them in a comment. The two commits cancel out, so the PR's **Files changed** stays
-empty; only the commit list shows the pair.
+**Post the tags verbatim — never rewrap them as `![](url)`.** The MCP server
+backticks a markdown image's URL, posting an `<img>` with no `src`; links and HTML
+`<img>` pass through untouched. Widths belong to the caller — the `pr` skill's table
+wants `width="500"` desktop, `"250"` mobile.
 
-**Call it once, after every capture is done** — including a base-branch set. Each
-call costs two commits and a push, and hosting early buys nothing here: the browser
-session that the default route front-loads for doesn't exist. It also refuses on a
-detached HEAD, so it can't run during a base-branch checkout anyway.
+**Call it once, after every capture including the base branch's.** Each call costs
+two commits and a push, and it refuses on a detached HEAD, so it can't run mid-checkout
+anyway.
 
-The script pushes once, for both commits. It also:
+It also refuses outside the sandbox, on `main`, on a **tracked** path (the cleanup
+commit would leave that deleted), on a **dirty index** (staged changes ride into the
+screenshot commit and survive the cleanup), and on **unpushed commits** (the push
+carries them under a skip-ci tip, so CI skips real code). `git rm --cached` keeps the
+files on disk for a later recapture.
 
-- refuses outside the sandbox, on `main`, and on a detached HEAD
-- refuses when the index has staged changes, which would otherwise ride into the
-  screenshot commit and survive the cleanup one
-- refuses when the branch has unpushed commits: the push carries them all under a
-  skip-ci tip, so CI would skip real code. Push, then host
-- leaves the PR's head on a skip-ci commit, so it shows **no checks** until the next
-  code push — say so rather than letting a reviewer read it as a CI failure
-- refuses a **tracked** path, which its cleanup commit would leave deleted
-- `git rm --cached`, so the images stay on disk for a caller mid-sequence (the
-  base-branch recapture in the `pr` skill's screenshot phase needs them)
-- puts `[skip ci]` on both commits — `ci.yml` is `on: push` with no branch filter,
-  so without it one screenshot post costs two full sharded runs
+Both commits carry `[skip ci]`, since `ci.yml` is `on: push` with no branch filter.
+That leaves the PR's head on a skip-ci commit showing **no checks** until the next
+code push — say so, or a reviewer reads it as a CI failure.
 
 ## What it costs
 
 The images live only in that branch's history. This repo squash-merges, so they
-never reach `main` and no clone pays for them — but once the branch is deleted
-the commits are unreachable, and the URLs last only until GitHub garbage-collects
-them. Unreachable objects usually survive a long time and GitHub's camo caches
-what it has rendered, neither of which is a guarantee.
+never reach `main` and no clone pays for them — but a deleted branch leaves them
+unreachable and eventually collectable. **Good for review, not an archive**: for
+permanence use a release asset uploaded by a workflow, since the API isn't reachable
+from here.
 
-**That makes this good enough for review, not an archive.** If a merged PR's
-screenshots need to still be there in a year, host them somewhere ref-independent
-— a release asset, uploaded by a workflow, since the API isn't reachable from
-here.
+## Posting, without `gh`
 
-## Posting the comment without `gh`
-
-Same rules as SKILL.md step 8 — one `## Screenshots` comment per PR, edited in
-place rather than duplicated — with the MCP tools in place of `gh`:
+Same rules as SKILL.md step 8 — one `## Screenshots` comment per PR, edited in place.
+Find it by `get_me`'s login and a body starting `## Screenshots`, paging through
+`get_comments` since on a busy PR it won't be on the first page.
 
 | SKILL.md | here |
 | --- | --- |
-| `gh pr view --json number` | `mcp__github__list_pull_requests` with `head: "bikeindex:<branch>"`, `state: "open"` |
-| `gh api user --jq .login` | `mcp__github__get_me` |
-| `gh api …/issues/N/comments` | `mcp__github__issue_read` with `method: "get_comments"` (paginate with `page`) |
-| `gh pr comment` | `mcp__github__add_issue_comment` (appends an attribution footer — see below) |
-| `gh api -X PATCH …/comments/ID` | `mcp__github__update_issue_comment` |
+| `gh pr view --json number` | `list_pull_requests`, `head: "bikeindex:<branch>"`, `state: "open"` |
+| `gh api user --jq .login` | `get_me` |
+| `gh api …/issues/N/comments` | `issue_read`, `method: "get_comments"` |
+| `gh pr comment` | `add_issue_comment` |
+| `gh api -X PATCH …/comments/ID` | `update_issue_comment` |
 
-Find the existing comment the same way — authored by `get_me`'s login, body
-starting `## Screenshots` — and page through `get_comments`, since on a busy PR it
-won't be on the first page.
-
-**`add_issue_comment` appends a Claude Code attribution footer** that the `pr`
-skill's rules don't allow, and which you never wrote — the tell is the session id
-in its link. `update_issue_comment` doesn't, so read the comment back after posting
-and strip the footer with an update.
+`add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
+the tell is the session id in its link. `update_issue_comment` doesn't, so read the
+comment back and strip it.
 
 ## Verifying
 
-Unlike `user-attachments/assets/` URLs, these are plain public files, so `curl`
-settles it and no browser is needed:
+Unlike `user-attachments` URLs these are plain public files, so `curl` settles it:
 
 ```bash
 curl -sI "<url>" -o /dev/null -w '%{http_code} %{content_type}\n'   # want: 200 image/png
 ```
 
-A `404` means the push didn't land, or the URL names a branch rather than the sha
-— a branch ref stops resolving the moment the cleanup commit removes the file,
-which is the whole reason the script pins the sha.
+A `404` means the push didn't land, or the URL names a branch rather than the sha —
+a branch ref stops resolving the moment the cleanup commit lands.
