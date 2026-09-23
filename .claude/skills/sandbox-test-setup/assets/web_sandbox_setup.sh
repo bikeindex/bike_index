@@ -3,14 +3,9 @@
 #
 #   bash .claude/skills/sandbox-test-setup/assets/web_sandbox_setup.sh [--dev-server]
 #
-# Gets the toolchain in place, then hands off to `bin/workspace_setup --without_seeds`
-# for the gems, node_modules and databases, builds the css and seeds an empty
-# development database in the background (/tmp/seed.status says when it's done).
-# Everything that can overlap does: the prebuilt downloads, the apt/services/chrome
-# work that needs no Ruby, and (when no prebuilt Ruby is reachable) the source build
-# all run at once.
-# Idempotent: re-running it after a container idle period just restarts the
-# services. Pass --dev-server to also boot bin/dev in the background.
+# Toolchain, then `bin/workspace_setup --without_seeds`, the css, and a background seed
+# of an empty development database (/tmp/seed.status). Idempotent; --dev-server also
+# boots bin/dev.
 #
 # Logs: /tmp/ruby_build.log, /tmp/system_setup.log, /tmp/css_build.log,
 #       /tmp/playwright_install.log, /tmp/seed.log (+ /tmp/seed.status), /tmp/dev_server.log
@@ -20,22 +15,19 @@ REPO="${CLAUDE_PROJECT_DIR:-/home/user/bike_index}"
 RUBYVER=$(awk '$1=="ruby"{print $2}' "$REPO/.tool-versions")
 LOCK_SHA=$(sha256sum "$REPO/Gemfile.lock" | cut -c1-12)
 NPM_SHA=$(sha256sum "$REPO/package-lock.json" | cut -c1-12)
-# rbconfig bakes the prefix in, so the tarball has to land where it was built:
-# ruby/setup-ruby's toolcache path. /opt/ruby-<ver>/x64 stays as a symlink to it.
+# rbconfig bakes the prefix in, so the tarball lands where it was built (setup-ruby's
+# toolcache); /opt/ruby-<ver>/x64 symlinks to it.
 TOOLCACHE="/opt/hostedtoolcache/Ruby/${RUBYVER}"
 RUBY_PREFIX="/opt/ruby-${RUBYVER}/x64"
 PREBUILT_BASE="${BINX_PREBUILT_BASE:-https://github.com/bikeindex/bike_index/releases/download/web-sandbox-prebuilt}"
 
 RUBY_TARBALL="ruby-${RUBYVER}-ubuntu24.04-x86_64.tar.gz"
 BUNDLE_TARBALL="bundle-${RUBYVER}-${LOCK_SHA}-ubuntu24.04-x86_64.tar.gz"
-# main's Gemfile.lock moves often enough that an exact miss is the common case, so
-# fall back to the newest published bundle: `bundle install` then fetches the few
-# gems that differ instead of all of them. This one names that tarball rather than
-# being a second copy of it - the bundle is ~270MB.
+# An exact-lock miss is common, so fall back to the newest bundle and let `bundle
+# install` fetch the difference. A pointer, not a ~270MB second copy.
 BUNDLE_LATEST_POINTER="bundle-${RUBYVER}-latest.txt"
 NODE_TARBALL="node_modules-${NPM_SHA}-ubuntu24.04.tar.gz"
 
-# Authored once: used here, appended to $CLAUDE_ENV_FILE, and printed at the end.
 ENV_EXPORTS="export PATH=\"$RUBY_PREFIX/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin\"
 export LD_LIBRARY_PATH=\"$RUBY_PREFIX/lib:\${LD_LIBRARY_PATH:-}\"
 export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
@@ -49,12 +41,10 @@ STAGE=$(mktemp -d)
 trap 'rm -rf "$STAGE"' EXIT
 
 # ------------------------------------------------------------ prebuilt assets
-# .github/workflows/web-sandbox-prebuild.yml publishes these; every failure here
-# is non-fatal, because building from source is always still an option.
+# Published by .github/workflows/web-sandbox-prebuild.yml. Non-fatal: source builds remain.
 download_asset() { # <tarball> — verified into $STAGE
   local tarball="$1" code
   [ "${BINX_SKIP_PREBUILT:-}" != "1" ] || { echo "skip $tarball (BINX_SKIP_PREBUILT)" >> "$STAGE/prebuilt.log"; return 1; }
-  # -f decides; the code is only so the log can tell a blocked host from a 404.
   code=$(curl -sfL --max-time 600 -o "$STAGE/$tarball" -w '%{http_code}' "$PREBUILT_BASE/$tarball") || code="${code:-000}"
   if [ -s "$STAGE/$tarball" ] &&
     curl -sfL --max-time 60 -o "$STAGE/$tarball.sha256" "$PREBUILT_BASE/$tarball.sha256" &&
@@ -62,16 +52,13 @@ download_asset() { # <tarball> — verified into $STAGE
     echo "hit  $tarball" >> "$STAGE/prebuilt.log"
     return 0
   fi
-  # 000 is the tell that matters: no HTTP answer at all, i.e. the egress proxy
-  # refused the host rather than the release not having the asset.
+  # 000: the network policy refused the host, rather than the asset being missing
   echo "miss $tarball (http $code)" >> "$STAGE/prebuilt.log"
   rm -f "$STAGE/$tarball" "$STAGE/$tarball.sha256"
   return 1
 }
 
-# Release assets redirect to release-assets.githubusercontent.com; an environment
-# whose network policy refuses that host makes every download miss and every session
-# pay the 6-minute source build. Say so rather than letting it look normal.
+# A refused release-assets.githubusercontent.com otherwise looks like a normal miss
 report_prebuilt() {
   say "prebuilt assets:"
   sed 's/^/    /' "$STAGE/prebuilt.log" 2>/dev/null
@@ -84,8 +71,7 @@ report_prebuilt() {
 }
 
 link_ruby_prefix() {
-  # A half-built prefix left by a timed-out session would shadow what we just
-  # unpacked, so move it aside rather than letting the rebuild path win.
+  # A half-built prefix from a timed-out session would shadow the unpacked tree
   [ -L "$RUBY_PREFIX" ] || [ ! -e "$RUBY_PREFIX" ] || mv "$RUBY_PREFIX" "$RUBY_PREFIX.broken.$$"
   mkdir -p "$(dirname "$RUBY_PREFIX")"
   ln -sfn "$TOOLCACHE/x64" "$RUBY_PREFIX"
@@ -103,15 +89,14 @@ build_ruby() {
   set -e
   local src="/tmp/ruby-build-src/ruby-${RUBYVER}"
   mkdir -p /tmp/ruby-build-src
-  # The release tarball ships ./configure and the bundled gems; a network policy that
-  # refuses cache.ruby-lang.org still allows git-over-https, so fall back to the tag.
+  # The release tarball ships ./configure and the bundled gems; the tag is the fallback
   [ -d "$src" ] || curl -sfL --max-time 300 "https://cache.ruby-lang.org/pub/ruby/${RUBYVER%.*}/ruby-${RUBYVER}.tar.gz" \
     | tar -C /tmp/ruby-build-src -xz || { rm -rf "$src"; false; } ||
     git clone --depth 1 --branch "v${RUBYVER}" https://github.com/ruby/ruby.git "$src"
   cd "$src"
   [ -f configure ] || ./autogen.sh
-  # Pre-stage the bundled gems `make install` would fetch through rubygems'
-  # own cert store. 8 at a time - serially this is a minute of latency.
+  # A git checkout lacks the bundled gems, and `make install` would fetch them through
+  # rubygems' own cert store, which the proxy breaks
   awk '$1 !~ /^#/ && NF {print $1, $2}' gems/bundled_gems \
     | xargs -P8 -n2 bash -c '[ -s "gems/$0-$1.gem" ] || curl -sfL --max-time 60 \
         -o "gems/$0-$1.gem" "https://rubygems.org/downloads/$0-$1.gem"'
@@ -120,7 +105,6 @@ build_ruby() {
     --enable-shared --disable-install-doc --with-openssl-dir=/usr
   make -j"$(nproc)"
   SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt make install
-  # Some shebangs assume the GitHub-Actions hostedtoolcache layout
   mkdir -p "$TOOLCACHE"
   [ -e "$TOOLCACHE/x64" ] || ln -s "$RUBY_PREFIX" "$TOOLCACHE/x64"
   "$RUBY_PREFIX/bin/ruby" --version
@@ -128,8 +112,7 @@ build_ruby() {
 
 # ------------------------------------- everything that needs no Ruby, in parallel
 setup_system() {
-  # ruby-vips loads at boot, so without libvips every rails/rspec run dies. mini_magick
-  # shells out to ImageMagick's `identify`, which db:seed's organization avatars need.
+  # libvips: ruby-vips loads at boot. imagemagick: db:seed's avatars need `identify`.
   local pkgs=()
   ldconfig -p | grep -q libvips.so.42 || pkgs+=(libvips42)
   command -v identify >/dev/null || pkgs+=(imagemagick)
@@ -138,12 +121,12 @@ setup_system() {
       { apt-get update && apt-get install -y --no-install-recommends "${pkgs[@]}"; }
   fi
 
-  service postgresql start >/dev/null   # redis logs a benign ulimit warning
+  service postgresql start >/dev/null
   service redis-server start 2>&1 | grep -v ulimit
   sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='rails'" | grep -q 1 ||
     sudo -u postgres psql -c "CREATE USER rails WITH SUPERUSER PASSWORD 'password';"
 
-  # Playwright MCP's chrome: fixed path, --no-sandbox (we are root), auth file
+  # Playwright MCP's `chrome` channel: fixed path, and --no-sandbox because we're root
   local chrome_dir
   chrome_dir="$(ls -d /opt/pw-browsers/chromium-*/chrome-linux 2>/dev/null | sort -V | tail -1)"
   mkdir -p /root/.cache/ms-playwright
@@ -166,7 +149,6 @@ say "starting system setup, prebuilt downloads and (if needed) the ruby build to
 setup_system > /tmp/system_setup.log 2>&1 &
 SYSTEM_PID=$!
 
-# Named by whichever bundle download won, so the unpack knows what to open.
 BUNDLE_WON="$STAGE/bundle.name"
 
 download_bundle() {
@@ -179,17 +161,11 @@ download_bundle() {
   printf '%s' "$won" > "$BUNDLE_WON"
 }
 
-# Stamps let a warm container - a resume, or a hand re-run - skip the download and
-# extraction of trees that are already correct. Each lives inside the tree it
-# vouches for, so anything that removes the tree removes the claim with it.
+# Inside the tree each vouches for, so removing the tree removes the claim
 GEM_STAMP="$TOOLCACHE/x64/lib/ruby/gems/.binx_lock_sha"
 NPM_STAMP="$REPO/node_modules/.binx_npm_sha"
 stamped() { [ "$(cat "$1" 2>/dev/null)" = "$2" ]; }
 
-# Fused onto its own download below, because node_modules needs neither the Ruby
-# nor the gem tree - so on the source-build path it lands during those six minutes
-# rather than after them. bin/setup's `npm install` reconciles whatever it leaves
-# short; bin/lint and the :js specs' playwright package both need the tree.
 unpack_node() {
   tar -C "$REPO" -xzf "$STAGE/$NODE_TARBALL" || return 1
   say "prebuilt node_modules for package-lock ${NPM_SHA} installed"
@@ -222,14 +198,12 @@ fi
 
 cd "$REPO"
 
-# The two trees are disjoint, so they unpack at the same time. The gem one goes
-# over the Ruby's own GEM_HOME, which is why it waited for the Ruby to land.
+# Over the Ruby's own GEM_HOME, so after the Ruby lands
 unpack_gems() {
   local won
   won=$(cat "$BUNDLE_WON" 2>/dev/null)
   [ -n "$won" ] && unpack_ruby_tree "$won" || return 0
-  # Only when nothing has claimed the prefix yet: after a source build it's a real
-  # directory that $TOOLCACHE/x64 points AT, and relinking would chase its own tail.
+  # After a source build the prefix is the real directory $TOOLCACHE/x64 points at
   ruby_is_built || link_ruby_prefix
   if [ "$won" = "$BUNDLE_TARBALL" ]; then
     say "prebuilt gems for Gemfile.lock ${LOCK_SHA} installed"
@@ -241,42 +215,29 @@ unpack_gems() {
 [ -z "$BUNDLE_DL_PID" ] || { wait "$BUNDLE_DL_PID"; unpack_gems; }
 [ -z "$NODE_DL_PID" ] || wait "$NODE_DL_PID"
 
-# workspace_setup wants postgres up and the rails role in place before it can
-# allocate an ID out of the dev_workspaces database.
 wait "$SYSTEM_PID" || say "system setup had a problem - see /tmp/system_setup.log"
 report_prebuilt
 
-# Everything above exists to make this a no-op: bin/setup checks the Ruby version,
-# runs `bundle check` and `npm install`. --without_seeds because bin/setup seeds on
-# every run, and a re-run over a seeded database dies on duplicates - seeding is below.
+# bin/setup seeds on every run, and a second db:seed dies on duplicates
 say "bin/workspace_setup --without_seeds"
 bin/workspace_setup --without_seeds || exit 1
 
-# After workspace_setup, not before: .workspace_id is what gives BASE_URL its port.
+# After workspace_setup: .workspace_id gives BASE_URL its port
 eval "$(ruby bin/env --export)"
 
-# The pinned playwright can want a newer chromium build than the image ships under
-# /opt/pw-browsers; its CDN is reachable, so fetch the headless shell the :js specs
-# launch (~10s, a no-op when present) while the css builds.
+# The pin can want a newer build than /opt/pw-browsers ships; the :js specs launch this one
 npx --no-install playwright install chromium-headless-shell >/tmp/playwright_install.log 2>&1 &
 PW_PID=$!
 
-# bin/setup builds dartsass only on the seeding path, and tailwind not at all, and
-# without them anything rendering the application layout - a request spec on an html
-# format, any :js system spec - dies on AssetNotFound. Built before seeding, because
-# db:seed's inline jobs render emails (email.css). bin/dev's watchers rebuild on top.
+# bin/setup builds neither under --without_seeds; db:seed's emails need email.css
 say "building tailwind + dartsass"
 bundle exec rails tailwindcss:build dartsass:build >/tmp/css_build.log 2>&1 ||
   say "css build failed - see /tmp/css_build.log (layout-rendering specs will fail until it works)"
 
 wait "$PW_PID" || say "playwright browser install failed - see /tmp/playwright_install.log (:js specs need it)"
 
-# Seeding is ~95s of the run, and nothing the session starts with needs it (specs use
-# the test database), so it goes to the background rather than holding the session
-# up. Detached with every fd redirected, so the SessionStart hook doesn't wait on it.
-# Only into an empty database: bin/setup re-seeds unconditionally, and a second
-# db:seed over seeded records dies on duplicates. psql, not `rails runner`: each
-# Rails boot here is ~7s.
+# ~95s nothing at session start needs, so detached with every fd redirected — else the
+# SessionStart hook waits on it. psql because a Rails boot is ~7s.
 SEED_STATUS=/tmp/seed.status
 DEV_DB="bikeindex_development_${WORKSPACE_ID}"
 SEEDED=$(psql -d "$DEV_DB" -tAc 'SELECT EXISTS (SELECT 1 FROM bikes)' 2>&1)
@@ -284,8 +245,7 @@ if [ "$SEEDED" = "f" ]; then
   say "seeding the development database in the background -> /tmp/seed.log"
   say "  wait for it: until grep -qx 'done\|failed' $SEED_STATUS; do sleep 5; done"
   echo running > "$SEED_STATUS"
-  # Status is written after the seed rather than redirected around it, which would
-  # truncate the file to empty for the whole run.
+  # Redirecting around the seed would truncate the status to empty while it runs
   setsid nohup bash -c "if bundle exec rails db:seed; then s=done; else s=failed; fi; echo \$s > $SEED_STATUS" \
     </dev/null >/tmp/seed.log 2>&1 &
 elif [ "$SEEDED" = "t" ]; then
@@ -299,8 +259,7 @@ fi
 if [ "$DEV_SERVER" = 1 ]; then
   say "starting bin/dev -> /tmp/dev_server.log"
   setsid nohup bin/dev </dev/null >/tmp/dev_server.log 2>&1 &
-  # First boot compiles assets, ~40s. Bounded, so a server that dies on boot
-  # reports its log instead of hanging the session hook until its timeout.
+  # Bounded, so a server that dies on boot doesn't hang the hook
   for _ in $(seq 1 48); do curl -fs -o /dev/null "$BASE_URL/" && break; sleep 5; done
   if curl -fs -o /dev/null "$BASE_URL/"; then
     say "dev server up at $BASE_URL"
@@ -310,14 +269,11 @@ if [ "$DEV_SERVER" = 1 ]; then
   fi
 fi
 
-# Stamped here rather than at unpack, and unconditionally: what makes each tree
-# match its lockfile is bin/setup's `bundle install` and `npm install`, not which
-# prebuilt landed. A run that dies before this point re-downloads next time.
+# Here, not at unpack: bin/setup's installs are what make the trees match their lockfiles
 printf '%s' "$LOCK_SHA" > "$GEM_STAMP"
 printf '%s' "$NPM_SHA" > "$NPM_STAMP"
 
-# Set by the SessionStart hook: everything written here is exported into the
-# session's shells, so later commands need no `export PATH=...` preamble.
+# Set by the SessionStart hook; what's written here is exported into the session's shells
 if [ -n "${CLAUDE_ENV_FILE:-}" ] && ! grep -qF "$RUBY_PREFIX/bin" "$CLAUDE_ENV_FILE" 2>/dev/null; then
   printf '%s\n' "$ENV_EXPORTS" >> "$CLAUDE_ENV_FILE"
   say "wrote the toolchain env to \$CLAUDE_ENV_FILE"
