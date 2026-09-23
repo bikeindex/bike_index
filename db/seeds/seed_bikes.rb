@@ -33,10 +33,11 @@ def seed_bike(creator:, user:, params:, origin: nil, label: "bike")
   bike
 end
 
-# Marks a seeded stolen bike recovered and builds the display the homepage showcase renders
+# Builds the recovery display the homepage showcase renders. Latitude and longitude aren't
+# among StolenRecordUpdator's permitted attributes, so they have to be written after the fact.
 def seed_recovery_display(bike:, location:, photo_filename:, recovered_at:, recovered_description:, quote_by:, location_string:, quote:)
   stolen_record = bike.current_stolen_record
-  stolen_record.update_columns(latitude: location[:latitude], longitude: location[:longitude])
+  stolen_record.update_columns(location.slice(:latitude, :longitude))
 
   photo_path = Rails.root.join("db/seeds/images", photo_filename)
   public_image = PublicImage.new(imageable: bike, listing_order: 1)
@@ -46,13 +47,15 @@ def seed_recovery_display(bike:, location:, photo_filename:, recovered_at:, reco
   stolen_record.add_recovery_information(recovered_at:, recovered_description:,
     index_helped_recovery: true, can_share_recovery: true)
 
-  recovery_display = RecoveryDisplay.new(stolen_record:, recovered_at:, quote_by:, location_string:, quote:)
+  # skip_callback_job because the job runs inline below instead - photo_url has to exist
+  # without sidekiq, since the homepage filters on it
+  recovery_display = RecoveryDisplay.new(stolen_record:, recovered_at:, quote_by:, location_string:, quote:,
+    skip_callback_job: true)
   # save! goes inside the block - ActiveStorage re-reads the io to upload it
   File.open(photo_path) do |file|
-    recovery_display.photo.attach(io: file, filename: photo_path.basename.to_s)
+    recovery_display.photo.attach(io: file, filename: photo_filename)
     recovery_display.save!
   end
-  # Inline, so photo_url exists without sidekiq running - the homepage filters on it
   ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
   recovery_display
 end
@@ -332,8 +335,6 @@ recovered_bike = seed_bike(
       date_stolen: (Time.current - 3.weeks).to_s
     ),
     stolen_record: {
-      latitude: calgary_location[:latitude].to_s,
-      longitude: calgary_location[:longitude].to_s,
       street: calgary_location[:street],
       city: calgary_location[:city],
       zipcode: calgary_location[:zipcode],
@@ -361,13 +362,16 @@ puts "  Created recovered Trek in #{calgary_location[:city]} with recovery displ
 
 # --- Specific recovered bike: Riese & Müller Load4 cargo e-bike recovered in Portland ---
 puts "Creating recovered Riese & Müller Load4 in Portland..."
+rm_manufacturer = Manufacturer.friendly_find("Riese & Müller")
+twenty_inch_id = WheelSize.id_for_bsd(406) # front "20 inch"
+twenty_six_inch_id = WheelSize.id_for_bsd(559) # rear "26 inch"
 or_state = State.find_by_abbreviation("OR")
 portland_location = {latitude: 45.5231, longitude: -122.6765, street: "1120 SW 5th Ave", city: "Portland", zipcode: "97204"}
 
 recovered_cargo_bike = seed_bike(
   creator:, user:, label: "Recovered Riese & Müller bike",
   params: {
-    bike: bike_params(owner_email: "user_4@gmail.com", manufacturer_id: Manufacturer.friendly_find("Riese & Müller")&.id).merge(
+    bike: bike_params(owner_email: "user_4@gmail.com", manufacturer_id: rm_manufacturer&.id).merge(
       cycle_type: "cargo",
       propulsion_type: "pedal-assist",
       primary_frame_color_id: silver&.id,
@@ -377,15 +381,13 @@ recovered_cargo_bike = seed_bike(
       handlebar_type: "flat",
       rear_tire_narrow: "false",
       front_tire_narrow: "false",
-      front_wheel_size_id: WheelSize.id_for_bsd(406),
-      rear_wheel_size_id: WheelSize.id_for_bsd(559),
+      front_wheel_size_id: twenty_inch_id,
+      rear_wheel_size_id: twenty_six_inch_id,
       description: "Bosch Cargo Line mid-drive with a 725Wh PowerPack, Rohloff Speedhub and a Gates belt drive. Blue rain canopy over the front box.",
       status: "status_stolen",
       date_stolen: (Time.current - 9.days).to_s
     ),
     stolen_record: {
-      latitude: portland_location[:latitude].to_s,
-      longitude: portland_location[:longitude].to_s,
       street: portland_location[:street],
       city: portland_location[:city],
       zipcode: portland_location[:zipcode],
@@ -431,8 +433,6 @@ recovered_viner_bike = seed_bike(
       date_stolen: (Time.current - 7.weeks).to_s
     ),
     stolen_record: {
-      latitude: chicago_location[:latitude].to_s,
-      longitude: chicago_location[:longitude].to_s,
       street: chicago_location[:street],
       city: chicago_location[:city],
       zipcode: chicago_location[:zipcode],
@@ -461,13 +461,9 @@ puts "  Created recovered Viner in #{chicago_location[:city]} with recovery disp
 
 # --- Specific real bike: Riese & Müller Load4 75 rohloff cargo e-bike (child carrying) ---
 puts "Creating Riese & Müller Load4 75 rohloff cargo bike..."
-rm_manufacturer = Manufacturer.friendly_find("Riese & Müller")
 rm_owner = User.find_by_email("user@fakegmail.com")
 brakebills_org = Organization.friendly_find("Brakebills")
-grey = Color.friendly_find("Silver, gray or bare metal")
 child_carrying_activity = PrimaryActivity.friendly_find("Child Carrying")
-twenty_inch_id = WheelSize.id_for_bsd(406) # front "20 inch"
-twenty_six_inch_id = WheelSize.id_for_bsd(559) # rear "26 inch"
 
 # Stock build spec from Riese & Müller's Load4 75 rohloff (2023, universal size)
 rm_components = [
@@ -516,7 +512,7 @@ rm_bike = seed_bike(
     creation_organization_id: brakebills_org.id.to_s,
     cycle_type: "cargo",
     propulsion_type: "pedal-assist",
-    primary_frame_color_id: grey&.id,
+    primary_frame_color_id: silver&.id,
     year: 2023,
     frame_model: "Load4 75 rohloff",
     frame_material_slug: "aluminum",

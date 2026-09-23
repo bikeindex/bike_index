@@ -289,9 +289,10 @@ class Organization < ApplicationRecord
     end
 
     def example
-      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
+      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead.
+      # Everywhere else 92 is the production record, and the name is what a seeded database has.
       found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
-      found || Organization.create(name: "Example Bike Shop")
+      found || Organization.find_by(name: "Example Bike Shop") || Organization.create!(name: "Example Bike Shop")
     end
 
     private
