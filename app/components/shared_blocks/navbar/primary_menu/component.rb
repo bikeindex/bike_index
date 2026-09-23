@@ -22,7 +22,7 @@ module SharedBlocks
             {type: :divider, item_class: SIDE_CLASSES.fetch(:mobile)},
             *account_items,
             {label: translation(".help"), path: help_path},
-            {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path},
+            {label: translation(".stolen_bike"), path: stolen_index_path},
             {label: translation(".donate"), path: why_donate_path},
             {label: translation(".blog"), path: news_index_path, match_paths: "#{news_index_path}/**"},
             marketplace_item(:desktop),

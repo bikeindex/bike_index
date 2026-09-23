@@ -1,0 +1,139 @@
+---
+en:
+  components:
+    pages:
+      stolen:
+        index:
+          act_in_the_first_24_hours: Act in the first 24 hours
+          bike_stolen: Bike stolen
+          bikes_that_came_home: Bikes that came home
+          call_police_with_the_case_number: Call police with the case number and your
+            listing.
+          do_not_go_get_it_yourself: Do not go get it yourself.
+          every_hour_it_sits_unregistered: Every hour it sits unregistered is an hour
+            nobody can identify it.
+          faq_confront_answer: >-
+            No. Call the police, give them your case number and a link to your Bike
+            Index listing, and let them make contact. People have been hurt trying
+            to take a bike back themselves.
+          faq_confront_question: Should I confront the person who has my bike?
+          faq_cost_answer: >-
+            Registering a bike, marking it stolen, and using the recovery tools are
+            free. Bike Index is a nonprofit funded by donations, partner organizations,
+            and optional promoted alerts.
+          faq_cost_question: Does any of this cost money?
+          faq_other_city_answer: >-
+            The registry is international, and recoveries happen hundreds of miles
+            from the theft. Your listing stays live and searchable until you mark
+            the bike recovered.
+          faq_other_city_question: What if it turns up in another city?
+          faq_serial_answer: >-
+            Register anyway. Photos, a purchase receipt, shop service records, insurance
+            paperwork, or a Strava photo can all identify a bike. Add whatever you
+            have, and check with the shop that sold it — they often have the serial
+            on file.
+          faq_serial_question: I don't have my serial number.
+          faq_unregistered_answer: >-
+            That is the common case. You can register it as stolen right now; there
+            is no requirement that it was registered beforehand.
+          faq_unregistered_question: My bike was never registered before it was stolen.
+          here_is_the_next_hour: Here is the next hour.
+          how_alerts_work: How alerts work
+          lede: >-
+            Six steps, in order. The first two matter most: file a police report to
+            get a case number, then register the bike as stolen on Bike Index so every
+            shop, officer, and buyer who checks a serial finds yours.
+          lede_short: >-
+            Police report first, for the case number. Bike Index second, so the serial
+            is public.
+          more_resources: More resources
+          no_account_yet: >-
+            No account yet? Registering a stolen bike creates one. Registration is
+            free, always.
+          partner_organizations: partner shops, police departments, and cities
+          pillar_alerts_body: >-
+            Your listing gets shared to our social channels and, optionally, promoted
+            into feeds near the theft. Anyone who spots it can message you directly.
+          pillar_alerts_title: Alerts that travel
+          pillar_network_body: >-
+            Hundreds of thousands of riders plus ambassadors, shops, and law enforcement
+            partners watch resale listings and flag chop shops.
+          pillar_network_title: A volunteer network
+          pillar_serial_body: >-
+            Anyone can search a serial number on Bike Index for free — shops at intake,
+            officers in the field, buyers before they hand over cash.
+          pillar_serial_title: A public serial record
+          promoted_alerts: Promoted alerts
+          promoted_alerts_body: >-
+            A promoted alert pushes your stolen bike listing into Facebook feeds in
+            the area around the theft, plus our own social channels. It reaches people
+            who are not looking for your bike but will recognize it locked to the
+            wrong porch.
+          promoted_alerts_title: Put your bike in front of the neighborhood it was
+            taken from
+          questions_people_ask_at_2am: Questions people ask at 2am
+          read_more_recovery_stories: Read more recovery stories
+          recovered: Recovered
+          recoveries_reported_by_owners: Recent recoveries, reported by their owners.
+          recovery_record: Recovery record
+          register_your_stolen_bike: Register your stolen bike
+          register_your_stolen_bike_free: Register your stolen bike — free
+          resource_bay_area: Stolen in the Bay Area
+          resource_portland: Stolen in Portland, Oregon
+          resource_register_found: Register a found bike
+          resource_safety_tips: Safety tips for recovering your own bicycle
+          resource_seattle: Stolen in Seattle
+          resource_what_to_do: What to do if your bike is stolen
+          resource_why_register: Why register your bikes on Bike Index?
+          search_the_registry: Search the registry
+          step_alert_action: Share your alert
+          step_alert_body: >-
+            Your listing generates a shareable stolen bike alert built for social.
+            Post it, send it to local riding groups and neighborhood pages, and consider
+            a promoted alert to reach the blocks around the theft.
+          step_alert_tag: 10 min
+          step_alert_title: Send out your alert
+          step_listing_action: Edit your listing
+          step_listing_body: >-
+            A listing with the police report number, clear photos, and any identifying
+            marks is one an officer can act on in minutes. Vague listings stall.
+          step_listing_tag: 5 min
+          step_listing_title: Add the case number and photos
+          step_police_action: Find your local report line
+          step_police_body: >-
+            Do this first. The case number is what lets an officer hand your bike
+            back instead of impounding it, and every later step references it. Bring
+            the serial number, photos, and the address and time it was taken.
+          step_police_tag: 15 min
+          step_police_title: File a police report
+          step_register_action: Register your stolen bike
+          step_register_body: >-
+            This is the switch that turns everything else on. Your serial number goes
+            into a public registry that bike shops, police departments, pawn databases,
+            and used-bike buyers check before they touch a secondhand frame.
+          step_register_tag: 3 min · free
+          step_register_title: Register it as stolen on Bike Index
+          step_resale_action: Search the marketplace
+          step_resale_body: >-
+            Most stolen bikes surface on Marketplace, Craigslist, and OfferUp within
+            two weeks. Save searches for your make, model, and color, and check daily.
+          step_resale_tag: Ongoing
+          step_resale_title: Watch the resale listings
+          step_shops_action: Find partner shops
+          step_shops_body: >-
+            Thieves bring stolen bikes in for repairs and parts. Shops that check
+            Bike Index at intake are how a large share of flagged bikes get found.
+          step_shops_tag: 20 min
+          step_shops_title: Tell the shops near you
+          stolen_bikes_recovered: stolen bikes recovered
+          the_first_24_hours: The first 24 hours
+          three_minutes_no_cost: Three minutes, no cost, and the serial number is
+            all you need to start.
+          to_register_always: to register, always
+          value_returned_to_owners: value returned to owners
+          why_registering_changes_the_odds: Why registering changes the odds
+          why_registering_subhead: >-
+            A stolen bike that nobody can identify is just a used bike. Registration
+            makes yours identifiable to the people who handle used bikes all day.
+          work_top_to_bottom: Work top to bottom.
+          your_bike_is_gone: Your bike is gone.
