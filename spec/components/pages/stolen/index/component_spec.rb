@@ -7,7 +7,7 @@ RSpec.describe Pages::Stolen::Index::Component, type: :component do
   let(:component) { render_inline(instance) }
   let(:options) do
     {recoveries_count: 18_263, recoveries_value: 38_412_345, organizations_count: 1_000, recovery_displays:,
-     feedback: Feedback.new, current_user:}
+     feedback: Feedback.new(email: current_user&.email), current_user:}
   end
   let(:recovery_displays) { [] }
   let(:current_user) { nil }

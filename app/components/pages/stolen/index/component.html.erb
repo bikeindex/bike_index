@@ -451,16 +451,15 @@
 
           <div class="tw:mb-4">
             <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "feedback[title]", entries: report_title_entries,
-              selected: @feedback.title.presence || REPORT_TITLES.first)) %>
+              selected: @feedback.title.presence || report_title_entries.first[:value])) %>
           </div>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
             label_text: translation(".where_is_this_happening"), required: true,
-            html_options: {rows: 5, required: true})) %>
+            html_options: {rows: 5})) %>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
-            <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true,
-              html_options: {value: @feedback.email.presence || @current_user.email})) %>
+            <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true)) %>
           <% end %>
 
           <%= render(UI::Button::Component.new(text: translation(".send_report"), color: :primary, type: "submit")) %>

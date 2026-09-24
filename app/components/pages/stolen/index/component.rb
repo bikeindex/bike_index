@@ -12,9 +12,6 @@ module Pages
         CTA = "#{PILL} tw:px-6! tw:py-4! tw:text-[15.5px]! tw:uppercase tw:tracking-wider " \
           "tw:hover:-translate-y-0.5 tw:hover:brightness-110"
 
-        # Values are the feedback titles admins already filter on, so they stay untranslated
-        REPORT_TITLES = ["Someone is selling a stolen bike", "Bike ChopShop report"].freeze
-
         def initialize(recoveries_count:, recoveries_value:, organizations_count:, recovery_displays:,
           feedback:, current_user: nil)
           @feedback = feedback
@@ -96,9 +93,10 @@ module Pages
             [translation(".resource_why_register"), news_path("why-register-your-bikes-on-bike-index")]]
         end
 
+        # The titles the legacy form stored, so the values stay untranslated
         def report_title_entries
-          [{value: REPORT_TITLES.first, label: translation(".report_someone_selling_a_stolen_bike")},
-            {value: REPORT_TITLES.last, label: translation(".report_a_bicycle_chop_shop")}]
+          [{value: "Someone is selling a stolen bike", label: translation(".report_someone_selling_a_stolen_bike")},
+            {value: "Bike ChopShop report", label: translation(".report_a_bicycle_chop_shop")}]
         end
 
         def promoted_alerts_path = news_path("bike-indexs-new-promoted-alerts-are-the-megaphone-crooks-dont-want-you")
