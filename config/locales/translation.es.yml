@@ -6770,23 +6770,27 @@ es:
         organized:
           additional_features_html: Bike Index ofrece funciones adicionales para organizaciones
             policiales verificadas. Comuníquese con %{email_link} para activarlas.
-          how_integration_works: cómo funciona la integración
-          integrate_bike_index_with_ascend: Integrar Bike Index con Ascend
-          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed.
-          link_to_register_html: "<strong>%{link}</strong> para registrar automáticamente
-            las bicicletas que vendes a tus clientes."
-          other_point_of_sale_system: "¿Otro sistema de punto de venta?"
-          read_a_full_explanation_html: Lea una explicación completa de %{link}.
-          register_bikes_with_link_html: Registra bicicletas con nuestro <strong>%{link}</strong>
-          streamlined_bike_shop_registration_page: Página de registro simplificada
-            para la tienda de bicicletas
           subscription_expired_html: Tu suscripción a Bike Index ha caducado. Ponte
             en contacto con %{email_link} para reactivarla.
-          use_ascend: "¿Usar Ascend?"
-          use_lightspeed_retail_pos: "¿Utilizas el sistema POS Lightspeed Retail?"
-          viewing_our_streamlined_page: Actualmente estás viendo nuestra página de
-            registro simplificada de la tienda de bicicletas, que es la que recomendamos
-            usar.
+        organized_shop_integration_alert:
+          add_a_bike: Añade una bicicleta
+          already_viewing_add_a_bike_page: Ya estás viendo esta página.
+          ascend_card_title: Ascender
+          dismiss: Despedir
+          dont_show_again: No vuelvas a mostrar esto
+          how_integration_works: Cómo funciona la integración
+          integrate_bike_index_with_ascend: Integrar Bike Index con Ascend
+          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed.
+          integration_card_body: Registra automáticamente las bicicletas que vendes
+            a tus clientes.
+          lightspeed_card_title: Punto de venta minorista Lightspeed
+          other_system_body: 'No se necesita integración: registra las bicicletas
+            manualmente en pocos segundos.'
+          other_system_card_title: 'Otro sistema: envíenos un correo electrónico.'
+          pos_callout_subhead: Conecta tu sistema de punto de venta y cada bicicleta
+            que vendas quedará registrada a nombre de tu cliente en Bike Index.
+          pos_callout_title: Registra las bicicletas automáticamente desde tu punto
+            de venta.
       navbar:
         org_sidebar:
           admin_panel: PANEL DE ADMINISTRACIÓN

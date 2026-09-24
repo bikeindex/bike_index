@@ -247,9 +247,9 @@ them, and several look like timing but aren't.
 
 **Not actually flaky — the environment is wrong.** A missing
 `app/assets/builds/tailwind.css` makes `tw:hidden` silently not apply, so
-visibility assertions fail in ways that read as flakes. The
-[`sandbox-test-setup`](../sandbox-test-setup/SKILL.md) skill has the build
-command per environment. Same class of thing: an unmigrated test DB, a stale VCR cassette.
+visibility assertions fail in ways that read as flakes —
+`bin/rails tailwindcss:build` (see [`sandbox-test-setup`](../sandbox-test-setup/SKILL.md)).
+Same class of thing: an unmigrated test DB, a stale VCR cassette.
 
 A build that's *present but predates a merge* fails the same way and reads worse, because
 the class the failing spec needs is in the source and the whole suite is otherwise green —
