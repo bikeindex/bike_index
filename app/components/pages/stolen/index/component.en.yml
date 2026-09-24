@@ -76,8 +76,16 @@ en:
           recovered: Recovered
           recoveries_reported_by_owners: Recent recoveries, reported by their owners.
           recovery_record: Recovery record
+          register_it: Register it
           register_your_stolen_bike: Register your stolen bike
           register_your_stolen_bike_free: Register your stolen bike — free
+          report_a_bicycle_chop_shop: A bicycle chop shop
+          report_bike_theft_issues: Report bike theft issues
+          report_bike_theft_issues_subhead: Seen a stolen bike for sale, or a chop
+            shop? Let us know where.
+          report_someone_selling_a_stolen_bike: Someone is selling a stolen bike
+          reporting_your_own_bike_html: Reporting your own bike stolen? %{register_it_link}
+            instead.
           resource_bay_area: Stolen in the Bay Area
           resource_portland: Stolen in Portland, Oregon
           resource_register_found: Register a found bike
@@ -86,6 +94,9 @@ en:
           resource_what_to_do: What to do if your bike is stolen
           resource_why_register: Why register your bikes on Bike Index?
           search_the_registry: Search the registry
+          send_report: Send report
+          sign_in: Sign in
+          sign_in_to_report_html: "%{sign_in_link} to make a report."
           step_alert_action: Share your alert
           step_alert_body: >-
             Your listing generates a shareable stolen bike alert built for social.
@@ -132,6 +143,8 @@ en:
             all you need to start.
           to_register_always: to register, always
           value_returned_to_owners: value returned to owners
+          where_is_this_happening: Where is this happening? A URL, an address, any
+            information you have
           why_registering_changes_the_odds: Why registering changes the odds
           why_registering_subhead: >-
             A stolen bike that nobody can identify is just a used bike. Registration

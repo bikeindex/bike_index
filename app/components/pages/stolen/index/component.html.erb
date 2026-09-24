@@ -429,6 +429,50 @@
     </div>
   </section>
 
+  <section class="tw:border-t tw:border-gray-200">
+    <div class="<%= section_inner %>">
+      <h2 class="<%= h2_classes %>">
+        <%= translation(".report_bike_theft_issues") %>
+      </h2>
+
+      <p
+        class="
+          tw:mt-1 tw:mb-4 tw:max-w-190 tw:text-[15px] tw:lg:mb-6
+          tw:lg:text-[17px]
+        "
+      >
+        <%= translation(".report_bike_theft_issues_subhead") %>
+        <%= translation(".reporting_your_own_bike_html", register_it_link: link_to(translation(".register_it"), register_stolen_path, class: "twlink")) %>
+      </p>
+
+      <% if @current_user.present? %>
+        <%= form_for @feedback, html: {class: "tw:max-w-3xl"} do |f| %>
+          <%= f.hidden_field :feedback_type, value: "stolen_information" %>
+
+          <div class="tw:mb-4">
+            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "feedback[title]", entries: report_title_entries,
+              selected: @feedback.title.presence || REPORT_TITLES.first)) %>
+          </div>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
+            label_text: translation(".where_is_this_happening"), required: true,
+            html_options: {rows: 5, required: true})) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+            <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true,
+              html_options: {value: @feedback.email.presence || @current_user.email})) %>
+          <% end %>
+
+          <%= render(UI::Button::Component.new(text: translation(".send_report"), color: :primary, type: "submit")) %>
+        <% end %>
+      <% else %>
+        <p class="tw:m-0 tw:text-[15px]">
+          <%= translation(".sign_in_to_report_html", sign_in_link: link_to(translation(".sign_in"), new_session_path, class: "twlink")) %>
+        </p>
+      <% end %>
+    </div>
+  </section>
+
   <section class="tw:bg-blue-600 tw:text-white">
     <div
       class="

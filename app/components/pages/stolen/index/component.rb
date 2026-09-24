@@ -12,7 +12,13 @@ module Pages
         CTA = "#{PILL} tw:px-6! tw:py-4! tw:text-[15.5px]! tw:uppercase tw:tracking-wider " \
           "tw:hover:-translate-y-0.5 tw:hover:brightness-110"
 
-        def initialize(recoveries_count:, recoveries_value:, organizations_count:, recovery_displays:)
+        # Values are the feedback titles admins already filter on, so they stay untranslated
+        REPORT_TITLES = ["Someone is selling a stolen bike", "Bike ChopShop report"].freeze
+
+        def initialize(recoveries_count:, recoveries_value:, organizations_count:, recovery_displays:,
+          feedback:, current_user: nil)
+          @feedback = feedback
+          @current_user = current_user
           @recoveries_count = recoveries_count
           @recoveries_value = recoveries_value
           @organizations_count = organizations_count
@@ -21,7 +27,7 @@ module Pages
 
         private
 
-        def register_stolen_path = new_bike_path(stolen: true)
+        def register_stolen_path = register_path(stolen: true)
 
         def stats
           [{value: number_display(@recoveries_count), label: translation(".stolen_bikes_recovered")},
@@ -88,6 +94,11 @@ module Pages
             [translation(".resource_seattle"), news_path("what-to-do-when-your-bike-has-been-stolen-in-seattle")],
             [translation(".resource_bay_area"), news_path("what-to-do-when-your-bike-has-been-stolen-in-the-bay-area")],
             [translation(".resource_why_register"), news_path("why-register-your-bikes-on-bike-index")]]
+        end
+
+        def report_title_entries
+          [{value: REPORT_TITLES.first, label: translation(".report_someone_selling_a_stolen_bike")},
+            {value: REPORT_TITLES.last, label: translation(".report_a_bicycle_chop_shop")}]
         end
 
         def promoted_alerts_path = news_path("bike-indexs-new-promoted-alerts-are-the-megaphone-crooks-dont-want-you")

@@ -1,0 +1,5 @@
+<%# A template rather than a controller render: FeedbacksController re-renders it when a report fails validation %>
+<%= render(Pages::Stolen::Index::Component.new(recoveries_count: Counts.recoveries,
+  recoveries_value: Counts.recoveries_value, organizations_count: Counts.organizations,
+  recovery_displays: RecoveryDisplay.includes(photo_processed_attachment: :blob),
+  feedback: @feedback || Feedback.new, current_user:)) %>

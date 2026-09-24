@@ -6,9 +6,7 @@ class StolenController < ApplicationController
   before_action :set_permitted_format, only: [:index]
 
   def index
-    render Pages::Stolen::Index::Component.new(recoveries_count: Counts.recoveries,
-      recoveries_value: Counts.recoveries_value, organizations_count: Counts.organizations,
-      recovery_displays: RecoveryDisplay.includes(photo_processed_attachment: :blob))
+    @feedback = Feedback.new
   end
 
   def current_tsv
