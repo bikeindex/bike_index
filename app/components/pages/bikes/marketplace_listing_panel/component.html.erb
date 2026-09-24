@@ -39,12 +39,16 @@
 
     <% if show_shipping? %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".shipping"))) do %>
-        <% reason = @marketplace_listing.shipping_unavailable_reason %>
-        <%= translation(".shipping_#{reason.nil?}") %>
+        <%= @marketplace_listing.shippable? ? translation(".shipping_true") : translation(".shipping_false") %>
 
-        <% if reason %>
+        <% unless @marketplace_listing.shippable? %>
           <em class="less-strong tw:text-sm">
-            <%= translation(".shipping_#{reason}", bike_type: @marketplace_listing.item_type_display.downcase) %>
+            <% case @marketplace_listing.shipping_unavailable_reason %>
+            <% when :cycle_type %>
+              <%= translation(".shipping_cycle_type", bike_type: @marketplace_listing.item_type_display.downcase) %>
+            <% when :motorized %>
+              <%= translation(".shipping_motorized", bike_type: @marketplace_listing.item_type_display.downcase) %>
+            <% end %>
           </em>
         <% end %>
       <% end %>
