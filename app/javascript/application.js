@@ -56,6 +56,12 @@ if (honeybadgerApiKey) {
         if (navigatingAway && NAVIGATION_FETCH_ERROR.test(notice.message)) {
           return false
         }
+        // Google's iOS apps (GSA, CriOS) inject a script that recurses. WebKit files its frames
+        // under the page's URL, at the same line numbers whatever the page
+        if (notice.message?.includes('Maximum call stack size exceeded') &&
+          !notice.backtrace?.some((frame) => frame.file?.includes('/assets/'))) {
+          return false
+        }
       })
     })
     .catch(() => {})
