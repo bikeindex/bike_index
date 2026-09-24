@@ -723,12 +723,12 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       open_filters_if_not
       expect(page).to have_field("show_location_search", checked: true, disabled: true)
       expect(page).not_to have_field("location", exact: true)
-      expect(page).to have_css("button[aria-label^=\"Searching all registrations\"]")
+      expect(page).to have_css("button[aria-label^=\"You can't search location\"]")
       choose("search_status_stolen", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/location=New\+York/, wait: 10)
       expect(page).to have_field("show_location_search", checked: true, disabled: false)
       expect(page).to have_field("location", with: "New York")
-      expect(page).not_to have_css("button[aria-label^=\"Searching all registrations\"]")
+      expect(page).not_to have_css("button[aria-label^=\"You can't search location\"]")
 
       # Visit with bike_sticker param to test assign_bike_sticker column
       visit "#{bikes_path}?bike_sticker=#{unlinked_sticker.code}"

@@ -26,23 +26,32 @@ module BikeServices
         .where("bike_organization_notes.body ILIKE ?", query_string)
     end
 
-    # A stolen or impounded bike is where it was taken or impounded; any other is at its
-    # registration address - which only an organization's own, address-collecting search can reach
     LOCATIONABLE_STATUSES = %w[stolen impounded stolen_or_impounded].freeze
 
     def location_searchable?(organization:, search_all:, search_status:)
-      LOCATIONABLE_STATUSES.include?(search_status) || (!search_all && organization.enabled?("reg_address"))
+      LOCATIONABLE_STATUSES.include?(search_status) || registration_address_searchable?(organization:, search_all:)
     end
 
-    # Ignored where it isn't searchable, as the disabled field is
+    # Ignored where it isn't searchable, as the disabled field is. A stolen bike is where it
+    # was stolen, an impounded one where it was impounded from - only an organization's own,
+    # address-collecting search reaches registration addresses
     def location(bikes, location, distance, organization:, search_all: false, search_status: nil, ip_address: nil)
-      return bikes if location.blank? || !location_searchable?(organization:, search_all:, search_status:)
+      return bikes if location.blank? || location.match?(/anywhere/i) ||
+        !location_searchable?(organization:, search_all:, search_status:)
 
       proximity = BikeSearchable.proximity_bounding_box(location, distance, ip_address)
-      return bikes if proximity.nil? && location.match?(/anywhere/i)
       return bikes.none if proximity.nil?
 
-      bikes.within_bounding_box(proximity[:bounding_box])
+      bounding_box = proximity[:bounding_box]
+      located = bikes.status_stolen.within_bounding_box(bounding_box)
+        .or(bikes.where(current_impound_record_id: ImpoundRecord.within_bounding_box(bounding_box).select(:id)))
+      return located unless registration_address_searchable?(organization:, search_all:)
+
+      sw_lat, sw_lng, ne_lat, ne_lng = bounding_box
+      # Not the bike's coordinates: without a registration address they fall back to the
+      # organization's
+      located.or(bikes.where(address_record_id: AddressRecord
+        .where(latitude: sw_lat..ne_lat, longitude: sw_lng..ne_lng).select(:id)))
     end
 
     def stickers(bikes, value)
@@ -72,5 +81,15 @@ module BikeServices
       else bikes.where(status: "status_#{value}")
       end
     end
+
+    #
+    # private below here
+    #
+
+    def registration_address_searchable?(organization:, search_all:)
+      !search_all && organization.enabled?("reg_address")
+    end
+
+    conceal :registration_address_searchable?
   end
 end

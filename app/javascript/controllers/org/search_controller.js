@@ -1,10 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapseField } from 'utils/collapse_utils'
 
 /* global localStorage */
 
 const RESULT_VIEW_KEY = 'orgRegistrationResultView'
-// BikeServices::OrganizedSearch::LOCATIONABLE_STATUSES
-const LOCATIONABLE_STATUSES = ['stolen', 'impounded', 'stolen_or_impounded']
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
@@ -14,8 +13,8 @@ export default class extends Controller {
 
   connect () {
     this.chartSearch = this.chartParams()
-    this.initOptionalFields()
-    this.syncLocationSearch()
+    this.initOptionalFields(0)
+    this.syncLocationSearch(0)
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
   }
@@ -65,14 +64,13 @@ export default class extends Controller {
     return this.element.querySelector('.search-results-frame-wrapper > turbo-frame')
   }
 
-  // The notes and location fields, each named by data-field. One opens if a text input in it
-  // has a value - not the distance, which always does - or if it was left open
-  initOptionalFields () {
+  // The notes and location fields, each named by data-field. One opens if an input in it has
+  // a value, or if it was left open
+  initOptionalFields (duration) {
     this.optionalFieldTargets.forEach(field => {
-      const hasValue = [...field.querySelectorAll('input[type=text]')].some(input => input.value.length > 0)
-      if (hasValue || localStorage.getItem(field.dataset.storageKey) === 'true') {
-        this.setOptionalField(field.dataset.field, true)
-      }
+      const hasValue = [...field.querySelectorAll('input')].some(input => input.value.length > 0)
+      const open = hasValue || localStorage.getItem(field.dataset.storageKey) === 'true'
+      this.setOptionalField(field.dataset.field, open, duration)
     })
   }
 
@@ -80,10 +78,10 @@ export default class extends Controller {
     this.setOptionalField(event.target.dataset.field, event.target.checked)
   }
 
-  setOptionalField (name, open) {
+  setOptionalField (name, open, duration) {
     const field = this.optionalFieldTargets.find(target => target.dataset.field === name)
     if (!field) return
-    field.classList.toggle('tw:hidden', !open)
+    collapseField(field, open, duration)
     localStorage.setItem(field.dataset.storageKey, String(open))
     const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === name)
     if (checkbox) checkbox.checked = open
@@ -91,19 +89,18 @@ export default class extends Controller {
 
   // BikeServices::OrganizedSearch.location_searchable? - disabled, the fields hide and stop
   // submitting, but the checkbox keeps whether they were open
-  syncLocationSearch () {
+  syncLocationSearch (duration) {
     const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === 'location')
     const field = this.optionalFieldTargets.find(target => target.dataset.field === 'location')
     if (!checkbox || !field) return
 
     const status = document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
     const searchAll = this.hasSearchAllTarget && this.searchAllTarget.checked
-    const searchable = LOCATIONABLE_STATUSES.includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
+    const searchable = JSON.parse(checkbox.dataset.locationableStatuses).includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
 
     checkbox.disabled = !searchable
     if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
-    field.classList.toggle('tw:hidden', !(searchable && checkbox.checked))
-    field.querySelectorAll('input').forEach(input => { input.disabled = !searchable })
+    collapseField(field, searchable && checkbox.checked, duration)
   }
 
   // Bubbled from any field, so it picks out the one it's for
@@ -113,6 +110,7 @@ export default class extends Controller {
     this.searchAllTarget.disabled = hasEmail
     if (hasEmail) this.searchAllTarget.checked = false
     this.searchAllHintTarget.hidden = !hasEmail
+    this.syncLocationSearch()
   }
 
   filterChanged () {

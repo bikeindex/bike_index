@@ -30,11 +30,11 @@ en:
             impound_id_cell: Impound ID
             location_search_disabled_no_address: >-
               %{org_name} doesn't collect registration addresses, so only stolen and
-              impounded bikes have a location. Filter to one of those statuses to
-              search by location.
+              impounded registrations have a location. Filter to one of those statuses
+              to search by location.
             location_search_disabled_search_all: >-
-              Searching all registrations, only stolen and impounded bikes have a
-              location. Filter to one of those statuses to search by location.
+              You can't search location when searching all registrations, unless you
+              are searching just impounded and/or stolen registrations.
             manufacturer_cell: Manufacturer
             model_cell: Model
             none: none

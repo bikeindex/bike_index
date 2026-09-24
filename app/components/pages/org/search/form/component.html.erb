@@ -72,8 +72,8 @@
 
                 <%= label_tag :distance, translation(".search_distance"), class: "twlabel tw:sr-only" %>
 
-                <%= number_field_tag :distance, distance, placeholder: GeocodeHelper::DEFAULT_DISTANCE,
-                  min: GeocodeHelper::MIN_DISTANCE, disabled: location_search_disabled?,
+                <%= number_field_tag :distance, @interpreted_params[:distance], placeholder: GeocodeHelper::DEFAULT_DISTANCE,
+                  min: GeocodeHelper::MIN_DISTANCE, disabled: location_search_disabled?, data: {restores_from_url: true},
                   class: "twinput tw:w-24 fieldResetsCounts" %>
 
                 <span><%= translation(".miles_of") %></span>
@@ -81,7 +81,7 @@
                 <%= label_tag :location, translation(".search_location"), class: "twlabel tw:sr-only" %>
 
                 <%= text_field_tag :location, @interpreted_params[:location],
-                  placeholder: translation(".search_location"), disabled: location_search_disabled?,
+                  placeholder: translation(".search_location"), disabled: location_search_disabled?, data: {restores_from_url: true},
                   class: "twinput tw:min-w-50 tw:flex-1 fieldResetsCounts" %>
               </div>
             </div>

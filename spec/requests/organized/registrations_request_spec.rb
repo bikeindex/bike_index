@@ -76,10 +76,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {search_no_js: true, location: "", distance: "50"}
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_chicago.id, stolen_bike.id])
 
+        get base_url, params: {search_no_js: true, location: ["New York"], distance: ["50"]}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_chicago.id, stolen_bike.id])
+
         # Searching all, it's only searched alongside a stolen or impounded status
         get base_url, params: {search_no_js: true, location: "New York", distance: "50", search_all: true}
         expect(assigns(:bikes).pluck(:id)).to include(bike.id, bike_chicago.id, stolen_bike.id)
-        expect(response.body).to include("Searching all registrations, only stolen and impounded bikes")
+        expect(response.body).to include("You can&#39;t search location when searching all registrations")
 
         get base_url, params: {search_no_js: true, location: "New York", distance: "50", search_all: true, search_status: "stolen"}
         expect(assigns(:bikes).pluck(:id)).to eq([stolen_bike.id])
