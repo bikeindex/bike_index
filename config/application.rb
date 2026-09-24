@@ -42,12 +42,15 @@ module Bikeindex
     # builds them without a query - at the cost of only being able to count them from the bucket.
     config.active_storage.track_variants = false
 
-    # Our error pages get the failed request's env - clear its params, or malformed ones
-    # raise again and fall through to Rails' unlogged plain-text 500
-    config.exceptions_app = ->(env) {
+    # Our error pages get the failed request's env - clear its params if they don't parse,
+    # or they raise again and fall through to Rails' unlogged plain-text 500
+    config.exceptions_app = lambda do |env|
+      ActionDispatch::Request.new(env).then { it.GET && it.POST }
+      routes.call(env)
+    rescue ActionController::BadRequest, ActionDispatch::Http::Parameters::ParseError
       routes.call(env.merge("action_dispatch.request.request_parameters" => {},
         "action_dispatch.request.query_parameters" => {}))
-    }
+    end
 
     config.time_zone = "Central Time (US & Canada)"
 

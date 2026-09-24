@@ -51,7 +51,7 @@ module RequestSpecHelpers
       env_config.merge!(production)
       example.run
     ensure
-      env_config.merge!(original)
+      env_config.except!(*production.keys).merge!(original)
     end
   end
 
