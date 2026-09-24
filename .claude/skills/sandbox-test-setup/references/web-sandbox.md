@@ -111,8 +111,8 @@ A different browser from the specs', configured by the script:
 
 It **can't reach anything off localhost** — it rejects the egress proxy's CA
 (`ERR_CERT_AUTHORITY_INVALID`, even with HTTPS errors ignored), so every page logs
-failures for jsdelivr, Google Fonts, GTM and Facebook. Those are the sandbox; an
-app-origin error is the signal. Screenshots still reach a PR: `github-pr-images` has a
+failures for Google Fonts, GTM and Facebook, and a map page for jsdelivr's maplibre.
+Those are the sandbox; an app-origin error is the signal. Screenshots still reach a PR: `github-pr-images` has a
 browserless route for here (its `references/web-sandbox.md`).
 
 Selectors: `UI::Forms::Combobox` hides non-matching options rather than removing them,
