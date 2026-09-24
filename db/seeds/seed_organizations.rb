@@ -1,4 +1,4 @@
-# Seed organizations: Brakebills, Ike's Bikes, Cannondale, and Bike Recovery Team
+# Seed organizations: Brakebills, Craig's Bike Shop, Cannondale, Bike Recovery Team and City of Palo Alto
 
 # --- Organization Features ---
 # This list was created with:
@@ -56,6 +56,7 @@ feature_name_and_slugs = [
 brakebills_feature_ids = []
 official_manufacturer_feature_id = nil
 law_enforcement_feature_id = nil
+bike_search_feature_id = nil
 
 brakebills_skipped_feature_names = ["Avery Export", "Passwordless users", "Single Sign On (SSO)", "Skip ownership email"]
 
@@ -69,16 +70,32 @@ feature_name_and_slugs.each do |attrs|
     official_manufacturer_feature_id = org_feature.id
   else
     law_enforcement_feature_id = org_feature.id if attrs[:name] == "Law Enforcement functionality"
+    bike_search_feature_id = org_feature.id if attrs[:name] == "Organization Views: Search bikes"
     brakebills_feature_ids << org_feature.id
   end
+end
+
+# An invoice's features only reach enabled_feature_slugs when the organization is saved again.
+# Invoice#update_organization enqueues that, and seeds run without a worker.
+def seed_invoice(organization:, feature_ids:, **invoice_attrs)
+  invoice = Invoice.create(organization:, amount_due: 0, start_at: Time.current - 1.hour, **invoice_attrs)
+  invoice.update(organization_feature_ids: feature_ids.compact)
+  UpdateOrganizationAssociationsJob.new.perform(organization.id)
+end
+
+def seed_organization_member(organization:, email:, name: nil, role: "member")
+  user = User.find_by_email(email) ||
+    User.create!(name:, email:, password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true)
+  user.confirm(user.confirmation_token) unless user.confirmed?
+  OrganizationRole.find_or_create_by!(organization_id: organization.id, user_id: user.id, role:)
+  user
 end
 
 # --- Brakebills: every feature except brakebills_skipped_feature_names, on an is_endless invoice ---
 SeedHelpers.tick
 brakebills = Organization.find_by_name("Brakebills") || Organization.create!(name: "Brakebills")
-brakebills_invoice = Invoice.create(organization: brakebills, amount_due: 0, start_at: Time.current - 1.hour, is_endless: true)
-brakebills_invoice.update(organization_feature_ids: brakebills_feature_ids)
-OrganizationRole.create(organization_id: brakebills.id, user_id: User.find_by_email("member@brakebills.edu").id, role: "member")
+seed_organization_member(organization: brakebills, email: "member@brakebills.edu")
+seed_invoice(organization: brakebills, feature_ids: brakebills_feature_ids, is_endless: true)
 
 # Logo (rasterized from db/seeds/images/brakebills.svg — CarrierWave rejects SVG)
 if brakebills.avatar.blank?
@@ -94,39 +111,34 @@ OrganizationLandingPage.find_or_initialize_by(organization_id: brakebills.id).ta
     enabled: landing_page.env_enabled?)
 end
 
-# --- Ike's Bikes ---
+# --- Craig's Bike Shop ---
 SeedHelpers.tick
-# No short_name - "Ikes" is on OrganizationNameValidator::INVALID_NAMES, which rejects the record
-Organization.find_by_name("Ike's Bikes") ||
-  Organization.create!(name: "Ike's Bikes", website: "", show_on_map: true, kind: :bike_shop)
+craigs = Organization.find_by_name("Craig's Bike Shop") ||
+  Organization.create!(name: "Craig's Bike Shop", website: "", short_name: "Craig's", show_on_map: true, kind: :bike_shop)
+seed_organization_member(organization: craigs, name: "Craig Shop Mechanic", email: "craigs@bikeindex.org")
 
 # --- Cannondale ---
 SeedHelpers.tick
 cannondale = Organization.find_by_name("Cannondale") ||
   Organization.create!(name: "Cannondale", kind: :bike_manufacturer, manufacturer_id: Manufacturer.find_by_name("Cannondale")&.id)
-cannondale_invoice = Invoice.create(organization: cannondale, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
-cannondale_invoice.update(organization_feature_ids: [official_manufacturer_feature_id].compact)
-
-# Create cannondale user and make admin
-cannondale_user = User.create(name: "Cannondale Admin", email: "cannondale@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true)
-cannondale_user.confirm(cannondale_user.confirmation_token)
-cannondale_user.save
-OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user.id, role: "admin")
+seed_organization_member(organization: cannondale, name: "Cannondale Admin", email: "cannondale@bikeindex.org", role: "admin")
+seed_invoice(organization: cannondale, feature_ids: [official_manufacturer_feature_id], subscription_end_at: 1.year.from_now)
 
 # --- Bike Recovery Team: Law Enforcement functionality ---
 # phoneable_by?'s police check reads Organization.law_enforcement — the kind, not the feature slugs
 SeedHelpers.tick
 recovery_team = Organization.find_by_name("Bike Recovery Team") ||
   Organization.create!(name: "Bike Recovery Team", kind: :law_enforcement)
-recovery_team_invoice = Invoice.create(organization: recovery_team, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
-recovery_team_invoice.update(organization_feature_ids: [law_enforcement_feature_id].compact)
+seed_organization_member(organization: recovery_team, name: "Recovery Team Member", email: "recovery@bikeindex.org")
+seed_invoice(organization: recovery_team, feature_ids: [law_enforcement_feature_id], subscription_end_at: 1.year.from_now)
 
-recovery_team_user = User.find_by_email("recovery@bikeindex.org") ||
-  User.create(name: "Recovery Team Member", email: "recovery@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true)
-recovery_team_user.confirm(recovery_team_user.confirmation_token) unless recovery_team_user.confirmed?
-OrganizationRole.create(organization_id: recovery_team.id, user_id: recovery_team_user.id, role: "member")
+# --- City of Palo Alto: municipality with bike search ---
+SeedHelpers.tick
+palo_alto = Organization.find_by_name("City of Palo Alto") ||
+  Organization.create!(name: "City of Palo Alto", short_name: "Palo Alto", kind: :municipality)
+seed_organization_member(organization: palo_alto, name: "Palo Alto Staffer", email: "paloalto@bikeindex.org")
+seed_invoice(organization: palo_alto, feature_ids: [bike_search_feature_id], subscription_end_at: 1.year.from_now)
 
-# Make sure example organization exists
-Organization.example
+seed_organization_member(organization: Organization.example, email: "example_user@bikeindex.org")
 
-puts "Organizations seeded: Brakebills, Ike's Bikes, Cannondale, Bike Recovery Team\n"
+puts "Organizations seeded: Brakebills, Craig's Bike Shop, Cannondale, Bike Recovery Team, City of Palo Alto\n"

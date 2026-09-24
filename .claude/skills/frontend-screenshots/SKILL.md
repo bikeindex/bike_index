@@ -43,7 +43,9 @@ get back local PNG paths.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
 - **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
   back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the
-  per-workspace throwaway DB), or capture previews.
+  per-workspace throwaway DB), or capture previews. In the web sandbox the seed is already running
+  in the background — wait on `/tmp/seed.status` (`sandbox-test-setup`) rather than starting a
+  second one, which dies on duplicates.
 
 ## Sign in (with the PII gate)
 

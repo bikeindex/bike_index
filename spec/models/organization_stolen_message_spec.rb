@@ -39,6 +39,12 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(Organization.with_stolen_message.pluck(:id)).to eq([organization.id])
       end
     end
+    context "municipality organization" do
+      let(:organization) { FactoryBot.create(:organization, kind: "municipality") }
+      it "defaults to area" do
+        expect(organization_stolen_message.reload.kind).to eq "area"
+      end
+    end
     context "overly long body" do
       let(:target) { "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qu" }
       it "truncates" do
