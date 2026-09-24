@@ -3,9 +3,11 @@
 module Pages
   module Stolen
     module Index
-      # Below lg it's the design's mobile layout, which drops the promoted alerts band,
-      # the FAQ and the resources
+      # Below lg it's the design's mobile layout, which drops the promoted alerts band
+      # and the FAQ
       class Component < ApplicationComponent
+        include MoneyHelper
+
         PILL = "tw:rounded-full! tw:font-semibold! tw:transition-all!"
         CTA = "#{PILL} tw:px-6! tw:py-4! tw:text-[15.5px]! tw:uppercase tw:tracking-wider " \
           "tw:hover:-translate-y-0.5 tw:hover:brightness-110"
@@ -21,15 +23,13 @@ module Pages
 
         def register_stolen_path = new_bike_path(stolen: true)
 
-        def recoveries_value_millions = (@recoveries_value / 100_000) / 10.0
-
         def stats
           [{value: number_display(@recoveries_count), label: translation(".stolen_bikes_recovered")},
-            {value: safe_join(["$", number_display(recoveries_value_millions), "M"]),
+            {value: "#{as_currency(@recoveries_value / 1_000_000)}M+",
              label: translation(".value_returned_to_owners")},
             {value: safe_join([number_display(@organizations_count), "+"]),
              label: translation(".partner_organizations")},
-            {value: "$0", label: translation(".to_register_always")}]
+            {value: as_currency(0), label: translation(".to_register_always")}]
         end
 
         def steps
@@ -44,7 +44,7 @@ module Pages
              href: my_account_path},
             {title: translation(".step_alert_title"), tag: translation(".step_alert_tag"),
              body: translation(".step_alert_body"), action: translation(".step_alert_action"),
-             href: promoted_alerts_path},
+             href: my_account_path},
             {title: translation(".step_google_alerts_title"), tag: translation(".step_google_alerts_tag"),
              body: translation(".step_google_alerts_body"), action: translation(".step_google_alerts_action"),
              href: "https://www.google.com/alerts"},
