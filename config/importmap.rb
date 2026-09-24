@@ -6,7 +6,6 @@ pin "application"
 pin "@hotwired/turbo-rails", to: "turbo.min.js", preload: true
 pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
-# pin "flowbite", to: "https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.turbo.min.js"
 # Vendored and preloaded (not CDN-pinned): application.js imports this at the
 # top level, so fetching it gates every Stimulus controller connecting.
 # See the file header to re-generate.
@@ -21,6 +20,9 @@ pin "@floating-ui/dom", to: "@floating-ui--dom.js"
 # fetch 10KB on every page -- the controller import()s them for the same reason.
 pin "highlight.js/lib/core", to: "highlight.js--core.js", preload: false
 pin "highlight.js/lib/languages/json", to: "highlight.js--json.js", preload: false
+# Vendored (not CDN-pinned); see the file header to re-generate. preload: false because
+# application.js only import()s it when the page carries an api key.
+pin "@honeybadger-io/js", to: "@honeybadger-io--js.js", preload: false
 
 # From the chartkick gem's vendor/assets, which its engine adds to assets.precompile.
 # preload: false because they are 180KB gzipped that only a page with a chart on it
@@ -32,10 +34,6 @@ pin "Chart.bundle", to: "Chart.bundle.js", preload: false
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin_all_from "app/components", under: "components"
 pin_all_from "app/javascript/utils", under: "utils", to: "utils"
-
-# Vendored (not CDN-pinned); see the file header to re-generate. preload: false because
-# application.js only import()s it when the page carries an api key.
-pin "@honeybadger-io/js", to: "@honeybadger-io--js.js", preload: false
 
 # Lexxy rich text editor (Action Text). Assets served by the lexxy/activestorage gems.
 pin "lexxy", to: "lexxy.js"

@@ -123,7 +123,7 @@ settle, so sample sub-second states inside one `browser_evaluate`.
 
 They run through `capybara-playwright-driver` and the `playwright` npm package — **no
 chromedriver, no Selenium**. Needs `LOCAL_CHROME_OVERRIDE=1`: `spec/support/local_chrome.rb`
-then adds the root-in-a-container flags and routes `cdn.jsdelivr.net` to `127.0.0.1:8443`.
+then adds the root-in-a-container flags.
 
 On a browser-not-found, ask where it's looking:
 
@@ -140,21 +140,6 @@ mkdir -p /opt/pw-browsers/chromium_headless_shell-1223
 ln -sfn /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux \
         /opt/pw-browsers/chromium_headless_shell-1223/chrome-headless-shell-linux64
 ln -sfn headless_shell /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/chrome-headless-shell
-```
-
-### The jsdelivr shim — rarely needed
-
-The only CDN pin in `config/importmap.rb` is `@honeybadger-io/js`, loaded through a
-guarded `import()`, so specs pass with nothing on :8443. Only if a spec needs a CDN
-module, mirror the pins and serve them. It impersonates a public host over TLS, which
-auto mode may refuse — ask rather than work around it:
-
-```bash
-for u in $(grep '^pin' config/importmap.rb | grep -o 'https://cdn.jsdelivr.net/[^"]*'); do
-  curl -sf --create-dirs -o "/tmp/cdn/serve/${u#https://cdn.jsdelivr.net/}" "$u"; done
-openssl req -x509 -newkey rsa:2048 -nodes -days 365 -keyout /tmp/cdn/key.pem -out /tmp/cdn/cert.pem \
-  -subj "/CN=cdn.jsdelivr.net" -addext "subjectAltName=DNS:cdn.jsdelivr.net" 2>/dev/null
-nohup python3 .claude/skills/sandbox-test-setup/assets/cdn_server.py >/dev/null 2>&1 &
 ```
 
 ## No `gh`
