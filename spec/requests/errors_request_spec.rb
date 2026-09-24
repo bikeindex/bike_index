@@ -34,15 +34,7 @@ RSpec.describe ErrorsController, type: :request do
   end
 
   context "rendered for an exception, as in production" do
-    around do |example|
-      env_config = Rails.application.env_config
-      production = {"action_dispatch.show_exceptions" => :all, "action_dispatch.show_detailed_exceptions" => false}
-      original = env_config.slice(*production.keys)
-      env_config.merge!(production)
-      example.run
-    ensure
-      env_config.merge!(original)
-    end
+    include_context :request_spec_production_exceptions
 
     it "renders the error page for malformed params" do
       post "/", params: "{not json", headers: {"CONTENT_TYPE" => "application/json"}

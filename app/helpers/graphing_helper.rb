@@ -92,7 +92,7 @@ module GraphingHelper
 
   def collection_grouped(collection:, column: "created_at", time_range: nil)
     time_range ||= @time_range
-    # A default_scope order (Organization's name) can't sit beside the GROUP BY
+    # A default_scope order can't sit beside the GROUP BY
     collection.unscope(:order).send(group_by_method(time_range), column, **grouping(time_range))
   end
 
