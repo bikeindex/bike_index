@@ -515,6 +515,21 @@ RSpec.describe RegisterController, type: :request do
         post session_path, params: {session: {email: user.email, password: "testthisthing7$"}}
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
       end
+      context "by organization staff, for the owner" do
+        let(:owner) { FactoryBot.create(:user_confirmed, email: owner_email) }
+        let(:b_param) do
+          FactoryBot.create(:b_param_unfinished_registration, creator: FactoryBot.create(:user_confirmed),
+            owner_email:, origin: "register_flow_organized")
+        end
+        it "signs the owner in, then resumes it" do
+          get register_path(b_param_token: b_param.id_token)
+          expect(response).to redirect_to new_session_url
+
+          post session_path, params: {session: {email: owner.email, password: "testthisthing7$"}}
+          get register_path(b_param_token: b_param.id_token)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "2")
+        end
+      end
     end
   end
 
