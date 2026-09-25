@@ -30,13 +30,13 @@ module GeocodeHelper
     (clamped_distance % 1 == 0) ? clamped_distance.to_i : clamped_distance
   end
 
-  def bounding_box(lookup_string, distance)
+  def bounding_box(lookup_string, distance = nil, default_distance: DEFAULT_DISTANCE, min_distance: MIN_DISTANCE)
     box_param = if lookup_string.is_a?(Array) && lookup_string.length == 2
       lookup_string # It's a coordinate array, use it (rather than doing a lookup)
     else
       geocoder_lookup_string(lookup_string)
     end
-    box_coords = Geocoder::Calculations.bounding_box(box_param, distance)
+    box_coords = Geocoder::Calculations.bounding_box(box_param, permitted_distance(distance, default_distance:, min_distance:))
     box_coords.detect(&:nan?) ? [] : box_coords
   end
 

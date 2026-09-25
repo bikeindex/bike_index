@@ -192,6 +192,18 @@ RSpec.describe GeocodeHelper do
         expect(described_class.bounding_box([42.8490197, -106.3015341], 10)).to eq target
       end
     end
+    context "distance" do
+      let(:coordinates) { [42.8490197, -106.3015341] }
+      before { allow(Geocoder::Calculations).to receive(:bounding_box) { |_, distance| [distance.to_f] } }
+
+      it "uses permitted_distance" do
+        expect(described_class.bounding_box(coordinates)).to eq([GeocodeHelper::DEFAULT_DISTANCE])
+        expect(described_class.bounding_box(coordinates, "9000")).to eq([GeocodeHelper::MAX_DISTANCE])
+        expect(described_class.bounding_box(coordinates, 0.1)).to eq([GeocodeHelper::MIN_DISTANCE])
+        expect(described_class.bounding_box(coordinates, default_distance: 5)).to eq([5])
+        expect(described_class.bounding_box(coordinates, 0.1, min_distance: 0.01)).to eq([0.1])
+      end
+    end
     context "unknown location" do
       it "returns empty" do
         VCR.use_cassette("geohelper-boundingbox-unknown", vcr_config) do

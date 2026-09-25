@@ -78,9 +78,9 @@ RSpec.describe BikeServices::Searcher do
     context "with an out-of-range radius" do
       let(:search) { BikeServices::Searcher.new(stolen: true, proximity: "New York, NY", proximity_radius: "9000") }
 
-      it "clamps the radius via GeocodeHelper.permitted_distance" do
+      it "clamps the radius" do
         search.instance_variable_set(:@bikes, Bike.where(id: bike.id))
-        expect(GeocodeHelper).to receive(:bounding_box).with("New York, NY", GeocodeHelper::MAX_DISTANCE).and_return([])
+        expect(Geocoder::Calculations).to receive(:bounding_box).with("New York, NY", GeocodeHelper::MAX_DISTANCE).and_return([])
         search.by_proximity
       end
     end
