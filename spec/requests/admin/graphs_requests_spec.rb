@@ -35,7 +35,7 @@ RSpec.describe Admin::GraphsController, type: :request do
       context "with bikes registered different ways" do
         let!(:sticker_bikes) { FactoryBot.create_list(:bike, 2, :with_ownership, creation_state_origin: "sticker") }
         let!(:web_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "web") }
-        let(:origin_colors) { Ownership.origins.zip(Admin::GraphsController::ORIGIN_COLORS).to_h }
+        let(:origin_colors) { Pages::Admin::Graphs::Bikes::Component::ORIGIN_COLORS }
         # [origin, swatch color, bike count] per row of the origin table, as rendered
         let(:origin_rows) do
           Nokogiri::HTML(response.body).css("td span[style*='background-color']").map do |swatch|

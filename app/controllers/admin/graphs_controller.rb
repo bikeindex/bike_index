@@ -1,10 +1,5 @@
 module Admin
   class GraphsController < Admin::BaseController
-    # The shared chart palette, which runs out well before Ownership.origins does
-    ORIGIN_COLORS = (UI::Chart::Component::COLORS + %w[#0891B2 #65A30D #EA580C #4F46E5
-      #9333EA #0D9488 #CA8A04 #E11D48 #2563EB #16A34A]).freeze
-    IOS_VERSION_SQL = "ownerships.registration_info ->> 'ios_version'"
-
     before_action :set_period
     before_action :set_variable_graph_kind
     around_action :set_reading_role
@@ -41,8 +36,7 @@ module Admin
       @bounding_box = GeocodeHelper.bounding_box(params[:location], @location_radius) if params[:location].present?
     end
 
-    helper_method :matching_bikes, :pos_search_kinds, :default_period,
-      :origin_colors, :origin_bike_counts, :ios_version_bike_counts
+    helper_method :matching_bikes, :default_period
 
     protected
 
@@ -79,37 +73,8 @@ module Admin
       "year"
     end
 
-    # Each series carries its own, so the table's swatches match without the two
-    # agreeing on an order across the chart's separate request
-    def origin_colors
-      @origin_colors ||= Ownership.origins.zip(ORIGIN_COLORS).to_h
-    end
-
-    # Ownership.origins order breaks count ties, so the rows don't reshuffle between
-    # loads. Distinct: a bike has an ownership per transfer
-    def origin_bike_counts
-      return @origin_bike_counts if defined?(@origin_bike_counts)
-
-      origins = Ownership.origins
-      counts = matching_bikes.joins(:ownerships).group("ownerships.origin").distinct.count(:id)
-      @origin_bike_counts = origins.index_with { counts[it] || 0 }
-        .sort_by { |origin, count| [-count, origins.index(origin)] }
-    end
-
-    def ios_version_bikes
-      matching_bikes.joins(:ownerships).where("#{IOS_VERSION_SQL} IS NOT NULL").group(IOS_VERSION_SQL)
-    end
-
-    def ios_version_bike_counts
-      ios_version_bikes.distinct.count(:id).sort_by { |version, count| [-count, version] }
-    end
-
     def bike_graph_kinds
       %w[stolen origin ios_version pos ignored]
-    end
-
-    def pos_search_kinds
-      %w[lightspeed_pos ascend_pos does_not_need_pos no_pos]
     end
 
     # {group => {time => count}}, grouped by both so it's one query rather than one per
@@ -124,13 +89,13 @@ module Admin
       series = grouped_time_range_counts(bikes.joins(:ownerships).group("ownerships.origin"))
       empty = helpers.empty_time_range_counts
       Ownership.origins.map do |origin|
-        {name: origin.humanize, color: origin_colors[origin], data: empty.merge(series[origin] || {})}
+        {name: origin.humanize, color: Pages::Admin::Graphs::Bikes::Component::ORIGIN_COLORS[origin], data: empty.merge(series[origin] || {})}
       end
     end
 
-    # Ordered like ios_version_bike_counts, so the chart's legend matches the table
+    # Ordered like the component's table, so the chart's legend matches it
     def ios_version_chart_series
-      grouped_time_range_counts(ios_version_bikes)
+      grouped_time_range_counts(Pages::Admin::Graphs::Bikes::Component.ios_version_bikes(matching_bikes))
         .sort_by { |version, data| [-data.values.sum, version] }
         .map { |version, data| {name: "iOS #{version}", data:} }
     end
@@ -154,7 +119,7 @@ module Admin
       elsif bike_graph_kind == "ios_version"
         ios_version_chart_series
       elsif bike_graph_kind == "pos"
-        pos_search_kinds.map do |pos_kind|
+        Pages::Admin::Graphs::Bikes::Component::POS_SEARCH_KINDS.map do |pos_kind|
           {
             name: pos_kind.humanize,
             data: helpers.time_range_counts(collection: bikes.send(pos_kind))
