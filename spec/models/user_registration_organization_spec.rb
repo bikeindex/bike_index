@@ -70,6 +70,18 @@ RSpec.describe UserRegistrationOrganization, type: :model do
       ownership1.update(updated_at: Time.current)
       expect(ownership1.reload.registration_info).to eq target_universal_info.merge(ownership_only_info)
     end
+    it "leaves a registration's own keys off the user's registration_info" do
+      bike
+      new_user_registration_organization = UserRegistrationOrganization.new(user:, organization:, all_bikes: true)
+      new_user_registration_organization.set_initial_registration_info
+      expect(new_user_registration_organization.registration_info.keys)
+        .to match_array(ownership_registration_info.keys - ownership_only_info.keys)
+
+      # Stored before they were left off
+      user_registration_organization.update(registration_info: user_registration_organization.registration_info
+        .merge("register_separate_attestation" => true, "bike_sticker" => "1111"))
+      expect(UserRegistrationOrganization.universal_registration_info_for(user.reload)).to eq target_universal_info
+    end
     context "with an organization with reg_organization_affiliation and reg_student_id" do
       let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[reg_organization_affiliation reg_student_id]) }
       let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization2, can_edit_claimed: false) }

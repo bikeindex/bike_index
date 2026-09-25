@@ -695,6 +695,19 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         end
       end
 
+      context "a bike, which has no safety pages to leave out" do
+        it "doesn't count as a separate attestation" do
+          post "#{base_url}/switches", params: {separate_attestation: true}
+          get "#{base_url}/new"
+          b_param = BParam.last
+          post "/register", params: {b_param_token: b_param.id_token,
+                                     b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
+          expect { patch "/register", params: {b_param_token: b_param.id_token, bike: details} }
+            .to change(Bike, :count).by 1
+          expect(Bike.last.current_ownership.registration_info.keys).to_not include "register_separate_attestation"
+        end
+      end
+
       context "registering for another organization" do
         let(:other_organization) { FactoryBot.create(:organization) }
         let!(:other_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: other_organization) }

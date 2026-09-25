@@ -244,20 +244,24 @@ module BikeServices
 
     # Step 1 is the least a registration can be: who owns it and what it is. The params are
     # merged in whether or not it passes, so a re-render still shows everything they entered
-    # The switches ride to the ownership's registration_info, so registrations can be counted by them
-    def save_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil, single_page: false,
-      separate_attestation: false)
-      bike_params = honeypot_spam(bike_params, additional).merge(register_single_page: single_page,
-        register_separate_attestation: separate_attestation)
-      b_param.clean_params({bike: bike_params, propulsion_type_motorized:}.as_json)
-      # Before save, which clears the errors it's about to re-run validations for
-      b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?
-      b_param.errors.add(:base, translation(:manufacturer_required)) if b_param.manufacturer_id.blank?
-      return false if b_param.errors.any?
+    def save_step_1(b_param, **)
+      return false unless assign_step_1(b_param, **)
       return true if b_param.save
 
       b_param.errors.add(:base, translation(:unable_to_save))
       false
+    end
+
+    # save_step_1 without the write, for the single page - save_step_2 writes both.
+    # The switches are the flow's once it's submitted, whatever the session says after
+    def assign_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil, single_page: false,
+      separate_attestation: false)
+      b_param.clean_params({bike: honeypot_spam(bike_params, additional), propulsion_type_motorized:,
+                            register_single_page: single_page, register_separate_attestation: separate_attestation}.as_json)
+      # Before save, which clears the errors it's about to re-run validations for
+      b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?
+      b_param.errors.add(:base, translation(:manufacturer_required)) if b_param.manufacturer_id.blank?
+      b_param.errors.none?
     end
 
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
@@ -357,11 +361,17 @@ module BikeServices
       return nil if b_param.with_bike? || !creator_available?(b_param) ||
         !ready_for_bike?(b_param, sequence:)
 
-      create_bike(b_param, ip_address:)
+      create_bike(b_param, ip_address:, sequence:)
     end
 
-    def create_bike(b_param, ip_address:)
+    # The switches ride to the ownership's registration_info, so registrations can be counted
+    # by them - separate attestation only where it left out a sequence the organization has
+    def create_bike(b_param, ip_address:, sequence:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
+      b_param.params = b_param.params.deep_merge("bike" => {
+        "register_single_page" => b_param.params["register_single_page"],
+        "register_separate_attestation" => sequence.blank? && registration_sequence(b_param).present?
+      })
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
       # The bike is what the acknowledgment hangs off once the b_param is swept
       acknowledgment(b_param)&.update(bike_id: bike.id, user_id: b_param.creator_id) if bike.id.present?

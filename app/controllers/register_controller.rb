@@ -42,9 +42,8 @@ class RegisterController < ApplicationController
   # a tokenized step, so the frame is one request and nothing past step 1 is embeddable
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
-    # Not flow_steps - the frame is step 1 alone, whatever the session's switch says
-    steps = BikeServices::Register.steps(@b_param, sequence: @registration_sequence)
-    render Pages::Register::Embed::Component.new(b_param: @b_param, steps:, current_user:,
+    # The frame is step 1 alone, whatever the session's switch says
+    render Pages::Register::Embed::Component.new(b_param: @b_param, steps: flow_steps(single_page: false), current_user:,
       header_tags_options: helpers.header_tags_component_options,
       button_color: HexColor.normalize(params[:button]),
       button_hover_color: HexColor.normalize(params[:button_hover])), layout: false
@@ -83,13 +82,13 @@ class RegisterController < ApplicationController
   def create
     # The combined form says so itself - the embed frames step 1 alone whatever the session holds
     single_page = params[:single_page].present?
-    saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
-      propulsion_type_motorized: params[:propulsion_type_motorized], additional: params[:additional],
-      single_page:, separate_attestation: register_setting?(@b_param, "separate_attestation")) &&
+    # The single page writes once, in save_details - which merges the details even after a
+    # failure, so the re-render keeps them, but doesn't write past one
+    saved = BikeServices::Register.public_send(single_page ? :assign_step_1 : :save_step_1, @b_param,
+      bike_params: create_params, propulsion_type_motorized: params[:propulsion_type_motorized],
+      additional: params[:additional], single_page:, separate_attestation: register_setting?(@b_param, "separate_attestation")) &&
       turnstile_verified?(@b_param, @b_param.owner_email)
     if single_page
-      # Even after a failure, so the re-render keeps the details - which save_step_2
-      # doesn't persist past one
       saved = save_details && saved
       # Saving step 1 is what makes the registration an e-vehicle, so the filter's sequence
       # was resolved too early - and this page finishes here rather than on a later request

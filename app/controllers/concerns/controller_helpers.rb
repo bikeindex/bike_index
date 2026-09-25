@@ -195,7 +195,7 @@ module ControllerHelpers
   # registering for them. Step 1 saves them onto the registration; until then the session's
   # apply only to a registration for the organization they were set on
   def register_setting?(b_param, key)
-    b_param.bike.fetch("register_#{key}") do
+    b_param.params.to_h.fetch("register_#{key}") do
       settings = session[:register_settings] || {}
       settings[key].present? && settings["organization_id"].to_s == b_param.creation_organization_id.to_s
     end

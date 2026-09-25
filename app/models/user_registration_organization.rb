@@ -35,7 +35,9 @@ class UserRegistrationOrganization < ApplicationRecord
 
   class << self
     def universal_registration_info_for(user, passed_reg_info = {})
+      # Excepted from what's already stored too, since rows set before the exclusion carry them
       uro_reg_info = user.user_registration_organizations.pluck(:registration_info).reduce({}, :merge)
+        .except(*RegistrationInfoable::REGISTRATION_ONLY_KEYS)
       own_reg_info = user.ownerships.reorder(:updated_at).pluck(:registration_info).reduce({}, :merge)
       merging_own_keys = (own_reg_info.keys - uro_reg_info.keys - RegistrationInfoable::REGISTRATION_ONLY_KEYS)
       location_keys = RegistrationInfoable::LOCATION_KEYS
@@ -87,7 +89,7 @@ class UserRegistrationOrganization < ApplicationRecord
   # Use all the registration info from the bikes
   def set_initial_registration_info
     reg_info_array = bikes.reorder(:updated_at).map(&:registration_info).reject(&:blank?)
-    self.registration_info = reg_info_array.reduce({}, :merge)
+    self.registration_info = reg_info_array.reduce({}, :merge).except(*RegistrationInfoable::REGISTRATION_ONLY_KEYS)
   end
 
   # Because seth wants to have default=false attributes in the database, but can_edit_claimed is easier to think about
