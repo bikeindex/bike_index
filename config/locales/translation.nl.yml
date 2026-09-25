@@ -5705,6 +5705,10 @@ nl:
             search_notes: Zoeknotities
             search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de
               eigenaar.
+            miles_of: mijl van
+            search_distance: Zoek afstand
+            search_location: Zoek locatie
+            within: binnen
           wrapper:
             e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
             view_matching_any_audit: weergave die overeenkomt met elke audit
@@ -5793,6 +5797,13 @@ nl:
             updated_at_cell_panel: Tijd - bijgewerkt
             filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
               beslag genomen</strong>
+            location_search_disabled_no_address: "%{org_name} verzamelt geen registratieadressen,
+              dus alleen gestolen en in beslag genomen kentekens hebben een locatie.
+              Filter op een van deze statussen om te zoeken op locatie."
+            location_search_disabled_search_all: Je kunt niet op locatie zoeken bij
+              het doorzoeken van alle kentekens, tenzij je alleen zoekt naar in beslag
+              genomen en/of gestolen kentekens.
+            show_location_search: toon locatie zoeken
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
