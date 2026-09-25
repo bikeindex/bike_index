@@ -305,12 +305,12 @@ module BikeServices
       create_bike_if_ready(b_param, sequence:, ip_address:)
     end
 
-    # The unfinished registrations a new bike completes: every register flow one of it -
+    # The unfinished registrations a new bike completes: every register flow registration of it -
     # registering it some other way is what they were abandoned for - and the likeliest embed_partial
     def matching_partial_registrations(bike)
       return [] if bike.owner_email.blank?
 
-      register_flow, embed = BParam.partial_registrations.where("email ilike ?", "%#{bike.owner_email}%")
+      register_flow, embed = BParam.partial_registrations.email_search(bike.owner_email)
         .reorder(:created_at).partition(&:register_flow?)
       embed_match = (embed.select { it.manufacturer_id == bike.manufacturer_id }.presence || embed).last
       register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
@@ -433,9 +433,9 @@ module BikeServices
     end
 
     # Its creator, or the owner it's for - staff registering for someone leaves them the
-    # creator. Once the bike exists the token only ever shows the completion page, so anyone
+    # creator. Anyone once the bike exists, since the token then only shows the completion page
     def resumable_by?(b_param, user)
-      b_param.creator_id.blank? || b_param.created_bike_id.present? ||
+      b_param.creator_id.blank? || b_param.with_bike? ||
         b_param.creator_id == user&.id || b_param.self_made?(user)
     end
 
