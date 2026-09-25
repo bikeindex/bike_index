@@ -111,8 +111,9 @@ class OrganizationExportJob < ApplicationJob
     address = export_headers.include?("address") ? b_param.address_record.address_hash_legacy : {}
     export_headers.map do |header|
       case header
-      when "registered_at" then b_param.created_at.utc
-      when "manufacturer", "is_stolen", "is_impounded", "motorized" then value_for_header(header, b_param)
+      when "registered_at", "manufacturer", "is_stolen", "is_impounded", "motorized", "owner_email", "phone",
+        "organization_affiliation", "student_id"
+        value_for_header(header, b_param)
       when "model" then b_param.bike["frame_model"]
       when "serial" then b_param.bike["serial_number"]
       when "extra_registration_number" then b_param.bike["extra_registration_number"]
@@ -121,7 +122,6 @@ class OrganizationExportJob < ApplicationJob
           color_id = b_param.bike[key]
           color_id.present? ? Color.find(color_id).name : nil
         }.compact.join(", ")
-      when "owner_email", "phone", "organization_affiliation", "student_id" then b_param.public_send(header)
       when "owner_name" then b_param.user_name
       when "bike_sticker" then b_param.bike_sticker_code
       when "address" then address["street"]

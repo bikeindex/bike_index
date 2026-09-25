@@ -465,9 +465,7 @@ class BParam < ApplicationRecord
     bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"])
   end
 
-  def embed_partial?
-    origin == "embed_partial"
-  end
+  def embed_partial? = origin == "embed_partial"
 
   # Unsaved - read through the same whitelist that turns these into the created bike's address
   def address_record = AddressRecord.new(self.class.address_record_attributes(bike))

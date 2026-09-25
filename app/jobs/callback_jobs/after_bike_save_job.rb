@@ -62,15 +62,11 @@ module CallbackJobs
       return true unless bike.created_at > Time.current - 5.minutes # skip unless new bike
       return true if bike.owner_email.blank?
 
-      owner_email = EmailNormalizer.normalize(bike.owner_email)
       register_flow, embed = BParam.partial_registrations.where("email ilike ?", "%#{bike.owner_email}%")
         .reorder(:created_at).partition(&:register_flow?)
-      # Every register flow registration of this bike - it being registered is what they were abandoned for
-      register_flow = register_flow.select do |b_param|
-        EmailNormalizer.normalize(b_param.email) == owner_email && BikeServices::Register.matches_bike?(b_param, bike)
-      end
       embed_match = (embed.select { it.manufacturer_id == bike.manufacturer_id }.presence || embed).last
-      matches = register_flow + [embed_match].compact
+      # Every register flow registration of this bike - it being registered is what they were abandoned for
+      matches = register_flow.select { BikeServices::Register.matches_bike?(it, bike) } + [embed_match].compact
       return true if matches.none?
 
       matches.each { it.update(created_bike_id: bike.id) }

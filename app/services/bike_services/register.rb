@@ -21,14 +21,10 @@ module BikeServices
     STOLEN_REPORT_ATTRS = %i[theft_description police_report_number police_report_department
       estimated_value locking_description lock_defeat_description proof_of_ownership
       receive_notifications phone_for_users phone_for_shops phone_for_police].freeze
-    # What a registration can say about its bike past step 1, and the bike column each
-    # is compared on
-    MATCHED_ATTRS = {"serial_number" => "serial_normalized", "frame_model" => "frame_model", "year" => "year",
-                     "frame_size" => "frame_size", "frame_size_number" => "frame_size",
-                     "primary_frame_color_id" => "primary_frame_color_id",
-                     "secondary_frame_color_id" => "secondary_frame_color_id",
-                     "tertiary_frame_color_id" => "tertiary_frame_color_id",
-                     "extra_registration_number" => "extra_registration_number", "status" => "status"}.freeze
+    # What a registration can say about its bike past step 1
+    MATCHED_ATTRS = %w[frame_model year frame_size primary_frame_color_id secondary_frame_color_id
+      tertiary_frame_color_id extra_registration_number status].index_with(&:itself)
+      .merge("serial_number" => "serial_normalized", "frame_size_number" => "frame_size").freeze
 
     # The token's registration when step 1 was never submitted, otherwise a new one.
     # A signed-in user's email prefills owner_email
@@ -313,7 +309,7 @@ module BikeServices
     # what it is, so any bike of that make and type is; whatever came after has to match too
     def matches_bike?(b_param, bike)
       built = BikeServices::Builder.build(b_param).tap(&:set_calculated_unassociated_attributes)
-      attrs = %w[mnfg_name cycle_type] + MATCHED_ATTRS.filter_map { |key, attr| attr if b_param.bike[key].present? }
+      attrs = %w[owner_email mnfg_name cycle_type] + MATCHED_ATTRS.filter_map { |key, attr| attr if b_param.bike[key].present? }
       built.slice(*attrs) == bike.slice(*attrs)
     end
 
