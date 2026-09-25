@@ -61,7 +61,7 @@ module CallbackJobs
     def update_matching_partial_registrations(bike)
       return true unless bike.created_at > Time.current - 5.minutes # skip unless new bike
 
-      matches = BParam.partial_registrations.without_bike.where("email ilike ?", "%#{bike.owner_email}%")
+      matches = BParam.partial_registrations.where("email ilike ?", "%#{bike.owner_email}%")
         .reorder(:created_at)
       if matches.count > 1
         # Try to make it a little more accurate lookup

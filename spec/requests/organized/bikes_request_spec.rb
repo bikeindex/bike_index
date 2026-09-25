@@ -165,7 +165,6 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(current_organization.auto_user).to eq current_user
         expect(current_organization.public_impound_bikes?).to be_falsey
         ActionMailer::Base.deliveries = []
-        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {bike: bike_params.merge(image: test_photo), parking_notification: parking_notification}
@@ -379,6 +378,23 @@ RSpec.describe Organized::BikesController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template :incompletes
       expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
+    end
+    context "register flow" do
+      let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs}, origin: "register_flow_organized") }
+      let!(:shell) { BParam.create(params: {bike: partial_reg_attrs.except(:manufacturer_id)}, origin: "register_flow_organized") }
+      it "renders the submitted one, and resends it a link to the register flow" do
+        get "#{base_url}/incompletes"
+        expect(response.status).to eq(200)
+        expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
+
+        Sidekiq::Testing.inline! do
+          expect { post "#{base_url}/#{partial_registration.id}/resend_incomplete_email" }
+            .to change(Notification, :count).by 1
+        end
+        expect(flash[:success]).to be_present
+        expect(ActionMailer::Base.deliveries.last.html_part.decoded).to include "register?b_param_token=#{partial_registration.id_token}"
+        expect(partial_registration.partial_notification_resends.count).to eq 1
+      end
     end
     context "sortable" do
       let(:motorized_params) { partial_reg_attrs.merge(cycle_type: "tandem", propulsion_type_slug: "pedal-assist") }

@@ -107,17 +107,32 @@ class OrganizationExportJob < ApplicationJob
     export_headers.map { |header| value_for_header(header, bike) }
   end
 
+  # Only the register flow's step 2 fills in the details and the address
   def b_param_to_row(b_param)
+    address = AddressRecord.new(BParam.address_record_attributes(b_param.bike)).address_hash_legacy
     export_headers.map do |header|
       case header
       when "registered_at" then b_param.created_at.utc
-      when "manufacturer" then b_param.manufacturer&.name
+      when "manufacturer" then b_param.mnfg_name
+      when "model" then b_param.bike["frame_model"]
+      when "serial" then b_param.bike["serial_number"]
+      when "extra_registration_number" then b_param.bike["extra_registration_number"]
       when "color"
         %w[primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id].map { |key|
           color_id = b_param.bike[key]
           color_id.present? ? Color.find(color_id).name : nil
         }.compact.join(", ")
       when "owner_email" then b_param.owner_email
+      when "owner_name" then b_param.user_name
+      when "phone" then b_param.phone
+      when "organization_affiliation" then b_param.organization_affiliation
+      when "student_id" then b_param.student_id
+      when "bike_sticker" then b_param.bike_sticker_code
+      when "is_stolen" then b_param.status_stolen? ? "true" : nil
+      when "is_impounded" then b_param.status_impounded? ? "true" : nil
+      when "address" then address["street"]
+      when "address_2" then address["street_2"]
+      when "city", "state", "zipcode" then address[header]
       when "vehicle_type" then CycleType.slug_translation_short(b_param.cycle_type)
       when "motorized" then b_param.motorized?
       when "partial_registration" then true

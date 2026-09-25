@@ -238,6 +238,19 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
       expect(bike.organizations.pluck(:id)).to eq([organization.id])
       expect(bike.send(:editable_organization_ids)).to eq([organization.id])
     end
+    context "register flow partial registration" do
+      let!(:partial_registration) do
+        FactoryBot.create(:b_param, creator: nil, origin: "register_flow_organized",
+          params: {bike: {manufacturer_id: Manufacturer.other.id, owner_email: "stuff@things.COM", creation_organization_id: organization.id}})
+      end
+      it "assigns the partial registration" do
+        expect(BParam.partial_registrations.pluck(:id)).to eq([partial_registration.id])
+        instance.perform(bike.id)
+        expect(partial_registration.reload.created_bike).to eq bike
+        expect(bike.reload.current_ownership.organization_id).to eq organization.id
+        expect(bike.current_ownership.origin).to eq "register_flow_organized"
+      end
+    end
     context "bike already has organization" do
       let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: user, organization: FactoryBot.create(:organization)) }
       it "does not assign" do

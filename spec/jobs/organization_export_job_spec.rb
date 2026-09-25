@@ -564,6 +564,29 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(export.exported_bike_ids).to eq([bike.id])
           end
         end
+        context "register flow partial registration, past step 2" do
+          let(:state) { FactoryBot.create(:state_california) }
+          let(:step_2_attrs) do
+            {frame_model: "Big Dummy", serial_number: "XXX-1234", user_name: "Sally Owner", phone: "7177423423",
+             extra_registration_number: "extra-1", organization_affiliation: "student", student_id: "S1234",
+             status: "status_stolen", address_record_attributes: {street: "1 Shields Ave", city: "Davis",
+                                                                  region_record_id: state.id, postal_code: "95616", country_id: Country.united_states.id}}
+          end
+          let!(:partial_registration) do
+            BParam.create(params: {bike: partial_reg_attrs.merge(step_2_attrs)}, origin: "register_flow_organized")
+          end
+          it "exports the step 2 details" do
+            expect(export.incompletes_scoped.pluck(:id)).to eq([partial_registration.id])
+            instance.perform(export.id)
+            export.reload
+            line_hash = csv_line_to_hash(export.file.read.force_encoding("UTF-8").split("\n").last, headers: export.written_headers)
+            expect(line_hash).to match_hash_indifferently(target_partial_row.merge(
+              model: "Big Dummy", serial: "XXX-1234", owner_name: "Sally Owner", phone: "7177423423",
+              extra_registration_number: "extra-1", organization_affiliation: "student", student_id: "S1234",
+              is_stolen: "true", address: "1 Shields Ave", city: "Davis", state: "CA", zipcode: "95616"
+            ))
+          end
+        end
       end
 
       context "impounded" do

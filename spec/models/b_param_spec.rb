@@ -25,6 +25,19 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "partial_registrations" do
+    let!(:embed_partial) { FactoryBot.create(:b_param_partial_registration) }
+    let!(:embed_partial_with_bike) { FactoryBot.create(:b_param_partial_registration, created_bike_id: 12) }
+    let!(:step_1_submitted) { FactoryBot.create(:b_param_unfinished_registration, origin: "register_flow_organized") }
+    let!(:step_1_with_bike) { FactoryBot.create(:b_param_unfinished_registration, created_bike_id: 12) }
+    let!(:register_flow_shell) { FactoryBot.create(:b_param, origin: "register_flow") }
+    let!(:web) { FactoryBot.create(:b_param_unfinished_registration, origin: "web") }
+    it "is embed_partial and submitted register flow, without a bike" do
+      expect(BParam.partial_registrations.pluck(:id)).to match_array([embed_partial.id, step_1_submitted.id])
+      expect(step_1_submitted.partial_registration?).to be_falsey
+    end
+  end
+
   describe "bike" do
     it "returns the bike attribs" do
       b_param = BParam.new(params: {bike: {serial_number: "XXX"}})
@@ -702,6 +715,13 @@ RSpec.describe BParam, type: :model do
       let(:created_at) { Time.at(1690590595) } # 2023-07-28 19:29:55
       it "includes initial notification" do
         expect(b_param.partial_notification_pre_tracking?).to be_truthy
+        expect(b_param.partial_notifications.count).to eq 1
+        expect(b_param.partial_notification_resends.count).to eq 1
+      end
+    end
+    context "register flow" do
+      let(:b_param) { FactoryBot.create(:b_param_unfinished_registration) }
+      it "includes the first notification" do
         expect(b_param.partial_notifications.count).to eq 1
         expect(b_param.partial_notification_resends.count).to eq 1
       end

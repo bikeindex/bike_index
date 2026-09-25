@@ -96,7 +96,9 @@ class BParam < ApplicationRecord
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
-  scope :partial_registrations, -> { where(origin: "embed_partial") }
+  # register flow ones count once step 1 is submitted (manufacturer is required there)
+  scope :step_1_submitted, -> { where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL") }
+  scope :partial_registrations, -> { where(origin: "embed_partial").or(step_1_submitted).without_bike }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   # register/new shells whose step 1 was never submitted (manufacturer is required
@@ -107,10 +109,7 @@ class BParam < ApplicationRecord
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
   # Step 1 submitted, no bike yet, and the token still resumes it
-  scope :unfinished_registrations, -> {
-    unexpired.without_bike.where(origin: Ownership::ORIGIN_REG_FLOW)
-      .where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL")
-  }
+  scope :unfinished_registrations, -> { unexpired.without_bike.step_1_submitted }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -746,8 +745,9 @@ class BParam < ApplicationRecord
     (created_at || Time.current) < EmailJobs::PartialRegistrationJob::NOTIFICATION_STARTED
   end
 
+  # The register flow sends no partial_registration email of its own, so every one is a resend
   def partial_notification_resends
-    return partial_notifications if partial_notification_pre_tracking?
+    return partial_notifications if partial_notification_pre_tracking? || register_flow?
 
     partial_notifications.offset(1)
   end
