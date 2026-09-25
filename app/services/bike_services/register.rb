@@ -37,7 +37,7 @@ module BikeServices
       BParam.create(origin:, creator_id: user&.id, params: {bike: bike_params}.as_json)
     end
 
-    # Resume a registration by token: anonymous or created by the passed user
+    # Resume a registration by token: anonymous, or the passed user's
     def find_token(user:, params_token: nil, session_token: nil)
       token = params_token.presence || session_token.presence
       return if token.blank?
@@ -45,7 +45,7 @@ module BikeServices
       BParam.unexpired_with_token(token).detect { resumable_by?(it, user) }
     end
 
-    # A registration only its creator can resume, so a signed-out visitor holding its
+    # A registration someone signed in started, so a signed-out visitor holding its
     # link (an organization's resend) signs in rather than starting over
     def sign_in_to_resume?(params_token, user:)
       user.blank? && params_token.present? &&
@@ -432,10 +432,11 @@ module BikeServices
        "address_record_attributes" => attrs["address_record_attributes"]}.compact
     end
 
-    # Once the bike exists the token only ever shows the completion page, so
-    # access doesn't require matching the creator assigned at creation
+    # Its creator, or the owner it's for - staff registering for someone leaves them the
+    # creator. Once the bike exists the token only ever shows the completion page, so anyone
     def resumable_by?(b_param, user)
-      b_param.creator_id.blank? || b_param.creator_id == user&.id || b_param.created_bike_id.present?
+      b_param.creator_id.blank? || b_param.created_bike_id.present? ||
+        b_param.creator_id == user&.id || b_param.self_made?(user)
     end
 
     # manufacturer_id is the submitted-step-1 marker. Matching origin, so arriving from an
