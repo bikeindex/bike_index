@@ -67,18 +67,40 @@
       </div>
     </div>
 
-    <% if notes_search? %>
-      <label
-        class="
-          tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2
-          tw:border-t tw:border-gray-200 tw:pt-3 tw:dark:border-gray-700
-        "
-      >
-        <%= check_box_tag :show_notes_search, "1", false,
-        data: {action: "change->org--search#toggleNotesSearch", "org--search-target": "notesCheckbox"} %>
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-2 tw:border-t tw:border-gray-200 tw:pt-3
+        tw:dark:border-gray-700
+      "
+    >
+      <% if notes_search? %>
+        <label class="tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2">
+          <%= check_box_tag :show_notes_search, "1", false, data: {field: "notes",
+            action: "change->org--search#toggleOptionalField", "org--search-target": "optionalFieldCheckbox"} %>
 
-        <%= notes_search_label %>
-      </label>
-    <% end %>
+          <%= notes_search_label %>
+        </label>
+      <% end %>
+
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <label
+          class="
+            tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2
+            tw:has-disabled:cursor-not-allowed tw:has-disabled:opacity-50
+          "
+        >
+          <%= check_box_tag :show_location_search, "1", false, disabled: location_search_disabled?,
+            data: {field: "location", reg_address: organization.enabled?("reg_address"),
+              locationable_statuses: BikeServices::OrganizedSearch::LOCATIONABLE_STATUSES,
+              action: "change->org--search#toggleOptionalField", "org--search-target": "optionalFieldCheckbox"} %>
+
+          <%= location_search_label %>
+        </label>
+
+        <%= tag.span(render(UI::Tooltip::Component.new(text: location_search_disabled_hint)),
+          class: "tw:leading-none", hidden: !location_search_disabled?,
+          data: {"org--search-target": "locationSearchHint"}) %>
+      </div>
+    </div>
   </div>
 </div>
