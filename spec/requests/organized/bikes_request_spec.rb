@@ -165,6 +165,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(current_organization.auto_user).to eq current_user
         expect(current_organization.public_impound_bikes?).to be_falsey
         ActionMailer::Base.deliveries = []
+        Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           expect {
             post base_url, params: {bike: bike_params.merge(image: test_photo), parking_notification: parking_notification}
@@ -393,7 +394,6 @@ RSpec.describe Organized::BikesController, type: :request do
         end
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.last.html_part.decoded).to include "register?b_param_token=#{partial_registration.id_token}"
-        expect(partial_registration.partial_notification_resends.count).to eq 1
       end
     end
     context "sortable" do

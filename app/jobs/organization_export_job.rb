@@ -107,9 +107,8 @@ class OrganizationExportJob < ApplicationJob
     export_headers.map { |header| value_for_header(header, bike) }
   end
 
-  # Only the register flow's step 2 fills in the details and the address
   def b_param_to_row(b_param)
-    address = AddressRecord.new(BParam.address_record_attributes(b_param.bike)).address_hash_legacy
+    address = export_headers.include?("address") ? b_param.address_record.address_hash_legacy : {}
     export_headers.map do |header|
       case header
       when "registered_at" then b_param.created_at.utc
@@ -122,11 +121,8 @@ class OrganizationExportJob < ApplicationJob
           color_id = b_param.bike[key]
           color_id.present? ? Color.find(color_id).name : nil
         }.compact.join(", ")
-      when "owner_email" then b_param.owner_email
+      when "owner_email", "phone", "organization_affiliation", "student_id" then b_param.public_send(header)
       when "owner_name" then b_param.user_name
-      when "phone" then b_param.phone
-      when "organization_affiliation" then b_param.organization_affiliation
-      when "student_id" then b_param.student_id
       when "bike_sticker" then b_param.bike_sticker_code
       when "is_stolen" then b_param.status_stolen? ? "true" : nil
       when "is_impounded" then b_param.status_impounded? ? "true" : nil

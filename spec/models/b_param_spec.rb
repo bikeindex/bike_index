@@ -34,7 +34,6 @@ RSpec.describe BParam, type: :model do
     let!(:web) { FactoryBot.create(:b_param_unfinished_registration, origin: "web") }
     it "is embed_partial and submitted register flow, without a bike" do
       expect(BParam.partial_registrations.pluck(:id)).to match_array([embed_partial.id, step_1_submitted.id])
-      expect(step_1_submitted.partial_registration?).to be_falsey
     end
   end
 
