@@ -75,14 +75,14 @@ RSpec.describe Pages::SearchResults::BikeCard::Component, type: :component do
     end
   end
 
-  context "without an organization" do
+  context "with a public listing" do
     let(:organization) { nil }
     let(:seller) { FactoryBot.create(:user_confirmed) }
     let(:listing) { FactoryBot.create(:marketplace_listing, :for_sale, seller:, amount_cents: 420_00) }
     let(:bike) { listing.item.reload }
 
     it "links to the public bike page, with the price and the listing's location" do
-      expect(component).to have_link(href: bike.html_url)
+      expect(component).to have_link(href: "/bikes/#{bike.id}")
       expect(component).to have_text("420")
       expect(component).to have_text("For Sale ·")
       expect(component).to have_text(listing.address_record.city)
@@ -92,8 +92,7 @@ RSpec.describe Pages::SearchResults::BikeCard::Component, type: :component do
     # search_all is the org badge's, so it has nothing to say without an organization
     context "with a member's listing, and search_all passed" do
       let(:search_all) { true }
-      let(:membership) { FactoryBot.create(:membership) }
-      let(:seller) { membership.user }
+      let(:seller) { FactoryBot.create(:membership).user }
 
       it "badges the listing as a member's" do
         expect(listing.reload.seller_member).to be true

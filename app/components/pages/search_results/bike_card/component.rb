@@ -3,10 +3,9 @@
 module Pages
   module SearchResults
     module BikeCard
-      # One vehicle in a search's cards view: the photo carrying its price and status, then
-      # title, colors, vehicle type, location and serial. Per the Bike Thumbnails design doc
-      # (1c). An organization links each card to its org page, and search_all adds whether
-      # the bike is registered with it; without one the card is the public marketplace's.
+      # One vehicle in a search's cards view, per the Bike Thumbnails design doc (1c).
+      # An organization makes it that org's search - links reach its org pages, and
+      # search_all badges whether the bike is registered with it. Without one it's public.
       class Component < ApplicationComponent
         include BikeHelper
 
@@ -17,26 +16,20 @@ module Pages
           @bike = bike
           @organization = organization
           @current_user = current_user
-          # The badge vouches for a registration, so it's the credibility feature's - and
-          # an organization's alone, never the public marketplace's
+          # The badge vouches for a registration, so it's the credibility feature's
           @render_org_badge = search_all && @organization.present? &&
             @organization.enabled?("credibility_badges")
         end
 
         private
 
-        # Like the table's rows, not per viewer. The listing because a price change doesn't
-        # touch the bike, and the badge because enabling the feature doesn't touch the
-        # organization's cards either
+        # Like the table's rows, not per viewer. The listing and the badge flag are in the
+        # key because neither a price change nor enabling the feature touches the bike
         def cache_key
           [self.class.cache_digest, @organization&.id, @render_org_badge, @bike, for_sale_listing]
         end
 
-        def bike_href
-          return @bike.html_url if @organization.blank?
-
-          bike_path(@bike, organization_id: @organization.to_param)
-        end
+        def bike_href = bike_path(@bike, organization_id: @organization&.to_param)
 
         # The org pages are Turbo's; the public bike page isn't, so it takes a full load
         def bike_link_data
@@ -56,21 +49,17 @@ module Pages
           @bike.occurred_at || for_sale_listing&.published_at || @bike.created_at
         end
 
-        def colors
-          @colors ||= [@bike.primary_frame_color, @bike.secondary_frame_color, @bike.tertiary_frame_color].compact
-        end
-
         # Member listings sort ahead of the rest on the marketplace, so the badge says why
-        def render_member_badge?
-          for_sale_listing&.seller_member? || false
+        def render_member_badge? = for_sale_listing&.seller_member?
+
+        def location
+          @location ||= location_record&.formatted_address_string
         end
 
         # A bike's own address is its owner's registration address, which only an
-        # organization's search may show - publicly a result is placed by its listing
-        # or theft report alone
-        def location
-          @location ||= (@bike.current_event_record || (@bike if @organization.present?))
-            &.formatted_address_string
+        # organization's search may show
+        def location_record
+          @bike.current_event_record || (@bike if @organization.present?)
         end
 
         # Lazily, so a cached card doesn't query it

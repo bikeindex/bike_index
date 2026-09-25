@@ -188,8 +188,8 @@ RSpec.describe Search::MarketplaceController, type: :request do
           expect(response).to render_template(:index)
           expect(assigns(:interpreted_params)).to eq(stolenness: "all")
           expect(assigns(:bikes).pluck(:id)).to eq([item.id])
-          # Expect there to be a link to the bike url
-          expect(response.body).to match(/href="#{ENV["BASE_URL"]}\/bikes\/#{item.id}"/)
+          # Expect there to be a link to the bike
+          expect(response.body).to match(/href="\/bikes\/#{item.id}"/)
 
           expect(marketplace_listing_nyc).to be_present
           get "#{base_url}?price_max_amount=500", as: :turbo_stream

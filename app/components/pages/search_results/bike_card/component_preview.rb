@@ -17,8 +17,11 @@ module Pages
         # BikeListItem's preview renders the same bikes
         def component_class = Component
 
+        # The org badge needs the feature, so the stand-in carries it - otherwise the
+        # search_all toggle is a control that renders nothing
         def organization
-          lookbook_organization || Organization.new(name: "Brakebills University", short_name: "Brakebills")
+          lookbook_organization || Organization.new(name: "Brakebills University",
+            short_name: "Brakebills", enabled_feature_slugs: ["credibility_badges"])
         end
 
         def vehicle_types

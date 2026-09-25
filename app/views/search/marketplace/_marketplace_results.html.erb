@@ -5,12 +5,8 @@
 <% end %>
 
 <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
-  <%# Each result caches itself, keyed on its listing as well as the bike - a price change doesn't touch the bike %>
-  <%= render(Pages::SearchResults::Container::Component.new(result_view: @result_view, no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) do |container| %>
-    <% @bikes.each do |bike| %>
-      <%= render(container.component_class.new(bike:)) %>
-    <% end %>
-  <% end %>
+  <%= render(Pages::SearchResults::Container::Component.new(result_view: @result_view, bikes: @bikes,
+    no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) %>
 </div>
 
 <%#

@@ -27,14 +27,14 @@ RSpec.describe Pages::SearchResults::BikeListItem::Component, type: :component d
     end
   end
 
-  context "without an organization" do
+  context "with a public listing" do
     let(:organization) { nil }
     let(:listing) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 420_00) }
     let(:bike) { listing.item.reload }
 
     it "links to the public bike page, edged in the for-sale color" do
       expect(component).to have_css("li.tw\\:border-l-purple-500")
-      expect(component).to have_link(href: bike.html_url)
+      expect(component).to have_link(href: "/bikes/#{bike.id}")
       expect(component).to have_text("420")
       expect(component).not_to have_text("Registered with")
     end

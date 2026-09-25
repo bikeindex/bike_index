@@ -51,7 +51,7 @@
         <% end %>
       </h3>
 
-      <% if colors.any? %>
+      <% if @bike.frame_color_records.any? %>
         <div
           class="
             tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-sm
@@ -59,12 +59,12 @@
           "
         >
           <span class="tw:flex tw:gap-0.5">
-            <% colors.each do |color| %>
+            <% @bike.frame_color_records.each do |color| %>
               <%= render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm)) %>
             <% end %>
           </span>
 
-          <%= colors.map(&:name).join(" / ") %>
+          <%= @bike.frame_colors.join(" / ") %>
         </div>
       <% end %>
 
@@ -77,7 +77,7 @@
         <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: @bike.motorized? ? :purple : :gray)) %>
 
         <% if render_member_badge? %>
-          <%= render(UI::Badge::Component.new(text: translation(".member"), color: :purple)) %>
+          <%= render(UI::Badge::Component.new(text: translation(".member_listing"), title: translation(".member_listing_tooltip"), color: :purple)) %>
         <% end %>
       </div>
 
