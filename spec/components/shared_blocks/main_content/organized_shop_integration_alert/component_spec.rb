@@ -11,13 +11,24 @@ RSpec.describe SharedBlocks::MainContent::OrganizedShopIntegrationAlert::Compone
   let(:options) { {current_organization: organization, controller_name:, action_name:} }
   let(:component) { render_inline(described_class.new(**options)) }
 
-  it "renders the three-card callout with every link" do
+  it "renders the four-card callout with every link" do
     expect(component.text).to include "Register bikes automatically from your point of sale"
     expect(component).to have_link "Integrate Bike Index with Lightspeed", href: lightspeed_interface_path
     expect(component).to have_link "How the integration works", href: lightspeed_path
     expect(component).to have_link "Integrate Bike Index with Ascend", href: ascend_path
+    expect(component).to have_link "Integrate Bike Index with Shopify",
+      href: new_shopify_integration_path(organization_id: organization.to_param)
     expect(component).to have_link "Add a bike",
       href: new_organization_bike_path(organization_id: organization.to_param)
+  end
+
+  # A shop whose integration has broken is exactly who the callout is for
+  context "when a POS integration is broken" do
+    let(:organization) { FactoryBot.create(:organization, kind: "bike_shop", pos_kind: "broken_shopify_pos") }
+
+    it "still renders the callout" do
+      expect(component.text).to include "Register bikes automatically from your point of sale"
+    end
   end
 
   context "when the organization doesn't qualify" do
