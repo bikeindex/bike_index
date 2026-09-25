@@ -305,6 +305,21 @@ module BikeServices
       create_bike_if_ready(b_param, sequence:, ip_address:)
     end
 
+    # The unfinished registrations a new bike completes: every register flow one of it -
+    # registering it some other way is what they were abandoned for - and the likeliest embed_partial
+    def matching_partial_registrations(bike)
+      return [] if bike.owner_email.blank?
+
+      register_flow, embed = BParam.partial_registrations.where("email ilike ?", "%#{bike.owner_email}%")
+        .reorder(:created_at).partition(&:register_flow?)
+      embed_match = (embed.select { it.manufacturer_id == bike.manufacturer_id }.presence || embed).last
+      register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
+    end
+
+    #
+    # private below here
+    #
+
     # Whether a bike registered some other way is this registration's. Step 1 says only
     # what it is, so any bike of that make and type is; whatever came after has to match too
     def matches_bike?(b_param, bike)
@@ -312,10 +327,6 @@ module BikeServices
       attrs = %w[owner_email mnfg_name cycle_type] + MATCHED_ATTRS.filter_map { |key, attr| attr if b_param.bike[key].present? }
       built.slice(*attrs) == bike.slice(*attrs)
     end
-
-    #
-    # private below here
-    #
 
     # The one the registrant belongs to, or failing that the one their other bikes are
     # registered with. Two of either says nothing about this bike, so it stays unattributed
@@ -523,7 +534,7 @@ module BikeServices
       additional.present? ? bike_params.to_h.merge("likely_spam" => true) : bike_params.to_h
     end
 
-    conceal :auto_organization, :assign_auto_organization, :set_auto_organization,
+    conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
       :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
