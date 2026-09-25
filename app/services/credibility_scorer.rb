@@ -153,7 +153,8 @@ class CredibilityScorer
     return false unless organization.present?
     return true if organization.is_invoiced?
 
-    %w[other_pos lightspeed_pos ascend_pos does_not_need_pos].include?(organization.manual_pos_kind)
+    organization.manual_pos_kind.present? &&
+      !Organization.broken_pos_kinds.include?(organization.manual_pos_kind)
   end
 
   #

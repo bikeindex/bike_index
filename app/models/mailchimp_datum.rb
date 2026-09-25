@@ -27,8 +27,9 @@ class MailchimpDatum < ApplicationRecord
     archived: 5 # Not a mailchimp status, but tracking it as well
   }.freeze
 
-  MANAGED_TAGS = %w[ascend in_bike_index lightspeed member not_org_creator paid paid_previously
-    pos_approved].freeze
+  # The pos tags are what calculated_tags derives from pos_kind, so they follow the enum
+  MANAGED_TAGS = (%w[in_bike_index member not_org_creator paid paid_previously pos_approved] +
+    Organization.pos_kinds.map { it.delete_suffix("_pos") }).freeze
 
   enum :status, STATUS_ENUM
 

@@ -424,7 +424,10 @@ class BParam < ApplicationRecord
     BulkImport.find_by_id(params["bulk_import_id"])
   end
 
+  # Derived, never posted: api_v1's permitted params are unfiltered, so a pos_kind read off
+  # the bike hash would let any authorized organization claim another POS on its registrations
   def pos_kind
+    return "shopify_pos" if origin == "shopify_webhook"
     return "lightspeed_pos" if is_pos
 
     bulk_import&.ascend? ? "ascend_pos" : "no_pos"

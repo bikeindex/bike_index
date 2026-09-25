@@ -12,6 +12,7 @@ en:
           how_integration_works: How the integration works
           integrate_bike_index_with_ascend: Integrate Bike Index with Ascend
           integrate_bike_index_with_lightspeed: Integrate Bike Index with Lightspeed
+          integrate_bike_index_with_shopify: Integrate Bike Index with Shopify
           integration_card_body: Automatically register the bikes you sell to your
             customers.
           lightspeed_card_title: Lightspeed Retail POS
@@ -22,3 +23,6 @@ en:
             Connect your POS and every bike you sell is registered to your customer
             on Bike Index.
           pos_callout_title: Register bikes automatically from your point of sale
+          shopify_card_body: Write the serial into the sale and the bike is registered
+            to whoever bought it.
+          shopify_card_title: Shopify

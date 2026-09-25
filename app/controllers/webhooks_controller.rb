@@ -43,7 +43,31 @@ class WebhooksController < ApplicationController
     end
   end
 
+  # Shopify retries anything that isn't a 2xx and uninstalls an app that keeps failing, so
+  # nothing but signature verification happens before the 200
+  def shopify
+    raw_body = request.body.read
+    unless Integrations::Shopify::Client.verified_webhook?(raw_body, request.headers["X-Shopify-Hmac-Sha256"])
+      head(:unauthorized) && return
+    end
+
+    shopify_integration = ShopifyIntegration.friendly_find(request.headers["X-Shopify-Shop-Domain"])
+    if shopify_integration.present?
+      shopify_handle(shopify_integration, request.headers["X-Shopify-Topic"], raw_body)
+    end
+    head :ok
+  end
+
   private
+
+  def shopify_handle(shopify_integration, topic, raw_body)
+    case topic
+    when "orders/create", "orders/updated"
+      ShopifyJobs::ProcessOrderJob.perform_async(shopify_integration.id, raw_body)
+    when "app/uninstalled"
+      shopify_integration.destroy
+    end
+  end
 
   def strava_verify_subscription
     if Binxtils::Secure.compare?(params["hub.verify_token"], STRAVA_WEBHOOK_VERIFY_TOKEN)

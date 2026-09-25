@@ -93,6 +93,7 @@ Rails.application.routes.draw do
       post :stripe
       get :strava
       post :strava
+      post :shopify
     end
   end
 
@@ -150,6 +151,11 @@ Rails.application.routes.draw do
   resource :strava_integration, only: [:new, :destroy] do
     get :callback, on: :member
     get :sync_status, on: :member
+  end
+  # Shopify integration - the callback URL is allowlisted in the Shopify app config, so it
+  # can't be scoped to the organization; the OAuth state carries that
+  resource :shopify_integration, only: %i[new create destroy] do
+    get :callback, on: :member
   end
   # Legacy - there are places where user_home existed in emails, etc, so keep this
   get "user_home", to: redirect("/my_account")

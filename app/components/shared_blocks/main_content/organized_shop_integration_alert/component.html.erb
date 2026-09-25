@@ -150,6 +150,52 @@
     <div
       class="
         tw:flex tw:flex-col tw:gap-[5px] tw:rounded-lg tw:border
+        tw:border-gray-200 tw:bg-white tw:p-3 tw:hover:border-purple-200
+        tw:dark:border-gray-700 tw:dark:bg-gray-800
+        tw:dark:hover:border-purple-800
+      "
+    >
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <span
+          class="
+            tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center
+            tw:rounded-md tw:bg-purple-50 tw:text-[10.5px] tw:font-bold
+            tw:text-purple-800 tw:dark:bg-purple-950 tw:dark:text-purple-400
+          "
+        >
+          S
+        </span>
+
+        <h3
+          class="
+            tw:m-0 tw:text-[13.5px] tw:font-bold tw:text-gray-900
+            tw:dark:text-gray-100
+          "
+        >
+          <%= translation(".shopify_card_title") %>
+        </h3>
+      </div>
+
+      <p
+        class="
+          tw:m-0 tw:text-[12.5px] tw:leading-[1.45] tw:text-gray-600
+          tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".shopify_card_body") %>
+      </p>
+
+      <div class="tw:mt-auto tw:flex tw:flex-col tw:items-start tw:gap-1.5 tw:pt-2">
+        <%= link_to new_shopify_integration_path(organization_id: @current_organization.to_param), class: "tw:text-[13px] tw:font-semibold tw:text-purple-600 tw:dark:text-purple-400 tw:no-underline tw:hover:underline" do %>
+          <%= translation(".integrate_bike_index_with_shopify") %>
+          <span aria-hidden="true">&rarr;</span>
+        <% end %>
+      </div>
+    </div>
+
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-[5px] tw:rounded-lg tw:border
         tw:border-dashed tw:border-gray-200 tw:bg-gray-50 tw:p-3
         tw:dark:border-gray-700 tw:dark:bg-gray-900
       "

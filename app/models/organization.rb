@@ -80,7 +80,9 @@ class Organization < ApplicationRecord
     ascend_pos: 3,
     does_not_need_pos: 5,
     broken_lightspeed_pos: 4,
-    broken_ascend_pos: 6
+    broken_ascend_pos: 6,
+    shopify_pos: 7,
+    broken_shopify_pos: 8
   }.freeze
 
   acts_as_paranoid
@@ -130,6 +132,7 @@ class Organization < ApplicationRecord
   has_one :organization_landing_page
   has_one :impound_configuration
   has_one :organization_saml_configuration
+  has_one :shopify_integration
   has_many :hot_sheets
   has_many :organization_model_audits
   accepts_nested_attributes_for :mail_snippets
@@ -188,7 +191,7 @@ class Organization < ApplicationRecord
     end
 
     def broken_pos_kinds
-      %w[broken_ascend_pos broken_lightspeed_pos].freeze
+      pos_kinds.select { it.start_with?("broken_") }
     end
 
     def without_pos_kinds

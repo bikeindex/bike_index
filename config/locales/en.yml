@@ -761,6 +761,7 @@ en:
           ascend_pos: ascend
           broken_ascend_pos: ascend (broken)
           broken_lightspeed_pos: lightspeed (broken)
+          broken_shopify_pos: shopify (broken)
           bulk_import: bulk import
           bulk_import_worker: bulk import worker
           creator_unregistered_parking_notification: unregistered parking notification
@@ -775,6 +776,8 @@ en:
           register_flow: new flow
           register_flow_landing_page: landing page
           register_flow_organized: new flow organized
+          shopify_pos: shopify
+          shopify_webhook: shopify webhook
           sticker: sticker
           transferred_ownership: transferred ownership
           web: web
@@ -790,6 +793,9 @@ en:
           broken_lightspeed_pos: >-
             automatically registered by bike shop point of sale (Lightspeed POS),
             whose integration is marked broken
+          broken_shopify_pos: >-
+            automatically registered by bike shop point of sale (Shopify), whose integration
+            is marked broken
           bulk_import: registered by spreadsheet import
           bulk_import_worker: registered by spreadsheet import
           creator_unregistered_parking_notification: registered via the Unregistered
@@ -811,6 +817,8 @@ en:
             registration flow
           register_flow_organized: registered by an organization member, in the multi-step
             registration flow
+          shopify_pos: automatically registered by bike shop point of sale (Shopify)
+          shopify_webhook: registered from a Shopify sale
           sticker: registration began from a sticker
           transferred_ownership: transferred to a new owner
           web: registered with self registration process
