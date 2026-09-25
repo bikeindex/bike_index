@@ -21,6 +21,10 @@ module BikeServices
     STOLEN_REPORT_ATTRS = %i[theft_description police_report_number police_report_department
       estimated_value locking_description lock_defeat_description proof_of_ownership
       receive_notifications phone_for_users phone_for_shops phone_for_police].freeze
+    # What a registration can say about its bike past step 1
+    MATCHED_ATTRS = %w[frame_model year frame_size primary_frame_color_id secondary_frame_color_id
+      tertiary_frame_color_id extra_registration_number status].index_with(&:itself)
+      .merge("serial_number" => "serial_normalized", "frame_size_number" => "frame_size").freeze
 
     # The token's registration when step 1 was never submitted, otherwise a new one.
     # A signed-in user's email prefills owner_email
@@ -33,15 +37,19 @@ module BikeServices
       BParam.create(origin:, creator_id: user&.id, params: {bike: bike_params}.as_json)
     end
 
-    # Resume a registration by token: anonymous or created by the passed user
+    # Resume a registration by token: anonymous, or the passed user's
     def find_token(user:, params_token: nil, session_token: nil)
       token = params_token.presence || session_token.presence
       return if token.blank?
 
-      # Once the bike exists the token only ever shows the completion page, so
-      # access doesn't require matching the creator assigned at creation
-      BParam.unexpired_with_token(token)
-        .detect { |b| b.creator_id.blank? || b.creator_id == user&.id || b.created_bike_id.present? }
+      BParam.unexpired_with_token(token).detect { resumable_by?(it, user) }
+    end
+
+    # A registration someone signed in started, so a signed-out visitor holding its
+    # link (an organization's resend) signs in rather than starting over
+    def sign_in_to_resume?(params_token, user:)
+      user.blank? && params_token.present? &&
+        BParam.unexpired_with_token(params_token).any? { !resumable_by?(it, nil) }
     end
 
     # The start over link. Destroyed rather than left behind: its token would still resume
@@ -297,9 +305,28 @@ module BikeServices
       create_bike_if_ready(b_param, sequence:, ip_address:)
     end
 
+    # The unfinished registrations a new bike completes: every register flow registration of it -
+    # registering it some other way is what they were abandoned for - and the likeliest embed_partial
+    def matching_partial_registrations(bike)
+      return [] if bike.owner_email.blank?
+
+      register_flow, embed = BParam.partial_registrations.email_search(bike.owner_email)
+        .reorder(:created_at).partition(&:register_flow?)
+      embed_match = (embed.select { it.manufacturer_id == bike.manufacturer_id }.presence || embed).last
+      register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
+    end
+
     #
     # private below here
     #
+
+    # Whether a bike registered some other way is this registration's. Step 1 says only
+    # what it is, so any bike of that make and type is; whatever came after has to match too
+    def matches_bike?(b_param, bike)
+      built = BikeServices::Builder.build(b_param).tap(&:set_calculated_unassociated_attributes)
+      attrs = %w[owner_email mnfg_name cycle_type] + MATCHED_ATTRS.filter_map { |key, attr| attr if b_param.bike[key].present? }
+      built.slice(*attrs) == bike.slice(*attrs)
+    end
 
     # The one the registrant belongs to, or failing that the one their other bikes are
     # registered with. Two of either says nothing about this bike, so it stays unattributed
@@ -405,6 +432,13 @@ module BikeServices
        "address_record_attributes" => attrs["address_record_attributes"]}.compact
     end
 
+    # Its creator, or the owner it's for - staff registering for someone leaves them the
+    # creator. Anyone once the bike exists, since the token then only shows the completion page
+    def resumable_by?(b_param, user)
+      b_param.creator_id.blank? || b_param.with_bike? ||
+        b_param.creator_id == user&.id || b_param.self_made?(user)
+    end
+
     # manufacturer_id is the submitted-step-1 marker. Matching origin, so arriving from an
     # organization's page doesn't take over a shell started on /register and register the
     # bike as though it came in there
@@ -501,10 +535,10 @@ module BikeServices
       additional.present? ? bike_params.to_h.merge("likely_spam" => true) : bike_params.to_h
     end
 
-    conceal :auto_organization, :assign_auto_organization, :set_auto_organization,
+    conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
       :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
-      :impound_report_attrs, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
+      :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
       :step_2_params, :translation, :honeypot_spam
   end
