@@ -32,9 +32,8 @@ module BikeServices
       LOCATIONABLE_STATUSES.include?(search_status) || registration_address_searchable?(organization:, search_all:)
     end
 
-    # Ignored where it isn't searchable, as the disabled field is. A stolen bike is where it
-    # was stolen, an impounded one where it was impounded from - only an organization's own,
-    # address-collecting search reaches registration addresses
+    # Ignored where it isn't searchable, as the disabled field is. Only a stolen bike's own
+    # coordinates are safe to search - any other's can be its owner's or its organization's
     def location(bikes, location, distance, organization:, search_all: false, search_status: nil, ip_address: nil)
       return bikes if location.blank? || location.match?(/anywhere/i) ||
         !location_searchable?(organization:, search_all:, search_status:)
@@ -43,15 +42,19 @@ module BikeServices
       return bikes.none if proximity.nil?
 
       bounding_box = proximity[:bounding_box]
-      located = bikes.status_stolen.within_bounding_box(bounding_box)
-        .or(bikes.where(current_impound_record_id: ImpoundRecord.within_bounding_box(bounding_box).select(:id)))
-      return located unless registration_address_searchable?(organization:, search_all:)
-
-      sw_lat, sw_lng, ne_lat, ne_lng = bounding_box
-      # Not the bike's coordinates: without a registration address they fall back to the
-      # organization's
-      located.or(bikes.where(address_record_id: AddressRecord
-        .where(latitude: sw_lat..ne_lat, longitude: sw_lng..ne_lng).select(:id)))
+      # EXISTS rather than IN: an IN subquery inside an OR can't use an index, so it scans
+      # every address record. Skipping the arm the status rules out keeps the lat/lng index
+      matches = []
+      matches << bikes.status_stolen.within_bounding_box(bounding_box) unless search_status == "impounded"
+      unless search_status == "stolen"
+        matches << bikes.where(ImpoundRecord.within_bounding_box(bounding_box)
+          .where("impound_records.id = bikes.current_impound_record_id").arel.exists)
+      end
+      if registration_address_searchable?(organization:, search_all:)
+        matches << bikes.where(AddressRecord.within_bounding_box(bounding_box)
+          .where("address_records.id = bikes.address_record_id").arel.exists)
+      end
+      matches.reduce(:or)
     end
 
     def stickers(bikes, value)

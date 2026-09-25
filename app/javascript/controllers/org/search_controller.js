@@ -131,9 +131,11 @@ export default class extends Controller {
     if (event.target.name !== 'search_email' || !this.hasSearchAllTarget) return
     const hasEmail = event.target.value.trim() !== ''
     this.searchAllTarget.disabled = hasEmail
-    if (hasEmail) this.searchAllTarget.checked = false
     this.searchAllHintTarget.hidden = !hasEmail
-    this.syncLocationSearch()
+    if (hasEmail && this.searchAllTarget.checked) {
+      this.searchAllTarget.checked = false
+      this.syncLocationSearch()
+    }
   }
 
   filterChanged () {

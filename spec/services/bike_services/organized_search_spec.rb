@@ -41,7 +41,9 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(impounded_from_nowhere.reload.latitude).to eq bike_nyc.reload.latitude
       expect(described_class.location(Bike.all, "New York", "50", organization:)).to eq(Bike.all)
       expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen").pluck(:id))
-        .to match_array([stolen_nyc.id, impounded_nyc.id])
+        .to eq([stolen_nyc.id])
+      expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen_or_impounded")
+        .pluck(:id)).to match_array([stolen_nyc.id, impounded_nyc.id])
       expect(described_class.location(Bike.all, "", "50", organization:, search_status: "stolen")).to eq(Bike.all)
       expect(described_class.location(Bike.all, "Anywhere", "50", organization:, search_status: "stolen")).to eq(Bike.all)
     end
@@ -59,7 +61,7 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
           .to match_array([bike_nyc.id, stolen_nyc.id, impounded_nyc.id, impounded_from_nowhere.id])
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true)).to eq(Bike.all)
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
-          search_status: "impounded").pluck(:id)).to match_array([stolen_nyc.id, impounded_nyc.id])
+          search_status: "impounded").pluck(:id)).to eq([impounded_nyc.id])
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
           search_status: "stolen_or_impounded").pluck(:id)).to match_array([stolen_nyc.id, impounded_nyc.id])
       end
