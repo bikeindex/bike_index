@@ -14,7 +14,7 @@
   <%= form_with(url: switches_path, method: :get, data: {turbo: false}) do %>
     <%= hidden_field_tag :register_settings, true %>
 
-    <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: @single_page,
+    <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: single_page?,
         label: translation(".single_page")) %>
 
     <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,

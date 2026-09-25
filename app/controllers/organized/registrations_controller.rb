@@ -81,8 +81,7 @@ module Organized
       sequence = register_flow_sequence(@b_param)
       steps = BikeServices::Register.steps(@b_param, sequence:, single_page: register_single_page?)
       render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, steps:,
-        organization: current_organization, current_user:, single_page: register_single_page?,
-        separate_attestation: register_separate_attestation?)
+        organization: current_organization, current_user:, separate_attestation: register_separate_attestation?)
     end
 
     def multi_search

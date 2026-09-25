@@ -6,7 +6,7 @@ module Pages
       # The page the flow opens on - its progress, heading and errors - around whichever
       # form asks for step 1: its own, or the one that asks for both steps
       class Component < ApplicationComponent
-        def initialize(b_param:, steps:, organization: nil, subtitle: nil, embed: false, skip_heading: false)
+        def initialize(b_param:, steps:, organization:, subtitle: nil, embed: false, skip_heading: false)
           @b_param = b_param
           @steps = steps
           @organization = organization

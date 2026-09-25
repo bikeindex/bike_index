@@ -8,21 +8,21 @@ module Pages
       # The register flow's opening page on an organization's own page, with the
       # switches that change its shape below it
       class Component < ApplicationComponent
-        def initialize(b_param:, steps:, organization:, current_user: nil,
-          single_page: false, separate_attestation: false)
+        def initialize(b_param:, steps:, organization:, current_user: nil, separate_attestation: false)
           @b_param = b_param
           @steps = steps
           @organization = organization
           @current_user = current_user
-          @single_page = single_page
           @separate_attestation = separate_attestation
         end
 
         private
 
-        # The organized menu already says whose admin panel this is, so the step doesn't
+        def single_page? = @steps.exclude?("2")
+
+        # skip_heading: the organized menu already names the organization
         def opening_page
-          component = @single_page ? Pages::Register::StepCombined::Component : Pages::Register::Step1::Component
+          component = single_page? ? Pages::Register::StepCombined::Component : Pages::Register::Step1::Component
           component.new(b_param: @b_param, steps: @steps, current_user: @current_user,
             organization: @organization, skip_heading: true)
         end

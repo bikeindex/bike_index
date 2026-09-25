@@ -10,8 +10,9 @@ module SharedBlocks
         PAGE_CONTAINERS = {%w[registrations new] => nil, %w[bulk_imports show] => "container-fluid"}.freeze
         FLUID_CONTROLLERS = %w[parking_notifications impound_records impound_claims graduated_notifications
           lines model_audits registrations].freeze
-        JAVASCRIPT_PACK_PAGES = [%w[bikes recoveries], %w[bikes incompletes], %w[exports show], %w[exports new],
-          %w[users new], %w[dashboard index]].freeze
+        JAVASCRIPT_PACK_PAGES = {%w[parking_notifications index] => false, %w[bikes recoveries] => true,
+                                 %w[bikes incompletes] => true, %w[exports show] => true, %w[exports new] => true,
+                                 %w[users new] => true, %w[dashboard index] => true}.freeze
 
         def initialize(current_organization:, current_user:, passive_organization:,
           show_general_alert:, controller_name:, action_name:)
@@ -28,15 +29,11 @@ module SharedBlocks
         def page = [@controller_name, @action_name]
 
         def container
-          return PAGE_CONTAINERS[page] if PAGE_CONTAINERS.key?(page)
-
-          FLUID_CONTROLLERS.include?(@controller_name) ? "container-fluid" : "container"
+          PAGE_CONTAINERS.fetch(page) { FLUID_CONTROLLERS.include?(@controller_name) ? "container-fluid" : "container" }
         end
 
         def include_javascript_pack?
-          return false if page == %w[parking_notifications index]
-
-          container == "container-fluid" || JAVASCRIPT_PACK_PAGES.include?(page)
+          JAVASCRIPT_PACK_PAGES.fetch(page) { container == "container-fluid" }
         end
       end
     end

@@ -73,7 +73,7 @@ class RegisterController < ApplicationController
       render Pages::Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
     when "1"
       @page_title = I18n.t("meta_titles.register_step_1")
-      render start_component(single_page: register_single_page?, steps:)
+      render start_component(steps:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
       render Pages::Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps:)
@@ -92,7 +92,7 @@ class RegisterController < ApplicationController
       find_registration_sequence
     end
     unless saved && turnstile_verified?(@b_param, @b_param.owner_email)
-      return render(start_component(single_page:, steps: flow_steps(single_page:)),
+      return render(start_component(steps: flow_steps(single_page:)),
         status: :unprocessable_entity)
     end
 
@@ -189,8 +189,8 @@ class RegisterController < ApplicationController
       additional: params[:additional])
   end
 
-  def start_component(single_page:, steps:)
-    component = single_page ? Pages::Register::StepCombined::Component : Pages::Register::Step1::Component
+  def start_component(steps:)
+    component = steps.include?("2") ? Pages::Register::Step1::Component : Pages::Register::StepCombined::Component
     component.new(b_param: @b_param, steps:, current_user:)
   end
 
