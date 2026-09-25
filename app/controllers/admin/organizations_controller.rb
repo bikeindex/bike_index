@@ -5,6 +5,8 @@ module Admin
     # Each has a template of its own rendering its slice of the organization form; #edit
     # picks between them, so only "edit" is an action
     FORM_TABS = %w[edit locations invoice_functionality sso].freeze
+    # Like FORM_TABS, each names a template of its own - one #show renders in place of the profile
+    SHOW_TABS = %w[registration_sequences].freeze
 
     before_action :find_organization, only: %w[show edit update destroy]
     before_action :set_admin_form_page_id, only: %w[edit new]
@@ -13,15 +15,18 @@ module Admin
       @per_page = permitted_per_page
       organizations = if sort_column == "bikes"
         matching_organizations.left_joins(:bikes).group(:id)
-          .order("COUNT(bikes.id) #{sort_direction}")
+          .order(sortable_order("COUNT(bikes.id)", nulls_last: false))
       else
         matching_organizations
-          .reorder("organizations.#{sort_column} #{sort_direction}")
+          .reorder(sortable_order(Organization))
       end
       @pagy, @organizations = pagy(:countish, organizations, limit: @per_page, page: permitted_page)
     end
 
     def show
+      active_tab = params[:active_tab].presence_in(SHOW_TABS)
+      return render(action: active_tab) if active_tab.present?
+
       @deleted_organization_roles = @organization.deleted? || Binxtils::InputNormalizer.boolean(params[:deleted_organization_roles])
       bikes = @organization.bikes.reorder("created_at desc")
       @bikes_count = bikes.size
@@ -63,7 +68,7 @@ module Admin
         UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
         redirect_to form_tab_url
       else
-        render action: form_tab || "edit"
+        render action: form_tab || "edit", status: :unprocessable_entity
       end
     end
 
@@ -74,7 +79,7 @@ module Admin
         flash[:success] = "Organization Created!"
         redirect_to edit_admin_organization_url(@organization)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

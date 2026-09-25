@@ -20,13 +20,13 @@ RSpec.describe Admin::BikesController, type: :request do
       it "renders the chart" do
         get base_url, params: {render_chart: true, search_email: "somethingcool@bikeindex.org", period: "year"}
         expect(response.code).to eq("200")
-        expect(response.body).to include("chart-1")
+        expect(response.body).to include('data-controller="ui--chart"')
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
 
         # Also works with user.id
         get base_url, params: {render_chart: true, user_id: user.id, period: "year"}
         expect(response.code).to eq("200")
-        expect(response.body).to include("chart-1")
+        expect(response.body).to include('data-controller="ui--chart"')
         expect(assigns(:user_subject)).to eq user
       end
     end
@@ -107,6 +107,21 @@ RSpec.describe Admin::BikesController, type: :request do
       # A tab the show action doesn't render would otherwise raise from the tabs component
       get "#{base_url}/#{bike.id}?active_tab=party"
       expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
+    end
+
+    context "with an alert from a soft-deleted user" do
+      let(:alert_user) { FactoryBot.create(:user_confirmed, email: "gone@example.com") }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user: alert_user, bike:) }
+
+      # The alerts table is a partial rendered from a component, so its user cell reaches
+      # sort_state through a view context the index doesn't share
+      it "names the deleted user in the alerts table" do
+        alert_user.destroy
+        get "#{base_url}/#{bike.id}?active_tab=messages"
+        expect(response.code).to eq("200")
+        expect(response.body).to include("gone@example.com")
+        expect(response.body).to include("user deleted")
+      end
     end
   end
 
@@ -256,23 +271,18 @@ RSpec.describe Admin::BikesController, type: :request do
       end
 
       context "removing organization with note" do
-        include_context :with_paper_trail
-
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, creation_organization: organization) }
         let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:) }
 
-        it "deletes the bike_organization_note and creates a paper trail version" do
+        it "keeps the bike_organization_note and touches the bike" do
           expect(bike.reload.bike_organization_ids).to eq([organization.id])
-          expect(BikeOrganizationNote.where(bike_id: bike.id, organization_id: organization.id).count).to eq 1
-          expect(bike_organization_note.versions.count).to eq 1
+          bike.update_column(:updated_at, 1.day.ago)
 
           put "#{base_url}/#{bike.id}", params: {bike: {bike_organization_ids: [""]}}
           expect(flash[:success]).to be_present
           expect(bike.reload.bike_organization_ids).to eq([])
-          expect(BikeOrganizationNote.where(bike_id: bike.id, organization_id: organization.id).count).to eq 0
-
-          version = PaperTrail::Version.where(item_type: "BikeOrganizationNote", item_id: bike_organization_note.id).last
-          expect(version.event).to eq "destroy"
+          expect(bike.updated_at).to be_within(2).of Time.current
+          expect(bike_organization_note.reload.body).to be_present
         end
       end
     end

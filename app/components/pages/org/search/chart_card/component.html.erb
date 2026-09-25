@@ -1,0 +1,111 @@
+<%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:h-full")) do %>
+  <%= tag.div(data: {controller: "ui--collapse", "ui--collapse-param-value": COLLAPSE_PARAM}) do %>
+    <%#
+      672px is where .twwiderow's second column stops fitting, so the card collapses
+      exactly while it stands alone full-width - beside the form it's always open
+    %>
+
+    <%= render(UI::Collapse::Component.new(chevron: :trailing, color: :link,
+      html_class: "tw:w-full tw:@min-[672px]/twwiderow:hidden!")) do %>
+      <%# The button centres its content, so the label takes the row and leaves the chevron %>
+      <span class="tw:flex-1 tw:text-left"><%= translation(".chart") %></span>
+    <% end %>
+
+    <%#
+      Collapsing pins a height and a scale as well as the display, so the wide row forces
+      all three off - it never renders the trigger that would clear them
+    %>
+
+    <div
+      data-ui--collapse-target="content"
+      class="
+        tw:relative tw:hidden! tw:@min-[672px]/twwiderow:block!
+        tw:@min-[672px]/twwiderow:h-auto!
+        tw:@min-[672px]/twwiderow:scale-y-100!
+      "
+    >
+      <%= helpers.turbo_frame_tag(FRAME_ID, src: @src, loading: (:lazy if @src),
+        class: "tw:peer tw:block tw:pt-3 tw:@min-[672px]/twwiderow:pt-0 #{LOADING_FRAME_CLASSES}") do %>
+        <%#
+          org--search refetches the card only while this is in it: the year scope's counts
+          don't move with the search
+        %>
+
+        <%= tag.div(data: {chart_follows_search: (true if follows_search?)}) do %>
+          <% if @src %>
+            <div class="<%= PLACEHOLDER_CLASSES %>"></div>
+          <% else %>
+            <%# Standing alone the caption shares this row with the toggle, under the trigger %>
+            <div
+              class="
+                tw:mb-2 tw:flex tw:items-baseline tw:justify-between
+                tw:gap-2 tw:@min-[672px]/twwiderow:flex-wrap
+              "
+            >
+              <%# The page's size where there's room; 2xs only below the width the card collapses at %>
+              <span
+                class="
+                  tw:font-bold tw:tracking-wider tw:text-gray-400
+                  tw:uppercase tw:@max-[672px]/twwiderow:text-2xs
+                "
+              >
+                <span class="tw:hidden tw:@min-[672px]/twwiderow:inline"><%= translation(".chart") %> ·</span>
+                <%= caption %>
+              </span>
+
+              <% if @scope_paths.any? %>
+                <div data-controller="org--chart-card-scope-links">
+                  <%= render(UI::ButtonGroup::Component.new(entries: scope_entries, kind: :toggle)) %>
+                </div>
+              <% end %>
+            </div>
+
+            <%= render(@chart) if @chart %>
+
+            <% if @stats.any? %>
+              <dl
+                class="
+                  tw:mt-3 tw:mb-0 tw:flex tw:flex-col tw:gap-2 tw:border-t
+                  tw:border-gray-100 tw:pt-3 tw:dark:border-gray-700
+                "
+              >
+                <% @stats.each do |stat| %>
+                  <%# Only dt/dd directly inside the row, which is what a <dl> takes %>
+                  <div class="tw:flex tw:items-center tw:gap-2">
+                    <dt
+                      class="
+                        tw:flex tw:min-w-0 tw:flex-1 tw:items-center
+                        tw:gap-2 tw:text-sm tw:font-medium
+                      "
+                    >
+                      <span class="tw:h-2.5 tw:w-2.5 tw:shrink-0 tw:rounded-sm <%= BANDS.dig(stat.key, :swatch) %>"></span>
+
+                      <span class="tw:truncate"><%= translation(".stat_#{stat.key}") %></span>
+                    </dt>
+
+                    <dd
+                      class="
+                        tw:mb-0 tw:flex tw:items-center tw:gap-2
+                        tw:font-mono tw:text-base tw:font-semibold
+                      "
+                    >
+                      <%= number_display(stat.count) %>
+
+                      <% if stat.delta_display %>
+                        <%= render(delta_badge(stat)) %>
+                      <% end %>
+                    </dd>
+                  </div>
+                <% end %>
+              </dl>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <div class="<%= LOADING_OVERLAY_CLASSES %>">
+        <%= render UI::LoadingSpinner::Component.new(text: translation(".loading_chart")) %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

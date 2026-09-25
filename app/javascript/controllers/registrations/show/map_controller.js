@@ -1,18 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
-import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION, showMapUnavailable } from 'utils/maplibre'
+
+/* global IntersectionObserver */
 
 // Connects to data-controller='registrations--show--map'
-// Renders a map centered on the coordinates, marking them with a dot (point) or
+// Renders a map centered on the coordinates, marking them with a pin (point) or
 // a translucent red circle (approximate area).
-
-// A fixed dot marking the exact spot
-const POINT_PAINT = {
-  'circle-radius': 7,
-  'circle-color': 'red',
-  'circle-opacity': 0.9,
-  'circle-stroke-width': 2,
-  'circle-stroke-color': 'white'
-}
 
 // A translucent circle covering the approximate area
 const CIRCLE_PAINT = (radiusMeters, latitude) => ({
@@ -22,43 +15,44 @@ const CIRCLE_PAINT = (radiusMeters, latitude) => ({
 })
 
 export default class extends Controller {
-  static targets = ['canvas', 'unavailable']
+  static targets = ['canvas', 'unavailable', 'pin']
   static values = {
     latitude: Number,
     longitude: Number,
-    radiusMeters: Number,
-    point: Boolean
+    radiusMeters: Number
   }
 
-  async connect () {
+  // Load only once on screen — it can sit in a collapsed panel or below the fold
+  connect () {
+    this.observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return
+      this.observer.disconnect()
+      this.#load()
+    }, { rootMargin: '200px' })
+    this.observer.observe(this.element)
+  }
+
+  async #load () {
     try {
       const maplibregl = await loadMapLibre()
       if (!this.element.isConnected) return // disconnected while loading
 
       this.#render(maplibregl)
     } catch (error) {
-      this.#showUnavailable(error)
+      showMapUnavailable(error, {
+        source: this.identifier,
+        map: this.map,
+        canvas: this.canvasTarget,
+        message: this.hasUnavailableTarget ? this.unavailableTarget : null
+      })
+      this.map = null
     }
   }
 
   disconnect () {
+    this.observer?.disconnect()
     this.map?.remove()
     this.map = null
-  }
-
-  // WebGL/MapLibre can be unavailable (crawlers, headless browsers, disabled GPU,
-  // blocked CDN). Reveal a message instead of leaving a blank box, and swallow the
-  // rejection so it isn't reported as unhandled.
-  #showUnavailable (error) {
-    console.warn('Stolen map failed to render:', error)
-    // A control may have thrown after the map was built — dispose it, or its WebGL
-    // context and our controls' document listeners outlive the page
-    this.map?.remove()
-    this.map = null
-    if (!this.hasUnavailableTarget) return
-
-    this.canvasTarget.hidden = true
-    this.unavailableTarget.hidden = false
   }
 
   #render (maplibregl) {
@@ -73,6 +67,12 @@ export default class extends Controller {
     })
     this.map.addControl(new ExpandControl(), 'top-right')
 
+    if (this.hasPinTarget) {
+      const element = this.pinTarget.content.firstElementChild.cloneNode(true)
+      new maplibregl.Marker({ element, anchor: 'bottom' }).setLngLat(center).addTo(this.map)
+      return
+    }
+
     this.map.on('load', () => {
       this.map.addSource('location', {
         type: 'geojson',
@@ -82,7 +82,7 @@ export default class extends Controller {
         id: 'location',
         type: 'circle',
         source: 'location',
-        paint: this.pointValue ? POINT_PAINT : CIRCLE_PAINT(this.radiusMetersValue, this.latitudeValue)
+        paint: CIRCLE_PAINT(this.radiusMetersValue, this.latitudeValue)
       })
     })
   }

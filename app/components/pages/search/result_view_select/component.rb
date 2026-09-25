@@ -15,7 +15,7 @@ module Pages
               entries: view_entries,
               selected: @selected_result_view,
               # The result component is chosen server-side, so switching layout re-runs the search
-              data: {action: "change->search--form#submit"}
+              html_options: {data: {action: "change->search--form#submit"}}
             ))
           end
         end

@@ -65,10 +65,13 @@ class Organization < ApplicationRecord
     property_management: 6,
     other: 7,
     ambassador: 8,
-    bike_depot: 9
+    bike_depot: 9,
+    municipality: 10
   }.freeze
 
   USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS = [36, 1].freeze # SBR and BikeIndex
+
+  ORGANIZATION_AFFILIATIONS = %w[student graduate_student postdoc employee community_member].freeze
 
   POS_KIND_ENUM = {
     no_pos: 0,
@@ -286,9 +289,10 @@ class Organization < ApplicationRecord
     end
 
     def example
-      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
+      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead.
+      # Everywhere else 92 is the production record, and the name is what a seeded database has.
       found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
-      found || Organization.create(name: "Example Bike Shop")
+      found || Organization.find_by(name: "Example Bike Shop") || Organization.create!(name: "Example Bike Shop")
     end
 
     private
@@ -487,7 +491,7 @@ class Organization < ApplicationRecord
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
-    %w[student graduate_student postdoc employee community_member]
+    ORGANIZATION_AFFILIATIONS
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 
@@ -589,7 +593,10 @@ class Organization < ApplicationRecord
   def ensure_auto_user
     return true if auto_user.present?
 
-    self.embedable_user_email = users.first && users.first.email || ENV["AUTO_ORG_MEMBER"]
+    email = calculated_embedable_user_email
+    return false if email.blank?
+
+    self.embedable_user_email = email
     save
   end
 
@@ -607,11 +614,13 @@ class Organization < ApplicationRecord
 
   def set_auto_user
     if embedable_user_email.present?
-      u = User.fuzzy_email_find(embedable_user_email)
-      self.auto_user_id = u.id if u&.member_of?(self)
+      user = User.fuzzy_email_find(embedable_user_email)
+      return nil if user.blank?
+
+      self.auto_user_id = user.id if user.member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
-        OrganizationRole.create(user_id: u.id, organization_id: id, role: "member")
-        self.auto_user_id = u.id
+        OrganizationRole.create(user_id: user.id, organization_id: id, role: "member")
+        self.auto_user_id = user.id
       end
     elsif auto_user_id.blank?
       return nil unless users.any?
@@ -627,6 +636,13 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  # Returning an address no account holds would leave auto_user blank, so every
+  # later ensure_auto_user would save again and re-enqueue UpdateOrganizationAssociationsJob
+  def calculated_embedable_user_email
+    email = users.first&.email || ENV["AUTO_ORG_MEMBER"]
+    email if User.fuzzy_email_find(email).present?
+  end
 
   def calculated_slug(new_slug)
     orgs = id.present? ? Organization.unscoped.where.not(id:) : Organization.unscoped.all

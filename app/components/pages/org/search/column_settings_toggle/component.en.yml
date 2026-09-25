@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      org:
+        search:
+          column_settings_toggle:
+            column_settings: Column settings

@@ -15,7 +15,7 @@
   .mt-4
   = render(UI::Chart::Component.new(series: claimed_ownerships, time_range: @time_range, stacked: true, colors: ["#88a2e0", "#ffc281"]))
 
-%div{ style: "margin-top: 50px;" }
+%div{ style: "margin-top: 50px;", class: "tw:flex tw:justify-end" }
   = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:)
 
 = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
@@ -23,7 +23,7 @@
     Local registrations
   - else
     Registrations
-  = humanized_time_range(@time_range)
+  = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
 .full-screen-table.mt-4
   %table.table.table-striped.table-bordered.table-sm
     %tbody
@@ -78,7 +78,7 @@
 - if current_organization.parent?
   = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
     Registrations by related organizations
-    = humanized_time_range(@time_range)
+    = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
   - render_regional_nearby = current_organization.child_organizations.first.regional?
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
@@ -106,7 +106,7 @@
 - if current_organization.nearby_organizations.any?
   = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
     Registrations by local bike shops or other organizations
-    = humanized_time_range(@time_range)
+    = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead

@@ -7,7 +7,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 100)
       @pagy, @content_tags = pagy(:countish, matching_content_tags
-        .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
+        .order(sortable_order(ContentTag)), limit: @per_page, page: permitted_page)
     end
 
     def new
@@ -35,7 +35,7 @@ module Admin
         redirect_to admin_content_tags_path
       else
         flash[:error] = "Unable to create"
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 

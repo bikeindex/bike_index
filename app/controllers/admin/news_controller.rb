@@ -6,12 +6,22 @@ module Admin
     before_action :set_dignified_name
 
     def index
-      @blogs = available_blogs.reorder(sort_column + " " + sort_direction)
+      @blogs = available_blogs.reorder(sortable_order(Blog))
         .includes(:user, :content_tags)
     end
 
     def new
       @blog = Blog.new(published_at: Time.current, user_id: current_user.id)
+    end
+
+    # Values are tag names, which Blog#content_tag_names= reads
+    def content_tag_chips
+      values = params[:combobox_values].to_s.split(",")
+      chips = (values & ContentTag.where(name: values).pluck(:name)).map do
+        helpers.hw_combobox_selection_chip(display: it, value: it, for_id: params[:for_id])
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
     end
 
     def image_edit
@@ -38,7 +48,7 @@ module Admin
         flash[:success] = "#{@blog.info? ? "Info post" : "Blog"} saved!"
         redirect_to edit_admin_news_url(@blog)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -93,7 +103,7 @@ module Admin
         :user_email,
         :user_id,
         :info_kind,
-        content_tag_names: []
+        :content_tag_names
       )
     end
 

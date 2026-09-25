@@ -76,7 +76,7 @@ module Organized
     def update
       bike = Bike.unscoped.find_id(params[:id])
 
-      unless bike.organized?(current_organization) && current_organization.enabled?("registration_notes")
+      unless bike.visible_by?(current_user) && current_organization.enabled?("registration_notes")
         flash[:error] = "Not authorized to update notes"
         redirect_to(bike_path(bike)) && return
       end
@@ -147,7 +147,7 @@ module Organized
       else
         @sort_column = "id" unless %w[id email].include?(sort_column)
 
-        b_params.order("b_params.#{sort_column} #{sort_direction}")
+        b_params.order(sortable_order(BParam))
       end
     end
 

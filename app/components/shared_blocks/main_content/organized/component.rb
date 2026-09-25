@@ -11,7 +11,7 @@ module SharedBlocks
         FLUID_CONTROLLERS = %w[parking_notifications impound_records impound_claims graduated_notifications
           lines model_audits registrations].freeze
         JAVASCRIPT_PACK_PAGES = [%w[bikes recoveries], %w[bikes incompletes], %w[exports show], %w[exports new],
-          %w[users new], %w[dashboard index], %w[impounded_bikes index]].freeze
+          %w[users new], %w[dashboard index]].freeze
 
         def initialize(current_organization:, current_user:, passive_organization:,
           show_general_alert:, controller_name:, action_name:)
@@ -34,6 +34,8 @@ module SharedBlocks
         end
 
         def include_javascript_pack?
+          return false if page == %w[parking_notifications index]
+
           container == "container-fluid" || JAVASCRIPT_PACK_PAGES.include?(page)
         end
       end

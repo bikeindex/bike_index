@@ -1,0 +1,39 @@
+<div
+  class="<%= "tw:hidden!" unless @open %> <%= PANEL_CLASSES %>"
+  data-ui--collapse-target="content"
+>
+  <div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-3 tw:gap-y-2">
+    <%= render(UI::Header::Component.new(text: translation(".visible_columns"), tag: :h3, html_class: "uncap tw:mb-0! tw:pr-1")) %>
+
+    <%= render UI::Button::Component.new(text: translation(".all"), color: :link,
+        data: { action: "click->org--search-column-settings#selectAll" }) %>
+
+    <%= render UI::Button::Component.new(text: translation(".none"), color: :link,
+        data: { action: "click->org--search-column-settings#selectNone" }) %>
+
+    <%= render UI::Button::Component.new(text: translation(".default"), color: :link,
+        data: { action: "click->org--search-column-settings#selectDefault" }) %>
+  </div>
+
+  <% column_rows = (@settings.panel_columns.size / 3.0).ceil %>
+
+  <div
+    class="
+      tw:grid tw:grid-cols-2 tw:gap-x-7 tw:gap-y-2.5 tw:md:grid-flow-col
+      tw:md:grid-cols-3
+    "
+    style="grid-template-rows: repeat(<%= column_rows %>, auto)"
+    data-org--search-column-settings-target="checkboxes"
+  >
+    <% @settings.panel_columns.each do |cell_name| %>
+      <% always_visible = @settings.always_visible?(cell_name) %>
+
+      <%# Unchecked columns read quieter than the ones showing %>
+      <%= render(UI::Forms::Checkbox::Component.new(name: cell_name, value: cell_name, checked: always_visible,
+        label: @settings.panel_labels[cell_name.to_sym],
+        class_name: "tw:mb-0! tw:leading-[1.25]! tw:text-gray-400 tw:has-checked:text-gray-900 tw:dark:has-checked:text-gray-100",
+        html_options: {class: "tw:accent-blue-600", disabled: always_visible,
+                       data: {action: "change->org--search-column-settings#columnToggled"}})) %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,7 @@
+<%= tag.div(class: "org-search-component", data:) do %>
+  <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
+
+  <div class="tw:mt-3">
+    <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:, open: true)) %>
+  </div>
+<% end %>

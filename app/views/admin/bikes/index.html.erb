@@ -10,7 +10,7 @@
 
 <% if @render_chart %>
   <% rendered_chart = capture do %>
-    <% series = [{name: "Bikes", data: UI::Chart::Component.time_range_counts(collection: available_bikes.reorder(nil), time_range: @time_range, column: "bikes.created_at")}] %>
+    <% series = [{name: "Bikes", data: UI::Chart::Component.time_range_counts(collection: available_bikes, time_range: @time_range, column: "bikes.created_at")}] %>
     <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
   <% end %>
 <% end %>
@@ -127,17 +127,12 @@
         <% if show_search_statuses %>
           <%= render(Pages::Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state,
                 searched_statuses: @searched_statuses, default_statuses: @default_statuses,
-                not_default_statuses: @not_default_statuses, display_dev_info: display_dev_info?)) %>
+                not_default_statuses: @not_default_statuses)) %>
         <% end %>
 
         <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2">
           <% if show_search_statuses %>
-            <%= render(UI::Button::Component.new(size: :sm, active: @not_default_statuses,
-                  html_class: "tw:inline-flex tw:items-center tw:gap-1.5",
-                  data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
-              <span class="tw:inline-block tw:transition-transform tw:duration-200" data-ui--collapse-target="chevron"><span class="tw:flex"><%= render UI::IconChevron::Component.new %></span></span>
-              Search statuses
-            <% end %>
+            <%= render(UI::Collapse::Component.new(text: "Search statuses", chevron: true, size: :sm, active: @not_default_statuses)) %>
           <% end %>
 
           <%= text_field_tag :serial, params[:serial], placeholder: "Find by serial", class: "twinput tw:w-auto" %>
@@ -166,7 +161,7 @@
 <% end unless admin_search_filtered? %>
 
 <% table_view = capture do %>
-  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?, show_serial: params[:show_serial].present?, skip_manufacturer_link: params[:search_manufacturer].present?, render_sortable: true, render_multi_check: @multi_delete) %>
+  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, show_serial: params[:show_serial].present?, skip_manufacturer_link: params[:search_manufacturer].present?, render_sortable: true, render_multi_check: @multi_delete) %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(

@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :component do
-  it_behaves_like "cached_markup_digest"
-
   let(:instance) { described_class.new(**options) }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
@@ -23,9 +21,26 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component).to have_text(bike.mnfg_name)
   end
 
+  it "leads with a frozen view link to the bike, then its photo" do
+    expect(component).to have_css("tbody td:first-child a[href='/bikes/#{bike.id}?organization_id=#{organization.to_param}']", text: "View")
+    expect(component.css("th").first["class"]).to include("tw:sticky")
+    expect(component).to have_css("th:nth-child(2).photo_cell", text: "Photo")
+    expect(component).to have_css("tbody td.color_cell", text: bike.primary_frame_color.name)
+  end
+
+  context "with a pedal bike and an e-bike" do
+    let(:e_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
+    let(:bikes) { [bike, e_bike] }
+
+    it "leaves pedal blank in the e-vehicle column" do
+      expect(bike.propulsion_type).to eq "foot-pedal"
+      expect(component.css("td.propulsion_type_cell").map { |td| td.text.strip }).to eq ["", e_bike.propulsion_titleize]
+    end
+  end
+
   it "renders plain headers when not sortable" do
     expect(component).to have_css("th", text: "Registered")
-    expect(component).not_to have_css("th a.twlink")
+    expect(component).not_to have_css("th a")
   end
 
   context "with a hidden-serial bike and an authorized org member" do
@@ -53,25 +68,78 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
   context "with every column's feature enabled" do
     let(:enabled_feature_slugs) do
-      %w[bike_search avery_export bike_stickers impound_bikes registration_notes
+      %w[bike_search avery_export bike_stickers impound_bikes registration_notes registration_sequences
         reg_address reg_extra_registration_number reg_organization_affiliation reg_phone reg_student_id]
     end
-    # The panel builds a checkbox per enabled_columns entry, and org--search-column-toggle
+    # The panel builds a checkbox per enabled_columns entry, and org--search-column-settings
     # only ever reveals a column whose cell class matches a checked one
     let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:) }
 
-    it "heads one column per settings checkbox, and no others" do
-      headers = component.css("th.hideableColumn")
-        .map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
+    let(:header_cells) do
+      component.css("th.hideableColumn").map { |th| th["class"].split.find { |klass| klass.end_with?("_cell") } }
+    end
 
-      expect(headers).to match_array(settings.enabled_columns)
+    it "heads one column per settings checkbox, and no others" do
+      expect(header_cells).to match_array(settings.enabled_columns)
+    end
+
+    it "places the organization's registration fields beside the columns they relate to" do
+      expect(header_cells.each_cons(2)).to include(%w[owner_name_cell reg_phone_cell],
+        %w[reg_phone_cell reg_student_id_cell], %w[reg_student_id_cell reg_organization_affiliation_cell],
+        %w[serial_number_cell reg_extra_registration_number_cell])
+      # Placed nowhere, so after the columns every organization has
+      expect(header_cells.index("reg_address_cell")).to be > header_cells.index("propulsion_type_cell")
     end
 
     it "heads the columns with the shared labels" do
       expect(component).to have_css("th.avery_cell", normalize_ws: true, exact_text: "Avery Exportable")
       expect(component).to have_css("th.propulsion_type_cell", normalize_ws: true, exact_text: "E-vehicle (propulsion)")
       expect(component).to have_css("th.notes_cell", normalize_ws: true,
-        exact_text: "#{organization.short_name} Registration Notes")
+        exact_text: "Registration Notes by #{organization.short_name}")
+    end
+  end
+
+  context "with reg_student_id enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search reg_student_id] }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+    before { bike.current_ownership.update(registration_info: {"student_id" => "JD_4821"}) }
+
+    it "renders the student ID as registered" do
+      expect(component).to have_css("td.reg_student_id_cell", exact_text: "JD_4821", normalize_ws: true)
+    end
+  end
+
+  context "with registration_sequences enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search registration_sequences] }
+    let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
+    let(:unacknowledged_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
+    let(:bikes) { [bike, unacknowledged_bike] }
+    let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization:) }
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike:) }
+
+    it "renders when each bike was acknowledged" do
+      expect(component).to have_css("th.acknowledgment_cell span[title='Registration sequence acknowledgment at']",
+        visible: :all, normalize_ws: true, exact_text: "Reg acknowledged")
+      expect(component.css("td.acknowledgment_cell .localizeTime").count).to eq 1
+    end
+
+    context "with a bike registered elsewhere" do
+      let(:other_bike) { FactoryBot.create(:bike, propulsion_type:) }
+      let(:bikes) { [other_bike] }
+      let(:propulsion_type) { "pedal-assist" }
+
+      it "renders the e-vehicle as hidden" do
+        expect(component).to have_css("td.acknowledgment_cell", text: "hidden")
+        expect(component).to have_css("td.acknowledgment_cell [role=tooltip]", text: "Hidden because it is not registered", visible: :all)
+      end
+
+      context "that isn't an e-vehicle" do
+        let(:propulsion_type) { "foot-pedal" }
+
+        it "renders nothing" do
+          expect(component).to have_no_css("td.acknowledgment_cell", text: "hidden")
+        end
+      end
     end
   end
 
@@ -88,7 +156,6 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
 
     it "renders the impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
-      expect(component).to have_css("th.impounded_cell", visible: :all, text: "Impounded")
     end
   end
 
@@ -109,10 +176,14 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).not_to have_text("stranger@example.com")
       expect(component).not_to have_text("555-555-1212")
       expect(component).not_to have_text("SECRET-EXTRA")
-      hidden_text = "hidden, not registered with #{organization.short_name}"
-      expect(component).to have_css(".owner_email_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".reg_phone_cell em.less-strong", text: hidden_text)
-      expect(component).to have_css(".reg_extra_registration_number_cell em.less-strong", text: hidden_text)
+      hidden_text = "Hidden because it is not registered with #{organization.short_name}"
+      %w[owner_email_cell reg_phone_cell reg_extra_registration_number_cell].each do |cell|
+        expect(component).to have_css(".#{cell} button em.less-strong", text: "hidden")
+        expect(component).to have_css(".#{cell} [role=tooltip]", text: hidden_text, visible: :all)
+      end
     end
   end
+
+  let(:cached_record) { bike }
+  it_behaves_like("cached_table_rows") { let(:row_cache_key) { "org-#{organization.id}-#{described_class.cache_digest}" } }
 end

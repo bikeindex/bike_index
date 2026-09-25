@@ -1,0 +1,57 @@
+---
+en:
+  components:
+    pages:
+      org:
+        search:
+          column_settings:
+            acknowledgment_cell: Reg acknowledged
+            acknowledgment_cell_panel: Time - Registration sequence acknowledged
+            address: 'Address:'
+            all: all
+            avery_cell: Avery Exportable
+            color_cell: Color
+            created_at_cell: Registered
+            created_at_cell_panel: Time - registered
+            creation_description_cell: Source
+            cycle_type_cell: Vehicle type
+            default: default
+            filter_impounded_html: only <strong>impounded</strong>
+            filter_no_address_html: only <strong>no</strong> address
+            filter_no_sticker_html: only <strong>no</strong> sticker
+            filter_not_impounded_html: only <strong>not</strong> impounded
+            filter_not_stolen_or_impounded_html: not stolen or impounded
+            filter_not_unregistered_html: "<strong>not</strong> unregistered"
+            filter_only_unregistered_html: only <strong>unregistered</strong>
+            filter_stolen_html: only <strong>stolen</strong>
+            filter_stolen_or_impounded_html: only <strong>stolen</strong> or <strong>impounded</strong>
+            filter_with_address_html: only <strong>with</strong> address
+            filter_with_stickers_html: only <strong>with</strong> stickers
+            impound_id_cell: Impound ID
+            manufacturer_cell: Manufacturer
+            model_cell: Model
+            none: none
+            notes_cell_html: Registration Notes <em>by %{org_name}</em>
+            occurred_at_cell: Status at
+            occurred_at_cell_panel: Time - status
+            owner_email_cell: Sent to
+            owner_name_cell: Owner name
+            photo_cell: Photo
+            propulsion_type_cell: E-vehicle (propulsion)
+            reg_address_cell: Address
+            reg_extra_registration_number_cell: Secondary#
+            reg_organization_affiliation_cell_html: Affiliation <em>in %{org_name}</em>
+            reg_phone_cell: Phone
+            reg_student_id_cell_html: Student ID <em>for %{org_name}</em>
+            serial_number_cell: Serial
+            show_notes_search: show notes search
+            status: 'Status:'
+            status_cell: Status
+            sticker_cell: Sticker
+            stickers: 'Stickers:'
+            unregistered: 'Unregistered:'
+            updated_at_cell: Updated
+            updated_at_cell_panel: Time - updated
+            url_cell: URL
+            view_cell: View
+            visible_columns: Visible columns

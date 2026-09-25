@@ -11,11 +11,17 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
+# ".git" from the main checkout and "" outside a repo both expand to APP_ROOT
+def shared_root
+  root = File.expand_path(File.dirname(`git rev-parse --git-common-dir 2>/dev/null`.strip), APP_ROOT)
+  root unless root == APP_ROOT
+end
+
 FileUtils.chdir APP_ROOT do
-  # Conductor workspace setup
-  if ENV["CONDUCTOR_ROOT_PATH"]
-    root = ENV["CONDUCTOR_ROOT_PATH"]
-    puts "== Setting up Conductor workspace =="
+  # Untracked state too big or too stateful to duplicate comes from the root
+  # checkout rather than being rebuilt per workspace
+  if (root = shared_root)
+    puts "== Setting up workspace against #{root} =="
 
     # Copy .env.test from root repo
     env_test = File.join(root, ".env.test")
@@ -85,17 +91,25 @@ FileUtils.chdir APP_ROOT do
   # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
   system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
 
+  # The layout needs tailwind.css and emails (which seeding sends) need email.css; without
+  # the build Sprockets tries compiling email.scss with sassc
+  puts "\n== Building stylesheets =="
+  system! "bin/rails tailwindcss:build dartsass:build"
+
   unless without_seeds
-    # Build stylesheets so seeding can render emails. Seeding delivers mailers
-    # without compilation Sprockets tries to compile email.scss and with sassc, but should use dartsass
-    puts "\n== Building stylesheets =="
-    system! "bin/rails dartsass:build"
+    # db:seed isn't idempotent: a re-run over seeded records dies on duplicates
+    if system("bin/rails runner 'exit Bike.unscoped.exists?'")
+      puts "\n== Database already seeded =="
+    else
+      puts "\n== Seeding database =="
+      system! "bin/rake db:seed"
+    end
 
-    puts "\n== Seeding database =="
-    system! "bin/rake db:seed"
-
-    puts "\n== Preparing test database (including parallelism) =="
-    system! "bin/rake parallel:prepare"
+    # Opt-in, matching lib/tasks/parallel_migrate.rake
+    unless ENV["PARALLEL_MIGRATIONS"].to_s.strip.empty?
+      puts "\n== Preparing parallel test databases =="
+      system! "bin/rake parallel:prepare"
+    end
 
     # Autocomplete (typeahead) is loaded by db:seed above; here we just load counts
     puts "\n== loading bike counts =="

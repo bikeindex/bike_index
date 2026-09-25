@@ -14,6 +14,11 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         get base_url
         expect(response).to be_ok
         expect(response).to render_template(:index)
+
+        get base_url, params: {search_paid_admin: "paid_and_unpaid", search_location_counts: true}
+        expect(response).to be_ok
+        expect(response.body).to include(theft_alert.theft_alert_plan.name)
+        expect(response.body).to include("Blank location")
       end
       let(:target_timezone) { ActiveSupport::TimeZone["Pacific Time (US & Canada)"] }
       context "period of one day" do

@@ -142,7 +142,7 @@
         class="form-group mt-4"
       >
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :photo, label_text: "Recovery photo")) do %>
-          <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :photo, accept: ImageUploader.permitted_extensions)) %>
+          <%= render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :photo, accept: ImageUploader.permitted_extensions)) %>
         <% end %>
       </div>
 

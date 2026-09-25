@@ -18,37 +18,37 @@
   <% end %>
 
   <% table.column(sortable: "organization_id") do |batch| %>
-    <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: batch.organization, render_search: true) %>
+    <%= render Atoms::Admin::TableCells::Organization::Component.new(sort_state:, organization: batch.organization, render_search: true) %>
   <% end %>
 
   <% if matching_count %>
     <% all_matching = matching_bike_stickers %>
-    <% table.column(label: "Matching count", header_classes: "tw:font-normal") do |batch| %>
+    <% table.column(label: "Matching count") do |batch| %>
       <%= number_display(all_matching.where(bike_sticker_batch_id: batch.id).count) %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Count", header_classes: "tw:font-normal") do |batch| %>
+  <% table.column(label: "Count") do |batch| %>
     <small><%= number_display(batch.bike_stickers.count) %></small>
   <% end %>
 
-  <% table.column(label: "Claimed", header_classes: "tw:font-normal") do |batch| %>
+  <% table.column(label: "Claimed") do |batch| %>
     <small><%= number_display(batch.bike_stickers.claimed.count) %></small>
   <% end %>
 
-  <% table.column(label: "Prefix", header_classes: "tw:font-normal") do |batch| %>
+  <% table.column(label: "Prefix") do |batch| %>
     <small><%= batch.prefix %></small>
   <% end %>
 
-  <% table.column(label: "Min", header_classes: "tw:font-normal") do |batch| %>
+  <% table.column(label: "Min") do |batch| %>
     <small><%= number_display(batch.min_code_integer) %></small>
   <% end %>
 
-  <% table.column(label: "Max", header_classes: "tw:font-normal") do |batch| %>
+  <% table.column(label: "Max") do |batch| %>
     <small><%= number_display(batch.max_code_integer) %></small>
   <% end %>
 
-  <% table.column(label: "Notes", header_classes: "tw:font-normal") do |batch| %>
+  <% table.column(label: "Notes") do |batch| %>
     <small><%= batch.notes %></small>
   <% end %>
 <% end %>

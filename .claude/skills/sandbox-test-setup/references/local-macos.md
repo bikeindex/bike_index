@@ -1,44 +1,28 @@
-# Local macOS (Conductor workspace)
+# Local macOS (Conductor workspace or spawned worktree)
 
-Ruby 4.0.6 is installed via [mise](https://mise.jdx.dev/), but Claude
-Code's shell sometimes spawns subprocesses without the mise shim on
-PATH — bare `ruby` then resolves to `/usr/bin/ruby` (2.6). **The Ruby is
-installed; the PATH just isn't right** — don't reinstall, don't edit
-the Gemfile. It surfaces differently depending on the entry point:
+In a `.claude/worktrees/…` checkout, `bin/workspace_setup --without_seeds` comes first
+(SKILL.md).
 
-- `bundle` / `bundle exec` → `Could not find 'bundler' (4.0.x)`
-- a `bin/` script (`bin/rspec`, `bin/lint`) → `uninitialized constant Pathname`,
-  `undefined method 'intersect?' for Array` (`bin/lint`, on a 2.6 that predates
-  it), or the same `Could not find 'bundler'` when it boots Rails
-  (`bin/update_component_digests`)
+Ruby comes from [mise](https://mise.jdx.dev/), but Claude Code's shell sometimes spawns
+subprocesses without its shims on PATH, so bare `ruby` is `/usr/bin/ruby` (2.6). **Ruby
+is installed; PATH is wrong** — don't reinstall or edit the Gemfile. It shows up as:
 
-Check first; only prefix PATH if `ruby -v` doesn't already print 4.0.6
-(`mise exec -- ruby`/`bundle` are unreliable in this harness — they
-can still resolve to system 2.6, so use the direct prefix):
+- `Could not find 'bundler' (4.0.x)` from `bundle`, or from a `bin/` script that boots Rails
+- `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a
+  `bin/` script (`bin/rspec`, `bin/lint`)
 
 ```bash
-ruby -v
-# If it's not 4.0.6:
-export PATH="$HOME/.local/share/mise/shims:$PATH"   # shims, not installs/ruby/<version>/bin - they follow .tool-versions
+ruby -v   # not the .tool-versions pin? then:
+export PATH="$HOME/.local/share/mise/shims:$PATH"
 ```
 
-Then run specs the normal way:
+Use the shims (they follow `.tool-versions`), not `mise exec`, which can still resolve
+to 2.6 here. Then `bundle exec rspec …` and `bin/lint` work normally.
 
-```bash
-bundle exec rspec spec/path/to/file_spec.rb
-```
+No `eval "$(ruby bin/env --export)"` needed for Ruby commands — `config/boot.rb` loads
+`bin/env` itself. Export it only when the shell reads the values (`curl "$BASE_URL"`).
 
-(No need to `eval "$(ruby bin/env --export)"` first — `config/boot.rb` loads
-`bin/env` for every Ruby entry point, so `WORKSPACE_ID` / `DEV_PORT` /
-`BASE_URL` / `REDIS_URL` are already set inside the process. Only export
-them into the shell when the shell itself reads them, e.g. `curl "$BASE_URL/..."`.)
+A pending-migration abort from `rails_helper` → `bundle exec rails db:create db:migrate`.
 
-If `rails_helper` aborts complaining about a pending migration, run
-`bundle exec rails db:create db:migrate` first
-(`ActiveRecord::Migration.maintain_test_schema!`).
-
-Lint with `bin/lint` (same PATH prefix if needed). Postgres, redis,
-and the jsdelivr proxy are handled by your local dev environment, so
-nothing else here applies **except** the Tailwind build in SKILL.md,
-which can still bite a fresh Conductor workspace where `bin/dev`
-hasn't run.
+Postgres, redis and the network are your local environment's, so the only other thing
+that bites here is the CSS build in SKILL.md.

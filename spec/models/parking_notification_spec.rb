@@ -72,6 +72,31 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe ".preload_bikes" do
+    let!(:parking_notification) { FactoryBot.create(:parking_notification) }
+    let(:notifications) { ParkingNotification.where(id: parking_notification.id).to_a }
+
+    it "assigns the bike without a query per notification" do
+      expect(ParkingNotification.preload_bikes(notifications).first.bike).to eq parking_notification.bike
+      queries = []
+      collect = ->(*, payload) { queries << payload[:sql] unless payload[:name] == "SCHEMA" }
+      ActiveSupport::Notifications.subscribed(collect, "sql.active_record") do
+        notifications.each { |notification| notification.bike.frame_colors }
+      end
+      expect(queries).to eq([])
+    end
+
+    context "with a deleted bike" do
+      before { parking_notification.bike.destroy }
+
+      it "assigns the deleted bike" do
+        ParkingNotification.preload_bikes(notifications)
+        expect(notifications.first.bike&.id).to eq parking_notification.bike_id
+        expect(notifications.first.bike.deleted?).to be_truthy
+      end
+    end
+  end
+
   describe "reply_to_email" do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization) }

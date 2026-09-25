@@ -32,15 +32,20 @@ get back local PNG paths.
 ## Preflight
 
 - `eval "$(ruby bin/env --export)"` so `$BASE_URL` is set.
-- `curl -fs "$BASE_URL/" >/dev/null` — if it isn't, **stop and ask the user to start it**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev the user starts will bind to the same port and DB this skill expects.
+- `curl -fs "$BASE_URL/" >/dev/null` — run it every time, even if an earlier check in the session failed; the user may have started it since. If it fails now, **stop and ask the user to start it — unless this is a spawned `.claude/worktrees/…` checkout or the web sandbox, where you start it yourself**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so whoever starts bin/dev binds the same port and DB this skill expects.
+- **A 200 doesn't prove the server is this checkout's.** Confirm `ruby bin/env --export` names a `WORKSPACE_ID` first — without one the curl reaches the main checkout. See the `sandbox-test-setup` skill. The web sandbox (`/home/user/bike_index`) gets a `WORKSPACE_ID` like anywhere else — its setup script runs `bin/workspace_setup` — but it's the only checkout in that container, so whatever `$BASE_URL` resolves to is the right one.
 - A 200 there doesn't promise the next page renders. A merge from the base can leave the dev DB
   unmigrated, and `CheckPending` only re-raises once the evented file watcher notices `db/migrate`
   moved — so a passing curl can be followed by `ActiveRecord::PendingMigrationError` on every page.
   `bundle exec rails db:migrate`, and read `log/development.log` before blaming the capture.
+  A gem the merge bumped does the same: the running server keeps the version it booted with, so a
+  method the new one adds is a `NoMethodError` until `bin/rails restart`.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
 - **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
   back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the
-  per-workspace throwaway DB), or capture previews.
+  per-workspace throwaway DB), or capture previews. In the web sandbox the seed is already running
+  in the background — wait on `/tmp/seed.status` (`sandbox-test-setup`) rather than starting a
+  second one, which dies on duplicates.
 
 ## Sign in (with the PII gate)
 
@@ -108,6 +113,8 @@ If the returned content height is **less than the viewport height**, `browser_re
 
 **Mid-interaction states are in scope.** When the caller asks for a dropdown open, a modal showing, a hover state, a partially-filled form, etc., drive Playwright between settle and the screenshot — `browser_click`, `browser_type`, `browser_press_key`, `browser_hover`, then wait for the UI to reach the target state (`browser_wait_for` on a marker element, or check via `browser_evaluate`) before `browser_take_screenshot`. Treat the interaction sequence as part of the page-slug — e.g. capture `combobox-open` after clicking + typing, distinct from a static `search-registrations` page-load shot. For cross-branch comparisons, run the *same* interaction sequence on each branch so the screenshots actually compare like-for-like.
 
+**A loading state is captured by holding the request open, not by racing it.** In `browser_run_code_unsafe`, `page.route` the frame's URL and delay with `await page.waitForTimeout(90000)` before `route.continue()` — `setTimeout` isn't defined there — then trigger the fetch the way the frame does, by re-setting its `src`. Load the results first: a frame that goes busy from an empty page captures a header reading "0 matches".
+
 **One capture's `?organization_id=` or `?view_as=<org>` changes what the *next* param-less URL renders.** `set_passive_organization` writes the org into the session, and `/registrations/:id` with no params then resolves through `default_view_for` to that org's admin view — so a `/registrations/54` shot taken after a `view_as=brakebills.staff` one is the org page, in the org layout, at the same URL. Nothing errors, and the pair only looks wrong once you open it. Navigate `?organization_id=false` before any capture whose URL carries no `view_as`, and remember the session survives the base-branch checkout, so the branch and base loops can drift apart on this if their orders differ.
 
 **`localStorage` survives that checkout too, and a mid-capture interaction writes to it.** The org search column toggle persists the checked set to `orgRegistrationColumns`, so a base loop run after a branch loop that toggled columns loads the branch's column set — the pair then compares different tables at the same URL. Clear the key, or re-apply the interaction, at the start of each loop rather than once per run.
@@ -132,7 +139,7 @@ $BASE_URL/rails/view_components/<preview_path>/<scenario>
 
 `<preview_path>` is the preview class underscored with the `Preview` suffix dropped, and `<scenario>` is the preview method. `SharedBlocks::ReviewAppBanner::ComponentPreview#superadmin_signed_in` → `/rails/view_components/shared_blocks/review_app_banner/component/superadmin_signed_in`. If a scenario doesn't exist yet, add a method to the component's `*_preview.rb` first — a preview that renders the exact state (pass the args that trigger it) is often the fastest path to a clean shot.
 
-Use this bare route, not Lookbook's `/lookbook/inspect/...`, which wraps the component in its own browser chrome. `/lookbook/preview/...` is the one route that puts a whole `@!group` on a single page — `/lookbook/preview/ui/tooltip/variants` for `UI::Tooltip::ComponentPreview`'s `# @!group Variants`. Reach for it when the shot needs several scenarios side by side; the component's system spec usually already visits it. **It takes a group, not a scenario** — `/lookbook/preview/<preview_path>/<scenario>` 404s, which reads as a wrong preview path rather than a wrong route.
+Use this bare route, not Lookbook's `/lookbook/inspect/...`, which wraps the component in its own browser chrome. `/lookbook/preview/...` is the one route that puts a whole `@!group` on a single page — `/lookbook/preview/ui/tooltip/variants` for `UI::Tooltip::ComponentPreview`'s `# @!group Variants`. Reach for it when the shot needs several scenarios side by side; the component's system spec usually already visits it. **It takes a group, not a scenario, and drops the trailing `component`** — `/lookbook/preview/ui/tooltip/component/variants` and `/lookbook/preview/ui/tooltip/<scenario>` both 404, which reads as an unregistered group rather than a wrong path.
 
 **On a dev server that's been up a while, the group page stops picking up newly added scenarios** — it renders every *other* one, which reads as a broken preview rather than a stale registry (`bin/rails restart` clears it; a fresh server picks them up within a request or two). The bare `/rails/view_components/…` route stays current either way, since `config/initializers/lookbook.rb` patches `__vc_load_previews` to re-resolve through the autoloader — capture a new scenario there.
 
@@ -158,11 +165,12 @@ When the caller wants before/after, repeat the capture loop against the base ref
 
 **Capture the base at what the branch actually merged, not at the ref's tip.** A fetch moves `origin/main` to commits the branch hasn't taken, so a base capture there renders *the base's newer work* and the diff attributes it to this PR. Check `git rev-list --count HEAD..$BASE_REF` before detaching: non-zero means merge first, or detach at `$(git merge-base HEAD $BASE_REF)` instead. On a busy repo the base can move between the branch capture and the base capture of the same run.
 
-**The detached checkout in step 3 is a sanctioned exception to "never change branch" — don't stop and ask for it.** It detaches at a *remote* ref, reads, and returns to the same branch within this section, committing nothing. Nothing here licenses any other checkout, `git checkout -b`, or one that outlives the capture.
+**The detached checkout in step 4 is a sanctioned exception to "never change branch" — don't stop and ask for it.** It detaches at a *remote* ref, reads, and returns to the same branch within this section, committing nothing. Nothing here licenses any other checkout, `git checkout -b`, or one that outlives the capture.
 
 1. `git status` — abort if there are uncommitted changes.
-2. Diff `db/migrate/` between the branch and `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error.
-3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_REF` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD at the remote ref is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
+2. Settle what you're detaching at, per the note above — `$BASE_REF`, or `$(git merge-base HEAD $BASE_REF)` when the branch is behind it. Call that `$BASE_AT`.
+3. Diff `db/migrate/` between the branch and **`$BASE_AT`**, not `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error. A migration that only shows up against the ref's tip belongs to commits the branch never took, and detaching at the merge-base is what resolves it; aborting there abandons a capture that was fine.
+4. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_AT` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files — the watcher can lag that first request, so confirm the page shows the base's markup (the changed element gone) and re-navigate if it doesn't — repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
 
 A `Gemfile.lock` diff is **not** a reason to abort.
 

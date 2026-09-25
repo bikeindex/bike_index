@@ -99,6 +99,14 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       end
     end
 
+    context "with search_status: stolen_or_impounded" do
+      let(:search_status) { "stolen_or_impounded" }
+
+      it "returns stolen or impounded filter description" do
+        expect(instance.active_search_filter_descriptions).to eq(["only <strong>stolen</strong> or <strong>impounded</strong>"])
+      end
+    end
+
     context "with multiple filters active" do
       let(:search_stickers) { "with" }
       let(:search_address) { "with_street" }
@@ -110,10 +118,29 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
+  describe "panel_columns" do
+    it "lists the always-visible view column with the toggleable ones, in label order" do
+      expect(instance.panel_columns).to include("view_cell")
+      expect(instance.enabled_columns).not_to include("view_cell")
+      expect(instance.panel_columns).to eq(instance.panel_columns.sort_by { |cell| instance.panel_labels[cell.to_sym] })
+    end
+  end
+
+  describe "panel_labels" do
+    it "prefixes the time columns, leaving the table headers short" do
+      expect(instance.panel_labels[:created_at_cell]).to eq "Time - registered"
+      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - updated"
+      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - status"
+      expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Registration sequence acknowledged"
+      expect(instance.column_renames[:created_at_cell]).to eq "Registered"
+      expect(instance.panel_labels[:color_cell]).to eq "Color"
+    end
+  end
+
   describe "initially_checked_columns" do
     it "returns default columns" do
       cols = instance.initially_checked_columns
-      expect(cols).to include("created_at_cell", "manufacturer_cell", "model_cell",
+      expect(cols).to include("photo_cell", "created_at_cell", "manufacturer_cell", "model_cell",
         "color_cell", "owner_email_cell", "owner_name_cell", "creation_description_cell")
       expect(cols).not_to include("sticker_cell")
     end
@@ -125,23 +152,23 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
         expect(instance.initially_checked_columns).to include("sticker_cell")
       end
     end
-
-    context "with search_impoundedness impounded" do
-      let(:options) { super().merge(params: {search_impoundedness: "impounded"}) }
-
-      it "includes impounded_cell" do
-        expect(instance.initially_checked_columns).to include("impounded_cell")
-      end
-    end
   end
 
   describe "column_renames" do
     let(:enabled_feature_slugs) { %w[bike_search reg_student_id] }
 
-    it "prefixes the organization's own columns with its short name" do
+    it "names the organization in its own columns" do
       expect(instance.column_renames[:color_cell]).to eq "Color"
-      expect(instance.column_renames[:notes_cell]).to eq "#{organization.short_name} Registration Notes"
-      expect(instance.column_renames[:reg_student_id_cell]).to eq "#{organization.short_name} Student ID"
+      expect(instance.column_renames[:notes_cell]).to eq "Registration Notes <em>by #{organization.short_name}</em>"
+      expect(instance.column_renames[:reg_student_id_cell]).to eq "Student ID <em>for #{organization.short_name}</em>"
+    end
+  end
+
+  describe "sort_column_label" do
+    it "labels a permitted sort by its column, and nothing else" do
+      expect(instance.sort_column_label("id")).to eq "Registered"
+      expect(instance.sort_column_label("serial_number")).to be_nil
+      expect(instance.sort_column_label(nil)).to be_nil
     end
   end
 
@@ -149,7 +176,7 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
 
     it "adds the feature's columns" do
-      expect(instance.enabled_columns).to include("impound_id_cell", "impounded_cell", "url_cell")
+      expect(instance.enabled_columns).to include("impound_id_cell", "url_cell")
     end
 
     context "without impound_bikes" do
@@ -161,25 +188,44 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
-  describe "default_open?" do
-    it "is false" do
-      expect(instance.default_open?).to be_falsey
+  describe "filter_groups" do
+    let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes] }
+    let(:search_status) { "impounded" }
+
+    it "returns a group per enabled filter, carrying the searched value" do
+      groups = instance.filter_groups
+      expect(groups.map { it[:name] })
+        .to eq(%i[search_stickers search_address search_status search_unregisteredness])
+      expect(groups.find { it[:name] == :search_status }[:selected]).to eq "impounded"
+      expect(groups.find { it[:name] == :search_stickers }[:entries].map { it[:value] })
+        .to eq ["", "with", "none"]
+      expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
+        .to eq %w[all not_impounded impounded stolen stolen_or_impounded with_owner]
     end
 
-    context "with search_address" do
-      let(:search_address) { "with_street" }
+    context "with no optional features" do
+      let(:enabled_feature_slugs) { %w[bike_search] }
+      let(:search_status) { "all" }
 
-      it "is true" do
-        expect(instance.default_open?).to be_truthy
+      it "returns only the ungated ones, without the impound statuses" do
+        groups = instance.filter_groups
+        expect(groups.map { it[:name] }).to eq %i[search_status search_unregisteredness]
+        expect(groups.find { it[:name] == :search_status }[:selected]).to eq "all"
+        expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
+          .to eq %w[all stolen with_owner]
       end
     end
+  end
 
-    context "with search_open param" do
-      let(:options) { super().merge(params: {search_open: "true"}) }
+  describe "export_disabled?" do
+    let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 
-      it "is true" do
-        expect(instance.default_open?).to be_truthy
-      end
+    it "is true once the search reaches past the organization, which still renders the export" do
+      expect(instance.export_disabled?).to be false
+
+      search_all = described_class.new(**options.merge(search_all: true))
+      expect(search_all.render_export?).to be true
+      expect(search_all.export_disabled?).to be true
     end
   end
 

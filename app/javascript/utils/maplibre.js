@@ -110,6 +110,19 @@ export class ExpandControl {
   }
 }
 
+// WebGL/MapLibre can be unavailable (crawlers, headless browsers, disabled GPU, blocked
+// CDN). Swaps the blank canvas for the message; callers catch the error so it isn't
+// reported as unhandled. A control may have thrown after the map was built, so dispose
+// it too, or its WebGL context and our controls' document listeners outlive the page.
+export function showMapUnavailable (error, { source, map, canvas, message }) {
+  console.warn(`${source} map failed to render:`, error)
+  map?.remove()
+  if (!message) return
+
+  canvas.hidden = true
+  message.hidden = false
+}
+
 let mapLibrePromise
 
 export function loadMapLibre () {

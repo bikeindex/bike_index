@@ -30,14 +30,11 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
     end
 
     describe "edit" do
-      # The uppy uploader on these pages is set up by the legacy admin bundle on DOM ready,
-      # which a turbo restoration visit doesn't re-run - it restores a clone of its snapshot,
-      # so coming back would find live-looking markup nothing is bound to
-      it "doesn't send the tabs through turbo, from a page carrying the uploader" do
+      it "renders the uploader" do
         get "#{base_url}/landing_page/edit"
         expect(response.status).to eq(200)
-        expect(response.body).to include("UppyForm")
-        expect(response.body).to_not include('data-turbo="true"')
+        expect(response.body).to include("data-ui--forms--files--upload-multiple-target=\"list\"")
+        expect(response.body).to include("data-ui--forms--files--upload-multiple-params-value=\"{&quot;organization_id&quot;:&quot;#{organization.to_param}&quot;}\"")
       end
 
       context "landing_page" do

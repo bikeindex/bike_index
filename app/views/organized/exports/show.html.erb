@@ -243,11 +243,7 @@
                   data-controller="ui--collapse"
                   data-ui--collapse-param-value="show_assigned_stickers"
                 >
-                  <%= render UI::Button::Component.new(
-                    text: t(".show_previously_assigned_stickers"),
-                    color: :link,
-                    data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"},
-                    aria: {expanded: false}) %>
+                  <%= render UI::Collapse::Component.new(text: t(".show_previously_assigned_stickers"), color: :link) %>
 
                   <div data-ui--collapse-target="content" class="tw:hidden">
                     <%= assigned_stickers %>

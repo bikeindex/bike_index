@@ -1,5 +1,5 @@
-/* Bike Index's own tw* classes. Rules that style one component's markup — .ui-table,
- * .search-results-frame-wrapper — stay in application.css */
+/* Bike Index's own tw* classes. Rules that style one component's markup, like
+ * .ui-table, stay in application.css */
 
 /* A plain custom property rather than @theme: a theme variable takes the tw prefix, and
  * is dropped unless a generated utility references it */
@@ -27,8 +27,9 @@
 /* The dev-info marking, formerly admin_unvendored's unlayered copy. A hand-written block
  * rather than @utility, which would take the tw: prefix and so match none of the ~95
  * existing .only-dev-visible sites - nor the `<style>.only-dev-visible {display: none}`
- * hooks several admin tables hide it with. Emitted after tailwind's own utilities, so it
- * takes ties against a resting background like an active UI::Tabs tab's tw:bg-white.
+ * that SharedBlocks::HeaderTags emits for non-dev viewers. This block lands after
+ * tailwind's own utilities, so it takes ties against a resting background like an
+ * active UI::Tabs tab's tw:bg-white.
  * The legacy rule's border is dropped: it fought the shape it marked, and the tab's white
  * lower edge is what breaks the row's underline */
 @layer utilities {

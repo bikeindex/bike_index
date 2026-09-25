@@ -50,6 +50,21 @@ RSpec.describe SharedBlocks::MainContent::Organized::Component, type: :component
     end
   end
 
+  context "parking_notifications" do
+    let(:controller_name) { "parking_notifications" }
+    it "is fluid, without the legacy bundle" do
+      expect(container_class).to eq "container-fluid"
+      expect(javascript_pack).to be_falsey
+    end
+
+    context "show" do
+      let(:action_name) { "show" }
+      it "has the legacy bundle" do
+        expect(javascript_pack).to be_truthy
+      end
+    end
+  end
+
   context "bikes recoveries" do
     let(:controller_name) { "bikes" }
     let(:action_name) { "recoveries" }

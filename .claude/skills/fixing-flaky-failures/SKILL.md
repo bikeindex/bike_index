@@ -108,11 +108,21 @@ gh api repos/bikeindex/bike_index/actions/artifacts/<id>/zip > tmp/a.zip && unzi
 
 The exact failure text usually names the mechanism, and it is easy to skim past
 into a wrong assumption. Worked example from this repo: `expected nil to match
-/\/bikes\/\d+/` was long assumed to mean "the click was lost". It doesn't —
-Capybara returns a nil `current_path` **only** for an `about:` scheme
-(`capybara/session.rb`: `return nil if uri&.scheme == 'about'`), so the browser
-was on `about:blank` and the page had gone away. Different cause, different fix.
-Check the matcher's source when a message is surprising.
+/\/bikes\/\d+/` was long assumed to mean "the click was lost". It doesn't — a nil
+`current_path` means the URL had no path for Capybara to return, which is three
+different browser states, not one (`capybara/session.rb:207`: nil for an `about:`
+scheme, then `path unless path&.empty?`):
+
+| URL | how it got there |
+| --- | --- |
+| `about:blank` | traversed to entry 0, or the page was replaced |
+| `chrome-error://chromewebdata` | a cross-document navigation failed outright |
+| `""` | no document has committed yet |
+
+All three screenshot blank, so the picture can't tell them apart — `tmp/capybara/browser_events.log`
+(written by `spec/support/capybara.rb`, uploaded with the screenshots) can. Check the
+matcher's source when a message is surprising, and don't read one of these three as
+another: the fix differs, and "about:blank" has been the standing wrong guess.
 
 ### 3. Instrument rather than theorise
 
@@ -237,9 +247,17 @@ them, and several look like timing but aren't.
 
 **Not actually flaky — the environment is wrong.** A missing
 `app/assets/builds/tailwind.css` makes `tw:hidden` silently not apply, so
-visibility assertions fail in ways that read as flakes. The
-[`sandbox-test-setup`](../sandbox-test-setup/SKILL.md) skill has the build
-command per environment. Same class of thing: an unmigrated test DB, a stale VCR cassette.
+visibility assertions fail in ways that read as flakes —
+`bin/rails tailwindcss:build` (see [`sandbox-test-setup`](../sandbox-test-setup/SKILL.md)).
+Same class of thing: an unmigrated test DB, a stale VCR cassette.
+
+A build that's *present but predates a merge* fails the same way and reads worse, because
+the class the failing spec needs is in the source and the whole suite is otherwise green —
+Tailwind only generates what the content scan saw, so a class arriving with the merge
+(`tw:h-64`, used by one preview) isn't in a build from before it. `bin/dev` down means no
+watcher, so its `app/assets/builds/*.css` mtime against the merge commit's is the check;
+`bin/rails tailwindcss:build` is the fix. Deterministic, not intermittent: three identical
+failures with no ordering component is this rather than a flake.
 
 **Shared state across examples.** The autocomplete cache (`autc:test:*`) lives
 in a Redis DB shared across `:js` examples and survives 600s, and `load_all`

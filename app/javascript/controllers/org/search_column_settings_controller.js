@@ -1,0 +1,111 @@
+import { Controller } from '@hotwired/stimulus'
+
+/* global localStorage */
+
+// Connects to data-controller='org--search-column-settings'
+export default class extends Controller {
+  static targets = ['checkboxes']
+  static values = { enabledColumns: Array, defaultColumns: Array, assignBikeSticker: Boolean }
+
+  connect () {
+    this.refreshEnabledColumns()
+    // The registrations search renders the checkboxes inside the results frame, which
+    // hasn't loaded yet - the frame's own render is what applies the stored selection there
+    if (this.hasCheckboxesTarget) this.selectStoredVisibleColumns()
+    document.addEventListener('turbo:frame-render', this.handleFrameRender)
+  }
+
+  disconnect () {
+    document.removeEventListener('turbo:frame-render', this.handleFrameRender)
+  }
+
+  // The checkboxes render inside the results frame, so a search replaces them unchecked -
+  // re-read the stored selection rather than applying what's in the DOM
+  handleFrameRender = (event) => {
+    if (!this.element.contains(event.target) || !this.hasCheckboxesTarget) return
+    this.refreshEnabledColumns()
+    this.selectStoredVisibleColumns()
+  }
+
+  refreshEnabledColumns () {
+    // Stimulus Array values return a fresh copy on each read, so mutating
+    // via push won't persist (and assign_bike_sticker_cell is ignored)
+    // build the full array, then assign it once.
+    const columns = [...this.element.querySelectorAll('th.hideableColumn')].map(th =>
+      [...th.classList].find(c => c.endsWith('_cell'))
+    ).filter(Boolean)
+
+    if (this.assignBikeStickerValue) {
+      columns.push('assign_bike_sticker_cell')
+    }
+
+    this.enabledColumnsValue = columns
+  }
+
+  columnToggled () {
+    this.updateVisibleColumns()
+  }
+
+  // An always-visible column's checkbox is disabled, and stays checked through all/none/default
+  get toggleableCheckboxes () {
+    return this.checkboxesTarget.querySelectorAll('input[type=checkbox]:not(:disabled)')
+  }
+
+  selectAll () {
+    this.setAllCheckboxes(true)
+  }
+
+  selectNone () {
+    this.setAllCheckboxes(false)
+  }
+
+  selectDefault () {
+    const defaults = this.defaultColumnsValue
+    this.toggleableCheckboxes.forEach(cb => {
+      cb.checked = defaults.includes(cb.name)
+    })
+    this.updateVisibleColumns()
+  }
+
+  setAllCheckboxes (checked) {
+    this.toggleableCheckboxes.forEach(cb => {
+      cb.checked = checked
+    })
+    this.updateVisibleColumns()
+  }
+
+  selectStoredVisibleColumns () {
+    const stored = localStorage.getItem('orgRegistrationColumns')
+    let columns = this.defaultColumnsValue
+    if (stored) {
+      try { columns = JSON.parse(stored) } catch { localStorage.removeItem('orgRegistrationColumns') }
+    }
+
+    this.toggleableCheckboxes.forEach(cb => {
+      cb.checked = columns.includes(cb.name)
+    })
+    this.updateVisibleColumns()
+  }
+
+  updateVisibleColumns () {
+    const checked = []
+    this.toggleableCheckboxes.forEach(cb => {
+      if (cb.checked) checked.push(cb.name)
+    })
+    localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
+
+    if (this.assignBikeStickerValue) {
+      checked.push('assign_bike_sticker_cell')
+    }
+
+    this.enabledColumnsValue.forEach(col => {
+      const isVisible = checked.includes(col)
+      this.element.querySelectorAll(`.${col}`).forEach(el => {
+        el.classList.toggle('tw:hidden', !isVisible)
+      })
+    })
+
+    // Re-apply first/last visible column border styles via ui-table controller
+    window.dispatchEvent(new Event('ui-table:refresh'))
+  }
+}

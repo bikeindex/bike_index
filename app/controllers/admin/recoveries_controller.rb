@@ -6,7 +6,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
-      @pagy, @recoveries = pagy(:countish, available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
+      @pagy, @recoveries = pagy(:countish, available_recoveries.reorder(sortable_order(StolenRecord))
         .includes(:bike, :country, :region_record), limit: @per_page, page: permitted_page)
     end
 
@@ -34,7 +34,7 @@ module Admin
         redirect_to redirect || admin_recoveries_url
       else
         @recovery = @stolen_record
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 

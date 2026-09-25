@@ -1,0 +1,75 @@
+<%# locals: (payments:, render_sortable: false, skip_user: false, skip_paid_at: false, skip_kind: false, render_method: false) %>
+
+<% render_organization_search = render_sortable && current_organization.blank? %>
+
+<div
+  data-controller="update-cached-sortable-links"
+  data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
+>
+  <%= render(UI::Table::Component.new(records: payments, render_sortable:, sort_state:,
+        cache_key: cache_fragment_name(["admin_payments", render_sortable, skip_user, skip_paid_at, skip_kind, render_method, render_organization_search]),
+        cache_records: ->(payment) { [payment.user, payment.organization, payment.invoice] })) do |table| %>
+    <% table.column(sortable: "created_at") do |payment| %>
+      <%= link_to render(UI::Time::Component.new(time: payment.created_at)), edit_admin_payment_path(payment), class: "twlink" %>
+    <% end %>
+
+    <% unless skip_paid_at %>
+      <% table.column(sortable: "paid_at", label: "Paid", classes: "tw:text-xs") do |payment| %>
+        <%= render UI::Time::Component.new(time: payment.paid_at) %>
+      <% end %>
+    <% end %>
+
+    <% unless skip_user %>
+      <% table.column(sortable: "user_id") do |payment| %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, email: payment.email, user: payment.user, render_search: render_sortable) %>
+      <% end %>
+    <% end %>
+
+    <% table.column(sortable: "referral_source") do |payment| %>
+      <% if payment.referral_source.present? %>
+        <code class="small"><%= payment.referral_source %></code>
+        <% if render_sortable %>
+          <%= link_to search_emoji, url_for(sort_state.search_params.merge(query: payment.referral_source)), class: "display-sortable-link small" %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% unless skip_kind %>
+      <% table.column(sortable: "kind") do |payment| %>
+        <% if payment.theft_alert? %>
+          <%= link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert), class: "twlink" %>
+        <% else %>
+          <%= payment.kind_humanized %>
+        <% end %>
+
+        <% if render_sortable %>
+          <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: payment.kind)), class: "display-sortable-link small" %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% table.column(sortable: "organization_id") do |payment| %>
+      <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: payment.organization, organization_id: payment.organization_id, search_url: (url_for(sort_state.search_params.merge(organization_id: payment.organization_id)) if render_organization_search), render_search: render_organization_search, short_name: true) %>
+    <% end %>
+
+    <% table.column(sortable: "invoice_id") do |payment| %>
+      <%= render partial: "/admin/payments/payment_invoice_cell", locals: {payment:} %>
+    <% end %>
+
+    <% if render_method %>
+      <% table.column(sortable: "payment_method", label: "method", classes: "tw:text-xs") do |payment| %>
+        <% if payment.stripe? %>
+          <%= link_to "stripe", payment.stripe_admin_url, class: "twlink" %>
+        <% else %>
+          <%= payment.payment_method.humanize.downcase %>
+        <% end %>
+
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_payment_method: payment.payment_method)), class: "display-sortable-link small" %>
+      <% end %>
+    <% end %>
+
+    <% table.column(sortable: "amount_cents", label: "Amount") do |payment| %>
+      <%= payment.amount_formatted %>
+    <% end %>
+  <% end %>
+</div>

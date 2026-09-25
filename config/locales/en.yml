@@ -4511,8 +4511,9 @@ en:
         view_avery_labels: View Avery Labels
     impound_records:
       index:
+        find_an_impound_record: Find an impound record
         impound_records: Impound Records
-        render_chart: Render chart
+        search_impound_records: Search impound records
     manage_impoundings:
       edit:
         impound_settings_html: Manage <em>%{org_name}</em> impound settings
@@ -4559,20 +4560,12 @@ en:
           By default, emails to unclaimed bikes are sent to your organization to review
           and forward to the final user, because those users haven't opted in to Bike
           Index notifications.
-    parking_notifications:
-      index:
-        matches_visible: visible
-        parking_notifications: Parking notifications
-      table:
-        address: Address
-        bike: Bike
-        by: By
-        created: Created
-        notification_number: Notification#
-        resolved: Resolved
     registrations:
       search:
-        render_chart: Render chart
+        find_a_registration: Find a registration
+        search_all_email_disabled: You can only search your organization's registrations
+          with owner email or name
+        search_registrations: Search registrations
     stickers:
       edit:
         bike: Bike

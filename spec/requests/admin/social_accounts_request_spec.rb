@@ -5,10 +5,13 @@ RSpec.describe Admin::SocialAccountsController, type: :request, vcr: true do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
+    let!(:social_account) { FactoryBot.create(:social_account, account_info: {name: "Some account"}) }
+
     it "renders" do
       get base_url
       expect(response).to be_ok
       expect(response).to render_template(:index)
+      expect(response.body).to include(social_account.screen_name)
     end
   end
 

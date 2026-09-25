@@ -8,7 +8,7 @@ module Admin
       @per_page = permitted_per_page(default: 50)
       @pagy, @social_posts = pagy(:countish, matching_social_posts
         .includes(:social_account, :public_images, :stolen_record, :reposts, :original_post)
-        .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
+        .reorder(sortable_order(SocialPost)), limit: @per_page, page: permitted_page)
     end
 
     def show
@@ -30,7 +30,7 @@ module Admin
         flash[:notice] = "Post saved!"
         redirect_to edit_admin_social_post_url
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -59,7 +59,7 @@ module Admin
         redirect_to edit_admin_social_post_url(id: @social_post.id)
       else
         flash[:error] ||= "Unable to create post"
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

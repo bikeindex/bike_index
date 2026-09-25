@@ -1,83 +1,63 @@
-<div class="full-screen-table pt-2">
-  <table class="table table-striped table-bordered sortable table-sm">
-    <thead class="thead-light">
-      <th><%= sortable "created_at" %></th>
-      <th><%= sortable "progress" %></th>
-      <th>Errors</th>
-      <th><%= sortable "user_id", "Creator" %></th>
-      <th>Organization &amp; file</th>
-      <th>Bikes</th>
-    </thead>
+<%# locals: (collection:, render_sortable: false) %>
 
-    <tbody>
-      <% collection.each do |bulk_import| %>
-        <% cache(["admin_bulk_import", bulk_import]) do %>
-          <tr>
-            <td>
-              <a
-                class="localizeTime"
-                href="<%= admin_bulk_import_url(bulk_import) %>"
-              >
-                <%= l bulk_import.created_at, format: :convert_time %>
-              </a>
+<div class="pt-2">
+  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
+        cache_key: cache_fragment_name("admin_bulk_import"),
+        cache_records: ->(bulk_import) { [bulk_import.organization, bulk_import.user, bulk_import.ownerships.size] })) do |table| %>
+    <% table.column(sortable: "created_at") do |bulk_import| %>
+      <%= link_to render(UI::Time::Component.new(time: bulk_import.created_at)), admin_bulk_import_url(bulk_import), class: "twlink" %>
 
-              <% if bulk_import.organization_id.present? %>
-                <small class="less-strong">
-                  <%= link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "em less-strong" %>
-                </small>
-              <% end %>
-            </td>
+      <% if bulk_import.organization_id.present? %>
+        <small class="less-strong">
+          <%= link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "em less-strong" %>
+        </small>
+      <% end %>
+    <% end %>
 
-            <td>
-              <%= render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import:} %>
+    <% table.column(sortable: "progress") do |bulk_import| %>
+      <%= render partial: "/organized/bulk_imports/progress_display", locals: {bulk_import:} %>
 
-              <% if bulk_import.timeout_failure? %>
-                <em class="small">import failed to process</em>
-                <small class="only-dev-visible">still pending</small>
-              <% end %>
-            </td>
+      <% if bulk_import.timeout_failure? %>
+        <em class="small">import failed to process</em>
+        <small class="only-dev-visible">still pending</small>
+      <% end %>
+    <% end %>
 
-            <td>
-              <%= render(Pages::Org::BulkImportError::Component.new(bulk_import:, short_display: true, in_admin: true, display_dev_info: display_dev_info?)) %>
-            </td>
+    <% table.column(label: "Errors") do |bulk_import| %>
+      <%= render(Pages::Org::BulkImportError::Component.new(bulk_import:, short_display: true, in_admin: true, display_dev_info: true)) %>
+    <% end %>
 
-            <td>
-              <% if bulk_import.user_id.present? %>
-                <%= bulk_import.user.display_name %>
-              <% end %>
+    <% table.column(sortable: "user_id", label: "Creator") do |bulk_import| %>
+      <% if bulk_import.user_id.present? %>
+        <%= bulk_import.user.display_name %>
+      <% end %>
 
-              <% if bulk_import.ascend? %>
-                <small class="less-strong">ascend</small>
-                <% if bulk_import.ascend_unprocessable? %>
-                  <small class="text-warning">
-                    missing Ascend Organization!
-                  </small>
-                <% end %>
-              <% end %>
-            </td>
-
-            <td>
-              <% if bulk_import.organization.present? %>
-                <%= link_to bulk_import.organization.name, admin_bulk_imports_url(sortable_search_params.merge(organization_id: bulk_import.organization.to_param)) %>
-              <% else %>
-                <%= link_to "no org", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc" %>
-              <% end %>
-
-              <small>
-                <% if bulk_import.file_cleaned? %>
-                  <em class="text-warning">file removed</em>
-                <% else %>
-                  <%= bulk_import.file_filename %>
-                <% end %>
-              </small>
-            </td>
-
-            <td>
-              <%= number_display bulk_import.ownerships.count %>
-            </td>
-          </tr>
+      <% if bulk_import.ascend? %>
+        <small class="less-strong">ascend</small>
+        <% if bulk_import.ascend_unprocessable? %>
+          <small class="text-warning"> missing Ascend Organization! </small>
         <% end %>
       <% end %>
-    </tbody>
-  </table>
+    <% end %>
+
+    <% table.column(label: "Organization & file") do |bulk_import| %>
+      <% if bulk_import.organization.present? %>
+        <%= link_to bulk_import.organization.name, admin_bulk_imports_url(sort_state.search_params.merge(organization_id: bulk_import.organization.to_param)), class: "twlink" %>
+      <% else %>
+        <%= link_to "no org", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc" %>
+      <% end %>
+
+      <small>
+        <% if bulk_import.file_cleaned? %>
+          <em class="text-warning">file removed</em>
+        <% else %>
+          <%= bulk_import.file_filename %>
+        <% end %>
+      </small>
+    <% end %>
+
+    <% table.column(label: "Bikes") do |bulk_import| %>
+      <%= number_display bulk_import.ownerships.size %>
+    <% end %>
+  <% end %>
 </div>

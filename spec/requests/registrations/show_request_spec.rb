@@ -11,7 +11,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
   end
 
   context "consumer view" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, year: 2020, frame_model: "Stumpjumper", name: "Morning commuter") }
     let(:current_user) { bike.reload.user }
 
     it "renders the redesigned consumer view with owner actions" do
@@ -25,6 +25,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       expect(body).to match("Mark stolen")
       expect(body).to match("Add photo")
       expect(body).to match("Edit this bike")
+      expect(body).to match("2020 #{bike.mnfg_name} Stumpjumper nickname: Morning commuter")
       expect(response.body).to match(edit_bike_path(bike, edit_template: bike.default_edit_template))
     end
 
@@ -420,8 +421,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Owner & access")
         expect(body).to match(bike.owner_name)
         expect(body).to match(bike.owner_email)
-        expect(body).to match("E-Vehicle Audit")
-        # Gated by credibility_badges and additional_registrations_information
+        # Gated by e-vehicles, credibility_badges and additional_registrations_information
+        expect(body).to_not match("E-Vehicle Audit")
         expect(body).to_not match("Credibility")
         expect(body).to_not match("Other registrations")
       end
@@ -510,6 +511,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
             # The View notifications action opens the parking-notification show panel
             expect(body).to match("View notification")
             expect(body).to match("Parked incorrectly")
+            expect(response.body).to include('data-registrations--show--map-latitude-value="40.7143528"')
             expect(response.body).to match(organization_parking_notification_path(ParkingNotification.last.id, organization_id: organization.to_param))
           end
         end
@@ -669,10 +671,10 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to_not match("not allowed to view this registration")
       end
 
-      context "with parking notifications and impound enabled" do
-        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+      context "with parking notifications, impound and bike_stickers enabled" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes bike_stickers]) }
 
-        it "offers create parking notification, not the impound action" do
+        it "offers create parking notification and linking a sticker, not the impound action" do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           # Limited members can create a parking notification
@@ -680,6 +682,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
           # No impound action for limited (create is staff-only, request impound removed)
           expect(response.body).to_not match('data-panel-name="impound"')
           expect(body).to_not match("Request impound")
+          expect(body).to match("Link sticker")
+          expect(response.body).to include(organization_sticker_path(id: "code", organization_id: organization.to_param))
         end
       end
     end

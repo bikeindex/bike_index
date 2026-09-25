@@ -1,8 +1,4 @@
 <%# require inline CSS setting because of caching %>
-<% unless @display_dev_info %>
-  <style>.only-dev-visible {display: none !important;} </style>
-<% end %>
-
 <% if @skip_manufacturer_link %>
   <style>.display-mnfg-link {display: none !important;}</style>
 <% end %>
@@ -32,7 +28,7 @@
     data-controller="update-cached-sortable-links"
     data-update-cached-sortable-links-base-url-value="<%= url_for(@sort_state.search_params) %>"
   >
-    <%= render(UI::Table::Component.new(records: @bikes, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state, classes: @show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
+    <%= render(UI::Table::Component.new(records: @bikes, cache_key: self.class.cache_digest, render_sortable: @render_sortable, sort_state: @sort_state, classes: @show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
       <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bike| %>
         <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
       <% end %>
@@ -49,7 +45,7 @@
         <div class="tw:relative">
           <%# Pass in search_url because caching breaks with url_for %>
           <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
-          <%= render Pages::Admin::Users::Cell::Component.new(email: bike.owner_email, user: bike.user, search_url:, render_search: true) %>
+          <%= render Atoms::Admin::TableCells::User::Component.new(email: bike.owner_email, user: bike.user, search_url:, render_search: true) %>
 
           <% if bike.claimed? %>
             <span
@@ -78,7 +74,7 @@
       <% end %>
 
       <% table.column(label: "Info", classes: "tw:hidden tw:lg:table-cell") do |bike| %>
-        <div class="tw:relative">
+        <div>
           <%= render Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike:) %>
           <%= [bike.year, bike.frame_model_truncated].join(' ') %>
           <%= "(#{bike.type})" unless bike.type == 'bike' %>
@@ -93,17 +89,17 @@
             <small>📷</small>
           <% end %>
 
-          <span class="lg:tw:inline tw:hidden tw:text-gray-400">
+          <span class="tw:hidden tw:text-gray-400 tw:lg:inline">
             <%= bike.frame_colors.to_sentence %>
           </span>
 
           <% if BikeServices::Displayer.paint_description?(bike) %>
-            <small class="lg:tw:inline tw:hidden tw:text-gray-400">
+            <small class="tw:hidden tw:text-gray-400 tw:lg:inline">
               <%= link_to bike.paint_description, edit_admin_paint_url(bike.paint) %>
             </small>
           <% end %>
 
-          <span class="tw:absolute tw:right-0 tw:bottom-0">
+          <span class="tw:float-right">
             <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
           </span>
         </div>

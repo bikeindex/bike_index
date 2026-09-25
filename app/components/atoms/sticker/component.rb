@@ -5,6 +5,7 @@ module Atoms
     # Renders a bike sticker's code as a monospace code block. Pass a BikeSticker,
     # or a raw pretty_code string; url links the code.
     class Component < ApplicationComponent
+      # Template Dependency: Atoms::ShortId::Component
       BASE_CLASSES = "#{ShortId::Component::BASE_CLASSES} tw:font-semibold"
 
       def initialize(bike_sticker: nil, pretty_code: nil, url: nil, html_class: nil)

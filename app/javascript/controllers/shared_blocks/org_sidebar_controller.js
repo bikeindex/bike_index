@@ -11,9 +11,7 @@ const READER_SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
 // Gap below whatever is revealed, so a fractional row height can't leave it a subpixel
 // short of the fold
 const REVEAL_MARGIN = 8
-// Matched by the panel it opens rather than by ui--collapse's target, so a collapse
-// nested in the sidebar keeps the data-active that controller gives it
-const GROUP_TRIGGER = '[aria-controls^="org_sidebar_group_"]'
+const GROUP = '[data-controller~="ui--collapse"]'
 
 // Connects to data-controller="shared-blocks--org-sidebar"
 //
@@ -62,7 +60,7 @@ export default class extends Controller {
   // by clicking it, so this owns the decision rather than letting a second action race it
   toggleGroup (event) {
     const trigger = event.currentTarget
-    const group = this.groupFor(trigger)
+    const group = this.collapseFor(trigger)
 
     if (!this.collapsed) {
       group.toggle()
@@ -72,23 +70,7 @@ export default class extends Controller {
       group.show()
     }
 
-    this.flagCurrentGroup()
     this.revealGroup(trigger)
-  }
-
-  // ui--collapse flags its trigger data-active while the group is open, which is the
-  // is-active variant the current row is styled with -- so restated after each toggle as
-  // what that styling means on a group: it holds the current row, open or not
-  flagCurrentGroup () {
-    this.element.querySelectorAll(GROUP_TRIGGER).forEach((trigger) => {
-      const group = trigger.closest('[data-controller~="ui--collapse"]')
-      trigger.dataset.active = String(group?.querySelector('[aria-current]') != null)
-    })
-  }
-
-  groupFor (trigger) {
-    return this.application.getControllerForElementAndIdentifier(
-      trigger.closest('[data-controller~="ui--collapse"]'), 'ui--collapse')
   }
 
   // ui--active-link announces the current row as it marks it
@@ -104,9 +86,9 @@ export default class extends Controller {
   // ordered against this one -- so a group that isn't connected yet is waited for rather
   // than skipped, and the row is read from the DOM in case its event fired first
   openGroupFor (link, attempt = 0) {
-    const group = link.closest('[data-controller~="ui--collapse"]')
-    // A top-level row has no group to open, but is still a row to settle around
-    if (!group) return this.settleCurrentRow()
+    const group = link.closest(GROUP)
+    // A top-level row has no group to open, but is still a row to reveal
+    if (!group) return this.revealCurrentRow()
 
     const collapse = this.collapseFor(group)
     if (!collapse) {
@@ -119,19 +101,16 @@ export default class extends Controller {
 
     if (!open || !group.contains(open)) {
       collapse.setExpanded(true, 0)
-      if (open) this.groupFor(open)?.setExpanded(false, 0)
+      if (open) this.collapseFor(open)?.setExpanded(false, 0)
     }
 
-    this.settleCurrentRow()
-  }
-
-  settleCurrentRow () {
-    this.flagCurrentGroup()
     this.revealCurrentRow()
   }
 
+  // The ui--collapse of the group an element is in (or is) -- null until its module connects
   collapseFor (element) {
-    return this.application.getControllerForElementAndIdentifier(element, 'ui--collapse')
+    const group = element.closest(GROUP)
+    return group && this.application.getControllerForElementAndIdentifier(group, 'ui--collapse')
   }
 
   watchForReaderScroll () {

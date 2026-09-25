@@ -21,10 +21,10 @@ module UI
       # It always renders inside a wrapper div, so the combobox sits at the same
       # depth either way -- add your own wrapper for the parent's layout.
       #
-      # Any other keyword (id:, value:, open:, free_text:, autocomplete:,
-      # placeholder:, etc.) is forwarded to `hw_combobox_tag`. That includes
-      # `aria:` - `aria: {describedby: group.helper_text_id}` reaches the real
-      # input, which is how this pairs with UI::Forms::Group's helper text.
+      # html_options (form:, id:, value:, required:, placeholder:, etc.) are
+      # forwarded to `hw_combobox_tag`. That includes `aria:` -
+      # `aria: {describedby: group.helper_text_id}` reaches the real input, which
+      # is how this pairs with UI::Forms::Group's helper text.
       class Component < ApplicationComponent
         RICH_DISPLAYS = %i[inline stacked].freeze
 
@@ -35,13 +35,20 @@ module UI
         # Centered as a block, so blurring lines up with the input's own centered text
         STACKED_OVERLAY_CLASSES = "tw:flex tw:flex-col tw:justify-center tw:overflow-hidden"
         STACKED_INPUT_CLASSES = "tw:min-h-13"
+        MULTISELECT_REQUIRED_ACTIONS = "hw-combobox:selection->ui--forms--multiselect-required#sync " \
+          "hw-combobox:removal->ui--forms--multiselect-required#sync"
 
-        def initialize(name:, options: [], src: nil, rich_display: nil, no_js: nil, **combobox_options)
+        def initialize(name:, options: [], src: nil, rich_display: nil, no_js: nil, dialog_label: nil,
+          free_text: false, include_blank: nil, multiselect_chip_src: nil, open: false, html_options: {})
           @name = name
           @options_or_src = src || options
           @rich_display = RICH_DISPLAYS.detect { |display| display.to_s == rich_display.to_s }
           @no_js = no_js
-          @combobox_options = combobox_options
+          # Names the input in the full screen dialog the gem opens on mobile, which hides the
+          # Group's label -- pass it when that label isn't the humanized name
+          @combobox_options = {dialog_label: dialog_label || name.to_s.humanize, free_text:, include_blank:,
+                               multiselect_chip_src:, open:}.compact
+          @html_options = html_options
         end
 
         def call
@@ -52,7 +59,7 @@ module UI
 
         def combobox
           # customize_ (rather than the input: kwarg) appends to the gem's own classes
-          helpers.hw_combobox_tag(@name, @options_or_src, **defaults, **combobox_attrs) do |component|
+          helpers.hw_combobox_tag(@name, @options_or_src, **@combobox_options, **default_id, **combobox_attrs) do |component|
             component.customize_input(class: STACKED_INPUT_CLASSES) if stacked?
           end
         end
@@ -61,10 +68,14 @@ module UI
         # it's a hidden control no browser will submit past, which without JavaScript is
         # every submission
         def combobox_attrs
-          js_required? ? @combobox_options.except(:required) : @combobox_options
+          js_required? ? @html_options.except(:required) : @html_options
         end
 
-        def js_required? = @no_js.present? && @combobox_options[:required].present?
+        def required? = @html_options[:required].present?
+
+        def js_required? = @no_js.present? && required?
+
+        def multiselect_required? = @combobox_options[:multiselect_chip_src].present? && required?
 
         # What this falls back to without JavaScript. A select posts the options' own
         # values, so only a textbox needs the caller to say what to show (`no_js: {value:}`)
@@ -72,15 +83,15 @@ module UI
           return if @no_js.blank?
 
           render UI::Forms::NoJsField::Component.new(name: no_js_name,
-            label: @combobox_options.fetch(:dialog_label) { defaults[:dialog_label] },
-            value: @no_js.is_a?(Hash) ? @no_js[:value] : @combobox_options[:value],
-            options: no_js_options, required: @combobox_options[:required], text: no_js_text?)
+            label: @combobox_options[:dialog_label],
+            value: @no_js.is_a?(Hash) ? @no_js[:value] : @html_options[:value],
+            options: no_js_options, required: @html_options[:required], text: no_js_text?)
         end
 
         # A list can't serve free text, options fetched from an endpoint, or more of them
         # than anyone wants to scroll
         def no_js_text?
-          @combobox_options[:free_text].present? || !@options_or_src.is_a?(Array) ||
+          @combobox_options[:free_text] || !@options_or_src.is_a?(Array) ||
             @options_or_src.length > NO_JS_SELECT_MAX
         end
 
@@ -94,16 +105,18 @@ module UI
         end
 
         def no_js_name
-          form = @combobox_options[:form]
+          form = @html_options[:form]
           form ? form.field_name(@name) : @name
         end
 
-        # Only a rich display needs the controller, or the positioning context its overlay
+        # Only a rich display needs the display controller, or the positioning context its overlay
         # is placed against. data-js-required is what the fallback's stylesheet hides
         def wrapper_attrs
           controllers = [("ui--forms--combobox-display" if @rich_display),
-            ("ui--forms--js-required" if js_required?)].compact
+            ("ui--forms--js-required" if js_required?),
+            ("ui--forms--multiselect-required" if multiselect_required?)].compact
           data = {controller: controllers.presence&.join(" "),
+                  action: (MULTISELECT_REQUIRED_ACTIONS if multiselect_required?),
                   js_required: (true if @no_js.present?)}.compact
           {class: ("tw:relative" if @rich_display), data:}.compact
         end
@@ -122,12 +135,9 @@ module UI
           [OVERLAY_CLASSES, stacked? ? STACKED_OVERLAY_CLASSES : "tw:truncate"].join(" ")
         end
 
-        # id: without a form builder the gem ids the input with a uuid, which a Group
-        # label's `for` can't target. dialog_label: names the input in the full screen
-        # dialog the gem opens on mobile, which hides the Group's label -- pass it
-        # explicitly when that label isn't the humanized name.
-        def defaults
-          {dialog_label: @name.to_s.humanize, id: (@name unless @combobox_options[:form])}.compact
+        # Without a form builder the gem ids the input with a uuid, which a Group label's `for` can't target
+        def default_id
+          @html_options[:form] ? {} : {id: @name}
         end
       end
     end

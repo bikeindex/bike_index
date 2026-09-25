@@ -25,6 +25,22 @@ RSpec.describe UI::Table::Component, type: :component do
     expect(component).to have_css("td", text: "Alice")
     expect(component).to have_css("td", text: "bob@example.com")
     expect(component).to have_css("table.ui-table")
+    expect(component).not_to have_css("tfoot")
+  end
+
+  context "with a footer" do
+    let(:component) do
+      render_inline(described_class.new(records:)) do |table|
+        table.column(label: "Name", footer: "Total") { |r| r.name }
+        table.column(label: "Email") { |r| r.email }
+      end
+    end
+
+    it "renders one footer cell per column, after the rows" do
+      expect(component).to have_css("tfoot tr td", count: 2)
+      expect(component).to have_css("tfoot td:first-child", text: "Total")
+      expect(component).not_to have_css("tbody td", text: "Total")
+    end
   end
 
   context "with custom classes" do
@@ -67,6 +83,18 @@ RSpec.describe UI::Table::Component, type: :component do
       expect(result).to have_css("th a.twlink[data-active='true']", text: /Name/)
       expect(result).to have_css("th a.twlink", text: /Email/)
       expect(result).not_to have_css("th a[data-active]", text: /Email/)
+    end
+
+    context "with header_tooltip" do
+      it "renders the tooltip beside the sort link, not inside it" do
+        result = render_inline(described_class.new(records:, render_sortable: true)) do |table|
+          table.column(sortable: "name", header_tooltip: "Their full name") { |r| r.name }
+        end
+
+        expect(result).to have_css("th a", text: /Name/)
+        expect(result).to have_css("th", text: /Their full name/)
+        expect(result).not_to have_css("th a [role=tooltip], th a button")
+      end
     end
 
     context "with custom label" do
@@ -157,47 +185,73 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
+  # Every part of a row's key serves a stale row if it drops out, and nothing about the
+  # rendered markup shows which parts are there — so these assert on the keys written
   context "with cache_key", :caching do
     include_context :caching_basic
 
-    it "caches each row" do
-      users = FactoryBot.create_list(:user, 2)
+    let(:users) { FactoryBot.create_list(:user, 2) }
 
+    def render_table(cache_key: "test", cache_records: nil)
       with_controller_class(ApplicationController) do
-        result = render_inline(described_class.new(records: users, cache_key: "test")) do |table|
+        render_inline(described_class.new(records: users, cache_key:, cache_records:)) do |table|
           table.column(label: "Name") { |u| u.name }
-          table.column(label: "Email") { |u| u.email }
-        end
-
-        expect(result).to have_css("td", text: users.first.name)
-        expect(result).to have_css("td", text: users.second.email)
-      end
-    end
-
-    it "caches rows with lower_right content" do
-      users = FactoryBot.create_list(:user, 2)
-
-      with_controller_class(ApplicationController) do
-        result = render_inline(described_class.new(records: users, cache_key: "lr-test")) do |table|
           table.column(label: "Email", lower_right: ->(u) { u.id }) { |u| u.email }
         end
-
-        expect(result).to have_css("td div", text: /#{users.first.email}/)
-        expect(result).to have_css("td div small", text: users.first.id.to_s)
       end
     end
 
-    it "namespaces cache keys with a string" do
-      users = FactoryBot.create_list(:user, 1)
+    it "writes a fragment per row, scoped to the record, the cache_key and the locale" do
+      result = nil
+      keys = fragments_written { result = render_table }
 
-      with_controller_class(ApplicationController) do
-        render_inline(described_class.new(records: users, cache_key: "view-a")) do |table|
-          table.column(label: "Name") { |u| u.name }
-        end
+      expect(result).to have_css("td", text: users.first.name)
+      expect(result).to have_css("td div small", text: users.first.id.to_s)
+      expect(keys.count).to eq 2
+      expect(keys.first).to include("test", users.first.cache_key_with_version, "locale/en")
+      expect(keys.second).to include(users.second.cache_key_with_version)
 
-        render_inline(described_class.new(records: users, cache_key: "view-b")) do |table|
-          table.column(label: "Name") { |u| u.name }
-        end
+      expect(fragments_written { render_table }).to eq([])
+
+      # cache_key namespaces the rows, so another table rendering the same records
+      # doesn't serve this one's cells
+      expect(fragments_written { render_table(cache_key: "other") }.count).to eq 2
+
+      # The version in each record's key is what busts that row when the record changes
+      users.first.update(name: "Changed name")
+      rewritten = fragments_written { render_table }
+      expect(rewritten.count).to eq 1
+      expect(rewritten.first).to include(users.first.cache_key_with_version)
+    end
+
+    it "busts a row when a record from cache_records changes" do
+      organization = FactoryBot.create(:organization)
+      cache_records = ->(_user) { organization }
+
+      keys = fragments_written { render_table(cache_records:) }
+      expect(keys.count).to eq 2
+      expect(keys.first).to include(organization.cache_key_with_version)
+      expect(fragments_written { render_table(cache_records:) }).to eq([])
+
+      organization.update(name: "Renamed")
+      expect(fragments_written { render_table(cache_records:) }.count).to eq 2
+    end
+
+    context "in another locale" do
+      it "keys the rows to that locale" do
+        keys = I18n.with_locale(:nl) { fragments_written { render_table } }
+
+        expect(keys.first).to include("locale/nl")
+      end
+    end
+
+    context "without a cache_key" do
+      it "renders every row uncached" do
+        result = nil
+        keys = fragments_written { result = render_table(cache_key: nil) }
+
+        expect(keys).to eq([])
+        expect(result).to have_css("td", text: users.first.name)
       end
     end
   end
@@ -236,11 +290,11 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with header_classes font-normal" do
-    it "adds font-normal class to th" do
+  context "with a sortable column" do
+    it "sets only the plain headers to normal weight" do
       result = render_inline(described_class.new(records:)) do |table|
-        table.column(label: "Name") { |r| r.name }
-        table.column(label: "Email", header_classes: "tw:font-normal") { |r| r.email }
+        table.column(sortable: "name") { |r| r.name }
+        table.column(label: "Email") { |r| r.email }
       end
 
       headers = result.css("th")

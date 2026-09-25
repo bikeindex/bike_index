@@ -6,7 +6,7 @@ module Admin
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
         matching_marketplace_listings.includes(:seller, :item, :buyer, :address_record)
-          .reorder("marketplace_listings.#{sort_column} #{sort_direction}"),
+          .reorder(sortable_order(MarketplaceListing)),
         limit: @per_page,
         page: permitted_page)
     end

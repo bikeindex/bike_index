@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
-import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION, showMapUnavailable } from 'utils/maplibre'
 
 /* global navigator */
 
@@ -92,25 +92,25 @@ export default class extends Controller {
   // Segmented control: "current" places a pin on the map, "entered" reveals the
   // address fields
   selectLocationMode (event) {
-    if (event.target.value === 'entered') this.enterManually()
-    else this.startLocation()
+    if (event.target.value === 'entered') this.enterManually(COLLAPSE_DURATION_MS)
+    else this.startLocation(COLLAPSE_DURATION_MS)
   }
 
   // Reflect the chosen mode across the radios, the hidden flag, the required
   // fields and which of the map / address panels is showing
-  applyLocationMode (manual) {
+  applyLocationMode (manual, duration) {
     const value = manual ? 'entered' : 'current'
     this.locationModeTargets.forEach((radio) => { radio.checked = radio.value === value })
     if (this.hasUseEnteredAddressTarget) this.useEnteredAddressTarget.value = manual
     this.setManualRequired(manual)
-    this.toggle(this.addressGroupTarget, manual)
-    this.toggle(this.mapSectionTarget, !manual)
+    collapse(manual ? 'show' : 'hide', this.addressGroupTarget, duration)
+    collapse(manual ? 'hide' : 'show', this.mapSectionTarget, duration)
   }
 
   // Show the map and seed the pin. Once a location has resolved this session the
   // pin is already placed, so just re-reveal the map.
   startLocation (revealDuration = 0) {
-    this.applyLocationMode(false)
+    this.applyLocationMode(false, revealDuration)
 
     if (this.located) {
       // The frame may still be mid-collapse, so measure once it has settled
@@ -267,21 +267,15 @@ export default class extends Controller {
         this.renderDeviceLocation() // a fix that landed before the style was ready
       })
     } catch (error) {
-      this.mapUnavailable(error)
+      // The coordinates are already stamped, so the form still submits
+      showMapUnavailable(error, {
+        source: this.identifier,
+        map: this.map,
+        canvas: this.mapFrameTarget,
+        message: this.hasMapUnavailableTarget ? this.mapUnavailableTarget : null
+      })
+      this.map = null
     }
-  }
-
-  // WebGL/MapLibre can be unavailable (crawlers, headless browsers, disabled GPU,
-  // blocked CDN). The coordinates are already stamped, so the form still submits;
-  // just reveal a message instead of a blank box
-  mapUnavailable (error) {
-    console.warn('Parking-notification map failed to render:', error)
-    // A control may have thrown after the map was built — dispose it, or its WebGL
-    // context and our controls' document listeners outlive the page
-    this.map?.remove()
-    this.map = null
-    if (this.hasMapFrameTarget) this.mapFrameTarget.hidden = true
-    if (this.hasMapUnavailableTarget) this.mapUnavailableTarget.hidden = false
   }
 
   disconnect () {
@@ -330,8 +324,8 @@ export default class extends Controller {
     } catch { /* leave the fields for them to fill in */ }
   }
 
-  enterManually () {
-    this.applyLocationMode(true)
+  enterManually (duration = 0) {
+    this.applyLocationMode(true, duration)
     // Seed from the resolved address while it still describes the pin, without
     // waiting on the network; a pin that has moved gets a fresh geocode instead
     if (this.geocodedFor === this.pinKey) this.fillAddress()

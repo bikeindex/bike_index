@@ -117,9 +117,9 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Fill every field: text, chip radio, unit select, comboboxes (including the
     # collapsed additional-color rows) and the missing-serial checkbox
-    fill_in "bike[user_name]", with: user_name
-    fill_in "bike[frame_model]", with: "Marlin 7"
-    fill_in "bike[year]", with: "2023"
+    fill_in_verified "bike[user_name]", with: user_name
+    fill_in_verified "bike[frame_model]", with: "Marlin 7"
+    fill_in_verified "bike[year]", with: "2023"
     type_into("#bike_primary_frame_color_id", "Red")
     click_combobox_option("Red")
     click_button "+ Add another color"
@@ -139,7 +139,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Unchecking has to undo the animated hide, not just its display:none
     uncheck "Missing serial"
-    fill_in "bike[serial_number]", with: "SERIAL9"
+    fill_in_verified "bike[serial_number]", with: "SERIAL9"
 
     check "Missing serial"
     expect(page).to have_no_field("bike[serial_number]")
@@ -210,7 +210,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     expect(page).to have_field("bike_status", with: "Stolen", wait: 10)
     expect(find("input[name='bike[status]']", visible: :all).value).to eq "status_stolen"
-    fill_in "bike[phone]", with: "(555) 000-0000"
+    fill_in_verified "bike[phone]", with: "(555) 000-0000"
 
     # Anonymous, so this uploads against the registration's token - after the reload above,
     # which would have dropped a file picked before it
@@ -393,7 +393,7 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_current_path(/step=2/, url: true)
       expect(Bike.count).to eq 0
 
-      fill_in "bike[user_name]", with: user_name
+      fill_in_verified "bike[user_name]", with: user_name
       click_button "Complete Bike Registration"
 
       expect(page).to have_content("Registration complete")
@@ -413,7 +413,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "XYZ 123"
+      fill_in_verified "bike[serial_number]", with: "XYZ 123"
 
       # The bot gets the same finished page it would if it had gotten away with it
       click_button "Complete Bike Registration"
@@ -448,20 +448,15 @@ RSpec.describe "Register flow", :js, type: :system do
     def complete_the_registration
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "HELD1234"
-      fill_in "bike[user_name]", with: user_name # anonymous, so it's asked for
+      fill_in_verified "bike[serial_number]", with: "HELD1234"
+      fill_in_verified "bike[user_name]", with: user_name # anonymous, so it's asked for
       click_button "Complete Bike Registration"
     end
 
     it "holds the submit until the blob lands, then sends it" do
       start_registration
-      # Held just long enough to submit against it; the upload finishes on its own after
-      page.driver.with_playwright_page do |playwright_page|
-        playwright_page.route(upload_url_pattern, ->(route, _request) {
-          sleep 3
-          route.continue
-        })
-      end
+      # Held until the submit has landed against it
+      upload = hold_requests(upload_url_pattern)
 
       attach_file("bike_image", image_path, make_visible: true)
       expect(page).to have_content("uploading")
@@ -473,6 +468,7 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_current_path(/step=2/, url: true)
 
       # ...and once the blob lands the held submit goes through, carrying the photo
+      upload.release
       expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_present
     end
@@ -483,8 +479,8 @@ RSpec.describe "Register flow", :js, type: :system do
       hang_the_upload
       # Shortens the wait rather than skipping a step - the whole path still runs
       page.execute_script(<<~JS)
-        document.querySelector("[data-controller~='ui--forms--file-upload']")
-          .setAttribute("data-ui--forms--file-upload-stall-value", "1500")
+        document.querySelector("[data-controller~='ui--forms--files--upload']")
+          .setAttribute("data-ui--forms--files--upload-stall-value", "1500")
       JS
 
       attach_file("bike_image", image_path, make_visible: true)
@@ -523,7 +519,7 @@ RSpec.describe "Register flow", :js, type: :system do
         # A color is required for the bike to save, and signed in it saves on submit
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
-        fill_in "bike[serial_number]", with: "R2UP1234"
+        fill_in_verified "bike[serial_number]", with: "R2UP1234"
         click_button "Complete Bike Registration"
         expect(page).to have_content("Registration complete")
 

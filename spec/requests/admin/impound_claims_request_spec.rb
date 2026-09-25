@@ -11,6 +11,12 @@ RSpec.describe Admin::ImpoundClaimsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:impound_claims)).to eq([impound_claim])
+
+      impound_claim_later = FactoryBot.create(:impound_claim)
+      impound_claim.update(impound_record: FactoryBot.create(:impound_record, organization: impound_claim.organization))
+      get base_url, params: {sort: "impound_record_id", direction: "desc"}
+      expect(response.status).to eq(200)
+      expect(assigns(:impound_claims)).to eq([impound_claim, impound_claim_later])
     end
   end
 

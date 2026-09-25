@@ -116,7 +116,16 @@ export default class extends Controller {
     const first = new URL(url, window.location.origin)
     const second = new URL(otherUrl, window.location.origin)
 
-    return first.pathname === second.pathname && first.search !== second.search
+    return first.pathname === second.pathname && this.resultsSearch(first) !== this.resultsSearch(second)
+  }
+
+  // The org chart's scope and open state ride in the address bar so a reload keeps them,
+  // but the results are the same under either - moving them mustn't re-run the search.
+  resultsSearch (url) {
+    const params = new URLSearchParams(url.search)
+    ;['chart_scope', 'chart_open'].forEach(name => params.delete(name))
+
+    return params.toString()
   }
 
   // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
@@ -153,6 +162,12 @@ export default class extends Controller {
     } else if (event.target === this.frameElement && this.frameResponseSuperseded(response?.url)) {
       event.preventDefault()
     }
+    // What's outside the frame follows the results, so it waits on this rather than watching
+    if (!response?.ok && this.ownsFetch(event)) this.announceFailure()
+  }
+
+  announceFailure () {
+    window.dispatchEvent(new CustomEvent('search:results-failed'))
   }
 
   // The frame's eager src fetch and a search submitted while it's still in flight
@@ -188,6 +203,7 @@ export default class extends Controller {
     this.failedSubmit = event.target === this.formTarget
     this.hideLoading()
     this.showNotice('fetch-failed')
+    this.announceFailure()
   }
 
   handleRetryClick = (event) => {
@@ -225,9 +241,9 @@ export default class extends Controller {
 
   showRateLimited = () => this.showNotice('rate-limited')
 
-  // The form sits outside the results frame, so frame-nav period clicks advance
-  // the URL but leave its hidden fields stale. Sync from the URL so the next
-  // submit doesn't drop the period the user just chose.
+  // The form sits outside the results frame, so a frame-nav period click or a collapse
+  // toggle advances the URL but leaves its hidden fields stale. Sync from the URL - on
+  // every frame render, and on the submit itself, which Turbo serializes after this runs.
   syncHiddenFieldsFromUrl () {
     const params = new URLSearchParams(window.location.search)
     this.formTarget.querySelectorAll('input[type="hidden"]').forEach(input => {

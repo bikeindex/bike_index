@@ -1,0 +1,42 @@
+<%# locals: (memberships:, skip_user: false, render_sortable: false) %>
+
+<div
+  data-controller="update-cached-sortable-links"
+  data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
+>
+  <%= render(UI::Table::Component.new(records: memberships, render_sortable:, sort_state:,
+        cache_key: cache_fragment_name(["admin_memberships", render_sortable, skip_user]),
+        cache_records: ->(membership) { [membership.user, membership.creator] })) do |table| %>
+    <% table.column(sortable: "created_at", lower_right: ->(membership) { membership.id }) do |membership| %>
+      <%= link_to render(UI::Time::Component.new(time: membership.created_at)), admin_membership_url(membership), class: "twlink" %>
+    <% end %>
+
+    <% unless skip_user %>
+      <% table.column(sortable: "user_id") do |membership| %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(user: membership.user, user_id: membership.user_id) %>
+      <% end %>
+    <% end %>
+
+    <% table.column(sortable: "start_at") do |membership| %>
+      <%= render UI::Time::Component.new(time: membership.start_at) %>
+    <% end %>
+
+    <% table.column(sortable: "end_at") do |membership| %>
+      <%= render UI::Time::Component.new(time: membership.end_at) %>
+    <% end %>
+
+    <% table.column(sortable: "level") do |membership| %>
+      <%= membership.level_humanized %>
+    <% end %>
+
+    <% table.column(sortable: "creator") do |membership| %>
+      <% if membership.stripe_managed? %>
+        <%= link_to "Stripe", membership.stripe_admin_url, class: "twlink" %>
+      <% else %>
+        <div class="less-strong">
+          <%= render Atoms::Admin::TableCells::User::Component.new(user: membership.creator, user_id: membership.creator_id) %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

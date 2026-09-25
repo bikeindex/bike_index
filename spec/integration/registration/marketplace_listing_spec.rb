@@ -31,7 +31,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
 
   # The listing reads the same to the seller previewing it and to the buyer who found it
   def expect_listing_shown
-    expect(page).to have_content("For Sale")
+    expect(page).to have_content("FOR SALE")
     expect(page).to have_content("$450")
     expect(page).to have_content("price is negotiable")
     expect(page).to have_content("lightly ridden")
@@ -44,6 +44,13 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
   # refusing to filter and once as both plain fills arriving empty. Neither CPU throttling
   # nor holding form_persist_controller and autofocus_controller on the route reproduces
   # it, so wait_for_details_step is not the gap; the retries stand in for a fix
+  #
+  # A second mode the retries do NOT cover: run 35173362306 failed all four attempts on
+  # the "Surly Cross Check" click below, nil current_path each time. browser_events.log
+  # was silent, which then only watched for about:, so the browser was on chrome-error:
+  # or nothing - a cross-document navigation that failed rather than one that was lost.
+  # Raising the count won't help a run where every attempt fails; the widened log is
+  # there to name it next time.
   it "publishes a registration for sale, sells it through a buyer's message, and transfers it", flaky: 4 do
     sign_in_as_seller
 
@@ -52,12 +59,8 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
 
     type_into("#bike_primary_frame_color_id", "Red")
     click_combobox_option("Red")
-    fill_in "bike[frame_model]", with: "Cross Check"
-    fill_in "bike[serial_number]", with: "MKT12345"
-
-    # A lost fill leaves the serial empty and the browser holds the submit, so without this
-    # the flake below surfaces 10s later as a missing "Registration complete"
-    expect(page).to have_field("bike[serial_number]", with: "MKT12345")
+    fill_in_verified "bike[frame_model]", with: "Cross Check"
+    fill_in_verified "bike[serial_number]", with: "MKT12345"
     click_button "Complete Bike Registration"
 
     expect(page).to have_content("Registration complete")

@@ -91,7 +91,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # frame via turbo_stream; back-nav must restore it fresh from the server, not
     # from a cached snapshot whose frame would be stale.
     fill_in "search_email", with: "nobody@example.com"
-    find("#search-button").click
+    click_button "Search impound records"
 
     expect(page).to have_current_path(/search_email=nobody/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame", wait: 10)
@@ -116,7 +116,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # The proximity + location fields submit with the search form via turbo
     fill_in "search_proximity", with: "50"
     fill_in "search_location", with: "New York"
-    find("#search-button").click
+    click_button "Search impound records"
 
     expect(page).to have_current_path(/search_location=New\+York/, wait: 10)
     expect(page).to have_current_path(/search_proximity=50/)

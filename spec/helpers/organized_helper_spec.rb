@@ -12,13 +12,13 @@ RSpec.describe OrganizedHelper, type: :helper do
       expect(organized_bike_text(bike, skip_creation: true)).to eq "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong></span>"
     end
     context "unregistered" do
-      let(:target_text) do
-        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><small> cargo bike</small><em class=\"small text-warning\"> unregistered</em></span>"
-      end
-      it "renders with unregistered" do
+      it "renders the unregistered badge, not the origin" do
         bike.cycle_type = "cargo"
         bike.status = "unregistered_parking_notification"
-        expect(organized_bike_text(bike)).to eq target_text
+        result = organized_bike_text(bike)
+        expect(result).to start_with "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><small> cargo bike</small> "
+        expect(result).to include("Unregistered")
+        expect(result).not_to include("less-strong")
       end
     end
     context "deleted" do

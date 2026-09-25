@@ -18,7 +18,12 @@
  * ancestor activates tw:dark:* utilities. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* The selected/pressed state of a button, link or menu item, however it's flagged.
+/* Below anything holding the org registrations search's checked search_all: the owner email
+ * field and the chart card fold away on it */
+@custom-variant search-all-checked (&:where(:has([data-org--search-target=searchAll]:checked) *));
+
+/* The selected/pressed state of a button, link or menu item, however it's flagged —
+ * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
  * order, and sorting after `dark` is what lets tw:is-active:* beat the resting,
  * hover and dark colors it overrides without `!important`.
@@ -26,13 +31,17 @@
  * The :not()s keep a disabled element from looking active, and tie the specificity of
  * the hovers they beat (guarded not-disabled:not-aria-disabled:) — sorting last only
  * settles ties, so without them a pressed button renders its hover color. */
-@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active):not(:disabled):not([aria-disabled="true"]));
+@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active, :has(> :checked)):not(:disabled):not([aria-disabled="true"]));
 
 @theme {
   --font-sans: "Open Sans", sans-serif;
   --font-header: "Montserrat", sans-serif;
   --breakpoint-xs: 23rem; /* 368px (iphone mini is 375px) */
   --breakpoint-navbar: 62rem; /* 992px, the $grid-breakpoint-lg the navbar switches at */
+
+  /* 11px, below tailwind's own xs; the line box stays xs's 1rem */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: calc(1 / 0.6875);
 
   /* OG Bike Index brand palettes (formerly config/tailwind.config.js) */
   /* Blue 500 and up carry the redesign's saturation (kelsey_styles.css's
@@ -123,16 +132,16 @@
   .ui-table thead tr th:last-child {
     @apply tw:rounded-tr-sm;
   }
-  .ui-table tbody tr:last-child td:first-child {
+  .ui-table :is(tbody:last-child, tfoot) tr:last-child td:first-child {
     @apply tw:rounded-bl-sm;
   }
-  .ui-table tbody tr:last-child td:last-child {
+  .ui-table :is(tbody:last-child, tfoot) tr:last-child td:last-child {
     @apply tw:rounded-br-sm;
   }
-  .ui-table-bordered tbody tr td:first-child {
+  .ui-table-bordered :is(tbody, tfoot) tr td:first-child {
     @apply tw:ui-table-bordered-td-first;
   }
-  .ui-table-bordered tbody tr td:last-child {
+  .ui-table-bordered :is(tbody, tfoot) tr td:last-child {
     @apply tw:ui-table-bordered-td-last;
   }
   .ui-table-bordered thead tr th:first-child {
@@ -141,24 +150,10 @@
   .ui-table-bordered thead tr th:last-child {
     @apply tw:ui-table-bordered-th-last;
   }
-
-  /* Turbo sets [busy] on the results frame during requests. Hide the existing
-     results and overlay a spinner; min-height gives the spinner a place to
-     land on the initial auto-submit when the frame is still empty. */
-  .search-results-frame-wrapper {
-    @apply tw:relative;
-  }
-  .search-results-frame-wrapper > turbo-frame[busy] {
-    @apply tw:opacity-0 tw:pointer-events-none;
-  }
-  .search-results-frame-wrapper > .search-loading-overlay {
-    @apply tw:hidden tw:absolute tw:top-0 tw:left-0 tw:right-0 tw:pointer-events-none tw:z-1;
-  }
-  .search-results-frame-wrapper:has(> turbo-frame[busy]) {
-    @apply tw:min-h-48;
-  }
-  .search-results-frame-wrapper:has(> turbo-frame[busy]) > .search-loading-overlay {
-    @apply tw:block;
+  /* A 🔎 or tooltip "?" stays on the line of what it follows. Only the whole cell
+     works: Chromium still breaks after a preceding element that wraps */
+  .ui-table td:has(.keep-with-previous) {
+    @apply tw:whitespace-nowrap;
   }
 }
 
@@ -240,6 +235,12 @@ body.with-org-sidebar main > :only-child {
   width: 100%;
 }
 
+/* Fixed to the viewport, which body's margin doesn't reach */
+body.with-org-sidebar #flash-messages {
+  left: var(--org-sidebar-width, 266px);
+  transition: left 0.18s ease;
+}
+
 /* SharedBlocks::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
    a top bar in the flow -- which takes its own space, so there's nothing to hold
    open for it. `width <` rather than a max-width of 759px, so a fractional viewport
@@ -248,7 +249,8 @@ body.with-org-sidebar main > :only-child {
   body.with-org-sidebar {
     --nav-gap: 16px;
 
-    margin-left: 0;
+    /* Shadows what the controller writes on the document, so every reader of it follows */
+    --org-sidebar-width: 0px;
   }
 
   body.with-org-sidebar main {

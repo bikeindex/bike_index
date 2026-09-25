@@ -6,9 +6,7 @@
     <h1>
       Impound Record
       <% if @bike.present? && @bike.creator_unregistered_parking_notification? %>
-        <small class="text-warning">
-          for <em>unregistered <%= @bike.type %></em>
-        </small>
+        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_status: "unregistered")) %>
       <% end %>
     </h1>
 
@@ -70,7 +68,7 @@
           <td>Bike</td>
 
           <td>
-            <%= render Pages::Admin::Bikes::Cell::Component.new(bike: @impound_record.bike) %>
+            <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @impound_record.bike) %>
           </td>
         </tr>
 
@@ -78,7 +76,7 @@
           <td>User</td>
 
           <td>
-            <%= render Pages::Admin::Users::Cell::Component.new(user: @impound_record.user) %>
+            <%= render Atoms::Admin::TableCells::User::Component.new(user: @impound_record.user) %>
           </td>
         </tr>
       </tbody>
@@ -141,7 +139,7 @@
           </td>
 
           <td>
-            <%= render Pages::Admin::Users::Cell::Component.new(user: impound_record_update.user) %>
+            <%= render Atoms::Admin::TableCells::User::Component.new(user: impound_record_update.user) %>
           </td>
 
           <td><em><%= impound_record_update.kind_humanized %></em></td>

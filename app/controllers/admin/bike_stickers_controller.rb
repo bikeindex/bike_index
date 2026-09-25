@@ -34,7 +34,7 @@ module Admin
         redirect_to admin_bike_stickers_path(search_bike_sticker_batch_id: @bike_sticker_batch.id)
       else
         @organizations = Organization.all
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -139,7 +139,7 @@ module Admin
 
     def scoped_bike_stickers(stickers)
       @per_page = permitted_per_page
-      pagy(:countish, stickers.reorder("bike_stickers.#{sort_column} #{sort_direction}")
+      pagy(:countish, stickers.reorder(sortable_order(BikeSticker))
         .includes(:organization, :bike_sticker_batch, :bike_sticker_updates, :bike), limit: @per_page, page: permitted_page)
     end
 

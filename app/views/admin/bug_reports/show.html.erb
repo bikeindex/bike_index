@@ -40,7 +40,7 @@
 
           <td>
             <% if @bug_report.user_id.present? %>
-              <%= render Pages::Admin::Users::Cell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
+              <%= render Atoms::Admin::TableCells::User::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
             <% else %>
               <span class="less-strong">no user</span>
             <% end %>
@@ -108,9 +108,9 @@
       <% end %>
 
       <%= render(UI::Forms::Group::Component.new(attribute: :tags, form_builder: f)) do %>
-        <%= render UI::Forms::Combobox::Component.new(name: :tags, form: f, free_text: true,
-          options: searchable_tags, multiselect_chip_src: tag_chips_admin_bug_reports_path,
-          placeholder: "Select or create tags") %>
+        <%= render UI::Forms::Combobox::Component.new(name: :tags,
+          options: searchable_tags, free_text: true, multiselect_chip_src: tag_chips_admin_bug_reports_path,
+          html_options: {form: f, placeholder: "Select or create tags"}) %>
       <% end %>
 
       <%= render(UI::Forms::Group::Component.new(attribute: :github_pull_request, form_builder: f, kind: :number_field)) %>
@@ -128,8 +128,7 @@
 <% if @bug_report.body_significant_tags? %>
   <div data-controller="ui--collapse" class="tw:max-w-3xl">
     <div class="tw:flex tw:justify-end">
-      <%= render UI::Button::Component.new(text: "show with tags", color: :link,
-        data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"}, aria: {expanded: false}) %>
+      <%= render UI::Collapse::Component.new(text: "show with tags", color: :link) %>
     </div>
 
     <div data-ui--collapse-target="content" class="tw:hidden">

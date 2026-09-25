@@ -4,17 +4,17 @@ module Atoms
   module Serial
     # Renders a bike's serial as seen by the given user. A hidden, unknown or
     # absent serial renders that word in place of the number, and a hidden serial
-    # is followed by why it's hidden unless skip_explanation.
+    # is followed by why it's hidden - inline, or in a tooltip.
     # Pass a bike, or a raw serial string.
     class Component < ApplicationComponent
       # What serial_display returns in place of a number
       PLACEHOLDERS = ["hidden", "unknown", "made without serial"].freeze
 
-      def initialize(bike: nil, serial: nil, user: nil, skip_explanation: false, html_class: nil)
+      def initialize(bike: nil, serial: nil, user: nil, explanation: :inline, html_class: nil)
         @bike = bike
         @serial = serial
         @user = user
-        @skip_explanation = skip_explanation
+        @explanation = explanation
         @html_class = html_class
       end
 
@@ -25,7 +25,7 @@ module Atoms
       def call
         return serial_block unless explanation?
 
-        safe_join([serial_block, " ", explanation])
+        safe_join([serial_block, " ", explanation_block])
       end
 
       private
@@ -54,17 +54,33 @@ module Atoms
       end
 
       def explanation?
-        @bike&.serial_hidden? && !@skip_explanation
+        @bike&.serial_hidden?
       end
 
-      def explanation
-        content_tag(:em, explanation_text, class: "small less-less-strong")
+      def explanation_block
+        return tooltip(explanation_text) if @explanation == :tooltip
+
+        em = content_tag(:em, explanation_text, class: "small less-less-strong")
+        return em unless serial_visible?
+
+        safe_join([em, " ", tooltip(status_text)])
       end
 
       def explanation_text
-        return translation(".hidden_for_unauthorized_users") if @bike.authorized?(@user)
+        serial_visible? ? translation(".hidden_for_unauthorized_users") : status_text
+      end
 
+      def status_text
         translation(".hidden_because_status", bike_type: @bike.type, status: @bike.status_humanized_translated)
+      end
+
+      # serial_display already decided whether this viewer may see a hidden serial
+      def serial_visible?
+        serial.downcase != "hidden"
+      end
+
+      def tooltip(text)
+        render(UI::Tooltip::Component.new(text:))
       end
     end
   end

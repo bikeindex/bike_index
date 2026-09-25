@@ -27,16 +27,6 @@ module BikeServices
       end
     end
 
-    # This is just a quick hack, will improve
-    def vehicle_search?(params_and_interpreted_params)
-      return true if (%i[propulsion_type cycle_type] & params_and_interpreted_params.keys).any? ||
-        params_and_interpreted_params[:search_model_audit_id].present?
-
-      # Vehicle or propulsion type query items
-      (params_and_interpreted_params[:query_items] || [])
-        .any? { it.start_with?("v_", "p_") }
-    end
-
     # user arg because all methods have it
     def paint_description?(bike, _user = nil)
       bike.pos? && bike.paint.present?
@@ -56,8 +46,7 @@ module BikeServices
       end
       return false if user.blank?
 
-      bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
-        bike.impound_claims_claimed.active.where(user_id: user.id).any?
+      bike.impound_claims_claimed.active.where(user_id: user.id).any?
     end
 
     def display_marketplace_message?(bike, _user = nil)

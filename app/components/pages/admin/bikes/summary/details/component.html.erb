@@ -37,7 +37,7 @@
           <td>Serial number</td>
 
           <td>
-            <%= render(Atoms::Serial::Component.new(bike: @bike, user: @user, skip_explanation: true)) %>
+            <%= render(Atoms::Serial::Component.new(bike: @bike, user: @user, explanation: :tooltip)) %>
           </td>
         </tr>
 
@@ -144,7 +144,7 @@
 
           <td>
             <% if @bike.user.present? %>
-              <%= render(Pages::Admin::Users::Cell::Component.new(user: @bike.user)) %>
+              <%= render(Atoms::Admin::TableCells::User::Component.new(user: @bike.user)) %>
             <% else %>
               Unclaimed
             <% end %>
