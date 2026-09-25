@@ -5833,6 +5833,7 @@ it:
             view_cards: Carte
             view_list: Lista
             view_table: Tavolo
+            loading_results: Caricamento dei risultati...
           chart_card:
             caption_search: Ricerca attuale
             caption_year: Riepilogo dell'anno scorso
@@ -5897,6 +5898,7 @@ it:
             created_at_cell_panel: Tempo - registrato
             occurred_at_cell_panel: Tempo - stato
             updated_at_cell_panel: Ora - aggiornato
+            filter_stolen_or_impounded_html: solo <strong>rubati</strong> o <strong>sequestrati</strong>
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
@@ -6786,23 +6788,27 @@ it:
         organized:
           additional_features_html: Bike Index offre funzionalità aggiuntive per le
             forze dell'ordine verificate. Contatta %{email_link} per abilitarle.
-          how_integration_works: come funziona l'integrazione
-          integrate_bike_index_with_ascend: Integra Bike Index con Lightspeed
-          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed
-          link_to_register_html: "<strong>%{link}</strong> per registrare automaticamente
-            le biciclette vendute ai clienti."
-          other_point_of_sale_system: Un altro sistema POS?
-          read_a_full_explanation_html: Leggi la spiegazione completa di %{link}.
-          register_bikes_with_link_html: Registra le biciclette con il nostro <strong>%{link}</strong>
-          streamlined_bike_shop_registration_page: pagina di registrazione del negozio
-            di biciclette semplificata
           subscription_expired_html: Il tuo abbonamento a Bike Index è scaduto. Contatta
             %{email_link} per riattivarlo.
-          use_ascend: Utilizzate Ascend?
-          use_lightspeed_retail_pos: Utilizzate Lightspeed Retail POS?
-          viewing_our_streamlined_page: Al momento stai visualizzando la nostra pagina
-            di registrazione semplificata per i negozi di biciclette, che è quella
-            che ti consigliamo di utilizzare
+        organized_shop_integration_alert:
+          add_a_bike: Aggiungi una bicicletta
+          already_viewing_add_a_bike_page: Stai già visualizzando questa pagina
+          ascend_card_title: Ascendere
+          dismiss: Congedare
+          dont_show_again: Non mostrare più questo contenuto
+          how_integration_works: Come funziona l'integrazione
+          integrate_bike_index_with_ascend: Integra Bike Index con Lightspeed
+          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed
+          integration_card_body: Registra automaticamente le biciclette che vendi
+            ai tuoi clienti.
+          lightspeed_card_title: Punto vendita Lightspeed
+          other_system_body: 'Non è necessaria alcuna integrazione: registra le biciclette
+            manualmente in pochi secondi.'
+          other_system_card_title: 'Altri sistemi: contattateci via email.'
+          pos_callout_subhead: Collega il tuo sistema POS e ogni bicicletta che vendi
+            verrà registrata a nome del tuo cliente su Bike Index.
+          pos_callout_title: Registra automaticamente le biciclette dal tuo punto
+            vendita
       navbar:
         org_sidebar:
           admin_panel: PANNELLO DI AMMINISTRAZIONE

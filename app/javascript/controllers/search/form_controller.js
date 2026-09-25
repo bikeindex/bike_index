@@ -161,6 +161,12 @@ export default class extends Controller {
     } else if (event.target === this.frameElement && this.frameResponseSuperseded(response?.url)) {
       event.preventDefault()
     }
+    // What's outside the frame follows the results, so it waits on this rather than watching
+    if (!response?.ok && this.ownsFetch(event)) this.announceFailure()
+  }
+
+  announceFailure () {
+    window.dispatchEvent(new CustomEvent('search:results-failed'))
   }
 
   // The frame's eager src fetch and a search submitted while it's still in flight
@@ -196,6 +202,7 @@ export default class extends Controller {
     this.failedSubmit = event.target === this.formTarget
     this.hideLoading()
     this.showNotice('fetch-failed')
+    this.announceFailure()
   }
 
   handleRetryClick = (event) => {

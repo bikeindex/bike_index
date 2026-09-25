@@ -5561,6 +5561,7 @@ nb:
             view_cards: Kort
             view_list: Liste
             view_table: Bord
+            loading_results: Laster inn resultater...
           chart_card:
             caption_search: Nåværende søk
             caption_year: Oversikt over fjoråret
@@ -5625,6 +5626,7 @@ nb:
             created_at_cell_panel: Tid - registrert
             occurred_at_cell_panel: Tid - status
             updated_at_cell_panel: Tid - oppdatert
+            filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
@@ -6487,21 +6489,26 @@ nb:
           additional_features_html: Bike Index gir tilleggsfunksjoner for verifiserte
             rettshåndhevelsesorganisasjoner. Ta kontakt med %{email_link} for å få
             dem aktivert.
-          how_integration_works: hvordan integreringen fungerer
-          integrate_bike_index_with_ascend: Integrer Bike Index med Ascend
-          integrate_bike_index_with_lightspeed: Integrer Bike Index med Lightspeed
-          link_to_register_html: "<strong>%{link}</strong> for automatisk å registrere
-            syklene du selger til kundene dine."
-          other_point_of_sale_system: Andre salgssteder?
-          read_a_full_explanation_html: Les en fullstendig forklaring av %{link}.
-          register_bikes_with_link_html: Registrer sykler med vår <strong>%{link}</strong>
-          streamlined_bike_shop_registration_page: strømlinjeformet Bike Shop registreringsside
           subscription_expired_html: Ditt abonnement på Bike Index har utløpt. Ta
             kontakt med %{email_link} for å få den aktivert på nytt.
-          use_ascend: Bruk Ascend?
-          use_lightspeed_retail_pos: Bruker du Lightspeed Retail POS?
-          viewing_our_streamlined_page: Du ser for øyeblikket på vår strømlinjeformede
-            Bike Shop-registreringsside, som er det vi anbefaler å bruke
+        organized_shop_integration_alert:
+          add_a_bike: Legg til en sykkel
+          already_viewing_add_a_bike_page: Du ser allerede på denne siden
+          ascend_card_title: Stige
+          dismiss: Avskjedige
+          dont_show_again: Ikke vis dette igjen
+          how_integration_works: Hvordan integrasjonen fungerer
+          integrate_bike_index_with_ascend: Integrer Bike Index med Ascend
+          integrate_bike_index_with_lightspeed: Integrer Bike Index med Lightspeed
+          integration_card_body: Registrer automatisk syklene du selger til kundene
+            dine.
+          lightspeed_card_title: Lightspeed Retail POS
+          other_system_body: Ingen integrasjon nødvendig – registrer sykler manuelt
+            på få sekunder.
+          other_system_card_title: Annet system – vennligst send oss en e-post
+          pos_callout_subhead: Koble til POS-en din, så registreres hver sykkel du
+            selger til kunden din på Bike Index.
+          pos_callout_title: Registrer sykler automatisk fra salgsstedet ditt
       navbar:
         org_sidebar:
           admin_panel: ADMINISTRASJONSPANEL

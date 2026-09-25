@@ -91,7 +91,7 @@ class OrganizationStolenMessage < ApplicationRecord
   end
 
   def self.default_kind_for_organization_kind(org_kind)
-    %w[law_enforcement bike_advocacy].include?(org_kind) ? "area" : "association"
+    %w[law_enforcement bike_advocacy municipality].include?(org_kind) ? "area" : "association"
   end
 
   # NOTE: doesn't calculate. Only checks stolen record attributes

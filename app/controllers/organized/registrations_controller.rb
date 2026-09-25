@@ -156,7 +156,7 @@ module Organized
     end
 
     def chart_bikes
-      @chart_bikes ||= (chart_scope_year? ? organization_bikes : @searched_bikes).unscope(:order)
+      @chart_bikes ||= chart_scope_year? ? organization_bikes : @searched_bikes
     end
 
     # Whole months, so the bars are comparable rather than the first and last being part ones

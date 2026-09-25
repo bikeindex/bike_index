@@ -1,0 +1,220 @@
+<div
+  class="
+    tw:mb-10 tw:w-full tw:max-w-[1080px] tw:overflow-hidden tw:rounded-xl
+    tw:border tw:border-gray-200 tw:bg-white tw:shadow-sm
+    tw:dark:border-gray-700 tw:dark:bg-gray-800
+  "
+  data-controller="org--pos-callout"
+  data-org--pos-callout-organization-id-value="<%= @current_organization.id %>"
+>
+  <header class="tw:flex tw:items-start tw:gap-4 tw:px-4 tw:pt-3.5">
+    <div class="tw:min-w-0 tw:flex-1">
+      <h2
+        class="
+          tw:m-0 tw:text-[15px] tw:leading-[1.3] tw:font-bold
+          tw:tracking-[-0.01em] tw:text-gray-900 tw:dark:text-gray-100
+        "
+      >
+        <%= translation(".pos_callout_title") %>
+      </h2>
+
+      <p
+        class="
+          tw:mt-0.5 tw:mb-0 tw:text-[12.5px] tw:leading-[1.45]
+          tw:font-normal tw:text-gray-500 tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".pos_callout_subhead") %>
+      </p>
+    </div>
+
+    <button
+      type="button"
+      aria-label="<%= translation(".dismiss") %>"
+      data-action="click->org--pos-callout#hide"
+      class="
+        tw:-mt-1 tw:-mr-1.5 tw:flex tw:size-[30px] tw:shrink-0
+        tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-md
+        tw:border-0 tw:bg-transparent tw:text-[17px] tw:leading-none
+        tw:text-gray-500 tw:hover:bg-gray-100 tw:hover:text-gray-600
+        tw:dark:text-gray-400 tw:dark:hover:bg-gray-700
+        tw:dark:hover:text-gray-300
+      "
+    >
+      ✕
+    </button>
+  </header>
+
+  <div
+    class="
+      tw:grid tw:grid-cols-[repeat(auto-fit,minmax(210px,1fr))] tw:gap-2.5
+      tw:px-4 tw:pt-3
+    "
+  >
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-[5px] tw:rounded-lg tw:border
+        tw:border-gray-200 tw:bg-white tw:p-3 tw:hover:border-purple-200
+        tw:dark:border-gray-700 tw:dark:bg-gray-800
+        tw:dark:hover:border-purple-800
+      "
+    >
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <span
+          class="
+            tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center
+            tw:rounded-md tw:bg-purple-50 tw:text-[10.5px] tw:font-bold
+            tw:text-purple-800 tw:dark:bg-purple-950 tw:dark:text-purple-400
+          "
+        >
+          L
+        </span>
+
+        <h3
+          class="
+            tw:m-0 tw:text-[13.5px] tw:font-bold tw:text-gray-900
+            tw:dark:text-gray-100
+          "
+        >
+          <%= translation(".lightspeed_card_title") %>
+        </h3>
+      </div>
+
+      <p
+        class="
+          tw:m-0 tw:text-[12.5px] tw:leading-[1.45] tw:text-gray-600
+          tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".integration_card_body") %>
+      </p>
+
+      <div class="tw:mt-auto tw:flex tw:flex-col tw:items-start tw:gap-1.5 tw:pt-2">
+        <%= link_to lightspeed_interface_path, class: "tw:text-[13px] tw:font-semibold tw:text-purple-600 tw:dark:text-purple-400 tw:no-underline tw:hover:underline" do %>
+          <%= translation(".integrate_bike_index_with_lightspeed") %>
+          <span aria-hidden="true">→</span>
+        <% end %>
+
+        <%= link_to lightspeed_path, class: "tw:text-[12px] tw:text-gray-500 tw:dark:text-gray-400 tw:no-underline tw:border-b tw:border-gray-300 tw:dark:border-gray-600 tw:hover:text-gray-900 tw:dark:hover:text-gray-100 tw:hover:border-gray-900 tw:dark:hover:border-gray-100" do %>
+          <%= translation(".how_integration_works") %>
+        <% end %>
+      </div>
+    </div>
+
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-[5px] tw:rounded-lg tw:border
+        tw:border-gray-200 tw:bg-white tw:p-3 tw:hover:border-purple-200
+        tw:dark:border-gray-700 tw:dark:bg-gray-800
+        tw:dark:hover:border-purple-800
+      "
+    >
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <span
+          class="
+            tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center
+            tw:rounded-md tw:bg-purple-50 tw:text-[10.5px] tw:font-bold
+            tw:text-purple-800 tw:dark:bg-purple-950 tw:dark:text-purple-400
+          "
+        >
+          A
+        </span>
+
+        <h3
+          class="
+            tw:m-0 tw:text-[13.5px] tw:font-bold tw:text-gray-900
+            tw:dark:text-gray-100
+          "
+        >
+          <%= translation(".ascend_card_title") %>
+        </h3>
+      </div>
+
+      <p
+        class="
+          tw:m-0 tw:text-[12.5px] tw:leading-[1.45] tw:text-gray-600
+          tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".integration_card_body") %>
+      </p>
+
+      <div class="tw:mt-auto tw:flex tw:flex-col tw:items-start tw:gap-1.5 tw:pt-2">
+        <%= link_to ascend_path, class: "tw:text-[13px] tw:font-semibold tw:text-purple-600 tw:dark:text-purple-400 tw:no-underline tw:hover:underline" do %>
+          <%= translation(".integrate_bike_index_with_ascend") %>
+          <span aria-hidden="true">→</span>
+        <% end %>
+      </div>
+    </div>
+
+    <div
+      class="
+        tw:flex tw:flex-col tw:gap-[5px] tw:rounded-lg tw:border
+        tw:border-dashed tw:border-gray-200 tw:bg-gray-50 tw:p-3
+        tw:dark:border-gray-700 tw:dark:bg-gray-900
+      "
+    >
+      <div class="tw:flex tw:items-center tw:gap-2">
+        <span
+          class="
+            tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center
+            tw:rounded-md tw:bg-gray-100 tw:text-[10.5px] tw:font-bold
+            tw:text-gray-700 tw:dark:bg-gray-700 tw:dark:text-gray-300
+          "
+        >
+          +
+        </span>
+
+        <h3
+          class="
+            tw:m-0 tw:text-[13.5px] tw:font-semibold tw:text-gray-700
+            tw:dark:text-gray-300
+          "
+        >
+          <%= translation(".other_system_card_title") %>
+        </h3>
+      </div>
+
+      <p
+        class="
+          tw:m-0 tw:text-[12.5px] tw:leading-[1.45] tw:text-gray-500
+          tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".other_system_body") %>
+      </p>
+
+      <div class="tw:mt-auto tw:flex tw:flex-col tw:items-start tw:gap-1.5 tw:pt-2">
+        <% if viewing_add_a_bike_page? %>
+          <span
+            class="
+              tw:text-[13px] tw:font-semibold tw:text-gray-500
+              tw:dark:text-gray-400
+            "
+          >
+            <%= translation(".already_viewing_add_a_bike_page") %>
+          </span>
+        <% else %>
+          <%= link_to new_organization_bike_path(organization_id: @current_organization.to_param), class: "tw:text-[13px] tw:font-semibold tw:text-purple-600 tw:dark:text-purple-400 tw:no-underline tw:hover:underline" do %>
+            <%= translation(".add_a_bike") %>
+            <span aria-hidden="true">→</span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <footer class="tw:flex tw:justify-end tw:px-4 tw:pt-2 tw:pb-3">
+    <button
+      type="button"
+      data-action="click->org--pos-callout#dismissForever"
+      class="
+        tw:cursor-pointer tw:border-0 tw:bg-transparent tw:px-0.5 tw:py-1
+        tw:text-[12px] tw:text-gray-500 tw:hover:text-gray-600
+        tw:dark:text-gray-400 tw:dark:hover:text-gray-300
+      "
+    >
+      <%= translation(".dont_show_again") %>
+    </button>
+  </footer>
+</div>
