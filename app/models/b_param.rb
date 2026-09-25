@@ -465,8 +465,6 @@ class BParam < ApplicationRecord
     bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"])
   end
 
-  def embed_partial? = origin == "embed_partial"
-
   # Unsaved - read through the same whitelist that turns these into the created bike's address
   def address_record = AddressRecord.new(self.class.address_record_attributes(bike))
 
@@ -745,7 +743,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_notification_resends
-    return partial_notifications if partial_notification_pre_tracking? || !embed_partial?
+    return partial_notifications if partial_notification_pre_tracking? || register_flow?
 
     partial_notifications.offset(1)
   end
