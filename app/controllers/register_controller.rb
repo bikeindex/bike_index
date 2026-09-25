@@ -16,6 +16,7 @@ class RegisterController < ApplicationController
   before_action :assign_organization, except: %i[new confirm]
   before_action :find_registration_sequence, except: %i[new confirm]
   before_action :redirect_finished, only: %i[create update report acknowledge]
+  before_action :redirect_bike_created, only: %i[create update report]
   # The step shown is server state - a cached page could show one the registration is past
   # (register--revalidate covers Safari's bfcache, Pages::Register::Page Turbo's own snapshots)
   before_action { response.set_header("Cache-Control", "no-store") }
@@ -269,7 +270,7 @@ class RegisterController < ApplicationController
     # The session follows whichever registration the token named, so the next tokenless
     # request stays on it - until its bike exists, when there's nothing left to go back
     # to and the bare /register should start the next registration instead
-    if @b_param.with_bike?
+    if @b_param.with_bike? && !@b_param.acknowledgment_pending?
       session.delete(:register_b_param_token)
     else
       session[:register_b_param_token] = @b_param.id_token
@@ -280,6 +281,11 @@ class RegisterController < ApplicationController
   # the completion page - submissions redirect there too, saving nothing
   def redirect_finished
     redirect_to step_path(:finished) if BikeServices::Register.finished?(@b_param, sequence: @registration_sequence)
+  end
+
+  # The bike is created from these steps, so once it exists only the safety rules are left
+  def redirect_bike_created
+    redirect_to_current_step if @b_param.with_bike?
   end
 
   def redirect_after_bike_creation(bike)

@@ -86,6 +86,23 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "find_token" do
+    let(:creator) { FactoryBot.create(:user_confirmed) }
+    let(:b_param) do
+      BParam.create(origin: "register_flow", creator_id: creator.id, created_bike_id: FactoryBot.create(:bike).id,
+        params: {bike: bike_params, acknowledgment_pending: true}.as_json)
+    end
+
+    it "only resumes a bike's registration for its creator until the safety rules are agreed to" do
+      expect(described_class.find_token(params_token: b_param.id_token, user: nil)).to be_nil
+      expect(described_class.sign_in_to_resume?(b_param.id_token, user: nil)).to be_truthy
+      expect(described_class.find_token(params_token: b_param.id_token, user: creator)&.id).to eq b_param.id
+
+      b_param.update(params: b_param.params.except("acknowledgment_pending"))
+      expect(described_class.find_token(params_token: b_param.id_token, user: nil)&.id).to eq b_param.id
+    end
+  end
+
   describe "discard_extra" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:oldest) do
@@ -381,7 +398,6 @@ RSpec.describe BikeServices::Register do
 
       # Everything's in - the submission that saved it creates the bike
       expect(described_class.send(:report_completed?, b_param)).to be_truthy
-      expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
     end
 
     describe "when and where a theft has to answer" do
@@ -436,7 +452,7 @@ RSpec.describe BikeServices::Register do
         expect(b_param.reload.status).to eq "status_with_owner"
         expect(b_param.stolen_attrs).to be_blank
         expect(described_class.report_step?(b_param.status)).to be_falsey
-        expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
+        expect(described_class.send(:report_completed?, b_param)).to be_truthy
       end
 
       it "asks the other report's questions when it's still a status that reports" do

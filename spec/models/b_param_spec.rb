@@ -908,6 +908,23 @@ RSpec.describe BParam, type: :model do
         expect(b_param.unfinished_registration?).to be_falsey
         expect(creator.reload.alert_slugs).to eq []
       end
+
+      context "with the safety rules still to agree to" do
+        it "alerts until they're agreed to" do
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id,
+            params: b_param.params.merge("acknowledgment_pending" => true))
+
+          expect(b_param.unfinished_registration?).to be_truthy
+          expect(BParam.unfinished_registrations.pluck(:id)).to eq [b_param.id]
+          expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+
+          b_param.update(params: b_param.params.except("acknowledgment_pending"))
+
+          expect(b_param.unfinished_registration?).to be_falsey
+          expect(BParam.unfinished_registrations.pluck(:id)).to eq []
+          expect(creator.reload.alert_slugs).to eq []
+        end
+      end
     end
 
     # EmailJobs::PartialRegistrationJob destroys them for banned email domains

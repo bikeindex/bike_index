@@ -107,7 +107,8 @@ class BParam < ApplicationRecord
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
-  scope :unfinished_registrations, -> { unexpired.without_bike.step_1_submitted }
+  scope :acknowledgment_pending, -> { where("(params -> 'acknowledgment_pending') IS NOT NULL") }
+  scope :unfinished_registrations, -> { unexpired.step_1_submitted.and(without_bike.or(acknowledgment_pending)) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -303,13 +304,17 @@ class BParam < ApplicationRecord
     created_bike_id.present?
   end
 
+  # The register flow creates the bike ahead of its organization's safety rules, which
+  # it still requires - so the registration isn't finished until they're agreed to
+  def acknowledgment_pending? = params["acknowledgment_pending"].present?
+
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
   # after_commit a destroy fires resolves its alert rather than re-saving it.
   # self_made? last, and taking the user callers already hold, since it's the only clause
   # that queries: one made for someone else isn't the creator's bike to alert about
   def unfinished_registration?(user = creator)
-    !destroyed? && register_flow? && !with_bike? && manufacturer_id.present? &&
+    !destroyed? && register_flow? && (!with_bike? || acknowledgment_pending?) && manufacturer_id.present? &&
       created_at.present? && created_at > Time.current - TOKEN_EXPIRATION && self_made?(user)
   end
 
