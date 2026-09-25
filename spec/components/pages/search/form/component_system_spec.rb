@@ -35,9 +35,8 @@ RSpec.describe Pages::Search::Form::Component, :js, type: :system do
       all("input[name='query_items[]']", visible: :all).map(&:value)
     end
 
-    # The open dropdown overlays the rest of the form, so wait for it to close before
-    # touching another field. The chip streams in later, and Turbo hands focus back to the
-    # combobox a frame after it renders - typing into another field before then lands here
+    # Settle before touching another field: the open dropdown overlays the form, and Turbo
+    # refocuses the combobox once the chip renders
     def combobox_select(query, option_text)
       type_into(".hw-combobox__input", query)
       expect(page).to have_css(".hw-combobox__option", text: option_text, wait: 30)
