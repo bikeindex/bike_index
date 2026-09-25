@@ -702,6 +702,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
   context "with avery_export enabled" do
     let(:enabled_feature_slugs) { %w[bike_search avery_export reg_address bike_stickers csv_exports] }
+    include_context :geocoder_stubbed_bounding_box
     let!(:avery_bike) do
       bike = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: organization)
       bike.current_ownership.update!(owner_name: "Test Owner")
@@ -758,6 +759,37 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_current_path(/search_stickers=with/, wait: 10)
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 1)
+
+      # Location search - reg_address matches registrations by their address, not only stolen bikes
+      choose("search_stickers_", allow_label_click: true, visible: :all)
+      expect(page).to have_css("tbody tr", count: 3, wait: 10)
+      expect(page).not_to have_field("location", exact: true)
+      check "show_location_search"
+      fill_in "distance", with: "50"
+      fill_in "location", with: "New York"
+      click_button "Search registrations"
+      expect(page).to have_current_path(/location=New\+York/, wait: 10)
+      expect(page).to have_css("tbody tr", count: 1, wait: 10)
+      expect(page).to have_text("Test Owner")
+
+      # A reload carrying a location opens the fields with it
+      visit page.current_url
+      expect(page).to have_field("location", with: "New York", wait: 10)
+      expect(page).to have_field("distance", with: "50")
+
+      # Searching all, only a stolen or impounded status leaves location searchable
+      check "search_all"
+      expect(page).to have_current_path(/search_all=true/, wait: 10)
+      expect(page).not_to have_current_path(/location=/)
+      open_filters_if_not
+      expect(page).to have_field("show_location_search", checked: true, disabled: true)
+      expect(page).not_to have_field("location", exact: true)
+      expect(page).to have_css("button[aria-label^=\"You can't search location\"]")
+      choose("search_status_stolen", allow_label_click: true, visible: :all)
+      expect(page).to have_current_path(/location=New\+York/, wait: 10)
+      expect(page).to have_field("show_location_search", checked: true, disabled: false)
+      expect(page).to have_field("location", with: "New York")
+      expect(page).not_to have_css("button[aria-label^=\"You can't search location\"]")
 
       # Visit with bike_sticker param to test assign_bike_sticker column
       visit "#{bikes_path}?bike_sticker=#{unlinked_sticker.code}"
