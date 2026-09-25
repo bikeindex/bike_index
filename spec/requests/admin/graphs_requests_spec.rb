@@ -26,16 +26,26 @@ RSpec.describe Admin::GraphsController, type: :request do
       end
     end
     context "bikes" do
-      it "renders" do
+      it "renders, leaving the tables to their lazy frames" do
         get base_url, params: {search_kind: "bikes"}
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
+        frames = Nokogiri::HTML(response.body).css("turbo-frame[loading=lazy]")
+        expect(frames.map { it["id"] }).to eq(Pages::Admin::Graphs::BikesTable::Component::KINDS.map { "bikes_table_#{it}" })
+
+        Pages::Admin::Graphs::BikesTable::Component::KINDS.each do |table_kind|
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", table_kind:}
+          expect(response.status).to eq(200)
+          frame = Nokogiri::HTML(response.body).at_css("turbo-frame#bikes_table_#{table_kind}")
+          expect(frame["src"]).to be_nil
+          expect(frame.css("table")).to be_present
+        end
       end
 
       context "with bikes registered different ways" do
         let!(:sticker_bikes) { FactoryBot.create_list(:bike, 2, :with_ownership, creation_state_origin: "sticker") }
         let!(:web_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "web") }
-        let(:origin_colors) { Pages::Admin::Graphs::Bikes::Component::ORIGIN_COLORS }
+        let(:origin_colors) { Pages::Admin::Graphs::BikesTable::Component::ORIGIN_COLORS }
         # [origin, swatch color, bike count] per row of the origin table, as rendered
         let(:origin_rows) do
           Nokogiri::HTML(response.body).css("td span[style*='background-color']").map do |swatch|
@@ -44,7 +54,7 @@ RSpec.describe Admin::GraphsController, type: :request do
         end
 
         it "sorts the origin table highest count first, each swatch the chart's color for that origin" do
-          get base_url, params: {search_kind: "bikes", period: "week"}
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "origin"}
           expect(response.status).to eq(200)
           expect(origin_rows.first(2)).to eq([["Sticker", origin_colors["sticker"], "2"],
             ["Web", origin_colors["web"], "1"]])
@@ -73,7 +83,7 @@ RSpec.describe Admin::GraphsController, type: :request do
         end
 
         it "counts bikes by iOS version, highest count first" do
-          get base_url, params: {search_kind: "bikes", period: "week"}
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "ios_version"}
           expect(response.status).to eq(200)
           expect(ios_version_rows).to eq([%w[1.6.9 2], %w[2.0.1 1]])
 
