@@ -227,7 +227,6 @@ RSpec.describe RegistrationsController, type: :request do
           b_param = BParam.last
           expect(b_param.owner_email).to eq "something@stuff.com"
           expect(b_param.origin).to eq "embed_partial"
-          expect(b_param.embed_partial?).to be_truthy
           expect(b_param.motorized?).to be_falsey
           expect(b_param.params["propulsion_type_motorized"]).to be_blank
           expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
@@ -270,7 +269,6 @@ RSpec.describe RegistrationsController, type: :request do
           expect(b_param.origin).to eq "embed_partial"
           expect(b_param.motorized?).to be_truthy
           expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
-          expect(b_param.embed_partial?).to be_truthy
         end
 
         context "with invalid cycle_type" do
@@ -285,7 +283,6 @@ RSpec.describe RegistrationsController, type: :request do
             expect(b_param.cycle_type).to eq "bike"
             expect(b_param.motorized?).to be_truthy
             expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
-            expect(b_param.embed_partial?).to be_truthy
           end
         end
       end

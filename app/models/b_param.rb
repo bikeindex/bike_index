@@ -91,7 +91,7 @@ class BParam < ApplicationRecord
   before_save :clean_params
   # Leaving the flow is exactly when nothing else bumps the user, so the alert can't
   # wait for their next update job
-  after_commit :update_creator_alert
+  after_commit :update_unfinished_registration_alerts
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
@@ -472,8 +472,6 @@ class BParam < ApplicationRecord
     bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"])
   end
 
-  def embed_partial? = origin == "embed_partial"
-
   # Unsaved - read through the same whitelist that turns these into the created bike's address
   def address_record = AddressRecord.new(self.class.address_record_attributes(bike))
 
@@ -752,7 +750,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_notification_resends
-    return partial_notifications if partial_notification_pre_tracking? || !embed_partial?
+    return partial_notifications if partial_notification_pre_tracking? || register_flow?
 
     partial_notifications.offset(1)
   end
@@ -781,12 +779,15 @@ class BParam < ApplicationRecord
 
   private
 
-  # origin, so the API and embed forms don't pay for a lookup that can't alert
-  def update_creator_alert
+  # origin, so the API and embed forms don't pay for a lookup that can't alert. Only with a
+  # creator: anonymously, anyone could alert any account by typing in its email
+  def update_unfinished_registration_alerts
     return if creator_id.blank? || !register_flow?
 
-    UserAlert.update_unfinished_registration(user: creator, b_param: self)
-    UserAlert.refresh_alert_slugs(creator)
+    [creator, (User.fuzzy_email_find(owner_email) unless self_made?)].compact.each do |user|
+      UserAlert.update_unfinished_registration(user:, b_param: self)
+      UserAlert.refresh_alert_slugs(user)
+    end
   end
 
   def ensure_valid_params

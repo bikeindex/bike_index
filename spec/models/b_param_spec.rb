@@ -957,6 +957,30 @@ RSpec.describe BParam, type: :model do
         expect(b_param.unfinished_registration?).to be_falsey
         expect(creator.reload.alert_slugs).to eq []
       end
+
+      context "with an account" do
+        let!(:owner) { FactoryBot.create(:user_confirmed, email: "someone-else@example.com") }
+
+        it "alerts the owner, until the bike is created" do
+          expect(b_param.unfinished_registration?(owner)).to be_truthy
+          expect(owner.reload.alert_slugs).to eq ["unfinished_registration"]
+          expect(owner.user_alerts.active.unfinished_registration.map(&:alertable)).to eq [b_param]
+          expect(creator.reload.alert_slugs).to eq []
+
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+
+          expect(owner.reload.alert_slugs).to eq []
+        end
+
+        context "without a creator" do
+          let(:creator) { nil }
+
+          it "doesn't alert the owner" do
+            expect(b_param.reload.creator_id).to be_nil
+            expect(owner.reload.alert_slugs).to eq []
+          end
+        end
+      end
     end
 
     context "owned by a confirmed secondary email of the creator's" do

@@ -65,7 +65,8 @@ module CallbackJobs
       return true if matches.none?
 
       matches.each { it.update(created_bike_id: bike.id) }
-      matching_b_param = matches.max_by(&:created_at)
+      # An organization to attribute the bike to beats a newer registration without one
+      matching_b_param = matches.max_by { [it.organization_id ? 1 : 0, it.created_at] }
       # Only set ownership
       ownership = bike.current_ownership
       if ownership.present? && ownership.origin == "web" && ownership.organization_id.blank?
