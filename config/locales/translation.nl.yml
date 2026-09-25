@@ -5705,6 +5705,10 @@ nl:
             search_notes: Zoeknotities
             search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de
               eigenaar.
+            miles_of: mijl van
+            search_distance: Zoek afstand
+            search_location: Zoek locatie
+            within: binnen
           wrapper:
             e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
             view_matching_any_audit: weergave die overeenkomt met elke audit
@@ -5793,6 +5797,13 @@ nl:
             updated_at_cell_panel: Tijd - bijgewerkt
             filter_stolen_or_impounded_html: alleen <strong>gestolen</strong> of <strong>in
               beslag genomen</strong>
+            location_search_disabled_no_address: "%{org_name} verzamelt geen registratieadressen,
+              dus alleen gestolen en in beslag genomen kentekens hebben een locatie.
+              Filter op een van deze statussen om te zoeken op locatie."
+            location_search_disabled_search_all: Je kunt niet op locatie zoeken bij
+              het doorzoeken van alle kentekens, tenzij je alleen zoekt naar in beslag
+              genomen en/of gestolen kentekens.
+            show_location_search: toon locatie zoeken
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -6673,22 +6684,26 @@ nl:
           additional_features_html: Bike Index biedt extra functies voor geverifieerde
             wetshandhavingsorganisaties. Neem contact op met %{email_link} om ze ingeschakeld
             te krijgen.
-          how_integration_works: hoe de integratie werkt
-          integrate_bike_index_with_ascend: Integreer Bike Index met Ascend
-          integrate_bike_index_with_lightspeed: Integreer Bike Index met Lightspeed
-          link_to_register_html: "<strong>%{link}</strong> om de fietsen die u aan
-            uw klanten verkoopt automatisch te registreren."
-          other_point_of_sale_system: Ander Point of Sale-systeem?
-          read_a_full_explanation_html: Lees een volledige uitleg van %{link}.
-          register_bikes_with_link_html: Registreer fietsen met onze <strong>%{link}</strong>
-          streamlined_bike_shop_registration_page: gestroomlijnde registratiepagina
-            voor Bike Shop
           subscription_expired_html: Uw abonnement op Bike Index is verlopen. Neem
             contact op met %{email_link} om het opnieuw in te schakelen.
-          use_ascend: Ascend gebruiken?
-          use_lightspeed_retail_pos: Lightspeed Retail POS gebruiken?
-          viewing_our_streamlined_page: U bekijkt momenteel onze gestroomlijnde registratiepagina
-            voor Bike Shop, die wij aanbevelen te gebruiken
+        organized_shop_integration_alert:
+          add_a_bike: Voeg een fiets toe
+          already_viewing_add_a_bike_page: Je bekijkt deze pagina al.
+          ascend_card_title: Stijg op
+          dismiss: Afwijzen
+          dont_show_again: Niet meer laten zien
+          how_integration_works: Hoe de integratie werkt
+          integrate_bike_index_with_ascend: Integreer Bike Index met Ascend
+          integrate_bike_index_with_lightspeed: Integreer Bike Index met Lightspeed
+          integration_card_body: Registreer de fietsen die u aan uw klanten verkoopt
+            automatisch.
+          lightspeed_card_title: Lightspeed Retail POS
+          other_system_body: Geen integratie nodig — registreer fietsen handmatig
+            in een paar seconden.
+          other_system_card_title: Voor andere systemen kunt u ons een e-mail sturen.
+          pos_callout_subhead: Koppel je kassasysteem en elke fiets die je verkoopt,
+            wordt geregistreerd op naam van je klant in Bike Index.
+          pos_callout_title: Registreer fietsen automatisch via uw verkooppunt.
       navbar:
         org_sidebar:
           admin_panel: ADMINISTRATIEPANEEL
