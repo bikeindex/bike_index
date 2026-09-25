@@ -60,10 +60,15 @@ module CallbackJobs
 
     def update_matching_partial_registrations(bike)
       return true unless bike.created_at > Time.current - 5.minutes # skip unless new bike
+      return true if bike.owner_email.blank?
 
+      owner_email = EmailNormalizer.normalize(bike.owner_email)
       # Another registration open in the register flow is often a second bike being registered
       matches = BParam.partial_registrations.where("email ilike ?", "%#{bike.owner_email}%")
-        .reorder(:created_at).reject { it.register_flow? && it.manufacturer_id != bike.manufacturer_id }
+        .reorder(:created_at).reject do |b_param|
+          b_param.register_flow? && (b_param.manufacturer_id != bike.manufacturer_id ||
+            EmailNormalizer.normalize(b_param.email) != owner_email)
+        end
       if matches.count > 1
         # Try to make it a little more accurate lookup
         best_matches = matches.select { |b_param| b_param.manufacturer_id == bike.manufacturer_id }

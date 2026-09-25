@@ -259,6 +259,25 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
           expect(bike.reload.current_ownership.origin).to eq "web"
         end
       end
+      context "with an email that only contains the bike's owner email" do
+        let!(:partial_registration) do
+          FactoryBot.create(:b_param, creator: nil, origin: "register_flow",
+            params: {bike: {manufacturer_id:, owner_email: "morestuff@things.com"}})
+        end
+        it "doesn't assign it" do
+          expect(BParam.partial_registrations.pluck(:id)).to eq([partial_registration.id])
+          instance.perform(bike.id)
+          expect(partial_registration.reload.with_bike?).to be_falsey
+          expect(bike.reload.current_ownership.origin).to eq "web"
+        end
+      end
+      context "bike without an owner email" do
+        before { bike.update_column :owner_email, "" }
+        it "doesn't assign it" do
+          instance.perform(bike.id)
+          expect(partial_registration.reload.with_bike?).to be_falsey
+        end
+      end
     end
     context "bike already has organization" do
       let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: user, organization: FactoryBot.create(:organization)) }
