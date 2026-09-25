@@ -23,6 +23,29 @@
             "statusMessage": "Checking the path is inside this checkout"
           }
         ]
+      },
+      {
+        "matcher": "Bash|mcp__.*_pull_request",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pr-guardrails.sh",
+            "statusMessage": "Checking the PR guardrails"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh",
+            "timeout": 900,
+            "statusMessage": "Setting up the sandbox toolchain"
+          }
+        ]
       }
     ]
   }
