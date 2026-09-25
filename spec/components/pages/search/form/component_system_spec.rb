@@ -36,12 +36,14 @@ RSpec.describe Pages::Search::Form::Component, :js, type: :system do
     end
 
     # The open dropdown overlays the rest of the form, so wait for it to close before
-    # touching another field
+    # touching another field. The chip streams in later, and Turbo hands focus back to the
+    # combobox a frame after it renders - typing into another field before then lands here
     def combobox_select(query, option_text)
       type_into(".hw-combobox__input", query)
       expect(page).to have_css(".hw-combobox__option", text: option_text, wait: 30)
       click_combobox_option(option_text)
       expect(page).to have_css('.hw-combobox__input[aria-expanded="false"]', wait: 10)
+      expect(page).to have_css(".hw-combobox__chip", text: option_text)
     end
 
     def expect_count(kind_scope, value = :greater_than_zero)
