@@ -1,5 +1,4 @@
--# Make sure that period is passed - because it's a different period than other places
-- sortable_params = {period: default_period}.merge(sortable_search_params).symbolize_keys
+- sortable_params = graphs_sortable_params
 = render partial: "admin/graphs/graphs_subnav", locals: {sortable_params: sortable_params}
 
 - if @kind == "general"

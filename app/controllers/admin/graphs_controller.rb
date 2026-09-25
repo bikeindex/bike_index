@@ -32,7 +32,7 @@ module Admin
 
     def bikes_table
       render Pages::Admin::Graphs::BikesTable::Component.new(kind: params[:table_kind], bikes: matching_bikes,
-        time_range: @time_range, sortable_params: helpers.sortable_search_params.to_h.symbolize_keys), layout: false
+        time_range: @time_range, sortable_params: graphs_sortable_params), layout: false
     end
 
     def tables
@@ -41,7 +41,7 @@ module Admin
       @bounding_box = GeocodeHelper.bounding_box(params[:location], @location_radius) if params[:location].present?
     end
 
-    helper_method :matching_bikes, :default_period
+    helper_method :graphs_sortable_params
 
     protected
 
@@ -76,6 +76,11 @@ module Admin
 
     def default_period
       "year"
+    end
+
+    # The period is always passed, since the graphs default to a different one than other pages
+    def graphs_sortable_params
+      {period: default_period}.merge(helpers.sortable_search_params).symbolize_keys
     end
 
     def bike_graph_kinds
