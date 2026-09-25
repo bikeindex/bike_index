@@ -39,8 +39,7 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
     # The pages are acknowledged one at a time on the b_param; this is the moment
     # they're agreed to as a whole
     def create_for(b_param, sequence:, user: nil)
-      create(registration_sequence: sequence, b_param:, user:, owner_email: b_param.owner_email,
-        bike_id: b_param.created_bike_id)
+      create(registration_sequence: sequence, b_param:, user:, owner_email: b_param.owner_email)
     end
 
     def find_for(bike:, organization:) = for_organization(organization).where(bike_id: bike.id).last

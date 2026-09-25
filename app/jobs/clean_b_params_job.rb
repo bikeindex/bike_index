@@ -17,6 +17,6 @@ class CleanBParamsJob < ScheduledJob
   # safety rules are still owed - its token is the way back to them
   def b_params
     stale = BParam.where("updated_at < ?", self.class.clean_before)
-    stale.with_bike.where.not(id: BParam.unfinished_registrations).or(stale.without_bike_values)
+    stale.with_bike.where.not(id: BParam.unexpired.acknowledgment_pending).or(stale.without_bike_values)
   end
 end

@@ -38,7 +38,6 @@ module Pages
           BikeServices::Register.acknowledged_page_ids(@b_param).include?(page.id)
         end
 
-        # None back into the steps the bike was created from
         def previous_path
           step = BikeServices::Register.step_before(@step, steps: @steps)
           register_path(b_param_token: @b_param.id_token, step:) if BikeServices::Register.editable_step?(@b_param, step)
