@@ -96,12 +96,12 @@ module Admin
         .sort_by { |origin, count| [-count, origins.index(origin)] }
     end
 
-    def ios_version_bikes(bikes) = bikes.joins(:ownerships).where("#{IOS_VERSION_SQL} IS NOT NULL")
+    def ios_version_bikes
+      matching_bikes.joins(:ownerships).where("#{IOS_VERSION_SQL} IS NOT NULL").group(IOS_VERSION_SQL)
+    end
 
-    # Distinct: a bike has an ownership per transfer
     def ios_version_bike_counts
-      @ios_version_bike_counts ||= ios_version_bikes(matching_bikes).group(IOS_VERSION_SQL).distinct.count(:id)
-        .sort_by { |version, count| [-count, version] }
+      ios_version_bikes.distinct.count(:id).sort_by { |version, count| [-count, version] }
     end
 
     def bike_graph_kinds
@@ -133,8 +133,8 @@ module Admin
     end
 
     # Ordered like ios_version_bike_counts, so the chart's legend matches the table
-    def ios_version_chart_series(bikes)
-      grouped_time_range_counts(ios_version_bikes(bikes).group(IOS_VERSION_SQL))
+    def ios_version_chart_series
+      grouped_time_range_counts(ios_version_bikes)
         .sort_by { |version, data| [-data.values.sum, version] }
         .map { |version, data| {name: "iOS #{version}", data:} }
     end
@@ -156,7 +156,7 @@ module Admin
       elsif bike_graph_kind == "origin"
         origin_chart_series(bikes)
       elsif bike_graph_kind == "ios_version"
-        ios_version_chart_series(bikes)
+        ios_version_chart_series
       elsif bike_graph_kind == "pos"
         pos_search_kinds.map do |pos_kind|
           {
