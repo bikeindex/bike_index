@@ -56,10 +56,15 @@ if (honeybadgerApiKey) {
         if (navigatingAway && NAVIGATION_FETCH_ERROR.test(notice.message)) {
           return false
         }
+        const fromOurAssets = notice.backtrace?.some((frame) => frame.file?.includes('/assets/'))
         // Google's iOS apps (GSA, CriOS) inject a script that recurses. WebKit files its frames
         // under the page's URL, at the same line numbers whatever the page
-        if (notice.message?.includes('Maximum call stack size exceeded') &&
-          !notice.backtrace?.some((frame) => frame.file?.includes('/assets/'))) {
+        if (notice.message?.includes('Maximum call stack size exceeded') && !fromOurAssets) {
+          return false
+        }
+        // Safari's fetch failure arrives stackless, mostly from pages where nothing of ours
+        // fetches. Chrome's "Failed to fetch" keeps a stack, so ours still report from there
+        if (notice.message?.includes('Load failed') && !fromOurAssets) {
           return false
         }
       })
