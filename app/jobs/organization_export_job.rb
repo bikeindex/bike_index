@@ -112,7 +112,7 @@ class OrganizationExportJob < ApplicationJob
     export_headers.map do |header|
       case header
       when "registered_at" then b_param.created_at.utc
-      when "manufacturer" then b_param.mnfg_name
+      when "manufacturer", "is_stolen", "is_impounded", "motorized" then value_for_header(header, b_param)
       when "model" then b_param.bike["frame_model"]
       when "serial" then b_param.bike["serial_number"]
       when "extra_registration_number" then b_param.bike["extra_registration_number"]
@@ -124,13 +124,10 @@ class OrganizationExportJob < ApplicationJob
       when "owner_email", "phone", "organization_affiliation", "student_id" then b_param.public_send(header)
       when "owner_name" then b_param.user_name
       when "bike_sticker" then b_param.bike_sticker_code
-      when "is_stolen" then b_param.status_stolen? ? "true" : nil
-      when "is_impounded" then b_param.status_impounded? ? "true" : nil
       when "address" then address["street"]
       when "address_2" then address["street_2"]
       when "city", "state", "zipcode" then address[header]
       when "vehicle_type" then CycleType.slug_translation_short(b_param.cycle_type)
-      when "motorized" then b_param.motorized?
       when "partial_registration" then true
       end
     end

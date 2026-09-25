@@ -46,10 +46,14 @@ module BikeServices
       token = params_token.presence || session_token.presence
       return if token.blank?
 
-      # Once the bike exists the token only ever shows the completion page, so
-      # access doesn't require matching the creator assigned at creation
-      BParam.unexpired_with_token(token)
-        .detect { |b| b.creator_id.blank? || b.creator_id == user&.id || b.created_bike_id.present? }
+      BParam.unexpired_with_token(token).detect { resumable_by?(it, user) }
+    end
+
+    # A registration only its creator can resume, so a signed-out visitor holding its
+    # link (an organization's resend) signs in rather than starting over
+    def sign_in_to_resume?(params_token, user:)
+      user.blank? && params_token.present? &&
+        BParam.unexpired_with_token(params_token).any? { !resumable_by?(it, nil) }
     end
 
     # The start over link. Destroyed rather than left behind: its token would still resume
@@ -421,6 +425,12 @@ module BikeServices
        "address_record_attributes" => attrs["address_record_attributes"]}.compact
     end
 
+    # Once the bike exists the token only ever shows the completion page, so
+    # access doesn't require matching the creator assigned at creation
+    def resumable_by?(b_param, user)
+      b_param.creator_id.blank? || b_param.creator_id == user&.id || b_param.created_bike_id.present?
+    end
+
     # manufacturer_id is the submitted-step-1 marker. Matching origin, so arriving from an
     # organization's page doesn't take over a shell started on /register and register the
     # bike as though it came in there
@@ -520,7 +530,7 @@ module BikeServices
     conceal :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
       :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
-      :impound_report_attrs, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
+      :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
       :step_2_params, :translation, :honeypot_spam
   end

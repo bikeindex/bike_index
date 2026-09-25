@@ -257,8 +257,11 @@ class RegisterController < ApplicationController
     @b_param = BikeServices::Register.find_token(params_token: params[:b_param_token],
       session_token: session[:register_b_param_token], user: current_user)
     @b_param ||= BikeServices::Register.b_param_for(user: current_user) if build
-    return store_return_and_authenticate_user(translation_key: :sign_in_to_continue_registration, flash_type: :notice) if sign_in_resumes?
     if @b_param.blank?
+      if BikeServices::Register.sign_in_to_resume?(params[:b_param_token], user: current_user)
+        return store_return_and_authenticate_user(translation_key: :sign_in_to_continue_registration, flash_type: :notice)
+      end
+
       flash[:notice] = translation(:registration_not_found) if params[:b_param_token].present?
       return redirect_to(new_register_path(start_params))
     end
@@ -271,13 +274,6 @@ class RegisterController < ApplicationController
     else
       session[:register_b_param_token] = @b_param.id_token
     end
-  end
-
-  # Only its creator can resume a registration someone signed in started, so a signed-out
-  # visitor holding its link (an organization's resend) signs in rather than starting over
-  def sign_in_resumes?
-    @b_param.blank? && current_user.blank? && params[:b_param_token].present? &&
-      BParam.unexpired_with_token(params[:b_param_token]).without_bike.where.not(creator_id: nil).exists?
   end
 
   # A finished registration (bike created, or awaiting the email) only shows

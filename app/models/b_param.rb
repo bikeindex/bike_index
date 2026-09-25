@@ -465,7 +465,7 @@ class BParam < ApplicationRecord
     bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"])
   end
 
-  def partial_registration?
+  def embed_partial?
     origin == "embed_partial"
   end
 
@@ -747,7 +747,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_notification_resends
-    return partial_notifications if partial_notification_pre_tracking? || !partial_registration?
+    return partial_notifications if partial_notification_pre_tracking? || !embed_partial?
 
     partial_notifications.offset(1)
   end
