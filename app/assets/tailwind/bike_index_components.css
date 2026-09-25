@@ -146,9 +146,7 @@
     @apply tw:grid tw:gap-x-8;
     --twwiderow-columns: 2;
     container: twwiderow / inline-size;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, max(320px, calc(
-      (100% - var(--tw-spacing) * 8 * (var(--twwiderow-columns) - 1)) / var(--twwiderow-columns)
-    ))), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, max(320px, calc(100% / var(--twwiderow-columns) - var(--tw-spacing) * 8))), 1fr));
   }
 
   .twwiderow-3 {
