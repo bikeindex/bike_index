@@ -63,21 +63,18 @@ module CallbackJobs
       return true if bike.owner_email.blank?
 
       owner_email = EmailNormalizer.normalize(bike.owner_email)
-      # Another registration open in the register flow is often a second bike being registered
-      matches = BParam.partial_registrations.where("email ilike ?", "%#{bike.owner_email}%")
-        .reorder(:created_at).reject do |b_param|
-          b_param.register_flow? && (b_param.manufacturer_id != bike.manufacturer_id ||
-            EmailNormalizer.normalize(b_param.email) != owner_email)
-        end
-      if matches.count > 1
-        # Try to make it a little more accurate lookup
-        best_matches = matches.select { |b_param| b_param.manufacturer_id == bike.manufacturer_id }
-        matches = best_matches if matches.any?
+      register_flow, embed = BParam.partial_registrations.where("email ilike ?", "%#{bike.owner_email}%")
+        .reorder(:created_at).partition(&:register_flow?)
+      # Every register flow registration of this bike - it being registered is what they were abandoned for
+      register_flow = register_flow.select do |b_param|
+        EmailNormalizer.normalize(b_param.email) == owner_email && BikeServices::Register.matches_bike?(b_param, bike)
       end
-      matching_b_param = matches.last # Because we want the last created
-      return true unless matching_b_param.present?
+      embed_match = (embed.select { it.manufacturer_id == bike.manufacturer_id }.presence || embed).last
+      matches = register_flow + [embed_match].compact
+      return true if matches.none?
 
-      matching_b_param.update(created_bike_id: bike.id)
+      matches.each { it.update(created_bike_id: bike.id) }
+      matching_b_param = matches.max_by(&:created_at)
       # Only set ownership
       ownership = bike.current_ownership
       if ownership.present? && ownership.origin == "web" && ownership.organization_id.blank?
