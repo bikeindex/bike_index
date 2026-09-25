@@ -268,12 +268,13 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
           FactoryBot.create(:b_param, creator: nil, origin: "register_flow",
             params: {bike: {manufacturer_id:, cycle_type: "tandem", owner_email: "stuff@things.com"}})
         end
-        it "assigns every one of the same make and type" do
+        it "assigns every one of the same make and type, attributed to the one with an organization" do
           instance.perform(bike.id)
           expect(partial_registration.reload.created_bike).to eq bike
           expect(partial_registration_same.reload.created_bike).to eq bike
           expect(partial_registration_other_type.reload.with_bike?).to be_falsey
-          expect(bike.reload.current_ownership.origin).to eq "register_flow"
+          expect(bike.reload.current_ownership.origin).to eq "register_flow_organized"
+          expect(bike.current_ownership.organization_id).to eq organization.id
         end
       end
       context "past step 1" do
