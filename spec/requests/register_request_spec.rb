@@ -702,6 +702,43 @@ RSpec.describe RegisterController, type: :request do
           expect(fields).to include("b_param[owner_email]").and include("bike[serial_number]")
         end
       end
+
+      context "step 1's manufacturer missing" do
+        let(:step_1_params) { {b_param: {manufacturer_id: "", cycle_type: "cargo", owner_email:}} }
+
+        it "re-renders the one page with the details still on it, saving neither step" do
+          expect { post base_url, params: create_params }.to_not change(Bike, :count)
+          expect(response).to have_http_status(:unprocessable_entity)
+          page = Nokogiri::HTML(response.body)
+          expect(page.at_css("input[name='bike[serial_number]']")["value"]).to eq "XYZ 123"
+          expect(empty_b_param.reload.bike["serial_number"]).to be_blank
+        end
+      end
+    end
+
+    context "the single page form, anonymous with a risky email and the challenge configured" do
+      let(:owner_email) { "rider@yahoo.com" }
+      let(:create_params) do
+        super().merge(single_page: true, bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+                                                status: "status_with_owner", user_name:})
+      end
+      before do
+        stub_const("Integrations::Turnstile::ENABLED", true)
+        stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
+      end
+
+      it "leaves the registration unfinished until the challenge is answered, then emails the link" do
+        expect { post base_url, params: create_params }
+          .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(BikeServices::Register.finished?(empty_b_param.reload, sequence: nil)).to be_falsey
+
+        VCR.use_cassette("integrations_turnstile-verified") do
+          expect { post base_url, params: create_params.merge("cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX") }
+            .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
+        end
+        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: "finished")
+      end
     end
   end
 

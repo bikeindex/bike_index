@@ -11,9 +11,7 @@
     <%= link_to translation(".go_back_to_old_view"), new_organization_bike_path(organization_id: @organization.to_param, old_view: true), class: "twlink" %>
   </p>
 
-  <%= form_with(url: switches_path, method: :get, data: {turbo: false}) do %>
-    <%= hidden_field_tag :register_settings, true %>
-
+  <%= form_with(url: switches_path, data: {turbo: false}) do %>
     <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: single_page?,
         label: translation(".single_page")) %>
 

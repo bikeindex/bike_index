@@ -85,17 +85,17 @@ class RegisterController < ApplicationController
     single_page = params[:single_page].present?
     saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
       propulsion_type_motorized: params[:propulsion_type_motorized], additional: params[:additional],
-      single_page:, separate_attestation: register_separate_attestation?)
+      single_page:, separate_attestation: register_setting?(@b_param, "separate_attestation")) &&
+      turnstile_verified?(@b_param, @b_param.owner_email)
     if single_page
-      saved &&= save_details
+      # Even after a failure, so the re-render keeps the details - which save_step_2
+      # doesn't persist past one
+      saved = save_details && saved
       # Saving step 1 is what makes the registration an e-vehicle, so the filter's sequence
       # was resolved too early - and this page finishes here rather than on a later request
       find_registration_sequence
     end
-    unless saved && turnstile_verified?(@b_param, @b_param.owner_email)
-      return render(start_component(steps: flow_steps(single_page:)),
-        status: :unprocessable_entity)
-    end
+    return render(start_component(steps: flow_steps(single_page:)), status: :unprocessable_entity) unless saved
 
     # Step 2 says the link is on its way, so it goes out here rather than at the end
     BikeServices::Register.send_confirmation_email(@b_param)
@@ -260,7 +260,7 @@ class RegisterController < ApplicationController
 
   # Read at render time rather than in a filter: the submissions save first, and where
   # the report sits depends on what they saved
-  def flow_steps(single_page: register_single_page?)
+  def flow_steps(single_page: register_setting?(@b_param, "single_page"))
     BikeServices::Register.steps(@b_param, sequence: @registration_sequence, single_page:)
   end
 

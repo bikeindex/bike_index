@@ -25,7 +25,7 @@ RSpec.describe Pages::Org::RegisterStep1::Component, type: :component do
     expect(component).to have_link("Go back to the old view",
       href: "/o/#{organization.to_param}/bikes/new?old_view=true")
 
-    switches = component.at_css("form[action='/o/#{organization.to_param}/registrations/new']")
+    switches = component.at_css("form[action='/o/#{organization.to_param}/registrations/switches'][method=post]")
     expect(switches.css("input[type=checkbox]").map { |el| el["name"] })
       .to eq(%w[single_page separate_attestation])
     expect(switches.css("input[type=checkbox][checked]")).to be_empty

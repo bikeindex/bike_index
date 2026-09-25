@@ -589,7 +589,9 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     context "the switches below the legacy one" do
       # Both submit together, so what's checked is the whole setting
       def set_switches(**params)
-        get "#{base_url}/new", params: {register_settings: true}.merge(params)
+        post "#{base_url}/switches", params: params
+        expect(response).to redirect_to "#{base_url}/new"
+        get "#{base_url}/new"
       end
 
       def form_field_names(scope)
@@ -601,7 +603,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(form_field_names("bike")).to eq([])
 
         set_switches(single_page: true)
-        expect(session[:register_single_page]).to be_present
+        expect(session[:register_settings]).to include("single_page" => true)
         expect(form_field_names("b_param")).to include "b_param[owner_email]"
         expect(form_field_names("bike")).to include "bike[serial_number]"
 
@@ -610,16 +612,16 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(form_field_names("bike")).to include "bike[serial_number]"
 
         set_switches
-        expect(session[:register_single_page]).to be_blank
+        expect(session[:register_settings]).to include("single_page" => false)
         expect(form_field_names("bike")).to eq([])
       end
 
       it "stores the separate attestation switch" do
         set_switches(separate_attestation: true)
-        expect(session[:register_separate_attestation]).to be_present
+        expect(session[:register_settings]).to include("separate_attestation" => true)
 
         set_switches(single_page: true)
-        expect(session[:register_separate_attestation]).to be_blank
+        expect(session[:register_settings]).to include("separate_attestation" => false)
       end
     end
 
@@ -630,7 +632,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       # The one page submits both steps together, so the whole registration is this post
       def register_e_scooter
-        get "#{base_url}/new", params: {register_settings: true, single_page: true}
+        post "#{base_url}/switches", params: {single_page: true}
+        get "#{base_url}/new"
         b_param = BParam.last
         post "/register", params: {b_param_token: b_param.id_token, single_page: true,
                                    propulsion_type_motorized: true,
@@ -661,7 +664,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       # Through the flow rather than the service, since the switch is a session preference
       def register_e_scooter
-        get "#{base_url}/new", params: {register_settings: true, separate_attestation: true}
+        post "#{base_url}/switches", params: {separate_attestation: true}
+        get "#{base_url}/new"
         b_param = BParam.last
         post "/register", params: {b_param_token: b_param.id_token, propulsion_type_motorized: true,
                                    b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}}
@@ -687,6 +691,23 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         it "asks for the attestation, which is theirs to agree to" do
           b_param = nil
           expect { b_param = register_e_scooter }.to_not change(Bike, :count)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        end
+      end
+
+      context "registering for another organization" do
+        let(:other_organization) { FactoryBot.create(:organization) }
+        let!(:other_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: other_organization) }
+
+        it "asks for its attestation - the switch is this organization's" do
+          post "#{base_url}/switches", params: {separate_attestation: true}
+          get "/register/new", params: {organization_id: other_organization.id}
+          b_param = BParam.last
+          expect(b_param.creation_organization_id).to eq other_organization.id
+          post "/register", params: {b_param_token: b_param.id_token, propulsion_type_motorized: true,
+                                     b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}}
+          expect { patch "/register", params: {b_param_token: b_param.id_token, bike: details} }
+            .to_not change(Bike, :count)
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
         end
       end

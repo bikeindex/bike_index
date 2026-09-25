@@ -28,7 +28,7 @@ module Pages
         end
 
         def switches_path
-          new_organization_registration_path(organization_id: @organization.to_param)
+          switches_organization_registrations_path(organization_id: @organization.to_param)
         end
       end
     end
