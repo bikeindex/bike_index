@@ -36,7 +36,7 @@ module Admin
 
     def tables
       @kind = ""
-      @location_radius = params[:location_radius].presence&.to_i || 100
+      @location_radius = GeocodeHelper.permitted_distance(params[:location_radius])
       @bounding_box = GeocodeHelper.bounding_box(params[:location], @location_radius) if params[:location].present?
     end
 
