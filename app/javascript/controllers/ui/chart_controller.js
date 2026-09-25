@@ -6,11 +6,7 @@ export default class extends Controller {
   // when it arrives, so it can load this late. Chart.bundle first, or chartkick dispatches
   // with no adapter.
   async connect () {
-    try {
-      await import('Chart.bundle')
-      await import('chartkick')
-    } catch {
-      // A module fetch the network dropped - the chart stays blank, and there's nothing to report
-    }
+    await import('Chart.bundle')
+    await import('chartkick')
   }
 }
