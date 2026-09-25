@@ -16,18 +16,6 @@ module Pages
 
         private
 
-        # Both steps' controllers, on the one form that holds both their fields
-        def form_options
-          {data: {turbo: true, form_persist_key_value: "register-combined-#{@b_param.id_token}",
-                  controller: "autofocus form-persist register--status-fields register--organization " \
-                    "register--retry ui--forms--turnstile",
-                  **UI::Forms::Turnstile::Component.form_data(user: @current_user),
-                  action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
-                    "hw-combobox:selection->register--status-fields#update " \
-                    "register--organization:changed->register--status-fields#update " \
-                    "input->ui--forms--turnstile#update submit->form-persist#clear"}}
-        end
-
         def organization
           @organization ||= @b_param.creation_organization
         end

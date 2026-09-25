@@ -190,8 +190,7 @@ class RegisterController < ApplicationController
   end
 
   def start_component(steps:)
-    component = steps.include?("2") ? Pages::Register::Step1::Component : Pages::Register::StepCombined::Component
-    component.new(b_param: @b_param, steps:, current_user:)
+    Pages::Register::StartPage::Component.opening_page(b_param: @b_param, steps:, current_user:)
   end
 
   def complete_registration

@@ -22,9 +22,8 @@ module Pages
 
         # skip_heading: the organized menu already names the organization
         def opening_page
-          component = single_page? ? Pages::Register::StepCombined::Component : Pages::Register::Step1::Component
-          component.new(b_param: @b_param, steps: @steps, current_user: @current_user,
-            organization: @organization, skip_heading: true)
+          Pages::Register::StartPage::Component.opening_page(b_param: @b_param, steps: @steps,
+            current_user: @current_user, organization: @organization, skip_heading: true)
         end
 
         def switches_path

@@ -6,6 +6,11 @@ module Pages
       # What step 2 asks for, ending in the button that submits it - rendered into
       # whichever form holds it, its own or the single-page flow's
       class Component < ApplicationComponent
+        # What these fields need on whichever form holds them
+        FORM_CONTROLLERS = "register--status-fields register--organization"
+        FORM_ACTIONS = "hw-combobox:selection->register--status-fields#update " \
+          "register--organization:changed->register--status-fields#update"
+
         # show_owner_email: step 1's address echoed back, which the single-page form
         # doesn't need - it has the field itself
         def initialize(b_param:, steps:, form:, current_user: nil, organization: nil,
