@@ -640,6 +640,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(RegistrationSequenceAcknowledgment.count).to eq 0
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
         expect(Bike.last).to have_attributes(owner_email:, cycle_type: "e-scooter")
+        expect(Bike.last.current_ownership.registration_info.slice("register_single_page", "register_separate_attestation"))
+          .to eq("register_separate_attestation" => true)
         # Nothing left over to alert the member who registered it
         expect(b_param.unfinished_registration?(current_user)).to be_falsey
       end

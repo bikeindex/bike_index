@@ -45,6 +45,8 @@ class BParam < ApplicationRecord
     phone
     postal_code
     region_string
+    register_separate_attestation
+    register_single_page
     street
     student_id
     user_name
@@ -68,6 +70,8 @@ class BParam < ApplicationRecord
     propulsion_type
     propulsion_type_slug
     rear_gear_type_slug
+    register_separate_attestation
+    register_single_page
     revised_new
     state_id
     stolen

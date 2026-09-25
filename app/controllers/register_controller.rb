@@ -81,10 +81,13 @@ class RegisterController < ApplicationController
   end
 
   def create
-    saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
-      propulsion_type_motorized: params[:propulsion_type_motorized], additional: params[:additional])
     # The combined form says so itself - the embed frames step 1 alone whatever the session holds
     single_page = params[:single_page].present?
+    # Carried to the ownership's registration_info, so registrations can be counted by the switches
+    bike_params = create_params.merge(register_single_page: single_page,
+      register_separate_attestation: register_separate_attestation?)
+    saved = BikeServices::Register.save_step_1(@b_param, bike_params:,
+      propulsion_type_motorized: params[:propulsion_type_motorized], additional: params[:additional])
     if single_page
       saved &&= save_details
       # Saving step 1 is what makes the registration an e-vehicle, so the filter's sequence

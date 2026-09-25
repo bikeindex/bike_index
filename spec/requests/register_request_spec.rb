@@ -686,6 +686,8 @@ RSpec.describe RegisterController, type: :request do
         expect { post base_url, params: create_params }.to change(Bike, :count).by 1
         expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
           manufacturer_id: manufacturer.id, creator_id: current_user.id)
+        expect(Bike.last.current_ownership.registration_info.slice("register_single_page", "register_separate_attestation"))
+          .to eq("register_single_page" => true)
         expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: "finished")
       end
 
