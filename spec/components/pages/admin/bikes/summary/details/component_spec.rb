@@ -38,6 +38,17 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
     end
   end
 
+  context "registered from the iOS app" do
+    let(:bike) do
+      FactoryBot.create(:bike, :with_ownership, creation_state_origin: "api_v3",
+        creation_registration_info: {ios_version: "1.6.9"})
+    end
+
+    it "renders the iOS version" do
+      expect(component.css("small").map { |e| e.text.squish }).to include "iOS 1.6.9"
+    end
+  end
+
   context "with a phone and no stolen record" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership, phone: "2223334444") }
 
