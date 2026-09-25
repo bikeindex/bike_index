@@ -7,9 +7,10 @@ module Pages
       # around whichever fields step 1 asks for: its own, or both steps'
       class Component < ApplicationComponent
         # Which page opens the flow is read off the steps, so the switch is decided in one place
-        def self.opening_page(steps:, **)
-          component = steps.include?("2") ? Pages::Register::Step1::Component : Pages::Register::StepCombined::Component
-          component.new(steps:, **)
+        def self.opening_page(steps:, motorized_review: false, **)
+          return Pages::Register::Step1::Component.new(steps:, **) if steps.include?("2")
+
+          Pages::Register::StepCombined::Component.new(steps:, motorized_review:, **)
         end
 
         def initialize(b_param:, steps:, organization:, current_user: nil, subtitle: nil, embed: false,

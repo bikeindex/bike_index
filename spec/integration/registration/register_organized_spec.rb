@@ -187,6 +187,34 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
 
+    context "a member, on the organization's single page" do
+      let(:member) do
+        FactoryBot.create(:user_confirmed, email: "member@bikeindex.org", accepted_vendor_terms_of_service: true)
+      end
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: member, organization:) }
+
+      it "labels the submit and asks for the owner's name off what's filled in above them" do
+        sign_in(member)
+        visit "/o/#{organization.to_param}/registrations/new"
+        within("form[action$='/registrations/switches']") do
+          check "Show registration in a single page"
+          click_button "Update"
+        end
+
+        expect(page).to have_button("Complete Bike Registration")
+        check "Electric (motorized)"
+        expect(page).to have_button("Next")
+        uncheck "Electric (motorized)"
+        expect(page).to have_button("Complete Bike Registration")
+
+        expect(page).to have_field("bike[user_name]")
+        fill_in "b_param[owner_email]", with: member.email
+        expect(page).to have_no_field("bike[user_name]")
+        fill_in "b_param[owner_email]", with: owner_email
+        expect(page).to have_field("bike[user_name]")
+      end
+    end
+
     # Every step submits through Turbo, so a throttle or a bad gateway is a response the
     # page can retry. This flow has one of every step, so each gets its turn at failing.
     context "when the server fails each step once" do

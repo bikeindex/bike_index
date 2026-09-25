@@ -8,12 +8,14 @@ module Pages
       # The register flow's opening page on an organization's own page, with the
       # switches that change its shape below it
       class Component < ApplicationComponent
-        def initialize(b_param:, steps:, organization:, current_user: nil, separate_attestation: false)
+        def initialize(b_param:, steps:, organization:, current_user: nil, separate_attestation: false,
+          motorized_review: false)
           @b_param = b_param
           @steps = steps
           @organization = organization
           @current_user = current_user
           @separate_attestation = separate_attestation
+          @motorized_review = motorized_review
         end
 
         private
@@ -23,7 +25,8 @@ module Pages
         # skip_heading: the organized menu already names the organization
         def opening_page
           Pages::Register::StartPage::Component.opening_page(b_param: @b_param, steps: @steps,
-            current_user: @current_user, organization: @organization, skip_heading: true)
+            current_user: @current_user, organization: @organization, skip_heading: true,
+            motorized_review: @motorized_review)
         end
 
         def switches_path

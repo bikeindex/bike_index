@@ -190,7 +190,8 @@ class RegisterController < ApplicationController
   end
 
   def start_component(steps:)
-    Pages::Register::StartPage::Component.opening_page(b_param: @b_param, steps:, current_user:)
+    Pages::Register::StartPage::Component.opening_page(b_param: @b_param, steps:, current_user:,
+      motorized_review: register_motorized_review?(@b_param, steps))
   end
 
   def complete_registration

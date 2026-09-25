@@ -80,8 +80,9 @@ module BikeServices
     # The safety rules a registration acknowledges before its bike is created - the
     # organization's active sequence, and only for an e-vehicle
     # motorized? first - it's in memory, and creation_organization is a query
-    def registration_sequence(b_param, separate_attestation: false, user: nil)
-      return nil unless b_param.motorized?
+    # motorized: the single page asks what an e-vehicle would get, before it's said it's one
+    def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?)
+      return nil unless motorized
       # Left to the registrant, so the flow has no sequence and the bike is created
       # without one
       return nil if separate_attestation && !b_param.self_made?(user)

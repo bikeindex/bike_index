@@ -643,6 +643,22 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         b_param.reload
       end
 
+      def motorized_text
+        Nokogiri::HTML(response.body).at_css("[data-register--status-fields-target=submitLabel]")["data-motorized-text"]
+      end
+
+      it "labels the submit for the safety pages an e-vehicle would get, without a progress count yet" do
+        post "#{base_url}/switches", params: {single_page: true}
+        get "#{base_url}/new"
+        expect(motorized_text).to eq "Next"
+        expect(Nokogiri::HTML(response.body).css("span.tw\\:h-1.tw\\:rounded-full")).to be_empty
+
+        # Left to the registrant, so an e-vehicle registered here finishes on this page
+        post "#{base_url}/switches", params: {single_page: true, separate_attestation: true}
+        get "#{base_url}/new"
+        expect(motorized_text).to be_blank
+      end
+
       # The submission is what makes it an e-vehicle, so the sequence isn't knowable
       # until it's saved - and nothing after this post resolves it again
       it "stops at the safety pages, which the submission is what asks for" do

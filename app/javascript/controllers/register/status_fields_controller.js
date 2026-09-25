@@ -42,10 +42,21 @@ export default class extends Controller {
       collapseField(field, JSON.parse(statuses).includes(status), duration)
       if (texts) this.applyRequired(field, JSON.parse(texts)[status])
     })
+    this.updateSubmitLabel()
+  }
+
+  // On the single page the electric checkbox is in this form too, and an e-vehicle's
+  // safety pages come after it - data-motorized-text is the label for then
+  updateSubmitLabel () {
+    if (!this.hasSubmitLabelTarget) return
+
+    const label = this.submitLabelTarget
+    const status = this.element.querySelector('input[name$="[status]"]')?.value
+    const motorized = this.element.querySelector('input[name="propulsion_type_motorized"]')?.checked
     // Backspacing the combobox empty deselects it, so keep the label it had rather
     // than writing an undefined status's missing text into the button
-    const submitText = this.hasSubmitLabelTarget && JSON.parse(this.submitLabelTarget.dataset.texts)[status]
-    if (submitText) this.submitLabelTarget.textContent = submitText
+    const submitText = (motorized && label.dataset.motorizedText) || JSON.parse(label.dataset.texts)[status]
+    if (submitText) label.textContent = submitText
   }
 
   // The phone a theft or a find gets contacted on: required, starred rather than badged

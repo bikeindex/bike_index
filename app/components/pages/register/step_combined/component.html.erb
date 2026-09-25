@@ -11,6 +11,7 @@
 
   <%= fields_for(:bike) do |f| %>
     <%= render Pages::Register::Step2Fields::Component.new(b_param: @b_param, steps: @steps,
-        form: f, current_user: @current_user, organization:, show_owner_email: false) %>
+        form: f, current_user: @current_user, organization:, single_page: true,
+        motorized_review: @motorized_review) %>
   <% end %>
 <% end %>

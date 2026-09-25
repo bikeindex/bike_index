@@ -9,18 +9,21 @@ module Pages
         # What these fields need on whichever form holds them
         FORM_CONTROLLERS = "register--status-fields register--organization"
         FORM_ACTIONS = "hw-combobox:selection->register--status-fields#update " \
-          "register--organization:changed->register--status-fields#update"
+          "register--organization:changed->register--status-fields#update " \
+          "change->register--status-fields#updateSubmitLabel"
 
-        # show_owner_email: step 1's address echoed back, which the single-page form
-        # doesn't need - it has the field itself
+        # single_page: step 1's fields are on the same form, so its address isn't echoed back
+        # and whether the owner's name is asked for follows what's typed into it.
+        # motorized_review: whether an e-vehicle gets the safety pages after this form
         def initialize(b_param:, steps:, form:, current_user: nil, organization: nil,
-          show_owner_email: true)
+          single_page: false, motorized_review: false)
           @b_param = b_param
           @steps = steps
           @form = form
           @current_user = current_user
           @organization = organization
-          @show_owner_email = show_owner_email
+          @single_page = single_page
+          @motorized_review = motorized_review
         end
 
         private
@@ -66,6 +69,15 @@ module Pages
         # Step 1's email settles who this is for, so the name is only asked for here
         def user_name_required?
           !@b_param.self_made?(@current_user)
+        end
+
+        # The single page matches what's typed against the addresses BParam#self_made? does
+        def owner_name_data
+          return {} unless @single_page
+
+          own_emails = @current_user ? ([@current_user.email] + @current_user.confirmed_emails).uniq : []
+          {controller: "register--owner-name", "register--owner-name-own-emails-value": own_emails.to_json,
+           action: "input@window->register--owner-name#update form-persist:restored@window->register--owner-name#update"}
         end
 
         # What the account already holds only answers the organization's fields when the

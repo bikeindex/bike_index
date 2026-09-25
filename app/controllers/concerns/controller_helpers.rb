@@ -203,9 +203,15 @@ module ControllerHelpers
 
   # Both entry points into the flow build it the same way - the organization's page and
   # the /register submissions it hands off to have to agree on whether there's a sequence
-  def register_flow_sequence(b_param)
-    BikeServices::Register.registration_sequence(b_param, user: current_user,
+  def register_flow_sequence(b_param, motorized: b_param.motorized?)
+    BikeServices::Register.registration_sequence(b_param, user: current_user, motorized:,
       separate_attestation: register_setting?(b_param, "separate_attestation"))
+  end
+
+  # The single page's electric checkbox is on the same form as its submit button, so the
+  # button is told what it'd lead to for an e-vehicle
+  def register_motorized_review?(b_param, steps)
+    steps.exclude?("2") && register_flow_sequence(b_param, motorized: true).present?
   end
 
   def show_general_alert
