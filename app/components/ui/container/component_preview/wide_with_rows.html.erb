@@ -1,0 +1,13 @@
+<%= render(UI::Container::Component.new(width: :wide)) do %>
+  <div class="twwiderow tw:gap-y-6">
+    <% 2.times do |index| %>
+      <%= render(UI::Card::Component.new) { "Card #{index + 1} of 2" } %>
+    <% end %>
+  </div>
+
+  <div class="twwiderow twwiderow-3 tw:mt-6 tw:gap-y-6">
+    <% 3.times do |index| %>
+      <%= render(UI::Card::Component.new) { "Card #{index + 1} of 3" } %>
+    <% end %>
+  </div>
+<% end %>

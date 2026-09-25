@@ -1,0 +1,21 @@
+<%= render(UI::Container::Component.new(width:, alignment:)) do %>
+  <%= render(UI::Card::Component.new) do %>
+    <label class="twlabel" for="container_preview_name">Name</label>
+
+    <input
+      class="twinput"
+      id="container_preview_name"
+      type="text"
+      autocomplete="name"
+    >
+
+    <label class="twlabel tw:mt-4" for="container_preview_email">Email</label>
+
+    <input
+      class="twinput"
+      id="container_preview_email"
+      type="email"
+      autocomplete="email"
+    >
+  <% end %>
+<% end %>
