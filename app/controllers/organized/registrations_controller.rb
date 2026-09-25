@@ -233,6 +233,10 @@ module Organized
       bikes = (@search_all || org.blank?) ? Bike.search(@interpreted_params) : org.bikes.search(@interpreted_params)
       bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
       bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
+      if org.present?
+        bikes = BikeServices::OrganizedSearch.location(bikes, @interpreted_params[:location], @interpreted_params[:distance],
+          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address)
+      end
       bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
       bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
       bikes = BikeServices::OrganizedSearch.status(bikes, search_status)
@@ -350,7 +354,8 @@ module Organized
       # TODO: Enable stolenness for export selection
       return false if @interpreted_params[:stolenness]&.downcase != "all"
 
-      @interpreted_params.except(:stolenness).values.reject(&:blank?).none?
+      # A distance is only a search alongside a location
+      @interpreted_params.except(:stolenness, :distance).values.reject(&:blank?).none?
     end
 
     def directly_create_export?(bikes_count)
