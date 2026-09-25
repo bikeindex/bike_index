@@ -1,0 +1,238 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Export the UI:: Lookbook component previews as a self-contained HTML bundle for a
+# claude.ai/design design-system project. Pair with the /design-sync skill: point
+# DesignSync at the output directory (default tmp/design_export) and push.
+#
+# Each top-level Lookbook scenario (a @!group renders all its variants stacked; an
+# ungrouped scenario renders alone) becomes one standalone card, made self-contained:
+#   - same-origin stylesheets inlined as <style>
+#   - JS rebuilt as a minimal Stimulus bootstrap: only the controllers the card actually
+#     uses (from its data-controller attrs) are registered, and just their transitive-closure
+#     of modules is inlined as data: URIs. This replaces the app's fragile `application`
+#     entrypoint (which drags in turbo/lexxy/etc.) — cards stay small and actually interact.
+# Headed by the first-line `<!-- @dsCard group="..." -->` marker Claude indexes cards from.
+#
+# Talks only to the running dev server over HTTP — it does NOT boot Rails. Enumeration
+# from /lookbook/previews.json, rendering from /lookbook/preview/*. If the dev server
+# isn't up, it stops and asks you to start it (bin/dev).
+# Usage: bin/design_export [OUTPUT_DIR]
+
+require "net/http"
+require "fileutils"
+require "json"
+require "base64"
+
+OUTPUT_DIR = File.expand_path(ARGV[0] || "tmp/design_export", File.expand_path("..", __dir__))
+BASE_URL = ENV["BASE_URL"].to_s
+abort("BASE_URL is not set — run `eval \"$(ruby bin/env --export)\"` first") if BASE_URL.empty?
+
+# Paths to skip, matched against the preview path after "ui/" as a segment-aware prefix
+# (so "forms/legacy_form_well" excludes that subtree without touching the rest of "forms").
+EXCLUDED_COMPONENTS = %w[
+  address_display alerts button_link color_swatch
+  forms/combobox_manufacturer forms/legacy_form_well time_localizer
+].freeze
+
+# Controllers never registered on a card: each pulls a heavy dep (rich-text editor, combobox)
+# not worth inlining, so that component renders static and its card links to production instead.
+EXCLUDED_CONTROLLERS = %w[controllers/lexxy_controller controllers/hw_combobox_controller].freeze
+
+# Components whose interactivity relies on the JS above (excluded): their static card
+# links to the live production Lookbook rather than pretending the snapshot is functional.
+PRODUCTION_URL = "https://bikeindex.org"
+PRODUCTION_REFERENCED = %w[forms/combobox forms/text_editor].freeze
+
+CACHE = {}
+
+# Fetch from the dev server, retrying through Rack::Attack throttling. cache: memoizes
+# by path so repeated assets (stylesheets, shared modules) are fetched once per run.
+def get(path, cache: false)
+  return CACHE[path] if cache && CACHE.key?(path)
+
+  body = fetch(path)
+  CACHE[path] = body if cache
+  body
+end
+
+def fetch(path)
+  5.times do
+    response = Net::HTTP.get_response(URI.join(BASE_URL, path))
+    return response.body if response.is_a?(Net::HTTPSuccess)
+    return nil unless response.code == "429"
+
+    sleep 1.5
+  end
+  nil
+rescue SystemCallError
+  nil
+end
+
+def same_origin?(url)
+  url.start_with?("/", BASE_URL)
+end
+
+# Segment-aware prefix match, e.g. "forms/combobox" matches "forms/combobox/variants"
+# but not "forms/combobox_manufacturer".
+def path_matches?(path, prefixes)
+  prefixes.any? { |prefix| path == prefix || path.start_with?("#{prefix}/") }
+end
+
+# Inline same-origin stylesheets as <style>; external links (fonts) are left alone.
+def inline_stylesheets(html)
+  html.gsub(/<link\b[^>]*>/i) do |tag|
+    next tag unless /rel=["']stylesheet["']/i.match?(tag)
+    href = tag[/href=["']([^"']+)["']/i, 1]
+    next tag unless href && same_origin?(href)
+
+    css = get(href, cache: true)
+    css ? "<style>\n#{css}\n</style>" : tag
+  end
+end
+
+def data_uri(js)
+  "data:text/javascript;base64,#{Base64.strict_encode64(js)}"
+end
+
+# Stimulus identifier -> importmap controller key, mirroring stimulus-loading's convention:
+# "ui--dropdown" => "controllers/ui/dropdown_controller", "form--file-upload" => ".../form/file_upload_controller".
+def controller_module(identifier)
+  "controllers/#{identifier.split("--").map { |segment| segment.tr("-", "_") }.join("/")}_controller"
+end
+
+# Bare import specifiers a module references (static `from "x"` / `import "x"` and dynamic `import("x")`).
+def import_specifiers(js)
+  js.scan(/(?:from|import)\s*\(?\s*["']([^"']+)["']/).flatten
+end
+
+# Transitive closure of importmap keys reachable from the seeds. Same-origin modules are
+# fetched and scanned for further imports; CDN pins are kept as leaves (self-contained bundles).
+def module_closure(seeds, imports)
+  reached = {}
+  stack = seeds.dup
+  until stack.empty?
+    name = stack.pop
+    next if reached.key?(name) || !imports.key?(name)
+
+    reached[name] = imports[name]
+    next unless same_origin?(imports[name])
+
+    js = get(imports[name], cache: true)
+    import_specifiers(js).each { |specifier| stack << specifier } if js
+  end
+  reached
+end
+
+# Strip the server's importmap, module scripts, es-module-shims/mini-profiler (<script src>),
+# and modulepreload hints — replaced by a minimal per-card bootstrap when controllers are used.
+def strip_js(html)
+  html
+    .gsub(%r{<script\b[^>]*type=["'](?:importmap|module)["'][^>]*>.*?</script>}mi, "")
+    .gsub(%r{<script\b[^>]*\ssrc=["'][^"']*["'][^>]*>\s*</script>}i, "")
+    .gsub(/<link\b[^>]*rel=["']modulepreload["'][^>]*>/i, "")
+end
+
+# Rebuild JS as a minimal Stimulus bootstrap: register only the controllers this card uses,
+# importing them (and their transitive deps) from an importmap trimmed to that closure and
+# inlined as data: URIs. Sidesteps the app's fragile `application` entrypoint and stays small.
+def inline_js(html)
+  importmap = html[%r{<script\b[^>]*type=["']importmap["'][^>]*>(.*?)</script>}mi, 1]
+  imports = importmap ? JSON.parse(importmap).fetch("imports", {}) : {}
+
+  identifiers = html.scan(/data-controller=["']([^"']+)["']/i).flatten.join(" ").split.uniq
+  registrations = identifiers.filter_map do |identifier|
+    mod = controller_module(identifier)
+    [identifier, mod] if imports.key?(mod) && !EXCLUDED_CONTROLLERS.include?(mod)
+  end
+
+  html = strip_js(html)
+  return html if registrations.empty?
+
+  closure = module_closure(["@hotwired/stimulus", *registrations.map(&:last)], imports)
+  inlined = closure.to_h do |name, url|
+    js = same_origin?(url) ? get(url, cache: true) : nil
+    [name, js ? data_uri(js) : url]
+  end
+  inject_bootstrap(html, inlined, registrations)
+end
+
+# Inject the trimmed importmap and a module that starts Stimulus and registers each controller.
+def inject_bootstrap(html, imports, registrations)
+  importmap = %(<script type="importmap">#{JSON.generate("imports" => imports)}</script>)
+  loads = registrations.each_with_index.map { |(_id, mod), index| "import c#{index} from #{mod.to_json}" }
+  registers = registrations.each_with_index.map { |(id, _mod), index| "app.register(#{id.to_json}, c#{index})" }
+  bootstrap = <<~JS.chomp
+    import { Application } from "@hotwired/stimulus"
+    #{loads.join("\n")}
+    const app = Application.start()
+    #{registers.join("\n")}
+    window.Stimulus = app
+  JS
+  html.sub(%r{</head>}i) { %(#{importmap}\n<script type="module">#{bootstrap}</script>\n#{Regexp.last_match(0)}) }
+end
+
+def self_contain(html)
+  inline_js(inline_stylesheets(html))
+end
+
+# Prepend a link to the live, interactive production Lookbook into the card body.
+def production_reference(html, lookup)
+  url = "#{PRODUCTION_URL}/lookbook/inspect/#{lookup}"
+  style = "margin:0 0 1rem;padding:.5rem .75rem;border:1px solid #3498db;border-radius:.25rem;font:14px/1.4 sans-serif"
+  banner = %(<div style="#{style}">Interactive component — <a href="#{url}">view live on production →</a></div>)
+  html.sub(/(<div class="tw:p-4">)/) { "#{Regexp.last_match(1)}#{banner}" }
+end
+
+previews_json = get("/lookbook/previews.json") or abort(<<~MSG)
+  Dev server not reachable at #{BASE_URL} (this script does not boot Rails).
+  Start it with `bin/dev`, then re-run.
+MSG
+
+# Only top-level scenarios are routable at /lookbook/preview/* (leaves nested in a @!group
+# are not). Build one card per top-level entry — for a group, its own render stacks the
+# variants. The group/leaf name plus the preview's URL prefix gives the render path.
+cards = JSON.parse(previews_json).fetch("previews").flat_map do |preview|
+  tops = preview["scenarios"]
+  reference = tops.flat_map { |scenario| scenario["examples"] || [scenario] }.first
+  next [] unless reference
+
+  prefix = reference["preview_path"].sub(%r{/[^/]+\z}, "") # "/lookbook/preview/ui/button"
+  next [] unless prefix.start_with?("/lookbook/preview/ui/")
+
+  path = prefix.sub("/lookbook/preview/ui/", "") # "button", "forms/legacy_form_well/address_record"
+  next [] if path_matches?(path, EXCLUDED_COMPONENTS)
+
+  component = path.split("/").first # "button", "forms", "definition_list"
+  tops.map { |scenario| {url: "#{prefix}/#{scenario["name"]}", component:} }
+end
+abort("No UI:: previews found at #{BASE_URL}/lookbook") if cards.empty?
+
+FileUtils.rm_rf(OUTPUT_DIR)
+written = []
+skipped = []
+
+cards.each do |card|
+  lookup = card[:url].sub("/lookbook/preview/", "") # e.g. "ui/button/colors"
+  html = get(card[:url])
+  if html.nil?
+    skipped << lookup
+    next
+  end
+
+  group = card[:component].split("_").map(&:capitalize).join(" ") # "short_id" => "Short Id"
+  body = self_contain(html)
+  body = production_reference(body, lookup) if path_matches?(lookup.delete_prefix("ui/"), PRODUCTION_REFERENCED)
+  path = File.join(OUTPUT_DIR, "#{lookup}.html")
+  FileUtils.mkdir_p(File.dirname(path))
+  size = File.write(path, "<!-- @dsCard group=\"#{group}\" -->\n#{body}")
+  written << {path:, size:}
+  puts format("  %-46s %5d KiB", lookup, size / 1024)
+end
+
+total = written.sum { it[:size] }
+largest = written.max_by { it[:size] }
+puts "\nWrote #{written.size} cards to #{OUTPUT_DIR}"
+puts "Bundle #{total / 1024} KiB total; largest card #{largest[:size] / 1024} KiB (#{largest[:path].sub("#{OUTPUT_DIR}/", "")})" if largest
+puts "Skipped (non-200 render): #{skipped.join(", ")}" if skipped.any?
+puts "\nNext: run /design-sync and point it at #{OUTPUT_DIR}"
