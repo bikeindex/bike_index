@@ -101,6 +101,8 @@ Its text is **"Paste, drop, or click to add files"**. `data-file-attachment-for=
 button.Button--small[data-file-attachment-for="fc-new_comment_field"]
 ```
 
+That's a CSS selector, and `browser_click` takes a snapshot `ref` — pass the selector to `browser_run_code_unsafe` instead, clicking it against a `page.waitForEvent('filechooser')`. **Open the chooser there and stop**: calling `setFiles` inside that block *and* `browser_file_upload` afterwards satisfies it twice, and every image uploads twice.
+
 **Upload every image in one `browser_file_upload` call** — it takes an array of paths, and GitHub processes them together. Don't upload one at a time. Always absolute paths.
 
 Then poll the textarea until it holds one `user-attachments/assets/` URL per file, rather than sleeping a fixed interval — GitHub injects each image's markup asynchronously as it finishes:
