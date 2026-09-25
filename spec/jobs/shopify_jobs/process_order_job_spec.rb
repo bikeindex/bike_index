@@ -15,7 +15,7 @@ RSpec.describe ShopifyJobs::ProcessOrderJob, type: :job do
   end
 
   it "registers the bike to the buyer, credited to the shop's POS" do
-    expect { described_class.new.perform(shopify_integration.id, order) }
+    expect { described_class.new.perform(shopify_integration.id, order.to_json) }
       .to change(Bike, :count).by(1)
 
     bike = Bike.last
@@ -30,8 +30,8 @@ RSpec.describe ShopifyJobs::ProcessOrderJob, type: :job do
 
   # orders/updated redelivers the whole sale every time the shop edits it
   it "does not register the same sale twice" do
-    described_class.new.perform(shopify_integration.id, order)
-    expect { described_class.new.perform(shopify_integration.id, order) }
+    described_class.new.perform(shopify_integration.id, order.to_json)
+    expect { described_class.new.perform(shopify_integration.id, order.to_json) }
       .to_not change(Bike, :count)
   end
 
@@ -39,7 +39,7 @@ RSpec.describe ShopifyJobs::ProcessOrderJob, type: :job do
     let(:line_item) { super().merge("properties" => []) }
 
     it "registers nothing" do
-      expect { described_class.new.perform(shopify_integration.id, order) }
+      expect { described_class.new.perform(shopify_integration.id, order.to_json) }
         .to_not change(Bike, :count)
       expect(shopify_integration.reload.last_order_at).to be_nil
     end
@@ -52,7 +52,7 @@ RSpec.describe ShopifyJobs::ProcessOrderJob, type: :job do
     let(:order) { super().merge("line_items" => [line_item, helmet]) }
 
     it "registers only the line item carrying a serial" do
-      expect { described_class.new.perform(shopify_integration.id, order) }
+      expect { described_class.new.perform(shopify_integration.id, order.to_json) }
         .to change(Bike, :count).by(1)
       expect(Bike.last.frame_model).to eq "Trek Domane AL 2"
     end
@@ -63,7 +63,7 @@ RSpec.describe ShopifyJobs::ProcessOrderJob, type: :job do
     let(:order) { super().merge("note" => "S/N: FR8842") }
 
     it "registers it against that product" do
-      expect { described_class.new.perform(shopify_integration.id, order) }
+      expect { described_class.new.perform(shopify_integration.id, order.to_json) }
         .to change(Bike, :count).by(1)
       expect(Bike.last).to have_attributes(serial_number: "FR8842", manufacturer_id: manufacturer.id)
     end
@@ -74,7 +74,7 @@ RSpec.describe ShopifyJobs::ProcessOrderJob, type: :job do
     let(:line_item) { super().merge("vendor" => "Some Local Framebuilder") }
 
     it "registers under Other, keeping the vendor name" do
-      expect { described_class.new.perform(shopify_integration.id, order) }
+      expect { described_class.new.perform(shopify_integration.id, order.to_json) }
         .to change(Bike, :count).by(1)
       expect(Bike.last).to have_attributes(manufacturer_id: Manufacturer.other.id,
         manufacturer_other: "Some Local Framebuilder", serial_number: "WTU123K0912")
@@ -84,7 +84,7 @@ RSpec.describe ShopifyJobs::ProcessOrderJob, type: :job do
   context "the integration is gone" do
     it "does nothing" do
       shopify_integration.destroy
-      expect { described_class.new.perform(shopify_integration.id, order) }
+      expect { described_class.new.perform(shopify_integration.id, order.to_json) }
         .to_not change(Bike, :count)
     end
   end
@@ -93,7 +93,7 @@ RSpec.describe ShopifyJobs::ProcessOrderJob, type: :job do
     let(:order) { super().merge("email" => nil, "customer" => {}) }
 
     it "registers nothing" do
-      expect { described_class.new.perform(shopify_integration.id, order) }
+      expect { described_class.new.perform(shopify_integration.id, order.to_json) }
         .to_not change(Bike, :count)
     end
   end

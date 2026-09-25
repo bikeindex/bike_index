@@ -6,7 +6,6 @@ FactoryBot.define do
     user { FactoryBot.create(:user_confirmed) }
     sequence(:shop_domain) { |n| "bike-shop-#{n}.myshopify.com" }
     access_token { "shpua_test_access_token_123" }
-    scopes { Integrations::Shopify::Client::DEFAULT_SCOPE }
     status { :pending }
 
     trait :active do

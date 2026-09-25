@@ -8,6 +8,10 @@
     </p>
 
     <dl class="tw:mb-4 tw:text-sm">
+      <dt class="twlabel">Status</dt>
+
+      <dd class="tw:mb-2"><%= @shopify_integration.status.titleize %></dd>
+
       <dt class="twlabel">Registrations from Shopify</dt>
 
       <dd class="tw:mb-2">
@@ -23,7 +27,10 @@
 
       <% if @shopify_integration.last_error.present? %>
         <dt class="twlabel">Last error</dt>
-        <dd class="tw:mb-2"><%= @shopify_integration.last_error %></dd>
+        <dd class="tw:mb-2">
+          <%= @shopify_integration.last_error %>
+          (<%= render(UI::Time::Component.new(time: @shopify_integration.last_error_at)) %>)
+        </dd>
       <% end %>
     </dl>
 
@@ -51,8 +58,7 @@
     </p>
   </div>
 
-  <%= form_with url: shopify_integration_path, method: :post, class: "tw:mb-6" do |f| %>
-    <%= hidden_field_tag :organization_id, @organization.to_param %>
+  <%= form_with url: shopify_integration_path(organization_id: @organization.to_param), method: :post, class: "tw:mb-6" do |f| %>
     <label class="twlabel" for="shop_domain">Your Shopify store</label>
 
     <%= text_field_tag :shop_domain, nil, class: "twinput tw:mb-4", autocomplete: "url",

@@ -11,8 +11,6 @@ module Integrations
         def manufacturer = line_item&.dig("vendor").presence || "Unknown"
 
         def frame_model = line_item&.dig("title")
-
-        def quantity = line_item&.dig("quantity") || 1
       end
 
       def registerable?(order)
@@ -29,7 +27,8 @@ module Integrations
       def registrations(order)
         return [] if order.blank?
 
-        line_item_registrations(order) + note_registrations(order)
+        from_line_items = line_item_registrations(order)
+        from_line_items + note_registrations(order, from_line_items.map(&:serial))
       end
 
       #
@@ -38,18 +37,17 @@ module Integrations
 
       def line_item_registrations(order)
         line_items(order).flat_map do |line_item|
-          SerialParser.serials_in_attributes(line_item["properties"])
+          Integrations::Shopify::SerialParser.serials_in_attributes(line_item["properties"])
             .map { Registration.new(serial: it, line_item:) }
         end
       end
 
       # An order note names no line item, so it only resolves to a product when the sale has
       # exactly one - a multi-item sale registers the serial with an unknown manufacturer
-      def note_registrations(order)
+      def note_registrations(order, claimed)
         line_items = line_items(order)
-        claimed = line_item_registrations(order).map(&:serial)
-        serials = SerialParser.serials_in(order["note"]) +
-          SerialParser.serials_in_attributes(order["note_attributes"])
+        serials = Integrations::Shopify::SerialParser.serials_in(order["note"]) +
+          Integrations::Shopify::SerialParser.serials_in_attributes(order["note_attributes"])
 
         (serials.uniq - claimed).map do |serial|
           Registration.new(serial:, line_item: (line_items.one? ? line_items.first : nil))

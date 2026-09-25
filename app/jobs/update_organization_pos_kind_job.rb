@@ -3,6 +3,8 @@ class UpdateOrganizationPosKindJob < ScheduledJob
 
   sidekiq_options queue: "low_priority", retry: false
 
+  POS_PROVIDERS = %w[lightspeed shopify].freeze # ascend has its own branch, above
+
   class << self
     def frequency
       6.3.hours
@@ -17,20 +19,26 @@ class UpdateOrganizationPosKindJob < ScheduledJob
         last_import = BulkImport.ascend.where(organization_id: organization.id).order(id: :desc).limit(1).last
         return last_import&.blocking_error? ? "broken_ascend_pos" : "ascend_pos"
       end
-      return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
-      return "shopify_pos" if recent_bikes.shopify_pos.count > 0
+      recent_provider = pos_provider_for(recent_bikes)
+      return "#{recent_provider}_pos" if recent_provider.present?
       return "other_pos" if recent_bikes.any_pos.count > 0
 
       if organization.bike_shop?
         return "does_not_need_pos" if does_not_need_pos?(organization, bikes)
       end
-      return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
-      return "broken_shopify_pos" if bikes.shopify_pos.count > 0
+      broken_provider = pos_provider_for(bikes)
+      return "broken_#{broken_provider}_pos" if broken_provider.present?
 
       (bikes.any_pos.count > 0) ? "broken_ascend_pos" : "no_pos"
     end
 
     private
+
+    # One list for both blocks - the fallback below labels anything unlisted "broken ascend",
+    # so a provider added to only one of them mislabels orgs rather than failing
+    def pos_provider_for(bikes)
+      POS_PROVIDERS.find { bikes.public_send(:"#{it}_pos").exists? }
+    end
 
     # Try to prevent churn in does_not_need_pos designation
     def does_not_need_pos?(organization, bikes)

@@ -56,25 +56,21 @@ module Integrations
         GRAPHQL
       end
 
+      # Aliased into one document rather than a request per topic - three round trips on the
+      # install path, and three times the GraphQL cost budget, for the same result
       def register_webhooks(shopify_integration)
-        callback_url = Rails.application.routes.url_helpers.shopify_webhooks_url
-        WEBHOOK_TOPICS.map { register_webhook(shopify_integration, it, callback_url) }
+        mutations = WEBHOOK_TOPICS.each_with_index.map { |topic, index|
+          "t#{index}: webhookSubscriptionCreate(topic: #{topic}, " \
+            "webhookSubscription: {callbackUrl: $callbackUrl, format: JSON}) " \
+            "{ userErrors { field message } }"
+        }
+        query(shopify_integration, "mutation($callbackUrl: URL!) { #{mutations.join(" ")} }",
+          callbackUrl: Rails.application.routes.url_helpers.shopify_webhooks_url)
       end
 
       #
       # private below here
       #
-
-      def register_webhook(shopify_integration, topic, callback_url)
-        query(shopify_integration, <<~GRAPHQL, topic:, callbackUrl: callback_url)
-          mutation($topic: WebhookSubscriptionTopic!, $callbackUrl: URL!) {
-            webhookSubscriptionCreate(
-              topic: $topic
-              webhookSubscription: {callbackUrl: $callbackUrl, format: JSON}
-            ) { userErrors { field message } webhookSubscription { id } }
-          }
-        GRAPHQL
-      end
 
       def query(shopify_integration, graphql, **variables)
         api_connection(shopify_integration).post("admin/api/#{API_VERSION}/graphql.json") do |req|
@@ -83,25 +79,24 @@ module Integrations
       end
 
       def api_connection(shopify_integration)
-        Faraday.new(url: "https://#{shopify_integration.shop_domain}") do |conn|
-          conn.request :json
-          conn.response :json, content_type: /\bjson$/
-          conn.adapter Faraday.default_adapter
+        connection(shopify_integration.shop_domain, timeout: 30) do |conn|
           conn.headers["X-Shopify-Access-Token"] = shopify_integration.access_token
-          conn.options.timeout = 30
         end
       end
 
-      def oauth_connection(shop_domain)
+      def oauth_connection(shop_domain) = connection(shop_domain, timeout: 15)
+
+      def connection(shop_domain, timeout:)
         Faraday.new(url: "https://#{shop_domain}") do |conn|
           conn.request :json
           conn.response :json, content_type: /\bjson$/
           conn.adapter Faraday.default_adapter
-          conn.options.timeout = 15
+          conn.options.timeout = timeout
+          yield(conn) if block_given?
         end
       end
 
-      conceal :register_webhook, :query, :api_connection, :oauth_connection
+      conceal :query, :api_connection, :oauth_connection, :connection
     end
   end
 end

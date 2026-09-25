@@ -4,9 +4,11 @@ module ShopifyJobs
   class ProcessOrderJob < ApplicationJob
     sidekiq_options queue: "high_priority", retry: 3
 
-    def perform(shopify_integration_id, order)
+    def perform(shopify_integration_id, raw_order)
       shopify_integration = ShopifyIntegration.find_by(id: shopify_integration_id)
       return if shopify_integration.blank? || skip_job?
+
+      order = JSON.parse(raw_order)
       return unless Integrations::Shopify::OrderParser.registerable?(order)
 
       registrations = Integrations::Shopify::OrderParser.registrations(order)
@@ -28,7 +30,6 @@ module ShopifyJobs
     def b_param_hash(shopify_integration, order, registration)
       {
         bike: {
-          pos_kind: "shopify_pos",
           is_new: true,
           # orders/updated redelivers the whole sale, so every registration is a repeat of
           # one already made - the duplicate check is what keeps it from registering twice
@@ -37,8 +38,7 @@ module ShopifyJobs
           frame_model: registration.frame_model,
           serial_number: registration.serial,
           owner_email: Integrations::Shopify::OrderParser.owner_email(order),
-          user_name: order.dig("customer", "first_name").present? ?
-            "#{order.dig("customer", "first_name")} #{order.dig("customer", "last_name")}".strip : nil,
+          user_name: order["customer"]&.values_at("first_name", "last_name")&.compact_blank&.join(" ").presence,
           color: "Black", # Shopify carries no frame color, and a color is required
           send_email: true,
           creation_organization_id: shopify_integration.organization_id

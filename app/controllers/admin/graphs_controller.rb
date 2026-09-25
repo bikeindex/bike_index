@@ -104,7 +104,7 @@ module Admin
     end
 
     def pos_search_kinds
-      %w[lightspeed_pos ascend_pos does_not_need_pos no_pos]
+      Organization.pos_kinds - Organization.broken_pos_kinds - %w[other_pos]
     end
 
     # Grouped by origin as well as by time, so this is one query rather than one per

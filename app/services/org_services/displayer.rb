@@ -8,7 +8,7 @@ module OrgServices
 
     def bike_shop_display_integration_alert?(organization)
       organization.bike_shop? &&
-        (%w[no_pos] + Organization.broken_pos_kinds).include?(organization.pos_kind) &&
+        (organization.no_pos? || organization.broken_pos?) &&
         !organization.official_manufacturer?
     end
 

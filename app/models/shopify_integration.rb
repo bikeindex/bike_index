@@ -11,7 +11,6 @@
 #  last_error             :string
 #  last_error_at          :datetime
 #  last_order_at          :datetime
-#  scopes                 :string
 #  shop_data              :jsonb
 #  shop_domain            :string           not null
 #  status                 :integer          default("pending"), not null
@@ -43,8 +42,6 @@ class ShopifyIntegration < ApplicationRecord
   before_validation :set_calculated_attributes
   before_destroy :mark_disconnected
 
-  scope :webhooks_unregistered, -> { where(webhooks_registered_at: nil) }
-
   class << self
     # Shopify sends the shop as "example.myshopify.com" everywhere except the install
     # form, where a merchant types whatever they think their store is called
@@ -57,11 +54,7 @@ class ShopifyIntegration < ApplicationRecord
       domain = str.split("/").first.to_s.delete_suffix(".")
       return nil if domain.blank?
 
-      domain.end_with?(".myshopify.com") ? domain : "#{domain.split(".").first}.myshopify.com"
-    end
-
-    def valid_shop_domain?(str)
-      normalize_shop_domain(str)&.match?(/\A[a-z0-9][a-z0-9-]*\.myshopify\.com\z/) || false
+      myshopify(domain.end_with?(".myshopify.com") ? domain : domain.split(".").first)
     end
 
     def friendly_find(str)
@@ -70,18 +63,19 @@ class ShopifyIntegration < ApplicationRecord
 
     private
 
-    def store_from_admin_url(str)
-      store = str.split("/")[2]
-      store.present? ? "#{store}.myshopify.com" : nil
+    def store_from_admin_url(str) = myshopify(str.split("/")[2])
+
+    # Anything that doesn't reduce to a store is nil rather than a domain nobody can install
+    def myshopify(store)
+      domain = store.to_s.delete_suffix(".myshopify.com")
+      return nil unless domain.match?(/\A[a-z0-9][a-z0-9-]*\z/)
+
+      "#{domain}.myshopify.com"
     end
   end
 
   def shop_name
     shop_data&.dig("name") || shop_domain
-  end
-
-  def shop_url
-    "https://#{shop_domain}"
   end
 
   def admin_url

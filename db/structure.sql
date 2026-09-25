@@ -3546,7 +3546,6 @@ CREATE TABLE public.shopify_integrations (
     user_id bigint NOT NULL,
     shop_domain character varying NOT NULL,
     access_token text NOT NULL,
-    scopes character varying,
     status integer DEFAULT 0 NOT NULL,
     shop_data jsonb,
     webhooks_registered_at timestamp(6) without time zone,

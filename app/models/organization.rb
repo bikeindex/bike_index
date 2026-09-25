@@ -191,7 +191,7 @@ class Organization < ApplicationRecord
     end
 
     def broken_pos_kinds
-      %w[broken_ascend_pos broken_lightspeed_pos broken_shopify_pos].freeze
+      pos_kinds.select { it.start_with?("broken_") }
     end
 
     def without_pos_kinds
@@ -204,10 +204,6 @@ class Organization < ApplicationRecord
 
     def lightspeed_or_broken_lightspeed_kinds
       %w[lightspeed_pos broken_lightspeed_pos].freeze
-    end
-
-    def shopify_or_broken_shopify_kinds
-      %w[shopify_pos broken_shopify_pos].freeze
     end
 
     def with_pos_kinds
@@ -344,10 +340,6 @@ class Organization < ApplicationRecord
 
   def ascend_or_broken_ascend?
     self.class.ascend_or_broken_ascend_kinds.include?(pos_kind)
-  end
-
-  def shopify_or_broken_shopify?
-    self.class.shopify_or_broken_shopify_kinds.include?(pos_kind)
   end
 
   # Enable this if they have paid for showing it, or if they use ascend

@@ -5,7 +5,6 @@ class CreateShopifyIntegrations < ActiveRecord::Migration[8.0]
       t.references :user, null: false, foreign_key: false, index: false
       t.string :shop_domain, null: false
       t.text :access_token, null: false
-      t.string :scopes
       t.integer :status, default: 0, null: false
       t.jsonb :shop_data
       t.datetime :webhooks_registered_at

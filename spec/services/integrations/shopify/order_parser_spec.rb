@@ -67,7 +67,6 @@ RSpec.describe Integrations::Shopify::OrderParser do
           .to have_attributes(serial: "WTU123K0912", manufacturer: "Trek")
       end
 
-      # A note names no line item, so a multi-item sale can't say which product it meant
       context "and more than one line item" do
         let(:order) { super().merge("line_items" => [bike_line_item, helmet_line_item]) }
 

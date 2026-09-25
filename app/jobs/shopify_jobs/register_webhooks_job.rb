@@ -8,26 +8,23 @@ module ShopifyJobs
       shopify_integration = ShopifyIntegration.find_by(id: shopify_integration_id)
       return if shopify_integration.blank? || skip_job?
 
-      responses = Integrations::Shopify::Client.register_webhooks(shopify_integration)
-      errors = responses.flat_map { user_errors(it) }
-      if errors.any?
-        shopify_integration.record_error(errors.join(", "))
-      else
-        shopify_integration.update(status: :active, webhooks_registered_at: Time.current)
-        Integrations::Shopify::Client.fetch_shop(shopify_integration).then do |resp|
-          shopify_integration.update(shop_data: resp.body.dig("data", "shop")) if resp.success?
-        end
-      end
+      errors = user_errors(Integrations::Shopify::Client.register_webhooks(shopify_integration))
+      return shopify_integration.record_error(errors.join(", ")) if errors.any?
+
+      shop = Integrations::Shopify::Client.fetch_shop(shopify_integration)
+      shopify_integration.update(status: :active, webhooks_registered_at: Time.current,
+        shop_data: shop.success? ? shop.body.dig("data", "shop") : nil)
     end
 
     private
 
-    # A GraphQL mutation reports a rejected subscription in userErrors with a 200 status
+    # A GraphQL mutation reports a rejected subscription in userErrors with a 200 status, and
+    # each topic answers under its own alias
     def user_errors(response)
       return ["#{response.status} from Shopify"] unless response.success?
 
-      (response.body.dig("data", "webhookSubscriptionCreate", "userErrors") || [])
-        .map { it["message"] } + (response.body["errors"] || []).map { it["message"] }
+      (response.body["data"] || {}).values.flat_map { it["userErrors"] || [] }.map { it["message"] } +
+        (response.body["errors"] || []).map { it["message"] }
     end
   end
 end

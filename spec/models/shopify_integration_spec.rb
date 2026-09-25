@@ -2,7 +2,6 @@ require "rails_helper"
 
 RSpec.describe ShopifyIntegration, type: :model do
   describe "normalize_shop_domain" do
-    # Merchants type whatever they call their store; Shopify only ever sends the myshopify host
     it "reduces what a merchant might type to the myshopify host" do
       expect(described_class.normalize_shop_domain("cool-bikes")).to eq "cool-bikes.myshopify.com"
       expect(described_class.normalize_shop_domain("cool-bikes.myshopify.com")).to eq "cool-bikes.myshopify.com"
@@ -10,19 +9,13 @@ RSpec.describe ShopifyIntegration, type: :model do
       expect(described_class.normalize_shop_domain(" COOL-BIKES.myshopify.com ")).to eq "cool-bikes.myshopify.com"
       expect(described_class.normalize_shop_domain(nil)).to be_nil
       expect(described_class.normalize_shop_domain(" ")).to be_nil
+      expect(described_class.normalize_shop_domain("-nope.myshopify.com")).to be_nil
     end
 
-    # It's the URL in a merchant's address bar, and its host names no store
     it "takes the store out of an admin URL" do
       expect(described_class.normalize_shop_domain("https://admin.shopify.com/store/cool-bikes")).to eq "cool-bikes.myshopify.com"
       expect(described_class.normalize_shop_domain("admin.shopify.com/store/cool-bikes/orders")).to eq "cool-bikes.myshopify.com"
       expect(described_class.normalize_shop_domain("https://admin.shopify.com/store/")).to be_nil
-    end
-
-    it "rejects what can't be a store" do
-      expect(described_class.valid_shop_domain?("cool-bikes")).to be_truthy
-      expect(described_class.valid_shop_domain?("-nope.myshopify.com")).to be_falsey
-      expect(described_class.valid_shop_domain?(nil)).to be_falsey
     end
   end
 
@@ -56,7 +49,6 @@ RSpec.describe ShopifyIntegration, type: :model do
   describe "destroy" do
     let(:shopify_integration) { FactoryBot.create(:shopify_integration, :active) }
 
-    # Shopify revokes the token on uninstall, so keeping it only risks using a dead one
     it "soft deletes and drops the credentials" do
       shopify_integration.destroy
       expect(described_class.where(id: shopify_integration.id).count).to eq 0

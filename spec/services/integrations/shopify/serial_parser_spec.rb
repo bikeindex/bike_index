@@ -24,7 +24,6 @@ RSpec.describe Integrations::Shopify::SerialParser do
       expect(described_class.serials_in("Bike serial: ABC123, helmet included")).to eq(["ABC123"])
     end
 
-    # These are what the shop means by "there is no serial", not serials to register
     it "drops a label whose value says there isn't one" do
       expect(described_class.serials_in("Serial: none")).to eq([])
       expect(described_class.serials_in("Serial: N/A")).to eq([])

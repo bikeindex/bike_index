@@ -63,7 +63,7 @@ class WebhooksController < ApplicationController
   def shopify_handle(shopify_integration, topic, raw_body)
     case topic
     when "orders/create", "orders/updated"
-      ShopifyJobs::ProcessOrderJob.perform_async(shopify_integration.id, JSON.parse(raw_body))
+      ShopifyJobs::ProcessOrderJob.perform_async(shopify_integration.id, raw_body)
     when "app/uninstalled"
       shopify_integration.destroy
     end

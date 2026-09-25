@@ -12,7 +12,7 @@ class ShopifyIntegrationsController < ApplicationController
 
   def create
     shop_domain = ShopifyIntegration.normalize_shop_domain(params[:shop_domain])
-    unless ShopifyIntegration.valid_shop_domain?(shop_domain)
+    if shop_domain.blank?
       flash[:error] = "Enter your Shopify store address, e.g. your-store.myshopify.com"
       redirect_to(new_shopify_integration_path(organization_id: @organization.to_param)) && return
     end
