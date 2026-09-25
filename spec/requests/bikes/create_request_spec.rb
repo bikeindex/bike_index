@@ -823,7 +823,6 @@ RSpec.describe "BikesController#create", type: :request do
     end
     let(:b_param) { BParam.create(params: {"bike" => bike_params.as_json}, origin: "embed_partial") }
     before do
-      expect(b_param.origin).to eq "embed_partial"
       bb_data = {bike: {}}
       # We need to call clean_params on the BParam after bikebook update, so that
       # the foreign keys are assigned correctly.

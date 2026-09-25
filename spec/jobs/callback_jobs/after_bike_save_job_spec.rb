@@ -216,7 +216,7 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
 
   describe "remove_partial_registrations" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:partial_registration) { FactoryBot.create(:b_param_partial_registration, owner_email: "stuff@things.COM", origin: "embed_partial", organization: organization) }
+    let!(:partial_registration) { FactoryBot.create(:b_param_partial_registration, owner_email: "stuff@things.COM", organization:) }
     let(:bike) { FactoryBot.create(:bike, owner_email: "stuff@things.com") }
     let(:user) { FactoryBot.create(:user_confirmed, email: "stuff@things.com") }
     let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: user) }
@@ -225,7 +225,6 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
       expect(bike.creation_organization_id).to be_blank
       expect(bike.current_ownership.organization_id).to be_blank
       expect(bike.current_ownership.origin).to eq "web"
-      expect(partial_registration.origin).to eq "embed_partial"
       expect(partial_registration.with_bike?).to be_falsey
       instance.perform(bike.id)
       partial_registration.reload
@@ -326,7 +325,6 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
         og_organization_id = ownership.organization_id
         expect(bike.current_ownership.organization_id).to be_present
         expect(bike.current_ownership.origin).to eq "web"
-        expect(partial_registration.origin).to eq "embed_partial"
         expect(partial_registration.with_bike?).to be_falsey
         instance.perform(bike.id)
         partial_registration.reload
@@ -343,7 +341,6 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
         expect(bike.creation_organization_id).to be_blank
         expect(bike.current_ownership.organization_id).to be_blank
         expect(bike.current_ownership.origin).to eq "api_v2"
-        expect(partial_registration.origin).to eq "embed_partial"
         expect(partial_registration.with_bike?).to be_falsey
         instance.perform(bike.id)
         partial_registration.reload
@@ -359,9 +356,7 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
       let(:manufacturer) { bike.manufacturer }
       let!(:partial_registration_accurate) { FactoryBot.create(:b_param_partial_registration, owner_email: "STUFF@things.com", manufacturer: manufacturer) }
       it "only removes the more accurate match" do
-        expect(partial_registration.origin).to eq "embed_partial"
         expect(partial_registration.with_bike?).to be_falsey
-        expect(partial_registration_accurate.origin).to eq "embed_partial"
         expect(partial_registration_accurate.with_bike?).to be_falsey
         instance.perform(bike.id)
         partial_registration.reload

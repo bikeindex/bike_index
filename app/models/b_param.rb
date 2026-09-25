@@ -772,9 +772,8 @@ class BParam < ApplicationRecord
 
   private
 
-  # origin, so the API and embed forms don't pay for a lookup that can't alert. The owner
-  # too when someone else - organization staff - registered it for them, but not for an
-  # anonymous registration, since anyone can type in anyone's email
+  # origin, so the API and embed forms don't pay for a lookup that can't alert. Only with a
+  # creator: anonymously, anyone could alert any account by typing in its email
   def update_unfinished_registration_alerts
     return if creator_id.blank? || !register_flow?
 
