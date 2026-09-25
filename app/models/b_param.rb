@@ -91,7 +91,7 @@ class BParam < ApplicationRecord
   before_save :clean_params
   # Leaving the flow is exactly when nothing else bumps the user, so the alert can't
   # wait for their next update job
-  after_commit :update_creator_alert
+  after_commit :update_unfinished_registration_alerts
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
@@ -774,12 +774,16 @@ class BParam < ApplicationRecord
 
   private
 
-  # origin, so the API and embed forms don't pay for a lookup that can't alert
-  def update_creator_alert
+  # origin, so the API and embed forms don't pay for a lookup that can't alert. The owner
+  # too when someone else - organization staff - registered it for them, but not for an
+  # anonymous registration, since anyone can type in anyone's email
+  def update_unfinished_registration_alerts
     return if creator_id.blank? || !register_flow?
 
-    UserAlert.update_unfinished_registration(user: creator, b_param: self)
-    UserAlert.refresh_alert_slugs(creator)
+    [creator, (User.fuzzy_email_find(owner_email) unless self_made?)].compact.each do |user|
+      UserAlert.update_unfinished_registration(user:, b_param: self)
+      UserAlert.refresh_alert_slugs(user)
+    end
   end
 
   def ensure_valid_params
