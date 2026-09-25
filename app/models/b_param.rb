@@ -65,6 +65,7 @@ class BParam < ApplicationRecord
     is_new
     is_pos
     no_duplicate
+    pos_kind
     propulsion_type
     propulsion_type_slug
     rear_gear_type_slug
@@ -425,6 +426,7 @@ class BParam < ApplicationRecord
   end
 
   def pos_kind
+    return bike["pos_kind"] if Organization.pos_kinds.include?(bike["pos_kind"])
     return "lightspeed_pos" if is_pos
 
     bulk_import&.ascend? ? "ascend_pos" : "no_pos"

@@ -10,6 +10,7 @@ module Pages
           class Component < ApplicationComponent
             # The order the dropdown lists them; "any (POS or not)" clears the param instead
             POS_TYPES = {"ascend_pos" => "Ascend", "lightspeed_pos" => "Lightspeed",
+                         "shopify_pos" => "Shopify",
                          "any_pos" => "POS of any type", "no_pos" => "Not POS"}.freeze
 
             def initialize(index:, motorized: false, multi_delete: false,

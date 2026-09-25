@@ -28,7 +28,7 @@ class MailchimpDatum < ApplicationRecord
   }.freeze
 
   MANAGED_TAGS = %w[ascend in_bike_index lightspeed member not_org_creator paid paid_previously
-    pos_approved].freeze
+    pos_approved shopify].freeze
 
   enum :status, STATUS_ENUM
 

@@ -66,7 +66,8 @@ class Ownership < ApplicationRecord
     sticker: 13,
     register_flow: 14,
     register_flow_organized: 15,
-    register_flow_landing_page: 16
+    register_flow_landing_page: 16,
+    shopify_webhook: 17
   }.freeze
   # BParam#origin takes the same strings
   ORIGIN_REG_FLOW = %w[register_flow register_flow_organized register_flow_landing_page].freeze

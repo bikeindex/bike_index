@@ -47,6 +47,14 @@
             %small.less-strong
               if checked, bikes from Lightspeed POS will be registered with their phone number (if one is available)
 
+  - if @organization.bike_shop?
+    .form-group.row
+      %label.org-form-label
+        Shopify
+      .col-sm-4
+        -# not translating because POS integration isn't translated, so whatever
+        = link_to @organization.shopify_integration.present? ? "Manage Shopify integration" : "Register bikes from your Shopify sales", new_shopify_integration_path(organization_id: @organization.to_param)
+
   .form-group.row
     = f.label :website, class: "org-form-label"
     .col-sm-4

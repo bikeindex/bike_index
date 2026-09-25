@@ -3537,6 +3537,48 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: shopify_integrations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.shopify_integrations (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    shop_domain character varying NOT NULL,
+    access_token text NOT NULL,
+    scopes character varying,
+    status integer DEFAULT 0 NOT NULL,
+    shop_data jsonb,
+    webhooks_registered_at timestamp(6) without time zone,
+    last_order_at timestamp(6) without time zone,
+    last_error character varying,
+    last_error_at timestamp(6) without time zone,
+    deleted_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: shopify_integrations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.shopify_integrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: shopify_integrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.shopify_integrations_id_seq OWNED BY public.shopify_integrations.id;
+
+
+--
 -- Name: social_accounts; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -5131,6 +5173,13 @@ ALTER TABLE ONLY public.sales ALTER COLUMN id SET DEFAULT nextval('public.sales_
 
 
 --
+-- Name: shopify_integrations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.shopify_integrations ALTER COLUMN id SET DEFAULT nextval('public.shopify_integrations_id_seq'::regclass);
+
+
+--
 -- Name: social_accounts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -6001,6 +6050,14 @@ ALTER TABLE ONLY public.registration_sequences
 
 ALTER TABLE ONLY public.sales
     ADD CONSTRAINT sales_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: shopify_integrations shopify_integrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.shopify_integrations
+    ADD CONSTRAINT shopify_integrations_pkey PRIMARY KEY (id);
 
 
 --
@@ -7462,6 +7519,20 @@ CREATE UNIQUE INDEX index_registration_sequences_one_draft_template ON public.re
 
 
 --
+-- Name: index_shopify_integrations_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_shopify_integrations_on_organization_id ON public.shopify_integrations USING btree (organization_id);
+
+
+--
+-- Name: index_shopify_integrations_on_shop_domain; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_shopify_integrations_on_shop_domain ON public.shopify_integrations USING btree (shop_domain) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_social_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7814,6 +7885,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260923101319'),
 ('20260915181500'),
 ('20260915110042'),
 ('20260912102406'),

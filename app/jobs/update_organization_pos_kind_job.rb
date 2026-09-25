@@ -18,12 +18,14 @@ class UpdateOrganizationPosKindJob < ScheduledJob
         return last_import&.blocking_error? ? "broken_ascend_pos" : "ascend_pos"
       end
       return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
+      return "shopify_pos" if recent_bikes.shopify_pos.count > 0
       return "other_pos" if recent_bikes.any_pos.count > 0
 
       if organization.bike_shop?
         return "does_not_need_pos" if does_not_need_pos?(organization, bikes)
       end
       return "broken_lightspeed_pos" if bikes.lightspeed_pos.count > 0
+      return "broken_shopify_pos" if bikes.shopify_pos.count > 0
 
       (bikes.any_pos.count > 0) ? "broken_ascend_pos" : "no_pos"
     end

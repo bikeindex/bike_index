@@ -248,7 +248,7 @@ module Admin
       search_statuses = DEFAULT_SEARCH_STATUSES + (current_user.su_option?(:no_hide_spam) ? ["spam"] : [])
       bikes = admin_search_bike_statuses(bikes, default_statuses: search_statuses)
 
-      @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
+      @pos_search_type = %w[lightspeed_pos ascend_pos shopify_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
       bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
       @origin_search_type = Ownership.origins.include?(params[:search_origin]) ? params[:search_origin] : nil
       bikes = bikes.includes(:ownerships).where(ownerships: {origin: @origin_search_type}) if @origin_search_type.present?

@@ -79,7 +79,9 @@ class Organization < ApplicationRecord
     ascend_pos: 3,
     does_not_need_pos: 5,
     broken_lightspeed_pos: 4,
-    broken_ascend_pos: 6
+    broken_ascend_pos: 6,
+    shopify_pos: 7,
+    broken_shopify_pos: 8
   }.freeze
 
   acts_as_paranoid
@@ -129,6 +131,7 @@ class Organization < ApplicationRecord
   has_one :organization_landing_page
   has_one :impound_configuration
   has_one :organization_saml_configuration
+  has_one :shopify_integration
   has_many :hot_sheets
   has_many :organization_model_audits
   accepts_nested_attributes_for :mail_snippets
@@ -187,7 +190,7 @@ class Organization < ApplicationRecord
     end
 
     def broken_pos_kinds
-      %w[broken_ascend_pos broken_lightspeed_pos].freeze
+      %w[broken_ascend_pos broken_lightspeed_pos broken_shopify_pos].freeze
     end
 
     def without_pos_kinds
@@ -200,6 +203,10 @@ class Organization < ApplicationRecord
 
     def lightspeed_or_broken_lightspeed_kinds
       %w[lightspeed_pos broken_lightspeed_pos].freeze
+    end
+
+    def shopify_or_broken_shopify_kinds
+      %w[shopify_pos broken_shopify_pos].freeze
     end
 
     def with_pos_kinds
@@ -335,6 +342,10 @@ class Organization < ApplicationRecord
 
   def ascend_or_broken_ascend?
     self.class.ascend_or_broken_ascend_kinds.include?(pos_kind)
+  end
+
+  def shopify_or_broken_shopify?
+    self.class.shopify_or_broken_shopify_kinds.include?(pos_kind)
   end
 
   # Enable this if they have paid for showing it, or if they use ascend

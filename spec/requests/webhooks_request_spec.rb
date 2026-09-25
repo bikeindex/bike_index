@@ -208,4 +208,67 @@ RSpec.describe WebhooksController, type: :request do
       end
     end
   end
+
+  describe "POST shopify" do
+    let(:webhook_url) { "/webhooks/shopify" }
+    let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop") }
+    let!(:shopify_integration) do
+      FactoryBot.create(:shopify_integration, :active, organization:, shop_domain: "cool-bikes.myshopify.com")
+    end
+    let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
+    let!(:color) { FactoryBot.create(:color, name: "Black") }
+    let(:order) do
+      {id: 5551212, email: "rider@example.com", note: "Serial: WTU123K0912",
+       line_items: [{title: "Trek Domane AL 2", vendor: "Trek", quantity: 1, properties: []}]}
+    end
+    let(:payload) { order.to_json }
+
+    def shopify_headers(body, topic: "orders/create", shop: "cool-bikes.myshopify.com")
+      digest = OpenSSL::HMAC.digest("sha256", Integrations::Shopify::Client::SHOPIFY_SECRET, body)
+      {"X-Shopify-Hmac-Sha256" => Base64.strict_encode64(digest),
+       "X-Shopify-Topic" => topic, "X-Shopify-Shop-Domain" => shop,
+       "CONTENT_TYPE" => "application/json"}
+    end
+
+    it "enqueues the order, and registers the bike when it drains" do
+      expect {
+        post webhook_url, params: payload, headers: shopify_headers(payload)
+      }.to change(ShopifyJobs::ProcessOrderJob.jobs, :count).by(1)
+      expect(response).to have_http_status(:ok)
+
+      expect { ShopifyJobs::ProcessOrderJob.drain }.to change(Bike, :count).by(1)
+      expect(Bike.last).to have_attributes(serial_number: "WTU123K0912", owner_email: "rider@example.com")
+      expect(Bike.last.current_ownership.pos_kind).to eq "shopify_pos"
+    end
+
+    # Anyone can POST here, so the signature is the only thing that makes the payload a sale
+    it "rejects an unsigned or mis-signed payload" do
+      expect {
+        post webhook_url, params: payload, headers: shopify_headers(payload).except("X-Shopify-Hmac-Sha256")
+      }.to_not change(ShopifyJobs::ProcessOrderJob.jobs, :count)
+      expect(response).to have_http_status(:unauthorized)
+
+      expect {
+        post webhook_url, params: payload,
+          headers: shopify_headers(payload).merge("X-Shopify-Hmac-Sha256" => Base64.strict_encode64("nope"))
+      }.to_not change(ShopifyJobs::ProcessOrderJob.jobs, :count)
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "acknowledges a signed payload from a shop that isn't connected, without enqueuing" do
+      expect {
+        post webhook_url, params: payload, headers: shopify_headers(payload, shop: "other-shop.myshopify.com")
+      }.to_not change(ShopifyJobs::ProcessOrderJob.jobs, :count)
+      expect(response).to have_http_status(:ok)
+    end
+
+    context "app/uninstalled" do
+      it "disconnects the integration" do
+        post webhook_url, params: payload, headers: shopify_headers(payload, topic: "app/uninstalled")
+        expect(response).to have_http_status(:ok)
+        expect(ShopifyIntegration.where(id: shopify_integration.id).count).to eq 0
+        expect(shopify_integration.reload.access_token).to eq ""
+      end
+    end
+  end
 end
