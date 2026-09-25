@@ -39,11 +39,12 @@ export default class extends Controller {
   }
 
   update () {
-    const label = this.isOneTime ? this.oneTimeLabelValue : this.monthlyLabelValue
-    const text = label.replace('%{amount}', this.selectedAmount())
+    const isOneTime = this.isOneTime
+    const label = isOneTime ? this.oneTimeLabelValue : this.monthlyLabelValue
+    const text = label.replace('%{amount}', this.selectedAmount(isOneTime))
     this.submitTargets.forEach(button => { button.textContent = text })
 
-    const customDollars = this.isOneTime && this.customAmountTarget.value
+    const customDollars = isOneTime && this.customAmountTarget.value
     this.majorGiftTargets.forEach(card => {
       card.dataset.active = card.dataset.amount === customDollars
     })
@@ -54,16 +55,16 @@ export default class extends Controller {
     return !this.hasMonthlyFormTarget || this.cadenceTargets.find(radio => radio.checked)?.value === 'one-time'
   }
 
-  selectedAmount () {
-    if (this.isOneTime && !this.customCentsTarget.disabled) {
-      const dollars = Number(this.customCentsTarget.value) / 100
+  selectedAmount (isOneTime) {
+    const dollars = parseFloat(this.customAmountTarget.value)
+    if (isOneTime && dollars > 0) {
       return new Intl.NumberFormat(document.documentElement.lang || 'en', {
         style: 'currency',
         currency: this.currencyValue,
         maximumFractionDigits: Number.isInteger(dollars) ? 0 : 2
       }).format(dollars)
     }
-    const form = this.isOneTime ? this.oneTimeFormTarget : this.monthlyFormTarget
+    const form = isOneTime ? this.oneTimeFormTarget : this.monthlyFormTarget
     return form.querySelector('input[type="radio"]:checked')?.dataset.amount || ''
   }
 }

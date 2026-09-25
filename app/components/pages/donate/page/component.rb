@@ -8,7 +8,7 @@ module Pages
       # without javascript - the donate--page controller only keeps the labels in step.
       class Component < ApplicationComponent
         # Checkout charges the level's active monthly StripePrice, which has to match these
-        MONTHLY_TIERS = {basic: 500, plus: 1500, patron: 5000}.freeze
+        MONTHLY_TIERS = {basic: 5, plus: 15, patron: 50}.freeze
         ONE_TIME_AMOUNTS = [25, 50, 100].freeze
         MAJOR_AMOUNTS = [500, 1000].freeze
 
@@ -22,11 +22,11 @@ module Pages
 
         def initialize(recovery_displays:, currency: Currency.default, initial_amount: nil, referral_source: nil,
           current_user: nil)
-          @recovery_displays = recovery_displays.select { it.photo_url.present? }.first(4)
+          @recovery_displays = recovery_displays
           @currency = currency
           @initial_amount = initial_amount.to_i if initial_amount.to_i.positive?
           @referral_source = referral_source
-          @current_user = current_user
+          @email = current_user&.email
           @member = current_user&.membership_active.present?
         end
 
@@ -40,7 +40,7 @@ module Pages
 
         def selected_one_time = @initial_amount || 50
 
-        def money(cents) = MoneyFormatter.money_format_without_cents(cents, @currency)
+        def money(dollars) = MoneyFormatter.money_format_without_cents(dollars * 100, @currency)
 
         def tier_amount(level) = money(MONTHLY_TIERS[level])
 
@@ -48,11 +48,11 @@ module Pages
 
         def one_time_label(amount) = translation(".one_time_submit", amount:)
 
-        def submit_label
-          return one_time_label(money(selected_one_time * 100)) if one_time?
+        def one_time_submit = one_time_label(money(selected_one_time))
 
-          monthly_label(tier_amount(:plus))
-        end
+        def monthly_submit = monthly_label(tier_amount(:plus))
+
+        def submit_label = one_time? ? one_time_submit : monthly_submit
 
         def stats
           [
@@ -91,16 +91,8 @@ module Pages
           ]
         end
 
-        def row_classes
-          "tw:group/row tw:flex tw:cursor-pointer tw:items-center tw:gap-4 tw:rounded-lg tw:border " \
-            "tw:border-gray-200 tw:bg-white tw:px-4.5 tw:py-4 tw:transition-colors tw:hover:border-[#a9d2f0] " \
-            "tw:has-focus-visible:ring-3 tw:has-focus-visible:ring-blue-500/40 tw:is-active:border-blue-600 " \
-            "tw:is-active:ring-1 tw:is-active:ring-blue-600 tw:is-active:hover:border-blue-600 " \
-            "tw:dark:border-gray-700 tw:dark:bg-gray-800"
-        end
-
         def radio_mark
-          tag.span(class: "tw:ml-auto tw:flex tw:size-6 tw:shrink-0 tw:items-center tw:justify-center " \
+          @radio_mark ||= tag.span(class: "tw:ml-auto tw:flex tw:size-6 tw:shrink-0 tw:items-center tw:justify-center " \
             "tw:rounded-full tw:border-[1.5px] tw:border-gray-300 tw:text-transparent " \
             "tw:group-has-checked/row:border-blue-600 tw:group-has-checked/row:bg-blue-600 " \
             "tw:group-has-checked/row:text-white") do

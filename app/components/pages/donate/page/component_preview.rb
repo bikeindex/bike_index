@@ -5,7 +5,7 @@ module Pages
     module Page
       class ComponentPreview < ApplicationComponentPreview
         def default
-          render(Pages::Donate::Page::Component.new(recovery_displays: RecoveryDisplay.limit(8)))
+          render(Pages::Donate::Page::Component.new(recovery_displays: RecoveryDisplay.joins(:photo_processed_attachment).limit(4)))
         end
 
         # From a major gift link, or a newsletter's "donate $500"

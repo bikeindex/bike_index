@@ -53,18 +53,4 @@ RSpec.describe Pages::Donate::Page::Component, type: :component do
       expect(component).to have_button("Donate $50", count: 2)
     end
   end
-
-  context "with recovery displays" do
-    let(:recovery_display) { FactoryBot.create(:recovery_display, quote_by: "Sandy") }
-    let(:options) { {recovery_displays: [recovery_display, FactoryBot.create(:recovery_display)]} }
-    before do
-      recovery_display.photo_processed.attach(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),
-        filename: "bike.jpg", content_type: "image/jpeg")
-    end
-
-    it "shows only the stories with a photo" do
-      expect(component).to have_css("li img", count: 1)
-      expect(component).to have_text("Sandy")
-    end
-  end
 end

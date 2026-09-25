@@ -101,8 +101,8 @@ RSpec.describe InfoController, type: :request do
 
       context "with amount" do
         it "redirects to the payment page" do
-          get "/donate?amount=120"
-          expect(response).to redirect_to new_payment_path(amount: 120)
+          get "/donate?amount=120&source=newsletter"
+          expect(response).to redirect_to new_payment_path(amount: 120, source: "newsletter")
         end
       end
     end

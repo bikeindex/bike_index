@@ -196,7 +196,7 @@ module ControllerHelpers
 
     return @show_general_alert = false unless (current_user.alert_slugs - UserAlert.disabled_kinds).any?
 
-    no_alerts = %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index donate].include?(action_name)
+    no_alerts = %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
     @show_general_alert = !no_alerts
   end
 
