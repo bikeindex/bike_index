@@ -2223,6 +2223,7 @@ it:
           owner_already_has_account: Il proprietario di questa %{bike_type} ha già
             un account su Bike Index. Accedi per rivendicarlo!
           you_have_to_log_in: Spiacenti, è necessario effettuare l'accesso.
+          sign_in_to_continue_registration: Accedi per continuare la registrazione
         ensure_member_of!:
           accept_tos_for_orgs: Si prega di accettare i termini di servizio per le
             organizzazioni.
