@@ -41,7 +41,7 @@ module Admin
       @bounding_box = GeocodeHelper.bounding_box(params[:location], @location_radius) if params[:location].present?
     end
 
-    helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period,
+    helper_method :matching_bikes, :pos_search_kinds, :default_period,
       :origin_colors, :origin_bike_counts, :ios_version_bike_counts
 
     protected
@@ -106,10 +106,6 @@ module Admin
 
     def bike_graph_kinds
       %w[stolen origin ios_version pos ignored]
-    end
-
-    def shown_bike_graph_kinds
-      bike_graph_kinds - ["ignored"]
     end
 
     def pos_search_kinds

@@ -79,70 +79,69 @@
 <% render_other_bike_graphs = time_range_length(@time_range) < 367.days.to_i %>
 
 <% if render_other_bike_graphs %>
-  <% shown_bike_graph_kinds.each do |graph_kind| %>
-    <%# stolen is already rendered above %>
-    <% next if graph_kind == "stolen" %>
+  <%# TODO: make this actually work %>
+  <%# ["Transferred pre-registration", Ownership.transferred_pre_registration.joins(:bike).merge(matching_bikes).count] %>
+  <% origin_rows = origin_bike_counts + [
+      ["Stolen records", StolenRecord.unscoped.where(created_at: @time_range).joins(:bike).merge(bikes).count],
+      ["Recoveries", StolenRecord.unscoped.where(recovered_at: @time_range).joins(:bike).merge(bikes).count]
+    ] %>
+  <% colors = origin_colors %>
 
-    <% if graph_kind == "pos" %>
-      <div class="col-sm-6 offset-sm-3 mt-4">
-        <%= render(UI::Table::Component.new(records: pos_search_kinds)) do |table| %>
-          <% table.column(label: "Kind") do |pos_kind| %>
-            <%= pos_kind.humanize %>
-            <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_pos: pos_kind)) %>
-          <% end %>
-
-          <% table.column(label: "Bikes", classes: "tw:text-right") do |pos_kind| %>
-            <%= number_display(bikes.send(pos_kind).count) %>
-          <% end %>
+  <div class="col-sm-6 offset-sm-3 mt-4">
+    <%= render(UI::Table::Component.new(records: origin_rows)) do |table| %>
+      <% table.column(label: "Origin") do |(origin)| %>
+        <% if colors.key?(origin) %>
+          <%# Chartkick fills its columns at half opacity and outlines them; the swatch matches %>
+          <span
+            class="d-inline-block mr-1"
+            style="width: .75rem; height: .75rem; border: 1px solid <%= colors[origin] %>; background-color: <%= colors[origin] %>80;"
+          ></span>
+          <%= origin.humanize %>
+          <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_origin: origin)) %>
+        <% else %>
+          <%= origin %>
         <% end %>
-      </div>
-    <% elsif graph_kind == "ios_version" %>
-      <div class="col-sm-6 offset-sm-3 mt-4">
-        <%= render(UI::Table::Component.new(records: ios_version_bike_counts)) do |table| %>
-          <% table.column(label: "iOS version") do |(version)| %>
-            <%= version %>
-          <% end %>
+      <% end %>
 
-          <% table.column(label: "Bikes", classes: "tw:text-right") do |_version, bike_count| %>
-            <%= number_display(bike_count) %>
-          <% end %>
-        <% end %>
-      </div>
-    <% elsif graph_kind == "origin" %>
-      <%# TODO: make this actually work %>
-      <%# ["Transferred pre-registration", Ownership.transferred_pre_registration.joins(:bike).merge(matching_bikes).count] %>
-      <% origin_rows = origin_bike_counts + [
-        ["Stolen records", StolenRecord.unscoped.where(created_at: @time_range).joins(:bike).merge(bikes).count],
-        ["Recoveries", StolenRecord.unscoped.where(recovered_at: @time_range).joins(:bike).merge(bikes).count]
-      ] %>
-      <% colors = origin_colors %>
-
-      <div class="col-sm-6 offset-sm-3 mt-4">
-        <%= render(UI::Table::Component.new(records: origin_rows)) do |table| %>
-          <% table.column(label: "Origin") do |(origin)| %>
-            <% if colors.key?(origin) %>
-              <%# Chartkick fills its columns at half opacity and outlines them; the swatch matches %>
-              <span
-                class="d-inline-block mr-1"
-                style="width: .75rem; height: .75rem; border: 1px solid <%= colors[origin] %>; background-color: <%= colors[origin] %>80;"
-              ></span>
-              <%= origin.humanize %>
-              <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_origin: origin)) %>
-            <% else %>
-              <%= origin %>
-            <% end %>
-          <% end %>
-
-          <% table.column(label: "Bikes", classes: "tw:text-right") do |_origin, bike_count| %>
-            <%= number_display(bike_count) %>
-          <% end %>
-        <% end %>
-      </div>
+      <% table.column(label: "Bikes", classes: "tw:text-right") do |_origin, bike_count| %>
+        <%= number_display(bike_count) %>
+      <% end %>
     <% end %>
+  </div>
 
-    <div class="mt-4"></div>
-    <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: graph_kind)), stacked: true)) %>
-  <% end %>
+  <div class="mt-4"></div>
+  <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "origin")), stacked: true)) %>
+
+  <div class="twwiderow tw:mt-4 tw:gap-y-6">
+    <div>
+      <%= render(UI::Table::Component.new(records: ios_version_bike_counts)) do |table| %>
+        <% table.column(label: "iOS version") do |(version)| %>
+          <%= version %>
+        <% end %>
+
+        <% table.column(label: "Bikes", classes: "tw:text-right") do |_version, bike_count| %>
+          <%= number_display(bike_count) %>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "ios_version")), stacked: true)) %>
+    </div>
+
+    <div>
+      <%= render(UI::Table::Component.new(records: pos_search_kinds)) do |table| %>
+        <% table.column(label: "Kind") do |pos_kind| %>
+          <%= pos_kind.humanize %>
+          <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_pos: pos_kind)) %>
+        <% end %>
+
+        <% table.column(label: "Bikes", classes: "tw:text-right") do |pos_kind| %>
+          <%= number_display(bikes.send(pos_kind).count) %>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "pos")), stacked: true)) %>
+    </div>
+  </div>
 
   <% organization_counts = bikes.group(:creation_organization_id).count.sort_by { |_org_id, bike_count| -bike_count } %>
   <% organizations = Organization.unscoped.where(id: organization_counts.map(&:first)).index_by(&:id) %>
