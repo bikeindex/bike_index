@@ -60,6 +60,28 @@ RSpec.describe Admin::GraphsController, type: :request do
           expect(totals).to eq(Ownership.origins.to_h { [it.humanize, 0] }.merge("Sticker" => 2, "Web" => 1))
         end
       end
+
+      context "with bikes registered from the iOS app" do
+        let!(:bikes_old_version) do
+          FactoryBot.create_list(:bike, 2, :with_ownership, creation_registration_info: {ios_version: "1.6.9"})
+        end
+        let!(:bike_new_version) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: {ios_version: "2.0.1"}) }
+        let!(:web_bike) { FactoryBot.create(:bike, :with_ownership) }
+        let(:ios_version_rows) do
+          Nokogiri::HTML(response.body).css("tr").map { |row| row.css("td").map { it.text.strip } }
+            .select { |cells| cells.first&.match?(/\A\d+\.\d+\.\d+\z/) }
+        end
+
+        it "counts bikes by iOS version, highest count first" do
+          get base_url, params: {search_kind: "bikes", period: "week"}
+          expect(response.status).to eq(200)
+          expect(ios_version_rows).to eq([%w[1.6.9 2], %w[2.0.1 1]])
+
+          get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "ios_version"}
+          expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
+            .to eq([["iOS 1.6.9", 2], ["iOS 2.0.1", 1]])
+        end
+      end
     end
   end
 

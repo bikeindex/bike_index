@@ -96,6 +96,18 @@
           <% end %>
         <% end %>
       </div>
+    <% elsif graph_kind == "ios_version" %>
+      <div class="col-sm-6 offset-sm-3 mt-4">
+        <%= render(UI::Table::Component.new(records: ios_version_bike_counts)) do |table| %>
+          <% table.column(label: "iOS version") do |(version)| %>
+            <%= version %>
+          <% end %>
+
+          <% table.column(label: "Bikes", classes: "tw:text-right") do |_version, bike_count| %>
+            <%= number_display(bike_count) %>
+          <% end %>
+        <% end %>
+      </div>
     <% elsif graph_kind == "origin" %>
       <%# TODO: make this actually work %>
       <%# ["Transferred pre-registration", Ownership.transferred_pre_registration.joins(:bike).merge(matching_bikes).count] %>

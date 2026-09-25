@@ -3,6 +3,7 @@ module Admin
     # The shared chart palette, which runs out well before Ownership.origins does
     ORIGIN_COLORS = (UI::Chart::Component::COLORS + %w[#0891B2 #65A30D #EA580C #4F46E5
       #9333EA #0D9488 #CA8A04 #E11D48 #2563EB #16A34A]).freeze
+    IOS_VERSION_SQL = "ownerships.registration_info ->> 'ios_version'"
 
     before_action :set_period
     before_action :set_variable_graph_kind
@@ -41,7 +42,7 @@ module Admin
     end
 
     helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period,
-      :origin_colors, :origin_bike_counts
+      :origin_colors, :origin_bike_counts, :ios_version_bike_counts
 
     protected
 
@@ -95,8 +96,16 @@ module Admin
         .sort_by { |origin, count| [-count, origins.index(origin)] }
     end
 
+    def ios_version_bikes(bikes) = bikes.joins(:ownerships).where("#{IOS_VERSION_SQL} IS NOT NULL")
+
+    # Distinct: a bike has an ownership per transfer
+    def ios_version_bike_counts
+      @ios_version_bike_counts ||= ios_version_bikes(matching_bikes).group(IOS_VERSION_SQL).distinct.count(:id)
+        .sort_by { |version, count| [-count, version] }
+    end
+
     def bike_graph_kinds
-      %w[stolen origin pos ignored]
+      %w[stolen origin ios_version pos ignored]
     end
 
     def shown_bike_graph_kinds
@@ -107,17 +116,27 @@ module Admin
       %w[lightspeed_pos ascend_pos does_not_need_pos no_pos]
     end
 
-    # Grouped by origin as well as by time, so this is one query rather than one per
-    # origin. Groupdate's range only fills the origins it found rows for, so the rest take
-    # the empty series. Distinct: a bike has an ownership per transfer
+    # {group => {time => count}}, grouped by both so it's one query rather than one per
+    # group. Distinct: a bike has an ownership per transfer
+    def grouped_time_range_counts(collection)
+      helpers.time_range_counts(column: "bikes.created_at", collection: collection.distinct)
+        .each_with_object({}) { |((group, at), count), h| (h[group] ||= {})[at] = count }
+    end
+
+    # Groupdate's range only fills the origins it found rows for, so the rest take the empty series
     def origin_chart_series(bikes)
-      counts = helpers.time_range_counts(column: "bikes.created_at",
-        collection: bikes.joins(:ownerships).group("ownerships.origin").distinct)
-      series = counts.each_with_object({}) { |((origin, at), count), h| (h[origin] ||= {})[at] = count }
+      series = grouped_time_range_counts(bikes.joins(:ownerships).group("ownerships.origin"))
       empty = helpers.empty_time_range_counts
       Ownership.origins.map do |origin|
         {name: origin.humanize, color: origin_colors[origin], data: empty.merge(series[origin] || {})}
       end
+    end
+
+    # Ordered like ios_version_bike_counts, so the chart's legend matches the table
+    def ios_version_chart_series(bikes)
+      grouped_time_range_counts(ios_version_bikes(bikes).group(IOS_VERSION_SQL))
+        .sort_by { |version, data| [-data.values.sum, version] }
+        .map { |version, data| {name: "iOS #{version}", data:} }
     end
 
     def bike_chart_data
@@ -136,6 +155,8 @@ module Admin
         ]
       elsif bike_graph_kind == "origin"
         origin_chart_series(bikes)
+      elsif bike_graph_kind == "ios_version"
+        ios_version_chart_series(bikes)
       elsif bike_graph_kind == "pos"
         pos_search_kinds.map do |pos_kind|
           {
