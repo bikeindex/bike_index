@@ -5800,6 +5800,10 @@ es:
             search_notes: Notas de búsqueda
             search_owner_email_or_name: Buscar el correo electrónico o el nombre del
               propietario
+            miles_of: millas de
+            search_distance: Distancia de búsqueda
+            search_location: Buscar ubicación
+            within: dentro
           wrapper:
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
             view_matching_any_audit: ver coincidencia con cualquier auditoría
@@ -5885,6 +5889,13 @@ es:
             occurred_at_cell_panel: Hora - estado
             updated_at_cell_panel: Hora - actualizada
             filter_stolen_or_impounded_html: solo <strong>robado</strong> o <strong>confiscado</strong>
+            location_search_disabled_no_address: "%{org_name} no recopila direcciones
+              de registro, por lo que solo los registros robados o confiscados tienen
+              una ubicación. Filtre por uno de esos estados para buscar por ubicación."
+            location_search_disabled_search_all: No se puede buscar por ubicación
+              al buscar todos los registros, a menos que se busquen únicamente los
+              registros incautados o robados.
+            show_location_search: mostrar búsqueda de ubicación
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:

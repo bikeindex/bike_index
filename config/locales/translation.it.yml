@@ -5812,6 +5812,10 @@ it:
             search_for_serial_number: Cerca il numero di serie
             search_notes: Note di ricerca
             search_owner_email_or_name: Cerca l'indirizzo email o il nome del proprietario
+            miles_of: miglia di
+            search_distance: Distanza di ricerca
+            search_location: Posizione di ricerca
+            within: entro
           wrapper:
             e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
             view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
@@ -5899,6 +5903,14 @@ it:
             occurred_at_cell_panel: Tempo - stato
             updated_at_cell_panel: Ora - aggiornato
             filter_stolen_or_impounded_html: solo <strong>rubati</strong> o <strong>sequestrati</strong>
+            location_search_disabled_no_address: "%{org_name} non raccoglie gli indirizzi
+              di immatricolazione, quindi solo le immatricolazioni rubate o sequestrate
+              hanno una posizione. Filtra per uno di questi stati per cercare in base
+              alla posizione."
+            location_search_disabled_search_all: Non è possibile effettuare una ricerca
+              per località quando si cercano tutte le immatricolazioni, a meno che
+              non si stiano cercando solo immatricolazioni sequestrate e/o rubate.
+            show_location_search: mostra la ricerca della posizione
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:

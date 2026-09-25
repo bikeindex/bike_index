@@ -5542,6 +5542,10 @@ nb:
             search_for_serial_number: Søk etter serienummer
             search_notes: Søk i notater
             search_owner_email_or_name: Søk etter eierens e-postadresse eller navn
+            miles_of: miles av
+            search_distance: Søkeavstand
+            search_location: Søk plassering
+            within: innenfor
           wrapper:
             e_vehicles_for_audit: 'Elbiler for revisjon:'
             view_matching_any_audit: visning som samsvarer med enhver revisjon
@@ -5627,6 +5631,13 @@ nb:
             occurred_at_cell_panel: Tid - status
             updated_at_cell_panel: Tid - oppdatert
             filter_stolen_or_impounded_html: bare <strong>stjålet</strong> eller <strong>beslaglagt</strong>
+            location_search_disabled_no_address: "%{org_name} samler ikke inn registreringsadresser,
+              så bare stjålne og beslaglagte registreringer har en plassering. Filtrer
+              til en av disse statusene for å søke etter plassering."
+            location_search_disabled_search_all: Du kan ikke søke etter sted når du
+              søker etter alle registreringer, med mindre du bare søker etter beslaglagte
+              og/eller stjålne registreringer.
+            show_location_search: vis stedssøk
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
