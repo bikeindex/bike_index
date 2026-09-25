@@ -244,8 +244,11 @@ module BikeServices
 
     # Step 1 is the least a registration can be: who owns it and what it is. The params are
     # merged in whether or not it passes, so a re-render still shows everything they entered
-    def save_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil)
-      bike_params = honeypot_spam(bike_params, additional)
+    # The switches ride to the ownership's registration_info, so registrations can be counted by them
+    def save_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil, single_page: false,
+      separate_attestation: false)
+      bike_params = honeypot_spam(bike_params, additional).merge(register_single_page: single_page,
+        register_separate_attestation: separate_attestation)
       b_param.clean_params({bike: bike_params, propulsion_type_motorized:}.as_json)
       # Before save, which clears the errors it's about to re-run validations for
       b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?

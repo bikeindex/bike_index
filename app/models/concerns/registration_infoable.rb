@@ -14,6 +14,9 @@ module RegistrationInfoable
     longitude
   ].freeze
 
+  # Describe one registration rather than the user, so they aren't shared across the user's ownerships
+  REGISTRATION_ONLY_KEYS = %w[bike_sticker register_separate_attestation register_single_page].freeze
+
   # Currently not used, keeping it around for reference
   # REGISTRATION_INFO_KEYS = %w[
   #   organization_affiliation

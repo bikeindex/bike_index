@@ -33,17 +33,14 @@ RSpec.describe UserRegistrationOrganization, type: :model do
   describe "registration_info and ownership registration_info" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:user) { FactoryBot.create(:user, name: "Name Goes Here") }
+    let(:ownership_only_info) { {"bike_sticker" => "9998888", "register_single_page" => true} }
     let(:ownership_registration_info) do
-      {
-        bike_sticker: "9998888",
-        register_single_page: true,
+      ownership_only_info.merge(
         phone: "1112224444",
         student_id: "XXZZUUU",
         organization_affiliation: "community_member"
-      }.merge(default_location_registration_address).as_json
+      ).merge(default_location_registration_address).as_json
     end
-    # Describes the one registration, so it stays on its ownership rather than reaching the user's others
-    let(:ownership_only_info) { {"bike_sticker" => "9998888", "register_single_page" => true} }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user, creation_registration_info: ownership_registration_info) }
     let(:target_universal_info) do
       ownership_registration_info.except(*ownership_only_info.keys)

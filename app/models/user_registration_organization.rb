@@ -37,9 +37,7 @@ class UserRegistrationOrganization < ApplicationRecord
     def universal_registration_info_for(user, passed_reg_info = {})
       uro_reg_info = user.user_registration_organizations.pluck(:registration_info).reduce({}, :merge)
       own_reg_info = user.ownerships.reorder(:updated_at).pluck(:registration_info).reduce({}, :merge)
-      # These describe one registration rather than the user, so they stay on their own ownership
-      ignored_own_keys = %w[bike_sticker register_separate_attestation register_single_page]
-      merging_own_keys = (own_reg_info.keys - uro_reg_info.keys - ignored_own_keys)
+      merging_own_keys = (own_reg_info.keys - uro_reg_info.keys - RegistrationInfoable::REGISTRATION_ONLY_KEYS)
       location_keys = RegistrationInfoable::LOCATION_KEYS
       # Then, remove location keys
       unless (uro_reg_info.keys & location_keys).count == location_keys.count
@@ -65,7 +63,7 @@ class UserRegistrationOrganization < ApplicationRecord
           ids.each { |i| new_reg_info["organization_affiliation_#{i}"] ||= organization_affiliation }
         end
       end
-      new_reg_info.merge((passed_reg_info || {}).slice(*ignored_own_keys))
+      new_reg_info.merge((passed_reg_info || {}).slice(*RegistrationInfoable::REGISTRATION_ONLY_KEYS))
     end
 
     private
