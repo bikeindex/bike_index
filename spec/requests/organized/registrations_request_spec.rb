@@ -442,6 +442,48 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "asc"}
         expect(assigns(:bikes).map(&:id)).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, bike.id])
       end
+
+      context "registered through the register flow" do
+        let(:enabled_feature_slugs) { %w[bike_search registration_sequences show_partial_registrations] }
+        let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+
+        def sorted_bike_ids(direction)
+          get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction:}
+          assigns(:bikes).map(&:id)
+        end
+
+        it "is a registered bike, unacknowledged until its safety rules are agreed to" do
+          get "/register/new", params: {organization_id: current_organization.to_param}
+          b_param = BParam.last
+          post "/register", params: {b_param_token: b_param.id_token,
+                                     b_param: {manufacturer_id: FactoryBot.create(:manufacturer).id, cycle_type: "e-scooter",
+                                               owner_email: "owner@example.com"}}
+          get "/o/#{current_organization.to_param}/bikes/incompletes"
+          expect(assigns(:b_params)).to eq([b_param])
+
+          patch "/register", params: {b_param_token: b_param.id_token,
+                                      bike: {primary_frame_color_id: FactoryBot.create(:color).id, serial_number: "XYZ 123",
+                                             status: "status_with_owner", user_name: "Sally Rider"}}
+          registered_bike = Bike.find(b_param.reload.created_bike_id)
+          expect(registered_bike.unfinished_registration?).to be_truthy
+
+          get "/o/#{current_organization.to_param}/bikes/incompletes"
+          expect(assigns(:b_params)).to eq([])
+
+          expect(sorted_bike_ids("desc").first(2)).to match_array([bike.id, registered_bike.id])
+          expect(sorted_bike_ids("asc").last(2)).to match_array([bike.id, registered_bike.id])
+
+          registration_sequence.registration_sequence_pages.each_with_index do |page, index|
+            patch "/register/acknowledge", params: {b_param_token: b_param.id_token, step: (index + 3).to_s,
+                                                    acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
+          end
+          patch "/register/acknowledge", params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+          expect(registered_bike.unfinished_registration?).to be_falsey
+
+          expect(sorted_bike_ids("desc")).to eq([bike.id, registered_bike.id, bike_acknowledged_later.id, bike_acknowledged_earlier.id])
+          expect(sorted_bike_ids("asc")).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, registered_bike.id, bike.id])
+        end
+      end
     end
 
     context "sorted by status at" do
