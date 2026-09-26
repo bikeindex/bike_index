@@ -1415,11 +1415,12 @@ RSpec.describe RegisterController, type: :request do
       # Step 2 creates the bike, but hands off to the first safety page rather than finishing
       expect {
         patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-      }.to change(Bike, :count).by 1
+      }.to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
       expect(response).to redirect_to step_path("3")
       bike = Bike.last
       expect(b_param.reload.created_bike_id).to eq bike.id
       expect(b_param.acknowledgment_pending?).to be_truthy
+      expect(bike.unfinished_registration?).to be_truthy
       expect(BParam.unfinished_registrations.pluck(:id)).to eq([b_param.id])
       # The finished registration email waits on the rules
       expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
@@ -1476,7 +1477,8 @@ RSpec.describe RegisterController, type: :request do
       # The acknowledgment is what finishes the registration
       expect {
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
-      }.to change(RegistrationSequenceAcknowledgment, :count).by 1
+      }.to change(RegistrationSequenceAcknowledgment.acknowledged, :count).by 1
+      expect(RegistrationSequenceAcknowledgment.count).to eq 1
       expect(Bike.count).to eq 1
       expect(response).to redirect_to step_path("finished")
       expect(b_param.reload.acknowledgment_pending?).to be_falsey
@@ -1495,6 +1497,15 @@ RSpec.describe RegisterController, type: :request do
         bike_id: bike.id, user_id: current_user.id, owner_email:,
         acknowledgment_text: "agree to all of it")
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
+    end
+
+    it "leaves nothing pending when the bike isn't created" do
+      expect {
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.except(:primary_frame_color_id)}
+      }.to_not change(RegistrationSequenceAcknowledgment, :count)
+      expect(Bike.count).to eq 0
+      expect(response).to redirect_to step_path("2")
+      expect(b_param.reload.acknowledgment_pending?).to be_falsey
     end
 
     it "claims a registrant who signed in partway through the safety pages" do

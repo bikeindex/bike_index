@@ -90,14 +90,15 @@ RSpec.describe BikeServices::Register do
     let(:creator) { FactoryBot.create(:user_confirmed) }
     let(:b_param) do
       BParam.create(origin: "register_flow", creator_id: creator.id, created_bike_id: FactoryBot.create(:bike).id,
-        params: {bike: bike_params, acknowledgment_pending: true}.as_json)
+        params: {bike: bike_params}.as_json)
     end
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:) }
 
     it "only resumes a bike's registration for its creator until the safety rules are agreed to" do
       expect(described_class.resume(params_token: b_param.id_token, user: nil)).to eq([nil, true])
       expect(described_class.find_token(params_token: b_param.id_token, user: creator)&.id).to eq b_param.id
 
-      b_param.update(params: b_param.params.except("acknowledgment_pending"))
+      acknowledgment.update(acknowledged_at: Time.current)
       expect(described_class.find_token(params_token: b_param.id_token, user: nil)&.id).to eq b_param.id
     end
   end
@@ -131,8 +132,8 @@ RSpec.describe BikeServices::Register do
 
     context "with a more recent one owing the safety rules" do
       let!(:pending) do
-        FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: FactoryBot.create(:bike).id,
-          params: {bike: {manufacturer_id: 1}, acknowledgment_pending: true})
+        FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: FactoryBot.create(:bike).id)
+          .tap { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: it) }
       end
 
       it "keeps it, and the most recent without a bike" do

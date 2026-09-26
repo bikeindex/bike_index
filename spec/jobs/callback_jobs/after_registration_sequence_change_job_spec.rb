@@ -8,8 +8,10 @@ RSpec.describe CallbackJobs::AfterRegistrationSequenceChangeJob, type: :job do
   let!(:b_param_other_organization) { pending_b_param(FactoryBot.create(:organization)) }
 
   def pending_b_param(organization)
-    BParam.create(origin: "register_flow", created_bike_id: FactoryBot.create(:bike, :with_ownership).id,
-      params: {bike: {creation_organization_id: organization.id}, acknowledgment_pending: true}.as_json)
+    bike = FactoryBot.create(:bike, :with_ownership)
+    BParam.create(origin: "register_flow", created_bike_id: bike.id,
+      params: {bike: {creation_organization_id: organization.id}}.as_json)
+      .tap { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: it, bike:) }
   end
 
   it "finishes the organization's pending registrations once it has no active sequence" do
@@ -17,7 +19,9 @@ RSpec.describe CallbackJobs::AfterRegistrationSequenceChangeJob, type: :job do
     registration_sequence.update(end_at: Time.current)
     expect(described_class.jobs.map { it["args"] }).to eq([[registration_sequence.id]])
 
-    instance.perform(registration_sequence.id)
+    # Deleted, not acknowledged - nothing was agreed to
+    expect { instance.perform(registration_sequence.id) }.to change(RegistrationSequenceAcknowledgment, :count).by(-1)
+    expect(RegistrationSequenceAcknowledgment.acknowledged.count).to eq 0
     expect(b_param.reload.acknowledgment_pending?).to be_falsey
     expect(b_param.finished_registration?).to be_truthy
     expect(b_param_other_organization.reload.acknowledgment_pending?).to be_truthy

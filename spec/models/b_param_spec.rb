@@ -910,15 +910,16 @@ RSpec.describe BParam, type: :model do
       end
 
       context "with the safety rules still to agree to" do
+        let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:) }
+
         it "alerts until they're agreed to" do
-          b_param.update(created_bike_id: FactoryBot.create(:bike).id,
-            params: b_param.params.merge("acknowledgment_pending" => true))
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id)
 
           expect(b_param.unfinished_registration?).to be_truthy
           expect(BParam.unfinished_registrations.pluck(:id)).to eq [b_param.id]
           expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
 
-          b_param.update(params: b_param.params.except("acknowledgment_pending"))
+          acknowledgment.update(acknowledged_at: Time.current)
 
           expect(b_param.unfinished_registration?).to be_falsey
           expect(BParam.unfinished_registrations.pluck(:id)).to eq []
@@ -926,14 +927,13 @@ RSpec.describe BParam, type: :model do
         end
 
         it "doesn't expire until they're agreed to" do
-          b_param.update(created_bike_id: FactoryBot.create(:bike).id, created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day,
-            params: b_param.params.merge("acknowledgment_pending" => true))
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id, created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day)
 
           expect(b_param.unfinished_registration?).to be_truthy
           expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq [b_param.id]
           expect(BParam.unfinished_registrations.pluck(:id)).to eq [b_param.id]
 
-          b_param.update(params: b_param.params.except("acknowledgment_pending"))
+          acknowledgment.update(acknowledged_at: Time.current)
 
           expect(b_param.unfinished_registration?).to be_falsey
           expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq []

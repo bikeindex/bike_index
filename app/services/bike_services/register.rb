@@ -151,11 +151,7 @@ module BikeServices
 
     # Nothing to agree to without a sequence, otherwise the acknowledgment record
     def acknowledged?(b_param, sequence:)
-      sequence_pages(sequence).none? || acknowledgment(b_param).present?
-    end
-
-    def acknowledgment(b_param)
-      RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
+      sequence_pages(sequence).none? || RegistrationSequenceAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
     end
 
     # Which pages have been acknowledged so far. In-flight progress, so it lives on
@@ -190,9 +186,11 @@ module BikeServices
     # record of its own, which outlives the registration
     def save_acknowledgment(b_param, sequence, acknowledged_all:, user: nil)
       return false unless Binxtils::InputNormalizer.boolean(acknowledged_all) && sequence.present?
-      return true if acknowledgment(b_param).present?
+      return true if acknowledged?(b_param, sequence:)
+      return false unless RegistrationSequenceAcknowledgment.acknowledge(b_param, sequence:, user:)
 
-      RegistrationSequenceAcknowledgment.create_for(b_param, sequence:, user:).persisted?
+      send_held_email(b_param) if b_param.with_bike?
+      true
     end
 
     # The bike exists with its rules agreed to, or everything reachable is entered and awaiting
@@ -314,20 +312,13 @@ module BikeServices
       claim_creator(b_param, user)
       return create_bike_if_ready(b_param, sequence:, ip_address:) unless b_param.with_bike?
 
-      finish_acknowledgment(b_param, b_param.created_bike) unless acknowledgment_owed?(b_param, sequence:)
+      b_param.created_bike unless acknowledgment_owed?(b_param, sequence:)
     end
 
-    # The bike is what the acknowledgment hangs off once the b_param is swept. The finished
-    # registration email waited on the rules, as it did when they came before the bike
-    def finish_acknowledgment(b_param, bike)
-      RegistrationSequenceAcknowledgment.where(b_param_id: b_param.id).update_all(bike_id: bike.id, user_id: b_param.creator_id)
-      return bike unless b_param.acknowledgment_pending?
-
-      b_param.update(params: b_param.params.except("acknowledgment_pending"))
-      ownership = bike.ownerships.reorder(:id).first
-      ownership.update(skip_email: b_param.skip_email?)
-      EmailJobs::OwnershipInvitationJob.perform_async(ownership.id)
-      bike
+    # No active sequence leaves no safety rules to agree to, so nothing is owed
+    def drop_pending_acknowledgment(b_param)
+      RegistrationSequenceAcknowledgment.pending.where(b_param_id: b_param.id).destroy_all
+      send_held_email(b_param)
     end
 
     # The unfinished registrations a new bike completes: every register flow registration of it -
@@ -406,15 +397,28 @@ module BikeServices
       create_bike(b_param, sequence:, ip_address:)
     end
 
+    # Returns nil while the rules are owed - the bike exists, but the registration isn't finished
     def create_bike(b_param, sequence:, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      acknowledged = acknowledged?(b_param, sequence:)
       # Ahead of the bike, so the ownership it creates holds its email back
-      b_param.update(params: b_param.params.merge("acknowledgment_pending" => true)) unless acknowledged
+      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence:) unless acknowledged?(b_param, sequence:)
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
-      return bike if bike.id.blank?
+      if bike.id.blank?
+        pending&.destroy
+        return bike
+      end
 
-      finish_acknowledgment(b_param, bike) if acknowledged
+      # The bike is what the acknowledgment hangs off once the b_param is swept
+      RegistrationSequenceAcknowledgment.where(b_param_id: b_param.id).update_all(bike_id: bike.id, user_id: b_param.creator_id)
+      bike if pending.blank?
+    end
+
+    # The finished registration email, which the pending acknowledgment held back - as it
+    # did when the rules came before the bike
+    def send_held_email(b_param)
+      ownership = b_param.created_bike.ownerships.reorder(:id).first
+      ownership.update(skip_email: b_param.skip_email?)
+      EmailJobs::OwnershipInvitationJob.perform_async(ownership.id)
     end
 
     # Nothing to report without a status that has a record, otherwise save_report's marker
@@ -492,7 +496,7 @@ module BikeServices
       when "1" then b_param.manufacturer_id.present?
       when "2" then details_completed?(b_param)
       when "report" then report_completed?(b_param)
-      when "review" then acknowledgment(b_param).present?
+      when "review" then acknowledged?(b_param, sequence:)
       else acknowledged_page_ids(b_param).include?(page_for_step(step, sequence:)&.id)
       end
     end
@@ -559,7 +563,7 @@ module BikeServices
     end
 
     conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
-      :claim_creator, :create_bike_if_ready, :create_bike,
+      :claim_creator, :create_bike_if_ready, :create_bike, :send_held_email,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,

@@ -446,15 +446,12 @@ RSpec.describe Bike, type: :model do
 
   describe "unfinished_registration?" do
     let(:bike) { FactoryBot.create(:bike) }
-    let!(:b_param) do
-      BParam.create(origin: "register_flow", created_bike_id: bike.id,
-        params: {bike: {manufacturer_id: bike.manufacturer_id}, acknowledgment_pending: true}.as_json)
-    end
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, bike:) }
 
     it "is true until the safety rules are agreed to" do
       expect(bike.unfinished_registration?).to be_truthy
 
-      b_param.update(params: b_param.params.except("acknowledgment_pending"))
+      acknowledgment.update(acknowledged_at: Time.current)
       expect(bike.unfinished_registration?).to be_falsey
     end
   end

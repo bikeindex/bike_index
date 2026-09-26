@@ -108,7 +108,7 @@ class BParam < ApplicationRecord
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
-  scope :acknowledgment_pending, -> { where("(params -> 'acknowledgment_pending') IS NOT NULL") }
+  scope :acknowledgment_pending, -> { where(id: RegistrationSequenceAcknowledgment.pending.select(:b_param_id)) }
   scope :unfinished_registrations, -> { unexpired.step_1_submitted.and(without_bike.or(acknowledgment_pending)) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
@@ -307,11 +307,13 @@ class BParam < ApplicationRecord
 
   # The register flow creates the bike ahead of its organization's safety rules, which
   # it still requires - so the registration isn't finished until they're agreed to
-  def acknowledgment_pending? = params["acknowledgment_pending"].present?
+  def acknowledgment_pending?
+    persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
+  end
 
   def finished_registration? = with_bike? && !acknowledgment_pending?
 
-  def unexpired? = acknowledgment_pending? || created_at.present? && created_at >= Time.current - TOKEN_EXPIRATION
+  def unexpired? = created_at.present? && created_at >= Time.current - TOKEN_EXPIRATION || acknowledgment_pending?
 
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
@@ -780,8 +782,6 @@ class BParam < ApplicationRecord
       .merge(addy_hash.blank? ? {} : {"address_record_attributes" => addy_hash})
   end
 
-  private
-
   # origin, so the API and embed forms don't pay for a lookup that can't alert. Only with a
   # creator: anonymously, anyone could alert any account by typing in its email
   def update_unfinished_registration_alerts
@@ -792,6 +792,8 @@ class BParam < ApplicationRecord
       UserAlert.refresh_alert_slugs(user)
     end
   end
+
+  private
 
   def ensure_valid_params
     self.params ||= {"bike" => {}}
