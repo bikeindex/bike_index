@@ -16,7 +16,7 @@
     <%= tag.div(data: {controller: ("registrations--show--message-owner" if @organization_message)}) do %>
       <% if @organization_message %>
         <div class="tw:mt-3">
-          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "message_kind", kind: :toggle, selected: "not_stolen", entries: [{value: "not_stolen", label: translation(".not_stolen")}, {value: "stolen", label: translation(".stolen")}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
+          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "message_kind", selected: "general", entries: [{value: "general", label: translation(".general_message")}, {value: "theft", label: translation(".message_about_theft")}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
         </div>
 
         <div

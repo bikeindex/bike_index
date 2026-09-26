@@ -46,7 +46,7 @@ RSpec.describe "Viewing a registration", :js, type: :system do
     let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: true) }
     let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: owner, creation_organization: organization) }
 
-    it "sends an organization message, toggling to the stolen form and back" do
+    it "sends an organization message, switching to the stolen form and back" do
       sign_in(viewer)
       visit registration_path(bike, organization_id: organization.id)
       click_button "Message Owner"
@@ -54,11 +54,11 @@ RSpec.describe "Viewing a registration", :js, type: :system do
       expect(page).to have_field("organization_message[message]")
       expect(page).to have_no_field("stolen_notification[reference_url]")
 
-      choose "Stolen", allow_label_click: true
+      choose "Message about theft", allow_label_click: true
       expect(page).to have_field("stolen_notification[reference_url]")
       expect(page).to have_no_field("organization_message[message]")
 
-      choose "Not stolen", allow_label_click: true
+      choose "General message", allow_label_click: true
       fill_in "organization_message[message]", with: "Your lock is on the rack"
 
       Sidekiq::Job.clear_all

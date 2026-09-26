@@ -75,7 +75,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
         render_inline(described_class.new(bike:, organization:, current_user:))
 
         expect(page).to have_text("Message the owner of this e-scooter")
-        expect(page).to have_checked_field("Not stolen", visible: :all)
+        expect(page).to have_checked_field("General message", visible: :all)
         expect(page).to have_css("form[action='/o/#{organization.to_param}/organization_messages'] textarea[name='organization_message[message]'][placeholder='What do you want to tell the owner of this e-scooter?']", visible: :all)
         expect(page).to_not have_css("input[name='organization_message[reference_url]']", visible: :all)
         expect(page).to have_css(".tw\\:hidden[data-registrations--show--message-owner-target='stolenNotification'] input[name='stolen_notification[reference_url]']", visible: :all)
