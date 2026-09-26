@@ -47,10 +47,13 @@ module SharedBlocks
         # for sale. How long a bike has been registered is what vouches for it, so the
         # with-owner badge - which carries that date and nothing else - is the feature's
         def status_badge
-          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :inherit,
+          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: status_badge_size,
             skip_with_owner: !credibility_badges?,
             time: @bike.occurred_at || for_sale_listing&.published_at || @bike.created_at)
         end
+
+        # The photo corner has no text size to inherit; the row's title line does
+        def status_badge_size = :md
 
         def credibility_badges? = @organization&.enabled?("credibility_badges") || false
 

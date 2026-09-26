@@ -22,6 +22,8 @@ module SharedBlocks
         # BikeCard's, whose methods this shares - config/i18n-tasks.yml's scope_overrides too
         def component_translation_scope = %i[components shared_blocks search_results bike_card]
 
+        def status_badge_size = :inherit
+
         def row_border_class
           BORDER_CLASSES.fetch(Atoms::RegistrationStatusBadge::Component.color(@bike), "tw:border-l-gray-300")
         end
