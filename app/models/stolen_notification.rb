@@ -103,7 +103,7 @@ class StolenNotification < ApplicationRecord
 
   private
 
-  # The one the form was sent from, else the oldest (not Organization's default name order)
+  # Falls back to the oldest, not Organization's default name order
   def calculated_organization
     return @calculated_organization if defined?(@calculated_organization)
 
