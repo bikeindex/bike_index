@@ -24,7 +24,7 @@ RSpec.describe Pages::Admin::Strava::RequestsChart::Component, type: :component 
 
     it "lays the pies out in two columns" do
       component = render_inline(instance)
-      expect(component.css(".twwiderow:not(.twwiderow-3) h4").map(&:text)).to eq(["Response status", "Request type"])
+      expect(component.css(".twwiderow:not(.twwiderow-3)").last.css("h4").map(&:text)).to eq(["Response status", "Request type"])
     end
   end
 
