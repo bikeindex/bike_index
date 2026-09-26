@@ -18,12 +18,11 @@ class PaymentsController < ApplicationController
   end
 
   def create
-    amount_cents = permitted_amount_cents
-    if invalid_amount_cents?(amount_cents)
+    if invalid_amount_cents?(permitted_create_parameters[:amount_cents])
       flash[:notice] = "Please enter a valid amount"
       redirect_back(fallback_location: new_payment_path) && return
     end
-    @payment = Payment.create(permitted_create_parameters.merge(amount_cents:))
+    @payment = Payment.create(permitted_create_parameters)
     @payment.stripe_checkout_session
 
     redirect_to @payment.stripe_checkout_session.url, allow_other_host: true
@@ -42,12 +41,12 @@ class PaymentsController < ApplicationController
 
   # A typed amount (in dollars) wins over a checked preset - without javascript both submit
   def permitted_amount_cents
-    Amountable.to_cents(params.dig(:payment, :amount).presence) || permitted_create_parameters[:amount_cents]
+    Amountable.to_cents(params.dig(:payment, :amount).presence) || params.dig(:payment, :amount_cents)
   end
 
   def permitted_create_parameters
     params.require(:payment)
       .permit(:kind, :amount_cents, :email, :currency, :referral_source)
-      .merge(user_id: current_user&.id)
+      .merge(user_id: current_user&.id, amount_cents: permitted_amount_cents)
   end
 end
