@@ -3,8 +3,7 @@
 module Pages
   module Register
     module Step1
-      # What step 1's own page ends in: its submit, and the way to start over.
-      # The single page ends in step 2's fields instead
+      # What step 1's own page ends in: its submit, and the way to start over
       class Component < ApplicationComponent
         def initialize(b_param:, flow:, organization: nil, current_user: nil, button_color: nil,
           button_hover_color: nil)

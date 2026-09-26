@@ -20,8 +20,7 @@ module Pages
 
         private
 
-        # Nothing to leave to the registrant until the organization has rules to agree to.
-        # Through the association, since a bare RegistrationSequence here is Pages::Org's
+        # Nothing to leave to the registrant until the organization has rules to agree to
         def safety_rules? = @organization.registration_sequences.active.exists?
 
         def switches_path

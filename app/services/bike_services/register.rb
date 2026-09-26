@@ -140,7 +140,8 @@ module BikeServices
     # Placing the report asks whether there's a creator yet, which is a query, so this is
     # built once a request and passed down
     def flow(b_param, sequence:, single_page: false)
-      BikeServices::RegisterFlow.new(steps: flow_steps(b_param, sequence, single_page), single_page:)
+      BikeServices::RegisterFlow.new(single_page:, page_count: sequence_pages(sequence).count,
+        report: report_placement(b_param))
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -491,13 +492,10 @@ module BikeServices
     # The report comes right after step 2, unless the registration is waiting on its
     # confirmation email: the emailed link is what proves the address the report belongs
     # to, and it's clicked after the acknowledgment pages rather than before them
-    def flow_steps(b_param, sequence, single_page)
-      pages = sequence_pages(sequence)
-      rest = pages.each_index.map { step_for_page_index(it) } + (pages.any? ? %w[review] : [])
-      details = single_page ? %w[1] : %w[1 2]
-      return details + rest unless report_step?(b_param&.status)
+    def report_placement(b_param)
+      return unless report_step?(b_param&.status)
 
-      creator_available?(b_param) ? details + %w[report] + rest : details + rest + %w[report]
+      creator_available?(b_param) ? :after_details : :last
     end
 
     # Every step the registration has reached, in order - each one opens the next, so the
@@ -582,7 +580,7 @@ module BikeServices
     conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
-      :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :flow_steps, :permitted_steps, :step_completed?,
+      :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :report_placement, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
       :step_2_params, :translation, :honeypot_spam
   end

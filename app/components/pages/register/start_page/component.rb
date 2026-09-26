@@ -6,7 +6,6 @@ module Pages
       # The page the flow opens on - its progress, heading, errors and the form itself, which
       # ends in step 1's own submit or, on the single page, step 2's fields
       class Component < ApplicationComponent
-        # motorized_review: whether an e-vehicle gets the safety pages after the single page
         def initialize(b_param:, flow:, organization: nil, current_user: nil, embed: false,
           skip_heading: false, button_color: nil, button_hover_color: nil, motorized_review: false)
           @b_param = b_param

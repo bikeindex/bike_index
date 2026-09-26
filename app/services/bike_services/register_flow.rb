@@ -1,17 +1,29 @@
 # frozen_string_literal: true
 
 module BikeServices
-  # The register flow's shape - every step it reaches, in order, and whether step 1's page
-  # asks for step 2's details too. BikeServices::Register.flow builds it once a request
-  RegisterFlow = Data.define(:steps, :single_page) do
-    def initialize(steps:, single_page: false)
+  # The register flow's shape. report: :after_details, :last, or nil for a registration
+  # with nothing to report
+  RegisterFlow = Data.define(:single_page, :page_count, :report) do
+    def initialize(single_page: false, page_count: 0, report: nil)
       super
     end
 
     def single_page? = single_page
 
     # The e-vehicle acknowledgment pages, which end at the review
-    def acknowledgments? = steps.include?("review")
+    def acknowledgments? = page_count.positive?
+
+    # Every step it reaches, in order - what the progress bar counts off and the back links walk
+    def steps
+      details = single_page ? %w[1] : %w[1 2]
+      acknowledgments = page_count.times.map { BikeServices::Register.step_for_page_index(it) } +
+        (acknowledgments? ? %w[review] : [])
+      case report
+      when :after_details then details + %w[report] + acknowledgments
+      when :last then details + acknowledgments + %w[report]
+      else details + acknowledgments
+      end
+    end
 
     def count = steps.count
 
@@ -22,7 +34,8 @@ module BikeServices
     def after(step) = steps[position(step)]
 
     def before(step)
-      steps[position(step) - 2] if position(step) > 1
+      index = position(step) - 2
+      steps[index] unless index.negative?
     end
   end
 end

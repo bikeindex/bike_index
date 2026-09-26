@@ -66,8 +66,7 @@ module Pages
           !@b_param.self_made?(@current_user)
         end
 
-        # Step 1's fields are on the single page's form, so whether the owner's name is asked
-        # for follows what's typed into them - matched against the addresses BParam#self_made? does
+        # The single page matches what's typed against the addresses BParam#self_made? does
         def owner_name_data
           return {} unless @flow.single_page?
 
