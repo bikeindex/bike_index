@@ -228,8 +228,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).not_to have_css("turbo-frame#page_2")
     # The selection persists after the search - the hidden field carries the id,
     # the visible input shows the display name
-    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
-    expect(find("#primary_activity").value).to eq "Mountain biking"
+    expect(page).to have_field("primary_activity-hw-hidden-field", with: primary_activity.id.to_s, type: "hidden")
+    expect(page).to have_field("primary_activity", with: "Mountain biking")
 
     # Switching to the list layout re-runs the search rather than dropping its filters
     choose("search_result_view_list", allow_label_click: true)
@@ -276,6 +276,10 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # history entry can intermittently no-op in WebDriver (the URL stays on the back
   # entry). It's a harness artifact - a real browser does back/forward reliably -
   # so retry on CI.
+  #
+  # Not that one, though: the form settles after both the URL and the card count,
+  # since it sits outside the results frame and comes back with Turbo's restored
+  # snapshot. That's why its values are polled for rather than read once.
   it "keeps results and the primary_activity form in sync across back/forward", :flaky do
     visit_marketplace_via_nav
     # First 12 on the unfiltered page (the 2 members sort first)
@@ -284,24 +288,24 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # The two counts differ, so a settled count proves which search the frame holds.
     search_primary_activity("Mountain biking")
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 6)
-    expect(find("#primary_activity").value).to eq "Mountain biking"
+    expect(page).to have_field("primary_activity", with: "Mountain biking")
 
     search_primary_activity("Road cycling")
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 9)
-    expect(find("#primary_activity").value).to eq "Road cycling"
+    expect(page).to have_field("primary_activity", with: "Road cycling")
 
     # Back to the Mountain biking search - results and the combobox reconcile to it
     page.go_back
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/, wait: 10)
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 6)
-    expect(find("#primary_activity").value).to eq "Mountain biking"
-    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
+    expect(page).to have_field("primary_activity", with: "Mountain biking", wait: 10)
+    expect(page).to have_field("primary_activity-hw-hidden-field", with: primary_activity.id.to_s, type: "hidden")
 
     # Forward to the Road cycling search - everything reconciles back to it
     page.go_forward
     expect(page).to have_current_path(/primary_activity=#{other_primary_activity.id}/, wait: 10)
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 9)
-    expect(find("#primary_activity").value).to eq "Road cycling"
-    expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq other_primary_activity.id.to_s
+    expect(page).to have_field("primary_activity", with: "Road cycling", wait: 10)
+    expect(page).to have_field("primary_activity-hw-hidden-field", with: other_primary_activity.id.to_s, type: "hidden")
   end
 end
