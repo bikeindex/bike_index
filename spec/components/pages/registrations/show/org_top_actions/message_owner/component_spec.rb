@@ -84,11 +84,14 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
       context "by phone" do
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, :phone_registration, creation_organization: organization, owner_email: "7183914410") }
 
-        it "has no organization message form" do
+        it "shows the stolen notification form, with no toggle" do
           render_inline(described_class.new(bike:, organization:, current_user:))
 
-          expect(page).to have_field("message_kind", visible: :all)
+          expect(page).to have_text("Know something about this bike")
+          expect(page).to_not have_field("message_kind", visible: :all)
           expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
+          expect(page).to_not have_css(".tw\\:hidden[data-registrations--show--message-owner-target='stolenNotification']", visible: :all)
+          expect(page).to have_css("textarea[name='stolen_notification[message]']", visible: :all)
           expect(page).to have_link("718-391-4410", href: "tel:718-391-4410")
         end
       end

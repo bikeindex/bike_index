@@ -13,7 +13,9 @@ module Pages
               @bike = bike
               @organization = organization
               @current_user = current_user
-              @organization_message = OrganizationMessage.for?(bike:, organization:)
+              # A phone registration has no email to send an organization message to
+              @organization_message = OrganizationMessage.for?(bike:, organization:) &&
+                OrganizationMessage.receiver_email_for(bike).present?
             end
 
             private
@@ -44,10 +46,6 @@ module Pages
 
             def message_notification
               @message_notification ||= StolenNotification.new(bike: @bike)
-            end
-
-            def organization_message_form?
-              OrganizationMessage.receiver_email_for(@bike).present?
             end
 
             def owner_phone
