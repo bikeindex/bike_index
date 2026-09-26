@@ -286,6 +286,37 @@ RSpec.describe Search::MarketplaceController, type: :request do
           end
         end
       end
+
+      # The cards are the org search's, where they badge the registering organization and
+      # link to its org pages. The public page reaches them through Container, which has no
+      # organization to hand on. (Not the registration address, the third thing an org sees:
+      # publishing a listing replaces the bike's own address record with the listing's, so
+      # there's no second address to leak here - the container spec covers that one.)
+      context "with a registration of an organization's" do
+        let(:organization) do
+          FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"])
+        end
+        let!(:organized_bike) do
+          FactoryBot.create(:bike_organized, :with_primary_activity, :with_ownership_claimed,
+            creation_organization: organization)
+        end
+        let!(:organized_listing) do
+          FactoryBot.create(:marketplace_listing, :for_sale, item: organized_bike, amount_cents: 300_00)
+        end
+
+        it "renders none of what the org search adds" do
+          expect(organized_listing.reload.status).to eq "for_sale"
+          expect(organized_bike.reload.organized?(organization)).to be true
+          get base_url, as: :turbo_stream
+          expect(response).to have_http_status(:success)
+          expect(assigns(:bikes).pluck(:id)).to include(organized_bike.id)
+          # The card rendered, so the absences below aren't a missing card
+          expect(response.body).to match(/href="\/bikes\/#{organized_bike.id}"/)
+
+          expect(response.body).to_not include("Registered with")
+          expect(response.body).to_not include("organization_id=")
+        end
+      end
     end
 
     describe "counts" do

@@ -30,4 +30,38 @@ RSpec.describe SharedBlocks::SearchResults::Container::Component, type: :compone
       expect(component).to have_text no_results
     end
   end
+
+  # The public searches reach BikeCard and BikeListItem only through here, and this passes
+  # no organization - which is what keeps the org search's badge, its organization_id links
+  # and the owner's registration address off a public page. A bike carrying all three.
+  context "with a registration of an organization's, listed for sale" do
+    let(:organization) do
+      FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"])
+    end
+    let(:bike) do
+      FactoryBot.create(:bike_organized, creation_organization: organization,
+        address_record: FactoryBot.create(:address_record, :los_angeles, kind: :bike))
+    end
+    let(:bikes) { [bike] }
+
+    def expect_nothing_the_org_search_adds
+      expect(component).to have_link(href: "/bikes/#{bike.id}")
+      expect(component).to have_no_text("Registered with")
+      expect(component).to have_no_text("Not registered with")
+      expect(component).to have_no_text("Los Angeles")
+      expect(component.to_html).to_not include("organization_id=")
+    end
+
+    it "renders the cards without it" do
+      expect_nothing_the_org_search_adds
+    end
+
+    context "result_view :list" do
+      let(:result_view) { :list }
+
+      it "renders the rows without it" do
+        expect_nothing_the_org_search_adds
+      end
+    end
+  end
 end
