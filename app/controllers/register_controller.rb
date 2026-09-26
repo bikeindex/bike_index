@@ -54,7 +54,7 @@ class RegisterController < ApplicationController
   # ?step=finished. A step the registration isn't at redirects to one it is.
   # The emailed and alert links arrive without a step, rather than moving through the flow
   def show
-    notify_rules_restarted if params[:step].blank?
+    resume_registration if params[:step].blank?
     steps = flow_steps
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
     return redirect_to(step_path(step)) if step != params[:step]
@@ -247,11 +247,12 @@ class RegisterController < ApplicationController
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
 
-  # Only the tokenless arrival, so it shows once rather than on every page they walk again
-  def notify_rules_restarted
-    return unless BikeServices::Register.rules_restarted?(@b_param, sequence: @registration_sequence)
-
-    flash[:notice] = translation(:safety_rules_updated, controller_method: :acknowledge)
+  # All resuming changes today: rules the organization has replaced since start over.
+  # No sequence to resume on is the common case, and returns what was already resolved
+  def resume_registration
+    @registration_sequence, restarted = BikeServices::Register
+      .resume_registration_sequence(@b_param, sequence: @registration_sequence)
+    flash[:notice] = translation(:safety_rules_updated, controller_method: :acknowledge) if restarted
   end
 
   # Read at render time rather than in a filter: the submissions save first, and where

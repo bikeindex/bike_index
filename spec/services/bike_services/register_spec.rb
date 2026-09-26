@@ -624,24 +624,23 @@ RSpec.describe BikeServices::Register do
           new_sequence.make_active!
         end
 
-        it "moves to the newer version, the page already agreed to not counting toward it" do
-          resolved = described_class.registration_sequence(b_param)
-          expect(resolved).to eq new_sequence
-          expect(described_class.rules_restarted?(b_param, sequence: resolved)).to be_truthy
+        it "stays on the version being agreed to, until resumed on the newer one" do
+          started = described_class.registration_sequence(b_param)
+          expect(started).to eq sequence
 
-          # Nothing is written to switch versions - the id kept names a page the newer one
-          # doesn't have, so the walk is back at its first page
-          expect(described_class.acknowledged_page_ids(b_param)).to eq([pages.first.id])
-          expect(described_class.permitted_step(b_param, nil, sequence: resolved)).to eq "3"
+          expect(described_class.resume_registration_sequence(b_param, sequence: started)).to eq([new_sequence, true])
+          expect(described_class.acknowledged_page_ids(b_param)).to eq([])
+          expect(described_class.registration_sequence(b_param)).to eq new_sequence
+          expect(described_class.resume_registration_sequence(b_param, sequence: new_sequence)).to eq([new_sequence, false])
         end
 
         context "already agreed to" do
           before { described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1") }
 
-          it "stays on the version that was agreed to" do
-            expect(sequence.reload.archived?).to be_truthy
-            expect(described_class.registration_sequence(b_param)).to eq sequence
-            expect(described_class.rules_restarted?(b_param, sequence:)).to be_falsey
+          it "isn't restarted" do
+            started = described_class.registration_sequence(b_param)
+            expect(started.archived?).to be_truthy
+            expect(described_class.resume_registration_sequence(b_param, sequence: started)).to eq([sequence, false])
           end
         end
       end

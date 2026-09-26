@@ -85,8 +85,8 @@ module BikeServices
       b_param.save
     end
 
-    # The safety rules a registration acknowledges, only for an e-vehicle - the version it
-    # started while that's still the organization's, otherwise whatever is current now.
+    # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
+    # active sequence, or the one its pages are being agreed to from, even once replaced.
     # motorized? first - it's in memory, and creation_organization is a query
     def registration_sequence(b_param)
       return nil unless b_param.motorized?
@@ -94,14 +94,19 @@ module BikeServices
       organization = b_param.creation_organization
       return nil if organization.blank?
 
-      started_sequence(b_param, organization) || RegistrationSequence.active_for(organization)
+      started_id = b_param.params.dig("registration_sequence", "id")
+      (RegistrationSequence.find_by(id: started_id, organization:) if started_id.present?) ||
+        RegistrationSequence.active_for(organization)
     end
 
-    # Whether the rules on screen aren't the ones this registration started - the notice, and
-    # nothing else: what's shown is registration_sequence's answer either way
-    def rules_restarted?(b_param, sequence:)
-      started_id = started_sequence_id(b_param)
-      started_id.present? && sequence.present? && started_id != sequence.id
+    # registration_sequence for a link back into the flow, and whether the rules restarted:
+    # resuming starts over on the organization's current version rather than finishing one
+    # it's replaced since. An agreement already made stands
+    def resume_registration_sequence(b_param, sequence:)
+      return [sequence, false] if sequence.blank? || sequence.active? || acknowledged?(b_param, sequence:)
+
+      b_param.update(params: b_param.params.except("registration_sequence"))
+      [registration_sequence(b_param), true]
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the email),
@@ -159,7 +164,7 @@ module BikeServices
 
     # Nothing to agree to without a sequence, otherwise the acknowledgment record
     def acknowledged?(b_param, sequence:)
-      sequence_pages(sequence).none? || agreement_exists?(b_param)
+      sequence_pages(sequence).none? || RegistrationSequenceAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
     end
 
     # Which pages have been acknowledged so far. In-flight progress, so it lives on
@@ -328,25 +333,6 @@ module BikeServices
     #
     # private below here
     #
-
-    # The version a walk in progress is on, or nil to start over on the organization's current
-    # rules. Nothing is written to switch: a replacement clones its pages under new ids, so the
-    # ids already acknowledged match none of them
-    def started_sequence(b_param, organization)
-      started_id = started_sequence_id(b_param)
-      return nil if started_id.blank?
-
-      sequence = RegistrationSequence.find_by(id: started_id, organization:)
-      sequence if sequence.present? && (sequence.active? || agreement_exists?(b_param))
-    end
-
-    def started_sequence_id(b_param) = b_param.params.dig("registration_sequence", "id")
-
-    # The agreement alone, without acknowledged?'s "nothing to agree to" clause - an activated
-    # sequence always has pages, and loading them to ask costs their images too
-    def agreement_exists?(b_param)
-      RegistrationSequenceAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
-    end
 
     # Whether a bike registered some other way is this registration's. Step 1 says only
     # what it is, so any bike of that make and type is; whatever came after has to match too
@@ -575,8 +561,7 @@ module BikeServices
       additional.present? ? bike_params.to_h.merge("likely_spam" => true) : bike_params.to_h
     end
 
-    conceal :started_sequence, :started_sequence_id, :agreement_exists?,
-      :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
+    conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,

@@ -1556,25 +1556,35 @@ RSpec.describe RegisterController, type: :request do
         expect(sequence.reload.archived?).to be_truthy
       end
 
-      # However they come back - the emailed link, or a tab left open on the old version
-      it "shows the newer version either way" do
-        # Kept, not wiped - the acknowledged id names a page the newer version doesn't have
-        expect { get register_path(b_param_token: b_param.id_token) }
-          .to_not change { b_param.reload.params }
+      it "finishes on the version they started" do
+        get step_path("4")
+        expect(response.body).to include "Campus rules"
+
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                  step: "4", acknowledged: {"0" => "1"}}
+        expect(response).to redirect_to step_path("review")
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                  step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to step_path("finished")
+        expect(RegistrationSequenceAcknowledgment.sole).to have_attributes(registration_sequence_id: sequence.id,
+          bike_id: b_param.reload.created_bike_id)
+        expect(RegistrationSequenceAcknowledgment.sole.acknowledged_at).to be_present
+      end
+
+      it "starts the newer version over when resumed from a link" do
+        get register_path(b_param_token: b_param.id_token)
         expect(response).to redirect_to step_path("3")
         expect(flash[:notice]).to eq "The safety rules have been updated — please review them again"
+        expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
+        expect(BikeServices::Register.registration_sequence(b_param)&.id).to eq new_sequence.id
 
-        # So the page left open on the old version doesn't count toward the new one
+        # A page left open from the old version doesn't count toward the new one
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
                                                   step: "4", acknowledged: {"0" => "1"}}
         expect(response).to redirect_to step_path("3")
         expect(flash[:notice]).to eq "The safety rules have been updated — please review them again"
+        expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
 
-        get step_path("3")
-        expect(response.body).to include new_pages.first.title
-      end
-
-      it "finishes on the newer version" do
         new_pages.each_with_index do |page, index|
           patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: new_sequence.id,
                                                     step: (index + 3).to_s, acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
