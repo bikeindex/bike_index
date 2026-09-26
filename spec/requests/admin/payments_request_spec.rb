@@ -38,9 +38,10 @@ RSpec.describe Admin::PaymentsController, type: :request do
 
       it "keys the row to this partial, the payment and the records the row renders" do
         subject
-        keys = fragments_written { get base_url }.select { it.include?("admin/payments/_table") }
+        keys = fragments_written { get base_url }
         expect(keys.count).to eq 1
-        expect(keys.first).to include(subject.cache_key_with_version, current_user.cache_key_with_version)
+        expect(keys.first).to include("admin/payments/_table", subject.cache_key_with_version,
+          current_user.cache_key_with_version)
       end
     end
   end
