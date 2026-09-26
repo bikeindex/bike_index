@@ -48,6 +48,14 @@ FileUtils.chdir APP_ROOT do
     end
     FileUtils.ln_sf root_storage, "storage"
 
+    # A clone (APFS clonefile) shares the root install's disk blocks, where npm writes a
+    # full 160MB copy per workspace. npm replaces a symlinked node_modules, so it can't be one
+    root_node_modules = File.join(root, "node_modules")
+    if Dir.exist?(root_node_modules) && !Dir.exist?("node_modules")
+      puts "Cloning node_modules from #{root_node_modules}..."
+      system("cp", "-Rc", root_node_modules, "node_modules")
+    end
+
     # Copy Facebook VCR cassettes
     fb_cassettes = File.join(root, "spec/vcr_cassettes/facebook")
     if Dir.exist?(fb_cassettes)
