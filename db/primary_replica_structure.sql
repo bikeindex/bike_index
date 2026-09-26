@@ -473,6 +473,43 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
+-- Name: bike_flights_requests; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_flights_requests (
+    id bigint NOT NULL,
+    kind integer NOT NULL,
+    path character varying,
+    request_body jsonb,
+    response_status integer,
+    response_body jsonb,
+    error_message character varying,
+    duration_ms integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: bike_flights_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_flights_requests_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_flights_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_flights_requests_id_seq OWNED BY public.bike_flights_requests.id;
+
+
+--
 -- Name: bike_organization_notes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4592,6 +4629,13 @@ ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_p
 
 
 --
+-- Name: bike_flights_requests id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_flights_requests ALTER COLUMN id SET DEFAULT nextval('public.bike_flights_requests_id_seq'::regclass);
+
+
+--
 -- Name: bike_organization_notes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5385,6 +5429,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_flights_requests bike_flights_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_flights_requests
+    ADD CONSTRAINT bike_flights_requests_pkey PRIMARY KEY (id);
 
 
 --
@@ -7814,6 +7866,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260922120000'),
 ('20260915181500'),
 ('20260915110042'),
 ('20260912102406'),

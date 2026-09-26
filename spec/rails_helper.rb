@@ -94,8 +94,15 @@ VCR.configure do |config|
   %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
     MAXMIND_KEY R2_TEST_ACCESS_KEY R2_TEST_ACCESS_KEY_SECRET R2_TEST_ENDPOINT SENDGRID_EMAIL_VALIDATION_KEY
     LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN CLOUDFLARE_TURNSTILE_SECRET_KEY
-    STRAVA_TEST_REFRESH_TOKEN].each do |key|
+    STRAVA_TEST_REFRESH_TOKEN BIKEFLIGHTS_EMAIL BIKEFLIGHTS_PASSWORD].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
+    # A value sent in a json body is escaped, so the raw value misses one containing " or \
+    config.filter_sensitive_data("<#{key}>") { ENV[key]&.to_json&.slice(1..-2) }
+  end
+
+  # BikeFlights returns its token in the login response body, so it isn't known until then
+  config.filter_sensitive_data("<BIKEFLIGHTS_TOKEN>") do |i|
+    i.response.body[/"token":"([^"]+)"/, 1] if i.request.uri.end_with?("/api/Authentication/login")
   end
 
   # aws-sdk addresses R2 virtual-host style (bucket.<account>.r2...), so the endpoint never appears

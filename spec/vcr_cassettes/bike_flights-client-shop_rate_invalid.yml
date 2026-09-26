@@ -1,0 +1,85 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://sandbox.bikeflights.com/api/Authentication/login
+    body:
+      encoding: UTF-8
+      string: '{"email":"<BIKEFLIGHTS_EMAIL>","password":"<BIKEFLIGHTS_PASSWORD>"}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.18.0 (Ubuntu)
+      Date:
+      - Tue, 22 Sep 2026 21:28:47 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - no-cache,no-store
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Strict-Transport-Security:
+      - max-age=2592000
+    body:
+      encoding: UTF-8
+      string: '{"token":"<BIKEFLIGHTS_TOKEN>","expiration":"2026-09-22T22:28:47.1337137Z"}'
+  recorded_at: Tue, 22 Sep 2026 21:28:47 GMT
+- request:
+    method: post
+    uri: https://sandbox.bikeflights.com/api/ShopRate
+    body:
+      encoding: UTF-8
+      string: '{"shopName":"Bike Index","stage":{"from":{"firstName":"Test","lastName":"Seller","address1":"2028
+        SE Division St","city":"Portland","state":"OR","postalCode":"97202","countryCode":"US"},"to":{"firstName":"Test","lastName":"Buyer","phoneNumber":"2125550100","address1":"278
+        Broadway","city":"New York","state":"NY","postalCode":"10007","countryCode":"US","isResidential":true}},"packages":[{"length":45,"width":12,"height":30,"value":1200,"weight":45,"linearUnit":"IN","weightUnit":"LB","contentCode":"8000","insideDescription":"Bicycle","outsideDescription":"Bicycle"}]}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Server:
+      - nginx/1.18.0 (Ubuntu)
+      Date:
+      - Tue, 22 Sep 2026 21:28:47 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=2592000
+    body:
+      encoding: UTF-8
+      string: '[{"propertyName":"Stage.From.PhoneNumber","errorMessage":"From PhoneNumber
+        is required","severity":0,"errorCode":"NotEmptyValidator","formattedMessagePlaceholderValues":{"PropertyName":"Phone
+        Number","PropertyValue":null,"PropertyPath":"Stage.From.PhoneNumber"}}]'
+  recorded_at: Tue, 22 Sep 2026 21:28:47 GMT
+recorded_with: VCR 6.4.0
