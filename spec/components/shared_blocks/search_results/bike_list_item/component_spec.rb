@@ -30,9 +30,22 @@ RSpec.describe SharedBlocks::SearchResults::BikeListItem::Component, type: :comp
   context "with its owner" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
 
-    it "is edged in the registered color, with no status" do
+    it "is edged in the registered color, badged without its date" do
       expect(component).to have_css("li.tw\\:border-l-green-600")
-      expect(component).to have_no_text("Registered")
+      expect(component).to have_text("Registered")
+      expect(component).to have_no_css("span.localizeTime")
+    end
+
+    # BikeCard's copy of status_time, which no longer reaches this one
+    context "with credibility_badges" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"])
+      end
+
+      it "carries the registration date" do
+        expect(component).to have_text("Registered ·")
+        expect(component).to have_css("span.localizeTime")
+      end
     end
   end
 

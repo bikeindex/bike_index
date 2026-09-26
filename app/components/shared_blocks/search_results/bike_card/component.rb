@@ -45,13 +45,15 @@ module SharedBlocks
           @for_sale_listing ||= @bike.current_for_sale_marketplace_listing
         end
 
+        def status_badge(size:)
+          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size:, time: status_time)
+        end
+
         # occurred_at is the stolen or impounded date, and nil for a bike with its owner or
         # for sale. How long a bike has been registered is what vouches for it, so the
-        # with-owner badge is the credibility feature's
-        def status_badge(size:)
-          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size:,
-            skip_with_owner: !credibility_badges?,
-            time: @bike.occurred_at || for_sale_listing&.published_at || @bike.created_at)
+        # registration date - not the badge carrying it - is the credibility feature's
+        def status_time
+          @bike.occurred_at || for_sale_listing&.published_at || (@bike.created_at if credibility_badges?)
         end
 
         def credibility_badges? = @organization&.enabled?("credibility_badges")

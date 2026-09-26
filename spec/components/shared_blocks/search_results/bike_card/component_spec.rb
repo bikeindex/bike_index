@@ -49,9 +49,10 @@ RSpec.describe SharedBlocks::SearchResults::BikeCard::Component, type: :componen
         address_record: FactoryBot.create(:address_record, :los_angeles, kind: :bike))
     end
 
-    it "renders it for the organization, and no status for a bike with its owner" do
+    it "renders it for the organization, and the with-owner badge without its date" do
       expect(component).to have_text("Los Angeles")
-      expect(component).to have_no_text("Registered")
+      expect(component).to have_text("Registered")
+      expect(component).to have_no_css("span.localizeTime")
     end
 
     # How long a bike has been registered is what vouches for it
