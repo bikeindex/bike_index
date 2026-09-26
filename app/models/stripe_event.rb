@@ -15,9 +15,7 @@
 #
 # Indexes
 #
-#  index_stripe_events_on_stripe_account_id  (stripe_account_id)
-#  index_stripe_events_on_stripe_event_id    (stripe_event_id) UNIQUE
-#  index_stripe_events_on_stripe_id          (stripe_id)
+#  index_stripe_events_on_stripe_event_id  (stripe_event_id) UNIQUE
 #
 class StripeEvent < ApplicationRecord
   KNOWN_EVENTS = %w[checkout.session.completed customer.subscription.created

@@ -7550,24 +7550,10 @@ CREATE UNIQUE INDEX index_strava_integrations_on_user_id ON public.strava_integr
 
 
 --
--- Name: index_stripe_events_on_stripe_account_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_stripe_events_on_stripe_account_id ON public.stripe_events USING btree (stripe_account_id);
-
-
---
 -- Name: index_stripe_events_on_stripe_event_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_stripe_events_on_stripe_event_id ON public.stripe_events USING btree (stripe_event_id);
-
-
---
--- Name: index_stripe_events_on_stripe_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_stripe_events_on_stripe_id ON public.stripe_events USING btree (stripe_id);
 
 
 --
@@ -7839,6 +7825,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260923120001'),
 ('20260923120000'),
 ('20260915181500'),
 ('20260915110042'),
