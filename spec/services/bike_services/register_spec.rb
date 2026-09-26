@@ -624,13 +624,14 @@ RSpec.describe BikeServices::Register do
           new_sequence.make_active!
         end
 
-        it "stays on the version being agreed to, until restarted on the newer one" do
+        it "stays on the version being agreed to, until resumed on the newer one" do
           started = described_class.registration_sequence(b_param)
           expect(started).to eq sequence
-          expect(described_class.restart_replaced_sequence(b_param, sequence: started)).to be_truthy
+
+          expect(described_class.resume_registration_sequence(b_param, sequence: started)).to eq([new_sequence, true])
           expect(described_class.acknowledged_page_ids(b_param)).to eq([])
           expect(described_class.registration_sequence(b_param)).to eq new_sequence
-          expect(described_class.restart_replaced_sequence(b_param, sequence: new_sequence)).to be_falsey
+          expect(described_class.resume_registration_sequence(b_param, sequence: new_sequence)).to eq([new_sequence, false])
         end
 
         context "already agreed to" do
@@ -639,8 +640,7 @@ RSpec.describe BikeServices::Register do
           it "isn't restarted" do
             started = described_class.registration_sequence(b_param)
             expect(started.archived?).to be_truthy
-            expect(described_class.restart_replaced_sequence(b_param, sequence: started)).to be_falsey
-            expect(described_class.registration_sequence(b_param)).to eq sequence
+            expect(described_class.resume_registration_sequence(b_param, sequence: started)).to eq([sequence, false])
           end
         end
       end

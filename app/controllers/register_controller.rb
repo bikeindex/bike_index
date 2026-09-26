@@ -15,8 +15,6 @@ class RegisterController < ApplicationController
   # confirm renders a self-posting form and nothing else, so it reads neither
   before_action :assign_organization, except: %i[new confirm]
   before_action :find_registration_sequence, except: %i[new confirm]
-  # The emailed and alert links have no step, so this is resuming rather than moving through the flow
-  before_action :restart_replaced_sequence, only: %i[show], if: -> { params[:step].blank? }
   before_action :redirect_finished, only: %i[create update report acknowledge]
   before_action :redirect_bike_created, only: %i[create update]
   # The step shown is server state - a cached page could show one the registration is past
@@ -54,7 +52,9 @@ class RegisterController < ApplicationController
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a
   # find, the e-vehicle acknowledgment pages (?step=3 up), ?step=review and
   # ?step=finished. A step the registration isn't at redirects to one it is.
+  # The emailed and alert links arrive without a step, rather than moving through the flow
   def show
+    resume_registration if params[:step].blank?
     steps = flow_steps
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
     return redirect_to(step_path(step)) if step != params[:step]
@@ -244,11 +244,12 @@ class RegisterController < ApplicationController
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
 
-  def restart_replaced_sequence
-    return unless BikeServices::Register.restart_replaced_sequence(@b_param, sequence: @registration_sequence)
-
-    flash[:notice] = translation(:safety_rules_updated)
-    find_registration_sequence
+  # All resuming changes today: rules the organization has replaced since start over.
+  # No sequence to resume on is the common case, and returns what was already resolved
+  def resume_registration
+    @registration_sequence, restarted = BikeServices::Register
+      .resume_registration_sequence(@b_param, sequence: @registration_sequence)
+    flash[:notice] = translation(:safety_rules_updated, controller_method: :acknowledge) if restarted
   end
 
   # Read at render time rather than in a filter: the submissions save first, and where

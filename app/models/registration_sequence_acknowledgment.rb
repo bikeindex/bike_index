@@ -34,8 +34,12 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
   belongs_to :bike
   belongs_to :user
 
-  # Whether it's pending is what keeps the registration unfinished
-  after_commit { b_param&.update_unfinished_registration_alerts }
+  # Not on create: the pending one is made just before its b_param saves the bike,
+  # which refreshes the alert anyway
+  after_commit(on: %i[update destroy]) do
+    b_param&.update_unfinished_registration_alerts
+    release_held_email
+  end
 
   scope :pending, -> { where(acknowledged_at: nil) }
   scope :acknowledged, -> { where.not(acknowledged_at: nil) }
@@ -45,11 +49,12 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
 
   class << self
     # The pages are acknowledged one at a time on the b_param; this is the moment they're
-    # agreed to as a whole. Onto the pending one when the bike came first, and against the
-    # sequence the pages were read from, which may not be the one it was pending on
+    # agreed to as a whole - onto the pending one when the bike came first, against the
+    # sequence the pages were read from rather than the one it was pending on.
+    # Whoever is agreeing, over the creator create_bike stood in with
     def acknowledge(b_param, sequence:, user: nil)
       acknowledgment = find_or_initialize_by(b_param_id: b_param.id)
-      acknowledgment.update(registration_sequence: sequence, user_id: acknowledgment.user_id || user&.id,
+      acknowledgment.update(registration_sequence: sequence, user_id: user&.id || acknowledgment.user_id,
         owner_email: b_param.owner_email, acknowledged_at: Time.current)
     end
 
@@ -67,8 +72,6 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
     end
   end
 
-  def acknowledged? = acknowledged_at.present?
-
   # The review is only reachable with every page acknowledged, so the whole (frozen)
   # sequence is what was agreed to
   def acknowledged_pages
@@ -77,5 +80,16 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
 
   def acknowledgment_text
     registration_sequence&.acknowledgment
+  end
+
+  private
+
+  # The finished registration email being pending held back - the job decides whether it
+  # sends. saved_change_to: create_bike stamps bike_id on an already-acknowledged row too
+  def release_held_email
+    return if bike_id.blank?
+    return unless destroyed? || saved_change_to_acknowledged_at?
+
+    EmailJobs::OwnershipInvitationJob.perform_async(Bike.unscoped.where(id: bike_id).pick(:current_ownership_id))
   end
 end

@@ -40,14 +40,21 @@ RSpec.describe RegistrationSequenceAcknowledgment, type: :model do
         described_class.create_pending(b_param, sequence: previous_sequence).tap { it.update(user:) }
       end
 
-      it "acknowledges that one, against the sequence now active, keeping who it was for" do
+      it "acknowledges that one, against the sequence passed, keeping the stand-in creator" do
         expect(described_class.pending.pluck(:id)).to eq([pending.id])
         expect {
           described_class.acknowledge(b_param, sequence:)
         }.to_not change(described_class, :count)
         expect(pending.reload).to have_attributes(registration_sequence_id: sequence.id, user_id: user.id)
-        expect(pending.acknowledged?).to be_truthy
+        expect(pending.acknowledged_at).to be_present
         expect(described_class.pending.count).to eq 0
+      end
+
+      it "records whoever agrees over that stand-in" do
+        agreeing = FactoryBot.create(:user_confirmed)
+        described_class.acknowledge(b_param, sequence:, user: agreeing)
+
+        expect(pending.reload.user_id).to eq agreeing.id
       end
     end
   end
