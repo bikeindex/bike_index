@@ -1,5 +1,5 @@
-/* Bike Index's own tw* classes. Rules that style one component's markup — .ui-table,
- * .search-results-frame-wrapper — stay in application.css */
+/* Bike Index's own tw* classes. Rules that style one component's markup, like
+ * .ui-table, stay in application.css */
 
 /* A plain custom property rather than @theme: a theme variable takes the tw prefix, and
  * is dropped unless a generated utility references it */
@@ -134,16 +134,23 @@
     @apply tw:my-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-2;
   }
 
-  /* Two columns of cards or sections, breaking on the row's own width like .twfieldrow
-   * rather than at a viewport breakpoint. The max() caps it at two, which repeat() alone
-   * would not do - a wide row fits four 320px tracks. auto-fill rather than auto-fit so a
-   * column whose only child is hidden holds its place instead of handing the whole row to
-   * its neighbour. The min(100%) is what keeps that 320px floor from overflowing a row
-   * nested in something narrower than it. */
+  /* Two columns of cards or sections (three with .twwiderow-3), breaking on the row's own
+   * width like .twfieldrow rather than at a viewport breakpoint. The max() caps the column
+   * count, which repeat() alone would not do - a wide row fits four 320px tracks. auto-fill
+   * rather than auto-fit so a column whose only child is hidden holds its place instead of
+   * handing the whole row to its neighbour. The min(100%) is what keeps that 320px floor
+   * from overflowing a row nested in something narrower than it.
+   * Both counts share the 320px floor, so both are single-column below the 672px that
+   * .twfullbleed and the /twwiderow container queries read. Three columns go 3, 2+1, 1 */
   .twwiderow {
     @apply tw:grid tw:gap-x-8;
+    --twwiderow-columns: 2;
     container: twwiderow / inline-size;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, max(320px, calc((100% - var(--tw-spacing) * 8) / 2))), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, max(320px, calc(100% / var(--twwiderow-columns) - var(--tw-spacing) * 8))), 1fr));
+  }
+
+  .twwiderow-3 {
+    --twwiderow-columns: 3;
   }
 
   [aria-expanded="true"] .twdropdown-chevron {

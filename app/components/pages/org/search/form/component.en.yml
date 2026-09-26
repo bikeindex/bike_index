@@ -8,6 +8,10 @@ en:
             doesnt_look_like_serial: >-
               This doesn't look like a serial number. Serials are usually 6+ letters
               and numbers, located under the bottom bracket.
+            miles_of: miles of
+            search_distance: Search distance
             search_for_serial_number: Search for serial number
+            search_location: Search location
             search_notes: Search notes
             search_owner_email_or_name: Search owner email or name
+            within: within
