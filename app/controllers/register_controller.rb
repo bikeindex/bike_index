@@ -280,6 +280,10 @@ class RegisterController < ApplicationController
       session_token: session[:register_b_param_token], user: current_user)
     @b_param ||= BikeServices::Register.b_param_for(user: current_user) if build
     if @b_param.blank?
+      if BikeServices::Register.sign_in_to_resume?(params[:b_param_token], user: current_user)
+        return store_return_and_authenticate_user(translation_key: :sign_in_to_continue_registration, flash_type: :notice)
+      end
+
       flash[:notice] = translation(:registration_not_found) if params[:b_param_token].present?
       return redirect_to(new_register_path(start_params))
     end
