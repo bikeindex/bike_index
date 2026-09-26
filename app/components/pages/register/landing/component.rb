@@ -60,13 +60,13 @@ module Pages
 
         def stickers
           [{sound: translation(".sticker_register_sound"), color: "tw:text-blue-600",
-            image: "register_landing/u-lock.png",
+            image: "register_landing/u-lock.webp",
             title: translation(".sticker_register_title"), body: translation(".sticker_register_body")},
             {sound: translation(".sticker_stolen_sound"), color: "tw:text-[#cc0000]",
-             image: "register_landing/stolen-alert.png",
+             image: "register_landing/stolen-alert.webp",
              title: translation(".sticker_stolen_title"), body: translation(".sticker_stolen_body")},
             {sound: translation(".sticker_flagged_sound"), color: "tw:text-purple-500",
-             image: "register_landing/bike-bell.png",
+             image: "register_landing/bike-bell.webp",
              title: translation(".sticker_flagged_title"), body: translation(".sticker_flagged_body")}]
         end
 

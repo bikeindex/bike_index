@@ -11,6 +11,8 @@ module Pages
 
         ONE_TIME_DOLLARS = [25, 50, 100].freeze
 
+        RADIO_CLASSES = "tw:mt-1 tw:size-5 tw:shrink-0 tw:accent-blue-600"
+
         private
 
         def membership_tiles
@@ -33,7 +35,6 @@ module Pages
           end
         end
 
-        # A tile is a radio its label wraps, so the pick is the checked state
         def tile_classes
           "tw:flex tw:cursor-pointer tw:items-center tw:sm:items-start tw:justify-between tw:gap-2 tw:rounded-lg tw:border " \
             "tw:border-gray-200 tw:bg-white tw:px-4 tw:py-3 tw:sm:py-4 tw:transition-colors tw:duration-150 tw:hover:border-blue-300 " \

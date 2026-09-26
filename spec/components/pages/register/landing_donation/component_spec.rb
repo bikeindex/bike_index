@@ -10,11 +10,11 @@ RSpec.describe Pages::Register::LandingDonation::Component, type: :component do
     expect(cta.text.strip).to eq "Become a member — $15/month"
     expect(cta["href"]).to eq "/membership/new?membership_level=plus"
 
-    monthly = component.css("[data-amount-for=monthly]")
+    monthly = component.css("[name=landing_donation_monthly]")
     expect(monthly.map { it["data-href"] }).to eq(%w[basic plus patron].map { "/membership/new?membership_level=#{it}" })
     expect(monthly.map { it.key?("checked") }).to eq [false, true, false]
 
-    one_time = component.css("[data-amount-for=one_time]")
+    one_time = component.css("[name=landing_donation_one_time]")
     expect(one_time.map { it["data-label"] }).to eq ["Donate $25", "Donate $50", "Donate $100"]
     expect(one_time.map { it["data-href"] }).to eq(%w[25 50 100].map { "/donate?initial_amount=#{it}" })
     expect(component.at_css("[data-controller=register--landing-donation]")["data-register--landing-donation-custom-label-value"])

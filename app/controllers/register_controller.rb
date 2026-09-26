@@ -50,7 +50,6 @@ class RegisterController < ApplicationController
       button_hover_color: HexColor.normalize(params[:button_hover])), layout: false
   end
 
-  # The marketing page around step 1, whose form posts into create like the flow's own
   def landing
     recoveries_count, recoveries_value, organizations_count, bikes_count =
       Counts.retrieve_many("recoveries", "recoveries_value", "organizations", "total_bikes")

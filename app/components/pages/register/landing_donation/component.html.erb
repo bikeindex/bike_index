@@ -63,7 +63,6 @@
             value="monthly"
             class="tw:sr-only"
             checked
-            data-cadence
             data-action="register--landing-donation#update"
           >
 
@@ -76,7 +75,6 @@
             name="landing_donation_cadence"
             value="one_time"
             class="tw:sr-only"
-            data-cadence
             data-one-time
             data-action="register--landing-donation#update"
           >
@@ -86,7 +84,6 @@
       </fieldset>
     </div>
 
-    <%# One per row on phones, with the tier name beside its price %>
     <fieldset
       class="
         tw:m-0 tw:grid tw:gap-2.5 tw:border-0 tw:p-0
@@ -113,9 +110,7 @@
           </span>
 
           <%= radio_button_tag("landing_donation_monthly", tile[:amount], tile[:checked], id: nil,
-            class: "tw:mt-1 tw:size-5 tw:shrink-0 tw:accent-blue-600",
-            data: {amount_for: "monthly", href: tile[:href], label: tile[:label],
-                   action: "register--landing-donation#update"}) %>
+            class: RADIO_CLASSES, data: {href: tile[:href], label: tile[:label], action: "register--landing-donation#update"}) %>
         </label>
       <% end %>
     </fieldset>
@@ -140,9 +135,7 @@
           </span>
 
           <%= radio_button_tag("landing_donation_one_time", tile[:amount], tile[:checked], id: nil,
-            class: "tw:mt-1 tw:size-5 tw:shrink-0 tw:accent-blue-600",
-            data: {amount_for: "one_time", href: tile[:href], label: tile[:label],
-                   action: "register--landing-donation#select"}) %>
+            class: RADIO_CLASSES, data: {href: tile[:href], label: tile[:label], action: "register--landing-donation#select"}) %>
         </label>
       <% end %>
 
