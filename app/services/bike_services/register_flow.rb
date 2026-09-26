@@ -13,7 +13,6 @@ module BikeServices
     # The e-vehicle acknowledgment pages, which end at the review
     def acknowledgments? = page_count.positive?
 
-    # Every step it reaches, in order - what the progress bar counts off and the back links walk
     def steps
       details = single_page ? %w[1] : %w[1 2]
       acknowledgments = page_count.times.map { BikeServices::Register.step_for_page_index(it) } +

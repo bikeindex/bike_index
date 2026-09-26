@@ -87,7 +87,6 @@ RSpec.describe Pages::Register::StartPage::Component, type: :component do
       expect(component.css("input[name=single_page]").count).to eq 1
       # One honeypot, not one per step
       expect(component.css("input[name=additional]").count).to eq 1
-      # Its steps turn on what it's asking, so no count and no "just the essentials" yet
       expect(component.to_html).to_not include "Just the essentials"
     end
   end
