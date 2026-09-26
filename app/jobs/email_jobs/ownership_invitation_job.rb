@@ -17,10 +17,9 @@ module EmailJobs
       ownership.bike&.update(updated_at: Time.current)
       ownership.reload
 
-      # update_column, since caching what was calculated is not an edit of the ownership -
-      # belongs_to :bike, touch: true would bump the bike on every run that reconciles
       if ownership.calculated_send_email != ownership.send_email
-        ownership.update_column(:skip_email, !ownership.calculated_send_email)
+        # Update the ownership to have send email set
+        ownership.update_attribute(:skip_email, !ownership.calculated_send_email)
       end
       return if ownership.skip_email
       # Below the write-back, not in calculated_send_email, which it would latch into
