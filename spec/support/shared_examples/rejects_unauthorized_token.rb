@@ -30,7 +30,7 @@ RSpec.shared_examples "rejects_unauthorized_token" do
   end
 
   context "token for a user with an unrelated superuser ability" do
-    before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bikes") }
+    before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "payments") }
     it "returns 403" do
       get url, params: token_param
       expect(response.status).to eq 403

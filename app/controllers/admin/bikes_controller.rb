@@ -1,6 +1,7 @@
 module Admin
   class BikesController < Admin::BaseController
     include Binxtils::SortableTable
+    include Admin::TokenAccessible
 
     # The Pages::Admin::Bikes::Tabs tabs show renders; the rest are other controllers' screens
     SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
@@ -17,11 +18,18 @@ module Admin
     end
 
     def missing_manufacturer
-      @per_page = permitted_per_page(default: 100)
-      @pagy, @bikes = pagy(:countish,
-        missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :current_impound_record, :paint),
-        limit: @per_page,
-        page: permitted_page)
+      respond_to do |format|
+        format.html do
+          @per_page = permitted_per_page(default: 100)
+          @pagy, @bikes = pagy(:countish,
+            missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :current_impound_record, :paint),
+            limit: @per_page,
+            page: permitted_page)
+        end
+        format.json do
+          render json: {manufacturer_other_counts: missing_manufacturer_bikes.reorder(nil).group(:manufacturer_other).count}
+        end
+      end
     end
 
     def update_manufacturers
