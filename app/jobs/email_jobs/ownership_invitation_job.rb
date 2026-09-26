@@ -21,6 +21,10 @@ module EmailJobs
         # Update the ownership to have send email set
         ownership.update_attribute(:skip_email, !ownership.calculated_send_email)
       end
+      # The register flow creates the bike ahead of its organization's safety rules, and
+      # enqueues this again once they're agreed to. Not skip_email, which latches: reading
+      # it back as calculated_send_email would keep the email held after they are
+      return if ownership.bike.unfinished_registration?
       return if ownership.skip_email
 
       notification = Notification.find_or_create_by(notifiable: ownership,

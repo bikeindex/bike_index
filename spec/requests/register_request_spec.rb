@@ -1422,7 +1422,8 @@ RSpec.describe RegisterController, type: :request do
       expect(b_param.acknowledgment_pending?).to be_truthy
       expect(bike.unfinished_registration?).to be_truthy
       expect(BParam.unfinished_registrations.pluck(:id)).to eq([b_param.id])
-      # The finished registration email waits on the rules
+      # The finished registration email waits on the rules, not on a skipped ownership
+      expect(bike.current_ownership.skip_email).to be_falsey
       expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
 
       # The steps the bike was created from are closed

@@ -571,7 +571,7 @@ class BParam < ApplicationRecord
   end
 
   def skip_email?
-    return true if status_impounded? || unregistered_parking_notification? || acknowledgment_pending?
+    return true if status_impounded? || unregistered_parking_notification?
 
     send_email = params.dig("bike", "send_email").to_s
     send_email.present? && !Binxtils::InputNormalizer.boolean(send_email)

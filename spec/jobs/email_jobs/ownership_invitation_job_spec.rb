@@ -21,6 +21,20 @@ RSpec.describe EmailJobs::OwnershipInvitationJob, type: :job do
     expect(notification.bike_id).to eq bike.id
     expect(notification.user_id).to be_blank
   end
+  context "with the safety rules still to agree to" do
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, bike:) }
+
+    it "waits on them, without latching skip_email" do
+      ActionMailer::Base.deliveries = []
+      expect { described_class.new.perform(ownership.id) }.to_not change(Notification, :count)
+      expect(ownership.reload.skip_email).to be_falsey
+
+      acknowledgment.update(acknowledged_at: Time.current)
+      expect { described_class.new.perform(ownership.id) }.to change(Notification, :count).by(1)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+    end
+  end
+
   context "notification already exists" do
     let!(:notification) { FactoryBot.create(:notification, notifiable: ownership, kind: "finished_registration", delivery_status:) }
     let(:delivery_status) { "delivery_success" }
