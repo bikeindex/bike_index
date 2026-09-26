@@ -17,7 +17,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     expect(component).to have_text("SUR-77120934")
     expect(component).to have_link("List for sale")
     expect(component).to have_link("Mark bike stolen")
-    expect(component).not_to have_css(".alert")
+    expect(component).not_to have_css("[role=alert]")
   end
 
   context "with an unassigned_bike_org alert" do
@@ -28,7 +28,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     before { UserAlert.refresh_alert_slugs(user) }
 
     it "renders only this bike's alert" do
-      expect(component).to have_css(".account-user-alert", count: 1)
+      expect(component).to have_css("[role=alert]", count: 1)
       expect(component).to have_text("associated with Brakebills")
       expect(component).to have_link("Add it now!", href: "/user_alerts/#{user_alert.id}?add_bike_organization=true")
     end

@@ -123,16 +123,16 @@
     </div>
   <% end %>
 
-  <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user)) %>
+  <%# The row wraps, so the alerts fill the width below the photo and details %>
+  <div class="tw:basis-full">
+    <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user)) %>
 
-  <% @user_alerts.each do |user_alert| %>
-    <div class="account-user-alert alert alert-info mb-0">
-      <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
-      <%= link_to translation(".add_it_now"), user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, action: "update", class: "text-underline text-success" %>
-
-      <div class="small less-strong dismiss-wrapper">
-        <%= link_to translation(".ignore"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, action: "update" %>
-      </div>
-    </div>
-  <% end %>
+    <% @user_alerts.each do |user_alert| %>
+      <%= render(UI::Alerts::Base::Component.new) do %>
+        <%= link_to translation(".ignore"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, action: "update", class: "twlink-underlined tw:float-right tw:ml-4 tw:text-sm" %>
+        <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
+        <%= link_to translation(".add_it_now"), user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, action: "update", class: "twlink-underlined" %>
+      <% end %>
+    <% end %>
+  </div>
 </li>
