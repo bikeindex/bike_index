@@ -66,7 +66,7 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 ## Buttons: always `UI::Button` (and the UI component library generally)
 
-**Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:purple`/`:link` — its `COLORS` is the list of record), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
+**Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (its `COLORS` is the list of record), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
 
 **An in-page action trigger that doesn't navigate is a `UI::Button`, not `link_to "#"`** — `.herb.yml` runs `html-anchor-require-href` over `app/components` only, so a component is caught and an `app/views` template isn't. `UI::Forms::NestedFields::Component`'s add trigger is the worked example.
 
