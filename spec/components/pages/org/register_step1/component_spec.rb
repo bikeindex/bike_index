@@ -26,9 +26,19 @@ RSpec.describe Pages::Org::RegisterStep1::Component, type: :component do
       href: "/o/#{organization.to_param}/bikes/new?old_view=true")
 
     switches = component.at_css("form[action='/o/#{organization.to_param}/registrations/switches'][method=post]")
-    expect(switches.css("input[type=checkbox]").map { |el| el["name"] })
-      .to eq(%w[single_page separate_attestation])
+    # No safety rules here, so nothing to leave to the registrant
+    expect(switches.css("input[type=checkbox]").map { |el| el["name"] }).to eq(%w[single_page])
     expect(switches.css("input[type=checkbox][checked]")).to be_empty
+  end
+
+  context "with an active registration sequence" do
+    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+    it "offers the separate attestation switch as well" do
+      switches = component.at_css("form[action$='/registrations/switches']")
+      expect(switches.css("input[type=checkbox]").map { |el| el["name"] })
+        .to eq(%w[single_page separate_attestation])
+    end
   end
 
   context "single_page" do

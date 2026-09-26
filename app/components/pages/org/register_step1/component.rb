@@ -22,6 +22,10 @@ module Pages
 
         def single_page? = @steps.exclude?("2")
 
+        # Nothing to leave to the registrant until the organization has rules to agree to.
+        # Through the association, since a bare RegistrationSequence here is Pages::Org's
+        def safety_rules? = @organization.registration_sequences.active.exists?
+
         # skip_heading: the organized menu already names the organization
         def opening_page
           Pages::Register::StartPage::Component.opening_page(b_param: @b_param, steps: @steps,
