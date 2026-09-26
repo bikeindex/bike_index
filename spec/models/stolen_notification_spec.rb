@@ -76,6 +76,53 @@ RSpec.describe StolenNotification, type: :model do
           expect(stolen_notification.kind).to eq "stolen_permitted"
         end
       end
+      context "registered with the sender's organizations" do
+        let(:organization) { organization_unstolen }
+        let(:organization2) { FactoryBot.create(:organization) }
+        let(:organization_unregistered) { FactoryBot.create(:organization) }
+        let(:stolen_notification) { StolenNotification.new(message: "party", bike_id: bike.id, sender:, organization_id:) }
+        let(:organization_id) { nil }
+        before do
+          FactoryBot.create(:bike_organization, bike:, organization: organization_unstolen)
+          FactoryBot.create(:bike_organization, bike:, organization: organization2)
+          FactoryBot.create(:organization_role_claimed, user: sender, organization: organization2)
+          FactoryBot.create(:organization_role_claimed, user: sender, organization: organization_unregistered)
+        end
+
+        it "sends an organization message from the oldest, directly to the owner" do
+          expect(stolen_notification.sender_organization&.id).to eq organization_unstolen.id
+          expect_stolen_notification_to_send(stolen_notification, creator)
+          expect(stolen_notification.receiver_email).to eq owner_email
+          expect(stolen_notification.kind).to eq "unstolen_organization_permitted"
+          expect(stolen_notification.organization_id).to eq organization_unstolen.id
+
+          OrganizationRole.where(user: sender).destroy_all
+          expect(stolen_notification.reload.sender_organization&.id).to eq organization_unstolen.id
+        end
+        context "sent from the second organization" do
+          let(:organization_id) { organization2.id }
+          it "is from the second organization" do
+            expect_stolen_notification_to_send(stolen_notification, creator)
+            expect(stolen_notification.organization_id).to eq organization2.id
+          end
+        end
+        context "sent from an organization the bike isn't registered with" do
+          let(:organization_id) { organization_unregistered.id }
+          it "is from the oldest" do
+            expect_stolen_notification_to_send(stolen_notification, creator)
+            expect(stolen_notification.organization_id).to eq organization_unstolen.id
+          end
+        end
+        context "phone registration" do
+          let(:bike) { FactoryBot.create(:bike, :phone_registration, creator:) }
+          let(:owner_email) { bike.owner_email }
+          it "sends to the creator" do
+            expect_stolen_notification_to_send(stolen_notification, creator)
+            expect(stolen_notification.receiver_email).to eq "creator@notmine.com"
+            expect(stolen_notification.kind).to eq "unstolen_organization_permitted"
+          end
+        end
+      end
     end
   end
 end

@@ -3765,7 +3765,8 @@ CREATE TABLE public.stolen_notifications (
     reference_url text,
     send_dates json,
     kind integer,
-    doorkeeper_app_id bigint
+    doorkeeper_app_id bigint,
+    organization_id bigint
 );
 
 
@@ -7504,6 +7505,13 @@ CREATE INDEX index_sso_identities_on_user_id ON public.sso_identities USING btre
 
 
 --
+-- Name: index_stolen_notifications_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_notifications_on_organization_id ON public.stolen_notifications USING btree (organization_id);
+
+
+--
 -- Name: index_stolen_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7814,6 +7822,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260925120000'),
 ('20260915181500'),
 ('20260915110042'),
 ('20260912102406'),

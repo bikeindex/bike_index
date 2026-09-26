@@ -109,6 +109,20 @@ RSpec.describe StolenNotificationsController, type: :request do
           expect(mail_text).to match(/from UCLA sent you a message/)
           expect(mail_text).to_not match(/stolen/i)
         end
+        context "sent from another of the bike's organizations" do
+          let(:organization2) { FactoryBot.create(:organization, short_name: "Rec Center") }
+          before do
+            FactoryBot.create(:organization_role_claimed, user: current_user, organization: organization2)
+            FactoryBot.create(:bike_organization, bike:, organization: organization2)
+          end
+          it "sends from that organization" do
+            post base_url, params: {stolen_notification: stolen_notification_attributes.merge(organization_id: organization2.id)}
+            expect(StolenNotification.last.organization_id).to eq organization2.id
+
+            EmailJobs::StolenNotificationJob.drain
+            expect(ActionMailer::Base.deliveries.last.subject).to eq("Message from Rec Center about your bike")
+          end
+        end
       end
       context "not permitted notification" do
         let(:bike) { FactoryBot.create(:bike) }

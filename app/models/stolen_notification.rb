@@ -14,8 +14,13 @@
 #  updated_at        :datetime         not null
 #  bike_id           :integer
 #  doorkeeper_app_id :bigint
+#  organization_id   :bigint
 #  receiver_id       :integer
 #  sender_id         :integer
+#
+# Indexes
+#
+#  index_stolen_notifications_on_organization_id  (organization_id)
 #
 class StolenNotification < ApplicationRecord
   KIND_ENUM = {
@@ -36,6 +41,7 @@ class StolenNotification < ApplicationRecord
   belongs_to :sender, class_name: "User", foreign_key: :sender_id
   belongs_to :receiver, class_name: "User", foreign_key: :receiver_id
   belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application"
+  belongs_to :organization, -> { with_deleted }
 
   has_many :notifications, as: :notifiable
 
@@ -63,7 +69,8 @@ class StolenNotification < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.receiver_email ||= organization_message? ? bike.owner_email : bike&.contact_owner_email(sender)
+    self.organization = calculated_organization if new_record?
+    self.receiver_email ||= calculated_receiver_email
     self.receiver ||= bike.owner
     self.send_dates ||= [].to_json
     self.kind ||= calculated_kind
@@ -76,10 +83,10 @@ class StolenNotification < ApplicationRecord
     STR
   end
 
+  # Stored on create - the sender's memberships and the bike's registrations can
+  # change before the email sends
   def sender_organization
-    return @sender_organization if defined?(@sender_organization)
-
-    @sender_organization = sender&.organizations&.find_by(id: bike&.bike_organizations&.select(:organization_id))
+    new_record? ? calculated_organization : organization
   end
 
   # An org messaging a bike registered with it isn't reporting it stolen
@@ -94,6 +101,22 @@ class StolenNotification < ApplicationRecord
   end
 
   private
+
+  # Of the sender's organizations the bike is registered with, the one the form was
+  # sent from, falling back to the oldest
+  def calculated_organization
+    return @calculated_organization if defined?(@calculated_organization)
+
+    organizations = sender&.organizations&.where(id: bike&.bike_organizations&.select(:organization_id))
+    @calculated_organization = organizations&.find_by(id: organization_id) || organizations&.reorder(:id)&.first
+  end
+
+  # A phone registration's owner_email is the phone number
+  def calculated_receiver_email
+    return bike.owner_email if organization_message? && !bike.phone_registration?
+
+    bike&.contact_owner_email(sender)
+  end
 
   def calculated_unstolen_blocked?
     !bike.status_stolen? && !bike.contact_owner?(sender)

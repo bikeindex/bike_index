@@ -9,8 +9,9 @@ module Pages
           # message for the org's own registration. Rendered inside the org-admin action-panel
           # accordion (data-panel-name="message")
           class Component < ApplicationComponent
-            def initialize(bike:, current_user: nil)
+            def initialize(bike:, organization: nil, current_user: nil)
               @bike = bike
+              @organization = organization
               @current_user = current_user
             end
 
@@ -47,7 +48,7 @@ module Pages
             end
 
             def message_notification
-              @message_notification ||= StolenNotification.new(bike: @bike, sender: @current_user)
+              @message_notification ||= StolenNotification.new(bike: @bike, sender: @current_user, organization: @organization)
             end
 
             def owner_phone

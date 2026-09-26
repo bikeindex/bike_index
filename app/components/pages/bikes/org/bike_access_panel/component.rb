@@ -47,7 +47,7 @@ module Pages
           end
 
           def stolen_notification
-            @stolen_notification ||= StolenNotification.new(bike: @bike, sender: @user)
+            @stolen_notification ||= StolenNotification.new(bike: @bike, sender: @user, organization: @organization)
           end
 
           def organization_message?
