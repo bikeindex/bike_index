@@ -144,6 +144,18 @@ RSpec.describe UI::Button::Component, type: :component do
         expect(component.to_html).to include("tw:text-base")
       end
     end
+
+    # A standard radius, weight or transition alongside its own would tie, and Tailwind's
+    # sort order would pick the winner
+    context "with callout" do
+      let(:size) { :callout }
+
+      it "renders a pill with none of the standard shape" do
+        tokens = component.css("button").first["class"].split
+        expect(tokens).to include("tw:rounded-full", "tw:font-semibold", "tw:transition-all")
+        expect(tokens & described_class::STANDARD_SHAPE.split).to eq([])
+      end
+    end
   end
 
   context "with active state" do

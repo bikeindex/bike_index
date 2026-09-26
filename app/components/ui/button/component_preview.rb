@@ -111,6 +111,11 @@ module UI
         render(UI::Button::Component.new(text: "Large", size: :lg))
       end
 
+      # The pill for a page's main call to action
+      def callout
+        render(UI::Button::Component.new(text: "Callout", color: :yellow, size: :callout))
+      end
+
       def large_with_icon
         render(UI::Button::Component.new(size: :lg)) do
           '<svg class="tw:w-5 tw:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg> Add Item'.html_safe

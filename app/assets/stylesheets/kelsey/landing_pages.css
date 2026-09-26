@@ -83,20 +83,18 @@
   margin-bottom: 2rem;
 }
 
-/* Unlayered, so it outranks UI::Button's padding, radius and type utilities */
 .kelsey_styles .le-btn-primary {
   padding: 1rem 2.5rem;
   font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
-  border-width: 2px;
   border-radius: 25px;
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.kelsey_styles .le-btn-primary:hover:not(:disabled) {
+.kelsey_styles .le-btn-primary:hover {
   transform: translateY(-2px);
 }
 
