@@ -69,7 +69,7 @@ module Pages
 
           def non_admin_view_link
             render(UI::ButtonLink::Component.new(text: "non-admin view", size: :sm,
-              href: bike_path(@bike.to_param)))
+              href: bike_path(@bike, organization_id: false)))
           end
 
           # Bike.current is the scope that drops all four of the states the alerts explain
