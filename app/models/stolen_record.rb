@@ -188,7 +188,12 @@ class StolenRecord < ApplicationRecord
     # TODO: This should probably be handled on the frontend - so users can set weird values if they really want to
     def corrected_date_stolen(date = nil)
       date = Binxtils::TimeParser.parse(date) || Time.current
-      date = date.change(year: 2000 + date.year % 100) if date.year < Time.current.year - 100
+      year = Time.current.year
+      if date.year < year - 100
+        # The latest year ending in the digits entered - a one-digit year is a partly typed one
+        place = (date.year < 10) ? 10 : 100
+        date = date.change(year: year - (year - date.year) % place)
+      end
       if date > Time.current + 2.days
         updated_year = (date.month < Time.current.month) ? Time.current.year : Time.current.year - 1
         corrected = date.change(year: updated_year)
