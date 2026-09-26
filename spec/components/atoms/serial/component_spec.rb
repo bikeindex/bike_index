@@ -48,7 +48,6 @@ RSpec.describe Atoms::Serial::Component, type: :component do
       end
     end
 
-    # What an org page cached for its members passes, rather than the viewer
     context "for an organization the bike is registered with" do
       let(:bike) { FactoryBot.create(:bike_organized, :impounded, serial_number: "FFF333", cycle_type: :tandem).reload }
       let(:options) { {organization: bike.organizations.first} }

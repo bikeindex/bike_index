@@ -2,10 +2,10 @@
 
 module Atoms
   module Serial
-    # Renders a bike's serial as seen by the given user, or by any member of the given
-    # organization - which is what a page cached for an organization passes. A hidden,
-    # unknown or absent serial renders that word in place of the number, and a hidden
-    # serial is followed by why it's hidden - inline, or in a tooltip.
+    # Renders a bike's serial as seen by the given user, or by the given organization's
+    # members - which a page cached per organization passes. A hidden, unknown or absent
+    # serial renders that word in place of the number, and a hidden serial is followed
+    # by why it's hidden - inline, or in a tooltip.
     # Pass a bike, or a raw serial string.
     class Component < ApplicationComponent
       # What serial_display returns in place of a number
