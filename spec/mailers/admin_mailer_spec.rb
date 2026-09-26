@@ -124,6 +124,27 @@ RSpec.describe AdminMailer, type: :mailer do
     end
   end
 
+  describe "stolen_serial_marketplace_match_email" do
+    let(:listed_bike) { FactoryBot.create(:bike, :with_primary_activity, :with_ownership_claimed, serial_number: "WTU171G0123C") }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: listed_bike) }
+    let(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "WTU171G0123C-X", cycle_type: :tandem) }
+    let(:notification) { Notification.create(kind: :stolen_serial_marketplace_match, bike: listed_bike, notifiable: stolen_bike) }
+    let(:mail) { AdminMailer.stolen_serial_marketplace_match_email(notification) }
+
+    it "renders email" do
+      expect(mail.to).to eq(%w[bryan@bikeindex.org gavin@bikeindex.org])
+      expect(mail.subject).to eq("Marketplace listing's serial matches a stolen registration")
+      expect(mail.tag).to eq("admin")
+      body = mail.deliver_now.html_part.body.to_s
+      expect(body).to include("WTU171G0123C-X")
+        .and include("same tandem")
+        .and include("/admin/bikes/#{listed_bike.to_param}")
+        .and include("/admin/bikes/#{stolen_bike.to_param}")
+        .and include("/bikes/#{stolen_bike.to_param}")
+        .and include("/admin/marketplace_listings/#{marketplace_listing.id}")
+    end
+  end
+
   describe "#theft_alert_notification" do
     context "given notify_of_recovered true" do
       it "renders email with recovered notification" do
