@@ -63,8 +63,19 @@ class InfoController < ApplicationController
   end
 
   def donate
+    # amount is a fixed payment, which the payments page takes
+    return redirect_to_payment if params[:amount].present?
+
     @page_title = "Support Bike Index"
-    render layout: "payments_layout"
+    @skip_general_alert = true
+    render Pages::Donate::Page::Component.new(
+      recovery_displays: RecoveryDisplay.joins(:photo_processed_attachment).with_attached_photo_processed.limit(4),
+      monthly_prices: StripePrice.active.monthly.where(currency_enum: current_currency.slug),
+      currency: current_currency,
+      initial_amount: params[:initial_amount],
+      referral_source: params[:source],
+      current_user:
+    )
   end
 
   def support_bike_index
@@ -92,10 +103,10 @@ class InfoController < ApplicationController
   private
 
   def redirect_to_donation_or_payment
-    if params[:amount].present?
-      redirect_to new_payment_path(amount: params[:amount])
-    else
-      redirect_to donate_url
-    end
+    params[:amount].present? ? redirect_to_payment : redirect_to(donate_url(params.permit(:source, :initial_amount, :currency)))
+  end
+
+  def redirect_to_payment
+    redirect_to new_payment_path(amount: params[:amount], source: params[:source])
   end
 end
