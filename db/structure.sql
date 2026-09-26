@@ -4001,7 +4001,11 @@ CREATE TABLE public.stripe_events (
     stripe_id character varying,
     name character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    payload jsonb,
+    stripe_event_id character varying,
+    stripe_account_id character varying,
+    processed_at timestamp(6) without time zone
 );
 
 
@@ -7546,6 +7550,13 @@ CREATE UNIQUE INDEX index_strava_integrations_on_user_id ON public.strava_integr
 
 
 --
+-- Name: index_stripe_events_on_stripe_event_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_stripe_events_on_stripe_event_id ON public.stripe_events USING btree (stripe_event_id);
+
+
+--
 -- Name: index_stripe_subscriptions_on_membership_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7814,6 +7825,8 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260923120001'),
+('20260923120000'),
 ('20260915181500'),
 ('20260915110042'),
 ('20260912102406'),

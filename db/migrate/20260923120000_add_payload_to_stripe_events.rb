@@ -1,0 +1,9 @@
+class AddPayloadToStripeEvents < ActiveRecord::Migration[8.1]
+  def change
+    add_column :stripe_events, :payload, :jsonb
+    add_column :stripe_events, :stripe_event_id, :string
+    # Set on Stripe Connect events, which arrive on behalf of a connected account
+    add_column :stripe_events, :stripe_account_id, :string
+    add_column :stripe_events, :processed_at, :datetime
+  end
+end

@@ -3,11 +3,19 @@
 # Table name: stripe_events
 # Database name: primary
 #
-#  id         :bigint           not null, primary key
-#  name       :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  stripe_id  :string
+#  id                :bigint           not null, primary key
+#  name              :string
+#  payload           :jsonb
+#  processed_at      :datetime
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  stripe_account_id :string
+#  stripe_event_id   :string
+#  stripe_id         :string
+#
+# Indexes
+#
+#  index_stripe_events_on_stripe_event_id  (stripe_event_id) UNIQUE
 #
 class StripeEvent < ApplicationRecord
   KNOWN_EVENTS = %w[checkout.session.completed customer.subscription.created
@@ -18,7 +26,10 @@ class StripeEvent < ApplicationRecord
   def self.create_from(event)
     data = event["data"]
 
-    stripe_event = create(name: event["type"], stripe_id: data["object"]["id"])
+    # Stripe redelivers an event until it gets a 2xx, so a retry finds the stored row
+    stripe_event = create_with(name: event["type"], stripe_id: data["object"]["id"],
+      stripe_account_id: event["account"], payload: event.to_hash)
+      .create_or_find_by!(stripe_event_id: event["id"])
     stripe_event.data = data
     stripe_event
   end
@@ -51,12 +62,20 @@ class StripeEvent < ApplicationRecord
     # Currently, only handle on creation, when the data object is assigned.
     raise "Stripe Data not assigned, unable to handle" unless @data.present?
 
-    if checkout?
-      if data_object.subscription.present?
-        update_stripe_subscription(Stripe::Subscription.retrieve(data_object.subscription), data_object)
+    # Stripe can deliver an event more than once, even concurrently, and a subscription event
+    # carries the subscription as it was then, so a redelivery could undo a later event.
+    # Jobs enqueued in here have to be after_commit, or they'd run for rolled back work
+    with_lock do
+      next if processed_at.present?
+
+      if checkout?
+        if data_object.subscription.present?
+          update_stripe_subscription(Stripe::Subscription.retrieve(data_object.subscription), data_object)
+        end
+      elsif subscription?
+        update_stripe_subscription(data_object)
       end
-    elsif subscription?
-      update_stripe_subscription(data_object)
+      update!(processed_at: Time.current)
     end
   end
 

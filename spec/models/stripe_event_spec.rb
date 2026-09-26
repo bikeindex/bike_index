@@ -2,15 +2,49 @@ require "rails_helper"
 
 RSpec.describe StripeEvent, type: :model do
   let(:cassette_options) { {match_requests_on: [:method], re_record_interval: 12.months} }
+  let(:stripe_event) { StripeEvent.create_from(Stripe::Event.construct_from(webhook_payload)) }
+
+  describe "create_from" do
+    let(:webhook_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-checkout.session.completed.json"))) }
+    let(:target_attributes) do
+      {
+        name: "checkout.session.completed",
+        stripe_event_id: "evt_0Tb1opm0T0GBfX0veedyxQTJ",
+        stripe_id: "cs_test_a1XzIICn9NZ2p5RoNzP8GLCSMog4c2noU1G4d4V8sgs3MVjZxEYysztFHl",
+        stripe_account_id: nil,
+        payload: webhook_payload
+      }
+    end
+
+    it "stores the payload once per Stripe event" do
+      expect { stripe_event }.to change(StripeEvent, :count).by 1
+      expect(stripe_event).to have_attributes target_attributes
+      expect(stripe_event.reload).to have_attributes target_attributes
+
+      expect { StripeEvent.create_from(Stripe::Event.construct_from(webhook_payload)) }
+        .to_not change(StripeEvent, :count)
+    end
+
+    context "with a Connect event" do
+      let(:webhook_payload) do
+        {
+          "id" => "evt_1Connect", "object" => "event", "type" => "account.updated", "account" => "acct_1Seller",
+          "data" => {"object" => {"id" => "acct_1Seller", "object" => "account", "payouts_enabled" => true}}
+        }
+      end
+      let(:target_attributes) do
+        {name: "account.updated", stripe_event_id: "evt_1Connect", stripe_id: "acct_1Seller",
+         stripe_account_id: "acct_1Seller", payload: webhook_payload}
+      end
+
+      it "stores the connected account" do
+        expect(stripe_event).to have_attributes target_attributes
+        expect(stripe_event.known_event?).to be_falsey
+      end
+    end
+  end
 
   describe "update_bike_index_record!" do
-    let(:event_mock) do
-      # Just uses openstruct, not stripe, but good enough for now
-      object = OpenStruct.new(webhook_payload.dig("data", "object"))
-
-      OpenStruct.new(:type => webhook_payload["type"], "data" => {"object" => object})
-    end
-    let(:stripe_event) { StripeEvent.create_from(event_mock) }
     let!(:stripe_price) { FactoryBot.create(:stripe_price_plus) }
 
     context "subscription stripe_checkout completed" do
@@ -73,19 +107,36 @@ RSpec.describe StripeEvent, type: :model do
         expect(payment.user_id).to be_blank
       end
 
-      context "called twice" do
+      context "create_or_update_from_stripe! called twice" do
         it "only creates the things once" do
           expect do
             VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
-              stripe_event.update_bike_index_record!
-            end
-            VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
-              stripe_event.update_bike_index_record!
+              stripe_subscription_obj = Stripe::Subscription.retrieve(stripe_event.data_object.subscription)
+              2.times do
+                StripeSubscription.create_or_update_from_stripe!(stripe_subscription_obj:,
+                  stripe_checkout_session: stripe_event.data_object)
+              end
             end
           end.to change(StripeSubscription, :count).by(1)
             .and change(Payment, :count).by 1
 
           expect_stripe_subscription_and_payment_to_match_targets(StripeSubscription.last, Payment.last)
+        end
+      end
+
+      context "redelivered" do
+        it "doesn't process it again" do
+          VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
+            stripe_event.update_bike_index_record!
+          end
+          processed_at = stripe_event.reload.processed_at
+          expect(processed_at).to be_present
+
+          # No cassette, so any Stripe request would raise
+          expect do
+            StripeEvent.create_from(Stripe::Event.construct_from(webhook_payload)).update_bike_index_record!
+          end.not_to change(Payment, :count)
+          expect(stripe_event.reload.processed_at).to eq processed_at
         end
       end
 
@@ -181,6 +232,26 @@ RSpec.describe StripeEvent, type: :model do
           expect(membership.start_at).to be_within(1).of stripe_subscription.start_at
           expect(membership.end_at).to be_within(1).of stripe_subscription.end_at
           expect(membership.status).to eq "ended"
+        end
+
+        context "with the created event redelivered after the delete" do
+          let(:created_payload) { JSON.parse(File.read(Rails.root.join("spec/fixtures/stripe_webhook-customer.subscription.created.json"))) }
+
+          def process_event(payload)
+            StripeEvent.create_from(Stripe::Event.construct_from(payload)).update_bike_index_record!
+          end
+
+          it "doesn't apply the created event again" do
+            process_event(created_payload)
+            expect(stripe_subscription.reload.stripe_status).to eq "incomplete"
+            stripe_event.update_bike_index_record!
+            expect(stripe_subscription.reload.stripe_status).to eq "canceled"
+            expect(stripe_event.reload.processed_at).to be_present
+
+            process_event(created_payload)
+            expect(stripe_subscription.reload.stripe_status).to eq "canceled"
+            expect(stripe_subscription.membership.status).to eq "ended"
+          end
         end
       end
     end

@@ -38,9 +38,8 @@ RSpec.describe WebhooksController, type: :request do
 
           expect(response).to have_http_status(:ok)
           expect(json_result).to eq({"success" => true})
-          stripe_event = StripeEvent.last
-          expect(stripe_event.name).to eq "checkout.session.completed"
-          expect(stripe_event.stripe_id).to be_present
+          stripe_event = StripeEvent.find_by(stripe_id: "cs_test_a1XzIICn9NZ2p5RoNzP8GLCSMog4c2noU1G4d4V8sgs3MVjZxEYysztFHl")
+          expect(stripe_event).to have_attributes(name: "checkout.session.completed", payload: JSON.parse(payload))
           stripe_subscription = StripeSubscription.last
           expect(stripe_subscription.start_at).to be_within(1).of start_at
           expect(stripe_subscription.end_at).to be_blank
@@ -49,6 +48,26 @@ RSpec.describe WebhooksController, type: :request do
           expect(stripe_subscription.membership_id).to be_blank
           expect(stripe_subscription.payments.count).to eq 1
         end
+      end
+
+      it "doesn't process a redelivered event again" do
+        Sidekiq::Job.drain_all
+        ActionMailer::Base.deliveries = []
+
+        VCR.use_cassette("WebhooksController-checkout_session-completed", **cassette_options) do
+          expect do
+            2.times do
+              post webhook_url,
+                params: payload,
+                headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
+              expect(response).to have_http_status(:ok)
+            end
+          end.to change(StripeEvent, :count).by(1)
+            .and change(Payment, :count).by(1)
+        end
+
+        Sidekiq::Job.drain_all
+        expect(ActionMailer::Base.deliveries.count).to eq 1
       end
     end
 
@@ -137,10 +156,27 @@ RSpec.describe WebhooksController, type: :request do
       end
     end
 
-    # TODO: Someday, handle this - not a high priority though
-    # context "unknown event type" do
-    #   it "returns 400"
-    # end
+    context "with an unhandled dispute event" do
+      let(:payload) do
+        {
+          id: "evt_1Dispute", object: "event", type: "charge.dispute.created",
+          data: {object: {id: "dp_1Dispute", object: "dispute", charge: "ch_1Charge", amount: 999}}
+        }.to_json
+      end
+
+      it "stores the payload and returns 200" do
+        expect do
+          post webhook_url,
+            params: payload,
+            headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
+        end.to change(StripeEvent, :count).by 1
+
+        expect(response).to have_http_status(:ok)
+        expect(json_result).to eq({"success" => true})
+        expect(StripeEvent.find_by(stripe_id: "dp_1Dispute")).to have_attributes(processed_at: nil,
+          name: "charge.dispute.created", stripe_event_id: "evt_1Dispute", payload: JSON.parse(payload))
+      end
+    end
   end
 
   describe "strava" do
