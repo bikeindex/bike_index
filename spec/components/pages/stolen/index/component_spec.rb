@@ -24,7 +24,7 @@ RSpec.describe Pages::Stolen::Index::Component, type: :component do
     expect(component).to have_text("1,000+")
     expect(component).to have_css("details[open]", count: 1)
     expect(component).to have_css("details[name='stolen-faq']", count: 5)
-    expect(component).to have_link("Register your stolen bike", href: "/register?status=status_stolen")
+    expect(component).to have_link("Register your stolen bike", href: "/register/new?status=status_stolen")
     expect(component).to have_link("Sign in", href: "/session/new")
     expect(component).to_not have_css("form#new_feedback")
   end
@@ -41,7 +41,7 @@ RSpec.describe Pages::Stolen::Index::Component, type: :component do
 
   context "with more recovery displays than it shows" do
     let(:recovery_displays) do
-      Array.new(5) { |i| FactoryBot.build(:recovery_display, quote: "Quote #{i}", quote_by: "Owner #{i}") }
+      Array.new(5) { |i| FactoryBot.create(:recovery_display_with_photo, quote: "Quote #{i}", quote_by: "Owner #{i}") }
     end
 
     it "renders the first four, hiding the last two on mobile" do

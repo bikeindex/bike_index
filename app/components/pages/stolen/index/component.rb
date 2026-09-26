@@ -24,11 +24,11 @@ module Pages
 
         private
 
-        def register_stolen_path = register_path(status: "status_stolen")
+        def register_stolen_path = new_register_path(status: "status_stolen")
 
         def stats
           [{value: number_display(@recoveries_count), label: translation(".stolen_bikes_recovered")},
-            {value: "#{as_currency(@recoveries_value / 1_000_000)}M+",
+            {value: render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value)),
              label: translation(".value_returned_to_owners")},
             {value: safe_join([number_display(@organizations_count), "+"]),
              label: translation(".partner_organizations")},
@@ -86,7 +86,7 @@ module Pages
         def resources
           [[translation(".resource_what_to_do"), get_your_stolen_bike_back_path],
             [translation(".resource_safety_tips"), news_path("bike-safety-tips-for-recovering-your-own-bicycle")],
-            [translation(".resource_register_found"), register_path(status: "found")],
+            [translation(".resource_register_found"), new_register_path(status: "found")],
             [translation(".resource_portland"), news_path("what-to-do-when-your-bike-is-stolen-in-portland-oregon")],
             [translation(".resource_seattle"), news_path("what-to-do-when-your-bike-has-been-stolen-in-seattle")],
             [translation(".resource_bay_area"), news_path("what-to-do-when-your-bike-has-been-stolen-in-the-bay-area")],

@@ -319,10 +319,8 @@
               <%= index > 1 ? "tw:hidden tw:sm:flex" : "tw:flex" %>
             "
           >
-            <% if recovery_display.photo_url.present? %>
-              <%= image_tag(recovery_display.photo_url, alt: recovery_display.image_alt,
-                class: "tw:h-45 tw:w-full tw:object-cover tw:lg:h-42", loading: "lazy") %>
-            <% end %>
+            <%= image_tag(recovery_display.photo_url, alt: recovery_display.image_alt,
+              class: "tw:h-45 tw:w-full tw:object-cover tw:lg:h-42", loading: "lazy") %>
 
             <div
               class="
@@ -335,9 +333,11 @@
               </blockquote>
 
               <p class="tw:m-0 tw:text-[11.5px]">
-                <strong class="tw:mr-1 tw:text-[13.5px] tw:font-extrabold tw:text-slate-900">
-                  <%= recovery_display.quote_by %>
-                </strong>
+                <% if recovery_display.quote_by.present? %>
+                  <strong class="tw:mr-1 tw:text-[13.5px] tw:font-extrabold tw:text-slate-900">
+                    <%= recovery_display.quote_by %>
+                  </strong>
+                <% end %>
 
                 <%= translation(".recovered") %>
                 <%= render(UI::Time::Component.new(time: recovery_display.recovered_at)) %>

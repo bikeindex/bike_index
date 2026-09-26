@@ -26,7 +26,7 @@ class FeedbacksController < ApplicationController
       template = "#{re_path[:controller]}/#{re_path[:action]}"
       @force_landing_page_render = re_path[:controller] == "landing_pages"
       @page_id = [re_path[:controller], re_path[:action]].join("_")
-      @recovery_displays = RecoveryDisplay.limit(5) if template == "welcome/index"
+      @recovery_displays = RecoveryDisplay.with_photo.limit(5) if template == "welcome/index"
       render template: template
     end
   end

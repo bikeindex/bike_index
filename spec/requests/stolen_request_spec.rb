@@ -2,7 +2,8 @@ require "rails_helper"
 
 RSpec.describe StolenController, type: :request do
   describe "index" do
-    let!(:recovery_display) { FactoryBot.create(:recovery_display, quote: "Found it on my alert", quote_by: "Sandy") }
+    let!(:recovery_display) { FactoryBot.create(:recovery_display_with_photo, quote: "Found it on my alert", quote_by: "Sandy") }
+    let!(:recovery_display_without_photo) { FactoryBot.create(:recovery_display, quote: "Still processing") }
 
     it "renders with layout even if text" do
       get "/stolen.txt"
@@ -10,14 +11,17 @@ RSpec.describe StolenController, type: :request do
       expect(response.media_type).to eq "text/html"
       expect(response.body).to match("Your bike is gone.")
       expect(response.body).to match("Found it on my alert")
-      expect(response.body).to include(register_path(status: "status_stolen"))
+      expect(response.body).to_not match("Still processing")
+      expect(response.body).to include(new_register_path(status: "status_stolen"))
     end
 
-    # ?stolen=true was dropped on the bare /register's redirect to new
-    it "links to a registration that starts stolen" do
+    it "links to a registration that starts stolen, over an abandoned one" do
+      get "/register/new"
+      abandoned = BParam.last
       get "/stolen"
       get Nokogiri::HTML(response.body).at("a:contains('Register your stolen bike')")["href"]
       follow_redirect!
+      expect(BParam.last.id).to_not eq abandoned.id
       expect(BParam.last.status).to eq "status_stolen"
     end
   end
