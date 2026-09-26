@@ -1,5 +1,8 @@
 # Seeding isn't idempotent: a re-run over seeded records dies on duplicates
-return if Bike.unscoped.exists?
+if Bike.unscoped.exists?
+  puts "Database already seeded"
+  return
+end
 
 # Development logs every query with its caller's backtrace, which is over a third of seeding
 Rails.logger.level = :info

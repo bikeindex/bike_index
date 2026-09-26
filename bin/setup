@@ -89,16 +89,14 @@ FileUtils.chdir APP_ROOT do
   # The layout needs tailwind.css and emails (which seeding sends) need email.css; without
   # the build Sprockets tries compiling email.scss with sassc
   tasks = %w[db:prepare tailwindcss:build dartsass:build log:clear]
-  tasks += %w[db:seed setup:load_counts] unless without_seeds
+  unless without_seeds
+    tasks += %w[db:seed setup:load_counts]
+    # Opt-in, matching lib/tasks/parallel_migrate.rake
+    tasks += %w[parallel:create parallel:prepare] unless ENV["PARALLEL_MIGRATIONS"].to_s.strip.empty?
+  end
   puts "\n== Running #{tasks.join(" ")} =="
   system!("bin/rails", *tasks)
   Process.wait(npm_install)
-
-  # Opt-in, matching lib/tasks/parallel_migrate.rake
-  unless without_seeds || ENV["PARALLEL_MIGRATIONS"].to_s.strip.empty?
-    puts "\n== Preparing parallel test databases =="
-    system! "bin/rake parallel:prepare"
-  end
 
   puts "\n== Restarting application server =="
   system! "bin/rails restart"
