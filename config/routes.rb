@@ -189,6 +189,7 @@ Rails.application.routes.draw do
   # ?step=1|2|report|3…|review|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register do
     get :embed
+    get :landing
     patch :report
     patch :acknowledge
     # The emailed confirmation link, and the form it posts itself to

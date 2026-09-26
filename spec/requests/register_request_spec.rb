@@ -364,6 +364,32 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
+  describe "landing" do
+    it "renders step 1 in the page, posting into the flow on the session's registration" do
+      expect { get "/register/landing" }.to change(BParam, :count).by 1
+      expect(response.status).to eq 200
+      landing_b_param = BParam.last
+      expect(landing_b_param.origin).to eq "register_flow"
+      expect(response.body).to include("Give your bike a way home.", "Fund the next recovery", "</html>")
+      expect(response.body).to include(%(value="#{landing_b_param.id_token}"))
+      # Turbo, persisted and challenged like the flow's own step 1, but it doesn't grab focus
+      expect(response.body).to match(/<form[^>]*data-turbo="true"/)
+      expect(response.body).to_not match(/<form[^>]*data-controller="autofocus/)
+      expect(response.headers["Cache-Control"]).to eq "no-store"
+
+      # The session's still-blank registration, rather than one per view
+      expect { get "/register/landing" }.to_not change(BParam, :count)
+
+      post base_url, params: {b_param_token: landing_b_param.id_token,
+                              b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
+      expect(response).to redirect_to register_path(b_param_token: landing_b_param.id_token, step: 2)
+      expect(landing_b_param.reload).to have_attributes(owner_email:, manufacturer_id: manufacturer.id)
+
+      # Submitted, so the next visit starts another
+      expect { get "/register/landing" }.to change(BParam, :count).by 1
+    end
+  end
+
   describe "show step: 1" do
     it "renders" do
       get register_path(b_param_token: b_param.id_token, step: 1)

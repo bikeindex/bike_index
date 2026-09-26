@@ -5,12 +5,14 @@ module Pages
     module Step1
       # Step 1 of the registration flow: the quick-start form
       class Component < ApplicationComponent
-        def initialize(b_param:, steps:, current_user: nil, embed: false, button_color: nil,
+        # landing: in Pages::Register::Landing's hero card, which supplies the shell
+        def initialize(b_param:, steps:, current_user: nil, embed: false, landing: false, button_color: nil,
           button_hover_color: nil, skip_heading: false)
           @b_param = b_param
           @steps = steps
           @current_user = current_user
           @embed = embed
+          @landing = landing
           @button_color = button_color
           @button_hover_color = button_hover_color
           @skip_heading = skip_heading
@@ -21,11 +23,12 @@ module Pages
         # What a frame can't have: a Turbo submission, which Turbo would render back inside it
         # (the target is ignored unless it names an iframe); autofocus, which scrolls the
         # embedding page down to the frame on load; and form-persist, whose localStorage is
-        # partitioned per embedding site and blocked outright in Safari
+        # partitioned per embedding site and blocked outright in Safari.
+        # The landing page skips autofocus too, which would scroll past its hero
         def form_options
           return {data: {turbo: false}, html: {target: "_top"}} if @embed
 
-          {data: {turbo: true, controller: "autofocus form-persist register--retry ui--forms--turnstile",
+          {data: {turbo: true, controller: "#{"autofocus " unless @landing}form-persist register--retry ui--forms--turnstile",
                   form_persist_key_value: "register-start-#{@b_param.id_token}",
                   "ui--forms--turnstile-domains-value": EmailDomain::RISKY_EMAIL_DOMAINS.to_json,
                   "ui--forms--turnstile-script-url-value": UI::Forms::Turnstile::Component::SCRIPT_URL,
