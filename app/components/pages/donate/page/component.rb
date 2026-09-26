@@ -7,8 +7,6 @@ module Pages
       # payment. The cadence radios switch between the two forms in CSS, so both submit
       # without javascript - the donate--page controller only keeps the labels in step.
       class Component < ApplicationComponent
-        # Checkout charges the level's active monthly StripePrice, which has to match these
-        MONTHLY_TIERS = {basic: 5, plus: 15, patron: 50}.freeze
         ONE_TIME_AMOUNTS = [25, 50, 100].freeze
         MAJOR_AMOUNTS = [500, 1000].freeze
 
@@ -20,9 +18,11 @@ module Pages
           wh198hgo27wt25cc83xhwzi4h439
         ].map { "https://uploads.bikeindex.org/#{it}" }.freeze
 
-        def initialize(recovery_displays:, currency: Currency.default, initial_amount: nil, referral_source: nil,
-          current_user: nil)
+        # monthly_prices: the active monthly StripePrices in currency, which checkout charges
+        def initialize(recovery_displays:, monthly_prices:, currency: Currency.default, initial_amount: nil,
+          referral_source: nil, current_user: nil)
           @recovery_displays = recovery_displays
+          @monthly_prices = monthly_prices.to_h { [it.membership_level.to_sym, it] }
           @currency = currency
           @initial_amount = initial_amount.to_i if initial_amount.to_i.positive?
           @referral_source = referral_source
@@ -32,7 +32,9 @@ module Pages
 
         private
 
-        def one_time? = @member || @initial_amount.present?
+        def monthly? = !@member && @monthly_prices.any?
+
+        def one_time? = !monthly? || @initial_amount.present?
 
         def custom_amount
           @initial_amount unless ONE_TIME_AMOUNTS.include?(@initial_amount)
@@ -40,9 +42,15 @@ module Pages
 
         def selected_one_time = @initial_amount || 50
 
-        def money(dollars) = MoneyFormatter.money_format_without_cents(dollars * 100, @currency)
+        def money(dollars)
+          return MoneyFormatter.money_format_without_cents(dollars * 100, @currency) if dollars % 1 == 0
 
-        def tier_amount(level) = money(MONTHLY_TIERS[level])
+          MoneyFormatter.money_format(dollars * 100, @currency)
+        end
+
+        def tier_amount(level) = money(@monthly_prices[level].amount)
+
+        def default_tier = @monthly_prices.key?(:plus) ? :plus : tiers.first.first
 
         def monthly_label(amount) = translation(".monthly_submit", amount:)
 
@@ -50,7 +58,7 @@ module Pages
 
         def one_time_submit = one_time_label(money(selected_one_time))
 
-        def monthly_submit = monthly_label(tier_amount(:plus))
+        def monthly_submit = monthly_label(tier_amount(default_tier))
 
         def submit_label = one_time? ? one_time_submit : monthly_submit
 
@@ -58,7 +66,8 @@ module Pages
           [
             [abbreviated(Counts.total_bikes), translation(".stat_bikes")],
             [number_display(Counts.recoveries), translation(".stat_recoveries")],
-            [safe_join([@currency.symbol, number_display((Counts.recoveries_value / 1_000_000.0).round(1)), "M"]),
+            # Counted in USD, whatever the page's currency
+            [safe_join([Currency.default.symbol, number_display((Counts.recoveries_value / 1_000_000.0).round(1)), "M"]),
               translation(".stat_value")],
             [safe_join([number_display(Counts.organizations.floor(-2)), "+"]), translation(".stat_partners")]
           ]
@@ -75,7 +84,7 @@ module Pages
             [:basic, translation(".tier_basic"), translation(".tier_basic_benefit")],
             [:plus, translation(".tier_plus"), translation(".tier_plus_benefit")],
             [:patron, translation(".tier_patron"), translation(".tier_patron_benefit")]
-          ]
+          ].select { |level, _, _| @monthly_prices.key?(level) }
         end
 
         def major_gifts

@@ -84,18 +84,36 @@ RSpec.describe InfoController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template("layouts/application")
         expect(response.body).to include("Fund the next recovery")
-        expect(response.body).to match(/name="referral_source"[^>]*value="newsletter"/)
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="newsletter"/)
       end
 
       context "signed in with a membership" do
         include_context :request_spec_logged_in_as_user
-        before { FactoryBot.create(:membership, user: current_user) }
+        before do
+          FactoryBot.create(:stripe_price_basic)
+          FactoryBot.create(:membership, user: current_user)
+        end
 
         it "links to the membership rather than offering a second one" do
           get "/donate"
           expect(response.status).to eq(200)
           expect(response.body).to include(edit_membership_path)
           expect(response.body).to_not include('action="/membership"')
+        end
+      end
+
+      context "with a currency" do
+        before do
+          FactoryBot.create(:stripe_price_basic)
+          FactoryBot.create(:stripe_price, membership_level: "plus", amount_cents: 1299, currency_enum: "cad")
+        end
+
+        it "checks out in it, showing its monthly prices" do
+          get "/donate?currency=cad"
+          expect(response.body).to match(/name="currency"[^>]*value="cad"/)
+          expect(response.body).to match(/name="payment\[currency\]"[^>]*value="CAD"/)
+          expect(response.body).to include("Become a member — $12.99/month")
+          expect(response.body).to_not include("Basic membership")
         end
       end
 
@@ -158,6 +176,12 @@ RSpec.describe InfoController, type: :request do
     it "redirects support_the_index" do
       get "/support_the_index"
       expect(response).to redirect_to donate_path
+    end
+    it "keeps the params donate reads" do
+      %w[/support_bike_index /support_the_index /support_the_bike_index].each do |path|
+        get "#{path}?source=newsletter&initial_amount=500&currency=cad&other=x"
+        expect(response).to redirect_to donate_url(source: "newsletter", initial_amount: "500", currency: "cad")
+      end
     end
     it "redirects support_the_index" do
       get "/support_bike_index"

@@ -5,13 +5,18 @@ module Pages
     module Page
       class ComponentPreview < ApplicationComponentPreview
         def default
-          render(Pages::Donate::Page::Component.new(recovery_displays: RecoveryDisplay.joins(:photo_processed_attachment).limit(4)))
+          render(Pages::Donate::Page::Component.new(recovery_displays: RecoveryDisplay.joins(:photo_processed_attachment).limit(4),
+            monthly_prices:))
         end
 
         # From a major gift link, or a newsletter's "donate $500"
         def initial_amount
-          render(Pages::Donate::Page::Component.new(recovery_displays: [], initial_amount: "500"))
+          render(Pages::Donate::Page::Component.new(recovery_displays: [], monthly_prices:, initial_amount: "500"))
         end
+
+        private
+
+        def monthly_prices = StripePrice.active.monthly.where(currency_enum: Currency.default.slug)
       end
     end
   end

@@ -15,8 +15,9 @@
 <% selectable = "tw:transition-colors tw:hover:border-[#a9d2f0] tw:is-active:border-blue-600 tw:is-active:ring-1 tw:is-active:ring-blue-600" %>
 <% row = "tw:group/row tw:flex tw:cursor-pointer tw:items-center tw:gap-3 tw:px-3.5 tw:py-4 tw:xs:gap-4 tw:xs:px-4.5 tw:has-focus-visible:ring-3 tw:has-focus-visible:ring-blue-500/40 #{card} #{selectable}" %>
 <% amount_classes = "tw:font-header tw:text-[19px] tw:font-extrabold tw:group-has-checked/row:text-blue-600 tw:lg:text-[22px] tw:dark:group-has-checked/row:text-blue-400 #{ink}" %>
-<% pill = "tw:rounded-full! tw:px-4! tw:py-4! tw:text-[13px]! tw:font-semibold! tw:tracking-wide tw:xs:text-sm! tw:xs:tracking-wider tw:uppercase tw:transition! tw:hover:-translate-y-0.5 tw:hover:brightness-110" %>
-<% submit_button = ->(text) { render UI::Button::Component.new(text:, color: :primary, type: "submit", html_class: "#{pill} tw:mt-2 tw:w-full", data: {donate__page_target: "submit"}) } %>
+
+<%# the callout's 40px padding and 16px type don't fit a label in the 404px card %>
+<% submit_button = ->(text) { render UI::Button::Component.new(text:, color: :primary, size: :callout, type: "submit", html_class: "tw:mt-2 tw:w-full tw:px-4! tw:text-xs! tw:xs:text-sm!", data: {donate__page_target: "submit"}) } %>
 
 <div
   class="
@@ -26,7 +27,7 @@
   data-controller="donate--page"
   data-donate--page-monthly-label-value="<%= monthly_label("%{amount}") %>"
   data-donate--page-one-time-label-value="<%= one_time_label("%{amount}") %>"
-  data-donate--page-currency-value="<%= @currency.name %>"
+  data-donate--page-currency-symbol-value="<%= @currency.symbol %>"
 >
   <div class="tw:grid tw:grid-cols-3 tw:gap-[3px] tw:bg-[#2c3e50] tw:md:grid-cols-7">
     <% WALL_PHOTOS.each do |url| %>
@@ -100,24 +101,29 @@
           <%= translation(".form_title") %>
         </h2>
 
-        <div
-          class="tw:flex tw:border-b tw:border-[#e0e0e0] tw:dark:border-gray-700"
-          role="radiogroup"
-          aria-label="<%= translation(".cadence") %>"
-        >
-          <% [["monthly", translation(".monthly")], ["one-time", translation(".one_time")]].each do |cadence, label| %>
-            <label
-              class="
-                tw:-mb-px tw:flex-1 tw:cursor-pointer tw:border-b-3
-                tw:border-transparent tw:py-2.75 tw:text-center tw:text-sm
-                tw:font-semibold tw:tracking-wider tw:text-[#666]
-                tw:uppercase tw:has-checked:border-blue-500
-                tw:has-checked:text-blue-500 tw:has-focus-visible:bg-blue-50
-                tw:lg:text-[15px] tw:dark:text-gray-400
-                tw:dark:has-focus-visible:bg-gray-700
-              "
-            >
-              <%= radio_button_tag :donate_cadence,
+        <% if monthly? %>
+          <div
+            class="
+              tw:flex tw:border-b tw:border-[#e0e0e0]
+              tw:dark:border-gray-700
+            "
+            role="radiogroup"
+            aria-label="<%= translation(".cadence") %>"
+          >
+            <% [["monthly", translation(".monthly")], ["one-time", translation(".one_time")]].each do |cadence, label| %>
+              <label
+                class="
+                  tw:-mb-px tw:flex-1 tw:cursor-pointer tw:border-b-3
+                  tw:border-transparent tw:py-2.75 tw:text-center tw:text-sm
+                  tw:font-semibold tw:tracking-wider tw:text-[#666]
+                  tw:uppercase tw:has-checked:border-blue-500
+                  tw:has-checked:text-blue-500
+                  tw:has-focus-visible:bg-blue-50 tw:lg:text-[15px]
+                  tw:dark:text-gray-400
+                  tw:dark:has-focus-visible:bg-gray-700
+                "
+              >
+                <%= radio_button_tag :donate_cadence,
               cadence,
               (cadence == "one-time") == one_time?,
               id: "donate-cadence-#{cadence}",
@@ -128,10 +134,11 @@
                 action: "donate--page#update",
               } %>
 
-              <%= label %>
-            </label>
-          <% end %>
-        </div>
+                <%= label %>
+              </label>
+            <% end %>
+          </div>
+        <% end %>
 
         <div
           class="
@@ -139,33 +146,33 @@
             tw:group-has-[#donate-cadence-one-time:checked]/donate:hidden
           "
         >
-          <div
-            class="
-              tw:rounded-lg tw:border tw:border-[#a9d2f0] tw:bg-[#e8f3fc]
-              tw:px-3.75 tw:py-3.25 tw:text-[14.5px] tw:text-[#444]
-              tw:dark:border-blue-900 tw:dark:bg-blue-950
-              tw:dark:text-gray-200
-            "
-          >
-            <% if @member %>
-              <p class="tw:mb-1"><%= translation(".already_member") %></p>
-              <%= link_to translation(".manage_membership"),
+          <% if @member || monthly? %>
+            <div
+              class="
+                tw:rounded-lg tw:border tw:border-[#a9d2f0] tw:bg-[#e8f3fc]
+                tw:px-3.75 tw:py-3.25 tw:text-[14.5px] tw:text-[#444]
+                tw:dark:border-blue-900 tw:dark:bg-blue-950
+                tw:dark:text-gray-200
+              "
+            >
+              <% if @member %>
+                <p class="tw:mb-1"><%= translation(".already_member") %></p>
+                <%= link_to translation(".manage_membership"),
               edit_membership_path,
               class: "twlink tw:font-bold" %>
-            <% else %>
-              <p class="tw:mb-1">
-                <%= translation(".membership_note",
-                basic: tier_amount(:basic),
-                plus: tier_amount(:plus),
-                patron: tier_amount(:patron)) %>
-              </p>
-              <%= link_to translation(".membership_link"),
+              <% else %>
+                <p class="tw:mb-1">
+                  <%= translation(".membership_note",
+                amounts: tiers.map { |level, _, _| tier_amount(level) }.to_sentence) %>
+                </p>
+                <%= link_to translation(".membership_link"),
               membership_path,
               class: "twlink tw:font-bold" %>
-            <% end %>
-          </div>
+              <% end %>
+            </div>
+          <% end %>
 
-          <% unless @member %>
+          <% if monthly? %>
             <%= form_tag membership_path, method: :post, class: "tw:flex tw:flex-col tw:gap-2.25", data: {donate__page_target: "monthlyForm"} do %>
               <%= hidden_field_tag "membership[set_interval]", "monthly", id: nil %>
               <%= hidden_field_tag :currency, @currency.slug, id: nil %>
@@ -180,7 +187,7 @@
                   <label class="<%= row %>">
                     <%= radio_button_tag "membership[level]",
                     level,
-                    level == :plus,
+                    level == default_tier,
                     class: "tw:sr-only",
                     autocomplete: "off",
                     data: {
@@ -215,7 +222,10 @@
         <%= form_tag payments_path,
         method: :post,
         class:
-          "tw:hidden tw:flex-col tw:gap-2.25 tw:group-has-[#donate-cadence-one-time:checked]/donate:flex",
+          class_names(
+            "tw:flex-col tw:gap-2.25",
+            monthly? ? "tw:hidden tw:group-has-[#donate-cadence-one-time:checked]/donate:flex" : "tw:flex",
+          ),
         data: {
           donate__page_target: "oneTimeForm",
         } do %>
@@ -223,14 +233,6 @@
           <%= hidden_field_tag "payment[currency]", @currency.name, id: nil %>
           <%= hidden_field_tag "payment[email]", @email, id: nil %>
           <%= hidden_field_tag "payment[referral_source]", @referral_source, id: nil %>
-
-          <%= hidden_field_tag "payment[amount_cents]",
-          custom_amount && custom_amount * 100,
-          id: nil,
-          disabled: custom_amount.blank?,
-          data: {
-            donate__page_target: "customCents",
-          } %>
 
           <fieldset class="tw:flex tw:flex-col tw:gap-2.25">
             <legend class="tw:sr-only"><%= translation(".one_time") %></legend>
@@ -273,6 +275,7 @@
               step="0.01"
               inputmode="decimal"
               autocomplete="off"
+              name="payment[amount]"
               value="<%= custom_amount %>"
               placeholder="<%= translation(".other_amount") %>"
               class="
@@ -488,7 +491,8 @@
       <%= render UI::Button::Component.new(
         text: submit_label,
         color: :yellow,
-        html_class: "#{pill} tw:w-full tw:md:w-auto tw:md:px-7! tw:lg:text-[15.5px]!",
+        size: :callout,
+        html_class: "tw:w-full tw:md:w-auto tw:max-md:px-4! tw:max-xs:text-xs!",
         data: {
           donate__page_target: "submit",
           action: "donate--page#submitActive"

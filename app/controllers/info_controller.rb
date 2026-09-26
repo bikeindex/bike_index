@@ -70,6 +70,8 @@ class InfoController < ApplicationController
     @skip_general_alert = true
     render Pages::Donate::Page::Component.new(
       recovery_displays: RecoveryDisplay.joins(:photo_processed_attachment).with_attached_photo_processed.limit(4),
+      monthly_prices: StripePrice.active.monthly.where(currency_enum: current_currency.slug),
+      currency: current_currency,
       initial_amount: params[:initial_amount],
       referral_source: params[:source],
       current_user:
@@ -101,7 +103,7 @@ class InfoController < ApplicationController
   private
 
   def redirect_to_donation_or_payment
-    params[:amount].present? ? redirect_to_payment : redirect_to(donate_url)
+    params[:amount].present? ? redirect_to_payment : redirect_to(donate_url(params.permit(:source, :initial_amount, :currency)))
   end
 
   def redirect_to_payment
