@@ -235,7 +235,7 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
 
   describe "remove_partial_registrations" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:partial_registration) { FactoryBot.create(:b_param_partial_registration, owner_email: "stuff@things.COM", origin: "embed_partial", organization: organization) }
+    let!(:partial_registration) { FactoryBot.create(:b_param_partial_registration, owner_email: "stuff@things.COM", organization:) }
     let(:bike) { FactoryBot.create(:bike, owner_email: "stuff@things.com") }
     let(:user) { FactoryBot.create(:user_confirmed, email: "stuff@things.com") }
     let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: user) }
@@ -244,7 +244,6 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
       expect(bike.creation_organization_id).to be_blank
       expect(bike.current_ownership.organization_id).to be_blank
       expect(bike.current_ownership.origin).to eq "web"
-      expect(partial_registration.partial_registration?).to be_truthy
       expect(partial_registration.with_bike?).to be_falsey
       instance.perform(bike.id)
       partial_registration.reload
@@ -257,13 +256,94 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
       expect(bike.organizations.pluck(:id)).to eq([organization.id])
       expect(bike.send(:editable_organization_ids)).to eq([organization.id])
     end
+    context "register flow partial registration" do
+      let(:manufacturer_id) { bike.manufacturer_id }
+      let!(:partial_registration) do
+        FactoryBot.create(:b_param, creator: nil, origin: "register_flow_organized",
+          params: {bike: {manufacturer_id:, owner_email: "stuff@things.COM", creation_organization_id: organization.id}})
+      end
+      it "assigns the partial registration" do
+        expect(BParam.partial_registrations.pluck(:id)).to eq([partial_registration.id])
+        instance.perform(bike.id)
+        expect(partial_registration.reload.created_bike).to eq bike
+        expect(bike.reload.current_ownership.organization_id).to eq organization.id
+        expect(bike.current_ownership.origin).to eq "register_flow_organized"
+      end
+      context "with a different manufacturer" do
+        let(:manufacturer_id) { Manufacturer.other.id }
+        it "doesn't assign it, since it's likely another bike" do
+          instance.perform(bike.id)
+          expect(partial_registration.reload.with_bike?).to be_falsey
+          expect(bike.reload.current_ownership.origin).to eq "web"
+        end
+      end
+      context "with more step 1 registrations" do
+        let!(:partial_registration_same) do
+          FactoryBot.create(:b_param, creator: nil, origin: "register_flow",
+            params: {bike: {manufacturer_id:, cycle_type: bike.cycle_type, owner_email: "stuff@things.com"}})
+        end
+        let!(:partial_registration_other_type) do
+          FactoryBot.create(:b_param, creator: nil, origin: "register_flow",
+            params: {bike: {manufacturer_id:, cycle_type: "tandem", owner_email: "stuff@things.com"}})
+        end
+        it "assigns every one of the same make and type, attributed to the one with an organization" do
+          instance.perform(bike.id)
+          expect(partial_registration.reload.created_bike).to eq bike
+          expect(partial_registration_same.reload.created_bike).to eq bike
+          expect(partial_registration_other_type.reload.with_bike?).to be_falsey
+          expect(bike.reload.current_ownership.origin).to eq "register_flow_organized"
+          expect(bike.current_ownership.organization_id).to eq organization.id
+        end
+      end
+      context "past step 1" do
+        let(:serial_number) { bike.serial_number }
+        let!(:partial_registration) do
+          FactoryBot.create(:b_param, creator: nil, origin: "register_flow_organized",
+            params: {details_completed: true, bike: {manufacturer_id:, owner_email: "stuff@things.com",
+                                                     creation_organization_id: organization.id, serial_number:, year: "2020",
+                                                     primary_frame_color_id: bike.primary_frame_color_id.to_s, status: "status_with_owner"}})
+        end
+        before { bike.update(year: 2020) }
+        it "assigns it" do
+          instance.perform(bike.id)
+          expect(partial_registration.reload.created_bike).to eq bike
+          expect(bike.reload.current_ownership.origin).to eq "register_flow_organized"
+        end
+        context "with a different serial" do
+          let(:serial_number) { "something else" }
+          it "doesn't assign it" do
+            instance.perform(bike.id)
+            expect(partial_registration.reload.with_bike?).to be_falsey
+            expect(bike.reload.current_ownership.origin).to eq "web"
+          end
+        end
+      end
+      context "with an email that only contains the bike's owner email" do
+        let!(:partial_registration) do
+          FactoryBot.create(:b_param, creator: nil, origin: "register_flow",
+            params: {bike: {manufacturer_id:, owner_email: "morestuff@things.com"}})
+        end
+        it "doesn't assign it" do
+          expect(BParam.partial_registrations.pluck(:id)).to eq([partial_registration.id])
+          instance.perform(bike.id)
+          expect(partial_registration.reload.with_bike?).to be_falsey
+          expect(bike.reload.current_ownership.origin).to eq "web"
+        end
+      end
+      context "bike without an owner email" do
+        before { bike.update_column :owner_email, "" }
+        it "doesn't assign it" do
+          instance.perform(bike.id)
+          expect(partial_registration.reload.with_bike?).to be_falsey
+        end
+      end
+    end
     context "bike already has organization" do
       let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: user, organization: FactoryBot.create(:organization)) }
       it "does not assign" do
         og_organization_id = ownership.organization_id
         expect(bike.current_ownership.organization_id).to be_present
         expect(bike.current_ownership.origin).to eq "web"
-        expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
         instance.perform(bike.id)
         partial_registration.reload
@@ -280,7 +360,6 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
         expect(bike.creation_organization_id).to be_blank
         expect(bike.current_ownership.organization_id).to be_blank
         expect(bike.current_ownership.origin).to eq "api_v2"
-        expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
         instance.perform(bike.id)
         partial_registration.reload
@@ -296,9 +375,7 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
       let(:manufacturer) { bike.manufacturer }
       let!(:partial_registration_accurate) { FactoryBot.create(:b_param_partial_registration, owner_email: "STUFF@things.com", manufacturer: manufacturer) }
       it "only removes the more accurate match" do
-        expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
-        expect(partial_registration_accurate.partial_registration?).to be_truthy
         expect(partial_registration_accurate.with_bike?).to be_falsey
         instance.perform(bike.id)
         partial_registration.reload

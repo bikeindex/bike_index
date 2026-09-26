@@ -83,6 +83,18 @@ module BikeSearchable
       end
     end
 
+    # returns nil OR {location:, distance:, bounding_box:} - nil if the location can't be boxed
+    def proximity_bounding_box(location, distance, ip_address = nil)
+      location, coordinates = search_location(location, ip_address)
+      return if location.blank?
+
+      distance = GeocodeHelper.permitted_distance(distance)
+      bounding_box = GeocodeHelper.bounding_box(coordinates.presence || location, distance)
+      return if bounding_box.empty?
+
+      {bounding_box:, location:, distance:}
+    end
+
     private
 
     def searchable_query_items_query(query_params)
@@ -207,24 +219,11 @@ module BikeSearchable
     end
 
     def extracted_searchable_proximity_hash(query_params, ip_address)
-      location, coordinates = search_location(query_params[:location], ip_address)
-      return if location.blank?
+      proximity = proximity_bounding_box(query_params[:location], query_params[:distance], ip_address)
+      return if proximity.blank?
 
-      distance = GeocodeHelper.permitted_distance(query_params[:distance])
-      bounding_box = if coordinates.present?
-        GeocodeHelper.bounding_box(coordinates, distance)
-      else
-        GeocodeHelper.bounding_box(location, distance)
-      end
-
-      return if bounding_box.empty? # If we can't create a bounding box, skip
-
-      {
-        bounding_box: bounding_box,
-        stolenness: query_params[:stolenness],
-        location:, # This will overwrite the user's input
-        distance:
-      }
+      # location overwrites the user's input
+      proximity.merge(stolenness: query_params[:stolenness])
     end
   end
 

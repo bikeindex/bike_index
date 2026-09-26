@@ -1724,6 +1724,7 @@ en:
           owner_already_has_account: >-
             The owner of this %{bike_type} already has an account on Bike Index. Sign
             in to claim it!
+          sign_in_to_continue_registration: Sign in to continue your registration
           you_have_to_log_in: Sorry, you have to log in.
         ensure_member_of!:
           accept_tos_for_orgs: Please accept the terms of service for organizations.

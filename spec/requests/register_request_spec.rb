@@ -503,6 +503,34 @@ RSpec.describe RegisterController, type: :request do
         expect(flash[:notice]).to be_present
       end
     end
+
+    context "started by a user, visited signed out" do
+      let(:user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+      let(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: user) }
+      it "signs in, then resumes it" do
+        get register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to new_session_url
+        expect(flash[:notice]).to eq "Sign in to continue your registration"
+
+        post session_path, params: {session: {email: user.email, password: "testthisthing7$"}}
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+      end
+      context "by organization staff, for the owner" do
+        let(:owner) { FactoryBot.create(:user_confirmed, email: owner_email) }
+        let(:b_param) do
+          FactoryBot.create(:b_param_unfinished_registration, creator: FactoryBot.create(:user_confirmed),
+            owner_email:, origin: "register_flow_organized")
+        end
+        it "signs the owner in, then resumes it" do
+          get register_path(b_param_token: b_param.id_token)
+          expect(response).to redirect_to new_session_url
+
+          post session_path, params: {session: {email: owner.email, password: "testthisthing7$"}}
+          get register_path(b_param_token: b_param.id_token)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "2")
+        end
+      end
+    end
   end
 
   describe "create" do

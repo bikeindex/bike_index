@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapseField } from 'utils/collapse_utils'
 
 /* global localStorage */
 
@@ -6,12 +7,13 @@ const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
   static values = { resultView: String }
 
   connect () {
-    this.initNotesSearch()
+    this.initOptionalFields(0)
+    this.syncLocationSearch(0)
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
@@ -29,6 +31,7 @@ export default class extends Controller {
   handleFrameRender = (event) => {
     this.syncResultView()
     this.syncPeriodLabel()
+    this.syncLocationSearch()
     this.endSubmitSpinner()
     if (event.target === this.resultsFrame) this.reloadChart()
   }
@@ -84,24 +87,43 @@ export default class extends Controller {
     return this.element.querySelector('.search-results-frame-wrapper > turbo-frame')
   }
 
-  initNotesSearch () {
-    if (!this.hasNotesFieldTarget) return
-    const input = this.notesFieldTarget.querySelector('input')
-    const hasValue = input && input.value.length > 0
-    if (hasValue || localStorage.getItem('orgRegistrationNotesSearchOpen') === 'true') {
-      this.setNotesSearch(true)
-    }
+  // The notes and location fields, each named by data-field. One opens if an input in it has
+  // a value, or if it was left open
+  initOptionalFields (duration) {
+    this.optionalFieldTargets.forEach(field => {
+      const hasValue = [...field.querySelectorAll('input')].some(input => input.value.length > 0)
+      const open = hasValue || localStorage.getItem(field.dataset.storageKey) === 'true'
+      this.setOptionalField(field.dataset.field, open, duration)
+    })
   }
 
-  toggleNotesSearch () {
-    if (!this.hasNotesFieldTarget) return
-    this.setNotesSearch(this.notesFieldTarget.classList.contains('tw:hidden'))
+  toggleOptionalField (event) {
+    this.setOptionalField(event.target.dataset.field, event.target.checked)
   }
 
-  setNotesSearch (open) {
-    this.notesFieldTarget.classList.toggle('tw:hidden', !open)
-    localStorage.setItem('orgRegistrationNotesSearchOpen', String(open))
-    if (this.hasNotesCheckboxTarget) this.notesCheckboxTarget.checked = open
+  setOptionalField (name, open, duration) {
+    const field = this.optionalFieldTargets.find(target => target.dataset.field === name)
+    if (!field) return
+    collapseField(field, open, duration)
+    localStorage.setItem(field.dataset.storageKey, String(open))
+    const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === name)
+    if (checkbox) checkbox.checked = open
+  }
+
+  // BikeServices::OrganizedSearch.location_searchable? - disabled, the fields hide and stop
+  // submitting, but the checkbox keeps whether they were open
+  syncLocationSearch (duration) {
+    const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === 'location')
+    const field = this.optionalFieldTargets.find(target => target.dataset.field === 'location')
+    if (!checkbox || !field) return
+
+    const status = document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
+    const searchAll = this.hasSearchAllTarget && this.searchAllTarget.checked
+    const searchable = JSON.parse(checkbox.dataset.locationableStatuses).includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
+
+    checkbox.disabled = !searchable
+    if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
+    collapseField(field, searchable && checkbox.checked, duration)
   }
 
   // Bubbled from any field, so it picks out the one it's for
@@ -109,12 +131,17 @@ export default class extends Controller {
     if (event.target.name !== 'search_email' || !this.hasSearchAllTarget) return
     const hasEmail = event.target.value.trim() !== ''
     this.searchAllTarget.disabled = hasEmail
-    if (hasEmail) this.searchAllTarget.checked = false
     this.searchAllHintTarget.hidden = !hasEmail
+    if (hasEmail && this.searchAllTarget.checked) {
+      this.searchAllTarget.checked = false
+      this.syncLocationSearch()
+    }
   }
 
   filterChanged () {
     this.syncFilterSummary()
+    // Before the submit, so a disabled location isn't searched
+    this.syncLocationSearch()
     const form = document.getElementById('Search_Form')
     if (form) {
       form.requestSubmit()
