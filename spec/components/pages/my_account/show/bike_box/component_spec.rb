@@ -31,6 +31,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
       expect(component).to have_css("[role=alert]", count: 1)
       expect(component).to have_text("associated with Brakebills")
       expect(component).to have_link("Add it now!", href: "/user_alerts/#{user_alert.id}?add_bike_organization=true")
+      expect(component).to have_link("Ignore this suggestion", href: "/user_alerts/#{user_alert.id}?alert_action=dismiss")
     end
   end
 
