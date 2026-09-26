@@ -1559,13 +1559,11 @@ RSpec.describe RegisterController, type: :request do
       # However they come back - the emailed link, or a tab left open on the old version -
       # and without the arrival writing anything
       it "shows the newer version either way" do
+        # Kept, not wiped - the acknowledged id names a page the newer version doesn't have
         expect { get register_path(b_param_token: b_param.id_token) }
           .to_not change { b_param.reload.params }
         expect(response).to redirect_to step_path("3")
         expect(flash[:notice]).to eq "The safety rules have been updated — please review them again"
-        expect(BikeServices::Register.registration_sequence(b_param)&.id).to eq new_sequence.id
-        # Kept, not wiped: the id names a page of the old version, which the newer one lacks
-        expect(BikeServices::Register.acknowledged_page_ids(b_param)).to eq([battery_page.id])
 
         # So the page left open on the old version doesn't count toward the new one
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,

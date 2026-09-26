@@ -101,7 +101,7 @@ module BikeServices
     # notice says: the organization replaced them, so the walk starts over on the current version
     def rules_restarted?(b_param, sequence:)
       started_id = started_sequence_id(b_param)
-      started_id.present? && sequence.present? && started_id.to_s != sequence.id.to_s
+      started_id.present? && sequence.present? && started_id != sequence.id
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the email),
@@ -159,7 +159,7 @@ module BikeServices
 
     # Nothing to agree to without a sequence, otherwise the acknowledgment record
     def acknowledged?(b_param, sequence:)
-      sequence_pages(sequence).none? || RegistrationSequenceAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
+      sequence_pages(sequence).none? || agreement_exists?(b_param)
     end
 
     # Which pages have been acknowledged so far. In-flight progress, so it lives on
@@ -338,13 +338,16 @@ module BikeServices
       return nil if started_id.blank?
 
       sequence = RegistrationSequence.find_by(id: started_id, organization:)
-      return nil if sequence.blank?
-
-      sequence if sequence.active? || acknowledged?(b_param, sequence:)
+      sequence if sequence.present? && (sequence.active? || agreement_exists?(b_param))
     end
 
-    # Written by acknowledge_page alongside the ids, so they're unambiguously scoped
     def started_sequence_id(b_param) = b_param.params.dig("registration_sequence", "id")
+
+    # The agreement alone, without acknowledged?'s "nothing to agree to" clause - an activated
+    # sequence always has pages, and loading them to ask costs their images too
+    def agreement_exists?(b_param)
+      RegistrationSequenceAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
+    end
 
     # Whether a bike registered some other way is this registration's. Step 1 says only
     # what it is, so any bike of that make and type is; whatever came after has to match too
@@ -573,7 +576,7 @@ module BikeServices
       additional.present? ? bike_params.to_h.merge("likely_spam" => true) : bike_params.to_h
     end
 
-    conceal :started_sequence, :started_sequence_id,
+    conceal :started_sequence, :started_sequence_id, :agreement_exists?,
       :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,

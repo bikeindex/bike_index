@@ -630,9 +630,9 @@ RSpec.describe BikeServices::Register do
           expect(described_class.rules_restarted?(b_param, sequence: resolved)).to be_truthy
 
           # Nothing is written to switch versions - the id kept names a page the newer one
-          # doesn't have, so its own first page reads as unacknowledged
+          # doesn't have, so the walk is back at its first page
           expect(described_class.acknowledged_page_ids(b_param)).to eq([pages.first.id])
-          expect(described_class.send(:step_completed?, b_param, "3", sequence: resolved)).to be_falsey
+          expect(described_class.permitted_step(b_param, nil, sequence: resolved)).to eq "3"
         end
 
         context "already agreed to" do
