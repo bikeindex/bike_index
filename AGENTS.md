@@ -102,7 +102,7 @@ on a write to `organizations` — which reads as a database misconfiguration rat
 record. `spec/integration/admin/news_images_spec.rb` and `spec/requests/admin/dashboard_request_spec.rb`
 both do it.
 
-**Assert on what a drain produces, not on the flag that precedes it.** `Ownership#skip_email` records what the registration asked for, not what the job did with it, so it answers a different question than the one you're asking — `calculated_send_email`, the notification, or the delivery is the answer.
+**Assert on what a drain produces, not on the flag that precedes it.** A column a job reconciles when it runs records what was true at write time — `Ownership#skip_email` is one — so it answers a different question than the one you're asking.
 
 **A spec that shells out gets what `.github/ci/Dockerfile` installs, which is `ruby:slim` plus a short list — no `jq`, no `which`.** Locally they're both on PATH, so the spec passes here and fails on one CI shard with an assertion that names neither. Probe for the binary (`/bin/grep`, `/usr/bin/grep`) rather than asking `which`, and don't reach for `jq` to read JSON a Ruby spec could parse itself.
 
