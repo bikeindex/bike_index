@@ -34,7 +34,7 @@ module Pages
           b_param = preview_b_param(sequence, acknowledged ? [page.id] : [])
           render(Pages::Register::StepAcknowledgment::Component.new(sequence:, b_param:,
             step: ::BikeServices::Register.step_for_page_index(index),
-            steps: ::BikeServices::Register.steps(b_param, sequence:)))
+            flow: ::BikeServices::Register.flow(b_param, sequence:)))
         end
 
         # The pages only appear for an e-vehicle registered with the organization

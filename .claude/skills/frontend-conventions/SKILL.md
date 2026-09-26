@@ -92,9 +92,9 @@ Four of those carry a rule beyond "use the component":
 
 ## Form drafts: always `form-persist`
 
-**A form worth not retyping mirrors itself to localStorage through the `form-persist` controller** — never one of your own. It takes a `data-form-persist-key-value` when the derived key — the pathname plus the form's action — isn't unique per form. See `app/components/pages/register/step1/component.rb` and `app/components/pages/register/step2/component.html.erb`.
+**A form worth not retyping mirrors itself to localStorage through the `form-persist` controller** — never one of your own. It takes a `data-form-persist-key-value` when the derived key — the pathname plus the form's action — isn't unique per form. See `app/components/pages/register/start_page/component.rb` and `app/components/pages/register/step2/component.html.erb`.
 
-**A controller whose UI hangs off a restored field reconciles in two places** — a `form-persist:restored@window->…` entry in the element's `data-action`, and the same call in its own `connect`. A hand-rolled `window.addEventListener` is the older idiom; don't add more. See `app/components/pages/register/step1/component.html.erb` with `app/javascript/controllers/register/heading_controller.js`.
+**A controller whose UI hangs off a restored field reconciles in two places** — a `form-persist:restored@window->…` entry in the element's `data-action`, and the same call in its own `connect`. A hand-rolled `window.addEventListener` is the older idiom; don't add more. See `app/components/pages/register/start_page/component.html.erb` with `app/javascript/controllers/register/heading_controller.js`.
 
 ## Current-page links: always `UI::ActiveLink`
 

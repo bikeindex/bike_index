@@ -5,9 +5,9 @@ module Pages
     module Step2
       # Step 2 of the registration flow: the bike details form
       class Component < ApplicationComponent
-        def initialize(b_param:, steps:, current_user: nil)
+        def initialize(b_param:, flow:, current_user: nil)
           @b_param = b_param
-          @steps = steps
+          @flow = flow
           @current_user = current_user
         end
 

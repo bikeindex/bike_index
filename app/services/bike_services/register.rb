@@ -114,10 +114,10 @@ module BikeServices
 
     # The step to show: finished once the bike exists (or it's awaiting the email),
     # otherwise the furthest step reached, since every earlier one stays browsable
-    def permitted_step(b_param, requested_step, sequence:, steps: nil)
+    def permitted_step(b_param, requested_step, sequence:, flow: nil)
       return "finished" if finished?(b_param, sequence:)
 
-      reached = permitted_steps(b_param, sequence, steps || steps(b_param, sequence:))
+      reached = permitted_steps(b_param, sequence, flow || flow(b_param, sequence:))
       reached.include?(requested_step) ? requested_step : reached.last
     end
 
@@ -131,33 +131,16 @@ module BikeServices
 
     def step_for_page_index(index) = (index + ACKNOWLEDGMENT_OFFSET).to_s
 
-    # What the next and back links go to - nil for the steps nothing comes before or after
-    def step_after(step, steps:) = steps[steps.index(step.to_s).to_i + 1]
-
-    def step_before(step, steps:)
-      index = steps.index(step.to_s).to_i
-      steps[index - 1] if index.positive?
-    end
-
     # to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
     # for each of them
     def sequence_pages(sequence)
       sequence&.registration_sequence_pages&.to_a || []
     end
 
-    # Every step the flow reaches, in order - what the progress bar counts off and the back
-    # links walk. The report comes right after step 2, unless the registration is waiting on
-    # its confirmation email: the emailed link is what proves the address the report belongs
-    # to, and it's clicked after the acknowledgment pages rather than before them.
-    # Placing it asks whether there's a creator yet, which is a query, so this is built once
-    # a request and passed down
-    def steps(b_param, sequence:, single_page: false)
-      pages = sequence_pages(sequence)
-      rest = pages.each_index.map { step_for_page_index(it) } + (pages.any? ? %w[review] : [])
-      details = single_page ? %w[1] : %w[1 2]
-      return details + rest unless report_step?(b_param&.status)
-
-      creator_available?(b_param) ? details + %w[report] + rest : details + rest + %w[report]
+    # Placing the report asks whether there's a creator yet, which is a query, so this is
+    # built once a request and passed down
+    def flow(b_param, sequence:, single_page: false)
+      BikeServices::RegisterFlow.new(steps: flow_steps(b_param, sequence, single_page), single_page:)
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -505,18 +488,29 @@ module BikeServices
       b_param.destroy
     end
 
+    # The report comes right after step 2, unless the registration is waiting on its
+    # confirmation email: the emailed link is what proves the address the report belongs
+    # to, and it's clicked after the acknowledgment pages rather than before them
+    def flow_steps(b_param, sequence, single_page)
+      pages = sequence_pages(sequence)
+      rest = pages.each_index.map { step_for_page_index(it) } + (pages.any? ? %w[review] : [])
+      details = single_page ? %w[1] : %w[1 2]
+      return details + rest unless report_step?(b_param&.status)
+
+      creator_available?(b_param) ? details + %w[report] + rest : details + rest + %w[report]
+    end
+
     # Every step the registration has reached, in order - each one opens the next, so the
     # flow stops at the first that hasn't been done
-    def permitted_steps(b_param, sequence, steps)
-      reached = steps.take_while { step_completed?(b_param, it, sequence:, steps:) }.count
-      steps.first(reached + 1).select { editable_step?(b_param, it) }
+    def permitted_steps(b_param, sequence, flow)
+      reached = flow.steps.take_while { step_completed?(b_param, it, sequence:, flow:) }.count
+      flow.steps.first(reached + 1).select { editable_step?(b_param, it) }
     end
 
     # Whether a step has been submitted with everything it asks for
-    def step_completed?(b_param, step, sequence:, steps:)
+    def step_completed?(b_param, step, sequence:, flow:)
       case step
-      # With no step 2, step 1's page asks for its details too
-      when "1" then steps.include?("2") ? b_param.manufacturer_id.present? : details_completed?(b_param)
+      when "1" then flow.single_page? ? details_completed?(b_param) : b_param.manufacturer_id.present?
       when "2" then details_completed?(b_param)
       when "report" then report_completed?(b_param)
       when "review" then acknowledged?(b_param, sequence:)
@@ -588,7 +582,7 @@ module BikeServices
     conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
-      :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
+      :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :flow_steps, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
       :step_2_params, :translation, :honeypot_spam
   end

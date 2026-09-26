@@ -1,5 +1,5 @@
 <%= render Pages::Register::Page::Component.new do %>
-  <%= render Pages::Register::Progress::Component.new(steps: @steps, step: "report") %>
+  <%= render Pages::Register::Progress::Component.new(flow: @flow, step: "report") %>
 
   <%= render UI::Header::Component.new(text: heading, subtitle:) %>
 

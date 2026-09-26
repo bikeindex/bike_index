@@ -3,72 +3,25 @@
 require "rails_helper"
 
 RSpec.describe Pages::Register::Step1::Component, type: :component do
-  let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
-  let(:params) { {bike: {owner_email: "owner@bikeindex.org", creation_organization_id: organization.id}} }
-  let(:b_param) { BParam.create(origin: "register_flow", params: params.as_json) }
+  let(:b_param) { BParam.create(origin: "register_flow", params: {bike: {owner_email: "owner@bikeindex.org"}}.as_json) }
+  let(:single_page) { false }
 
-  # Reloaded, so an organization updated mid-example isn't answered from the copy
-  # the previous render left on the registration
   def render_step_1(**options)
-    reloaded = b_param.reload
-    render_inline(described_class.new(b_param: reloaded, **options,
-      steps: BikeServices::Register.steps(reloaded, sequence: nil)))
+    render_inline(described_class.new(b_param:, **options,
+      flow: BikeServices::Register.flow(b_param, sequence: nil, single_page:)))
   end
 
-  # Minus the required "*" the label carries
-  def email_label
-    page.find("label[for='b_param_owner_email']").text.delete("*").strip
-  end
+  context "single_page" do
+    let(:single_page) { true }
 
-  def email_placeholder
-    page.find("input[name='b_param[owner_email]']")["placeholder"]
-  end
-
-  describe "the email label and placeholder" do
-    it "take the organization's, and fall back to the generic word and example address" do
-      render_step_1
-      expect(email_label).to eq "Email"
-      expect(email_placeholder).to eq "you@example.com"
-
-      # A school has a name worth asking by, without anyone setting one
-      organization.update(kind: "school")
-      render_step_1
-      expect(email_label).to eq "Brakebills email"
-
-      # The admin label wins over the school's name, and names the field rather
-      # than the address inside it
-      organization.update(registration_field_labels: {owner_email: "brakebills.edu email"})
-      render_step_1
-      expect(email_label).to eq "brakebills.edu email"
-      expect(email_placeholder).to eq "you@example.com"
-
-      organization.update(registration_field_labels: {owner_email: "brakebills.edu email",
-                                                      email_placeholder: "you@brakebills.edu"})
-      render_step_1
-      expect(email_placeholder).to eq "you@brakebills.edu"
-      expect(email_label).to eq "brakebills.edu email"
+    it "renders nothing - the single page ends in step 2's submit" do
+      expect(render_step_1.to_html).to be_blank
     end
-
-    it "are the generic word and example address without an organization" do
-      b_param.update(params: {bike: {owner_email: "owner@bikeindex.org"}}.as_json)
-      render_step_1
-
-      expect(email_label).to eq "Email"
-      expect(email_placeholder).to eq "you@example.com"
-    end
-  end
-
-  # Outside the form it submits nothing, which the specs posting `additional` directly
-  # can't see. What the field itself has to be is UI::Forms::Honeypot's own spec
-  it "renders the honeypot inside the form" do
-    render_step_1
-
-    expect(page).to have_css("form input[name='additional']", visible: :all)
   end
 
   describe "button_color" do
     def submit_button
-      page.find("form button[type=submit]")
+      page.find("button[type=submit]")
     end
 
     it "colors the button, hovering a shade darker" do

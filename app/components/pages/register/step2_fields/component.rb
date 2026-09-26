@@ -11,17 +11,13 @@ module Pages
         FORM_ACTIONS = "hw-combobox:selection->register--status-fields#update " \
           "register--organization:changed->register--status-fields#update"
 
-        # single_page: step 1's fields are on the same form, so its address isn't echoed back
-        # and whether the owner's name is asked for follows what's typed into it.
         # motorized_review: whether an e-vehicle gets the safety pages after this form
-        def initialize(b_param:, steps:, form:, current_user: nil, organization: nil,
-          single_page: false, motorized_review: false)
+        def initialize(b_param:, flow:, form:, current_user: nil, organization: nil, motorized_review: false)
           @b_param = b_param
-          @steps = steps
+          @flow = flow
           @form = form
           @current_user = current_user
           @organization = organization
-          @single_page = single_page
           @motorized_review = motorized_review
         end
 
@@ -37,7 +33,7 @@ module Pages
         # renders - so the label reads off the same answer both times
         def submit_texts
           @submit_texts ||= Bike.statuses.index_with do |status|
-            next translation(".next") if @steps.include?("review") || BikeServices::Register.report_step?(status)
+            next translation(".next") if @flow.acknowledgments? || BikeServices::Register.report_step?(status)
 
             translation(".complete_registration", cycle_type: @b_param.type_titleize)
           end
@@ -70,9 +66,10 @@ module Pages
           !@b_param.self_made?(@current_user)
         end
 
-        # The single page matches what's typed against the addresses BParam#self_made? does
+        # Step 1's fields are on the single page's form, so whether the owner's name is asked
+        # for follows what's typed into them - matched against the addresses BParam#self_made? does
         def owner_name_data
-          return {} unless @single_page
+          return {} unless @flow.single_page?
 
           {controller: "register--owner-name", "register--owner-name-own-emails-value": (@current_user&.own_emails || []).to_json,
            action: "input@window->register--owner-name#update form-persist:restored@window->register--owner-name#update"}

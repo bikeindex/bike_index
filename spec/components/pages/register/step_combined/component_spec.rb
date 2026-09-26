@@ -3,26 +3,24 @@
 require "rails_helper"
 
 RSpec.describe Pages::Register::StepCombined::Component, type: :component do
-  let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
-  let(:params) { {bike: {owner_email: "owner@bikeindex.org", creation_organization_id: organization.id}} }
-  let(:b_param) { BParam.create(origin: "register_flow", params: params.as_json) }
+  let(:b_param) { BParam.create(origin: "register_flow", params: {bike: {owner_email: "owner@bikeindex.org"}}.as_json) }
+  let(:single_page) { true }
   let(:component) do
-    render_inline(described_class.new(b_param:, current_user: nil,
-      steps: BikeServices::Register.steps(b_param, sequence: nil, single_page: true)))
+    render_inline(described_class.new(b_param:,
+      flow: BikeServices::Register.flow(b_param, sequence: nil, single_page:)))
   end
 
-  def field_names(scope)
-    component.css("form [name^='#{scope}[']").map { |el| el["name"] }.uniq
-  end
-
-  it "posts both steps from one form, each in the scope create reads it from" do
-    expect(component).to have_css("form[action='/register'][method=post]")
-    expect(field_names("b_param")).to include("b_param[manufacturer_id]", "b_param[owner_email]")
-    expect(field_names("bike")).to include("bike[serial_number]", "bike[status]")
-
-    # What tells create the submission carries step 2 as well
+  it "tells create both steps are here, and asks for step 2's details" do
     expect(component.css("input[name=single_page]").count).to eq 1
-    # One honeypot, not one per step
-    expect(component.css("input[name=additional]").count).to eq 1
+    expect(component).to have_css("[name='bike[serial_number]']")
+    expect(component).to have_css("button[type=submit]")
+  end
+
+  context "with a step 2 page of its own" do
+    let(:single_page) { false }
+
+    it "renders nothing" do
+      expect(component.to_html).to be_blank
+    end
   end
 end

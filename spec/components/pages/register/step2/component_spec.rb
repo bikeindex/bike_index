@@ -15,7 +15,7 @@ RSpec.describe Pages::Register::Step2::Component, type: :component do
   def render_step_2
     reloaded = b_param.reload
     render_inline(described_class.new(b_param: reloaded,
-      steps: BikeServices::Register.steps(reloaded, sequence: nil)))
+      flow: BikeServices::Register.flow(reloaded, sequence: nil)))
   end
 
   # The wrapper register--status-fields shows and requires, rather than the input itself.

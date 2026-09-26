@@ -208,8 +208,8 @@ module ControllerHelpers
 
   # The single page's electric checkbox is on the same form as its submit button, so the
   # button is told what it'd lead to for an e-vehicle
-  def register_motorized_review?(b_param, steps)
-    steps.exclude?("2") && register_flow_sequence(b_param, motorized: true).present?
+  def register_motorized_review?(b_param, flow)
+    flow.single_page? && register_flow_sequence(b_param, motorized: true).present?
   end
 
   def show_general_alert

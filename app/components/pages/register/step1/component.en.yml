@@ -4,7 +4,6 @@ en:
     pages:
       register:
         step1:
-          just_the_essentials: Just the essentials to start.
           next: Next
           no_need_to_wait: We'll email a confirmation link — you don't have to wait
             for it to continue.

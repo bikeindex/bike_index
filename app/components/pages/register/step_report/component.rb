@@ -6,9 +6,9 @@ module Pages
       # What the registration is reporting - the theft, or the vehicle that was found.
       # The fields become the created bike's stolen record or its impound record
       class Component < ApplicationComponent
-        def initialize(b_param:, steps:, sequence: nil)
+        def initialize(b_param:, flow:, sequence: nil)
           @b_param = b_param
-          @steps = steps
+          @flow = flow
           @sequence = sequence
         end
 
@@ -79,7 +79,7 @@ module Pages
         # Read off the list rather than hardcoded - where the report sits is the flow's to say
         def previous_path
           register_path(b_param_token: @b_param.id_token,
-            step: BikeServices::Register.step_before("report", steps: @steps))
+            step: @flow.before("report"))
         end
 
         def phone_visibility_entries

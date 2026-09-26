@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Pages::Register::Progress::Component, type: :component do
-  let(:component) { render_inline(described_class.new(steps: %w[1 2 report], step:)) }
+  let(:component) { render_inline(described_class.new(flow: BikeServices::RegisterFlow.new(steps: %w[1 2 report]), step:)) }
 
   context "a step in the list" do
     let(:step) { 2 }

@@ -316,7 +316,8 @@
   </div>
 <% end %>
 
-<% unless @single_page %>
+<%# The single page's form already holds step 1's address, so it isn't echoed back %>
+<% unless @flow.single_page? %>
   <div class="tw:mb-4">
     <span class="twlabel"><%= translation(".email") %></span>
 
@@ -337,7 +338,7 @@
 <% end %>
 
 <%# Who the registration is for - a signed in registrant's own address arrives with a name %>
-<% if @single_page || user_name_required? %>
+<% if @flow.single_page? || user_name_required? %>
   <%= tag.div(data: owner_name_data) do %>
     <%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :user_name,
         label_text: translation(".owner_name"), required: true,

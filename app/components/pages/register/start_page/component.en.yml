@@ -4,5 +4,6 @@ en:
     pages:
       register:
         start_page:
+          just_the_essentials: Just the essentials to start.
           register_your_vehicle: Register your vehicle!
           register_your_vehicle_with_org: Register your vehicle with %{org_name}!

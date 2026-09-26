@@ -4,18 +4,18 @@ module Pages
   module Register
     module Progress
       class Component < ApplicationComponent
-        # steps: the flow's whole ordered list, so a step's place in it is its segment -
-        # the report shifts everything after it, and only the list knows where it landed
-        def initialize(steps:, step:)
-          @steps = steps
-          @step = step.to_s
+        # flow: a step's place in it is its segment - the report shifts everything after
+        # it, and only the flow knows where it landed
+        def initialize(flow:, step:)
+          @flow = flow
+          @step = step
         end
 
         private
 
-        def number = @number ||= @steps.index(@step).to_i + 1
+        def number = @number ||= @flow.position(@step)
 
-        def total = @steps.count
+        def total = @flow.count
       end
     end
   end

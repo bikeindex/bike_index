@@ -14,7 +14,7 @@ module Pages
 
           b_param = preview_b_param(sequence, pages.map(&:id))
           render(Pages::Register::StepAcknowledgmentReview::Component.new(sequence:, b_param:, current_user: lookbook_user,
-            steps: ::BikeServices::Register.steps(b_param, sequence:)))
+            flow: ::BikeServices::Register.flow(b_param, sequence:)))
         end
 
         private
