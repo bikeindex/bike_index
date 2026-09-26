@@ -414,9 +414,8 @@ module BikeServices
       create_bike(b_param, sequence:, ip_address:)
     end
 
-    # Returns nil while the rules are owed - the bike exists, but the registration isn't finished.
-    # Rules the separate attestation switch left out are owed too, but by the owner: they're
-    # emailed the link back, and this flow finishes.
+    # Returns nil while the rules are owed - the bike exists, but the registration isn't finished -
+    # unless separate attestation left them to the owner, who's emailed the link back instead.
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)

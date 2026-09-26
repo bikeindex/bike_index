@@ -639,7 +639,7 @@ RSpec.describe BikeServices::Register do
         let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
         let(:registrant) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
 
-        it "is nil for a registration made for someone else, so the bike is created without one" do
+        it "is nil for a registration made for someone else, whose owner the rules are left to" do
           expect(described_class.registration_sequence(b_param, separate_attestation: true, user: member)).to be_nil
           expect(described_class.steps(b_param, sequence: nil).count).to eq 2
         end

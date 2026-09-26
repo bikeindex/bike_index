@@ -35,7 +35,7 @@ class UserRegistrationOrganization < ApplicationRecord
 
   class << self
     def universal_registration_info_for(user, passed_reg_info = {})
-      # Excepted from what's already stored too, since rows set before the exclusion carry them
+      # Rows stored before set_initial_registration_info left them out still carry them
       uro_reg_info = user.user_registration_organizations.pluck(:registration_info).reduce({}, :merge)
         .except(*RegistrationInfoable::REGISTRATION_ONLY_KEYS)
       own_reg_info = user.ownerships.reorder(:updated_at).pluck(:registration_info).reduce({}, :merge)
