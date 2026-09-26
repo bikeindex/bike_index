@@ -135,7 +135,7 @@
   %>
 
   <% if @user_alerts.any? %>
-    <div class="tw:basis-full tw:[&>:last-child]:mb-0">
+    <div class="tw:mt-2 tw:basis-full tw:[&>:last-child]:mb-0">
       <% @user_alerts.each do |user_alert| %>
         <%= render(UI::Alerts::Base::Component.new) do %>
           <%= link_to translation(".ignore"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, action: "update", class: "twlink-underlined tw:float-right tw:ml-4 tw:text-sm" %>
