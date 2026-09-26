@@ -56,7 +56,6 @@ class OrganizationExportJob < ApplicationJob
     true
   end
 
-  # Yields each exported row, returns the row count
   def each_row
     row_index = 0
     [@export.bikes_scoped, @export.incompletes_scoped].each do |scope|
@@ -95,12 +94,11 @@ class OrganizationExportJob < ApplicationJob
   end
 
   def b_param_to_row(b_param)
-    address = b_param.address_record.address_hash_legacy if export_headers.include?("address")
     export_headers.map do |header|
       case header
       when "registered_at", "manufacturer", "is_stolen", "is_impounded", "motorized", "owner_email", "phone",
         "organization_affiliation", "student_id", "vehicle_type", *ADDRESS_KEYS.keys
-        value_for_header(header, b_param, address:)
+        value_for_header(header, b_param)
       when "model" then b_param.bike["frame_model"]
       when "serial" then b_param.bike["serial_number"]
       when "extra_registration_number" then b_param.bike["extra_registration_number"]
@@ -137,10 +135,9 @@ class OrganizationExportJob < ApplicationJob
     @export_headers
   end
 
-  # b_params pass their address; bikes read registration_address
-  def value_for_header(header, bike, address: nil)
+  def value_for_header(header, bike)
     return bike.send(header) if MATCHING_KEYS.include?(header)
-    return (address || bike.registration_address)[ADDRESS_KEYS[header]] if ADDRESS_KEYS.key?(header)
+    return bike.registration_address[ADDRESS_KEYS[header]] if ADDRESS_KEYS.key?(header)
 
     case header
     when "link" then LINK_BASE + bike.id.to_s

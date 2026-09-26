@@ -468,6 +468,9 @@ class BParam < ApplicationRecord
   # Unsaved - read through the same whitelist that turns these into the created bike's address
   def address_record = AddressRecord.new(self.class.address_record_attributes(bike))
 
+  # Mirrors Bike#registration_address
+  def registration_address = @registration_address ||= address_record.address_hash_legacy
+
   def email_confirmed?
     params["email_confirmed_at"].present?
   end
