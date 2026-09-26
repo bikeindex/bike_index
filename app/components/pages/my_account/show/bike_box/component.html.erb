@@ -123,8 +123,12 @@
     </div>
   <% end %>
 
-  <%# The row wraps, so the alerts fill the width below the photo and details %>
-  <div class="tw:basis-full">
+  <%#
+    The row wraps, so the alerts fill the width below the photo and details. The last
+    one's margin would show the box's background below it
+  %>
+
+  <div class="tw:basis-full tw:[&>:last-child]:mb-0">
     <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user)) %>
 
     <% @user_alerts.each do |user_alert| %>
