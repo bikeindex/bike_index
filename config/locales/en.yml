@@ -908,9 +908,6 @@ en:
           not_with_owner: "%{item_type} mark the bike recovered to list it"
           price_required: Price is required
           primary_activity_required: Primary activity is required
-          serial_matches_stolen: >-
-            %{item_type} serial matches a registration reported stolen - contact support@bikeindex.org
-            if this is a mistake
         organization_message:
           latlon_required: latitude and longitude required
           required: required

@@ -209,10 +209,7 @@ RSpec.describe MarketplaceListing, type: :model do
   describe "validate_publishable!" do
     let(:user_hidden) { false }
     let(:primary_activity) { FactoryBot.create(:primary_activity) }
-    let(:serial_number) { FactoryBot.generate(:serial_number) }
-    let(:item) do
-      FactoryBot.create(:bike, :with_ownership_claimed, user_hidden:, cycle_type: :stroller, primary_activity:, serial_number:)
-    end
+    let(:item) { FactoryBot.create(:bike, :with_ownership_claimed, user_hidden:, cycle_type: :stroller, primary_activity:) }
     let(:user) { item.user }
     let(:address_record) { FactoryBot.create(:address_record, user:, kind: :user) }
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item:, address_record:, condition: "poor") }
@@ -235,32 +232,6 @@ RSpec.describe MarketplaceListing, type: :model do
         expect(item.reload.current?).to be_falsey
         expect(marketplace_listing.validate_publishable!).to be_falsey
         expect(marketplace_listing.errors.full_messages).to eq(["Stroller is not visible - maybe you marked it hidden?"])
-      end
-    end
-    context "serial matches another registration that's stolen" do
-      let(:serial_number) { "wtu-0123-x" }
-      let!(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "WTU0123X") }
-      it "is false" do
-        expect(marketplace_listing.valid_publishable?).to be_falsey
-        expect(marketplace_listing.validate_publishable!).to be_falsey
-        expect(marketplace_listing.errors.full_messages).to eq(["Stroller serial matches a registration reported " \
-          "stolen - contact support@bikeindex.org if this is a mistake"])
-      end
-    end
-    context "stolen registration with an unknown serial" do
-      let(:serial_number) { "unknown" }
-      let!(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "unknown") }
-      it "is truthy" do
-        expect(marketplace_listing.valid_publishable?).to be_truthy
-        expect(marketplace_listing.validate_publishable!).to be_truthy
-      end
-    end
-    context "serial matches another registration that isn't stolen" do
-      let(:serial_number) { "wtu-0123-x" }
-      let!(:other_bike) { FactoryBot.create(:bike, serial_number: "WTU0123X") }
-      it "is truthy" do
-        expect(marketplace_listing.valid_publishable?).to be_truthy
-        expect(marketplace_listing.validate_publishable!).to be_truthy
       end
     end
   end
