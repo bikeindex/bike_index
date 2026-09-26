@@ -1,9 +1,5 @@
 module Admin
   class GraphsController < Admin::BaseController
-    # The shared chart palette, which runs out well before Ownership.origins does
-    ORIGIN_COLORS = (UI::Chart::Component::COLORS + %w[#0891B2 #65A30D #EA580C #4F46E5
-      #9333EA #0D9488 #CA8A04 #E11D48 #2563EB #16A34A]).freeze
-
     before_action :set_period
     before_action :set_variable_graph_kind
     around_action :set_reading_role
@@ -40,8 +36,7 @@ module Admin
       @bounding_box = GeocodeHelper.bounding_box(params[:location], @location_radius) if params[:location].present?
     end
 
-    helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period,
-      :origin_colors, :origin_bike_counts
+    helper_method :matching_bikes, :default_period
 
     protected
 
@@ -78,46 +73,31 @@ module Admin
       "year"
     end
 
-    # Each series carries its own, so the table's swatches match without the two
-    # agreeing on an order across the chart's separate request
-    def origin_colors
-      @origin_colors ||= Ownership.origins.zip(ORIGIN_COLORS).to_h
-    end
-
-    # Ownership.origins order breaks count ties, so the rows don't reshuffle between
-    # loads. Distinct: a bike has an ownership per transfer
-    def origin_bike_counts
-      return @origin_bike_counts if defined?(@origin_bike_counts)
-
-      origins = Ownership.origins
-      counts = matching_bikes.joins(:ownerships).group("ownerships.origin").distinct.count(:id)
-      @origin_bike_counts = origins.index_with { counts[it] || 0 }
-        .sort_by { |origin, count| [-count, origins.index(origin)] }
-    end
-
     def bike_graph_kinds
-      %w[stolen origin pos ignored]
+      %w[stolen origin ios_version pos ignored]
     end
 
-    def shown_bike_graph_kinds
-      bike_graph_kinds - ["ignored"]
+    # {group => {time => count}}, grouped by both so it's one query rather than one per
+    # group. Distinct: a bike has an ownership per transfer
+    def grouped_time_range_counts(collection)
+      helpers.time_range_counts(column: "bikes.created_at", collection: collection.distinct)
+        .each_with_object({}) { |((group, at), count), h| (h[group] ||= {})[at] = count }
     end
 
-    def pos_search_kinds
-      %w[lightspeed_pos ascend_pos does_not_need_pos no_pos]
-    end
-
-    # Grouped by origin as well as by time, so this is one query rather than one per
-    # origin. Groupdate's range only fills the origins it found rows for, so the rest take
-    # the empty series. Distinct: a bike has an ownership per transfer
+    # Groupdate's range only fills the origins it found rows for, so the rest take the empty series
     def origin_chart_series(bikes)
-      counts = helpers.time_range_counts(column: "bikes.created_at",
-        collection: bikes.joins(:ownerships).group("ownerships.origin").distinct)
-      series = counts.each_with_object({}) { |((origin, at), count), h| (h[origin] ||= {})[at] = count }
+      series = grouped_time_range_counts(bikes.joins(:ownerships).group("ownerships.origin"))
       empty = helpers.empty_time_range_counts
       Ownership.origins.map do |origin|
-        {name: origin.humanize, color: origin_colors[origin], data: empty.merge(series[origin] || {})}
+        {name: origin.humanize, color: Pages::Admin::Graphs::Bikes::Component::ORIGIN_COLORS[origin], data: empty.merge(series[origin] || {})}
       end
+    end
+
+    # Ordered like the component's table, so the chart's legend matches it
+    def ios_version_chart_series
+      grouped_time_range_counts(Pages::Admin::Graphs::Bikes::Component.ios_version_bikes(matching_bikes))
+        .sort_by { |version, data| [-data.values.sum, version] }
+        .map { |version, data| {name: "iOS #{version}", data:} }
     end
 
     def bike_chart_data
@@ -136,8 +116,10 @@ module Admin
         ]
       elsif bike_graph_kind == "origin"
         origin_chart_series(bikes)
+      elsif bike_graph_kind == "ios_version"
+        ios_version_chart_series
       elsif bike_graph_kind == "pos"
-        pos_search_kinds.map do |pos_kind|
+        Pages::Admin::Graphs::Bikes::Component::POS_SEARCH_KINDS.map do |pos_kind|
           {
             name: pos_kind.humanize,
             data: helpers.time_range_counts(collection: bikes.send(pos_kind))

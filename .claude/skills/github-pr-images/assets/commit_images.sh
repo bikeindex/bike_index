@@ -53,20 +53,8 @@ TRACKED=$(git ls-files -- "${PATHS[@]}")
 git diff --cached --quiet ||
   { echo "the index has staged changes - commit or reset them first" >&2; exit 1; }
 
-# The push below carries every unpushed commit, and its tip is a skip-ci one, so
-# CI would be skipped for real code riding along in the same push.
-if UNPUSHED=$(git rev-list '@{u}..HEAD' 2>/dev/null); then
-  [ -z "$UNPUSHED" ] ||
-    { echo "unpushed commits on $BRANCH - push them first, or CI skips them too" >&2; exit 1; }
-else
-  echo "$BRANCH has no upstream - push it first, or CI skips every commit on it" >&2
-  exit 1
-fi
-
-# skip-ci markers on both: ci.yml is `on: push` with no branch filter, so without
-# them every screenshot post costs two full sharded runs.
 git add -f -- "${PATHS[@]}"
-git commit -q -m "Add PR screenshots [skip ci]
+git commit -q -m "Add PR screenshots
 
 Deleted in the next commit; the URLs in the screenshots comment are pinned
 to this commit's sha, so they keep resolving."
@@ -75,7 +63,7 @@ SHA=$(git rev-parse HEAD)
 # --cached: drop them from the index but leave the files on disk, so a caller
 # mid-sequence (a base-branch recapture) still has them.
 git rm -q --cached -- "${PATHS[@]}"
-git commit -q -m "Remove PR screenshots [skip ci]
+git commit -q -m "Remove PR screenshots
 
 Keeps the PR's Files changed empty; the blobs stay reachable at ${SHA:0:12}."
 
@@ -93,4 +81,3 @@ for path in paths:
     src = f"https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(path)}"
     print(f'<img alt="{html.escape(path.rsplit("/", 1)[-1], quote=True)}" src="{src}" />')
 ENCODE
-echo "note: the PR's head is now a skip-ci commit, so it shows no checks until the next code push" >&2

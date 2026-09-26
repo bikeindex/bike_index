@@ -84,6 +84,12 @@
 
                 <%= link_to helpers.search_emoji, admin_bikes_path(search_doorkeeper_app_id: current_ownership.doorkeeper_app_id), class: "tw:mx-1" %>
               <% end %>
+
+              <% if current_ownership&.ios_version.present? %>
+                <small class="twless-strong">
+                  iOS <em><%= current_ownership.ios_version %></em>
+                </small>
+              <% end %>
             <% end %>
 
             <% if bulk_import.present? %>
