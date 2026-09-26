@@ -12,10 +12,21 @@ RSpec.describe Pages::Admin::Strava::RequestsChart::Component, type: :component 
     FactoryBot.create(:strava_request, :processed, strava_integration:)
   end
 
-  it "renders both charts" do
+  it "renders both charts, with the integration pie as a third column" do
     component = render_inline(instance)
     expect(component.text).to include("By response status")
     expect(component.text).to include("By request type")
+    expect(component.css(".twwiderow-3 h4").map(&:text)).to eq(["Response status", "Request type", "By integration"])
+  end
+
+  context "without the integration chart" do
+    let(:instance) { described_class.new(collection:, time_range:, show_integration_chart: false) }
+
+    it "lays the pies out in two columns" do
+      component = render_inline(instance)
+      expect(component.css(".twwiderow-3")).to be_empty
+      expect(component.css(".twwiderow h4").map(&:text)).to eq(["Response status", "Request type"])
+    end
   end
 
   context "with requested_at time_range_column" do
