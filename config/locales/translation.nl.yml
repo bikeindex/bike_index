@@ -2074,6 +2074,7 @@ nl:
           owner_already_has_account: De eigenaar van deze %{bike_type} heeft al een
             account op Bike Index. Log in om het te claimen!
           you_have_to_log_in: Sorry, je moet inloggen.
+          sign_in_to_continue_registration: Meld u aan om uw registratie te voltooien.
         require_admin!:
           not_an_org_admin: Je moet een organisatiebeheerder zijn om dat te doen!
         require_index_admin!:
