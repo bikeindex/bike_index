@@ -1,6 +1,8 @@
 # The record that a registrant agreed to an organization's e-vehicle safety rules.
 # Outlives the registration it came from - the b_param is swept once its bike exists.
-# Pending (no acknowledged_at) from when the bike is created until they're agreed to.
+# Pending (no acknowledged_at) from when the bike is created until they're agreed to, which
+# holds the bike's finished registration email back - holding_email? is what withholds it,
+# acknowledge! and abandon! are the two ways it's let go.
 # What was agreed to is read off the sequence, which activation froze.
 # == Schema Information
 #
@@ -36,10 +38,7 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
 
   # Not on create: the pending one is made just before its b_param saves the bike,
   # which refreshes the alert anyway
-  after_commit(on: %i[update destroy]) do
-    b_param&.update_unfinished_registration_alerts
-    release_held_email
-  end
+  after_commit(on: %i[update destroy]) { b_param&.update_unfinished_registration_alerts }
 
   scope :pending, -> { where(acknowledged_at: nil) }
   scope :acknowledged, -> { where.not(acknowledged_at: nil) }
@@ -54,12 +53,23 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
     # Whoever is agreeing, over the creator create_bike stood in with
     def acknowledge(b_param, sequence:, user: nil)
       acknowledgment = find_or_initialize_by(b_param_id: b_param.id)
-      acknowledgment.update(registration_sequence: sequence, user_id: user&.id || acknowledgment.user_id,
-        owner_email: b_param.owner_email, acknowledged_at: Time.current)
+      acknowledgment.acknowledge!(sequence:, owner_email: b_param.owner_email,
+        user_id: user&.id || acknowledgment.user_id)
     end
 
     def create_pending(b_param, sequence:)
       create(registration_sequence: sequence, b_param:, owner_email: b_param.owner_email)
+    end
+
+    # Whether the finished registration email is still waiting on the rules. Only the initial
+    # ownership waits: the bike came before them, so a transfer since isn't owed anything
+    def holding_email?(ownership)
+      ownership.initial? && ownership.bike&.unfinished_registration?
+    end
+
+    # No active sequence leaves no rules to agree to, so nothing is owed
+    def abandon_pending(organization_id)
+      pending.for_organization(organization_id).each(&:abandon!)
     end
 
     def find_for(bike:, organization:) = acknowledged.for_organization(organization).where(bike_id: bike.id).last
@@ -82,14 +92,26 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
     registration_sequence&.acknowledgment
   end
 
+  # The moment the rules are agreed to, whether or not the bike came first
+  def acknowledge!(sequence:, user_id:, owner_email:)
+    return false unless update(registration_sequence: sequence, user_id:, owner_email:,
+      acknowledged_at: Time.current)
+
+    release_held_email
+    true # Not release_held_email's job id - callers ask whether the agreement saved
+  end
+
+  # Given up on rather than agreed to, so the record goes with the rules it was owed against
+  def abandon! = destroy && release_held_email
+
   private
 
-  # The finished registration email being pending held back - the job decides whether it
-  # sends. saved_change_to: create_bike stamps bike_id on an already-acknowledged row too
+  # The job decides whether it sends. The initial ownership, since that's the one
+  # holding_email? withheld - a transfer since doesn't move the hold onto the new owner
   def release_held_email
     return if bike_id.blank?
-    return unless destroyed? || saved_change_to_acknowledged_at?
 
-    EmailJobs::OwnershipInvitationJob.perform_async(Bike.unscoped.where(id: bike_id).pick(:current_ownership_id))
+    ownership_id = Ownership.where(bike_id:, previous_ownership_id: nil).pick(:id)
+    EmailJobs::OwnershipInvitationJob.perform_async(ownership_id) if ownership_id.present?
   end
 end

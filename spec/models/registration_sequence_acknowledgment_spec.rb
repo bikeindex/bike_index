@@ -71,6 +71,38 @@ RSpec.describe RegistrationSequenceAcknowledgment, type: :model do
     end
   end
 
+  describe "the held email" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership) }
+    let!(:pending) { described_class.create_pending(b_param, sequence:).tap { it.update(bike_id: bike.id) } }
+    let(:initial_ownership) { bike.reload.current_ownership }
+    let(:enqueued) { EmailJobs::OwnershipInvitationJob.jobs.map { it["args"] } }
+
+    it "releases to the ownership it was held for, not whoever owns it now" do
+      expect(described_class.holding_email?(initial_ownership)).to be_truthy
+      transferred = BikeServices::OwnershipTransferer.find_or_create(bike, updator: nil,
+        new_owner_email: "new@example.com")
+      # The bike came before the rules, so the new owner was never waiting on them
+      expect(described_class.holding_email?(transferred)).to be_falsey
+
+      Sidekiq::Job.clear_all
+      expect(described_class.acknowledge(b_param, sequence:)).to be_truthy
+      expect(enqueued).to eq([[initial_ownership.id]])
+    end
+
+    it "releases it when the rules are given up on instead" do
+      Sidekiq::Job.clear_all
+      expect { pending.abandon! }.to change(described_class, :count).by(-1)
+      expect(enqueued).to eq([[initial_ownership.id]])
+    end
+
+    # Only acknowledge! and abandon! release it - create_bike stamps bike_id on its way past
+    it "stays held while the bike is only being attached" do
+      Sidekiq::Job.clear_all
+      pending.update(owner_email: "elsewhere@example.com")
+      expect(enqueued).to eq([])
+    end
+  end
+
   describe "the organization being destroyed" do
     let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, b_param:, registration_sequence: sequence) }
 
