@@ -52,10 +52,9 @@ class RegisterController < ApplicationController
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a
   # find, the e-vehicle acknowledgment pages (?step=3 up), ?step=review and
   # ?step=finished. A step the registration isn't at redirects to one it is.
-  # The emailed and alert links have no step, so they resume - which restarts rules the
-  # organization has replaced since - rather than moving through the flow
+  # The emailed and alert links arrive without a step, rather than moving through the flow
   def show
-    resume_registration_sequence if params[:step].blank?
+    resume_registration if params[:step].blank?
     steps = flow_steps
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
     return redirect_to(step_path(step)) if step != params[:step]
@@ -245,7 +244,9 @@ class RegisterController < ApplicationController
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
 
-  def resume_registration_sequence
+  # All resuming changes today: rules the organization has replaced since start over.
+  # No sequence to resume on is the common case, and returns what was already resolved
+  def resume_registration
     @registration_sequence, restarted = BikeServices::Register
       .resume_registration_sequence(@b_param, sequence: @registration_sequence)
     flash[:notice] = translation(:safety_rules_updated, controller_method: :acknowledge) if restarted
