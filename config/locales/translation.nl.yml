@@ -5766,10 +5766,6 @@ nl:
             serial_label: 'Serial:'
             sticker_label: 'Sticker:'
             view_all: alles bekijken
-          bike_card:
-            e_vehicle: E-voertuig
-            not_registered_with: Niet geregistreerd bij %{org_name}
-            registered_with: Geregistreerd bij %{org_name}
         impound_records:
           index:
             all_bikes: Alle fietsen
@@ -6318,29 +6314,8 @@ nl:
           stolenness_stolen: Overal gestolen
           within: binnen
         result_view_select:
-          bike_box_view: Bekijk als lijst
-          thumbnail_view: Bekijken als miniaturen
-      search_results:
-        bike_box:
-          ended_at: Einde
-          location: Plaats
-          not_applicable: Niet van toepassing
-          posted_at: Genoteerd
-          price: Prijs
-          primary_colors: Primaire kleuren
-          removed_from: Verwijderd uit de fietsindex
-          serial: Serie
-        container:
-          no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
-        frame:
-          fetch_failed: Deze resultaten konden niet worden geladen. Controleer uw
-            verbinding en probeer het opnieuw.
-          rate_limited: Te veel zoekopdrachten te snel achter elkaar — je hebt een
-            limiet bereikt. Wacht even en probeer het opnieuw.
-          retry: Probeer het opnieuw
-        vehicle_thumbnail:
-          member: Lid van Bike Index
-          registered_not_stolen: geregistreerd, niet gestolen
+          cards_view: Bekijk als kaarten
+          list_view: Weergeven als lijst
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Klik op de onderstaande knop om verder te gaan.
@@ -6864,6 +6839,34 @@ nl:
           finish_the_required_steps: Voltooi de vereiste stappen.
           not_registered_yet_html: Uw %{manufacturer} %{cycle_type} is nog niet geregistreerd!
             Gelieve %{finish_link}
+      search_results:
+        bike_box:
+          ended_at: Einde
+          location: Plaats
+          not_applicable: Niet van toepassing
+          posted_at: Genoteerd
+          price: Prijs
+          primary_colors: Primaire kleuren
+          removed_from: Verwijderd uit de fietsindex
+          serial: Serie
+        bike_card:
+          e_vehicle: E-voertuig
+          member_listing: Lid van Bike Index
+          member_listing_tooltip: Deze verkoper is lid van Bike Index.
+          not_registered_with: Niet geregistreerd bij %{org_name}
+          registered_with: Geregistreerd bij %{org_name}
+        bike_list_item:
+          e_vehicle: E-voertuig
+          member_listing: Lid van Bike Index
+          member_listing_tooltip: Deze verkoper is lid van Bike Index.
+          not_registered_with: Niet geregistreerd bij %{org_name}
+          registered_with: Geregistreerd bij %{org_name}
+        frame:
+          fetch_failed: Deze resultaten konden niet worden geladen. Controleer uw
+            verbinding en probeer het opnieuw.
+          rate_limited: Te veel zoekopdrachten te snel achter elkaar — je hebt een
+            limiet bereikt. Wacht even en probeer het opnieuw.
+          retry: Probeer het opnieuw
   user_emails:
     confirm:
       confirm_email: E-mail bevestigen
