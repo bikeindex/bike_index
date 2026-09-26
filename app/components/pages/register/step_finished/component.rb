@@ -54,10 +54,15 @@ module Pages
           # A find isn't theirs to be watched over, and isn't claimed by the address it was
           # registered for - it's claimed by whoever lost it
           return translation(".owner_can_claim") if found?
+          return translation(".safety_rules_sent_html", bike_display: @bike.mnfg_name, email: owner_email_tag) if rules_sent?
           return translation(".registered_for_owner_html", bike_display: @bike.mnfg_name, email: owner_email_tag) unless self_made?
 
           translation(".we_will_keep_watch", bike_display: @bike.mnfg_name)
         end
+
+        # The separate attestation switch left the safety rules to the owner, whose claim
+        # email waits on them
+        def rules_sent? = !self_made? && @b_param.acknowledgment_pending?
 
         def owner_email_tag
           content_tag(:strong, @b_param.owner_email)

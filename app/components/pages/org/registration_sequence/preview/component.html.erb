@@ -1,5 +1,5 @@
 <%= render Pages::Register::Page::Component.new do %>
-  <%= render Pages::Register::Progress::Component.new(steps: progress_steps, step: progress_step) %>
+  <%= render Pages::Register::Progress::Component.new(flow: progress_flow, step: progress_step) %>
 
   <%= render Pages::Register::AcknowledgmentProgress::Component.new(number: @index + 1, total: acknowledgment_step_count) %>
 

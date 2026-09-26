@@ -35,7 +35,7 @@ module Pages
           }.merge(params).as_json)
           sequence = ::BikeServices::Register.registration_sequence(b_param)
           render(Pages::Register::StepReport::Component.new(b_param:, sequence:,
-            steps: ::BikeServices::Register.steps(b_param, sequence:)))
+            flow: ::BikeServices::Register.flow(b_param, sequence:)))
         end
       end
     end

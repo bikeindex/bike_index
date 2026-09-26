@@ -35,10 +35,11 @@ class UserRegistrationOrganization < ApplicationRecord
 
   class << self
     def universal_registration_info_for(user, passed_reg_info = {})
+      # Rows stored before set_initial_registration_info left them out still carry them
       uro_reg_info = user.user_registration_organizations.pluck(:registration_info).reduce({}, :merge)
+        .except(*RegistrationInfoable::REGISTRATION_ONLY_KEYS)
       own_reg_info = user.ownerships.reorder(:updated_at).pluck(:registration_info).reduce({}, :merge)
-      ignored_own_keys = %w[bike_sticker]
-      merging_own_keys = (own_reg_info.keys - uro_reg_info.keys - ignored_own_keys)
+      merging_own_keys = (own_reg_info.keys - uro_reg_info.keys - RegistrationInfoable::REGISTRATION_ONLY_KEYS)
       location_keys = RegistrationInfoable::LOCATION_KEYS
       # Then, remove location keys
       unless (uro_reg_info.keys & location_keys).count == location_keys.count
@@ -64,7 +65,7 @@ class UserRegistrationOrganization < ApplicationRecord
           ids.each { |i| new_reg_info["organization_affiliation_#{i}"] ||= organization_affiliation }
         end
       end
-      new_reg_info.merge((passed_reg_info || {}).slice(*ignored_own_keys))
+      new_reg_info.merge((passed_reg_info || {}).slice(*RegistrationInfoable::REGISTRATION_ONLY_KEYS))
     end
 
     private
@@ -88,7 +89,7 @@ class UserRegistrationOrganization < ApplicationRecord
   # Use all the registration info from the bikes
   def set_initial_registration_info
     reg_info_array = bikes.reorder(:updated_at).map(&:registration_info).reject(&:blank?)
-    self.registration_info = reg_info_array.reduce({}, :merge)
+    self.registration_info = reg_info_array.reduce({}, :merge).except(*RegistrationInfoable::REGISTRATION_ONLY_KEYS)
   end
 
   # Because seth wants to have default=false attributes in the database, but can_edit_claimed is easier to think about

@@ -1,0 +1,8 @@
+<%# What tells create both steps are here - the embed frames step 1 alone %>
+<%= hidden_field_tag :single_page, true %>
+
+<%= fields_for(:bike) do |f| %>
+  <%= render Pages::Register::Step2Fields::Component.new(b_param: @b_param, flow: @flow,
+      form: f, current_user: @current_user, organization: @organization,
+      motorized_review: @motorized_review) %>
+<% end %>

@@ -1,13 +1,28 @@
-<%# The organized menu already says whose admin panel this is %>
-<%= render Pages::Register::Step1::Component.new(b_param: @b_param, steps: @steps, current_user: @current_user,
-      skip_heading: true) %>
+<%# The organized menu already names the organization %>
+<%= render Pages::Register::StartPage::Component.new(b_param: @b_param, flow: @flow, organization: @organization,
+    current_user: @current_user, skip_heading: true, motorized_review: @motorized_review) %>
 
 <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
-<p
-  class="
-    tw:mt-24 tw:mb-8 tw:pl-4 tw:text-lg tw:font-semibold tw:text-gray-900
-    tw:italic tw:dark:text-gray-100
-  "
->
-  <%= link_to "Go back to the old view", new_organization_bike_path(organization_id: @organization.to_param, old_view: true), class: "twlink" %>
-</p>
+<div class="tw:mt-24 tw:mb-8 tw:pl-4">
+  <p
+    class="
+      tw:mb-4 tw:text-lg tw:font-semibold tw:text-gray-900 tw:italic
+      tw:dark:text-gray-100
+    "
+  >
+    <%= link_to translation(".go_back_to_old_view"), new_organization_bike_path(organization_id: @organization.to_param, old_view: true), class: "twlink" %>
+  </p>
+
+  <%= form_with(url: switches_path, data: {turbo: false}) do %>
+    <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: @flow.single_page?,
+        label: translation(".single_page")) %>
+
+    <% if safety_rules? %>
+      <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,
+          class_name: "tw:mt-2", label: translation(".separate_attestation")) %>
+    <% end %>
+
+    <%= render UI::Button::Component.new(text: translation(".update"), color: :secondary, size: :sm,
+        type: "submit", html_class: "tw:mt-3") %>
+  <% end %>
+</div>

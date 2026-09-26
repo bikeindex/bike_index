@@ -8,10 +8,10 @@ RSpec.describe Pages::Register::StepReport::Component, type: :component do
   let(:sequence) { nil }
   let(:params) { {bike: {owner_email: current_user.email, manufacturer_id: 12, status:}} }
   let(:b_param) { BParam.create(origin: "register_flow", creator_id: current_user.id, params: params.as_json) }
-  let(:steps) { BikeServices::Register.steps(b_param, sequence:) }
+  let(:flow) { BikeServices::Register.flow(b_param, sequence:) }
 
   it "asks about the theft, and is the last step" do
-    render_inline(described_class.new(b_param:, sequence:, steps:))
+    render_inline(described_class.new(b_param:, sequence:, flow:))
 
     expect(page).to have_field("report[police_report_number]")
     expect(page).to have_button("Complete Bike Registration")
@@ -36,7 +36,7 @@ RSpec.describe Pages::Register::StepReport::Component, type: :component do
     end
 
     it "shows the report as it was entered" do
-      render_inline(described_class.new(b_param:, sequence:, steps:))
+      render_inline(described_class.new(b_param:, sequence:, flow:))
 
       date = page.find("input[name='report[date]']")
       # The app's zone, which is what a submission without one is read back in
@@ -55,7 +55,7 @@ RSpec.describe Pages::Register::StepReport::Component, type: :component do
     let(:status) { "status_impounded" }
 
     it "asks about the find instead, in its own words" do
-      render_inline(described_class.new(b_param:, sequence:, steps:))
+      render_inline(described_class.new(b_param:, sequence:, flow:))
 
       expect(page).to have_field("report[impounded_description]")
       expect(page).to_not have_field("report[theft_description]")
@@ -76,7 +76,7 @@ RSpec.describe Pages::Register::StepReport::Component, type: :component do
     end
 
     it "doesn't claim to finish the registration" do
-      render_inline(described_class.new(b_param:, sequence:, steps:))
+      render_inline(described_class.new(b_param:, sequence:, flow:))
 
       expect(page).to have_button("Next")
       expect(page).to_not have_button("Complete e-Scooter Registration")
@@ -88,7 +88,7 @@ RSpec.describe Pages::Register::StepReport::Component, type: :component do
       before { FactoryBot.create(:registration_sequence_acknowledgment, b_param:, registration_sequence: sequence) }
 
       it "finishes the registration" do
-        render_inline(described_class.new(b_param:, sequence:, steps:))
+        render_inline(described_class.new(b_param:, sequence:, flow:))
 
         expect(page).to have_button("Complete e-Scooter Registration")
         expect(page).to_not have_button("Next")

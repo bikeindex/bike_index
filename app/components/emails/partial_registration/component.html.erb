@@ -1,13 +1,25 @@
-<h1><%= translation("youre_almost_done") %></h1>
+<% if rules_owed? %>
+  <h1><%= translation("agree_to_the_safety_rules") %></h1>
 
-<p>
-  <%= translation("just_a_few_steps_away_html", color_and_brand: @b_param.color_and_brand) %>
-</p>
+  <p>
+    <%= translation("safety_rules_owed_html", color_and_brand: @b_param.color_and_brand,
+        org_name: organization.short_name) %>
+  </p>
+<% else %>
+  <h1><%= translation("youre_almost_done") %></h1>
+
+  <p>
+    <%= translation("just_a_few_steps_away_html", color_and_brand: @b_param.color_and_brand) %>
+  </p>
+<% end %>
 
 <% if organization_snippet_body.present? %>
   <%= organization_snippet_body.html_safe %>
 <% end %>
 
-<p><%= translation("click_below_to_complete_your_registration") %></p>
+<% unless rules_owed? %>
+  <p><%= translation("click_below_to_complete_your_registration") %></p>
+<% end %>
 
-<%= link_to translation("finish_it"), tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>
+<%= link_to rules_owed? ? translation("review_the_rules") : translation("finish_it"), tokenized_url,
+    "data-pm-no-track" => true, class: "binx-button" %>

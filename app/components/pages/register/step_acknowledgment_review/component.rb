@@ -6,10 +6,10 @@ module Pages
       # The last of the e-vehicle pages: what was acknowledged, and the acknowledgment
       # binding the registrant to it
       class Component < ApplicationComponent
-        def initialize(b_param:, sequence:, steps:, current_user: nil)
+        def initialize(b_param:, sequence:, flow:, current_user: nil)
           @b_param = b_param
           @sequence = sequence
-          @steps = steps
+          @flow = flow
           @current_user = current_user
         end
 
