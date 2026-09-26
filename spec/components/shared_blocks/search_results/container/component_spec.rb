@@ -35,9 +35,7 @@ RSpec.describe SharedBlocks::SearchResults::Container::Component, type: :compone
   # no organization - which is what keeps the org search's badge, its organization_id links
   # and the owner's registration address off a public page. A bike carrying all three.
   context "with a registration of an organization's, listed for sale" do
-    let(:organization) do
-      FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"])
-    end
+    let(:organization) { FactoryBot.create(:organization) }
     let(:bike) do
       FactoryBot.create(:bike_organized, creation_organization: organization,
         address_record: FactoryBot.create(:address_record, :los_angeles, kind: :bike))

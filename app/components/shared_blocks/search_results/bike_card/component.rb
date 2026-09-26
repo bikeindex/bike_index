@@ -16,17 +16,16 @@ module SharedBlocks
         def initialize(bike:, organization: nil, search_all: false)
           @bike = bike
           @organization = organization
-          # The badge vouches for a registration, so it's the credibility feature's
-          @render_org_badge = search_all && @organization.present? &&
-            @organization.enabled?("credibility_badges")
+          @render_org_badge = search_all && @organization.present?
         end
 
         private
 
-        # Like the table's rows, not per viewer. The listing and the badge flag are in the
-        # key because neither a price change nor enabling the feature touches the bike
+        # Like the table's rows, not per viewer. The listing and the credibility flag are in
+        # the key because neither a price change nor enabling the feature touches the bike
         def cache_key
-          [self.class.cache_digest, @organization&.id, @render_org_badge, @bike, for_sale_listing]
+          [self.class.cache_digest, @organization&.id, @render_org_badge, credibility_badges?,
+            @bike, for_sale_listing]
         end
 
         def bike_href = bike_path(@bike, organization_id: @organization&.to_param)
@@ -44,11 +43,16 @@ module SharedBlocks
           @for_sale_listing ||= @bike.current_for_sale_marketplace_listing
         end
 
-        # occurred_at is the stolen or impounded date, and nil for a bike for sale
+        # occurred_at is the stolen or impounded date, and nil for a bike with its owner or
+        # for sale. How long a bike has been registered is what vouches for it, so the
+        # with-owner badge - which carries that date and nothing else - is the feature's
         def status_badge
-          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :inherit,
-            time: @bike.occurred_at || for_sale_listing&.published_at)
+          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :inherit,
+            skip_with_owner: !credibility_badges?,
+            time: @bike.occurred_at || for_sale_listing&.published_at || @bike.created_at)
         end
+
+        def credibility_badges? = @organization&.enabled?("credibility_badges") || false
 
         # Member listings sort ahead of the rest on the marketplace, so the badge says why
         def render_member_badge? = for_sale_listing&.seller_member?

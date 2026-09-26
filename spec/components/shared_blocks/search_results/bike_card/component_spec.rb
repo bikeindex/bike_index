@@ -4,8 +4,7 @@ require "rails_helper"
 
 RSpec.describe SharedBlocks::SearchResults::BikeCard::Component, type: :component do
   let(:component) { render_inline(described_class.new(bike:, organization:, search_all:)) }
-  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
-  let(:enabled_feature_slugs) { ["credibility_badges"] }
+  let(:organization) { FactoryBot.create(:organization) }
   let(:search_all) { false }
   let(:color) { FactoryBot.create(:color, name: "Purple", display: "#715eb2") }
   let(:bike) do
@@ -33,16 +32,6 @@ RSpec.describe SharedBlocks::SearchResults::BikeCard::Component, type: :componen
       expect(component).to have_text("Registered with #{organization.short_name}")
     end
 
-    # The badge vouches for the registration, so it's the credibility feature's
-    context "without credibility_badges" do
-      let(:enabled_feature_slugs) { ["bike_search"] }
-
-      it "renders no badge" do
-        expect(component).to have_no_text("Registered with")
-        expect(component).to have_no_text("Not registered with")
-      end
-    end
-
     context "when it isn't registered with the organization" do
       let(:bike) { FactoryBot.create(:bike, propulsion_type: "throttle", cycle_type: "cargo") }
 
@@ -63,6 +52,18 @@ RSpec.describe SharedBlocks::SearchResults::BikeCard::Component, type: :componen
     it "renders it for the organization, and no status for a bike with its owner" do
       expect(component).to have_text("Los Angeles")
       expect(component).to have_no_text("Registered")
+    end
+
+    # How long a bike has been registered is what vouches for it
+    context "with credibility_badges" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"])
+      end
+
+      it "renders the with-owner badge, carrying the registration date" do
+        expect(component).to have_text("Registered ·")
+        expect(component).to have_css("span.localizeTime")
+      end
     end
 
     # The registration address is the owner's home, and nothing on the public page

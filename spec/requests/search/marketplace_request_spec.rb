@@ -293,9 +293,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
       # publishing a listing replaces the bike's own address record with the listing's, so
       # there's no second address to leak here - the container spec covers that one.)
       context "with a registration of an organization's" do
-        let(:organization) do
-          FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"])
-        end
+        let(:organization) { FactoryBot.create(:organization) }
         let!(:organized_bike) do
           FactoryBot.create(:bike_organized, :with_primary_activity, :with_ownership_claimed,
             creation_organization: organization)
