@@ -3,7 +3,7 @@
 module SharedBlocks
   module SearchResults
     module BikeListItem
-      class ComponentPreview < BikeCard::ComponentPreview
+      class ComponentPreview < SharedBlocks::SearchResults::BikeCard::ComponentPreview
         # @!group Variants
         # Redefined, since only a preview's own methods are listed
         # @param search_all toggle
