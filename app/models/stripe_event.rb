@@ -61,19 +61,22 @@ class StripeEvent < ApplicationRecord
   def update_bike_index_record!
     # Currently, only handle on creation, when the data object is assigned.
     raise "Stripe Data not assigned, unable to handle" unless @data.present?
-    # Stripe can redeliver a processed event. A subscription event carries the subscription as
-    # it was then, so a redelivery could undo a later event. Out of order first deliveries
-    # still apply as they arrive
-    return if processed_at.present?
 
-    if checkout?
-      if data_object.subscription.present?
-        update_stripe_subscription(Stripe::Subscription.retrieve(data_object.subscription), data_object)
+    # Stripe can deliver an event more than once, even concurrently, and a subscription event
+    # carries the subscription as it was then, so a redelivery could undo a later event.
+    # Jobs enqueued in here have to be after_commit, or they'd run for rolled back work
+    with_lock do
+      next if processed_at.present?
+
+      if checkout?
+        if data_object.subscription.present?
+          update_stripe_subscription(Stripe::Subscription.retrieve(data_object.subscription), data_object)
+        end
+      elsif subscription?
+        update_stripe_subscription(data_object)
       end
-    elsif subscription?
-      update_stripe_subscription(data_object)
+      update!(processed_at: Time.current)
     end
-    update!(processed_at: Time.current)
   end
 
   private

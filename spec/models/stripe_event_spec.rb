@@ -18,6 +18,7 @@ RSpec.describe StripeEvent, type: :model do
 
     it "stores the payload once per Stripe event" do
       expect { stripe_event }.to change(StripeEvent, :count).by 1
+      expect(stripe_event).to have_attributes target_attributes
       expect(stripe_event.reload).to have_attributes target_attributes
 
       expect { StripeEvent.create_from(Stripe::Event.construct_from(webhook_payload)) }
@@ -37,7 +38,7 @@ RSpec.describe StripeEvent, type: :model do
       end
 
       it "stores the connected account" do
-        expect(stripe_event.reload).to have_attributes target_attributes
+        expect(stripe_event).to have_attributes target_attributes
         expect(stripe_event.known_event?).to be_falsey
       end
     end
@@ -106,19 +107,36 @@ RSpec.describe StripeEvent, type: :model do
         expect(payment.user_id).to be_blank
       end
 
-      context "called twice" do
+      context "create_or_update_from_stripe! called twice" do
         it "only creates the things once" do
           expect do
             VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
-              stripe_event.update_bike_index_record!
-            end
-            VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
-              stripe_event.update_bike_index_record!
+              stripe_subscription_obj = Stripe::Subscription.retrieve(stripe_event.data_object.subscription)
+              2.times do
+                StripeSubscription.create_or_update_from_stripe!(stripe_subscription_obj:,
+                  stripe_checkout_session: stripe_event.data_object)
+              end
             end
           end.to change(StripeSubscription, :count).by(1)
             .and change(Payment, :count).by 1
 
           expect_stripe_subscription_and_payment_to_match_targets(StripeSubscription.last, Payment.last)
+        end
+      end
+
+      context "redelivered" do
+        it "doesn't process it again" do
+          VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
+            stripe_event.update_bike_index_record!
+          end
+          processed_at = stripe_event.reload.processed_at
+          expect(processed_at).to be_present
+
+          # No cassette, so any Stripe request would raise
+          expect do
+            StripeEvent.create_from(Stripe::Event.construct_from(webhook_payload)).update_bike_index_record!
+          end.to change(Payment, :count).by(0)
+          expect(stripe_event.reload.processed_at).to eq processed_at
         end
       end
 
