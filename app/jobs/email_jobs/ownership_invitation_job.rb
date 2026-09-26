@@ -17,15 +17,9 @@ module EmailJobs
       ownership.bike&.update(updated_at: Time.current)
       ownership.reload
 
-      if ownership.calculated_send_email != ownership.send_email
-        # Update the ownership to have send email set
-        ownership.update_attribute(:skip_email, !ownership.calculated_send_email)
-      end
-      return if ownership.skip_email
-      # initial?, since the rules are owed by the registration that made the bike - a later
-      # transfer isn't waiting on them. Not skip_email, which latches: calculated_send_email
-      # reads it back and goes on holding the email after they're agreed to
-      return if ownership.initial? && ownership.bike.unfinished_registration?
+      # Read every run rather than cached onto skip_email, which is what the registration
+      # asked for - writing the answer back there latches it against a reason that lifts
+      return unless ownership.calculated_send_email
 
       notification = Notification.find_or_create_by(notifiable: ownership,
         kind: "finished_registration")

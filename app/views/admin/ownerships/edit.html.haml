@@ -56,7 +56,7 @@
       %tr
         %td Send Email
         %td
-          = check_mark if @ownership.send_email
+          = check_mark if @ownership.calculated_send_email
       %tr
         %td Cached Data
         %td= @bike.cached_data

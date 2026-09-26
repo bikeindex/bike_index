@@ -145,22 +145,21 @@ RSpec.describe EmailJobs::OwnershipInvitationJob, type: :job do
     let(:bike) { FactoryBot.create(:bike) }
     let(:user) { FactoryBot.create(:user, no_non_theft_notification: true) }
     let(:ownership) { FactoryBot.create(:ownership, bike: bike, user: user) }
-    it "does not send, updates ownership to be send_email false" do
+    it "does not send, and leaves skip_email as it was asked for" do
       ownership.reload
       expect(ownership.calculated_send_email).to be_falsey
       expect(ownership.skip_email).to be_falsey
       ActionMailer::Base.deliveries = []
       EmailJobs::OwnershipInvitationJob.new.perform(ownership.id)
       expect(ActionMailer::Base.deliveries).to be_empty
-      ownership.reload
-      expect(ownership.reload.skip_email).to be_truthy
+      expect(ownership.reload.skip_email).to be_falsey
     end
   end
   context "creation organization has skip_email" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["skip_ownership_email"]) }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
     let(:ownership) { bike.ownerships.first }
-    it "doesn't send email, updates to be send_email false, sends email to the second ownership" do
+    it "doesn't send email, sends email to the second ownership" do
       ActionMailer::Base.deliveries = []
       expect(ownership.send_email).to be_truthy
       expect {
@@ -168,7 +167,7 @@ RSpec.describe EmailJobs::OwnershipInvitationJob, type: :job do
       }.to change(Notification, :count).by(0)
       expect(ActionMailer::Base.deliveries).to be_empty
       ownership.reload
-      expect(ownership.send_email).to be_falsey
+      expect(ownership.calculated_send_email).to be_falsey
       expect(ownership.current?).to be_truthy
       # Second email
       ownership2 = FactoryBot.create(:ownership, bike: bike, created_at: Time.current)

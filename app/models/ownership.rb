@@ -252,6 +252,9 @@ class Ownership < ApplicationRecord
   def calculated_send_email
     return false if skip_email || bike.blank? || phone_registration? || bike.example? || bike.likely_spam?
     return false if spam_risky_email? || user&.no_non_theft_notification
+    # The register flow creates the bike ahead of its organization's safety rules; a
+    # later transfer isn't waiting on them
+    return false if initial? && bike.unfinished_registration?
 
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     true unless organization.present? && organization.enabled?("skip_ownership_email")
