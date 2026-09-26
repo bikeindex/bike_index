@@ -18,6 +18,14 @@ RSpec.describe Pages::Admin::Bikes::Tabs::Component, type: :component do
     expect(component).to have_link("non-admin view", href: "/bikes/#{bike.id}")
   end
 
+  context "with a creation organization" do
+    let(:bike) { FactoryBot.create(:bike_organized) }
+
+    it "links the non-admin view without it" do
+      expect(component).to have_link("non-admin view", href: "/bikes/#{bike.id}")
+    end
+  end
+
   context "with an invalid active tab" do
     let(:active) { :party }
 

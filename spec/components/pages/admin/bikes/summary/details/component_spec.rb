@@ -17,6 +17,7 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
     expect(component).to have_content("owner@bikeindex.org")
     expect(component).to have_content("self reg")
     expect(component).to_not have_content("status:")
+    expect(component).to have_link("No Image", href: "/bikes/#{bike.id}")
   end
 
   context "with display_dev_info" do
@@ -32,8 +33,9 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
   context "with a creation organization" do
     let(:bike) { FactoryBot.create(:bike_organized, owner_email: "owner@bikeindex.org") }
 
-    it "links it instead of the creator" do
+    it "links it instead of the creator, and the thumbnail to the unorganized bike page" do
       expect(component).to have_link(bike.creation_organization.name)
+      expect(component).to have_link("No Image", href: "/bikes/#{bike.id}")
       expect(component.css("small").map { |e| e.text.strip }).to_not include "self reg"
     end
   end

@@ -5,7 +5,7 @@
 
 <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-y-2">
   <div class="tw:w-1/4 tw:pr-4 tw:lg:w-2/12">
-    <a href="<%= edit_admin_bike_path(@bike.to_param) %>">
+    <a href="<%= bike_path(@bike.to_param) %>">
       <% if @bike.thumb_path.present? %>
         <%= image_tag @bike.thumb_path, alt: @bike.title_string, class: "tw:mx-auto tw:w-full tw:max-w-45" %>
       <% else %>
