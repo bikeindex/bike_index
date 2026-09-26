@@ -308,21 +308,20 @@ class BParam < ApplicationRecord
   # The register flow creates the bike ahead of its organization's safety rules, which
   # it still requires - so the registration isn't finished until they're agreed to
   def acknowledgment_pending?
-    persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
+    register_flow? && persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
   end
 
   def finished_registration? = with_bike? && !acknowledgment_pending?
 
-  def unexpired? = created_at.present? && created_at >= Time.current - TOKEN_EXPIRATION || acknowledgment_pending?
-
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
-  # after_commit a destroy fires resolves its alert rather than re-saving it.
-  # self_made? last, and taking the user callers already hold, since it's the only clause
-  # that queries: one made for someone else isn't the creator's bike to alert about
+  # after_commit a destroy fires resolves its alert rather than re-saving it. One with a
+  # bike here owes the safety rules, which don't expire.
+  # self_made? last, taking the user callers already hold: one made for someone else
+  # isn't the creator's bike to alert about
   def unfinished_registration?(user = creator)
     !destroyed? && register_flow? && !finished_registration? && manufacturer_id.present? &&
-      unexpired? && self_made?(user)
+      (with_bike? || created_at.present? && created_at > Time.current - TOKEN_EXPIRATION) && self_made?(user)
   end
 
   def register_flow? = Ownership::ORIGIN_REG_FLOW.include?(origin)

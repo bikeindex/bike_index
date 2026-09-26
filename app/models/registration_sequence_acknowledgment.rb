@@ -34,8 +34,9 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
   belongs_to :bike
   belongs_to :user
 
-  # Whether it's pending is what keeps the registration unfinished
-  after_commit { b_param&.update_unfinished_registration_alerts }
+  # The unfinished_registration alert reads whether this is pending. Not on create: the
+  # pending one is made just before its b_param saves the bike, which refreshes it anyway
+  after_commit(on: %i[update destroy]) { b_param&.update_unfinished_registration_alerts }
 
   scope :pending, -> { where(acknowledged_at: nil) }
   scope :acknowledged, -> { where.not(acknowledged_at: nil) }
@@ -45,8 +46,8 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
 
   class << self
     # The pages are acknowledged one at a time on the b_param; this is the moment they're
-    # agreed to as a whole. Onto the pending one when the bike came first, and against the
-    # sequence the pages were read from, which may not be the one it was pending on
+    # agreed to as a whole - onto the pending one when the bike came first, against the
+    # sequence the pages were read from rather than the one it was pending on
     def acknowledge(b_param, sequence:, user: nil)
       acknowledgment = find_or_initialize_by(b_param_id: b_param.id)
       acknowledgment.update(registration_sequence: sequence, user_id: acknowledgment.user_id || user&.id,
@@ -66,8 +67,6 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
       Arel.sql("(#{acknowledged_at.to_sql}) #{(direction == "asc") ? "ASC" : "DESC"}")
     end
   end
-
-  def acknowledged? = acknowledged_at.present?
 
   # The review is only reachable with every page acknowledged, so the whole (frozen)
   # sequence is what was agreed to

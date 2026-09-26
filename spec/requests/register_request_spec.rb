@@ -1545,13 +1545,13 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to step_path("finished")
         expect(RegistrationSequenceAcknowledgment.sole).to have_attributes(registration_sequence_id: sequence.id,
           bike_id: b_param.reload.created_bike_id)
-        expect(RegistrationSequenceAcknowledgment.sole.acknowledged?).to be_truthy
+        expect(RegistrationSequenceAcknowledgment.sole.acknowledged_at).to be_present
       end
 
       it "starts the newer version over when resumed from a link" do
         get register_path(b_param_token: b_param.id_token)
         expect(response).to redirect_to step_path("3")
-        expect(flash[:notice]).to eq "The safety rules have been updated since you started — please review them again"
+        expect(flash[:notice]).to eq "The safety rules have been updated — please review them again"
         expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
         expect(BikeServices::Register.registration_sequence(b_param)&.id).to eq new_sequence.id
 

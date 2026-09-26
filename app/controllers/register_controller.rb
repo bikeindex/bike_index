@@ -247,7 +247,7 @@ class RegisterController < ApplicationController
   def restart_replaced_sequence
     return unless BikeServices::Register.restart_replaced_sequence(@b_param, sequence: @registration_sequence)
 
-    flash[:notice] = translation(:safety_rules_updated)
+    flash[:notice] = translation(:safety_rules_updated, controller_method: :acknowledge)
     find_registration_sequence
   end
 

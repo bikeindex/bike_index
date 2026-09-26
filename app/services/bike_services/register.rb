@@ -27,7 +27,6 @@ module BikeServices
     MATCHED_ATTRS = %w[frame_model year frame_size primary_frame_color_id secondary_frame_color_id
       tertiary_frame_color_id extra_registration_number status].index_with(&:itself)
       .merge("serial_number" => "serial_normalized", "frame_size_number" => "frame_size").freeze
-    # What matches_bike? builds its comparison from
     MATCH_INPUTS = (MATCHED_ATTRS.keys + %w[owner_email manufacturer_id manufacturer_other cycle_type frame_size_unit]).freeze
 
     # The token's registration when step 1 was never submitted, otherwise a new one.
@@ -194,8 +193,7 @@ module BikeServices
       acknowledge_page(b_param, page_for_step(step, sequence:), checked:)
     end
 
-    # The moment the pages become an agreement - promoted off the b_param onto a
-    # record of its own, which outlives the registration
+    # The moment the pages become an agreement, on a record that outlives the registration
     def save_acknowledgment(b_param, sequence, acknowledged_all:, user: nil)
       return false unless Binxtils::InputNormalizer.boolean(acknowledged_all) && sequence.present?
       return true if acknowledged?(b_param, sequence:)
@@ -214,9 +212,9 @@ module BikeServices
     end
 
     # The bike is created before the safety rules, which the registration still has to agree
-    # to. acknowledged? too, for a sequence that's since gone and left nothing to agree to
+    # to - unless the sequence has since gone, leaving nothing to agree to
     def acknowledgment_owed?(b_param, sequence:)
-      b_param.acknowledgment_pending? && !acknowledged?(b_param, sequence:)
+      b_param.acknowledgment_pending? && sequence_pages(sequence).any?
     end
 
     def editable_step?(b_param, step) = !b_param.with_bike? || BIKE_STEPS.exclude?(step)
@@ -351,7 +349,7 @@ module BikeServices
     # Whether a bike registered some other way is this registration's. Step 1 says only
     # what it is, so any bike of that make and type is; whatever came after has to match too
     def matches_bike?(b_param, bike)
-      built = Bike.new({"cycle_type" => "bike"}.merge(b_param.safe_bike_attrs({}).slice(*MATCH_INPUTS)))
+      built = Bike.new(b_param.safe_bike_attrs({}).slice(*MATCH_INPUTS))
         .tap(&:set_calculated_unassociated_attributes)
       attrs = %w[owner_email mnfg_name cycle_type] + MATCHED_ATTRS.filter_map { |key, attr| attr if b_param.bike[key].present? }
       built.slice(*attrs) == bike.slice(*attrs)
@@ -425,10 +423,9 @@ module BikeServices
       bike if pending.blank?
     end
 
-    # The finished registration email, which the pending acknowledgment held back - as it
-    # did when the rules came before the bike
+    # The finished registration email, which the pending acknowledgment held back
     def send_held_email(b_param)
-      ownership = b_param.created_bike.ownerships.reorder(:id).first
+      ownership = b_param.created_bike.first_ownership
       ownership.update(skip_email: b_param.skip_email?)
       EmailJobs::OwnershipInvitationJob.perform_async(ownership.id)
     end
