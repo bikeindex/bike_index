@@ -128,6 +128,19 @@ RSpec.describe BikeServices::Register do
         expect(BParam.pluck(:id)).to match_array([middle.id, most_recent.id])
       end
     end
+
+    context "with a more recent one owing the safety rules" do
+      let!(:pending) do
+        FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: FactoryBot.create(:bike).id,
+          params: {bike: {manufacturer_id: 1}, acknowledgment_pending: true})
+      end
+
+      it "keeps it, and the most recent without a bike" do
+        expect(BParam.unfinished_registrations.reorder(updated_at: :desc).first.id).to eq pending.id
+        expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-2)
+        expect(BParam.pluck(:id)).to match_array([most_recent.id, pending.id])
+      end
+    end
   end
 
   describe "assign_organization" do

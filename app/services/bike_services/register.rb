@@ -61,11 +61,11 @@ module BikeServices
 
     # Two waiting at most - the one new lands on and the one before it. Ordered the way
     # the unfinished_registration alert picks its one, so what goes is what it would
-    # never have pointed at
+    # never have pointed at. Without a bike, since one owing the safety rules is never discarded
     def discard_extra(user:)
       return if user.blank?
 
-      user.b_params.unfinished_registrations.reorder(updated_at: :desc).offset(1)
+      user.b_params.unfinished_registrations.without_bike.reorder(updated_at: :desc).offset(1)
         .each { destroy_discardable(it) }
     end
 
