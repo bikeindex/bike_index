@@ -85,8 +85,6 @@ class RegisterController < ApplicationController
   def create
     # The combined form says so itself - the embed frames step 1 alone whatever the session holds
     single_page = params[:single_page].present?
-    # The single page writes once, in save_details - which merges the details even after a
-    # failure, so the re-render keeps them, but doesn't write past one
     saved = BikeServices::Register.public_send(single_page ? :assign_step_1 : :save_step_1, @b_param,
       bike_params: create_params, propulsion_type_motorized: params[:propulsion_type_motorized],
       additional: params[:additional], single_page:, separate_attestation: register_setting?(@b_param, "separate_attestation")) &&

@@ -9,8 +9,7 @@ module Pages
         # What these fields need on whichever form holds them
         FORM_CONTROLLERS = "register--status-fields register--organization"
         FORM_ACTIONS = "hw-combobox:selection->register--status-fields#update " \
-          "register--organization:changed->register--status-fields#update " \
-          "change->register--status-fields#updateSubmitLabel"
+          "register--organization:changed->register--status-fields#update"
 
         # single_page: step 1's fields are on the same form, so its address isn't echoed back
         # and whether the owner's name is asked for follows what's typed into it.
@@ -75,8 +74,7 @@ module Pages
         def owner_name_data
           return {} unless @single_page
 
-          own_emails = @current_user ? ([@current_user.email] + @current_user.confirmed_emails).uniq : []
-          {controller: "register--owner-name", "register--owner-name-own-emails-value": own_emails.to_json,
+          {controller: "register--owner-name", "register--owner-name-own-emails-value": (@current_user&.own_emails || []).to_json,
            action: "input@window->register--owner-name#update form-persist:restored@window->register--owner-name#update"}
         end
 

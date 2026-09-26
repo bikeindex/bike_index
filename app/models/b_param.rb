@@ -465,7 +465,7 @@ class BParam < ApplicationRecord
   def self_made?(user = creator)
     return false if user.blank?
 
-    ([user.email] + user.confirmed_emails).include?(EmailNormalizer.normalize(owner_email))
+    user.own_emails.include?(EmailNormalizer.normalize(owner_email))
   end
 
   def creation_organization

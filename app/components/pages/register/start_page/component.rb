@@ -6,7 +6,7 @@ module Pages
       # The page the flow opens on - its progress, heading, errors and the form itself -
       # around whichever fields step 1 asks for: its own, or both steps'
       class Component < ApplicationComponent
-        # Which page opens the flow is read off the steps, so the switch is decided in one place
+        # Which page opens the flow is read off the steps
         def self.opening_page(steps:, motorized_review: false, **)
           return Pages::Register::Step1::Component.new(steps:, **) if steps.include?("2")
 
@@ -43,14 +43,19 @@ module Pages
         def form_options
           return {data: {turbo: false}, html: {target: "_top"}} if @embed
 
-          # The single page's form holds step 2's fields too
+          details = Pages::Register::Step2Fields::Component
           {data: {turbo: true, form_persist_key_value: "register-#{single_page? ? "combined" : "start"}-#{@b_param.id_token}",
-                  controller: ["autofocus form-persist register--retry ui--forms--turnstile",
-                    (Pages::Register::Step2Fields::Component::FORM_CONTROLLERS if single_page?)].compact.join(" "),
+                  controller: "autofocus form-persist register--retry ui--forms--turnstile #{details::FORM_CONTROLLERS if single_page?}",
                   **UI::Forms::Turnstile::Component.form_data(user: @current_user),
-                  action: ["input->form-persist#save hw-combobox:selection->form-persist#save " \
-                    "input->ui--forms--turnstile#update submit->form-persist#clear",
-                    (Pages::Register::Step2Fields::Component::FORM_ACTIONS if single_page?)].compact.join(" ")}}
+                  action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
+                    "input->ui--forms--turnstile#update submit->form-persist#clear #{single_page_actions}"}}
+        end
+
+        # The electric checkbox shares the single page's form, and changes what the submit leads to
+        def single_page_actions
+          return unless single_page?
+
+          "#{Pages::Register::Step2Fields::Component::FORM_ACTIONS} change->register--status-fields#updateSubmitLabel"
         end
       end
     end

@@ -17,10 +17,9 @@
   <%= organization_snippet_body.html_safe %>
 <% end %>
 
-<% if rules_owed? %>
-  <%= link_to translation("review_the_rules"), tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>
-<% else %>
+<% unless rules_owed? %>
   <p><%= translation("click_below_to_complete_your_registration") %></p>
-
-  <%= link_to translation("finish_it"), tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>
 <% end %>
+
+<%= link_to rules_owed? ? translation("review_the_rules") : translation("finish_it"), tokenized_url,
+    "data-pm-no-track" => true, class: "binx-button" %>

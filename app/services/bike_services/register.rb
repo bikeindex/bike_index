@@ -87,8 +87,8 @@ module BikeServices
 
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
     # active sequence, or the one its pages are being agreed to from, even once replaced.
-    # motorized? first - it's in memory, and creation_organization is a query
-    # motorized: the single page asks what an e-vehicle would get, before it's said it's one
+    # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
+    # Checked first - it's in memory, and creation_organization is a query
     def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?)
       return nil unless motorized
       # Left to the owner, so this flow has none - create_bike holds the bike for them to agree
@@ -278,8 +278,7 @@ module BikeServices
       false
     end
 
-    # save_step_1 without the write, for the single page - save_step_2 writes both.
-    # The switches are the flow's once it's submitted, whatever the session says after
+    # save_step_1 without the write, for the single page - save_step_2 writes both
     def assign_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil, single_page: false,
       separate_attestation: false)
       b_param.clean_params({bike: honeypot_spam(bike_params, additional), propulsion_type_motorized:,
@@ -295,8 +294,7 @@ module BikeServices
     # file field, or as the signed id of a blob the browser already uploaded.
     # Returns whether the step passed - a registration for someone else needs their name.
     # A failed step still saves, it just isn't marked complete, so nothing entered is lost.
-    # Not after an error on the same submission (the single page's step 1 or its challenge),
-    # which saving would clear - and which leaves nothing that should be marked complete
+    # Not past an earlier error on the submission, which saving would clear
     def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil, additional: nil)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
