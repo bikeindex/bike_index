@@ -34,9 +34,13 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
   belongs_to :bike
   belongs_to :user
 
-  # The unfinished_registration alert reads whether this is pending. Not on create: the
-  # pending one is made just before its b_param saves the bike, which refreshes it anyway
-  after_commit(on: %i[update destroy]) { b_param&.update_unfinished_registration_alerts }
+  # What being pending held back is released here rather than by whoever stopped it being
+  # pending. Not on create: the pending one is made just before its b_param saves the bike,
+  # which refreshes the alert anyway
+  after_commit(on: %i[update destroy]) do
+    b_param&.update_unfinished_registration_alerts
+    release_held_email
+  end
 
   scope :pending, -> { where(acknowledged_at: nil) }
   scope :acknowledged, -> { where.not(acknowledged_at: nil) }
@@ -77,5 +81,17 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
 
   def acknowledgment_text
     registration_sequence&.acknowledgment
+  end
+
+  private
+
+  # Agreed to, or dropped along with the rules it owed - either way the registration is
+  # finished, and the finished registration email its pending state held back can go.
+  # The job decides whether it actually sends
+  def release_held_email
+    return if bike_id.blank?
+    return unless destroyed? || saved_change_to_acknowledged_at?
+
+    EmailJobs::OwnershipInvitationJob.perform_async(Bike.unscoped.where(id: bike_id).pick(:current_ownership_id))
   end
 end

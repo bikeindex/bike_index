@@ -8,15 +8,10 @@ module CallbackJobs
       organization_id = RegistrationSequence.with_deleted.find_by(id: registration_sequence_id)&.organization_id
       return if organization_id.blank? || RegistrationSequence.active.where(organization_id:).exists?
 
-      BParam.acknowledgment_pending.with_bike.where(organization_id:).find_each { drop_pending_acknowledgment(it) }
-    end
-
-    private
-
-    # No active sequence leaves no safety rules to agree to, so nothing is owed
-    def drop_pending_acknowledgment(b_param)
-      RegistrationSequenceAcknowledgment.pending.where(b_param_id: b_param.id).destroy_all
-      BikeServices::Register.send_held_email(b_param)
+      # No active sequence leaves no safety rules to agree to, so nothing is owed. destroy_all
+      # rather than delete_all: each record releases the email it was holding back
+      RegistrationSequenceAcknowledgment.pending
+        .where(b_param_id: BParam.with_bike.where(organization_id:)).destroy_all
     end
   end
 end

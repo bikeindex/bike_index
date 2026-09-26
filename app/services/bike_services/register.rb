@@ -199,10 +199,8 @@ module BikeServices
     def save_acknowledgment(b_param, sequence, acknowledged_all:, user: nil)
       return false unless Binxtils::InputNormalizer.boolean(acknowledged_all) && sequence.present?
       return true if acknowledged?(b_param, sequence:)
-      return false unless RegistrationSequenceAcknowledgment.acknowledge(b_param, sequence:, user:)
 
-      send_held_email(b_param) if b_param.with_bike?
-      true
+      RegistrationSequenceAcknowledgment.acknowledge(b_param, sequence:, user:)
     end
 
     # The bike exists with its rules agreed to, or everything reachable is entered and awaiting
@@ -325,11 +323,6 @@ module BikeServices
       return create_bike_if_ready(b_param, sequence:, ip_address:) unless b_param.with_bike?
 
       b_param.created_bike unless acknowledgment_owed?(b_param, sequence:)
-    end
-
-    # The finished registration email the pending acknowledgment held back
-    def send_held_email(b_param)
-      EmailJobs::OwnershipInvitationJob.perform_async(b_param.created_bike.current_ownership_id)
     end
 
     # The unfinished registrations a new bike completes: every register flow registration of it -
