@@ -1954,6 +1954,8 @@ en:
     register:
       acknowledge:
         acknowledge_everything: Check every box to agree to these rules
+        safety_rules_updated: The safety rules have been updated — please review them
+          again
       confirm_email:
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
@@ -1963,6 +1965,9 @@ en:
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
           below
+      restart_replaced_sequence:
+        safety_rules_updated: The safety rules have been updated since you started
+          — please review them again
       sign_in_confirmed_user:
         unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
           account

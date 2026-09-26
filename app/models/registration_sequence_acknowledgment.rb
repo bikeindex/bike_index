@@ -46,7 +46,7 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
   class << self
     # The pages are acknowledged one at a time on the b_param; this is the moment they're
     # agreed to as a whole. Onto the pending one when the bike came first, and against the
-    # sequence now active, which may have replaced the one it was pending on
+    # sequence the pages were read from, which may not be the one it was pending on
     def acknowledge(b_param, sequence:, user: nil)
       acknowledgment = find_or_initialize_by(b_param_id: b_param.id)
       acknowledgment.update(registration_sequence: sequence, user_id: acknowledgment.user_id || user&.id,

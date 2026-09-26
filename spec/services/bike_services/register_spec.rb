@@ -616,6 +616,34 @@ RSpec.describe BikeServices::Register do
           expect(described_class.registration_sequence(b_param)).to be_nil
         end
       end
+
+      context "with a page acknowledged, then a newer version activated" do
+        let(:new_sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+        before do
+          described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
+          new_sequence.make_active!
+        end
+
+        it "stays on the version being agreed to, until restarted on the newer one" do
+          started = described_class.registration_sequence(b_param)
+          expect(started).to eq sequence
+          expect(described_class.restart_replaced_sequence(b_param, sequence: started)).to be_truthy
+          expect(described_class.acknowledged_page_ids(b_param)).to eq([])
+          expect(described_class.registration_sequence(b_param)).to eq new_sequence
+          expect(described_class.restart_replaced_sequence(b_param, sequence: new_sequence)).to be_falsey
+        end
+
+        context "already agreed to" do
+          before { described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1") }
+
+          it "isn't restarted" do
+            started = described_class.registration_sequence(b_param)
+            expect(started.archived?).to be_truthy
+            expect(described_class.restart_replaced_sequence(b_param, sequence: started)).to be_falsey
+            expect(described_class.registration_sequence(b_param)).to eq sequence
+          end
+        end
+      end
     end
 
     it "opens one page at a time, then the review" do

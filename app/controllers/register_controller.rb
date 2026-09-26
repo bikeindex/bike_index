@@ -15,6 +15,8 @@ class RegisterController < ApplicationController
   # confirm renders a self-posting form and nothing else, so it reads neither
   before_action :assign_organization, except: %i[new confirm]
   before_action :find_registration_sequence, except: %i[new confirm]
+  # The emailed and alert links have no step, so this is resuming rather than moving through the flow
+  before_action :restart_replaced_sequence, only: %i[show], if: -> { params[:step].blank? }
   before_action :redirect_finished, only: %i[create update report acknowledge]
   before_action :redirect_bike_created, only: %i[create update]
   # The step shown is server state - a cached page could show one the registration is past
@@ -127,6 +129,12 @@ class RegisterController < ApplicationController
 
   # Each acknowledgment page posts here, and the review's final acknowledgment
   def acknowledge
+    # What was read can have been replaced since - by a newer version, or a restart in another tab
+    if params[:registration_sequence_id].to_s != @registration_sequence&.id.to_s
+      flash[:notice] = translation(:safety_rules_updated)
+      return redirect_to_current_step
+    end
+
     steps = flow_steps
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
     acknowledged = BikeServices::Register.acknowledge_step(@b_param, step,
@@ -234,6 +242,13 @@ class RegisterController < ApplicationController
   # Resolved once - the step math, the progress bar and the pages themselves all read it
   def find_registration_sequence
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
+  end
+
+  def restart_replaced_sequence
+    return unless BikeServices::Register.restart_replaced_sequence(@b_param, sequence: @registration_sequence)
+
+    flash[:notice] = translation(:safety_rules_updated)
+    find_registration_sequence
   end
 
   # Read at render time rather than in a filter: the submissions save first, and where

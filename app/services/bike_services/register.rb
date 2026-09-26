@@ -86,14 +86,26 @@ module BikeServices
       b_param.save
     end
 
-    # The safety rules a registration acknowledges before its bike is created - the
-    # organization's active sequence, and only for an e-vehicle
+    # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
+    # active sequence, or the one its pages are being agreed to from, even once replaced.
     # motorized? first - it's in memory, and creation_organization is a query
     def registration_sequence(b_param)
       return nil unless b_param.motorized?
 
       organization = b_param.creation_organization
-      RegistrationSequence.active_for(organization) if organization.present?
+      return nil if organization.blank?
+
+      started_id = b_param.params.dig("registration_sequence", "id")
+      (RegistrationSequence.find_by(id: started_id, organization:) if started_id.present?) ||
+        RegistrationSequence.active_for(organization)
+    end
+
+    # Resuming starts over on the organization's current rules, rather than finishing a
+    # version they've since replaced. An agreement already made stands
+    def restart_replaced_sequence(b_param, sequence:)
+      return false if sequence.blank? || sequence.active? || acknowledged?(b_param, sequence:)
+
+      b_param.update(params: b_param.params.except("registration_sequence"))
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the email),
