@@ -24,7 +24,7 @@ module Pages
 
         private
 
-        def register_stolen_path = register_path(stolen: true)
+        def register_stolen_path = register_path(status: "status_stolen")
 
         def stats
           [{value: number_display(@recoveries_count), label: translation(".stolen_bikes_recovered")},

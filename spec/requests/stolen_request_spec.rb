@@ -10,7 +10,15 @@ RSpec.describe StolenController, type: :request do
       expect(response.media_type).to eq "text/html"
       expect(response.body).to match("Your bike is gone.")
       expect(response.body).to match("Found it on my alert")
-      expect(response.body).to include(register_path(stolen: true))
+      expect(response.body).to include(register_path(status: "status_stolen"))
+    end
+
+    # ?stolen=true was dropped on the bare /register's redirect to new
+    it "links to a registration that starts stolen" do
+      get "/stolen"
+      get Nokogiri::HTML(response.body).at("a:contains('Register your stolen bike')")["href"]
+      follow_redirect!
+      expect(BParam.last.status).to eq "status_stolen"
     end
   end
 

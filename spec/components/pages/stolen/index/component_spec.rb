@@ -24,7 +24,7 @@ RSpec.describe Pages::Stolen::Index::Component, type: :component do
     expect(component).to have_text("1,000+")
     expect(component).to have_css("details[open]", count: 1)
     expect(component).to have_css("details[name='stolen-faq']", count: 5)
-    expect(component).to have_link("Register your stolen bike", href: "/register?stolen=true")
+    expect(component).to have_link("Register your stolen bike", href: "/register?status=status_stolen")
     expect(component).to have_link("Sign in", href: "/session/new")
     expect(component).to_not have_css("form#new_feedback")
   end
