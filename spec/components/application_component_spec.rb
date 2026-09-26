@@ -13,6 +13,22 @@ RSpec.describe ApplicationComponent, type: :component do
 
       expect(orphaned).to eq []
     end
+
+    # The inverse: a component reads its copy through component_translation_scope, but
+    # its digest hashes only the sidecars beside it - so a scope pointing at a sibling's
+    # serves stale copy out of a fragment cache with nothing to say so. Overriding
+    # `translation` outright borrows the same way and isn't caught here.
+    it "keeps every cached component's translation scope in its own directory" do
+      borrowed = cached_components.sort_by(&:name).filter_map do |component|
+        scope = component.allocate.send(:component_translation_scope)
+        directory = Rails.root.join("app/components", *scope.drop(1).map(&:to_s)).to_s
+        next if directory == Pathname.new(component.identifier).dirname.to_s
+
+        "#{component} reads #{scope.join(".")}"
+      end
+
+      expect(borrowed).to eq []
+    end
   end
 
   describe "inheritance" do
