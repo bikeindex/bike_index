@@ -7,13 +7,11 @@ module Pages
         # One of the account page's registrations. The alerts render outside the cache, since
         # resolving or dismissing one doesn't touch the bike
         class Component < ApplicationComponent
-          ALERT_KINDS = %w[unassigned_bike_org unfinished_registration].freeze
-
           # Loaded once for the page; each box picks out its own
           def self.user_alerts(user)
-            return [] unless user.alert_slugs.intersect?(ALERT_KINDS)
+            return [] unless user.alert_slugs.intersect?(UserAlert.account_kinds)
 
-            user.user_alerts.active.where(kind: ALERT_KINDS).includes(:alertable, :organization).to_a
+            user.user_alerts.active.account.includes(:organization).to_a
           end
 
           def initialize(bike:, current_user:, user_alerts: [])
@@ -26,6 +24,10 @@ module Pages
 
           def cache_key
             [self.class.cache_digest, @bike]
+          end
+
+          def unfinished_b_param
+            @bike.b_params.acknowledgment_pending.last if @bike.unfinished_registration?
           end
         end
       end

@@ -123,18 +123,16 @@
     </div>
   <% end %>
 
-  <% @user_alerts.each do |user_alert| %>
-    <% if user_alert.unfinished_registration? %>
-      <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: user_alert.alertable, current_user: @current_user)) %>
-    <% else %>
-      <div class="account-user-alert alert alert-info mb-0">
-        <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
-        <%= link_to translation(".add_it_now"), user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, action: "update", class: "text-underline text-success" %>
+  <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user)) %>
 
-        <div class="small less-strong dismiss-wrapper">
-          <%= link_to translation(".ignore"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, action: "update" %>
-        </div>
+  <% @user_alerts.each do |user_alert| %>
+    <div class="account-user-alert alert alert-info mb-0">
+      <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
+      <%= link_to translation(".add_it_now"), user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, action: "update", class: "text-underline text-success" %>
+
+      <div class="small less-strong dismiss-wrapper">
+        <%= link_to translation(".ignore"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, action: "update" %>
       </div>
-    <% end %>
+    </div>
   <% end %>
 </li>

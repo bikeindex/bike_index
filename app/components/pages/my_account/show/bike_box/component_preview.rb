@@ -25,19 +25,17 @@ module Pages
             render_box(bike(id: 44, thumb_path: Pages::SearchResults::BikeBox::ComponentPreview.vehicles.first.thumb_path))
           end
 
-          # The register flow creates the bike before its organization's safety rules are agreed to
+          # Bike#unfinished_registration? queries, so this needs a real registration whose
+          # organization's safety rules are still to agree to
           def unfinished_registration_alert
-            with_alert = bike(id: 45)
-            b_param = ::BParam.new(id_token: "preview-token", origin: "register_flow", created_at: Time.current,
-              creator: preview_user, created_bike_id: with_alert.id,
-              params: {acknowledgment_pending: true,
-                       bike: {manufacturer_id: 1, cycle_type: "bike", owner_email: preview_user.email}})
-            render_box(with_alert, user_alerts: [::UserAlert.new(id: 1, kind: "unfinished_registration",
-              bike_id: with_alert.id, alertable: b_param)])
+            b_param = ::BParam.unexpired.acknowledgment_pending.with_bike.reorder(:updated_at).last
+            return missing_notice("an unfinished registration") if b_param&.created_bike.blank?
+
+            render_box(b_param.created_bike, current_user: b_param.creator)
           end
 
           def unassigned_bike_org_alert
-            with_alert = bike(id: 46)
+            with_alert = bike(id: 45)
             organization = lookbook_organization || ::Organization.new(name: "Brakebills University", short_name: "Brakebills")
             render_box(with_alert, user_alerts: [::UserAlert.new(id: 2, kind: "unassigned_bike_org",
               bike_id: with_alert.id, organization:)])
@@ -46,9 +44,9 @@ module Pages
 
           private
 
-          def render_box(bike, user_alerts: [])
+          def render_box(bike, current_user: preview_user, user_alerts: [])
             render_with_template(template: "pages/my_account/show/bike_box/component_preview/bike_box",
-              locals: {bike:, current_user: preview_user, user_alerts:})
+              locals: {bike:, current_user:, user_alerts:})
           end
 
           def preview_user
