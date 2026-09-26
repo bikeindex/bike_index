@@ -4,13 +4,13 @@ module SharedBlocks
   module SearchResults
     module BikeCard
       class ComponentPreview < ApplicationComponentPreview
+        # @!group Variants
         # @param search_all toggle
         # @param organized toggle "An org search, linking each card to its org page - off is the marketplace's"
         def default(search_all: false, organized: true)
           render_preview(organization: (preview_organization if organized), search_all:)
         end
 
-        # @!group Credibility badges
         # How long a bike has been registered is what vouches for it, so a bike with its
         # owner is badged only here. Every other status renders either way.
         # @param search_all toggle
