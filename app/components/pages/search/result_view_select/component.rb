@@ -26,8 +26,13 @@ module Pages
 
         def view_entries
           SharedBlocks::SearchResults::Container::Component::RESULT_VIEW_COMPONENT.keys.map do |view|
-            {value: view, label: icon_label(VIEW_ICONS.fetch(view), translation(".#{view}_view"))}
+            {value: view, label: icon_label(VIEW_ICONS.fetch(view), view_label(view))}
           end
+        end
+
+        # A literal key per branch, so i18n-tasks resolves them
+        def view_label(view)
+          (view == :cards) ? translation(".cards_view") : translation(".list_view")
         end
 
         # The chip is icon-only, so title carries the hint a visible label would - but not
