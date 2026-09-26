@@ -11,11 +11,11 @@
     </h1>
 
     <%= render Pages::Search::Form::Component.new(target_search_path: search_registrations_path,
-      target_frame: :search_registrations_results_frame, interpreted_params: @interpreted_params, result_view: @result_view) %>
+      target_frame: :search_registrations_results_frame, interpreted_params: @interpreted_params) %>
   </div>
 <% end %>
 
-<%= render Pages::SearchResults::Frame::Component.new(frame_id: :search_registrations_results_frame,
+<%= render SharedBlocks::SearchResults::Frame::Component.new(frame_id: :search_registrations_results_frame,
   render_results: @render_results, current_path: request.original_fullpath,
   loading_text: t(".loading_results")) do %>
   <%= render partial: "results" %>

@@ -6,11 +6,10 @@ module CallbackJobs
 
     def perform(registration_sequence_id)
       organization_id = RegistrationSequence.with_deleted.find_by(id: registration_sequence_id)&.organization_id
+      # An active sequence still has rules to agree to, so they're still owed
       return if organization_id.blank? || RegistrationSequence.active.where(organization_id:).exists?
 
-      # No active sequence leaves no safety rules to agree to, so nothing is owed. destroy_all
-      # rather than delete_all: each record releases the email it was holding back
-      RegistrationSequenceAcknowledgment.pending.for_organization(organization_id).destroy_all
+      RegistrationSequenceAcknowledgment.abandon_pending(organization_id)
     end
   end
 end

@@ -124,7 +124,7 @@ RSpec.describe UI::Alerts::Base::Component, type: :component do
       expect(component).to have_content "some text"
       expect(component).to have_css('[role="alert"].tw:text-green-800')
       # It has the dismissable button
-      expect(component).to have_selector("button")
+      expect(component).to have_css("button svg path")
     end
   end
 end
