@@ -141,9 +141,10 @@ class UserAlert < ApplicationRecord
     user_alert = find_or_build_by(kind: "unfinished_registration",
       user_id: user.id, alertable: b_param)
     if b_param.unfinished_registration?(user)
-      # Nothing is assigned after the lookup, so saving a found one only re-runs the
-      # uniqueness select find_or_build_by just did - in the register flow's request
-      user_alert.save if user_alert.new_record?
+      # The register flow creates the bike before the registration finishes. Saving an
+      # unchanged one would only re-run the uniqueness select find_or_build_by just did
+      user_alert.bike_id = b_param.created_bike_id
+      user_alert.save if user_alert.changed?
     else # Don't create just to resolve
       user_alert.id.blank? || user_alert.resolve!
     end
