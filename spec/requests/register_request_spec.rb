@@ -515,6 +515,19 @@ RSpec.describe RegisterController, type: :request do
         post session_path, params: {session: {email: user.email, password: "testthisthing7$"}}
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
       end
+      context "submitting a step" do
+        it "signs in, then resumes it" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: {frame_model: "Something"}}
+          expect(response).to redirect_to new_session_url
+          expect(session[:return_to]).to eq register_path(b_param_token: b_param.id_token)
+
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3"}
+          expect(response).to redirect_to new_session_url
+
+          post session_path, params: {session: {email: user.email, password: "testthisthing7$"}}
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        end
+      end
       context "by organization staff, for the owner" do
         let(:owner) { FactoryBot.create(:user_confirmed, email: owner_email) }
         let(:b_param) do
