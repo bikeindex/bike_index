@@ -2,7 +2,7 @@
 
 module CallbackJobs
   class AfterRegistrationSequenceChangeJob < ApplicationJob
-    sidekiq_options queue: "low_priority"
+    sidekiq_options queue: "med_priority"
 
     def perform(registration_sequence_id)
       organization_id = RegistrationSequence.with_deleted.find_by(id: registration_sequence_id)&.organization_id
