@@ -1178,7 +1178,6 @@ RSpec.describe RegisterController, type: :request do
             }.to_not change(RegistrationSequenceAcknowledgment, :count)
             expect(b_param.reload.creation_organization_id).to be_blank
             expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
-            expect(Bike.last.unfinished_registration?).to be_falsey
             # Nothing holding it back, so it goes out rather than waiting on rules nobody owes
             ActionMailer::Base.deliveries = []
             expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1

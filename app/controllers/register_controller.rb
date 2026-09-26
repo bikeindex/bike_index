@@ -100,8 +100,7 @@ class RegisterController < ApplicationController
       image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
       bike_params: update_params, register_with_organization: params[:register_with_organization],
       additional: params[:additional])
-    # Re-read: the "register with" checkbox can have dropped the organization it belongs to,
-    # and the bike is created below against whatever it resolves to now
+    # Re-read: the "register with" checkbox can have dropped the organization it belongs to
     find_registration_sequence
     # Saved either way, so the re-render has everything they entered
     unless saved
@@ -243,7 +242,7 @@ class RegisterController < ApplicationController
   end
 
   # Resolved in a filter rather than per read - the step math, the progress bar and the pages
-  # themselves all ask for it. update re-reads it: step 2 is what can change the organization
+  # themselves all ask for it
   def find_registration_sequence
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
