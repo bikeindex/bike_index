@@ -97,8 +97,8 @@ module BikeServices
       started_sequence(b_param, organization) || RegistrationSequence.active_for(organization)
     end
 
-    # Whether the rules on screen aren't the ones this registration started, which is what the
-    # notice says: the organization replaced them, so the walk starts over on the current version
+    # Whether the rules on screen aren't the ones this registration started - the notice, and
+    # nothing else: what's shown is registration_sequence's answer either way
     def rules_restarted?(b_param, sequence:)
       started_id = started_sequence_id(b_param)
       started_id.present? && sequence.present? && started_id != sequence.id
@@ -329,10 +329,9 @@ module BikeServices
     # private below here
     #
 
-    # The version a walk in progress is on, or nil once the organization has replaced it, which
-    # starts the pages over on the current rules. An agreement already made stands, so a
-    # replacement doesn't un-finish it. Nothing is written to switch versions: the acknowledged
-    # ids name the old version's pages, and a replacement clones its pages under new ids
+    # The version a walk in progress is on, or nil to start over on the organization's current
+    # rules. Nothing is written to switch: a replacement clones its pages under new ids, so the
+    # ids already acknowledged match none of them
     def started_sequence(b_param, organization)
       started_id = started_sequence_id(b_param)
       return nil if started_id.blank?

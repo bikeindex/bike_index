@@ -1556,8 +1556,7 @@ RSpec.describe RegisterController, type: :request do
         expect(sequence.reload.archived?).to be_truthy
       end
 
-      # However they come back - the emailed link, or a tab left open on the old version -
-      # and without the arrival writing anything
+      # However they come back - the emailed link, or a tab left open on the old version
       it "shows the newer version either way" do
         # Kept, not wiped - the acknowledged id names a page the newer version doesn't have
         expect { get register_path(b_param_token: b_param.id_token) }

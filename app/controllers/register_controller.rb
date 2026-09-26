@@ -247,8 +247,7 @@ class RegisterController < ApplicationController
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
 
-  # Only on the tokenless arrival: the redirect it makes lands on a step, so the notice
-  # shows once rather than on every page of the version they're starting over on
+  # Only the tokenless arrival, so it shows once rather than on every page they walk again
   def notify_rules_restarted
     return unless BikeServices::Register.rules_restarted?(@b_param, sequence: @registration_sequence)
 
