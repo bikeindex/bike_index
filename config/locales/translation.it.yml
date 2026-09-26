@@ -4348,26 +4348,16 @@ it:
     show:
       add_a_bike: Aggiungi una bicicletta
       add_a_lock: Aggiungi un lucchetto
-      add_a_photo: Aggiungi una foto
-      add_it_now: Aggiungilo ora!
-      bike_sticker: Adesivo per bicicletta
       bikes: biciclette
       combination: Combinazione
       edit: modifica
-      generally_connect_to_org: Alcune delle tue bici sono associate a %{org_name},
-        ma questa no. In genere, dovresti collegare tutte le tue bici a %{org_name}
-        -
-      ignore: ignorare
       key_serial: Chiave seriale
-      location: Luogo
       lock_type: Tipo di serratura
       locks: serrature
       manufacturer: Produttore
       next: Prossimi passi
-      primary_colors: Colori primari
       register_new_items: Registra un nuovo articolo
       registered: Registrato
-      serial: Seriale
       sorry_your_bike_was_stolen: Ci dispiace che il tuo %{bikes_last_type} sia stato
         rubato, ma speriamo che, grazie alla possibilità di cercarlo da parte di tutti,
         tu possa recuperarlo!
@@ -4377,16 +4367,11 @@ it:
       to_bike_index_thanks_for_signing_up: a Bike Index. Grazie per esserti registrato!
       update_your_profile: Aggiorna il tuo profilo
       updated: Fatto
-      user_hidden: Nascosto agli altri utenti
       welcome: Benvenuto
       you_have_no_registered_bikes: Non hai biciclette registrate
       you_have_no_registered_locks: Non hai serrature registrate
       header_title: "%{current_user_name} su Bike Index"
       membership_subtitle: Grazie per essere un membro di Bike Index %{level}!
-      edit_registration: Modifica %{bike_type}
-      list_for_sale: Elenco in vendita
-      mark_stolen: Mark %{bike_type} rubato
-      update_marketplace_listing: Aggiorna l'inserzione sul marketplace!
     messages:
       form:
         body_placeholder: Aggiungi del testo del messaggio
@@ -6651,6 +6636,25 @@ it:
           sync_running_in_background: La sincronizzazione è in corso in background.
             Questa pagina si aggiornerà automaticamente.
           syncing_activities: Sincronizzazione delle attività in corso...
+        show:
+          bike_box:
+            add_a_photo: Aggiungi una foto
+            add_it_now: Aggiungilo ora!
+            bike_sticker: Adesivo per bicicletta
+            edit_registration: Modifica %{bike_type}
+            generally_connect_to_org: Alcune delle tue bici sono associate a %{org_name},
+              ma questa no. In genere, dovresti collegare tutte le tue bici a %{org_name}
+              -
+            ignore_this_suggestion: Ignora questo suggerimento
+            list_for_sale: Elenco in vendita
+            location: Luogo
+            mark_stolen: Mark %{bike_type} rubato
+            primary_colors: Colori primari
+            registered: Registrato
+            serial: Seriale
+            update_marketplace_listing: Aggiorna l'inserzione sul marketplace!
+            updated: Fatto
+            user_hidden: Nascosto agli altri utenti
       sales:
         new_form:
           record_sale: Vendita record
