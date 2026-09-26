@@ -23,7 +23,7 @@ module Pages
           end
 
           def with_owner_with_photo
-            render_box(bike(id: 44, thumb_path: Pages::SearchResults::BikeBox::ComponentPreview.vehicles.first.thumb_path))
+            render_box(bike(id: 44, thumb_path: SharedBlocks::SearchResults::BikeBox::ComponentPreview.vehicles.first.thumb_path))
           end
 
           # The alert checks the database that the safety rules are still owed, so this needs a
