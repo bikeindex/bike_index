@@ -86,7 +86,7 @@
         <p class="tw:m-0 tw:text-xs tw:text-gray-400"><%= location %></p>
       <% end %>
 
-      <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip,
+      <%= render(Atoms::Serial::Component.new(bike: @bike, organization: @organization, explanation: :tooltip,
         html_class: "tw:text-xs! tw:text-gray-400!")) %>
 
       <% if @render_org_badge %>

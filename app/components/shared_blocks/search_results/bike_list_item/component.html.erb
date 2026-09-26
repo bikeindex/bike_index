@@ -97,7 +97,7 @@
           tw:dark:bg-gray-900
         "
       >
-        <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :tooltip)) %>
+        <%= render(Atoms::Serial::Component.new(bike: @bike, organization: @organization, explanation: :tooltip)) %>
       </span>
 
       <% if @render_org_badge %>

@@ -1465,6 +1465,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.serial_display).to eq "Hidden"
           expect(bike.serial_display(bike.user)).to eq "HELLO PARTY"
           expect(bike.serial_display(impound_user)).to eq "HELLO PARTY"
+          expect(bike.serial_display(organization: impound_record.organization)).to eq "HELLO PARTY"
         end
       end
       context "when user shares an organization with the bike" do
@@ -1478,6 +1479,11 @@ RSpec.describe Bike, type: :model do
           expect(bike.authorized?(org_user)).to be_falsey
           expect(bike.send(:can_see_hidden_serial?, org_user)).to be_truthy
           expect(bike.serial_display(org_user)).to eq "HELLO PARTY"
+        end
+
+        it "shows serial for the organization, without a user" do
+          expect(bike.reload.serial_display(organization:)).to eq "HELLO PARTY"
+          expect(bike.serial_display(organization: FactoryBot.create(:organization))).to eq "Hidden"
         end
       end
     end

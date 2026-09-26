@@ -12,10 +12,9 @@ module SharedBlocks
         # For the list holding them
         LIST_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4"
 
-        def initialize(bike:, organization: nil, current_user: nil, search_all: false)
+        def initialize(bike:, organization: nil, search_all: false)
           @bike = bike
           @organization = organization
-          @current_user = current_user
           # The badge vouches for a registration, so it's the credibility feature's
           @render_org_badge = search_all && @organization.present? &&
             @organization.enabled?("credibility_badges")
