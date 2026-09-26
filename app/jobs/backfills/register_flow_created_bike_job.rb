@@ -19,7 +19,7 @@ module Backfills
       bike = Bike.where(owner_email: EmailNormalizer.normalize(b_param.email))
         .where("created_at > ?", b_param.created_at).reorder(:created_at)
         .detect { BikeServices::Register.matches_bike?(b_param, it) }
-      b_param.update(created_bike_id: bike.id) if bike.present?
+      b_param.update(created_bike_id: bike.id) if bike
     end
   end
 end
