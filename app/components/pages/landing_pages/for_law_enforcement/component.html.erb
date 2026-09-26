@@ -19,13 +19,7 @@
       </p>
 
       <div class="le-hero-buttons">
-        <button
-          commandfor="law-enforcement-demo-modal"
-          command="show-modal"
-          class="le-btn-primary"
-        >
-          Schedule a Demo
-        </button>
+        <%= render(UI::Button::Component.new(text: "Schedule a Demo", color: :yellow, size: :callout, commandfor: "law-enforcement-demo-modal", command: "show-modal")) %>
       </div>
 
       <div class="le-hero-stats">

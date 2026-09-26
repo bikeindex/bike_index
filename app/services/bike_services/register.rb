@@ -21,10 +21,13 @@ module BikeServices
     STOLEN_REPORT_ATTRS = %i[theft_description police_report_number police_report_department
       estimated_value locking_description lock_defeat_description proof_of_ownership
       receive_notifications phone_for_users phone_for_shops phone_for_police].freeze
+    # The steps the vehicle is created from, which it can't take changes to once it exists
+    VEHICLE_STEPS = %w[1 2 report].freeze
     # What a registration can say about its bike past step 1
     MATCHED_ATTRS = %w[frame_model year frame_size primary_frame_color_id secondary_frame_color_id
       tertiary_frame_color_id extra_registration_number status].index_with(&:itself)
       .merge("serial_number" => "serial_normalized", "frame_size_number" => "frame_size").freeze
+    MATCH_INPUTS = (MATCHED_ATTRS.keys + %w[owner_email manufacturer_id manufacturer_other cycle_type frame_size_unit]).freeze
 
     # The token's registration when step 1 was never submitted, otherwise a new one.
     # A signed-in user's email prefills owner_email
@@ -38,18 +41,15 @@ module BikeServices
     end
 
     # Resume a registration by token: anonymous, or the passed user's
-    def find_token(user:, params_token: nil, session_token: nil)
+    def find_token(user:, params_token: nil, session_token: nil) = resume(user:, params_token:, session_token:).first
+
+    # find_token's registration, and whether to sign in for one it couldn't resume: a link to a
+    # registration someone signed in started (an organization's resend), visited signed out
+    def resume(user:, params_token: nil, session_token: nil)
       token = params_token.presence || session_token.presence
-      return if token.blank?
-
-      BParam.unexpired_with_token(token).detect { resumable_by?(it, user) }
-    end
-
-    # A registration someone signed in started, so a signed-out visitor holding its
-    # link (an organization's resend) signs in rather than starting over
-    def sign_in_to_resume?(params_token, user:)
-      user.blank? && params_token.present? &&
-        BParam.unexpired_with_token(params_token).any? { !resumable_by?(it, nil) }
+      matches = token.present? ? BParam.unexpired_with_token(token).to_a : []
+      b_param = matches.detect { resumable_by?(it, user) }
+      [b_param, b_param.blank? && user.blank? && params_token.present? && matches.any?]
     end
 
     # The start over link. Destroyed rather than left behind: its token would still resume
@@ -60,11 +60,11 @@ module BikeServices
 
     # Two waiting at most - the one new lands on and the one before it. Ordered the way
     # the unfinished_registration alert picks its one, so what goes is what it would
-    # never have pointed at
+    # never have pointed at. Without a bike, since one owing the safety rules is never discarded
     def discard_extra(user:)
       return if user.blank?
 
-      user.b_params.unfinished_registrations.reorder(updated_at: :desc).offset(1)
+      user.b_params.unfinished_registrations.without_bike.reorder(updated_at: :desc).offset(1)
         .each { destroy_discardable(it) }
     end
 
@@ -85,14 +85,28 @@ module BikeServices
       b_param.save
     end
 
-    # The safety rules a registration acknowledges before its bike is created - the
-    # organization's active sequence, and only for an e-vehicle
+    # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
+    # active sequence, or the one its pages are being agreed to from, even once replaced.
     # motorized? first - it's in memory, and creation_organization is a query
     def registration_sequence(b_param)
       return nil unless b_param.motorized?
 
       organization = b_param.creation_organization
-      RegistrationSequence.active_for(organization) if organization.present?
+      return nil if organization.blank?
+
+      started_id = b_param.params.dig("registration_sequence", "id")
+      (RegistrationSequence.find_by(id: started_id, organization:) if started_id.present?) ||
+        RegistrationSequence.active_for(organization)
+    end
+
+    # registration_sequence for a link back into the flow, and whether the rules restarted:
+    # resuming starts over on the organization's current version rather than finishing one
+    # it's replaced since. An agreement already made stands
+    def resume_registration_sequence(b_param, sequence:)
+      return [sequence, false] if sequence.blank? || sequence.active? || acknowledged?(b_param, sequence:)
+
+      b_param.update(params: b_param.params.except("registration_sequence"))
+      [registration_sequence(b_param), true]
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the email),
@@ -150,11 +164,7 @@ module BikeServices
 
     # Nothing to agree to without a sequence, otherwise the acknowledgment record
     def acknowledged?(b_param, sequence:)
-      sequence_pages(sequence).none? || acknowledgment(b_param).present?
-    end
-
-    def acknowledgment(b_param)
-      RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
+      sequence_pages(sequence).none? || RegistrationSequenceAcknowledgment.acknowledged.exists?(b_param_id: b_param.id)
     end
 
     # Which pages have been acknowledged so far. In-flight progress, so it lives on
@@ -185,21 +195,29 @@ module BikeServices
       acknowledge_page(b_param, page_for_step(step, sequence:), checked:)
     end
 
-    # The moment the pages become an agreement - promoted off the b_param onto a
-    # record of its own, which outlives the registration
+    # The moment the pages become an agreement, on a record that outlives the registration
     def save_acknowledgment(b_param, sequence, acknowledged_all:, user: nil)
       return false unless Binxtils::InputNormalizer.boolean(acknowledged_all) && sequence.present?
-      return true if acknowledgment(b_param).present?
+      return true if acknowledged?(b_param, sequence:)
 
-      RegistrationSequenceAcknowledgment.create_for(b_param, sequence:, user:).persisted?
+      RegistrationSequenceAcknowledgment.acknowledge(b_param, sequence:, user:)
     end
 
-    # The bike exists, or everything reachable is entered and awaiting the email - the
-    # report step waits on that same confirmation, so it isn't what's left to enter here
+    # The bike exists with its rules agreed to, or everything reachable is entered and awaiting
+    # the email - the report step waits on that same confirmation, so it isn't what's left here
     def finished?(b_param, sequence:)
-      b_param.with_bike? ||
-        details_and_acknowledged?(b_param, sequence:) && !creator_available?(b_param)
+      return !acknowledgment_owed?(b_param, sequence:) if b_param.with_bike?
+
+      details_completed?(b_param) && acknowledged?(b_param, sequence:) && !creator_available?(b_param)
     end
+
+    # The bike is created before the safety rules, which the registration still has to agree
+    # to - unless the sequence has since gone, leaving nothing to agree to
+    def acknowledgment_owed?(b_param, sequence:)
+      b_param.acknowledgment_pending? && sequence_pages(sequence).any?
+    end
+
+    def editable_step?(b_param, step) = !b_param.with_bike? || VEHICLE_STEPS.exclude?(step)
 
     # user: being signed in as the address settles it, without any link being clicked
     def confirmation_email_pending?(b_param, user: nil)
@@ -298,11 +316,13 @@ module BikeServices
       errors.none?
     end
 
-    # Everything a submission does once its step is saved. Returns the bike, or nil while
-    # the registration is still short of one - more to enter, or the email unconfirmed
+    # Everything a submission does once its step is saved. Returns the bike, or nil while the
+    # registration is short of finished - more to enter, the email unconfirmed, or rules owed
     def complete(b_param, user:, sequence:, ip_address:)
       claim_creator(b_param, user)
-      create_bike_if_ready(b_param, sequence:, ip_address:)
+      return create_bike_if_ready(b_param, sequence:, ip_address:) unless b_param.with_bike?
+
+      b_param.created_bike unless acknowledgment_owed?(b_param, sequence:)
     end
 
     # The unfinished registrations a new bike completes: every register flow registration of it -
@@ -323,7 +343,12 @@ module BikeServices
     # Whether a bike registered some other way is this registration's. Step 1 says only
     # what it is, so any bike of that make and type is; whatever came after has to match too
     def matches_bike?(b_param, bike)
-      built = BikeServices::Builder.build(b_param).tap(&:set_calculated_unassociated_attributes)
+      built = begin
+        Bike.new(b_param.safe_bike_attrs({}).slice(*MATCH_INPUTS))
+      rescue ArgumentError # an enum value no bike could have, so none matches
+        return false
+      end
+      built.set_calculated_unassociated_attributes
       attrs = %w[owner_email mnfg_name cycle_type] + MATCHED_ATTRS.filter_map { |key, attr| attr if b_param.bike[key].present? }
       built.slice(*attrs) == bike.slice(*attrs)
     end
@@ -372,26 +397,27 @@ module BikeServices
     end
 
     def create_bike_if_ready(b_param, sequence:, ip_address:)
-      return nil if b_param.with_bike? || !creator_available?(b_param) ||
-        !ready_for_bike?(b_param, sequence:)
+      return nil if !creator_available?(b_param) || !details_completed?(b_param) ||
+        !report_completed?(b_param)
 
-      create_bike(b_param, ip_address:)
+      create_bike(b_param, sequence:, ip_address:)
     end
 
-    def create_bike(b_param, ip_address:)
+    # Returns nil while the rules are owed - the bike exists, but the registration isn't finished
+    def create_bike(b_param, sequence:, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
+      # Ahead of the bike, so the ownership it creates holds its email back
+      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence:) unless acknowledged?(b_param, sequence:)
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
+      if bike.id.blank?
+        pending&.destroy
+        return bike
+      end
+
       # The bike is what the acknowledgment hangs off once the b_param is swept
-      acknowledgment(b_param)&.update(bike_id: bike.id, user_id: b_param.creator_id) if bike.id.present?
-      bike
-    end
-
-    def ready_for_bike?(b_param, sequence:)
-      details_and_acknowledged?(b_param, sequence:) && report_completed?(b_param)
-    end
-
-    def details_and_acknowledged?(b_param, sequence:)
-      details_completed?(b_param) && acknowledged?(b_param, sequence:)
+      acknowledgment = pending || RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
+      acknowledgment&.update(bike_id: bike.id, user_id: acknowledgment.user_id || b_param.creator_id)
+      bike if pending.blank?
     end
 
     # Nothing to report without a status that has a record, otherwise save_report's marker
@@ -432,10 +458,10 @@ module BikeServices
        "address_record_attributes" => attrs["address_record_attributes"]}.compact
     end
 
-    # Its creator, or the owner it's for - staff registering for someone leaves them the
-    # creator. Anyone once the bike exists, since the token then only shows the completion page
+    # Its creator, or the owner it's for - staff registering for someone leaves them the creator.
+    # Anyone once the registration is finished, since the token then only shows the completion page
     def resumable_by?(b_param, user)
-      b_param.creator_id.blank? || b_param.with_bike? ||
+      b_param.creator_id.blank? || b_param.finished_registration? ||
         b_param.creator_id == user&.id || b_param.self_made?(user)
     end
 
@@ -460,7 +486,7 @@ module BikeServices
     # flow stops at the first that hasn't been done
     def permitted_steps(b_param, sequence, steps)
       reached = steps.take_while { step_completed?(b_param, it, sequence:) }.count
-      steps.first(reached + 1)
+      steps.first(reached + 1).select { editable_step?(b_param, it) }
     end
 
     # Whether a step has been submitted with everything it asks for
@@ -469,7 +495,7 @@ module BikeServices
       when "1" then b_param.manufacturer_id.present?
       when "2" then details_completed?(b_param)
       when "report" then report_completed?(b_param)
-      when "review" then acknowledgment(b_param).present?
+      when "review" then acknowledged?(b_param, sequence:)
       else acknowledged_page_ids(b_param).include?(page_for_step(step, sequence:)&.id)
       end
     end
@@ -536,8 +562,8 @@ module BikeServices
     end
 
     conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
-      :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
-      :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
+      :claim_creator, :create_bike_if_ready, :create_bike,
+      :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
       :step_2_params, :translation, :honeypot_spam

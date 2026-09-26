@@ -46,7 +46,7 @@
             tw:sm:items-center
           "
         >
-          <%= render(UI::ButtonLink::Component.new(href: register_stolen_path, color: :primary, html_class: CTA)) do %>
+          <%= render(UI::ButtonLink::Component.new(href: register_stolen_path, color: :primary, size: :callout)) do %>
             <span class="tw:sm:hidden"><%= translation(".register_your_stolen_bike") %></span>
             <span class="tw:hidden tw:sm:inline"><%= translation(".register_your_stolen_bike_free") %></span>
           <% end %>
@@ -279,7 +279,7 @@
         </div>
 
         <%= render(UI::ButtonLink::Component.new(href: promoted_alerts_path,
-          text: translation(".how_alerts_work"), color: :purple, html_class: "#{CTA} tw:shrink-0")) %>
+          text: translation(".how_alerts_work"), color: :purple, size: :callout, html_class: "tw:shrink-0")) %>
       </div>
     </div>
   </section>
@@ -496,8 +496,8 @@
       </div>
 
       <%= render(UI::ButtonLink::Component.new(href: register_stolen_path,
-        text: translation(".register_your_stolen_bike"), color: :primary,
-        html_class: "#{CTA} tw:shrink-0 tw:bg-[#ffd660]! tw:border-[#ffd660]! tw:text-blue-600!")) %>
+        text: translation(".register_your_stolen_bike"), color: :yellow,
+        size: :callout, html_class: "tw:shrink-0")) %>
     </div>
   </section>
 </div>

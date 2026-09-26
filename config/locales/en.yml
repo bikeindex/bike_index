@@ -1958,6 +1958,8 @@ en:
     register:
       acknowledge:
         acknowledge_everything: Check every box to agree to these rules
+        safety_rules_updated: The safety rules have been updated — please review them
+          again
       confirm_email:
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
@@ -4041,31 +4043,18 @@ en:
     show:
       add_a_bike: Add a bike
       add_a_lock: Add a lock
-      add_a_photo: Add a photo
-      add_it_now: Add it now!
-      bike_sticker: Bike Sticker
       bikes: bikes
       combination: Combination
       edit: edit
-      edit_registration: Edit %{bike_type}
-      generally_connect_to_org: >-
-        Some of your bikes are associated with %{org_name}, but this one is not. Generally,
-        you should connect all your bikes to %{org_name} -
       header_title: "%{current_user_name} on Bike Index"
-      ignore: ignore
       key_serial: Key Serial
-      list_for_sale: List for sale
-      location: Location
       lock_type: Lock Type
       locks: locks
       manufacturer: Manufacturer
-      mark_stolen: Mark %{bike_type} stolen
       membership_subtitle: Thank you for being a Bike Index %{level} member!
       next: Next steps
-      primary_colors: Primary colors
       register_new_items: Register new items
       registered: Registered
-      serial: Serial
       sorry_your_bike_was_stolen: >-
         We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone
         able to search for it, you'll get it back!
@@ -4073,10 +4062,8 @@ en:
       thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
         to the Index.
       to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
-      update_marketplace_listing: Update marketplace listing!
       update_your_profile: Update your profile
       updated: Updated
-      user_hidden: Hidden from other users
       welcome: Welcome
       you_have_no_registered_bikes: You have no registered bikes
       you_have_no_registered_locks: You have no registered locks

@@ -2261,6 +2261,8 @@ nl:
     register:
       acknowledge:
         acknowledge_everything: Vink alle vakjes aan om akkoord te gaan met deze regels.
+        safety_rules_updated: De veiligheidsvoorschriften zijn bijgewerkt — lees ze
+          alstublieft nog eens door.
       confirm_email:
         confirmation_link_expired: Die bevestigingslink is verlopen. Controleer je
           e-mail voor een nieuwe link.
@@ -4891,19 +4893,15 @@ nl:
     show:
       add_a_bike: Voeg een fiets toe
       add_a_lock: Voeg een slot toe
-      add_a_photo: Voeg een foto toe
       bikes: fietsen
       combination: Combinatie
       edit: Bewerken
       key_serial: Sleutel serienummer
-      location: Plaats
       lock_type: Slottype
       locks: sloten
       manufacturer: Fabrikant
       next: Volgende stappen
-      primary_colors: Primaire kleuren
       register_new_items: Registreer nieuwe items
-      serial: Serie
       sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,
         maar hopelijk krijgt u hem terug, als iedereen er naar kan zoeken.
       tell_us_more_about_yourself: Vertel ons meer over uzelf.
@@ -4914,21 +4912,10 @@ nl:
       welcome: Welkom
       you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
-      bike_sticker: Fiets sticker
-      add_it_now: Voeg het nu toe!
-      generally_connect_to_org: Sommige van uw fietsen zijn geassocieerd met %{org_name},
-        maar deze niet. Over het algemeen sluit u al uw fietsen aan op %{org_name}
-        -
-      ignore: Negeren
-      user_hidden: Verborgen voor andere gebruikers
       registered: Geregistreerd
       updated: Bijgewerkt
       header_title: "%{current_user_name} op Fietsindex"
       membership_subtitle: Bedankt dat u lid bent van Bike Index %{level}!
-      edit_registration: Bewerken %{bike_type}
-      list_for_sale: Lijst te koop
-      mark_stolen: Markeer %{bike_type} gestolen
-      update_marketplace_listing: Update marktplaatsvermelding!
     edit:
       save_changes: Wijzigingen opslaan
       edit_pages: 'Accountpagina''s bewerken:'
@@ -6538,6 +6525,25 @@ nl:
           sync_running_in_background: De synchronisatie is op de achtergrond bezig.
             Deze pagina wordt automatisch bijgewerkt.
           syncing_activities: Activiteiten synchroniseren...
+        show:
+          bike_box:
+            add_a_photo: Voeg een foto toe
+            add_it_now: Voeg het nu toe!
+            bike_sticker: Fiets sticker
+            edit_registration: Bewerken %{bike_type}
+            generally_connect_to_org: Sommige van uw fietsen zijn geassocieerd met
+              %{org_name}, maar deze niet. Over het algemeen sluit u al uw fietsen
+              aan op %{org_name} -
+            ignore_this_suggestion: Negeer deze suggestie
+            list_for_sale: Lijst te koop
+            location: Plaats
+            mark_stolen: Markeer %{bike_type} gestolen
+            primary_colors: Primaire kleuren
+            registered: Geregistreerd
+            serial: Serie
+            update_marketplace_listing: Update marktplaatsvermelding!
+            updated: Bijgewerkt
+            user_hidden: Verborgen voor andere gebruikers
       sales:
         new_form:
           record_sale: Recordverkoop

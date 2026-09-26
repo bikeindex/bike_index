@@ -9,8 +9,6 @@ module Pages
         include MoneyHelper
 
         PILL = "tw:rounded-full! tw:font-semibold! tw:transition-all!"
-        CTA = "#{PILL} tw:px-6! tw:py-4! tw:text-[15.5px]! tw:uppercase tw:tracking-wider " \
-          "tw:hover:-translate-y-0.5 tw:hover:brightness-110"
 
         def initialize(recoveries_count:, recoveries_value:, organizations_count:, recovery_displays:,
           feedback:, current_user: nil)

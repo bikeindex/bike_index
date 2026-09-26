@@ -444,6 +444,18 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "unfinished_registration?" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, bike:) }
+
+    it "is true until the safety rules are agreed to" do
+      expect(bike.unfinished_registration?).to be_truthy
+
+      acknowledgment.update(acknowledged_at: Time.current)
+      expect(bike.unfinished_registration?).to be_falsey
+    end
+  end
+
   describe "visible_by?" do
     let(:owner) { User.new }
     let(:superuser) { FactoryBot.create(:superuser) }
@@ -1453,6 +1465,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.serial_display).to eq "Hidden"
           expect(bike.serial_display(bike.user)).to eq "HELLO PARTY"
           expect(bike.serial_display(impound_user)).to eq "HELLO PARTY"
+          expect(bike.serial_display(organization: impound_record.organization)).to eq "HELLO PARTY"
         end
       end
       context "when user shares an organization with the bike" do
@@ -1466,6 +1479,11 @@ RSpec.describe Bike, type: :model do
           expect(bike.authorized?(org_user)).to be_falsey
           expect(bike.send(:can_see_hidden_serial?, org_user)).to be_truthy
           expect(bike.serial_display(org_user)).to eq "HELLO PARTY"
+        end
+
+        it "shows serial for the organization, without a user" do
+          expect(bike.reload.serial_display(organization:)).to eq "HELLO PARTY"
+          expect(bike.serial_display(organization: FactoryBot.create(:organization))).to eq "Hidden"
         end
       end
     end
