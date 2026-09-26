@@ -1,6 +1,6 @@
 <%#
-  No overflow-hidden, which would clip the status tooltip - so the photo rounds its own
-  corners, and the hovered card rises over the next row for the tooltip to show
+  No overflow-hidden, which would clip the tooltips - so the photo rounds its own
+  corners, and the hovered card rises over the next row for a tooltip to show
 %>
 
 <% cache(cache_key) do %>
@@ -39,11 +39,8 @@
 
     <div class="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-3.5">
       <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
-        <%#
-          Above the card's link, so its tooltip opens rather than the bike - and pulled left by
-          the badge's padding and border, so its text lines up with the rows below
-        %>
-        <span class="tw:relative tw:z-20 tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :inherit, time: status_time)) %></span>
+        <%# Above the link, so its tooltip opens; pulled left so its text lines up with the rows below %>
+        <span class="tw:relative tw:z-20 tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(status_badge) %></span>
 
         <%= link_to bike_href, class: "tw:twtext-color tw:hover:underline", data: bike_link_data do %>
           <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>

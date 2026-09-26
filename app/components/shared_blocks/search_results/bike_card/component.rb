@@ -44,7 +44,10 @@ module SharedBlocks
         end
 
         # occurred_at is the stolen or impounded date, and nil for a bike for sale
-        def status_time = @bike.occurred_at || for_sale_listing&.published_at
+        def status_badge
+          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :inherit,
+            time: @bike.occurred_at || for_sale_listing&.published_at)
+        end
 
         # Member listings sort ahead of the rest on the marketplace, so the badge says why
         def render_member_badge? = for_sale_listing&.seller_member?
