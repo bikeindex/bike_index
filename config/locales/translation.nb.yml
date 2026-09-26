@@ -5602,10 +5602,6 @@ nb:
             serial_label: 'Serie:'
             sticker_label: 'Klistremerke:'
             view_all: se alle
-          bike_card:
-            e_vehicle: Elbil
-            not_registered_with: Ikke registrert hos %{org_name}
-            registered_with: Registrert hos %{org_name}
         impound_records:
           index:
             all_bikes: Alle sykler
@@ -6141,29 +6137,8 @@ nb:
           stolenness_stolen: Stjålet hvor som helst
           within: innenfor
         result_view_select:
-          bike_box_view: Vis som liste
-          thumbnail_view: Vis som miniatyrbilder
-      search_results:
-        bike_box:
-          ended_at: Avsluttet
-          location: plassering
-          not_applicable: Ikke aktuelt
-          posted_at: Oppført
-          price: Pris
-          primary_colors: Primærfarger
-          removed_from: Fjernet fra sykkelindeksen
-          serial: Serienummer
-        container:
-          no_results: Ingen registreringer samsvarte nøyaktig med søket ditt
-        frame:
-          fetch_failed: Kunne ikke laste inn disse resultatene – sjekk tilkoblingen
-            din og prøv på nytt.
-          rate_limited: For mange søk for raskt – du er frekvensbegrenset. Vent et
-            øyeblikk, og prøv på nytt.
-          retry: Prøv igjen
-        vehicle_thumbnail:
-          member: Medlem av sykkelindeksen
-          registered_not_stolen: registrert, ikke stjålet
+          cards_view: Vis som kort
+          list_view: Vis som liste
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Klikk på knappen nedenfor for å fortsette
@@ -6671,6 +6646,34 @@ nb:
           finish_the_required_steps: fullfør de nødvendige trinnene
           not_registered_yet_html: Din %{manufacturer} %{cycle_type} er ikke registrert
             ennå! Vennligst %{finish_link}
+      search_results:
+        bike_box:
+          ended_at: Avsluttet
+          location: plassering
+          not_applicable: Ikke aktuelt
+          posted_at: Oppført
+          price: Pris
+          primary_colors: Primærfarger
+          removed_from: Fjernet fra sykkelindeksen
+          serial: Serienummer
+        bike_card:
+          e_vehicle: Elbil
+          member_listing: Medlem av sykkelindeksen
+          member_listing_tooltip: Denne selgeren er medlem av Bike Index
+          not_registered_with: Ikke registrert hos %{org_name}
+          registered_with: Registrert hos %{org_name}
+        bike_list_item:
+          e_vehicle: Elbil
+          member_listing: Medlem av sykkelindeksen
+          member_listing_tooltip: Denne selgeren er medlem av Bike Index
+          not_registered_with: Ikke registrert hos %{org_name}
+          registered_with: Registrert hos %{org_name}
+        frame:
+          fetch_failed: Kunne ikke laste inn disse resultatene – sjekk tilkoblingen
+            din og prøv på nytt.
+          rate_limited: For mange søk for raskt – du er frekvensbegrenset. Vent et
+            øyeblikk, og prøv på nytt.
+          retry: Prøv igjen
   user_emails:
     confirm:
       confirm_email: Bekreft e-post
