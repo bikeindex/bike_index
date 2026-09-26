@@ -49,6 +49,25 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response).to render_template("missing_manufacturer")
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
+
+    context "authenticated with an API token" do
+      let(:current_user) { false }
+      include_context :admin_doorkeeper_token
+      let(:url) { "#{base_url}/missing_manufacturer.json" }
+      include_examples "rejects_unauthorized_token"
+
+      context "token for a bikes superuser" do
+        before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bikes") }
+        let!(:bike_2) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes") }
+        let!(:bike_3) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Party") }
+
+        it "renders the manufacturer_other counts" do
+          get url, params: token_param.merge(period: "all")
+          expect(response.status).to eq 200
+          expect(json_result["manufacturer_other_counts"]).to eq({"Cool Bikes" => 2, "Party" => 1})
+        end
+      end
+    end
   end
 
   describe "edit" do

@@ -79,5 +79,36 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       expect(new_manufacturer).to have_attributes permitted_attributes
       # permitted_attributes.each { |attribute, val| expect(target.send(attribute)).to eq val }
     end
+
+    context "authenticated with an API token" do
+      let(:current_user) { false }
+      include_context :admin_doorkeeper_token
+      include_context :test_csrf_token
+      let(:url) { "/admin/manufacturers.json" }
+      include_examples "rejects_unauthorized_token", :post
+
+      context "token for a manufacturers superuser" do
+        before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "manufacturers") }
+
+        it "creates" do
+          expect {
+            post url, params: token_param.merge(manufacturer: {name: "Cool Bikes", frame_maker: true})
+          }.to change(Manufacturer, :count).by 1
+          expect(response.status).to eq 200
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes", "slug" => "cool", "frame_maker" => true)
+        end
+
+        context "with a name that is taken" do
+          let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Cool Bikes") }
+          it "returns the errors" do
+            expect {
+              post url, params: token_param.merge(manufacturer: {name: "Cool Bikes"})
+            }.to_not change(Manufacturer, :count)
+            expect(response.status).to eq 422
+            expect(json_result["errors"]).to be_present
+          end
+        end
+      end
+    end
   end
 end
