@@ -5,9 +5,10 @@ module SharedBlocks
     module UnfinishedRegistration
       # Links back into the register flow, which reopens the registration where it was left
       class Component < ApplicationComponent
-        def initialize(b_param:, current_user: nil)
+        def initialize(b_param:, current_user: nil, kind: :notice)
           @b_param = b_param
           @current_user = current_user
+          @kind = kind
         end
 
         # The alert outlives the registration finishing elsewhere (another tab, the
@@ -18,7 +19,7 @@ module SharedBlocks
         end
 
         def call
-          render(UI::Alerts::Base::Component.new) do
+          render(UI::Alerts::Base::Component.new(kind: @kind)) do
             translation(".not_registered_yet_html", manufacturer: @b_param.mnfg_name,
               cycle_type: @b_param.type,
               finish_link: link_to(translation(".finish_the_required_steps"),

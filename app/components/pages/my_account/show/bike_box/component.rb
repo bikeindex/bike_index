@@ -27,7 +27,9 @@ module Pages
           end
 
           def unfinished_b_param
-            @bike.b_params.acknowledgment_pending.last if @bike.unfinished_registration?
+            return @unfinished_b_param if defined?(@unfinished_b_param)
+
+            @unfinished_b_param = (@bike.b_params.acknowledgment_pending.last if @bike.unfinished_registration?)
           end
         end
       end

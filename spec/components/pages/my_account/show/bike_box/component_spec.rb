@@ -40,8 +40,8 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
         params: {acknowledgment_pending: true, bike: {manufacturer_id: bike.manufacturer_id, owner_email: user.email}})
     end
 
-    it "renders the unfinished registration alert" do
-      expect(component).to have_text("Your Surly bike isn't registered yet!")
+    it "renders the unfinished registration alert, above the registration" do
+      expect(component).to have_css("li > div:first-child [role=alert]", text: "Your Surly bike isn't registered yet!")
       expect(component).to have_link("finish the required steps")
     end
   end

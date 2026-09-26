@@ -1,4 +1,10 @@
 <li class="bike-box-item tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800">
+  <% if unfinished_b_param %>
+    <div class="tw:basis-full">
+      <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user, kind: :error)) %>
+    </div>
+  <% end %>
+
   <% cache(cache_key) do %>
     <% image_link = @bike.thumb_path ? bike_url(@bike) : edit_bike_url(@bike, edit_template: 'photos') %>
 
@@ -128,15 +134,15 @@
     one's margin would show the box's background below it
   %>
 
-  <div class="tw:basis-full tw:[&>:last-child]:mb-0">
-    <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user)) %>
-
-    <% @user_alerts.each do |user_alert| %>
-      <%= render(UI::Alerts::Base::Component.new) do %>
-        <%= link_to translation(".ignore"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, action: "update", class: "twlink-underlined tw:float-right tw:ml-4 tw:text-sm" %>
-        <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
-        <%= link_to translation(".add_it_now"), user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, action: "update", class: "twlink-underlined" %>
+  <% if @user_alerts.any? %>
+    <div class="tw:basis-full tw:[&>:last-child]:mb-0">
+      <% @user_alerts.each do |user_alert| %>
+        <%= render(UI::Alerts::Base::Component.new) do %>
+          <%= link_to translation(".ignore"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, action: "update", class: "twlink-underlined tw:float-right tw:ml-4 tw:text-sm" %>
+          <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
+          <%= link_to translation(".add_it_now"), user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, action: "update", class: "twlink-underlined" %>
+        <% end %>
       <% end %>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
 </li>
