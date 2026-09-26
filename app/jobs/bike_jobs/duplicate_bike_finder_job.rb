@@ -60,10 +60,8 @@ module BikeJobs
     def notify_stolen_serial_marketplace_matches(bike)
       duplicate_bikes = bike.duplicate_bikes.distinct
       pairs = if bike.status_stolen?
-        duplicate_bikes.where.not(status: "status_stolen")
-          .where(id: MarketplaceListing.for_sale.where(item_type: "Bike").select(:item_id))
-          .map { [it, bike] }
-      elsif bike.marketplace_listings.for_sale.any?
+        duplicate_bikes.for_sale.where.not(status: "status_stolen").map { [it, bike] }
+      elsif bike.current_for_sale_marketplace_listing.present?
         duplicate_bikes.status_stolen.map { [bike, it] }
       end
       pairs&.each { |listed_bike, stolen_bike| notify_admins(listed_bike, stolen_bike) }
@@ -73,7 +71,6 @@ module BikeJobs
       notification = Notification.create!(kind: :stolen_serial_marketplace_match, bike: listed_bike,
         notifiable: stolen_bike, message_channel_target: AdminMailer::STOLEN_SERIAL_MATCH_EMAILS.join(", "))
     rescue ActiveRecord::RecordNotUnique # another run already sent it
-      nil
     else
       Notifications::Deliver.track_email(notification) do
         AdminMailer.stolen_serial_marketplace_match_email(notification).deliver_now

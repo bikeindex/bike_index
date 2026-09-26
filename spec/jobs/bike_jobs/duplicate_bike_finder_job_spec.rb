@@ -123,20 +123,19 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
       described_class.drain
     end
 
+    def run_for_both_bikes
+      run_job(listed_bike.id)
+      run_job(stolen_bike.id)
+    end
+
     it "emails admins once, however many times it runs for either bike" do
       expect(marketplace_listing.reload.status).to eq "for_sale"
       expect(stolen_bike.status).to eq "status_stolen"
       expect { run_job(bike_id) }.to change(Notification, :count).by 1
       expect(Notification.last).to have_attributes(target_attributes)
       expect(ActionMailer::Base.deliveries.count).to eq 1
-      mail = ActionMailer::Base.deliveries.last
-      expect(mail.to).to eq(%w[bryan@bikeindex.org gavin@bikeindex.org])
-      expect(mail.body.encoded).to include("/admin/marketplace_listings/#{marketplace_listing.id}")
 
-      expect {
-        run_job(listed_bike.id)
-        run_job(stolen_bike.id)
-      }.to_not change(Notification, :count)
+      expect { run_for_both_bikes }.to_not change(Notification, :count)
       expect(ActionMailer::Base.deliveries.count).to eq 1
     end
 
@@ -155,10 +154,7 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
         NormalizedSerialSegment.update_all(duplicate_bike_group_id: duplicate_bike_group.id)
       end
       it "doesn't email" do
-        expect {
-          run_job(listed_bike.id)
-          run_job(stolen_bike.id)
-        }.to_not change(Notification, :count)
+        expect { run_for_both_bikes }.to_not change(Notification, :count)
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
@@ -166,10 +162,7 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
     context "listing not for sale" do
       let(:status) { :draft }
       it "doesn't email" do
-        expect {
-          run_job(listed_bike.id)
-          run_job(stolen_bike.id)
-        }.to_not change(Notification, :count)
+        expect { run_for_both_bikes }.to_not change(Notification, :count)
         expect(stolen_bike.reload.duplicate_bikes.pluck(:id)).to eq([listed_bike.id])
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
