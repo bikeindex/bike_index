@@ -83,8 +83,7 @@
   margin-bottom: 2rem;
 }
 
-/* The shape only - UI::Button's :yellow colors it, and this stylesheet is unlayered, so
- * it outranks the button's own padding, radius and type utilities */
+/* Unlayered, so it outranks UI::Button's padding, radius and type utilities */
 .kelsey_styles .le-btn-primary {
   padding: 1rem 2.5rem;
   font-size: 1rem;
@@ -99,7 +98,6 @@
 
 .kelsey_styles .le-btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  text-decoration: none;
 }
 
 .kelsey_styles .le-hero-stats {
