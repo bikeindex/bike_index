@@ -2556,6 +2556,8 @@ es:
     register:
       acknowledge:
         acknowledge_everything: Marque todas las casillas para aceptar estas reglas.
+        safety_rules_updated: Las normas de seguridad se han actualizado; por favor,
+          revíselas de nuevo.
       confirm_email:
         confirmation_link_expired: Ese enlace de confirmación ha caducado; revisa
           tu correo electrónico para obtener uno nuevo.

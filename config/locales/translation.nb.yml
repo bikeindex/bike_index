@@ -2491,6 +2491,8 @@ nb:
     register:
       acknowledge:
         acknowledge_everything: Kryss av i hver boks for å godta disse reglene
+        safety_rules_updated: Sikkerhetsreglene er oppdatert – vennligst gjennomgå
+          dem på nytt
       confirm_email:
         confirmation_link_expired: Bekreftelseslenken er utløpt – sjekk e-posten din
           for en ny.
