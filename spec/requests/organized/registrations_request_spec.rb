@@ -745,9 +745,19 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])
         expect(ActionMailer::Base.deliveries.last.body.encoded).to include "Agree to the safety rules"
 
-        log_in(FactoryBot.create(:user_confirmed, email: owner_email))
-        get "/register", params: {b_param_token: b_param.id_token}
+        # The owner follows it signed out, with no account yet - the registration is the member's
+        allow(User).to receive(:from_auth).and_call_original
+        confirmation_token = b_param.reload.email_confirmation_token
+        rules_link = Nokogiri::HTML(ActionMailer::Base.deliveries.last.html_part.decoded).at_css("a.binx-button")["href"]
+        expect(URI(rules_link).request_uri).to eq confirm_register_path(b_param_token: b_param.id_token, confirmation_token:)
+        get URI(rules_link).request_uri
+        expect(response.status).to eq 200
+        expect {
+          post confirm_email_register_path, params: {b_param_token: b_param.id_token, confirmation_token:}
+        }.to change(User, :count).by 1
+        expect(User.last).to have_attributes(email: owner_email, confirmed: true, passwordless_user: true)
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        expect(b_param.reload).to have_attributes(creator_id: current_user.id, email_confirmation_token: nil)
         %w[3 4].each do |step|
           patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
                                                     step:, acknowledged: {"0" => "1", "1" => "1"}}
@@ -759,6 +769,24 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
         expect(RegistrationSequenceAcknowledgment.sole.user.email).to eq owner_email
         expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+      end
+
+      context "the rules link is wrong" do
+        it "emails the owner the rules again, once the last email is old enough" do
+          b_param = register_e_scooter
+          allow(User).to receive(:from_auth).and_call_original
+          wrong_params = {b_param_token: b_param.id_token, confirmation_token: "wrong-token"}
+          expect { post confirm_email_register_path, params: wrong_params }
+            .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
+          expect(flash[:error]).to be_present
+
+          sent_at = Time.current - BikeServices::Register::CONFIRMATION_EMAIL_INTERVAL - 1.minute
+          b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => sent_at))
+          expect { post confirm_email_register_path, params: wrong_params }
+            .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
+          expect(EmailJobs::PartialRegistrationJob.jobs.last["args"]).to eq [b_param.id, "partial_registration"]
+          expect(User.where(email: owner_email)).to be_none
+        end
       end
 
       context "registering their own" do

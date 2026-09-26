@@ -23,3 +23,7 @@
 
 <%= link_to rules_owed? ? translation("review_the_rules") : translation("finish_it"), tokenized_url,
     "data-pm-no-track" => true, class: "binx-button" %>
+
+<% if rules_owed? %>
+  <p><%= translation("link_signs_you_in", days: expiration_days) %></p>
+<% end %>

@@ -171,7 +171,11 @@ class RegisterController < ApplicationController
     return redirect_to_current_step if @b_param.email_confirmed?
 
     unless BikeServices::Register.confirmation_token_valid?(@b_param, params[:confirmation_token])
-      BikeServices::Register.send_confirmation_email(@b_param)
+      if @b_param.acknowledgment_pending?
+        BikeServices::Register.send_rules_email(@b_param)
+      else
+        BikeServices::Register.send_confirmation_email(@b_param)
+      end
       flash[:error] = translation(:confirmation_link_expired)
       return redirect_to_current_step
     end
@@ -183,6 +187,8 @@ class RegisterController < ApplicationController
     elsif sign_in_confirmed_user.blank?
       return redirect_to_current_step
     end
+    # The separate attestation's rules are the owner's, and the filter ran before signing them in
+    find_registration_sequence
 
     @b_param.confirm_email!(creator_id: current_user.id)
     complete_registration

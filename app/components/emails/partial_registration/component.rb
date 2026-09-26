@@ -23,8 +23,12 @@ module Emails
         @b_param.creation_organization
       end
 
+      def expiration_days = BParam::TOKEN_EXPIRATION.in_days.to_i
+
       def tokenized_url
         return OrgServices::EmailPreview::TOKEN_PATH if @email_preview
+        # The registration is the member's, so the owner is signed in by the link
+        return confirm_register_url(b_param_token: @b_param.id_token, confirmation_token: @b_param.email_confirmation_token) if rules_owed?
 
         @b_param.register_flow? ? register_url(b_param_token: @b_param.id_token) : new_bike_url(b_param_token: @b_param.id_token)
       end
