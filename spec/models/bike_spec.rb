@@ -444,6 +444,18 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "unfinished_registration?" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, bike:) }
+
+    it "is true until the safety rules are agreed to" do
+      expect(bike.unfinished_registration?).to be_truthy
+
+      acknowledgment.update(acknowledged_at: Time.current)
+      expect(bike.unfinished_registration?).to be_falsey
+    end
+  end
+
   describe "visible_by?" do
     let(:owner) { User.new }
     let(:superuser) { FactoryBot.create(:superuser) }

@@ -1954,6 +1954,8 @@ en:
     register:
       acknowledge:
         acknowledge_everything: Check every box to agree to these rules
+        safety_rules_updated: The safety rules have been updated — please review them
+          again
       confirm_email:
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
