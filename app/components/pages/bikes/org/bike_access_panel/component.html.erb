@@ -329,15 +329,11 @@
         <% if display_unstolen_notification_form? %>
           <div class="unstolen-notification-box tw:[grid-area:message]">
             <p class="mb-2">
-              <% if organization_message? %>
-                <strong><%= translation(".message_the_owner", bike_type: @bike.type) %></strong>
-              <% else %>
-                <em>
-                  <%= translation(".bike_not_marked_stolen", bike_type: @bike.type_titleize) %>
-                </em>
+              <em>
+                <%= translation(".bike_not_marked_stolen", bike_type: @bike.type_titleize) %>
+              </em>
 
-                <strong><%= translation(".believe_it_is_anyway") %></strong>
-              <% end %>
+              <strong><%= translation(".believe_it_is_anyway") %></strong>
             </p>
 
             <% if @bike.contact_owner?(@user) %>
@@ -355,23 +351,24 @@
                   <%= translation(".write_a_message") %>
                 </a>
 
-                <%= organization_message? ? translation(".to_the_owner", bike_type: @bike.type) : translation(".contact_the_owner_it_is_stolen", bike_type: @bike.type) %>
+                <%= translation(".contact_the_owner_it_is_stolen", bike_type: @bike.type) %>
               </div>
               <div
                 class="collapse <%= "in" if @contact_owner_open %>"
                 id="new_stolen_message"
               >
-                <%= form_for stolen_notification do |f| %>
-                  <%= f.hidden_field :bike_id, value: @bike.id %>
-                  <%= f.hidden_field :organization_id %>
+                <% @stolen_notification ||= StolenNotification.new(bike: @bike, sender: @user) %>
 
-                  <% if !organization_message? && @user.ambassador? %>
-                    <%= f.text_area :message, required: true, value: stolen_notification.default_message, rows: 6, class: "form-control" %>
+                <%= form_for @stolen_notification do |f| %>
+                  <%= f.hidden_field :bike_id, value: @bike.id %>
+
+                  <% if @user.ambassador? %>
+                    <%= f.text_area :message, required: true, value: @stolen_notification.default_message, rows: 6, class: "form-control" %>
                   <% else %>
-                    <%= f.text_area :message, required: true, placeholder: message_placeholder, rows: 6, class: "form-control" %>
+                    <%= f.text_area :message, required: true, placeholder: translation(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control" %>
                   <% end %>
 
-                  <%= f.text_field :reference_url, placeholder: organization_message? ? translation(".link_url") : translation(".link_url_for_online_sighting"), class: "form-control additional-field" %>
+                  <%= f.text_field :reference_url, placeholder: translation(".link_url_for_online_sighting"), class: "form-control additional-field" %>
 
                   <div class="send-message">
                     <%= f.submit translation(".send_message"), class: "btn btn-primary btn-lg" %>

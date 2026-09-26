@@ -46,22 +46,6 @@ module Pages
             @bike.status_with_owner? && @organization.enabled?("unstolen_notifications")
           end
 
-          def stolen_notification
-            @stolen_notification ||= StolenNotification.new(bike: @bike, sender: @user, organization: @organization)
-          end
-
-          def organization_message?
-            stolen_notification.organization_message?
-          end
-
-          def message_placeholder
-            if organization_message?
-              translation(".what_do_you_want_to_tell_the_owner", bike_type: @bike.type)
-            else
-              translation(".where_did_you_see_this_bike", bike_type: @bike.type)
-            end
-          end
-
           def show_sticker_modal?
             @organization.enabled?("bike_stickers")
           end

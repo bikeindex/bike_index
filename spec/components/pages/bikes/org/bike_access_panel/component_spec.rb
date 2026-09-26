@@ -136,10 +136,6 @@ RSpec.describe Pages::Bikes::Org::BikeAccessPanel::Component, type: :component d
         expect(bike.reload.phoneable_by?(current_user)).to be_truthy
         expect(bike.contact_owner?(current_user)).to be_truthy
 
-        component_text = whitespace_normalized_body_text(component.to_html)
-        expect(component_text).to match(/Message the owner of this bike/)
-        expect(component_text).to_not match(/stolen/i)
-        expect(component).to have_css("textarea[placeholder='What do you want to tell the owner of this bike?']")
         expect(component).to have_content("111-222-3333")
         expect(component).to have_css("a[href='tel:111-222-3333']")
         expect(component).to have_css("a[href='/bikes/#{bike_duplicate_id}']")

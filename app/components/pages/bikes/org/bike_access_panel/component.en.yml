@@ -43,10 +43,8 @@ en:
             is_registered: reged with %{org_name}
             is_true: 'true'
             link_sticker: Link Sticker
-            link_url: Link url (optional)
             link_url_for_online_sighting: Link url for online sighting (optional)
             mark_bike_recovered: Mark bike recovered
-            message_the_owner: Message the owner of this %{bike_type}
             missing_address: missing address
             missing_owner_name: missing user name
             model_audit: E-Vehicle audit
@@ -72,7 +70,6 @@ en:
             sticker: Sticker
             sticker_code: Sticker Code
             support_email: support@bikeindex.org
-            to_the_owner: to the owner of this %{bike_type}.
             unable_to_display_additional_information: >-
               Unable to display additional information because %{bike_type} is not
               registered with %{org_name}
@@ -81,8 +78,6 @@ en:
               This user <strong>revoked</strong> permission to contact them prior
               to their bike being marked stolen.
             waiting_on_device_location: Waiting on device location
-            what_do_you_want_to_tell_the_owner: What do you want to tell the owner
-              of this %{bike_type}?
             where_did_you_see_this_bike: >-
               Where did you see this %{bike_type}? If you're contacting about an ad
               you found online, include a link in the field below
