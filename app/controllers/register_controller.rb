@@ -255,11 +255,11 @@ class RegisterController < ApplicationController
   # than only a not-found. start_params is what carries an organization across that.
   # build: only step 1's submission, which carries everything a registration needs
   def find_b_param(build: false)
-    @b_param = BikeServices::Register.find_token(params_token: params[:b_param_token],
+    @b_param, sign_in_to_resume = BikeServices::Register.resume(params_token: params[:b_param_token],
       session_token: session[:register_b_param_token], user: current_user)
     @b_param ||= BikeServices::Register.b_param_for(user: current_user) if build
     if @b_param.blank?
-      if BikeServices::Register.sign_in_to_resume?(params[:b_param_token], user: current_user)
+      if sign_in_to_resume
         # A submission's token is in its body, and its path has no GET to come back to
         store_return_to(register_path(b_param_token: params[:b_param_token], step: params[:step]))
         return authenticate_user(translation_key: :sign_in_to_continue_registration, flash_type: :notice)

@@ -94,8 +94,7 @@ RSpec.describe BikeServices::Register do
     end
 
     it "only resumes a bike's registration for its creator until the safety rules are agreed to" do
-      expect(described_class.find_token(params_token: b_param.id_token, user: nil)).to be_nil
-      expect(described_class.sign_in_to_resume?(b_param.id_token, user: nil)).to be_truthy
+      expect(described_class.resume(params_token: b_param.id_token, user: nil)).to eq([nil, true])
       expect(described_class.find_token(params_token: b_param.id_token, user: creator)&.id).to eq b_param.id
 
       b_param.update(params: b_param.params.except("acknowledgment_pending"))
