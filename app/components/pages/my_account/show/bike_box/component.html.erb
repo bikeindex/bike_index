@@ -14,7 +14,7 @@
     <% image_link = @bike.thumb_path ? bike_url(@bike) : edit_bike_url(@bike, edit_template: 'photos') %>
 
     <a
-      class="<%= class_names("bike-list-image", "hover-expand": @bike.thumb_path) %>"
+      class="<%= class_names("bike-list-image tw:[&>img:not(.no-image)]:size-full tw:[&>img:not(.no-image)]:object-cover", "hover-expand": @bike.thumb_path) %>"
       href="<%= image_link %>"
     >
       <% unless @bike.thumb_path %>
