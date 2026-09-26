@@ -85,8 +85,8 @@ module BikeServices
       b_param.save
     end
 
-    # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
-    # active sequence, or the one its pages are being agreed to from, even once replaced.
+    # The safety rules a registration acknowledges, only for an e-vehicle - the version it
+    # started while that's still the organization's, otherwise whatever is current now.
     # motorized? first - it's in memory, and creation_organization is a query
     def registration_sequence(b_param)
       return nil unless b_param.motorized?
@@ -94,19 +94,14 @@ module BikeServices
       organization = b_param.creation_organization
       return nil if organization.blank?
 
-      started_id = b_param.params.dig("registration_sequence", "id")
-      (RegistrationSequence.find_by(id: started_id, organization:) if started_id.present?) ||
-        RegistrationSequence.active_for(organization)
+      started_sequence(b_param, organization) || RegistrationSequence.active_for(organization)
     end
 
-    # registration_sequence for a link back into the flow, and whether the rules restarted:
-    # resuming starts over on the organization's current version rather than finishing one
-    # it's replaced since. An agreement already made stands
-    def resume_registration_sequence(b_param, sequence:)
-      return [sequence, false] if sequence.blank? || sequence.active? || acknowledged?(b_param, sequence:)
-
-      b_param.update(params: b_param.params.except("registration_sequence"))
-      [registration_sequence(b_param), true]
+    # Whether the rules on screen aren't the ones this registration started, which is what the
+    # notice says: the organization replaced them, so the walk starts over on the current version
+    def rules_restarted?(b_param, sequence:)
+      started_id = started_sequence_id(b_param)
+      started_id.present? && sequence.present? && started_id.to_s != sequence.id.to_s
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the email),
@@ -333,6 +328,23 @@ module BikeServices
     #
     # private below here
     #
+
+    # The version a walk in progress is on, or nil once the organization has replaced it, which
+    # starts the pages over on the current rules. An agreement already made stands, so a
+    # replacement doesn't un-finish it. Nothing is written to switch versions: the acknowledged
+    # ids name the old version's pages, and a replacement clones its pages under new ids
+    def started_sequence(b_param, organization)
+      started_id = started_sequence_id(b_param)
+      return nil if started_id.blank?
+
+      sequence = RegistrationSequence.find_by(id: started_id, organization:)
+      return nil if sequence.blank?
+
+      sequence if sequence.active? || acknowledged?(b_param, sequence:)
+    end
+
+    # Written by acknowledge_page alongside the ids, so they're unambiguously scoped
+    def started_sequence_id(b_param) = b_param.params.dig("registration_sequence", "id")
 
     # Whether a bike registered some other way is this registration's. Step 1 says only
     # what it is, so any bike of that make and type is; whatever came after has to match too
@@ -561,7 +573,8 @@ module BikeServices
       additional.present? ? bike_params.to_h.merge("likely_spam" => true) : bike_params.to_h
     end
 
-    conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
+    conceal :started_sequence, :started_sequence_id,
+      :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
