@@ -33,7 +33,7 @@ get back local PNG paths.
 
 - `eval "$(ruby bin/env --export)"` so `$BASE_URL` is set.
 - `curl -fs "$BASE_URL/" >/dev/null` — run it every time, even if an earlier check in the session failed; the user may have started it since. If it fails now, **stop and ask the user to start it — unless this is a spawned `.claude/worktrees/…` checkout or the web sandbox, where you start it yourself**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so whoever starts bin/dev binds the same port and DB this skill expects.
-- **A 200 doesn't prove the server is this checkout's.** Confirm `ruby bin/env --export` names a `WORKSPACE_ID` first — without one the curl reaches the main checkout. See the `sandbox-test-setup` skill.
+- **A 200 doesn't prove the server is this checkout's.** Confirm `ruby bin/env --export` names a `WORKSPACE_ID` first — without one the curl reaches the main checkout. See the `sandbox-test-setup` skill. The web sandbox (`/home/user/bike_index`) gets a `WORKSPACE_ID` like anywhere else — its setup script runs `bin/workspace_setup` — but it's the only checkout in that container, so whatever `$BASE_URL` resolves to is the right one.
 - A 200 there doesn't promise the next page renders. A merge from the base can leave the dev DB
   unmigrated, and `CheckPending` only re-raises once the evented file watcher notices `db/migrate`
   moved — so a passing curl can be followed by `ActiveRecord::PendingMigrationError` on every page.
@@ -43,7 +43,9 @@ get back local PNG paths.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
 - **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
   back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the
-  per-workspace throwaway DB), or capture previews.
+  per-workspace throwaway DB), or capture previews. In the web sandbox the seed is already running
+  in the background — wait on `/tmp/seed.status` (`sandbox-test-setup`) rather than starting a
+  second one, which dies on duplicates.
 
 ## Sign in (with the PII gate)
 

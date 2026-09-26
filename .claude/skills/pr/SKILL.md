@@ -5,7 +5,10 @@ description: >-
   asks to create/open/make a PR, or to edit/update/rewrite/fix the PR
   description, body, summary, or title — including bare phrasings like "update
   pr" or "update the PR" with no other object — for both new PRs and existing
-  ones. Note this runs `/simplify`, `bin/lint`, an AGENTS.md conformance pass and
+  ones. Also trigger when the ask is to re-host, recreate, or duplicate an
+  existing PR under this repo (e.g. "close this PR and open a new one of the
+  same changes, not a fork") — that's still creating a PR even with no new diff
+  to write. Note this runs `/simplify`, `bin/lint`, an AGENTS.md conformance pass and
   a merge from the base before writing the body — skipped when the ask is only to
   reword the description — and pushes the result. For
   frontend diffs, delegates the screenshot phase to `references/screenshots.md`,
@@ -100,7 +103,7 @@ Record this as frontend true/false — it's what **Screenshots** gates on.
 
 ### Write the summary body
 
-Write the body to a temp file. Read the last few merged PRs first — `gh pr list --state merged --limit 5 --json title,body` — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
+Write the body to a file under the repo's own `tmp/`; a `PreToolUse` hook refuses writes outside the checkout. Read the last few merged PRs first — `gh pr list --state merged --limit 5 --json title,body` — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
 
 Rules:
 
@@ -110,7 +113,7 @@ Rules:
 - **Reference branches by PR number.** A stacked base or a branch this builds on is `#3918`, not a branch name: `gh pr list --head <branch> --state all --json number --jq '.[0].number'`. Name the branch only when it has no PR.
 - **No "Test plan" section unless the user asks.** Never list what CI already covers. Only reviewer-facing manual verification ("click X, confirm Y appears") qualifies, and only on request.
 - **No generic "covered by tests" bullet.** That a change is tested is assumed, and naming test mechanics (a fixture, a cassette) goes stale. Mention tests only when *what* is verified is the reviewer-facing point ("adds a regression test for the UTF-8 download crash").
-- **No Claude Code attribution footer**, here or in any comment this workflow posts. It should read like the human author wrote it.
+- **No Claude Code attribution footer**, here or in any comment this workflow posts. It should read like the human author wrote it. **Leaving it out isn't enough where `gh` is missing**: `create_pull_request` and `add_issue_comment` append one server-side (the tell is the session id in its link), while the `update_*` calls don't — so read back what you posted and strip it with an update.
 - **Link the issue when there is one.** If the branch name, a commit message, or the user's request names an issue, close it from the body — `Closes #4103` on its own line. Don't invent a number.
 
 If a bullet is turning into an essay, compress it to one sentence naming the *kind* of change.
@@ -143,7 +146,7 @@ The one that talks itself into existence is the "still accurate" update — a la
 Two gates, either of which skips the section outright:
 
 - **Not a frontend diff** — per the classifier above. **Unless a `## Screenshots` comment already exists**: the user asked for those captures, so a commit since the last one that changes what they show stales them even here. Recapture only those pages.
-- **No `gh`, or no browser signed in to GitHub.** Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. The `gh`-less sandbox in the appendix is this case.
+- **No `gh`, or no browser signed in to GitHub**, with `$CLAUDE_CODE_REMOTE` unset. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The web sandbox is not this case**, though it has neither: `$CLAUDE_CODE_REMOTE` is `true` there, and the section runs, because `github-pr-images` hosts through the PR branch's history — see the appendix.
 
 **A dev server you believe is down is not a gate.** Run `curl -fs "$BASE_URL/"` now, whatever an earlier check in the session said — the user starts `bin/dev` whenever, and #4319 went out without screenshots on a stale "isn't running". Only a failing curl *this* run is a reason to stop and ask.
 
@@ -171,7 +174,7 @@ Then return the PR URL.
 
 ## Appendix: the sandbox with no `gh`
 
-Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found", swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
+Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found", swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
 
 | Where | `gh` | MCP |
 | --- | --- | --- |
@@ -182,4 +185,4 @@ Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI;
 
 Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
-**There is no Screenshots row because the section doesn't run here.** No `gh` means no browser session either, so nothing can be hosted or posted; skip it and say so, rather than reaching for `add_issue_comment` to post something in its place.
+**Screenshots do run here**, though neither `gh` nor a usable browser does: `github-pr-images`' `references/web-sandbox.md` commits the images to the PR's branch, deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com` URLs through the MCP tools. Capture as normal and follow that reference for the hosting and posting steps. Those URLs live as long as the branch's objects do, so say in your summary that a merged PR's screenshots aren't archival.

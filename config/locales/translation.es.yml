@@ -2227,6 +2227,7 @@ es:
           owner_already_has_account: El propietario de este %{bike_type} ya tiene
             una cuenta en Bike Index. ¡Inicia sesión para reclamarlo!
           you_have_to_log_in: Lo sentimos, tienes que iniciar sesión.
+          sign_in_to_continue_registration: Inicia sesión para continuar con tu registro.
         ensure_member_of!:
           accept_tos_for_orgs: Por favor, acepte los términos de servicio para organizaciones.
           not_a_member_of_that_org: "¡No eres miembro de esa organización!"
@@ -5800,6 +5801,10 @@ es:
             search_notes: Notas de búsqueda
             search_owner_email_or_name: Buscar el correo electrónico o el nombre del
               propietario
+            miles_of: millas de
+            search_distance: Distancia de búsqueda
+            search_location: Buscar ubicación
+            within: dentro
           wrapper:
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
             view_matching_any_audit: ver coincidencia con cualquier auditoría
@@ -5819,6 +5824,7 @@ es:
             view_cards: Tarjetas
             view_list: Lista
             view_table: Mesa
+            loading_results: Cargando resultados...
           chart_card:
             caption_search: Búsqueda actual
             caption_year: Resumen del año pasado
@@ -5884,6 +5890,13 @@ es:
             occurred_at_cell_panel: Hora - estado
             updated_at_cell_panel: Hora - actualizada
             filter_stolen_or_impounded_html: solo <strong>robado</strong> o <strong>confiscado</strong>
+            location_search_disabled_no_address: "%{org_name} no recopila direcciones
+              de registro, por lo que solo los registros robados o confiscados tienen
+              una ubicación. Filtre por uno de esos estados para buscar por ubicación."
+            location_search_disabled_search_all: No se puede buscar por ubicación
+              al buscar todos los registros, a menos que se busquen únicamente los
+              registros incautados o robados.
+            show_location_search: mostrar búsqueda de ubicación
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -6769,23 +6782,27 @@ es:
         organized:
           additional_features_html: Bike Index ofrece funciones adicionales para organizaciones
             policiales verificadas. Comuníquese con %{email_link} para activarlas.
-          how_integration_works: cómo funciona la integración
-          integrate_bike_index_with_ascend: Integrar Bike Index con Ascend
-          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed.
-          link_to_register_html: "<strong>%{link}</strong> para registrar automáticamente
-            las bicicletas que vendes a tus clientes."
-          other_point_of_sale_system: "¿Otro sistema de punto de venta?"
-          read_a_full_explanation_html: Lea una explicación completa de %{link}.
-          register_bikes_with_link_html: Registra bicicletas con nuestro <strong>%{link}</strong>
-          streamlined_bike_shop_registration_page: Página de registro simplificada
-            para la tienda de bicicletas
           subscription_expired_html: Tu suscripción a Bike Index ha caducado. Ponte
             en contacto con %{email_link} para reactivarla.
-          use_ascend: "¿Usar Ascend?"
-          use_lightspeed_retail_pos: "¿Utilizas el sistema POS Lightspeed Retail?"
-          viewing_our_streamlined_page: Actualmente estás viendo nuestra página de
-            registro simplificada de la tienda de bicicletas, que es la que recomendamos
-            usar.
+        organized_shop_integration_alert:
+          add_a_bike: Añade una bicicleta
+          already_viewing_add_a_bike_page: Ya estás viendo esta página.
+          ascend_card_title: Ascender
+          dismiss: Despedir
+          dont_show_again: No vuelvas a mostrar esto
+          how_integration_works: Cómo funciona la integración
+          integrate_bike_index_with_ascend: Integrar Bike Index con Ascend
+          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed.
+          integration_card_body: Registra automáticamente las bicicletas que vendes
+            a tus clientes.
+          lightspeed_card_title: Punto de venta minorista Lightspeed
+          other_system_body: 'No se necesita integración: registra las bicicletas
+            manualmente en pocos segundos.'
+          other_system_card_title: 'Otro sistema: envíenos un correo electrónico.'
+          pos_callout_subhead: Conecta tu sistema de punto de venta y cada bicicleta
+            que vendas quedará registrada a nombre de tu cliente en Bike Index.
+          pos_callout_title: Registra las bicicletas automáticamente desde tu punto
+            de venta.
       navbar:
         org_sidebar:
           admin_panel: PANEL DE ADMINISTRACIÓN
