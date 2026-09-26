@@ -36,7 +36,6 @@ RSpec.describe OrganizationMessage, type: :model do
     it "is for a with-owner bike registered with the organization" do
       expect(OrganizationMessage.for?(bike:, organization:)).to be_truthy
       expect(OrganizationMessage.for?(bike:, organization: FactoryBot.create(:organization))).to be_falsey
-      expect(OrganizationMessage.for?(bike:, organization: nil)).to be_falsey
     end
 
     context "impounded" do

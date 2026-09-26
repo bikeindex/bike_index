@@ -10,7 +10,9 @@ en:
               know_who_has_this_bike_type: Know who has this %{bike_type}?
               link_url: Link url
               message_the_owner_of_this_bike_type: Message the owner of this %{bike_type}
+              not_stolen: Not stolen
               send_message: Send message
+              stolen: Stolen
               what_do_you_need_to_ask: >-
                 What do you need to ask about this %{bike_type}? Include a link in
                 the field below if there's one that helps

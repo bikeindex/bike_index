@@ -65,29 +65,30 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
       render_inline(described_class.new(bike:, organization:, current_user:))
 
       expect(page).to have_link("718-391-4410", href: "tel:718-391-4410")
+      expect(page).to_not have_field("message_kind", visible: :all)
     end
 
     context "registered with the viewer's organization" do
       let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: owner, creation_organization: organization, cycle_type: "e-scooter") }
 
-      it "asks for a message to the owner, not a sighting" do
+      it "defaults to an organization message, with a toggle to the stolen notification" do
         render_inline(described_class.new(bike:, organization:, current_user:))
 
         expect(page).to have_text("Message the owner of this e-scooter")
-        expect(page).to_not have_text("Know something about this e-scooter")
-        expect(page).to have_css("form[action='/o/#{organization.to_param}/organization_messages']", visible: :all)
-        expect(page).to have_css("textarea[name='organization_message[message]'][placeholder='What do you want to tell the owner of this e-scooter?']", visible: :all)
-        expect(page).to_not have_css("input[name$='[reference_url]']", visible: :all)
+        expect(page).to have_checked_field("Not stolen", visible: :all)
+        expect(page).to have_css("form[action='/o/#{organization.to_param}/organization_messages'] textarea[name='organization_message[message]'][placeholder='What do you want to tell the owner of this e-scooter?']", visible: :all)
+        expect(page).to_not have_css("input[name='organization_message[reference_url]']", visible: :all)
+        expect(page).to have_css(".tw\\:hidden[data-registrations--show--message-owner-target='stolenNotification'] input[name='stolen_notification[reference_url]']", visible: :all)
       end
 
       context "by phone" do
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, :phone_registration, creation_organization: organization, owner_email: "7183914410") }
 
-        it "only shows the phone" do
+        it "has no organization message form" do
           render_inline(described_class.new(bike:, organization:, current_user:))
 
-          expect(page).to have_text("Message the owner of this bike")
-          expect(page).to_not have_css("textarea", visible: :all)
+          expect(page).to have_field("message_kind", visible: :all)
+          expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
           expect(page).to have_link("718-391-4410", href: "tel:718-391-4410")
         end
       end

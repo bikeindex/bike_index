@@ -20,8 +20,8 @@
 #  index_organization_messages_on_receiver_id      (receiver_id)
 #  index_organization_messages_on_sender_id        (sender_id)
 #
-# An organization member's message to the owner of a bike registered with the organization -
-# not a stolen notification, which is for bikes that are (or might be) stolen
+# An org member's message to the owner of a bike registered with the org — not a
+# StolenNotification, which is contact about a theft
 class OrganizationMessage < ApplicationRecord
   belongs_to :bike
   belongs_to :organization
@@ -37,15 +37,19 @@ class OrganizationMessage < ApplicationRecord
   after_create_commit { EmailJobs::OrganizationMessageJob.perform_async(id) }
 
   def self.for?(bike:, organization:)
-    organization.present? && bike.status_with_owner? && bike.organized?(organization)
+    bike.status_with_owner? && bike.organized?(organization)
+  end
+
+  # A phone registration's owner_email is the phone number
+  def self.receiver_email_for(bike)
+    bike.owner_email unless bike.phone_registration?
   end
 
   private
 
   def set_calculated_attributes
     self.receiver ||= bike&.user
-    # A phone registration's owner_email is the phone number
-    self.receiver_email ||= bike&.owner_email unless bike&.phone_registration?
+    self.receiver_email ||= self.class.receiver_email_for(bike) if bike.present?
   end
 
   def sender_permitted

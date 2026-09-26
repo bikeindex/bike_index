@@ -55,16 +55,13 @@ class OrganizedMailer < ApplicationMailer
 
   def parking_notification(parking_notification)
     @organization = parking_notification.organization
-    component_args = {parking_notification:, bike: parking_notification.bike}
 
     I18n.with_locale(parking_notification.user&.preferred_language) do
       mail(reply_to: parking_notification.reply_to_email,
         to: parking_notification.email,
         tag: __callee__,
         subject: parking_notification.subject) do |format|
-        # Fresh component per format: ViewComponent locks an instance to the format used on first render
-        format.html { render Emails::ParkingNotification::Component.new(**component_args) }
-        format.text { render Emails::ParkingNotification::Component.new(**component_args) }
+        render_html_and_text(format, Emails::ParkingNotification::Component, parking_notification:, bike: parking_notification.bike)
       end
     end
   end
@@ -84,17 +81,13 @@ class OrganizedMailer < ApplicationMailer
 
   def organization_message(organization_message)
     @organization = organization_message.organization
-    component_args = {organization_message:}
-    subject_vars = {organization_name: @organization.short_name, bike_type: organization_message.bike.type}
 
     I18n.with_locale(organization_message.receiver&.preferred_language) do
       mail(reply_to: organization_message.sender.email,
         to: organization_message.receiver_email,
-        subject: default_i18n_subject(subject_vars),
+        subject: default_i18n_subject(organization_name: @organization.short_name, bike_type: organization_message.bike.type),
         tag: __callee__) do |format|
-        # Fresh component per format: ViewComponent locks an instance to the format used on first render
-        format.html { render Emails::OrganizationMessage::Component.new(**component_args) }
-        format.text { render Emails::OrganizationMessage::Component.new(**component_args) }
+        render_html_and_text(format, Emails::OrganizationMessage::Component, organization_message:)
       end
     end
   end
@@ -139,6 +132,12 @@ class OrganizedMailer < ApplicationMailer
   end
 
   private
+
+  # Fresh component per format: ViewComponent locks an instance to the format used on first render
+  def render_html_and_text(format, component_class, **args)
+    format.html { render component_class.new(**args) }
+    format.text { render component_class.new(**args) }
+  end
 
   # Addressed to whoever entered the registration, and subjected by the caller's own name
   def b_param_mail(b_param, component, tag:, subject_key: tag)

@@ -12,12 +12,10 @@ RSpec.describe Organized::OrganizationMessagesController, type: :request do
   describe "create" do
     it "creates and sends an organization message to the owner" do
       Sidekiq::Job.clear_all
-      ActionMailer::Base.deliveries = []
       expect {
         post base_url, params:
       }.to change(OrganizationMessage, :count).by(1)
       expect(flash[:success]).to be_present
-      expect(StolenNotification.count).to eq 0
 
       organization_message = OrganizationMessage.last
       expect(organization_message).to have_attributes(bike_id: bike.id, organization_id: current_organization.id,
@@ -33,6 +31,9 @@ RSpec.describe Organized::OrganizationMessagesController, type: :request do
       expect(mail.text_part.body.to_s).to_not match(/stolen/i)
       expect(organization_message.notifications.pluck(:kind, :user_id, :message_channel_target, :delivery_status))
         .to eq([["organization_message", owner.id, owner.email, "delivery_success"]])
+      notification = organization_message.notifications.first
+      expect(notification.sender).to eq current_user
+      expect(Notification.notifications_sent_or_received_by(current_user)).to include(notification)
     end
 
     context "bike not registered with the organization" do

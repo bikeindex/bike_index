@@ -141,13 +141,12 @@ class Notification < ApplicationRecord
       user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
       # TODO: THIS IS SHITTY
       customer_contact_ids = CustomerContact.where(creator_id: user_id).pluck(:id)
-      stolen_notification_ids = StolenNotification.where(sender: user_id).pluck(:id)
-      organization_message_ids = OrganizationMessage.where(sender: user_id).pluck(:id)
 
-      where(user_id: user_id)
-        .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
-        .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
-        .or(where(notifiable_type: "OrganizationMessage", notifiable_id: organization_message_ids))
+      SENDER_RECEIVER_NOTIFIABLE_TYPES.reduce(
+        where(user_id: user_id).or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
+      ) do |scope, type|
+        scope.or(where(notifiable_type: type, notifiable_id: type.constantize.where(sender_id: user_id).select(:id)))
+      end
     end
   end
 
