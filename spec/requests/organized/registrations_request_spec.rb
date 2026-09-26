@@ -429,8 +429,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       let!(:bike_acknowledged_earlier) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_acknowledged_later) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       before do
-        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_earlier, created_at: 2.days.ago)
-        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_later, created_at: 1.day.ago)
+        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_earlier, acknowledged_at: 2.days.ago)
+        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_later, acknowledged_at: 1.day.ago)
         # Another organization's acknowledgment doesn't count
         FactoryBot.create(:registration_sequence_acknowledgment, bike:)
       end
@@ -466,10 +466,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(sorted_bike_ids("asc").last(2)).to match_array([bike.id, registered_bike.id])
 
         registration_sequence.registration_sequence_pages.each_with_index do |page, index|
-          patch "/register/acknowledge", params: {b_param_token: b_param.id_token, step: (index + 3).to_s,
-                                                  acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
+          patch "/register/acknowledge", params: {b_param_token: b_param.id_token, registration_sequence_id: registration_sequence.id,
+                                                  step: (index + 3).to_s, acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
         end
-        patch "/register/acknowledge", params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+        patch "/register/acknowledge", params: {b_param_token: b_param.id_token, registration_sequence_id: registration_sequence.id,
+                                                step: "review", acknowledged_all: "1"}
         expect(registered_bike.unfinished_registration?).to be_falsey
 
         expect(sorted_bike_ids("desc")).to eq([bike.id, registered_bike.id, bike_acknowledged_later.id, bike_acknowledged_earlier.id])
