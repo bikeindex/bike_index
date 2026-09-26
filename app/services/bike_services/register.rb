@@ -21,8 +21,8 @@ module BikeServices
     STOLEN_REPORT_ATTRS = %i[theft_description police_report_number police_report_department
       estimated_value locking_description lock_defeat_description proof_of_ownership
       receive_notifications phone_for_users phone_for_shops phone_for_police].freeze
-    # The steps the bike is created from, which it can't take changes to once it exists
-    BIKE_STEPS = %w[1 2 report].freeze
+    # The steps the vehicle is created from, which it can't take changes to once it exists
+    VEHICLE_STEPS = %w[1 2 report].freeze
     # What a registration can say about its bike past step 1
     MATCHED_ATTRS = %w[frame_model year frame_size primary_frame_color_id secondary_frame_color_id
       tertiary_frame_color_id extra_registration_number status].index_with(&:itself)
@@ -217,7 +217,7 @@ module BikeServices
       b_param.acknowledgment_pending? && sequence_pages(sequence).any?
     end
 
-    def editable_step?(b_param, step) = !b_param.with_bike? || BIKE_STEPS.exclude?(step)
+    def editable_step?(b_param, step) = !b_param.with_bike? || VEHICLE_STEPS.exclude?(step)
 
     # user: being signed in as the address settles it, without any link being clicked
     def confirmation_email_pending?(b_param, user: nil)
