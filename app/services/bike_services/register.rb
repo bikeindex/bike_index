@@ -87,9 +87,12 @@ module BikeServices
 
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
     # active sequence, or the one its pages are being agreed to from, even once replaced.
-    # motorized? first - it's in memory, and creation_organization is a query
-    def registration_sequence(b_param)
-      return nil unless b_param.motorized?
+    # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
+    # Checked first - it's in memory, and creation_organization is a query
+    def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?)
+      return nil unless motorized
+      # Left to the owner, so this flow has none - create_bike holds the bike for them to agree
+      return nil if separate_attestation && !b_param.self_made?(user)
 
       organization = b_param.creation_organization
       return nil if organization.blank?
@@ -148,12 +151,13 @@ module BikeServices
     # to, and it's clicked after the acknowledgment pages rather than before them.
     # Placing it asks whether there's a creator yet, which is a query, so this is built once
     # a request and passed down
-    def steps(b_param, sequence:)
+    def steps(b_param, sequence:, single_page: false)
       pages = sequence_pages(sequence)
       rest = pages.each_index.map { step_for_page_index(it) } + (pages.any? ? %w[review] : [])
-      return %w[1 2] + rest unless report_step?(b_param&.status)
+      details = single_page ? %w[1] : %w[1 2]
+      return details + rest unless report_step?(b_param&.status)
 
-      creator_available?(b_param) ? %w[1 2 report] + rest : %w[1 2] + rest + %w[report]
+      creator_available?(b_param) ? details + %w[report] + rest : details + rest + %w[report]
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -260,24 +264,31 @@ module BikeServices
 
     # Step 1 is the least a registration can be: who owns it and what it is. The params are
     # merged in whether or not it passes, so a re-render still shows everything they entered
-    def save_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil)
-      bike_params = honeypot_spam(bike_params, additional)
-      b_param.clean_params({bike: bike_params, propulsion_type_motorized:}.as_json)
-      # Before save, which clears the errors it's about to re-run validations for
-      b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?
-      b_param.errors.add(:base, translation(:manufacturer_required)) if b_param.manufacturer_id.blank?
-      return false if b_param.errors.any?
+    def save_step_1(b_param, **)
+      return false unless assign_step_1(b_param, **)
       return true if b_param.save
 
       b_param.errors.add(:base, translation(:unable_to_save))
       false
     end
 
+    # save_step_1 without the write, for the single page - save_step_2 writes both
+    def assign_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil, single_page: false,
+      separate_attestation: false)
+      b_param.clean_params({bike: honeypot_spam(bike_params, additional), propulsion_type_motorized:,
+                            register_single_page: single_page, register_separate_attestation: separate_attestation}.as_json)
+      # Before save, which clears the errors it's about to re-run validations for
+      b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?
+      b_param.errors.add(:base, translation(:manufacturer_required)) if b_param.manufacturer_id.blank?
+      b_param.errors.none?
+    end
+
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
     # fields into the params json. The photo arrives one of two ways: as bytes from a plain
     # file field, or as the signed id of a blob the browser already uploaded.
     # Returns whether the step passed - a registration for someone else needs their name.
-    # A failed step still saves, it just isn't marked complete, so nothing entered is lost
+    # A failed step still saves, it just isn't marked complete, so nothing entered is lost.
+    # Not past an earlier error on the submission, which saving would clear
     def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil, additional: nil)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
@@ -286,7 +297,7 @@ module BikeServices
       clear_stale_report(b_param, bike_params["status"])
       set_auto_organization(b_param, register_with_organization)
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
-      b_param.save
+      b_param.save if b_param.errors.none?
       b_param.errors.add(:base, translation(:name_required)) unless completed
       completed
     end
@@ -403,11 +414,19 @@ module BikeServices
       create_bike(b_param, sequence:, ip_address:)
     end
 
-    # Returns nil while the rules are owed - the bike exists, but the registration isn't finished
+    # Returns nil while the rules are owed - the bike exists, but the registration isn't finished -
+    # unless separate attestation left them to the owner, who's emailed the link back instead.
+    # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
+      owners_sequence = registration_sequence(b_param) if sequence.blank?
+      b_param.params = b_param.params.deep_merge("bike" => {
+        "register_single_page" => b_param.params["register_single_page"],
+        "register_separate_attestation" => owners_sequence.present?
+      })
+      owed = sequence || owners_sequence
       # Ahead of the bike, so the ownership it creates holds its email back
-      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence:) unless acknowledged?(b_param, sequence:)
+      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence: owed) unless acknowledged?(b_param, sequence: owed)
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
       if bike.id.blank?
         pending&.destroy
@@ -417,7 +436,11 @@ module BikeServices
       # The bike is what the acknowledgment hangs off once the b_param is swept
       acknowledgment = pending || RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
       acknowledgment&.update(bike_id: bike.id, user_id: acknowledgment.user_id || b_param.creator_id)
-      bike if pending.blank?
+      return bike if pending.blank?
+      return if owners_sequence.blank?
+
+      EmailJobs::PartialRegistrationJob.perform_async(b_param.id)
+      bike
     end
 
     # Nothing to report without a status that has a record, otherwise save_report's marker
@@ -485,14 +508,15 @@ module BikeServices
     # Every step the registration has reached, in order - each one opens the next, so the
     # flow stops at the first that hasn't been done
     def permitted_steps(b_param, sequence, steps)
-      reached = steps.take_while { step_completed?(b_param, it, sequence:) }.count
+      reached = steps.take_while { step_completed?(b_param, it, sequence:, steps:) }.count
       steps.first(reached + 1).select { editable_step?(b_param, it) }
     end
 
     # Whether a step has been submitted with everything it asks for
-    def step_completed?(b_param, step, sequence:)
+    def step_completed?(b_param, step, sequence:, steps:)
       case step
-      when "1" then b_param.manufacturer_id.present?
+      # With no step 2, step 1's page asks for its details too
+      when "1" then steps.include?("2") ? b_param.manufacturer_id.present? : details_completed?(b_param)
       when "2" then details_completed?(b_param)
       when "report" then report_completed?(b_param)
       when "review" then acknowledged?(b_param, sequence:)

@@ -45,6 +45,8 @@ class BParam < ApplicationRecord
     phone
     postal_code
     region_string
+    register_separate_attestation
+    register_single_page
     street
     student_id
     user_name
@@ -68,6 +70,8 @@ class BParam < ApplicationRecord
     propulsion_type
     propulsion_type_slug
     rear_gear_type_slug
+    register_separate_attestation
+    register_single_page
     revised_new
     state_id
     stolen
@@ -461,7 +465,7 @@ class BParam < ApplicationRecord
   def self_made?(user = creator)
     return false if user.blank?
 
-    ([user.email] + user.confirmed_emails).include?(EmailNormalizer.normalize(owner_email))
+    user.own_emails.include?(EmailNormalizer.normalize(owner_email))
   end
 
   def creation_organization

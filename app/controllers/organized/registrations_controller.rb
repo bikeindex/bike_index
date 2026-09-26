@@ -77,10 +77,18 @@ module Organized
       @skip_general_alert = true
       # The form carries this registration's token, and a cached page would carry a stale one
       response.set_header("Cache-Control", "no-store")
-      sequence = BikeServices::Register.registration_sequence(@b_param)
-      steps = BikeServices::Register.steps(@b_param, sequence:)
-      render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, steps:,
-        organization: current_organization, current_user:)
+      sequence = register_flow_sequence(@b_param)
+      steps = BikeServices::Register.steps(@b_param, sequence:, single_page: register_setting?(@b_param, "single_page"))
+      render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, steps:, organization: current_organization,
+        current_user:, separate_attestation: register_setting?(@b_param, "separate_attestation"),
+        motorized_review: register_motorized_review?(@b_param, steps))
+    end
+
+    # Both switches submit together, so an unchecked box is what turns one off
+    def switches
+      session[:register_settings] = {"organization_id" => current_organization.id,
+        "single_page" => params[:single_page].present?, "separate_attestation" => params[:separate_attestation].present?}
+      redirect_to new_organization_registration_path(organization_id: current_organization.to_param)
     end
 
     def multi_search

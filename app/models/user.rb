@@ -260,6 +260,9 @@ class User < ApplicationRecord
     user_emails.confirmed.pluck(:email)
   end
 
+  # The primary address counts before it's confirmed
+  def own_emails = ([email] + confirmed_emails).uniq
+
   def secondary_emails
     user_emails.where.not(email: email).pluck(:email)
   end

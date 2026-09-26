@@ -1,18 +1,36 @@
 # frozen_string_literal: true
 
-# TODO: #4185 - remove this component when removing the legacy org new bike iframe
+# TODO: #4185 - remove the legacy view switch when removing the legacy org new bike iframe
 
 module Pages
   module Org
     module RegisterStep1
-      # The register flow's opening step on an organization's own page, with the way
-      # back to the embed form it replaces
+      # The register flow's opening page on an organization's own page, with the
+      # switches that change its shape below it
       class Component < ApplicationComponent
-        def initialize(b_param:, steps:, organization:, current_user: nil)
+        def initialize(b_param:, steps:, organization:, current_user: nil, separate_attestation: false,
+          motorized_review: false)
           @b_param = b_param
           @steps = steps
           @organization = organization
           @current_user = current_user
+          @separate_attestation = separate_attestation
+          @motorized_review = motorized_review
+        end
+
+        private
+
+        def single_page? = @steps.exclude?("2")
+
+        # skip_heading: the organized menu already names the organization
+        def opening_page
+          Pages::Register::StartPage::Component.opening_page(b_param: @b_param, steps: @steps,
+            current_user: @current_user, organization: @organization, skip_heading: true,
+            motorized_review: @motorized_review)
+        end
+
+        def switches_path
+          switches_organization_registrations_path(organization_id: @organization.to_param)
         end
       end
     end

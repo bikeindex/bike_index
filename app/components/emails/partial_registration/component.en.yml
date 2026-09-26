@@ -3,9 +3,14 @@ en:
   components:
     emails:
       partial_registration:
+        agree_to_the_safety_rules: Agree to the safety rules
         click_below_to_complete_your_registration: Click below to complete your registration
         finish_it: Finish it!
         just_a_few_steps_away_html: >-
           You're just a few steps away from registering your <strong>%{color_and_brand}</strong>
           on the world's most comprehensive bike registry!
+        review_the_rules: Review the rules
+        safety_rules_owed_html: >-
+          Your <strong>%{color_and_brand}</strong> is registered with %{org_name}
+          on Bike Index. Agree to %{org_name}'s safety rules to finish the registration.
         youre_almost_done: You’re Almost Done!

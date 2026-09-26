@@ -1,0 +1,17 @@
+<%= render Pages::Register::StartPage::Component.new(b_param: @b_param, steps: @steps, organization:,
+    current_user: @current_user, skip_heading: @skip_heading) do %>
+  <%# What tells create both steps are here - the embed frames step 1 alone %>
+  <%= hidden_field_tag :single_page, true %>
+
+  <%# Step 1 posts its own scope, which create reads separately from step 2's %>
+  <%= fields_for(:b_param, @b_param) do |b_param_form| %>
+    <%= render Pages::Register::Step1Fields::Component.new(b_param: @b_param,
+        form: b_param_form, current_user: @current_user, organization:) %>
+  <% end %>
+
+  <%= fields_for(:bike) do |f| %>
+    <%= render Pages::Register::Step2Fields::Component.new(b_param: @b_param, steps: @steps,
+        form: f, current_user: @current_user, organization:, single_page: true,
+        motorized_review: @motorized_review) %>
+  <% end %>
+<% end %>
