@@ -234,9 +234,13 @@ module BikeServices
       email_confirmation_link(b_param, "partial_register_confirmation")
     end
 
-    # The safety rules the separate attestation switch left to the owner. The registration
-    # is the member's, so its link signs the owner in the way the confirmation link does
+    # The registration is the member's, so this link signs the owner in
     def send_rules_email(b_param) = email_confirmation_link(b_param, "partial_registration")
+
+    # Whichever email the expired link came from
+    def resend_email_link(b_param)
+      b_param.acknowledgment_pending? ? send_rules_email(b_param) : send_confirmation_email(b_param)
+    end
 
     # Time limited, so an old link proves nothing - the address gets a fresh one
     def confirmation_token_valid?(b_param, token)

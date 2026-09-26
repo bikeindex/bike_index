@@ -25,5 +25,7 @@
     "data-pm-no-track" => true, class: "binx-button" %>
 
 <% if rules_owed? %>
-  <p><%= translation("link_signs_you_in", days: expiration_days) %></p>
+  <p>
+    <%= translation("link_signs_you_in", days: BParam::TOKEN_EXPIRATION.in_days.to_i) %>
+  </p>
 <% end %>
