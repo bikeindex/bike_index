@@ -1,0 +1,325 @@
+<% membership = current_user.membership_active %>
+
+<div class="container">
+  <div class="row tw:flex tw:flex-wrap tw:items-end tw:py-4">
+    <div class="tw:flex-1 tw:px-[15px] tw:pb-4">
+      <h1 class="uncap mb-2">
+        <%= t(".header_title", current_user_name: current_user.display_name) %>
+      </h1>
+
+      <% if membership.present? %>
+        <h3 class="uncap">
+          <%= t(".membership_subtitle", level: membership.basic? ? '' : membership.level_humanized) %>
+        </h3>
+      <% end %>
+    </div>
+
+    <% if membership.present? %>
+      <div class="tw:flex tw:w-full tw:px-[15px] tw:sm:w-1/3">
+        <%= render(Atoms::MemberBadge::Component.new(level: membership.level, shadow: true, classes: "tw:max-w-1/2! tw:sm:max-w-full! tw:mx-auto")) %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <ul class="user-items-nav nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a
+            class="<%= class_names("nav-link", active: !@locks_active_tab) %>"
+            href="#bikes_tab_content"
+            data-toggle="tab"
+            data-role="tab"
+          >
+            <%= t(".bikes") %>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a
+            class="<%= class_names("nav-link", active: @locks_active_tab) %>"
+            href="#locks_tab_content"
+            data-toggle="tab"
+            data-role="tab"
+          >
+            <%= t(".locks") %>
+          </a>
+        </li>
+      </ul>
+
+      <div class="user-items-content tab-content">
+        <div
+          class="<%= class_names("tab-pane", active: !@locks_active_tab) %>"
+          id="bikes_tab_content"
+        >
+          <% if @bikes.present? %>
+            <% user_alerts = current_user.alert_slugs.any? ? current_user.user_alerts.active.account : [] %>
+            <ul class="bike-boxes">
+              <% @bikes.each do |bike| %>
+                <% bike_alerts = user_alerts.select { |ua| ua.bike_id == bike.id } %>
+
+                <li class="bike-box-item tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800">
+                  <% cache(["my_account", bike]) do %>
+                    <% image_link = bike.thumb_path ? bike_url(bike) : edit_bike_url(bike, edit_template: 'photos') %>
+
+                    <a
+                      class="<%= class_names("bike-list-image", "hover-expand": bike.thumb_path) %>"
+                      href="<%= image_link %>"
+                    >
+                      <% unless bike.thumb_path %>
+                        <div class="thumb-overlay">
+                          <%= image_tag 'revised/photo_icon.svg' %>
+
+                          <h4><%= t(".add_a_photo") %></h4>
+                        </div>
+                      <% end %>
+
+                      <%= bike_thumb_image(bike) %>
+                    </a>
+
+                    <div class="bike-information multi-attr-lists">
+                      <h5 class="title-link">
+                        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
+                        <%= link_to bike_title_html(bike), bike_path(bike) %>
+                      </h5>
+
+                      <ul class="attr-list">
+                        <li>
+                          <strong class="attr-title"><%= t(".serial") %>:</strong>
+                          <%= render(Atoms::Serial::Component.new(bike:, user: current_user, explanation: :tooltip)) %>
+                        </li>
+
+                        <%= attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors")) %>
+
+                        <li class="less-strong">
+                          <strong class="attr-title"><%= t(".registered") %>:</strong>
+                          <span class="localizeTime"><%= l bike.created_at, format: :convert_time %></span>
+                        </li>
+
+                        <li class="less-strong">
+                          <strong class="attr-title"><%= t(".updated") %>:</strong>
+                          <span class="localizeTime"><%= l bike.updated_by_user_fallback, format: :convert_time %></span>
+                        </li>
+                      </ul>
+
+                      <ul class="attr-list">
+                        <% if bike.bike_stickers.any? %>
+                          <% sticker_count = bike.bike_stickers.count %>
+                          <li>
+                            <strong><%= t(".bike_sticker").pluralize(sticker_count) %></strong>
+
+                            <% if sticker_count > 1 %>
+                              <ul class="multi-sticker">
+                                <% bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker| %>
+                                  <li>
+                                    <code class="sticker-code"><%= bike_sticker.pretty_code %></code>
+                                  </li>
+                                <% end %>
+                              </ul>
+                            <% else %>
+                              <% bike.bike_stickers.includes(:bike_sticker_batch).each do |bike_sticker| %>
+                                <code class="sticker-code"><%= bike_sticker.pretty_code %></code>
+                              <% end %>
+                            <% end %>
+                          </li>
+                        <% end %>
+
+                        <% if bike.occurred_at.present? %>
+                          <li>
+                            <strong class="attr-title"><%= bike.status_humanized.titleize %>:</strong>
+                            <span class="localizeTime"><%= l bike.occurred_at, format: :convert_time %></span>
+                          </li>
+                        <% end %>
+
+                        <%# marketplace_listing handles address differently. TODO: Reconcile that! %>
+                        <% if bike.current_event_record.present? && !bike.is_for_sale %>
+                          <% if bike.current_event_record.is_a?(ImpoundRecord) %>
+                            <%= attr_list_item(bike.current_event_record.address_record&.formatted_address_string(visible_attribute: :street), t(".location")) %>
+                          <% else %>
+                            <%= attr_list_item(bike.current_event_record.formatted_address_string, t(".location")) %>
+                          <% end %>
+                        <% end %>
+
+                        <li>
+                          <%= link_to t(".edit_registration", bike_type: bike.type_titleize&.downcase), edit_bike_path(bike, edit_template: bike.default_edit_template) %>
+                        </li>
+
+                        <% if bike.status_stolen? %>
+                          <%#
+                            Hide printable PDF because it isn't working right now :(
+                            link_to t(".printable_pdf"), pdf_bike_path(bike)
+                          %>
+                          <% if bike.impound_claims_submitting.active.any? %>
+                            <% impound_claim = bike.impound_claims_submitting.active.last %>
+                            <li>
+                              <span class="text-warning">
+                                <em><%= impound_claim.status_humanized.titleize %></em>
+                                claim to
+                              </span>
+
+                              <%= link_to "this #{impound_claim.impound_record.kind} #{impound_claim.bike_claimed.type_titleize&.downcase}", bike_path(impound_claim.bike_claimed) %>
+                            </li>
+                          <% end %>
+                        <% elsif bike.status_with_owner? %>
+                          <li>
+                            <% marketplace_translation = bike.is_for_sale ? t(".update_marketplace_listing") : t(".list_for_sale") %>
+                            <%= link_to marketplace_translation, edit_bike_path(bike, edit_template: "marketplace"), class: "less-strong" %>
+                          </li>
+                          <% if bike.strava_gear.present? %>
+                            <li>
+                              <%= link_to strava_search_path(gear: bike.strava_gear.strava_id), class: "less-strong" do %>
+                                <%= inline_svg_tag("logos/strava.svg", style: "vertical-align: baseline; display: inline-block; height: 12px; width: auto;") %>
+                                <span class="less-strong"><%= bike.strava_gear.strava_gear_display_name %></span>
+                              <% end %>
+                            </li>
+                          <% end %>
+                          <li>
+                            <%= link_to t(".mark_stolen", bike_type: bike.type_titleize&.downcase), edit_bike_path(bike, edit_template: "report_stolen"), class: "text-danger less-strong" %>
+                          </li>
+                        <% end %>
+
+                        <% if bike.user_hidden %>
+                          <li>
+                            <em class="small text-warning"><%= t(".user_hidden") %></em>
+                          </li>
+                        <% end %>
+                      </ul>
+                    </div>
+                  <% end %>
+
+                  <% if bike_alerts.any? %>
+                    <% alert = bike_alerts.find { |a| a.kind == "unassigned_bike_org" } %>
+                    <% if alert.present? %>
+                      <div class="account-user-alert alert alert-info mb-0">
+                        <%= t(".generally_connect_to_org", org_name: alert.organization&.short_name) %>
+                        <%= link_to t(".add_it_now"), user_alert_path(id: alert.id, add_bike_organization: true), method: :patch, action: "update", class: "text-underline text-success" %>
+
+                        <div class="small less-strong dismiss-wrapper">
+                          <%= link_to t(".ignore"), user_alert_path(id: alert.id, alert_action: "dismiss"), method: :patch, action: "update" %>
+                        </div>
+                      </div>
+                    <% end %>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+
+            <div class="pt-4 pb-4">
+              <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>
+            </div>
+          <% else %>
+            <h2><%= t(".you_have_no_registered_bikes") %></h2>
+          <% end %>
+        </div>
+
+        <div
+          class="<%= class_names("tab-pane", active: @locks_active_tab) %>"
+          id="locks_tab_content"
+        >
+          <% if @locks.present? %>
+            <table class="table table-striped table-bordered">
+              <thead>
+                <th><%= t(".registered") %></th>
+                <th><%= t(".lock_type") %></th>
+                <th><%= t(".manufacturer") %></th>
+                <th><%= t(".key_serial") %></th>
+                <th><%= t(".combination") %></th>
+                <th class="small"><%= t(".updated") %></th>
+              </thead>
+
+              <tbody>
+                <% @locks.each do |lock| %>
+                  <tr>
+                    <td>
+                      <span class="localizeTime mr-2"><%= l lock.created_at, format: :convert_time %></span>
+                      <small><%= link_to(t(".edit"), edit_lock_path(lock)) %></small>
+                    </td>
+
+                    <td><%= lock.lock_type&.name %></td>
+                    <td><%= lock.mnfg_name %></td>
+                    <td><%= lock.key_serial %></td>
+                    <td><%= lock.combination %></td>
+
+                    <td>
+                      <small class="localizeTime"><%= l lock.updated_at, format: :convert_time %></small>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% else %>
+            <h2><%= t(".you_have_no_registered_locks") %></h2>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="side-box">
+        <h3 class="first-item"><%= t(".register_new_items") %></h3>
+
+        <div class="inner">
+          <%= link_to t(".add_a_bike"), register_path, class: "btn btn-primary btn-lg" %>
+          <%= link_to t(".add_a_lock"), new_lock_url, class: "btn btn-primary-offset btn-lg" %>
+        </div>
+
+        <h3><%= t(".next") %></h3>
+
+        <div class="inner last-item tw:space-y-2 tw:[&_.lock-group]:mb-0 tw:[&_p]:mb-0">
+          <% if @bikes.present? %>
+            <div class="lock-group">
+              <div class="image-column">
+                <% if @bikes.last.status_stolen? %>
+                  <%= image_tag 'icons/emoji-crying.png', alt: 'Crying, sad face' %>
+                <% else %>
+                  <%= image_tag 'icons/emoji-smiling.png', alt: 'Happy, Smiling face' %>
+                <% end %>
+              </div>
+
+              <div class="col-xs-10">
+                <p>
+                  <% if @bikes.count > 0 %>
+                    <% if @bikes.last.status_stolen? %>
+                      <%= t(".sorry_your_bike_was_stolen", bikes_last_type: @bikes.last.type) %>
+                    <% else %>
+                      <%= t(".thanks_for_adding_your_bike", bikes_last_type: @bikes.last.type) %>
+                    <% end %>
+                  <% else %>
+                    <strong><%= t(".welcome") %></strong>
+                    <%= t(".to_bike_index_thanks_for_signing_up") %>
+                  <% end %>
+                </p>
+              </div>
+            </div>
+          <% end %>
+
+          <div class="lock-group">
+            <div class="image-column">
+              <%= image_tag 'revised/update_account_icon.svg' %>
+            </div>
+
+            <div class="col-xs-10">
+              <p>
+                <strong><%= t(".tell_us_more_about_yourself") %></strong>
+                <%= link_to t(".update_your_profile"), edit_my_account_url %>
+              </p>
+            </div>
+          </div>
+
+          <% if Flipper.enabled?(:strava_integration, current_user) %>
+            <%= render(Pages::MyAccount::StravaIntegration::Component.new(user: current_user)) %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% unless current_user.paid_organization_registration? %>
+  <%# Cache this render callout to avoid allocations %>
+  <% cache("donation_modal2") do %>
+    <%= render "/shared/donation_modal" %>
+  <% end %>
+<% end %>
