@@ -24,8 +24,8 @@ When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/ta
 
 You're only here because the diff is frontend (SKILL.md's classifier gates on that). Decide scope by PR state:
 
-- New PR → capture every affected page.
-- Existing PR → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
+- New PR, or an existing one with no `## Screenshots` comment → capture every page the whole branch diff affects, not just the commits since the last run.
+- Existing PR with a screenshots comment → continue only if its captures are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
 
 **A page the diff no longer touches loses its block rather than gaining a recapture.** When its work lands on the base separately, `git diff origin/main -- <path>` comes back empty and the before/after documents a change this PR doesn't make. Drop the `### <url-path>` block; don't recapture it to show two identical images.
 
