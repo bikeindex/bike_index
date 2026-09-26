@@ -35,6 +35,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
   it "renders the card header, column panel, table and footer" do
     expect(component).to have_css("table")
+    expect(component).not_to have_text("Ordered by")
     expect(component).to have_css("tbody tr", count: 1)
     # the column panel ships collapsed, opened from the header button
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\!", visible: :all)
@@ -45,30 +46,68 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
     expect(component).to have_css("select#per_page_select")
     # bike data in cells
     expect(component).to have_text(bike.mnfg_name)
+    # the table bleeds to the page's edges once the card is full bleed
+    expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
+      .to include(*described_class::TABLE_BLEED_CLASSES.split)
+    # the card marks itself for the frame's loading swap, and the rows swap off the
+    # frame's tw:group for the spinner that replaces them
+    expect(component).to have_css(".search-results-card", visible: :all)
+    expect(component).to have_css(".tw\\:group-\\[\\[busy\\]\\]\\:block", visible: :all)
+    expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
+      .to include("tw:group-[[busy]]:hidden")
+    expect(component).to have_text("Loading results...")
   end
 
-  context "with result_view thumbnail" do
-    let(:sort_state) { ComponentStructs::SortState.new(search_params: {serial: "xyz"}) }
-    let(:options) { super().merge(result_view: "thumbnail", sort_state:) }
+  context "with result_view cards" do
+    let(:sort_state) { ComponentStructs::SortState.new(search_params: {serial: "xyz"}, sort: "mnfg_name", direction: "asc") }
+    let(:options) { super().merge(result_view: "cards", sort_state:) }
 
-    it "renders no chips until the flag is on" do
-      expect(component).to_not have_link("Spreadsheet")
-      expect(component).to_not have_text("View as")
+    it "marks the chip active, carries the search into the other one's link, and renders cards" do
+      expect(component).to have_css("a[data-active='true']", text: "Cards")
+      expect(component).to have_link("Table", href: /search_result_view=table/)
+      expect(component).to have_link("Table", href: /serial=xyz/)
+      expect(component).to have_css("ul li", text: bike.mnfg_name)
+      expect(component).not_to have_css("table")
+      expect(component).not_to have_button("Column settings", visible: :all)
+      expect(component).to have_text("Ordered by Manufacturer, ascending")
+      expect(component).to have_css("button[aria-label='Switch to the table view to change ordering']", text: "?")
     end
 
-    it "marks the chip active and carries the search into the other one's link" do
-      Flipper.enable(:organization_registration_view_switcher)
-      expect(component).to have_css("a[data-active='true']", text: "Thumbnail")
-      expect(component).to have_link("Spreadsheet", href: /search_result_view=spreadsheet/)
-      expect(component).to have_link("Spreadsheet", href: /serial=xyz/)
+    context "with csv_exports enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
+
+      it "renders no export" do
+        expect(component).to have_css("ul li", text: bike.mnfg_name)
+        expect(component).not_to have_link("Export CSV", visible: :all)
+      end
+    end
+
+    context "with result_view list" do
+      let(:options) { super().merge(result_view: "list") }
+
+      it "renders rows" do
+        expect(component).to have_css("a[data-active='true']", text: "List")
+        expect(component).to have_css("ul li.tw\\:border-l-4", text: bike.mnfg_name)
+        expect(component).not_to have_css("table")
+        expect(component).not_to have_button("Column settings", visible: :all)
+      end
     end
 
     context "with an unknown view" do
       let(:options) { super().merge(result_view: "nonsense") }
-      before { Flipper.enable(:organization_registration_view_switcher) }
 
-      it "falls back to the spreadsheet" do
-        expect(component).to have_css("a[data-active='true']", text: "Spreadsheet")
+      it "falls back to the table" do
+        expect(component).to have_css("a[data-active='true']", text: "Table")
+        expect(component).to have_css("table")
+      end
+    end
+
+    context "without search_page" do
+      let(:search_page) { false }
+
+      it "renders the table" do
+        expect(component).to have_css("table")
+        expect(component).not_to have_text("View as")
       end
     end
   end
@@ -78,10 +117,15 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
     it "renders the column settings button without the search's actions, and brings its own controllers" do
       expect(component).to have_css("table")
+      # no results frame above this card, so nothing sets [busy] and there's no loading swap
+      expect(component).not_to have_css(".search-results-card", visible: :all)
+      expect(component).not_to have_text("Loading results...")
       expect(component).to have_css("[data-controller~='org--search-column-settings']")
       expect(component).to have_button("Column settings", visible: :all)
       # the header's button is the only one - the panel doesn't carry the legacy one
       expect(component).to have_css("[data-ui--collapse-target='trigger']", count: 1, visible: :all)
+      expect(component.at_css("div:has(> [data-controller~='org--bikes-table-overflow'])")[:class].split)
+        .not_to include(*described_class::TABLE_BLEED_CLASSES.split)
     end
 
     context "with csv_exports enabled" do
@@ -98,7 +142,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
     it "renders impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
-      expect(component).to have_css("th.impounded_cell", visible: :all, text: "Impounded")
     end
   end
 
@@ -138,10 +181,6 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
   end
 
   context "when bike is user_hidden and org cannot edit" do
-    let(:current_user) { FactoryBot.create(:organization_role_claimed, organization:).user }
-    let(:options) do
-      super().merge(current_user:)
-    end
     let(:bike) do
       FactoryBot.create(:bike_organized,
         creation_organization: organization,
@@ -152,7 +191,7 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, type: :component do
 
     it "renders the serial number" do
       expect(component).to have_css("tbody tr", count: 1)
-      expect(component).to have_text(bike.serial_display(current_user))
+      expect(component).to have_text(bike.serial_display(organization:))
     end
   end
 

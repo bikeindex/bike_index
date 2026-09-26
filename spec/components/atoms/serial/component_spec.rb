@@ -37,29 +37,65 @@ RSpec.describe Atoms::Serial::Component, type: :component do
         .to eq '<span class="less-strong">hidden</span> <em class="small less-less-strong">because tandem is impounded</em>'
     end
 
-    context "with skip_explanation" do
-      let(:options) { {skip_explanation: true} }
+    context "with explanation: :tooltip" do
+      let(:options) { {explanation: :tooltip} }
 
-      it "hides the serial without the explanation" do
-        expect(component.to_html.strip).to eq '<span class="less-strong">hidden</span>'
+      it "hides the serial with the explanation in a tooltip" do
+        expect(component.css("span.less-strong").text).to eq "hidden"
+        expect(component.css("em")).to be_blank
+        expect(component.css("button").text).to eq "?"
+        expect(component.css("[role=tooltip]").text).to eq "because tandem is impounded"
+      end
+    end
+
+    context "for an organization the bike is registered with" do
+      let(:bike) { FactoryBot.create(:bike_organized, :impounded, serial_number: "FFF333", cycle_type: :tandem).reload }
+      let(:options) { {organization: bike.organizations.first} }
+
+      it "shows the serial with the unauthorized-users note" do
+        expect(component.css("span.serial-span").text).to eq "FFF333"
+        expect(component.css("em").text).to eq "hidden for unauthorized users"
+      end
+
+      context "with another organization" do
+        let(:options) { {organization: FactoryBot.create(:organization)} }
+
+        it "hides the serial" do
+          expect(component.css("span.less-strong").text).to eq "hidden"
+        end
       end
     end
 
     context "for a user who may see it" do
       let(:options) { {user: FactoryBot.create(:superuser)} }
 
-      it "shows the serial with the unauthorized-users note" do
-        expect(component.to_html.strip)
-          .to eq '<span class="serial-span">FFF333</span> <em class="small less-less-strong">hidden for unauthorized users</em>'
+      it "shows the serial with the unauthorized-users note, and why in a tooltip" do
+        expect(component.css("span.serial-span").text).to eq "FFF333"
+        expect(component.css("em").text).to eq "hidden for unauthorized users"
+        expect(component.css("[role=tooltip]").text).to eq "because tandem is impounded"
       end
 
-      context "with skip_explanation" do
-        let(:options) { super().merge(skip_explanation: true) }
+      context "with explanation: :tooltip" do
+        let(:options) { super().merge(explanation: :tooltip) }
 
-        it "shows the serial alone" do
-          expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
+        it "shows the serial with the note in a tooltip" do
+          expect(component.css("span.serial-span").text).to eq "FFF333"
+          expect(component.css("[role=tooltip]").text).to eq "hidden for unauthorized users"
         end
       end
+    end
+  end
+
+  context "owner of a bike impounded by an organization" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, serial_number: "FFF333") }
+    let(:options) { {user: bike.user} }
+    before { FactoryBot.create(:impound_record_with_organization, bike:) }
+
+    it "shows the serial with the unauthorized-users note, although not authorized" do
+      expect(bike.reload.authorized?(bike.user)).to be_falsey
+      expect(component.css("span.serial-span").text).to eq "FFF333"
+      expect(component.css("em").text).to eq "hidden for unauthorized users"
+      expect(component.css("[role=tooltip]").text).to eq "because bike is impounded"
     end
   end
 

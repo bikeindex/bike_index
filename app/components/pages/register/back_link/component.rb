@@ -9,6 +9,8 @@ module Pages
           @href = href
         end
 
+        def render? = @href.present?
+
         def call
           content_tag(:p, class: "tw:mt-3 tw:mb-0 tw:text-center") do
             link_to("← #{translation(".back")}", @href,

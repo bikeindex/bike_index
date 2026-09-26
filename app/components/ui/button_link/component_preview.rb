@@ -67,6 +67,19 @@ module UI
       def purple_disabled
         render(UI::ButtonLink::Component.new(text: "Purple Disabled", href: "#", color: :purple, disabled: true))
       end
+
+      # Blue on the brand yellow, the landing pages' call to action
+      def yellow
+        render(UI::ButtonLink::Component.new(text: "Yellow Link", href: "#", color: :yellow))
+      end
+
+      def yellow_active
+        render(UI::ButtonLink::Component.new(text: "Yellow Active", href: "#", color: :yellow, active: true))
+      end
+
+      def yellow_disabled
+        render(UI::ButtonLink::Component.new(text: "Yellow Disabled", href: "#", color: :yellow, disabled: true))
+      end
       # @!endgroup
 
       # @!group Extra types

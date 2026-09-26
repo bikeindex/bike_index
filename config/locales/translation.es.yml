@@ -2227,6 +2227,7 @@ es:
           owner_already_has_account: El propietario de este %{bike_type} ya tiene
             una cuenta en Bike Index. ¡Inicia sesión para reclamarlo!
           you_have_to_log_in: Lo sentimos, tienes que iniciar sesión.
+          sign_in_to_continue_registration: Inicia sesión para continuar con tu registro.
         ensure_member_of!:
           accept_tos_for_orgs: Por favor, acepte los términos de servicio para organizaciones.
           not_a_member_of_that_org: "¡No eres miembro de esa organización!"
@@ -2555,6 +2556,8 @@ es:
     register:
       acknowledge:
         acknowledge_everything: Marque todas las casillas para aceptar estas reglas.
+        safety_rules_updated: Las normas de seguridad se han actualizado; por favor,
+          revíselas de nuevo.
       confirm_email:
         confirmation_link_expired: Ese enlace de confirmación ha caducado; revisa
           tu correo electrónico para obtener uno nuevo.
@@ -4320,25 +4323,16 @@ es:
     show:
       add_a_bike: Añade una bicicleta
       add_a_lock: Agregar un candado
-      add_a_photo: Añade una foto
-      add_it_now: "¡Añádelo ahora!"
-      bike_sticker: Pegatina para bicicleta
       bikes: bicicletas
       combination: Combinación
       edit: Editar
-      generally_connect_to_org: Algunas de tus bicicletas están asociadas con %{org_name},
-        pero esta no. En general, debes conectar todas tus bicicletas a %{org_name}.
-      ignore: ignorar
       key_serial: Clave de serie
-      location: Ubicación
       lock_type: Tipo de cerradura
       locks: cabellos
       manufacturer: Fabricante
       next: Próximos pasos
-      primary_colors: Colores primarios
       register_new_items: Registrar nuevos artículos
       registered: Registrado
-      serial: De serie
       sorry_your_bike_was_stolen: Lamentamos que te hayan robado tu %{bikes_last_type},
         pero esperamos que, con la ayuda de todos para buscarlo, lo recuperes.
       tell_us_more_about_yourself: Cuéntanos más sobre ti.
@@ -4347,16 +4341,11 @@ es:
       to_bike_index_thanks_for_signing_up: a Bike Index. ¡Gracias por registrarte!
       update_your_profile: Actualiza tu perfil
       updated: Actualizado
-      user_hidden: Oculto para otros usuarios
       welcome: Bienvenido
       you_have_no_registered_bikes: No tienes bicicletas registradas.
       you_have_no_registered_locks: No tienes cerraduras registradas.
       header_title: "%{current_user_name} en Índice de Bicicletas"
       membership_subtitle: "¡Gracias por ser miembro de Bike Index %{level}!"
-      edit_registration: Editar %{bike_type}
-      list_for_sale: Listado para la venta
-      mark_stolen: Marca %{bike_type} robada
-      update_marketplace_listing: "¡Actualiza tu anuncio en el mercado!"
     delete_account:
       delete_account: Eliminar cuenta
       delete_my_account: Eliminar mi cuenta y todas mis bicicletas registradas.
@@ -5292,68 +5281,6 @@ es:
       in_super_admin: "%{org_name} en superadministrador"
       registrations_index: Registro de organizaciones
       search_all_registrations: Buscar en todos los registros
-  stolen:
-    index:
-      ambassador: embajador
-      bike_index: Bike Index
-      bike_index_will_broadcast: Bike Index publicará la información sobre tu bicicleta
-        robada en la cuenta local de Twitter de Bicicletas Robadas y la difundirá
-        a través de otras redes sociales. Nuestros datos de bicicletas robadas están
-        vinculados a LeadsOnline, por lo que si tu bicicleta aparece en el sistema,
-        se marcará y te contactaremos. Nuestra comunidad estará atenta a las diferentes
-        plataformas de reventa.
-      check_out_your_local_flea_market: Busca tu bicicleta en el mercadillo de tu
-        zona.
-      donation: donación
-      error: error
-      file_a_police_report: Presenta una denuncia policial. Si puedes, acude a tu
-        comisaría local y pide que un agente venga a tomarte declaración. ¡Haz que
-        se involucren en tu caso!
-      if_you_are_here_your_bike_was_probably_stolen: 'Si estás aquí, probablemente
-        te robaron la bicicleta. ¡Qué mala suerte!, pero estamos aquí para ayudarte.
-        Esto es lo que debes hacer:'
-      keep_an_eye_on_craigslist: Mantente atento a Craigslist. Configura una alerta
-        específica en ifttt.com para que te avise de los anuncios que coincidan con
-        tu bicicleta. También puedes usar aplicaciones como OfferUp y LetGo, ya que
-        se utilizan con frecuencia para la compraventa de bicicletas.
-      list_recent_stolen_bikes_html: Enumere las bicicletas robadas recientemente
-        en su sitio con nuestro %{stolen_widget_link}
-      look_for_local_stolen_bike_groups_on_face: Busca grupos locales de bicicletas
-        robadas en Facebook (busca 'bicicleta robada {nombre de la ciudad}'). Muchos
-        de estos grupos de voluntarios existen en todo el mundo y pueden ayudarte
-        en tus esfuerzos de recuperación.
-      make_sure_your_bike_is_registered_html: Asegúrate de que tu bicicleta esté registrada
-        en %{new_bike_link} y en cualquier registro local de tu comunidad. Marca tu
-        bicicleta como <strong>robada</strong> en Bike Index para que nuestra comunidad
-        pueda ayudarte.
-      other_recovery_tools: Otras herramientas de recuperación
-      please_fix_the_following: Por favor, corrija lo siguiente %{errors}
-      please_login_to_make_report_html: Por favor %{login_link} haga este informe
-      register_it: regístralo
-      report_a_bicycle_chop_shop: Denuncie un taller clandestino de desmantelamiento
-        de bicicletas.
-      report_bike_theft_issues: 'Denuncie los robos de bicicletas:'
-      report_someone_selling_a_stolen_bike: Denuncie a alguien que esté vendiendo
-        una bicicleta robada.
-      reporting_your_own_bike_stolen_html: "¿Quieres denunciar el robo de tu bicicleta?
-        Primero debes %{register_it_link}"
-      send_alert: "¡Enviar alerta!"
-      sign_in: iniciar sesión
-      stolen_widget: widget robado
-      tell_everyone_you_know: Cuéntale a todo el mundo que te robaron la bicicleta.
-        Usa todas tus redes sociales (Facebook, Instagram, Twitter, etc.) y envía
-        un mensaje de texto o correo electrónico a todos tus contactos.
-      we_wish_you_the_best_of_luck_html: Te deseamos mucha suerte en la recuperación
-        de tu bicicleta. Nos encantaría añadir tu historia a nuestra lista de %{recoveries_count}
-        bicicletas recuperadas. Si deseas apoyar nuestra causa, considera hacer una
-        donación %{donations_link} o unirte a nuestro programa %{ambassadors_link}.
-      what_happens_next: "¿Qué sucederá después?"
-      what_to_do_if_your_bike_is_stolen: Qué hacer si te roban la bicicleta
-      where_is_this_happening: "¿Dónde está ocurriendo esto? URL, dirección: cualquier
-        información que tengas"
-      your_email_address: Su dirección de correo electrónico
-      your_local_police_department_will_do_what: La policía local hará todo lo posible
-        por recuperar tu bicicleta. Mantente en contacto con ellos.
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -5800,6 +5727,10 @@ es:
             search_notes: Notas de búsqueda
             search_owner_email_or_name: Buscar el correo electrónico o el nombre del
               propietario
+            miles_of: millas de
+            search_distance: Distancia de búsqueda
+            search_location: Buscar ubicación
+            within: dentro
           wrapper:
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
             view_matching_any_audit: ver coincidencia con cualquier auditoría
@@ -5811,10 +5742,15 @@ es:
             per_page: Resultados por página
             showing_html: mostrando %{from}–%{to} de %{count}
             view_as: Ver como
-            view_spreadsheet: Hoja de cálculo
-            view_thumbnail: Uña del pulgar
             export_unavailable_search_all: Solo puedes exportar los registros de tu
               organización. Desmarca la opción "Buscar todos los registros" para exportarlos.
+            ordered_by_asc: Ordenado por %{column}, ascendente
+            ordered_by_desc: Ordenado por %{column}, descendente
+            ordered_by_tooltip: Cambia a la vista de tabla para modificar el orden.
+            view_cards: Tarjetas
+            view_list: Lista
+            view_table: Mesa
+            loading_results: Cargando resultados...
           chart_card:
             caption_search: Búsqueda actual
             caption_year: Resumen del año pasado
@@ -5850,7 +5786,6 @@ es:
             filter_with_address_html: solo <strong>con</strong> dirección
             filter_with_stickers_html: solo <strong>con</strong> pegatinas
             impound_id_cell: ID del depósito
-            impounded_cell: Incautado
             manufacturer_cell: Fabricante
             model_cell: Modelo
             none: ninguno
@@ -5866,7 +5801,6 @@ es:
             status_cell: Estado
             sticker_cell: Etiqueta engomada
             stickers: 'Pegatinas:'
-            stolen_cell: Robado
             unregistered: 'No registrado:'
             updated_at_cell: Actualizado
             url_cell: URL
@@ -5874,6 +5808,21 @@ es:
             notes_cell_html: Notas de registro <em>de %{org_name}</em>
             reg_organization_affiliation_cell_html: Afiliación <em>en %{org_name}</em>
             reg_student_id_cell_html: Número de identificación del estudiante <em>%{org_name}</em>
+            occurred_at_cell: Estado en
+            photo_cell: Foto
+            view_cell: Vista
+            acknowledgment_cell_panel: Tiempo - Secuencia de registro reconocida
+            created_at_cell_panel: Hora - registrada
+            occurred_at_cell_panel: Hora - estado
+            updated_at_cell_panel: Hora - actualizada
+            filter_stolen_or_impounded_html: solo <strong>robado</strong> o <strong>confiscado</strong>
+            location_search_disabled_no_address: "%{org_name} no recopila direcciones
+              de registro, por lo que solo los registros robados o confiscados tienen
+              una ubicación. Filtre por uno de esos estados para buscar por ubicación."
+            location_search_disabled_search_all: No se puede buscar por ubicación
+              al buscar todos los registros, a menos que se busquen únicamente los
+              registros incautados o robados.
+            show_location_search: mostrar búsqueda de ubicación
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -5890,6 +5839,10 @@ es:
             link_sticker: pegatina de enlace
             hidden: oculto
             not_registered_with: Oculto porque no está registrado con %{org_name}
+            acknowledgment_title: Confirmación de la secuencia de registro en
+            occurred_at_tooltip: Cuando fue robado, confiscado, encontrado o puesto
+              a la venta
+            view: Vista
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
@@ -5900,6 +5853,10 @@ es:
             serial_label: 'De serie:'
             sticker_label: 'Etiqueta engomada:'
             view_all: ver todo
+          bike_card:
+            e_vehicle: Vehículo eléctrico
+            not_registered_with: No está registrado con %{org_name}
+            registered_with: Registrado con %{org_name}
         impound_records:
           index:
             all_bikes: Todas las bicicletas
@@ -6661,12 +6618,179 @@ es:
           sync_running_in_background: La sincronización se está ejecutando en segundo
             plano. Esta página se actualizará automáticamente.
           syncing_activities: Sincronizando actividades...
+        show:
+          bike_box:
+            add_a_photo: Añade una foto
+            add_it_now: "¡Añádelo ahora!"
+            bike_sticker: Pegatina para bicicleta
+            edit_registration: Editar %{bike_type}
+            generally_connect_to_org: Algunas de tus bicicletas están asociadas con
+              %{org_name}, pero esta no. En general, debes conectar todas tus bicicletas
+              a %{org_name}.
+            ignore_this_suggestion: Ignora esta sugerencia.
+            list_for_sale: Listado para la venta
+            location: Ubicación
+            mark_stolen: Marca %{bike_type} robada
+            primary_colors: Colores primarios
+            registered: Registrado
+            serial: De serie
+            update_marketplace_listing: "¡Actualiza tu anuncio en el mercado!"
+            updated: Actualizado
+            user_hidden: Oculto para otros usuarios
       sales:
         new_form:
           record_sale: Venta récord
           sold_for: Cantidad vendida por
           transfer_to_html: Esto transferirá el registro a %{buyer_html} y cerrará
             el listado del mercado.
+      stolen:
+        index:
+          act_in_the_first_24_hours: Actúa en las primeras 24 horas.
+          bike_stolen: Robo de bicicleta
+          bikes_that_came_home: Bicicletas que volvieron a casa
+          call_police_with_the_case_number: Llame a la policía e indique el número
+            de caso y su anuncio.
+          do_not_go_get_it_yourself: No vayas a buscarlo tú mismo.
+          email: Email
+          every_hour_it_sits_unregistered: Cada hora que permanece sin registrar es
+            una hora en la que nadie puede identificarlo.
+          faq_confront_answer: No. Llama a la policía, dales tu número de caso y un
+            enlace a tu ficha en Bike Index, y deja que ellos se pongan en contacto
+            contigo. Ha habido personas que han resultado heridas al intentar recuperar
+            una bicicleta por su cuenta.
+          faq_confront_question: "¿Debería enfrentarme a la persona que tiene mi bicicleta?"
+          faq_cost_answer: Registrar una bicicleta, marcarla como robada y usar las
+            herramientas de recuperación son gratuitos. Bike Index es una organización
+            sin fines de lucro financiada por donaciones, organizaciones asociadas
+            y alertas promocionales opcionales.
+          faq_cost_question: "¿Algo de esto cuesta dinero?"
+          faq_other_city_answer: El registro es internacional y las recuperaciones
+            se producen a cientos de kilómetros del lugar del robo. Tu anuncio permanece
+            activo y visible hasta que marques la bicicleta como recuperada.
+          faq_other_city_question: "¿Y si aparece en otra ciudad?"
+          faq_serial_answer: Regístrate de todos modos. Fotos, un recibo de compra,
+            registros de mantenimiento, documentación del seguro o una foto de Strava
+            pueden ayudarte a identificar una bicicleta. Añade todo lo que tengas
+            y consulta con la tienda que te la vendió; a menudo tienen el número de
+            serie registrado.
+          faq_serial_question: No tengo mi número de serie.
+          faq_unregistered_answer: Ese es el caso habitual. Puedes denunciarlo como
+            robado ahora mismo; no es necesario que se haya denunciado previamente.
+          faq_unregistered_question: Mi bicicleta nunca estuvo matriculada antes de
+            que me la robaran.
+          here_is_the_next_hour: Aquí está la próxima hora.
+          how_alerts_work: Cómo funcionan las alertas
+          lede: 'Seis pasos, en orden. Los dos primeros son los más importantes: presentar
+            una denuncia policial para obtener un número de caso y, a continuación,
+            registrar la bicicleta como robada en Bike Index para que cualquier tienda,
+            agente o comprador que consulte el número de serie encuentre la suya.'
+          lede_short: Primero el informe policial, para obtener el número de caso.
+            Segundo, el índice de bicicletas, para que el número de serie sea público.
+          more_resources: Más recursos
+          no_account_yet: "¿Aún no tienes cuenta? Al registrar una bicicleta robada,
+            se crea una. El registro es siempre gratuito."
+          partner_organizations: tiendas asociadas, departamentos de policía y ciudades
+          pillar_alerts_body: Tu anuncio se comparte en nuestras redes sociales y,
+            opcionalmente, se promociona en las noticias cercanas al lugar del robo.
+            Cualquiera que lo vea puede contactarte directamente.
+          pillar_alerts_title: Alertas que viajan
+          pillar_network_body: Cientos de miles de motociclistas, además de embajadores,
+            tiendas y socios de las fuerzas del orden, vigilan los anuncios de reventa
+            y denuncian los talleres clandestinos que manipulan las motocicletas ilegalmente.
+          pillar_network_title: Una red de voluntarios
+          pillar_serial_body: 'Cualquier persona puede buscar un número de serie en
+            Bike Index de forma gratuita: tiendas en la recepción, agentes de policía
+            en el terreno, compradores antes de entregar el dinero en efectivo.'
+          pillar_serial_title: Un registro público en serie
+          promoted_alerts: Alertas promocionadas
+          promoted_alerts_body: Una alerta destacada muestra el anuncio de tu bicicleta
+            robada en las noticias de Facebook de la zona donde ocurrió el robo, además
+            de en nuestras propias redes sociales. Llega a personas que no están buscando
+            tu bicicleta, pero que la reconocerán atada a la puerta equivocada.
+          promoted_alerts_title: Deja tu bicicleta frente al barrio del que fue robada.
+          questions_people_ask_at_2am: Preguntas que la gente hace a las 2 de la madrugada.
+          read_more_recovery_stories: Lee más historias de recuperación
+          recovered: Recuperado
+          recoveries_reported_by_owners: Recuperaciones recientes, reportadas por
+            sus propietarios.
+          recovery_record: historial de recuperación
+          register_it: Regístrelo
+          register_your_stolen_bike: Registra tu bicicleta robada
+          register_your_stolen_bike_free: Registra tu bicicleta robada — gratis
+          report_a_bicycle_chop_shop: Un taller clandestino de desguace de bicicletas
+          report_bike_theft_issues: Denuncie los problemas de robo de bicicletas.
+          report_bike_theft_issues_subhead: "¿Has visto alguna moto robada a la venta
+            o un taller clandestino donde la desmantelan? Avísanos dónde."
+          report_someone_selling_a_stolen_bike: Alguien está vendiendo una bicicleta
+            robada.
+          reporting_your_own_bike_html: "¿Quieres denunciar el robo de tu bicicleta?
+            %{register_it_link} en su lugar."
+          resource_bay_area: Robado en el Área de la Bahía
+          resource_portland: Robado en Portland, Oregón.
+          resource_register_found: Registra una bicicleta encontrada
+          resource_safety_tips: Consejos de seguridad para recuperar tu propia bicicleta
+          resource_seattle: Robado en Seattle
+          resource_what_to_do: Qué hacer si te roban la bicicleta
+          resource_why_register: "¿Por qué registrar tus bicicletas en Bike Index?"
+          search_the_registry: Buscar en el registro
+          send_report: Enviar informe
+          sign_in: Iniciar sesión
+          sign_in_to_report_html: "%{sign_in_link} para hacer un informe."
+          step_alert_action: Comparte tu alerta
+          step_alert_body: Tu anuncio genera una alerta de bicicleta robada que se
+            puede compartir en redes sociales. Publícala, envíala a grupos de ciclistas
+            locales y páginas vecinales, y considera promocionarla para llegar a las
+            manzanas cercanas al lugar del robo.
+          step_alert_tag: 10 minutos
+          step_alert_title: Envía tu alerta
+          step_google_alerts_action: Configurar alertas de Google
+          step_google_alerts_body: Configura varias alertas de Google con detalles
+            que coincidan con tu bicicleta (marca, modelo, componentes distintivos,
+            color), para que te lleguen los nuevos anuncios y publicaciones que la
+            mencionen.
+          step_google_alerts_tag: 5 minutos
+          step_google_alerts_title: Configurar alertas de Google
+          step_listing_action: Edita tu anuncio
+          step_listing_body: Un anuncio con el número de informe policial, fotos claras
+            y cualquier marca de identificación permite a un agente actuar en cuestión
+            de minutos. Los anuncios vagos retrasan el proceso.
+          step_listing_tag: 5 minutos
+          step_listing_title: Añade el número de caso y las fotos.
+          step_police_action: Encuentra tu línea de denuncia local
+          step_police_body: Haz esto primero. El número de caso es lo que permite
+            que un agente te devuelva la bicicleta en lugar de confiscarla, y todos
+            los pasos posteriores lo tendrán en cuenta. Trae el número de serie, fotos,
+            la dirección y la hora en que fue confiscada.
+          step_police_tag: 15 minutos
+          step_police_title: Presentar una denuncia policial
+          step_register_action: Registra tu bicicleta robada
+          step_register_body: Este es el interruptor que activa todo lo demás. Tu
+            número de serie se registra en un registro público que las tiendas de
+            bicicletas, los departamentos de policía, las bases de datos de casas
+            de empeño y los compradores de bicicletas usadas consultan antes de tocar
+            un cuadro de segunda mano.
+          step_register_tag: 3 min · gratis
+          step_register_title: Regístrelo como robado en Bike Index.
+          step_shops_action: Encuentra tiendas asociadas
+          step_shops_body: Los ladrones llevan bicicletas robadas a reparar o a comprar
+            repuestos. Los talleres que consultan Bike Index al recibirlas son los
+            que permiten encontrar una gran parte de las bicicletas reportadas.
+          step_shops_tag: 20 minutos
+          step_shops_title: Díselo a las tiendas cercanas
+          stolen_bikes_recovered: Recuperan bicicletas robadas
+          the_first_24_hours: Las primeras 24 horas
+          three_minutes_no_cost: Tres minutos, gratis, y el número de serie es todo
+            lo que necesitas para empezar.
+          to_register_always: para registrarse, siempre
+          value_returned_to_owners: valor devuelto a los propietarios
+          where_is_this_happening: "¿Dónde está ocurriendo esto? Una URL, una dirección,
+            cualquier información que tengas"
+          why_registering_changes_the_odds: Por qué registrarse cambia las probabilidades
+          why_registering_subhead: Una bicicleta robada que nadie puede identificar
+            es simplemente una bicicleta usada. El registro permite que la tuya sea
+            identificable para quienes se dedican a la compraventa de bicicletas usadas.
+          work_top_to_bottom: Trabajar de arriba abajo.
+          your_bike_is_gone: Tu bicicleta ha desaparecido.
     shared_blocks:
       footer:
         about: Acerca
@@ -6751,23 +6875,27 @@ es:
         organized:
           additional_features_html: Bike Index ofrece funciones adicionales para organizaciones
             policiales verificadas. Comuníquese con %{email_link} para activarlas.
-          how_integration_works: cómo funciona la integración
-          integrate_bike_index_with_ascend: Integrar Bike Index con Ascend
-          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed.
-          link_to_register_html: "<strong>%{link}</strong> para registrar automáticamente
-            las bicicletas que vendes a tus clientes."
-          other_point_of_sale_system: "¿Otro sistema de punto de venta?"
-          read_a_full_explanation_html: Lea una explicación completa de %{link}.
-          register_bikes_with_link_html: Registra bicicletas con nuestro <strong>%{link}</strong>
-          streamlined_bike_shop_registration_page: Página de registro simplificada
-            para la tienda de bicicletas
           subscription_expired_html: Tu suscripción a Bike Index ha caducado. Ponte
             en contacto con %{email_link} para reactivarla.
-          use_ascend: "¿Usar Ascend?"
-          use_lightspeed_retail_pos: "¿Utilizas el sistema POS Lightspeed Retail?"
-          viewing_our_streamlined_page: Actualmente estás viendo nuestra página de
-            registro simplificada de la tienda de bicicletas, que es la que recomendamos
-            usar.
+        organized_shop_integration_alert:
+          add_a_bike: Añade una bicicleta
+          already_viewing_add_a_bike_page: Ya estás viendo esta página.
+          ascend_card_title: Ascender
+          dismiss: Despedir
+          dont_show_again: No vuelvas a mostrar esto
+          how_integration_works: Cómo funciona la integración
+          integrate_bike_index_with_ascend: Integrar Bike Index con Ascend
+          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed.
+          integration_card_body: Registra automáticamente las bicicletas que vendes
+            a tus clientes.
+          lightspeed_card_title: Punto de venta minorista Lightspeed
+          other_system_body: 'No se necesita integración: registra las bicicletas
+            manualmente en pocos segundos.'
+          other_system_card_title: 'Otro sistema: envíenos un correo electrónico.'
+          pos_callout_subhead: Conecta tu sistema de punto de venta y cada bicicleta
+            que vendas quedará registrada a nombre de tu cliente en Bike Index.
+          pos_callout_title: Registra las bicicletas automáticamente desde tu punto
+            de venta.
       navbar:
         org_sidebar:
           admin_panel: PANEL DE ADMINISTRACIÓN

@@ -5,8 +5,12 @@ en:
       org:
         search_results:
           bikes_table:
+            acknowledgment_title: Registration sequence acknowledgment at
             assign_bike_sticker: Assign sticker
             email_hidden: email hidden
             hidden: hidden
             link_sticker: link sticker
             not_registered_with: Hidden because it is not registered with %{org_name}
+            occurred_at_tooltip: When it was stolen, impounded, found or listed for
+              sale
+            view: View

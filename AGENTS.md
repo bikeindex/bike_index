@@ -104,6 +104,8 @@ both do it.
 
 **Assert on what a drain produces, not on the flag that precedes it.** A column a job reconciles when it runs records what was true at write time — `Ownership#skip_email` is one — so it answers a different question than the one you're asking.
 
+**A spec that shells out gets what `.github/ci/Dockerfile` installs, which is `ruby:slim` plus a short list — no `jq`, no `which`.** Locally they're both on PATH, so the spec passes here and fails on one CI shard with an assertion that names neither. Probe for the binary (`/bin/grep`, `/usr/bin/grep`) rather than asking `which`, and don't reach for `jq` to read JSON a Ruby spec could parse itself.
+
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded. To clear stale contents, `rm` the file and re-run the spec.
 
 **Name a cassette in lowercase, without the constant** — `stripe-update_prices_job`, not `StripeJobs::UpdatePricesJob`. A namespace rename then leaves every cassette alone, and the name greps to its own filename, which the constant form doesn't: VCR rewrites `::` and `.` to `_` on the way to disk.
@@ -118,7 +120,8 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 
 ## Pull requests
 
-- When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs and captures desktop+mobile screenshots, which it posts as a `## Screenshots` comment (never in the body, so the summary stays first).
+- When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs and captures desktop+mobile screenshots, which it posts as a `## Screenshots` comment (never in the body, so the summary stays first). `.claude/hooks/pr-guardrails.sh` denies the authoring commands until that skill is loaded.
+- **Merging a PR is the human's, including when they ask you to do it in the moment.** Say the PR is ready and leave it. The same hook denies it, and won't be talked round — but it only covers agents running here, so treat the rule as the thing to follow rather than the hook as the thing to get past.
 - To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, the `gh` CLI **cannot upload images** — use the `github-pr-images` skill, which drives a real browser to GitHub's user-attachments uploader.
 
 ## Architecture notes

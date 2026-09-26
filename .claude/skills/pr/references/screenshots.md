@@ -8,9 +8,9 @@ The flow: decide what to capture → capture the branch → upload → capture t
 
 **This phase needs `gh` *and* a browser signed in to GitHub. Missing either, skip the whole thing** — don't capture, don't upload, don't post anything in its place. Say in your summary that screenshots need a machine with both, and hand back the PR URL.
 
-**Check the browser session here, before step 1, not when you reach the upload.** The MCP browser's github.com cookies come from a storage-state file that expires on its own schedule, so a run that captured fine last week signs out mid-workflow — and finding out at step 3 wastes both capture loops and a base-branch checkout. One `browser_navigate` to the PR plus `browser_snapshot` settles it: a "Sign in" link in the header means signed out. Re-login can't be driven headlessly (`github-pr-images`' `references/headless-relogin.md` has the user-run helper), so this is a stop-and-ask.
+**Check the browser session here, before step 1, not when you reach the upload** — unless `$CLAUDE_CODE_REMOTE` is `true`, where no browser posts anything and this check would stop a working run. The MCP browser's github.com cookies come from a storage-state file that expires on its own schedule, so a run that captured fine last week signs out mid-workflow — and finding out at step 3 wastes both capture loops and a base-branch checkout. One `browser_navigate` to the PR plus `browser_snapshot` settles it: a "Sign in" link in the header means signed out. Re-login can't be driven headlessly, so this is a stop-and-ask: show the message in `github-pr-images`' `references/headless-relogin.md`.
 
-The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an MCP browser that rejects the egress proxy's CA, so github.com won't even load (`ERR_CERT_AUTHORITY_INVALID`) and a logged-in session can't be established headlessly. Capture alone would work there, which is the trap — PNGs nothing can host, and no way to post them.
+**The web sandbox is the exception to that skip.** It has neither, but hosts in the PR branch's own history instead — capture and post normally, following `github-pr-images`' [references/web-sandbox.md](../../github-pr-images/references/web-sandbox.md) for the hosting. Those URLs last only as long as the branch's objects, so say in your summary that a merged PR's screenshots aren't archival.
 
 **Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment; that's how #4126 ended up with three comments telling one story. If it's worth having, put it in your summary and let the user decide where it goes.
 
@@ -49,7 +49,7 @@ If it returns failures it couldn't diagnose, report them and leave the PR withou
 
 ## 3. Host the branch screenshots and get inline URLs
 
-Invoke `github-pr-images` with the PNGs from step 2 and **no body** — that's its host-only call, and it returns the `user-attachments/assets/` URLs without posting anything. This runs before step 4: the upload is the first thing to touch GitHub, so an expired browser session surfaces having cost one capture round rather than two and a base checkout. Step 5 composes the comment and that same skill posts it in one go, so nothing lands on the PR until the before/after is complete.
+Invoke `github-pr-images` with the PNGs from step 2 and **no body** — that's its host-only call, and it returns one URL per image without posting anything. Don't assume their shape — it differs by route, and both render the same. This runs before step 4: the upload is the first thing to touch GitHub, so an expired browser session surfaces having cost one capture round rather than two and a base checkout. **Not in the sandbox**: no session to expire, and each call costs two commits and a push — capture the base first, host both sets in one call after step 4. Step 5 composes the comment and that same skill posts it in one go, so nothing lands on the PR until the before/after is complete.
 
 Collect the returned URLs, keyed by `(page-slug, viewport)`.
 

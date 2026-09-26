@@ -220,7 +220,7 @@
           </div>
 
           <div class="tw:mt-3">
-            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings: other_registrations_settings)) %>
+            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, settings: other_registrations_settings)) %>
           </div>
         <% end %>
       <% end %>

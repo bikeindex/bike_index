@@ -6,11 +6,22 @@ module Pages
       module Wrapper
         # A card of org registrations: the match count and the column settings button, the
         # column-visibility panel, the table and the pagination footer. On the registrations
-        # search (search_page) the header also carries the view switcher and the export, and
-        # the card renders inside the results turbo-frame, so every search brings it back whole.
+        # search (search_page) the header also carries the view switcher and the export, the
+        # cards and list views swap the table for cards or rows, and the card renders inside
+        # the results turbo-frame, so every search brings it back whole.
         class Component < ApplicationComponent
+          # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
+          # .container-fluid padding to the page's edges
+          TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:-mx-[15px]"
+
           # Display order, and the first is what search_result_view falls back to
-          RESULT_VIEWS = %i[spreadsheet thumbnail].freeze
+          RESULT_VIEWS = %i[table list cards].freeze
+
+          # The table's is BikesTable, rendered with its column settings
+          RESULT_COMPONENTS = {
+            list: Pages::Org::SearchResults::BikeListItem::Component,
+            cards: Pages::Org::SearchResults::BikeCard::Component
+          }.freeze
 
           def self.permitted_result_view(result_view)
             view = result_view&.to_sym
@@ -23,7 +34,6 @@ module Pages
             per_page:,
             params:,
             bikes: [],
-            current_user: nil,
             interpreted_params: {},
             sort_state: ComponentStructs::SortState.new,
             search_stickers: nil,
@@ -40,7 +50,6 @@ module Pages
             @organization = organization
             @pagy = pagy
             @bikes = bikes
-            @current_user = current_user
             @interpreted_params = interpreted_params
             @sort_state = sort_state
             @per_page = per_page
@@ -82,7 +91,6 @@ module Pages
               organization: @organization,
               interpreted_params: @interpreted_params,
               sortable_search_params: @sort_state.search_params,
-              params: @params,
               search_stickers: @search_stickers,
               search_address: @search_address,
               search_status: @search_status,
@@ -91,25 +99,48 @@ module Pages
             )
           end
 
-          # On the search page the .twwiderow holding the card supplies the gap above it, and
-          # is the container twfullbleed reads; elsewhere the card stands on its own
+          # On the search page the .twwiderow holding the card supplies the gap above it and is
+          # the container twfullbleed reads, and search-results-card is what the results frame
+          # reads to leave this card standing while it loads; elsewhere the card stands alone
           def card_classes
             ["org-search-component tw:rounded-xl", UI::Card::Component::BASE_CLASSES,
-              @search_page ? "tw:twfullbleed" : "tw:mt-4"].join(" ")
+              @search_page ? "search-results-card tw:twfullbleed" : "tw:mt-4"].join(" ")
           end
 
-          # Full bleed drops the card's gutter, so the header meets the chart's edge
-          def header_padding_class = @search_page ? "tw:@min-[672px]/twwiderow:px-4" : "tw:px-4"
+          def table_clip_classes
+            ["tw:overflow-hidden", results_swap_class, (TABLE_BLEED_CLASSES if @search_page)].compact.join(" ")
+          end
+
+          # The rows hide for the spinner above them while the frame they render in is busy
+          def results_swap_class = ("tw:group-[[busy]]:hidden" if @search_page)
+
+          # Full bleed drops the card's gutter, so the header and cards meet the chart's edge
+          def padding_x_class = @search_page ? "tw:@min-[672px]/twwiderow:px-4" : "tw:px-4"
 
           # Built here rather than on the settings struct, which route helpers never reach
           def export_path
             organization_registrations_path(settings.search_params.merge(create_export: true))
           end
 
-          def render_result_view? = Flipper.enabled?(:organization_registration_view_switcher)
+          # Only the search page offers the view switcher, so it's the only place cards or rows render
+          def result_component
+            RESULT_COMPONENTS[@result_view] if @search_page
+          end
 
-          # TODO: the chips move search_result_view through the URL, but nothing renders the
-          # thumbnail view behind it yet - see the Bike Thumbnails design doc
+          # The cards and rows have no headers to sort by, so their views name the order
+          def ordered_by_text
+            return @ordered_by_text if defined?(@ordered_by_text)
+
+            column = settings.sort_column_label(@sort_state.sort)
+            @ordered_by_text = if column.nil?
+              nil
+            elsif @sort_state.direction == "asc"
+              translation(".ordered_by_asc", column:)
+            else
+              translation(".ordered_by_desc", column:)
+            end
+          end
+
           def result_view_entries
             RESULT_VIEWS.map do |view|
               ComponentStructs::Shapes.entry(translation(".view_#{view}"), href: result_view_path(view),

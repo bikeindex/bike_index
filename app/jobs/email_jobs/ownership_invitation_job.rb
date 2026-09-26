@@ -22,6 +22,9 @@ module EmailJobs
         ownership.update_attribute(:skip_email, !ownership.calculated_send_email)
       end
       return if ownership.skip_email
+      # Below the write-back, not in calculated_send_email, which it would latch into
+      # skip_email. initial?, since a later transfer isn't waiting on the rules
+      return if ownership.initial? && ownership.bike.unfinished_registration?
 
       notification = Notification.find_or_create_by(notifiable: ownership,
         kind: "finished_registration")

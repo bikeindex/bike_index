@@ -11,10 +11,12 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     # be the ranges the controller computes for the same period
     it "computes the ranges the period chips carry" do
       %w[hour day week month year].each do |period|
+        # Bracketed, since a cold request can take seconds
+        range_before = UI::PeriodSelect::Component.period_range(period)
         get base_url, params: {search_no_js: true, period:}
-        range = UI::PeriodSelect::Component.period_range(period)
-        expect(assigns(:start_time)).to be_within(5.seconds).of(range.first)
-        expect(assigns(:end_time)).to be_within(5.seconds).of(range.last)
+        range_after = UI::PeriodSelect::Component.period_range(period)
+        expect(assigns(:start_time)).to be_between(range_before.first, range_after.first)
+        expect(assigns(:end_time)).to be_between(range_before.last, range_after.last)
       end
     end
 
@@ -53,6 +55,41 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       get base_url, params: {search_no_js: true, search_address: "without_street"}
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+    end
+    describe "location search" do
+      include_context :geocoder_stubbed_bounding_box
+      let(:enabled_feature_slugs) { %w[bike_search reg_address] }
+      let!(:bike) { FactoryBot.create(:bike_organized, :with_address_record, creation_organization: current_organization) }
+      let!(:bike_chicago) do
+        FactoryBot.create(:bike_organized, :with_address_record, address_in: :chicago, creation_organization: current_organization)
+      end
+      let!(:stolen_bike) do
+        bike = FactoryBot.create(:bike_organized, creation_organization: current_organization)
+        FactoryBot.create(:stolen_record, :in_nyc, bike:)
+        bike
+      end
+
+      it "searches within the distance of the location" do
+        get base_url, params: {search_no_js: true, location: "New York", distance: "50"}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, stolen_bike.id])
+        expect(response.body).to include("show_location_search")
+
+        get base_url, params: {search_no_js: true, location: "", distance: "50"}
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_chicago.id, stolen_bike.id])
+
+        get base_url, params: {search_no_js: true, location: ["New York"], distance: ["50"]}
+        expect(response.status).to eq(200)
+        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_chicago.id, stolen_bike.id])
+
+        # Searching all, it's only searched alongside a stolen or impounded status
+        get base_url, params: {search_no_js: true, location: "New York", distance: "50", search_all: true}
+        expect(assigns(:bikes).pluck(:id)).to include(bike.id, bike_chicago.id, stolen_bike.id)
+        expect(response.body).to include("You can&#39;t search location when searching all registrations")
+
+        get base_url, params: {search_no_js: true, location: "New York", distance: "50", search_all: true, search_status: "stolen"}
+        expect(assigns(:bikes).pluck(:id)).to eq([stolen_bike.id])
+      end
     end
     context "member_no_bike_edit" do
       let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization, role: "member_no_bike_edit") }
@@ -107,7 +144,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
             end_time: nil, start_time: nil, user_id: nil, search_bike_id: nil, render_chart: false,
             search_marketplace_listing_id: nil, search_status: nil, search_kind: nil, search_ignored: nil,
             stolenness: "all", search_stickers: nil, search_address: nil, search_secondary: nil,
-            sort: "id", sort_direction: "desc", create_export: true
+            location: "", distance: "100", sort: "id", sort_direction: "desc", create_export: true
           }
         end
         it "redirects to export new" do
@@ -150,6 +187,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         end
       end
     end
+    it "renders the cards view" do
+      get base_url, params: {search_no_js: true, search_result_view: "cards"}
+      expect(response.status).to eq(200)
+      expect(response.body).to include(bike.mnfg_name)
+      expect(response.body).to_not include("Column settings")
+      expect(response.body).to include("Ordered by Registered, descending")
+    end
+
     context "with search_all" do
       it "reaches past the organization's own registrations, and refuses an export" do
         get base_url, params: {search_no_js: true}
@@ -276,18 +321,18 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "search_result_view" do
-      it "defaults to the spreadsheet, and carries what it's given into the next search" do
+      it "defaults to the table, and carries what it's given into the next search" do
         get base_url, params: {search_no_js: true}
-        expect(assigns(:result_view)).to eq :spreadsheet
+        expect(assigns(:result_view)).to eq :table
 
         get base_url, params: {search_no_js: true, search_result_view: "nonsense"}
-        expect(assigns(:result_view)).to eq :spreadsheet
+        expect(assigns(:result_view)).to eq :table
 
-        get base_url, params: {search_no_js: true, search_result_view: "thumbnail"}
-        expect(assigns(:result_view)).to eq :thumbnail
+        get base_url, params: {search_no_js: true, search_result_view: "cards"}
+        expect(assigns(:result_view)).to eq :cards
         # The view rides in the address bar, so a new search has to carry it
         expect(Capybara.string(response.body))
-          .to have_css("#Search_Form input[name=search_result_view][value=thumbnail]", visible: :all)
+          .to have_css("#Search_Form input[name=search_result_view][value=cards]", visible: :all)
       end
     end
 
@@ -381,23 +426,73 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
 
     context "sorted by registration sequence acknowledgment" do
-      let(:enabled_feature_slugs) { %w[bike_search registration_sequences] }
-      let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization: current_organization) }
+      let(:enabled_feature_slugs) { %w[bike_search registration_sequences show_partial_registrations] }
+      let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
       let!(:bike_acknowledged_earlier) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       let!(:bike_acknowledged_later) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
       before do
-        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_earlier, created_at: 2.days.ago)
-        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_later, created_at: 1.day.ago)
+        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_earlier, acknowledged_at: 2.days.ago)
+        FactoryBot.create(:registration_sequence_acknowledgment, registration_sequence:, bike: bike_acknowledged_later, acknowledged_at: 1.day.ago)
         # Another organization's acknowledgment doesn't count
         FactoryBot.create(:registration_sequence_acknowledgment, bike:)
       end
 
-      it "sorts by when this organization's sequence was acknowledged" do
-        get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "desc"}
-        expect(assigns(:bikes).map(&:id)).to eq([bike.id, bike_acknowledged_later.id, bike_acknowledged_earlier.id])
+      def sorted_bike_ids(direction)
+        get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction:}
+        assigns(:bikes).map(&:id)
+      end
 
-        get base_url, params: {search_no_js: true, sort: "acknowledged_at", direction: "asc"}
-        expect(assigns(:bikes).map(&:id)).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, bike.id])
+      it "sorts by when this organization's sequence was acknowledged, a register flow bike once its rules are agreed to" do
+        expect(sorted_bike_ids("desc")).to eq([bike.id, bike_acknowledged_later.id, bike_acknowledged_earlier.id])
+        expect(sorted_bike_ids("asc")).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, bike.id])
+
+        get "/register/new", params: {organization_id: current_organization.to_param}
+        b_param = BParam.last
+        post "/register", params: {b_param_token: b_param.id_token,
+                                   b_param: {manufacturer_id: FactoryBot.create(:manufacturer).id, cycle_type: "e-scooter",
+                                             owner_email: "owner@example.com"}}
+        get "/o/#{current_organization.to_param}/bikes/incompletes"
+        expect(assigns(:b_params)).to eq([b_param])
+
+        # Step 2 creates the bike ahead of the safety rules - registered, not incomplete
+        patch "/register", params: {b_param_token: b_param.id_token,
+                                    bike: {primary_frame_color_id: FactoryBot.create(:color).id, serial_number: "XYZ 123",
+                                           status: "status_with_owner", user_name: "Sally Rider"}}
+        registered_bike = Bike.find(b_param.reload.created_bike_id)
+        expect(registered_bike.unfinished_registration?).to be_truthy
+
+        get "/o/#{current_organization.to_param}/bikes/incompletes"
+        expect(assigns(:b_params)).to eq([])
+
+        expect(sorted_bike_ids("desc").first(2)).to match_array([bike.id, registered_bike.id])
+        expect(sorted_bike_ids("asc").last(2)).to match_array([bike.id, registered_bike.id])
+
+        registration_sequence.registration_sequence_pages.each_with_index do |page, index|
+          patch "/register/acknowledge", params: {b_param_token: b_param.id_token, registration_sequence_id: registration_sequence.id,
+                                                  step: (index + 3).to_s, acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
+        end
+        patch "/register/acknowledge", params: {b_param_token: b_param.id_token, registration_sequence_id: registration_sequence.id,
+                                                step: "review", acknowledged_all: "1"}
+        expect(registered_bike.unfinished_registration?).to be_falsey
+
+        expect(sorted_bike_ids("desc")).to eq([bike.id, registered_bike.id, bike_acknowledged_later.id, bike_acknowledged_earlier.id])
+        expect(sorted_bike_ids("asc")).to eq([bike_acknowledged_earlier.id, bike_acknowledged_later.id, registered_bike.id, bike.id])
+      end
+    end
+
+    context "sorted by status at" do
+      let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: current_organization, date_stolen: 3.days.ago) }
+
+      it "sorts by occurred_at" do
+        impounded_bike
+        expect(bike.reload.occurred_at).to be_nil
+        expect(stolen_bike.reload.occurred_at).to be < impounded_bike.reload.occurred_at
+
+        get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "desc"}
+        expect(assigns(:bikes).map(&:id)).to eq([impounded_bike.id, stolen_bike.id, bike.id])
+
+        get base_url, params: {search_no_js: true, search_status: "all", sort: "occurred_at", direction: "asc"}
+        expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id, impounded_bike.id, bike.id])
       end
     end
 

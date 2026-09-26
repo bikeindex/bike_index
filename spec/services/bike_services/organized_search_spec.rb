@@ -20,6 +20,63 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
     end
   end
 
+  describe ".location" do
+    include_context :geocoder_stubbed_bounding_box
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
+    let(:enabled_feature_slugs) { [] }
+    let!(:bike_nyc) { FactoryBot.create(:bike, :with_address_record, address_in: :new_york) }
+    let!(:bike_chicago) { FactoryBot.create(:bike, :with_address_record, address_in: :chicago) }
+    let!(:stolen_nyc) { FactoryBot.create(:stolen_bike_in_nyc) }
+    let!(:stolen_chicago) { FactoryBot.create(:stolen_bike_in_chicago) }
+    let!(:impounded_nyc) do
+      FactoryBot.create(:impound_record,
+        impounded_from_address_record: FactoryBot.create(:address_record, :new_york, kind: :impounded_from)).bike
+    end
+    # Its coordinates are its registration address, which searching past the organization can't reach
+    let!(:impounded_from_nowhere) do
+      FactoryBot.create(:impound_record, bike: FactoryBot.create(:bike, :with_address_record, address_in: :new_york)).bike
+    end
+
+    it "is ignored without a locationable status" do
+      expect(impounded_from_nowhere.reload.latitude).to eq bike_nyc.reload.latitude
+      expect(described_class.location(Bike.all, "New York", "50", organization:)).to eq(Bike.all)
+      expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen").pluck(:id))
+        .to eq([stolen_nyc.id])
+      expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen_or_impounded")
+        .pluck(:id)).to match_array([stolen_nyc.id, impounded_nyc.id])
+      expect(described_class.location(Bike.all, "", "50", organization:, search_status: "stolen")).to eq(Bike.all)
+      expect(described_class.location(Bike.all, "Anywhere", "50", organization:, search_status: "stolen")).to eq(Bike.all)
+    end
+
+    context "with reg_address" do
+      let(:enabled_feature_slugs) { %w[reg_address] }
+
+      # Its coordinates fall back to the organization's, not a registration address
+      let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york) }
+      let!(:bike_without_address) { FactoryBot.create(:bike_organized, creation_organization: location.organization) }
+
+      it "matches registration addresses, except searching all" do
+        expect(bike_without_address.reload.latitude).to eq bike_nyc.reload.latitude
+        expect(described_class.location(Bike.all, "New York", "50", organization:).pluck(:id))
+          .to match_array([bike_nyc.id, stolen_nyc.id, impounded_nyc.id, impounded_from_nowhere.id])
+        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true)).to eq(Bike.all)
+        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
+          search_status: "impounded").pluck(:id)).to eq([impounded_nyc.id])
+        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
+          search_status: "stolen_or_impounded").pluck(:id)).to match_array([stolen_nyc.id, impounded_nyc.id])
+      end
+    end
+
+    context "unknown location" do
+      let(:bounding_box) { [66.0, -84.22, 67.0, (0.0 / 0)] }
+
+      it "matches nothing" do
+        expect(described_class.location(Bike.all, "Nowhere", "50", organization:, search_status: "stolen").pluck(:id))
+          .to eq([])
+      end
+    end
+  end
+
   describe ".notes" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization) }
@@ -56,6 +113,7 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
 
       expect(described_class.status(Bike.all, "stolen").pluck(:id)).to eq([bike_stolen.id])
       expect(described_class.status(Bike.all, "not_impounded").pluck(:id)).to match_array([bike_with_sticker.id, bike_stolen.id])
+      expect(described_class.status(Bike.all, "stolen_or_impounded").pluck(:id)).to match_array([bike_stolen.id, bike_impounded.id])
       expect(described_class.status(Bike.all, "all").count).to eq 3
 
       # The panel offers street; none and with still arrive from older links

@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapseField } from 'utils/collapse_utils'
 
 /* global localStorage */
 
@@ -6,34 +7,59 @@ const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
   static values = { resultView: String }
 
   connect () {
-    this.chartSearch = this.chartParams()
-    this.initNotesSearch()
+    this.initOptionalFields(0)
+    this.syncLocationSearch(0)
     this.syncResultView()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
+    document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
+    window.addEventListener('search:results-failed', this.stopChartSpinner)
   }
 
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
+    document.removeEventListener('turbo:before-fetch-request', this.handleFetchRequest)
+    window.removeEventListener('search:results-failed', this.stopChartSpinner)
   }
 
-  // The column panel and the chart render inside frames the search replaces. The panel
-  // looks after itself - ui--collapse reconnects with it - but the chart is outside them.
+  // The column panel renders inside the results frame, but the chart is outside it - so it
+  // fetches once the results land, from the address bar they moved.
   handleFrameRender = (event) => {
     this.syncResultView()
     this.syncPeriodLabel()
+    this.syncLocationSearch()
     this.endSubmitSpinner()
-    if (event.target === this.chartFrame) return
-    this.reloadChart()
+    if (event.target === this.resultsFrame) this.reloadChart()
   }
 
-  // Spreadsheet or thumbnail is the server's choice, so restoring the stored one means
-  // asking the frame for it again - only when the address bar names no view, which every
-  // search and every chip leaves it doing.
+  // The chart spins from the submit, though it waits for the results to fetch. A form
+  // submit's target is the form, so the header is what names the frame. A hover's
+  // prefetch isn't a search yet.
+  handleFetchRequest = (event) => {
+    const { headers } = event.detail.fetchOptions
+    if (!headers['Turbo-Frame'] || headers['X-Sec-Purpose'] === 'prefetch') return
+    if (headers['Turbo-Frame'] !== this.resultsFrame?.id) return
+    const chart = this.searchChart
+    if (!chart || this.chartParams(new URL(event.detail.url, window.location.href)) === this.chartShows(chart)) return
+    chart.setAttribute('busy', '')
+    this.chartAwaitingResults = true
+  }
+
+  // search--form shows the error; the chart stays on the search it has. Only the spinner
+  // set above - Turbo marks the frame busy for its own fetches too.
+  stopChartSpinner = () => {
+    if (!this.chartAwaitingResults) return
+    this.chartAwaitingResults = false
+    this.chartFrame?.removeAttribute('busy')
+  }
+
+  // The view is the server's choice, so restoring the stored one means asking the frame
+  // for it again - only when the address bar names no view, which every search and every
+  // chip leaves it doing.
   syncResultView () {
     const params = new URLSearchParams(window.location.search)
     const inUrl = params.get('search_result_view')
@@ -61,24 +87,43 @@ export default class extends Controller {
     return this.element.querySelector('.search-results-frame-wrapper > turbo-frame')
   }
 
-  initNotesSearch () {
-    if (!this.hasNotesFieldTarget) return
-    const input = this.notesFieldTarget.querySelector('input')
-    const hasValue = input && input.value.length > 0
-    if (hasValue || localStorage.getItem('orgRegistrationNotesSearchOpen') === 'true') {
-      this.setNotesSearch(true)
-    }
+  // The notes and location fields, each named by data-field. One opens if an input in it has
+  // a value, or if it was left open
+  initOptionalFields (duration) {
+    this.optionalFieldTargets.forEach(field => {
+      const hasValue = [...field.querySelectorAll('input')].some(input => input.value.length > 0)
+      const open = hasValue || localStorage.getItem(field.dataset.storageKey) === 'true'
+      this.setOptionalField(field.dataset.field, open, duration)
+    })
   }
 
-  toggleNotesSearch () {
-    if (!this.hasNotesFieldTarget) return
-    this.setNotesSearch(this.notesFieldTarget.classList.contains('tw:hidden'))
+  toggleOptionalField (event) {
+    this.setOptionalField(event.target.dataset.field, event.target.checked)
   }
 
-  setNotesSearch (open) {
-    this.notesFieldTarget.classList.toggle('tw:hidden', !open)
-    localStorage.setItem('orgRegistrationNotesSearchOpen', String(open))
-    if (this.hasNotesCheckboxTarget) this.notesCheckboxTarget.checked = open
+  setOptionalField (name, open, duration) {
+    const field = this.optionalFieldTargets.find(target => target.dataset.field === name)
+    if (!field) return
+    collapseField(field, open, duration)
+    localStorage.setItem(field.dataset.storageKey, String(open))
+    const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === name)
+    if (checkbox) checkbox.checked = open
+  }
+
+  // BikeServices::OrganizedSearch.location_searchable? - disabled, the fields hide and stop
+  // submitting, but the checkbox keeps whether they were open
+  syncLocationSearch (duration) {
+    const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === 'location')
+    const field = this.optionalFieldTargets.find(target => target.dataset.field === 'location')
+    if (!checkbox || !field) return
+
+    const status = document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
+    const searchAll = this.hasSearchAllTarget && this.searchAllTarget.checked
+    const searchable = JSON.parse(checkbox.dataset.locationableStatuses).includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
+
+    checkbox.disabled = !searchable
+    if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
+    collapseField(field, searchable && checkbox.checked, duration)
   }
 
   // Bubbled from any field, so it picks out the one it's for
@@ -86,12 +131,17 @@ export default class extends Controller {
     if (event.target.name !== 'search_email' || !this.hasSearchAllTarget) return
     const hasEmail = event.target.value.trim() !== ''
     this.searchAllTarget.disabled = hasEmail
-    if (hasEmail) this.searchAllTarget.checked = false
     this.searchAllHintTarget.hidden = !hasEmail
+    if (hasEmail && this.searchAllTarget.checked) {
+      this.searchAllTarget.checked = false
+      this.syncLocationSearch()
+    }
   }
 
   filterChanged () {
     this.syncFilterSummary()
+    // Before the submit, so a disabled location isn't searched
+    this.syncLocationSearch()
     const form = document.getElementById('Search_Form')
     if (form) {
       form.requestSubmit()
@@ -142,25 +192,37 @@ export default class extends Controller {
   }
 
   // The card sits outside the results frame, so a search leaves it answering the previous
-  // one - when its scope is the search, which the card says by rendering the target. Gated
-  // on the search itself having moved, or the first results render would refetch the chart
-  // the frame is already fetching. The URL carries the scope, so it's the search.
+  // one. Gated on the search itself having moved, or the first results render would refetch
+  // the chart the frame is already fetching.
   reloadChart () {
-    const frame = this.chartFrame
-    if (!frame?.querySelector('[data-chart-follows-search]')) return
-    if (this.chartParams() === this.chartSearch) return
-    if (!frame.getAttribute('src')) return
-    this.chartSearch = this.chartParams()
-    frame.setAttribute('src', window.location.href)
+    this.stopChartSpinner()
+    const chart = this.searchChart
+    if (!chart || this.chartParams() === this.chartShows(chart)) return
+    chart.setAttribute('src', window.location.href)
   }
 
-  // A page turn, a sort, a per-page change or opening the card itself returns the same
-  // chart, so they don't count as the address bar having moved.
-  chartParams () {
-    const params = new URLSearchParams(window.location.search);
-    ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view', 'chart_open']
+  // The chart frame, when its scope is the search - which the card says by rendering the
+  // target. Switching scope navigates the frame itself, so the scope isn't part of a search.
+  get searchChart () {
+    const frame = this.chartFrame
+    if (!frame?.getAttribute('src') || !frame.querySelector('[data-chart-follows-search]')) return null
+    return frame
+  }
+
+  // What the chart is showing: its src is the record of it, holding the search the frame
+  // last asked for, including one still in flight.
+  chartShows (frame) {
+    return this.chartParams(new URL(frame.getAttribute('src'), window.location.href))
+  }
+
+  // The same search, written by a link and by the address bar, differs in order and in
+  // which empty fields it carries - so compare a canonical form. A page turn, a sort, a
+  // per-page change or opening the card returns the same chart, so they're left out too.
+  chartParams (url = window.location) {
+    const params = new URLSearchParams(url.search);
+    ['page', 'sort', 'sort_direction', 'direction', 'per_page', 'search_result_view', 'chart_open', 'chart_scope']
       .forEach(name => params.delete(name))
 
-    return params.toString()
+    return [...params].filter(([, value]) => value !== '').sort().join('&')
   }
 }
