@@ -1421,6 +1421,8 @@ RSpec.describe RegisterController, type: :request do
       expect(b_param.reload.created_bike_id).to eq bike.id
       expect(b_param.acknowledgment_pending?).to be_truthy
       expect(BParam.unfinished_registrations.pluck(:id)).to eq([b_param.id])
+      # The finished registration email waits on the rules
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
 
       # The steps the bike was created from are closed
       get step_path("2")
@@ -1479,6 +1481,8 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to step_path("finished")
       expect(b_param.reload.acknowledgment_pending?).to be_falsey
       expect(BParam.unfinished_registrations.pluck(:id)).to eq([])
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+      expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])
 
       follow_redirect!
       expect(response.body).to include "<title>Your e-scooter registration</title>"
