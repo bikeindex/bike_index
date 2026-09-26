@@ -86,6 +86,23 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "find_token" do
+    let(:creator) { FactoryBot.create(:user_confirmed) }
+    let(:b_param) do
+      BParam.create(origin: "register_flow", creator_id: creator.id, created_bike_id: FactoryBot.create(:bike).id,
+        params: {bike: bike_params}.as_json)
+    end
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:) }
+
+    it "only resumes a bike's registration for its creator until the safety rules are agreed to" do
+      expect(described_class.resume(params_token: b_param.id_token, user: nil)).to eq([nil, true])
+      expect(described_class.find_token(params_token: b_param.id_token, user: creator)&.id).to eq b_param.id
+
+      acknowledgment.update(acknowledged_at: Time.current)
+      expect(described_class.find_token(params_token: b_param.id_token, user: nil)&.id).to eq b_param.id
+    end
+  end
+
   describe "discard_extra" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:oldest) do
@@ -110,6 +127,19 @@ RSpec.describe BikeServices::Register do
       it "keeps it - the email promises the address it can still finish that registration" do
         expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-1)
         expect(BParam.pluck(:id)).to match_array([middle.id, most_recent.id])
+      end
+    end
+
+    context "with a more recent one owing the safety rules" do
+      let!(:pending) do
+        FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: FactoryBot.create(:bike).id)
+          .tap { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: it) }
+      end
+
+      it "keeps it, and the most recent without a bike" do
+        expect(BParam.unfinished_registrations.reorder(updated_at: :desc).first.id).to eq pending.id
+        expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-2)
+        expect(BParam.pluck(:id)).to match_array([most_recent.id, pending.id])
       end
     end
   end
@@ -399,7 +429,6 @@ RSpec.describe BikeServices::Register do
 
       # Everything's in - the submission that saved it creates the bike
       expect(described_class.send(:report_completed?, b_param)).to be_truthy
-      expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
     end
 
     describe "when and where a theft has to answer" do
@@ -454,7 +483,7 @@ RSpec.describe BikeServices::Register do
         expect(b_param.reload.status).to eq "status_with_owner"
         expect(b_param.stolen_attrs).to be_blank
         expect(described_class.report_step?(b_param.status)).to be_falsey
-        expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
+        expect(described_class.send(:report_completed?, b_param)).to be_truthy
       end
 
       it "asks the other report's questions when it's still a status that reports" do
@@ -618,6 +647,34 @@ RSpec.describe BikeServices::Register do
         it "is the sequence when the registrant is the one registering" do
           expect(described_class.registration_sequence(b_param, separate_attestation: true, user: registrant))
             .to eq sequence
+        end
+      end
+
+      context "with a page acknowledged, then a newer version activated" do
+        let(:new_sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+        before do
+          described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
+          new_sequence.make_active!
+        end
+
+        it "stays on the version being agreed to, until resumed on the newer one" do
+          started = described_class.registration_sequence(b_param)
+          expect(started).to eq sequence
+
+          expect(described_class.resume_registration_sequence(b_param, sequence: started)).to eq([new_sequence, true])
+          expect(described_class.acknowledged_page_ids(b_param)).to eq([])
+          expect(described_class.registration_sequence(b_param)).to eq new_sequence
+          expect(described_class.resume_registration_sequence(b_param, sequence: new_sequence)).to eq([new_sequence, false])
+        end
+
+        context "already agreed to" do
+          before { described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1") }
+
+          it "isn't restarted" do
+            started = described_class.registration_sequence(b_param)
+            expect(started.archived?).to be_truthy
+            expect(described_class.resume_registration_sequence(b_param, sequence: started)).to eq([sequence, false])
+          end
         end
       end
     end
