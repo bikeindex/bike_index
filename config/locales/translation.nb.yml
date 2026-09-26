@@ -2491,6 +2491,8 @@ nb:
     register:
       acknowledge:
         acknowledge_everything: Kryss av i hver boks for å godta disse reglene
+        safety_rules_updated: Sikkerhetsreglene er oppdatert – vennligst gjennomgå
+          dem på nytt
       confirm_email:
         confirmation_link_expired: Bekreftelseslenken er utløpt – sjekk e-posten din
           for en ny.
@@ -4125,26 +4127,16 @@ nb:
     show:
       add_a_bike: Legg til en sykkel
       add_a_lock: Legg til en lås
-      add_a_photo: Legg til et bilde
-      add_it_now: Legg det til nå!
-      bike_sticker: Sykkel-klistremerke
       bikes: sykler
       combination: Kombinasjon
       edit: Endre
-      generally_connect_to_org: Noen av syklene dine er assosiert med %{org_name},
-        men denne er det ikke. Vanligvis bør du koble alle syklene dine til %{org_name}
-        -
-      ignore: overse
       key_serial: Nøkkelserie
-      location: plassering
       lock_type: Lås type
       locks: låser
       manufacturer: Produsent
       next: Neste skritt
-      primary_colors: Primærfarger
       register_new_items: Registrer nye varer
       registered: Registrert
-      serial: Serienummer
       sorry_your_bike_was_stolen: Vi beklager at %{bikes_last_type} ble stjålet, men
         forhåpentligvis, med alle som kan søke etter den, får du den tilbake!
       tell_us_more_about_yourself: Fortell oss mer om deg selv.
@@ -4154,16 +4146,11 @@ nb:
         deg!
       update_your_profile: Oppdater profilen din
       updated: Oppdatert
-      user_hidden: Skjult for andre brukere
       welcome: Velkommen
       you_have_no_registered_bikes: Du har ingen registrerte sykler
       you_have_no_registered_locks: Du har ingen registrerte låser
       header_title: "%{current_user_name} på Bike Index"
       membership_subtitle: Takk for at du er medlem av Bike Index %{level}!
-      edit_registration: Rediger %{bike_type}
-      list_for_sale: Liste til salgs
-      mark_stolen: Merke %{bike_type} stjålet
-      update_marketplace_listing: Oppdater markedsplassoppføringen!
     delete_account:
       delete_account: Slett konto
       delete_my_account: Slett kontoen min og alle mine registrerte sykler
@@ -6357,6 +6344,25 @@ nb:
           sync_running_in_background: Synkroniseringen kjører i bakgrunnen. Denne
             siden oppdateres automatisk.
           syncing_activities: Synkroniserer aktiviteter ...
+        show:
+          bike_box:
+            add_a_photo: Legg til et bilde
+            add_it_now: Legg det til nå!
+            bike_sticker: Sykkel-klistremerke
+            edit_registration: Rediger %{bike_type}
+            generally_connect_to_org: Noen av syklene dine er assosiert med %{org_name},
+              men denne er det ikke. Vanligvis bør du koble alle syklene dine til
+              %{org_name} -
+            ignore_this_suggestion: Ignorer dette forslaget
+            list_for_sale: Liste til salgs
+            location: plassering
+            mark_stolen: Merke %{bike_type} stjålet
+            primary_colors: Primærfarger
+            registered: Registrert
+            serial: Serienummer
+            update_marketplace_listing: Oppdater markedsplassoppføringen!
+            updated: Oppdatert
+            user_hidden: Skjult for andre brukere
       sales:
         new_form:
           record_sale: Rekordsalg
