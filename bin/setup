@@ -48,13 +48,6 @@ FileUtils.chdir APP_ROOT do
     end
     FileUtils.ln_sf root_storage, "storage"
 
-    # Symlink node_modules so every workspace shares one install
-    root_node_modules = File.join(root, "node_modules")
-    FileUtils.mkdir_p root_node_modules unless Dir.exist?(root_node_modules)
-    puts "Symlinking node_modules from #{root_node_modules}..."
-    FileUtils.rm_rf "node_modules"
-    FileUtils.ln_sf root_node_modules, "node_modules"
-
     # Copy Facebook VCR cassettes
     fb_cassettes = File.join(root, "spec/vcr_cassettes/facebook")
     if Dir.exist?(fb_cassettes)
@@ -83,18 +76,13 @@ FileUtils.chdir APP_ROOT do
   puts "== Starting redis so database can be migrated =="
   system "redis-server &"
 
-  # Install JavaScript dependencies
-  system("npm install")
+  npm_install = spawn("npm install")
 
-  puts "\n== Preparing database =="
-
-  # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
-  system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
-
-  # The layout needs tailwind.css and emails (which seeding sends) need email.css; without
-  # the build Sprockets tries compiling email.scss with sassc
-  puts "\n== Building stylesheets =="
-  system! "bin/rails tailwindcss:build dartsass:build"
+  # One boot for every task. The layout needs tailwind.css and emails (which seeding
+  # sends) need email.css; without the build Sprockets tries compiling email.scss with sassc
+  puts "\n== Preparing database, building stylesheets, clearing logs =="
+  system!({"ANNOTATERB_SKIP_ON_DB_TASKS" => "1"}, "bin/rails db:prepare tailwindcss:build dartsass:build log:clear")
+  Process.wait(npm_install)
 
   unless without_seeds
     # db:seed isn't idempotent: a re-run over seeded records dies on duplicates
@@ -115,9 +103,6 @@ FileUtils.chdir APP_ROOT do
     puts "\n== loading bike counts =="
     system! "bin/rake setup:load_counts"
   end
-
-  puts "\n== Removing old logs and tempfiles =="
-  system! "bin/rails log:clear tmp:clear"
 
   puts "\n== Restarting application server =="
   system! "bin/rails restart"

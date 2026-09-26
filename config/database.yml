@@ -20,6 +20,8 @@ development:
   primary:
     <<: *default_local
     database: bikeindex_development<%= "_#{ENV["WORKSPACE_ID"]}" if ENV["WORKSPACE_ID"] %>
+    # bin/setup seeds; db:prepare would otherwise seed whenever it creates any database
+    seeds: false
   primary_replica:
     <<: *default_local
     # Using primary database, replica not actually replicating
@@ -38,6 +40,7 @@ test:
   primary:
     <<: *default_local
     database: bikeindex_test<%= "_#{ENV["WORKSPACE_ID"]}" if ENV["WORKSPACE_ID"] %><%= ENV["TEST_ENV_NUMBER"] %>
+    seeds: false
   primary_replica:
     <<: *default_local
     # Using primary database, replica not actually replicating
