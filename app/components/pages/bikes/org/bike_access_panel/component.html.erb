@@ -363,7 +363,7 @@
               >
                 <%= form_for stolen_notification do |f| %>
                   <%= f.hidden_field :bike_id, value: @bike.id %>
-                  <%= f.hidden_field :organization_id, value: @organization.id %>
+                  <%= f.hidden_field :organization_id %>
 
                   <% if !organization_message? && @user.ambassador? %>
                     <%= f.text_area :message, required: true, value: stolen_notification.default_message, rows: 6, class: "form-control" %>

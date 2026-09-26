@@ -69,8 +69,9 @@ class StolenNotification < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.organization = calculated_organization if new_record?
-    self.receiver_email ||= calculated_receiver_email
+    self.organization = sender_organization if new_record?
+    # A phone registration's owner_email is the phone number
+    self.receiver_email ||= (organization_message? && !bike.phone_registration?) ? bike.owner_email : bike.contact_owner_email(sender)
     self.receiver ||= bike.owner
     self.send_dates ||= [].to_json
     self.kind ||= calculated_kind
@@ -102,20 +103,13 @@ class StolenNotification < ApplicationRecord
 
   private
 
-  # Of the sender's organizations the bike is registered with, the one the form was
-  # sent from, falling back to the oldest
+  # The one the form was sent from, else the oldest (not Organization's default name order)
   def calculated_organization
     return @calculated_organization if defined?(@calculated_organization)
 
-    organizations = sender&.organizations&.where(id: bike&.bike_organizations&.select(:organization_id))
-    @calculated_organization = organizations&.find_by(id: organization_id) || organizations&.reorder(:id)&.first
-  end
-
-  # A phone registration's owner_email is the phone number
-  def calculated_receiver_email
-    return bike.owner_email if organization_message? && !bike.phone_registration?
-
-    bike&.contact_owner_email(sender)
+    organizations = Organization.where(id: sender&.organization_roles&.select(:organization_id))
+      .where(id: bike.bike_organizations.select(:organization_id)).reorder(:id).to_a
+    @calculated_organization = organizations.find { it.id == organization_id } || organizations.first
   end
 
   def calculated_unstolen_blocked?

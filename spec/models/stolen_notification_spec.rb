@@ -90,27 +90,25 @@ RSpec.describe StolenNotification, type: :model do
         end
 
         it "sends an organization message from the oldest, directly to the owner" do
-          expect(stolen_notification.sender_organization&.id).to eq organization_unstolen.id
+          expect(stolen_notification.sender_organization).to eq organization_unstolen
           expect_stolen_notification_to_send(stolen_notification, creator)
           expect(stolen_notification.receiver_email).to eq owner_email
           expect(stolen_notification.kind).to eq "unstolen_organization_permitted"
           expect(stolen_notification.organization_id).to eq organization_unstolen.id
 
           OrganizationRole.where(user: sender).destroy_all
-          expect(stolen_notification.reload.sender_organization&.id).to eq organization_unstolen.id
+          expect(stolen_notification.reload.sender_organization).to eq organization_unstolen
         end
         context "sent from the second organization" do
           let(:organization_id) { organization2.id }
           it "is from the second organization" do
-            expect_stolen_notification_to_send(stolen_notification, creator)
-            expect(stolen_notification.organization_id).to eq organization2.id
+            expect(stolen_notification.sender_organization).to eq organization2
           end
         end
         context "sent from an organization the bike isn't registered with" do
           let(:organization_id) { organization_unregistered.id }
           it "is from the oldest" do
-            expect_stolen_notification_to_send(stolen_notification, creator)
-            expect(stolen_notification.organization_id).to eq organization_unstolen.id
+            expect(stolen_notification.sender_organization).to eq organization_unstolen
           end
         end
         context "phone registration" do
