@@ -1,7 +1,7 @@
 class RegisterController < ApplicationController
   include Sessionable
 
-  before_action :find_b_param, except: %i[new embed create confirm confirm_email]
+  before_action :find_b_param, except: %i[new embed landing create confirm confirm_email]
   # An expired token starts a registration rather than bouncing and losing the
   # submission. assign_organization runs next, so the form's organization_id lands on it
   before_action -> { find_b_param(build: true) }, only: %i[create]
@@ -10,6 +10,7 @@ class RegisterController < ApplicationController
   before_action -> {
     start_registration(token_id: session[:register_b_param_token], origin: "register_flow_landing_page")
   }, only: %i[embed]
+  before_action -> { start_registration(token_id: session[:register_b_param_token]) }, only: %i[landing]
   # The emailed link resumes a registration the session knows nothing about
   before_action :find_b_param_for_confirmation, only: %i[confirm confirm_email]
   # confirm renders a self-posting form and nothing else, so it reads neither
@@ -47,6 +48,14 @@ class RegisterController < ApplicationController
       header_tags_options: helpers.header_tags_component_options,
       button_color: HexColor.normalize(params[:button]),
       button_hover_color: HexColor.normalize(params[:button_hover])), layout: false
+  end
+
+  # The marketing page around step 1, whose form posts into create like the flow's own
+  def landing
+    recoveries_count, recoveries_value, organizations_count, bikes_count =
+      Counts.retrieve_many("recoveries", "recoveries_value", "organizations", "total_bikes")
+    render Pages::Register::Landing::Component.new(b_param: @b_param, steps: flow_steps, current_user:,
+      recoveries_count:, recoveries_value:, organizations_count:, bikes_count:)
   end
 
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a

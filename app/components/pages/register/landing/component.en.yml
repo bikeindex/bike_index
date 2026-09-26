@@ -1,0 +1,90 @@
+---
+en:
+  components:
+    pages:
+      register:
+        landing:
+          benefit_alerts_body: >-
+            If it's taken, mark it stolen and we alert partner shops, police, and
+            riders near where it happened.
+          benefit_alerts_title: One-click stolen alerts
+          benefit_app_body: >-
+            Register and manage all your bikes from the Bike Index iOS app, and report
+            a theft from wherever you are.
+          benefit_app_title: Your garage in your pocket
+          benefit_found_body: >-
+            When someone finds your bike and looks up the serial, we connect them
+            with you directly.
+          benefit_found_title: Found? We tell you.
+          benefit_marketplace_body: >-
+            Sell your bike on the Bike Index marketplace with no fees. Every listing
+            starts from a registered bike and is checked against theft reports, so
+            buyers know it's legit.
+          benefit_marketplace_title: A trusted marketplace
+          benefit_network_body: >-
+            Volunteers, local recovery teams, and more than 1,000 police departments,
+            universities, cities, and shops watch for stolen bikes and flag them.
+          benefit_network_title: People looking out for it
+          benefit_private_body: >-
+            Your contact info stays hidden. We're a nonprofit, so we don't sell data
+            or run ads.
+          benefit_private_title: Private by default
+          benefit_proof_body: >-
+            Your serial, photos, and receipt live in one permanent record. Useful
+            for police reports and insurance claims.
+          benefit_proof_title: Proof it's yours
+          benefit_resell_body: >-
+            Buyers, shops, and police check serials against the index. A registered
+            stolen bike is a bike nobody wants to buy.
+          benefit_resell_title: Harder to resell
+          benefit_transfer_body: >-
+            Transfer the registration to the next owner in a few clicks, so the bike's
+            history travels with it.
+          benefit_transfer_title: Easy to sell or pass on
+          bike_already_stolen: Bike already stolen? See what to do now
+          check_add_later: You can add photos and details later
+          check_free_forever: Free forever. No ads, no data sales.
+          check_two_minutes: Takes about two minutes
+          faq_free_answer: >-
+            Yes. Registering, reporting, and searching are free for everyone, forever.
+            Bike Index is a 501(c)(3) nonprofit.
+          faq_free_question: Is it really free?
+          faq_privacy_answer: >-
+            The bike's public details are searchable. Your name, email, and address
+            are never shown publicly.
+          faq_privacy_question: Who can see my information?
+          faq_serial_answer: >-
+            Register anyway and add it later. Flip the bike over and look under the
+            bottom bracket, where the pedals meet the frame.
+          faq_serial_question: I don't know my serial number.
+          free_nonprofit_worldwide: Free · Nonprofit · Worldwide
+          give_your_bike_a_way_home: Give your bike a way home.
+          if_the_worst_happens: If the worst happens
+          lede: >-
+            Register it now and you'll have proof it's yours, a one-click stolen alert,
+            and a network of shops, police, and riders watching for it.
+          quick_answers: Quick answers
+          register_your_bike: Register your bike
+          stat_bikes_recovered: stolen bikes recovered
+          stat_bikes_registered: bikes registered, free
+          stat_partners: partner shops, police departments, and cities
+          stat_value_returned: value returned to owners
+          sticker_flagged_body: >-
+            When a shop, buyer, or officer checks the serial, it comes up stolen,
+            and you get the message.
+          sticker_flagged_sound: DING!
+          sticker_flagged_title: 3. It gets flagged
+          sticker_register_body: >-
+            Your bike's serial and details go on file before anything goes wrong.
+            That's the part most people skip.
+          sticker_register_sound: CLICK!
+          sticker_register_title: 1. You register today
+          sticker_stolen_body: >-
+            One click puts it on the stolen list and alerts partners nearby. Don't
+            confront anyone. Contact police.
+          sticker_stolen_sound: STOLEN!
+          sticker_stolen_title: 2. Mark it stolen
+          what_registering_gets_you: What registering gets you
+          what_registering_subhead: >-
+            Most stolen bikes never make it home because nobody can prove whose they
+            are. A registration fixes that.

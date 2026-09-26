@@ -3845,6 +3845,9 @@ en:
       and then some.
     my_accounts_show: Your bikes on Bike Index
     news_index: Read Bike Index news. Also, periodically, learn magic spells.
+    register_landing: >-
+      Register your bike on Bike Index for free. Get proof it's yours, one-click stolen
+      alerts, and a network of shops, police, and riders watching for it.
     registrations_embed: >-
       Embedable %{organization} Bike Index registration form. Register your bike for
       free, right now
@@ -3894,6 +3897,7 @@ en:
     register_acknowledgment: Safety check for your %{cycle_type}
     register_confirm: Confirming your email
     register_create: Register your vehicle!
+    register_landing: Register your bike for free
     register_report: Tell us what happened
     register_review: Review your %{cycle_type} safety check
     register_show: Your %{cycle_type} registration

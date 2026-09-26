@@ -1,0 +1,224 @@
+<div class="tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-white tw:text-gray-500">
+  <section
+    id="register"
+    class="tw:scroll-mt-4 tw:border-b tw:border-gray-200 tw:bg-gray-50"
+  >
+    <div
+      class="
+        twwiderow tw:mx-auto tw:max-w-6xl tw:items-center tw:gap-y-10
+        tw:px-5 tw:pt-10 tw:pb-12 tw:lg:gap-x-12 tw:lg:px-6 tw:lg:pt-14
+        tw:lg:pb-16
+      "
+    >
+      <div class="tw:flex tw:flex-col tw:items-start tw:gap-5.5">
+        <span
+          class="
+            tw:rounded-full tw:border tw:border-gray-200 tw:bg-white
+            tw:px-3.5 tw:py-1.5 tw:text-[13px] tw:font-bold
+            tw:tracking-widest tw:text-blue-600 tw:uppercase
+          "
+        >
+          <%= translation(".free_nonprofit_worldwide") %>
+        </span>
+
+        <h1
+          class="
+            tw:m-0 tw:font-header tw:text-[38px] tw:leading-[1.05]
+            tw:font-extrabold tw:tracking-tight tw:text-slate-900
+            tw:sm:text-[52px]
+          "
+        >
+          <%= translation(".give_your_bike_a_way_home") %>
+        </h1>
+
+        <p
+          class="
+            tw:m-0 tw:max-w-120 tw:text-[17px] tw:leading-[1.55]
+            tw:sm:text-[19px]
+          "
+        >
+          <%= translation(".lede") %>
+        </p>
+
+        <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0">
+          <% checks.each do |check| %>
+            <li
+              class="
+                tw:flex tw:items-center tw:gap-2.5 tw:text-base
+                tw:text-gray-700
+              "
+            >
+              <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:size-4.5 tw:shrink-0 tw:text-blue-600", aria_hidden: true) %>
+              <%= check %>
+            </li>
+          <% end %>
+        </ul>
+
+        <%= image_tag("register_landing/bike-hero.webp", alt: "",
+          class: "tw:hidden tw:w-full tw:max-w-75 tw:drop-shadow-[0_8px_16px_rgba(44,62,80,.18)] tw:sm:block") %>
+      </div>
+
+      <div
+        class="
+          tw:w-full tw:max-w-130 tw:justify-self-center tw:rounded-lg
+          tw:border tw:border-gray-200 tw:bg-white tw:p-5 tw:text-gray-900
+          tw:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:sm:p-8
+        "
+      >
+        <%= render(Pages::Register::Step1::Component.new(b_param: @b_param, steps: @steps,
+          current_user: @current_user, landing: true)) %>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:border-b tw:border-gray-200 tw:bg-gray-50">
+    <dl
+      class="
+        tw:mx-auto tw:my-0 tw:grid tw:max-w-6xl tw:grid-cols-2 tw:gap-6
+        tw:px-5 tw:py-7 tw:text-center tw:lg:grid-cols-4 tw:lg:px-6
+      "
+    >
+      <% stats.each do |stat| %>
+        <div class="tw:flex tw:flex-col-reverse">
+          <dt class="tw:text-sm"><%= stat[:label] %></dt>
+
+          <dd
+            class="
+              tw:m-0 tw:font-header tw:text-[28px] tw:font-extrabold
+              tw:text-slate-900 tw:lg:text-[34px]
+            "
+          >
+            <%= stat[:value] %>
+          </dd>
+        </div>
+      <% end %>
+    </dl>
+  </section>
+
+  <section>
+    <div class="<%= section_inner %>">
+      <div class="tw:mx-auto tw:mb-10 tw:max-w-160 tw:text-center">
+        <h2 class="<%= h2_classes %>">
+          <%= translation(".what_registering_gets_you") %>
+        </h2>
+
+        <p class="tw:m-0 tw:mt-3 tw:text-[17px] tw:leading-relaxed tw:lg:text-lg">
+          <%= translation(".what_registering_subhead") %>
+        </p>
+      </div>
+
+      <ul class="twwiderow twwiderow-3 tw:m-0 tw:list-none tw:gap-6 tw:p-0">
+        <% benefits.each do |benefit| %>
+          <li
+            class="
+              tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg tw:border
+              tw:border-gray-200 tw:bg-white tw:p-7 tw:shadow-sm
+            "
+          >
+            <span
+              class="
+                tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-full
+                <%= benefit[:circle] %>
+              "
+            >
+              <%= helpers.inline_svg_tag(benefit[:icon], class: "tw:size-5.5", aria_hidden: true) %>
+            </span>
+
+            <h3
+              class="
+                tw:m-0 tw:font-header tw:text-xl tw:font-bold
+                tw:text-slate-900
+              "
+            >
+              <%= benefit[:title] %>
+            </h3>
+
+            <p class="tw:m-0 tw:leading-relaxed"><%= benefit[:body] %></p>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tw:border-y tw:border-gray-200 tw:bg-gray-50">
+    <div class="tw:flex tw:flex-col tw:gap-10 <%= section_inner %>">
+      <h2 class="tw:text-center <%= h2_classes %>">
+        <%= translation(".if_the_worst_happens") %>
+      </h2>
+
+      <ol class="twwiderow twwiderow-3 tw:m-0 tw:list-none tw:gap-7 tw:p-0">
+        <% stickers.each do |sticker| %>
+          <li
+            class="
+              tw:rounded-lg tw:border-3 tw:border-gray-950 tw:bg-white
+              tw:p-6 tw:shadow-[4px_4px_0_var(--color-gray-950)]
+            "
+          >
+            <div class="tw:mb-3 tw:flex tw:items-center tw:justify-between tw:gap-4">
+              <span
+                class="
+                  tw:font-[Bangers,_cursive] tw:text-[34px] tw:tracking-[.03em]
+                  <%= sticker[:color] %>
+                "
+                aria-hidden="true"
+              >
+                <%= sticker[:sound] %>
+              </span>
+
+              <%= image_tag(sticker[:image], alt: "", class: "tw:h-20 tw:w-auto", loading: "lazy") %>
+            </div>
+
+            <h3
+              class="
+                tw:m-0 tw:font-header tw:text-xl tw:font-bold
+                tw:text-slate-900
+              "
+            >
+              <%= sticker[:title] %>
+            </h3>
+
+            <p class="tw:m-0 tw:mt-2 tw:leading-relaxed">
+              <%= sticker[:body] %>
+            </p>
+          </li>
+        <% end %>
+      </ol>
+
+      <%= link_to(stolen_index_path, class: "twlink tw:inline-flex tw:items-center tw:gap-1.5 tw:self-center tw:text-[15px] tw:font-bold") do %>
+        <%= translation(".bike_already_stolen") %>
+        <%= helpers.inline_svg_tag("icons/arrow-right.svg", class: "tw:size-4", aria_hidden: true) %>
+      <% end %>
+    </div>
+  </section>
+
+  <section>
+    <div class="tw:mx-auto tw:max-w-190 tw:px-5 tw:py-12 tw:lg:px-6 tw:lg:py-18">
+      <h2 class="tw:mb-4 tw:text-center tw:lg:text-[32px] <%= h2_classes %>">
+        <%= translation(".quick_answers") %>
+      </h2>
+
+      <dl class="tw:m-0">
+        <% faqs.each do |question, answer| %>
+          <div class="tw:border-b tw:border-gray-200 tw:py-5 tw:last:border-b-0">
+            <dt class="tw:font-header tw:text-lg tw:font-bold tw:text-slate-900">
+              <%= question %>
+            </dt>
+
+            <dd class="tw:m-0 tw:mt-2 tw:leading-relaxed"><%= answer %></dd>
+          </div>
+        <% end %>
+      </dl>
+
+      <div class="tw:mt-6 tw:text-center">
+        <%= render(UI::ButtonLink::Component.new(href: "#register",
+          text: translation(".register_your_bike"), color: :primary, size: :callout)) %>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:border-t tw:border-gray-200 tw:bg-gray-50">
+    <div class="tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-12 tw:lg:px-6">
+      <%= render(Pages::Register::LandingDonation::Component.new) %>
+    </div>
+  </section>
+</div>
