@@ -105,7 +105,10 @@ Judge each against the **Comments** section of `AGENTS.md` and reach a verdict o
 
 ```bash
 rtk proxy git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
+rtk proxy git diff origin/main...HEAD -- '*.rb' | grep -in '^+[^+].*errors\.add.*bike'
 ```
+
+The second one is load-bearing: a model's `errors.add(:base, "…")` reaches a flash through `full_messages`, never passing a locale file, so the YAML grep can't see it. `Sale#seller_is_owner` interpolates the cycle type into one.
 
 Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` and `Pages::Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/pages/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
 
