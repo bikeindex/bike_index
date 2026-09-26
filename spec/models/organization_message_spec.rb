@@ -17,9 +17,9 @@ RSpec.describe OrganizationMessage, type: :model do
     context "phone registration" do
       let(:bike) { FactoryBot.create(:bike_organized, :phone_registration, creation_organization: organization) }
       it "is invalid" do
-        expect(OrganizationMessage.for?(bike:, organization:)).to be_truthy
+        expect(OrganizationMessage.for?(bike:, organization:)).to be_falsey
         expect(organization_message.save).to be_falsey
-        expect(organization_message.errors.full_messages).to eq(["Receiver email can't be blank"])
+        expect(organization_message.errors.full_messages).to eq(["sender can't message the owner of this bike"])
       end
     end
 

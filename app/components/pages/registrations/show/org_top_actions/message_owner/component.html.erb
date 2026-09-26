@@ -13,8 +13,8 @@
       <%= heading %>
     </h2>
 
-    <%= tag.div(data: {controller: ("registrations--show--message-owner" if @organization_message)}) do %>
-      <% if @organization_message %>
+    <%= tag.div(data: {controller: ("registrations--show--message-owner" if organization_message?)}) do %>
+      <% if organization_message? %>
         <div class="tw:mt-3">
           <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "message_kind", selected: "general", entries: [{value: "general", label: translation(".general_message")}, {value: "theft", label: translation(".message_about_theft")}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
         </div>
@@ -23,7 +23,7 @@
           class="tw:mt-3"
           data-registrations--show--message-owner-target="organizationMessage"
         >
-          <%= form_with(model: [@organization, OrganizationMessage.new], data: {controller: "csrf-refresh form-persist", "form-persist-key-value": "organization-message-#{@bike.id}", action: "input->form-persist#save submit->form-persist#clear"}) do |form| %>
+          <%= form_with(model: [@organization, OrganizationMessage.new], data: form_data("organization-message")) do |form| %>
             <%= form.hidden_field :bike_id, value: @bike.id %>
 
             <%= form.text_area :message, required: true, rows: 6, placeholder: translation(".what_do_you_want_to_tell_the_owner", bike_type: @bike.type), class: "twinput tw:w-full" %>
@@ -36,10 +36,10 @@
       <% end %>
 
       <div
-        class="tw:mt-3 <%= "tw:hidden" if @organization_message %>"
+        class="tw:mt-3 <%= "tw:hidden" if organization_message? %>"
         data-registrations--show--message-owner-target="stolenNotification"
       >
-        <%= form_with(model: message_notification, url: stolen_notifications_path, data: {controller: "csrf-refresh form-persist", "form-persist-key-value": "contact-owner-#{@bike.id}", action: "input->form-persist#save submit->form-persist#clear"}) do |form| %>
+        <%= form_with(model: message_notification, url: stolen_notifications_path, data: form_data("contact-owner")) do |form| %>
           <%= form.hidden_field :bike_id, value: @bike.id %>
 
           <%= form.text_area :message, required: true, rows: 6, placeholder: message_placeholder, class: "twinput tw:w-full" %>

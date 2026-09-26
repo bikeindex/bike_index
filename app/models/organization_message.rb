@@ -36,26 +36,24 @@ class OrganizationMessage < ApplicationRecord
   before_validation :set_calculated_attributes
   after_create_commit { EmailJobs::OrganizationMessageJob.perform_async(id) }
 
+  # A phone registration's owner_email is the phone number, so there's nothing to email
   def self.for?(bike:, organization:)
-    bike.status_with_owner? && bike.organized?(organization)
-  end
-
-  # A phone registration's owner_email is the phone number
-  def self.receiver_email_for(bike)
-    bike.owner_email unless bike.phone_registration?
+    bike.status_with_owner? && !bike.phone_registration? && bike.organized?(organization)
   end
 
   private
 
   def set_calculated_attributes
-    self.receiver ||= bike&.user
-    self.receiver_email ||= self.class.receiver_email_for(bike) if bike.present?
+    return if bike.blank?
+
+    self.receiver ||= bike.user
+    self.receiver_email ||= bike.owner_email
   end
 
   def sender_permitted
     return if bike.blank? || organization.blank?
     return if self.class.for?(bike:, organization:) && bike.contact_owner?(sender, organization)
 
-    errors.add(:base, "sender can't message the owner of this bike")
+    errors.add(:base, "sender can't message the owner of this #{bike.type}")
   end
 end
