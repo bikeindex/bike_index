@@ -1,0 +1,39 @@
+<h2 class="uncap" style="font-weight: 400;">
+  A marketplace listing's serial matches a stolen registration
+</h2>
+
+<p>
+  The <%= @listed_bike.type %> below is listed for sale on the marketplace, and
+  its serial matches a registration that's reported stolen. Nothing was blocked
+  automatically: the listing is still up.
+</p>
+
+<p>
+  Please check whether they're the same <%= @stolen_bike.type %>. Serials are
+  compared in segments, so a partial match can be a coincidence.
+</p>
+
+<p>
+  <strong>For sale:</strong> <%= @listed_bike.title_string %>, serial
+  <code><%= @listed_bike.serial_number %></code>
+  <br>
+  <%= link_to "Admin page", admin_bike_url(@listed_bike) %> &middot;
+  <%= link_to "Public page", bike_url(@listed_bike) %>
+  <% if @marketplace_listing.present? %>
+    &middot;
+    <%= link_to "Marketplace listing (admin)", admin_marketplace_listing_url(@marketplace_listing) %>
+  <% end %>
+</p>
+
+<p>
+  <strong>Stolen:</strong> <%= @stolen_bike.title_string %>, serial
+  <code><%= @stolen_bike.serial_number %></code>
+  <br>
+  <%= link_to "Admin page", admin_bike_url(@stolen_bike) %> &middot;
+  <%= link_to "Public page", bike_url(@stolen_bike) %>
+</p>
+
+<p style="color: #555;">
+  If they aren't the same, you can ignore this email; it won't be sent again for
+  this pair.
+</p>

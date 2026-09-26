@@ -22,10 +22,11 @@
 #
 # Indexes
 #
-#  index_notifications_on_bike_id                            (bike_id)
-#  index_notifications_on_message_channel_target_trgm        (message_channel_target) USING gin
-#  index_notifications_on_notifiable_type_and_notifiable_id  (notifiable_type,notifiable_id)
-#  index_notifications_on_user_id                            (user_id)
+#  index_notifications_on_bike_id                              (bike_id)
+#  index_notifications_on_message_channel_target_trgm          (message_channel_target) USING gin
+#  index_notifications_on_notifiable_type_and_notifiable_id    (notifiable_type,notifiable_id)
+#  index_notifications_on_user_id                              (user_id)
+#  index_notifications_stolen_serial_marketplace_match_unique  (bike_id,notifiable_id) UNIQUE WHERE ((kind = 39) AND ((notifiable_type)::text = 'Bike'::text))
 #
 
 class Notification < ApplicationRecord
@@ -115,7 +116,8 @@ class Notification < ApplicationRecord
     end
 
     def admin_kinds
-      %w[stolen_notification_blocked marketplace_message_blocked unknown_organization_for_ascend].freeze +
+      %w[stolen_notification_blocked marketplace_message_blocked unknown_organization_for_ascend
+        stolen_serial_marketplace_match].freeze +
         pos_integration_broken_kinds
     end
 
@@ -275,6 +277,7 @@ class Notification < ApplicationRecord
 
   def calculated_user_id
     return notifiable&.receiver_id if notifiable_type == "StolenNotification"
+    return if stolen_serial_marketplace_match? # notifiable is the stolen bike, not a recipient
 
     notifiable&.user_id if defined?(notifiable.user_id)
   end

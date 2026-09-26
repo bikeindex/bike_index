@@ -7091,6 +7091,13 @@ CREATE INDEX index_notifications_on_user_id ON public.notifications USING btree 
 
 
 --
+-- Name: index_notifications_stolen_serial_marketplace_match_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_notifications_stolen_serial_marketplace_match_unique ON public.notifications USING btree (bike_id, notifiable_id) WHERE ((kind = 39) AND ((notifiable_type)::text = 'Bike'::text));
+
+
+--
 -- Name: index_oauth_access_grants_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7814,6 +7821,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260926030236'),
 ('20260915181500'),
 ('20260915110042'),
 ('20260912102406'),
