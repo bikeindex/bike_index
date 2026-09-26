@@ -7,6 +7,7 @@ module SharedBlocks
         # @param search_all toggle
         # @param organized toggle "An org search, linking each card to its org page - off is the marketplace's"
         def default(search_all: false, organized: true)
+          organization = lookbook_organization || Organization.new(name: "Brakebills University", short_name: "Brakebills")
           render_with_template(template: "shared_blocks/search_results/bike_card/component_preview/default",
             locals: {organization: (organization if organized), search_all:, component_class:,
                      bikes: SharedBlocks::SearchResults::BikeBox::ComponentPreview.vehicles + vehicle_types})
@@ -16,10 +17,6 @@ module SharedBlocks
 
         # BikeListItem's preview renders the same bikes
         def component_class = Component
-
-        def organization
-          lookbook_organization || Organization.new(name: "Brakebills University", short_name: "Brakebills")
-        end
 
         def vehicle_types
           [

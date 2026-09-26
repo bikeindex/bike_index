@@ -16,17 +16,19 @@ module SharedBlocks
         def initialize(bike:, organization: nil, search_all: false)
           @bike = bike
           @organization = organization
-          @render_org_badge = search_all && @organization.present?
+          @search_all = search_all
         end
 
         private
 
-        # Like the table's rows, not per viewer. The listing and the credibility flag are in
-        # the key because neither a price change nor enabling the feature touches the bike
+        # Like the table's rows, not per viewer. The organization record rather than its id,
+        # so enabling a feature invalidates; the listing because a price change doesn't
+        # touch the bike
         def cache_key
-          [self.class.cache_digest, @organization&.id, @render_org_badge, credibility_badges?,
-            @bike, for_sale_listing]
+          [self.class.cache_digest, @organization, @search_all, @bike, for_sale_listing]
         end
+
+        def render_org_badge? = @search_all && @organization.present?
 
         def bike_href = bike_path(@bike, organization_id: @organization&.to_param)
 
@@ -45,17 +47,14 @@ module SharedBlocks
 
         # occurred_at is the stolen or impounded date, and nil for a bike with its owner or
         # for sale. How long a bike has been registered is what vouches for it, so the
-        # with-owner badge - which carries that date and nothing else - is the feature's
-        def status_badge
-          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: status_badge_size,
+        # with-owner badge is the credibility feature's
+        def status_badge(size:)
+          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size:,
             skip_with_owner: !credibility_badges?,
             time: @bike.occurred_at || for_sale_listing&.published_at || @bike.created_at)
         end
 
-        # The photo corner has no text size to inherit; the row's title line does
-        def status_badge_size = :md
-
-        def credibility_badges? = @organization&.enabled?("credibility_badges") || false
+        def credibility_badges? = @organization&.enabled?("credibility_badges")
 
         # Member listings sort ahead of the rest on the marketplace, so the badge says why
         def render_member_badge? = for_sale_listing&.seller_member?

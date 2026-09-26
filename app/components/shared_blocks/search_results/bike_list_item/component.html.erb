@@ -33,8 +33,8 @@
       "
     >
       <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
-        <%# Above the link, so its tooltip opens; pulled left so its text lines up with the rows below %>
-        <span class="tw:relative tw:z-20 tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(status_badge) %></span>
+        <%# Above the link, so its tooltip opens; pulled left and sized to the title so it lines up %>
+        <span class="tw:relative tw:z-20 tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(status_badge(size: :inherit)) %></span>
 
         <%= link_to bike_href, class: "tw:twtext-color tw:hover:underline", data: bike_link_data do %>
           <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
@@ -97,7 +97,7 @@
         <%= render(Atoms::Serial::Component.new(bike: @bike, organization: @organization, explanation: :tooltip)) %>
       </span>
 
-      <% if @render_org_badge %>
+      <% if render_org_badge? %>
         <%= render(UI::Badge::Component.new(text: org_badge_text, color: organized? ? :notice : :gray)) %>
       <% end %>
     </div>

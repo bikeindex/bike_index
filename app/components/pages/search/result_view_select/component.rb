@@ -32,7 +32,10 @@ module Pages
 
         # A literal key per branch, so i18n-tasks resolves them
         def view_label(view)
-          (view == :cards) ? translation(".cards_view") : translation(".list_view")
+          case view
+          when :cards then translation(".cards_view")
+          when :list then translation(".list_view")
+          end
         end
 
         # The chip is icon-only, so title carries the hint a visible label would - but not

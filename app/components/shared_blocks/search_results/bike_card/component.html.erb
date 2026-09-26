@@ -39,7 +39,7 @@
 
       <%# Above the card's link, so its tooltip opens rather than the bike %>
       <span class="tw:absolute tw:top-2 tw:right-2 tw:z-20">
-        <%= render(status_badge) %>
+        <%= render(status_badge(size: :md)) %>
       </span>
     </div>
 
@@ -89,7 +89,7 @@
       <%= render(Atoms::Serial::Component.new(bike: @bike, organization: @organization, explanation: :tooltip,
         html_class: "tw:text-xs! tw:text-gray-400!")) %>
 
-      <% if @render_org_badge %>
+      <% if render_org_badge? %>
         <div>
           <%= render(UI::Badge::Component.new(text: org_badge_text, color: organized? ? :notice : :gray)) %>
         </div>
