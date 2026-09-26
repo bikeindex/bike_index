@@ -472,6 +472,9 @@ class Bike < ApplicationRecord
     !example? && !user_hidden && deleted_at.blank? && !likely_spam
   end
 
+  # The register flow creates the bike ahead of its organization's safety rules
+  def unfinished_registration? = b_params.acknowledgment_pending.exists?
+
   def current_parking_notification
     parking_notifications.current.first
   end

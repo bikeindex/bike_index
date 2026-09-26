@@ -260,7 +260,9 @@ class RegisterController < ApplicationController
     @b_param ||= BikeServices::Register.b_param_for(user: current_user) if build
     if @b_param.blank?
       if BikeServices::Register.sign_in_to_resume?(params[:b_param_token], user: current_user)
-        return store_return_and_authenticate_user(translation_key: :sign_in_to_continue_registration, flash_type: :notice)
+        # A submission's token is in its body, and its path has no GET to come back to
+        store_return_to(register_path(b_param_token: params[:b_param_token], step: params[:step]))
+        return authenticate_user(translation_key: :sign_in_to_continue_registration, flash_type: :notice)
       end
 
       flash[:notice] = translation(:registration_not_found) if params[:b_param_token].present?
