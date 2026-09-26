@@ -5853,10 +5853,6 @@ es:
             serial_label: 'De serie:'
             sticker_label: 'Etiqueta engomada:'
             view_all: ver todo
-          bike_card:
-            e_vehicle: Vehículo eléctrico
-            not_registered_with: No está registrado con %{org_name}
-            registered_with: Registrado con %{org_name}
         impound_records:
           index:
             all_bikes: Todas las bicicletas
@@ -6404,30 +6400,8 @@ es:
           stolenness_stolen: Robado en cualquier lugar
           within: dentro
         result_view_select:
-          bike_box_view: Ver como lista
-          thumbnail_view: Ver como miniaturas
-      search_results:
-        bike_box:
-          ended_at: Finalizado
-          location: Ubicación
-          not_applicable: N / A
-          posted_at: Listado
-          price: Precio
-          primary_colors: Colores primarios
-          removed_from: Eliminado del índice de bicicletas
-          serial: De serie
-        container:
-          no_results: No se encontraron registros que coincidieran exactamente con
-            su búsqueda.
-        frame:
-          fetch_failed: No se pudieron cargar estos resultados; compruebe su conexión
-            e inténtelo de nuevo.
-          rate_limited: Se han realizado demasiadas búsquedas demasiado rápido; se
-            ha alcanzado el límite de solicitudes. Espere un momento y vuelva a intentarlo.
-          retry: Intentar otra vez
-        vehicle_thumbnail:
-          member: Miembro de Bike Index
-          registered_not_stolen: Registrado, no robado.
+          cards_view: Ver como tarjetas
+          list_view: Ver como lista
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Haz clic en el botón de abajo para continuar.
@@ -6956,6 +6930,34 @@ es:
           finish_the_required_steps: completar los pasos requeridos
           not_registered_yet_html: Tu %{manufacturer} %{cycle_type} aún no está registrado.
             Por favor %{finish_link}
+      search_results:
+        bike_box:
+          ended_at: Finalizado
+          location: Ubicación
+          not_applicable: N / A
+          posted_at: Listado
+          price: Precio
+          primary_colors: Colores primarios
+          removed_from: Eliminado del índice de bicicletas
+          serial: De serie
+        bike_card:
+          e_vehicle: Vehículo eléctrico
+          member_listing: Miembro de Bike Index
+          member_listing_tooltip: Este vendedor es miembro de Bike Index.
+          not_registered_with: No está registrado con %{org_name}
+          registered_with: Registrado con %{org_name}
+        bike_list_item:
+          e_vehicle: Vehículo eléctrico
+          member_listing: Miembro de Bike Index
+          member_listing_tooltip: Este vendedor es miembro de Bike Index.
+          not_registered_with: No está registrado con %{org_name}
+          registered_with: Registrado con %{org_name}
+        frame:
+          fetch_failed: No se pudieron cargar estos resultados; compruebe su conexión
+            e inténtelo de nuevo.
+          rate_limited: Se han realizado demasiadas búsquedas demasiado rápido; se
+            ha alcanzado el límite de solicitudes. Espere un momento y vuelva a intentarlo.
+          retry: Intentar otra vez
   user_emails:
     confirm:
       confirm_email: Confirmar correo electrónico
