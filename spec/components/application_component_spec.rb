@@ -15,6 +15,19 @@ RSpec.describe ApplicationComponent, type: :component do
     end
   end
 
+  describe "inheritance" do
+    # A component subclassing another inherits its translation scope and sits inside its
+    # digest tree, so the pair go stale together and an edit meant for one reaches both.
+    # Share by duplicating, or by an object both components call.
+    it "subclasses ApplicationComponent and nothing else" do
+      subclassed = component_classes.sort_by(&:name)
+        .reject { |component| component.superclass == ApplicationComponent }
+        .map { |component| "#{component} < #{component.superclass}" }
+
+      expect(subclassed).to eq []
+    end
+  end
+
   describe "cache digests" do
     # What the tracker misses goes stale with the key still moving for its siblings, so
     # nothing else catches it. A source scan is the oracle here: anything the markup
