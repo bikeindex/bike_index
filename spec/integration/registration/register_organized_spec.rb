@@ -188,10 +188,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
     end
 
     context "a member, on the organization's single page" do
-      let(:member) do
-        FactoryBot.create(:user_confirmed, email: "member@bikeindex.org", accepted_vendor_terms_of_service: true)
-      end
-      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: member, organization:) }
+      let(:member) { FactoryBot.create(:organization_user, organization:, email: "member@bikeindex.org") }
 
       it "labels the submit and asks for the owner's name off what's filled in above them" do
         sign_in(member)
