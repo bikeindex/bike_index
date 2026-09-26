@@ -7,6 +7,7 @@ module SharedBlocks
       # An organization makes it that org's search - links reach its org pages, and
       # search_all badges whether the bike is registered with it. Without one it's public.
       class Component < ApplicationComponent
+        # Template Dependency: Atoms::RegistrationStatusBadge::Component
         include BikeHelper
 
         # For the list holding them
