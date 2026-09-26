@@ -9,7 +9,6 @@ module SharedBlocks
       # ApplicationComponent and nothing else, so the two diverge by editing both.
       class Component < ApplicationComponent
         # Template Dependency: Atoms::RegistrationStatusBadge::Component
-        include BikeHelper
 
         # The rows wrap against their list, so they fit a narrow card too
         LIST_CLASSES = "tw:@container tw:flex tw:flex-col tw:gap-3"
@@ -29,9 +28,6 @@ module SharedBlocks
         end
 
         private
-
-        # BikeCard's copy, which both render - config/i18n-tasks.yml's scope_overrides too
-        def component_translation_scope = %i[components shared_blocks search_results bike_card]
 
         def row_border_class
           BORDER_CLASSES.fetch(Atoms::RegistrationStatusBadge::Component.color(@bike), "tw:border-l-gray-300")
@@ -65,9 +61,9 @@ module SharedBlocks
           Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size:, time: status_time)
         end
 
-        # occurred_at is the stolen or impounded date, and nil for a bike with its owner or
-        # for sale. How long a bike has been registered is what vouches for it, so the
-        # registration date - not the badge carrying it - is the credibility feature's
+        # occurred_at is the stolen or impounded date, and nil for a bike with its owner
+        # or for sale. The badge renders either way; how long a bike has been registered
+        # is what vouches for it, so that date is the credibility feature's
         def status_time
           @bike.occurred_at || for_sale_listing&.published_at || (@bike.created_at if credibility_badges?)
         end

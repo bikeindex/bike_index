@@ -16,13 +16,13 @@ RSpec.describe ApplicationComponent, type: :component do
   end
 
   describe "inheritance" do
-    # A component subclassing another inherits its translation scope and sits inside its
-    # digest tree, so the pair go stale together and an edit meant for one reaches both.
-    # Share by duplicating, or by an object both components call.
+    # A subclass's digest folds in the parent's Ruby, template and sidecars, so the
+    # parent's edits bust the child's fragments and a change meant for one renders in
+    # both. Share by duplicating, or by an object both components call.
     it "subclasses ApplicationComponent and nothing else" do
-      subclassed = component_classes.sort_by(&:name)
-        .reject { |component| component.superclass == ApplicationComponent }
-        .map { |component| "#{component} < #{component.superclass}" }
+      subclassed = view_component_classes.sort_by(&:name).filter_map do |component|
+        "#{component} < #{component.superclass}" unless component.superclass == ApplicationComponent
+      end
 
       expect(subclassed).to eq []
     end
@@ -64,6 +64,14 @@ RSpec.describe ApplicationComponent, type: :component do
   def component_classes
     Rails.application.eager_load!
     ApplicationComponent.descendants.select(&:identifier)
+  end
+
+  # ViewComponent::Base rather than ApplicationComponent, so one skipping the base class
+  # altogether is caught by the same example rather than being invisible to it
+  def view_component_classes
+    Rails.application.eager_load!
+    components = Rails.root.join("app/components").to_s
+    ViewComponent::Base.descendants.select { it.identifier&.start_with?(components) } - [ApplicationComponent]
   end
 
   # The components whose markup digest is folded into a cache key: one keying its own

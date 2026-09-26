@@ -8,7 +8,6 @@ module SharedBlocks
       # search_all badges whether the bike is registered with it. Without one it's public.
       class Component < ApplicationComponent
         # Template Dependency: Atoms::RegistrationStatusBadge::Component
-        include BikeHelper
 
         # For the list holding them
         LIST_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4"
@@ -49,9 +48,9 @@ module SharedBlocks
           Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size:, time: status_time)
         end
 
-        # occurred_at is the stolen or impounded date, and nil for a bike with its owner or
-        # for sale. How long a bike has been registered is what vouches for it, so the
-        # registration date - not the badge carrying it - is the credibility feature's
+        # occurred_at is the stolen or impounded date, and nil for a bike with its owner
+        # or for sale. The badge renders either way; how long a bike has been registered
+        # is what vouches for it, so that date is the credibility feature's
         def status_time
           @bike.occurred_at || for_sale_listing&.published_at || (@bike.created_at if credibility_badges?)
         end

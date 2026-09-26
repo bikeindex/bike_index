@@ -87,6 +87,13 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     find("#search-button").click
   end
 
+  # Both halves of the combobox, polled: the form sits outside the results frame, so it
+  # settles after the URL and the card count a back/forward already waited on
+  def expect_primary_activity(record, display_name)
+    expect(page).to have_field("primary_activity", with: display_name, wait: 10)
+    expect(page).to have_field("primary_activity-hw-hidden-field", with: record.id.to_s, type: "hidden", wait: 10)
+  end
+
   # Hold back the unfiltered results the frame eager-loads on arrival, so the example
   # decides when they land rather than racing a timer
   def hold_initial_results_load
@@ -228,8 +235,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).not_to have_css("turbo-frame#page_2")
     # The selection persists after the search - the hidden field carries the id,
     # the visible input shows the display name
-    expect(page).to have_field("primary_activity-hw-hidden-field", with: primary_activity.id.to_s, type: "hidden")
-    expect(page).to have_field("primary_activity", with: "Mountain biking")
+    expect_primary_activity(primary_activity, "Mountain biking")
 
     # Switching to the list layout re-runs the search rather than dropping its filters
     choose("search_result_view_list", allow_label_click: true)
@@ -277,9 +283,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # entry). It's a harness artifact - a real browser does back/forward reliably -
   # so retry on CI.
   #
-  # Not that one, though: the form settles after both the URL and the card count,
-  # since it sits outside the results frame and comes back with Turbo's restored
-  # snapshot. That's why its values are polled for rather than read once.
+  # The form isn't part of that artifact: it settles after both the URL and the card
+  # count, since it sits outside the results frame and comes back with Turbo's
+  # restored snapshot.
   it "keeps results and the primary_activity form in sync across back/forward", :flaky do
     visit_marketplace_via_nav
     # First 12 on the unfiltered page (the 2 members sort first)
@@ -288,24 +294,22 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # The two counts differ, so a settled count proves which search the frame holds.
     search_primary_activity("Mountain biking")
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 6)
-    expect(page).to have_field("primary_activity", with: "Mountain biking")
+    expect_primary_activity(primary_activity, "Mountain biking")
 
     search_primary_activity("Road cycling")
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 9)
-    expect(page).to have_field("primary_activity", with: "Road cycling")
+    expect_primary_activity(other_primary_activity, "Road cycling")
 
     # Back to the Mountain biking search - results and the combobox reconcile to it
     page.go_back
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/, wait: 10)
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 6)
-    expect(page).to have_field("primary_activity", with: "Mountain biking", wait: 10)
-    expect(page).to have_field("primary_activity-hw-hidden-field", with: primary_activity.id.to_s, type: "hidden")
+    expect_primary_activity(primary_activity, "Mountain biking")
 
     # Forward to the Road cycling search - everything reconciles back to it
     page.go_forward
     expect(page).to have_current_path(/primary_activity=#{other_primary_activity.id}/, wait: 10)
     expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 9)
-    expect(page).to have_field("primary_activity", with: "Road cycling", wait: 10)
-    expect(page).to have_field("primary_activity-hw-hidden-field", with: other_primary_activity.id.to_s, type: "hidden")
+    expect_primary_activity(other_primary_activity, "Road cycling")
   end
 end

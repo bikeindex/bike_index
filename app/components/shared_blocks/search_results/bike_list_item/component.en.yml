@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    shared_blocks:
+      search_results:
+        bike_list_item:
+          e_vehicle: E-vehicle
+          member_listing: Bike Index member
+          member_listing_tooltip: This seller is a Bike Index member
+          not_registered_with: Not registered with %{org_name}
+          registered_with: Registered with %{org_name}
