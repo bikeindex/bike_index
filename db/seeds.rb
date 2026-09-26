@@ -1,6 +1,12 @@
-# Abort loudly if the import fails: later steps (e.g. seed_manufacturer_priorities)
-# depend on this reference data and would otherwise raise a misleading error.
-abort "Seeding failed: bin/rake setup:import_spreadsheets" unless system("bin/rake setup:import_spreadsheets")
+# Seeding isn't idempotent: a re-run over seeded records dies on duplicates
+return if Bike.unscoped.exists?
+
+# Development logs every query with its caller's backtrace, which is over a third of seeding
+Rails.logger.level = :info
+# Seeded users' passwords are published, so hashing them at the default cost buys nothing
+ActiveModel::SecurePassword.min_cost = true
+
+SpreadsheetJobs::ImporterJob.new.perform
 
 # Set Cgroup display order; the import assigns priority by CSV row order, which isn't what we want
 cgroup_priorities = [["Frame and Fork", 1], ["Wheels", 2], ["Drivetrain", 3], ["Brakes", 4], ["Cargo", 5], ["Additional Parts", 6]]

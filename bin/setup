@@ -88,28 +88,16 @@ FileUtils.chdir APP_ROOT do
 
   # The layout needs tailwind.css and emails (which seeding sends) need email.css; without
   # the build Sprockets tries compiling email.scss with sassc
-  puts "\n== Preparing database, building stylesheets, clearing logs =="
-  system! "bin/rails db:prepare tailwindcss:build dartsass:build log:clear"
+  tasks = %w[db:prepare tailwindcss:build dartsass:build log:clear]
+  tasks += %w[db:seed setup:load_counts] unless without_seeds
+  puts "\n== Running #{tasks.join(" ")} =="
+  system!("bin/rails", *tasks)
   Process.wait(npm_install)
 
-  unless without_seeds
-    # db:seed isn't idempotent: a re-run over seeded records dies on duplicates
-    if system("bin/rails runner 'exit Bike.unscoped.exists?'")
-      puts "\n== Database already seeded =="
-    else
-      puts "\n== Seeding database =="
-      system! "bin/rake db:seed"
-    end
-
-    # Opt-in, matching lib/tasks/parallel_migrate.rake
-    unless ENV["PARALLEL_MIGRATIONS"].to_s.strip.empty?
-      puts "\n== Preparing parallel test databases =="
-      system! "bin/rake parallel:prepare"
-    end
-
-    # Autocomplete (typeahead) is loaded by db:seed above; here we just load counts
-    puts "\n== loading bike counts =="
-    system! "bin/rake setup:load_counts"
+  # Opt-in, matching lib/tasks/parallel_migrate.rake
+  unless without_seeds || ENV["PARALLEL_MIGRATIONS"].to_s.strip.empty?
+    puts "\n== Preparing parallel test databases =="
+    system! "bin/rake parallel:prepare"
   end
 
   puts "\n== Restarting application server =="
