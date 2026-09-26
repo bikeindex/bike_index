@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::SearchResults::BikeListItem::Component, type: :component do
+RSpec.describe SharedBlocks::SearchResults::BikeListItem::Component, type: :component do
   let(:component) { render_inline(described_class.new(bike:, organization:, search_all:)) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"]) }
   let(:search_all) { false }

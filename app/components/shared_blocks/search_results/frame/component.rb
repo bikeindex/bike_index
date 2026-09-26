@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Pages
+module SharedBlocks
   module SearchResults
     module Frame
       # Wraps an eager-loaded search results turbo-frame and its loading overlay.

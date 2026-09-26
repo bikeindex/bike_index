@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Pages
+module SharedBlocks
   module SearchResults
     module BikeListItem
       # One vehicle in a search's list view, per the Bike Thumbnails design doc's dense
@@ -20,7 +20,7 @@ module Pages
         private
 
         # BikeCard's, whose methods this shares - config/i18n-tasks.yml's scope_overrides too
-        def component_translation_scope = %i[components pages search_results bike_card]
+        def component_translation_scope = %i[components shared_blocks search_results bike_card]
 
         def row_border_class
           BORDER_CLASSES.fetch(Atoms::RegistrationStatusBadge::Component.color(@bike), "tw:border-l-gray-300")

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Pages
+module SharedBlocks
   module SearchResults
     module BikeBox
       class ComponentPreview < ApplicationComponentPreview
@@ -32,7 +32,7 @@ module Pages
         # - serial user_hidden
 
         def default
-          {template: "pages/search_results/bike_box/component_preview/default"}
+          {template: "shared_blocks/search_results/bike_box/component_preview/default"}
         end
       end
     end

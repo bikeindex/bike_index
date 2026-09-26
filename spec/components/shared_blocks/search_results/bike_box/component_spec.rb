@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::SearchResults::BikeBox::Component, type: :component do
+RSpec.describe SharedBlocks::SearchResults::BikeBox::Component, type: :component do
   let(:options) { {bike:, current_user:, skip_cache:, render_deleted:, event_record:} }
   let(:event_record) { nil }
   let(:render_deleted) { false }

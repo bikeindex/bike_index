@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::SearchResults::Container::Component, type: :component do
+RSpec.describe SharedBlocks::SearchResults::Container::Component, type: :component do
   let(:component) { render_inline(described_class.new(bikes:, no_results:, result_view:)) }
   let(:bikes) { [FactoryBot.create(:bike, id: 42)] }
   let(:result_view) { nil }

@@ -7,7 +7,7 @@ module Pages
         VIEW_ICONS = {cards: "icons/image.svg", list: "icons/list.svg"}.freeze
 
         def initialize(result_view: nil)
-          @selected_result_view = Pages::SearchResults::Container::Component.permitted_result_view(result_view)
+          @selected_result_view = SharedBlocks::SearchResults::Container::Component.permitted_result_view(result_view)
         end
 
         def call
@@ -25,7 +25,7 @@ module Pages
         private
 
         def view_entries
-          Pages::SearchResults::Container::Component::RESULT_VIEW_COMPONENT.keys.map do |view|
+          SharedBlocks::SearchResults::Container::Component::RESULT_VIEW_COMPONENT.keys.map do |view|
             {value: view, label: icon_label(VIEW_ICONS.fetch(view), translation(".#{view}_view"))}
           end
         end

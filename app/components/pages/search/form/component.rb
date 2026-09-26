@@ -23,7 +23,7 @@ module Pages
           @currency_sym = (currency || Currency.default).symbol.to_s
           @price_min_amount = price_min_amount
           @price_max_amount = price_max_amount
-          @result_view = Pages::SearchResults::Container::Component.permitted_result_view(result_view)
+          @result_view = SharedBlocks::SearchResults::Container::Component.permitted_result_view(result_view)
           @search_obj_name = search_obj_name
         end
 

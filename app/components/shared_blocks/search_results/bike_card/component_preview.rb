@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-module Pages
+module SharedBlocks
   module SearchResults
     module BikeCard
       class ComponentPreview < ApplicationComponentPreview
         # @param search_all toggle
         # @param organized toggle "An org search, linking each card to its org page - off is the marketplace's"
         def default(search_all: false, organized: true)
-          render_with_template(template: "pages/search_results/bike_card/component_preview/default",
+          render_with_template(template: "shared_blocks/search_results/bike_card/component_preview/default",
             locals: {organization: (organization if organized), search_all:, component_class:,
-                     bikes: Pages::SearchResults::BikeBox::ComponentPreview.vehicles + vehicle_types})
+                     bikes: SharedBlocks::SearchResults::BikeBox::ComponentPreview.vehicles + vehicle_types})
         end
 
         private

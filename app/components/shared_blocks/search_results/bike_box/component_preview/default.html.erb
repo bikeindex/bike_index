@@ -19,15 +19,15 @@
 <% marketplace_listing = MarketplaceListing.for_sale.last %>
 
 <ul class="bike-boxes">
-  <%= render(Pages::SearchResults::BikeBox::Component.new(bike:)) %>
+  <%= render(SharedBlocks::SearchResults::BikeBox::Component.new(bike:)) %>
 
   <% if bike2.present? %>
-    <%= render(Pages::SearchResults::BikeBox::Component.new(bike: bike2)) %>
+    <%= render(SharedBlocks::SearchResults::BikeBox::Component.new(bike: bike2)) %>
   <% end %>
 
   <% if marketplace_listing.present? %>
     <%= render(
-      Pages::SearchResults::BikeBox::Component.new(
+      SharedBlocks::SearchResults::BikeBox::Component.new(
         bike: marketplace_listing.item,
         event_record: marketplace_listing
       )
@@ -35,6 +35,6 @@
   <% end %>
 
   <% if bike3.present? %>
-    <%= render(Pages::SearchResults::BikeBox::Component.new(bike: bike3)) %>
+    <%= render(SharedBlocks::SearchResults::BikeBox::Component.new(bike: bike3)) %>
   <% end %>
 </ul>

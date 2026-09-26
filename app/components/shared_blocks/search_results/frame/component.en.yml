@@ -1,7 +1,7 @@
 ---
 en:
   components:
-    pages:
+    shared_blocks:
       search_results:
         frame:
           fetch_failed: Couldn't load these results — check your connection and try

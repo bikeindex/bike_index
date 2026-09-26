@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Pages
+module SharedBlocks
   module SearchResults
     module BikeCard
       # One vehicle in a search's cards view, per the Bike Thumbnails design doc (1c).

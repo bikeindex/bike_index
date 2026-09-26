@@ -121,7 +121,7 @@ module Pages
           # Only the search page offers the view switcher, so it's the only place cards or rows
           # render - and :table isn't one of Container's, which is what sends it to BikesTable
           def result_component
-            Pages::SearchResults::Container::Component::RESULT_VIEW_COMPONENT[@result_view] if @search_page
+            SharedBlocks::SearchResults::Container::Component::RESULT_VIEW_COMPONENT[@result_view] if @search_page
           end
 
           # The cards and rows have no headers to sort by, so their views name the order

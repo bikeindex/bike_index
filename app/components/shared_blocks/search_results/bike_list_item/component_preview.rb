@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Pages
+module SharedBlocks
   module SearchResults
     module BikeListItem
       class ComponentPreview < BikeCard::ComponentPreview

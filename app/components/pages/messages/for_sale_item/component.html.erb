@@ -1,6 +1,6 @@
 <ul class="bike-boxes">
   <%= render(
-    Pages::SearchResults::BikeBox::Component.new(
+    SharedBlocks::SearchResults::BikeBox::Component.new(
       bike: @vehicle,
       current_user: @current_user,
       skip_cache: true,

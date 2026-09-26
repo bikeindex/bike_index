@@ -5,7 +5,7 @@
 <% end %>
 
 <div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
-  <%= render(Pages::SearchResults::Container::Component.new(result_view: @result_view, bikes: @bikes,
+  <%= render(SharedBlocks::SearchResults::Container::Component.new(result_view: @result_view, bikes: @bikes,
     no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) %>
 </div>
 

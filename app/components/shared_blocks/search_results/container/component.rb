@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Pages
+module SharedBlocks
   module SearchResults
     module Container
       # The marketplace search's results: the chosen view's <ul> of them, or the no-results
@@ -8,8 +8,8 @@ module Pages
       class Component < ApplicationComponent
         # Display order, and the first is what search_result_view falls back to
         RESULT_VIEW_COMPONENT = {
-          cards: Pages::SearchResults::BikeCard::Component,
-          list: Pages::SearchResults::BikeListItem::Component
+          cards: SharedBlocks::SearchResults::BikeCard::Component,
+          list: SharedBlocks::SearchResults::BikeListItem::Component
         }.freeze
 
         def self.permitted_result_view(result_view)

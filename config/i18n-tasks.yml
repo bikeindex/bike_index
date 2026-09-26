@@ -67,7 +67,7 @@ search:
     - ["::I18nTasks::ComponentScanner",
        {paths: ["app/components"], only: ["*.rb", "*.erb"], translate_call: "(?<![\\p{L}_'\\-.])translation",
         scope_overrides: {"pages/search/everything_combobox_options": "components.pages.search.everything_combobox",
-          "pages/search_results/bike_list_item": "components.pages.search_results.bike_card"}}]
+          "shared_blocks/search_results/bike_list_item": "components.shared_blocks.search_results.bike_card"}}]
 
   ## Root directories for relative keys resolution.
   relative_roots:

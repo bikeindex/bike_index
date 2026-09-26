@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::SearchResults::Frame::Component, type: :component do
+RSpec.describe SharedBlocks::SearchResults::Frame::Component, type: :component do
   let(:options) { {frame_id: :test_results_frame, render_results:, current_path: "/search?query=x"} }
   let(:component) { render_inline(described_class.new(**options)) { "<p>the results</p>".html_safe } }
 
