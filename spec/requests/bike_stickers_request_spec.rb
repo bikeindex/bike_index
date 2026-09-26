@@ -19,9 +19,17 @@ RSpec.describe BikeStickersController, type: :request do
           put "#{base_url}/#{bike_sticker.code}", params: {bike_id: bike.id.to_s}
         }.to change(BikeStickerUpdate, :count).by 1
         expect(flash[:success]).to be_present
+        expect(response).to redirect_to(registration_path(bike))
         bike_sticker.reload
         expect(bike_sticker.bike).to eq bike
         expect(bike_sticker.bike_sticker_updates.last.kind).to eq "initial_claim"
+      end
+      context "user opted into the legacy view" do
+        before { current_user.update(feature_registration_show_legacy: true) }
+        it "redirects to the legacy page" do
+          put "#{base_url}/#{bike_sticker.code}", params: {bike_id: bike.id.to_s}
+          expect(response).to redirect_to(bike_path(bike))
+        end
       end
       context "bikeindex url" do
         it "succeeds" do
