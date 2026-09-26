@@ -18,8 +18,11 @@ existing = CSV.parse(manufacturers_csv, headers: true).each_with_object({}) do |
   [row["name"], row["alternate_name"]].compact_blank.each { slugs[Slugifyer.manufacturer(it)] = row["name"] }
 end
 
+# manufacturer_other is typed by whoever registered the bike - print it as short, printable data
+def display(name) = name.gsub(/[^[:print:]]/, "").truncate(60).inspect
+
 groups = counts.group_by { |name, _count| Slugifyer.manufacturer(name) }.except("").map do |slug, pairs|
-  {slug:, count: pairs.sum(&:last), variants: pairs.sort_by { -it.last }.first(4).map(&:first),
+  {slug:, count: pairs.sum(&:last), variants: pairs.sort_by { -it.last }.first(4).map { display(it.first) },
    existing: existing[slug], prefix_of: existing[slug.split("_").first]}
 end.sort_by { -it[:count] }
 
