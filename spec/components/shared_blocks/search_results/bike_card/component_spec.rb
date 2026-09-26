@@ -60,8 +60,9 @@ RSpec.describe SharedBlocks::SearchResults::BikeCard::Component, type: :componen
         address_record: FactoryBot.create(:address_record, :los_angeles, kind: :bike))
     end
 
-    it "renders it for the organization" do
+    it "renders it for the organization, and no status for a bike with its owner" do
       expect(component).to have_text("Los Angeles")
+      expect(component).to have_no_text("Registered")
     end
 
     # The registration address is the owner's home, and nothing on the public page

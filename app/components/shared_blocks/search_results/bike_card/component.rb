@@ -44,10 +44,8 @@ module SharedBlocks
           @for_sale_listing ||= @bike.current_for_sale_marketplace_listing
         end
 
-        # occurred_at is the stolen or impounded date, and nil for a bike with its owner or for sale
-        def status_time
-          @bike.occurred_at || for_sale_listing&.published_at || @bike.created_at
-        end
+        # occurred_at is the stolen or impounded date, and nil for a bike for sale
+        def status_time = @bike.occurred_at || for_sale_listing&.published_at
 
         # Member listings sort ahead of the rest on the marketplace, so the badge says why
         def render_member_badge? = for_sale_listing&.seller_member?
