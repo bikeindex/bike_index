@@ -1,0 +1,93 @@
+<%= helpers.turbo_frame_tag("bikes_table_#{@kind}", src: (src if lazy?), loading: (:lazy if lazy?), target: "_top") do %>
+  <% if lazy? %>
+    <%= render(UI::LoadingSpinner::Component.new) %>
+  <% else %>
+    <% bikes = @bikes %>
+    <%# a local, since UI::Table cell blocks are instance_exec'd %>
+    <% sortable_params = @sortable_params %>
+
+    <% if @kind == "origin" %>
+      <%# TODO: make this actually work %>
+      <%# ["Transferred pre-registration", Ownership.transferred_pre_registration.joins(:bike).merge(matching_bikes).count] %>
+      <% origin_rows = origin_bike_counts + [
+          ["Stolen records", StolenRecord.unscoped.where(created_at: @time_range).joins(:bike).merge(bikes).count],
+          ["Recoveries", StolenRecord.unscoped.where(recovered_at: @time_range).joins(:bike).merge(bikes).count]
+        ] %>
+      <% colors = ORIGIN_COLORS %>
+
+      <%= render(UI::Table::Component.new(records: origin_rows)) do |table| %>
+        <% table.column(label: "Origin") do |(origin)| %>
+          <% if colors.key?(origin) %>
+            <%# Chartkick fills its columns at half opacity and outlines them; the swatch matches %>
+            <span
+              class="d-inline-block mr-1"
+              style="width: .75rem; height: .75rem; border: 1px solid <%= colors[origin] %>; background-color: <%= colors[origin] %>80;"
+            ></span>
+            <%= origin.humanize %>
+            <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_origin: origin)) %>
+          <% else %>
+            <%= origin %>
+          <% end %>
+        <% end %>
+
+        <% table.column(label: "Bikes", classes: "tw:text-right") do |_origin, bike_count| %>
+          <%= number_display(bike_count) %>
+        <% end %>
+      <% end %>
+    <% elsif @kind == "ios_version" %>
+      <%= render(UI::Table::Component.new(records: ios_version_bike_counts)) do |table| %>
+        <% table.column(label: "iOS version") do |(version)| %>
+          <%= version %>
+        <% end %>
+
+        <% table.column(label: "Bikes", classes: "tw:text-right") do |_version, bike_count| %>
+          <%= number_display(bike_count) %>
+        <% end %>
+      <% end %>
+    <% elsif @kind == "pos" %>
+      <%= render(UI::Table::Component.new(records: POS_SEARCH_KINDS)) do |table| %>
+        <% table.column(label: "Kind") do |pos_kind| %>
+          <%= pos_kind.humanize %>
+          <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_pos: pos_kind)) %>
+        <% end %>
+
+        <% table.column(label: "Bikes", classes: "tw:text-right") do |pos_kind| %>
+          <%= number_display(bikes.send(pos_kind).count) %>
+        <% end %>
+      <% end %>
+    <% elsif @kind == "organization" %>
+      <% organization_counts = bikes.group(:creation_organization_id).count.sort_by { |_org_id, bike_count| -bike_count } %>
+      <% organizations = Organization.unscoped.where(id: organization_counts.map(&:first)).index_by(&:id) %>
+      <% organization_rows = organization_counts.map { |org_id, bike_count| [org_id, organizations[org_id], bike_count] } %>
+
+      <%= render(UI::Table::Component.new(records: organization_rows)) do |table| %>
+        <% table.column(label: "Organization") do |org_id, organization| %>
+          <% if organization.present? %>
+            <%= link_to organization.name, admin_bikes_path(sortable_params.merge(organization_id: org_id, render_chart: true)), class: "twlink" %>
+            <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(organization_id: org_id)) %>
+          <% else %>
+            <a
+              class="gray-link"
+              href="<%= admin_bikes_path(sortable_params.merge(organization_id: "false", render_chart: true)) %>"
+              title="(id: <%= org_id %>)"
+            >
+              no organization
+            </a>
+          <% end %>
+        <% end %>
+
+        <% table.column(label: "Kind") do |_org_id, organization| %>
+          <%= organization&.kind&.humanize %>
+        <% end %>
+
+        <% table.column(label: "Integration", header_classes: "tw:font-normal tw:text-xs") do |_org_id, organization| %>
+          <%= organization&.pos_kind&.humanize %>
+        <% end %>
+
+        <% table.column(label: "Bikes", classes: "tw:text-right") do |_org_id, _organization, bike_count| %>
+          <%= number_display(bike_count) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
