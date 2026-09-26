@@ -87,8 +87,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     find("#search-button").click
   end
 
-  # Both halves of the combobox, polled: the form sits outside the results frame, so it
-  # settles after the URL and the card count a back/forward already waited on
+  # The form sits outside the results frame, so it settles after the URL and the card
+  # count a back/forward already waited on
   def expect_primary_activity(record, display_name)
     expect(page).to have_field("primary_activity", with: display_name, wait: 10)
     expect(page).to have_field("primary_activity-hw-hidden-field", with: record.id.to_s, type: "hidden", wait: 10)
@@ -281,11 +281,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # :flaky retry: a programmatic go_forward to a form-submitted (turbo advance)
   # history entry can intermittently no-op in WebDriver (the URL stays on the back
   # entry). It's a harness artifact - a real browser does back/forward reliably -
-  # so retry on CI.
-  #
-  # The form isn't part of that artifact: it settles after both the URL and the card
-  # count, since it sits outside the results frame and comes back with Turbo's
-  # restored snapshot.
+  # so retry on CI. The form's values aren't part of that artifact.
   it "keeps results and the primary_activity form in sync across back/forward", :flaky do
     visit_marketplace_via_nav
     # First 12 on the unfiltered page (the 2 members sort first)

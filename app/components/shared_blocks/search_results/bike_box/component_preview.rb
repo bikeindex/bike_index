@@ -14,8 +14,7 @@ module SharedBlocks
             frame_model: "self titled",
             frame_material: :steel,
             cycle_type: :bike,
-            # Unsaved, so nothing fills this in - and it's the registration date the
-            # cards and rows badge a bike with its owner by
+            # Unsaved, so nothing fills in the registration date the cards badge by
             created_at: 3.years.ago,
             thumb_path:
               "https://files.bikeindex.org/uploads/Pu/395980/small_D3C6B1AF-F1FC-4BAA-BD39-9C107871FCAE.jpeg"

@@ -34,9 +34,8 @@ module SharedBlocks
         # links need - only the feature the previews differ on is set here
         def preview_organization(credibility_badges: false)
           organization = lookbook_organization || Organization.new(name: "Brakebills University", short_name: "Brakebills")
-          slugs = organization.enabled_feature_slugs.to_a - ["credibility_badges"]
-          slugs += ["credibility_badges"] if credibility_badges
-          organization.enabled_feature_slugs = slugs
+          slugs = organization.enabled_feature_slugs.to_a
+          organization.enabled_feature_slugs = credibility_badges ? slugs | ["credibility_badges"] : slugs - ["credibility_badges"]
           organization
         end
 

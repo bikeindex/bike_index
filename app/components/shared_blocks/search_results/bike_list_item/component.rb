@@ -62,8 +62,8 @@ module SharedBlocks
         end
 
         # occurred_at is the stolen or impounded date, and nil for a bike with its owner
-        # or for sale. The badge renders either way; how long a bike has been registered
-        # is what vouches for it, so that date is the credibility feature's
+        # or for sale. How long a bike has been registered is what vouches for it, so that
+        # date is the credibility feature's
         def status_time
           @bike.occurred_at || for_sale_listing&.published_at || (@bike.created_at if credibility_badges?)
         end
