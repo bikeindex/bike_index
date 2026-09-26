@@ -135,7 +135,7 @@ RSpec.describe StripeEvent, type: :model do
           # No cassette, so any Stripe request would raise
           expect do
             StripeEvent.create_from(Stripe::Event.construct_from(webhook_payload)).update_bike_index_record!
-          end.to change(Payment, :count).by(0)
+          end.not_to change(Payment, :count)
           expect(stripe_event.reload.processed_at).to eq processed_at
         end
       end
