@@ -54,8 +54,7 @@ module UI
       # unless focus is restated under the variant.
       FOCUS_CLASSES = "tw:focus:outline-none tw:focus:ring-3 tw:is-active:focus:ring-3"
 
-      # Focus and disabled reach link color too — only the sizing and weight are
-      # button-shaped
+      # Focus and disabled reach link color too — only SIZES is button-shaped
       def self.build_classes(color:, size:, html_class: nil)
         extras = [FOCUS_CLASSES, DISABLED_CLASSES]
         extras += [SIZES[size], "tw:no-underline"] unless color == :link
