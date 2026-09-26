@@ -4,6 +4,7 @@ module Pages
   module MyAccount
     module Show
       module BikeBox
+        # @display legacy_stylesheet true
         class ComponentPreview < ApplicationComponentPreview
           # @!group Registrations
           def stolen
