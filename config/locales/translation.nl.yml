@@ -2261,6 +2261,8 @@ nl:
     register:
       acknowledge:
         acknowledge_everything: Vink alle vakjes aan om akkoord te gaan met deze regels.
+        safety_rules_updated: De veiligheidsvoorschriften zijn bijgewerkt — lees ze
+          alstublieft nog eens door.
       confirm_email:
         confirmation_link_expired: Die bevestigingslink is verlopen. Controleer je
           e-mail voor een nieuwe link.

@@ -2550,6 +2550,8 @@ it:
     register:
       acknowledge:
         acknowledge_everything: Seleziona tutte le caselle per accettare queste regole
+        safety_rules_updated: 'Le norme di sicurezza sono state aggiornate: si prega
+          di consultarle nuovamente.'
       confirm_email:
         confirmation_link_expired: 'Quel link di conferma è scaduto: controlla la
           tua email per trovarne uno nuovo.'
