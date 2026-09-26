@@ -1415,12 +1415,15 @@ RSpec.describe RegisterController, type: :request do
       # Step 2 creates the bike, but hands off to the first safety page rather than finishing
       expect {
         patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-      }.to change(Bike, :count).by 1
+      }.to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
       expect(response).to redirect_to step_path("3")
       bike = Bike.last
       expect(b_param.reload.created_bike_id).to eq bike.id
       expect(b_param.acknowledgment_pending?).to be_truthy
+      expect(bike.unfinished_registration?).to be_truthy
       expect(BParam.unfinished_registrations.pluck(:id)).to eq([b_param.id])
+      # The finished registration email waits on the rules
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
 
       # The steps the bike was created from are closed
       get step_path("2")
@@ -1443,7 +1446,7 @@ RSpec.describe RegisterController, type: :request do
       get step_path("4")
       expect(response).to redirect_to step_path("3")
 
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "3",
                                                 acknowledged: {"0" => "1", "1" => "1"}}
       expect(response).to redirect_to step_path("4")
       expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([battery_page.id])
@@ -1454,7 +1457,7 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include organization.short_name
 
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "4",
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "4",
                                                   acknowledged: {"0" => "1"}}
       }.to_not change(Bike, :count)
       expect(response).to redirect_to step_path("review")
@@ -1473,12 +1476,15 @@ RSpec.describe RegisterController, type: :request do
 
       # The acknowledgment is what finishes the registration
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
-      }.to change(RegistrationSequenceAcknowledgment, :count).by 1
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "review", acknowledged_all: "1"}
+      }.to change(RegistrationSequenceAcknowledgment.acknowledged, :count).by 1
+      expect(RegistrationSequenceAcknowledgment.count).to eq 1
       expect(Bike.count).to eq 1
       expect(response).to redirect_to step_path("finished")
       expect(b_param.reload.acknowledgment_pending?).to be_falsey
       expect(BParam.unfinished_registrations.pluck(:id)).to eq([])
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+      expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])
 
       follow_redirect!
       expect(response.body).to include "<title>Your e-scooter registration</title>"
@@ -1493,38 +1499,98 @@ RSpec.describe RegisterController, type: :request do
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
 
+    it "leaves nothing pending when the bike isn't created" do
+      expect {
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.except(:primary_frame_color_id)}
+      }.to_not change(RegistrationSequenceAcknowledgment, :count)
+      expect(Bike.count).to eq 0
+      expect(response).to redirect_to step_path("2")
+      expect(b_param.reload.acknowledgment_pending?).to be_falsey
+    end
+
     it "claims a registrant who signed in partway through the safety pages" do
       # As if the details had gone in before there was an account to attribute them to
       b_param.update(params: b_param.params.deep_merge("details_completed" => true, "bike" => bike_details.as_json))
 
       sequence.registration_sequence_pages.each_with_index do |page, index|
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: (index + 3).to_s,
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: (index + 3).to_s,
                                                   acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
       end
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "review", acknowledged_all: "1"}
       }.to change(Bike, :count).by 1
       expect(Bike.last.creator_id).to eq current_user.id
     end
 
+    context "with a newer version activated partway through" do
+      let(:new_sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:, acknowledgment_text: "the new rules") }
+      let(:new_pages) { new_sequence.registration_sequence_pages.to_a }
+      before do
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                  step: "3", acknowledged: {"0" => "1", "1" => "1"}}
+        new_sequence.make_active!
+        expect(sequence.reload.archived?).to be_truthy
+      end
+
+      it "finishes on the version they started" do
+        get step_path("4")
+        expect(response.body).to include "Campus rules"
+
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                  step: "4", acknowledged: {"0" => "1"}}
+        expect(response).to redirect_to step_path("review")
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                  step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to step_path("finished")
+        expect(RegistrationSequenceAcknowledgment.sole).to have_attributes(registration_sequence_id: sequence.id,
+          bike_id: b_param.reload.created_bike_id)
+        expect(RegistrationSequenceAcknowledgment.sole.acknowledged?).to be_truthy
+      end
+
+      it "starts the newer version over when resumed from a link" do
+        get register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to step_path("3")
+        expect(flash[:notice]).to eq "The safety rules have been updated since you started — please review them again"
+        expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
+        expect(BikeServices::Register.registration_sequence(b_param)&.id).to eq new_sequence.id
+
+        # A page left open from the old version doesn't count toward the new one
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                  step: "4", acknowledged: {"0" => "1"}}
+        expect(response).to redirect_to step_path("3")
+        expect(flash[:notice]).to eq "The safety rules have been updated — please review them again"
+        expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
+
+        new_pages.each_with_index do |page, index|
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: new_sequence.id,
+                                                    step: (index + 3).to_s, acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
+        end
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: new_sequence.id,
+                                                  step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to step_path("finished")
+        expect(RegistrationSequenceAcknowledgment.sole.registration_sequence_id).to eq new_sequence.id
+      end
+    end
+
     it "advances one page at a time, even once the later ones are acknowledged" do
       patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "3",
                                                 acknowledged: {"0" => "1", "1" => "1"}}
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "4",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "4",
                                                 acknowledged: {"0" => "1"}}
       expect(response).to redirect_to step_path("review")
 
       # Revisiting the first page from the review and continuing walks forward
       # through the rest, rather than jumping straight back to the end
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "3",
                                                 acknowledged: {"0" => "1", "1" => "1"}}
       expect(response).to redirect_to step_path("4")
     end
 
     it "refuses a page with a rule left unchecked" do
       patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "3",
                                                 acknowledged: {"0" => "1"}}
       expect(flash[:error]).to be_present
       expect(response).to redirect_to step_path("3")
@@ -1534,7 +1600,7 @@ RSpec.describe RegisterController, type: :request do
     it "refuses an acknowledgment that skipped the pages" do
       patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "review", acknowledged_all: "1"}
       }.to_not change(Bike, :count)
       # The review isn't reachable yet, so this lands back on the first page
       expect(response).to redirect_to step_path("3")
@@ -1574,14 +1640,14 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to step_path("3")
 
       sequence.registration_sequence_pages.each_with_index do |page, index|
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token,
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
                                                   step: (index + 3).to_s,
                                                   acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
       end
       expect(response).to redirect_to step_path("review")
 
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "review", acknowledged_all: "1"}
       }.to_not change(Bike, :count)
       expect(response).to redirect_to step_path("finished")
       follow_redirect!

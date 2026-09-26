@@ -473,7 +473,7 @@ class Bike < ApplicationRecord
   end
 
   # The register flow creates the bike ahead of its organization's safety rules
-  def unfinished_registration? = b_params.acknowledgment_pending.exists?
+  def unfinished_registration? = persisted? && RegistrationSequenceAcknowledgment.pending.exists?(bike_id: id)
 
   def current_parking_notification
     parking_notifications.current.first

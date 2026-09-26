@@ -15,6 +15,8 @@ class RegisterController < ApplicationController
   # confirm renders a self-posting form and nothing else, so it reads neither
   before_action :assign_organization, except: %i[new confirm]
   before_action :find_registration_sequence, except: %i[new confirm]
+  # The emailed and alert links have no step, so this is resuming rather than moving through the flow
+  before_action :restart_replaced_sequence, only: %i[show], if: -> { params[:step].blank? }
   before_action :redirect_finished, only: %i[create update report acknowledge]
   before_action :redirect_bike_created, only: %i[create update]
   # The step shown is server state - a cached page could show one the registration is past
@@ -127,6 +129,12 @@ class RegisterController < ApplicationController
 
   # Each acknowledgment page posts here, and the review's final acknowledgment
   def acknowledge
+    # What was read can have been replaced since - by a newer version, or a restart in another tab
+    if params[:registration_sequence_id].to_s != @registration_sequence&.id.to_s
+      flash[:notice] = translation(:safety_rules_updated)
+      return redirect_to_current_step
+    end
+
     steps = flow_steps
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
     acknowledged = BikeServices::Register.acknowledge_step(@b_param, step,
@@ -236,6 +244,13 @@ class RegisterController < ApplicationController
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
 
+  def restart_replaced_sequence
+    return unless BikeServices::Register.restart_replaced_sequence(@b_param, sequence: @registration_sequence)
+
+    flash[:notice] = translation(:safety_rules_updated)
+    find_registration_sequence
+  end
+
   # Read at render time rather than in a filter: the submissions save first, and where
   # the report sits depends on what they saved
   def flow_steps
@@ -255,11 +270,11 @@ class RegisterController < ApplicationController
   # than only a not-found. start_params is what carries an organization across that.
   # build: only step 1's submission, which carries everything a registration needs
   def find_b_param(build: false)
-    @b_param = BikeServices::Register.find_token(params_token: params[:b_param_token],
+    @b_param, sign_in_to_resume = BikeServices::Register.resume(params_token: params[:b_param_token],
       session_token: session[:register_b_param_token], user: current_user)
     @b_param ||= BikeServices::Register.b_param_for(user: current_user) if build
     if @b_param.blank?
-      if BikeServices::Register.sign_in_to_resume?(params[:b_param_token], user: current_user)
+      if sign_in_to_resume
         # A submission's token is in its body, and its path has no GET to come back to
         store_return_to(register_path(b_param_token: params[:b_param_token], step: params[:step]))
         return authenticate_user(translation_key: :sign_in_to_continue_registration, flash_type: :notice)

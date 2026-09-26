@@ -90,15 +90,15 @@ RSpec.describe BikeServices::Register do
     let(:creator) { FactoryBot.create(:user_confirmed) }
     let(:b_param) do
       BParam.create(origin: "register_flow", creator_id: creator.id, created_bike_id: FactoryBot.create(:bike).id,
-        params: {bike: bike_params, acknowledgment_pending: true}.as_json)
+        params: {bike: bike_params}.as_json)
     end
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:) }
 
     it "only resumes a bike's registration for its creator until the safety rules are agreed to" do
-      expect(described_class.find_token(params_token: b_param.id_token, user: nil)).to be_nil
-      expect(described_class.sign_in_to_resume?(b_param.id_token, user: nil)).to be_truthy
+      expect(described_class.resume(params_token: b_param.id_token, user: nil)).to eq([nil, true])
       expect(described_class.find_token(params_token: b_param.id_token, user: creator)&.id).to eq b_param.id
 
-      b_param.update(params: b_param.params.except("acknowledgment_pending"))
+      acknowledgment.update(acknowledged_at: Time.current)
       expect(described_class.find_token(params_token: b_param.id_token, user: nil)&.id).to eq b_param.id
     end
   end
@@ -127,6 +127,19 @@ RSpec.describe BikeServices::Register do
       it "keeps it - the email promises the address it can still finish that registration" do
         expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-1)
         expect(BParam.pluck(:id)).to match_array([middle.id, most_recent.id])
+      end
+    end
+
+    context "with a more recent one owing the safety rules" do
+      let!(:pending) do
+        FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: FactoryBot.create(:bike).id)
+          .tap { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: it) }
+      end
+
+      it "keeps it, and the most recent without a bike" do
+        expect(BParam.unfinished_registrations.reorder(updated_at: :desc).first.id).to eq pending.id
+        expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-2)
+        expect(BParam.pluck(:id)).to match_array([most_recent.id, pending.id])
       end
     end
   end
@@ -601,6 +614,34 @@ RSpec.describe BikeServices::Register do
         it "is nil - a draft isn't shown to registrants" do
           expect(sequence).to be_draft
           expect(described_class.registration_sequence(b_param)).to be_nil
+        end
+      end
+
+      context "with a page acknowledged, then a newer version activated" do
+        let(:new_sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+        before do
+          described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
+          new_sequence.make_active!
+        end
+
+        it "stays on the version being agreed to, until restarted on the newer one" do
+          started = described_class.registration_sequence(b_param)
+          expect(started).to eq sequence
+          expect(described_class.restart_replaced_sequence(b_param, sequence: started)).to be_truthy
+          expect(described_class.acknowledged_page_ids(b_param)).to eq([])
+          expect(described_class.registration_sequence(b_param)).to eq new_sequence
+          expect(described_class.restart_replaced_sequence(b_param, sequence: new_sequence)).to be_falsey
+        end
+
+        context "already agreed to" do
+          before { described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1") }
+
+          it "isn't restarted" do
+            started = described_class.registration_sequence(b_param)
+            expect(started.archived?).to be_truthy
+            expect(described_class.restart_replaced_sequence(b_param, sequence: started)).to be_falsey
+            expect(described_class.registration_sequence(b_param)).to eq sequence
+          end
         end
       end
     end
