@@ -13,10 +13,7 @@ class RegistrationsController < ApplicationController
     @bike = Bike.unscoped.find_id(params[:id])
     fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
 
-    # no_redesign so the classic page doesn't bounce them straight back here
-    unless registration_redesign_enabled?
-      redirect_to(bike_path(@bike, request.query_parameters.merge(no_redesign: true))) && return
-    end
+    redirect_to(bike_path(@bike, request.query_parameters)) && return unless registration_redesign_enabled?
 
     requested_view = view_from_param(params[:view_as])
     available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
@@ -40,7 +37,7 @@ class RegistrationsController < ApplicationController
     bike = Bike.unscoped.find_id(params[:id])
     show_legacy = !registration_show_legacy?
     if current_user.blank?
-      session[:registration_show_legacy] = show_legacy
+      show_legacy ? session[:registration_show_legacy] = true : session.delete(:registration_show_legacy)
     elsif !current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
       # Unrelated validations (e.g. a preferred_language no longer available) can block
       # the update, so return to the view they came from rather than bouncing them

@@ -719,7 +719,7 @@ RSpec.describe "BikesController#show", type: :request do
 
     it "sends the redesigned page back to the classic one, params and all" do
       get "/registrations/#{bike.id}?scanned_id=XD8888"
-      expect(response).to redirect_to(bike_path(bike, scanned_id: "XD8888", no_redesign: true))
+      expect(response).to redirect_to(bike_path(bike, scanned_id: "XD8888"))
     end
   end
 

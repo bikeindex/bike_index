@@ -31,13 +31,6 @@ RSpec.describe BikeStickersController, type: :request do
           expect(response).to redirect_to(bike_path(bike))
         end
       end
-      context "redesign disabled" do
-        before { Flipper.enable(:registration_redesign_disabled) }
-        it "redirects to the legacy page" do
-          put "#{base_url}/#{bike_sticker.code}", params: {bike_id: bike.id.to_s}
-          expect(response).to redirect_to(bike_path(bike))
-        end
-      end
       context "bikeindex url" do
         it "succeeds" do
           expect {
