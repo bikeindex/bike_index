@@ -1162,6 +1162,29 @@ RSpec.describe RegisterController, type: :request do
           expect(Bike.last.organizations.pluck(:id)).to eq([])
         end
 
+        # The sequence is resolved in a filter, before the checkbox drops the organization
+        context "with an e-vehicle sequence, unchecked" do
+          let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+          let(:b_param) do
+            BParam.create(origin: "register_flow", creator_id: current_user.id,
+              params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter",
+                              creation_organization_id: organization.id},
+                       auto_organization_id: organization.id}.as_json)
+          end
+
+          it "owes nothing to the organization it just dropped" do
+            expect {
+              patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+            }.to_not change(RegistrationSequenceAcknowledgment, :count)
+            expect(b_param.reload.creation_organization_id).to be_blank
+            expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+            expect(Bike.last.unfinished_registration?).to be_falsey
+            # Nothing holding it back, so it goes out rather than waiting on rules nobody owes
+            ActionMailer::Base.deliveries = []
+            expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+          end
+        end
+
         it "keeps offering it after it's dropped, so it can be taken back" do
           patch base_url, params: {b_param_token: b_param.id_token,
                                    bike: bike_details.merge(user_name: " ")}
