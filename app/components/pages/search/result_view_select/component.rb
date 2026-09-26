@@ -4,8 +4,10 @@ module Pages
   module Search
     module ResultViewSelect
       class Component < ApplicationComponent
+        VIEW_ICONS = {cards: "icons/image.svg", list: "icons/list.svg"}.freeze
+
         def initialize(result_view: nil)
-          @selected_result_view = Pages::SearchResults::Container::Component.permitted_result_view(result_view)
+          @selected_result_view = SharedBlocks::SearchResults::Container::Component.permitted_result_view(result_view)
         end
 
         def call
@@ -23,9 +25,17 @@ module Pages
         private
 
         def view_entries
-          [[:bike_box, "icons/list.svg", translation(".bike_box_view")],
-            [:thumbnail, "icons/image.svg", translation(".thumbnail_view")]]
-            .map { |value, icon, label| {value:, label: icon_label(icon, label)} }
+          SharedBlocks::SearchResults::Container::Component::RESULT_VIEW_COMPONENT.keys.map do |view|
+            {value: view, label: icon_label(VIEW_ICONS.fetch(view), view_label(view))}
+          end
+        end
+
+        # A literal key per branch, so i18n-tasks resolves them
+        def view_label(view)
+          case view
+          when :cards then translation(".cards_view")
+          when :list then translation(".list_view")
+          end
         end
 
         # The chip is icon-only, so title carries the hint a visible label would - but not

@@ -106,6 +106,8 @@ class RegisterController < ApplicationController
 
   def update
     saved = save_details
+    # Re-read: the "register with" checkbox can have dropped the organization it belongs to
+    find_registration_sequence
     # Saved either way, so the re-render has everything they entered
     unless saved
       return render(Pages::Register::Step2::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
@@ -259,7 +261,8 @@ class RegisterController < ApplicationController
       user: current_user, passive_organization:)
   end
 
-  # Resolved once - the step math, the progress bar and the pages themselves all read it
+  # Resolved in a filter rather than per read - the step math, the progress bar and the pages
+  # themselves all ask for it
   def find_registration_sequence
     @registration_sequence = register_flow_sequence(@b_param)
   end

@@ -215,12 +215,6 @@ module BikeServices
       details_completed?(b_param) && acknowledged?(b_param, sequence:) && !creator_available?(b_param)
     end
 
-    # The bike is created before the safety rules, which the registration still has to agree
-    # to - unless the sequence has since gone, leaving nothing to agree to
-    def acknowledgment_owed?(b_param, sequence:)
-      b_param.acknowledgment_pending? && sequence_pages(sequence).any?
-    end
-
     def editable_step?(b_param, step) = !b_param.with_bike? || VEHICLE_STEPS.exclude?(step)
 
     # user: being signed in as the address settles it, without any link being clicked
@@ -407,6 +401,12 @@ module BikeServices
       b_param.update(creator_id: user.id)
     end
 
+    # The bike is created before the safety rules, which the registration still has to agree
+    # to - unless the sequence has since gone, leaving nothing to agree to
+    def acknowledgment_owed?(b_param, sequence:)
+      b_param.acknowledgment_pending? && sequence_pages(sequence).any?
+    end
+
     def create_bike_if_ready(b_param, sequence:, ip_address:)
       return nil if !creator_available?(b_param) || !details_completed?(b_param) ||
         !report_completed?(b_param)
@@ -586,7 +586,7 @@ module BikeServices
     end
 
     conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
-      :claim_creator, :create_bike_if_ready, :create_bike,
+      :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,

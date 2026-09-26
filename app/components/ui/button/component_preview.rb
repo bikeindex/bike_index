@@ -83,6 +83,19 @@ module UI
         render(UI::Button::Component.new(text: "Purple Disabled", color: :purple, disabled: true))
       end
 
+      # Blue on the brand yellow, the landing pages' call to action
+      def yellow
+        render(UI::Button::Component.new(text: "Yellow", color: :yellow))
+      end
+
+      def yellow_active
+        render(UI::Button::Component.new(text: "Yellow Active", color: :yellow, active: true))
+      end
+
+      def yellow_disabled
+        render(UI::Button::Component.new(text: "Yellow Disabled", color: :yellow, disabled: true))
+      end
+
       # @!endgroup
 
       # @!group Sizes
@@ -96,6 +109,11 @@ module UI
 
       def large
         render(UI::Button::Component.new(text: "Large", size: :lg))
+      end
+
+      # The pill for a page's main call to action
+      def callout
+        render(UI::Button::Component.new(text: "Callout", color: :yellow, size: :callout))
       end
 
       def large_with_icon

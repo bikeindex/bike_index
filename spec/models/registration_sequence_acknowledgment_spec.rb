@@ -71,6 +71,37 @@ RSpec.describe RegistrationSequenceAcknowledgment, type: :model do
     end
   end
 
+  describe "the held email" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership) }
+    let!(:pending) do
+      FactoryBot.create(:registration_sequence_acknowledgment_pending, registration_sequence: sequence,
+        b_param:, bike:)
+    end
+    let(:initial_ownership) { bike.ownerships.initial.first }
+    let(:enqueued) { EmailJobs::OwnershipInvitationJob.jobs.map { it["args"] } }
+
+    it "releases to the ownership it was held for, not whoever owns it now" do
+      BikeServices::OwnershipTransferer.find_or_create(bike, updator: nil, new_owner_email: "new@example.com")
+
+      Sidekiq::Job.clear_all
+      expect(described_class.acknowledge(b_param, sequence:)).to be_truthy
+      expect(enqueued).to eq([[initial_ownership.id]])
+    end
+
+    it "releases it when the rules are given up on instead" do
+      Sidekiq::Job.clear_all
+      expect { pending.abandon! }.to change(described_class, :count).by(-1)
+      expect(enqueued).to eq([[initial_ownership.id]])
+    end
+
+    # A blanket release on save would send it before the rules were ever agreed to
+    it "stays held through a write that isn't the agreement" do
+      Sidekiq::Job.clear_all
+      pending.update(owner_email: "elsewhere@example.com")
+      expect(enqueued).to eq([])
+    end
+  end
+
   describe "the organization being destroyed" do
     let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment, b_param:, registration_sequence: sequence) }
 

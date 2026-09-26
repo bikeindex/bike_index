@@ -89,6 +89,8 @@ git diff origin/<base> -- app/ lib/ config/   # then account for every file list
 
 Every differing file must be explainable as *this branch's work* (or a sibling branch you're intentionally stacked on). Anything else is a resurrection or a stray. For a file that's mostly wrong, don't hand-patch hunks — `git checkout origin/<base> -- <file>` and re-apply your change on top.
 
+**Reverting a file to the base's version *before* you've merged that base takes whatever the base has gained since** — commits your branch doesn't have, landing in your diff as your own work, and breaking against the code around them. `git checkout $(git merge-base origin/main HEAD) -- <file>` is the version your branch actually forked from.
+
 **Resolving two files to opposite sides breaks the interface between them**, and neither looks wrong on its own. Taking the base's version of a component while the helper that calls it auto-merges keeping your argument is an unknown-keyword error on every render, past an audit that reports both files as expected. Whenever you reset a file that has callers, grep the arguments you dropped: `git grep -n '<kwarg>' -- app` should come back empty, or only where the base still accepts it.
 
 What it catches:

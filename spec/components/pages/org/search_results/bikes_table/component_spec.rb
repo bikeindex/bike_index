@@ -43,12 +43,11 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component).not_to have_css("th a")
   end
 
-  context "with a hidden-serial bike and an authorized org member" do
-    let(:current_user) { FactoryBot.create(:organization_role_claimed, organization:).user }
-    let(:options) { super().merge(current_user:) }
+  # The organization rather than the viewer, so every member reads the one cached row
+  context "with a hidden-serial bike registered with the organization" do
     let(:bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization).reload }
 
-    it "passes the current user through so the hidden serial is revealed" do
+    it "reveals the serial to the organization" do
       expect(bike.serial_hidden?).to be_truthy
       expect(component).to have_css(".serial_number_cell .serial-span", text: bike.serial_number.upcase)
       expect(component).to have_no_css(".serial_number_cell", text: "Hidden")
@@ -157,6 +156,21 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     it "renders the impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
     end
+
+    # The org's own display_id, which is what its impound records index and their URLs
+    # use - not the global record id
+    context "with an impounded bike" do
+      let!(:impound_record) do
+        FactoryBot.create(:impound_record_with_organization, organization:, bike:)
+      end
+
+      it "renders the impound record's display_id" do
+        expect(bike.reload.status_impounded?).to be true
+        expect(impound_record.reload.display_id).to be_present
+        expect(impound_record.display_id).to_not eq impound_record.id.to_s
+        expect(component.css("td.impound_id_cell").text.strip).to eq impound_record.display_id
+      end
+    end
   end
 
   context "when a bike does not belong to the organization" do
@@ -185,5 +199,22 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   end
 
   let(:cached_record) { bike }
-  it_behaves_like("cached_table_rows") { let(:row_cache_key) { "org-#{organization.id}-#{described_class.cache_digest}" } }
+  it_behaves_like "cached_table_rows"
+
+  # Which columns render follows the organization's features and fields
+  context "with caching", :caching do
+    include_context :caching_basic
+
+    def render_table
+      with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options)) }
+    end
+
+    it "keys each row to the organization's version" do
+      expect(fragments_written { render_table }.first).to include(organization.cache_key_with_version)
+      expect(fragments_written { render_table }).to eq([])
+
+      organization.update(name: "Renamed org")
+      expect(fragments_written { render_table }.count).to eq 1
+    end
+  end
 end
