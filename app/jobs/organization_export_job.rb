@@ -1,6 +1,7 @@
 class OrganizationExportJob < ApplicationJob
   LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
   MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation student_id].freeze
+  ADDRESS_KEYS = {"address" => "street", "address_2" => "street_2", "city" => "city", "state" => "state", "zipcode" => "zipcode"}.freeze
 
   sidekiq_options retry: false, queue: "med_priority"
 
@@ -39,22 +40,7 @@ class OrganizationExportJob < ApplicationJob
     axlsx_package = Axlsx::Package.new
     axlsx_package.workbook.add_worksheet(name: "Basic Worksheet") do |sheet|
       sheet.add_row(export_headers)
-      row_index = 0
-      @export.bikes_scoped.find_each(batch_size: 100) do |bike|
-        check_export_ebrake(row_index) # Run first thing in case it's already broken
-        next unless export_bike?(bike)
-
-        row_index += 1
-        sheet.add_row(bike_to_row(bike))
-      end
-      @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
-        check_export_ebrake(row_index) # Run first thing in case it's already broken
-        next unless export_bike?(b_param)
-
-        row_index += 1
-        sheet.add_row(b_param_to_row(b_param))
-      end
-      @export.rows = row_index
+      @export.rows = each_row { |row| sheet.add_row(row) }
     end
     return if @export_ebraked
 
@@ -66,22 +52,23 @@ class OrganizationExportJob < ApplicationJob
   def write_csv(file)
     require "csv"
     file.write(comma_wrapped_string(export_headers))
-    row_index = 0
-    @export.bikes_scoped.find_each(batch_size: 100) do |bike|
-      check_export_ebrake(row_index) # Run first thing in case it's already broken
-      next unless export_bike?(bike)
-
-      row_index += 1
-      file.write(comma_wrapped_string(bike_to_row(bike)))
-    end
-    @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
-      check_export_ebrake(row_index) # Run first thing in case it's already broken
-      next unless export_bike?(b_param)
-
-      row_index += 1
-      file.write(comma_wrapped_string(b_param_to_row(b_param)))
-    end
+    each_row { |row| file.write(comma_wrapped_string(row)) }
     true
+  end
+
+  # Yields each exported row, returns the row count
+  def each_row
+    row_index = 0
+    [@export.bikes_scoped, @export.incompletes_scoped].each do |scope|
+      scope.find_each(batch_size: 100) do |bike_or_b_param|
+        check_export_ebrake(row_index) # Run first thing in case it's already broken
+        next unless export_bike?(bike_or_b_param)
+
+        row_index += 1
+        yield(bike_or_b_param.is_a?(Bike) ? bike_to_row(bike_or_b_param) : b_param_to_row(bike_or_b_param))
+      end
+    end
+    row_index
   end
 
   def comma_wrapped_string(array)
@@ -108,12 +95,12 @@ class OrganizationExportJob < ApplicationJob
   end
 
   def b_param_to_row(b_param)
-    address = export_headers.include?("address") ? b_param.address_record.address_hash_legacy : {}
+    address = b_param.address_record.address_hash_legacy if export_headers.include?("address")
     export_headers.map do |header|
       case header
       when "registered_at", "manufacturer", "is_stolen", "is_impounded", "motorized", "owner_email", "phone",
-        "organization_affiliation", "student_id"
-        value_for_header(header, b_param)
+        "organization_affiliation", "student_id", "vehicle_type", *ADDRESS_KEYS.keys
+        value_for_header(header, b_param, address:)
       when "model" then b_param.bike["frame_model"]
       when "serial" then b_param.bike["serial_number"]
       when "extra_registration_number" then b_param.bike["extra_registration_number"]
@@ -124,10 +111,6 @@ class OrganizationExportJob < ApplicationJob
         }.compact.join(", ")
       when "owner_name" then b_param.user_name
       when "bike_sticker" then b_param.bike_sticker_code
-      when "address" then address["street"]
-      when "address_2" then address["street_2"]
-      when "city", "state", "zipcode" then address[header]
-      when "vehicle_type" then CycleType.slug_translation_short(b_param.cycle_type)
       when "partial_registration" then true
       end
     end
@@ -139,7 +122,7 @@ class OrganizationExportJob < ApplicationJob
     @export_headers = @export.headers
     if @export_headers.include?("address")
       # Remove address and re-add, because we want to keep them in line
-      @export_headers = (@export_headers - ["address"]) + %w[address address_2 city state zipcode]
+      @export_headers = (@export_headers - ["address"]) + ADDRESS_KEYS.keys
     end
     # If there are partial registrations, always include partial_registration
     if @export.partial_registrations.present? && @export_headers.exclude?("partial_registration")
@@ -154,8 +137,10 @@ class OrganizationExportJob < ApplicationJob
     @export_headers
   end
 
-  def value_for_header(header, bike)
+  # b_params pass their address; bikes read registration_address
+  def value_for_header(header, bike, address: nil)
     return bike.send(header) if MATCHING_KEYS.include?(header)
+    return (address || bike.registration_address)[ADDRESS_KEYS[header]] if ADDRESS_KEYS.key?(header)
 
     case header
     when "link" then LINK_BASE + bike.id.to_s
@@ -169,11 +154,6 @@ class OrganizationExportJob < ApplicationJob
     when "is_stolen" then bike.status_stolen? ? "true" : nil
     when "is_impounded" then bike.status_impounded? ? "true" : nil
     when "impounded_at" then bike.current_impound_record&.impounded_at&.utc
-    when "address" then bike.registration_address["street"] # These are the expanded values for bike registration address
-    when "address_2" then bike.registration_address["street_2"]
-    when "city" then bike.registration_address["city"]
-    when "state" then bike.registration_address["state"]
-    when "zipcode" then bike.registration_address["zipcode"]
     when "bike_sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
     when "vehicle_type" then bike.type_titleize
