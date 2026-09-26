@@ -18,8 +18,8 @@ def shared_root
 end
 
 FileUtils.chdir APP_ROOT do
-  # Untracked state too big or too stateful to duplicate comes from the root
-  # checkout rather than being rebuilt per workspace
+  # Untracked state too stateful to duplicate comes from the root checkout rather
+  # than being rebuilt per workspace
   if (root = shared_root)
     puts "== Setting up workspace against #{root} =="
 
@@ -78,10 +78,10 @@ FileUtils.chdir APP_ROOT do
 
   npm_install = spawn("npm install")
 
-  # One boot for every task. The layout needs tailwind.css and emails (which seeding
-  # sends) need email.css; without the build Sprockets tries compiling email.scss with sassc
+  # The layout needs tailwind.css and emails (which seeding sends) need email.css; without
+  # the build Sprockets tries compiling email.scss with sassc
   puts "\n== Preparing database, building stylesheets, clearing logs =="
-  system!({"ANNOTATERB_SKIP_ON_DB_TASKS" => "1"}, "bin/rails db:prepare tailwindcss:build dartsass:build log:clear")
+  system! "bin/rails db:prepare tailwindcss:build dartsass:build log:clear"
   Process.wait(npm_install)
 
   unless without_seeds
