@@ -339,12 +339,11 @@ module BikeServices
     # Whether a bike registered some other way is this registration's. Step 1 says only
     # what it is, so any bike of that make and type is; whatever came after has to match too
     def matches_bike?(b_param, bike)
-      bike_attrs = b_param.safe_bike_attrs({}).slice(*MATCH_INPUTS)
-      # The one taken as submitted rather than off a reader that guards it - a cycle_type
-      # Bike's enum doesn't have (and raises assigning) is one no bike has either
-      return false if bike_attrs["cycle_type"].present? && !Bike.cycle_types.key?(bike_attrs["cycle_type"])
-
-      built = Bike.new(bike_attrs)
+      built = begin
+        Bike.new(b_param.safe_bike_attrs({}).slice(*MATCH_INPUTS))
+      rescue ArgumentError # an enum value no bike could have, so none matches
+        return false
+      end
       built.set_calculated_unassociated_attributes
       attrs = %w[owner_email mnfg_name cycle_type] + MATCHED_ATTRS.filter_map { |key, attr| attr if b_param.bike[key].present? }
       built.slice(*attrs) == bike.slice(*attrs)
