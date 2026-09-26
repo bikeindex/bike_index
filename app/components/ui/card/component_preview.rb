@@ -17,7 +17,8 @@ module UI
       end
 
       # The template supplies the .twwiderow full_bleed is keyed to. Narrow the preview until
-      # the row drops to one column to see the cards lose their sides and meet the gutter
+      # the rows drop to one column to see the cards lose their sides and meet the gutter -
+      # the three-column row goes 2+1 first
       def full_bleed
         {template: "ui/card/component_preview/full_bleed"}
       end
