@@ -25,7 +25,8 @@
 
     <div class="bike-information multi-attr-lists">
       <h5 class="title-link">
-        <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :inherit)) %>
+        <%# Pulled left by the badge's padding and border, so its text lines up with the rows below %>
+        <span class="tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :inherit)) %></span>
         <%= link_to helpers.bike_title_html(@bike), bike_path(@bike), class: "tw:inline" %>
       </h5>
 
