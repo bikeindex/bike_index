@@ -1,6 +1,11 @@
 <li class="bike-box-item tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800">
+  <%#
+    The row wraps, so the alerts fill the box's width. The last one's margin would show
+    the box's background between it and what follows
+  %>
+
   <% if unfinished_b_param %>
-    <div class="tw:basis-full">
+    <div class="tw:basis-full tw:[&>:last-child]:mb-0">
       <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user, kind: :error)) %>
     </div>
   <% end %>
@@ -130,13 +135,8 @@
     </div>
   <% end %>
 
-  <%#
-    The row wraps, so the alerts fill the width below the photo and details. The last
-    one's margin would show the box's background below it
-  %>
-
   <% if @user_alerts.any? %>
-    <div class="tw:mt-2 tw:basis-full tw:[&>:last-child]:mb-0">
+    <div class="tw:basis-full tw:[&>:last-child]:mb-0">
       <% @user_alerts.each do |user_alert| %>
         <%= render(UI::Alerts::Base::Component.new) do %>
           <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
