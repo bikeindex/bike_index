@@ -164,17 +164,17 @@ RSpec.describe WebhooksController, type: :request do
         }.to_json
       end
 
-      it "stores the payload and returns 400" do
+      it "stores the payload and returns 200" do
         expect do
           post webhook_url,
             params: payload,
             headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
         end.to change(StripeEvent, :count).by 1
 
-        expect(response).to have_http_status(:bad_request)
-        expect(StripeEvent.find_by(stripe_id: "dp_1Dispute")).to have_attributes(
-          name: "charge.dispute.created", stripe_event_id: "evt_1Dispute", payload: JSON.parse(payload)
-        )
+        expect(response).to have_http_status(:ok)
+        expect(json_result).to eq({"success" => true})
+        expect(StripeEvent.find_by(stripe_id: "dp_1Dispute")).to have_attributes(processed_at: nil,
+          name: "charge.dispute.created", stripe_event_id: "evt_1Dispute", payload: JSON.parse(payload))
       end
     end
   end

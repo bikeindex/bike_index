@@ -33,14 +33,10 @@ class WebhooksController < ApplicationController
     end
 
     stripe_event = StripeEvent.create_from(event)
-    if stripe_event.known_event?
-      stripe_event.update_bike_index_record!
+    # Stripe retries anything but a 2xx, and the unhandled event is already stored
+    stripe_event.update_bike_index_record! if stripe_event.known_event?
 
-      render json: {success: true}
-    else
-      render json: {success: false, message: "Unhandled event #{stripe_event.name}"}, status: 400
-      nil
-    end
+    render json: {success: true}
   end
 
   private
