@@ -2074,6 +2074,7 @@ nl:
           owner_already_has_account: De eigenaar van deze %{bike_type} heeft al een
             account op Bike Index. Log in om het te claimen!
           you_have_to_log_in: Sorry, je moet inloggen.
+          sign_in_to_continue_registration: Meld u aan om uw registratie te voltooien.
         require_admin!:
           not_an_org_admin: Je moet een organisatiebeheerder zijn om dat te doen!
         require_index_admin!:
@@ -2260,6 +2261,8 @@ nl:
     register:
       acknowledge:
         acknowledge_everything: Vink alle vakjes aan om akkoord te gaan met deze regels.
+        safety_rules_updated: De veiligheidsvoorschriften zijn bijgewerkt — lees ze
+          alstublieft nog eens door.
       confirm_email:
         confirmation_link_expired: Die bevestigingslink is verlopen. Controleer je
           e-mail voor een nieuwe link.
@@ -4800,63 +4803,6 @@ nl:
     show:
       by: Door
       also_published: 'Ook gepubliceerd op:'
-  stolen:
-    index:
-      ambassador: Ambassadeur
-      bike_index: Bike Index
-      bike_index_will_broadcast: Bike Index zal je gestolen fiets op de lokale 'Gestolen
-        Fiets Twitter-handle' publiceren en via andere social media verspreiden. Onze
-        gestolen fietsgegevens zijn bovendien gekoppeld aan LeadsOnline, dus als jouw
-        fiets in het 'systeem' terechtkomt, zal deze gemarkeerd worden en wordt er
-        contact met je opgenomen. Onze community zal dit ook in de gaten houden via
-        verschillende doorverkoop plekken.
-      check_out_your_local_flea_market: Bekijk je lokale rommelmarkt voor jouw fiets.
-      donation: Schenking
-      error: Fout
-      file_a_police_report: Doe aangifte wegens diefstal. Als je kunt, ga dan naar
-        het politiebureau in jouw omgeving en doe aangifte. Betrek ze bij jouw situatie!
-      if_you_are_here_your_bike_was_probably_stolen: 'Als je hier bent, is je fiets
-        waarschijnlijk gestolen. Dat is balen, maar wij zijn hier om je te helpen.
-        Dit is wat je moet doen:'
-      keep_an_eye_on_craigslist: Houd Craigslist in de gaten. Stel een specifieke
-        waarschuwing in met behulp van ifttt.com om de advertentie te markeren die
-        overeenkomt met jouw fiets. Volg apps zoals OfferUp en LetGo omdat ze vaak
-        worden gebruikt in gestolen fietsen.
-      list_recent_stolen_bikes_html: Maak een lijst van recent gestolen fietsen op
-        uw site met onze %{stolen_widget_link}
-      look_for_local_stolen_bike_groups_on_face: Zoek naar Facebook groepen voor gestolen
-        fietsen (zoek op 'gestolen fiets {plaatsnaam}'). Veel van deze vrijwilligersgroepen
-        bestaan over de hele wereld en kunnen je helpen bij het terugvinden van je
-        fiets.
-      make_sure_your_bike_is_registered_html: Zorg ervoor dat je fiets geregistreerd
-        is op %{new_bike_link} en register in jouw community. Markeer je fiets als
-        <strong>gestolen</strong> op Bike Index om onze community te activeren.
-      other_recovery_tools: Andere herstelhulpmiddelen
-      please_fix_the_following: Corrigeer het volgende %{errors}
-      please_login_to_make_report_html: Gelieve %{login_link} om dit rapport te maken
-      register_it: registreer het
-      report_a_bicycle_chop_shop: Meld een fietsenwinkel
-      report_bike_theft_issues: 'Problemen met fietsdiefstal melden:'
-      report_someone_selling_a_stolen_bike: Meld iemand die een gestolen fiets verkoopt
-      reporting_your_own_bike_stolen_html: Je eigen fiets gestolen melden? U moet
-        eerst %{register_it_link}
-      send_alert: Stuur melding!
-      sign_in: Log in
-      stolen_widget: gestolen widget
-      tell_everyone_you_know: Vertel iedereen die je kent over je gestolen fiets.
-        Gebruik hiervoor al je social media (Facebook, Instagram, Twitter, etc.) en
-        sms / e-mail iedereen die je kent.
-      we_wish_you_the_best_of_luck_html: Wij wensen je veel succes bij het terugvinden
-        van jouw gestolen fiets. We willen je verhaal graag toevoegen aan onze %{recoveries_count}
-        teruggevonden fietsen. Als je ons doel wilt steunen, overweeg dan een %{donations_link}
-        of neem deel aan ons %{ambassadors_link} -programma.
-      what_happens_next: Wat gebeurt er nu?
-      what_to_do_if_your_bike_is_stolen: Wat te doen als uw fiets wordt gestolen
-      where_is_this_happening: Waar gebeurt dit URL, adres - alle informatie die u
-        heeft
-      your_email_address: Uw e-mailadres
-      your_local_police_department_will_do_what: Jouw lokale politie-afdeling zal
-        doen wat het moet doet om de fiets terug te vinden. Blijf in contact met hen.
   theft_alert_plans:
     theft_alert_plan:
       days: dagen
@@ -4947,19 +4893,15 @@ nl:
     show:
       add_a_bike: Voeg een fiets toe
       add_a_lock: Voeg een slot toe
-      add_a_photo: Voeg een foto toe
       bikes: fietsen
       combination: Combinatie
       edit: Bewerken
       key_serial: Sleutel serienummer
-      location: Plaats
       lock_type: Slottype
       locks: sloten
       manufacturer: Fabrikant
       next: Volgende stappen
-      primary_colors: Primaire kleuren
       register_new_items: Registreer nieuwe items
-      serial: Serie
       sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,
         maar hopelijk krijgt u hem terug, als iedereen er naar kan zoeken.
       tell_us_more_about_yourself: Vertel ons meer over uzelf.
@@ -4970,21 +4912,10 @@ nl:
       welcome: Welkom
       you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
-      bike_sticker: Fiets sticker
-      add_it_now: Voeg het nu toe!
-      generally_connect_to_org: Sommige van uw fietsen zijn geassocieerd met %{org_name},
-        maar deze niet. Over het algemeen sluit u al uw fietsen aan op %{org_name}
-        -
-      ignore: Negeren
-      user_hidden: Verborgen voor andere gebruikers
       registered: Geregistreerd
       updated: Bijgewerkt
       header_title: "%{current_user_name} op Fietsindex"
       membership_subtitle: Bedankt dat u lid bent van Bike Index %{level}!
-      edit_registration: Bewerken %{bike_type}
-      list_for_sale: Lijst te koop
-      mark_stolen: Markeer %{bike_type} gestolen
-      update_marketplace_listing: Update marktplaatsvermelding!
     edit:
       save_changes: Wijzigingen opslaan
       edit_pages: 'Accountpagina''s bewerken:'
@@ -6594,12 +6525,181 @@ nl:
           sync_running_in_background: De synchronisatie is op de achtergrond bezig.
             Deze pagina wordt automatisch bijgewerkt.
           syncing_activities: Activiteiten synchroniseren...
+        show:
+          bike_box:
+            add_a_photo: Voeg een foto toe
+            add_it_now: Voeg het nu toe!
+            bike_sticker: Fiets sticker
+            edit_registration: Bewerken %{bike_type}
+            generally_connect_to_org: Sommige van uw fietsen zijn geassocieerd met
+              %{org_name}, maar deze niet. Over het algemeen sluit u al uw fietsen
+              aan op %{org_name} -
+            ignore_this_suggestion: Negeer deze suggestie
+            list_for_sale: Lijst te koop
+            location: Plaats
+            mark_stolen: Markeer %{bike_type} gestolen
+            primary_colors: Primaire kleuren
+            registered: Geregistreerd
+            serial: Serie
+            update_marketplace_listing: Update marktplaatsvermelding!
+            updated: Bijgewerkt
+            user_hidden: Verborgen voor andere gebruikers
       sales:
         new_form:
           record_sale: Recordverkoop
           sold_for: Verkoopbedrag voor
           transfer_to_html: Hierdoor wordt de registratie overgedragen naar %{buyer_html}
             en de vermelding op de marktplaats gesloten.
+      stolen:
+        index:
+          act_in_the_first_24_hours: Handel binnen de eerste 24 uur.
+          bike_stolen: Fiets gestolen
+          bikes_that_came_home: Fietsen die mee naar huis zijn genomen
+          call_police_with_the_case_number: Neem contact op met de politie en vermeld
+            het zaaknummer en uw adres.
+          do_not_go_get_it_yourself: Ga het niet zelf halen.
+          email: E-mailadres
+          every_hour_it_sits_unregistered: Elk uur dat het ongeregistreerd blijft,
+            is een uur waarin niemand het kan identificeren.
+          faq_confront_answer: Nee. Bel de politie, geef ze je zaaknummer en een link
+            naar je vermelding op Bike Index, en laat hen contact opnemen. Er zijn
+            mensen gewond geraakt toen ze zelf probeerden hun fiets terug te halen.
+          faq_confront_question: Moet ik de persoon aanspreken die mijn fiets heeft?
+          faq_cost_answer: Het registreren van een fiets, het melden van diefstal
+            en het gebruik van de terugvindtools zijn gratis. Bike Index is een non-profitorganisatie
+            die wordt gefinancierd door donaties, partnerorganisaties en optionele
+            advertenties voor gestolen fietsen.
+          faq_cost_question: Kost dit alles geld?
+          faq_other_city_answer: Het register is internationaal en teruggevonden fietsen
+            vinden honderden kilometers van de diefstal plaats. Uw advertentie blijft
+            actief en vindbaar totdat u de fiets als teruggevonden markeert.
+          faq_other_city_question: Wat als het in een andere stad opduikt?
+          faq_serial_answer: Registreer de fiets in elk geval. Foto's, een aankoopbewijs,
+            onderhoudsgegevens van de winkel, verzekeringspapieren of een Strava-foto
+            kunnen allemaal helpen bij de identificatie van een fiets. Voeg alles
+            toe wat je hebt en neem contact op met de winkel waar je de fiets hebt
+            gekocht – zij hebben het serienummer vaak in hun systeem staan.
+          faq_serial_question: Ik heb mijn serienummer niet.
+          faq_unregistered_answer: Dat is de meest voorkomende situatie. Je kunt het
+            nu meteen als gestolen opgeven; het hoeft niet eerder geregistreerd te
+            zijn.
+          faq_unregistered_question: Mijn fiets was nooit geregistreerd voordat hij
+            gestolen werd.
+          here_is_the_next_hour: Dit is het komende uur.
+          how_alerts_work: Hoe waarschuwingen werken
+          lede: 'Zes stappen, in de juiste volgorde. De eerste twee zijn het belangrijkst:
+            doe aangifte bij de politie om een dossiernummer te krijgen, en registreer
+            de fiets vervolgens als gestolen op Bike Index, zodat elke winkel, agent
+            en koper die een serienummer controleert, jouw fiets kan vinden.'
+          lede_short: Eerst het politierapport, voor het zaaknummer. Daarna de fietsindex,
+            zodat het serienummer openbaar is.
+          more_resources: Meer bronnen
+          no_account_yet: Nog geen account? Registreer een gestolen fiets en maak
+            er een aan. Registratie is altijd gratis.
+          partner_organizations: partnerwinkels, politiekorpsen en steden
+          pillar_alerts_body: Je melding wordt gedeeld op onze sociale mediakanalen
+            en, optioneel, gepromoot in berichten in de buurt van de diefstallocatie.
+            Iedereen die de melding ziet, kan je direct een bericht sturen.
+          pillar_alerts_title: Waarschuwingen die reizen
+          pillar_network_body: Honderdduizenden motorrijders, plus ambassadeurs, winkels
+            en partners van de politie, houden advertenties voor tweedehands motoren
+            in de gaten en signaleren illegale werkplaatsen.
+          pillar_network_title: Een vrijwilligersnetwerk
+          pillar_serial_body: 'Iedereen kan gratis een serienummer opzoeken in Bike
+            Index: winkels bij de ontvangst, agenten in het veld en kopers voordat
+            ze afrekenen.'
+          pillar_serial_title: Een openbaar serieel record
+          promoted_alerts: Gepromote meldingen
+          promoted_alerts_body: Een gepromote melding zorgt ervoor dat uw advertentie
+            voor de gestolen fiets verschijnt in Facebook-feeds in de omgeving van
+            de diefstal, en ook op onze eigen sociale mediakanalen. Zo bereikt het
+            mensen die niet specifiek naar uw fiets op zoek zijn, maar hem wel herkennen
+            als vastgeketend aan de verkeerde veranda.
+          promoted_alerts_title: Zet je fiets terug voor de wijk waar hij vandaan
+            is gestolen.
+          questions_people_ask_at_2am: Vragen die mensen om 2 uur 's nachts stellen
+          read_more_recovery_stories: Lees meer herstelverhalen
+          recovered: Hersteld
+          recoveries_reported_by_owners: Recent teruggevonden dieren, zoals gemeld
+            door hun eigenaren.
+          recovery_record: Herstelverslag
+          register_it: Registreer het
+          register_your_stolen_bike: Registreer je gestolen fiets
+          register_your_stolen_bike_free: Registreer je gestolen fiets — gratis
+          report_a_bicycle_chop_shop: Een fietsenmakerij
+          report_bike_theft_issues: Meld problemen met fietsdiefstal
+          report_bike_theft_issues_subhead: Heb je een gestolen fiets te koop gezien,
+            of een illegale fietsenmakerij? Laat het ons weten.
+          report_someone_selling_a_stolen_bike: Iemand verkoopt een gestolen fiets.
+          reporting_your_own_bike_html: Je eigen fiets als gestolen opgeven? %{register_it_link}
+            in plaats daarvan.
+          resource_bay_area: Gestolen in de Bay Area
+          resource_portland: Gestolen in Portland, Oregon
+          resource_register_found: Registreer een gevonden fiets
+          resource_safety_tips: Veiligheidstips voor het terugvinden van je eigen
+            fiets
+          resource_seattle: Gestolen in Seattle
+          resource_what_to_do: Wat te doen als uw fiets wordt gestolen
+          resource_why_register: Waarom zou je je fietsen registreren bij Bike Index?
+          search_the_registry: Doorzoek het register
+          send_report: Rapport verzenden
+          sign_in: Log in
+          sign_in_to_report_html: "%{sign_in_link} om een rapport op te stellen."
+          step_alert_action: Deel je melding
+          step_alert_body: Je melding genereert een deelbare melding van een gestolen
+            fiets, speciaal ontworpen voor sociale media. Plaats de melding, stuur
+            hem naar lokale fietsgroepen en buurtpagina's, en overweeg een gepromote
+            melding om de buurt rondom de diefstal te bereiken.
+          step_alert_tag: 10 min
+          step_alert_title: Verstuur je melding
+          step_google_alerts_action: Stel Google Alerts in
+          step_google_alerts_body: Stel meerdere Google Alerts in met details die
+            overeenkomen met je fiets (merk, model, opvallende onderdelen, kleur),
+            zodat je op de hoogte wordt gehouden van nieuwe advertenties en berichten
+            waarin jouw fiets wordt genoemd.
+          step_google_alerts_tag: 5 min
+          step_google_alerts_title: Stel Google Alerts in
+          step_listing_action: Bewerk je advertentie
+          step_listing_body: Een melding met het politierapportnummer, duidelijke
+            foto's en eventuele identificerende kenmerken is er een waarop een agent
+            binnen enkele minuten actie kan ondernemen. Vage meldingen vertragen het
+            proces.
+          step_listing_tag: 5 min
+          step_listing_title: Voeg het dossiernummer en de foto's toe.
+          step_police_action: Vind de meldlijn bij u in de buurt
+          step_police_body: Doe dit eerst. Het dossiernummer zorgt ervoor dat een
+            agent je fiets teruggeeft in plaats van hem in beslag te nemen, en elke
+            volgende stap verwijst ernaar. Neem het serienummer, foto's en het adres
+            en tijdstip waarop de fiets is meegenomen mee.
+          step_police_tag: 15 min
+          step_police_title: Doe aangifte bij de politie
+          step_register_action: Registreer je gestolen fiets
+          step_register_body: Dit is de schakelaar die al het andere inschakelt. Je
+            serienummer wordt opgenomen in een openbaar register dat fietsenwinkels,
+            politiebureaus, pandjeshuizen en kopers van tweedehands fietsen raadplegen
+            voordat ze een tweedehands frame aanraken.
+          step_register_tag: 3 min · gratis
+          step_register_title: Registreer het als gestolen op Bike Index.
+          step_shops_action: Vind partnerwinkels
+          step_shops_body: Dieven brengen gestolen fietsen binnen voor reparatie en
+            onderdelen. Winkels die bij binnenkomst de Bike Index raadplegen, zorgen
+            ervoor dat een groot deel van de gemelde fietsen wordt teruggevonden.
+          step_shops_tag: 20 min
+          step_shops_title: Vertel het aan de winkels bij jou in de buurt.
+          stolen_bikes_recovered: Gestolen fietsen teruggevonden
+          the_first_24_hours: De eerste 24 uur
+          three_minutes_no_cost: Drie minuten, geen kosten, en het enige wat je nodig
+            hebt om te beginnen is het serienummer.
+          to_register_always: om je altijd te registreren.
+          value_returned_to_owners: waarde teruggegeven aan eigenaren
+          where_is_this_happening: Waar gebeurt dit? Een URL, een adres, alle informatie
+            die je hebt.
+          why_registering_changes_the_odds: Waarom registreren de kansen verandert
+          why_registering_subhead: Een gestolen fiets die niemand kan identificeren,
+            is gewoon een tweedehands fiets. Registratie maakt jouw fiets herkenbaar
+            voor de mensen die dagelijks met tweedehands fietsen werken.
+          work_top_to_bottom: Werk van boven naar beneden.
+          your_bike_is_gone: Je fiets is verdwenen.
     shared_blocks:
       footer:
         about: Over

@@ -601,7 +601,7 @@ class Organization < ApplicationRecord
   end
 
   def incomplete_b_params
-    BParam.where(organization_id: [child_ids, id].flatten.compact).partial_registrations.without_bike
+    BParam.where(organization_id: [child_ids, id].flatten.compact).partial_registrations
   end
 
   # Can be improved later, for now just always get a location for the map

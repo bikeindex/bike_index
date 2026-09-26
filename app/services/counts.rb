@@ -16,6 +16,10 @@ module Counts
     RedisPool.conn { |r| r.hget STORAGE_KEY, count_key }.to_i
   end
 
+  def retrieve_many(*count_keys)
+    RedisPool.conn { |r| r.hmget STORAGE_KEY, *count_keys }.map(&:to_i)
+  end
+
   def count_keys
     COUNT_KEYS
   end

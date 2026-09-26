@@ -25,6 +25,18 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "partial_registrations" do
+    let!(:embed_partial) { FactoryBot.create(:b_param_partial_registration) }
+    let!(:embed_partial_with_bike) { FactoryBot.create(:b_param_partial_registration, created_bike_id: 12) }
+    let!(:step_1_submitted) { FactoryBot.create(:b_param_unfinished_registration, origin: "register_flow_organized") }
+    let!(:step_1_with_bike) { FactoryBot.create(:b_param_unfinished_registration, created_bike_id: 12) }
+    let!(:register_flow_shell) { FactoryBot.create(:b_param, origin: "register_flow") }
+    let!(:web) { FactoryBot.create(:b_param_unfinished_registration, origin: "web") }
+    it "is embed_partial and submitted register flow, without a bike" do
+      expect(BParam.partial_registrations.pluck(:id)).to match_array([embed_partial.id, step_1_submitted.id])
+    end
+  end
+
   describe "bike" do
     it "returns the bike attribs" do
       b_param = BParam.new(params: {bike: {serial_number: "XXX"}})
@@ -706,6 +718,13 @@ RSpec.describe BParam, type: :model do
         expect(b_param.partial_notification_resends.count).to eq 1
       end
     end
+    context "register flow" do
+      let(:b_param) { FactoryBot.create(:b_param_unfinished_registration) }
+      it "includes the first notification" do
+        expect(b_param.partial_notifications.count).to eq 1
+        expect(b_param.partial_notification_resends.count).to eq 1
+      end
+    end
   end
 
   describe "propulsion_type" do
@@ -889,6 +908,37 @@ RSpec.describe BParam, type: :model do
         expect(b_param.unfinished_registration?).to be_falsey
         expect(creator.reload.alert_slugs).to eq []
       end
+
+      context "with the safety rules still to agree to" do
+        let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:) }
+
+        it "alerts until they're agreed to" do
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+
+          expect(b_param.unfinished_registration?).to be_truthy
+          expect(BParam.unfinished_registrations.pluck(:id)).to eq [b_param.id]
+          expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+
+          acknowledgment.update(acknowledged_at: Time.current)
+
+          expect(b_param.unfinished_registration?).to be_falsey
+          expect(BParam.unfinished_registrations.pluck(:id)).to eq []
+          expect(creator.reload.alert_slugs).to eq []
+        end
+
+        it "doesn't expire until they're agreed to" do
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id, created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day)
+
+          expect(b_param.unfinished_registration?).to be_truthy
+          expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq [b_param.id]
+          expect(BParam.unfinished_registrations.pluck(:id)).to eq [b_param.id]
+
+          acknowledgment.update(acknowledged_at: Time.current)
+
+          expect(b_param.unfinished_registration?).to be_falsey
+          expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq []
+        end
+      end
     end
 
     # EmailJobs::PartialRegistrationJob destroys them for banned email domains
@@ -920,6 +970,30 @@ RSpec.describe BParam, type: :model do
       it "is unfinished, but isn't the creator's to be alerted about" do
         expect(b_param.unfinished_registration?).to be_falsey
         expect(creator.reload.alert_slugs).to eq []
+      end
+
+      context "with an account" do
+        let!(:owner) { FactoryBot.create(:user_confirmed, email: "someone-else@example.com") }
+
+        it "alerts the owner, until the bike is created" do
+          expect(b_param.unfinished_registration?(owner)).to be_truthy
+          expect(owner.reload.alert_slugs).to eq ["unfinished_registration"]
+          expect(owner.user_alerts.active.unfinished_registration.map(&:alertable)).to eq [b_param]
+          expect(creator.reload.alert_slugs).to eq []
+
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+
+          expect(owner.reload.alert_slugs).to eq []
+        end
+
+        context "without a creator" do
+          let(:creator) { nil }
+
+          it "doesn't alert the owner" do
+            expect(b_param.reload.creator_id).to be_nil
+            expect(owner.reload.alert_slugs).to eq []
+          end
+        end
       end
     end
 

@@ -79,7 +79,6 @@ class BikeIndex.Init extends BikeIndex
       my_accounts_edit: BikeIndex.UsersEdit
       my_account_show: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
-      stolen_index: BikeIndex.LegacyStolenIndex
       organized_manage_locations: BikeIndex.OrganizedManageLocations
       organizations_new: BikeIndex.OrganizedManageLocations # Because it has location fields
       organized_manage_show: BikeIndex.OrganizedManageLocations # it CAN location fields

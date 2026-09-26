@@ -34,7 +34,6 @@ module Pages
             per_page:,
             params:,
             bikes: [],
-            current_user: nil,
             interpreted_params: {},
             sort_state: ComponentStructs::SortState.new,
             search_stickers: nil,
@@ -51,7 +50,6 @@ module Pages
             @organization = organization
             @pagy = pagy
             @bikes = bikes
-            @current_user = current_user
             @interpreted_params = interpreted_params
             @sort_state = sort_state
             @per_page = per_page

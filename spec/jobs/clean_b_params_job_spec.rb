@@ -24,6 +24,21 @@ RSpec.describe CleanBParamsJob, type: :job do
       expect(BParam.pluck(:id)).to match_array([b_param_with_values.id, b_param_with_recent_bike.id, b_param_blank_recent.id])
     end
 
+    context "with the safety rules still to agree to" do
+      let!(:b_param_pending) do
+        FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: stale, origin: "register_flow",
+          created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day,
+          params: {bike: {manufacturer_id: 1}}.as_json)
+      end
+      before { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: b_param_pending, bike:) }
+
+      it "keeps it, even expired, since its token is how they're resumed" do
+        expect { described_class.new.perform }.to change(BParam, :count).by(-2)
+        expect(BParam.pluck(:id)).to include b_param_pending.id
+        expect(bike.unfinished_registration?).to be_truthy
+      end
+    end
+
     context "with an e-vehicle acknowledgment" do
       let!(:acknowledgment) do
         FactoryBot.create(:registration_sequence_acknowledgment, b_param: b_param_with_bike, bike:)

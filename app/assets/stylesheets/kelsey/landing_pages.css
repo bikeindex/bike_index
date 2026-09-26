@@ -83,8 +83,7 @@
   margin-bottom: 2rem;
 }
 
-.kelsey_styles .le-btn-primary,
-.kelsey_styles .le-btn-secondary {
+.kelsey_styles .le-btn-primary {
   padding: 1rem 2.5rem;
   font-size: 1rem;
   font-weight: 600;
@@ -95,38 +94,7 @@
   letter-spacing: 0.5px;
 }
 
-.kelsey_styles .le-btn-primary {
-  background: #ffd660;
-  color: var(--redesign-blue-800);
-  border: 2px solid #ffd660;
-}
-
 .kelsey_styles .le-btn-primary:hover {
-  background: #ffcc33;
-  border-color: #ffcc33;
-  transform: translateY(-2px);
-  text-decoration: none;
-  color: var(--redesign-blue-800);
-}
-
-/* After :hover, which still matches a disabled input in some browsers */
-.kelsey_styles .le-btn-primary:disabled {
-  background: #ffd660;
-  border-color: #ffd660;
-  transform: none;
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.kelsey_styles .le-btn-secondary {
-  background-color: transparent;
-  color: white;
-  border: 2px solid white;
-}
-
-.kelsey_styles .le-btn-secondary:hover {
-  background-color: white;
-  color: var(--redesign-blue-500);
   transform: translateY(-2px);
 }
 

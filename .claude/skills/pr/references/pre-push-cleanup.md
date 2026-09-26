@@ -67,7 +67,7 @@ This applies to the branch's specs, not the suite's. Don't delete pre-existing e
 
 When the branch adds or edits `AGENTS.md` or anything under `.claude/skills/`, check every
 claim it makes against the code before pushing — a doc asserting *why* something is done is as capable of
-being wrong as a comment, and nothing runs it. The wrong ones read as obvious. Also check what the edit *moved* — a rule relocated into a skill is a rule
+being wrong as a comment, and nothing runs it. The wrong ones read as obvious. **Grep the file for the subject before adding a line** — a fact the branch states in one section is often already stated in another, and the two drift; #4425 added an architecture note restating the testing line it had edited in the same run, and got it wrong in the restating. Also check what the edit *moved* — a rule relocated into a skill is a rule
 that only loads when that skill triggers.
 
 ### The churn audit

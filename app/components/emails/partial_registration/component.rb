@@ -24,7 +24,9 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? OrgServices::EmailPreview::TOKEN_PATH : new_bike_url(b_param_token: @b_param.id_token)
+        return OrgServices::EmailPreview::TOKEN_PATH if @email_preview
+
+        @b_param.register_flow? ? register_url(b_param_token: @b_param.id_token) : new_bike_url(b_param_token: @b_param.id_token)
       end
 
       def organization_snippet_body
