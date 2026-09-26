@@ -102,6 +102,80 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
     end
   end
 
+  describe "stolen serial marketplace match" do
+    let(:listed_bike) { FactoryBot.create(:bike, :with_primary_activity, :with_ownership_claimed, serial_number: "WTU171G0123C") }
+    let(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: "WTU171G0123C") }
+    let(:status) { :for_sale }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: listed_bike, status:) }
+    let(:bike_id) { listed_bike.id }
+    let(:target_attributes) do
+      {kind: "stolen_serial_marketplace_match", bike_id: listed_bike.id, notifiable: stolen_bike, user_id: nil,
+       delivery_status: "delivery_success", message_channel_target: "bryan@bikeindex.org, gavin@bikeindex.org"}
+    end
+    before do
+      [listed_bike, stolen_bike].each(&:create_normalized_serial_segments)
+      Sidekiq::Job.clear_all
+      ActionMailer::Base.deliveries.clear
+    end
+
+    def run_job(id)
+      described_class.perform_async(id)
+      described_class.drain
+    end
+
+    it "emails admins once, however many times it runs for either bike" do
+      expect(marketplace_listing.reload.status).to eq "for_sale"
+      expect(stolen_bike.status).to eq "status_stolen"
+      expect { run_job(bike_id) }.to change(Notification, :count).by 1
+      expect(Notification.last).to have_attributes(target_attributes)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to eq(%w[bryan@bikeindex.org gavin@bikeindex.org])
+      expect(mail.body.encoded).to include("/admin/marketplace_listings/#{marketplace_listing.id}")
+
+      expect {
+        run_job(listed_bike.id)
+        run_job(stolen_bike.id)
+      }.to_not change(Notification, :count)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+    end
+
+    context "run for the stolen bike" do
+      let(:bike_id) { stolen_bike.id }
+      it "emails admins with the listed bike as the bike" do
+        expect { run_job(bike_id) }.to change(Notification, :count).by 1
+        expect(Notification.last).to have_attributes(target_attributes)
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+      end
+    end
+
+    context "in an ignored group" do
+      before do
+        duplicate_bike_group = DuplicateBikeGroup.create(ignore: true)
+        NormalizedSerialSegment.update_all(duplicate_bike_group_id: duplicate_bike_group.id)
+      end
+      it "doesn't email" do
+        expect {
+          run_job(listed_bike.id)
+          run_job(stolen_bike.id)
+        }.to_not change(Notification, :count)
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
+
+    context "listing not for sale" do
+      let(:status) { :draft }
+      it "doesn't email" do
+        expect {
+          run_job(listed_bike.id)
+          run_job(stolen_bike.id)
+        }.to_not change(Notification, :count)
+        expect(stolen_bike.reload.duplicate_bikes.pluck(:id)).to eq([listed_bike.id])
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
+  end
+
   context "bike gone" do
     it "doesn't explode" do
       expect {

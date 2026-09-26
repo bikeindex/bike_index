@@ -32,7 +32,11 @@ module BikeJobs
         end
       end
 
-      serial_segments.destroy_all if should_delete
+      if should_delete
+        serial_segments.destroy_all
+      else
+        notify_stolen_serial_marketplace_matches(bike)
+      end
     end
 
     def remove_orphaned_duplicate(duplicate_bike_group, normalized_serial_segment)
@@ -48,6 +52,32 @@ module BikeJobs
         end
       end
       duplicate_bike_group.destroy if not_orphaned
+    end
+
+    private
+
+    # A stolen bike is never the listed side, so the unique index sees each pair one way round
+    def notify_stolen_serial_marketplace_matches(bike)
+      duplicate_bikes = bike.duplicate_bikes.distinct
+      pairs = if bike.status_stolen?
+        duplicate_bikes.where.not(status: "status_stolen")
+          .where(id: MarketplaceListing.for_sale.where(item_type: "Bike").select(:item_id))
+          .map { [it, bike] }
+      elsif bike.marketplace_listings.for_sale.any?
+        duplicate_bikes.status_stolen.map { [bike, it] }
+      end
+      pairs&.each { |listed_bike, stolen_bike| notify_admins(listed_bike, stolen_bike) }
+    end
+
+    def notify_admins(listed_bike, stolen_bike)
+      notification = Notification.create!(kind: :stolen_serial_marketplace_match, bike: listed_bike,
+        notifiable: stolen_bike, message_channel_target: AdminMailer::STOLEN_SERIAL_MATCH_EMAILS.join(", "))
+    rescue ActiveRecord::RecordNotUnique # another run already sent it
+      nil
+    else
+      Notifications::Deliver.track_email(notification) do
+        AdminMailer.stolen_serial_marketplace_match_email(notification).deliver_now
+      end
     end
   end
 end
