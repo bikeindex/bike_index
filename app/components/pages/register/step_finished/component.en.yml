@@ -23,6 +23,9 @@ en:
             Finish reporting your stolen %{cycle_type} and take advantage of our community
             network
           reported_stolen: Reported stolen
+          safety_rules_sent_html: >-
+            The %{bike_display} is registered with Bike Index. We've emailed %{email}
+            the safety rules to agree to, which finishes the registration.
           verify_your_email_html: >-
             One more step — verify your email. We sent a confirmation link to %{email};
             click it to finish your registration. Everything you've entered is saved.

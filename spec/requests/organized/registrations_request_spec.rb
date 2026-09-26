@@ -690,16 +690,39 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         b_param.reload
       end
 
-      it "creates the bike off step 2, with no safety pages and no acknowledgment" do
+      it "finishes the member's registration off step 2, and sends the owner the safety rules to agree to" do
         b_param = nil
-        expect { b_param = register_e_scooter }.to change(Bike, :count).by 1
-        expect(RegistrationSequenceAcknowledgment.count).to eq 0
+        expect { b_param = register_e_scooter }
+          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
         expect(Bike.last).to have_attributes(owner_email:, cycle_type: "e-scooter")
         expect(Bike.last.current_ownership.registration_info.slice("register_single_page", "register_separate_attestation"))
           .to eq("register_separate_attestation" => true)
-        # Nothing left over to alert the member who registered it
+        # The owner's to agree to, so nothing is left to alert the member who registered it
         expect(b_param.unfinished_registration?(current_user)).to be_falsey
+        follow_redirect!
+        expect(response.body).to include "the safety rules to agree to"
+
+        # The claim email waits on the rules, and the rules email is what goes out
+        expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+        expect { EmailJobs::PartialRegistrationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+        expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])
+        expect(ActionMailer::Base.deliveries.last.body.encoded).to include "Agree to the safety rules"
+
+        log_in(FactoryBot.create(:user_confirmed, email: owner_email))
+        get "/register", params: {b_param_token: b_param.id_token}
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        %w[3 4].each do |step|
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                    step:, acknowledged: {"0" => "1", "1" => "1"}}
+        end
+        expect {
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                    step: "review", acknowledged_all: "1"}
+        }.to change(RegistrationSequenceAcknowledgment.acknowledged, :count).by 1
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
+        expect(RegistrationSequenceAcknowledgment.sole.user.email).to eq owner_email
+        expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
       end
 
       context "registering their own" do

@@ -91,8 +91,7 @@ module BikeServices
     # motorized: the single page asks what an e-vehicle would get, before it's said it's one
     def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?)
       return nil unless motorized
-      # Left to the registrant, so the flow has no sequence and the bike is created
-      # without one
+      # Left to the owner, so this flow has none - create_bike holds the bike for them to agree
       return nil if separate_attestation && !b_param.self_made?(user)
 
       organization = b_param.creation_organization
@@ -418,16 +417,19 @@ module BikeServices
     end
 
     # Returns nil while the rules are owed - the bike exists, but the registration isn't finished.
-    # The switches ride to the ownership's registration_info, so registrations can be counted
-    # by them - separate attestation only where it left out a sequence the organization has
+    # Rules the separate attestation switch left out are owed too, but by the owner: they're
+    # emailed the link back, and this flow finishes.
+    # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
+      owners_sequence = registration_sequence(b_param) if sequence.blank?
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
-        "register_separate_attestation" => sequence.blank? && registration_sequence(b_param).present?
+        "register_separate_attestation" => owners_sequence.present?
       })
+      owed = sequence || owners_sequence
       # Ahead of the bike, so the ownership it creates holds its email back
-      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence:) unless acknowledged?(b_param, sequence:)
+      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence: owed) unless acknowledged?(b_param, sequence: owed)
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
       if bike.id.blank?
         pending&.destroy
@@ -437,7 +439,11 @@ module BikeServices
       # The bike is what the acknowledgment hangs off once the b_param is swept
       acknowledgment = pending || RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
       acknowledgment&.update(bike_id: bike.id, user_id: acknowledgment.user_id || b_param.creator_id)
-      bike if pending.blank?
+      return bike if pending.blank?
+      return if owners_sequence.blank?
+
+      EmailJobs::PartialRegistrationJob.perform_async(b_param.id)
+      bike
     end
 
     # Nothing to report without a status that has a record, otherwise save_report's marker

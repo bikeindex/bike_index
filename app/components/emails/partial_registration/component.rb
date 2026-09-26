@@ -29,6 +29,10 @@ module Emails
         @b_param.register_flow? ? register_url(b_param_token: @b_param.id_token) : new_bike_url(b_param_token: @b_param.id_token)
       end
 
+      # The bike exists, held on the organization's safety rules - which the owner is sent
+      # to agree to when the separate attestation switch left them out
+      def rules_owed? = @b_param.acknowledgment_pending?
+
       def organization_snippet_body
         organization&.mail_snippet_body("partial_registration", time: snippet_time)
       end
