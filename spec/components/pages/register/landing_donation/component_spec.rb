@@ -7,7 +7,7 @@ RSpec.describe Pages::Register::LandingDonation::Component, type: :component do
 
   it "points the call to action at the plus membership, with a tile for each cadence's amounts" do
     cta = component.at_css("[data-register--landing-donation-target=cta]")
-    expect(cta.text.strip).to eq "Become a member — $9.99/month"
+    expect(cta.text.strip).to eq "Become a member — $15/month"
     expect(cta["href"]).to eq "/membership/new?membership_level=plus"
 
     monthly = component.css("[data-amount-for=monthly]")

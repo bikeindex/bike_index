@@ -76,9 +76,9 @@ module Pages
             [translation(".faq_privacy_question"), translation(".faq_privacy_answer")]]
         end
 
-        def section_inner = "tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-12 tw:lg:px-6 tw:lg:py-18"
+        def section_inner = "tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-10 tw:sm:py-12 tw:lg:px-6 tw:lg:py-18"
 
-        def h2_classes = "tw:m-0 tw:font-header tw:text-[28px] tw:leading-tight tw:font-extrabold tw:text-slate-900 tw:lg:text-[38px]"
+        def h2_classes = "tw:m-0 tw:font-header tw:text-[26px] tw:leading-tight tw:sm:text-[32px] tw:font-extrabold tw:text-slate-900 tw:lg:text-[38px]"
       end
     end
   end

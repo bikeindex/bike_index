@@ -6,8 +6,8 @@ module Pages
       # The landing page's donation ask. Monthly tiles start a membership and one-time ones
       # the donate page - register--landing-donation points the call to action at the pick
       class Component < ApplicationComponent
-        # The prices Pages::Memberships::ChooseMembership charges
-        MEMBERSHIP_CENTS = {basic: 499, plus: 999, patron: 4999}.freeze
+        # Ahead of Pages::Memberships::ChooseMembership, which still shows the old Stripe prices
+        MEMBERSHIP_CENTS = {basic: 500, plus: 1500, patron: 5000}.freeze
 
         ONE_TIME_DOLLARS = [25, 50, 100].freeze
 
@@ -15,7 +15,7 @@ module Pages
 
         def membership_tiles
           @membership_tiles ||= MEMBERSHIP_CENTS.map do |level, cents|
-            price = MoneyFormatter.money_format(cents)
+            price = MoneyFormatter.money_format_without_cents(cents)
             {amount: price, name: translation(".membership_level", level: Membership.level_humanized(level.to_s)),
              checked: level == :plus, href: new_membership_path(membership_level: level),
              label: translation(".become_a_member", amount: price)}
@@ -35,8 +35,8 @@ module Pages
 
         # A tile is a radio its label wraps, so the pick is the checked state
         def tile_classes
-          "tw:flex tw:cursor-pointer tw:items-start tw:justify-between tw:gap-2 tw:rounded-lg tw:border " \
-            "tw:border-gray-200 tw:bg-white tw:p-4 tw:transition-colors tw:duration-150 tw:hover:border-blue-300 " \
+          "tw:flex tw:cursor-pointer tw:items-center tw:sm:items-start tw:justify-between tw:gap-2 tw:rounded-lg tw:border " \
+            "tw:border-gray-200 tw:bg-white tw:px-4 tw:py-3 tw:sm:py-4 tw:transition-colors tw:duration-150 tw:hover:border-blue-300 " \
             "tw:has-checked:border-blue-600 tw:has-checked:ring-1 tw:has-checked:ring-blue-600 " \
             "tw:has-focus-visible:outline-2 tw:has-focus-visible:outline-offset-2 tw:has-focus-visible:outline-blue-500"
         end
