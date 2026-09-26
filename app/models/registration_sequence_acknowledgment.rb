@@ -48,8 +48,7 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
     # The pages are acknowledged one at a time on the b_param; this is the moment they're
     # agreed to as a whole - onto the pending one when the bike came first, against the
     # sequence the pages were read from rather than the one it was pending on.
-    # Whoever is agreeing, over the creator create_bike stood in with - owner_email is
-    # who the registration is for, this is the account that attested to the rules
+    # Whoever is agreeing, over the creator create_bike stood in with
     def acknowledge(b_param, sequence:, user: nil)
       acknowledgment = find_or_initialize_by(b_param_id: b_param.id)
       acknowledgment.update(registration_sequence: sequence, user_id: user&.id || acknowledgment.user_id,

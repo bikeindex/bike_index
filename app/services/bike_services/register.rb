@@ -102,8 +102,7 @@ module BikeServices
     # registration_sequence for a link back into the flow, and whether the rules restarted:
     # resuming starts over on the organization's current version rather than finishing one
     # it's replaced since. An agreement already made stands
-    def resume_registration_sequence(b_param)
-      sequence = registration_sequence(b_param)
+    def resume_registration_sequence(b_param, sequence:)
       return [sequence, false] if sequence.blank? || sequence.active? || acknowledged?(b_param, sequence:)
 
       b_param.update(params: b_param.params.except("registration_sequence"))
@@ -328,8 +327,7 @@ module BikeServices
       b_param.created_bike unless acknowledgment_owed?(b_param, sequence:)
     end
 
-    # The finished registration email the pending acknowledgment held back - the job
-    # decides whether it goes, it just no longer has a reason to hold it
+    # The finished registration email the pending acknowledgment held back
     def send_held_email(b_param)
       EmailJobs::OwnershipInvitationJob.perform_async(b_param.created_bike.current_ownership_id)
     end
@@ -424,8 +422,7 @@ module BikeServices
         return bike
       end
 
-      # The bike is what the acknowledgment hangs off once the b_param is swept. The creator
-      # only stands in for whoever agreed - nobody was signed in to be recorded as it
+      # The bike is what the acknowledgment hangs off once the b_param is swept
       acknowledgment = pending || RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
       acknowledgment&.update(bike_id: bike.id, user_id: acknowledgment.user_id || b_param.creator_id)
       bike if pending.blank?

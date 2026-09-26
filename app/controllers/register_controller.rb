@@ -53,7 +53,7 @@ class RegisterController < ApplicationController
   # find, the e-vehicle acknowledgment pages (?step=3 up), ?step=review and
   # ?step=finished. A step the registration isn't at redirects to one it is.
   # No step at all is a link back in - the emailed and alert ones - rather than moving
-  # through the flow, so it resumes on the organization's current safety rules
+  # through the flow
   def show
     resume_registration_sequence if params[:step].blank?
     steps = flow_steps
@@ -246,7 +246,8 @@ class RegisterController < ApplicationController
   end
 
   def resume_registration_sequence
-    @registration_sequence, restarted = BikeServices::Register.resume_registration_sequence(@b_param)
+    @registration_sequence, restarted = BikeServices::Register
+      .resume_registration_sequence(@b_param, sequence: @registration_sequence)
     flash[:notice] = translation(:safety_rules_updated, controller_method: :acknowledge) if restarted
   end
 
