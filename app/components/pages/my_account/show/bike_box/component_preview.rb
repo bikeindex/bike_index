@@ -26,13 +26,14 @@ module Pages
             render_box(bike(id: 44, thumb_path: Pages::SearchResults::BikeBox::ComponentPreview.vehicles.first.thumb_path))
           end
 
-          # Bike#unfinished_registration? queries, so this needs a real registration whose
-          # organization's safety rules are still to agree to
+          # The alert checks the database that the safety rules are still owed, so this needs a
+          # real registration
           def unfinished_registration_alert
             b_param = ::BParam.unexpired.acknowledgment_pending.with_bike.reorder(:updated_at).last
             return missing_notice("an unfinished registration") if b_param&.created_bike.blank?
 
-            render_box(b_param.created_bike, current_user: b_param.creator)
+            render_box(b_param.created_bike, current_user: b_param.creator,
+              unfinished_b_params: {b_param.created_bike_id => b_param})
           end
 
           def unassigned_bike_org_alert
@@ -45,13 +46,9 @@ module Pages
 
           private
 
-          def render_box(bike, current_user: preview_user, user_alerts: [])
+          def render_box(bike, current_user: lookbook_user, user_alerts: [], unfinished_b_params: {})
             render_with_template(template: "pages/my_account/show/bike_box/component_preview/bike_box",
-              locals: {bike:, current_user:, user_alerts:})
-          end
-
-          def preview_user
-            @preview_user ||= ::User.new(email: "preview@bikeindex.org")
+              locals: {bike:, current_user:, user_alerts:, unfinished_b_params:})
           end
 
           def bike(**attrs)

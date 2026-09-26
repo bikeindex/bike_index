@@ -10,7 +10,6 @@ module UI
         sm: "tw:text-xs tw:font-medium tw:px-1 tw:py-px",
         md: "tw:text-xs tw:font-bold tw:px-2 tw:py-1",
         lg: "tw:text-sm tw:font-extrabold tw:px-3 tw:py-1",
-        # The font size of the text it sits in, e.g. a heading
         inherit: "tw:text-[length:inherit] tw:font-bold tw:px-2 tw:py-px"
       }
 

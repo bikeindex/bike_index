@@ -3,12 +3,17 @@
 require "rails_helper"
 
 RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
-  let(:instance) { described_class.new(bike:, current_user: user, user_alerts: described_class.user_alerts(user.reload)) }
-  let(:component) { render_inline(instance) }
+  let(:component) { render_inline(box) }
   let(:user) { FactoryBot.create(:user_confirmed) }
+  let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
   let(:bike) do
     FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer: FactoryBot.create(:manufacturer, name: "Surly"),
       frame_model: "Midnight Special", serial_number: "SUR-77120934")
+  end
+
+  def box
+    described_class.new(bike: bike.reload, current_user: user, user_alerts: described_class.user_alerts(user.reload),
+      unfinished_b_params: described_class.unfinished_b_params([bike]))
   end
 
   it "renders the registration, with no alerts" do
@@ -21,7 +26,6 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
   end
 
   context "with an unassigned_bike_org alert" do
-    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
     let!(:user_alert) { FactoryBot.create(:user_alert, user:, bike:, organization:, kind: "unassigned_bike_org") }
     let!(:other_alert) { FactoryBot.create(:user_alert, user:, organization:, kind: "unassigned_bike_org", bike: FactoryBot.create(:bike)) }
 
@@ -51,14 +55,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
   context "with caching", :caching do
     include_context :caching_basic
 
-    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
-
-    def render_box
-      with_controller_class(ApplicationController) do
-        render_inline(described_class.new(bike: bike.reload, current_user: user,
-          user_alerts: described_class.user_alerts(user.reload)))
-      end
-    end
+    def render_box = with_controller_class(ApplicationController) { render_inline(box) }
 
     it "caches the registration, and renders alerts outside the cache" do
       keys = fragments_written { render_box }

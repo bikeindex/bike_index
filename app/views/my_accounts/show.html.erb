@@ -56,9 +56,10 @@
         >
           <% if @bikes.present? %>
             <% user_alerts = Pages::MyAccount::Show::BikeBox::Component.user_alerts(current_user) %>
+            <% unfinished_b_params = Pages::MyAccount::Show::BikeBox::Component.unfinished_b_params(@bikes) %>
             <ul class="bike-boxes">
               <% @bikes.each do |bike| %>
-                <%= render(Pages::MyAccount::Show::BikeBox::Component.new(bike:, current_user:, user_alerts:)) %>
+                <%= render(Pages::MyAccount::Show::BikeBox::Component.new(bike:, current_user:, user_alerts:, unfinished_b_params:)) %>
               <% end %>
             </ul>
 

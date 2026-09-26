@@ -1,12 +1,8 @@
 <li class="bike-box-item tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800">
-  <%#
-    The row wraps, so the alerts fill the box's width. The last one's margin would show
-    the box's background between it and what follows
-  %>
-
-  <% if unfinished_b_param %>
-    <div class="tw:basis-full tw:[&>:last-child]:mb-0">
-      <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user, kind: :error)) %>
+  <%# The row wraps, so the alerts fill the box's width %>
+  <% if @unfinished_b_param %>
+    <div class="tw:basis-full">
+      <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: @unfinished_b_param, current_user: @current_user, kind: :error, margin_classes: "tw:mb-0")) %>
     </div>
   <% end %>
 
@@ -32,7 +28,7 @@
       <h5 class="title-link">
         <%# Pulled left by the badge's padding and border, so its text lines up with the rows below %>
         <span class="tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :inherit)) %></span>
-        <%= link_to helpers.bike_title_html(@bike), bike_path(@bike), class: "tw:inline" %>
+        <%= link_to helpers.bike_title_html(@bike), bike_path(@bike) %>
       </h5>
 
       <ul class="attr-list">
@@ -136,9 +132,9 @@
   <% end %>
 
   <% if @user_alerts.any? %>
-    <div class="tw:basis-full tw:[&>:last-child]:mb-0">
+    <div class="tw:flex tw:basis-full tw:flex-col tw:gap-4">
       <% @user_alerts.each do |user_alert| %>
-        <%= render(UI::Alerts::Base::Component.new) do %>
+        <%= render(UI::Alerts::Base::Component.new(margin_classes: "tw:mb-0")) do %>
           <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
           <%= link_to translation(".add_it_now"), user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, action: "update", class: "twlink-underlined" %>
 
