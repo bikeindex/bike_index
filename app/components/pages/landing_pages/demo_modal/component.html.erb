@@ -16,7 +16,7 @@
       <%= f.hidden_field :body, value: "lead" %>
 
       <div class="tw:pt-2">
-        <%= f.submit "Let's chat", class: "le-btn-primary tw:w-full tw:cursor-pointer" %>
+        <%= render(UI::Button::Component.new(text: "Let's chat", color: :yellow, size: :lg, type: "submit", html_class: "le-btn-primary tw:w-full")) %>
       </div>
     <% end %>
   <% end %>

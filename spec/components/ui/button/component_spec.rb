@@ -34,6 +34,14 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with yellow color" do
+    let(:color) { :yellow }
+
+    it "renders blue on the brand yellow" do
+      expect(component.to_html).to include("tw:text-blue-600", "tw:bg-[#ffd660]", "tw:not-disabled:not-aria-disabled:hover:bg-[#ffcc33]")
+    end
+  end
+
   context "with spinner" do
     let(:options) { {text:, type: "submit", spinner: true} }
 
