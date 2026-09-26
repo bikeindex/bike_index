@@ -27,6 +27,15 @@ RSpec.describe SharedBlocks::SearchResults::BikeListItem::Component, type: :comp
     end
   end
 
+  context "with its owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+
+    it "is edged in the registered color, with no status" do
+      expect(component).to have_css("li.tw\\:border-l-green-600")
+      expect(component).to have_no_text("Registered")
+    end
+  end
+
   context "with a public listing" do
     let(:organization) { nil }
     let(:listing) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 420_00) }
