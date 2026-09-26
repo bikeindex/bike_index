@@ -52,8 +52,8 @@ class RegisterController < ApplicationController
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a
   # find, the e-vehicle acknowledgment pages (?step=3 up), ?step=review and
   # ?step=finished. A step the registration isn't at redirects to one it is.
-  # No step at all is a link back in - the emailed and alert ones - rather than moving
-  # through the flow
+  # The emailed and alert links have no step, so they resume - which restarts rules the
+  # organization has replaced since - rather than moving through the flow
   def show
     resume_registration_sequence if params[:step].blank?
     steps = flow_steps

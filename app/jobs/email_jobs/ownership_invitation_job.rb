@@ -17,8 +17,7 @@ module EmailJobs
       ownership.bike&.update(updated_at: Time.current)
       ownership.reload
 
-      # Read every run rather than cached onto skip_email, which is what the registration
-      # asked for - writing the answer back there latches it against a reason that lifts
+      # Not written back to skip_email: a reason to withhold can lift, and a column wouldn't
       return unless ownership.calculated_send_email
 
       notification = Notification.find_or_create_by(notifiable: ownership,

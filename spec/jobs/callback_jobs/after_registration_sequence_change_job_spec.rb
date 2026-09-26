@@ -4,14 +4,15 @@ RSpec.describe CallbackJobs::AfterRegistrationSequenceChangeJob, type: :job do
   let(:instance) { described_class.new }
   let(:organization) { FactoryBot.create(:organization) }
   let!(:registration_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
-  let!(:b_param) { pending_b_param(organization) }
-  let!(:b_param_other_organization) { pending_b_param(FactoryBot.create(:organization)) }
+  let!(:b_param) { pending_b_param(registration_sequence) }
+  let!(:b_param_other_organization) { pending_b_param(FactoryBot.create(:registration_sequence_active)) }
 
-  def pending_b_param(organization)
+  # Pending against the organization's own sequence, the way create_pending makes it
+  def pending_b_param(sequence)
     bike = FactoryBot.create(:bike, :with_ownership)
     BParam.create(origin: "register_flow", created_bike_id: bike.id,
-      params: {bike: {creation_organization_id: organization.id}}.as_json)
-      .tap { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: it, bike:) }
+      params: {bike: {creation_organization_id: sequence.organization_id}}.as_json)
+      .tap { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: it, bike:, registration_sequence: sequence) }
   end
 
   it "finishes the organization's pending registrations once it has no active sequence" do
@@ -26,6 +27,18 @@ RSpec.describe CallbackJobs::AfterRegistrationSequenceChangeJob, type: :job do
     expect(b_param.finished_registration?).to be_truthy
     expect(b_param_other_organization.reload.acknowledgment_pending?).to be_truthy
     expect(EmailJobs::OwnershipInvitationJob.jobs.map { it["args"] }).to eq([[b_param.created_bike.current_ownership.id]])
+  end
+
+  context "with the organization destroyed" do
+    it "finishes them too, reaching the sequence it soft-deleted" do
+      organization.destroy
+      expect(registration_sequence.reload.deleted?).to be_truthy
+
+      expect { instance.perform(registration_sequence.id) }
+        .to change(RegistrationSequenceAcknowledgment.pending, :count).by(-1)
+      expect(b_param.reload.finished_registration?).to be_truthy
+      expect(b_param_other_organization.reload.acknowledgment_pending?).to be_truthy
+    end
   end
 
   context "with a new sequence activated in its place" do

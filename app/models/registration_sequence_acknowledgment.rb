@@ -34,8 +34,7 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
   belongs_to :bike
   belongs_to :user
 
-  # What being pending held back is released here rather than by whoever stopped it being
-  # pending. Not on create: the pending one is made just before its b_param saves the bike,
+  # Not on create: the pending one is made just before its b_param saves the bike,
   # which refreshes the alert anyway
   after_commit(on: %i[update destroy]) do
     b_param&.update_unfinished_registration_alerts
@@ -85,9 +84,8 @@ class RegistrationSequenceAcknowledgment < ApplicationRecord
 
   private
 
-  # Agreed to, or dropped along with the rules it owed - either way the registration is
-  # finished, and the finished registration email its pending state held back can go.
-  # The job decides whether it actually sends
+  # The finished registration email being pending held back - the job decides whether it
+  # sends. saved_change_to: create_bike stamps bike_id on an already-acknowledged row too
   def release_held_email
     return if bike_id.blank?
     return unless destroyed? || saved_change_to_acknowledged_at?

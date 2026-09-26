@@ -10,8 +10,7 @@ module CallbackJobs
 
       # No active sequence leaves no safety rules to agree to, so nothing is owed. destroy_all
       # rather than delete_all: each record releases the email it was holding back
-      RegistrationSequenceAcknowledgment.pending
-        .where(b_param_id: BParam.with_bike.where(organization_id:)).destroy_all
+      RegistrationSequenceAcknowledgment.pending.for_organization(organization_id).destroy_all
     end
   end
 end
