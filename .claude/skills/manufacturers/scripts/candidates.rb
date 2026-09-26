@@ -7,9 +7,8 @@
 require "csv"
 require "net/http"
 
-counts_path, min_count = ARGV
-abort("usage: bin/rails runner #{__FILE__} <missing_manufacturers.json> [min_count]") unless counts_path
-min_count = (min_count || 3).to_i
+counts_path = ARGV[0] or abort("usage: bin/rails runner #{__FILE__} <missing_manufacturers.json> [min_count]")
+min_count = ARGV.fetch(1, 3).to_i
 counts = JSON.parse(File.read(counts_path)).fetch("manufacturer_other_counts")
 
 # Production's list, rather than the local database's

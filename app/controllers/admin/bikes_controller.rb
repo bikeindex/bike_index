@@ -18,18 +18,15 @@ module Admin
     end
 
     def missing_manufacturer
-      respond_to do |format|
-        format.html do
-          @per_page = permitted_per_page(default: 100)
-          @pagy, @bikes = pagy(:countish,
-            missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :current_impound_record, :paint),
-            limit: @per_page,
-            page: permitted_page)
-        end
-        format.json do
-          render json: {manufacturer_other_counts: missing_manufacturer_bikes.reorder(nil).group(:manufacturer_other).count}
-        end
+      if request.format.json?
+        return render(json: {manufacturer_other_counts: missing_manufacturer_bikes.reorder(nil).group(:manufacturer_other).count})
       end
+
+      @per_page = permitted_per_page(default: 100)
+      @pagy, @bikes = pagy(:countish,
+        missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :current_impound_record, :paint),
+        limit: @per_page,
+        page: permitted_page)
     end
 
     def update_manufacturers

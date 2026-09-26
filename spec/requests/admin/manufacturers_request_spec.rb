@@ -85,7 +85,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       include_context :admin_doorkeeper_token
       include_context :test_csrf_token
       let(:url) { "/admin/manufacturers.json" }
-      include_examples "rejects_unauthorized_token"
+      include_examples "rejects_unauthorized_token", :post
 
       context "token for a manufacturers superuser" do
         before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "manufacturers") }

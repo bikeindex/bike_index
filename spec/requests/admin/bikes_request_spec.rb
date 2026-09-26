@@ -62,7 +62,6 @@ RSpec.describe Admin::BikesController, type: :request do
         let!(:bike_3) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Party") }
 
         it "renders the manufacturer_other counts" do
-          expect(bike).to be_present
           get url, params: token_param.merge(period: "all")
           expect(response.status).to eq 200
           expect(json_result["manufacturer_other_counts"]).to eq({"Cool Bikes" => 2, "Party" => 1})

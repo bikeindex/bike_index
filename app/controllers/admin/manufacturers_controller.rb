@@ -3,9 +3,6 @@ module Admin
     include Binxtils::SortableTable
     include Admin::TokenAccessible
 
-    MANUFACTURER_JSON_ATTRIBUTES = %w[id name slug secondary_slug website frame_maker motorized_only
-      open_year close_year].freeze
-
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
     def index
@@ -39,7 +36,7 @@ module Admin
         AutocompleteLoaderJob.perform_async
         respond_to do |format|
           format.html { redirect_to admin_manufacturer_url(@manufacturer), flash: {success: "Manufacturer Created!"} }
-          format.json { render json: {manufacturer: @manufacturer.as_json(only: MANUFACTURER_JSON_ATTRIBUTES)} }
+          format.json { render json: {manufacturer: @manufacturer.as_json(only: %w[id name slug secondary_slug website frame_maker motorized_only])} }
         end
       else
         respond_to do |format|
