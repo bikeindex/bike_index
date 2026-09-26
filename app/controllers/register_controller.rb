@@ -16,6 +16,7 @@ class RegisterController < ApplicationController
   before_action :assign_organization, except: %i[new confirm]
   before_action :find_registration_sequence, except: %i[new confirm]
   before_action :redirect_finished, only: %i[create update report acknowledge]
+  before_action :redirect_bike_created, only: %i[create update]
   # The step shown is server state - a cached page could show one the registration is past
   # (register--revalidate covers Safari's bfcache, Pages::Register::Page Turbo's own snapshots)
   before_action { response.set_header("Cache-Control", "no-store") }
@@ -51,7 +52,9 @@ class RegisterController < ApplicationController
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a
   # find, the e-vehicle acknowledgment pages (?step=3 up), ?step=review and
   # ?step=finished. A step the registration isn't at redirects to one it is.
+  # The emailed and alert links arrive without a step, rather than moving through the flow
   def show
+    resume_registration if params[:step].blank?
     steps = flow_steps
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
     return redirect_to(step_path(step)) if step != params[:step]
@@ -126,6 +129,12 @@ class RegisterController < ApplicationController
 
   # Each acknowledgment page posts here, and the review's final acknowledgment
   def acknowledge
+    # What was read can have been replaced since - by a newer version, or a restart in another tab
+    if params[:registration_sequence_id].to_s != @registration_sequence&.id.to_s
+      flash[:notice] = translation(:safety_rules_updated)
+      return redirect_to_current_step
+    end
+
     steps = flow_steps
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
     acknowledged = BikeServices::Register.acknowledge_step(@b_param, step,
@@ -235,6 +244,14 @@ class RegisterController < ApplicationController
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
 
+  # All resuming changes today: rules the organization has replaced since start over.
+  # No sequence to resume on is the common case, and returns what was already resolved
+  def resume_registration
+    @registration_sequence, restarted = BikeServices::Register
+      .resume_registration_sequence(@b_param, sequence: @registration_sequence)
+    flash[:notice] = translation(:safety_rules_updated, controller_method: :acknowledge) if restarted
+  end
+
   # Read at render time rather than in a filter: the submissions save first, and where
   # the report sits depends on what they saved
   def flow_steps
@@ -254,10 +271,16 @@ class RegisterController < ApplicationController
   # than only a not-found. start_params is what carries an organization across that.
   # build: only step 1's submission, which carries everything a registration needs
   def find_b_param(build: false)
-    @b_param = BikeServices::Register.find_token(params_token: params[:b_param_token],
+    @b_param, sign_in_to_resume = BikeServices::Register.resume(params_token: params[:b_param_token],
       session_token: session[:register_b_param_token], user: current_user)
     @b_param ||= BikeServices::Register.b_param_for(user: current_user) if build
     if @b_param.blank?
+      if sign_in_to_resume
+        # A submission's token is in its body, and its path has no GET to come back to
+        store_return_to(register_path(b_param_token: params[:b_param_token], step: params[:step]))
+        return authenticate_user(translation_key: :sign_in_to_continue_registration, flash_type: :notice)
+      end
+
       flash[:notice] = translation(:registration_not_found) if params[:b_param_token].present?
       return redirect_to(new_register_path(start_params))
     end
@@ -265,7 +288,7 @@ class RegisterController < ApplicationController
     # The session follows whichever registration the token named, so the next tokenless
     # request stays on it - until its bike exists, when there's nothing left to go back
     # to and the bare /register should start the next registration instead
-    if @b_param.with_bike?
+    if @b_param.finished_registration?
       session.delete(:register_b_param_token)
     else
       session[:register_b_param_token] = @b_param.id_token
@@ -276,6 +299,10 @@ class RegisterController < ApplicationController
   # the completion page - submissions redirect there too, saving nothing
   def redirect_finished
     redirect_to step_path(:finished) if BikeServices::Register.finished?(@b_param, sequence: @registration_sequence)
+  end
+
+  def redirect_bike_created
+    redirect_to_current_step if @b_param.with_bike?
   end
 
   def redirect_after_bike_creation(bike)

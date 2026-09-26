@@ -9,6 +9,19 @@ RSpec.describe RecoveryDisplay, type: :model do
     end
   end
 
+  describe "with_photo" do
+    let!(:recovery_display) { FactoryBot.create(:recovery_display_with_photo) }
+    let!(:recovery_display_unprocessed) { FactoryBot.create(:recovery_display) }
+    before do
+      recovery_display_unprocessed.photo.attach(io: StringIO.new("fake image"), filename: "test.jpg",
+        content_type: "image/jpeg")
+    end
+
+    it "includes only displays with a processed photo" do
+      expect(RecoveryDisplay.with_photo.pluck(:id)).to eq([recovery_display.id])
+    end
+  end
+
   describe "photo_processed? and image_processing" do
     let(:recovery_display) { RecoveryDisplay.new }
     it "is false by default" do

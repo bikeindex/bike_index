@@ -36,8 +36,7 @@ geocoder key being referer-restricted, not a failure. An unseeded database doesn
 so — counters read zero, comboboxes match nothing. Re-seed from scratch with
 `DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:reset` (~2 min).
 
-`bin/setup` seeds only an empty database — `db:seed` dies on duplicates over seeded
-records.
+`db:seed` over a seeded database prints `Database already seeded` and changes nothing.
 
 ## How the script gets Ruby
 
@@ -65,8 +64,8 @@ Gemfile — Bundler 4's resolver differs and you'll chase fake regressions.
 The script prints its env block at the end; it's also this:
 
 ```bash
-export PATH="/opt/ruby-4.0.6/x64/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"  # service is in /usr/sbin
-export LD_LIBRARY_PATH="/opt/ruby-4.0.6/x64/lib:$LD_LIBRARY_PATH"
+export PATH="/opt/ruby-4.0.7/x64/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"  # service is in /usr/sbin
+export LD_LIBRARY_PATH="/opt/ruby-4.0.7/x64/lib:$LD_LIBRARY_PATH"
 export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
 export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password  # dev DBs don't take database.yml's CI=1 creds
 export LANG=C.UTF-8 LC_ALL=C.UTF-8  # else foreman dies reading .env: invalid byte sequence in US-ASCII
