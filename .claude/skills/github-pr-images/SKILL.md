@@ -54,6 +54,8 @@ Use `ToolSearch` with a query like `"browser navigate upload"` to confirm `mcp__
 
 Playwright MCP runs isolated (`--isolated --storage-state=…/mcp-auth.json`), loading github.com cookies from that shared storage-state file at startup — so the session persists across sessions once the file is populated. It's load-only: the MCP never writes it back, so login can't be refreshed through the MCP browser. If GitHub logs the user out and you hit a 404 / login screen mid-task, see [references/headless-relogin.md](references/headless-relogin.md) — full login can't be driven headlessly.
 
+**A session cleared in the live context isn't that case** — `clearCookies`, which `frontend-screenshots` needs to capture a page signed out, drops the github.com cookies with it. Startup reloads them, so `browser_close` then navigate again restores the session; the re-login guide is only for one that expired at GitHub's end.
+
 ### If Playwright MCP is not registered
 
 The project ships a `.mcp.json` registering Playwright MCP (isolated, shared storage-state file, headless). Claude Code prompts to approve project MCP servers on first entry — if the `mcp__playwright__*` tools aren't registered, approve the `playwright` server there and restart the session (or `/mcp` → **playwright** → **reconnect**). On first use `mcp-auth.json` won't exist yet — populate it via the login helper in the re-login guide.
@@ -100,6 +102,8 @@ Its text is **"Paste, drop, or click to add files"**. `data-file-attachment-for=
 ```
 button.Button--small[data-file-attachment-for="fc-new_comment_field"]
 ```
+
+That's a CSS selector, and `browser_click` takes a snapshot `ref` — pass the selector to `browser_run_code_unsafe` instead, clicking it against a `page.waitForEvent('filechooser')`. **Open the chooser there and stop**: calling `setFiles` inside that block *and* `browser_file_upload` afterwards satisfies it twice, and every image uploads twice.
 
 **Upload every image in one `browser_file_upload` call** — it takes an array of paths, and GitHub processes them together. Don't upload one at a time. Always absolute paths.
 

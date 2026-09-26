@@ -13,6 +13,33 @@ RSpec.describe ApplicationComponent, type: :component do
 
       expect(orphaned).to eq []
     end
+
+    # A digest hashes only the sidecars beside the component, so a scope pointing at a
+    # sibling's serves stale copy out of a fragment cache.
+    # NOTE: overriding `translation` outright borrows the same way and isn't caught here
+    it "keeps every cached component's translation scope in its own directory" do
+      borrowed = cached_components.sort_by(&:name).filter_map do |component|
+        scope = component.allocate.send(:component_translation_scope)
+        next if Pathname.new(component.identifier).dirname == Rails.root.join("app/components", *scope.drop(1).map(&:to_s))
+
+        "#{component} reads #{scope.join(".")}"
+      end
+
+      expect(borrowed).to eq []
+    end
+  end
+
+  describe "inheritance" do
+    # A subclass's digest folds in the parent's Ruby, template and sidecars, so the
+    # parent's edits bust the child's fragments and a change meant for one renders in
+    # both. Share by duplicating, or by an object both components call.
+    it "subclasses ApplicationComponent and nothing else" do
+      subclassed = view_component_classes.sort_by(&:name).filter_map do |component|
+        "#{component} < #{component.superclass}" unless component.superclass == ApplicationComponent
+      end
+
+      expect(subclassed).to eq []
+    end
   end
 
   describe "cache digests" do
@@ -49,8 +76,15 @@ RSpec.describe ApplicationComponent, type: :component do
   private
 
   def component_classes
+    view_component_classes.select { it <= ApplicationComponent }
+  end
+
+  # ViewComponent::Base rather than ApplicationComponent, so a component skipping the base
+  # class is caught too
+  def view_component_classes
     Rails.application.eager_load!
-    ApplicationComponent.descendants.select(&:identifier)
+    components = Rails.root.join("app/components").to_s
+    ViewComponent::Base.descendants.select { it.identifier&.start_with?(components) } - [ApplicationComponent]
   end
 
   # The components whose markup digest is folded into a cache key: one keying its own
