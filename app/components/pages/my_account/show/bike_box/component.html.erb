@@ -136,10 +136,10 @@
       <% @user_alerts.each do |user_alert| %>
         <%= render(UI::Alerts::Base::Component.new(margin_classes: "tw:mb-0")) do %>
           <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
-          <%= link_to translation(".add_it_now"), user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, action: "update", class: "twlink-underlined" %>
+          <%= render(UI::ButtonLink::Component.new(text: translation(".add_it_now"), href: user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, color: :primary, size: :sm, form: {class: "tw:ml-1 tw:inline-block"})) %>
 
           <div class="tw:mt-2 tw:text-sm">
-            <%= link_to translation(".ignore_this_suggestion"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, action: "update", class: "twlink-underlined" %>
+            <%= link_to translation(".ignore_this_suggestion"), user_alert_path(id: user_alert.id, alert_action: "dismiss"), method: :patch, action: "update", class: "twlink-underlined twless-strong" %>
           </div>
         <% end %>
       <% end %>
