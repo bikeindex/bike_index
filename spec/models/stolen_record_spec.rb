@@ -301,6 +301,19 @@ RSpec.describe StolenRecord, type: :model do
         expect(result.to_date.to_s).to eq("2013-07-22")
       end
     end
+    # A one-digit year raised in production
+    context "single digit year" do
+      let(:date) { "000#{Time.current.year % 10}-01-01T09:45" }
+      it "sets the latest year ending in that digit" do
+        expect(result.to_date.to_s).to eq("#{Time.current.year}-01-01")
+      end
+      context "digit after this year's" do
+        let(:date) { "000#{(Time.current.year + 1) % 10}-01-01T09:45" }
+        it "sets the year a decade back" do
+          expect(result.to_date.to_s).to eq("#{Time.current.year - 9}-01-01")
+        end
+      end
+    end
     context "date next year" do
       let(:date) { Time.current + 2.months }
       it "it sets the year to last year" do
