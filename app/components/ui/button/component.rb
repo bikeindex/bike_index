@@ -16,7 +16,7 @@ module UI
         sm: "#{STANDARD_SHAPE} tw:px-2.5 tw:py-1 tw:text-xs",
         md: "#{STANDARD_SHAPE} tw:px-3 tw:py-1.5 tw:text-sm",
         lg: "#{STANDARD_SHAPE} tw:px-4 tw:py-2 tw:text-base",
-        callout: "tw:rounded-full tw:px-10 tw:py-4 tw:text-base tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:transition-all tw:duration-300 tw:not-disabled:not-aria-disabled:hover:-translate-y-0.5"
+        callout: "tw:rounded-full tw:px-10 tw:py-4 tw:text-base tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:transition-all tw:duration-300 tw:not-disabled:not-aria-disabled:hover:-translate-y-0.5 tw:is-active:translate-y-0"
       }.freeze
 
       # Hover is guarded against both ways an element says it's disabled — :disabled for a
