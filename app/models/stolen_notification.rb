@@ -14,13 +14,8 @@
 #  updated_at        :datetime         not null
 #  bike_id           :integer
 #  doorkeeper_app_id :bigint
-#  organization_id   :bigint
 #  receiver_id       :integer
 #  sender_id         :integer
-#
-# Indexes
-#
-#  index_stolen_notifications_on_organization_id  (organization_id)
 #
 class StolenNotification < ApplicationRecord
   KIND_ENUM = {
@@ -29,19 +24,17 @@ class StolenNotification < ApplicationRecord
     unstolen_blocked: 2,
     unstolen_claimed_permitted: 3,
     unstolen_unclaimed_permitted: 4,
-    unstolen_unclaimed_permitted_direct: 5,
-    unstolen_organization_permitted: 6
+    unstolen_unclaimed_permitted_direct: 5
   }.freeze
 
   # Kind enum was added to track how often various types of messages were sent
-  # in #2275 - only unstolen_organization_permitted is used for logic (the email's copy)
+  # in #2275 - it isn't currently used for logic, just data analysis
   enum :kind, KIND_ENUM
 
   belongs_to :bike
   belongs_to :sender, class_name: "User", foreign_key: :sender_id
   belongs_to :receiver, class_name: "User", foreign_key: :receiver_id
   belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application"
-  belongs_to :organization, -> { with_deleted }
 
   has_many :notifications, as: :notifiable
 
@@ -69,9 +62,7 @@ class StolenNotification < ApplicationRecord
   end
 
   def set_calculated_attributes
-    self.organization = sender_organization if new_record?
-    # A phone registration's owner_email is the phone number
-    self.receiver_email ||= (organization_message? && !bike.phone_registration?) ? bike.owner_email : bike.contact_owner_email(sender)
+    self.receiver_email ||= bike&.contact_owner_email(sender)
     self.receiver ||= bike.owner
     self.send_dates ||= [].to_json
     self.kind ||= calculated_kind
@@ -84,17 +75,6 @@ class StolenNotification < ApplicationRecord
     STR
   end
 
-  # Stored on create - the sender's memberships and the bike's registrations can
-  # change before the email sends
-  def sender_organization
-    new_record? ? calculated_organization : organization
-  end
-
-  # An org messaging a bike registered with it isn't reporting it stolen
-  def organization_message?
-    !bike.status_stolen? && sender_organization.present?
-  end
-
   def mail_snippet
     return nil if doorkeeper_app_id.blank?
 
@@ -102,15 +82,6 @@ class StolenNotification < ApplicationRecord
   end
 
   private
-
-  # Falls back to the oldest, not Organization's default name order
-  def calculated_organization
-    return @calculated_organization if defined?(@calculated_organization)
-
-    organizations = Organization.where(id: sender&.organization_roles&.select(:organization_id))
-      .where(id: bike.bike_organizations.select(:organization_id)).reorder(:id).to_a
-    @calculated_organization = organizations.find { it.id == organization_id } || organizations.first
-  end
 
   def calculated_unstolen_blocked?
     !bike.status_stolen? && !bike.contact_owner?(sender)
@@ -122,9 +93,7 @@ class StolenNotification < ApplicationRecord
     else
       return "unstolen_blocked" unless permitted_send?
 
-      if organization_message?
-        "unstolen_organization_permitted"
-      elsif bike&.claimed?
+      if bike&.claimed?
         "unstolen_claimed_permitted"
       elsif bike&.current_ownership&.organization_direct_unclaimed_notifications?
         "unstolen_unclaimed_permitted_direct"

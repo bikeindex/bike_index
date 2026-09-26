@@ -82,6 +82,23 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
+  def organization_message(organization_message)
+    @organization = organization_message.organization
+    component_args = {organization_message:}
+    subject_vars = {organization_name: @organization.short_name, bike_type: organization_message.bike.type}
+
+    I18n.with_locale(organization_message.receiver&.preferred_language) do
+      mail(reply_to: organization_message.sender.email,
+        to: organization_message.receiver_email,
+        subject: default_i18n_subject(subject_vars),
+        tag: __callee__) do |format|
+        # Fresh component per format: ViewComponent locks an instance to the format used on first render
+        format.html { render Emails::OrganizationMessage::Component.new(**component_args) }
+        format.text { render Emails::OrganizationMessage::Component.new(**component_args) }
+      end
+    end
+  end
+
   def hot_sheet(hot_sheet, override_emails = nil)
     @organization = hot_sheet.organization
     stolen_records = hot_sheet.fetch_stolen_records

@@ -5,11 +5,11 @@ module Pages
     module Show
       module OrgTopActions
         module MessageOwner
-          # Org-admin panel messaging the owner — a stolen notification, or an organization
-          # message for the org's own registration. Rendered inside the org-admin action-panel
-          # accordion (data-panel-name="message")
+          # Org-admin panel messaging the owner — an organization message for the org's own
+          # registration, otherwise a stolen notification. Rendered inside the org-admin
+          # action-panel accordion (data-panel-name="message")
           class Component < ApplicationComponent
-            def initialize(bike:, organization: nil, current_user: nil)
+            def initialize(bike:, organization:, current_user: nil)
               @bike = bike
               @organization = organization
               @current_user = current_user
@@ -24,7 +24,9 @@ module Pages
             end
 
             def organization_message?
-              message_notification.organization_message?
+              return @organization_message if defined?(@organization_message)
+
+              @organization_message = OrganizationMessage.for?(bike: @bike, organization: @organization)
             end
 
             def heading
@@ -47,8 +49,21 @@ module Pages
               end
             end
 
-            def message_notification
-              @message_notification ||= StolenNotification.new(bike: @bike, sender: @current_user, organization: @organization)
+            # A phone registration has no email to send an organization message to
+            def message_form?
+              !(organization_message? && @bike.phone_registration?)
+            end
+
+            def message_record
+              organization_message? ? OrganizationMessage.new : StolenNotification.new
+            end
+
+            def message_url
+              if organization_message?
+                organization_organization_messages_path(organization_id: @organization.to_param)
+              else
+                stolen_notifications_path
+              end
             end
 
             def owner_phone

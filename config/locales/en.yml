@@ -1898,6 +1898,10 @@ en:
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
+      organization_messages:
+        create:
+          sent: Message sent to the owner
+          unable_to_send: Unable to send - %{errors}
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
@@ -2167,8 +2171,6 @@ en:
         please_help_sender_html: >-
           Please help %{sender_name} contact the owner of this %{link}, they believe
           it is <span class='stolen-color'>stolen</span>!
-        sender_email_from_organization_sent_you_a_message_html: "%{sender_email} from
-          %{organization_name} sent you a message about your %{link}"
         sender_email_sent_you_a_message_html: "%{sender_email} sent you a message
           about your %{link}!"
         stolen_bike_type: stolen %{bike_type}
@@ -2185,7 +2187,6 @@ en:
           You registered this %{bike_type} on %{date}. The owner hasn't claimed it
           yet and it isn't marked stolen, so you have received this email to authorize
           contacting them.
-      organization_subject: Message from %{organization} about your %{bike_type}
       subject: Stolen %{bike_type} contact
     updated_terms_email:
       html:
@@ -4676,6 +4677,8 @@ en:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    organization_message:
+      subject: Message from %{organization_name} about your %{bike_type}
     partial_register_confirmation:
       subject: Confirm your email to finish your %{organization_name}registration
     partial_register_confirmation_abandoned:

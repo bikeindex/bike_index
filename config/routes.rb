@@ -501,6 +501,7 @@ Rails.application.routes.draw do
     resources :emails, only: %i[index show edit update]
     resources :parking_notifications
     resources :graduated_notifications, only: %w[index show]
+    resources :organization_messages, only: %i[create]
     resources :impound_records, only: %i[index show update]
     resources :impound_claims, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]

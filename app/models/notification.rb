@@ -45,6 +45,7 @@ class Notification < ApplicationRecord
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
   UNDELIVERABLE_ERROR_NAMES = UNDELIVERABLE_ERRORS.map(&:name).freeze
+  SENDER_RECEIVER_NOTIFIABLE_TYPES = %w[StolenNotification OrganizationMessage].freeze
 
   enum :kind, KIND_ENUM
   enum :message_channel, MESSAGE_CHANNEL_ENUM
@@ -141,10 +142,12 @@ class Notification < ApplicationRecord
       # TODO: THIS IS SHITTY
       customer_contact_ids = CustomerContact.where(creator_id: user_id).pluck(:id)
       stolen_notification_ids = StolenNotification.where(sender: user_id).pluck(:id)
+      organization_message_ids = OrganizationMessage.where(sender: user_id).pluck(:id)
 
       where(user_id: user_id)
         .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
         .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
+        .or(where(notifiable_type: "OrganizationMessage", notifiable_id: organization_message_ids))
     end
   end
 
@@ -198,7 +201,7 @@ class Notification < ApplicationRecord
 
     if notifiable_type == "CustomerContact"
       notifiable&.creator
-    elsif notifiable_type == "StolenNotification"
+    elsif SENDER_RECEIVER_NOTIFIABLE_TYPES.include?(notifiable_type)
       notifiable&.sender
     elsif impound_claim?
       notifiable&.user
@@ -266,7 +269,7 @@ class Notification < ApplicationRecord
 
   def calculated_email
     c_email = notifiable&.email if b_param? || %w[Payment UserEmail].include?(notifiable_type)
-    c_email ||= notifiable&.receiver_email if stolen_notification?
+    c_email ||= notifiable&.receiver_email if SENDER_RECEIVER_NOTIFIABLE_TYPES.include?(notifiable_type)
     c_email ||= user&.email if user_id.present?
     c_email ||= notifiable&.user_email if customer_contact?
     c_email ||= bike_with_fallback&.owner_email
@@ -274,7 +277,7 @@ class Notification < ApplicationRecord
   end
 
   def calculated_user_id
-    return notifiable&.receiver_id if notifiable_type == "StolenNotification"
+    return notifiable&.receiver_id if SENDER_RECEIVER_NOTIFIABLE_TYPES.include?(notifiable_type)
 
     notifiable&.user_id if defined?(notifiable.user_id)
   end
