@@ -663,7 +663,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       # until it's saved - and nothing after this post resolves it again
       it "stops at the safety pages, which the submission is what asks for" do
         b_param = nil
-        expect { b_param = register_e_scooter }.to_not change(Bike, :count)
+        expect { b_param = register_e_scooter }
+          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
       end
     end
@@ -706,7 +707,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
         it "asks for the attestation, which is theirs to agree to" do
           b_param = nil
-          expect { b_param = register_e_scooter }.to_not change(Bike, :count)
+          expect { b_param = register_e_scooter }
+            .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
         end
       end
@@ -736,7 +738,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           post "/register", params: {b_param_token: b_param.id_token, propulsion_type_motorized: true,
                                      b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}}
           expect { patch "/register", params: {b_param_token: b_param.id_token, bike: details} }
-            .to_not change(Bike, :count)
+            .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
         end
       end
