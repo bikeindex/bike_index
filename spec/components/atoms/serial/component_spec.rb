@@ -48,6 +48,24 @@ RSpec.describe Atoms::Serial::Component, type: :component do
       end
     end
 
+    context "for an organization the bike is registered with" do
+      let(:bike) { FactoryBot.create(:bike_organized, :impounded, serial_number: "FFF333", cycle_type: :tandem).reload }
+      let(:options) { {organization: bike.organizations.first} }
+
+      it "shows the serial with the unauthorized-users note" do
+        expect(component.css("span.serial-span").text).to eq "FFF333"
+        expect(component.css("em").text).to eq "hidden for unauthorized users"
+      end
+
+      context "with another organization" do
+        let(:options) { {organization: FactoryBot.create(:organization)} }
+
+        it "hides the serial" do
+          expect(component.css("span.less-strong").text).to eq "hidden"
+        end
+      end
+    end
+
     context "for a user who may see it" do
       let(:options) { {user: FactoryBot.create(:superuser)} }
 
