@@ -924,6 +924,20 @@ RSpec.describe BParam, type: :model do
           expect(BParam.unfinished_registrations.pluck(:id)).to eq []
           expect(creator.reload.alert_slugs).to eq []
         end
+
+        it "doesn't expire until they're agreed to" do
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id, created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day,
+            params: b_param.params.merge("acknowledgment_pending" => true))
+
+          expect(b_param.unfinished_registration?).to be_truthy
+          expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq [b_param.id]
+          expect(BParam.unfinished_registrations.pluck(:id)).to eq [b_param.id]
+
+          b_param.update(params: b_param.params.except("acknowledgment_pending"))
+
+          expect(b_param.unfinished_registration?).to be_falsey
+          expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq []
+        end
       end
     end
 

@@ -103,7 +103,8 @@ class BParam < ApplicationRecord
   # at submit) - only seeds and a prefilled email, nothing worth keeping
   scope :without_bike_values, -> { bike_params_empty.or(where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
   scope :step_1_submitted, -> { where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL") }
-  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
+  # One owing the safety rules never expires - its bike is unfinished until they're agreed to
+  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION).or(acknowledgment_pending) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
@@ -310,6 +311,8 @@ class BParam < ApplicationRecord
 
   def finished_registration? = with_bike? && !acknowledgment_pending?
 
+  def unexpired? = acknowledgment_pending? || created_at.present? && created_at >= Time.current - TOKEN_EXPIRATION
+
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
   # after_commit a destroy fires resolves its alert rather than re-saving it.
@@ -317,7 +320,7 @@ class BParam < ApplicationRecord
   # that queries: one made for someone else isn't the creator's bike to alert about
   def unfinished_registration?(user = creator)
     !destroyed? && register_flow? && !finished_registration? && manufacturer_id.present? &&
-      created_at.present? && created_at > Time.current - TOKEN_EXPIRATION && self_made?(user)
+      unexpired? && self_made?(user)
   end
 
   def register_flow? = Ownership::ORIGIN_REG_FLOW.include?(origin)
