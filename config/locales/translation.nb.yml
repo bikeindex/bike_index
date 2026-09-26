@@ -2178,6 +2178,8 @@ nb:
           owner_already_has_account: Eieren av denne %{bike_type} har allerede en
             konto på Bike Index. Logg på for å gjøre krav på det!
           you_have_to_log_in: Beklager, du må logge inn.
+          sign_in_to_continue_registration: Logg inn for å fortsette registreringen
+            din
         ensure_member_of!:
           accept_tos_for_orgs: Vennligst godta vilkårene for bruk for organisasjoner.
           not_a_member_of_that_org: Du er ikke medlem av den organisasjonen!
