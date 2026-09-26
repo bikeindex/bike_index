@@ -33,6 +33,14 @@ RSpec.describe EmailJobs::OwnershipInvitationJob, type: :job do
       expect { described_class.new.perform(ownership.id) }.to change(Notification, :count).by(1)
       expect(ActionMailer::Base.deliveries.count).to eq 1
     end
+
+    it "sends for a later owner, who isn't the one owing them" do
+      transferred = BikeServices::OwnershipTransferer.find_or_create(bike, updator: nil,
+        new_owner_email: "new@example.com")
+      expect(transferred.initial?).to be_falsey
+
+      expect { described_class.new.perform(transferred.id) }.to change(Notification, :count).by(1)
+    end
   end
 
   context "notification already exists" do
