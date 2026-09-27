@@ -5,7 +5,7 @@
 >
   <%# With dev info on this always shows, so the trigger would only ever close it %>
   <% unless @display_dev_info %>
-    <%= render(UI::Collapse::Component.new(text: "Creation data & developer information", chevron: true, color: :link, selectable: true)) %>
+    <%= render(UI::Collapse::Component.new(text: "Creation data & developer information", chevron: true, color: :link)) %>
   <% end %>
 
   <div

@@ -9,7 +9,7 @@ RSpec.describe Pages::Admin::Bikes::CreationData::Component, type: :component do
   let(:content) { component.at_css("[data-ui--collapse-target='content']") }
 
   it "renders the ownership, collapsed behind a trigger" do
-    expect(component).to have_css("[data-action~='click->ui--collapse#toggle']", text: "Creation data & developer information")
+    expect(component).to have_button("Creation data & developer information")
     expect(content["class"]).to include "tw:hidden"
     expect(component).to have_content("Ownership")
     expect(component).to have_content("No BParams exist")
@@ -24,7 +24,7 @@ RSpec.describe Pages::Admin::Bikes::CreationData::Component, type: :component do
 
     # Dev info means it always shows, so a trigger could only ever close it
     it "renders open, with no trigger" do
-      expect(component).to_not have_css("[data-action~='click->ui--collapse#toggle']", text: "Creation data & developer information")
+      expect(component).to_not have_button("Creation data & developer information")
       expect(content["class"]).to_not include "tw:hidden"
       expect(component).to have_content("ID: #{bike.current_ownership.id}")
     end

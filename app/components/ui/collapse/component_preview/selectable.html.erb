@@ -1,5 +1,5 @@
 <div data-controller="ui--collapse">
-  <%= render UI::Collapse::Component.new(chevron: true, selectable: true, color: :link) do %>
+  <%= render UI::Collapse::Component.new(chevron: true, color: :link) do %>
     <span>Selectable label</span>
     <%= render(UI::Badge::Component.new(text: "3", size: :sm)) %>
   <% end %>

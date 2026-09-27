@@ -36,7 +36,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     # and flips the trigger's aria-expanded and data-active.
     expect(page).to have_content("Persisted panel body")
     expect(page).to have_current_path(/details=1/, url: true)
-    expect(page).to have_css("button[aria-expanded='true'][data-active='true']", text: "Toggle details")
+    expect(page).to have_css("[role='button'][aria-expanded='true'][data-active='true']", text: "Toggle details")
     # Rotated, which is what spins a trigger's icon while its panel is open
     expect(page).to have_css("[data-ui--collapse-target='chevron'].tw\\:rotate-90")
 
@@ -45,18 +45,18 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     # Reloading with the param restores the open state (and the trigger's flags) without a click.
     visit "#{preview_path}?details=1"
     expect(page).to have_content("Persisted panel body")
-    expect(page).to have_css("button[aria-expanded='true'][data-active='true']", text: "Toggle details")
+    expect(page).to have_css("[role='button'][aria-expanded='true'][data-active='true']", text: "Toggle details")
 
     # Collapsing writes 0 rather than dropping the param, so the state is always explicit.
     click_button("Toggle details")
     expect(page).to have_no_content("Persisted panel body")
     expect(page).to have_current_path(/details=0/, url: true)
-    expect(page).to have_css("button[aria-expanded='false'][data-active='false']", text: "Toggle details")
+    expect(page).to have_css("[role='button'][aria-expanded='false'][data-active='false']", text: "Toggle details")
 
     # And it's restored collapsed, rather than the param's presence alone opening it
     visit "#{preview_path}?details=0"
     expect(page).to have_no_content("Persisted panel body")
-    expect(page).to have_css("button[aria-expanded='false'][data-active='false']", text: "Toggle details")
+    expect(page).to have_css("[role='button'][aria-expanded='false'][data-active='false']", text: "Toggle details")
 
     # The storage-key panel keeps the same state in localStorage, so the URL stays clean
     visit "/rails/view_components/ui/collapse/component/with_storage_key"
@@ -68,7 +68,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
 
     visit "/rails/view_components/ui/collapse/component/with_storage_key"
     expect(page).to have_content("Stored panel body")
-    expect(page).to have_css("button[aria-expanded='true']", text: "Toggle stored panel")
+    expect(page).to have_css("[role='button'][aria-expanded='true']", text: "Toggle stored panel")
 
     click_button("Toggle stored panel")
     expect(page).to have_no_content("Stored panel body")
@@ -76,7 +76,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     expect(page).to have_no_content("Stored panel body")
   end
 
-  it "selects a selectable trigger's label on a drag, and toggles on a click or a key" do
+  it "selects the trigger's label on a drag, and toggles on a click or a key" do
     visit "/rails/view_components/ui/collapse/component/selectable"
     wait_for_stimulus("ui--collapse")
     expect_axe_clean
@@ -96,6 +96,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     label.click
     expect(page).to have_content("Selectable panel body")
     expect(page).to have_css("[role='button'][aria-expanded='true'][data-active='true']")
+    expect(page.evaluate_script("getComputedStyle(document.querySelector('[role=button]')).fontWeight")).to eq "700"
 
     trigger = find("[data-ui--collapse-target='trigger']")
     trigger.send_keys(:enter)

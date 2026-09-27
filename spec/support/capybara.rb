@@ -27,6 +27,8 @@ end
 Capybara.configure do |config|
   config.default_driver = :playwright
   config.javascript_driver = :playwright
+  # UI::Collapse triggers are role=button spans, so Safari can select their text
+  config.enable_aria_role = true
 end
 
 # Each parallel worker needs its own port - a pinned one leaves all but the first
