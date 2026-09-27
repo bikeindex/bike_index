@@ -12,6 +12,8 @@ RSpec.describe MembershipsController, type: :request do
         expect(response).to render_template("new")
         expect(flash).to_not be_present
         expect(assigns(:referral_source)).to be_blank
+        expect(response).to render_template(layout: "application")
+        expect(response.body).to match("Choose your membership")
       end
       context "with UTM" do
         it "assigns referral_source" do

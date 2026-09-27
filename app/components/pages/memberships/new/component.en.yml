@@ -1,0 +1,116 @@
+---
+en:
+  components:
+    pages:
+      memberships:
+        new:
+          become_a_member: Become a member
+          bike_index_membership: Bike Index membership
+          bikes_registered_free: bikes registered, free
+          builds_next: Builds next
+          choose_your_membership: Choose your membership
+          cycling_cap: Cycling cap
+          every_tier_keeps_it_free: >-
+            Every tier keeps the registry free and funds new features. Higher tiers
+            come with more thank-yous.
+          faq_cancel_answer: >-
+            Any time, from your account page. Switching between monthly and yearly
+            works the same way.
+          faq_cancel_question: Can I change tiers or cancel?
+          faq_free_answer: >-
+            Yes. Registering, searching, and reporting a theft are free for everyone,
+            forever. Membership is how we pay for keeping it that way.
+          faq_free_question: Is registering a bike still free if I don't join?
+          faq_gear_answer: After you join we email you for a mailing address and ship
+            it from there.
+          faq_gear_question: When do I get my cap or shirt?
+          faq_marketplace_answer: >-
+            No. Anyone can list a registered bike with no fees. Members get their
+            listings promoted to the top.
+          faq_marketplace_question: Do I need to be a member to sell on the marketplace?
+          faq_tax_answer: >-
+            Bike Index is a 501(c)(3) nonprofit, EIN 81-4296194. Memberships and one-time
+            donations are tax-deductible in the US.
+          faq_tax_question: Is membership tax-deductible?
+          free_alerts_body: >-
+            Theft reports go out to shops, police departments, campuses, and riders
+            near where the bike was taken.
+          free_alerts_title: Stolen bike alerts
+          free_partners_body: >-
+            Onboarding new shops, departments, and cities, and helping police match
+            recovered bikes to their owners.
+          free_partners_title: Partners and recoveries
+          free_registration_body: >-
+            Registering, searching, and checking a used bike cost nothing, for riders,
+            shops, and police. We don't sell rider data.
+          free_registration_title: Registration and search
+          join_monthly: Join as %{level} — %{price}/mo
+          join_yearly: Join as %{level} — %{price}/yr
+          keep_bike_index_free: Keep Bike Index free for every rider
+          keeps_free: Keeps free
+          lede: >-
+            Membership is a monthly donation to Bike Index, a nonprofit. It pays for
+            the registry and the stolen bike alerts that get bikes home, and it funds
+            the new tools we build next. Registering a bike and reporting a theft
+            will always be free. Members are the reason we can promise that.
+          live: Live
+          member_gear: Member gear
+          member_gear_body: >-
+            Plus members get the Bike Index cycling cap. Patrons get the sun shirt.
+            Both are designed by Kelsey Graywill, and we mail them to you after you
+            join.
+          members_keep_it_free: A million bikes are registered. Members keep it free
+            for the next million.
+          monthly: Monthly
+          new_tools_for_bike_owners: New tools for bike owners
+          next: Next
+          next_ebike_database_body: A Global UL-certification database
+          next_ebike_database_title: E-Bike Database
+          next_ios_app_body: Register and manage bikes from your phone
+          next_ios_app_title: The iOS app
+          next_marketplace_body: Registered bikes only, checked against theft reports
+          next_marketplace_title: A safer marketplace
+          next_oem_parts_body: Factory specs and photos for every model
+          next_oem_parts_title: OEM parts and stock images
+          next_versioning_body: Keep a record as your bike changes
+          next_versioning_title: Bike versioning
+          official_registry: >-
+            The official registry for more than 1,000 police departments, universities,
+            cities, and shops
+          or_make_a_one_time_donation: Or make a one-time donation
+          partner_organizations: partner shops, police departments, and cities
+          per_month: "/ month"
+          per_year: "/ year"
+          perk_cycling_cap: Bike Index member cycling cap
+          perk_everything_in_basic: Everything in Basic
+          perk_everything_in_basic_and_plus: Everything in Basic and Plus
+          perk_faster_support: Faster support responses
+          perk_listings_promoted: Your marketplace listings promoted to the top
+          perk_member_badge: Member badge on your Bike Index profile
+          perk_no_ads: No ads, if we ever show them
+          perk_patron_badge: Patron badge on your Bike Index profile
+          perk_promoted_alert: A free promoted alert if your bike is stolen
+          perk_sun_shirt: Bike Index Patron sun shirt
+          perk_top_listing_placement: Top listing placement on the marketplace
+          plans_from: Plans from %{price} a month
+          questions: Questions
+          read_more_recovery_stories: Read more recovery stories
+          recommended: Recommended
+          recoveries_reported_by_owners: Every recovery is reported by the person
+            who got their bike back.
+          stolen_bikes_recovered: stolen bikes recovered
+          summary_monthly: "%{level} membership, %{price} a month"
+          summary_yearly: "%{level} membership, %{price} a year"
+          sun_shirt: Sun shirt
+          tax_deductible_cancel_any_time: >-
+            Memberships and one-time donations are tax-deductible in the US. Change
+            tiers or cancel any time from your account.
+          tax_deductible_ein: >-
+            Memberships and one-time donations are tax-deductible in the US. Bike
+            Index is a 501(c)(3) nonprofit, EIN 81-4296194.
+          the_registry_open_to_everyone: The registry, open to everyone
+          two_months_free: Two months free
+          value_returned_to_owners: value returned to owners
+          wear_the_shield: Wear the shield
+          what_members_make_possible: What members make possible
+          yearly: Yearly

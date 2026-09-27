@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    atoms:
+      recovery_display_card:
+        recovered: Recovered

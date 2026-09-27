@@ -30,7 +30,9 @@ module UI
         pink: "tw:bg-pink-50 tw:text-pink-400 tw:border-transparent tw:dark:bg-pink-950 tw:dark:text-pink-400",
         rose: "tw:bg-rose-50 tw:text-rose-700 tw:border-transparent tw:dark:bg-rose-950 tw:dark:text-rose-200",
         orange: "tw:bg-orange-50 tw:text-orange-700 tw:border-transparent tw:dark:bg-orange-950 tw:dark:text-orange-200",
-        empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600"
+        empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600",
+        # UI::Button's yellow
+        yellow: "tw:bg-[#ffd660] tw:text-slate-900 tw:border-transparent"
       }.freeze
 
       # Solid pills (saturated background + white text) — e.g. the redesign audience pill
@@ -45,7 +47,8 @@ module UI
         pink: "tw:bg-pink-500 tw:text-white tw:border-transparent",
         rose: "tw:bg-rose-500 tw:text-white tw:border-transparent",
         orange: "tw:bg-orange-500 tw:text-white tw:border-transparent",
-        empty: "tw:bg-gray-500 tw:text-white tw:border-transparent"
+        empty: "tw:bg-gray-500 tw:text-white tw:border-transparent",
+        yellow: "tw:bg-[#ffd660] tw:text-slate-900 tw:border-transparent"
       }.freeze
 
       def self.badge_classes(color:, size:, cursor: "tw:cursor-default", solid: false)
