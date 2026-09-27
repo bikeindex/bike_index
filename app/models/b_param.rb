@@ -375,6 +375,8 @@ class BParam < ApplicationRecord
     "status_with_owner"
   end
 
+  def status_humanized = Bike.status_humanized(status)
+
   def status_stolen?
     status == "status_stolen"
   end

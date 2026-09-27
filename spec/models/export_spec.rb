@@ -296,10 +296,9 @@ RSpec.describe Export, type: :model do
       let(:impound_user) { FactoryBot.create(:organization_user, organization:) }
       let(:bike_registered) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       let!(:impound_record_registered) { FactoryBot.create(:impound_record, organization:, user: impound_user, bike: bike_registered) }
-      let(:bike_unregistered) { FactoryBot.create(:bike, user_hidden: true) }
-      let!(:impound_record_unregistered) { FactoryBot.create(:impound_record, organization:, user: impound_user, bike: bike_unregistered) }
-      let!(:impound_record_resolved) { FactoryBot.create(:impound_record_resolved, organization:, user: impound_user) }
-      let!(:impound_record_other_organization) { FactoryBot.create(:impound_record_with_organization) }
+      let!(:impound_record_registered_elsewhere) { FactoryBot.create(:impound_record, organization:, user: impound_user) }
+      let(:bike_resolved) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      let!(:impound_record_resolved) { FactoryBot.create(:impound_record_resolved, organization:, user: impound_user, bike: bike_resolved) }
       let!(:bike_not_impounded) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       let!(:partial_registration) { BParam.create(params: {bike: {creation_organization_id: organization.id}}, origin: "embed_partial") }
 
@@ -307,7 +306,9 @@ RSpec.describe Export, type: :model do
         expect(organization.incomplete_b_params.pluck(:id)).to eq([partial_registration.id])
         expect(export.partial_registrations).to be_falsey
         expect(export.matching_kinds).to eq([:impounded])
-        expect(export.bikes_scoped.pluck(:id)).to match_array([bike_registered.id, bike_unregistered.id])
+        expect(impound_record_registered_elsewhere.bike.reload.status).to eq "status_impounded"
+        expect(bike_resolved.reload.status).to eq "status_with_owner"
+        expect(export.bikes_scoped.pluck(:id)).to eq([bike_registered.id])
         expect(export.incompletes_scoped.pluck(:id)).to eq([])
       end
       context "with the legacy partial_registrations: none" do
@@ -320,91 +321,41 @@ RSpec.describe Export, type: :model do
     end
   end
 
-  describe "permitted_headers_for" do
+  describe "permitted_headers" do
     let(:organization) { Organization.new }
-    let(:organization_reg_phone) { Organization.new(enabled_feature_slugs: ["reg_phone"]) }
-    let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker]) }
-    let(:permitted_headers) { Export::PERMITTED_HEADERS }
-    let(:additional_headers) { %w[address bike_sticker organization_affiliation phone student_id] }
-    let(:all_headers) do
-      %w[
-        address
-        bike_sticker
-        color
-        extra_registration_number
-        impounded_at
-        is_impounded
-        is_stolen
-        link
-        manufacturer
-        model
-        motorized
-        organization_affiliation
-        organization_notes
-        owner_email
-        owner_name
-        partial_registration
-        phone
-        registered_at
-        registered_by
-        registration_method
-        serial
-        status
-        student_id
-        thumbnail
-        vehicle_type
-      ]
+    let(:search_column_headers) do
+      %w[color link manufacturer model occurred_at owner_email owner_name propulsion_type registered_at
+        registration_method serial status thumbnail updated_at vehicle_type]
     end
-    it "returns the array we expect" do
-      expect(permitted_headers.count).to eq 16
-      expect(Export.permitted_headers).to eq permitted_headers
-      expect(Export.permitted_headers(organization)).to eq permitted_headers
-      expect(organization_reg_phone.additional_registration_fields).to eq(["reg_phone"])
-      expect(Export.permitted_headers(organization_reg_phone)).to eq(permitted_headers + ["phone"])
-      expect(organization_full.additional_registration_fields.map { |s| s.gsub("reg_", "") }).to eq additional_headers
-      expect(Export.permitted_headers(organization_full).sort).to eq(all_headers - %w[is_impounded impounded_at organization_notes partial_registration])
+    it "is the organization's registrations search columns" do
+      expect(Export.permitted_headers(organization)).to match_array search_column_headers
     end
-    context "with impounded, partial and notes" do
-      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes registration_notes show_partial_registrations]) }
-      # All headers except the reg_field headers
-      let(:permitted_headers) { all_headers - %w[address bike_sticker organization_affiliation phone student_id] }
-      it "returns the array we expect" do
-        expect(Export.permitted_headers(organization).sort).to eq permitted_headers
+    context "with every feature" do
+      let(:organization) { Organization.new(enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS) }
+      it "is every header but partial_registration, which the job adds" do
+        expect(Export.permitted_headers(organization)).to match_array(Export::HEADERS - ["partial_registration"])
       end
     end
     context "with bike_stickers from regional organization" do
       let!(:organization_in_region) { FactoryBot.create(:organization, :in_nyc) }
       let!(:organization_regional) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: %w[bike_stickers regional_bike_counts]) }
-      it "returns with reg_bike_sticker" do
+      it "offers the sticker column in the region" do
         organization_regional.reload
-        expect(organization_regional.regional?).to be_truthy
-        expect(organization_regional.regional_ids).to eq([organization_in_region.id])
-        expect(organization_regional.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
-        expect(Export.permitted_headers(organization_regional)).to eq(permitted_headers + ["bike_sticker"])
-        expect(organization_regional.enabled?("reg_student_id")).to be_falsey
-        expect(organization_regional.enabled?("reg_bike_sticker")).to be_truthy
-        expect(organization_regional.additional_registration_fields).to eq(["reg_bike_sticker"])
-        expect(Export.permitted_headers(organization_regional)).to eq(permitted_headers + ["bike_sticker"])
+        expect(Export.permitted_headers(organization_regional)).to match_array(search_column_headers + ["bike_sticker"])
 
         organization_in_region.update(updated_at: Time.current) # To bump enabled features there
         organization_in_region.reload
-        expect(organization_in_region.regional?).to be_falsey
-        expect(organization_in_region.regional_parents.pluck(:id)).to eq([organization_regional.id])
         expect(organization_in_region.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker])
-        expect(organization_in_region.enabled?("reg_student_id")).to be_falsey
-        expect(organization_in_region.enabled?("reg_bike_sticker")).to be_truthy
-        expect(organization_in_region.additional_registration_fields).to eq(["reg_bike_sticker"])
-        expect(Export.permitted_headers(organization_in_region)).to eq(permitted_headers + ["bike_sticker"])
+        expect(Export.permitted_headers(organization_in_region)).to match_array(search_column_headers + ["bike_sticker"])
       end
     end
     context "with superuser" do
       let(:user) { FactoryBot.create(:superuser) }
       let(:organization) { FactoryBot.create(:organization) }
-      let(:export) { Export.new(user:, options: {headers: all_headers}, kind: :organization, organization:) }
-      it "returns all_headers" do
-        expect(Export.permitted_headers(:include_all).sort).to eq all_headers
+      let(:export) { Export.new(user:, options: {headers: Export::HEADERS + %w[is_stolen]}, kind: :organization, organization:) }
+      it "permits every header, and nothing else" do
         expect(export).to be_valid
-        expect(export.headers.sort).to eq all_headers
+        expect(export.headers).to match_array Export::HEADERS
       end
     end
   end

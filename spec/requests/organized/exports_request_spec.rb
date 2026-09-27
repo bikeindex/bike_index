@@ -222,7 +222,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           get "#{base_url}/new"
           expect(response.code).to eq("200")
           expect(response.body).to include("export_headers_organization_notes")
-          expect(response.body).to include("Organization Notes")
+          expect(response.body).to include("Registration Notes")
         end
       end
       context "passed properties" do
@@ -232,7 +232,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             organization_id: current_organization.id,
             custom_bike_ids: "123_12_44444",
             only_custom_bike_ids: true,
-            headers: %w[link registered_at manufacturer model color serial is_stolen],
+            headers: %w[link registered_at manufacturer model color serial status],
             user_id: current_user.id
           }
         end
@@ -242,7 +242,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
           export = assigns(:export)
-          expect(export.headers).to eq(%w[link registered_at manufacturer model color serial is_stolen])
+          expect(export.headers).to eq(%w[link registered_at manufacturer model color serial status])
           expect(export.only_custom_bike_ids).to be_truthy
           expect(export.custom_bike_ids).to eq([123, 12, 44444])
         end
@@ -302,7 +302,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           end_at: nil,
           file_format: "xlsx",
           timezone: "America/Los Angeles",
-          headers: %w[link registered_at manufacturer model registered_by]
+          headers: %w[link registered_at manufacturer model status]
         }
       end
       let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221 ") }
