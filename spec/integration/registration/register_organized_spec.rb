@@ -193,10 +193,9 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       it "labels the submit and asks for the owner's name off what's filled in above them" do
         sign_in(member)
         visit "/o/#{organization.to_param}/registrations/new"
-        within("form[action$='/registrations/switches']") do
-          check "Show registration in a single page"
-          click_button "Update"
-        end
+        click_link "Your Register settings"
+        check "Show registration in a single page"
+        click_button "Update"
 
         expect(page).to have_button("Complete Bike Registration")
         check "Electric (motorized)"
@@ -211,12 +210,13 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         expect(page).to have_field("bike[user_name]")
 
         # Separate attestation leaves the rules to an owner who isn't the member
-        within("form[action$='/registrations/switches']") do
-          check "Registrant fills out the registration attestation separately"
-          click_button "Update"
-        end
+        click_link "Your Register settings"
+        expect(page).to have_checked_field("Show registration in a single page")
+        check "Registrant fills out the registration attestation separately"
+        click_button "Update"
+        # form-persist restores the draft once it loads, over anything checked before then
+        expect(page).to have_field("b_param[owner_email]", with: owner_email)
         check "Electric (motorized)"
-        fill_in "b_param[owner_email]", with: owner_email
         expect(page).to have_button("Complete Bike Registration")
         fill_in "b_param[owner_email]", with: member.email
         expect(page).to have_button("Next")

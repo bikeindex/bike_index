@@ -139,6 +139,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # Going back to the old view moves add-a-bike onto organized/bikes#new alongside the
     # notification's row, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
+    click_link "Your Register settings"
     click_link "Go back to the old view"
     click_link "Add a bike"
 

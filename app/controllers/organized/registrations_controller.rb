@@ -8,9 +8,9 @@ module Organized
 
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response]
     around_action :set_reading_role, only: :multi_search_response
-    # new renders a component, which takes its content type from the request - and index
-    # answers turbo_stream, so the format is one a link here could ask for
-    before_action :force_html_response, only: :new
+    # new and settings render a component, which takes its content type from the request - and
+    # index answers turbo_stream, so the format is one a link here could ask for
+    before_action :force_html_response, only: %i[new settings]
 
     def index
       return head(:not_acceptable) unless request.format.html? || request.format.turbo_stream?
@@ -80,8 +80,13 @@ module Organized
       sequence = register_flow_sequence(@b_param)
       flow = BikeServices::Register.flow(@b_param, sequence:, single_page: register_setting?(@b_param, "single_page"))
       render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, flow:, organization: current_organization,
-        current_user:, separate_attestation: register_setting?(@b_param, "separate_attestation"),
-        motorized_review: register_motorized_review(@b_param, flow))
+        current_user:, motorized_review: register_motorized_review(@b_param, flow))
+    end
+
+    def settings
+      render Pages::Org::RegisterSettings::Component.new(organization: current_organization,
+        single_page: session_register_setting?("single_page", current_organization.id),
+        separate_attestation: session_register_setting?("separate_attestation", current_organization.id))
     end
 
     # Both switches submit together, so an unchecked box is what turns one off

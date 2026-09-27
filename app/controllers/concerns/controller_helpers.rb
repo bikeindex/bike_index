@@ -343,13 +343,15 @@ module ControllerHelpers
 
   private
 
-  # The organization add-a-bike page's switches. Step 1 saves them onto the registration;
+  # The organization's register settings. Step 1 saves them onto the registration;
   # until then the session's apply only to the organization they were set on
   def register_setting?(b_param, key)
-    b_param.params.to_h.fetch("register_#{key}") do
-      settings = session[:register_settings] || {}
-      settings[key].present? && settings["organization_id"].to_s == b_param.creation_organization_id.to_s
-    end
+    b_param.params.to_h.fetch("register_#{key}") { session_register_setting?(key, b_param.creation_organization_id) }
+  end
+
+  def session_register_setting?(key, organization_id)
+    settings = session[:register_settings] || {}
+    settings[key].present? && settings["organization_id"].to_s == organization_id.to_s
   end
 
   # Both entry points into the flow build it the same way - the organization's page and

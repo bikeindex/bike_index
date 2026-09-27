@@ -566,7 +566,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(b_param.owner_email).to be_blank
       expect(response.body).to include("org_sidebar_nav")
       expect(response.body).to include(b_param.id_token)
-      expect(response.body).to include(new_organization_bike_path(organization_id: current_organization.to_param))
+      expect(response.body).to include("#{base_url}/settings")
 
       expect { get "#{base_url}/new" }.to_not change(BParam, :count)
 
@@ -622,7 +622,28 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
-    context "the switches below the legacy one" do
+    context "the register settings" do
+      def checked_switches
+        get "#{base_url}/settings"
+        expect(response.status).to eq(200)
+        Nokogiri::HTML(response.body).css("form[action='#{base_url}/switches'] input[type=checkbox][checked]")
+          .map { it["name"] }
+      end
+
+      it "shows what's set for this organization" do
+        expect(checked_switches).to eq([])
+        expect(response.body).to include("#{new_organization_bike_path(organization_id: current_organization.to_param)}?old_view=true")
+
+        post "#{base_url}/switches", params: {single_page: true}
+        expect(checked_switches).to eq(%w[single_page])
+
+        # Set on another organization, so it isn't this one's
+        session_organization = FactoryBot.create(:organization)
+        FactoryBot.create(:organization_role_claimed, user: current_user, organization: session_organization)
+        post "/o/#{session_organization.to_param}/registrations/switches", params: {single_page: true}
+        expect(checked_switches).to eq([])
+      end
+
       # Both submit together, so what's checked is the whole setting
       def set_switches(**params)
         post "#{base_url}/switches", params: params
@@ -832,6 +853,9 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       it "redirects" do
         expect { get "#{base_url}/new" }.to_not change(BParam, :count)
+        expect(response).to redirect_to user_root_url
+
+        get "#{base_url}/settings"
         expect(response).to redirect_to user_root_url
       end
     end
