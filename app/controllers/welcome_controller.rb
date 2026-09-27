@@ -25,12 +25,15 @@ class WelcomeController < ApplicationController
   end
 
   def recovery_stories
-    @per_page = permitted_per_page(default: 50)
+    @pagy, @recovery_displays = pagy(:countish, RecoveryDisplay.with_attached_photo_processed,
+      limit: permitted_per_page(default: Pages::RecoveryStories::Index::Component::PER_PAGE), page: permitted_page)
 
-    @pagy, @recovery_displays = pagy(:countish, RecoveryDisplay, limit: @per_page, page: permitted_page)
-    @slice1, @slice2 = list_halves(@recovery_displays)
+    flash.now[:notice] = translation(:no_stories_to_display) if @recovery_displays.empty?
+    total_bikes, recoveries_count, recoveries_value, organizations_count =
+      Counts.retrieve_many("total_bikes", "recoveries", "recoveries_value", "organizations")
 
-    flash[:notice] = translation(:no_stories_to_display) if @recovery_displays.empty?
+    render Pages::RecoveryStories::Index::Component.new(recovery_displays: @recovery_displays, pagy: @pagy,
+      total_bikes:, recoveries_count:, recoveries_value:, organizations_count:, currency: current_currency)
   end
 
   # Adding for testing purposes - so we can test where the root url for a user goes - sethherr, 2019-7-9
@@ -42,15 +45,5 @@ class WelcomeController < ApplicationController
 
   def authenticate_user_for_welcome_controller
     authenticate_user(translation_key: :create_account, flash_type: :notice, sign_up_not_in: true)
-  end
-
-  # Split the given array `list` into two halves
-  # Return a tuple with each half as an array.
-  def list_halves(list)
-    return [[], []] if list.empty?
-
-    slice_size = (list.length / 2.0).ceil
-    slice1, slice2 = list.each_slice(slice_size).entries
-    [slice1, slice2 || []]
   end
 end
