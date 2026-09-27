@@ -6581,7 +6581,6 @@ nb:
           subscription_expired_html: Ditt abonnement på Bike Index har utløpt. Ta
             kontakt med %{email_link} for å få den aktivert på nytt.
         organized_shop_integration_alert:
-          add_a_bike: Legg til en sykkel
           already_viewing_add_a_bike_page: Du ser allerede på denne siden
           ascend_card_title: Stige
           dismiss: Avskjedige
@@ -6598,6 +6597,7 @@ nb:
           pos_callout_subhead: Koble til POS-en din, så registreres hver sykkel du
             selger til kunden din på Bike Index.
           pos_callout_title: Registrer sykler automatisk fra salgsstedet ditt
+          add_a_registration: Legg til en registrering
       navbar:
         org_sidebar:
           admin_panel: ADMINISTRASJONSPANEL

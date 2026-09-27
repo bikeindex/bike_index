@@ -6883,7 +6883,6 @@ it:
           subscription_expired_html: Il tuo abbonamento a Bike Index è scaduto. Contatta
             %{email_link} per riattivarlo.
         organized_shop_integration_alert:
-          add_a_bike: Aggiungi una bicicletta
           already_viewing_add_a_bike_page: Stai già visualizzando questa pagina
           ascend_card_title: Ascendere
           dismiss: Congedare
@@ -6901,6 +6900,7 @@ it:
             verrà registrata a nome del tuo cliente su Bike Index.
           pos_callout_title: Registra automaticamente le biciclette dal tuo punto
             vendita
+          add_a_registration: Aggiungi una registrazione
       navbar:
         org_sidebar:
           admin_panel: PANNELLO DI AMMINISTRAZIONE
