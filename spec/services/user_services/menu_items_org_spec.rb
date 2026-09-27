@@ -66,7 +66,7 @@ RSpec.describe UserServices::MenuItemsOrg do
       context "gone back to the old view" do
         subject(:items) { described_class.for(organization:, current_user:, old_register_view: true) }
 
-        it "points add a bike at the embed form" do
+        it "points add a registration at the embed form" do
           expect(items.last).to eq(link_item("Add a registration", "/o/#{organization.to_param}/bikes/new",
             icon: "plus-circle", match_params: {parking_notification: nil}))
         end

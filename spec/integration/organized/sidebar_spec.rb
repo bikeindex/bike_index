@@ -110,7 +110,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(scroller_top).to be > 0
   end
 
-  it "lays a flash beside the sidebar, and tells the two add-a-bike rows apart by the param" do
+  it "lays a flash beside the sidebar, and tells add-a-registration from the notification row by the param" do
     # An unknown code redirects back to the index with the flash
     visit "/o/#{slug}/stickers/missing-code/edit"
 
@@ -136,7 +136,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
 
-    # Going back to the old view moves add-a-bike onto organized/bikes#new alongside the
+    # Going back to the old view moves add-a-registration onto organized/bikes#new alongside the
     # notification's row, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
     click_link "Go back to the old view"
