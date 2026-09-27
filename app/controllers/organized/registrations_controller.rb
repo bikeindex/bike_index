@@ -89,8 +89,7 @@ module Organized
         **session_register_settings)
     end
 
-    # The switches submit together, so an unchecked box turns one off - except under the old
-    # view, which disables the rest so they don't submit. new is what turns the old view off
+    # An unchecked box turns its setting off; the old view disables them, so the session keeps theirs
     def switches
       if params[:old_view].present?
         session[:old_register_view] = true

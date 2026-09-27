@@ -13,15 +13,17 @@
   </div>
 
   <div
-    class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3"
-    data-org--register-settings-target="flowSettings"
+    class="
+      tw:mb-6 tw:gap-x-8 tw:has-disabled:opacity-50 tw:sm:grid
+      tw:sm:grid-cols-3
+    "
   >
     <span class="twlabel tw:sm:text-right"><%= translation(".form_options") %></span>
 
     <div class="tw:sm:col-span-2">
       <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: @single_page,
           label: translation(".single_page"),
-          html_options: {data: {"org--register-settings-target": "oldViewShown", old_view_checked: false}}) %>
+          html_options: {data: {"org--register-settings-target": "oldViewShown"}}) %>
 
       <% if safety_rules? %>
         <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,

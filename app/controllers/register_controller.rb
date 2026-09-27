@@ -336,30 +336,30 @@ class RegisterController < ApplicationController
     if bike.errors.any?
       flash[:error] = @b_param.bike_errors&.to_sentence
       redirect_to step_path(2)
-    elsif single_page_organization.present?
-      redirect_to_single_page(bike)
+    elsif (organization = single_page_organization)
+      redirect_to_single_page(bike, organization)
     else
       redirect_to step_path(:finished)
     end
   end
 
-  # The single page is for registering one after another - but not for an owner finishing
-  # the safety rules a member left them, who isn't the one who submitted it
+  # Not for an owner finishing the safety rules a member left them
   def single_page_organization
     return if current_user.blank? || @b_param.creator_id != current_user.id
 
     @b_param.creation_organization if register_setting?(@b_param, "single_page")
   end
 
-  def redirect_to_single_page(bike)
+  def redirect_to_single_page(bike, organization)
+    bike_display = bike.mnfg_name
     flash[:success] = if @b_param.acknowledgment_pending?
-      translation(:safety_rules_sent, bike_display: bike.mnfg_name, email: bike.owner_email)
+      translation(:safety_rules_sent, bike_display:, email: bike.owner_email)
     elsif @b_param.self_made?(current_user)
-      translation(:registered_own, bike_display: bike.mnfg_name)
+      translation(:registered_own, bike_display:)
     else
-      translation(:registered_for_owner, bike_display: bike.mnfg_name, email: bike.owner_email)
+      translation(:registered_for_owner, bike_display:, email: bike.owner_email)
     end
-    redirect_to new_organization_registration_path(organization_id: single_page_organization.to_param)
+    redirect_to new_organization_registration_path(organization_id: organization.to_param)
   end
 
   def create_params

@@ -692,7 +692,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       let(:color) { FactoryBot.create(:color, name: "Red") }
 
       # The one page submits both steps together, so the whole registration is this post
-      def register_e_scooter(cycle_type: "e-scooter", **switches)
+      def register_on_single_page(cycle_type: "e-scooter", **switches)
         post "#{base_url}/switches", params: {single_page: true, **switches}
         get "#{base_url}/new"
         b_param = BParam.last
@@ -726,7 +726,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       # until it's saved - and nothing after this post resolves it again
       it "stops at the safety pages, which the submission is what asks for, then goes back for the next" do
         b_param = nil
-        expect { b_param = register_e_scooter }
+        expect { b_param = register_on_single_page }
           .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
 
@@ -742,7 +742,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       it "goes back to the single page for the next registration, rather than the finished page" do
         b_param = nil
-        expect { b_param = register_e_scooter(cycle_type: "bike") }.to change(Bike, :count).by 1
+        expect { b_param = register_on_single_page(cycle_type: "bike") }.to change(Bike, :count).by 1
         expect(response).to redirect_to "#{base_url}/new"
         expect(flash[:success]).to eq "The Trek is registered - we've emailed customer@example.com so they can claim it."
 
@@ -752,7 +752,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
 
       it "says the owner was sent the safety rules, when they're left to them" do
-        expect { register_e_scooter(separate_attestation: true) }
+        expect { register_on_single_page(separate_attestation: true) }
           .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
         expect(response).to redirect_to "#{base_url}/new"
         expect(flash[:success]).to eq "The Trek is registered - we've emailed customer@example.com the safety rules " \

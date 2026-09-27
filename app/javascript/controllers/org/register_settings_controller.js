@@ -1,11 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--register-settings'
-// The old view skips the register flow, so its settings don't apply while it's checked.
-// Each shows what the old view does instead - data-old-view-checked - so the single page
-// reads unchecked, and separate attestation checked, since it always leaves the rules to the owner
+// The old view bypasses these settings; each shows what it does instead (data-old-view-checked)
 export default class extends Controller {
-  static targets = ['oldView', 'flowSettings', 'oldViewShown']
+  static targets = ['oldView', 'oldViewShown']
 
   connect () {
     this.apply()
@@ -13,9 +11,10 @@ export default class extends Controller {
 
   apply () {
     const off = this.oldViewTarget.checked
-    this.oldViewShownTargets.forEach(box => this.showOldView(box, off))
-    this.flowSettingsTarget.classList.toggle('tw:opacity-50', off)
-    this.flowSettingsTarget.querySelectorAll('input').forEach(input => { input.disabled = off })
+    this.oldViewShownTargets.forEach(box => {
+      this.showOldView(box, off)
+      box.disabled = off
+    })
   }
 
   // Remembers what it was set to, for when the old view is unchecked
