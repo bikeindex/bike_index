@@ -34,6 +34,52 @@ RSpec.describe "RegistrationsController#toggle_legacy_view", type: :request do
 
       expect(user.reload.feature_registration_show_legacy).to be_falsey
     end
+
+    context "user unconfirmed" do
+      let!(:user) { FactoryBot.create(:user, password:, password_confirmation: password) }
+
+      it "keeps the opt-out in the session until they confirm" do
+        RearGearType.fixed
+        post toggle_legacy_view_registration_path(bike)
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(user.reload.feature_registration_show_legacy).to be_falsey
+        get bike_path(bike)
+        expect(response).to render_template(:show)
+
+        user.confirm(user.confirmation_token)
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(user.reload.feature_registration_show_legacy).to be_truthy
+        expect(session[:registration_show_legacy]).to be_blank
+      end
+    end
+
+    context "user invalid for an unrelated reason" do
+      before { user.update_column(:preferred_language, "xx") }
+
+      it "keeps the opt-out in the session" do
+        RearGearType.fixed
+        post toggle_legacy_view_registration_path(bike)
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(user.reload.feature_registration_show_legacy).to be_falsey
+        expect(session[:registration_show_legacy]).to be_truthy
+        get bike_path(bike)
+        expect(response).to render_template(:show)
+      end
+    end
+  end
+
+  context "redesign disabled" do
+    before { Flipper.enable(:registration_redesign_disabled) }
+
+    it "records the preference and redirects to the classic page either way" do
+      post toggle_legacy_view_registration_path(bike)
+      expect(response).to redirect_to(bike_path(bike))
+      expect(session[:registration_show_legacy]).to be_truthy
+
+      post toggle_legacy_view_registration_path(bike)
+      expect(response).to redirect_to(bike_path(bike))
+      expect(session[:registration_show_legacy]).to be_falsey
+    end
   end
 
   context "user logged in" do

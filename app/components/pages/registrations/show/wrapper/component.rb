@@ -21,12 +21,14 @@ module Pages
             @current_alerts = current_alerts
           end
 
-          # The dialog renders outside the cache block: it's per-request, and caching it
-          # would serve one token-holder's modal to everyone after them
+          # The dialog and the opt-out render outside the cache block: the dialog is
+          # per-request, and every signed-out viewer shares a cache entry, so a cached
+          # opt-out form would carry someone else's CSRF token
           def call
             safe_join([
               token_prompt ? render(token_prompt) : "",
-              capture { cache(cache_key) { concat(render(inner_component)) } }
+              capture { cache(cache_key) { concat(render(inner_component)) } },
+              render(Pages::Registrations::Show::LegacyViewLink::Component.new(bike: @bike, show_legacy: @show_legacy))
             ])
           end
 
@@ -38,7 +40,7 @@ module Pages
           # session-scoped and can't be keyed here — the csrf-refresh controller reissues
           # them client-side from the meta tag
           def cache_key
-            [self.class.cache_digest, @current_user&.id, @show_legacy,
+            [self.class.cache_digest, @current_user&.id,
               BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
               token_prompt && [@current_alerts.sort, *token_prompt.try(:cache_version)],
               @bike.cache_key_with_version, *inner_component.try(:cache_version)]
@@ -59,12 +61,11 @@ module Pages
               if organization
                 WrapperOrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
                   org_role: kind, available_views: @available_views, bike_sticker: @bike_sticker,
-                  current_alerts: @current_alerts, show_legacy: @show_legacy, display_dev_info: @display_dev_info)
+                  current_alerts: @current_alerts, display_dev_info: @display_dev_info)
               else
                 WrapperConsumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
                   show_for_sale: @bike.is_for_sale?, marketplace_preview: kind == :marketplace_preview,
-                  available_views: @available_views, bike_sticker: @bike_sticker,
-                  current_alerts: @current_alerts, show_legacy: @show_legacy)
+                  available_views: @available_views, bike_sticker: @bike_sticker, current_alerts: @current_alerts)
               end
             end
           end

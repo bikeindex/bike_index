@@ -739,11 +739,6 @@ RSpec.describe "BikesController#show", type: :request do
       expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
     end
 
-    it "renders the legacy page when no_redesign is passed" do
-      get "#{base_url}/#{bike.id}?no_redesign=true"
-      expect(response).to render_template(:show)
-    end
-
     context "signed out" do
       let(:current_user) { nil }
 

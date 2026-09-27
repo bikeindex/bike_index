@@ -1,4 +1,6 @@
 class BikesController < Bikes::BaseController
+  # Ahead of find_bike and the rest, which registrations#show repeats
+  prepend_before_action :hand_off_to_redesign, only: %i[show]
   skip_before_action :verify_authenticity_token, only: %i[create]
   before_action :sign_in_if_not!, only: %i[show]
   before_action :render_ad, only: %i[show]
@@ -9,7 +11,6 @@ class BikesController < Bikes::BaseController
 
   def show
     redirect_to(format: "png") && return if request.format == "gif"
-    redirect_to(registration_path(@bike, request.query_parameters)) && return if show_redesign?
 
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
@@ -217,11 +218,12 @@ class BikesController < Bikes::BaseController
     Binxtils::InputNormalizer.boolean(params[:contact_owner])
   end
 
-  # no_redesign reaches the classic page without changing the viewer's preference
-  def show_redesign?
-    return false if Binxtils::InputNormalizer.boolean(params[:no_redesign])
+  # A scanned sticker id is find_bike's to redirect
+  def hand_off_to_redesign
+    return unless request.format.html? && registration_redesign_enabled? && !registration_show_legacy? &&
+      !params[:id].match?(Bikes::BaseController::SCANNED_ID_MATCHER)
 
-    request.format.html? && registration_redesign_shown?
+    redirect_to(registration_path(params[:id], request.query_parameters))
   end
 
   def show_for_sale?(bike)

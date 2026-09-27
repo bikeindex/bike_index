@@ -191,37 +191,6 @@ module ControllerHelpers
     session[:old_register_view].present?
   end
 
-  # Carries a signed-out opt-out onto the account, since the redesign's own claim and
-  # sign-up CTAs are what push people through signing in. Only ever sets it - an absent
-  # session key means no preference was expressed, not that they want the redesign
-  def carry_registration_show_legacy(user)
-    return unless session.delete(:registration_show_legacy)
-
-    user.update(feature_registration_show_legacy: true, skip_update: true)
-  end
-
-  def registration_show_legacy?
-    current_user ? current_user.feature_registration_show_legacy? : session[:registration_show_legacy]
-  end
-
-  # Kill switch for the redesign rollout - enabling the flag sends every viewer to the
-  # classic page
-  def registration_redesign_enabled?
-    return @registration_redesign_enabled if defined?(@registration_redesign_enabled)
-
-    @registration_redesign_enabled = !Flipper.enabled?(:registration_redesign_disabled)
-  end
-
-  def registration_redesign_shown?
-    registration_redesign_enabled? && !registration_show_legacy?
-  end
-
-  # The bike's page as this viewer sees it, so a redirect lands there rather than
-  # hopping through bikes#show
-  def bike_view_path(bike, show_legacy: !registration_redesign_shown?, **query)
-    show_legacy ? bike_path(bike, query) : registration_path(bike, query)
-  end
-
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank? ||
       render_donation_request?
@@ -374,6 +343,56 @@ module ControllerHelpers
   end
 
   private
+
+  # Carries a signed-out opt-out onto the account, since the redesign's own claim and
+  # sign-up CTAs are what push people through signing in. Waits for confirmation because
+  # current_user is confirmed-only, and keeps the session key if the save fails
+  def carry_registration_show_legacy(user)
+    return unless user.confirmed? && session[:registration_show_legacy]
+
+    session.delete(:registration_show_legacy) if user.update(feature_registration_show_legacy: true, skip_update: true)
+  end
+
+  # The session holds a signed-out opt-out until it's carried onto the account
+  def registration_show_legacy?
+    current_user&.feature_registration_show_legacy? || session[:registration_show_legacy].present?
+  end
+
+  # Kill switch for the redesign rollout - enabling the flag sends every viewer to the
+  # classic page
+  def registration_redesign_enabled?
+    return @registration_redesign_enabled if defined?(@registration_redesign_enabled)
+
+    @registration_redesign_enabled = !Flipper.enabled?(:registration_redesign_disabled)
+  end
+
+  # The bike's page as this viewer sees it, so a redirect lands there rather than
+  # hopping through bikes#show
+  def bike_view_path(bike, show_legacy: registration_show_legacy?, **query)
+    (show_legacy || !registration_redesign_enabled?) ? bike_path(bike, query) : registration_path(bike, query)
+  end
+
+  # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
+  # Also provides testable protection against seeing organization info on bikes
+  def assign_current_organization
+    org = current_organization || passive_organization # actually call #current_organization first
+    # If forced false, or no user present, skip everything else
+    return true if @current_organization_force_blank || current_user.blank?
+
+    # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
+    # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
+    default_organization = OrganizationRole.default_organization(current_user) if params[:organization_id].present?
+    if default_organization.present?
+      return true if org.present? && current_user.authorized?(org)
+
+      set_passive_organization(default_organization)
+    else
+      # If current_user isn't authorized for the organization, force assign nil
+      return true if org.blank? || org.present? && current_user.authorized?(org)
+
+      set_passive_organization(nil)
+    end
+  end
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request

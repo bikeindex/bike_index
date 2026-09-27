@@ -11,8 +11,6 @@ RSpec.describe Pages::Registrations::Show::LegacyViewLink::Component, type: :com
     expect(page).to have_text("You're using the new bike viewer.")
     form = page.find("form[action='#{toggle_action}'][method='post']")
     expect(form).to have_button("Switch back to the legacy viewer")
-    # Refreshes its CSRF token client-side since it renders inside the cached redesign fragment
-    expect(form["data-controller"]).to eq("csrf-refresh")
   end
 
   context "viewer opted into the legacy view" do

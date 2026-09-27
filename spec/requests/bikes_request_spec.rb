@@ -603,6 +603,8 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template("scanned")
         expect(assigns(:bike_sticker)&.id).to eq bike_sticker3.id
         get "/bikes/scannedU01101"
+        expect(response).to redirect_to("/registrations/scannedU01101")
+        follow_redirect!
         expect(response.status).to eq 404
       end
     end

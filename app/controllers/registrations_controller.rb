@@ -5,6 +5,7 @@ class RegistrationsController < ApplicationController
   before_action :force_html_response, only: %i[show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
   before_action :sign_in_if_not!, only: %i[show]
+  before_action :assign_current_organization, only: %i[show]
   before_action :simple_header, except: %i[show edit]
   around_action :set_reading_role, only: %i[show]
   layout "reg_embed"
@@ -36,14 +37,13 @@ class RegistrationsController < ApplicationController
   def toggle_legacy_view
     bike = Bike.unscoped.find_id(params[:id])
     show_legacy = !registration_show_legacy?
-    if current_user.blank?
-      show_legacy ? session[:registration_show_legacy] = true : session.delete(:registration_show_legacy)
-    elsif !current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
+    if current_user.present? && !current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
       # Unrelated validations (e.g. a preferred_language no longer available) can block
       # the update, so return to the view they came from rather than bouncing them
       flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
       return redirect_to(bike_view_path(bike, show_legacy: !show_legacy))
     end
+    show_legacy ? session[:registration_show_legacy] = true : session.delete(:registration_show_legacy)
     redirect_to(bike_view_path(bike, show_legacy:))
   end
 
