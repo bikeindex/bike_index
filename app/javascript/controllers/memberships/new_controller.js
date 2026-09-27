@@ -9,7 +9,7 @@ export default class extends Controller {
     const interval = this.element.querySelector('input[name="membership[set_interval]"]:checked')
     const labels = JSON.parse(level.dataset.labels)[interval.value]
 
-    this.summaryTargets.forEach(element => { element.textContent = labels.summary })
+    this.summaryTarget.textContent = labels.summary
     this.joinTargets.forEach(element => { element.textContent = labels.join })
   }
 

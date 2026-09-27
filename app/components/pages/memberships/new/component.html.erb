@@ -90,7 +90,7 @@
     class="tw:scroll-mt-10 tw:border-b tw:border-gray-200 tw:bg-gray-50"
     data-memberships--new-target="plans"
   >
-    <%= form_for @membership, url: membership_path, method: :post,
+    <%= form_for Membership.new(level: @level), url: membership_path, method: :post,
       html: {class: "#{section_inner} tw:flex tw:flex-col tw:gap-7",
              data: {action: "change->memberships--new#update"}} do |f| %>
       <%= hidden_field_tag :currency, @currency.slug %>
@@ -113,7 +113,7 @@
         </div>
 
         <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "membership[set_interval]",
-          entries: interval_entries, selected: selected_interval, kind: :toggle)) %>
+          entries: interval_entries, selected: @interval, kind: :toggle)) %>
       </div>
 
       <div
@@ -232,7 +232,7 @@
             class="tw:m-0 tw:text-[17px] tw:font-extrabold tw:text-slate-900"
             data-memberships--new-target="summary"
           >
-            <%= summary_label(selected_level, selected_interval) %>
+            <%= labels(@level, @interval)[:summary] %>
           </p>
 
           <p class="tw:m-0 tw:mt-1 tw:text-sm">
@@ -242,7 +242,7 @@
 
         <%= render(UI::Button::Component.new(color: :primary, size: :callout, type: "submit", html_class: "tw:shrink-0")) do %>
           <span data-memberships--new-target="join">
-            <%= join_label(selected_level, selected_interval) %>
+            <%= labels(@level, @interval)[:join] %>
           </span>
         <% end %>
       </div>
@@ -313,11 +313,8 @@
               </div>
 
               <span class="tw:tracking-wider tw:uppercase">
-                <% if row[:live] %>
-                  <%= render(UI::Badge::Component.new(text: translation(".live"), color: :success, size: :xs)) %>
-                <% else %>
-                  <%= render(UI::Badge::Component.new(text: translation(".next"), color: :purple, size: :xs)) %>
-                <% end %>
+                <%= render(UI::Badge::Component.new(text: row[:live] ? translation(".live") : translation(".next"),
+                  color: row[:live] ? :success : :purple, size: :xs)) %>
               </span>
             </li>
           <% end %>
@@ -496,7 +493,7 @@
       <%= render(UI::ButtonLink::Component.new(href: "#membership-plans", color: :yellow, size: :callout,
         html_class: "tw:shrink-0", data: {action: "memberships--new#scrollToPlans"})) do %>
         <span data-memberships--new-target="join">
-          <%= join_label(selected_level, selected_interval) %>
+          <%= labels(@level, @interval)[:join] %>
         </span>
       <% end %>
     </div>

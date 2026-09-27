@@ -22,8 +22,8 @@ module Pages
           @organizations_count = organizations_count
           @recovery_displays = recovery_displays.first(4)
           @referral_source = referral_source
-          @membership = Membership.new(level: PRICES.key?(level&.to_sym) ? level.to_sym : :plus,
-            set_interval: StripePrice.interval_default)
+          @level = PRICES.key?(level&.to_sym) ? level.to_sym : :plus
+          @interval = StripePrice.interval_default.to_sym
         end
 
         private
@@ -32,25 +32,14 @@ module Pages
 
         def level_name(level) = Membership.level_humanized(level.to_s)
 
-        def summary_label(level, interval)
-          name = level_name(level)
-          price = price(level, interval)
-          (interval == :yearly) ? translation(".summary_yearly", level: name, price:) : translation(".summary_monthly", level: name, price:)
+        def labels(level, interval)
+          args = {level: level_name(level), price: price(level, interval)}
+          return {summary: translation(".summary_yearly", **args), join: translation(".join_yearly", **args)} if interval == :yearly
+
+          {summary: translation(".summary_monthly", **args), join: translation(".join_monthly", **args)}
         end
 
-        def join_label(level, interval)
-          name = level_name(level)
-          price = price(level, interval)
-          (interval == :yearly) ? translation(".join_yearly", level: name, price:) : translation(".join_monthly", level: name, price:)
-        end
-
-        def interval_labels(level)
-          %i[monthly yearly].index_with { {summary: summary_label(level, it), join: join_label(level, it)} }
-        end
-
-        def selected_level = @membership.level.to_sym
-
-        def selected_interval = @membership.set_interval.to_sym
+        def interval_labels(level) = %i[monthly yearly].index_with { labels(level, it) }
 
         def bikes_display
           return safe_join([number_display(@bikes_count), "+"]) if @bikes_count < 1_000_000

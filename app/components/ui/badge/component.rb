@@ -47,8 +47,7 @@ module UI
         pink: "tw:bg-pink-500 tw:text-white tw:border-transparent",
         rose: "tw:bg-rose-500 tw:text-white tw:border-transparent",
         orange: "tw:bg-orange-500 tw:text-white tw:border-transparent",
-        empty: "tw:bg-gray-500 tw:text-white tw:border-transparent",
-        yellow: "tw:bg-[#ffd660] tw:text-slate-900 tw:border-transparent"
+        empty: "tw:bg-gray-500 tw:text-white tw:border-transparent"
       }.freeze
 
       def self.badge_classes(color:, size:, cursor: "tw:cursor-default", solid: false)
