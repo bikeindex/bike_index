@@ -150,7 +150,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
           end
 
           it "sorts members first and paginates them, rather than piling all onto page 1" do
-            extra_standard_items = Array.new(16) do |i|
+            extra_standard_items = Array.new(13) do |i|
               extra_item = FactoryBot.create(:bike, :with_primary_activity)
               FactoryBot.create(:marketplace_listing, :for_sale,
                 address_record: seller.address_record, seller:, item: extra_item, amount_cents: 200_00,
@@ -158,7 +158,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
               extra_item
             end
             member_ids = [promoted_item.id, *extra_promoted_listings.map(&:item_id)] # 17 members
-            standard_ids = [item.id, *extra_standard_items.map(&:id)] # 17 standard
+            standard_ids = [item.id, *extra_standard_items.map(&:id)] # 14 standard
 
             get base_url, as: :turbo_stream
             page1 = assigns(:bikes).pluck(:id)
