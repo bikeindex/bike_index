@@ -44,8 +44,8 @@
     <% settings = ComponentStructs::OrgSearchSettings.new(organization: current_organization) %>
 
     <div class="mt-2 mb-4 hiddenOnAveryExport">
-      <%= render(Pages::Org::Search::ColumnCheckboxes::Component.new(heading: "Included columns",
-        columns: settings.export_checkbox_columns(@export.headers.presence || settings.default_export_headers))) %>
+      <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:,
+        export_headers: @export.headers.presence || settings.default_export_headers)) %>
     </div>
 
     <div class="form-group row mt-4 hiddenOnOnlyCustom">

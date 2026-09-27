@@ -15,6 +15,7 @@ en:
             created_at_cell_panel: Time - registered
             creation_description_cell: Source
             cycle_type_cell: Vehicle type
+            default: default
             filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address
             filter_no_sticker_html: only <strong>no</strong> sticker
@@ -27,6 +28,7 @@ en:
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_id_cell: Impound ID
+            included_columns: Included columns
             location_search_disabled_no_address: >-
               %{org_name} doesn't collect registration addresses, so only stolen and
               impounded registrations have a location. Filter to one of those statuses
@@ -36,6 +38,7 @@ en:
               are searching just impounded and/or stolen registrations.
             manufacturer_cell: Manufacturer
             model_cell: Model
+            none: none
             notes_cell_html: Registration Notes <em>by %{org_name}</em>
             occurred_at_cell: Status at
             occurred_at_cell_panel: Time - status

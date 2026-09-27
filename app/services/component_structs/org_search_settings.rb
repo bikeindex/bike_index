@@ -239,14 +239,6 @@ module ComponentStructs
     # In the panel's order
     def export_columns = EXPORT_HEADERS.slice(*panel_columns)
 
-    # The export form's Search::ColumnCheckboxes columns
-    def export_checkbox_columns(checked_headers)
-      export_columns.map do |cell_name, header|
-        {name: "export[headers][]", value: header, label: panel_labels[cell_name.to_sym],
-         checked: checked_headers.include?(header), default: initially_checked_columns.include?(cell_name)}
-      end
-    end
-
     # The panel's label for a written header - a legacy one, or an address part, by its name
     def export_header_label(header)
       cell_name = EXPORT_HEADERS.key(header)

@@ -17,6 +17,13 @@ module Pages
           def all_settings
             render_panel(enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS)
           end
+
+          # The export form's column fields, every feature enabled
+          def export_form
+            organization = ::Organization.new(short_name: "Preview org", enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS)
+            settings = ComponentStructs::OrgSearchSettings.new(organization:)
+            render(Component.new(settings:, export_headers: settings.default_export_headers))
+          end
           # @!endgroup
 
           private

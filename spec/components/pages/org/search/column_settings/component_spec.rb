@@ -36,6 +36,19 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     expect(component.at_css("[data-ui--collapse-target='content']")[:class]).to include("tw:hidden!")
   end
 
+  context "with export_headers" do
+    let(:instance) { described_class.new(settings:, export_headers: %w[serial]) }
+
+    it "renders the export form's column fields, open, without the View button" do
+      expect(component).not_to have_css("[data-ui--collapse-target]")
+      expect(component).to have_text("Included columns")
+      expect(component).to have_field("export[headers][]", with: "serial", checked: true)
+      expect(component).to have_field("export[headers][]", with: "registered_at", checked: false)
+      expect(component.at_css("input[value='registered_at']")["data-default"]).to eq "true"
+      expect(component).not_to have_field("view_cell")
+    end
+  end
+
   context "with open: true" do
     let(:instance) { described_class.new(settings:, open: true) }
 
