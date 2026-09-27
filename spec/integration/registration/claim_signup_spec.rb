@@ -80,7 +80,8 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     expect(new_user.name).to eq "New Claimer"
     expect(new_user.confirmed?).to be_truthy
 
-    first(:link, "Claim bike").click
+    # The dialog opens when its lazily loaded controller connects, covering the inline copy
+    within("dialog#claim-invitation-modal[open]") { click_link "Claim bike" }
     expect(page).to have_content("you just claimed it", wait: 5)
     expect(ownership.reload.claimed?).to be_truthy
     expect(ownership.user_id).to eq new_user.id
