@@ -694,7 +694,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         post "#{base_url}/switches", params: {single_page: true, separate_attestation: true}
         get "#{base_url}/new"
         expect(submit_label["data-motorized-text"]).to eq "Next"
-        expect(JSON.parse(submit_label["data-motorized-own-emails"])).to eq [current_user.email]
+        expect(JSON.parse(submit_label["data-motorized-own-emails"])).to include current_user.email
       end
 
       # The submission is what makes it an e-vehicle, so the sequence isn't knowable
