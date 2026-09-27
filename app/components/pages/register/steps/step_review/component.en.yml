@@ -1,8 +1,0 @@
----
-en:
-  components:
-    pages:
-      register:
-        steps:
-          step_review:
-            complete_registration: Complete %{cycle_type} Registration
