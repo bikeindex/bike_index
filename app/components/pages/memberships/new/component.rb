@@ -7,8 +7,8 @@ module Pages
       # memberships--new, which reads them off each tier's radio. Prices swap on CSS alone
       class Component < ApplicationComponent
         # Has to match the active StripePrices — the checkout looks the price up by level and interval
-        PRICES = {basic: {monthly: 500, yearly: 6000}, plus: {monthly: 1500, yearly: 18_000},
-                  patron: {monthly: 5000, yearly: 60_000}}.freeze
+        PRICES = {basic: {monthly: 500, yearly: 5000}, plus: {monthly: 1500, yearly: 15_000},
+                  patron: {monthly: 5000, yearly: 50_000}}.freeze
 
         MONTHLY_ONLY = "tw:group-has-[[value=yearly]:checked]/membership:hidden"
         YEARLY_ONLY = "tw:hidden tw:group-has-[[value=yearly]:checked]/membership:inline"

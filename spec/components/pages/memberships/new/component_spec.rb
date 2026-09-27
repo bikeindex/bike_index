@@ -24,7 +24,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
     expect(component).to have_css("input[name='referral_source'][value='donate']", visible: :all)
     expect(component).to have_css("[data-memberships--new-target='summary']", text: "Plus membership, $15 a month")
     expect(component).to have_css("[data-memberships--new-target='join']", text: "Join as Plus — $15/mo", count: 2)
-    expect(component).to have_text("$180")
+    expect(component).to have_text("$150")
     expect(component).to have_css("details[name='membership-faq']", count: 5)
     expect(component).to have_css("details[open]", count: 1)
     expect(component).to have_link("Or make a one-time donation", href: "/donate")
@@ -32,7 +32,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
 
     labels = JSON.parse(component.css("#membership_level_patron").first["data-labels"])
     expect(labels).to eq({"monthly" => {"summary" => "Patron membership, $50 a month", "join" => "Join as Patron — $50/mo"},
-                          "yearly" => {"summary" => "Patron membership, $600 a year", "join" => "Join as Patron — $600/yr"}})
+                          "yearly" => {"summary" => "Patron membership, $500 a year", "join" => "Join as Patron — $500/yr"}})
   end
 
   context "with a passed level" do
