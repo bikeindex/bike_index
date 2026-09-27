@@ -53,7 +53,7 @@ class RegisterController < ApplicationController
   def landing
     recoveries_count, recoveries_value, organizations_count, bikes_count =
       Counts.retrieve_many("recoveries", "recoveries_value", "organizations", "total_bikes")
-    render Pages::Register::Views::Landing::Component.new(b_param: @b_param, steps: flow_steps, current_user:,
+    render Pages::Register::Views::Landing::Component.new(b_param: @b_param, flow: register_flow, current_user:,
       recoveries_count:, recoveries_value:, organizations_count:, bikes_count:)
   end
 

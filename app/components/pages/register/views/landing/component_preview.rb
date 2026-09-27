@@ -11,7 +11,7 @@ module Pages
 
             b_param = ::BParam.new(origin: "register_flow")
             render(Pages::Register::Views::Landing::Component.new(b_param:, current_user: lookbook_user,
-              steps: ::BikeServices::Register.steps(b_param, sequence: nil),
+              flow: ::BikeServices::Register.flow(b_param, sequence: nil),
               recoveries_count: 18_263, recoveries_value: 38_412_345, organizations_count: 1_000,
               bikes_count: 1_204_112))
           end

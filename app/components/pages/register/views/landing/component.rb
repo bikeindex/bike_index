@@ -7,10 +7,10 @@ module Pages
         # The marketing page for registering, with step 1 of the flow in its hero - which
         # posts into the flow itself, so everything after it is the flow's own steps
         class Component < ApplicationComponent
-          def initialize(b_param:, steps:, recoveries_count:, recoveries_value:, organizations_count:,
+          def initialize(b_param:, flow:, recoveries_count:, recoveries_value:, organizations_count:,
             bikes_count:, current_user: nil)
             @b_param = b_param
-            @steps = steps
+            @flow = flow
             @current_user = current_user
             @recoveries_count = recoveries_count
             @recoveries_value = recoveries_value
