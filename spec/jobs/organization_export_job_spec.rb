@@ -10,13 +10,15 @@ RSpec.describe OrganizationExportJob, type: :job do
   let(:bike) { FactoryBot.create(:bike_organized, manufacturer: trek, primary_frame_color: black, creation_organization: organization) }
   let(:bike_row_hash) do
     {
-      color: "Black",
-      is_stolen: nil,
-      link: "http://test.host/bikes/#{bike.id}",
+      thumbnail: nil,
+      registered_at: bike.created_at.utc,
+      status: "",
       manufacturer: "Trek",
       model: nil,
-      registered_at: bike.created_at.utc,
-      serial: bike.serial_number
+      color: "Black",
+      owner_email: bike.owner_email,
+      owner_name: nil,
+      registration_method: "web"
     }
   end
   let(:bike_values) { bike_row_hash.values }
@@ -172,7 +174,7 @@ RSpec.describe OrganizationExportJob, type: :job do
     context "all unpaid headers" do
       # Setting up what we have, rather than waiting on everything
       # Also - test that it doesn't explode if unable to assign stickers
-      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: {headers: Export::PERMITTED_HEADERS, bike_code_start: "fff"}) }
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: {headers: Export.permitted_headers(Organization.new), bike_code_start: "fff"}) }
       let(:secondary_color) { FactoryBot.create(:color) }
       let(:email) { "testly@bikeindex.org" }
       let!(:bike) do
@@ -193,22 +195,21 @@ RSpec.describe OrganizationExportJob, type: :job do
       # let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: FactoryBot.create(:user_confirmed, name: "other person"), user: FactoryBot.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
       let(:bike_row_hash) do
         {
-          color: "Black, #{secondary_color.name}",
-          extra_registration_number: "cool extra serial",
-          is_stolen: nil,
-          link: "http://test.host/bikes/#{bike.id}",
+          thumbnail: nil,
+          registered_at: bike.created_at.utc.to_s,
+          status: nil, # no status
           manufacturer: "Sweet manufacturer &lt;&gt;&lt;&gt;&gt;&lt;",
           model: "\\\",,,\\\"<script>XSSSSS</script>",
-          motorized: "false",
+          color: "Black, #{secondary_color.name}",
           owner_email: email,
           owner_name: "George Smith",
-          registered_at: bike.created_at.utc.to_s,
-          registered_by: nil, # Since user isn't part of organization. TODO: Currently not implemented
           registration_method: "web",
+          link: "http://test.host/bikes/#{bike.id}",
+          updated_at: bike.reload.updated_by_user_fallback.utc.to_s,
           serial: bike.serial_number,
-          status: nil, # no status
-          thumbnail: nil,
           vehicle_type: "Bike",
+          propulsion_type: nil,
+          occurred_at: nil,
           assigned_sticker: nil
         }
       end
@@ -272,7 +273,7 @@ RSpec.describe OrganizationExportJob, type: :job do
         context "assigning stickers" do
           let(:export_options) { {headers: %w[link phone extra_registration_number address organization_affiliation student_id], bike_code_start: "ff333333"} }
           let(:target_headers) { %w[link phone extra_registration_number organization_affiliation student_id address address_2 city state zipcode assigned_sticker] }
-          let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "community_member", "XX9999", "717 Market St", "", "San Francisco", "CA", "94103", "FF 333 333"] }
+          let(:bike_values) { ["http://test.host/bikes/#{bike.id}", "7177423423", "cool extra serial", "Community member", "XX9999", "717 Market St", "", "San Francisco", "CA", "94103", "FF 333 333"] }
           it "returns the expected values" do
             expect(export.reload.avery_export?).to be_falsey
             VCR.use_cassette("geohelper-formatted_address_hash", match_requests_on: [:path]) do
@@ -315,7 +316,7 @@ RSpec.describe OrganizationExportJob, type: :job do
               generated_csv_string = export.file.read
               bike_line = generated_csv_string.split("\n").last
               expect(bike_line.split(",").count).to eq target_headers.count
-              expect(bike_line).to eq "\"community_member\""
+              expect(bike_line).to eq "\"Community member\""
 
               bike_sticker.reload
               expect(bike_sticker.claimed?).to be_falsey
@@ -345,35 +346,40 @@ RSpec.describe OrganizationExportJob, type: :job do
           end
         end
         context "including every available field + stickers" do
-          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes registration_notes show_partial_registrations] }
+          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[avery_export bike_stickers impound_bikes registration_notes registration_sequences show_partial_registrations] }
           let(:export_options) { {headers: Export.permitted_headers(organization)} }
           let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:, body: "Sold at the fall swap") }
+          let(:acknowledged_at) { Time.current - 1.day }
+          let!(:registration_sequence_acknowledgment) do
+            FactoryBot.create(:registration_sequence_acknowledgment, bike:, acknowledged_at:,
+              registration_sequence: FactoryBot.create(:registration_sequence_active, organization:))
+          end
           let(:bike_row_hash) do
             {
-              color: "Black",
-              extra_registration_number: "cool extra serial",
-              is_stolen: nil,
-              link: "http://test.host/bikes/#{bike.id}",
+              thumbnail: nil,
+              registered_at: bike.created_at.utc.to_s,
+              status: nil,
               manufacturer: bike.mnfg_name,
               model: nil,
-              motorized: "true",
+              color: "Black",
               owner_email: bike.owner_email,
               owner_name: nil,
-              registered_at: bike.created_at.utc.to_s,
-              registered_by: nil,
               registration_method: "web",
-              serial: bike.serial_number,
-              status: nil,
-              thumbnail: nil,
-              vehicle_type: "Cargo Bike",
               bike_sticker: "FF 333 333",
-              organization_affiliation: "community_member",
+              link: "http://test.host/bikes/#{bike.id}",
+              updated_at: bike.reload.updated_by_user_fallback.utc.to_s,
+              serial: bike.serial_number,
+              vehicle_type: "Cargo Bike",
+              propulsion_type: "Pedal Assist",
+              occurred_at: nil,
+              extra_registration_number: "cool extra serial",
+              organization_affiliation: "Community member",
               phone: "7177423423",
               student_id: "XX9999",
-              partial_registration: nil,
-              is_impounded: nil,
-              impounded_at: nil,
               organization_notes: "Sold at the fall swap",
+              impound_id: nil,
+              avery_exportable: "false",
+              acknowledged_at: acknowledged_at.utc.to_s,
               address: "717 Market St",
               address_2: nil,
               city: "San Francisco",
@@ -384,19 +390,12 @@ RSpec.describe OrganizationExportJob, type: :job do
           it "returns the expected values" do
             VCR.use_cassette("geohelper-formatted_address_hash2", match_requests_on: [:path]) do
               expect(organization.reload.enabled_feature_slugs).to eq enabled_feature_slugs.sort
-              target_header_keys = (bike_row_hash.keys.map(&:to_s) - %w[address_2 city state zipcode]).sort
-              expect(Export.permitted_headers(organization).count).to eq target_header_keys.count
-              expect(Export.permitted_headers(organization).sort).to eq target_header_keys
-              expect(Export.permitted_headers(organization).count).to eq(Export.permitted_headers(:include_all).count)
-              expect(Export.permitted_headers(organization).sort).to eq(Export.permitted_headers(:include_all).sort)
               bike_sticker.claim(user: user, bike: bike)
               bike_sticker.reload
               expect(bike_sticker.claimed?).to be_truthy
               expect(bike_sticker.bike).to eq bike
               expect(bike_sticker.user).to eq user
               expect(export.assign_bike_codes?).to be_falsey
-              expect(export.headers.count).to eq(Export.permitted_headers(:include_all).count)
-              expect(export.headers.sort).to eq(Export.permitted_headers(:include_all).sort)
               expect(bike.reload.user&.id).to be_blank
               expect(bike.owner_name).to eq nil
               expect(bike.phone).to eq "7177423423"
@@ -407,6 +406,7 @@ RSpec.describe OrganizationExportJob, type: :job do
               instance.perform(export.id)
             end
             export.reload
+            expect(Export.permitted_headers(organization)).to match_array(bike_row_hash.keys.map(&:to_s) - %w[address_2 city state zipcode])
             expect(instance.export_headers).to eq export.written_headers
             expect(instance.export_headers).to match_array bike_row_hash.keys.map(&:to_s)
             expect(export.progress).to eq "finished"
@@ -449,32 +449,32 @@ RSpec.describe OrganizationExportJob, type: :job do
         let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs}, origin: "embed_partial") }
         let(:target_partial_row) do
           {
-            color: "Black",
-            extra_registration_number: nil,
-            is_stolen: nil,
-            link: nil,
+            thumbnail: nil,
+            registered_at: partial_registration.created_at.utc.to_s,
+            status: nil,
             manufacturer: "Other",
             model: nil,
-            motorized: "true",
+            color: "Black",
             owner_email: "something@stuff.com",
             owner_name: nil,
-            registered_at: partial_registration.created_at.utc.to_s,
-            registered_by: nil,
             registration_method: nil,
-            serial: nil,
-            status: nil,
-            thumbnail: nil,
-            vehicle_type: "e-Personal Mobility Device",
             bike_sticker: nil,
+            link: nil,
+            updated_at: nil,
+            serial: nil,
+            vehicle_type: "e-Personal Mobility Device",
+            propulsion_type: nil,
+            occurred_at: nil,
+            extra_registration_number: nil,
             organization_affiliation: nil,
             phone: nil,
             student_id: nil,
-            partial_registration: "true",
             address: nil,
             address_2: nil,
             city: nil,
             state: nil,
-            zipcode: nil
+            zipcode: nil,
+            partial_registration: "true"
           }
         end
         it "returns expected values" do
@@ -501,32 +501,32 @@ RSpec.describe OrganizationExportJob, type: :job do
           let(:export_options) { {headers: Export.permitted_headers(organization), partial_registrations: true} }
           let(:target_complete_row) do
             {
-              color: "Black",
-              extra_registration_number: "cool extra serial",
-              is_stolen: nil,
-              link: "http://test.host/bikes/#{bike.id}",
+              thumbnail: nil,
+              registered_at: bike.created_at.utc.to_s,
+              status: nil,
               manufacturer: bike.mnfg_name,
               model: nil,
-              motorized: "true",
+              color: "Black",
               owner_email: bike.owner_email,
               owner_name: nil,
-              registered_at: bike.created_at.utc.to_s,
-              registered_by: nil,
               registration_method: "web",
-              serial: bike.serial_number,
-              status: nil,
-              thumbnail: nil,
-              vehicle_type: "e-Personal Mobility Device",
               bike_sticker: nil,
-              organization_affiliation: "community_member",
+              link: "http://test.host/bikes/#{bike.id}",
+              updated_at: bike.reload.updated_by_user_fallback.utc.to_s,
+              serial: bike.serial_number,
+              vehicle_type: "e-Personal Mobility Device",
+              propulsion_type: "Pedal Assist",
+              occurred_at: nil,
+              extra_registration_number: "cool extra serial",
+              organization_affiliation: "Community member",
               phone: "7177423423",
               student_id: "XX9999",
-              partial_registration: nil,
               address: "717 Market St",
               address_2: nil,
               city: "San Francisco",
               state: "CA",
-              zipcode: "94103"
+              zipcode: "94103",
+              partial_registration: nil
             }
           end
           it "returns expected values" do
@@ -583,7 +583,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(line_hash).to match_hash_indifferently(target_partial_row.merge(
               model: "Big Dummy", serial: "XXX-1234", owner_name: "Sally Owner", phone: "7177423423",
               extra_registration_number: "extra-1", organization_affiliation: "student", student_id: "S1234",
-              is_stolen: "true", address: "1 Shields Ave", city: "Davis", state: "CA", zipcode: "95616"
+              status: "stolen", address: "1 Shields Ave", city: "Davis", state: "CA", zipcode: "95616"
             ))
           end
         end
@@ -598,24 +598,22 @@ RSpec.describe OrganizationExportJob, type: :job do
         let!(:partial_registration) { BParam.create(params: {bike: {creation_organization_id: organization.id}}, origin: "embed_partial") }
         let(:target_impound_row) do
           {
-            color: "Black",
-            extra_registration_number: "cool extra serial",
-            is_stolen: nil,
-            link: "http://test.host/bikes/#{bike.id}",
+            thumbnail: nil,
+            registered_at: bike.created_at.utc.to_s,
+            status: "impounded",
             manufacturer: bike.mnfg_name,
             model: nil,
-            motorized: "true",
+            color: "Black",
             owner_email: bike.owner_email,
             owner_name: nil,
-            registered_at: bike.created_at.utc.to_s,
-            registered_by: nil,
             registration_method: "web",
+            link: "http://test.host/bikes/#{bike.id}",
+            updated_at: bike.reload.updated_by_user_fallback.utc.to_s,
             serial: bike.serial_number,
-            status: "impounded",
-            thumbnail: nil,
             vehicle_type: "Cargo Bike",
-            is_impounded: "true",
-            impounded_at: impounded_at.utc.to_s
+            propulsion_type: "Pedal Assist",
+            occurred_at: impounded_at.utc.to_s,
+            impound_id: impound_record.display_id
           }
         end
         it "returns impound values" do

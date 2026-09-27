@@ -1,6 +1,5 @@
 class OrganizationExportJob < ApplicationJob
-  LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
-  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation student_id].freeze
+  REG_FIELD_HEADERS = %w[phone extra_registration_number organization_affiliation student_id].freeze
   ADDRESS_KEYS = {"address" => "street", "address_2" => "street_2", "city" => "city", "state" => "state", "zipcode" => "zipcode"}.freeze
 
   sidekiq_options retry: false, queue: "med_priority"
@@ -96,9 +95,11 @@ class OrganizationExportJob < ApplicationJob
   def b_param_to_row(b_param)
     export_headers.map do |header|
       case header
-      when "registered_at", "manufacturer", "is_stolen", "is_impounded", "motorized", "owner_email", "phone",
-        "organization_affiliation", "student_id", "vehicle_type", *ADDRESS_KEYS.keys
+      when "registered_at", "manufacturer", "owner_email", "vehicle_type", *ADDRESS_KEYS.keys
         value_for_header(header, b_param)
+      when "phone", "organization_affiliation", "student_id" then b_param.send(header)
+      when "status"
+        Atoms::RegistrationStatusBadge::Component.status_humanized(b_param, override_status: Bike.status_humanized(b_param.status), skip_with_owner: true)
       when "model" then b_param.bike["frame_model"]
       when "serial" then b_param.bike["serial_number"]
       when "extra_registration_number" then b_param.bike["extra_registration_number"]
@@ -135,28 +136,36 @@ class OrganizationExportJob < ApplicationJob
     @export_headers
   end
 
+  # Each column's value as the registrations search table shows it
   def value_for_header(header, bike)
-    return bike.send(header) if MATCHING_KEYS.include?(header)
     return bike.registration_address[ADDRESS_KEYS[header]] if ADDRESS_KEYS.key?(header)
+    if REG_FIELD_HEADERS.include?(header)
+      return OrgServices::RegistrationFields.value(bike:, organization: @export.organization, reg_field: "reg_#{header}")
+    end
 
     case header
-    when "link" then LINK_BASE + bike.id.to_s
-    when "registration_method" then Ownership.creation_kind_humanized(bike.creation_kind)
-    when "thumbnail" then bike.thumb_path
+    when "link" then bike.html_url
+    when "thumbnail" then BikeServices::Displayer.thumb_image_url(bike)
     when "registered_at" then bike.created_at.utc
+    when "updated_at" then bike.updated_by_user_fallback.utc
+    when "occurred_at" then bike.occurred_at&.utc
+    when "status" then Atoms::RegistrationStatusBadge::Component.status_humanized(bike, skip_with_owner: true)
     when "manufacturer" then bike.mnfg_name
     when "model" then bike.frame_model
     when "color" then bike.frame_colors.join(", ")
     when "serial" then bike.serial_number
-    when "is_stolen" then bike.status_stolen? ? "true" : nil
-    when "is_impounded" then bike.status_impounded? ? "true" : nil
-    when "impounded_at" then bike.current_impound_record&.impounded_at&.utc
+    when "vehicle_type" then bike.type_titleize
+    when "propulsion_type" then bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal"
+    when "registration_method" then Ownership.creation_kind_humanized(bike.creation_kind)
+    when "owner_email" then bike.owner_email
+    when "owner_name" then bike.owner_name
+    when "organization_notes" then organization_note_bodies[bike.id]
     when "bike_sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
-    when "vehicle_type" then bike.type_titleize
-    when "motorized" then bike.motorized?
-    when "status" then Atoms::RegistrationStatusBadge::Component.status_humanized(bike, skip_with_owner: true)
-    when "organization_notes" then organization_note_bodies[bike.id]
+    when "impound_id" then bike.current_impound_record&.display_id if bike.status_impounded?
+    when "acknowledged_at"
+      RegistrationSequenceAcknowledgment.find_for(bike:, organization: @export.organization)&.acknowledged_at&.utc if bike.motorized?
+    when "avery_exportable" then bike.avery_exportable?
     end
   end
 

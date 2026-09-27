@@ -41,32 +41,15 @@
       </div>
     <% end %>
 
-    <div class="row mt-2 hiddenOnAveryExport">
-      <div class="col-lg-4">
-        <p class="export-included-columns-label">
-          Included columns:
-        </p>
-      </div>
+    <% settings = ComponentStructs::OrgSearchSettings.new(organization: current_organization) %>
+    <% checked_headers = @export.headers.presence || settings.default_export_headers %>
 
-      <div class="col-lg-8">
-        <div class="row">
-          <% checked_headers = @export.headers.present? ? @export.headers : Export.default_headers %>
-
-          <% Export.permitted_headers(current_organization).sort.each do |header| %>
-            <div class="form-group col-xs-6 col-md-4">
-              <label class="checkbox">
-                <%= f.check_box :headers, { multiple: true, checked: checked_headers.include?(header) }, header, 1 %>
-
-                <% if header == "motorized" %>
-                  Motorized / e-vehicle
-                <% else %>
-                  <%= header.titleize(keep_id_suffix: true) %>
-                <% end %>
-              </label>
-            </div>
-          <% end %>
-        </div>
-      </div>
+    <div class="mt-2 mb-4 hiddenOnAveryExport">
+      <%= render(Pages::Org::Search::ColumnCheckboxes::Component.new(heading: "Included columns",
+        columns: settings.export_columns.map { |cell_name, header|
+          { name: "export[headers][]", value: header, label: settings.panel_labels[cell_name.to_sym],
+            checked: checked_headers.include?(header), default: settings.default_export_headers.include?(header) }
+        })) %>
     </div>
 
     <div class="form-group row mt-4 hiddenOnOnlyCustom">

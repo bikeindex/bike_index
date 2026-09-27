@@ -31,6 +31,18 @@ module Pages
             @settings = settings
             @open = open
           end
+
+          private
+
+          # Named for their cell, which the search's controller shows and hides by
+          def columns
+            @settings.panel_columns.map do |cell_name|
+              always_visible = @settings.always_visible?(cell_name)
+              {name: cell_name, value: cell_name, label: @settings.panel_labels[cell_name.to_sym],
+               checked: always_visible, disabled: always_visible,
+               default: @settings.initially_checked_columns.include?(cell_name)}
+            end
+          end
         end
       end
     end

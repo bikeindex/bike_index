@@ -42,36 +42,14 @@ export default class extends Controller {
     this.enabledColumnsValue = columns
   }
 
+  // A checkbox's change, or all/none/default's in org--column-checkboxes
   columnToggled () {
     this.updateVisibleColumns()
   }
 
-  // An always-visible column's checkbox is disabled, and stays checked through all/none/default
+  // An always-visible column's checkbox is disabled, and stays checked
   get toggleableCheckboxes () {
     return this.checkboxesTarget.querySelectorAll('input[type=checkbox]:not(:disabled)')
-  }
-
-  selectAll () {
-    this.setAllCheckboxes(true)
-  }
-
-  selectNone () {
-    this.setAllCheckboxes(false)
-  }
-
-  selectDefault () {
-    const defaults = this.defaultColumnsValue
-    this.toggleableCheckboxes.forEach(cb => {
-      cb.checked = defaults.includes(cb.name)
-    })
-    this.updateVisibleColumns()
-  }
-
-  setAllCheckboxes (checked) {
-    this.toggleableCheckboxes.forEach(cb => {
-      cb.checked = checked
-    })
-    this.updateVisibleColumns()
   }
 
   selectStoredVisibleColumns () {

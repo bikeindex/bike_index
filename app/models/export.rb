@@ -33,28 +33,10 @@ class Export < ApplicationRecord
     manufacturer: 2
   }.freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
-  DEFAULT_HEADERS = %w[
-    color
-    is_stolen
-    link
-    manufacturer
-    model
-    registered_at
-    serial
-  ].freeze
-  EXTRA_HEADERS = %w[
-    extra_registration_number
-    motorized
-    owner_email
-    owner_name
-    registered_by
-    registration_method
-    status
-    thumbnail
-    vehicle_type
-  ].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
-  FEATURE_HEADERS = %w[partial_registration is_impounded impounded_at organization_notes].freeze
+  # The registrations search's columns, so the two offer the same set
+  HEADERS = (ComponentStructs::OrgSearchSettings::EXPORT_HEADERS.values + %w[partial_registration]).freeze
+  DEFAULT_HEADERS = ComponentStructs::OrgSearchSettings::EXPORT_HEADERS
+    .values_at(*ComponentStructs::OrgSearchSettings::DEFAULT_COLUMNS).freeze
   HEADERS_FOR_AVERY_EXPORT = %w[address owner_name].freeze
 
   acts_as_paranoid
@@ -117,31 +99,12 @@ class Export < ApplicationRecord
       }.as_json.freeze
     end
 
-    def permitted_headers(organization_or_overide = nil)
-      return PERMITTED_HEADERS unless organization_or_overide.present?
-
-      if organization_or_overide == :include_all # passing include_all overrides
-        additional_headers = reg_field_headers(OrganizationFeature::REG_FIELDS) + FEATURE_HEADERS
-      elsif organization_or_overide.is_a?(Organization)
-        additional_headers = reg_field_headers(organization_or_overide.additional_registration_fields)
-        additional_headers += %w[partial_registration] if organization_or_overide.enabled?("show_partial_registrations")
-        additional_headers += %w[is_impounded impounded_at] if organization_or_overide.enabled?("impound_bikes")
-        additional_headers += %w[organization_notes] if organization_or_overide.enabled?("registration_notes")
-      end
-      additional_headers ||= []
-      # We always give the option to export extra_registration_number, don't double up if org can add too
-      (PERMITTED_HEADERS + additional_headers).uniq
+    def permitted_headers(organization)
+      ComponentStructs::OrgSearchSettings.new(organization:).export_headers
     end
 
     def with_bike_sticker_code(bike_sticker_code)
       where("options->'bike_codes_assigned' @> ?", [bike_sticker_code].to_json)
-    end
-
-    private
-
-    def reg_field_headers(arr)
-      # skip the reg_ prefix, we don't want to display it
-      arr.map { |h| h.gsub("reg_", "") }
     end
   end
 
@@ -389,7 +352,7 @@ class Export < ApplicationRecord
     opts = self.class.default_options(kind).merge(opts)
     # Permit setting any header - we'll block organizations setting those headers via show and also via controller
     # but if we want to manually create an export, we should be able to do so
-    opts["headers"] = opts["headers"] & self.class.permitted_headers(:include_all)
+    opts["headers"] = opts["headers"] & HEADERS
     opts
   end
 
