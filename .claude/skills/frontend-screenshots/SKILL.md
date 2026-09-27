@@ -94,7 +94,9 @@ browser_evaluate: () => {
   document.body.classList.remove('modal-open');
   document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
   document.getElementById('review-app-banner')?.style.setProperty('display', 'none');
-  document.querySelector('.profiler-results')?.style.setProperty('display', 'none');
+  // A same-origin iframe (the legacy org add-a-bike page, the embeds) carries its own badge
+  [document, ...[...document.querySelectorAll('iframe')].map(f => f.contentDocument).filter(Boolean)]
+    .forEach(d => d.querySelector('.profiler-results')?.style.setProperty('display', 'none'));
   return document.body.scrollHeight; // content height with the chrome gone
 }
 ```
