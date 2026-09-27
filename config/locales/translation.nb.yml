@@ -5572,6 +5572,7 @@ nb:
               søker etter alle registreringer, med mindre du bare søker etter beslaglagte
               og/eller stjålne registreringer.
             show_location_search: vis stedssøk
+            included_columns: Inkluderte kolonner
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:

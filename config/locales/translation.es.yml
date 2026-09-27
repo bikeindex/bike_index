@@ -5823,6 +5823,7 @@ es:
               al buscar todos los registros, a menos que se busquen únicamente los
               registros incautados o robados.
             show_location_search: mostrar búsqueda de ubicación
+            included_columns: Columnas incluidas
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
