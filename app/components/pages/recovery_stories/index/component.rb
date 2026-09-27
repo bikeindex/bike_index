@@ -39,10 +39,10 @@ module Pages
         end
 
         def membership_options
-          [{value: "basic", cents: 499, note: translation(".basic_membership")},
-            {value: "plus", cents: 999, note: translation(".plus_membership"), checked: true},
-            {value: "patron", cents: 4999, note: translation(".patron_membership")}]
-            .map { it.merge(amount: MoneyFormatter.money_format(it[:cents], @currency.slug)) }
+          [{value: "basic", cents: 500, note: translation(".basic_membership")},
+            {value: "plus", cents: 1500, note: translation(".plus_membership"), checked: true},
+            {value: "patron", cents: 5000, note: translation(".patron_membership")}]
+            .map { it.merge(amount: MoneyFormatter.money_format_without_cents(it[:cents], @currency.slug)) }
             .map { it.merge(label: translation(".become_a_member", amount: it[:amount])) }
         end
 
