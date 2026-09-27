@@ -33,7 +33,7 @@ export default class extends Controller {
 
   // A drag that selects the label still ends in a click
   toggle (event) {
-    if (event.detail && this.dragSelected(event)) return
+    if (event?.detail && this.dragSelected(event)) return
     this.setExpanded(this.collapsed)
   }
 
