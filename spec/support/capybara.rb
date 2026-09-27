@@ -27,7 +27,7 @@ end
 Capybara.configure do |config|
   config.default_driver = :playwright
   config.javascript_driver = :playwright
-  # UI::Collapse triggers are role=button spans, so Safari can select their text
+  # UI::Collapse triggers are role=button spans
   config.enable_aria_role = true
 end
 

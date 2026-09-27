@@ -31,7 +31,7 @@ export default class extends Controller {
     this.pressedAt = [event.clientX, event.clientY]
   }
 
-  // A drag that selects the label still ends in a click. A keyboard press (no detail) always toggles.
+  // A drag that selects the label still ends in a click
   toggle (event) {
     if (event.detail && this.dragSelected(event)) return
     this.setExpanded(this.collapsed)

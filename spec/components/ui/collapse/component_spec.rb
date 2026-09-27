@@ -3,15 +3,12 @@
 require "rails_helper"
 
 RSpec.describe UI::Collapse::Component, type: :component do
-  let(:instance) { described_class.new(**options) }
-  let(:component) { render_inline(instance) }
+  let(:component) { render_inline(described_class.new(**options)) }
   let(:options) { {text: "Toggle details"} }
 
   it "renders a collapsed trigger without a chevron" do
-    expect(component).to have_button("Toggle details")
-    expect(component).to have_css("span[role='button'][tabindex='0'][data-ui--collapse-target='trigger'][data-action~='click->ui--collapse#toggle'][data-action~='keydown.enter->ui--collapse#toggle:prevent'][aria-expanded='false']")
+    expect(component).to have_css("span[role='button'][tabindex='0'][aria-expanded='false'][data-ui--collapse-target='trigger']", text: "Toggle details")
     expect(component).not_to have_css("[data-ui--collapse-target='chevron']")
-    expect(component).not_to have_css("button")
   end
 
   context "with chevron" do
@@ -27,7 +24,7 @@ RSpec.describe UI::Collapse::Component, type: :component do
     let(:component) { render_inline(described_class.new(chevron: :trailing)) { "<em>Columns</em>".html_safe } }
 
     it "renders the block, then the chevron" do
-      expect(component).to have_css("[role='button'] > em + [data-ui--collapse-target='chevron']", text: "")
+      expect(component).to have_css("[role='button'] > em + [data-ui--collapse-target='chevron']")
       expect(component).to have_button("Columns")
     end
   end

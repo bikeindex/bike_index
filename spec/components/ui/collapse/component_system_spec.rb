@@ -77,7 +77,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
   end
 
   it "selects the trigger's label on a drag, and toggles on a click or a key" do
-    visit "/rails/view_components/ui/collapse/component/selectable"
+    visit "/rails/view_components/ui/collapse/component/with_block"
     wait_for_stimulus("ui--collapse")
     expect_axe_clean
 
