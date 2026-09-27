@@ -31,18 +31,9 @@ export default class extends Controller {
     this.pressedAt = [event.clientX, event.clientY]
   }
 
-  // A drag that selects the label still ends in a click, and a double or triple click that
-  // selects a word or line leaves the panel as its first click found it. A keyboard press
-  // (no detail) always toggles.
+  // A drag that selects the label still ends in a click. A keyboard press (no detail) always toggles.
   toggle (event) {
-    if (event?.detail > 1) {
-      if (this.collapsed === this.expandedBeforeClick) this.setExpanded(this.expandedBeforeClick)
-      return
-    }
-    if (event?.detail) {
-      this.expandedBeforeClick = !this.collapsed
-      if (this.dragSelected(event)) return
-    }
+    if (event.detail && this.dragSelected(event)) return
     this.setExpanded(this.collapsed)
   }
 

@@ -7,16 +7,12 @@ module UI
     # chevron: true leads the label with it, :trailing follows. A block renders in place of text.
     # A role=button span styled as UI::Button, since Safari won't select a button's text.
     class Component < ApplicationComponent
-      ACTIONS = "mousedown->ui--collapse#press click->ui--collapse#toggle " \
-        "keydown.enter->ui--collapse#toggle:prevent keydown.space->ui--collapse#toggle:prevent"
-
       def initialize(text: nil, chevron: false, aria: {}, data: {}, **button_options)
-        raise ArgumentError, "a collapse trigger can't be disabled" if button_options[:disabled]
-
         @text = text
         @chevron = chevron
         @aria = aria.merge(expanded: "false")
-        @data = data.merge("ui--collapse-target": "trigger", action: ACTIONS)
+        @data = data.merge("ui--collapse-target": "trigger", action: "mousedown->ui--collapse#press click->ui--collapse#toggle " \
+          "keydown.enter->ui--collapse#toggle:prevent keydown.space->ui--collapse#toggle:prevent")
         @button_options = button_options
       end
 

@@ -86,7 +86,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     expect(page.evaluate_script("window.getSelection().toString()")).to start_with("Selectable lab")
     expect(page).to have_css("[role='button'][aria-expanded='false']")
 
-    # A double click selects a word, and leaves the panel as it found it
+    # A double click selects a word, and toggles twice
     label.double_click
     expect(page.evaluate_script("window.getSelection().toString()")).to eq "Selectable"
     expect(page).to have_css("[role='button'][aria-expanded='false']")

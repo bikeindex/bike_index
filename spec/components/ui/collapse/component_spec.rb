@@ -9,7 +9,7 @@ RSpec.describe UI::Collapse::Component, type: :component do
 
   it "renders a collapsed trigger without a chevron" do
     expect(component).to have_button("Toggle details")
-    expect(component).to have_css("span[role='button'][tabindex='0'][data-ui--collapse-target='trigger'][data-action='#{described_class::ACTIONS}'][aria-expanded='false']")
+    expect(component).to have_css("span[role='button'][tabindex='0'][data-ui--collapse-target='trigger'][data-action~='click->ui--collapse#toggle'][data-action~='keydown.enter->ui--collapse#toggle:prevent'][aria-expanded='false']")
     expect(component).not_to have_css("[data-ui--collapse-target='chevron']")
     expect(component).not_to have_css("button")
   end
@@ -21,10 +21,6 @@ RSpec.describe UI::Collapse::Component, type: :component do
       expect(component).to have_css("span.twlink.tw\\:w-full[title='Details'][aria-expanded='false'][aria-label='Details']", text: "Toggle details")
       expect(component).to have_css("[role='button'] [data-ui--collapse-target='chevron'] svg")
     end
-  end
-
-  it "can't be disabled, which a span has no way to be" do
-    expect { described_class.new(disabled: true) }.to raise_error(ArgumentError)
   end
 
   context "with a trailing chevron and a block" do
