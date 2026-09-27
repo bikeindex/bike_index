@@ -12,7 +12,8 @@
 
     <% if safety_rules? %>
       <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,
-          class_name: "tw:mt-2", label: translation(".separate_attestation")) %>
+          class_name: "tw:mt-2", label: translation(".separate_attestation"),
+          html_options: {data: {"org--register-settings-target": "separateAttestation"}}) %>
       <p
         class="
           tw:mt-1 tw:mb-0 tw:pl-6 tw:text-xs tw:text-gray-500

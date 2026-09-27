@@ -195,7 +195,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         visit "/o/#{organization.to_param}/registrations/new"
         click_link "Your Register settings"
         check "Show registration in a single page"
-        click_button "Update"
+        within("form[action$='/registrations/switches']") { click_button "Update" }
 
         expect(page).to have_button("Complete Bike Registration")
         check "Electric (motorized)"
@@ -211,8 +211,13 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
 
         # Separate attestation leaves the rules to an owner who isn't the member
         click_link "Your Register settings"
+        # The old view always leaves the rules to the owner
+        check "Use the old registration page"
+        expect(page).to have_checked_field("Registrant fills out the registration attestation separately", disabled: true)
+        uncheck "Use the old registration page"
+        expect(page).to have_unchecked_field("Registrant fills out the registration attestation separately")
         check "Registrant fills out the registration attestation separately"
-        click_button "Update"
+        within("form[action$='/registrations/switches']") { click_button "Update" }
         # The draft comes back after the reload, and would undo a check that landed before it
         expect(page).to have_field("b_param[owner_email]", with: owner_email)
         check "Electric (motorized)"
