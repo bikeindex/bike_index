@@ -62,8 +62,6 @@ class RegisterController < ApplicationController
 
     case step
     when "finished"
-      # A bike whose rules were left to its owner is finished here, though not finished_registration?
-      session.delete(:register_b_param_token) if @b_param.with_bike?
       @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)
       render Pages::Register::Views::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
@@ -184,10 +182,11 @@ class RegisterController < ApplicationController
       flash[:notice] = translation(:signed_in_as_other, email: current_user.email) unless @b_param.self_made?(current_user)
     elsif sign_in_confirmed_user.blank?
       return redirect_to_current_step
+    else
+      # The filter resolved it signed out, which separate attestation answers with no rules
+      find_registration_sequence
     end
 
-    # The filter resolved it signed out, which separate attestation answers with no rules
-    find_registration_sequence
     @b_param.confirm_email!(creator_id: current_user.id)
     complete_registration
   end
@@ -314,8 +313,9 @@ class RegisterController < ApplicationController
 
     # The session follows whichever registration the token named, so the next tokenless
     # request stays on it - until its bike exists, when there's nothing left to go back
-    # to and the bare /register should start the next registration instead
-    if @b_param.finished_registration?
+    # to and the bare /register should start the next registration instead. A bike whose
+    # rules were left to its owner is finished for everyone else
+    if @b_param.finished_registration? || (@b_param.with_bike? && @b_param.rules_left_to_owner?(current_user))
       session.delete(:register_b_param_token)
     else
       session[:register_b_param_token] = @b_param.id_token

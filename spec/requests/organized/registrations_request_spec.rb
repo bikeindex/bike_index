@@ -775,6 +775,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           confirmation_token: b_param.reload.email_confirmation_token)
         expect(ActionMailer::Base.deliveries.last.html_part.decoded).to include ERB::Util.html_escape(confirm_path)
 
+        # Signed out - log_in stubbed the member's session rather than signing them in
         allow(User).to receive(:from_auth).and_call_original
         expect {
           post "/register/confirm_email", params: {b_param_token: b_param.id_token,

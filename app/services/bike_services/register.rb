@@ -403,7 +403,7 @@ module BikeServices
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_sequence = registration_sequence(b_param) if sequence.blank? && b_param.params["register_separate_attestation"]
+      owners_sequence = registration_sequence(b_param) if sequence.blank? && b_param.rules_left_to_owner?(b_param.creator)
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
         "register_separate_attestation" => owners_sequence.present?

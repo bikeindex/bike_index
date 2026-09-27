@@ -33,7 +33,7 @@ module Pages
           # doesn't always finish the registration. Which statuses have one is rechecked
           # client-side, since the status is picked in this form rather than known when it
           # renders - so the label reads off the same answer both times. The single page's
-          # safety pages follow its electric checkbox instead, which motorized_review answers
+          # follow its electric checkbox
           def submit_texts
             @submit_texts ||= Bike.statuses.index_with do |status|
               next translation(".next") if (@flow.acknowledgments? && !@flow.single_page?) ||
@@ -70,7 +70,7 @@ module Pages
             !@b_param.self_made?(@current_user)
           end
 
-          def own_emails = @current_user&.own_emails || []
+          def own_emails = @own_emails ||= @current_user&.own_emails || []
 
           # The single page matches what's typed against the addresses BParam#self_made? does
           def owner_name_data
