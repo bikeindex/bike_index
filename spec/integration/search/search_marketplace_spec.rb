@@ -25,7 +25,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   end
 
   before do
-    # Create enough listings to span multiple pages (15 per page)
+    # Create enough listings to span multiple pages (12 per page)
 
     15.times do |i|
       item = FactoryBot.create(:bike,
@@ -175,13 +175,13 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     promoted_bike_ids = promoted_listings.map(&:item_id)
     visit_marketplace_via_nav
 
-    # Page 1 holds the first 15: the 2 members sort first, then standard listings
-    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 15)
+    # Page 1 holds the first 12: the 2 members sort first, then standard listings
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 12)
     # The 2 promoted bikes show the member badge and appear above the standard listings
     expect(page).to have_text("Bike Index member")
     expect(visible_bike_ids.first(2)).to match_array(promoted_bike_ids)
     expect_axe_clean
-    # Verify the lazy-loading frame for page 2 exists (2 listings remain)
+    # Verify the lazy-loading frame for page 2 exists (5 listings remain)
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     # Frame-rendered results are proof of JS, so the no-JS pagination links never
     # render - only the frame's spinner
@@ -196,8 +196,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # and verify that infinite scroll still works
     fill_in "price_max_amount", with: "1300"
     find_field("price_max_amount").send_keys(:return)
-    # Page 1 holds the first 15 (2 members ≤ $1300 sort first, then standard)
-    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 15)
+    # Page 1 holds the first 12 (2 members ≤ $1300 sort first, then standard)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 12)
     # Verify lazy frame exists
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
     scroll_to_lazy_load
@@ -256,7 +256,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   it "hands a search_no_js render back to infinite scroll, except on the last page" do
     page.current_window.resize_to(1280, 900)
     visit "/search/marketplace?search_no_js=true"
-    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 15)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 12)
 
     # The links a rider without JS would have used are gone, the frame's spinner shows
     expect(page).to have_no_link(exact_text: "2")
@@ -267,7 +267,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # The last page has no frame to scroll into, so its links stay - they're the only
     # way out for a rider who deep-linked here
     visit "/search/marketplace?search_no_js=true&page=2"
-    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 2)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 5)
     expect(page).to have_no_text("Loading more...")
     # Following one navigates the results frame, like registrations search - so page 1
     # comes back in infinite-scroll mode, with no links of its own. Don't count
@@ -284,8 +284,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # so retry on CI. The form's values aren't part of that artifact.
   it "keeps results and the primary_activity form in sync across back/forward", :flaky do
     visit_marketplace_via_nav
-    # First 15 on the unfiltered page (the 2 members sort first)
-    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 15)
+    # First 12 on the unfiltered page (the 2 members sort first)
+    expect(page).to have_css("[data-test-id^='search-result-card-']", wait: 10, count: 12)
     # Filter by "Mountain biking" (6 listings), then "Road cycling" (9 listings).
     # The two counts differ, so a settled count proves which search the frame holds.
     search_primary_activity("Mountain biking")

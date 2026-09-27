@@ -9,8 +9,9 @@ module SharedBlocks
       class Component < ApplicationComponent
         # Template Dependency: Atoms::RegistrationStatusBadge::Component
 
-        # For the list holding them
-        LIST_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] tw:gap-4"
+        # For the list holding them. At most 4 columns, so marketplace's 12-result pages
+        # fill their rows at every width - each page is its own grid
+        LIST_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(max(14rem,calc((100%_-_3rem)/4)),1fr))] tw:gap-4"
 
         def initialize(bike:, organization: nil, search_all: false)
           @bike = bike
