@@ -6,14 +6,13 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='ui--collapse'
 // Animates [data-ui--collapse-target=content] open/closed. Optionally rotates a
 // [data-ui--collapse-target=chevron] and keeps [data-ui--collapse-target=trigger]'s
-// aria-expanded and data-active (the is-active variant) in sync, and a selectable
-// trigger's [data-ui--collapse-target=row]'s data-active. With
+// aria-expanded and data-active (the is-active variant) in sync. With
 // data-ui--collapse-param-value set, the open state persists to the URL query
 // (?param=1, ?param=0 collapsed) so it survives reloads and navigation; with
 // data-ui--collapse-storage-key-value it persists to localStorage instead, for a panel
 // whose state is the rider's preference rather than part of the address.
 export default class extends Controller {
-  static targets = ['content', 'chevron', 'trigger', 'row']
+  static targets = ['content', 'chevron', 'trigger']
   static values = { param: String, storageKey: String }
 
   connect () {
@@ -94,8 +93,10 @@ export default class extends Controller {
 
   syncTriggers (expanding) {
     this.chevronTargets.forEach((chevron) => chevron.classList.toggle('tw:rotate-90', expanding))
-    this.triggerTargets.forEach((trigger) => trigger.setAttribute('aria-expanded', String(expanding)))
-    this.triggerTargets.concat(this.rowTargets).forEach((element) => { element.dataset.active = String(expanding) })
+    this.triggerTargets.forEach((trigger) => {
+      trigger.setAttribute('aria-expanded', String(expanding))
+      trigger.dataset.active = String(expanding)
+    })
   }
 
   persist (expanding) {
