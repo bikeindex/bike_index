@@ -195,6 +195,8 @@ class Export < ApplicationRecord
   end
 
   def partial_registrations
+    return false if impounded_bikes
+
     options["partial_registrations"].blank? ? false : options["partial_registrations"]
   end
 
@@ -203,10 +205,11 @@ class Export < ApplicationRecord
   end
 
   def matching_kinds
+    return [:impounded] if impounded_bikes
+
     kinds = []
-    kinds << :impounded if impounded_bikes
-    kinds << :incomplete if partial_registrations.present? && !partial_registrations.in?([false, "none"])
-    kinds << :registered unless partial_registrations == "only" || partial_registrations == "none"
+    kinds << :incomplete if partial_registrations.present?
+    kinds << :registered unless partial_registrations == "only"
     kinds
   end
 
@@ -328,11 +331,13 @@ class Export < ApplicationRecord
 
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
-    return Bike.none if partial_registrations.in?(["only", "none"])
+    return Bike.none if partial_registrations == "only"
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
-    return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
 
-    bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
+    bikes = impounded_bikes ? organization.impound_records.active.bikes.default_includes : organization.bikes
+    return bikes_within_time(bikes) unless custom_bike_ids.present?
+
+    bikes_within_time(bikes).or(bikes.where(id: custom_bike_ids))
   end
 
   def incompletes_scoped

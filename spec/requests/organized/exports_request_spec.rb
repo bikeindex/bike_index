@@ -392,17 +392,19 @@ RSpec.describe Organized::ExportsController, type: :request do
         end
       end
       context "with impounded_bikes" do
-        let(:enabled_feature_slugs) { %w[csv_exports impound_bikes] }
-        it "creates with impounded_bikes" do
+        let(:enabled_feature_slugs) { %w[csv_exports impound_bikes show_partial_registrations] }
+        it "creates with impounded_bikes, without partial registrations" do
           expect {
             post base_url, params: {
               export: valid_attrs,
-              include_impounded_bikes: "true"
+              include_impounded_bikes: "true",
+              include_partial_registrations: "true"
             }
           }.to change(Export, :count).by 1
           export = Export.last
           expect(export.impounded_bikes).to be_truthy
           expect(export.options["impounded_bikes"]).to be_truthy
+          expect(export.options["partial_registrations"]).to be_falsey
         end
       end
 
