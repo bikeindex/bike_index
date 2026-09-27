@@ -6,10 +6,10 @@ module Pages
       module Step1
         # Step 1 of the registration flow: the quick-start form
         class Component < ApplicationComponent
-          def initialize(b_param:, steps:, organization: nil, current_user: nil, embed: false,
+          def initialize(b_param:, flow:, organization: nil, current_user: nil, embed: false,
             skip_heading: false, button_color: nil, button_hover_color: nil)
             @b_param = b_param
-            @steps = steps
+            @flow = flow
             @organization = organization
             @current_user = current_user
             @embed = embed

@@ -12,9 +12,9 @@ module Pages
           FORM_ACTIONS = "hw-combobox:selection->register--status-fields#update " \
             "register--organization:changed->register--status-fields#update"
 
-          def initialize(b_param:, steps:, form:, current_user: nil)
+          def initialize(b_param:, flow:, form:, current_user: nil)
             @b_param = b_param
-            @steps = steps
+            @flow = flow
             @form = form
             @current_user = current_user
           end
@@ -31,7 +31,7 @@ module Pages
           # renders - so the label reads off the same answer both times
           def submit_texts
             @submit_texts ||= Bike.statuses.index_with do |status|
-              next translation(".next") if @steps.include?("review") || BikeServices::Register.report_step?(status)
+              next translation(".next") if @flow.acknowledgments? || BikeServices::Register.report_step?(status)
 
               translation(".complete_registration", cycle_type: @b_param.type_titleize)
             end
