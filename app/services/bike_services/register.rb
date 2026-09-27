@@ -85,6 +85,16 @@ module BikeServices
       b_param.save
     end
 
+    # The organization add-a-bike page's switches. Step 1 saves them onto the registration;
+    # until then the session's apply only to the organization they were set on
+    def settings(b_param, session_settings)
+      in_session = session_settings.present? &&
+        session_settings["organization_id"].to_s == b_param.creation_organization_id.to_s
+      %i[single_page separate_attestation].index_with do |key|
+        b_param.params.to_h.fetch("register_#{key}") { in_session && session_settings[key.to_s].present? }
+      end
+    end
+
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
     # active sequence, or the one its pages are being agreed to from, even once replaced.
     # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
@@ -142,6 +152,15 @@ module BikeServices
     def flow(b_param, sequence:, single_page: false)
       BikeServices::RegisterFlow.new(single_page:, page_count: sequence_pages(sequence).count,
         report: report_placement(b_param))
+    end
+
+    # The single page's electric checkbox is on the same form as its submit button, so the
+    # button is told what it'd lead to for an e-vehicle. Separate attestation leaves the rules
+    # to an owner who isn't the registrant, which the email typed above it decides - :own_emails
+    def motorized_review(b_param, flow, separate_attestation:)
+      return false unless flow.single_page? && registration_sequence(b_param, motorized: true).present?
+
+      separate_attestation ? :own_emails : true
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
