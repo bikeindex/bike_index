@@ -5837,6 +5837,7 @@ it:
               per località quando si cercano tutte le immatricolazioni, a meno che
               non si stiano cercando solo immatricolazioni sequestrate e/o rubate.
             show_location_search: mostra la ricerca della posizione
+            included_columns: Colonne incluse
           column_settings_toggle:
             column_settings: Impostazioni della colonna
           settings_and_filters:
