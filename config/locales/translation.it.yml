@@ -5257,7 +5257,6 @@ it:
       viewing_without_org: Visione senza alcuna organizzazione
       your_registrations: Le vostre registrazioni
     menu_items_org:
-      add_a_bike: Aggiungi una bicicletta
       add_an_impounded_vehicle: Aggiungi un veicolo sequestrato
       ascend_imports: Ascend Imports
       bulk_import_and_export: Importazione ed esportazione all'ingrosso
@@ -5295,6 +5294,7 @@ it:
       in_super_admin: "%{org_name} in super amministratore"
       registrations_index: Registrazioni delle organizzazioni
       search_all_registrations: Cerca tutte le registrazioni
+      add_a_registration: Aggiungi una registrazione
   theft_alert_plans:
     theft_alert_plan:
       days: Giorni

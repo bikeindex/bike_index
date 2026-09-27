@@ -5006,7 +5006,6 @@ nb:
       viewing_without_org: Visning uten organisering
       your_registrations: Dine registreringer
     menu_items_org:
-      add_a_bike: Legg til en sykkel
       add_an_impounded_vehicle: Legg til et beslaglagt kjøretøy
       ascend_imports: Ascend Import
       bulk_import_and_export: Import og eksport av store mengder
@@ -5044,6 +5043,7 @@ nb:
       in_super_admin: "%{org_name} i superadministrator"
       registrations_index: Organisasjonsregistreringer
       search_all_registrations: Søk i alle registreringer
+      add_a_registration: Legg til en registrering
   theft_alert_plans:
     theft_alert_plan:
       days: Dager
