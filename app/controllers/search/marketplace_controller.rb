@@ -19,7 +19,7 @@ module Search
         @pagy, @bikes = pagy(:countish,
           searched_bikes.reorder("marketplace_listings.seller_member DESC, marketplace_listings.published_at DESC")
             .preload(current_marketplace_listing: {address_record: %i[country region_record]}),
-          limit: 12, page: @page, max_pages: MAX_INDEX_PAGE)
+          limit: 15, page: @page, max_pages: MAX_INDEX_PAGE)
       end
 
       respond_to do |format|

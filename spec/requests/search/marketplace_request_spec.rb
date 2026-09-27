@@ -73,7 +73,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
       end
 
       context "with more listings than fit on a page" do
-        let!(:extra_listings) { FactoryBot.create_list(:marketplace_listing, 13, :for_sale, seller:) }
+        let!(:extra_listings) { FactoryBot.create_list(:marketplace_listing, 15, :for_sale, seller:) }
 
         it "renders pagination links only when it can't tell whether JS is running" do
           # A turbo request proves JS, so infinite scroll is the whole story - rendering
@@ -140,7 +140,7 @@ RSpec.describe Search::MarketplaceController, type: :request do
 
         context "with more member listings than fit on a page" do
           let!(:extra_promoted_listings) do
-            Array.new(13) do |i|
+            Array.new(16) do |i|
               extra_item = FactoryBot.create(:bike, :with_primary_activity)
               FactoryBot.create(:marketplace_listing, :for_sale,
                 address_record: paid_seller.address_record, seller: paid_seller, item: extra_item,
@@ -150,20 +150,20 @@ RSpec.describe Search::MarketplaceController, type: :request do
           end
 
           it "sorts members first and paginates them, rather than piling all onto page 1" do
-            extra_standard_items = Array.new(13) do |i|
+            extra_standard_items = Array.new(16) do |i|
               extra_item = FactoryBot.create(:bike, :with_primary_activity)
               FactoryBot.create(:marketplace_listing, :for_sale,
                 address_record: seller.address_record, seller:, item: extra_item, amount_cents: 200_00,
                 published_at: Time.current - (i + 1).hours)
               extra_item
             end
-            member_ids = [promoted_item.id, *extra_promoted_listings.map(&:item_id)] # 14 members
-            standard_ids = [item.id, *extra_standard_items.map(&:id)] # 14 standard
+            member_ids = [promoted_item.id, *extra_promoted_listings.map(&:item_id)] # 17 members
+            standard_ids = [item.id, *extra_standard_items.map(&:id)] # 17 standard
 
             get base_url, as: :turbo_stream
             page1 = assigns(:bikes).pluck(:id)
-            # Page 1 is bounded to 12 and entirely members (members sort ahead of standard)
-            expect(page1.size).to eq 12
+            # Page 1 is bounded to 15 and entirely members (members sort ahead of standard)
+            expect(page1.size).to eq 15
             expect(page1 - member_ids).to eq([])
             expect(assigns(:pagy).next).to eq 2
 
@@ -212,8 +212,8 @@ RSpec.describe Search::MarketplaceController, type: :request do
             # Should NOT include a lazy-loading frame for page 2 (only 1 result, fits on page 1)
             expect(response.body).not_to include("id=\"page_2\"")
 
-            # Create enough listings to have multiple pages (12 per page)
-            13.times do
+            # Create enough listings to have multiple pages (15 per page)
+            15.times do
               listing = FactoryBot.create(:marketplace_listing, :for_sale, seller:)
               listing.update(published_at: Time.current)
             end
