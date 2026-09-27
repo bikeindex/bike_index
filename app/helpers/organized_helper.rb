@@ -55,30 +55,6 @@ module OrganizedHelper
     end
   end
 
-  def organized_container
-    fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits registrations]
-    return "container-fluid" if fluid.include?(controller_name)
-
-    if controller_name == "bulk_imports" && action_name == "show"
-      return "container-fluid"
-    end
-    "container"
-  end
-
-  def organized_include_javascript_pack?
-    return false if [controller_name, action_name] == %w[parking_notifications index]
-    return true if organized_container == "container-fluid"
-
-    [
-      %w[bikes recoveries],
-      %w[bikes incompletes],
-      %w[exports show],
-      %w[exports new],
-      %w[users new],
-      %w[dashboard index]
-    ].include?([controller_name, action_name])
-  end
-
   def status_display_class(status)
     return "" if status.blank?
 
