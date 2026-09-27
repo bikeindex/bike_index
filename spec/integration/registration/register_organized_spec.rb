@@ -214,8 +214,10 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         # The old view always leaves the rules to the owner
         check "Use the old registration page"
         expect(page).to have_checked_field("Registrant fills out the registration attestation separately", disabled: true)
+        expect(page).to have_unchecked_field("Single page registration form", disabled: true)
         uncheck "Use the old registration page"
         expect(page).to have_unchecked_field("Registrant fills out the registration attestation separately")
+        expect(page).to have_checked_field("Single page registration form")
         check "Registrant fills out the registration attestation separately"
         within("form[action$='/registrations/switches']") { click_button "Update" }
         # The draft comes back after the reload, and would undo a check that landed before it

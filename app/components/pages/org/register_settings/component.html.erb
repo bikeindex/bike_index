@@ -20,12 +20,13 @@
 
     <div class="tw:sm:col-span-2">
       <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: @single_page,
-          label: translation(".single_page")) %>
+          label: translation(".single_page"),
+          html_options: {data: {"org--register-settings-target": "oldViewShown", old_view_checked: false}}) %>
 
       <% if safety_rules? %>
         <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,
             class_name: "tw:mt-2", label: translation(".separate_attestation"),
-            html_options: {data: {"org--register-settings-target": "separateAttestation"}}) %>
+            html_options: {data: {"org--register-settings-target": "oldViewShown", old_view_checked: true}}) %>
         <p
           class="
             tw:mt-1 tw:mb-0 tw:pl-6 tw:text-xs tw:text-gray-500

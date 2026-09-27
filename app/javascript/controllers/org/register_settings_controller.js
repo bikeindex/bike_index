@@ -1,10 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--register-settings'
-// The old view skips the register flow, so its settings don't apply while it's checked -
-// except that it always leaves the rules to the owner, so separate attestation shows checked
+// The old view skips the register flow, so its settings don't apply while it's checked.
+// Each shows what the old view does instead - data-old-view-checked - so the single page
+// reads unchecked, and separate attestation checked, since it always leaves the rules to the owner
 export default class extends Controller {
-  static targets = ['oldView', 'flowSettings', 'separateAttestation']
+  static targets = ['oldView', 'flowSettings', 'oldViewShown']
 
   connect () {
     this.apply()
@@ -12,20 +13,19 @@ export default class extends Controller {
 
   apply () {
     const off = this.oldViewTarget.checked
-    if (this.hasSeparateAttestationTarget) this.showSeparateAttestation(off)
+    this.oldViewShownTargets.forEach(box => this.showOldView(box, off))
     this.flowSettingsTarget.classList.toggle('tw:opacity-50', off)
     this.flowSettingsTarget.querySelectorAll('input').forEach(input => { input.disabled = off })
   }
 
   // Remembers what it was set to, for when the old view is unchecked
-  showSeparateAttestation (off) {
-    const box = this.separateAttestationTarget
+  showOldView (box, off) {
     if (off) {
-      this.separateAttestationChosen ??= box.checked
-      box.checked = true
-    } else if (this.separateAttestationChosen !== undefined) {
-      box.checked = this.separateAttestationChosen
-      this.separateAttestationChosen = undefined
+      box.dataset.chosen ??= box.checked
+      box.checked = box.dataset.oldViewChecked === 'true'
+    } else if (box.dataset.chosen !== undefined) {
+      box.checked = box.dataset.chosen === 'true'
+      delete box.dataset.chosen
     }
   }
 }
