@@ -203,10 +203,11 @@ class Export < ApplicationRecord
   end
 
   def matching_kinds
+    return [:impounded] if impounded_bikes
+
     kinds = []
-    kinds << :impounded if impounded_bikes
-    kinds << :incomplete if partial_registrations.present? && !partial_registrations.in?([false, "none"])
-    kinds << :registered unless partial_registrations == "only" || partial_registrations == "none"
+    kinds << :incomplete if partial_registrations.present?
+    kinds << :registered unless partial_registrations == "only"
     kinds
   end
 
@@ -328,15 +329,17 @@ class Export < ApplicationRecord
 
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
-    return Bike.none if partial_registrations.in?(["only", "none"])
+    return Bike.none if partial_registrations == "only"
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
-    return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
 
-    bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
+    bikes = impounded_bikes ? organization_impounded_bikes : organization.bikes
+    return bikes_within_time(bikes) unless custom_bike_ids.present?
+
+    bikes_within_time(bikes).or(bikes.where(id: custom_bike_ids))
   end
 
   def incompletes_scoped
-    return BParam.none unless partial_registrations.present?
+    return BParam.none if impounded_bikes || partial_registrations.blank?
 
     incompletes = organization.incomplete_b_params
     return incompletes unless option?("start_at") || option?("end_at")
@@ -385,6 +388,11 @@ class Export < ApplicationRecord
     # but if we want to manually create an export, we should be able to do so
     opts["headers"] = opts["headers"] & self.class.permitted_headers(:include_all)
     opts
+  end
+
+  # Impounding doesn't register the bike to the organization, and unregistered impounds are user_hidden
+  def organization_impounded_bikes
+    Bike.with_user_hidden.where(id: organization.impound_records.active.select(:bike_id))
   end
 
   def bikes_within_time(bikes)

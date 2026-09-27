@@ -289,6 +289,34 @@ RSpec.describe Export, type: :model do
         expect(export.bikes_scoped.to_sql).to eq organization.bikes.where(created_at: export.start_at..export.end_at).to_sql
       end
     end
+    context "impounded_bikes" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes show_partial_registrations]) }
+      let(:partial_registrations) { false }
+      let(:export) { FactoryBot.create(:export_organization, organization:, options: {impounded_bikes: true, partial_registrations:}) }
+      let(:impound_user) { FactoryBot.create(:organization_user, organization:) }
+      let(:bike_registered) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      let!(:impound_record_registered) { FactoryBot.create(:impound_record, organization:, user: impound_user, bike: bike_registered) }
+      let(:bike_unregistered) { FactoryBot.create(:bike, user_hidden: true) }
+      let!(:impound_record_unregistered) { FactoryBot.create(:impound_record, organization:, user: impound_user, bike: bike_unregistered) }
+      let!(:impound_record_resolved) { FactoryBot.create(:impound_record_resolved, organization:, user: impound_user) }
+      let!(:impound_record_other_organization) { FactoryBot.create(:impound_record_with_organization) }
+      let!(:bike_not_impounded) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      let!(:partial_registration) { BParam.create(params: {bike: {creation_organization_id: organization.id}}, origin: "embed_partial") }
+
+      it "is only the organization's impounded bikes" do
+        expect(organization.incomplete_b_params.pluck(:id)).to eq([partial_registration.id])
+        expect(export.matching_kinds).to eq([:impounded])
+        expect(export.bikes_scoped.pluck(:id)).to match_array([bike_registered.id, bike_unregistered.id])
+        expect(export.incompletes_scoped.pluck(:id)).to eq([])
+      end
+      context "with partial_registrations: none" do
+        let(:partial_registrations) { "none" }
+        it "is only the organization's impounded bikes" do
+          expect(export.bikes_scoped.pluck(:id)).to match_array([bike_registered.id, bike_unregistered.id])
+          expect(export.incompletes_scoped.pluck(:id)).to eq([])
+        end
+      end
+    end
   end
 
   describe "permitted_headers_for" do
