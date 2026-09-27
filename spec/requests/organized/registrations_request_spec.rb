@@ -595,7 +595,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       # Not a let - it's read after each request in turn, and a let would memoize the first
       def menu_add_bike_path
         Nokogiri::HTML(response.body).css("#org_sidebar_nav a")
-          .find { |a| a.text.strip == "Add a bike" }&.[]("href")
+          .find { |a| a.text.strip == "Add a registration" }&.[]("href")
       end
 
       it "keeps the menu on the old view until the register flow is asked for again" do

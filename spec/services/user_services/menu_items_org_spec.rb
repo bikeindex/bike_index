@@ -54,7 +54,7 @@ RSpec.describe UserServices::MenuItemsOrg do
             link_item("Organization Registrations", "/o/#{organization.to_param}/registrations"),
             link_item("Search all registrations", "/search/registrations?stolenness=all")
           ]),
-          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new",
+          link_item("Add a registration", "/o/#{organization.to_param}/registrations/new",
             icon: "plus-circle", match_params: {parking_notification: nil})
         ]
       end
@@ -67,7 +67,7 @@ RSpec.describe UserServices::MenuItemsOrg do
         subject(:items) { described_class.for(organization:, current_user:, old_register_view: true) }
 
         it "points add a bike at the embed form" do
-          expect(items.last).to eq(link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
+          expect(items.last).to eq(link_item("Add a registration", "/o/#{organization.to_param}/bikes/new",
             icon: "plus-circle", match_params: {parking_notification: nil}))
         end
       end

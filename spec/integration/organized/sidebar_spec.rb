@@ -128,21 +128,21 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
     visit "/o/#{slug}/registrations/new"
 
-    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
 
     visit "/o/#{slug}/bikes/new?parking_notification=true"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
-    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
 
     # Going back to the old view moves add-a-bike onto organized/bikes#new alongside the
     # notification's row, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
     click_link "Go back to the old view"
-    click_link "Add a bike"
+    click_link "Add a registration"
 
-    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
   end
 
