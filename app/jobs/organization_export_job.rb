@@ -44,7 +44,7 @@ class OrganizationExportJob < ApplicationJob
     end
     return if @export_ebraked
 
-    file.write(axlsx_package.to_stream.read)
+    file.binmode.write(axlsx_package.to_stream.read)
     @export.tmp_file.close
     true
   end
