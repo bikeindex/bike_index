@@ -6768,7 +6768,6 @@ nl:
           subscription_expired_html: Uw abonnement op Bike Index is verlopen. Neem
             contact op met %{email_link} om het opnieuw in te schakelen.
         organized_shop_integration_alert:
-          add_a_bike: Voeg een fiets toe
           already_viewing_add_a_bike_page: Je bekijkt deze pagina al.
           ascend_card_title: Stijg op
           dismiss: Afwijzen
@@ -6785,6 +6784,7 @@ nl:
           pos_callout_subhead: Koppel je kassasysteem en elke fiets die je verkoopt,
             wordt geregistreerd op naam van je klant in Bike Index.
           pos_callout_title: Registreer fietsen automatisch via uw verkooppunt.
+          add_a_registration: Voeg een registratie toe
       navbar:
         org_sidebar:
           admin_panel: ADMINISTRATIEPANEEL
