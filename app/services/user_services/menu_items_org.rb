@@ -115,7 +115,7 @@ module UserServices
       else
         routes.new_organization_registration_path(organization.to_param)
       end
-      ComponentStructs::Shapes.link(translation(:add_a_registration), path, icon: "plus-circle",
+      ComponentStructs::Shapes.link(translation(:add_a_bike), path, icon: "plus-circle",
         match_params: {parking_notification: nil})
     end
 
