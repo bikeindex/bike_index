@@ -10,7 +10,7 @@ RSpec.describe Pages::Org::RegisterStep1::Component, type: :component do
   end
   let(:instance) do
     described_class.new(b_param:, organization:,
-      flow: BikeServices::Register.flow(b_param, sequence: nil, single_page: false))
+      flow: BikeServices::Register.flow(b_param, sequence: nil))
   end
   let(:component) { render_inline(instance) }
 

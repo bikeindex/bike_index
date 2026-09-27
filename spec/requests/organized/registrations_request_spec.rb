@@ -593,30 +593,30 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
       let(:old_view_path) { new_organization_bike_path(organization_id: current_organization.to_param) }
       # Not a let - it's read after each request in turn, and a let would memoize the first
-      def menu_add_bike_path
+      def menu_add_registration_path
         Nokogiri::HTML(response.body).css("#org_sidebar_nav a")
-          .find { |a| a.text.strip == "Add a bike" }&.[]("href")
+          .find { |a| a.text.strip == "Add a registration" }&.[]("href")
       end
 
       it "keeps the menu on the old view until the register flow is asked for again" do
         get "#{base_url}/new"
-        expect(menu_add_bike_path).to eq "#{base_url}/new"
+        expect(menu_add_registration_path).to eq "#{base_url}/new"
 
         post "#{base_url}/switches", params: {old_view: true}
         expect(response).to redirect_to old_view_path
         expect(session[:old_register_view]).to be_truthy
         get "#{base_url}/settings"
         expect(Nokogiri::HTML(response.body).at_css("input[name=old_view]")["checked"]).to be_present
-        expect(menu_add_bike_path).to eq old_view_path
+        expect(menu_add_registration_path).to eq old_view_path
 
         # Every organized page follows it, not just the one that set it
         get base_url
-        expect(menu_add_bike_path).to eq old_view_path
+        expect(menu_add_registration_path).to eq old_view_path
 
         # And the register flow's own link is the way back
         get "#{base_url}/new"
         expect(session[:old_register_view]).to be_blank
-        expect(menu_add_bike_path).to eq "#{base_url}/new"
+        expect(menu_add_registration_path).to eq "#{base_url}/new"
       end
 
       it "leaves the flow's settings as they were" do

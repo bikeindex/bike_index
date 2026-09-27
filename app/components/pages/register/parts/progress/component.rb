@@ -15,7 +15,7 @@ module Pages
 
           def number = @number ||= @flow.position(@step)
 
-          def total = @flow.count
+          def total = @flow.steps.count
         end
       end
     end
