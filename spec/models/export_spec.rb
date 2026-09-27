@@ -302,14 +302,26 @@ RSpec.describe Export, type: :model do
       let!(:bike_not_impounded) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       let!(:partial_registration) { BParam.create(params: {bike: {creation_organization_id: organization.id}}, origin: "embed_partial") }
 
-      it "is only the organization's impounded bikes" do
+      it "is the organization's whole impound lot" do
         expect(organization.incomplete_b_params.pluck(:id)).to eq([partial_registration.id])
         expect(export.partial_registrations).to be_falsey
         expect(export.matching_kinds).to eq([:impounded])
         expect(impound_record_registered_elsewhere.bike.reload.status).to eq "status_impounded"
         expect(bike_resolved.reload.status).to eq "status_with_owner"
-        expect(export.bikes_scoped.pluck(:id)).to eq([bike_registered.id])
+        expect(export.bikes_scoped.pluck(:id)).to match_array([bike_registered.id, impound_record_registered_elsewhere.bike_id])
         expect(export.incompletes_scoped.pluck(:id)).to eq([])
+      end
+
+      context "with only_custom_bike_ids" do
+        let(:bike_elsewhere) { FactoryBot.create(:bike) }
+        let(:export) do
+          FactoryBot.create(:export_organization, organization:, options: {only_custom_bike_ids: true,
+                                                                           custom_bike_ids: [bike_not_impounded.id, impound_record_registered_elsewhere.bike_id, bike_elsewhere.id]})
+        end
+
+        it "reaches the impound lot, but no further past the organization" do
+          expect(export.bikes_scoped.pluck(:id)).to match_array([bike_not_impounded.id, impound_record_registered_elsewhere.bike_id])
+        end
       end
       context "with the legacy partial_registrations: none" do
         let(:partial_registrations) { "none" }

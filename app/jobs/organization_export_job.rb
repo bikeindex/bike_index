@@ -88,7 +88,8 @@ class OrganizationExportJob < ApplicationJob
   end
 
   def bike_to_row(bike)
-    export_headers.map { |header| value_for_header(header, bike) }
+    hide_owner = impounded_elsewhere_ids.include?(bike.id)
+    export_headers.map { |header| value_for_header(header, bike) unless hide_owner && owner_header?(header) }
   end
 
   def b_param_to_row(b_param)
@@ -161,6 +162,19 @@ class OrganizationExportJob < ApplicationJob
     when "impound_id" then bike.current_impound_record&.display_id if bike.status_impounded?
     when "acknowledged_at" then acknowledged_ats[bike.id]&.utc if bike.motorized?
     end
+  end
+
+  # The bikes the organization has impounded that aren't registered with it - the only ones an
+  # export reaches that aren't its own
+  def impounded_elsewhere_ids
+    @impounded_elsewhere_ids ||= @export.organization.impound_records.active
+      .where.not(bike_id: @export.organization.bike_organizations.select(:bike_id)).pluck(:bike_id).to_set
+  end
+
+  # The owner's details, which the registrations table hides on a bike registered elsewhere
+  def owner_header?(header)
+    %w[owner_email owner_name].include?(header) || ADDRESS_KEYS.key?(header) ||
+      ComponentStructs::OrgSearchSettings::EXPORT_HEADERS.key?("reg_#{header}_cell")
   end
 
   # Ordered so each bike keeps its latest, as RegistrationSequenceAcknowledgment.find_for does

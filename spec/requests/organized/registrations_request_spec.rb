@@ -232,6 +232,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
 
       context "with an impounded status" do
+        let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes] }
         let!(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: current_organization) }
         let!(:impounded_elsewhere) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user).bike }
         let!(:other_organization_impounded) { FactoryBot.create(:impound_record_with_organization).bike }
@@ -261,6 +262,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           get base_url, params: {chart_scope: "search", search_status: "impounded", period: "all"},
             headers: {"Turbo-Frame" => "chart_card_frame"}
           expect(assigns(:registrations_stats).first.count).to eq 1
+
+          # An export from the search carries the whole lot
+          get base_url, params: {search_status: "impounded", create_export: true}
+          export_bike_ids = response.redirect_url[/custom_bike_ids=([\d_]+)/, 1].split("_").map(&:to_i)
+          expect(export_bike_ids).to match_array([impounded_bike.id, impounded_elsewhere.id])
         end
       end
 

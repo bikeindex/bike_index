@@ -650,6 +650,29 @@ RSpec.describe OrganizationExportJob, type: :job do
           expect(instance.bike_to_row(bike)).to eq bike_values
         end
       end
+
+      context "with a bike the organization impounded that's registered elsewhere" do
+        let(:organization) do
+          FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[csv_exports impound_bikes reg_address reg_phone])
+        end
+        let(:export) { FactoryBot.create(:export_organization, organization:, options: {headers: %w[link owner_email owner_name phone address], impounded_bikes: true}) }
+        let(:impound_user) { FactoryBot.create(:organization_user, organization:) }
+        let(:bike_elsewhere) do
+          FactoryBot.create(:bike, :with_ownership, :with_address_record, owner_email: "elsewhere@example.com",
+            creation_registration_info: {user_name: "Someone Else", phone: "7177423423"})
+        end
+        let!(:impound_record) { FactoryBot.create(:impound_record, organization:, user: impound_user, bike: bike_elsewhere) }
+
+        it "blanks its owner's details, as the registrations table hides them" do
+          expect(bike_elsewhere.reload.phone).to eq "7177423423"
+          expect(bike_elsewhere.owner_name).to eq "Someone Else"
+          expect(bike_elsewhere.registration_address["street"]).to be_present
+          expect(export.bikes_scoped.pluck(:id)).to eq([bike_elsewhere.id])
+          expect(instance.bike_to_row(bike_elsewhere)).to eq(["http://test.host/bikes/#{bike_elsewhere.id}", *Array.new(8)])
+          # The organization's own registration keeps them
+          expect(instance.bike_to_row(bike)[1]).to eq bike.owner_email
+        end
+      end
     end
   end
 end
