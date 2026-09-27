@@ -325,6 +325,15 @@ module BikeServices
       register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
     end
 
+    # The legacy embed form shows no rules, so an e-vehicle's are left to its owner - even when
+    # a member registers their own, who'd otherwise never see them. It asks everything the
+    # flow's own steps do, so they're marked done and the owner's link lands on the rules
+    def create_embed_bike(b_param, ip_address:)
+      b_param.params = b_param.params.merge("register_separate_attestation" => true,
+        "details_completed" => true, "report_completed" => true)
+      create_bike(b_param, sequence: nil, ip_address:, rules_to_owner: true)
+    end
+
     #
     # private below here
     #
@@ -401,9 +410,10 @@ module BikeServices
     # Returns nil while the rules are owed - the bike exists, but the registration isn't finished -
     # unless separate attestation left them to the owner, who's emailed the link back instead.
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
-    def create_bike(b_param, sequence:, ip_address:)
+    def create_bike(b_param, sequence:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_sequence = registration_sequence(b_param) if sequence.blank? && b_param.rules_left_to_owner?(b_param.creator)
+      owners_sequence = registration_sequence(b_param) if sequence.blank? &&
+        (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
         "register_separate_attestation" => owners_sequence.present?

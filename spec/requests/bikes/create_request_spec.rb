@@ -749,6 +749,53 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
 
+    context "an e-vehicle, with the organization's safety rules" do
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+      let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+      let(:owner_email) { "flow@goodtimes.com" }
+      let(:e_vehicle_params) do
+        {propulsion_type_motorized: "true", bike: bike_params.merge(cycle_type: "bike", owner_email:)}
+      end
+
+      it "registers it, and emails the owner the rules to agree to" do
+        Sidekiq::Job.clear_all
+        ActionMailer::Base.deliveries = []
+        expect { post base_url, params: e_vehicle_params }
+          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+        expect(response).to redirect_to(embed_extended_organization_url(organization))
+
+        expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+        EmailJobs::PartialRegistrationJob.drain
+        expect(ActionMailer::Base.deliveries.sole.to).to eq([owner_email])
+        confirm_path = confirm_register_path(b_param_token: b_param.id_token,
+          confirmation_token: b_param.reload.email_confirmation_token)
+        expect(ActionMailer::Base.deliveries.sole.html_part.decoded).to include ERB::Util.html_escape(confirm_path)
+
+        log_in(FactoryBot.create(:user_confirmed, email: owner_email))
+        get "/register", params: {b_param_token: b_param.id_token}
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        %w[3 4].each do |step|
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                    step:, acknowledged: {"0" => "1", "1" => "1"}}
+        end
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                  step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
+        expect(RegistrationSequenceAcknowledgment.sole.user.email).to eq owner_email
+        expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+      end
+
+      context "registering their own" do
+        let(:owner_email) { current_user.email }
+
+        it "still leaves the rules to the email, since the form never shows them" do
+          expect { post base_url, params: e_vehicle_params }
+            .to change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+          expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id]])
+        end
+      end
+    end
+
     context "with an organization bike sticker and a signed in member" do
       let(:current_user) { FactoryBot.create(:organization_user, organization:) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, code: "aaa", kind: "sticker") }
