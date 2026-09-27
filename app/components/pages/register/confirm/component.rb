@@ -2,7 +2,7 @@
 
 module Pages
   module Register
-    module StepConfirm
+    module Confirm
       # Where the emailed confirmation link lands. Confirming is single use and scanners run the
       # page's JS, so the form waits for a click rather than submitting on render
       class Component < ApplicationComponent

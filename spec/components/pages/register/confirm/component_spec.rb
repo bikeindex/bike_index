@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Register::StepConfirm::Component, type: :component do
+RSpec.describe Pages::Register::Confirm::Component, type: :component do
   let(:component) { render_inline(described_class.new(b_param:, token: "sometoken")) }
   let(:b_param) { FactoryBot.create(:b_param, params: {bike: {owner_email: "someone@bikeindex.org"}}) }
 
