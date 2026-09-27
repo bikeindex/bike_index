@@ -4,5 +4,5 @@
 >
   <%= render(Pages::Org::Search::ColumnCheckboxes::Component.new(heading: translation(".visible_columns"),
     columns:, data: { "org--search-column-settings-target": "checkboxes",
-                      action: "change->org--search-column-settings#columnToggled" })) %>
+                      action: "change->org--search-column-settings#updateVisibleColumns" })) %>
 </div>

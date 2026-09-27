@@ -33,10 +33,7 @@ class Export < ApplicationRecord
     manufacturer: 2
   }.freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
-  # The registrations search's columns, so the two offer the same set
   HEADERS = (ComponentStructs::OrgSearchSettings::EXPORT_HEADERS.values + %w[partial_registration]).freeze
-  DEFAULT_HEADERS = ComponentStructs::OrgSearchSettings::EXPORT_HEADERS
-    .values_at(*ComponentStructs::OrgSearchSettings::DEFAULT_COLUMNS).freeze
   HEADERS_FOR_AVERY_EXPORT = %w[address owner_name].freeze
 
   acts_as_paranoid
@@ -74,12 +71,9 @@ class Export < ApplicationRecord
   scope :impounded, -> { where("(options -> 'impounded_bikes')::text = 'true'") }
 
   class << self
-    def default_headers
-      DEFAULT_HEADERS
-    end
-
-    def default_options(kind)
-      {"headers" => default_headers}.merge(default_kind_options[kind.to_s])
+    def default_options(kind, organization = nil)
+      headers = ComponentStructs::OrgSearchSettings.new(organization: organization || Organization.new).default_export_headers
+      {"headers" => headers}.merge(default_kind_options[kind.to_s])
     end
 
     def default_kind_options
@@ -349,7 +343,7 @@ class Export < ApplicationRecord
   end
 
   def validated_options(opts)
-    opts = self.class.default_options(kind).merge(opts)
+    opts = self.class.default_options(kind, organization).merge(opts)
     # Permit setting any header - we'll block organizations setting those headers via show and also via controller
     # but if we want to manually create an export, we should be able to do so
     opts["headers"] = opts["headers"] & HEADERS

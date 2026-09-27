@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--search-column-settings'
 export default class extends Controller {
   static targets = ['checkboxes']
-  static values = { enabledColumns: Array, defaultColumns: Array, assignBikeSticker: Boolean }
+  static values = { enabledColumns: Array, assignBikeSticker: Boolean }
 
   connect () {
     this.refreshEnabledColumns()
@@ -42,11 +42,6 @@ export default class extends Controller {
     this.enabledColumnsValue = columns
   }
 
-  // A checkbox's change, or all/none/default's in org--column-checkboxes
-  columnToggled () {
-    this.updateVisibleColumns()
-  }
-
   // An always-visible column's checkbox is disabled, and stays checked
   get toggleableCheckboxes () {
     return this.checkboxesTarget.querySelectorAll('input[type=checkbox]:not(:disabled)')
@@ -54,13 +49,13 @@ export default class extends Controller {
 
   selectStoredVisibleColumns () {
     const stored = localStorage.getItem('orgRegistrationColumns')
-    let columns = this.defaultColumnsValue
+    let columns = null
     if (stored) {
       try { columns = JSON.parse(stored) } catch { localStorage.removeItem('orgRegistrationColumns') }
     }
 
     this.toggleableCheckboxes.forEach(cb => {
-      cb.checked = columns.includes(cb.name)
+      cb.checked = columns ? columns.includes(cb.name) : cb.dataset.default === 'true'
     })
     this.updateVisibleColumns()
   }

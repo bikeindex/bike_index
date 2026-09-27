@@ -231,8 +231,8 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
 
   describe "export_columns" do
     it "is each column an export can write, in the panel's order, without the View button" do
-      expect(instance.export_columns.map(&:first)).to eq(instance.panel_columns - ["view_cell"])
-      expect(instance.export_columns.to_h["created_at_cell"]).to eq "registered_at"
+      expect(instance.export_columns.keys).to eq(instance.panel_columns - ["view_cell"])
+      expect(instance.export_columns["created_at_cell"]).to eq "registered_at"
     end
   end
 

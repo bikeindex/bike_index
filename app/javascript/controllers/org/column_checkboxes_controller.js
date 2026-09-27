@@ -14,8 +14,8 @@ export default class extends Controller {
     this.check(checkbox => checkbox.dataset.default === 'true')
   }
 
-  // A disabled checkbox is an always-shown column, and stays checked. The one change event
-  // is what a caller watching the element hears, as it does a single checkbox's
+  // A disabled checkbox is an always-shown column. The change tells a caller watching the
+  // element, as a single checkbox's does
   check (checkedFor) {
     this.element.querySelectorAll('input[type=checkbox]:not(:disabled)').forEach(checkbox => {
       checkbox.checked = checkedFor(checkbox)

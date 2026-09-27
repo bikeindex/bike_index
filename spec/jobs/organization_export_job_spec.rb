@@ -378,7 +378,6 @@ RSpec.describe OrganizationExportJob, type: :job do
               student_id: "XX9999",
               organization_notes: "Sold at the fall swap",
               impound_id: nil,
-              avery_exportable: "false",
               acknowledged_at: acknowledged_at.utc.to_s,
               address: "717 Market St",
               address_2: nil,

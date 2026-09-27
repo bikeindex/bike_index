@@ -42,14 +42,10 @@
     <% end %>
 
     <% settings = ComponentStructs::OrgSearchSettings.new(organization: current_organization) %>
-    <% checked_headers = @export.headers.presence || settings.default_export_headers %>
 
     <div class="mt-2 mb-4 hiddenOnAveryExport">
       <%= render(Pages::Org::Search::ColumnCheckboxes::Component.new(heading: "Included columns",
-        columns: settings.export_columns.map { |cell_name, header|
-          { name: "export[headers][]", value: header, label: settings.panel_labels[cell_name.to_sym],
-            checked: checked_headers.include?(header), default: settings.default_export_headers.include?(header) }
-        })) %>
+        columns: settings.export_checkbox_columns(@export.headers.presence || settings.default_export_headers))) %>
     </div>
 
     <div class="form-group row mt-4 hiddenOnOnlyCustom">

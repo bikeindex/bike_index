@@ -90,8 +90,9 @@ module ComponentStructs
     # Listed in the panel, but checked and disabled - the table always shows them
     ALWAYS_VISIBLE_COLUMNS = %w[view_cell].freeze
 
-    # The CSV header an export writes each column under. Existing files' headers, so a
-    # spreadsheet built on one (or the Avery service reading owner_name and address) keeps working
+    # The CSV header an export writes each column under - the names existing files have, which
+    # spreadsheets and the Avery service read. Not Avery Exportable: it restates the address
+    # columns, at several queries a row
     EXPORT_HEADERS = {
       "url_cell" => "link",
       "photo_cell" => "thumbnail",
@@ -116,8 +117,7 @@ module ComponentStructs
       "notes_cell" => "organization_notes",
       "sticker_cell" => "bike_sticker",
       "impound_id_cell" => "impound_id",
-      "acknowledgment_cell" => "acknowledged_at",
-      "avery_cell" => "avery_exportable"
+      "acknowledgment_cell" => "acknowledged_at"
     }.freeze
 
     attr_reader :organization
@@ -236,8 +236,16 @@ module ComponentStructs
 
     def default_export_headers = EXPORT_HEADERS.values_at(*initially_checked_columns).compact
 
-    # [cell_name, header] for each column an export can write, in the panel's order
-    def export_columns = panel_columns.filter_map { |cell_name| [cell_name, EXPORT_HEADERS[cell_name]] if EXPORT_HEADERS.key?(cell_name) }
+    # In the panel's order
+    def export_columns = EXPORT_HEADERS.slice(*panel_columns)
+
+    # The export form's Search::ColumnCheckboxes columns
+    def export_checkbox_columns(checked_headers)
+      export_columns.map do |cell_name, header|
+        {name: "export[headers][]", value: header, label: panel_labels[cell_name.to_sym],
+         checked: checked_headers.include?(header), default: initially_checked_columns.include?(cell_name)}
+      end
+    end
 
     # The panel's label for a written header - a legacy one, or an address part, by its name
     def export_header_label(header)

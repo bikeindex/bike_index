@@ -15,13 +15,13 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
 
   describe ".column_settings_data_attributes" do
     it "runs a caller's own controller alongside its two" do
-      attributes = described_class.column_settings_data_attributes(settings, controllers: "org--multi-search")
+      attributes = described_class.column_settings_data_attributes(controllers: "org--multi-search")
       expect(attributes[:controller]).to eq "org--multi-search org--search org--search-column-settings"
       expect(attributes.keys).not_to include(:"ui--collapse-storage-key-value")
     end
 
     it "adds the collapse with collapse: true" do
-      attributes = described_class.column_settings_data_attributes(settings, collapse: true)
+      attributes = described_class.column_settings_data_attributes(collapse: true)
       expect(attributes[:controller]).to eq "ui--collapse org--search org--search-column-settings"
       expect(attributes[:"ui--collapse-storage-key-value"]).to eq "orgRegistrationColumnsOpen"
     end
