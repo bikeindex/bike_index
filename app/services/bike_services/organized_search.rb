@@ -19,11 +19,6 @@ module BikeServices
         .union(organization.impound_records.active.select(:bike_id).arel)))
     end
 
-    def impounded_elsewhere_ids(organization)
-      ids = organization.impound_records.active.pluck(:bike_id)
-      ids - organization.bike_organizations.where(bike_id: ids).pluck(:bike_id)
-    end
-
     def email_and_name(bikes, query)
       return bikes unless query.present?
 
@@ -66,11 +61,15 @@ module BikeServices
         matches << bikes.where(ImpoundRecord.within_bounding_box(bounding_box)
           .where("impound_records.id = bikes.current_impound_record_id").arel.exists)
       end
-      # The organization's own registrations only: the impound lot reaches owners registered elsewhere
       if registration_address_searchable?(organization:, search_all:)
-        matches << bikes.where(AddressRecord.within_bounding_box(bounding_box)
+        addressed = bikes.where(AddressRecord.within_bounding_box(bounding_box)
           .where("address_records.id = bikes.address_record_id").arel.exists)
-          .where(organization.bike_organizations.where("bike_organizations.bike_id = bikes.id").arel.exists)
+        # The impound lot reaches owners registered elsewhere, whose addresses aren't the organization's
+        matches << if IMPOUND_LOT_STATUSES.include?(search_status)
+          addressed.where(organization.bike_organizations.where("bike_organizations.bike_id = bikes.id").arel.exists)
+        else
+          addressed
+        end
       end
       matches.reduce(:or)
     end

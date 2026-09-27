@@ -323,6 +323,20 @@ RSpec.describe Export, type: :model do
           expect(export.bikes_scoped.pluck(:id)).to match_array([bike_not_impounded.id, impound_record_registered_elsewhere.bike_id])
         end
       end
+
+      context "with custom_bike_ids alongside the organization's registrations" do
+        let(:bike_elsewhere) { FactoryBot.create(:bike) }
+        let(:export) do
+          FactoryBot.create(:export_organization, organization:,
+            options: {custom_bike_ids: [impound_record_registered_elsewhere.bike_id, bike_elsewhere.id]})
+        end
+
+        it "adds the impound lot's, but no others past the organization" do
+          expect(export.impound_lot?).to be_truthy
+          expect(export.bikes_scoped.pluck(:id)).to match_array([bike_registered.id, bike_resolved.id,
+            bike_not_impounded.id, impound_record_registered_elsewhere.bike_id])
+        end
+      end
       context "with the legacy partial_registrations: none" do
         let(:partial_registrations) { "none" }
         it "has no partial registrations" do

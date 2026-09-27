@@ -88,8 +88,13 @@ class OrganizationExportJob < ApplicationJob
   end
 
   def bike_to_row(bike)
-    hide_owner = impounded_elsewhere_ids.include?(bike.id)
-    export_headers.map { |header| value_for_header(header, bike) unless hide_owner && owner_header?(header) }
+    hidden = owner_hidden?(bike)
+    export_headers.map do |header|
+      # Claiming a sticker registers the bike with the organization, exposing its owner
+      next if hidden && (owner_header?(header) || header == "assigned_sticker")
+
+      value_for_header(header, bike)
+    end
   end
 
   def b_param_to_row(b_param)
@@ -164,8 +169,15 @@ class OrganizationExportJob < ApplicationJob
     end
   end
 
-  def impounded_elsewhere_ids
-    @impounded_elsewhere_ids ||= BikeServices::OrganizedSearch.impounded_elsewhere_ids(@export.organization).to_set
+  # Anything not registered when the export started is hidden, so a bike impounded partway
+  # through doesn't slip past
+  def owner_hidden?(bike)
+    @export.impound_lot? && registered_bike_ids.exclude?(bike.id)
+  end
+
+  def registered_bike_ids
+    @registered_bike_ids ||= @export.bikes_scoped
+      .where(id: @export.organization.bike_organizations.select(:bike_id)).pluck(:id).to_set
   end
 
   # The owner's details, which the registrations table hides on a bike registered elsewhere

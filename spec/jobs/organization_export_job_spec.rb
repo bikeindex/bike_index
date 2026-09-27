@@ -662,15 +662,34 @@ RSpec.describe OrganizationExportJob, type: :job do
             creation_registration_info: {user_name: "Someone Else", phone: "7177423423"})
         end
         let!(:impound_record) { FactoryBot.create(:impound_record, organization:, user: impound_user, bike: bike_elsewhere) }
+        let!(:impound_record_registered) { FactoryBot.create(:impound_record, organization:, user: impound_user, bike:) }
 
         it "blanks its owner's details, as the registrations table hides them" do
           expect(bike_elsewhere.reload.phone).to eq "7177423423"
           expect(bike_elsewhere.owner_name).to eq "Someone Else"
           expect(bike_elsewhere.registration_address["street"]).to be_present
-          expect(export.bikes_scoped.pluck(:id)).to eq([bike_elsewhere.id])
+          expect(export.bikes_scoped.pluck(:id)).to match_array([bike.id, bike_elsewhere.id])
           expect(instance.bike_to_row(bike_elsewhere)).to eq(["http://test.host/bikes/#{bike_elsewhere.id}", *Array.new(8)])
           # The organization's own registration keeps them
           expect(instance.bike_to_row(bike)[1]).to eq bike.owner_email
+          # ...and one impounded after the export started is hidden too
+          bike_impounded_later = FactoryBot.create(:impound_record, organization:, user: impound_user).bike
+          expect(instance.bike_to_row(bike_impounded_later)[1]).to be_nil
+        end
+
+        context "assigning stickers" do
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, code: "ff333333") }
+          let(:export) do
+            FactoryBot.create(:export_organization, organization:, user: impound_user,
+              options: {headers: %w[link], impounded_bikes: true, bike_code_start: "ff333333"})
+          end
+
+          it "doesn't claim one onto it, which would register it with the organization" do
+            expect(instance.bike_to_row(bike_elsewhere)).to eq(["http://test.host/bikes/#{bike_elsewhere.id}", nil])
+            expect(bike_sticker.reload.claimed?).to be_falsey
+            expect(bike_elsewhere.reload.organized?(organization)).to be_falsey
+            expect(instance.bike_to_row(bike).last).to eq "FF 333 333"
+          end
         end
       end
     end

@@ -16,7 +16,6 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.with_impound_lot(organization).pluck(:id)).to match_array([bike.id, impounded_elsewhere.id])
       FactoryBot.create(:impound_record, organization:, user:, bike:)
       expect(described_class.with_impound_lot(organization).pluck(:id)).to match_array([bike.id, impounded_elsewhere.id])
-      expect(described_class.impounded_elsewhere_ids(organization)).to eq([impounded_elsewhere.id])
     end
   end
 
@@ -73,11 +72,11 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       let!(:bike_without_address) { FactoryBot.create(:bike_organized, creation_organization: location.organization) }
       let!(:organized_nyc) { FactoryBot.create(:bike_organized, :with_address_record, address_in: :new_york, creation_organization: organization) }
 
-      it "matches the organization's registration addresses, except searching all" do
+      it "matches registration addresses, except searching all" do
         expect(bike_without_address.reload.latitude).to eq bike_nyc.reload.latitude
         expect(described_class.location(Bike.all, "New York", "50", organization:).pluck(:id))
-          .to match_array([organized_nyc.id, stolen_nyc.id, impounded_nyc.id])
-        # The impound lot's registered elsewhere, so its owners' addresses aren't the organization's
+          .to match_array([organized_nyc.id, bike_nyc.id, stolen_nyc.id, impounded_nyc.id, impounded_from_nowhere.id])
+        # A status that reaches the impound lot matches only the organization's registrations' addresses
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "impounded").pluck(:id))
           .to match_array([organized_nyc.id, impounded_nyc.id])
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true)).to eq(Bike.all)

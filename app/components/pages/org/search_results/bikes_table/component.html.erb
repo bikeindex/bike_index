@@ -155,10 +155,11 @@
 
     <% if organization.enabled?("impound_bikes") %>
       <% table.column(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
-        <% if bike.organized?(organization) %>
-          <% if bike.status_impounded? && bike.current_impound_record.present? %>
-            <%= bike.current_impound_record.display_id %>
-          <% end %>
+        <% impound_record = bike.current_impound_record if bike.status_impounded? %>
+
+        <%# The organization's own impound record, even on a bike registered elsewhere %>
+        <% if bike.organized?(organization) || impound_record&.organization_id == organization.id %>
+          <%= impound_record&.display_id %>
         <% else %>
           <%= hidden_html.call %>
         <% end %>

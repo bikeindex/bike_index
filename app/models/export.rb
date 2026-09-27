@@ -289,15 +289,19 @@ class Export < ApplicationRecord
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
     return Bike.none if partial_registrations == "only"
-    # OrganizationExportJob hides the owners of the bikes in it registered elsewhere
     impound_lot = BikeServices::OrganizedSearch.with_impound_lot(organization)
     return impound_lot.where(id: custom_bike_ids) if only_custom_bike_ids
 
     bikes = impounded_bikes ? impound_lot.status_impounded : organization.bikes
     return bikes_within_time(bikes) unless custom_bike_ids.present?
 
-    bikes_within_time(bikes).or(bikes.where(id: custom_bike_ids))
+    # By id, so the organization's registrations can join an .or with the lot
+    impound_lot.where(id: bikes_within_time(bikes).select(:id)).or(impound_lot.where(id: custom_bike_ids))
   end
+
+  # Whether bikes_scoped reaches past the organization's registrations, into the bikes it has
+  # impounded - OrganizationExportJob hides the owners of those
+  def impound_lot? = impounded_bikes || custom_bike_ids.present?
 
   def incompletes_scoped
     return BParam.none unless partial_registrations.present?

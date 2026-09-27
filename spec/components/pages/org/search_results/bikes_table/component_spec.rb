@@ -170,6 +170,26 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
         expect(impound_record.display_id).to_not eq impound_record.id.to_s
         expect(component.css("td.impound_id_cell").text.strip).to eq impound_record.display_id
       end
+
+      context "registered elsewhere" do
+        let(:bike) { FactoryBot.create(:bike, owner_email: "stranger@example.com") }
+        let(:bikes) { [bike.reload] }
+
+        it "renders the organization's own display_id, hiding the owner" do
+          expect(component.css("td.impound_id_cell").text.strip).to eq impound_record.reload.display_id
+          expect(component).to have_css(".owner_email_cell button em.less-strong", text: "hidden")
+        end
+      end
+
+      context "impounded by another organization" do
+        let(:bike) { FactoryBot.create(:bike, owner_email: "stranger@example.com") }
+        let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike:) }
+        let(:bikes) { [bike.reload] }
+
+        it "hides it" do
+          expect(component).to have_css(".impound_id_cell button em.less-strong", text: "hidden")
+        end
+      end
     end
   end
 
