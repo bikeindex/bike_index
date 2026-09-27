@@ -209,6 +209,19 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         expect(page).to have_no_field("bike[user_name]")
         fill_in "b_param[owner_email]", with: owner_email
         expect(page).to have_field("bike[user_name]")
+
+        # Separate attestation leaves the rules to an owner who isn't the member
+        within("form[action$='/registrations/switches']") do
+          check "Registrant fills out the registration attestation separately"
+          click_button "Update"
+        end
+        # The draft comes back after the reload, and would undo a check that landed before it
+        expect(page).to have_field("b_param[owner_email]", with: owner_email)
+        check "Electric (motorized)"
+        fill_in "b_param[owner_email]", with: owner_email
+        expect(page).to have_button("Complete Bike Registration")
+        fill_in "b_param[owner_email]", with: member.email
+        expect(page).to have_button("Next")
       end
     end
 

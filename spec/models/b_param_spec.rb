@@ -618,6 +618,20 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "rules_left_to_owner?" do
+    let(:b_param) { BParam.new(params: {register_separate_attestation: true, bike: {owner_email: "owner@example.com"}}.as_json) }
+    let(:owner) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
+
+    it "is the switch, for anyone but the owner" do
+      expect(b_param.rules_left_to_owner?(FactoryBot.create(:user_confirmed))).to be_truthy
+      expect(b_param.rules_left_to_owner?(nil)).to be_truthy
+      expect(b_param.rules_left_to_owner?(owner)).to be_falsey
+
+      b_param.params = b_param.params.merge("register_separate_attestation" => false)
+      expect(b_param.rules_left_to_owner?(nil)).to be_falsey
+    end
+  end
+
   describe "self_made?" do
     let(:b_param) { BParam.new(params: {bike: {owner_email: "owner@example.com"}}.as_json) }
     let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }

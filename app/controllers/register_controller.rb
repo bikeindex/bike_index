@@ -18,7 +18,7 @@ class RegisterController < ApplicationController
   before_action :redirect_finished, only: %i[create update report acknowledge]
   before_action :redirect_bike_created, only: %i[create update]
   # The step shown is server state - a cached page could show one the registration is past
-  # (register--revalidate covers Safari's bfcache, Pages::Register::Page Turbo's own snapshots)
+  # (register--revalidate covers Safari's bfcache, Pages::Register::Parts::Shell Turbo's own snapshots)
   before_action { response.set_header("Cache-Control", "no-store") }
   # Every step is a page, but a component takes its content type from the request - and a
   # Turbo submission asks for a turbo_stream, which grafts the next step onto this one
@@ -44,7 +44,7 @@ class RegisterController < ApplicationController
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
     # The frame is step 1 alone, whatever the session's switch says
-    render Pages::Register::Embed::Component.new(b_param: @b_param, steps: flow_steps(single_page: false), current_user:,
+    render Pages::Register::Views::Embed::Component.new(b_param: @b_param, flow: register_flow(single_page: false), current_user:,
       header_tags_options: helpers.header_tags_component_options,
       button_color: HexColor.normalize(params[:button]),
       button_hover_color: HexColor.normalize(params[:button_hover])), layout: false
@@ -56,29 +56,29 @@ class RegisterController < ApplicationController
   # The emailed and alert links arrive without a step, rather than moving through the flow
   def show
     resume_registration if params[:step].blank?
-    steps = flow_steps
-    step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
+    flow = register_flow
+    step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, flow:)
     return redirect_to(step_path(step)) if step != params[:step]
 
     case step
     when "finished"
       @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)
-      render Pages::Register::StepFinished::Component.new(b_param: @b_param, current_user:)
+      render Pages::Register::Views::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
       @page_title = I18n.t("meta_titles.register_review", cycle_type: @b_param.type)
-      render Pages::Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:, current_user:)
+      render Pages::Register::Views::StepReview::Component.new(b_param: @b_param, sequence: @registration_sequence, flow:, current_user:)
     when "report"
       @page_title = I18n.t("meta_titles.register_report")
-      render Pages::Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:)
+      render Pages::Register::Views::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, flow:)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
-      render Pages::Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
+      render Pages::Register::Views::Step2::Component.new(b_param: @b_param, flow:, current_user:)
     when "1"
       @page_title = I18n.t("meta_titles.register_step_1")
-      render start_component(steps:)
+      render start_page(flow:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
-      render Pages::Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps:)
+      render Pages::Register::Views::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, flow:)
     end
   end
 
@@ -95,7 +95,7 @@ class RegisterController < ApplicationController
       # was resolved too early - and this page finishes here rather than on a later request
       find_registration_sequence
     end
-    return render(start_component(steps: flow_steps(single_page:)), status: :unprocessable_entity) unless saved
+    return render(start_page(flow: register_flow(single_page:)), status: :unprocessable_entity) unless saved
 
     # Step 2 says the link is on its way, so it goes out here rather than at the end
     BikeServices::Register.send_confirmation_email(@b_param)
@@ -110,7 +110,7 @@ class RegisterController < ApplicationController
     find_registration_sequence
     # Saved either way, so the re-render has everything they entered
     unless saved
-      return render(Pages::Register::Step2::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
+      return render(Pages::Register::Views::Step2::Component.new(b_param: @b_param, flow: register_flow, current_user:),
         status: :unprocessable_entity)
     end
 
@@ -121,14 +121,14 @@ class RegisterController < ApplicationController
   # A theft has to say when and where; the rest of the step is optional
   def report
     # The report doesn't move the status or the creator, so the list survives the save
-    steps = flow_steps
-    step = BikeServices::Register.permitted_step(@b_param, "report", sequence: @registration_sequence, steps:)
+    flow = register_flow
+    step = BikeServices::Register.permitted_step(@b_param, "report", sequence: @registration_sequence, flow:)
     return redirect_to(step_path(step)) if step != "report"
 
     # Saved either way, so the re-render has everything they entered
     unless BikeServices::Register.save_report(@b_param, report_params:)
       @page_title = I18n.t("meta_titles.register_report")
-      return render(Pages::Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:),
+      return render(Pages::Register::Views::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, flow:),
         status: :unprocessable_entity)
     end
 
@@ -143,8 +143,8 @@ class RegisterController < ApplicationController
       return redirect_to_current_step
     end
 
-    steps = flow_steps
-    step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
+    flow = register_flow
+    step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, flow:)
     acknowledged = BikeServices::Register.acknowledge_step(@b_param, step,
       sequence: @registration_sequence, user: current_user,
       acknowledged_all: params[:acknowledged_all], checked: params[:acknowledged]&.to_unsafe_h&.values)
@@ -156,12 +156,12 @@ class RegisterController < ApplicationController
 
     # The step after this one, not the furthest reached - revisiting an earlier page
     # from the review walks forward through the rest rather than jumping back
-    redirect_to step_path(BikeServices::Register.step_after(step, steps:))
+    redirect_to step_path(flow.after(step))
   end
 
   def confirm
     @page_title = I18n.t("meta_titles.register_confirm")
-    render Pages::Register::StepConfirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
+    render Pages::Register::Views::Confirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
   end
 
   # The confirmation itself - the proven address gets an account, created here if
@@ -183,7 +183,7 @@ class RegisterController < ApplicationController
     elsif sign_in_confirmed_user.blank?
       return redirect_to_current_step
     else
-      # The separate attestation's rules are the owner's, and the filter ran before signing them in
+      # The filter resolved it signed out, which separate attestation answers with no rules
       find_registration_sequence
     end
 
@@ -201,9 +201,9 @@ class RegisterController < ApplicationController
       additional: params[:additional])
   end
 
-  def start_component(steps:)
-    Pages::Register::StartPage::Component.opening_page(b_param: @b_param, steps:, current_user:,
-      motorized_review: register_motorized_review?(@b_param, steps))
+  def start_page(flow:)
+    Pages::Register::Views::Step1::Component.new(b_param: @b_param, flow:, current_user:,
+      motorized_review: register_motorized_review(@b_param, flow))
   end
 
   def complete_registration
@@ -233,7 +233,7 @@ class RegisterController < ApplicationController
   # Wherever the registration now stands: the next unacknowledged page, or the review
   def redirect_to_current_step
     redirect_to step_path(BikeServices::Register.permitted_step(@b_param, nil,
-      sequence: @registration_sequence, steps: flow_steps))
+      sequence: @registration_sequence, flow: register_flow))
   end
 
   def step_path(step)
@@ -280,8 +280,8 @@ class RegisterController < ApplicationController
 
   # Read at render time rather than in a filter: the submissions save first, and where
   # the report sits depends on what they saved
-  def flow_steps(single_page: register_setting?(@b_param, "single_page"))
-    BikeServices::Register.steps(@b_param, sequence: @registration_sequence, single_page:)
+  def register_flow(single_page: register_setting?(@b_param, "single_page"))
+    BikeServices::Register.flow(@b_param, sequence: @registration_sequence, single_page:)
   end
 
   # Not find_b_param: the emailed token authorizes this, not the session, and an expired
@@ -313,8 +313,9 @@ class RegisterController < ApplicationController
 
     # The session follows whichever registration the token named, so the next tokenless
     # request stays on it - until its bike exists, when there's nothing left to go back
-    # to and the bare /register should start the next registration instead
-    if @b_param.finished_registration?
+    # to and the bare /register should start the next registration instead. A bike whose
+    # rules were left to its owner is finished for everyone else
+    if @b_param.finished_registration? || (@b_param.with_bike? && @b_param.rules_left_to_owner?(current_user))
       session.delete(:register_b_param_token)
     else
       session[:register_b_param_token] = @b_param.id_token

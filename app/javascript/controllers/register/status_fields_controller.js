@@ -46,16 +46,20 @@ export default class extends Controller {
   }
 
   // On the single page the electric checkbox is in this form too, and an e-vehicle's
-  // safety pages come after it - data-motorized-text is the label for then
+  // safety pages come after it - data-motorized-text is the label for then. Separate
+  // attestation leaves them to an owner whose email isn't one of data-motorized-own-emails
   updateSubmitLabel () {
     if (!this.hasSubmitLabelTarget) return
 
     const label = this.submitLabelTarget
     const status = this.element.querySelector('input[name$="[status]"]')?.value
     const motorized = this.element.querySelector('input[name="propulsion_type_motorized"]')?.checked
+    const ownEmails = label.dataset.motorizedOwnEmails && JSON.parse(label.dataset.motorizedOwnEmails)
+    const email = (this.element.querySelector('input[name="b_param[owner_email]"]')?.value || '').trim().toLowerCase()
+    const reviewed = motorized && (!ownEmails || ownEmails.includes(email))
     // Backspacing the combobox empty deselects it, so keep the label it had rather
     // than writing an undefined status's missing text into the button
-    const submitText = (motorized && label.dataset.motorizedText) || JSON.parse(label.dataset.texts)[status]
+    const submitText = (reviewed && label.dataset.motorizedText) || JSON.parse(label.dataset.texts)[status]
     if (submitText) label.textContent = submitText
   }
 

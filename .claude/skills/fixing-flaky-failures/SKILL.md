@@ -278,6 +278,10 @@ the rest — `wait_for_stimulus` (`spec/support/integration_spec_helpers.rb`) wa
 every identifier the page names, and **pass it the one you're about to interact with**
 (`wait_for_stimulus("shared-blocks--navbar")`): bare, it is vacuously true on a document
 that has parsed none yet, so it returns before that element even exists.
+A reload of a form with a saved draft runs the other way: form-persist's restore can land
+*after* the example has checked or typed, and puts the draft back over it — a tick after
+connect, so `wait_for_stimulus` doesn't cover it. Wait for a value the draft restores
+(`have_field(..., with:)`) first; `register_organized_spec`'s single-page example is the pattern.
 
 **Interacting before the legacy page script has bound.** The same shape, one era
 back: `init.coffee`'s `loadPageScript` constructs the per-page class in

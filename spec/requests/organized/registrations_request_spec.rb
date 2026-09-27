@@ -679,20 +679,22 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         b_param.reload
       end
 
-      def motorized_text
-        Nokogiri::HTML(response.body).at_css("[data-register--status-fields-target=submitLabel]")["data-motorized-text"]
+      def submit_label
+        Nokogiri::HTML(response.body).at_css("[data-register--status-fields-target=submitLabel]")
       end
 
       it "labels the submit for the safety pages an e-vehicle would get, without a progress count yet" do
         post "#{base_url}/switches", params: {single_page: true}
         get "#{base_url}/new"
-        expect(motorized_text).to eq "Next"
+        expect(submit_label["data-motorized-text"]).to eq "Next"
+        expect(submit_label["data-motorized-own-emails"]).to be_blank
         expect(Nokogiri::HTML(response.body).css("span.tw\\:h-1.tw\\:rounded-full")).to be_empty
 
-        # Left to the registrant, so an e-vehicle registered here finishes on this page
+        # Left to the owner unless the email typed above is the member's own
         post "#{base_url}/switches", params: {single_page: true, separate_attestation: true}
         get "#{base_url}/new"
-        expect(motorized_text).to be_blank
+        expect(submit_label["data-motorized-text"]).to eq "Next"
+        expect(JSON.parse(submit_label["data-motorized-own-emails"])).to include current_user.email
       end
 
       # The submission is what makes it an e-vehicle, so the sequence isn't knowable
@@ -745,19 +747,9 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])
         expect(ActionMailer::Base.deliveries.last.body.encoded).to include "Agree to the safety rules"
 
-        # The owner follows it signed out, with no account yet - the registration is the member's
-        allow(User).to receive(:from_auth).and_call_original
-        confirmation_token = b_param.reload.email_confirmation_token
-        rules_link = URI(Nokogiri::HTML(ActionMailer::Base.deliveries.last.html_part.decoded).at_css("a.binx-button")["href"]).request_uri
-        expect(rules_link).to eq confirm_register_path(b_param_token: b_param.id_token, confirmation_token:)
-        get rules_link
-        expect(response.status).to eq 200
-        expect {
-          post confirm_email_register_path, params: {b_param_token: b_param.id_token, confirmation_token:}
-        }.to change(User, :count).by 1
-        expect(User.last).to have_attributes(email: owner_email, confirmed: true, passwordless_user: true)
+        log_in(FactoryBot.create(:user_confirmed, email: owner_email))
+        get "/register", params: {b_param_token: b_param.id_token}
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
-        expect(b_param.reload).to have_attributes(creator_id: current_user.id, email_confirmation_token: nil)
         %w[3 4].each do |step|
           patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
                                                     step:, acknowledged: {"0" => "1", "1" => "1"}}
@@ -769,6 +761,29 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
         expect(RegistrationSequenceAcknowledgment.sole.user.email).to eq owner_email
         expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+      end
+
+      it "lets an owner without an account in through the rules email, and starts the member's next registration fresh" do
+        b_param = register_e_scooter
+        follow_redirect!
+        # Finished from the member's side, though the bike still waits on the owner
+        get "/register"
+        expect(response).to redirect_to new_register_path
+
+        EmailJobs::PartialRegistrationJob.drain
+        confirm_path = confirm_register_path(b_param_token: b_param.id_token,
+          confirmation_token: b_param.reload.email_confirmation_token)
+        expect(ActionMailer::Base.deliveries.last.html_part.decoded).to include ERB::Util.html_escape(confirm_path)
+
+        # Signed out - log_in stubbed the member's session rather than signing them in
+        allow(User).to receive(:from_auth).and_call_original
+        expect {
+          post "/register/confirm_email", params: {b_param_token: b_param.id_token,
+                                                   confirmation_token: b_param.email_confirmation_token}
+        }.to change(User, :count).by 1
+        expect(User.last.email).to eq owner_email
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        expect(b_param.reload.creator_id).to eq current_user.id
       end
 
       context "the rules link is wrong" do
