@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      register:
+        shared:
+          acknowledgment_check:
+            i_name_html: I, %{name},
+            registrants_name: registrant's name

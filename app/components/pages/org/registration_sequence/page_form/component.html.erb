@@ -36,8 +36,8 @@
 
       <%# pt and mb cancel the flow shell's negative margins; padding doesn't collapse %>
       <div class="tw:mb-24 tw:pt-(--nav-gap)">
-        <%= render Pages::Register::Shell::Component.new do %>
-          <%= render Pages::Register::PageContent::Component.new(page: @page, first: @page.listing_order.to_i.zero?) %>
+        <%= render Pages::Register::Shared::Shell::Component.new do %>
+          <%= render Pages::Register::Shared::PageContent::Component.new(page: @page, first: @page.listing_order.to_i.zero?) %>
         <% end %>
       </div>
     </div>

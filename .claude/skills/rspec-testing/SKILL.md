@@ -57,7 +57,7 @@ So drive the request that sets the key: `/oauth/authorize?partner=…&company=�
 
 What a component decides about its markup — a label, a placeholder, a class, whether a field renders at all — belongs in `spec/components/**/component_spec.rb`, not in the request spec for a page that happens to render it. Request specs cover the request: status, redirects, what was saved, what the page is wired to.
 
-A component having no spec yet isn't a reason to put it in the request spec instead. `spec/components/pages/register/step2/component_spec.rb` is the pattern, including the `render_x` helper that reloads the record so an object updated mid-example isn't answered from the copy the previous render left behind.
+A component having no spec yet isn't a reason to put it in the request spec instead. `spec/components/pages/register/steps/step2/component_spec.rb` is the pattern, including the `render_x` helper that reloads the record so an object updated mid-example isn't answered from the copy the previous render left behind.
 
 **No stylesheet loads here, so Capybara calls anything hidden by a class visible.** `have_no_field`/`visible: false` against a `tw:hidden` wrapper fails with "found 1 match", which reads as the component rendering the wrong thing. Assert the wrapper instead — `page.find("form div.tw\\:hidden input[name='additional']", visible: :all)` — and leave real invisibility to a `:js` system spec.
 

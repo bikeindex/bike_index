@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      register:
+        steps:
+          step_acknowledgment:
+            continue: Continue
