@@ -44,7 +44,7 @@ class OrganizationExportJob < ApplicationJob
     end
     return if @export_ebraked
 
-    file.binmode.write(axlsx_package.to_stream.read)
+    axlsx_package.serialize(file.path)
     @export.tmp_file.close
     true
   end
