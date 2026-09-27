@@ -2,7 +2,7 @@
 
 module Pages
   module Register
-    module Page
+    module Shell
       # Full-bleed gray shell for the registration flow pages. The negative
       # margins pull over the layout's nav/footer spacing so the gray runs
       # edge to edge; content is centered at form width.

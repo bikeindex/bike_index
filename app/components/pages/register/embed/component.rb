@@ -15,7 +15,7 @@ module Pages
           @button_hover_color = button_hover_color
         end
 
-        # Rendered before the document, so Pages::Register::Page's content_for(:header) is in the
+        # Rendered before the document, so Pages::Register::Shell's content_for(:header) is in the
         # buffer by the time <head> reads it
         def before_render
           @body = render Pages::Register::Step1::Component.new(b_param: @b_param, steps: @steps,

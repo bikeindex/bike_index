@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Register::Page::Component, type: :component do
+RSpec.describe Pages::Register::Shell::Component, type: :component do
   let(:component) { render_inline(described_class.new) { "page content" } }
 
   it "renders the content inside the centered shell" do

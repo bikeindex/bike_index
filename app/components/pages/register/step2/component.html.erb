@@ -1,4 +1,4 @@
-<%= render Pages::Register::Page::Component.new do %>
+<%= render Pages::Register::Shell::Component.new do %>
   <%= render Pages::Register::Progress::Component.new(steps: @steps, step: 2) %>
 
   <% if BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user) %>
