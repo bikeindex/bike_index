@@ -8,21 +8,21 @@ RSpec.describe Pages::Memberships::New::Component, :js, type: :system do
   it "updates the prices and labels as the interval and tier change" do
     visit(preview_path)
 
-    expect(page).to have_text("Plus membership, $9.99 a month")
-    expect(page).to have_button("Join as Plus — $9.99/mo")
-    expect(page).to have_text("$4.99")
-    expect(page).to_not have_text("Two months free")
+    expect(page).to have_text("Plus membership, $15 a month")
+    expect(page).to have_button("Join as Plus — $15/mo")
+    within("#membership-plans") { expect(page).to have_text(/\$5\s+\/ month.*\$15\s+\/ month.*\$50\s+\/ month/m) }
     expect_axe_clean
 
     find("label", text: "Yearly").click
-    expect(page).to have_text("Plus membership, $99.99 a year")
-    expect(page).to have_button("Join as Plus — $99.99/yr")
-    expect(page).to have_text("$49.99")
-    expect(find("#membership-plans")).to_not have_text("$4.99")
-    expect(page).to have_text("Two months free", count: 3)
+    expect(page).to have_text("Plus membership, $180 a year")
+    expect(page).to have_button("Join as Plus — $180/yr")
+    within("#membership-plans") do
+      expect(page).to have_text(/\$60\s+\/ year.*\$180\s+\/ year.*\$600\s+\/ year/m)
+      expect(page).to_not have_text("/ month")
+    end
 
     find("label", text: "Patron badge on your Bike Index profile").click
-    expect(page).to have_text("Patron membership, $499.99 a year")
-    expect(page).to have_link("Join as Patron — $499.99/yr", href: "#membership-plans")
+    expect(page).to have_text("Patron membership, $600 a year")
+    expect(page).to have_link("Join as Patron — $600/yr", href: "#membership-plans")
   end
 end

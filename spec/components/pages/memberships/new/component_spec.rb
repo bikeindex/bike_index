@@ -18,21 +18,21 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
     expect(component).to have_text("1M+")
     expect(component).to have_text("18,263")
     expect(component).to have_text("$38M+")
-    expect(component).to have_text("Plans from $4.99 a month")
+    expect(component).to have_text("Plans from $5 a month")
     expect(component).to have_checked_field("membership_level_plus", visible: :all)
     expect(component).to have_checked_field("membership_set_interval_monthly", visible: :all)
     expect(component).to have_css("input[name='referral_source'][value='donate']", visible: :all)
-    expect(component).to have_css("[data-memberships--new-target='summary']", text: "Plus membership, $9.99 a month")
-    expect(component).to have_css("[data-memberships--new-target='join']", text: "Join as Plus — $9.99/mo", count: 2)
-    expect(component).to have_text("$49.99")
+    expect(component).to have_css("[data-memberships--new-target='summary']", text: "Plus membership, $15 a month")
+    expect(component).to have_css("[data-memberships--new-target='join']", text: "Join as Plus — $15/mo", count: 2)
+    expect(component).to have_text("$180")
     expect(component).to have_css("details[name='membership-faq']", count: 5)
     expect(component).to have_css("details[open]", count: 1)
     expect(component).to have_link("Or make a one-time donation", href: "/donate")
     expect(component).to_not have_link("Read more recovery stories")
 
     labels = JSON.parse(component.css("#membership_level_patron").first["data-labels"])
-    expect(labels).to eq({"monthly" => {"summary" => "Patron membership, $49.99 a month", "join" => "Join as Patron — $49.99/mo"},
-                          "yearly" => {"summary" => "Patron membership, $499.99 a year", "join" => "Join as Patron — $499.99/yr"}})
+    expect(labels).to eq({"monthly" => {"summary" => "Patron membership, $50 a month", "join" => "Join as Patron — $50/mo"},
+                          "yearly" => {"summary" => "Patron membership, $600 a year", "join" => "Join as Patron — $600/yr"}})
   end
 
   context "with a passed level" do
@@ -40,7 +40,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
 
     it "selects it" do
       expect(component).to have_checked_field("membership_level_patron", visible: :all)
-      expect(component).to have_css("[data-memberships--new-target='summary']", text: "Patron membership, $49.99 a month")
+      expect(component).to have_css("[data-memberships--new-target='summary']", text: "Patron membership, $50 a month")
     end
   end
 
@@ -57,7 +57,7 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
 
     it "renders CAD prices" do
       expect(component).to have_css("input[name='currency'][value='cad']", visible: :all)
-      expect(component).to have_css("[data-memberships--new-target='summary']", text: /Plus membership, .*9\.99 a month/)
+      expect(component).to have_css("[data-memberships--new-target='summary']", text: /Plus membership, \D*15 a month/)
     end
   end
 

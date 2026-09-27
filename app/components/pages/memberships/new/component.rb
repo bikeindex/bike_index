@@ -6,9 +6,9 @@ module Pages
       # The summary and join labels follow the checked tier and interval through
       # memberships--new, which reads them off each tier's radio. Prices swap on CSS alone
       class Component < ApplicationComponent
-        # What the active StripePrices charge — the checkout looks the price up by level and interval
-        PRICES = {basic: {monthly: 499, yearly: 4999}, plus: {monthly: 999, yearly: 9999},
-                  patron: {monthly: 4999, yearly: 49_999}}.freeze
+        # Has to match the active StripePrices — the checkout looks the price up by level and interval
+        PRICES = {basic: {monthly: 500, yearly: 6000}, plus: {monthly: 1500, yearly: 18_000},
+                  patron: {monthly: 5000, yearly: 60_000}}.freeze
 
         MONTHLY_ONLY = "tw:group-has-[[value=yearly]:checked]/membership:hidden"
         YEARLY_ONLY = "tw:hidden tw:group-has-[[value=yearly]:checked]/membership:inline"
@@ -28,7 +28,7 @@ module Pages
 
         private
 
-        def price(level, interval) = MoneyFormatter.money_format(PRICES[level][interval], @currency)
+        def price(level, interval) = MoneyFormatter.money_format_without_cents(PRICES[level][interval], @currency)
 
         def level_name(level) = Membership.level_humanized(level.to_s)
 

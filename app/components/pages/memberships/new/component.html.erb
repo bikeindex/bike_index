@@ -171,32 +171,21 @@
               </span>
             </span>
 
-            <span>
-              <span class="tw:flex tw:items-baseline tw:gap-1.5">
-                <span
-                  class="
-                    tw:font-header tw:text-[40px] tw:leading-none
-                    tw:font-extrabold tw:tracking-tight tw:text-slate-900
-                    tw:group-has-checked/tier:text-blue-600
-                  "
-                >
-                  <span class="<%= MONTHLY_ONLY %>"><%= price(level, :monthly) %></span>
-                  <span class="<%= YEARLY_ONLY %>"><%= price(level, :yearly) %></span>
-                </span>
-
-                <span class="tw:text-[15px]">
-                  <span class="<%= MONTHLY_ONLY %>"><%= translation(".per_month") %></span>
-                  <span class="<%= YEARLY_ONLY %>"><%= translation(".per_year") %></span>
-                </span>
-              </span>
-
+            <span class="tw:flex tw:items-baseline tw:gap-1.5">
               <span
                 class="
-                  tw:mt-1.5 tw:block tw:min-h-5 tw:text-[13.5px]
-                  tw:font-bold tw:text-green-700
+                  tw:font-header tw:text-[40px] tw:leading-none
+                  tw:font-extrabold tw:tracking-tight tw:text-slate-900
+                  tw:group-has-checked/tier:text-blue-600
                 "
               >
-                <span class="<%= YEARLY_ONLY %>"><%= translation(".two_months_free") %></span>
+                <span class="<%= MONTHLY_ONLY %>"><%= price(level, :monthly) %></span>
+                <span class="<%= YEARLY_ONLY %>"><%= price(level, :yearly) %></span>
+              </span>
+
+              <span class="tw:text-[15px]">
+                <span class="<%= MONTHLY_ONLY %>"><%= translation(".per_month") %></span>
+                <span class="<%= YEARLY_ONLY %>"><%= translation(".per_year") %></span>
               </span>
             </span>
 
