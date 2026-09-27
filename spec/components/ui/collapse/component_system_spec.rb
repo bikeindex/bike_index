@@ -11,6 +11,20 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     # Starts collapsed (tw:hidden), so the body isn't visible and the param is absent.
     expect(page).to have_no_content("Persisted panel body")
 
+    # Dragging across the label selects it rather than toggling
+    wait_for_stimulus("ui--collapse")
+    label = find_button("Toggle details").evaluate_script("(({x, y, width, height}) => ({x, y, width, height}))(this.getBoundingClientRect())")
+    page.driver.with_playwright_page do |playwright_page|
+      middle = label["y"] + label["height"] / 2
+      playwright_page.mouse.move(label["x"] + 1, middle)
+      playwright_page.mouse.down
+      playwright_page.mouse.move(label["x"] + label["width"] - 1, middle, steps: 5)
+      playwright_page.mouse.up
+    end
+    expect(page.evaluate_script("window.getSelection().toString()")).to start_with("Toggle det")
+    expect(page).to have_css("button[aria-expanded='false']", text: "Toggle details")
+    expect(page).not_to have_current_path(/details=/, url: true)
+
     # Registered after Stimulus's, so the frame it samples is one the collapse has
     # already started: the panel pinned to 0 height with the transition running.
     page.execute_script(<<~JS)
@@ -23,6 +37,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
       })
     JS
 
+    # A click on the label while it's still selected toggles as usual
     click_button("Toggle details")
 
     # The checkbox sits at its full-open offset from the first frame, so unclipped it would

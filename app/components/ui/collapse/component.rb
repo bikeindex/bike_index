@@ -10,8 +10,8 @@ module UI
         @text = text
         @chevron = chevron
         @aria = aria.merge(expanded: "false")
-        @data = data.merge(action: "ui--collapse#toggle", "ui--collapse-target": "trigger")
-        @button_options = button_options
+        @data = data.merge(action: "mousedown->ui--collapse#press ui--collapse#toggle", "ui--collapse-target": "trigger")
+        @button_options = button_options.merge(html_class: [button_options[:html_class], "tw:select-text"].compact.join(" "))
       end
 
       def call

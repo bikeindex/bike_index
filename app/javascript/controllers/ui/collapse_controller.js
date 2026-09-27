@@ -27,7 +27,18 @@ export default class extends Controller {
     this.syncTriggers(!this.collapsed)
   }
 
-  toggle () {
+  press () {
+    this.selectionAtPress = window.getSelection().toString()
+  }
+
+  // A drag that selects the trigger's label ends in a click, told apart by the selection it
+  // made since the press. A keyboard press has no detail, so it always toggles.
+  toggle (event) {
+    const selection = window.getSelection()
+    const selected = selection.toString()
+    if (event?.detail && selected && selected !== this.selectionAtPress &&
+      event.currentTarget.contains(selection.anchorNode)) return
+
     this.setExpanded(this.collapsed)
   }
 

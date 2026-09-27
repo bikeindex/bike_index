@@ -8,7 +8,7 @@ RSpec.describe UI::Collapse::Component, type: :component do
   let(:options) { {text: "Toggle details"} }
 
   it "renders a collapsed trigger without a chevron" do
-    expect(component).to have_css("button[data-ui--collapse-target='trigger'][data-action='ui--collapse#toggle'][aria-expanded='false']", text: "Toggle details")
+    expect(component).to have_css("button[data-ui--collapse-target='trigger'][data-action='mousedown->ui--collapse#press ui--collapse#toggle'][aria-expanded='false']", text: "Toggle details")
     expect(component).not_to have_css("[data-ui--collapse-target='chevron']")
   end
 
