@@ -1,5 +1,5 @@
-<%= render Pages::Register::Shared::Shell::Component.new do %>
-  <%= render Pages::Register::Shared::Progress::Component.new(steps: @steps, step: 2) %>
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <%= render Pages::Register::Parts::Progress::Component.new(steps: @steps, step: 2) %>
 
   <% if BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user) %>
     <%= render UI::Alerts::Base::Component.new(kind: :purple, text: translation(".confirmation_link_sent"),
@@ -13,16 +13,16 @@
   <% end %>
 
   <%= form_with(url: register_path, method: :patch, scope: :bike,
-      data: {turbo: true, controller: "autofocus form-persist #{Pages::Register::Shared::Step2Fields::Component::FORM_CONTROLLERS} register--retry",
+      data: {turbo: true, controller: "autofocus form-persist #{Pages::Register::Parts::Step2Fields::Component::FORM_CONTROLLERS} register--retry",
         form_persist_key_value: "register-details-#{@b_param.id_token}",
-        action: "input->form-persist#save hw-combobox:selection->form-persist#save #{Pages::Register::Shared::Step2Fields::Component::FORM_ACTIONS} submit->form-persist#clear"}) do |f| %>
+        action: "input->form-persist#save hw-combobox:selection->form-persist#save #{Pages::Register::Parts::Step2Fields::Component::FORM_ACTIONS} submit->form-persist#clear"}) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
     <%= render UI::Forms::Honeypot::Component.new %>
 
-    <%= render Pages::Register::Shared::Step2Fields::Component.new(b_param: @b_param, steps: @steps,
+    <%= render Pages::Register::Parts::Step2Fields::Component.new(b_param: @b_param, steps: @steps,
         form: f, current_user: @current_user) %>
 
-    <%= render Pages::Register::Shared::BackLink::Component.new(href: register_path(b_param_token: @b_param.id_token, step: 1)) %>
+    <%= render Pages::Register::Parts::BackLink::Component.new(href: register_path(b_param_token: @b_param.id_token, step: 1)) %>
   <% end %>
 <% end %>

@@ -1,12 +1,12 @@
-<%= render Pages::Register::Shared::Shell::Component.new do %>
+<%= render Pages::Register::Parts::Shell::Component.new do %>
   <%# Not always the last step: a report waiting on the confirmation email comes after %>
-  <%= render Pages::Register::Shared::Progress::Component.new(steps: @steps, step: "review") %>
+  <%= render Pages::Register::Parts::Progress::Component.new(steps: @steps, step: "review") %>
 
   <%# The last acknowledgment step, not a finished one - the acknowledgment is still unsigned %>
-  <%= render Pages::Register::Shared::AcknowledgmentProgress::Component.new(number: acknowledgment_step_count,
+  <%= render Pages::Register::Parts::AcknowledgmentProgress::Component.new(number: acknowledgment_step_count,
       total: acknowledgment_step_count) %>
 
-  <%= render Pages::Register::Shared::ReviewSummary::Component.new(pages:, page_path: method(:page_path)) %>
+  <%= render Pages::Register::Parts::ReviewSummary::Component.new(pages:, page_path: method(:page_path)) %>
 
   <%= form_with(url: acknowledge_register_path, method: :patch,
       data: {turbo: true, controller: "register--acknowledgment register--retry"}) do %>
@@ -14,7 +14,7 @@
     <%= hidden_field_tag :registration_sequence_id, @sequence.id %>
     <%= hidden_field_tag :step, "review" %>
 
-    <%= render Pages::Register::Shared::AcknowledgmentCheck::Component.new(sequence: @sequence,
+    <%= render Pages::Register::Parts::AcknowledgmentCheck::Component.new(sequence: @sequence,
         registrant_name:, checkbox_name: :acknowledged_all) %>
 
     <%# Enabled as rendered - see the note in Pages::Register::Views::StepAcknowledgment %>
@@ -22,6 +22,6 @@
         color: :primary, size: :lg, type: "submit", spinner: true, html_class: "tw:w-full",
         data: {"register--acknowledgment-target": "submit"}) %>
 
-    <%= render Pages::Register::Shared::BackLink::Component.new(href: previous_path) %>
+    <%= render Pages::Register::Parts::BackLink::Component.new(href: previous_path) %>
   <% end %>
 <% end %>

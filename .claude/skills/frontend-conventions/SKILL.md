@@ -197,7 +197,7 @@ in, none of which shows up as an error — the page just behaves oddly:
 - **Turbo restores its own snapshot on back/forward**, which `Cache-Control: no-store` can't
   reach. If what a page renders depends on server state, opt out with
   `helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") }`
-  — `Pages::Register::Shared::Shell` and `SharedBlocks::SearchResults::Frame` are the examples — and a restoration re-fetches
+  — `Pages::Register::Parts::Shell` and `SharedBlocks::SearchResults::Frame` are the examples — and a restoration re-fetches
   instead of showing a page the user has moved past.
 
 `RegisterController` and the `Pages::Register::` components are the worked example of both.

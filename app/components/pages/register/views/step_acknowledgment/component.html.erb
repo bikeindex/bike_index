@@ -1,7 +1,7 @@
-<%= render Pages::Register::Shared::Shell::Component.new do %>
-  <%= render Pages::Register::Shared::Progress::Component.new(steps: @steps, step: @step) %>
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <%= render Pages::Register::Parts::Progress::Component.new(steps: @steps, step: @step) %>
 
-  <%= render Pages::Register::Shared::AcknowledgmentProgress::Component.new(number: position + 1,
+  <%= render Pages::Register::Parts::AcknowledgmentProgress::Component.new(number: position + 1,
       total: BikeServices::Register.acknowledgment_step_count(@sequence)) %>
 
   <%= form_with(url: acknowledge_register_path, method: :patch,
@@ -10,7 +10,7 @@
     <%= hidden_field_tag :registration_sequence_id, @sequence.id %>
     <%= hidden_field_tag :step, @step %>
 
-    <%= render Pages::Register::Shared::PageContent::Component.new(page:, first: first?,
+    <%= render Pages::Register::Parts::PageContent::Component.new(page:, first: first?,
         checkbox_name: :acknowledged, checked: acknowledged?) %>
 
     <%#
@@ -22,6 +22,6 @@
         type: "submit", spinner: true, html_class: "tw:mt-5 tw:w-full",
         data: {"register--acknowledgment-target": "submit"}) %>
 
-    <%= render Pages::Register::Shared::BackLink::Component.new(href: previous_path) %>
+    <%= render Pages::Register::Parts::BackLink::Component.new(href: previous_path) %>
   <% end %>
 <% end %>

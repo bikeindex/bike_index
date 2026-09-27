@@ -1,5 +1,5 @@
-<%= render Pages::Register::Shared::Shell::Component.new do %>
-  <%= render Pages::Register::Shared::Progress::Component.new(steps: @steps, step: "report") %>
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <%= render Pages::Register::Parts::Progress::Component.new(steps: @steps, step: "report") %>
 
   <%= render UI::Header::Component.new(text: heading, subtitle:) %>
 
@@ -24,7 +24,7 @@
     %>
     <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
 
-    <%= render Pages::Register::Shared::SectionLabel::Component.new(text: translation(".when_and_where")) %>
+    <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".when_and_where")) %>
 
     <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :date, kind: :datetime_local_field,
         label_text: date_label, required: true,
@@ -37,7 +37,7 @@
     <% end %>
 
     <% if stolen? %>
-      <%= render Pages::Register::Shared::SectionLabel::Component.new(text: translation(".theft_details"), divider: true) %>
+      <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".theft_details"), divider: true) %>
       <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :theft_description, kind: :text_area,
           label_text: translation(".what_happened"),
           html_options: {value: report_attrs[:theft_description], rows: 3,
@@ -59,7 +59,7 @@
       <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :estimated_value, kind: :number_field,
           label_text: translation(".estimated_value", currency: t("number.currency.format.unit")),
           html_options: {value: report_attrs[:estimated_value], min: 1, inputmode: "numeric"}) %>
-      <%= render Pages::Register::Shared::SectionLabel::Component.new(text: translation(".police_report"), divider: true) %>
+      <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".police_report"), divider: true) %>
       <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :police_report_number,
           label_text: translation(".report_number"),
           html_options: {value: report_attrs[:police_report_number], autocomplete: "off"}) do |group| %>
@@ -70,7 +70,7 @@
       <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :police_report_department,
           label_text: translation(".department_city"),
           html_options: {value: report_attrs[:police_report_department]}) %>
-      <%= render Pages::Register::Shared::SectionLabel::Component.new(text: translation(".contact_and_sharing"), divider: true) %>
+      <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".contact_and_sharing"), divider: true) %>
       <%# The number itself is step 2's - stolen registrations ask for one there %>
       <div class="tw:mb-4 tw:flex tw:flex-col tw:gap-2">
         <span class="twlabel">
@@ -97,6 +97,6 @@
     <%= render UI::Button::Component.new(text: submit_text,
         color: :primary, size: :lg, type: "submit", spinner: true, html_class: "tw:w-full") %>
 
-    <%= render Pages::Register::Shared::BackLink::Component.new(href: previous_path) %>
+    <%= render Pages::Register::Parts::BackLink::Component.new(href: previous_path) %>
   <% end %>
 <% end %>

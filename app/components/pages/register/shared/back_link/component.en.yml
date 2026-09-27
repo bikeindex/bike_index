@@ -1,8 +1,0 @@
----
-en:
-  components:
-    pages:
-      register:
-        shared:
-          back_link:
-            back: Back
