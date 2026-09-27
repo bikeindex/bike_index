@@ -334,7 +334,8 @@ class Export < ApplicationRecord
     return Bike.none if partial_registrations == "only"
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
 
-    bikes = impounded_bikes ? organization.impound_records.active.bikes.default_includes : organization.bikes
+    # The registrations search's filter: a bike registered elsewhere isn't the org's to export, even impounded
+    bikes = impounded_bikes ? BikeServices::OrganizedSearch.status(organization.bikes, "impounded") : organization.bikes
     return bikes_within_time(bikes) unless custom_bike_ids.present?
 
     bikes_within_time(bikes).or(bikes.where(id: custom_bike_ids))

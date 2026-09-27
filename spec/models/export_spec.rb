@@ -296,10 +296,9 @@ RSpec.describe Export, type: :model do
       let(:impound_user) { FactoryBot.create(:organization_user, organization:) }
       let(:bike_registered) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       let!(:impound_record_registered) { FactoryBot.create(:impound_record, organization:, user: impound_user, bike: bike_registered) }
-      let(:bike_unregistered) { FactoryBot.create(:bike, user_hidden: true) }
-      let!(:impound_record_unregistered) { FactoryBot.create(:impound_record, organization:, user: impound_user, bike: bike_unregistered) }
-      let!(:impound_record_resolved) { FactoryBot.create(:impound_record_resolved, organization:, user: impound_user) }
-      let!(:impound_record_other_organization) { FactoryBot.create(:impound_record_with_organization) }
+      let!(:impound_record_registered_elsewhere) { FactoryBot.create(:impound_record, organization:, user: impound_user) }
+      let(:bike_resolved) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      let!(:impound_record_resolved) { FactoryBot.create(:impound_record_resolved, organization:, user: impound_user, bike: bike_resolved) }
       let!(:bike_not_impounded) { FactoryBot.create(:bike_organized, creation_organization: organization) }
       let!(:partial_registration) { BParam.create(params: {bike: {creation_organization_id: organization.id}}, origin: "embed_partial") }
 
@@ -307,7 +306,9 @@ RSpec.describe Export, type: :model do
         expect(organization.incomplete_b_params.pluck(:id)).to eq([partial_registration.id])
         expect(export.partial_registrations).to be_falsey
         expect(export.matching_kinds).to eq([:impounded])
-        expect(export.bikes_scoped.pluck(:id)).to match_array([bike_registered.id, bike_unregistered.id])
+        expect(impound_record_registered_elsewhere.bike.reload.status).to eq "status_impounded"
+        expect(bike_resolved.reload.status).to eq "status_with_owner"
+        expect(export.bikes_scoped.pluck(:id)).to eq([bike_registered.id])
         expect(export.incompletes_scoped.pluck(:id)).to eq([])
       end
       context "with the legacy partial_registrations: none" do
