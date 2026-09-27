@@ -1965,6 +1965,13 @@ en:
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
           below
+      redirect_to_single_page:
+        registered_for_owner: The %{bike_display} is registered - we've emailed %{email}
+          so they can claim it.
+        registered_own: Your %{bike_display} is registered.
+        safety_rules_sent: >-
+          The %{bike_display} is registered - we've emailed %{email} the safety rules
+          to agree to, which finishes the registration.
       sign_in_confirmed_user:
         unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
           account
