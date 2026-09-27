@@ -5735,6 +5735,7 @@ nl:
               het doorzoeken van alle kentekens, tenzij je alleen zoekt naar in beslag
               genomen en/of gestolen kentekens.
             show_location_search: toon locatie zoeken
+            included_columns: Inbegrepen kolommen
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
