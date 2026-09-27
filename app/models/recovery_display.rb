@@ -34,6 +34,8 @@ class RecoveryDisplay < ActiveRecord::Base
 
   default_scope { order("recovered_at desc") }
 
+  scope :with_photo, -> { where.associated(:photo_processed_attachment).with_attached_photo_processed }
+
   class << self
     def from_stolen_record_id(id)
       stolen_record = StolenRecord.current_and_not.where(id:).first

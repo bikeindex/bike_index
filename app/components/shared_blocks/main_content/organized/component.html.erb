@@ -1,5 +1,5 @@
 <div class="organized-wrap">
-  <div class="<%= helpers.organized_container %>">
+  <div class="<%= container %>">
     <%# the layout skips its own spot for this, so it lands inside the content column %>
     <% if @show_general_alert %>
       <%= render SharedBlocks::UserAlerts::Wrapper::Component.new(current_user: @current_user, wrapper_class: "tw:my-4") %>
@@ -49,7 +49,7 @@
   </div>
 </div>
 
-<% if helpers.organized_include_javascript_pack? %>
+<% if include_javascript_pack? %>
   <script>
     window.passiveOrganizationId = <%== @passive_organization&.slug.to_json %>;
   </script>

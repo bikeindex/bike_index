@@ -287,6 +287,12 @@ the page to say so. `wait_for_page_script`
 (`spec/support/integration_spec_helpers.rb`) waits on `window.pageScript`; reach for
 it after any navigation into a jQuery-driven control.
 
+**Filling a field right after a multiselect combobox pick.** The chip arrives as a turbo-stream,
+and Turbo's `withPreservedFocus` puts focus back on the combobox input a frame after rendering it —
+so a `set` landing in that frame types into the combobox (the failure reads as the field keeping its
+default). Wait for the chip before moving on; `combobox_select` in
+`spec/components/pages/search/form/component_system_spec.rb` is the pattern.
+
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
 A Turbo frame that reloads (an eager frame, `reloadFrameIfUrlStale` on
 `turbo:load`, a broadcast morph) detaches the element mid-click, and the click

@@ -14,7 +14,7 @@ Skip it when the diff has no code in it — a docs- or skill-only branch gives i
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
-**The previous run's merge from the base names that commit** — `rtk proxy git log --merges -1 --format=%h origin/main..HEAD`, since **Prepare the branch** merges before it cleans. A run that had nothing to merge left no commit, so the range can reach back further than the last run; that costs a re-triage, not a wrong scope.
+**The previous run's merge from the base names that commit** — `rtk proxy git log --merges -2 --format=%h origin/main..HEAD | tail -1`. It's the *second* one because **Prepare the branch** merges before it cleans, so this run's own merge is already the most recent by the time you get here, and `-1` scopes the range to that merge alone — an empty diff, which reads as a clean branch rather than a wrong range. A run that had nothing to merge left no commit, so the range can reach back further than the last run; that costs a re-triage, not a wrong scope.
 
 **That range breaks when earlier branch work was split into its own PRs and merged.** Those commits return through a merge from the base, so `<last-simplify-commit>..HEAD` includes all of them plus everything else the base gained — hundreds of files, none of it yours. Check `git log --oneline <last-simplify-commit>..HEAD`; if it lists the base's merges, scope to your own commits (`git show` each) instead. `--no-merges` doesn't rescue it — it hides the merge commits, not the commits they brought in.
 
@@ -67,7 +67,7 @@ This applies to the branch's specs, not the suite's. Don't delete pre-existing e
 
 When the branch adds or edits `AGENTS.md` or anything under `.claude/skills/`, check every
 claim it makes against the code before pushing — a doc asserting *why* something is done is as capable of
-being wrong as a comment, and nothing runs it. The wrong ones read as obvious. Also check what the edit *moved* — a rule relocated into a skill is a rule
+being wrong as a comment, and nothing runs it. The wrong ones read as obvious. **Grep the file for the subject before adding a line** — a fact the branch states in one section is often already stated in another, and the two drift; #4425 added an architecture note restating the testing line it had edited in the same run, and got it wrong in the restating. Also check what the edit *moved* — a rule relocated into a skill is a rule
 that only loads when that skill triggers.
 
 ### The churn audit

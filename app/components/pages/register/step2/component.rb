@@ -126,10 +126,9 @@ module Pages
           !organization_dropped? && address_statuses.include?(@b_param.status)
         end
 
-        # form_with has no model here, so fields_for needs the record to render from -
-        # read through the same whitelist that turns these into the created bike's address
+        # form_with has no model here, so fields_for needs the record to render from
         def address_record
-          @address_record ||= AddressRecord.new(BParam.address_record_attributes(@b_param.bike))
+          @address_record ||= @b_param.address_record
         end
 
         # An organization asking for more than a standard registration owns the section

@@ -17,9 +17,9 @@ This project uses RSpec. All business logic should be tested.
 
 AGENTS.md has the rule. When something fails outside the files you changed, re-run that spec file on its own first: failing alone means it's real and gets fixed, never excused as pre-existing; passing alone is the [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) skill, whose first rule is that you can't reach for a retry, a looser matcher, or a deleted assertion to make it green.
 
-## `puts` from a spec doesn't reach you
+## What a spec prints doesn't reach you
 
-rtk's rspec wrapper reports a summary and drops the run's stdout, so a `puts` added to a scratch spec to inspect a value vanishes and the run reads as an ordinary pass. Redirect it — `bundle exec rspec spec/foo_spec.rb > tmp/probe.log 2>&1` — or write to a file from inside the example, as [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) does for browser-side values. `--format documentation` does not rescue it.
+rtk's rspec wrapper reports a summary in place of the run's output, which costs you two different things. A `puts` added to a scratch spec to inspect a value vanishes and the run reads as an ordinary pass — redirect it (`bundle exec rspec spec/foo_spec.rb > tmp/probe.log 2>&1`) or write to a file from inside the example, as [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) does for browser-side values. **A failure keeps its `ExpectationNotMetError:` line but loses the expected/got values under it**, so re-running the one example tells you no more than the first run did; `rtk proxy bundle exec rspec <file>:<line>` is what shows them. `--format documentation` rescues neither.
 
 ## What to test (and what not to)
 

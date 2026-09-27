@@ -39,8 +39,8 @@ module Pages
         end
 
         def previous_path
-          register_path(b_param_token: @b_param.id_token,
-            step: BikeServices::Register.step_before(@step, steps: @steps))
+          step = BikeServices::Register.step_before(@step, steps: @steps)
+          register_path(b_param_token: @b_param.id_token, step:) if BikeServices::Register.editable_step?(@b_param, step)
         end
       end
     end

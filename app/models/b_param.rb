@@ -91,26 +91,25 @@ class BParam < ApplicationRecord
   before_save :clean_params
   # Leaving the flow is exactly when nothing else bumps the user, so the alert can't
   # wait for their next update job
-  after_commit :update_creator_alert
+  after_commit :update_unfinished_registration_alerts
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
-  scope :partial_registrations, -> { where(origin: "embed_partial") }
+  scope :partial_registrations, -> { where(origin: "embed_partial").or(step_1_submitted).without_bike }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   # register/new shells whose step 1 was never submitted (manufacturer is required
   # at submit) - only seeds and a prefilled email, nothing worth keeping
   scope :without_bike_values, -> { bike_params_empty.or(where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
-  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
+  scope :step_1_submitted, -> { where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL") }
+  # One owing the safety rules never expires - its bike is unfinished until they're agreed to
+  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION).or(acknowledgment_pending) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
-  # Step 1 submitted, no bike yet, and the token still resumes it
-  scope :unfinished_registrations, -> {
-    unexpired.without_bike.where(origin: Ownership::ORIGIN_REG_FLOW)
-      .where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL")
-  }
+  scope :acknowledgment_pending, -> { where(id: RegistrationSequenceAcknowledgment.pending.select(:b_param_id)) }
+  scope :unfinished_registrations, -> { unexpired.step_1_submitted.and(without_bike.or(acknowledgment_pending)) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -306,14 +305,23 @@ class BParam < ApplicationRecord
     created_bike_id.present?
   end
 
+  # The register flow creates the bike ahead of its organization's safety rules, which
+  # it still requires - so the registration isn't finished until they're agreed to
+  def acknowledgment_pending?
+    register_flow? && persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
+  end
+
+  def finished_registration? = with_bike? && !acknowledgment_pending?
+
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
-  # after_commit a destroy fires resolves its alert rather than re-saving it.
-  # self_made? last, and taking the user callers already hold, since it's the only clause
-  # that queries: one made for someone else isn't the creator's bike to alert about
+  # after_commit a destroy fires resolves its alert rather than re-saving it. One with a
+  # bike here owes the safety rules, which don't expire.
+  # self_made? last, taking the user callers already hold: one made for someone else
+  # isn't the creator's bike to alert about
   def unfinished_registration?(user = creator)
-    !destroyed? && register_flow? && !with_bike? && manufacturer_id.present? &&
-      created_at.present? && created_at > Time.current - TOKEN_EXPIRATION && self_made?(user)
+    !destroyed? && register_flow? && !finished_registration? && manufacturer_id.present? &&
+      (with_bike? || created_at.present? && created_at > Time.current - TOKEN_EXPIRATION) && self_made?(user)
   end
 
   def register_flow? = Ownership::ORIGIN_REG_FLOW.include?(origin)
@@ -468,9 +476,11 @@ class BParam < ApplicationRecord
     bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"])
   end
 
-  def partial_registration?
-    origin == "embed_partial"
-  end
+  # Unsaved - read through the same whitelist that turns these into the created bike's address
+  def address_record = AddressRecord.new(self.class.address_record_attributes(bike))
+
+  # Mirrors Bike#registration_address
+  def registration_address = @registration_address ||= address_record.address_hash_legacy
 
   def email_confirmed?
     params["email_confirmed_at"].present?
@@ -747,7 +757,7 @@ class BParam < ApplicationRecord
   end
 
   def partial_notification_resends
-    return partial_notifications if partial_notification_pre_tracking?
+    return partial_notifications if partial_notification_pre_tracking? || register_flow?
 
     partial_notifications.offset(1)
   end
@@ -774,15 +784,18 @@ class BParam < ApplicationRecord
       .merge(addy_hash.blank? ? {} : {"address_record_attributes" => addy_hash})
   end
 
-  private
-
-  # origin, so the API and embed forms don't pay for a lookup that can't alert
-  def update_creator_alert
+  # origin, so the API and embed forms don't pay for a lookup that can't alert. Only with a
+  # creator: anonymously, anyone could alert any account by typing in its email
+  def update_unfinished_registration_alerts
     return if creator_id.blank? || !register_flow?
 
-    UserAlert.update_unfinished_registration(user: creator, b_param: self)
-    UserAlert.refresh_alert_slugs(creator)
+    [creator, (User.fuzzy_email_find(owner_email) unless self_made?)].compact.each do |user|
+      UserAlert.update_unfinished_registration(user:, b_param: self)
+      UserAlert.refresh_alert_slugs(user)
+    end
   end
+
+  private
 
   def ensure_valid_params
     self.params ||= {"bike" => {}}

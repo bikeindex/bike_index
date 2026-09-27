@@ -7,6 +7,7 @@
   <%= form_with(url: acknowledge_register_path, method: :patch,
       data: {turbo: true, controller: "register--acknowledgment register--retry"}) do %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
+    <%= hidden_field_tag :registration_sequence_id, @sequence.id %>
     <%= hidden_field_tag :step, @step %>
 
     <%= render Pages::Register::PageContent::Component.new(page:, first: first?,
