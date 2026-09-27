@@ -6,12 +6,12 @@ module UI
     # aria-expanded and the chevron's rotation in sync with its content.
     # chevron: true leads the label with it, :trailing follows. A block renders in place of text.
     class Component < ApplicationComponent
-      def initialize(text: nil, chevron: false, aria: {}, data: {}, **button_options)
+      def initialize(text: nil, chevron: false, html_class: nil, aria: {}, data: {}, **button_options)
         @text = text
         @chevron = chevron
         @aria = aria.merge(expanded: "false")
         @data = data.merge(action: "mousedown->ui--collapse#press ui--collapse#toggle", "ui--collapse-target": "trigger")
-        @button_options = button_options.merge(html_class: [button_options[:html_class], "tw:select-text"].compact.join(" "))
+        @button_options = button_options.merge(html_class: [html_class, "tw:select-text"].compact.join(" "))
       end
 
       def call

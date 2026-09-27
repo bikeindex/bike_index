@@ -31,15 +31,17 @@ export default class extends Controller {
     this.selectionAtPress = window.getSelection().toString()
   }
 
-  // A drag that selects the trigger's label ends in a click, told apart by the selection it
-  // made since the press. A keyboard press has no detail, so it always toggles.
+  // A drag that selects the label still ends in a click. A keyboard press (no detail) always toggles
   toggle (event) {
-    const selection = window.getSelection()
-    const selected = selection.toString()
-    if (event?.detail && selected && selected !== this.selectionAtPress &&
-      event.currentTarget.contains(selection.anchorNode)) return
+    if (event?.detail && this.selectedSincePress(event.currentTarget)) return
 
     this.setExpanded(this.collapsed)
+  }
+
+  selectedSincePress (trigger) {
+    const selection = window.getSelection()
+    const selected = selection.toString()
+    return selected && selected !== this.selectionAtPress && trigger.contains(selection.anchorNode)
   }
 
   show () {
