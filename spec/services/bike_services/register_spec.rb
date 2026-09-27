@@ -596,7 +596,7 @@ RSpec.describe BikeServices::Register do
       it "is the organization's active sequence" do
         expect(described_class.registration_sequence(b_param)).to eq sequence
         # Two detail steps, a page each and the review
-        expect(described_class.flow(b_param, sequence:).count).to eq 5
+        expect(described_class.flow(b_param, sequence:).steps.count).to eq 5
       end
 
       context "not an e-vehicle" do
@@ -605,7 +605,7 @@ RSpec.describe BikeServices::Register do
         it "is nil - only e-vehicles acknowledge safety rules" do
           expect(b_param.motorized?).to be_falsey
           expect(described_class.registration_sequence(b_param)).to be_nil
-          expect(described_class.flow(b_param, sequence: nil).count).to eq 2
+          expect(described_class.flow(b_param, sequence: nil).steps.count).to eq 2
         end
       end
 

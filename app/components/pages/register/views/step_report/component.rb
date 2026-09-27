@@ -77,7 +77,6 @@ module Pages
               .slice(*AddressRecord.permitted_params))
           end
 
-          # Read off the list rather than hardcoded - where the report sits is the flow's to say
           def previous_path
             register_path(b_param_token: @b_param.id_token,
               step: @flow.before("report"))

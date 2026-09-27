@@ -8,12 +8,10 @@ RSpec.describe BikeServices::RegisterFlow do
   it "walks its steps in order" do
     expect(flow.steps).to eq %w[1 2 report 3 4 review]
     expect(flow.acknowledgments?).to be_truthy
-    expect(flow.count).to eq 6
     expect(flow.position("report")).to eq 3
     expect(flow.position(2)).to eq 2
     expect(flow.after("report")).to eq "3"
     expect(flow.before("report")).to eq "2"
-    # Nothing comes before or after the ends
     expect(flow.before("1")).to be_nil
     expect(flow.after("review")).to be_nil
   end
