@@ -398,15 +398,13 @@ RSpec.describe Organized::ExportsController, type: :request do
             post base_url, params: {
               export: valid_attrs,
               include_impounded_bikes: "true",
-              include_full_registrations: "true",
               include_partial_registrations: "true"
             }
           }.to change(Export, :count).by 1
           export = Export.last
           expect(export.impounded_bikes).to be_truthy
           expect(export.options["impounded_bikes"]).to be_truthy
-          expect(export.partial_registrations).to be_falsey
-          expect(export.matching_kinds).to eq([:impounded])
+          expect(export.options["partial_registrations"]).to be_falsey
         end
       end
 

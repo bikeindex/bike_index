@@ -195,6 +195,8 @@ class Export < ApplicationRecord
   end
 
   def partial_registrations
+    return false if impounded_bikes
+
     options["partial_registrations"].blank? ? false : options["partial_registrations"]
   end
 
@@ -332,14 +334,14 @@ class Export < ApplicationRecord
     return Bike.none if partial_registrations == "only"
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
 
-    bikes = impounded_bikes ? organization_impounded_bikes : organization.bikes
+    bikes = impounded_bikes ? organization.impound_records.active.bikes.default_includes : organization.bikes
     return bikes_within_time(bikes) unless custom_bike_ids.present?
 
     bikes_within_time(bikes).or(bikes.where(id: custom_bike_ids))
   end
 
   def incompletes_scoped
-    return BParam.none if impounded_bikes || partial_registrations.blank?
+    return BParam.none unless partial_registrations.present?
 
     incompletes = organization.incomplete_b_params
     return incompletes unless option?("start_at") || option?("end_at")
@@ -388,11 +390,6 @@ class Export < ApplicationRecord
     # but if we want to manually create an export, we should be able to do so
     opts["headers"] = opts["headers"] & self.class.permitted_headers(:include_all)
     opts
-  end
-
-  # Impounding doesn't register the bike to the organization, and unregistered impounds are user_hidden
-  def organization_impounded_bikes
-    Bike.with_user_hidden.where(id: organization.impound_records.active.select(:bike_id))
   end
 
   def bikes_within_time(bikes)

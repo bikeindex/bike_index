@@ -291,7 +291,7 @@ RSpec.describe Export, type: :model do
     end
     context "impounded_bikes" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes show_partial_registrations]) }
-      let(:partial_registrations) { false }
+      let(:partial_registrations) { true }
       let(:export) { FactoryBot.create(:export_organization, organization:, options: {impounded_bikes: true, partial_registrations:}) }
       let(:impound_user) { FactoryBot.create(:organization_user, organization:) }
       let(:bike_registered) { FactoryBot.create(:bike_organized, creation_organization: organization) }
@@ -305,15 +305,16 @@ RSpec.describe Export, type: :model do
 
       it "is only the organization's impounded bikes" do
         expect(organization.incomplete_b_params.pluck(:id)).to eq([partial_registration.id])
+        expect(export.partial_registrations).to be_falsey
         expect(export.matching_kinds).to eq([:impounded])
         expect(export.bikes_scoped.pluck(:id)).to match_array([bike_registered.id, bike_unregistered.id])
         expect(export.incompletes_scoped.pluck(:id)).to eq([])
       end
-      context "with partial_registrations: none" do
+      context "with the legacy partial_registrations: none" do
         let(:partial_registrations) { "none" }
-        it "is only the organization's impounded bikes" do
-          expect(export.bikes_scoped.pluck(:id)).to match_array([bike_registered.id, bike_unregistered.id])
-          expect(export.incompletes_scoped.pluck(:id)).to eq([])
+        it "has no partial registrations" do
+          expect(export.partial_registrations).to be_falsey
+          expect(export.matching_kinds).to eq([:impounded])
         end
       end
     end
