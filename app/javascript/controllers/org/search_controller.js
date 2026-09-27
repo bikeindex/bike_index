@@ -9,7 +9,7 @@ const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 export default class extends Controller {
   static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
-  static values = { resultView: String }
+  static values = { resultView: String, impoundLotStatuses: Array }
 
   connect () {
     this.initOptionalFields(0)
@@ -117,30 +117,42 @@ export default class extends Controller {
     const field = this.optionalFieldTargets.find(target => target.dataset.field === 'location')
     if (!checkbox || !field) return
 
-    const status = document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
     const searchAll = this.hasSearchAllTarget && this.searchAllTarget.checked
-    const searchable = JSON.parse(checkbox.dataset.locationableStatuses).includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
+    const searchable = JSON.parse(checkbox.dataset.locationableStatuses).includes(this.searchStatus) || (checkbox.dataset.regAddress === 'true' && !searchAll)
 
     checkbox.disabled = !searchable
     if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
     collapseField(field, searchable && checkbox.checked, duration)
   }
 
+  get searchStatus () {
+    return document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
+  }
+
+  // The registrations controller's @search_all_lock - owner email first, then an impounded status.
+  // Returns whether it unchecked search_all
+  syncSearchAll () {
+    if (!this.hasSearchAllTarget) return false
+    const lock = document.getElementById('search_email')?.value.trim()
+      ? 'email'
+      : (this.impoundLotStatusesValue.includes(this.searchStatus) ? 'impounded' : null)
+    const unchecking = Boolean(lock) && this.searchAllTarget.checked
+
+    this.searchAllTarget.disabled = Boolean(lock)
+    if (unchecking) this.searchAllTarget.checked = false
+    this.searchAllHintTargets.forEach(hint => { hint.hidden = hint.dataset.lock !== lock })
+    return unchecking
+  }
+
   // Bubbled from any field, so it picks out the one it's for
   emailChanged (event) {
-    if (event.target.name !== 'search_email' || !this.hasSearchAllTarget) return
-    const hasEmail = event.target.value.trim() !== ''
-    this.searchAllTarget.disabled = hasEmail
-    this.searchAllHintTarget.hidden = !hasEmail
-    if (hasEmail && this.searchAllTarget.checked) {
-      this.searchAllTarget.checked = false
-      this.syncLocationSearch()
-    }
+    if (event.target.name === 'search_email' && this.syncSearchAll()) this.syncLocationSearch()
   }
 
   filterChanged () {
     this.syncFilterSummary()
-    // Before the submit, so a disabled location isn't searched
+    // Before the submit, so neither a locked search_all nor a disabled location is searched
+    this.syncSearchAll()
     this.syncLocationSearch()
     const form = document.getElementById('Search_Form')
     if (form) {

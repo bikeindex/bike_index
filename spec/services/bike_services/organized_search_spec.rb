@@ -3,6 +3,20 @@
 require "rails_helper"
 
 RSpec.describe BikeServices::OrganizedSearch, type: :service do
+  describe ".with_impound_lot" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes]) }
+    let(:user) { FactoryBot.create(:organization_user, organization:) }
+    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let!(:impounded_elsewhere) { FactoryBot.create(:impound_record, organization:, user:).bike }
+    let!(:retrieved) { FactoryBot.create(:impound_record_resolved, organization:, user:).bike }
+    let!(:other_organization_impounded) { FactoryBot.create(:impound_record_with_organization).bike }
+
+    it "is the organization's registrations and the bikes it has actively impounded" do
+      expect(retrieved.reload.status).to eq "status_with_owner"
+      expect(described_class.with_impound_lot(organization).pluck(:id)).to match_array([bike.id, impounded_elsewhere.id])
+    end
+  end
+
   describe ".email_and_name" do
     let!(:bike1) { FactoryBot.create(:bike, owner_email: "something@stuff.edu") }
     let(:user) { FactoryBot.create(:user_confirmed, name: "George Jones", email: "something2@stuff.edu") }

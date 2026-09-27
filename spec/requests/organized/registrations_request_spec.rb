@@ -231,6 +231,39 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         end
       end
 
+      context "with an impounded status" do
+        let!(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: current_organization) }
+        let!(:impounded_elsewhere) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user).bike }
+        let!(:other_organization_impounded) { FactoryBot.create(:impound_record_with_organization).bike }
+
+        it "searches the organization's whole impound lot, hiding its owners, and locks search_all" do
+          get base_url, params: {search_no_js: true, search_status: "impounded", search_all: true}
+          expect(response.status).to eq(200)
+          expect(assigns(:search_all)).to be_falsey
+          expect(assigns(:search_all_lock)).to eq :impounded
+          expect(assigns(:bikes).pluck(:id)).to match_array([impounded_bike.id, impounded_elsewhere.id])
+          expect(response.body).to include("Hidden because it is not registered with #{current_organization.short_name}")
+          expect(response.body).not_to include(impounded_elsewhere.owner_email)
+
+          get base_url, params: {search_no_js: true, search_status: "stolen_or_impounded"}
+          expect(assigns(:bikes).pluck(:id)).to match_array([impounded_bike.id, impounded_elsewhere.id])
+
+          get base_url, params: {search_no_js: true, search_status: "stolen"}
+          expect(assigns(:search_all_lock)).to be_nil
+          expect(assigns(:bikes).pluck(:id)).to eq([])
+
+          # Only the organization's own registrations answer an owner email
+          get base_url, params: {search_no_js: true, search_status: "impounded", search_email: impounded_elsewhere.owner_email}
+          expect(assigns(:search_all_lock)).to eq :email
+          expect(assigns(:bikes).pluck(:id)).to eq([])
+
+          # ...and the chart counts only those
+          get base_url, params: {chart_scope: "search", search_status: "impounded", period: "all"},
+            headers: {"Turbo-Frame" => "chart_card_frame"}
+          expect(assigns(:registrations_stats).first.count).to eq 1
+        end
+      end
+
       context "with csv_exports" do
         let(:enabled_feature_slugs) { %w[bike_search csv_exports] }
 

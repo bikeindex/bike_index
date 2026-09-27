@@ -472,6 +472,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
     let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
     let!(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization) }
+    let!(:impounded_elsewhere) { FactoryBot.create(:impound_record, organization:, user:).bike }
+    let(:search_all_impounded_disabled) do
+      "Impounded searches already include everything #{organization.short_name} has impounded, wherever it's registered"
+    end
 
     it "filters by status radios" do
       visit "#{bikes_path}?search_status=all"
@@ -523,12 +527,20 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("th.serial_number_cell", visible: :visible, wait: 10)
       expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
 
-      # Settings persisted open via localStorage; choose "only impounded"
+      # Settings persisted open via localStorage; choose "only impounded" - which reaches
+      # everything the organization has impounded, so it locks "search all"
       expect_filters_open
+      expect(page).to have_field("search_all", disabled: false)
       choose("search_status_impounded", allow_label_click: true, visible: :all)
       expect(page).to have_current_path(/search_status=impounded/, wait: 10)
       expect(page).to have_css("table", wait: 10)
-      expect(page).to have_css("tbody tr", count: 1)
+      expect(page).to have_css("tbody tr", count: 2)
+      expect(page).to have_field("search_all", checked: false, disabled: true)
+      find("button[aria-label=\"#{search_all_impounded_disabled}\"]").hover
+      expect(page).to have_css("[role=tooltip]", text: search_all_impounded_disabled)
+      # The one registered elsewhere keeps its owner hidden
+      expect(page).to have_text("hidden")
+      expect(page).not_to have_text(impounded_elsewhere.owner_email)
 
       # Doesn't have export, because no csv_export feature
       expect_filters_open
@@ -540,6 +552,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       expect(page).to have_css("table", wait: 10)
       expect(page).to have_css("tbody tr", count: 2)
       expect(page).to have_text("not stolen or impounded")
+      expect(page).to have_field("search_all", disabled: false)
 
       # Choose "All" to show everything
       choose("search_status_all", allow_label_click: true, visible: :all)

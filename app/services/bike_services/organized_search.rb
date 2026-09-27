@@ -8,6 +8,18 @@ module BikeServices
     # pagination, and what the results card says it found - stop here
     SEARCH_ALL_COUNT_LIMIT = 1_000
 
+    # The statuses that match the bikes an organization has impounded, which its search finds
+    # wherever they're registered
+    IMPOUND_LOT_STATUSES = %w[impounded stolen_or_impounded].freeze
+
+    def impound_lot_status?(search_status) = IMPOUND_LOT_STATUSES.include?(search_status)
+
+    # The organization's registrations, and every bike it has actively impounded
+    def with_impound_lot(organization)
+      Bike.where(id: organization.bike_organizations.select(:bike_id))
+        .or(Bike.where(id: organization.impound_records.active.select(:bike_id)))
+    end
+
     def email_and_name(bikes, query)
       return bikes unless query.present?
 
