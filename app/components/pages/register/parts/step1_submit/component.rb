@@ -4,7 +4,7 @@ module Pages
   module Register
     module Parts
       module Step1Submit
-        # What step 1's own page ends in: its submit, and the way to start over
+        # Step 1's submit, and the way to start over
         class Component < ApplicationComponent
           def initialize(b_param:, organization: nil, current_user: nil, button_color: nil,
             button_hover_color: nil)

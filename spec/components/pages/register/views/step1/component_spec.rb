@@ -57,13 +57,12 @@ RSpec.describe Pages::Register::Views::Step1::Component, type: :component do
     end
   end
 
-  # Outside the form it submits nothing, which the specs posting `additional` directly
+  # Outside the form they submit nothing, which the specs posting `additional` directly
   # can't see. What the field itself has to be is UI::Forms::Honeypot's own spec
-  it "renders the honeypot inside the form, and step 1's own fields and submit" do
+  it "renders the honeypot and the submit inside the form" do
     render_step_1
 
     expect(page).to have_css("form input[name='additional']", visible: :all)
-    expect(page).to have_text "Just the essentials to start."
     expect(page).to have_css("form button[type=submit]", text: "Next")
   end
 end

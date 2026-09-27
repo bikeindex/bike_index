@@ -34,8 +34,6 @@ module Pages
             page_path(pages.count - 1)
           end
 
-          # Who's agreeing: their account name, falling back to the address the
-          # registration is going to
           # Whoever the registration is for, not whoever is filling it in - step 2 asks for
           # a name exactly when the two differ, so it wins over the signed-in account's
           def registrant_name

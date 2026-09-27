@@ -4,8 +4,7 @@ module Pages
   module Register
     module Views
       module Step1
-        # Step 1 of the registration flow: the quick-start form, with its progress, heading
-        # and errors
+        # Step 1 of the registration flow: the quick-start form
         class Component < ApplicationComponent
           def initialize(b_param:, steps:, organization: nil, current_user: nil, embed: false,
             skip_heading: false, button_color: nil, button_hover_color: nil)
