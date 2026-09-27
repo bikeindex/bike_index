@@ -66,7 +66,7 @@
           tw:lg:justify-self-end
         "
       >
-        <%= render(Pages::Register::Step1::Component.new(b_param: @b_param, steps: @steps,
+        <%= render(Pages::Register::Views::Step1::Component.new(b_param: @b_param, steps: @steps,
           current_user: @current_user, landing: true)) %>
       </div>
     </div>
@@ -250,7 +250,7 @@
         tw:lg:px-6
       "
     >
-      <%= render(Pages::Register::LandingDonation::Component.new) %>
+      <%= render(Pages::Register::Parts::LandingDonation::Component.new) %>
     </div>
   </section>
 </div>

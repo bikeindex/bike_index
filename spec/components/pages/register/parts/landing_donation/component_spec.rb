@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Register::LandingDonation::Component, type: :component do
+RSpec.describe Pages::Register::Parts::LandingDonation::Component, type: :component do
   let(:component) { render_inline(described_class.new) }
 
   it "points the call to action at the plus membership, with a tile for each cadence's amounts" do
