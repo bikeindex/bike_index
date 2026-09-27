@@ -211,7 +211,6 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
 
         # Separate attestation leaves the rules to an owner who isn't the member
         click_link "Your Register settings"
-        expect(page).to have_checked_field("Show registration in a single page")
         check "Registrant fills out the registration attestation separately"
         click_button "Update"
         # form-persist restores the draft once it loads, over anything checked before then

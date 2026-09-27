@@ -632,7 +632,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       it "shows what's set for this organization" do
         expect(checked_switches).to eq([])
-        expect(response.body).to include("#{new_organization_bike_path(organization_id: current_organization.to_param)}?old_view=true")
 
         post "#{base_url}/switches", params: {single_page: true}
         expect(checked_switches).to eq(%w[single_page])

@@ -8,8 +8,8 @@ module Organized
 
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response]
     around_action :set_reading_role, only: :multi_search_response
-    # new and settings render a component, which takes its content type from the request - and
-    # index answers turbo_stream, so the format is one a link here could ask for
+    # A component takes its content type from the request - and index answers turbo_stream,
+    # so the format is one a link here could ask for
     before_action :force_html_response, only: %i[new settings]
 
     def index
@@ -84,9 +84,7 @@ module Organized
     end
 
     def settings
-      render Pages::Org::RegisterSettings::Component.new(organization: current_organization,
-        single_page: session_register_setting?("single_page", current_organization.id),
-        separate_attestation: session_register_setting?("separate_attestation", current_organization.id))
+      render Pages::Org::RegisterSettings::Component.new(organization: current_organization, **session_register_settings)
     end
 
     # Both switches submit together, so an unchecked box is what turns one off
