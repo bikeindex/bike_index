@@ -12,13 +12,6 @@ module SharedBlocks
           list: SharedBlocks::SearchResults::BikeListItem::Component
         }.freeze
 
-        # Cards cap at 4 columns, so a page of 12 - each lazily loaded page is its own
-        # grid - fills its rows at every width
-        LIST_CLASSES = {
-          cards: "tw:grid tw:grid-cols-[repeat(auto-fill,minmax(max(14rem,calc((100%_-_3rem)/4)),1fr))] tw:gap-4",
-          list: SharedBlocks::SearchResults::BikeListItem::Component::LIST_CLASSES
-        }.freeze
-
         def self.permitted_result_view(result_view)
           view = result_view&.to_sym
 
@@ -26,8 +19,7 @@ module SharedBlocks
         end
 
         def initialize(bikes:, no_results:, result_view: nil)
-          @result_view = self.class.permitted_result_view(result_view)
-          @component_class = RESULT_VIEW_COMPONENT[@result_view]
+          @component_class = RESULT_VIEW_COMPONENT[self.class.permitted_result_view(result_view)]
           @bikes = bikes
           @no_results = no_results
         end
