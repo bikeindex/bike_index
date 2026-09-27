@@ -33,6 +33,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(assigns(:current_organization)).to eq current_organization
         expect(response).to render_template(:new)
         expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
+        expect(response.body).to include "/o/#{current_organization.to_param}/registrations/settings"
       end
       context "parking_notification" do
         it "renders with unregistered_parking_notification" do
@@ -48,6 +49,7 @@ RSpec.describe Organized::BikesController, type: :request do
             expect(response.status).to eq(200)
             expect(assigns(:unregistered_parking_notification)).to be_truthy
             expect(response).to render_template(:new)
+            expect(response.body).to_not include "/registrations/settings"
           end
         end
       end
