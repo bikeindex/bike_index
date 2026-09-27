@@ -2,7 +2,7 @@
 
 module Pages
   module Register
-    module StepAcknowledgmentReview
+    module StepReview
       # The acknowledgment the rule pages end at, rendered from an organization's live sequence
       class ComponentPreview < ApplicationComponentPreview
         def default
@@ -13,7 +13,7 @@ module Pages
           return missing_notice("a registration sequence with pages") if pages.none?
 
           b_param = preview_b_param(sequence, pages.map(&:id))
-          render(Pages::Register::StepAcknowledgmentReview::Component.new(sequence:, b_param:, current_user: lookbook_user,
+          render(Pages::Register::StepReview::Component.new(sequence:, b_param:, current_user: lookbook_user,
             steps: ::BikeServices::Register.steps(b_param, sequence:)))
         end
 

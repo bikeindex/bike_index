@@ -2,7 +2,7 @@
 
 module Pages
   module Register
-    module StepAcknowledgmentReview
+    module StepReview
       # The last of the e-vehicle pages: what was acknowledged, and the acknowledgment
       # binding the registrant to it
       class Component < ApplicationComponent
