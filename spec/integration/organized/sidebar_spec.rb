@@ -140,7 +140,12 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # notification's row, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
     click_link "Your Register settings"
-    click_link "Go back to the old view"
+    check "Use the old registration page"
+    expect(page).to have_field("Show registration in a single page", disabled: true)
+    uncheck "Use the old registration page"
+    expect(page).to have_field("Show registration in a single page", disabled: false)
+    check "Use the old registration page"
+    within("form[action$='/registrations/switches']") { click_button "Update" }
     click_link "Add a bike"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"

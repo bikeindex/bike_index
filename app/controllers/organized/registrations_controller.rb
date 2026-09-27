@@ -84,11 +84,18 @@ module Organized
     end
 
     def settings
-      render Pages::Org::RegisterSettings::Component.new(organization: current_organization, **session_register_settings)
+      render Pages::Org::RegisterSettings::Component.new(organization: current_organization, old_view: old_register_view?,
+        **session_register_settings)
     end
 
-    # Both switches submit together, so an unchecked box is what turns one off
+    # The switches submit together, so an unchecked box turns one off - except under the old
+    # view, which disables the rest so they don't submit. new is what turns the old view off
     def switches
+      if params[:old_view].present?
+        session[:old_register_view] = true
+        return redirect_to new_organization_bike_path(organization_id: current_organization.to_param)
+      end
+
       session[:register_settings] = {"organization_id" => current_organization.id,
         "single_page" => params[:single_page].present?, "separate_attestation" => params[:separate_attestation].present?}
       redirect_to new_organization_registration_path(organization_id: current_organization.to_param)

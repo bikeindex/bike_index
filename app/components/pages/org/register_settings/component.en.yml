@@ -4,7 +4,7 @@ en:
     pages:
       org:
         register_settings:
-          go_back_to_old_view: Go back to the old view
+          old_view: Use the old registration page
           register_settings: Register settings
           separate_attestation: Registrant fills out the registration attestation
             separately

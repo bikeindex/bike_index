@@ -1,25 +1,28 @@
 <%= render UI::Header::Component.new(text: translation(".register_settings"), html_class: "tw:mb-4") %>
 
-<p class="tw:mb-6">
-  <%= link_to translation(".go_back_to_old_view"), new_organization_bike_path(organization_id: @organization.to_param, old_view: true), class: "twlink" %>
-</p>
+<%= form_with(url: switches_organization_registrations_path(organization_id: @organization.to_param),
+    data: {turbo: false, controller: "org--register-settings"}) do %>
+  <%= render UI::Forms::Checkbox::Component.new(name: :old_view, checked: @old_view,
+      label: translation(".old_view"), html_options: {data: {"org--register-settings-target": "oldView",
+        action: "org--register-settings#apply"}}) %>
 
-<%= form_with(url: switches_organization_registrations_path(organization_id: @organization.to_param), data: {turbo: false}) do %>
-  <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: @single_page,
-      label: translation(".single_page")) %>
+  <div class="tw:mt-2" data-org--register-settings-target="flowSettings">
+    <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: @single_page,
+        label: translation(".single_page")) %>
 
-  <% if safety_rules? %>
-    <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,
-        class_name: "tw:mt-2", label: translation(".separate_attestation")) %>
-    <p
-      class="
-        tw:mt-1 tw:mb-0 tw:pl-6 tw:text-xs tw:text-gray-500
-        tw:dark:text-gray-400
-      "
-    >
-      <%= translation(".separate_attestation_helper") %>
-    </p>
-  <% end %>
+    <% if safety_rules? %>
+      <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,
+          class_name: "tw:mt-2", label: translation(".separate_attestation")) %>
+      <p
+        class="
+          tw:mt-1 tw:mb-0 tw:pl-6 tw:text-xs tw:text-gray-500
+          tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".separate_attestation_helper") %>
+      </p>
+    <% end %>
+  </div>
 
   <%= render UI::Button::Component.new(text: translation(".update"), color: :secondary, size: :sm,
       type: "submit", html_class: "tw:mt-3") %>

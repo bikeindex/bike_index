@@ -602,8 +602,11 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get "#{base_url}/new"
         expect(menu_add_bike_path).to eq "#{base_url}/new"
 
-        get old_view_path, params: {old_view: true}
+        post "#{base_url}/switches", params: {old_view: true}
+        expect(response).to redirect_to old_view_path
         expect(session[:old_register_view]).to be_truthy
+        get "#{base_url}/settings"
+        expect(Nokogiri::HTML(response.body).at_css("input[name=old_view]")["checked"]).to be_present
         expect(menu_add_bike_path).to eq old_view_path
 
         # Every organized page follows it, not just the one that set it
@@ -614,11 +617,13 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get "#{base_url}/new"
         expect(session[:old_register_view]).to be_blank
         expect(menu_add_bike_path).to eq "#{base_url}/new"
+      end
 
-        # Landing on the old view any other way isn't a preference
-        get old_view_path
-        expect(session[:old_register_view]).to be_blank
-        expect(menu_add_bike_path).to eq "#{base_url}/new"
+      it "leaves the flow's settings as they were" do
+        post "#{base_url}/switches", params: {single_page: true}
+        # The old view disables the others, so they don't submit
+        post "#{base_url}/switches", params: {old_view: true}
+        expect(session[:register_settings]).to include("single_page" => true)
       end
     end
 
