@@ -11,7 +11,7 @@ RSpec.describe Pages::Register::Views::Step1::Component, type: :component do
   # the previous render left on the registration
   def render_step_1
     reloaded = b_param.reload
-    render_inline(described_class.new(b_param: reloaded, steps: BikeServices::Register.steps(reloaded, sequence: nil)))
+    render_inline(described_class.new(b_param: reloaded, flow: BikeServices::Register.flow(reloaded, sequence: nil)))
   end
 
   # Minus the required "*" the label carries

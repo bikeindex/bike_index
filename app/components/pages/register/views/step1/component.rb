@@ -7,10 +7,10 @@ module Pages
         # Step 1 of the registration flow: the quick-start form
         class Component < ApplicationComponent
           # landing: in Pages::Register::Views::Landing's hero card, which supplies the shell
-          def initialize(b_param:, steps:, organization: nil, current_user: nil, embed: false,
+          def initialize(b_param:, flow:, organization: nil, current_user: nil, embed: false,
             landing: false, skip_heading: false, button_color: nil, button_hover_color: nil)
             @b_param = b_param
-            @steps = steps
+            @flow = flow
             @organization = organization
             @current_user = current_user
             @embed = embed

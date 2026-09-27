@@ -43,6 +43,20 @@ RSpec.describe EmailJobs::OwnershipInvitationJob, type: :job do
     end
   end
 
+  # The seeds freeze the clock, so their listings shared a timestamp with the claim - and
+  # all came out sold
+  context "with a listing created the moment its ownership was claimed" do
+    let(:bike) { FactoryBot.create(:bike, :with_primary_activity, :with_ownership_claimed) }
+    let!(:marketplace_listing) do
+      FactoryBot.create(:marketplace_listing, :for_sale, item: bike, created_at: ownership.claimed_at)
+    end
+
+    it "leaves it for sale" do
+      described_class.new.perform(ownership.id)
+      expect(marketplace_listing.reload.status).to eq "for_sale"
+    end
+  end
+
   context "notification already exists" do
     let!(:notification) { FactoryBot.create(:notification, notifiable: ownership, kind: "finished_registration", delivery_status:) }
     let(:delivery_status) { "delivery_success" }

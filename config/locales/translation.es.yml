@@ -5243,7 +5243,6 @@ es:
       viewing_without_org: Visualización sin ninguna organización
       your_registrations: Sus registros
     menu_items_org:
-      add_a_bike: Añade una bicicleta
       add_an_impounded_vehicle: Agregar un vehículo incautado
       ascend_imports: Importaciones Ascend
       bulk_import_and_export: Importación y exportación a granel
@@ -5281,6 +5280,7 @@ es:
       in_super_admin: "%{org_name} en superadministrador"
       registrations_index: Registro de organizaciones
       search_all_registrations: Buscar en todos los registros
+      add_a_registration: Agregar un registro
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -5879,204 +5879,6 @@ es:
             created: Creado
             notification_number: Notificación#
             resolved: Resuelto
-      register:
-        acknowledgment_check:
-          i_name_html: Yo, %{name},
-          registrants_name: nombre del registrante
-        acknowledgment_progress:
-          progress_saved: Progreso guardado · Confirmación del vehículo eléctrico
-            · Paso %{number} de %{total}
-        back_link:
-          back: Atrás
-        page:
-          retry_failed: No pudimos guardar la información en este momento; no se ha
-            perdido nada de lo que ingresaste. Inténtalo de nuevo en un momento.
-        page_content:
-          electric_detected: "⚡️ Se detectó un vehículo eléctrico (motorizado)."
-          have_questions: "¿Tiene alguna pregunta sobre estas políticas?"
-          read_the_faq: Preguntas frecuentes sobre el reconocimiento de vehículos
-            eléctricos
-        review_summary:
-          a_quick_review: Un breve repaso de todo lo que usted reconoció.
-          a_quick_review_tap: Un breve repaso de todo lo que has confirmado. Pulsa
-            "Revisar" para volver a consultar un protocolo.
-          review: Revisar
-          youre_almost_done: Ya casi terminas.
-        step1:
-          bike_info_html: "%{cycle_type} información"
-          electric_helper: Verificamos que sean eléctricas para poder marcarlas y
-            comprobar su certificación.
-          electric_motorized: "⚡️ Eléctrico (motorizado)"
-          email: Email
-          email_placeholder: tú@ejemplo.com
-          email_school: "%{org_name} correo electrónico"
-          just_the_essentials: Solo lo esencial para empezar.
-          next: Próximo
-          no_need_to_wait: Le enviaremos un enlace de confirmación por correo electrónico;
-            no tiene que esperar para continuar.
-          register_your_vehicle: "¡Registra tu vehículo!"
-          register_your_vehicle_with_org: "¡Registra tu vehículo con %{org_name}!"
-          start_over: Volver a empezar
-          start_over_certain: "¿Empezar de nuevo?"
-          start_over_discards: Esto inicia un nuevo registro; nada de lo que haya
-            introducido aquí se conservará.
-          vehicle_type: Tipo de vehículo
-          yes_start_over: Sí, empezar de nuevo
-          your_info: Tu información
-        step2:
-          add_another_color: Añade otro color
-          add_your_bikes_details: Agregue los detalles de su %{cycle_type}
-          additional_serial_sticker_number: Número de serie/etiqueta adicional
-          affiliation: "%{org_name} afiliación"
-          are_you_certain: "¿Estás seguro?"
-          attach_photo: Adjuntar foto de %{cycle_type}
-          bike_details: "%{cycle_type} detalles"
-          bottom_bracket: Soporte inferior
-          cm: centímetro
-          color: Color
-          complete_registration: Registro completo %{cycle_type}
-          confirmation_link_sent: 'Te hemos enviado un enlace de confirmación a tu
-            correo electrónico. No tienes que esperar: puedes finalizar tu registro
-            ahora mismo.'
-          contact_info: Información de contacto
-          database_public_note: "¡Nuestra base de datos es pública! Podrás ajustar
-            la configuración de privacidad de las fotos individuales de tu registro
-            más adelante."
-          email: Email
-          enter_size: Introduzca el tamaño
-          found: Encontrado/Abandonado
-          found_description: Encontré esto %{cycle_type}
-          frame_size: Tamaño del marco
-          from_step_1: Desde el paso 1
-          head_tube: Tubo de dirección
-          how_to_find_serial: Cómo encontrar su número de serie
-          i_just_dont_know_the_serial: Simplemente no conozco el número de serie.
-          im_100_sure: Estoy 100% seguro
-          inches: pulgadas
-          information_for_org: Información para %{org_name}
-          is_a_handmade_frame: Es un marco hecho a mano
-          it_probably_has_a_serial_number: Probablemente tenga un número de serie.
-          missing_serial: Número de serie extraviado
-          model: Modelo
-          model_placeholder: Por ejemplo, Marlin 7
-          model_year: Año del modelo
-          model_year_placeholder: p. ej. 2023
-          more_useful_registration: Cuanto más añadas, más útil será el registro.
-          nevermind: No importa
-          next: Próximo
-          optional: opcional
-          or: o
-          owner_name: Nombre del propietario
-          owner_name_placeholder: Nombre y apellido
-          owner_registration: Registro del propietario
-          owner_registration_description: Registro para mí mismo o en nombre del propietario.
-          phone: Teléfono
-          phone_placeholder: "(555) 000-0000"
-          phone_required_found: Se requiere el teléfono para registrar un %{cycle_type}
-            encontrado.
-          phone_required_stolen: Se requiere el teléfono para registrar un %{cycle_type}
-            robado.
-          primary_color_blank: Color primario — por ejemplo, negro
-          read_how_to_find_html: Lea sobre %{how_to_find_link} <small>(se abre en
-            una ventana aparte)</small>
-          rear_dropouts: punteras traseras
-          register_with_org: Regístrate con %{org_name}
-          register_with_org_description: "%{org_name} podrá ver y ayudar a gestionar
-            este registro."
-          registration_type: Tipo de registro
-          remove_additional_color: Eliminar color
-          second_color_blank: Segundo color — por ejemplo, rojo
-          serial_help_intro: 'La mayoría de las bicicletas tienen su número de serie
-            grabado en el cuadro. Busca tu número de serie:'
-          serial_location_bottom_bracket: parte inferior del soporte inferior
-          serial_location_head_tube: en el tubo de dirección
-          serial_location_rear_dropouts: en las punteras traseras
-          serial_number: Número de serie
-          serial_placeholder: Obligatorio — o marcar como faltante
-          sticker_number: Número de pegatina del índice de bicicletas
-          sticker_placeholder: p. ej. A 471 829
-          stolen: Robado
-          stolen_description: Este %{cycle_type} ha sido robado.
-          student_id: Carné de estudiante
-          third_color_blank: Tercer color
-          up_to_3: hasta 3
-          very_very_few_bikes_html: "<em>Muy</em> pocos %{cycle_types} se fabrican
-            sin números de serie. A menos que este %{cycle_type}:"
-          view_serial_guide: Consulte la guía completa de números de serie.
-          was_made_before_1970: Fue fabricado antes de 1970.
-          wheres_my_serial: "¿Dónde está mi número de serie?"
-          without_serial: Este %{cycle_type} se hizo sin número de serie.
-          without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
-          phone_required_org: Se requiere un teléfono para registrarse en %{org_name}.
-        step_acknowledgment:
-          continue: Continuar
-        step_acknowledgment_review:
-          complete_registration: Registro completo %{cycle_type}
-        step_confirm:
-          confirming_your_email: Confirmando tu correo electrónico
-          continue: Continuar
-          continue_where_you_left_off: Continúa y retomaremos donde lo dejaste.
-        step_finished:
-          add_impound_details: Añade detalles sobre dónde encontraste el %{cycle_type}
-          add_photos: Agrega fotos de tu %{cycle_type}
-          confirming_lets_you: 'Confirmar tu correo electrónico te permite:'
-          do_these_things: Haz estas cosas para tener la mejor oportunidad de recuperarlo.
-          finish_adding: Finaliza la adición de tu %{cycle_type} al Índice de Bicicletas
-          listed_as_found: El %{bike_display} aparece en Bike Index.
-          listed_as_stolen: Tu %{bike_display} aparece como robada en Bike Index.
-          owner_can_claim: Su propietario puede encontrarlo aquí y reclamarlo; le
-            enviaremos un correo electrónico cuando alguien lo haga.
-          progress_saved: Progreso guardado
-          register_another: Registrar otro vehículo
-          registered_for_owner_html: La %{bike_display} está registrada en Bike Index.
-            Le hemos enviado un correo electrónico a %{email} para que pueda reclamar
-            el registro.
-          registration_complete: "¡Registro completado!"
-          report_it_stolen: Finaliza la denuncia de tu %{cycle_type} robado y aprovecha
-            nuestra red comunitaria.
-          reported_stolen: Denunciado como robado
-          verify_your_email_html: 'Un paso más: verifica tu correo electrónico. Te
-            enviamos un enlace de confirmación a %{email}; haz clic en él para finalizar
-            tu registro. Toda la información que ingresaste se guardará.'
-          view_the_registration: Ver el registro
-          view_your_registration: Ver su registro
-          we_will_keep_watch: Tu %{bike_display} está registrada en Bike Index. La
-            vigilaremos; si se denuncia como robada, toda la comunidad estará pendiente.
-        step_report:
-          about_the_one_you_found: Acerca del %{cycle_type} que encontraste
-          address_where_you_found_it: Dirección donde lo encontraste
-          complete_registration: Registro completo %{cycle_type}
-          contact_and_sharing: Contacto y compartición
-          department_city: Departamento/ciudad
-          estimated_value: Valor estimado (%{currency})
-          have_proof_of_ownership: Tengo pruebas de que soy el propietario de este
-            %{cycle_type}
-          help_us_reunite: Ayúdanos a devolvérselo a su dueño.
-          how_did_you_find_it: "¿Cómo encontraste el %{cycle_type}?"
-          how_was_it_locked: "¿Cómo se bloqueó %{cycle_type}?"
-          how_was_the_lock_defeated: "¿Cómo se logró abrir la cerradura?"
-          next: Próximo
-          police_report: Informe policial
-          receive_notifications: Envíame un correo electrónico si tuiteamos sobre
-            esto %{cycle_type} o si encontramos una posible coincidencia.
-          report_number: Número de informe
-          report_your_stolen: Denuncie su %{cycle_type} robado
-          show_phone_police: Policía
-          show_phone_shops: Tiendas de bicicletas
-          show_phone_users: Usuarios de Bike Index que han iniciado sesión
-          the_more_we_know: Cuanto más sepamos, mayores serán las posibilidades de
-            recuperarlo.
-          theft_details: Detalles del robo
-          what_happened: "¿Qué pasó?"
-          what_happened_placeholder: Por ejemplo, estaba enganchado a un estante fuera
-            de la cafetería, y ya no estaba cuando volví a salir.
-          when_and_where: Cuándo y dónde
-          when_did_you_find_it: "¿Cuándo lo encontraste?"
-          when_was_it_stolen: "¿Cuándo fue robado el %{cycle_type}?"
-          where_was_it_stolen: "¿Dónde fue robado?"
-          who_can_see_your_phone: "¿Quién puede ver tu número de teléfono?"
-          without_a_report: Presentar una denuncia policial le da a su %{cycle_type}
-            la mejor oportunidad de regresar; puede agregar el número más tarde.
       registrations:
         show:
           bike_details:
@@ -6765,6 +6567,211 @@ es:
             identificable para quienes se dedican a la compraventa de bicicletas usadas.
           work_top_to_bottom: Trabajar de arriba abajo.
           your_bike_is_gone: Tu bicicleta ha desaparecido.
+      register:
+        parts:
+          acknowledgment_check:
+            i_name_html: Yo, %{name},
+            registrants_name: nombre del registrante
+          acknowledgment_progress:
+            progress_saved: Progreso guardado · Confirmación del vehículo eléctrico
+              · Paso %{number} de %{total}
+          back_link:
+            back: Atrás
+          page_content:
+            electric_detected: "⚡️ Se detectó un vehículo eléctrico (motorizado)."
+            have_questions: "¿Tiene alguna pregunta sobre estas políticas?"
+            read_the_faq: Preguntas frecuentes sobre el reconocimiento de vehículos
+              eléctricos
+          review_summary:
+            a_quick_review: Un breve repaso de todo lo que usted reconoció.
+            a_quick_review_tap: Un breve repaso de todo lo que has confirmado. Pulsa
+              "Revisar" para volver a consultar un protocolo.
+            review: Revisar
+            youre_almost_done: Ya casi terminas.
+          shell:
+            retry_failed: No pudimos guardar la información en este momento; no se
+              ha perdido nada de lo que ingresaste. Inténtalo de nuevo en un momento.
+          step1_fields:
+            bike_info_html: "%{cycle_type} información"
+            electric_helper: Verificamos que sean eléctricas para poder marcarlas
+              y comprobar su certificación.
+            electric_motorized: "⚡️ Eléctrico (motorizado)"
+            email: Email
+            email_placeholder: tú@ejemplo.com
+            email_school: "%{org_name} correo electrónico"
+            vehicle_type: Tipo de vehículo
+            your_info: Tu información
+          step1_submit:
+            next: Próximo
+            no_need_to_wait: Le enviaremos un enlace de confirmación por correo electrónico;
+              no tiene que esperar para continuar.
+            start_over: Volver a empezar
+            start_over_certain: "¿Empezar de nuevo?"
+            start_over_discards: Esto inicia un nuevo registro; nada de lo que haya
+              introducido aquí se conservará.
+            yes_start_over: Sí, empezar de nuevo
+          step2_fields:
+            add_another_color: Añade otro color
+            additional_serial_sticker_number: Número de serie/etiqueta adicional
+            affiliation: "%{org_name} afiliación"
+            are_you_certain: "¿Estás seguro?"
+            attach_photo: Adjuntar foto de %{cycle_type}
+            bike_details: "%{cycle_type} detalles"
+            bottom_bracket: Soporte inferior
+            cm: centímetro
+            color: Color
+            complete_registration: Registro completo %{cycle_type}
+            contact_info: Información de contacto
+            database_public_note: "¡Nuestra base de datos es pública! Podrás ajustar
+              la configuración de privacidad de las fotos individuales de tu registro
+              más adelante."
+            email: Email
+            enter_size: Introduzca el tamaño
+            found: Encontrado/Abandonado
+            found_description: Encontré esto %{cycle_type}
+            frame_size: Tamaño del marco
+            from_step_1: Desde el paso 1
+            head_tube: Tubo de dirección
+            how_to_find_serial: Cómo encontrar su número de serie
+            i_just_dont_know_the_serial: Simplemente no conozco el número de serie.
+            im_100_sure: Estoy 100% seguro
+            inches: pulgadas
+            information_for_org: Información para %{org_name}
+            is_a_handmade_frame: Es un marco hecho a mano
+            it_probably_has_a_serial_number: Probablemente tenga un número de serie.
+            missing_serial: Número de serie extraviado
+            model: Modelo
+            model_placeholder: Por ejemplo, Marlin 7
+            model_year: Año del modelo
+            model_year_placeholder: p. ej. 2023
+            nevermind: No importa
+            next: Próximo
+            optional: opcional
+            or: o
+            owner_name: Nombre del propietario
+            owner_name_placeholder: Nombre y apellido
+            owner_registration: Registro del propietario
+            owner_registration_description: Registro para mí mismo o en nombre del
+              propietario.
+            phone: Teléfono
+            phone_placeholder: "(555) 000-0000"
+            phone_required_found: Se requiere el teléfono para registrar un %{cycle_type}
+              encontrado.
+            phone_required_org: Se requiere un teléfono para registrarse en %{org_name}.
+            phone_required_stolen: Se requiere el teléfono para registrar un %{cycle_type}
+              robado.
+            primary_color_blank: Color primario — por ejemplo, negro
+            read_how_to_find_html: Lea sobre %{how_to_find_link} <small>(se abre en
+              una ventana aparte)</small>
+            rear_dropouts: punteras traseras
+            register_with_org: Regístrate con %{org_name}
+            register_with_org_description: "%{org_name} podrá ver y ayudar a gestionar
+              este registro."
+            registration_type: Tipo de registro
+            remove_additional_color: Eliminar color
+            second_color_blank: Segundo color — por ejemplo, rojo
+            serial_help_intro: 'La mayoría de las bicicletas tienen su número de serie
+              grabado en el cuadro. Busca tu número de serie:'
+            serial_location_bottom_bracket: parte inferior del soporte inferior
+            serial_location_head_tube: en el tubo de dirección
+            serial_location_rear_dropouts: en las punteras traseras
+            serial_number: Número de serie
+            serial_placeholder: Obligatorio — o marcar como faltante
+            sticker_number: Número de pegatina del índice de bicicletas
+            sticker_placeholder: p. ej. A 471 829
+            stolen: Robado
+            stolen_description: Este %{cycle_type} ha sido robado.
+            student_id: Carné de estudiante
+            third_color_blank: Tercer color
+            up_to_3: hasta 3
+            very_very_few_bikes_html: "<em>Muy</em> pocos %{cycle_types} se fabrican
+              sin números de serie. A menos que este %{cycle_type}:"
+            view_serial_guide: Consulte la guía completa de números de serie.
+            was_made_before_1970: Fue fabricado antes de 1970.
+            wheres_my_serial: "¿Dónde está mi número de serie?"
+            without_serial: Este %{cycle_type} se hizo sin número de serie.
+            without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
+        views:
+          confirm:
+            confirming_your_email: Confirmando tu correo electrónico
+            continue: Continuar
+            continue_where_you_left_off: Continúa y retomaremos donde lo dejaste.
+          step1:
+            just_the_essentials: Solo lo esencial para empezar.
+            register_your_vehicle: "¡Registra tu vehículo!"
+            register_your_vehicle_with_org: "¡Registra tu vehículo con %{org_name}!"
+          step2:
+            add_your_bikes_details: Agregue los detalles de su %{cycle_type}
+            confirmation_link_sent: 'Te hemos enviado un enlace de confirmación a
+              tu correo electrónico. No tienes que esperar: puedes finalizar tu registro
+              ahora mismo.'
+            more_useful_registration: Cuanto más añadas, más útil será el registro.
+          step_acknowledgment:
+            continue: Continuar
+          step_finished:
+            add_impound_details: Añade detalles sobre dónde encontraste el %{cycle_type}
+            add_photos: Agrega fotos de tu %{cycle_type}
+            confirming_lets_you: 'Confirmar tu correo electrónico te permite:'
+            do_these_things: Haz estas cosas para tener la mejor oportunidad de recuperarlo.
+            finish_adding: Finaliza la adición de tu %{cycle_type} al Índice de Bicicletas
+            listed_as_found: El %{bike_display} aparece en Bike Index.
+            listed_as_stolen: Tu %{bike_display} aparece como robada en Bike Index.
+            owner_can_claim: Su propietario puede encontrarlo aquí y reclamarlo; le
+              enviaremos un correo electrónico cuando alguien lo haga.
+            progress_saved: Progreso guardado
+            register_another: Registrar otro vehículo
+            registered_for_owner_html: La %{bike_display} está registrada en Bike
+              Index. Le hemos enviado un correo electrónico a %{email} para que pueda
+              reclamar el registro.
+            registration_complete: "¡Registro completado!"
+            report_it_stolen: Finaliza la denuncia de tu %{cycle_type} robado y aprovecha
+              nuestra red comunitaria.
+            reported_stolen: Denunciado como robado
+            verify_your_email_html: 'Un paso más: verifica tu correo electrónico.
+              Te enviamos un enlace de confirmación a %{email}; haz clic en él para
+              finalizar tu registro. Toda la información que ingresaste se guardará.'
+            view_the_registration: Ver el registro
+            view_your_registration: Ver su registro
+            we_will_keep_watch: Tu %{bike_display} está registrada en Bike Index.
+              La vigilaremos; si se denuncia como robada, toda la comunidad estará
+              pendiente.
+          step_report:
+            about_the_one_you_found: Acerca del %{cycle_type} que encontraste
+            address_where_you_found_it: Dirección donde lo encontraste
+            complete_registration: Registro completo %{cycle_type}
+            contact_and_sharing: Contacto y compartición
+            department_city: Departamento/ciudad
+            estimated_value: Valor estimado (%{currency})
+            have_proof_of_ownership: Tengo pruebas de que soy el propietario de este
+              %{cycle_type}
+            help_us_reunite: Ayúdanos a devolvérselo a su dueño.
+            how_did_you_find_it: "¿Cómo encontraste el %{cycle_type}?"
+            how_was_it_locked: "¿Cómo se bloqueó %{cycle_type}?"
+            how_was_the_lock_defeated: "¿Cómo se logró abrir la cerradura?"
+            next: Próximo
+            police_report: Informe policial
+            receive_notifications: Envíame un correo electrónico si tuiteamos sobre
+              esto %{cycle_type} o si encontramos una posible coincidencia.
+            report_number: Número de informe
+            report_your_stolen: Denuncie su %{cycle_type} robado
+            show_phone_police: Policía
+            show_phone_shops: Tiendas de bicicletas
+            show_phone_users: Usuarios de Bike Index que han iniciado sesión
+            the_more_we_know: Cuanto más sepamos, mayores serán las posibilidades
+              de recuperarlo.
+            theft_details: Detalles del robo
+            what_happened: "¿Qué pasó?"
+            what_happened_placeholder: Por ejemplo, estaba enganchado a un estante
+              fuera de la cafetería, y ya no estaba cuando volví a salir.
+            when_and_where: Cuándo y dónde
+            when_did_you_find_it: "¿Cuándo lo encontraste?"
+            when_was_it_stolen: "¿Cuándo fue robado el %{cycle_type}?"
+            where_was_it_stolen: "¿Dónde fue robado?"
+            who_can_see_your_phone: "¿Quién puede ver tu número de teléfono?"
+            without_a_report: Presentar una denuncia policial le da a su %{cycle_type}
+              la mejor oportunidad de regresar; puede agregar el número más tarde.
+          step_review:
+            complete_registration: Registro completo %{cycle_type}
     shared_blocks:
       footer:
         about: Acerca
