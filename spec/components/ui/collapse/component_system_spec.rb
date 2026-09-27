@@ -11,12 +11,6 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     # Starts collapsed (tw:hidden), so the body isn't visible and the param is absent.
     expect(page).to have_no_content("Persisted panel body")
 
-    # Dragging across the label selects it rather than toggling
-    wait_for_stimulus("ui--collapse")
-    drag_select(find_button("Toggle details"), past: -2)
-    expect(page.evaluate_script("window.getSelection().toString()")).to start_with("Toggle det")
-    expect(page).to have_css("button[aria-expanded='false']", text: "Toggle details")
-
     # Registered after Stimulus's, so the frame it samples is one the collapse has
     # already started: the panel pinned to 0 height with the transition running.
     page.execute_script(<<~JS)
@@ -29,7 +23,6 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
       })
     JS
 
-    # A click on the label while it's still selected toggles as usual
     click_button("Toggle details")
 
     # The checkbox sits at its full-open offset from the first frame, so unclipped it would
@@ -81,5 +74,24 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     expect(page).to have_no_content("Stored panel body")
     visit "/rails/view_components/ui/collapse/component/with_storage_key"
     expect(page).to have_no_content("Stored panel body")
+  end
+
+  it "selects a selectable trigger's label on a drag, and toggles on a click or a key" do
+    visit "/rails/view_components/ui/collapse/component/selectable"
+    wait_for_stimulus("ui--collapse")
+    expect_axe_clean
+
+    label = find("span", exact_text: "Selectable label")
+    drag_select(label, past: -2)
+    expect(page.evaluate_script("window.getSelection().toString()")).to start_with("Selectable lab")
+    expect(page).to have_css("button[aria-expanded='false']")
+
+    # A click on the label while it's still selected toggles as usual
+    label.click
+    expect(page).to have_content("Selectable panel body")
+    expect(page).to have_css("button[aria-expanded='true'][aria-labelledby]")
+
+    find("[data-ui--collapse-target='trigger']").send_keys(:enter)
+    expect(page).to have_no_content("Selectable panel body")
   end
 end
