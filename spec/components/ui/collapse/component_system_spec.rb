@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "ui--collapse controller", :js, type: :system do
   let(:preview_path) { "/rails/view_components/ui/collapse/component/with_url_param" }
 
-  it "toggles, clips while opening, persists open state to the URL or localStorage, and restores it on load" do
+  it "toggles, clips while opening, persists and restores open state, and selects its label on a drag" do
     visit preview_path
 
     # Starts collapsed (tw:hidden), so the body isn't visible and the param is absent.
@@ -74,9 +74,8 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     expect(page).to have_no_content("Stored panel body")
     visit "/rails/view_components/ui/collapse/component/with_storage_key"
     expect(page).to have_no_content("Stored panel body")
-  end
 
-  it "selects the trigger's label on a drag, and toggles on a click or a key" do
+    # A drag selects the label without toggling
     visit "/rails/view_components/ui/collapse/component/with_block"
     wait_for_stimulus("ui--collapse")
     expect_axe_clean
