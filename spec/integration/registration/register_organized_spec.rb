@@ -194,7 +194,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         sign_in(member)
         visit "/o/#{organization.to_param}/registrations/new"
         click_link "Registration form settings"
-        check "Show registration in a single page"
+        check "Single page registration form"
         within("form[action$='/registrations/switches']") { click_button "Update" }
 
         expect(page).to have_button("Complete Bike Registration")

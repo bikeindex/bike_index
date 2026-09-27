@@ -141,9 +141,9 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     visit "/o/#{slug}/registrations/new"
     click_link "Registration form settings"
     check "Use the old registration page"
-    expect(page).to have_field("Show registration in a single page", disabled: true)
+    expect(page).to have_field("Single page registration form", disabled: true)
     uncheck "Use the old registration page"
-    expect(page).to have_field("Show registration in a single page", disabled: false)
+    expect(page).to have_field("Single page registration form", disabled: false)
     check "Use the old registration page"
     within("form[action$='/registrations/switches']") { click_button "Update" }
     click_link "Add a registration"

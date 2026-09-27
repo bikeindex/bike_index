@@ -16,5 +16,5 @@ en:
           separate_attestation_helper: >-
             They'll receive an email telling them their registration isn't finished,
             and that they need to finish it.
-          single_page: Show registration in a single page
+          single_page: Single page registration form
           update: Update
