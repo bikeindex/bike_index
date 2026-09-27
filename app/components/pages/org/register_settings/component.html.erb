@@ -1,4 +1,5 @@
-<%= render UI::Header::Component.new(text: translation(".registration_form_settings"), html_class: "uncap") %>
+<%= render UI::Header::Component.new(text: translation(".registration_form_settings"),
+    subtitle: translation(".browser_only"), html_class: "uncap") %>
 
 <%= form_with(url: switches_organization_registrations_path(organization_id: @organization.to_param),
     data: {turbo: false, controller: "org--register-settings"}) do %>

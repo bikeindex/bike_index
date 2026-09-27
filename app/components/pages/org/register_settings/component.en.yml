@@ -4,6 +4,9 @@ en:
     pages:
       org:
         register_settings:
+          browser_only: >-
+            These settings are just applied to your browser - they will not affect
+            other users
           form_options: Form options
           old_view: Use the old registration page
           registration_form_settings: Registration form settings
