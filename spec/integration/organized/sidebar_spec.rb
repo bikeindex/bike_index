@@ -139,7 +139,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # Going back to the old view moves add-a-registration onto organized/bikes#new alongside the
     # notification's row, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
-    click_link "Your Register settings"
+    click_link "Registration form settings"
     check "Use the old registration page"
     expect(page).to have_field("Show registration in a single page", disabled: true)
     uncheck "Use the old registration page"

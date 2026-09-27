@@ -3899,6 +3899,7 @@ en:
     register_show: Your %{cycle_type} registration
     register_step_1: Register your vehicle!
     register_step_2: Add your %{cycle_type}'s details
+    registration_form_settings: Registration form settings
     registrations_embed: Register a bike with %{organization}
     search_marketplace_index: Bike Index Marketplace
     search_registrations_index: Search results
@@ -5018,6 +5019,7 @@ en:
       parking_notification_unregistered: New unregistered notification
       parking_notifications_group: Parking Notifications
       recoveries: Recoveries
+      registration_form_settings: Registration form settings
       registration_sequences: Registration sequences
       registration_stickers: Registration stickers
       registrations_index: Organization Registrations

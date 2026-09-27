@@ -20,7 +20,7 @@ RSpec.describe Pages::Org::RegisterStep1::Component, type: :component do
     expect(component.to_html).to_not include "Register your vehicle"
     expect(component).to have_css("form[action='/register'] [name='bike[serial_number]']", count: 0)
 
-    expect(component).to have_link("Your Register settings",
+    expect(component).to have_link("Registration form settings",
       href: "/o/#{organization.to_param}/registrations/settings")
   end
 end

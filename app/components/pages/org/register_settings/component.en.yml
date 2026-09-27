@@ -4,8 +4,10 @@ en:
     pages:
       org:
         register_settings:
+          form_options: Form options
           old_view: Use the old registration page
-          register_settings: Register settings
+          registration_form_settings: Registration form settings
+          registration_page: Registration page
           separate_attestation: Registrant fills out the registration attestation
             separately
           separate_attestation_helper: >-

@@ -9,7 +9,7 @@ RSpec.describe Pages::Org::RegisterSettings::Component, type: :component do
   let(:switches) { component.at_css("form[action='/o/#{organization.to_param}/registrations/switches'][method=post]") }
 
   it "renders the switches" do
-    expect(component).to have_css("h1", text: "Register settings")
+    expect(component).to have_css("h1", text: "Registration form settings")
 
     # No safety rules here, so nothing to leave to the registrant
     expect(switches.css("input[type=checkbox]").map { it["name"] }).to eq(%w[old_view single_page])
