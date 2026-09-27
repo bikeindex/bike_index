@@ -34,8 +34,8 @@ module Pages
 
           # The registration's own steps, so the progress bar matches the real flow. No
           # b_param, so it's the flow without a report - which is what a preview walks
-          def progress_steps
-            @progress_steps ||= BikeServices::Register.steps(nil, sequence: @registration_sequence)
+          def progress_flow
+            @progress_flow ||= BikeServices::Register.flow(nil, sequence: @registration_sequence)
           end
 
           def progress_step
