@@ -12,12 +12,18 @@ module BikeServices
     # wherever they're registered
     IMPOUND_LOT_STATUSES = %w[impounded stolen_or_impounded].freeze
 
-    def impound_lot_status?(search_status) = IMPOUND_LOT_STATUSES.include?(search_status)
-
-    # The organization's registrations, and every bike it has actively impounded
+    # The organization's registrations, and every bike it has actively impounded. One IN over a
+    # UNION, which Postgres drives from the two organization-indexed tables - an OR of two IN
+    # subqueries filters every bike with the searched status
     def with_impound_lot(organization)
-      Bike.where(id: organization.bike_organizations.select(:bike_id))
-        .or(Bike.where(id: organization.impound_records.active.select(:bike_id)))
+      Bike.where(Bike.arel_table[:id].in(organization.bike_organizations.select(:bike_id).arel
+        .union(organization.impound_records.active.select(:bike_id).arel)))
+    end
+
+    # The bikes with_impound_lot reaches that aren't the organization's registrations
+    def impounded_elsewhere_ids(organization)
+      ids = organization.impound_records.active.pluck(:bike_id)
+      ids - organization.bike_organizations.where(bike_id: ids).pluck(:bike_id)
     end
 
     def email_and_name(bikes, query)
@@ -62,9 +68,11 @@ module BikeServices
         matches << bikes.where(ImpoundRecord.within_bounding_box(bounding_box)
           .where("impound_records.id = bikes.current_impound_record_id").arel.exists)
       end
+      # Only its own registrations' - the impound lot reaches owners registered elsewhere
       if registration_address_searchable?(organization:, search_all:)
         matches << bikes.where(AddressRecord.within_bounding_box(bounding_box)
           .where("address_records.id = bikes.address_record_id").arel.exists)
+          .where(organization.bike_organizations.where("bike_organizations.bike_id = bikes.id").arel.exists)
       end
       matches.reduce(:or)
     end

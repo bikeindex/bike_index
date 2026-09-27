@@ -23,7 +23,7 @@ module Organized
         # impounded status already reaches past them
         @search_all_lock = if params[:search_email].present?
           :email
-        elsif BikeServices::OrganizedSearch.impound_lot_status?(search_status)
+        elsif BikeServices::OrganizedSearch::IMPOUND_LOT_STATUSES.include?(search_status)
           :impounded
         end
         @search_all = !@search_all_lock && Binxtils::InputNormalizer.boolean(params[:search_all])
@@ -42,6 +42,7 @@ module Organized
         elsif chart_only?
           # The card counts the organization's own registrations, even while the search reaches past them
           @search_all = false
+          @search_all_lock = nil
           search_organization_bikes
           render chart_card_component, layout: false
         elsif @render_results
@@ -232,9 +233,8 @@ module Organized
       bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
       bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
       if org.present?
-        # The impound lot's owners' addresses aren't the organization's to search
         bikes = BikeServices::OrganizedSearch.location(bikes, @interpreted_params[:location], @interpreted_params[:distance],
-          organization: org, search_all: @search_all || impound_lot?, search_status:, ip_address: forwarded_ip_address)
+          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address)
       end
       bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
       bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
@@ -256,13 +256,7 @@ module Organized
     def search_scope(organization)
       return Bike if @search_all || organization.blank?
 
-      impound_lot? ? BikeServices::OrganizedSearch.with_impound_lot(organization) : organization.bikes
-    end
-
-    # Not the chart, which counts the organization's own registrations - and not an owner email
-    # or name search, which only those answer
-    def impound_lot?
-      @search_all_lock == :impounded && !chart_only?
+      (@search_all_lock == :impounded) ? BikeServices::OrganizedSearch.with_impound_lot(organization) : organization.bikes
     end
 
     # Searching past the organization reaches most of the index, so it counts - and pages -

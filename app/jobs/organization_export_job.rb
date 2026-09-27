@@ -164,11 +164,8 @@ class OrganizationExportJob < ApplicationJob
     end
   end
 
-  # The bikes the organization has impounded that aren't registered with it - the only ones an
-  # export reaches that aren't its own
   def impounded_elsewhere_ids
-    @impounded_elsewhere_ids ||= @export.organization.impound_records.active
-      .where.not(bike_id: @export.organization.bike_organizations.select(:bike_id)).pluck(:bike_id).to_set
+    @impounded_elsewhere_ids ||= BikeServices::OrganizedSearch.impounded_elsewhere_ids(@export.organization).to_set
   end
 
   # The owner's details, which the registrations table hides on a bike registered elsewhere

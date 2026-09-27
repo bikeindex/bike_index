@@ -14,6 +14,9 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
     it "is the organization's registrations and the bikes it has actively impounded" do
       expect(retrieved.reload.status).to eq "status_with_owner"
       expect(described_class.with_impound_lot(organization).pluck(:id)).to match_array([bike.id, impounded_elsewhere.id])
+      FactoryBot.create(:impound_record, organization:, user:, bike:)
+      expect(described_class.with_impound_lot(organization).pluck(:id)).to match_array([bike.id, impounded_elsewhere.id])
+      expect(described_class.impounded_elsewhere_ids(organization)).to eq([impounded_elsewhere.id])
     end
   end
 
@@ -46,7 +49,7 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       FactoryBot.create(:impound_record,
         impounded_from_address_record: FactoryBot.create(:address_record, :new_york, kind: :impounded_from)).bike
     end
-    # Its coordinates are its registration address, which searching past the organization can't reach
+    # Its coordinates are its registration address, which isn't the organization's to search
     let!(:impounded_from_nowhere) do
       FactoryBot.create(:impound_record, bike: FactoryBot.create(:bike, :with_address_record, address_in: :new_york)).bike
     end
@@ -68,11 +71,15 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       # Its coordinates fall back to the organization's, not a registration address
       let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york) }
       let!(:bike_without_address) { FactoryBot.create(:bike_organized, creation_organization: location.organization) }
+      let!(:organized_nyc) { FactoryBot.create(:bike_organized, :with_address_record, address_in: :new_york, creation_organization: organization) }
 
-      it "matches registration addresses, except searching all" do
+      it "matches the organization's registration addresses, except searching all" do
         expect(bike_without_address.reload.latitude).to eq bike_nyc.reload.latitude
         expect(described_class.location(Bike.all, "New York", "50", organization:).pluck(:id))
-          .to match_array([bike_nyc.id, stolen_nyc.id, impounded_nyc.id, impounded_from_nowhere.id])
+          .to match_array([organized_nyc.id, stolen_nyc.id, impounded_nyc.id])
+        # The impound lot's registered elsewhere, so its owners' addresses aren't the organization's
+        expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "impounded").pluck(:id))
+          .to match_array([organized_nyc.id, impounded_nyc.id])
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true)).to eq(Bike.all)
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
           search_status: "impounded").pluck(:id)).to eq([impounded_nyc.id])

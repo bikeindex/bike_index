@@ -151,7 +151,8 @@ export default class extends Controller {
 
   filterChanged () {
     this.syncFilterSummary()
-    // Before the submit, so neither a locked search_all nor a disabled location is searched
+    // Before the submit, so a disabled location isn't searched - and after syncSearchAll, which
+    // can uncheck the search_all it reads
     this.syncSearchAll()
     this.syncLocationSearch()
     const form = document.getElementById('Search_Form')
