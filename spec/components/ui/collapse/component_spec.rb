@@ -22,12 +22,12 @@ RSpec.describe UI::Collapse::Component, type: :component do
   end
 
   context "with a selectable label" do
-    let(:options) { {text: "Toggle details", chevron: true, selectable: true, html_class: "tw:flex tw:gap-2"} }
+    let(:options) { {text: "Toggle details", chevron: true, selectable: true, color: :link, html_class: "tw:w-full"} }
 
-    it "puts the label beside a chevron-only button that it names, with the row taking the clicks" do
+    it "puts the label beside a chevron-only button that it names, with the row taking the clicks and the button's look" do
       label_id = component.at_css("span.tw\\:contents")["id"]
 
-      expect(component).to have_css("div.tw\\:flex.tw\\:gap-2[data-action='mousedown->ui--collapse#press click->ui--collapse#toggle'] > " \
+      expect(component).to have_css("div.twlink.tw\\:w-full[data-action='mousedown->ui--collapse#press click->ui--collapse#toggle'] > " \
         "button[aria-labelledby='#{label_id}'][aria-expanded='false']:not([data-action]) + span.tw\\:contents", text: "Toggle details")
       expect(component).not_to have_css("button", text: "Toggle details")
     end

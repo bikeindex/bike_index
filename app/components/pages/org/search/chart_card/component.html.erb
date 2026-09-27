@@ -5,9 +5,9 @@
       exactly while it stands alone full-width - beside the form it's always open
     %>
 
-    <%= render(UI::Collapse::Component.new(chevron: :trailing, color: :link,
+    <%= render(UI::Collapse::Component.new(chevron: :trailing, color: :link, selectable: true,
       html_class: "tw:w-full tw:@min-[672px]/twwiderow:hidden!")) do %>
-      <%# The button centres its content, so the label takes the row and leaves the chevron %>
+      <%# The row centres its content, so the label takes the row and leaves the chevron %>
       <span class="tw:flex-1 tw:text-left"><%= translation(".chart") %></span>
     <% end %>
 

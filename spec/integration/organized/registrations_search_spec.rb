@@ -343,7 +343,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).to have_no_link("Last year")
     expect(page).to have_no_css("turbo-frame#chart_card_frame [id^='chart-'] canvas")
 
-    click_button "Chart"
+    find("[data-action~='click->ui--collapse#toggle']", exact_text: "Chart").click
     expect(page).to have_current_path(/chart_open=1/, wait: 5)
     # The trigger names the chart, so the caption below it is the scope alone
     # (the caption is uppercased in CSS, hence the insensitive match)
@@ -366,7 +366,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     # Collapsing spells the state out rather than dropping the param, so the search
     # carries the collapse the same way - and a reload comes back collapsed
-    click_button "Chart"
+    find("[data-action~='click->ui--collapse#toggle']", exact_text: "Chart").click
     expect(page).to have_no_link("Last year")
     expect(page).to have_current_path(/chart_open=0/)
 

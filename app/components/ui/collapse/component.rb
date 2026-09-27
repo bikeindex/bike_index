@@ -6,8 +6,8 @@ module UI
     # aria-expanded and the chevron's rotation in sync with its content.
     # chevron: true leads the label with it, :trailing follows. A block renders in place of text.
     # selectable: true puts the label beside a chevron-only button rather than inside it, since
-    # Safari won't select a button's text. The row around both takes the clicks, and html_class
-    # styles the row.
+    # Safari won't select a button's text. The row around both takes the clicks, styled as the
+    # button would have been.
     class Component < ApplicationComponent
       ACTIONS = "mousedown->ui--collapse#press click->ui--collapse#toggle"
 
@@ -25,10 +25,10 @@ module UI
         return button(label, @button_options, @aria, @data.merge(action: ACTIONS)) unless @selectable
 
         label_id = "ui-collapse-label-#{object_id}"
-        parts = [button(nil, {color: :link, html_class: "tw:twtext-color"}, @aria.merge(labelledby: label_id), @data),
+        parts = [button(nil, {color: :link, html_class: "tw:text-inherit"}, @aria.merge(labelledby: label_id), @data),
           tag.span(label, id: label_id, class: "tw:contents")]
         tag.div(safe_join((@chevron == :trailing) ? parts.reverse : parts),
-          class: @button_options[:html_class], data: {action: ACTIONS})
+          class: UI::Button::Component.new(**@button_options).button_classes, data: {action: ACTIONS})
       end
 
       private

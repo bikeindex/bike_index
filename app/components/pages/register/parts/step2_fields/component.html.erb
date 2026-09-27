@@ -120,7 +120,7 @@
     <% end %>
 
     <%= render UI::Collapse::Component.new(text: translation(".wheres_my_serial"), chevron: true,
-        color: :link, html_class: "tw:text-xs tw:font-bold") %>
+        color: :link, selectable: true, html_class: "tw:text-xs tw:font-bold") %>
   </div>
 
   <% made_without_serial = bike["serial_number"] == "made_without_serial" %>

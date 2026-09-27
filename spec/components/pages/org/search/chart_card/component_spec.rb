@@ -46,7 +46,7 @@ RSpec.describe Pages::Org::Search::ChartCard::Component, type: :component do
 
   it "collapses from a trigger outside the frame, keeping the open state in the URL" do
     expect(component).to have_css("[data-ui--collapse-param-value='chart_open']", visible: :all)
-    expect(component).to have_button("Chart", visible: :all)
+    expect(component).to have_css("[data-action~='click->ui--collapse#toggle']", text: "Chart", visible: :all)
     # The frame is what collapses, so nothing loads a chart the card hasn't been opened for
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden\\! turbo-frame",
       visible: :all)
