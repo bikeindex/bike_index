@@ -6,13 +6,14 @@ import { collapse } from 'utils/collapse_utils'
 // Connects to data-controller='ui--collapse'
 // Animates [data-ui--collapse-target=content] open/closed. Optionally rotates a
 // [data-ui--collapse-target=chevron] and keeps [data-ui--collapse-target=trigger]'s
-// aria-expanded and data-active (the is-active variant) in sync. With
+// aria-expanded and data-active (the is-active variant) in sync, and a selectable
+// trigger's [data-ui--collapse-target=row]'s data-active. With
 // data-ui--collapse-param-value set, the open state persists to the URL query
 // (?param=1, ?param=0 collapsed) so it survives reloads and navigation; with
 // data-ui--collapse-storage-key-value it persists to localStorage instead, for a panel
 // whose state is the rider's preference rather than part of the address.
 export default class extends Controller {
-  static targets = ['content', 'chevron', 'trigger']
+  static targets = ['content', 'chevron', 'trigger', 'row']
   static values = { param: String, storageKey: String }
 
   connect () {
@@ -27,21 +28,30 @@ export default class extends Controller {
     this.syncTriggers(!this.collapsed)
   }
 
-  press () {
-    this.selectionAtPress = window.getSelection().toString()
+  press (event) {
+    this.pressedAt = [event.clientX, event.clientY]
   }
 
-  // A drag that selects the label still ends in a click. A keyboard press (no detail) always toggles
+  // A drag that selects the label still ends in a click, and a double or triple click that
+  // selects a word or line leaves the panel as its first click found it. A keyboard press
+  // (no detail) always toggles.
   toggle (event) {
-    if (event?.detail && this.selectedSincePress(event.currentTarget)) return
-
+    if (event?.detail > 1) {
+      if (this.collapsed === this.expandedBeforeClick) this.setExpanded(this.expandedBeforeClick)
+      return
+    }
+    if (event?.detail) {
+      this.expandedBeforeClick = !this.collapsed
+      if (this.dragSelected(event)) return
+    }
     this.setExpanded(this.collapsed)
   }
 
-  selectedSincePress (trigger) {
+  dragSelected (event) {
     const selection = window.getSelection()
-    const selected = selection.toString()
-    return selected && selected !== this.selectionAtPress && trigger.contains(selection.anchorNode)
+    const [x, y] = this.pressedAt ?? [event.clientX, event.clientY]
+    return !selection.isCollapsed && event.currentTarget.contains(selection.anchorNode) &&
+    Math.hypot(event.clientX - x, event.clientY - y) > 3
   }
 
   show () {
@@ -84,10 +94,8 @@ export default class extends Controller {
 
   syncTriggers (expanding) {
     this.chevronTargets.forEach((chevron) => chevron.classList.toggle('tw:rotate-90', expanding))
-    this.triggerTargets.forEach((trigger) => {
-      trigger.setAttribute('aria-expanded', String(expanding))
-      trigger.dataset.active = String(expanding)
-    })
+    this.triggerTargets.forEach((trigger) => trigger.setAttribute('aria-expanded', String(expanding)))
+    this.triggerTargets.concat(this.rowTargets).forEach((element) => { element.dataset.active = String(expanding) })
   }
 
   persist (expanding) {

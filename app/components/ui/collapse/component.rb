@@ -24,11 +24,14 @@ module UI
         label = content || @text
         return button(label, @button_options, @aria, @data.merge(action: ACTIONS)) unless @selectable
 
-        label_id = "ui-collapse-label-#{object_id}"
-        parts = [button(nil, {color: :link, html_class: "tw:text-inherit"}, @aria.merge(labelledby: label_id), @data),
-          tag.span(label, id: label_id, class: "tw:contents")]
-        tag.div(safe_join((@chevron == :trailing) ? parts.reverse : parts),
-          class: UI::Button::Component.new(**@button_options).button_classes, data: {action: ACTIONS})
+        label_id = "ui-collapse-label-#{SecureRandom.hex(4)}"
+        # aria-hidden since it's already the button's name
+        parts = [button(nil, @button_options.except(:color, :size, :html_class).merge(color: :link, html_class: "tw:text-inherit"),
+          @aria.merge(labelledby: label_id), @data),
+          tag.span(label, id: label_id, class: "tw:contents", aria: {hidden: true})]
+        # A span, so a selectable trigger fits wherever the button did
+        tag.span(safe_join((@chevron == :trailing) ? parts.reverse : parts), class: row_classes,
+          data: {action: (ACTIONS unless @button_options[:disabled]), "ui--collapse-target": "row"})
       end
 
       private
@@ -37,6 +40,13 @@ module UI
         render(UI::Button::Component.new(**button_options, aria:, data:)) do
           safe_join(((@chevron == :trailing) ? [label, chevron_span] : [chevron_span, label]).compact)
         end
+      end
+
+      # .twlink bolds when active, which :active makes it for the length of a drag-select,
+      # reflowing the label under the pointer. A caller's own weight already outranks it
+      def row_classes
+        pin_weight = @button_options[:color] == :link && !@button_options[:html_class].to_s.include?("tw:font-")
+        [UI::Button::Component.new(**@button_options).button_classes, ("tw:[font-weight:inherit]" if pin_weight)].compact.join(" ")
       end
 
       def chevron_span

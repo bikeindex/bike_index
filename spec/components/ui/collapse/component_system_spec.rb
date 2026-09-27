@@ -86,10 +86,18 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     expect(page.evaluate_script("window.getSelection().toString()")).to start_with("Selectable lab")
     expect(page).to have_css("button[aria-expanded='false']")
 
-    # A click on the label while it's still selected toggles as usual
+    # A double click selects a word, and leaves the panel as it found it
+    label.double_click
+    expect(page.evaluate_script("window.getSelection().toString()")).to eq "Selectable"
+    expect(page).to have_css("button[aria-expanded='false']")
+    expect(page).to have_no_content("Selectable panel body")
+
+    # A click on the label while it's still selected toggles as usual, and the row takes
+    # the open look
     label.click
     expect(page).to have_content("Selectable panel body")
     expect(page).to have_css("button[aria-expanded='true'][aria-labelledby]")
+    expect(page).to have_css("[data-ui--collapse-target='row'][data-active='true']")
 
     find("[data-ui--collapse-target='trigger']").send_keys(:enter)
     expect(page).to have_no_content("Selectable panel body")
