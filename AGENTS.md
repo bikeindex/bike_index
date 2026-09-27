@@ -116,6 +116,8 @@ Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScr
 
 Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work — or, in a spawned `.claude/worktrees/…` checkout, start it yourself.
 
+**A "down" answer expires — re-run the curl each time you need the server, including right before reporting it down.** `bin/dev` boots Rails twice (`log:clear`, then puma) and calls `gh` in between, so a check landing in that gap says down about a server that's about to be up — and one started mid-session never gets noticed at all.
+
 **`app/views` holds more `.haml` than `.erb`** — deprecated, but 301 files against 266, so a grep for call sites that passes `--include='*.erb'` and stops there misses the majority of the directory. Anything a view can reach needs `*.haml` in the pathspec too; the miss surfaces as a `NoMethodError` at render, caught only by a spec that renders that page.
 
 ## Pull requests
