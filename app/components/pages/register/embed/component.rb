@@ -18,7 +18,7 @@ module Pages
         # Rendered before the document, so Pages::Register::Page's content_for(:header) is in the
         # buffer by the time <head> reads it
         def before_render
-          @body = render Pages::Register::Step1::Component.new(b_param: @b_param, steps: @steps,
+          @body = render Pages::Register::StartPage::Component.new(b_param: @b_param, steps: @steps,
             current_user: @current_user, embed: true, button_color: @button_color,
             button_hover_color: @button_hover_color)
         end

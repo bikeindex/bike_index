@@ -74,7 +74,7 @@ class RegisterController < ApplicationController
       render Pages::Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
     when "1"
       @page_title = I18n.t("meta_titles.register_step_1")
-      render Pages::Register::Step1::Component.new(b_param: @b_param, steps:, current_user:)
+      render Pages::Register::StartPage::Component.new(b_param: @b_param, steps:, current_user:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
       render Pages::Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps:)
@@ -85,7 +85,7 @@ class RegisterController < ApplicationController
     saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
       propulsion_type_motorized: params[:propulsion_type_motorized], additional: params[:additional])
     unless saved && turnstile_verified?(@b_param, @b_param.owner_email)
-      return render(Pages::Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
+      return render(Pages::Register::StartPage::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
 
