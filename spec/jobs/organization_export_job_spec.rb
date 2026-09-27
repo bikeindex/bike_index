@@ -591,9 +591,11 @@ RSpec.describe OrganizationExportJob, type: :job do
 
       context "impounded" do
         let(:enabled_feature_slugs) { %w[impound_bikes] }
-        let(:export_options) { {headers: Export.permitted_headers(organization)} }
+        let(:export_options) { {headers: Export.permitted_headers(organization), impounded_bikes: true} }
         let(:impounded_at) { Time.current - 3.days }
         let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike:, organization:, impounded_at:) }
+        let!(:bike_not_impounded) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+        let!(:partial_registration) { BParam.create(params: {bike: {creation_organization_id: organization.id}}, origin: "embed_partial") }
         let(:target_impound_row) do
           {
             color: "Black",
@@ -619,6 +621,7 @@ RSpec.describe OrganizationExportJob, type: :job do
         it "returns impound values" do
           expect(bike.reload.occurred_at.round).to eq impounded_at.round
           expect(bike.status).to eq "status_impounded"
+          expect(organization.incomplete_b_params.pluck(:id)).to eq([partial_registration.id])
           expect(export.bikes_scoped.pluck(:id)).to eq([bike.id])
           instance.perform(export.id)
           export.reload

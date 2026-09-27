@@ -5243,7 +5243,6 @@ es:
       viewing_without_org: Visualización sin ninguna organización
       your_registrations: Sus registros
     menu_items_org:
-      add_a_bike: Añade una bicicleta
       add_an_impounded_vehicle: Agregar un vehículo incautado
       ascend_imports: Importaciones Ascend
       bulk_import_and_export: Importación y exportación a granel
@@ -5281,6 +5280,7 @@ es:
       in_super_admin: "%{org_name} en superadministrador"
       registrations_index: Registro de organizaciones
       search_all_registrations: Buscar en todos los registros
+      add_a_registration: Agregar un registro
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -6859,7 +6859,6 @@ es:
           subscription_expired_html: Tu suscripción a Bike Index ha caducado. Ponte
             en contacto con %{email_link} para reactivarla.
         organized_shop_integration_alert:
-          add_a_bike: Añade una bicicleta
           already_viewing_add_a_bike_page: Ya estás viendo esta página.
           ascend_card_title: Ascender
           dismiss: Despedir
@@ -6877,6 +6876,7 @@ es:
             que vendas quedará registrada a nombre de tu cliente en Bike Index.
           pos_callout_title: Registra las bicicletas automáticamente desde tu punto
             de venta.
+          add_a_registration: Agregar un registro
       navbar:
         org_sidebar:
           admin_panel: PANEL DE ADMINISTRACIÓN

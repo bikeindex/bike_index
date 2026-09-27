@@ -2,7 +2,7 @@
     "register--heading-names-value": CycleType.slug_translation_hash_lowercase_short.to_json,
     action: "hw-combobox:selection->register--heading#update " \
       "form-persist:restored@window->register--heading#update"}) do %>
-  <%= render Pages::Register::Parts::Progress::Component.new(steps: @steps, step: 1) %>
+  <%= render Pages::Register::Parts::Progress::Component.new(flow: @flow, step: 1) %>
 
   <% unless @skip_heading %>
     <%= render UI::Header::Component.new(text: heading_text, subtitle: translation(".just_the_essentials")) %>

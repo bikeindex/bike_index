@@ -74,7 +74,9 @@ Run `bundle exec rails prepare_translations` after hand-editing a `component.en.
 
 **A component's copy lives in that component's own sidecar, and orphaning is never a reason to leave it somewhere else.** The sync relocates the other four locales on its next run, and non-English readers fall back to English only until it does — a scope that doesn't match its component doesn't expire.
 
-**Don't hand-edit `config/locales/translation.*.yml` for a new key either** — the sync writes those four too. A lookup in another locale raises rather than falling back in test, so the three `:nl` specs (`shared_blocks/footer`, `navbar/wrapper`, `header_tags`) go red until the sync reaches the key.
+**Changing what a value says means a new key.** The other locales keep their translation under an unchanged key, so rewording one in place leaves every non-English reader on the old copy.
+
+**Don't hand-edit `config/locales/translation.*.yml` for a new key either** — the sync writes those four too. A lookup in another locale raises rather than falling back in test, so the `:nl` specs (`shared_blocks/footer`, `navbar/wrapper`, `header_tags`, `user_services/menu_items_org`) go red until the sync reaches the key. That red is expected — never keep the old key to turn it green.
 
 When a sync lands on the base, apply the base's move onto your files rather than the reverse, then check for a scope both sides created: it auto-merges into two sibling keys of the same name and YAML keeps the last.
 

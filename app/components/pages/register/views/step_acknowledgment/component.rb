@@ -7,11 +7,11 @@ module Pages
         # One page of the organization's e-vehicle safety rules. Every rule has to be
         # checked before the flow moves on, so the page is agreed to as a whole.
         class Component < ApplicationComponent
-          def initialize(b_param:, sequence:, step:, steps:)
+          def initialize(b_param:, sequence:, step:, flow:)
             @b_param = b_param
             @sequence = sequence
             @step = step
-            @steps = steps
+            @flow = flow
           end
 
           private
@@ -40,7 +40,7 @@ module Pages
           end
 
           def previous_path
-            step = BikeServices::Register.step_before(@step, steps: @steps)
+            step = @flow.before(@step)
             register_path(b_param_token: @b_param.id_token, step:) if BikeServices::Register.editable_step?(@b_param, step)
           end
         end

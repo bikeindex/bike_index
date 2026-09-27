@@ -78,8 +78,8 @@ module Organized
       # The form carries this registration's token, and a cached page would carry a stale one
       response.set_header("Cache-Control", "no-store")
       sequence = BikeServices::Register.registration_sequence(@b_param)
-      steps = BikeServices::Register.steps(@b_param, sequence:)
-      render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, steps:,
+      flow = BikeServices::Register.flow(@b_param, sequence:)
+      render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, flow:,
         organization: current_organization, current_user:)
     end
 
