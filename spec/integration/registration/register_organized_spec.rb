@@ -213,9 +213,10 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         click_link "Your Register settings"
         check "Registrant fills out the registration attestation separately"
         click_button "Update"
-        # form-persist restores the draft once it loads, over anything checked before then
+        # The draft comes back after the reload, and would undo a check that landed before it
         expect(page).to have_field("b_param[owner_email]", with: owner_email)
         check "Electric (motorized)"
+        fill_in "b_param[owner_email]", with: owner_email
         expect(page).to have_button("Complete Bike Registration")
         fill_in "b_param[owner_email]", with: member.email
         expect(page).to have_button("Next")

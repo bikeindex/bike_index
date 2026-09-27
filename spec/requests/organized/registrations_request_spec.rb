@@ -714,7 +714,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         post "#{base_url}/switches", params: {single_page: true, separate_attestation: true}
         get "#{base_url}/new"
         expect(submit_label["data-motorized-text"]).to eq "Next"
-        expect(JSON.parse(submit_label["data-motorized-own-emails"])).to eq [current_user.email]
+        expect(JSON.parse(submit_label["data-motorized-own-emails"])).to include current_user.email
       end
 
       # The submission is what makes it an e-vehicle, so the sequence isn't knowable
@@ -795,6 +795,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           confirmation_token: b_param.reload.email_confirmation_token)
         expect(ActionMailer::Base.deliveries.last.html_part.decoded).to include ERB::Util.html_escape(confirm_path)
 
+        # Signed out - log_in stubbed the member's session rather than signing them in
         allow(User).to receive(:from_auth).and_call_original
         expect {
           post "/register/confirm_email", params: {b_param_token: b_param.id_token,

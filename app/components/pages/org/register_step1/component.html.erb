@@ -1,6 +1,6 @@
-<%# The organized menu already names the organization %>
-<%= render Pages::Register::StartPage::Component.new(b_param: @b_param, flow: @flow, organization: @organization,
-    current_user: @current_user, skip_heading: true, motorized_review: @motorized_review) %>
+<%# The organized menu already says whose admin panel this is %>
+<%= render Pages::Register::Views::Step1::Component.new(b_param: @b_param, flow: @flow, organization: @organization,
+      current_user: @current_user, skip_heading: true, motorized_review: @motorized_review) %>
 
 <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
 <p

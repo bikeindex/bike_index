@@ -462,6 +462,9 @@ class BParam < ApplicationRecord
     bike["user_name"]
   end
 
+  # The separate attestation switch hands the safety rules to an owner who isn't user
+  def rules_left_to_owner?(user) = params["register_separate_attestation"].present? && !self_made?(user)
+
   def self_made?(user = creator)
     return false if user.blank?
 
