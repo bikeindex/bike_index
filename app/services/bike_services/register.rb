@@ -325,10 +325,10 @@ module BikeServices
       register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
     end
 
-    # The legacy embed form shows no rules, so an e-vehicle's are left to its owner - even when
-    # a member registers their own, who'd otherwise never see them. It asks everything the
-    # flow's own steps do, so they're marked done and the owner's link lands on the rules
-    def create_embed_bike(b_param, ip_address:)
+    # The legacy forms show no rules, so an e-vehicle's are left to its owner - even when they
+    # register it themselves, since they'd otherwise never see them. The forms ask everything
+    # the flow's own steps do, so those are marked done and the owner's link lands on the rules
+    def create_legacy_bike(b_param, ip_address:)
       b_param.params = b_param.params.merge("register_separate_attestation" => true,
         "details_completed" => true, "report_completed" => true)
       create_bike(b_param, sequence: nil, ip_address:, rules_to_owner: true)

@@ -111,6 +111,21 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
   end
+  context "an e-vehicle, from an organization with safety rules" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+    let(:bike_params) { basic_bike_params.merge(creation_organization_id: organization.id, cycle_type: "bike") }
+
+    it "leaves the rules to the owner, even registering their own" do
+      Sidekiq::Job.clear_all
+      expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
+        .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+      bike = Bike.last
+      expect(response).to redirect_to(edit_bike_url(bike))
+      expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[BParam.last.id]])
+    end
+  end
+
   context "no existing b_param and stolen" do
     let(:wheel_size) { FactoryBot.create(:wheel_size) }
     let(:extra_long_string) { "Frame Material: Kona 6061 Aluminum Butted, Fork: Kona Project Two Aluminum Disc, Wheels: WTB ST i19 700c, Crankset: Shimano Sora, Drivetrain: Shimano Sora 9spd, Brakes: TRP Spyre C 160mm front / 160mm rear rotor, Seat Post: Kona Thumb w/Offset, Cockpit: Kona Road Bar/stem, Front Tire: WTB Riddler Comp 700x37c, Rear tire: WTB Riddler Comp 700x37c, Saddle: Kona Road" }
@@ -593,6 +608,16 @@ RSpec.describe "BikesController#create", type: :request do
       expect(bike.cycle_type).to eq "tricycle"
       expect(bike.current_ownership).to have_attributes(origin: "embed", organization:, creator: bike.creator)
       testable_bike_params.each { |key, value| expect(bike.send(key).to_s).to eq value.to_s }
+    end
+
+    context "an e-vehicle, with the organization's safety rules" do
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+      it "leaves the rules to the owner" do
+        expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
+          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+        expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id]])
+      end
     end
 
     # The embed form is posted from the organization's own site, so it can't carry our token
