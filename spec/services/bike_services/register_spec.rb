@@ -612,6 +612,22 @@ RSpec.describe BikeServices::Register do
         params: {details_completed: true, bike: bike_params}.as_json)
     end
 
+    describe "complete" do
+      let(:bike_params) do
+        super().merge(manufacturer_id: FactoryBot.create(:manufacturer).id, serial_number: "XYZ 123",
+          primary_frame_color_id: FactoryBot.create(:color).id, status: "status_with_owner")
+      end
+
+      # Only the switch leaves the rules to the owner - a caller without a sequence doesn't
+      it "doesn't hold the bike for the owner without separate attestation" do
+        b_param.update(creator_id: FactoryBot.create(:user_confirmed).id)
+        bike = described_class.complete(b_param, user: nil, sequence: nil, ip_address: nil)
+        expect(bike.id).to be_present
+        expect(RegistrationSequenceAcknowledgment.count).to eq 0
+        expect(EmailJobs::PartialRegistrationJob.jobs).to be_empty
+      end
+    end
+
     describe "registration_sequence" do
       it "is the organization's active sequence" do
         expect(described_class.registration_sequence(b_param)).to eq sequence

@@ -81,7 +81,7 @@ module Organized
       flow = BikeServices::Register.flow(@b_param, sequence:, single_page: register_setting?(@b_param, "single_page"))
       render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, flow:, organization: current_organization,
         current_user:, separate_attestation: register_setting?(@b_param, "separate_attestation"),
-        motorized_review: register_motorized_review?(@b_param, flow))
+        motorized_review: register_motorized_review(@b_param, flow))
     end
 
     # Both switches submit together, so an unchecked box is what turns one off

@@ -62,6 +62,8 @@ class RegisterController < ApplicationController
 
     case step
     when "finished"
+      # A bike whose rules were left to its owner is finished here, though not finished_registration?
+      session.delete(:register_b_param_token) if @b_param.with_bike?
       @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)
       render Pages::Register::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
@@ -184,6 +186,8 @@ class RegisterController < ApplicationController
       return redirect_to_current_step
     end
 
+    # The filter resolved it signed out, which separate attestation answers with no rules
+    find_registration_sequence
     @b_param.confirm_email!(creator_id: current_user.id)
     complete_registration
   end
@@ -200,7 +204,7 @@ class RegisterController < ApplicationController
 
   def start_page(flow:)
     Pages::Register::StartPage::Component.new(b_param: @b_param, flow:, current_user:,
-      motorized_review: register_motorized_review?(@b_param, flow))
+      motorized_review: register_motorized_review(@b_param, flow))
   end
 
   def complete_registration

@@ -85,9 +85,25 @@ RSpec.describe Pages::Register::StartPage::Component, type: :component do
 
       # What tells create the submission carries step 2 as well
       expect(component.css("input[name=single_page]").count).to eq 1
+      # The photo's fields_for is bare, so the form has to ask for multipart itself
+      expect(component.at_css("form[action='/register']")["enctype"]).to eq "multipart/form-data"
       # One honeypot, not one per step
       expect(component.css("input[name=additional]").count).to eq 1
       expect(component.to_html).to_not include "Just the essentials"
+    end
+
+    # A failed e-vehicle submission re-renders with its sequence resolved, and the electric
+    # checkbox, not the server, is what says the safety pages come next
+    context "re-rendered with the safety pages resolved" do
+      let(:component) do
+        render_inline(described_class.new(b_param:, flow: BikeServices::RegisterFlow.new(single_page: true, page_count: 2)))
+      end
+
+      it "still completes the registration for a status with nothing after it" do
+        texts = JSON.parse(component.at_css("[data-register--status-fields-target=submitLabel]")["data-texts"])
+        expect(texts["status_with_owner"]).to start_with "Complete"
+        expect(texts["status_stolen"]).to eq "Next"
+      end
     end
   end
 end

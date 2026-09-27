@@ -428,6 +428,7 @@
     data-register--status-fields-target="submitLabel"
     data-texts="<%= submit_texts.to_json %>"
     data-motorized-text="<%= translation(".next") if @motorized_review %>"
+    data-motorized-own-emails="<%= own_emails.to_json if @motorized_review == :own_emails %>"
   >
     <%= submit_text %>
   </span>

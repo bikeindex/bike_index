@@ -190,28 +190,6 @@ module ControllerHelpers
     session[:old_register_view].present?
   end
 
-  # The organization add-a-bike page's switches. Step 1 saves them onto the registration;
-  # until then the session's apply only to the organization they were set on
-  def register_setting?(b_param, key)
-    b_param.params.to_h.fetch("register_#{key}") do
-      settings = session[:register_settings] || {}
-      settings[key].present? && settings["organization_id"].to_s == b_param.creation_organization_id.to_s
-    end
-  end
-
-  # Both entry points into the flow build it the same way - the organization's page and
-  # the /register submissions it hands off to have to agree on whether there's a sequence
-  def register_flow_sequence(b_param, **)
-    BikeServices::Register.registration_sequence(b_param, user: current_user, **,
-      separate_attestation: register_setting?(b_param, "separate_attestation"))
-  end
-
-  # The single page's electric checkbox is on the same form as its submit button, so the
-  # button is told what it'd lead to for an e-vehicle
-  def register_motorized_review?(b_param, flow)
-    flow.single_page? && register_flow_sequence(b_param, motorized: true).present?
-  end
-
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank? ||
       render_donation_request?
@@ -364,6 +342,31 @@ module ControllerHelpers
   end
 
   private
+
+  # The organization add-a-bike page's switches. Step 1 saves them onto the registration;
+  # until then the session's apply only to the organization they were set on
+  def register_setting?(b_param, key)
+    b_param.params.to_h.fetch("register_#{key}") do
+      settings = session[:register_settings] || {}
+      settings[key].present? && settings["organization_id"].to_s == b_param.creation_organization_id.to_s
+    end
+  end
+
+  # Both entry points into the flow build it the same way - the organization's page and
+  # the /register submissions it hands off to have to agree on whether there's a sequence
+  def register_flow_sequence(b_param, **)
+    BikeServices::Register.registration_sequence(b_param, user: current_user, **,
+      separate_attestation: register_setting?(b_param, "separate_attestation"))
+  end
+
+  # The single page's electric checkbox is on the same form as its submit button, so the
+  # button is told what it'd lead to for an e-vehicle. Separate attestation leaves the rules
+  # to an owner who isn't the registrant, which the email typed above it decides - :own_emails
+  def register_motorized_review(b_param, flow)
+    return false unless flow.single_page? && BikeServices::Register.registration_sequence(b_param, motorized: true).present?
+
+    register_setting?(b_param, "separate_attestation") ? :own_emails : true
+  end
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request

@@ -40,23 +40,26 @@ module Pages
         # What a frame can't have: a Turbo submission, which Turbo would render back inside it
         # (the target is ignored unless it names an iframe); autofocus, which scrolls the
         # embedding page down to the frame on load; and form-persist, whose localStorage is
-        # partitioned per embedding site and blocked outright in Safari
+        # partitioned per embedding site and blocked outright in Safari.
+        # multipart: step 2's photo field is in a bare fields_for, whose flag never reaches the form
         def form_options
           return {data: {turbo: false}, html: {target: "_top"}} if @embed
 
           details = Pages::Register::Step2Fields::Component
-          {data: {turbo: true, form_persist_key_value: "register-#{@flow.single_page? ? "combined" : "start"}-#{@b_param.id_token}",
+          {multipart: @flow.single_page?,
+           data: {turbo: true, form_persist_key_value: "register-#{@flow.single_page? ? "combined" : "start"}-#{@b_param.id_token}",
                   controller: "autofocus form-persist register--retry ui--forms--turnstile #{details::FORM_CONTROLLERS if @flow.single_page?}",
                   **UI::Forms::Turnstile::Component.form_data(user: @current_user),
                   action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
                     "input->ui--forms--turnstile#update submit->form-persist#clear #{single_page_actions}"}}
         end
 
-        # The electric checkbox shares the single page's form, and changes what the submit leads to
+        # The electric checkbox and the owner's email share the single page's form, and change
+        # what the submit leads to
         def single_page_actions
           return unless @flow.single_page?
 
-          "#{Pages::Register::Step2Fields::Component::FORM_ACTIONS} change->register--status-fields#updateSubmitLabel"
+          "#{Pages::Register::Step2Fields::Component::FORM_ACTIONS} input->register--status-fields#updateSubmitLabel"
         end
       end
     end

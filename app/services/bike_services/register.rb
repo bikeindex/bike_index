@@ -403,7 +403,7 @@ module BikeServices
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_sequence = registration_sequence(b_param) if sequence.blank?
+      owners_sequence = registration_sequence(b_param) if sequence.blank? && b_param.params["register_separate_attestation"]
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
         "register_separate_attestation" => owners_sequence.present?
@@ -423,6 +423,8 @@ module BikeServices
       return bike if pending.blank?
       return if owners_sequence.blank?
 
+      # Its link proves the address, so an owner without an account can still get in to agree
+      b_param.generate_email_confirmation_token!
       EmailJobs::PartialRegistrationJob.perform_async(b_param.id)
       bike
     end
