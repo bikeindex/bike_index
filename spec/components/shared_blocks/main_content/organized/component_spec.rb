@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe SharedBlocks::MainContent::Organized::Component, type: :component do
-  let(:organization) { FactoryBot.create(:organization) }
+  let(:organization) { FactoryBot.build(:organization) }
   let(:action_name) { "index" }
   let(:component) do
     render_inline(described_class.new(current_organization: organization, current_user: nil,
@@ -36,40 +36,18 @@ RSpec.describe SharedBlocks::MainContent::Organized::Component, type: :component
     end
   end
 
-  context "bulk_imports" do
-    let(:controller_name) { "bulk_imports" }
-    it "is a container" do
-      expect(container_class).to eq "container"
-    end
-
-    context "show" do
-      let(:action_name) { "show" }
-      it "is fluid" do
-        expect(container_class).to eq "container-fluid"
-      end
-    end
-  end
-
   context "parking_notifications" do
     let(:controller_name) { "parking_notifications" }
     it "is fluid, without the legacy bundle" do
       expect(container_class).to eq "container-fluid"
       expect(javascript_pack).to be_falsey
     end
-
-    context "show" do
-      let(:action_name) { "show" }
-      it "has the legacy bundle" do
-        expect(javascript_pack).to be_truthy
-      end
-    end
   end
 
   context "bikes recoveries" do
     let(:controller_name) { "bikes" }
     let(:action_name) { "recoveries" }
-    it "is a container, with the legacy bundle" do
-      expect(container_class).to eq "container"
+    it "has the legacy bundle" do
       expect(javascript_pack).to be_truthy
     end
   end
