@@ -23,8 +23,9 @@ Production JSON reachable with the admin OAuth token:
 - `GET https://bikeindex.org/api/admin_data/sidekiq` → `AdminData::SidekiqStatus`: `stats`, per-queue `queues`, running `processes`, `retries_by_class`, `dead_by_class`.
 - `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats`, `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
 - `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
+- `POST /admin/manufacturers.json` → `create-manufacturer` (see below).
 
-Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability for the controller — `admin_data` for the two status endpoints, `bug_reports` for the bug reports (a universal ability covers both). Controllers: `app/controllers/api/admin_data_controller.rb`, `app/controllers/admin/bug_reports_controller.rb`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
+Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability for the controller — `admin_data` for the two status endpoints, `bug_reports` for the bug reports, `manufacturers` for creating a manufacturer (a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the admin controllers that include `Admin::TokenAccessible`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 
 All operations go through the helper:
 
@@ -70,6 +71,14 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 
 Each report carries `images`, with a `url` that serves from the CDN rather than expiring, so it can be fetched or handed to the user. Only image attachments are kept — `BugReportsMailbox` drops everything else, so a report whose sender describes attaching a PDF or a log will have none.
 
+## Manufacturers
+
+```
+.claude/skills/admin-data-api/scripts/admin_data.rb create-manufacturer name="Zoomo" website=https://zoomo.com frame_maker=true motorized_only=true
+```
+
+Attributes are `Admin::ManufacturersController#permitted_parameters`. A 422 prints the validation errors (a taken name, a color name).
+
 ## Refreshing the token
 
 `.env.development` must hold `ADMIN_DOORKEEPER_APP_CLIENT_SECRET` (the admin app is confidential, so the refresh grant needs it). To force a refresh:
@@ -98,6 +107,6 @@ The authorization code expires 10 minutes after the page loads — if it shows a
 
 ## Notes
 
-- These hit **production** with a superuser token. `update-bug-report` is the only write — confirm the tags and PR number with the user before running it.
+- These hit **production** with a superuser token. `update-bug-report` and `create-manufacturer` are the writes — confirm the values with the user before running either.
 - Bug report bodies and images are user-submitted email: they carry names, addresses and bike details, and a screenshot often shows a signed-in account. Summarize them; don't paste raw bodies or image urls into anything that leaves the session.
 - `.env.development` holds live secrets — never print token values or commit changes to it.
