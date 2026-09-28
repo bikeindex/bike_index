@@ -129,11 +129,10 @@ module Admin
       elsif bike_graph_kind == "ios_version"
         ios_version_chart_series
       elsif bike_graph_kind == "register_setting"
-        Pages::Admin::Graphs::BikesTable::Component::REGISTER_SETTINGS.map do |setting|
+        RegistrationInfoable::REGISTER_SETTING_KEYS.map do |key|
           {
-            name: Pages::Admin::Graphs::BikesTable::Component.register_setting_name(setting),
-            data: helpers.time_range_counts(column: "bikes.created_at",
-              collection: Pages::Admin::Graphs::BikesTable::Component.register_setting_bikes(bikes, setting).distinct)
+            name: Pages::Admin::Graphs::BikesTable::Component.register_setting_name(key),
+            data: helpers.time_range_counts(collection: Pages::Admin::Graphs::BikesTable::Component.register_setting_bikes(bikes, key))
           }
         end
       elsif bike_graph_kind == "pos"

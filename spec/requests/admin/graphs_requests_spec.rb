@@ -88,11 +88,11 @@ RSpec.describe Admin::GraphsController, type: :request do
         it "counts the bikes registered with each" do
           get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "register_setting"}
           expect(response.status).to eq(200)
-          expect(setting_rows).to eq([["Single page", "3"], ["Separate attestation", "1"]])
+          expect(setting_rows).to eq([["Separate attestation", "1"], ["Single page", "3"]])
 
           get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "register_setting"}
           expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
-            .to eq([["Single page", 3], ["Separate attestation", 1]])
+            .to eq([["Separate attestation", 1], ["Single page", 3]])
         end
       end
 

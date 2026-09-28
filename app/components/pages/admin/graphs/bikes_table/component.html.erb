@@ -57,11 +57,11 @@
       <% end %>
     <% elsif @kind == "register_setting" %>
       <%= render(UI::Table::Component.new(records: register_setting_bike_counts)) do |table| %>
-        <% table.column(label: "Registration setting") do |(setting)| %>
-          <%= Pages::Admin::Graphs::BikesTable::Component.register_setting_name(setting) %>
+        <% table.column(label: "Registration setting") do |(name)| %>
+          <%= name %>
         <% end %>
 
-        <% table.column(label: "Bikes", classes: "tw:text-right") do |_setting, bike_count| %>
+        <% table.column(label: "Bikes", classes: "tw:text-right") do |_name, bike_count| %>
           <%= number_display(bike_count) %>
         <% end %>
       <% end %>
