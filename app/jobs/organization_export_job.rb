@@ -89,12 +89,7 @@ class OrganizationExportJob < ApplicationJob
 
   def bike_to_row(bike)
     hidden = owner_hidden?(bike)
-    export_headers.map do |header|
-      # Claiming a sticker registers the bike with the organization, exposing its owner
-      next if hidden && (owner_header?(header) || header == "assigned_sticker")
-
-      value_for_header(header, bike)
-    end
+    export_headers.map { |header| value_for_header(header, bike) unless hidden && hidden_header?(header) }
   end
 
   def b_param_to_row(b_param)
@@ -180,9 +175,10 @@ class OrganizationExportJob < ApplicationJob
       .where(id: @export.organization.bike_organizations.select(:bike_id)).pluck(:id).to_set
   end
 
-  # The owner's details, which the registrations table hides on a bike registered elsewhere
-  def owner_header?(header)
-    %w[owner_email owner_name].include?(header) || ADDRESS_KEYS.key?(header) ||
+  # The owner's details, which the registrations table hides on a bike registered elsewhere - and
+  # assigned_sticker, since claiming one registers the bike with the organization
+  def hidden_header?(header)
+    %w[owner_email owner_name assigned_sticker].include?(header) || ADDRESS_KEYS.key?(header) ||
       ComponentStructs::OrgSearchSettings::EXPORT_HEADERS.key?("reg_#{header}_cell")
   end
 

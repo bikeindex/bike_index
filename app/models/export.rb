@@ -295,12 +295,11 @@ class Export < ApplicationRecord
     bikes = impounded_bikes ? impound_lot.status_impounded : organization.bikes
     return bikes_within_time(bikes) unless custom_bike_ids.present?
 
-    # By id, so the organization's registrations can join an .or with the lot
+    # .or needs both sides built on impound_lot
     impound_lot.where(id: bikes_within_time(bikes).select(:id)).or(impound_lot.where(id: custom_bike_ids))
   end
 
-  # Whether bikes_scoped reaches past the organization's registrations, into the bikes it has
-  # impounded - OrganizationExportJob hides the owners of those
+  # Whether bikes_scoped reaches past the organization's registrations, into the bikes it has impounded
   def impound_lot? = impounded_bikes || custom_bike_ids.present?
 
   def incompletes_scoped
