@@ -180,7 +180,7 @@ class RegisterController < ApplicationController
     # address that was emailed, it just isn't that account's own
     if current_user.present?
       # The rules are the owner's to agree to, and spending the link here would leave them no way in
-      if @b_param.acknowledgment_pending? && @b_param.rules_left_to_owner?(current_user)
+      if @b_param.rules_left_to_owner?(current_user) && @b_param.acknowledgment_pending?
         flash[:error] = translation(:sign_out_to_agree, email: current_user.email)
         return redirect_to(confirm_register_path(b_param_token: @b_param.id_token,
           confirmation_token: params[:confirmation_token]))

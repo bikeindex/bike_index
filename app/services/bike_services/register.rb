@@ -85,7 +85,7 @@ module BikeServices
       b_param.save
     end
 
-    # The organization add-a-bike page's switches. Step 1 saves them onto the registration;
+    # The organization add-a-registration page's switches. Step 1 saves them onto the registration;
     # until then the session's apply only to the organization they were set on
     def settings(b_param, session_settings)
       in_session = session_settings.present? &&
