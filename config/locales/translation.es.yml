@@ -2564,12 +2564,21 @@ es:
         signed_in_as_other: Has iniciado sesión como %{email}, por lo que mantuvimos
           tu cuenta. El registro sigue guardado en la dirección de correo electrónico
           que te enviamos.
+        sign_out_to_agree: Has iniciado sesión como %{email}. Cierra sesión y vuelve
+          a abrir el enlace para aceptar las normas de seguridad.
       find_b_param:
         registration_not_found: No pudimos encontrar ese registro; inicie uno nuevo
           a continuación.
       sign_in_confirmed_user:
         unable_to_sign_in: Hemos confirmado tu correo electrónico, pero no pudimos
           iniciar sesión en esa cuenta.
+      redirect_to_single_page:
+        registered_for_owner: El %{bike_display} está registrado; le hemos enviado
+          un correo electrónico a %{email} para que puedan reclamarlo.
+        registered_own: Su %{bike_display} está registrado.
+        safety_rules_sent: El %{bike_display} está registrado; le hemos enviado por
+          correo electrónico a %{email} las normas de seguridad para que las acepte,
+          lo que finaliza el registro.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4211,6 +4220,7 @@ es:
     register_step_2: Agregue los detalles de su %{cycle_type}
     search_marketplace_index: Mercado de índices de bicicletas
     strava_search_index: Índice de bicicletas Búsqueda en Strava
+    registration_form_settings: Configuración del formulario de registro
   money:
     currencies:
       en: Dólar estadounidense
@@ -4612,6 +4622,8 @@ es:
           bicicleta y haz clic en <em>la pegatina del enlace</em> para conectarla
           con esta %{bike_sticker_kind}.
         update: Actualizar
+      new:
+        registration_form_settings: Configuración del formulario de registro
     bulk_imports:
       index:
         added: Agregado
@@ -5281,6 +5293,7 @@ es:
       registrations_index: Registro de organizaciones
       search_all_registrations: Buscar en todos los registros
       add_a_registration: Agregar un registro
+      registration_form_settings: Configuración del formulario de registro
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -5528,6 +5541,11 @@ es:
         just_a_few_steps_away_html: "¡Estás a solo unos pasos de registrar tu <strong>%{color_and_brand}</strong>
           en el registro de bicicletas más completo del mundo!"
         youre_almost_done: "¡Ya casi terminas!"
+        agree_to_the_safety_rules: Acepte las normas de seguridad.
+        review_the_rules: Revisa las reglas
+        safety_rules_owed_html: Tu <strong>%{color_and_brand}</strong> está registrado
+          con %{org_name} en Bike Index. Acepta las normas de seguridad de %{org_name}
+          para finalizar el registro.
       confirmation_email:
         click_to_sign_in_html: ¡Haz clic en el botón <em>"Iniciar sesión</em> " para
           finalizar tu registro!
@@ -5880,6 +5898,22 @@ es:
             created: Creado
             notification_number: Notificación#
             resolved: Resuelto
+        register_settings:
+          browser_only: Esta configuración solo se aplica a tu navegador; no afectará
+            a otros usuarios.
+          form_options: Opciones de formulario
+          old_view: Utilice la página de registro antigua
+          registration_form_settings: Configuración del formulario de registro
+          registration_page: Página de registro
+          separate_attestation: El solicitante completa la declaración jurada de registro
+            por separado.
+          separate_attestation_helper: Recibirán un correo electrónico informándoles
+            de que su registro no está completo, junto con un enlace para finalizarlo.
+          single_page: Formulario de registro de una sola página
+          update: Actualizar
+        registrations:
+          new:
+            registration_form_settings: Configuración del formulario de registro
       registrations:
         show:
           bike_details:
@@ -6736,6 +6770,9 @@ es:
             we_will_keep_watch: Tu %{bike_display} está registrada en Bike Index.
               La vigilaremos; si se denuncia como robada, toda la comunidad estará
               pendiente.
+            safety_rules_sent_html: La %{bike_display} está registrada en Bike Index.
+              Le hemos enviado por correo electrónico a %{email} las normas de seguridad
+              para que las acepte, con lo que finaliza el registro.
           step_report:
             about_the_one_you_found: Acerca del %{cycle_type} que encontraste
             address_where_you_found_it: Dirección donde lo encontraste
