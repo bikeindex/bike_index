@@ -57,7 +57,8 @@ A 404 means nothing matches. It looks up the way `Manufacturer.friendly_find` do
 Production write — only for a name the user has confirmed in this conversation, typed from your shortlist rather than copied from a variant. Settle with them:
 
 - `name` — the brand as it brands itself, plus its other name in parentheses whenever it has one — a company name, a former name, a spelled-out abbreviation (`TQ (TQ-Systems)`). The parenthesized name becomes the `secondary_slug`, so a search for either finds it.
-- `website`, `frame_maker` (makes frames, not just components), `motorized_only` (e-bikes/scooters only).
+- `website` — the site's own address, not a guessed one: its `<link rel="canonical">`, else where `curl -sL -o /dev/null -w '%{url_effective}'` lands, minus a language path (`/en/`).
+- `frame_maker` (makes frames, not just components), `motorized_only` (e-bikes/scooters only).
 
 The rest of `Admin::ManufacturersController#permitted_parameters` is optional.
 
