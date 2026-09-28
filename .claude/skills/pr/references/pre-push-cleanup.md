@@ -109,7 +109,7 @@ Judge each against the **Comments** section of `AGENTS.md` and reach a verdict o
 
 Find what reads the old form before calling one due. A value nothing reads again doesn't need one, and one recording what happened — `Export#written_headers` describes the file that was written — shouldn't be rewritten.
 
-State the verdict in your reply to the user either way, naming the stored values you checked. When one is due, ask before writing it: a job in `app/jobs/backfills/`, and a body bullet saying it runs after deploy.
+State the verdict in your reply to the user either way, naming the stored values you checked. When one is due, write it without asking — a job in `app/jobs/backfills/` with its spec — and lead the PR body with it (SKILL.md's **Write the summary body**).
 
 ### The cycle-type translation check
 
