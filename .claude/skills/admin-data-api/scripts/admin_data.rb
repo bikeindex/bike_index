@@ -2,8 +2,7 @@
 # frozen_string_literal: true
 
 #
-# Helper for the production endpoints the admin OAuth app reaches: Sidekiq / PgHero
-# status, the admin bug reports, missing-manufacturer counts and manufacturer creation.
+# Helper for the production endpoints the admin OAuth app reaches.
 # Reads/writes token values in .env.development (located relative to this script,
 # so it works from any cwd). Run it directly, e.g.
 #   .claude/skills/admin-data-api/scripts/admin_data.rb check

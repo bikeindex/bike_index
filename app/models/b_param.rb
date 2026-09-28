@@ -45,6 +45,8 @@ class BParam < ApplicationRecord
     phone
     postal_code
     region_string
+    register_separate_attestation
+    register_single_page
     street
     student_id
     user_name
@@ -68,6 +70,8 @@ class BParam < ApplicationRecord
     propulsion_type
     propulsion_type_slug
     rear_gear_type_slug
+    register_separate_attestation
+    register_single_page
     revised_new
     state_id
     stolen
@@ -305,10 +309,10 @@ class BParam < ApplicationRecord
     created_bike_id.present?
   end
 
-  # The register flow creates the bike ahead of its organization's safety rules, which
-  # it still requires - so the registration isn't finished until they're agreed to
+  # The bike is created ahead of its organization's safety rules, which are still required -
+  # so the registration isn't finished until they're agreed to
   def acknowledgment_pending?
-    register_flow? && persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
+    persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
   end
 
   def finished_registration? = with_bike? && !acknowledgment_pending?
@@ -374,6 +378,8 @@ class BParam < ApplicationRecord
 
     "status_with_owner"
   end
+
+  def status_humanized = Bike.status_humanized(status)
 
   def status_stolen?
     status == "status_stolen"
@@ -458,10 +464,13 @@ class BParam < ApplicationRecord
     bike["user_name"]
   end
 
+  # The separate attestation switch hands the safety rules to an owner who isn't user
+  def rules_left_to_owner?(user) = params["register_separate_attestation"].present? && !self_made?(user)
+
   def self_made?(user = creator)
     return false if user.blank?
 
-    ([user.email] + user.confirmed_emails).include?(EmailNormalizer.normalize(owner_email))
+    user.own_emails.include?(EmailNormalizer.normalize(owner_email))
   end
 
   def creation_organization

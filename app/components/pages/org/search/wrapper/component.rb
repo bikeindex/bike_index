@@ -17,12 +17,6 @@ module Pages
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[table list cards].freeze
 
-          # The table's is BikesTable, rendered with its column settings
-          RESULT_COMPONENTS = {
-            list: Pages::Org::SearchResults::BikeListItem::Component,
-            cards: Pages::Org::SearchResults::BikeCard::Component
-          }.freeze
-
           def self.permitted_result_view(result_view)
             view = result_view&.to_sym
             RESULT_VIEWS.include?(view) ? view : RESULT_VIEWS.first
@@ -122,9 +116,10 @@ module Pages
             organization_registrations_path(settings.search_params.merge(create_export: true))
           end
 
-          # Only the search page offers the view switcher, so it's the only place cards or rows render
+          # Only the search page offers the view switcher, so it's the only place cards or rows
+          # render - and :table isn't one of Container's, which is what sends it to BikesTable
           def result_component
-            RESULT_COMPONENTS[@result_view] if @search_page
+            SharedBlocks::SearchResults::Container::Component::RESULT_VIEW_COMPONENT[@result_view] if @search_page
           end
 
           # The cards and rows have no headers to sort by, so their views name the order
@@ -162,7 +157,7 @@ module Pages
           def card_data_attributes
             return Pages::Org::Search::ColumnSettings::Component::COLLAPSE_DATA if @search_page
 
-            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(settings, collapse: true)
+            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(collapse: true)
           end
         end
       end

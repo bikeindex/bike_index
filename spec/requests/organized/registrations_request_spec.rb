@@ -566,7 +566,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(b_param.owner_email).to be_blank
       expect(response.body).to include("org_sidebar_nav")
       expect(response.body).to include(b_param.id_token)
-      expect(response.body).to include(new_organization_bike_path(organization_id: current_organization.to_param))
+      expect(response.body).to include("#{base_url}/settings")
 
       expect { get "#{base_url}/new" }.to_not change(BParam, :count)
 
@@ -593,32 +593,300 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
       let(:old_view_path) { new_organization_bike_path(organization_id: current_organization.to_param) }
       # Not a let - it's read after each request in turn, and a let would memoize the first
-      def menu_add_bike_path
+      def menu_add_registration_path
         Nokogiri::HTML(response.body).css("#org_sidebar_nav a")
-          .find { |a| a.text.strip == "Add a bike" }&.[]("href")
+          .find { |a| a.text.strip == "Add a registration" }&.[]("href")
       end
 
       it "keeps the menu on the old view until the register flow is asked for again" do
         get "#{base_url}/new"
-        expect(menu_add_bike_path).to eq "#{base_url}/new"
+        expect(menu_add_registration_path).to eq "#{base_url}/new"
 
-        get old_view_path, params: {old_view: true}
+        post "#{base_url}/switches", params: {old_view: true}
+        expect(response).to redirect_to old_view_path
         expect(session[:old_register_view]).to be_truthy
-        expect(menu_add_bike_path).to eq old_view_path
+        get "#{base_url}/settings"
+        expect(Nokogiri::HTML(response.body).at_css("input[name=old_view]")["checked"]).to be_present
+        expect(menu_add_registration_path).to eq old_view_path
 
         # Every organized page follows it, not just the one that set it
         get base_url
-        expect(menu_add_bike_path).to eq old_view_path
+        expect(menu_add_registration_path).to eq old_view_path
 
         # And the register flow's own link is the way back
         get "#{base_url}/new"
         expect(session[:old_register_view]).to be_blank
-        expect(menu_add_bike_path).to eq "#{base_url}/new"
+        expect(menu_add_registration_path).to eq "#{base_url}/new"
+      end
 
-        # Landing on the old view any other way isn't a preference
-        get old_view_path
-        expect(session[:old_register_view]).to be_blank
-        expect(menu_add_bike_path).to eq "#{base_url}/new"
+      it "leaves the flow's settings as they were" do
+        post "#{base_url}/switches", params: {single_page: true}
+        # The old view disables the others, so they don't submit
+        post "#{base_url}/switches", params: {old_view: true}
+        expect(session[:register_settings]).to include("single_page" => true)
+      end
+    end
+
+    context "the register settings" do
+      def checked_switches
+        get "#{base_url}/settings"
+        expect(response.status).to eq(200)
+        Nokogiri::HTML(response.body).css("form[action='#{base_url}/switches'] input[type=checkbox][checked]")
+          .map { it["name"] }
+      end
+
+      it "shows what's set for this organization" do
+        expect(checked_switches).to eq([])
+
+        post "#{base_url}/switches", params: {single_page: true}
+        expect(checked_switches).to eq(%w[single_page])
+
+        # Set on another organization, so it isn't this one's
+        session_organization = FactoryBot.create(:organization)
+        FactoryBot.create(:organization_role_claimed, user: current_user, organization: session_organization)
+        post "/o/#{session_organization.to_param}/registrations/switches", params: {single_page: true}
+        expect(checked_switches).to eq([])
+      end
+
+      # Both submit together, so what's checked is the whole setting
+      def set_switches(**params)
+        post "#{base_url}/switches", params: params
+        expect(response).to redirect_to "#{base_url}/new"
+        get "#{base_url}/new"
+      end
+
+      def form_field_names(scope)
+        Nokogiri::HTML(response.body).css("form[action='/register'] [name^='#{scope}[']").map { |n| n["name"] }.uniq
+      end
+
+      it "asks for both steps on one page, and stops once it's unchecked" do
+        get "#{base_url}/new"
+        expect(form_field_names("bike")).to eq([])
+
+        set_switches(single_page: true)
+        expect(session[:register_settings]).to include("single_page" => true)
+        expect(form_field_names("b_param")).to include "b_param[owner_email]"
+        expect(form_field_names("bike")).to include "bike[serial_number]"
+
+        # The preference follows the session rather than the link that set it
+        get "#{base_url}/new"
+        expect(form_field_names("bike")).to include "bike[serial_number]"
+
+        set_switches
+        expect(session[:register_settings]).to include("single_page" => false)
+        expect(form_field_names("bike")).to eq([])
+      end
+
+      it "stores the separate attestation switch" do
+        set_switches(separate_attestation: true)
+        expect(session[:register_settings]).to include("separate_attestation" => true)
+
+        set_switches(single_page: true)
+        expect(session[:register_settings]).to include("separate_attestation" => false)
+      end
+    end
+
+    context "both steps on one page" do
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
+      let(:color) { FactoryBot.create(:color, name: "Red") }
+
+      # The one page submits both steps together, so the whole registration is this post
+      def register_on_single_page(cycle_type: "e-scooter", **switches)
+        post "#{base_url}/switches", params: {single_page: true, **switches}
+        get "#{base_url}/new"
+        b_param = BParam.last
+        post "/register", params: {b_param_token: b_param.id_token, single_page: true,
+                                   propulsion_type_motorized: (true if cycle_type == "e-scooter"),
+                                   b_param: {manufacturer_id: "Trek", cycle_type:, owner_email: "customer@example.com"},
+                                   bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+                                          status: "status_with_owner", user_name: "Sally Rider"}}.compact
+        b_param.reload
+      end
+
+      def submit_label
+        Nokogiri::HTML(response.body).at_css("[data-register--status-fields-target=submitLabel]")
+      end
+
+      it "labels the submit for the safety pages an e-vehicle would get, without a progress count yet" do
+        post "#{base_url}/switches", params: {single_page: true}
+        get "#{base_url}/new"
+        expect(submit_label["data-motorized-text"]).to eq "Next"
+        expect(submit_label["data-motorized-own-emails"]).to be_blank
+        expect(Nokogiri::HTML(response.body).css("span.tw\\:h-1.tw\\:rounded-full")).to be_empty
+
+        # Left to the owner unless the email typed above is the member's own
+        post "#{base_url}/switches", params: {single_page: true, separate_attestation: true}
+        get "#{base_url}/new"
+        expect(submit_label["data-motorized-text"]).to eq "Next"
+        expect(JSON.parse(submit_label["data-motorized-own-emails"])).to include current_user.email
+      end
+
+      # The submission is what makes it an e-vehicle, so the sequence isn't knowable
+      # until it's saved - and nothing after this post resolves it again
+      it "stops at the safety pages, which the submission is what asks for, then goes back for the next" do
+        b_param = nil
+        expect { b_param = register_on_single_page }
+          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+
+        %w[3 4].each do |step|
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                    step:, acknowledged: {"0" => "1", "1" => "1"}}
+        end
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                  step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to "#{base_url}/new"
+        expect(flash[:success]).to eq "The Trek is registered - we've emailed customer@example.com so they can claim it."
+      end
+
+      it "goes back to the single page for the next registration, rather than the finished page" do
+        b_param = nil
+        expect { b_param = register_on_single_page(cycle_type: "bike") }.to change(Bike, :count).by 1
+        expect(response).to redirect_to "#{base_url}/new"
+        expect(flash[:success]).to eq "The Trek is registered - we've emailed customer@example.com so they can claim it."
+
+        follow_redirect!
+        expect(response.body).to include "we&#39;ve emailed customer@example.com"
+        expect(BParam.last.id_token).to_not eq b_param.id_token
+      end
+
+      it "says the owner was sent the safety rules, when they're left to them" do
+        expect { register_on_single_page(separate_attestation: true) }
+          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+        expect(response).to redirect_to "#{base_url}/new"
+        expect(flash[:success]).to eq "The Trek is registered - we've emailed customer@example.com the safety rules " \
+          "to agree to, which finishes the registration."
+      end
+    end
+
+    context "the registrant fills out the attestation separately" do
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
+      let(:color) { FactoryBot.create(:color, name: "Red") }
+      let(:owner_email) { "customer@example.com" }
+      let(:details) do
+        {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+         status: "status_with_owner", user_name: "Sally Rider"}
+      end
+
+      # Through the flow rather than the service, since the switch is a session preference
+      def register_e_scooter
+        post "#{base_url}/switches", params: {separate_attestation: true}
+        get "#{base_url}/new"
+        b_param = BParam.last
+        post "/register", params: {b_param_token: b_param.id_token, propulsion_type_motorized: true,
+                                   b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}}
+        patch "/register", params: {b_param_token: b_param.id_token, bike: details}
+        b_param.reload
+      end
+
+      it "finishes the member's registration off step 2, and sends the owner the safety rules to agree to" do
+        b_param = nil
+        expect { b_param = register_e_scooter }
+          .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
+        expect(Bike.last).to have_attributes(owner_email:, cycle_type: "e-scooter")
+        expect(Bike.last.current_ownership.registration_info.slice("register_single_page", "register_separate_attestation"))
+          .to eq("register_separate_attestation" => true)
+        # The owner's to agree to, so nothing is left to alert the member who registered it
+        expect(b_param.unfinished_registration?(current_user)).to be_falsey
+        follow_redirect!
+        expect(response.body).to include "the safety rules to agree to"
+
+        # The claim email waits on the rules, and the rules email is what goes out
+        expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+        expect { EmailJobs::PartialRegistrationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+        expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])
+        expect(ActionMailer::Base.deliveries.last.body.encoded).to include "Agree to the safety rules"
+
+        log_in(FactoryBot.create(:user_confirmed, email: owner_email))
+        get "/register", params: {b_param_token: b_param.id_token}
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        %w[3 4].each do |step|
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                    step:, acknowledged: {"0" => "1", "1" => "1"}}
+        end
+        expect {
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id,
+                                                    step: "review", acknowledged_all: "1"}
+        }.to change(RegistrationSequenceAcknowledgment.acknowledged, :count).by 1
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "finished")
+        expect(RegistrationSequenceAcknowledgment.sole.user.email).to eq owner_email
+        expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+      end
+
+      it "lets an owner without an account in through the rules email, and starts the member's next registration fresh" do
+        b_param = register_e_scooter
+        follow_redirect!
+        # Finished from the member's side, though the bike still waits on the owner
+        get "/register"
+        expect(response).to redirect_to new_register_path
+
+        EmailJobs::PartialRegistrationJob.drain
+        confirm_path = confirm_register_path(b_param_token: b_param.id_token,
+          confirmation_token: b_param.reload.email_confirmation_token)
+        expect(ActionMailer::Base.deliveries.last.html_part.decoded).to include ERB::Util.html_escape(confirm_path)
+
+        # Another account can't agree for the owner, so the link stays theirs to use
+        expect {
+          post "/register/confirm_email", params: {b_param_token: b_param.id_token,
+                                                   confirmation_token: b_param.email_confirmation_token}
+        }.to_not change(User, :count)
+        expect(response).to redirect_to confirm_path
+        expect(flash[:error]).to include "signed in as #{current_user.email}"
+        expect(b_param.reload).to have_attributes(email_confirmed?: false, email_confirmation_token: be_present)
+
+        # Signed out - log_in stubbed the member's session rather than signing them in
+        allow(User).to receive(:from_auth).and_call_original
+        expect {
+          post "/register/confirm_email", params: {b_param_token: b_param.id_token,
+                                                   confirmation_token: b_param.email_confirmation_token}
+        }.to change(User, :count).by 1
+        expect(User.last.email).to eq owner_email
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        expect(b_param.reload.creator_id).to eq current_user.id
+      end
+
+      context "registering their own" do
+        let(:owner_email) { current_user.email }
+
+        it "asks for the attestation, which is theirs to agree to" do
+          b_param = nil
+          expect { b_param = register_e_scooter }
+            .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        end
+      end
+
+      context "a bike, which has no safety pages to leave out" do
+        it "doesn't count as a separate attestation" do
+          post "#{base_url}/switches", params: {separate_attestation: true}
+          get "#{base_url}/new"
+          b_param = BParam.last
+          post "/register", params: {b_param_token: b_param.id_token,
+                                     b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
+          expect { patch "/register", params: {b_param_token: b_param.id_token, bike: details} }
+            .to change(Bike, :count).by 1
+          expect(Bike.last.current_ownership.registration_info.keys).to_not include "register_separate_attestation"
+        end
+      end
+
+      context "registering for another organization" do
+        let(:other_organization) { FactoryBot.create(:organization) }
+        let!(:other_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: other_organization) }
+
+        it "asks for its attestation - the switch is this organization's" do
+          post "#{base_url}/switches", params: {separate_attestation: true}
+          get "/register/new", params: {organization_id: other_organization.id}
+          b_param = BParam.last
+          expect(b_param.creation_organization_id).to eq other_organization.id
+          post "/register", params: {b_param_token: b_param.id_token, propulsion_type_motorized: true,
+                                     b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}}
+          expect { patch "/register", params: {b_param_token: b_param.id_token, bike: details} }
+            .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        end
       end
     end
 
@@ -627,6 +895,9 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       it "redirects" do
         expect { get "#{base_url}/new" }.to_not change(BParam, :count)
+        expect(response).to redirect_to user_root_url
+
+        get "#{base_url}/settings"
         expect(response).to redirect_to user_root_url
       end
     end
@@ -641,9 +912,10 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
     it "wires up multi-search, the column settings and its collapse on one element" do
       get "#{base_url}/multi_search"
-      wrapper = Nokogiri::HTML(response.body).at_css("[data-org--multi-search-url-value]")
+      page = Nokogiri::HTML(response.body)
+      wrapper = page.at_css("[data-org--multi-search-url-value]")
       expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search ui--collapse org--search org--search-column-settings])
-      expect(JSON.parse(wrapper["data-org--search-column-settings-default-columns-value"])).to include("created_at_cell")
+      expect(page.at_css("input[name='created_at_cell']")["data-default"]).to eq "true"
     end
   end
 

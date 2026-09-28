@@ -156,6 +156,21 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     it "renders the impound columns" do
       expect(component).to have_css("th.impound_id_cell", visible: :all, text: "Impound ID")
     end
+
+    # The org's own display_id, which is what its impound records index and their URLs
+    # use - not the global record id
+    context "with an impounded bike" do
+      let!(:impound_record) do
+        FactoryBot.create(:impound_record_with_organization, organization:, bike:)
+      end
+
+      it "renders the impound record's display_id" do
+        expect(bike.reload.status_impounded?).to be true
+        expect(impound_record.reload.display_id).to be_present
+        expect(impound_record.display_id).to_not eq impound_record.id.to_s
+        expect(component.css("td.impound_id_cell").text.strip).to eq impound_record.display_id
+      end
+    end
   end
 
   context "when a bike does not belong to the organization" do

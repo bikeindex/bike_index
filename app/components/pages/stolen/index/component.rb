@@ -34,13 +34,14 @@ module Pages
         end
 
         def steps
-          [{title: translation(".step_police_title"), tag: translation(".step_police_tag"),
-            body: translation(".step_police_body"), action: translation(".step_police_action"),
-            href: get_your_stolen_bike_back_path},
-            {title: translation(".step_register_title"), tag: translation(".step_register_tag"),
-             body: translation(".step_register_body"), action: translation(".step_register_action"),
-             href: register_stolen_path},
-            {title: translation(".step_listing_title"), tag: translation(".step_listing_tag"),
+          [{title: translation(".step_register_title"), tag: translation(".step_register_tag"),
+            body: [translation(".step_register_registry_body"), translation(".step_register_minimal_registration")],
+            action: translation(".step_register_action"),
+            href: register_stolen_path},
+            {title: translation(".step_police_title"), tag: translation(".step_police_tag"),
+             body: translation(".step_police_bring_body"), action: translation(".step_police_action"),
+             href: get_your_stolen_bike_back_path},
+            {title: translation(".step_listing_report_number_title"), tag: translation(".step_listing_report_number_tag"),
              body: translation(".step_listing_body"), action: translation(".step_listing_action"),
              href: my_account_path},
             {title: translation(".step_alert_title"), tag: translation(".step_alert_tag"),
@@ -50,7 +51,7 @@ module Pages
              body: translation(".step_google_alerts_body"), action: translation(".step_google_alerts_action"),
              href: "https://www.google.com/alerts"},
             {title: translation(".step_shops_title"), tag: translation(".step_shops_tag"),
-             body: translation(".step_shops_body"), action: translation(".step_shops_action"),
+             body: translation(".step_shops_recovered_body"), action: translation(".step_shops_action"),
              href: where_path}]
         end
 
@@ -66,16 +67,16 @@ module Pages
 
         def pillars
           [{icon: "icons/searcher.svg", circle: "tw:bg-blue-600",
-            title: translation(".pillar_serial_title"), body: translation(".pillar_serial_body")},
+            title: translation(".pillar_record_title"), body: translation(".pillar_record_body")},
             {icon: "icons/users.svg", circle: "tw:bg-purple-500",
-             title: translation(".pillar_network_title"), body: translation(".pillar_network_body")},
+             title: translation(".pillar_network_title"), body: translation(".pillar_network_millions_body")},
             {icon: "icons/megaphone.svg", circle: "tw:bg-slate-900",
-             title: translation(".pillar_alerts_title"), body: translation(".pillar_alerts_body")}]
+             title: translation(".pillar_alerts_title"), body: translation(".pillar_alerts_promoted_body")}]
         end
 
         def faqs
-          [[translation(".faq_serial_question"), translation(".faq_serial_answer")],
-            [translation(".faq_unregistered_question"), translation(".faq_unregistered_answer")],
+          [[translation(".faq_serial_question"), translation(".faq_serial_proof_answer")],
+            [translation(".faq_unregistered_question"), translation(".faq_unregistered_recovered_answer")],
             [translation(".faq_confront_question"), translation(".faq_confront_answer")],
             [translation(".faq_other_city_question"), translation(".faq_other_city_answer")],
             [translation(".faq_cost_question"), translation(".faq_cost_answer")]]

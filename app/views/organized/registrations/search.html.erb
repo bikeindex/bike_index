@@ -20,7 +20,7 @@
 ).compact %>
 
 <%= tag.div(class: "org-search-component", data: Pages::Org::Search::ColumnSettings::Component
-  .column_settings_data_attributes(settings)
+  .column_settings_data_attributes
   .merge("org--search-column-settings-assign-bike-sticker-value": @bike_sticker.present?,
     "org--search-result-view-value": @result_view,
     action: "input->org--search#emailChanged")) do %>
@@ -85,7 +85,7 @@
 
     <%# In the row for the container query full_bleed reads, but across both its columns %>
     <div class="tw:col-span-full tw:min-w-0">
-      <%= render Pages::SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
+      <%= render SharedBlocks::SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
         render_results: @render_results, current_path: request.original_fullpath) do %>
         <%= render partial: "results", locals: {settings:} %>
       <% end %>
