@@ -31,15 +31,26 @@ module Pages
             step_1(embed: true, button_color: "#c9a227", creation_organization_id: lookbook_organization&.id)
           end
 
+          # The organization switch that asks for both steps at once
+          def single_page
+            step_1(single_page: true)
+          end
+
+          # The organization's own registration fields, under its heading
+          def single_page_with_organization
+            step_1(single_page: true, creation_organization_id: lookbook_organization&.id)
+          end
+
           private
 
-          def step_1(embed: false, button_color: nil, **bike)
+          def step_1(embed: false, button_color: nil, single_page: false, **bike)
             return production_notice("registration") if Rails.env.production?
 
             b_param = ::BParam.new(origin: "register_flow",
               params: {bike: {owner_email: lookbook_user&.email}.merge(bike).compact}.as_json)
             render(Pages::Register::Views::Step1::Component.new(b_param:, current_user: lookbook_user, embed:, button_color:,
-              flow: ::BikeServices::Register.flow(b_param, sequence: ::BikeServices::Register.registration_sequence(b_param))))
+              flow: ::BikeServices::Register.flow(b_param, sequence: ::BikeServices::Register.registration_sequence(b_param),
+                single_page:)))
           end
         end
       end

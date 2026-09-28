@@ -27,8 +27,21 @@ export default class extends Controller {
     this.syncTriggers(!this.collapsed)
   }
 
-  toggle () {
+  press (event) {
+    this.pressedAt = [event.clientX, event.clientY]
+  }
+
+  // A drag that selects the label still ends in a click
+  toggle (event) {
+    if (event?.detail && this.dragSelected(event)) return
     this.setExpanded(this.collapsed)
+  }
+
+  dragSelected (event) {
+    const selection = window.getSelection()
+    const [x, y] = this.pressedAt ?? [event.clientX, event.clientY]
+    return !selection.isCollapsed && event.currentTarget.contains(selection.anchorNode) &&
+    Math.hypot(event.clientX - x, event.clientY - y) > 3
   }
 
   show () {

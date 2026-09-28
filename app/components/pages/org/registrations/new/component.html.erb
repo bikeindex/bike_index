@@ -1,6 +1,6 @@
 <%# The organized menu already says whose admin panel this is %>
 <%= render Pages::Register::Views::Step1::Component.new(b_param: @b_param, flow: @flow, organization: @organization,
-      current_user: @current_user, skip_heading: true) %>
+      current_user: @current_user, skip_heading: true, motorized_review: @motorized_review) %>
 
 <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
 <p
@@ -9,5 +9,5 @@
     tw:italic tw:dark:text-gray-100
   "
 >
-  <%= link_to "Go back to the old view", new_organization_bike_path(organization_id: @organization.to_param, old_view: true), class: "twlink" %>
+  <%= link_to translation(".registration_form_settings"), settings_organization_registrations_path(organization_id: @organization.to_param), class: "twlink" %>
 </p>
