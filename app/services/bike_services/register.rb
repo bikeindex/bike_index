@@ -346,11 +346,9 @@ module BikeServices
       register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
     end
 
-    # The legacy forms show no rules, so an e-vehicle's go to its owner even when self-registered.
-    # The forms ask what the flow's steps do, so those are marked done
+    # The legacy forms show no rules, so an e-vehicle's go to its owner even when self-registered
     def create_legacy_bike(b_param, ip_address:)
-      b_param.params = b_param.params.merge("register_separate_attestation" => true,
-        "details_completed" => true, "report_completed" => true)
+      b_param.params = b_param.params.merge("register_separate_attestation" => true)
       create_bike(b_param, sequence: nil, ip_address:, rules_to_owner: true)
     end
 
@@ -537,8 +535,11 @@ module BikeServices
       flow.steps.first(reached + 1).select { editable_step?(b_param, it) }
     end
 
-    # Whether a step has been submitted with everything it asks for
+    # Whether a step has been submitted with everything it asks for - the vehicle's steps have
+    # once a bike exists, whichever form made it
     def step_completed?(b_param, step, sequence:, flow:)
+      return true if b_param.with_bike? && VEHICLE_STEPS.include?(step)
+
       case step
       when "1" then flow.single_page? ? details_completed?(b_param) : b_param.manufacturer_id.present?
       when "2" then details_completed?(b_param)

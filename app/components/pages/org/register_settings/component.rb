@@ -5,7 +5,7 @@
 module Pages
   module Org
     module RegisterSettings
-      # The switches that change the shape of the organization's add-a-bike page, or send it
+      # The switches that change the shape of the organization's add-a-registration page, or send it
       # back to the legacy one
       class Component < ApplicationComponent
         def initialize(organization:, old_view: false, single_page: false, separate_attestation: false)
