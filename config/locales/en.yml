@@ -770,7 +770,7 @@ en:
           impound_import: impound import
           impound_process: impound process
           lightspeed_pos: lightspeed
-          organization_form: org form
+          organization_form: legacy org form
           other_pos: point of sale
           register_flow: new flow
           register_flow_landing_page: landing page
@@ -802,7 +802,8 @@ en:
           impound_process: transferred as part of the impound process
           lightspeed_pos: automatically registered by bike shop point of sale (Lightspeed
             POS)
-          organization_form: registered by an organization member, on the organization
+          organization_form: >-
+            registered by an organization member, on the legacy organization iframe
             form on Bike Index
           other_pos: automatically registered by bike shop point of sale
           register_flow: registered with the multi-step registration flow
