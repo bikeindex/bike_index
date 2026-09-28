@@ -40,10 +40,10 @@ en:
             are recovered that weren't registered until after they were stolen.
           here_is_the_next_hour: Here is the next hour.
           how_alerts_work: How alerts work
-          lede: >-
-            Six steps, in order. The first two matter most: file a police report to
-            get a case number, then register the bike as stolen on Bike Index so every
-            shop, officer, and buyer who checks a serial finds yours.
+          lede_register_first: >-
+            Six steps, in order. The first two matter most: register on Bike Index
+            so anyone who finds your bike can contact you, then file a police report
+            (and add your police report number to your Bike Index stolen report).
           lede_short: >-
             Police report first, for the case number. Bike Index second, so the serial
             is public.
