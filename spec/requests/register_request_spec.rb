@@ -712,6 +712,75 @@ RSpec.describe RegisterController, type: :request do
         end
       end
     end
+
+    # single_page rides the form rather than the session, so the embed's step 1 posts
+    # here unchanged whatever the member who framed it switched on
+    context "the single page form" do
+      include_context :request_spec_logged_in_as_user
+      let(:bike_details) do
+        {primary_frame_color_id: color.id, serial_number: "XYZ 123", status: "status_with_owner",
+         user_name:}
+      end
+      let(:create_params) { super().merge(single_page: true, bike: bike_details) }
+
+      it "saves both steps and finishes the registration" do
+        expect { post base_url, params: create_params }.to change(Bike, :count).by 1
+        expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
+          manufacturer_id: manufacturer.id, creator_id: current_user.id)
+        expect(Bike.last.current_ownership.registration_info.slice("register_single_page", "register_separate_attestation"))
+          .to eq("register_single_page" => true)
+        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: "finished")
+      end
+
+      context "step 2's details missing" do
+        let(:bike_details) { super().except(:user_name) }
+
+        it "re-renders the one page with both steps on it, saving what it has" do
+          expect { post base_url, params: create_params }.to_not change(Bike, :count)
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(empty_b_param.reload).to have_attributes(owner_email:, manufacturer_id: manufacturer.id)
+          fields = Nokogiri::HTML(response.body).css("form[action='/register'] input").map { |el| el["name"] }
+          expect(fields).to include("b_param[owner_email]").and include("bike[serial_number]")
+        end
+      end
+
+      context "step 1's manufacturer missing" do
+        let(:step_1_params) { {b_param: {manufacturer_id: "", cycle_type: "cargo", owner_email:}} }
+
+        it "re-renders the one page with the details still on it, saving neither step" do
+          expect { post base_url, params: create_params }.to_not change(Bike, :count)
+          expect(response).to have_http_status(:unprocessable_entity)
+          page = Nokogiri::HTML(response.body)
+          expect(page.at_css("input[name='bike[serial_number]']")["value"]).to eq "XYZ 123"
+          expect(empty_b_param.reload.bike["serial_number"]).to be_blank
+        end
+      end
+    end
+
+    context "the single page form, anonymous with a risky email and the challenge configured" do
+      let(:owner_email) { "rider@yahoo.com" }
+      let(:create_params) do
+        super().merge(single_page: true, bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+                                                status: "status_with_owner", user_name:})
+      end
+      before do
+        stub_const("Integrations::Turnstile::ENABLED", true)
+        stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
+      end
+
+      it "leaves the registration unfinished until the challenge is answered, then emails the link" do
+        expect { post base_url, params: create_params }
+          .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(BikeServices::Register.finished?(empty_b_param.reload, sequence: nil)).to be_falsey
+
+        VCR.use_cassette("integrations_turnstile-verified") do
+          expect { post base_url, params: create_params.merge("cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX") }
+            .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
+        end
+        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: "finished")
+      end
+    end
   end
 
   describe "show step: 2" do

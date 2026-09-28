@@ -139,7 +139,13 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # Going back to the old view moves add-a-registration onto organized/bikes#new alongside the
     # notification's row, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
-    click_link "Go back to the old view"
+    click_link "Registration form settings"
+    check "Use the old registration page"
+    expect(page).to have_field("Single page registration form", disabled: true)
+    uncheck "Use the old registration page"
+    expect(page).to have_field("Single page registration form", disabled: false)
+    check "Use the old registration page"
+    within("form[action$='/registrations/switches']") { click_button "Update" }
     click_link "Add a registration"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"

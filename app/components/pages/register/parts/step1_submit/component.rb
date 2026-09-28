@@ -4,16 +4,19 @@ module Pages
   module Register
     module Parts
       module Step1Submit
-        # Step 1's submit, and the way to start over
+        # Step 1's submit, and the way to start over. The single page ends in step 2's instead
         class Component < ApplicationComponent
-          def initialize(b_param:, organization: nil, current_user: nil, button_color: nil,
+          def initialize(b_param:, flow:, organization: nil, current_user: nil, button_color: nil,
             button_hover_color: nil)
             @b_param = b_param
+            @flow = flow
             @organization = organization
             @current_user = current_user
             @button_color = button_color
             @button_hover_color = button_hover_color
           end
+
+          def render? = !@flow.single_page?
 
           private
 

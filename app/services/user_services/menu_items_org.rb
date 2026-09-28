@@ -13,7 +13,7 @@ module UserServices
       return [] if organization.nil? || current_user.nil?
 
       # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
-      Rails.cache.fetch(["menu_items_org_v1", organization, current_user,
+      Rails.cache.fetch(["menu_items_org_v2", organization, current_user,
         old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -235,6 +235,8 @@ module UserServices
           routes.edit_organization_manage_impounding_path(organization_id: organization.to_param)),
         enabled_link(organization, "hot_sheet", translation(:stolen_hot_sheet),
           routes.edit_organization_hot_sheet_path(organization_id: organization.to_param)),
+        ComponentStructs::Shapes.link(translation(:registration_form_settings),
+          routes.settings_organization_registrations_path(organization_id: organization.to_param)),
         # Editing a page of a sequence is the same section of the menu, on a path of its own
         enabled_link(organization, "registration_sequences", translation(:registration_sequences), sequences,
           match_paths: ["#{sequences}/**", "#{org_root(organization)}/registration_sequence_pages/**"])

@@ -1959,12 +1959,22 @@ en:
       confirm_email:
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
+        sign_out_to_agree: >-
+          You're signed in as %{email}. Sign out, then open the link again to agree
+          to the safety rules.
         signed_in_as_other: >-
           You're signed in as %{email}, so we kept you in that account. The registration
           is still saved to the address we emailed.
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
           below
+      redirect_to_single_page:
+        registered_for_owner: The %{bike_display} is registered - we've emailed %{email}
+          so they can claim it.
+        registered_own: Your %{bike_display} is registered.
+        safety_rules_sent: >-
+          The %{bike_display} is registered - we've emailed %{email} the safety rules
+          to agree to, which finishes the registration.
       sign_in_confirmed_user:
         unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
           account
@@ -3899,6 +3909,7 @@ en:
     register_show: Your %{cycle_type} registration
     register_step_1: Register your vehicle!
     register_step_2: Add your %{cycle_type}'s details
+    registration_form_settings: Registration form settings
     registrations_embed: Register a bike with %{organization}
     search_marketplace_index: Bike Index Marketplace
     search_registrations_index: Search results
@@ -4350,6 +4361,8 @@ en:
         sent_to_a_new_owner: sent to a new owner
         sticker: Sticker
         stickers: Stickers
+      new:
+        registration_form_settings: Registration form settings
       recoveries:
         description: Description
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
@@ -5018,6 +5031,7 @@ en:
       parking_notification_unregistered: New unregistered notification
       parking_notifications_group: Parking Notifications
       recoveries: Recoveries
+      registration_form_settings: Registration form settings
       registration_sequences: Registration sequences
       registration_stickers: Registration stickers
       registrations_index: Organization Registrations
