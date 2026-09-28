@@ -220,7 +220,7 @@ class BikesController < Bikes::BaseController
 
   # A scanned sticker id is find_bike's to redirect
   def hand_off_to_redesign
-    return unless request.format.html? && registration_redesign_enabled? && !registration_show_legacy? &&
+    return unless request.format.html? && registration_redesign_shown? &&
       !params[:id].match?(Bikes::BaseController::SCANNED_ID_MATCHER)
 
     redirect_to(registration_path(params[:id], request.query_parameters))

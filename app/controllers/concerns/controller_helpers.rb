@@ -19,7 +19,7 @@ module ControllerHelpers
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state,
-      :registration_show_legacy?, :registration_redesign_enabled?
+      :registration_redesign_enabled?
     before_action :enable_rack_profiler
 
     before_action do
@@ -346,14 +346,13 @@ module ControllerHelpers
 
   # Carries a signed-out opt-out onto the account, since the redesign's own claim and
   # sign-up CTAs are what push people through signing in. Waits for confirmation because
-  # current_user is confirmed-only, and keeps the session key if the save fails
+  # current_user is confirmed-only
   def carry_registration_show_legacy(user)
     return unless user.confirmed? && session[:registration_show_legacy]
 
     session.delete(:registration_show_legacy) if user.update(feature_registration_show_legacy: true, skip_update: true)
   end
 
-  # The session holds a signed-out opt-out until it's carried onto the account
   def registration_show_legacy?
     current_user&.feature_registration_show_legacy? || session[:registration_show_legacy].present?
   end
@@ -366,10 +365,14 @@ module ControllerHelpers
     @registration_redesign_enabled = !Flipper.enabled?(:registration_redesign_disabled)
   end
 
+  def registration_redesign_shown?(show_legacy: registration_show_legacy?)
+    registration_redesign_enabled? && !show_legacy
+  end
+
   # The bike's page as this viewer sees it, so a redirect lands there rather than
   # hopping through bikes#show
   def bike_view_path(bike, show_legacy: registration_show_legacy?, **query)
-    (show_legacy || !registration_redesign_enabled?) ? bike_path(bike, query) : registration_path(bike, query)
+    registration_redesign_shown?(show_legacy:) ? registration_path(bike, query) : bike_path(bike, query)
   end
 
   # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers

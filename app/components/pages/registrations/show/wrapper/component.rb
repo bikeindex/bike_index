@@ -21,9 +21,8 @@ module Pages
             @current_alerts = current_alerts
           end
 
-          # The dialog and the opt-out render outside the cache block: the dialog is
-          # per-request, and every signed-out viewer shares a cache entry, so a cached
-          # opt-out form would carry someone else's CSRF token
+          # Outside the cache block: the dialog is per-request, and the opt-out varies
+          # per viewer rather than per cache key
           def call
             safe_join([
               token_prompt ? render(token_prompt) : "",

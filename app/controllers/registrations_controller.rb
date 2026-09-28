@@ -5,9 +5,9 @@ class RegistrationsController < ApplicationController
   before_action :force_html_response, only: %i[show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
   before_action :sign_in_if_not!, only: %i[show]
-  before_action :assign_current_organization, only: %i[show]
   before_action :simple_header, except: %i[show edit]
   around_action :set_reading_role, only: %i[show]
+  before_action :assign_current_organization, only: %i[show]
   layout "reg_embed"
 
   def show
@@ -43,7 +43,7 @@ class RegistrationsController < ApplicationController
       flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
       return redirect_to(bike_view_path(bike, show_legacy: !show_legacy))
     end
-    show_legacy ? session[:registration_show_legacy] = true : session.delete(:registration_show_legacy)
+    session[:registration_show_legacy] = show_legacy
     redirect_to(bike_view_path(bike, show_legacy:))
   end
 
