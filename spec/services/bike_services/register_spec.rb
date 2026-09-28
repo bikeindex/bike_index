@@ -683,7 +683,7 @@ RSpec.describe BikeServices::Register do
 
         it "is nil for a registration made for someone else, whose owner the rules are left to" do
           expect(described_class.registration_sequence(b_param, separate_attestation: true, user: member)).to be_nil
-          expect(described_class.flow(b_param, sequence: nil).count).to eq 2
+          expect(described_class.flow(b_param, sequence: nil).steps.count).to eq 2
         end
 
         it "is the sequence when the registrant is the one registering" do
