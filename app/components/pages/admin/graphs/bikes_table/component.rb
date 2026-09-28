@@ -7,7 +7,7 @@ module Pages
         # A table beside the admin bikes graphs. Without bikes it's the lazy frame that fetches
         # itself from GraphsController#bikes_table, which renders it again with them
         class Component < ApplicationComponent
-          KINDS = %w[origin ios_version pos organization].freeze
+          KINDS = %w[origin ios_version pos register_setting organization].freeze
           # Each series carries its own, so the table's swatches match without the two agreeing
           # on an order across the chart's separate request. The shared chart palette runs out
           # well before Ownership.origins does
@@ -15,10 +15,18 @@ module Pages
             #EA580C #4F46E5 #9333EA #0D9488 #CA8A04 #E11D48 #2563EB #16A34A]).to_h.freeze
           POS_SEARCH_KINDS = %w[lightspeed_pos ascend_pos does_not_need_pos no_pos].freeze
           IOS_VERSION_SQL = "ownerships.registration_info ->> 'ios_version'"
+          # The organization registration form settings, which the register flow records on the ownership
+          REGISTER_SETTINGS = %w[register_single_page register_separate_attestation].freeze
 
           def self.ios_version_bikes(bikes)
             bikes.joins(:ownerships).where("#{IOS_VERSION_SQL} IS NOT NULL").group(IOS_VERSION_SQL)
           end
+
+          def self.register_setting_bikes(bikes, setting)
+            bikes.joins(:ownerships).where("ownerships.registration_info ->> ? = 'true'", setting)
+          end
+
+          def self.register_setting_name(setting) = setting.delete_prefix("register_").humanize
 
           def initialize(kind:, sortable_params:, bikes: nil, time_range: nil)
             @kind = KINDS.include?(kind) ? kind : KINDS.first
@@ -39,6 +47,11 @@ module Pages
             origins = Ownership.origins
             counts = @bikes.joins(:ownerships).group("ownerships.origin").distinct.count(:id)
             origins.index_with { counts[it] || 0 }.sort_by { |origin, count| [-count, origins.index(origin)] }
+          end
+
+          # Distinct: a bike has an ownership per transfer
+          def register_setting_bike_counts
+            REGISTER_SETTINGS.map { [it, self.class.register_setting_bikes(@bikes, it).distinct.count(:id)] }
           end
 
           def ios_version_bike_counts

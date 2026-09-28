@@ -86,7 +86,7 @@
   <div class="mt-4"></div>
   <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "origin")), stacked: true)) %>
 
-  <div class="twwiderow tw:mt-4 tw:gap-y-6">
+  <div class="twwiderow twwiderow-3 tw:mt-4 tw:gap-y-6">
     <div>
       <%= render(Pages::Admin::Graphs::BikesTable::Component.new(kind: "ios_version", sortable_params:)) %>
 
@@ -97,6 +97,12 @@
       <%= render(Pages::Admin::Graphs::BikesTable::Component.new(kind: "pos", sortable_params:)) %>
 
       <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "pos")), stacked: true)) %>
+    </div>
+
+    <div>
+      <%= render(Pages::Admin::Graphs::BikesTable::Component.new(kind: "register_setting", sortable_params:)) %>
+
+      <%= render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: "register_setting")))) %>
     </div>
   </div>
 

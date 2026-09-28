@@ -55,6 +55,16 @@
           <%= number_display(bikes.send(pos_kind).count) %>
         <% end %>
       <% end %>
+    <% elsif @kind == "register_setting" %>
+      <%= render(UI::Table::Component.new(records: register_setting_bike_counts)) do |table| %>
+        <% table.column(label: "Registration setting") do |(setting)| %>
+          <%= Pages::Admin::Graphs::BikesTable::Component.register_setting_name(setting) %>
+        <% end %>
+
+        <% table.column(label: "Bikes", classes: "tw:text-right") do |_setting, bike_count| %>
+          <%= number_display(bike_count) %>
+        <% end %>
+      <% end %>
     <% elsif @kind == "organization" %>
       <% organization_counts = bikes.group(:creation_organization_id).count.sort_by { |_org_id, bike_count| -bike_count } %>
       <% organizations = Organization.unscoped.where(id: organization_counts.map(&:first)).index_by(&:id) %>

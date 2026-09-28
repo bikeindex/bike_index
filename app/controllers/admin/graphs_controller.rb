@@ -84,7 +84,7 @@ module Admin
     end
 
     def bike_graph_kinds
-      %w[stolen origin ios_version pos ignored]
+      %w[stolen origin ios_version pos register_setting ignored]
     end
 
     # {group => {time => count}}, grouped by both so it's one query rather than one per
@@ -128,6 +128,14 @@ module Admin
         origin_chart_series(bikes)
       elsif bike_graph_kind == "ios_version"
         ios_version_chart_series
+      elsif bike_graph_kind == "register_setting"
+        Pages::Admin::Graphs::BikesTable::Component::REGISTER_SETTINGS.map do |setting|
+          {
+            name: Pages::Admin::Graphs::BikesTable::Component.register_setting_name(setting),
+            data: helpers.time_range_counts(column: "bikes.created_at",
+              collection: Pages::Admin::Graphs::BikesTable::Component.register_setting_bikes(bikes, setting).distinct)
+          }
+        end
       elsif bike_graph_kind == "pos"
         Pages::Admin::Graphs::BikesTable::Component::POS_SEARCH_KINDS.map do |pos_kind|
           {

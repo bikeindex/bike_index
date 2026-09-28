@@ -71,6 +71,31 @@ RSpec.describe Admin::GraphsController, type: :request do
         end
       end
 
+      context "with bikes registered with the organization registration form settings" do
+        let!(:single_page_bikes) do
+          FactoryBot.create_list(:bike, 2, :with_ownership,
+            creation_registration_info: {register_single_page: true, register_separate_attestation: false})
+        end
+        let!(:both_bike) do
+          FactoryBot.create(:bike, :with_ownership,
+            creation_registration_info: {register_single_page: true, register_separate_attestation: true})
+        end
+        let!(:web_bike) { FactoryBot.create(:bike, :with_ownership) }
+        let(:setting_rows) do
+          Nokogiri::HTML(response.body).css("tbody tr").map { |row| row.css("td").map { it.text.strip } }
+        end
+
+        it "counts the bikes registered with each" do
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "register_setting"}
+          expect(response.status).to eq(200)
+          expect(setting_rows).to eq([["Single page", "3"], ["Separate attestation", "1"]])
+
+          get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "register_setting"}
+          expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
+            .to eq([["Single page", 3], ["Separate attestation", 1]])
+        end
+      end
+
       context "with bikes registered from the iOS app" do
         let!(:bikes_old_version) do
           FactoryBot.create_list(:bike, 2, :with_ownership, creation_registration_info: {ios_version: "1.6.9"})
