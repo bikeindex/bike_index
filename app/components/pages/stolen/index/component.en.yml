@@ -112,8 +112,8 @@ en:
           step_listing_body: >-
             A listing with the police report number, clear photos, and any identifying
             marks is one an officer can act on in minutes. Vague listings stall.
+          step_listing_report_number_tag: 1 min
           step_listing_report_number_title: Add the police report number to Bike Index
-          step_listing_tag: 5 min
           step_police_action: Find your local report line
           step_police_bring_body: >-
             The case number is what lets an officer hand your bike back instead of
