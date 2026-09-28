@@ -3,9 +3,7 @@ class OrganizationsController < ApplicationController
   before_action :allow_x_frame, only: %i[embed embed_extended embed_create_success]
 
   def new
-    session[:return_to] ||= new_organization_url unless current_user.present?
-    @organization = Organization.new
-    @active_section = "contact"
+    redirect_to new_organization_signup_path
   end
 
   def lightspeed_interface
@@ -14,31 +12,9 @@ class OrganizationsController < ApplicationController
     end
 
     session[:return_to] = lightspeed_interface_path
-    if current_user.present?
-      flash[:notice] = translation(:must_create_an_organization_first)
-      redirect_to new_organization_path
-    else
-      flash[:notice] = translation(:must_create_an_account_first)
-      redirect_to(new_user_path) && return
-    end
-  end
-
-  def create
-    if current_user.blank?
-      flash[:error] = translation(:must_create_an_account_first)
-      redirect_to(new_user_path) && return
-    end
-    @organization = Organization.new(permitted_create_params)
-    if @organization.save
-      OrganizationRole.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
-      notify_admins("organization_created")
-      flash[:success] = translation(:organization_created)
-      if current_user.present?
-        redirect_to organization_manage_path(organization_id: @organization.to_param)
-      end
-    else
-      render(action: :new) && return
-    end
+    # Signing up makes the account too, so it's where everyone without an organization goes
+    flash[:notice] = translation(:must_create_an_organization_first)
+    redirect_to new_organization_signup_path
   end
 
   # Additional parameter included in shop printouts: shop_display=true
@@ -109,27 +85,11 @@ class OrganizationsController < ApplicationController
     Time.current
   end
 
-  def permitted_create_params
-    approved_kind = params.dig(:organization, :kind)
-    approved_kind = "other" unless Organization.user_creatable_kinds.include?(approved_kind)
-    params.require(:organization)
-      .permit(:name, :website, locations_attributes:)
-      .merge(auto_user_id: current_user.id, kind: approved_kind)
-  end
-
-  def locations_attributes
-    %i[name phone publicly_visible] + [address_record_attributes: AddressRecord.permitted_params + [:id]]
-  end
-
   def find_organization
     @organization = Organization.friendly_find(params[:id])
     return @organization if @organization.present?
 
     flash[:error] = translation(:not_found)
     redirect_to(root_url) && return
-  end
-
-  def notify_admins(type)
-    AdminNotifier.new.for_organization(organization: @organization, user: current_user, type: type)
   end
 end

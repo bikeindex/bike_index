@@ -1,0 +1,56 @@
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup::FLOW, step: 1) %>
+
+  <%= render UI::Header::Component.new(text: translation(".add_your_organization"), subtitle: translation(".free_to_start")) %>
+
+  <% if @organization_signup.errors.any? %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @organization_signup.errors.full_messages.to_sentence) %>
+  <% end %>
+
+  <%= form_with(model: @organization_signup, url: organization_signup_path, method: :post, scope: :organization_signup, data: form_data) do |f| %>
+    <%= render UI::Forms::Honeypot::Component.new %>
+
+    <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".your_organization")) %>
+
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :name,
+        label_text: translation(".organization_name"), required: true,
+        html_options: {value: @organization_signup.name, required: true, autocomplete: "organization"}) %>
+
+    <div class="tw:mb-4">
+      <span class="twlabel"><%= translation(".organization_kind") %></span>
+
+      <div class="tw:mt-2">
+        <%= render UI::Forms::RadioButtonGroup::Component.new(name: "organization_signup[kind]", entries: kind_entries,
+            selected: @organization_signup.kind, html_options: {required: true}) %>
+      </div>
+    </div>
+
+    <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".your_info"), divider: true) %>
+
+    <% if @current_user.present? %>
+      <p class="tw:mb-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-300">
+        <%= translation(".signed_in_as_html", email: tag.strong(@current_user.email)) %>
+      </p>
+    <% else %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email,
+          label_text: translation(".email"), required: true, wrapper_class: "tw:mb-6")) do %>
+        <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :email, required: true,
+            html_options: {value: @organization_signup.email, placeholder: translation(".email_placeholder")}) %>
+      <% end %>
+    <% end %>
+
+    <%= render UI::Forms::Turnstile::Component.new(email: @organization_signup.email, user: @current_user) %>
+
+    <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
+        type: "submit", spinner: true, html_class: "tw:w-full") %>
+
+    <p
+      class="
+        tw:mt-3 tw:text-center tw:text-xs tw:text-gray-500
+        tw:dark:text-gray-400
+      "
+    >
+      <%= translation(".activation_link") %>
+    </p>
+  <% end %>
+<% end %>

@@ -1,0 +1,30 @@
+---
+en:
+  components:
+    pages:
+      org_signup:
+        views:
+          step1:
+            activation_link: >-
+              We'll email you a link to activate the organization — no need to wait
+              for it, keep going.
+            add_your_organization: Add your organization
+            email: Your email
+            email_placeholder: you@example.com
+            free_to_start: Free to start, and it takes a couple of minutes.
+            kind_bike_advocacy: Advocacy group
+            kind_bike_manufacturer: Manufacturer
+            kind_bike_shop: Bike shop
+            kind_law_enforcement: Law enforcement
+            kind_municipality: City or municipality
+            kind_other: Other
+            kind_property_management: Property management
+            kind_school: School or university
+            kind_software: Software
+            next: Next
+            organization_kind: What kind of organization?
+            organization_name: Organization name
+            signed_in_as_html: You're signed in as %{email}, which will be the organization's
+              administrator.
+            your_info: Your info
+            your_organization: Your organization

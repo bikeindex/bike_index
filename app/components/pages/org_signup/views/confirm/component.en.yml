@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      org_signup:
+        views:
+          confirm:
+            activate: Activate
+            activate_org: Activate %{name}
+            confirm_to_activate: >-
+              Confirm your email, and we'll set up the organization with you as its
+              administrator.
