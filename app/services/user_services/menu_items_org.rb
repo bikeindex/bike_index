@@ -38,7 +38,7 @@ module UserServices
 
       admin = current_user.admin_of?(organization)
 
-      [[registrations_group(organization), add_bike_link(organization, old_register_view)],
+      [[registrations_group(organization), add_registration_link(organization, old_register_view)],
         [impounded_group(organization),
           parking_group(organization),
           bulk_group(organization),
@@ -109,13 +109,13 @@ module UserServices
 
     # The old view puts this row on organized/bikes#new, which the parking notification row
     # also links, so the param is what tells them apart
-    def add_bike_link(organization, old_register_view)
+    def add_registration_link(organization, old_register_view)
       path = if old_register_view
         routes.new_organization_bike_path(organization.to_param)
       else
         routes.new_organization_registration_path(organization.to_param)
       end
-      ComponentStructs::Shapes.link(translation(:add_a_bike), path, icon: "plus-circle",
+      ComponentStructs::Shapes.link(translation(:add_a_registration), path, icon: "plus-circle",
         match_params: {parking_notification: nil})
     end
 
@@ -261,7 +261,7 @@ module UserServices
     end
 
     conceal :build_items, :organization_sections, :super_admin_link, :ambassador_items,
-      :registrations_group, :registrations_links, :add_bike_link, :impounded_group,
+      :registrations_group, :registrations_links, :add_registration_link, :impounded_group,
       :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
       :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :translation, :routes
   end

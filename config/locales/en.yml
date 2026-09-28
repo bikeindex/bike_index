@@ -4994,7 +4994,7 @@ en:
       viewing_without_org: Viewing without any organization
       your_registrations: Your registrations
     menu_items_org:
-      add_a_bike: Add a bike
+      add_a_registration: Add a registration
       add_an_impounded_vehicle: Add an Impounded Vehicle
       ascend_imports: Ascend Imports
       bulk_import_and_export: Bulk Import & Export

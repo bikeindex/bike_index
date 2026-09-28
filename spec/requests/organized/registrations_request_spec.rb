@@ -593,32 +593,32 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
       let(:old_view_path) { new_organization_bike_path(organization_id: current_organization.to_param) }
       # Not a let - it's read after each request in turn, and a let would memoize the first
-      def menu_add_bike_path
+      def menu_add_registration_path
         Nokogiri::HTML(response.body).css("#org_sidebar_nav a")
-          .find { |a| a.text.strip == "Add a bike" }&.[]("href")
+          .find { |a| a.text.strip == "Add a registration" }&.[]("href")
       end
 
       it "keeps the menu on the old view until the register flow is asked for again" do
         get "#{base_url}/new"
-        expect(menu_add_bike_path).to eq "#{base_url}/new"
+        expect(menu_add_registration_path).to eq "#{base_url}/new"
 
         get old_view_path, params: {old_view: true}
         expect(session[:old_register_view]).to be_truthy
-        expect(menu_add_bike_path).to eq old_view_path
+        expect(menu_add_registration_path).to eq old_view_path
 
         # Every organized page follows it, not just the one that set it
         get base_url
-        expect(menu_add_bike_path).to eq old_view_path
+        expect(menu_add_registration_path).to eq old_view_path
 
         # And the register flow's own link is the way back
         get "#{base_url}/new"
         expect(session[:old_register_view]).to be_blank
-        expect(menu_add_bike_path).to eq "#{base_url}/new"
+        expect(menu_add_registration_path).to eq "#{base_url}/new"
 
         # Landing on the old view any other way isn't a preference
         get old_view_path
         expect(session[:old_register_view]).to be_blank
-        expect(menu_add_bike_path).to eq "#{base_url}/new"
+        expect(menu_add_registration_path).to eq "#{base_url}/new"
       end
     end
 
@@ -856,9 +856,10 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
     it "wires up multi-search, the column settings and its collapse on one element" do
       get "#{base_url}/multi_search"
-      wrapper = Nokogiri::HTML(response.body).at_css("[data-org--multi-search-url-value]")
+      page = Nokogiri::HTML(response.body)
+      wrapper = page.at_css("[data-org--multi-search-url-value]")
       expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search ui--collapse org--search org--search-column-settings])
-      expect(JSON.parse(wrapper["data-org--search-column-settings-default-columns-value"])).to include("created_at_cell")
+      expect(page.at_css("input[name='created_at_cell']")["data-default"]).to eq "true"
     end
   end
 

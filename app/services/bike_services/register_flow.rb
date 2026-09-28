@@ -2,26 +2,25 @@
 
 module BikeServices
   # The register flow's shape. report: :after_details, :last, or nil for a registration
-  # with nothing to report. steps is built from the rest rather than passed in
-  RegisterFlow = Data.define(:single_page, :page_count, :report, :steps) do
-    def initialize(single_page: false, page_count: 0, report: nil)
-      details = single_page ? %w[1] : %w[1 2]
+  # with nothing to report
+  RegisterFlow = Data.define(:page_count, :report, :single_page) do
+    def initialize(page_count: 0, report: nil, single_page: false) = super
+
+    def steps
+      details = single_page? ? %w[1] : %w[1 2]
       acknowledgments = page_count.times.map { BikeServices::Register.step_for_page_index(it) } +
-        (page_count.positive? ? %w[review] : [])
-      steps = case report
+        (acknowledgments? ? %w[review] : [])
+      case report
       when :after_details then details + %w[report] + acknowledgments
       when :last then details + acknowledgments + %w[report]
       else details + acknowledgments
       end
-      super(single_page:, page_count:, report:, steps: steps.freeze)
     end
 
     def single_page? = single_page
 
     # The e-vehicle acknowledgment pages, which end at the review
     def acknowledgments? = page_count.positive?
-
-    def count = steps.count
 
     # 1-based, what the progress bar fills to
     def position(step) = steps.index(step.to_s).to_i + 1
@@ -30,8 +29,7 @@ module BikeServices
     def after(step) = steps[position(step)]
 
     def before(step)
-      index = position(step) - 2
-      steps[index] unless index.negative?
+      steps[position(step) - 2] if position(step) > 1
     end
   end
 end

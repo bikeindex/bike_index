@@ -120,7 +120,7 @@ class RegisterController < ApplicationController
   # The theft or the find - everything the stolen or impound record is built from.
   # A theft has to say when and where; the rest of the step is optional
   def report
-    # The report doesn't move the status or the creator, so the list survives the save
+    # The report doesn't move the status or the creator, so the flow survives the save
     flow = register_flow
     step = BikeServices::Register.permitted_step(@b_param, "report", sequence: @registration_sequence, flow:)
     return redirect_to(step_path(step)) if step != "report"
