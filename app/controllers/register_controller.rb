@@ -179,6 +179,13 @@ class RegisterController < ApplicationController
     # Someone else's session stays theirs - the registration is still finished for the
     # address that was emailed, it just isn't that account's own
     if current_user.present?
+      # The rules are the owner's to agree to, and spending the link here would leave them no way in
+      if @b_param.acknowledgment_pending? && @b_param.rules_left_to_owner?(current_user)
+        flash[:error] = translation(:sign_out_to_agree, email: current_user.email)
+        return redirect_to(confirm_register_path(b_param_token: @b_param.id_token,
+          confirmation_token: params[:confirmation_token]))
+      end
+
       flash[:notice] = translation(:signed_in_as_other, email: current_user.email) unless @b_param.self_made?(current_user)
     elsif sign_in_confirmed_user.blank?
       return redirect_to_current_step
