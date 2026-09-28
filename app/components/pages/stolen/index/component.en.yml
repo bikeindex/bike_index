@@ -33,10 +33,11 @@ en:
             paperwork can all identify a bike. Add whatever you have, and check with
             the shop that sold it — they often have the serial on file.
           faq_serial_question: I don't have my serial number.
-          faq_unregistered_answer: >-
-            That is the common case. You can register it as stolen right now; there
-            is no requirement that it was registered beforehand.
           faq_unregistered_question: My bike was never registered before it was stolen.
+          faq_unregistered_recovered_answer: >-
+            That is frequently the case. You can register it as stolen right now;
+            there is no requirement that it was registered beforehand — many bikes
+            are recovered that weren't registered until after they were stolen.
           here_is_the_next_hour: Here is the next hour.
           how_alerts_work: How alerts work
           lede: >-
