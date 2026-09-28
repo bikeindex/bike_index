@@ -52,7 +52,7 @@
         <div class="form-inline mt-2">
           <div class="mr-auto"></div>
 
-          <%= render(UI::Collapse::Component.new(text: "Search statuses", chevron: true, size: :sm, active: @not_default_statuses)) %>
+          <%= render(UI::Collapse::Component.new(text: "Search statuses", chevron: true, size: :sm)) %>
 
           <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2 ml-2" %>
         </div>

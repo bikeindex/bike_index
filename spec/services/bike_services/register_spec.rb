@@ -392,9 +392,9 @@ RSpec.describe BikeServices::Register do
 
     it "comes after step 2, and saves the stolen record the bike is created with" do
       expect(described_class.report_step?(b_param.status)).to be_truthy
-      expect(described_class.steps(b_param, sequence: nil).count).to eq 3
-      expect(described_class.steps(b_param, sequence: nil)).to eq %w[1 2 report]
-      expect(described_class.step_before("report", steps: described_class.steps(b_param, sequence: nil))).to eq "2"
+      flow = described_class.flow(b_param, sequence: nil)
+      expect(flow.steps).to eq %w[1 2 report]
+      expect(flow.before("report")).to eq "2"
       # Not finished: the theft is still to be reported
       expect(described_class.finished?(b_param, sequence: nil)).to be_falsey
       expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "report"
@@ -513,7 +513,7 @@ RSpec.describe BikeServices::Register do
 
       it "has no report to make" do
         expect(described_class.report_step?(b_param.status)).to be_falsey
-        expect(described_class.steps(b_param, sequence: nil)).to eq %w[1 2]
+        expect(described_class.flow(b_param, sequence: nil).steps).to eq %w[1 2]
         expect(described_class.permitted_step(b_param, "report", sequence: nil)).to eq "2"
       end
     end
@@ -545,13 +545,14 @@ RSpec.describe BikeServices::Register do
       it "comes before them" do
         expect(described_class.registration_sequence(b_param)).to eq sequence
         # Two detail steps, the report, a page each and the review
-        expect(described_class.steps(b_param, sequence:)).to eq %w[1 2 report 3 4 review]
+        flow = described_class.flow(b_param, sequence:)
+        expect(flow.steps).to eq %w[1 2 report 3 4 review]
         expect(described_class.permitted_step(b_param, "3", sequence:)).to eq "report"
-        expect(described_class.step_before("3", steps: described_class.steps(b_param, sequence:))).to eq "report"
+        expect(flow.before("3")).to eq "report"
 
         described_class.save_report(b_param, report_params:)
         expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
-        expect(described_class.steps(b_param, sequence:).index("3")).to eq 3
+        expect(flow.position("3")).to eq 4
       end
 
       context "without a creator" do
@@ -562,7 +563,7 @@ RSpec.describe BikeServices::Register do
 
         it "comes after them - the emailed link is clicked once they're acknowledged" do
           pages = described_class.sequence_pages(sequence)
-          expect(described_class.steps(b_param, sequence:)).to eq %w[1 2 3 4 review report]
+          expect(described_class.flow(b_param, sequence:).steps).to eq %w[1 2 3 4 review report]
           expect(described_class.permitted_step(b_param, "report", sequence:)).to eq "3"
 
           pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
@@ -572,7 +573,7 @@ RSpec.describe BikeServices::Register do
           # Confirming the email is what opens the report
           b_param.update(creator_id: creator.id)
           expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "report"
-          expect(described_class.step_before("report", steps: described_class.steps(b_param, sequence:))).to eq "2"
+          expect(described_class.flow(b_param, sequence:).before("report")).to eq "2"
         end
       end
     end
@@ -595,7 +596,7 @@ RSpec.describe BikeServices::Register do
       it "is the organization's active sequence" do
         expect(described_class.registration_sequence(b_param)).to eq sequence
         # Two detail steps, a page each and the review
-        expect(described_class.steps(b_param, sequence:).count).to eq 5
+        expect(described_class.flow(b_param, sequence:).steps.count).to eq 5
       end
 
       context "not an e-vehicle" do
@@ -604,7 +605,7 @@ RSpec.describe BikeServices::Register do
         it "is nil - only e-vehicles acknowledge safety rules" do
           expect(b_param.motorized?).to be_falsey
           expect(described_class.registration_sequence(b_param)).to be_nil
-          expect(described_class.steps(b_param, sequence: nil).count).to eq 2
+          expect(described_class.flow(b_param, sequence: nil).steps.count).to eq 2
         end
       end
 

@@ -20,7 +20,7 @@
 ).compact %>
 
 <%= tag.div(class: "org-search-component", data: Pages::Org::Search::ColumnSettings::Component
-  .column_settings_data_attributes(settings)
+  .column_settings_data_attributes
   .merge("org--search-column-settings-assign-bike-sticker-value": @bike_sticker.present?,
     "org--search-result-view-value": @result_view,
     action: "input->org--search#emailChanged")) do %>
