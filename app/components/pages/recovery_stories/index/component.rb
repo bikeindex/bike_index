@@ -8,7 +8,10 @@ module Pages
       class Component < ApplicationComponent
         PER_PAGE = 9
         REFERRAL_SOURCE = "recovery-stories"
+        CARD_CLASSES = "tw:flex tw:flex-col tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:text-gray-700 tw:no-underline tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:transition-all tw:duration-300"
         LINKED_CARD_CLASSES = "tw:hover:-translate-y-1.25 tw:hover:text-gray-700 tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.18)]"
+
+        PURPLE_OUTLINE = "tw:border-2! tw:border-purple-500! tw:normal-case! tw:text-purple-500! tw:hover:bg-purple-500! tw:hover:text-white!"
 
         def initialize(recovery_displays:, pagy:, total_bikes:, recoveries_count:, recoveries_value:,
           organizations_count:, currency:)
@@ -39,19 +42,22 @@ module Pages
         end
 
         def membership_options
-          [{value: "basic", cents: 500, note: translation(".basic_membership")},
+          priced([{value: "basic", cents: 500, note: translation(".basic_membership")},
             {value: "plus", cents: 1500, note: translation(".plus_membership"), checked: true},
-            {value: "patron", cents: 5000, note: translation(".patron_membership")}]
-            .map { it.merge(amount: MoneyFormatter.money_format_without_cents(it[:cents], @currency.slug)) }
-            .map { it.merge(label: translation(".become_a_member", amount: it[:amount])) }
+            {value: "patron", cents: 5000, note: translation(".patron_membership")}]) { translation(".become_a_member", amount: it) }
         end
 
         def donation_options
-          [{value: 25, note: translation(".donation_search")},
-            {value: 50, note: translation(".donation_alerts"), checked: true},
-            {value: 100, note: translation(".donation_partners")}]
-            .map { it.merge(amount: MoneyFormatter.money_format_without_cents(it[:value] * 100, @currency.slug)) }
-            .map { it.merge(label: translation(".donate_amount", amount: it[:amount])) }
+          priced([{value: 25, cents: 2500, note: translation(".donation_search")},
+            {value: 50, cents: 5000, note: translation(".donation_alerts"), checked: true},
+            {value: 100, cents: 10_000, note: translation(".donation_partners")}]) { translation(".donate_amount", amount: it) }
+        end
+
+        def priced(options)
+          options.map do |option|
+            amount = MoneyFormatter.money_format_without_cents(option[:cents], @currency.slug)
+            option.merge(amount:, label: yield(amount))
+          end
         end
 
         def gift_forms

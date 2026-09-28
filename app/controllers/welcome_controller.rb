@@ -28,7 +28,7 @@ class WelcomeController < ApplicationController
     @pagy, @recovery_displays = pagy(:countish, RecoveryDisplay.with_attached_photo_processed,
       limit: permitted_per_page(default: Pages::RecoveryStories::Index::Component::PER_PAGE), page: permitted_page)
 
-    flash.now[:notice] = translation(:no_stories_to_display) if @recovery_displays.empty?
+    flash.now[:notice] = translation(:no_stories_to_display) if @recovery_displays.load.empty?
     total_bikes, recoveries_count, recoveries_value, organizations_count =
       Counts.retrieve_many("total_bikes", "recoveries", "recoveries_value", "organizations")
 

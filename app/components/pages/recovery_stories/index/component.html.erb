@@ -1,9 +1,8 @@
 <% stories = capture do %>
   <% @recovery_displays.each do |recovery_display| %>
-    <% card_classes = "tw:flex tw:flex-col tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:text-gray-700 tw:no-underline tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:transition-all tw:duration-300" %>
+    <% link = recovery_display.link.presence %>
 
-    <%= content_tag(recovery_display.link.present? ? :a : :article, href: recovery_display.link.presence,
-      class: [card_classes, (LINKED_CARD_CLASSES if recovery_display.link.present?)].compact.join(" ")) do %>
+    <%= content_tag(link ? :a : :article, href: link, class: class_names(CARD_CLASSES, LINKED_CARD_CLASSES => link)) do %>
       <% if recovery_display.photo_url.present? %>
         <%= image_tag(recovery_display.photo_url, alt: recovery_display.image_alt, loading: "lazy",
           class: "tw:block tw:h-50 tw:w-full tw:bg-gray-100 tw:object-cover") %>
@@ -37,14 +36,16 @@
       <div class="tw:col-span-full tw:mt-4 tw:flex tw:justify-center">
         <%= render(UI::ButtonLink::Component.new(href: next_page_path, text: translation(".load_more_stories"),
           color: :secondary, size: :callout, data: {turbo: true},
-          html_class: "tw:border-2! tw:border-purple-500! tw:normal-case! tw:text-purple-500! tw:hover:bg-purple-500! tw:hover:text-white!")) %>
+          html_class: PURPLE_OUTLINE)) %>
       </div>
     <% end %>
   <% end %>
 <% end %>
 
+<% page_frame = helpers.turbo_frame_tag("recovery_stories_page_#{@pagy.page}", class: "tw:contents") { stories } %>
+
 <% if helpers.turbo_frame_request? %>
-  <%= helpers.turbo_frame_tag("recovery_stories_page_#{@pagy.page}", class: "tw:contents") { stories } %>
+  <%= page_frame %>
 <% else %>
   <div class="tw:bg-white tw:text-gray-700">
     <section class="tw:border-b tw:border-gray-200">
@@ -121,7 +122,7 @@
 
             <%= render(UI::ButtonLink::Component.new(href: new_register_path,
               text: translation(".register_your_bike"), color: :secondary, size: :callout,
-              html_class: "tw:border-2! tw:border-purple-500! tw:px-8! tw:py-3! tw:normal-case! tw:text-purple-500! tw:hover:bg-purple-500! tw:hover:text-white!")) %>
+              html_class: "#{PURPLE_OUTLINE} tw:px-8! tw:py-3!")) %>
           </div>
         </div>
       </div>
@@ -149,10 +150,8 @@
           tw:grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))]
           tw:gap-6
         "
-        data-controller="recovery-stories--stories"
-        data-action="turbo:frame-render->recovery-stories--stories#localize"
       >
-        <%= helpers.turbo_frame_tag("recovery_stories_page_#{@pagy.page}", class: "tw:contents") { stories } %>
+        <%= page_frame %>
       </div>
     </section>
 
