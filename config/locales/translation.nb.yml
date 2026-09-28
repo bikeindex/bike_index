@@ -5300,6 +5300,8 @@ nb:
         safety_rules_owed_html: Din <strong>%{color_and_brand}</strong> er registrert
           hos %{org_name} på Bike Index. Godta sikkerhetsreglene til %{org_name} for
           å fullføre registreringen.
+        link_signs_you_in: Denne lenken logger deg på Bike Index, så ikke videresend
+          den. Den fungerer i %{days} dager.
       confirmation_email:
         click_to_sign_in_html: Klikk på <em>Logg inn</em> -knappen for å fullføre
           registreringen!

@@ -5455,6 +5455,8 @@ nl:
         safety_rules_owed_html: Uw <strong>%{color_and_brand}</strong> is geregistreerd
           bij %{org_name} op Bike Index. Ga akkoord met de veiligheidsregels van %{org_name}
           om de registratie te voltooien.
+        link_signs_you_in: Deze link geeft je een account bij Bike Index, dus stuur
+          hem niet door. Hij is %{days} dagen geldig.
       confirmation_email:
         click_to_sign_in_html: Klik op de knop <em>'Inloggen'</em> om je registratie
           te voltooien!
