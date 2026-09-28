@@ -21,7 +21,7 @@ To add a brand the user names, skip to [Adding a manufacturer](#adding-a-manufac
 ### 1. Download
 
 ```
-.claude/skills/admin-data-api/scripts/admin_data.rb get missing_manufacturers period=all > tmp/missing_manufacturers.json
+.claude/skills/admin-data-api/scripts/admin_data.rb get missing_manufacturers > tmp/missing_manufacturers.json
 ```
 
 Returns `manufacturer_other_counts`: each `manufacturer_other` string and how many bikes carry it. Takes the page's filters as `key=value` — `Admin::BikesController#missing_manufacturer_bikes` is the list (`search_motorized`, `period`, `search_exclude_organization_ids`, …).
@@ -68,4 +68,4 @@ The rest of `Admin::ManufacturersController#permitted_parameters` is optional.
 
 Returns the new manufacturer; a 422 prints the validation errors (`Manufacturer` validations — a taken name or slug, a color name, a quote). Link the user to `https://bikeindex.org/admin/manufacturers/<slug>`.
 
-Creating a manufacturer doesn't move the bikes. Give the user `https://bikeindex.org/admin/bikes/missing_manufacturer?search_other_name=<name>&period=all` to reassign them, for both new manufacturers and the existing-match table.
+Creating a manufacturer doesn't move the bikes. Give the user `https://bikeindex.org/admin/bikes/missing_manufacturer?search_other_name=<name>` to reassign them, for both new manufacturers and the existing-match table.

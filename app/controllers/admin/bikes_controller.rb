@@ -8,7 +8,7 @@ module Admin
 
     before_action :find_bike, only: %i[edit update show]
     before_action :set_period, only: %i[index missing_manufacturer]
-    around_action :set_reading_role, only: %i[index show]
+    around_action :set_reading_role, only: %i[index show missing_manufacturer]
 
     def index
       @per_page = permitted_per_page(default: 100)
