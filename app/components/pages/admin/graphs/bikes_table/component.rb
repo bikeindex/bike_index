@@ -26,11 +26,7 @@ module Pages
               .transform_values { bikes.where(id: it.select(:bike_id)) }
           end
 
-          def self.register_setting_name(key)
-            return Ownership.creation_kind_humanized(key) if key == "organization_form"
-
-            key.delete_prefix("register_").humanize
-          end
+          def self.register_setting_name(key) = Ownership.creation_kind_humanized(key) || key.delete_prefix("register_").humanize
 
           def initialize(kind:, sortable_params:, bikes: nil, time_range: nil)
             @kind = KINDS.include?(kind) ? kind : KINDS.first

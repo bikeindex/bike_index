@@ -6,8 +6,7 @@
         - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: search_organization_kind.humanize, path: url_for(sortable_search_params.merge(search_organization_kind:)), match_params: {search_organization_kind:}) }
 
   %li
-    - origin_name = {"all" => "All origins", "only_initial" => "Only initial"}[@search_origin]
-    - origin_name ||= Ownership.creation_kind_humanized(@search_origin)
+    - origin_name = {"all" => "All origins", "only_initial" => "Only initial"}[@search_origin] || Ownership.creation_kind_humanized(@search_origin)
     = render(UI::Dropdown::Component.new(name: origin_name, button_size: :sm, active: @search_origin != "all")) do |dropdown|
       - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All origins", path: url_for(sortable_search_params.merge(search_origin: nil)), match_params: {search_origin: nil}) }
       - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only initial", path: url_for(sortable_search_params.merge(search_origin: "only_initial")), match_params: {search_origin: "only_initial"}) }

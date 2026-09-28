@@ -60,7 +60,7 @@ RSpec.describe Admin::GraphsController, type: :request do
             ["web", origin_colors["web"], "1"]])
           # The origins with no bikes keep Ownership.origins order, rather than reshuffling
           expect(origin_rows.map(&:first))
-            .to eq((%w[sticker web] + (Ownership.origins - %w[sticker web])).map { Ownership.creation_kind_humanized(it) })
+            .to eq((%w[sticker web] | Ownership.origins).map { Ownership.creation_kind_humanized(it) })
 
           get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "origin"}
           expect(json_result.to_h { [it["name"], it["color"]] })

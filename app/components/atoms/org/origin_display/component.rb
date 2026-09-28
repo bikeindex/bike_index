@@ -5,7 +5,7 @@ module Atoms
     module OriginDisplay
       class Component < ApplicationComponent
         def initialize(ownership: nil, creation_kind: nil)
-          @creation_kind = creation_kind&.to_sym || ownership&.creation_kind
+          @creation_kind = creation_kind || ownership&.creation_kind
         end
 
         def render?
