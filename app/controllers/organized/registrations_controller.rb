@@ -19,9 +19,14 @@ module Organized
 
       if current_organization.enabled?("bike_search")
         @search_claimedness = "all"
-        # Owner email and name only search the organization's own registrations
-        @search_all_locked = params[:search_email].present?
-        @search_all = !@search_all_locked && Binxtils::InputNormalizer.boolean(params[:search_all])
+        # Owner email and name only search the organization's own registrations, and an
+        # impounded status already reaches past them
+        @search_all_lock = if params[:search_email].present?
+          :email
+        elsif search_status == "impounded"
+          :impounded
+        end
+        @search_all = !@search_all_lock && Binxtils::InputNormalizer.boolean(params[:search_all])
         @chart_scope = Pages::Org::Search::ChartCard::Component.permitted_scope(params[:chart_scope])
         # ui--collapse's, not the server's - normalized only so the form's hidden field
         # carries 1/0 rather than the blank a rider who never touched the card would send
@@ -37,6 +42,7 @@ module Organized
         elsif chart_only?
           # The card counts the organization's own registrations, even while the search reaches past them
           @search_all = false
+          @search_all_lock = nil
           search_organization_bikes
           render chart_card_component, layout: false
         elsif @render_results
@@ -250,10 +256,7 @@ module Organized
     def search_scope(organization)
       return Bike if @search_all || organization.blank?
 
-      # An owner email search, and the chart card, only reach the organization's registrations
-      return organization.bikes if search_status != "impounded" || @search_all_locked || chart_only?
-
-      BikeServices::OrganizedSearch.with_impound_lot(organization)
+      (@search_all_lock == :impounded) ? BikeServices::OrganizedSearch.with_impound_lot(organization) : organization.bikes
     end
 
     # Searching past the organization reaches most of the index, so it counts - and pages -

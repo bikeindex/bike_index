@@ -62,8 +62,9 @@
 
           <% form.with_below_submit do %>
             <div class="tw:mt-3">
-              <%= render(Pages::Org::Search::SearchAll::Component.new(settings:, locked: @search_all_locked,
-                locked_hint: t(".search_all_email_disabled"))) %>
+              <%= render(Pages::Org::Search::SearchAll::Component.new(settings:, lock: @search_all_lock,
+                locked_hints: {email: t(".search_all_email_disabled"),
+                  impounded: t(".search_all_impounded_disabled", org_name: current_organization.short_name)})) %>
             </div>
           <% end %>
         <% end %>
