@@ -87,14 +87,14 @@ RSpec.describe Admin::GraphsController, type: :request do
           Nokogiri::HTML(response.body).css("tbody tr").map { |row| row.css("td").map { it.text.strip } }
         end
 
-        it "counts the bikes registered with each, and on the old registration page" do
+        it "counts the bikes registered with each, and on the legacy org form" do
           get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "register_setting"}
           expect(response.status).to eq(200)
-          expect(setting_rows).to eq([["Separate attestation", "1"], ["Single page", "3"], ["Old registration page", "1"]])
+          expect(setting_rows).to eq([["Separate attestation", "1"], ["Single page", "3"], ["Legacy org form", "1"]])
 
           get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "register_setting"}
           expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
-            .to eq([["Separate attestation", 1], ["Single page", 3], ["Old registration page", 1]])
+            .to eq([["Separate attestation", 1], ["Single page", 3], ["Legacy org form", 1]])
         end
       end
 

@@ -24,7 +24,7 @@ module Pages
           def self.register_setting_bikes(bikes)
             RegistrationInfoable::REGISTER_SETTING_KEYS
               .to_h { [it.delete_prefix("register_").humanize, Ownership.with_register_setting(it)] }
-              .merge("Old registration page" => Ownership.organization_form)
+              .merge(Ownership.creation_kind_humanized(:organization_form).upcase_first => Ownership.organization_form)
               .transform_values { bikes.where(id: it.select(:bike_id)) }
           end
 
