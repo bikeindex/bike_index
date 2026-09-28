@@ -38,6 +38,12 @@ RSpec.describe BikeVersionsController, type: :request do
         end
       end
     end
+    context "id too large for the column" do
+      it "404s" do
+        get "#{base_url}/57549641769762268311552"
+        expect(response.status).to eq 404
+      end
+    end
     it "renders" do
       get "#{base_url}/#{bike_version.to_param}"
       expect(response.code).to eq "200"

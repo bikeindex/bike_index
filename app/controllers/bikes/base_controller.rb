@@ -24,11 +24,7 @@ module Bikes
         redirect_to(scanned_bike_path(permitted_params))
         return
       end
-      begin
-        @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
-      rescue ActiveRecord::StatementInvalid => e
-        raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
-      end
+      @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
       return @bike if @bike.visible_by?(current_user)
 
       fail ActiveRecord::RecordNotFound
