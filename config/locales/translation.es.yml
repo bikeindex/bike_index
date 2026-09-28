@@ -5546,6 +5546,8 @@ es:
         safety_rules_owed_html: Tu <strong>%{color_and_brand}</strong> está registrado
           con %{org_name} en Bike Index. Acepta las normas de seguridad de %{org_name}
           para finalizar el registro.
+        link_signs_you_in: Este enlace te da acceso a Bike Index, así que no lo reenvíes.
+          Funciona durante %{days} días.
       confirmation_email:
         click_to_sign_in_html: ¡Haz clic en el botón <em>"Iniciar sesión</em> " para
           finalizar tu registro!
