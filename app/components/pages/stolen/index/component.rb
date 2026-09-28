@@ -35,7 +35,8 @@ module Pages
 
         def steps
           [{title: translation(".step_register_title"), tag: translation(".step_register_tag"),
-            body: translation(".step_register_minimal_body"), action: translation(".step_register_action"),
+            body: [translation(".step_register_registry_body"), translation(".step_register_minimal_registration")],
+            action: translation(".step_register_action"),
             href: register_stolen_path},
             {title: translation(".step_police_title"), tag: translation(".step_police_tag"),
              body: translation(".step_police_body"), action: translation(".step_police_action"),

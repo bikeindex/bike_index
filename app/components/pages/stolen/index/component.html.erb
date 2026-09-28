@@ -162,14 +162,16 @@
                   </span>
                 </h3>
 
-                <p
-                  class="
-                    tw:m-0 tw:mt-1.5 tw:max-w-190 tw:text-[14.5px]
-                    tw:leading-[1.55] tw:lg:text-base
-                  "
-                >
-                  <%= step[:body] %>
-                </p>
+                <% Array(step[:body]).each do |paragraph| %>
+                  <p
+                    class="
+                      tw:m-0 tw:mt-1.5 tw:max-w-190 tw:text-[14.5px]
+                      tw:leading-[1.55] tw:lg:text-base
+                    "
+                  >
+                    <%= paragraph %>
+                  </p>
+                <% end %>
               </div>
 
               <div class="tw:shrink-0">
