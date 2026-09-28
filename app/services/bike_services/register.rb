@@ -87,12 +87,14 @@ module BikeServices
 
     # The organization add-a-registration page's switches. Step 1 saves them onto the registration;
     # until then the session's apply only to the organization they were set on
-    def settings(b_param, session_settings)
-      in_session = session_settings.present? &&
-        session_settings["organization_id"].to_s == b_param.creation_organization_id.to_s
-      %i[single_page separate_attestation].index_with do |key|
-        b_param.params.to_h.fetch("register_#{key}") { in_session && session_settings[key.to_s].present? }
-      end
+    def settings(b_param, from_session)
+      session_settings(from_session, b_param.creation_organization_id)
+        .to_h { |key, value| [key, b_param.params.to_h.fetch("register_#{key}", value)] }
+    end
+
+    def session_settings(settings, organization_id)
+      in_session = settings.present? && settings["organization_id"].to_s == organization_id.to_s
+      %i[single_page separate_attestation].index_with { in_session && settings[it.to_s].present? }
     end
 
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's

@@ -87,7 +87,7 @@ module Organized
     def settings
       @page_title = I18n.t("meta_titles.registration_form_settings")
       render Pages::Org::RegisterSettings::Component.new(organization: current_organization, old_view: old_register_view?,
-        **session_register_settings)
+        **BikeServices::Register.session_settings(session[:register_settings], current_organization.id))
     end
 
     # An unchecked box turns its setting off; the old view disables them, so the session keeps theirs
@@ -119,14 +119,6 @@ module Organized
     end
 
     private
-
-    # The session's, when they were set on this organization
-    def session_register_settings
-      settings = session[:register_settings] || {}
-      return {} if settings["organization_id"].to_s != current_organization.id.to_s
-
-      settings.slice("single_page", "separate_attestation").symbolize_keys
-    end
 
     def normalized_search_kind
       (params[:search_kind] == "stickers") ? "stickers" : "serials"
