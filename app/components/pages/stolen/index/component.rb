@@ -71,7 +71,7 @@ module Pages
             {icon: "icons/users.svg", circle: "tw:bg-purple-500",
              title: translation(".pillar_network_title"), body: translation(".pillar_network_body")},
             {icon: "icons/megaphone.svg", circle: "tw:bg-slate-900",
-             title: translation(".pillar_alerts_title"), body: translation(".pillar_alerts_body")}]
+             title: translation(".pillar_alerts_title"), body: translation(".pillar_alerts_promoted_body")}]
         end
 
         def faqs

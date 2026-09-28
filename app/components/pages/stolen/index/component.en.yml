@@ -51,9 +51,9 @@ en:
             No account yet? Registering a stolen bike creates one. Registration is
             free, always.
           partner_organizations: partner shops, police departments, and cities
-          pillar_alerts_body: >-
-            Your listing gets shared to our social channels and, optionally, promoted
-            into feeds near the theft. Anyone who spots it can message you directly.
+          pillar_alerts_promoted_body: >-
+            Your listing gets shared to our social channels and promoted into feeds
+            near the theft. Anyone who spots it can message you directly.
           pillar_alerts_title: Alerts that travel
           pillar_network_body: >-
             Hundreds of thousands of riders plus ambassadors, shops, and law enforcement
