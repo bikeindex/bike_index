@@ -85,6 +85,18 @@ module BikeServices
       b_param.save
     end
 
+    # The organization add-a-registration page's switches. Step 1 saves them onto the registration;
+    # until then the session's apply only to the organization they were set on
+    def settings(b_param, from_session)
+      session_settings(from_session, b_param.creation_organization_id)
+        .to_h { |key, value| [key, b_param.params.to_h.fetch("register_#{key}", value)] }
+    end
+
+    def session_settings(settings, organization_id)
+      in_session = settings.present? && settings["organization_id"].to_s == organization_id.to_s
+      %i[single_page separate_attestation].index_with { in_session && settings[it.to_s].present? }
+    end
+
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
     # active sequence, or the one its pages are being agreed to from, even once replaced.
     # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
@@ -142,6 +154,15 @@ module BikeServices
     def flow(b_param, sequence:, single_page: false)
       BikeServices::RegisterFlow.new(single_page:, page_count: sequence_pages(sequence).count,
         report: report_placement(b_param))
+    end
+
+    # The single page's electric checkbox is on the same form as its submit button, so the
+    # button is told what it'd lead to for an e-vehicle. Separate attestation leaves the rules
+    # to an owner who isn't the registrant, which the email typed above it decides - :own_emails
+    def motorized_review(b_param, flow, separate_attestation:)
+      return false unless flow.single_page? && registration_sequence(b_param, motorized: true).present?
+
+      separate_attestation ? :own_emails : true
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -329,6 +350,12 @@ module BikeServices
       register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
     end
 
+    # The legacy forms show no rules, so an e-vehicle's go to its owner even when self-registered
+    def create_legacy_bike(b_param, ip_address:)
+      b_param.params = b_param.params.merge("register_separate_attestation" => true)
+      create_bike(b_param, sequence: nil, ip_address:, rules_to_owner: true)
+    end
+
     #
     # private below here
     #
@@ -405,9 +432,10 @@ module BikeServices
     # Returns nil while the rules are owed - the bike exists, but the registration isn't finished -
     # unless separate attestation left them to the owner, who's emailed the link back instead.
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
-    def create_bike(b_param, sequence:, ip_address:)
+    def create_bike(b_param, sequence:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_sequence = registration_sequence(b_param) if sequence.blank? && b_param.rules_left_to_owner?(b_param.creator)
+      owners_sequence = registration_sequence(b_param) if sequence.blank? &&
+        (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
         "register_separate_attestation" => owners_sequence.present?
@@ -518,8 +546,11 @@ module BikeServices
       flow.steps.first(reached + 1).select { editable_step?(b_param, it) }
     end
 
-    # Whether a step has been submitted with everything it asks for
+    # Whether a step has been submitted with everything it asks for - the vehicle's steps have
+    # once a bike exists, whichever form made it
     def step_completed?(b_param, step, sequence:, flow:)
+      return true if b_param.with_bike? && VEHICLE_STEPS.include?(step)
+
       case step
       when "1" then flow.single_page? ? details_completed?(b_param) : b_param.manufacturer_id.present?
       when "2" then details_completed?(b_param)

@@ -396,6 +396,29 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "settings" do
+    let(:bike_params) { super().merge(creation_organization_id: 12) }
+    let(:session_settings) { {"organization_id" => 12, "single_page" => true, "separate_attestation" => false} }
+
+    it "is the session's, for the organization they were set on" do
+      expect(described_class.settings(b_param, session_settings)).to eq(single_page: true, separate_attestation: false)
+      expect(described_class.settings(b_param, session_settings.merge("organization_id" => 13)))
+        .to eq(single_page: false, separate_attestation: false)
+      expect(described_class.settings(b_param, nil)).to eq(single_page: false, separate_attestation: false)
+    end
+
+    context "saved by step 1" do
+      let(:b_param) do
+        BParam.new(origin: "register_flow", params: {bike: bike_params, register_single_page: false,
+                                                     register_separate_attestation: true}.as_json)
+      end
+
+      it "is what the registration saved, whatever the session holds now" do
+        expect(described_class.settings(b_param, session_settings)).to eq(single_page: false, separate_attestation: true)
+      end
+    end
+  end
+
   describe "report step" do
     let(:creator) { FactoryBot.create(:user) }
     let(:bike_params) { {owner_email: "owner@example.com", manufacturer_id: 12, status: "status_stolen"} }
@@ -632,7 +655,7 @@ RSpec.describe BikeServices::Register do
       it "is the organization's active sequence" do
         expect(described_class.registration_sequence(b_param)).to eq sequence
         # Two detail steps, a page each and the review
-        expect(described_class.flow(b_param, sequence:).count).to eq 5
+        expect(described_class.flow(b_param, sequence:).steps.count).to eq 5
       end
 
       context "not an e-vehicle" do
@@ -641,7 +664,7 @@ RSpec.describe BikeServices::Register do
         it "is nil - only e-vehicles acknowledge safety rules" do
           expect(b_param.motorized?).to be_falsey
           expect(described_class.registration_sequence(b_param)).to be_nil
-          expect(described_class.flow(b_param, sequence: nil).count).to eq 2
+          expect(described_class.flow(b_param, sequence: nil).steps.count).to eq 2
         end
       end
 
@@ -660,12 +683,25 @@ RSpec.describe BikeServices::Register do
 
         it "is nil for a registration made for someone else, whose owner the rules are left to" do
           expect(described_class.registration_sequence(b_param, separate_attestation: true, user: member)).to be_nil
-          expect(described_class.flow(b_param, sequence: nil).count).to eq 2
+          expect(described_class.flow(b_param, sequence: nil).steps.count).to eq 2
         end
 
         it "is the sequence when the registrant is the one registering" do
           expect(described_class.registration_sequence(b_param, separate_attestation: true, user: registrant))
             .to eq sequence
+        end
+      end
+
+      describe "motorized_review" do
+        let(:bike_params) { super().merge(cycle_type: "bike") }
+        let(:single_page) { described_class.flow(b_param, sequence: nil, single_page: true) }
+
+        it "is what an e-vehicle would get, before the registration says it's one" do
+          expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to be true
+          expect(described_class.motorized_review(b_param, single_page, separate_attestation: true)).to eq :own_emails
+          # Two steps, so the submit label never has to guess
+          expect(described_class.motorized_review(b_param, described_class.flow(b_param, sequence: nil),
+            separate_attestation: false)).to be false
         end
       end
 

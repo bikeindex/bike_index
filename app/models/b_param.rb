@@ -309,10 +309,10 @@ class BParam < ApplicationRecord
     created_bike_id.present?
   end
 
-  # The register flow creates the bike ahead of its organization's safety rules, which
-  # it still requires - so the registration isn't finished until they're agreed to
+  # The bike is created ahead of its organization's safety rules, which are still required -
+  # so the registration isn't finished until they're agreed to
   def acknowledgment_pending?
-    register_flow? && persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
+    persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
   end
 
   def finished_registration? = with_bike? && !acknowledgment_pending?
@@ -378,6 +378,8 @@ class BParam < ApplicationRecord
 
     "status_with_owner"
   end
+
+  def status_humanized = Bike.status_humanized(status)
 
   def status_stolen?
     status == "status_stolen"

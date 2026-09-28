@@ -33,7 +33,7 @@ module Pages
           # doesn't always finish the registration. Which statuses have one is rechecked
           # client-side, since the status is picked in this form rather than known when it
           # renders - so the label reads off the same answer both times. The single page's
-          # follow its electric checkbox
+          # safety pages follow its electric checkbox instead
           def submit_texts
             @submit_texts ||= Bike.statuses.index_with do |status|
               next translation(".next") if (@flow.acknowledgments? && !@flow.single_page?) ||

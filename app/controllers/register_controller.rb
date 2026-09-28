@@ -87,7 +87,7 @@ class RegisterController < ApplicationController
     single_page = params[:single_page].present?
     saved = BikeServices::Register.public_send(single_page ? :assign_step_1 : :save_step_1, @b_param,
       bike_params: create_params, propulsion_type_motorized: params[:propulsion_type_motorized],
-      additional: params[:additional], single_page:, separate_attestation: register_setting?(@b_param, "separate_attestation")) &&
+      additional: params[:additional], single_page:, separate_attestation: register_settings[:separate_attestation]) &&
       turnstile_verified?(@b_param, @b_param.owner_email)
     if single_page
       saved = save_details && saved
@@ -120,7 +120,7 @@ class RegisterController < ApplicationController
   # The theft or the find - everything the stolen or impound record is built from.
   # A theft has to say when and where; the rest of the step is optional
   def report
-    # The report doesn't move the status or the creator, so the list survives the save
+    # The report doesn't move the status or the creator, so the flow survives the save
     flow = register_flow
     step = BikeServices::Register.permitted_step(@b_param, "report", sequence: @registration_sequence, flow:)
     return redirect_to(step_path(step)) if step != "report"
@@ -179,6 +179,13 @@ class RegisterController < ApplicationController
     # Someone else's session stays theirs - the registration is still finished for the
     # address that was emailed, it just isn't that account's own
     if current_user.present?
+      # The rules are the owner's to agree to, and spending the link here would leave them no way in
+      if @b_param.rules_left_to_owner?(current_user) && @b_param.acknowledgment_pending?
+        flash[:error] = translation(:sign_out_to_agree, email: current_user.email)
+        return redirect_to(confirm_register_path(b_param_token: @b_param.id_token,
+          confirmation_token: params[:confirmation_token]))
+      end
+
       flash[:notice] = translation(:signed_in_as_other, email: current_user.email) unless @b_param.self_made?(current_user)
     elsif sign_in_confirmed_user.blank?
       return redirect_to_current_step
@@ -203,7 +210,8 @@ class RegisterController < ApplicationController
 
   def start_page(flow:)
     Pages::Register::Views::Step1::Component.new(b_param: @b_param, flow:, current_user:,
-      motorized_review: register_motorized_review(@b_param, flow))
+      motorized_review: BikeServices::Register.motorized_review(@b_param, flow,
+        separate_attestation: register_settings[:separate_attestation]))
   end
 
   def complete_registration
@@ -267,7 +275,8 @@ class RegisterController < ApplicationController
   # Resolved in a filter rather than per read - the step math, the progress bar and the pages
   # themselves all ask for it
   def find_registration_sequence
-    @registration_sequence = register_flow_sequence(@b_param)
+    @registration_sequence = BikeServices::Register.registration_sequence(@b_param, user: current_user,
+      separate_attestation: register_settings[:separate_attestation])
   end
 
   # All resuming changes today: rules the organization has replaced since start over.
@@ -280,9 +289,13 @@ class RegisterController < ApplicationController
 
   # Read at render time rather than in a filter: the submissions save first, and where
   # the report sits depends on what they saved
-  def register_flow(single_page: register_setting?(@b_param, "single_page"))
+  def register_flow(single_page: register_settings[:single_page])
     BikeServices::Register.flow(@b_param, sequence: @registration_sequence, single_page:)
   end
+
+  # Not memoized: the session's are matched to the organization, which step 2's
+  # "register with" checkbox can drop
+  def register_settings = BikeServices::Register.settings(@b_param, session[:register_settings])
 
   # Not find_b_param: the emailed token authorizes this, not the session, and an expired
   # link has to find its registration to say so rather than dead-end. Nothing is written
@@ -336,9 +349,30 @@ class RegisterController < ApplicationController
     if bike.errors.any?
       flash[:error] = @b_param.bike_errors&.to_sentence
       redirect_to step_path(2)
+    elsif (organization = single_page_organization)
+      redirect_to_single_page(bike, organization)
     else
       redirect_to step_path(:finished)
     end
+  end
+
+  # Not for an owner finishing the safety rules a member left them
+  def single_page_organization
+    return if current_user.blank? || @b_param.creator_id != current_user.id
+
+    @b_param.creation_organization if register_settings[:single_page]
+  end
+
+  def redirect_to_single_page(bike, organization)
+    bike_display = bike.mnfg_name
+    flash[:success] = if @b_param.acknowledgment_pending?
+      translation(:safety_rules_sent, bike_display:, email: bike.owner_email)
+    elsif @b_param.self_made?(current_user)
+      translation(:registered_own, bike_display:)
+    else
+      translation(:registered_for_owner, bike_display:, email: bike.owner_email)
+    end
+    redirect_to new_organization_registration_path(organization_id: organization.to_param)
   end
 
   def create_params
