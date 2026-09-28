@@ -13,7 +13,7 @@ module UserServices
       return [] if organization.nil? || current_user.nil?
 
       # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
-      Rails.cache.fetch(["menu_items_org_v1", organization, current_user,
+      Rails.cache.fetch(["menu_items_org_v2", organization, current_user,
         old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -38,7 +38,7 @@ module UserServices
 
       admin = current_user.admin_of?(organization)
 
-      [[registrations_group(organization), add_bike_link(organization, old_register_view)],
+      [[registrations_group(organization), add_registration_link(organization, old_register_view)],
         [impounded_group(organization),
           parking_group(organization),
           bulk_group(organization),
@@ -109,13 +109,13 @@ module UserServices
 
     # The old view puts this row on organized/bikes#new, which the parking notification row
     # also links, so the param is what tells them apart
-    def add_bike_link(organization, old_register_view)
+    def add_registration_link(organization, old_register_view)
       path = if old_register_view
         routes.new_organization_bike_path(organization.to_param)
       else
         routes.new_organization_registration_path(organization.to_param)
       end
-      ComponentStructs::Shapes.link(translation(:add_a_bike), path, icon: "plus-circle",
+      ComponentStructs::Shapes.link(translation(:add_a_registration), path, icon: "plus-circle",
         match_params: {parking_notification: nil})
     end
 
@@ -235,6 +235,8 @@ module UserServices
           routes.edit_organization_manage_impounding_path(organization_id: organization.to_param)),
         enabled_link(organization, "hot_sheet", translation(:stolen_hot_sheet),
           routes.edit_organization_hot_sheet_path(organization_id: organization.to_param)),
+        ComponentStructs::Shapes.link(translation(:registration_form_settings),
+          routes.settings_organization_registrations_path(organization_id: organization.to_param)),
         # Editing a page of a sequence is the same section of the menu, on a path of its own
         enabled_link(organization, "registration_sequences", translation(:registration_sequences), sequences,
           match_paths: ["#{sequences}/**", "#{org_root(organization)}/registration_sequence_pages/**"])
@@ -261,7 +263,7 @@ module UserServices
     end
 
     conceal :build_items, :organization_sections, :super_admin_link, :ambassador_items,
-      :registrations_group, :registrations_links, :add_bike_link, :impounded_group,
+      :registrations_group, :registrations_links, :add_registration_link, :impounded_group,
       :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
       :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :translation, :routes
   end

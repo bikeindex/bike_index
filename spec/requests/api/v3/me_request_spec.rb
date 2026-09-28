@@ -34,7 +34,7 @@ RSpec.describe "Me API V3", type: :request do
              {type: "link", label: "Search all registrations",
               path: "/search/registrations?stolenness=all", icon: nil}
            ]},
-          {type: "link", label: "Add a bike", path: "/o/#{organization.slug}/registrations/new",
+          {type: "link", label: "Add a registration", path: "/o/#{organization.slug}/registrations/new",
            icon: "plus-circle", match_params: {parking_notification: nil}}
         ]
       end
