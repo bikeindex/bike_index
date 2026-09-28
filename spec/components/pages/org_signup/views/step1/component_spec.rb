@@ -13,6 +13,8 @@ RSpec.describe Pages::OrgSignup::Views::Step1::Component, type: :component do
     expect(component).to have_checked_field("Bike shop", visible: :all)
     kinds = component.css("input[name='organization_signup[kind]']").map { it["value"] }
     expect(kinds).to match_array(Organization.user_creatable_kinds)
+    expect(kinds.index("municipality")).to eq kinds.index("school") + 1
+    expect(kinds.last).to eq "other"
   end
 
   context "signed in" do
