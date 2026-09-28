@@ -20,7 +20,6 @@ module Pages
             bikes.joins(:ownerships).where("#{IOS_VERSION_SQL} IS NOT NULL").group(IOS_VERSION_SQL)
           end
 
-          # The organization_form origin is only set by the legacy organization page, not the embeds
           def self.register_setting_bikes(bikes)
             RegistrationInfoable::REGISTER_SETTING_KEYS
               .to_h { [it.delete_prefix("register_").humanize, Ownership.with_register_setting(it)] }
@@ -50,7 +49,7 @@ module Pages
           end
 
           def register_setting_bike_counts
-            self.class.register_setting_bikes(@bikes).transform_values(&:count).to_a
+            self.class.register_setting_bikes(@bikes).transform_values(&:count)
           end
 
           def ios_version_bike_counts
