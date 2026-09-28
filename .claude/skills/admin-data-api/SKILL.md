@@ -11,9 +11,8 @@ description: >-
   rather than logs or Honeybadger. Also trigger for anything about bug reports
   users have emailed in: what's been reported, searching/filtering them by
   status, tag or membership, or tagging one / linking it to the PR that fixes
-  it. Also trigger for adding a manufacturer in production. Also trigger when a
-  request returns 401/expired and the AdminData token needs
-  refreshing/re-authorizing. Not for reading log files (use
+  it. Also trigger when a request returns 401/expired and the AdminData token
+  needs refreshing/re-authorizing. Not for reading log files (use
   production-log-inspection) or aggregated exception triage (bin/binx_hb).
 ---
 
@@ -24,7 +23,7 @@ Production JSON reachable with the admin OAuth token:
 - `GET https://bikeindex.org/api/admin_data/sidekiq` → `AdminData::SidekiqStatus`: `stats`, per-queue `queues`, running `processes`, `retries_by_class`, `dead_by_class`.
 - `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats`, `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
 - `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
-- `POST /admin/manufacturers.json` → `create-manufacturer name=… [website=…] [frame_maker=true] [motorized_only=true]`, the attributes `Admin::ManufacturersController#permitted_parameters` takes.
+- `POST /admin/manufacturers.json` → `create-manufacturer`; the `manufacturers` skill walks through it.
 
 Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `manufacturers`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the admin controllers that include `Admin::TokenAccessible`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 
