@@ -1,13 +1,14 @@
 ---
 name: manufacturers
 description: >-
-  Find manufacturers Bike Index is missing and add them in production. Downloads the
-  counts of bikes registered with manufacturer "Other" (the /admin/bikes/missing_manufacturer
-  page) through the admin OAuth token, groups them against production's manufacturer list,
-  and creates new manufacturers via POST /admin/manufacturers. Trigger when the user asks about
-  missing manufacturers, "Other" manufacturer bikes, which brands to add, cleaning up
-  manufacturer_other, adding, creating or registering a manufacturer or brand in production,
-  or whether Bike Index already has one.
+  Find manufacturers Bike Index is missing, and add or update them in production.
+  Downloads the counts of bikes registered with manufacturer "Other" (the
+  /admin/bikes/missing_manufacturer page) through the admin OAuth token, groups them
+  against production's manufacturer list, and creates or edits manufacturers via POST and
+  PATCH /admin/manufacturers. Trigger when the user asks about missing manufacturers,
+  "Other" manufacturer bikes, which brands to add, cleaning up manufacturer_other, adding,
+  creating, registering, renaming or editing a manufacturer or brand in production, or
+  whether Bike Index already has one.
 ---
 
 # Manufacturers
@@ -55,7 +56,7 @@ A 404 means nothing matches. It looks up the way `Manufacturer.friendly_find` do
 
 Production write — only for a name the user has confirmed in this conversation, typed from your shortlist rather than copied from a variant. Settle with them:
 
-- `name` — the brand as it brands itself. A name in parentheses (`Brand (Other Name)`) makes the other name findable too.
+- `name` — the brand as it brands itself, plus its other name in parentheses whenever it has one — a company name, a former name, a spelled-out abbreviation (`TQ (TQ-Systems)`). The parenthesized name becomes the `secondary_slug`, so a search for either finds it.
 - `website`, `frame_maker` (makes frames, not just components), `motorized_only` (e-bikes/scooters only).
 
 The rest of `Admin::ManufacturersController#permitted_parameters` is optional.
@@ -69,3 +70,11 @@ The rest of `Admin::ManufacturersController#permitted_parameters` is optional.
 Returns the new manufacturer; a 422 prints the validation errors (`Manufacturer` validations — a taken name or slug, a color name, a quote). Link the user to `https://bikeindex.org/admin/manufacturers/<slug>`.
 
 Creating a manufacturer doesn't move the bikes. Give the user `https://bikeindex.org/admin/bikes/missing_manufacturer?search_other_name=<name>` to reassign them, for both new manufacturers and the existing-match table.
+
+## Updating
+
+```
+.claude/skills/admin-data-api/scripts/admin_data.rb update-manufacturer <slug> name="TQ (TQ-Systems)"
+```
+
+Takes the same attributes as create, and only the ones passed change. Production write — confirm the new values with the user first. The slug comes from the name outside the parentheses, so adding a secondary name leaves the slug and admin URL unchanged.
