@@ -11,8 +11,9 @@ description: >-
   rather than logs or Honeybadger. Also trigger for anything about bug reports
   users have emailed in: what's been reported, searching/filtering them by
   status, tag or membership, or tagging one / linking it to the PR that fixes
-  it. Also trigger when a request returns 401/expired and the AdminData token
-  needs refreshing/re-authorizing. Not for reading log files (use
+  it. Also trigger for adding a manufacturer in production. Also trigger when a
+  request returns 401/expired and the AdminData token needs
+  refreshing/re-authorizing. Not for reading log files (use
   production-log-inspection) or aggregated exception triage (bin/binx_hb).
 ---
 
@@ -23,9 +24,9 @@ Production JSON reachable with the admin OAuth token:
 - `GET https://bikeindex.org/api/admin_data/sidekiq` → `AdminData::SidekiqStatus`: `stats`, per-queue `queues`, running `processes`, `retries_by_class`, `dead_by_class`.
 - `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats`, `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
 - `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
-- `POST /admin/manufacturers.json` → `create-manufacturer` (see below).
+- `POST /admin/manufacturers.json` → `create-manufacturer name=… [website=…] [frame_maker=true] [motorized_only=true]`, the attributes `Admin::ManufacturersController#permitted_parameters` takes.
 
-Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability for the controller — `admin_data` for the two status endpoints, `bug_reports` for the bug reports, `manufacturers` for creating a manufacturer (a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the admin controllers that include `Admin::TokenAccessible`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
+Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `manufacturers`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the admin controllers that include `Admin::TokenAccessible`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 
 All operations go through the helper:
 
@@ -70,14 +71,6 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 `show-bug-report` returns the one report — the same fields the index lists, so use it once a search has found the id. `update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending), `github_pull_request` and `status` (one of `BugReport.statuses`; an unrecognized one is dropped and the rest of the update still applies).
 
 Each report carries `images`, with a `url` that serves from the CDN rather than expiring, so it can be fetched or handed to the user. Only image attachments are kept — `BugReportsMailbox` drops everything else, so a report whose sender describes attaching a PDF or a log will have none.
-
-## Manufacturers
-
-```
-.claude/skills/admin-data-api/scripts/admin_data.rb create-manufacturer name="Zoomo" website=https://zoomo.com frame_maker=true motorized_only=true
-```
-
-Attributes are `Admin::ManufacturersController#permitted_parameters`. A 422 prints the validation errors (a taken name, a color name).
 
 ## Refreshing the token
 
