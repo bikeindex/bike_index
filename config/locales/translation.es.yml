@@ -6459,9 +6459,6 @@ es:
           act_in_the_first_24_hours: Actúa en las primeras 24 horas.
           bike_stolen: Robo de bicicleta
           bikes_that_came_home: Bicicletas que volvieron a casa
-          call_police_with_the_case_number: Llame a la policía e indique el número
-            de caso y su anuncio.
-          do_not_go_get_it_yourself: No vayas a buscarlo tú mismo.
           email: Email
           every_hour_it_sits_unregistered: Cada hora que permanece sin registrar es
             una hora en la que nadie puede identificarlo.
@@ -6479,40 +6476,17 @@ es:
             se producen a cientos de kilómetros del lugar del robo. Tu anuncio permanece
             activo y visible hasta que marques la bicicleta como recuperada.
           faq_other_city_question: "¿Y si aparece en otra ciudad?"
-          faq_serial_answer: Regístrate de todos modos. Fotos, un recibo de compra,
-            registros de mantenimiento, documentación del seguro o una foto de Strava
-            pueden ayudarte a identificar una bicicleta. Añade todo lo que tengas
-            y consulta con la tienda que te la vendió; a menudo tienen el número de
-            serie registrado.
           faq_serial_question: No tengo mi número de serie.
-          faq_unregistered_answer: Ese es el caso habitual. Puedes denunciarlo como
-            robado ahora mismo; no es necesario que se haya denunciado previamente.
           faq_unregistered_question: Mi bicicleta nunca estuvo matriculada antes de
             que me la robaran.
           here_is_the_next_hour: Aquí está la próxima hora.
           how_alerts_work: Cómo funcionan las alertas
-          lede: 'Seis pasos, en orden. Los dos primeros son los más importantes: presentar
-            una denuncia policial para obtener un número de caso y, a continuación,
-            registrar la bicicleta como robada en Bike Index para que cualquier tienda,
-            agente o comprador que consulte el número de serie encuentre la suya.'
-          lede_short: Primero el informe policial, para obtener el número de caso.
-            Segundo, el índice de bicicletas, para que el número de serie sea público.
           more_resources: Más recursos
           no_account_yet: "¿Aún no tienes cuenta? Al registrar una bicicleta robada,
             se crea una. El registro es siempre gratuito."
           partner_organizations: tiendas asociadas, departamentos de policía y ciudades
-          pillar_alerts_body: Tu anuncio se comparte en nuestras redes sociales y,
-            opcionalmente, se promociona en las noticias cercanas al lugar del robo.
-            Cualquiera que lo vea puede contactarte directamente.
           pillar_alerts_title: Alertas que viajan
-          pillar_network_body: Cientos de miles de motociclistas, además de embajadores,
-            tiendas y socios de las fuerzas del orden, vigilan los anuncios de reventa
-            y denuncian los talleres clandestinos que manipulan las motocicletas ilegalmente.
           pillar_network_title: Una red de voluntarios
-          pillar_serial_body: 'Cualquier persona puede buscar un número de serie en
-            Bike Index de forma gratuita: tiendas en la recepción, agentes de policía
-            en el terreno, compradores antes de entregar el dinero en efectivo.'
-          pillar_serial_title: Un registro público en serie
           promoted_alerts: Alertas promocionadas
           promoted_alerts_body: Una alerta destacada muestra el anuncio de tu bicicleta
             robada en las noticias de Facebook de la zona donde ocurrió el robo, además
@@ -6565,33 +6539,17 @@ es:
           step_listing_body: Un anuncio con el número de informe policial, fotos claras
             y cualquier marca de identificación permite a un agente actuar en cuestión
             de minutos. Los anuncios vagos retrasan el proceso.
-          step_listing_tag: 5 minutos
-          step_listing_title: Añade el número de caso y las fotos.
           step_police_action: Encuentra tu línea de denuncia local
-          step_police_body: Haz esto primero. El número de caso es lo que permite
-            que un agente te devuelva la bicicleta en lugar de confiscarla, y todos
-            los pasos posteriores lo tendrán en cuenta. Trae el número de serie, fotos,
-            la dirección y la hora en que fue confiscada.
           step_police_tag: 15 minutos
           step_police_title: Presentar una denuncia policial
           step_register_action: Registra tu bicicleta robada
-          step_register_body: Este es el interruptor que activa todo lo demás. Tu
-            número de serie se registra en un registro público que las tiendas de
-            bicicletas, los departamentos de policía, las bases de datos de casas
-            de empeño y los compradores de bicicletas usadas consultan antes de tocar
-            un cuadro de segunda mano.
           step_register_tag: 3 min · gratis
           step_register_title: Regístrelo como robado en Bike Index.
           step_shops_action: Encuentra tiendas asociadas
-          step_shops_body: Los ladrones llevan bicicletas robadas a reparar o a comprar
-            repuestos. Los talleres que consultan Bike Index al recibirlas son los
-            que permiten encontrar una gran parte de las bicicletas reportadas.
           step_shops_tag: 20 minutos
           step_shops_title: Díselo a las tiendas cercanas
           stolen_bikes_recovered: Recuperan bicicletas robadas
           the_first_24_hours: Las primeras 24 horas
-          three_minutes_no_cost: Tres minutos, gratis, y el número de serie es todo
-            lo que necesitas para empezar.
           to_register_always: para registrarse, siempre
           value_returned_to_owners: valor devuelto a los propietarios
           where_is_this_happening: "¿Dónde está ocurriendo esto? Una URL, una dirección,
@@ -6602,6 +6560,50 @@ es:
             identificable para quienes se dedican a la compraventa de bicicletas usadas.
           work_top_to_bottom: Trabajar de arriba abajo.
           your_bike_is_gone: Tu bicicleta ha desaparecido.
+          faq_serial_proof_answer: De todas formas, regístrala. Fotos, el recibo de
+            compra, los registros de mantenimiento del taller o la documentación del
+            seguro pueden ayudarte a identificar la moto. Añade todo lo que tengas
+            y consulta con el taller donde la vendiste; a menudo tienen el número
+            de serie registrado.
+          faq_unregistered_recovered_answer: Eso suele ocurrir. Puedes denunciarla
+            como robada ahora mismo; no es necesario que estuviera registrada previamente.
+            Muchas bicicletas se recuperan después de haber sido robadas.
+          lede_register_first: 'Seis pasos, en orden. Los dos primeros son los más
+            importantes: regístrate en Bike Index para que cualquiera que encuentre
+            tu bicicleta pueda contactarte y, a continuación, presenta una denuncia
+            policial.'
+          pillar_alerts_promoted_body: Tu anuncio se comparte en nuestras redes sociales
+            y se promociona en las publicaciones cercanas al lugar del robo. Cualquiera
+            que lo vea puede contactarte directamente.
+          pillar_network_millions_body: Millones de motociclistas, además de embajadores,
+            tiendas y socios de las fuerzas del orden, monitorean los anuncios de
+            reventa y denuncian los talleres clandestinos que piratean vehículos.
+          pillar_record_body: 'Cualquier persona puede buscar una bicicleta en Bike
+            Index de forma gratuita: tiendas de bicicletas, agentes de policía en
+            servicio, compradores antes de pagar.'
+          pillar_record_title: Un registro público
+          report_on_the_stolen_bike_page: Si hay una bicicleta robada en Bike Index
+            sobre la que quieres informar, envía un mensaje en la página de esa bicicleta
+            robada.
+          step_listing_report_number_tag: 1 minuto
+          step_listing_report_number_title: Agregar el número de informe policial
+            al Índice de Bicicletas
+          step_police_bring_body: El número de expediente es lo que permite que un
+            agente te devuelva la bicicleta en lugar de confiscarla, y en todos los
+            trámites posteriores se hace referencia a él. Ten a mano la dirección,
+            la hora en que fue confiscada y el número de serie (si lo tienes).
+          step_register_minimal_registration: Si tienes el número de serie y una foto
+            de la bicicleta, ayuda, pero incluso un registro mínimo con solo el color
+            y el modelo permite recuperar bicicletas robadas.
+          step_register_registry_body: Este es el interruptor que activa todo lo demás.
+            Tu bicicleta se registra en un registro público que las tiendas de bicicletas,
+            los departamentos de policía, las bases de datos de casas de empeño y
+            los compradores de bicicletas usadas consultan antes de tocar un cuadro
+            de segunda mano.
+          step_shops_recovered_body: Los ladrones llevan las bicicletas robadas a
+            reparar o a comprar repuestos. Las tiendas que consultan Bike Index son
+            las que permiten recuperar una gran parte de las bicicletas robadas.
+          three_minutes_and_no_cost: Tres minutos y sin coste alguno.
       register:
         parts:
           acknowledgment_check:
