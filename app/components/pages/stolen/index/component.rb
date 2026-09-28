@@ -66,7 +66,7 @@ module Pages
 
         def pillars
           [{icon: "icons/searcher.svg", circle: "tw:bg-blue-600",
-            title: translation(".pillar_serial_title"), body: translation(".pillar_serial_body")},
+            title: translation(".pillar_record_title"), body: translation(".pillar_record_body")},
             {icon: "icons/users.svg", circle: "tw:bg-purple-500",
              title: translation(".pillar_network_title"), body: translation(".pillar_network_body")},
             {icon: "icons/megaphone.svg", circle: "tw:bg-slate-900",
