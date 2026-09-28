@@ -376,8 +376,8 @@
             class="tw:border-b tw:border-gray-200 tw:py-4"
             data-controller="ui--collapse"
           >
-            <%= render(UI::Collapse::Component.new(chevron: :trailing, color: :link,
-              html_class: "tw:w-full tw:gap-4 tw:text-[17.5px] tw:font-bold")) do %>
+            <%= render(UI::Collapse::Component.new(chevron: true, color: :link,
+              html_class: "tw:w-full tw:gap-2 tw:text-[17.5px] tw:font-bold tw:twtext-color")) do %>
               <span class="tw:flex-1 tw:text-left"><%= question %></span>
             <% end %>
 
