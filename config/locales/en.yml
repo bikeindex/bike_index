@@ -4553,9 +4553,6 @@ en:
         find_a_registration: Find a registration
         search_all_email_disabled: You can only search your organization's registrations
           with owner email or name
-        search_all_impounded_disabled: >-
-          Impounded searches already include everything %{org_name} has impounded,
-          wherever it's registered
         search_registrations: Search registrations
     stickers:
       edit:

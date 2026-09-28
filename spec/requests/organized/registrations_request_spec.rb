@@ -237,22 +237,24 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         let!(:impounded_elsewhere) { FactoryBot.create(:impound_record, organization: current_organization, user: current_user).bike }
         let!(:other_organization_impounded) { FactoryBot.create(:impound_record_with_organization).bike }
 
-        it "searches the organization's whole impound lot, hiding its owners, and locks search_all" do
-          get base_url, params: {search_no_js: true, search_status: "impounded", search_all: true}
+        it "searches the organization's whole impound lot, hiding its owners" do
+          get base_url, params: {search_no_js: true, search_status: "impounded"}
           expect(response.status).to eq(200)
-          expect(assigns(:search_all)).to be_falsey
-          expect(assigns(:search_all_lock)).to eq :impounded
           expect(assigns(:bikes).pluck(:id)).to match_array([impounded_bike.id, impounded_elsewhere.id])
           expect(response.body).to include("Hidden because it is not registered with #{current_organization.short_name}")
           expect(response.body).not_to include(impounded_elsewhere.owner_email)
 
+          # Searching all reaches every impounded bike
+          get base_url, params: {search_no_js: true, search_status: "impounded", search_all: true}
+          expect(assigns(:search_all)).to be_truthy
+          expect(assigns(:bikes).pluck(:id))
+            .to match_array([impounded_bike.id, impounded_elsewhere.id, other_organization_impounded.id])
+
           get base_url, params: {search_no_js: true, search_status: "stolen"}
-          expect(assigns(:search_all_lock)).to be_nil
           expect(assigns(:bikes).pluck(:id)).to eq([])
 
           # Only the organization's own registrations answer an owner email
           get base_url, params: {search_no_js: true, search_status: "impounded", search_email: impounded_elsewhere.owner_email}
-          expect(assigns(:search_all_lock)).to eq :email
           expect(assigns(:bikes).pluck(:id)).to eq([])
 
           # ...and the chart counts only those
