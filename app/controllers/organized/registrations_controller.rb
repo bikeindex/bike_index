@@ -120,6 +120,14 @@ module Organized
 
     private
 
+    # The session's, when they were set on this organization
+    def session_register_settings
+      settings = session[:register_settings] || {}
+      return {} if settings["organization_id"].to_s != current_organization.id.to_s
+
+      settings.slice("single_page", "separate_attestation").symbolize_keys
+    end
+
     def normalized_search_kind
       (params[:search_kind] == "stickers") ? "stickers" : "serials"
     end

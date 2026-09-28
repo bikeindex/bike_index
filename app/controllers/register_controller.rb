@@ -360,7 +360,7 @@ class RegisterController < ApplicationController
   def single_page_organization
     return if current_user.blank? || @b_param.creator_id != current_user.id
 
-    @b_param.creation_organization if register_setting?(@b_param, "single_page")
+    @b_param.creation_organization if register_settings[:single_page]
   end
 
   def redirect_to_single_page(bike, organization)
