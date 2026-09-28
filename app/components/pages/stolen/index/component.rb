@@ -51,7 +51,7 @@ module Pages
              body: translation(".step_google_alerts_body"), action: translation(".step_google_alerts_action"),
              href: "https://www.google.com/alerts"},
             {title: translation(".step_shops_title"), tag: translation(".step_shops_tag"),
-             body: translation(".step_shops_body"), action: translation(".step_shops_action"),
+             body: translation(".step_shops_recovered_body"), action: translation(".step_shops_action"),
              href: where_path}]
         end
 

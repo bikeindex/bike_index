@@ -140,9 +140,9 @@ en:
           step_register_tag: 3 min · free
           step_register_title: Register it as stolen on Bike Index
           step_shops_action: Find partner shops
-          step_shops_body: >-
+          step_shops_recovered_body: >-
             Thieves bring stolen bikes in for repairs and parts. Shops that check
-            Bike Index at intake are how a large share of flagged bikes get found.
+            Bike Index at intake are how a large share of stolen bikes get recovered.
           step_shops_tag: 20 min
           step_shops_title: Tell the shops near you
           stolen_bikes_recovered: stolen bikes recovered
