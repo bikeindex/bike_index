@@ -349,9 +349,30 @@ class RegisterController < ApplicationController
     if bike.errors.any?
       flash[:error] = @b_param.bike_errors&.to_sentence
       redirect_to step_path(2)
+    elsif (organization = single_page_organization)
+      redirect_to_single_page(bike, organization)
     else
       redirect_to step_path(:finished)
     end
+  end
+
+  # Not for an owner finishing the safety rules a member left them
+  def single_page_organization
+    return if current_user.blank? || @b_param.creator_id != current_user.id
+
+    @b_param.creation_organization if register_settings[:single_page]
+  end
+
+  def redirect_to_single_page(bike, organization)
+    bike_display = bike.mnfg_name
+    flash[:success] = if @b_param.acknowledgment_pending?
+      translation(:safety_rules_sent, bike_display:, email: bike.owner_email)
+    elsif @b_param.self_made?(current_user)
+      translation(:registered_own, bike_display:)
+    else
+      translation(:registered_for_owner, bike_display:, email: bike.owner_email)
+    end
+    redirect_to new_organization_registration_path(organization_id: organization.to_param)
   end
 
   def create_params

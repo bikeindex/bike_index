@@ -87,12 +87,14 @@ module BikeServices
 
     # The organization add-a-registration page's switches. Step 1 saves them onto the registration;
     # until then the session's apply only to the organization they were set on
-    def settings(b_param, session_settings)
-      in_session = session_settings.present? &&
-        session_settings["organization_id"].to_s == b_param.creation_organization_id.to_s
-      %i[single_page separate_attestation].index_with do |key|
-        b_param.params.to_h.fetch("register_#{key}") { in_session && session_settings[key.to_s].present? }
-      end
+    def settings(b_param, from_session)
+      session_settings(from_session, b_param.creation_organization_id)
+        .to_h { |key, value| [key, b_param.params.to_h.fetch("register_#{key}", value)] }
+    end
+
+    def session_settings(settings, organization_id)
+      in_session = settings.present? && settings["organization_id"].to_s == organization_id.to_s
+      %i[single_page separate_attestation].index_with { in_session && settings[it.to_s].present? }
     end
 
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
@@ -344,6 +346,14 @@ module BikeServices
       register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
     end
 
+    # The legacy forms show no rules, so an e-vehicle's go to its owner even when self-registered.
+    # The forms ask what the flow's steps do, so those are marked done
+    def create_legacy_bike(b_param, ip_address:)
+      b_param.params = b_param.params.merge("register_separate_attestation" => true,
+        "details_completed" => true, "report_completed" => true)
+      create_bike(b_param, sequence: nil, ip_address:, rules_to_owner: true)
+    end
+
     #
     # private below here
     #
@@ -420,9 +430,10 @@ module BikeServices
     # Returns nil while the rules are owed - the bike exists, but the registration isn't finished -
     # unless separate attestation left them to the owner, who's emailed the link back instead.
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
-    def create_bike(b_param, sequence:, ip_address:)
+    def create_bike(b_param, sequence:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_sequence = registration_sequence(b_param) if sequence.blank? && b_param.rules_left_to_owner?(b_param.creator)
+      owners_sequence = registration_sequence(b_param) if sequence.blank? &&
+        (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],
         "register_separate_attestation" => owners_sequence.present?

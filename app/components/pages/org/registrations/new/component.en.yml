@@ -5,8 +5,4 @@ en:
       org:
         registrations:
           new:
-            go_back_to_old_view: Go back to the old view
-            separate_attestation: Registrant fills out the registration attestation
-              separately
-            single_page: Show registration in a single page
-            update: Update
+            registration_form_settings: Registration form settings
