@@ -2269,12 +2269,21 @@ nl:
         signed_in_as_other: Je bent ingelogd als %{email}, dus we hebben je in dat
           account behouden. De registratiegegevens zijn nog steeds opgeslagen op het
           e-mailadres waarnaar we je hebben gemaild.
+        sign_out_to_agree: Je bent ingelogd als %{email}. Log uit en open de link
+          opnieuw om akkoord te gaan met de veiligheidsregels.
       find_b_param:
         registration_not_found: We konden die registratie niet vinden. Start hieronder
           een nieuwe registratie.
       sign_in_confirmed_user:
         unable_to_sign_in: We hebben je e-mailadres bevestigd, maar konden je niet
           inloggen op dat account.
+      redirect_to_single_page:
+        registered_for_owner: De %{bike_display} is geregistreerd - we hebben %{email}
+          een e-mail gestuurd zodat zij het kunnen claimen.
+        registered_own: Uw %{bike_display} is geregistreerd.
+        safety_rules_sent: De %{bike_display} is geregistreerd - we hebben %{email}
+          de veiligheidsregels gemaild ter goedkeuring, waarmee de registratie is
+          voltooid.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -3780,6 +3789,7 @@ nl:
     register_step_2: Voeg de gegevens van uw %{cycle_type} toe
     search_marketplace_index: Fietsindex Marktplaats
     strava_search_index: Fietsindex Strava-zoekfunctie
+    registration_form_settings: Instellingen voor het registratieformulier
   organized:
     ambassador_dashboards:
       getting_started:
@@ -3916,6 +3926,8 @@ nl:
         search_org_bikes_html: Of zoek de fietsen van %{org_name}, bekijk de fiets
           en klik <em>erop</em> om <em>hem</em> te verbinden met deze %{bike_sticker_kind}
         update: Bijwerken
+      new:
+        registration_form_settings: Instellingen voor het registratieformulier
     bulk_imports:
       index:
         added: Toegevoegd
@@ -4492,6 +4504,7 @@ nl:
       registrations_index: Organisatieregistraties
       search_all_registrations: Zoek alle registraties
       add_a_registration: Voeg een registratie toe
+      registration_form_settings: Instellingen voor het registratieformulier
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5437,6 +5450,11 @@ nl:
           het registreren van uw <strong>%{color_and_brand}</strong> in 's werelds
           meest uitgebreide <strong>fietsregister</strong> !
         youre_almost_done: Je bent bijna klaar!
+        agree_to_the_safety_rules: Ga akkoord met de veiligheidsregels.
+        review_the_rules: Bekijk de regels.
+        safety_rules_owed_html: Uw <strong>%{color_and_brand}</strong> is geregistreerd
+          bij %{org_name} op Bike Index. Ga akkoord met de veiligheidsregels van %{org_name}
+          om de registratie te voltooien.
       confirmation_email:
         click_to_sign_in_html: Klik op de knop <em>'Inloggen'</em> om je registratie
           te voltooien!
@@ -5793,6 +5811,23 @@ nl:
             created: Gemaakt
             notification_number: Kennisgeving#
             resolved: Vastbesloten
+        register_settings:
+          browser_only: Deze instellingen gelden alleen voor uw browser; ze hebben
+            geen invloed op andere gebruikers.
+          form_options: Formulieropties
+          old_view: Gebruik de oude registratiepagina.
+          registration_form_settings: Instellingen voor het registratieformulier
+          registration_page: Registratiepagina
+          separate_attestation: De registrant vult de registratieverklaring apart
+            in.
+          separate_attestation_helper: Ze ontvangen een e-mail met de melding dat
+            hun registratie nog niet is voltooid, inclusief een link om deze af te
+            ronden.
+          single_page: Registratieformulier van één pagina
+          update: Bijwerken
+        registrations:
+          new:
+            registration_form_settings: Instellingen voor het registratieformulier
       registrations:
         show:
           bike_details:
@@ -6647,6 +6682,9 @@ nl:
             we_will_keep_watch: Jouw %{bike_display} staat geregistreerd bij Bike
               Index. We houden het in de gaten — mocht het ooit als gestolen worden
               opgegeven, dan zoekt de hele gemeenschap mee.
+            safety_rules_sent_html: De %{bike_display} is geregistreerd bij Bike Index.
+              We hebben %{email} de veiligheidsregels gemaild ter goedkeuring, waarmee
+              de registratie is afgerond.
           step_report:
             about_the_one_you_found: Over de %{cycle_type} die je gevonden hebt
             address_where_you_found_it: Adres waar u het gevonden heeft
