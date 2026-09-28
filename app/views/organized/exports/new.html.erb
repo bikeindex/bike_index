@@ -41,32 +41,11 @@
       </div>
     <% end %>
 
-    <div class="row mt-2 hiddenOnAveryExport">
-      <div class="col-lg-4">
-        <p class="export-included-columns-label">
-          Included columns:
-        </p>
-      </div>
+    <% settings = ComponentStructs::OrgSearchSettings.new(organization: current_organization) %>
 
-      <div class="col-lg-8">
-        <div class="row">
-          <% checked_headers = @export.headers.present? ? @export.headers : Export.default_headers %>
-
-          <% Export.permitted_headers(current_organization).sort.each do |header| %>
-            <div class="form-group col-xs-6 col-md-4">
-              <label class="checkbox">
-                <%= f.check_box :headers, { multiple: true, checked: checked_headers.include?(header) }, header, 1 %>
-
-                <% if header == "motorized" %>
-                  Motorized / e-vehicle
-                <% else %>
-                  <%= header.titleize(keep_id_suffix: true) %>
-                <% end %>
-              </label>
-            </div>
-          <% end %>
-        </div>
-      </div>
+    <div class="mt-2 mb-4 hiddenOnAveryExport">
+      <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:,
+        export_headers: @export.headers.presence || settings.default_export_headers)) %>
     </div>
 
     <div class="form-group row mt-4 hiddenOnOnlyCustom">
@@ -152,7 +131,7 @@
             >
               <label class="checkbox">
                 <%= check_box_tag :include_impounded_bikes, true, @export.impounded_bikes %>
-                Impounded bikes
+                <em>Only</em> impounded bikes
               </label>
             </div>
           <% end %>

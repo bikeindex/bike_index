@@ -110,7 +110,7 @@ class BikesController < Bikes::BaseController
       signed_id = params[:bike].delete(:image_signed_id).presence || @b_param.image_signed_id
       @b_param.update(params: permitted_bparams.merge({"image_signed_id" => signed_id}.compact),
         origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
-      @bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
+      @bike = BikeServices::Register.create_legacy_bike(@b_param, ip_address: forwarded_ip_address)
       if @bike.errors.any?
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
@@ -131,7 +131,7 @@ class BikesController < Bikes::BaseController
       end
 
       @b_param.clean_params(permitted_bparams)
-      @bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
+      @bike = BikeServices::Register.create_legacy_bike(@b_param, ip_address: forwarded_ip_address)
       if @bike.errors.any?
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else

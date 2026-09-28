@@ -1,0 +1,20 @@
+---
+en:
+  components:
+    pages:
+      org:
+        register_settings:
+          browser_only: >-
+            These settings are just applied to your browser - they will not affect
+            other users
+          form_options: Form options
+          old_view: Use the old registration page
+          registration_form_settings: Registration form settings
+          registration_page: Registration page
+          separate_attestation: Registrant fills out the registration attestation
+            separately
+          separate_attestation_helper: >-
+            They'll receive an email telling them their registration isn't finished
+            with a link to finish it.
+          single_page: Single page registration form
+          update: Update
