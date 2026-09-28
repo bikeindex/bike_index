@@ -56,18 +56,18 @@ RSpec.describe Admin::GraphsController, type: :request do
         it "sorts the origin table highest count first, each swatch the chart's color for that origin" do
           get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "origin"}
           expect(response.status).to eq(200)
-          expect(origin_rows.first(2)).to eq([["Sticker", origin_colors["sticker"], "2"],
-            ["Web", origin_colors["web"], "1"]])
+          expect(origin_rows.first(2)).to eq([["sticker", origin_colors["sticker"], "2"],
+            ["web", origin_colors["web"], "1"]])
           # The origins with no bikes keep Ownership.origins order, rather than reshuffling
           expect(origin_rows.map(&:first))
-            .to eq(%w[sticker web].map(&:humanize) + (Ownership.origins - %w[sticker web]).map(&:humanize))
+            .to eq((%w[sticker web] + (Ownership.origins - %w[sticker web])).map { Ownership.creation_kind_humanized(it) })
 
           get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "origin"}
           expect(json_result.to_h { [it["name"], it["color"]] })
-            .to eq(origin_colors.transform_keys(&:humanize))
+            .to eq(origin_colors.transform_keys { Ownership.creation_kind_humanized(it) })
           # Every origin gets a zero-filled series, not just the ones the grouped query found
           totals = json_result.to_h { |series| [series["name"], series["data"].sum(&:last)] }
-          expect(totals).to eq(Ownership.origins.to_h { [it.humanize, 0] }.merge("Sticker" => 2, "Web" => 1))
+          expect(totals).to eq(Ownership.origins.to_h { [Ownership.creation_kind_humanized(it), 0] }.merge("sticker" => 2, "web" => 1))
         end
       end
 
@@ -83,18 +83,20 @@ RSpec.describe Admin::GraphsController, type: :request do
         let!(:web_bike) { FactoryBot.create(:bike, :with_ownership) }
         let!(:organization_form_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "organization_form") }
         let!(:embed_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "embed") }
+        # The label without the origin's description tooltip
         let(:setting_rows) do
-          Nokogiri::HTML(response.body).css("tbody tr").map { |row| row.css("td").map { it.text.strip } }
+          document = Nokogiri::HTML(response.body).tap { it.css("[data-controller='ui--tooltip']").each(&:remove) }
+          document.css("tbody tr").map { |row| row.css("td").map { it.text.strip } }
         end
 
         it "counts the bikes registered with each, and on the legacy org form" do
           get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "register_setting"}
           expect(response.status).to eq(200)
-          expect(setting_rows).to eq([["Separate attestation", "1"], ["Single page", "3"], ["Legacy org form", "1"]])
+          expect(setting_rows).to eq([["Separate attestation", "1"], ["Single page", "3"], ["legacy org form", "1"]])
 
           get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "register_setting"}
           expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
-            .to eq([["Separate attestation", 1], ["Single page", 3], ["Legacy org form", 1]])
+            .to eq([["Separate attestation", 1], ["Single page", 3], ["legacy org form", 1]])
         end
       end
 

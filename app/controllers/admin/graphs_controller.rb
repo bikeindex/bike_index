@@ -99,7 +99,7 @@ module Admin
       series = grouped_time_range_counts(bikes.joins(:ownerships).group("ownerships.origin"))
       empty = helpers.empty_time_range_counts
       Ownership.origins.map do |origin|
-        {name: origin.humanize, color: Pages::Admin::Graphs::BikesTable::Component::ORIGIN_COLORS[origin], data: empty.merge(series[origin] || {})}
+        {name: Ownership.creation_kind_humanized(origin), color: Pages::Admin::Graphs::BikesTable::Component::ORIGIN_COLORS[origin], data: empty.merge(series[origin] || {})}
       end
     end
 
@@ -129,8 +129,9 @@ module Admin
       elsif bike_graph_kind == "ios_version"
         ios_version_chart_series
       elsif bike_graph_kind == "register_setting"
-        Pages::Admin::Graphs::BikesTable::Component.register_setting_bikes(bikes).map do |name, setting_bikes|
-          {name:, data: helpers.time_range_counts(collection: setting_bikes)}
+        Pages::Admin::Graphs::BikesTable::Component.register_setting_bikes(bikes).map do |key, setting_bikes|
+          {name: Pages::Admin::Graphs::BikesTable::Component.register_setting_name(key),
+           data: helpers.time_range_counts(collection: setting_bikes)}
         end
       elsif bike_graph_kind == "pos"
         Pages::Admin::Graphs::BikesTable::Component::POS_SEARCH_KINDS.map do |pos_kind|

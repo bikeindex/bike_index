@@ -21,10 +21,15 @@ module Pages
           end
 
           def self.register_setting_bikes(bikes)
-            RegistrationInfoable::REGISTER_SETTING_KEYS
-              .to_h { [it.delete_prefix("register_").humanize, Ownership.with_register_setting(it)] }
-              .merge(Ownership.creation_kind_humanized(:organization_form).upcase_first => Ownership.organization_form)
+            RegistrationInfoable::REGISTER_SETTING_KEYS.index_with { Ownership.with_register_setting(it) }
+              .merge("organization_form" => Ownership.organization_form)
               .transform_values { bikes.where(id: it.select(:bike_id)) }
+          end
+
+          def self.register_setting_name(key)
+            return Ownership.creation_kind_humanized(key) if key == "organization_form"
+
+            key.delete_prefix("register_").humanize
           end
 
           def initialize(kind:, sortable_params:, bikes: nil, time_range: nil)

@@ -23,7 +23,7 @@
               class="d-inline-block mr-1"
               style="width: .75rem; height: .75rem; border: 1px solid <%= colors[origin] %>; background-color: <%= colors[origin] %>80;"
             ></span>
-            <%= origin.humanize %>
+            <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind: origin)) %>
             <%= link_to search_emoji, admin_bikes_path(sortable_params.merge(search_origin: origin)) %>
           <% else %>
             <%= origin %>
@@ -57,11 +57,15 @@
       <% end %>
     <% elsif @kind == "register_setting" %>
       <%= render(UI::Table::Component.new(records: register_setting_bike_counts)) do |table| %>
-        <% table.column(label: "Registration setting") do |(name)| %>
-          <%= name %>
+        <% table.column(label: "Registration setting") do |(key)| %>
+          <% if key == "organization_form" %>
+            <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind: key)) %>
+          <% else %>
+            <%= Pages::Admin::Graphs::BikesTable::Component.register_setting_name(key) %>
+          <% end %>
         <% end %>
 
-        <% table.column(label: "Bikes", classes: "tw:text-right") do |_name, bike_count| %>
+        <% table.column(label: "Bikes", classes: "tw:text-right") do |_key, bike_count| %>
           <%= number_display(bike_count) %>
         <% end %>
       <% end %>
