@@ -239,9 +239,6 @@ module BikeServices
       email_confirmation_link(b_param, "partial_register_confirmation")
     end
 
-    # The registration is the member's, so this link signs the owner in
-    def send_rules_email(b_param) = email_confirmation_link(b_param, "partial_registration")
-
     # Whichever email the expired link came from
     def resend_email_link(b_param)
       b_param.acknowledgment_pending? ? send_rules_email(b_param) : send_confirmation_email(b_param)
@@ -459,6 +456,9 @@ module BikeServices
       bike
     end
 
+    # The registration is the member's, so this link signs the owner in
+    def send_rules_email(b_param) = email_confirmation_link(b_param, "partial_registration")
+
     # Rate limited: anyone holding the registration's token can ask for a resend
     def email_confirmation_link(b_param, kind)
       return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
@@ -622,7 +622,7 @@ module BikeServices
     end
 
     conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
-      :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike, :email_confirmation_link,
+      :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike, :send_rules_email, :email_confirmation_link,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :report_placement, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
