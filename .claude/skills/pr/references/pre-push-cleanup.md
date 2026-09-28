@@ -99,6 +99,18 @@ The `+++ b/…` lines keep each hit attached to its file; the code-path filter k
 
 Judge each against the **Comments** section of `AGENTS.md` and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome, razoring the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
 
+### The backfill audit
+
+**Required.** Ask whether rows already in the database still fit the branch's code. The shapes that leave them behind:
+
+- **A vocabulary stored as data** — an enum value, a jsonb key or list, a class name in a string column. #4458 replaced names `Export#options["headers"]` holds; `Backfills::NotificationDeliveryErrorRenameJob` is a rename.
+- **A new column whose value depends on existing data**, not its default — `Backfills::OrganizationRolePriorityJob`.
+- **A changed calculated attribute** — existing rows keep the old value until something re-saves them. `Backfills::OrganizationPaidMoneyJob`.
+
+Find what reads the old form before calling one due. A value nothing reads again doesn't need one, and one recording what happened — `Export#written_headers` describes the file that was written — shouldn't be rewritten.
+
+State the verdict in your reply to the user either way, naming the stored values you checked. When one is due, ask before writing it: a job in `app/jobs/backfills/`, and a body bullet saying it runs after deploy.
+
 ### The cycle-type translation check
 
 `AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:
