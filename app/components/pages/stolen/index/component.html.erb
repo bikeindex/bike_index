@@ -435,15 +435,21 @@
         <%= translation(".report_bike_theft_issues") %>
       </h2>
 
-      <p
+      <div
         class="
-          tw:mt-1 tw:mb-4 tw:max-w-190 tw:text-[15px] tw:lg:mb-6
-          tw:lg:text-[17px]
+          tw:mt-1 tw:mb-4 tw:flex tw:max-w-190 tw:flex-col tw:gap-2
+          tw:text-[15px] tw:lg:mb-6 tw:lg:text-[17px]
         "
       >
-        <%= translation(".report_bike_theft_issues_subhead") %>
-        <%= translation(".reporting_your_own_bike_html", register_it_link: link_to(translation(".register_it"), register_stolen_path, class: "twlink")) %>
-      </p>
+        <p class="tw:m-0">
+          <%= translation(".report_bike_theft_issues_subhead") %>
+          <%= translation(".reporting_your_own_bike_html", register_it_link: link_to(translation(".register_it"), register_stolen_path, class: "twlink")) %>
+        </p>
+
+        <p class="tw:m-0">
+          <%= translation(".report_on_the_stolen_bike_page") %>
+        </p>
+      </div>
 
       <% if @current_user.present? %>
         <%= form_for @feedback, html: {class: "tw:max-w-3xl"} do |f| %>

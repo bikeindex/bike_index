@@ -84,6 +84,9 @@ en:
           report_bike_theft_issues: Report bike theft issues
           report_bike_theft_issues_subhead: Seen a stolen bike for sale, or a chop
             shop? Let us know where.
+          report_on_the_stolen_bike_page: >-
+            If there is a stolen bike on Bike Index that you're reporting about, send
+            a message on that stolen bike page instead.
           report_someone_selling_a_stolen_bike: Someone is selling a stolen bike
           reporting_your_own_bike_html: Reporting your own bike stolen? %{register_it_link}
             instead.
