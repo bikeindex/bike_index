@@ -28,11 +28,10 @@ en:
             from the theft. Your listing stays live and searchable until you mark
             the bike recovered.
           faq_other_city_question: What if it turns up in another city?
-          faq_serial_answer: >-
-            Register anyway. Photos, a purchase receipt, shop service records, insurance
-            paperwork, or a Strava photo can all identify a bike. Add whatever you
-            have, and check with the shop that sold it — they often have the serial
-            on file.
+          faq_serial_proof_answer: >-
+            Register anyway. Photos, a purchase receipt, shop service records or insurance
+            paperwork can all identify a bike. Add whatever you have, and check with
+            the shop that sold it — they often have the serial on file.
           faq_serial_question: I don't have my serial number.
           faq_unregistered_answer: >-
             That is the common case. You can register it as stolen right now; there

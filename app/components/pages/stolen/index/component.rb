@@ -74,7 +74,7 @@ module Pages
         end
 
         def faqs
-          [[translation(".faq_serial_question"), translation(".faq_serial_answer")],
+          [[translation(".faq_serial_question"), translation(".faq_serial_proof_answer")],
             [translation(".faq_unregistered_question"), translation(".faq_unregistered_answer")],
             [translation(".faq_confront_question"), translation(".faq_confront_answer")],
             [translation(".faq_other_city_question"), translation(".faq_other_city_answer")],
