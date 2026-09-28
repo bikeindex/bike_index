@@ -4,8 +4,8 @@ module Pages
   module Org
     module Search
       module ColumnSettings
-        # The column-visibility panel. Its sidecar holds the copy for everything
-        # ComponentStructs::OrgSearchSettings names — the column labels and the filters.
+        # The column-visibility panel, and the export form's column picker. Its sidecar holds the
+        # copy for everything ComponentStructs::OrgSearchSettings names — the column labels and the filters.
         class Component < ApplicationComponent
           # A band the width of the card the caller opens it from, per Kelsey's redesign
           PANEL_CLASSES = "tw:border-b tw:border-gray-100 tw:px-5 tw:py-5 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900"
@@ -17,19 +17,56 @@ module Pages
           # Goes on the element wrapping this panel, which the caller renders — so class-level,
           # not an instance built only to read off. collapse: when the ColumnSettingsToggle is
           # inside it too
-          def self.column_settings_data_attributes(settings, controllers: nil, collapse: false)
+          def self.column_settings_data_attributes(controllers: nil, collapse: false)
             controllers = [controllers, (COLLAPSE_DATA[:controller] if collapse), "org--search org--search-column-settings"]
-            {controller: controllers.compact.join(" "),
-             "org--search-column-settings-default-columns-value": settings.initially_checked_columns.to_json}
+            {controller: controllers.compact.join(" ")}
               .merge(collapse ? COLLAPSE_DATA.except(:controller) : {})
           end
 
           # Opened from a Search::ColumnSettingsToggle the caller renders, inside the
           # element it gives COLLAPSE_DATA. open: renders it expanded, for a collapse without
-          # a storage key (which would restore the stored state over it)
-          def initialize(settings:, open: false)
+          # a storage key (which would restore the stored state over it). export_headers: the
+          # export form's checked headers, which makes it that form's always-open column fields
+          def initialize(settings:, open: false, export_headers: nil)
             @settings = settings
-            @open = open
+            @export_headers = export_headers
+            @open = open || export?
+          end
+
+          private
+
+          def export? = !@export_headers.nil?
+
+          def columns
+            @columns ||= export? ? export_columns : search_columns
+          end
+
+          # Named for their cell, which the search's controller shows and hides by
+          def search_columns
+            @settings.panel_columns.map do |cell_name|
+              always_visible = @settings.always_visible?(cell_name)
+              {name: cell_name, value: cell_name, label: @settings.panel_labels[cell_name.to_sym],
+               checked: always_visible, disabled: always_visible, default: default?(cell_name)}
+            end
+          end
+
+          def export_columns
+            @settings.export_columns.map do |cell_name, header|
+              {name: "export[headers][]", value: header, label: @settings.panel_labels[cell_name.to_sym],
+               checked: @export_headers.include?(header), default: default?(cell_name)}
+            end
+          end
+
+          def default?(cell_name) = @settings.initially_checked_columns.include?(cell_name)
+
+          def column_rows = (columns.size / 3.0).ceil
+
+          # The search's controller hears each change, all/none/default's included
+          def checkboxes_data
+            return {controller: "org--column-checkboxes"} if export?
+
+            {controller: "org--column-checkboxes", "org--search-column-settings-target": "checkboxes",
+             action: "change->org--search-column-settings#updateVisibleColumns"}
           end
         end
       end

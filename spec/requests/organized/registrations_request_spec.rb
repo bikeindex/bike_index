@@ -828,6 +828,15 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           confirmation_token: b_param.reload.email_confirmation_token)
         expect(ActionMailer::Base.deliveries.last.html_part.decoded).to include ERB::Util.html_escape(confirm_path)
 
+        # Another account can't agree for the owner, so the link stays theirs to use
+        expect {
+          post "/register/confirm_email", params: {b_param_token: b_param.id_token,
+                                                   confirmation_token: b_param.email_confirmation_token}
+        }.to_not change(User, :count)
+        expect(response).to redirect_to confirm_path
+        expect(flash[:error]).to include "signed in as #{current_user.email}"
+        expect(b_param.reload).to have_attributes(email_confirmed?: false, email_confirmation_token: be_present)
+
         # Signed out - log_in stubbed the member's session rather than signing them in
         allow(User).to receive(:from_auth).and_call_original
         expect {
@@ -903,9 +912,10 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
     it "wires up multi-search, the column settings and its collapse on one element" do
       get "#{base_url}/multi_search"
-      wrapper = Nokogiri::HTML(response.body).at_css("[data-org--multi-search-url-value]")
+      page = Nokogiri::HTML(response.body)
+      wrapper = page.at_css("[data-org--multi-search-url-value]")
       expect(wrapper["data-controller"].split).to match_array(%w[org--multi-search ui--collapse org--search org--search-column-settings])
-      expect(JSON.parse(wrapper["data-org--search-column-settings-default-columns-value"])).to include("created_at_cell")
+      expect(page.at_css("input[name='created_at_cell']")["data-default"]).to eq "true"
     end
   end
 

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Org::RegisterStep1::Component, type: :component do
+RSpec.describe Pages::Org::Registrations::New::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
   let(:b_param) do
     BParam.create(origin: "register_flow_organized",

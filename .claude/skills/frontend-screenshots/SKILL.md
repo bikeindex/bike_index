@@ -92,7 +92,7 @@ browser_evaluate: () => {
   document.querySelectorAll('.close, [data-dismiss="modal"], [aria-label="Close"]').forEach(c => c.click());
   document.querySelectorAll('.modal-backdrop').forEach(b => b.style.setProperty('display', 'none'));
   document.body.classList.remove('modal-open');
-  document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
+  document.querySelector('.primary-footer')?.style.setProperty('display', 'none');
   document.getElementById('review-app-banner')?.style.setProperty('display', 'none');
   // A same-origin iframe (the legacy org add-a-bike page, the embeds) carries its own badge
   [document, ...[...document.querySelectorAll('iframe')].map(f => f.contentDocument).filter(Boolean)]

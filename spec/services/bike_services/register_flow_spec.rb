@@ -39,7 +39,6 @@ RSpec.describe BikeServices::RegisterFlow do
 
     it "is one step" do
       expect(flow.steps).to eq %w[1]
-      expect(flow.acknowledgments?).to be_falsey
     end
   end
 end

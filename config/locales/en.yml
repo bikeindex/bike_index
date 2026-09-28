@@ -1959,6 +1959,9 @@ en:
       confirm_email:
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
+        sign_out_to_agree: >-
+          You're signed in as %{email}. Sign out, then open the link again to agree
+          to the safety rules.
         signed_in_as_other: >-
           You're signed in as %{email}, so we kept you in that account. The registration
           is still saved to the address we emailed.
