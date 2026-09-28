@@ -58,8 +58,8 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.location(Bike.all, "New York", "50", organization:)).to eq(Bike.all)
       expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen").pluck(:id))
         .to eq([stolen_nyc.id])
-      expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen_or_impounded")
-        .pluck(:id)).to match_array([stolen_nyc.id, impounded_nyc.id])
+      expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "impounded").pluck(:id))
+        .to eq([impounded_nyc.id])
       expect(described_class.location(Bike.all, "", "50", organization:, search_status: "stolen")).to eq(Bike.all)
       expect(described_class.location(Bike.all, "Anywhere", "50", organization:, search_status: "stolen")).to eq(Bike.all)
     end
@@ -82,8 +82,6 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true)).to eq(Bike.all)
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
           search_status: "impounded").pluck(:id)).to eq([impounded_nyc.id])
-        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
-          search_status: "stolen_or_impounded").pluck(:id)).to match_array([stolen_nyc.id, impounded_nyc.id])
       end
     end
 
@@ -133,7 +131,6 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
 
       expect(described_class.status(Bike.all, "stolen").pluck(:id)).to eq([bike_stolen.id])
       expect(described_class.status(Bike.all, "not_impounded").pluck(:id)).to match_array([bike_with_sticker.id, bike_stolen.id])
-      expect(described_class.status(Bike.all, "stolen_or_impounded").pluck(:id)).to match_array([bike_stolen.id, bike_impounded.id])
       expect(described_class.status(Bike.all, "all").count).to eq 3
 
       # The panel offers street; none and with still arrive from older links

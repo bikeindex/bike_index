@@ -9,7 +9,7 @@ const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 export default class extends Controller {
   static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
-  static values = { resultView: String, impoundLotStatuses: Array }
+  static values = { resultView: String }
 
   connect () {
     this.initOptionalFields(0)
@@ -135,7 +135,7 @@ export default class extends Controller {
     if (!this.hasSearchAllTarget) return false
     const lock = document.getElementById('search_email')?.value.trim()
       ? 'email'
-      : (this.impoundLotStatusesValue.includes(this.searchStatus) ? 'impounded' : null)
+      : (this.searchStatus === 'impounded' ? 'impounded' : null)
     const unchecking = Boolean(lock) && this.searchAllTarget.checked
 
     this.searchAllTarget.disabled = Boolean(lock)

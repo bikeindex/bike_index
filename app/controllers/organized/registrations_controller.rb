@@ -23,7 +23,7 @@ module Organized
         # impounded status already reaches past them
         @search_all_lock = if params[:search_email].present?
           :email
-        elsif BikeServices::OrganizedSearch::IMPOUND_LOT_STATUSES.include?(search_status)
+        elsif search_status == "impounded"
           :impounded
         end
         @search_all = !@search_all_lock && Binxtils::InputNormalizer.boolean(params[:search_all])

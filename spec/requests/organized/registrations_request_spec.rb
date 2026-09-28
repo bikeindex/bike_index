@@ -246,9 +246,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           expect(response.body).to include("Hidden because it is not registered with #{current_organization.short_name}")
           expect(response.body).not_to include(impounded_elsewhere.owner_email)
 
-          get base_url, params: {search_no_js: true, search_status: "stolen_or_impounded"}
-          expect(assigns(:bikes).pluck(:id)).to match_array([impounded_bike.id, impounded_elsewhere.id])
-
           get base_url, params: {search_no_js: true, search_status: "stolen"}
           expect(assigns(:search_all_lock)).to be_nil
           expect(assigns(:bikes).pluck(:id)).to eq([])

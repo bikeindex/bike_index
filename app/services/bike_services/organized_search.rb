@@ -8,10 +8,6 @@ module BikeServices
     # pagination, and what the results card says it found - stop here
     SEARCH_ALL_COUNT_LIMIT = 1_000
 
-    # The statuses that match the bikes an organization has impounded, which its search finds
-    # wherever they're registered
-    IMPOUND_LOT_STATUSES = %w[impounded stolen_or_impounded].freeze
-
     # The organization's registrations, and every bike it has actively impounded. A UNION, since
     # an OR of two IN subqueries filters every bike with the searched status
     def with_impound_lot(organization)
@@ -37,7 +33,7 @@ module BikeServices
         .where("bike_organization_notes.body ILIKE ?", query_string)
     end
 
-    LOCATIONABLE_STATUSES = %w[stolen impounded stolen_or_impounded].freeze
+    LOCATIONABLE_STATUSES = %w[stolen impounded].freeze
 
     def location_searchable?(organization:, search_all:, search_status:)
       LOCATIONABLE_STATUSES.include?(search_status) || registration_address_searchable?(organization:, search_all:)
@@ -65,7 +61,7 @@ module BikeServices
         addressed = bikes.where(AddressRecord.within_bounding_box(bounding_box)
           .where("address_records.id = bikes.address_record_id").arel.exists)
         # The impound lot reaches owners registered elsewhere, whose addresses aren't the organization's
-        matches << if IMPOUND_LOT_STATUSES.include?(search_status)
+        matches << if search_status == "impounded"
           addressed.where(organization.bike_organizations.where("bike_organizations.bike_id = bikes.id").arel.exists)
         else
           addressed
@@ -97,7 +93,6 @@ module BikeServices
       case value
       when "all" then bikes
       when "not_impounded" then bikes.where.not(status: "status_impounded")
-      when "stolen_or_impounded" then bikes.stolen_or_impounded
       else bikes.where(status: "status_#{value}")
       end
     end
