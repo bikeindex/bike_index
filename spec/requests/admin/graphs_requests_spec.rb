@@ -81,18 +81,20 @@ RSpec.describe Admin::GraphsController, type: :request do
             creation_registration_info: {register_single_page: true, register_separate_attestation: true})
         end
         let!(:web_bike) { FactoryBot.create(:bike, :with_ownership) }
+        let!(:organization_form_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "organization_form") }
+        let!(:embed_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "embed") }
         let(:setting_rows) do
           Nokogiri::HTML(response.body).css("tbody tr").map { |row| row.css("td").map { it.text.strip } }
         end
 
-        it "counts the bikes registered with each" do
+        it "counts the bikes registered with each, and on the old registration page" do
           get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "register_setting"}
           expect(response.status).to eq(200)
-          expect(setting_rows).to eq([["Separate attestation", "1"], ["Single page", "3"]])
+          expect(setting_rows).to eq([["Separate attestation", "1"], ["Single page", "3"], ["Old registration page", "1"]])
 
           get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "register_setting"}
           expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
-            .to eq([["Separate attestation", 1], ["Single page", 3]])
+            .to eq([["Separate attestation", 1], ["Single page", 3], ["Old registration page", 1]])
         end
       end
 
