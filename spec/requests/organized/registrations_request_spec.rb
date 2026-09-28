@@ -848,6 +848,21 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(b_param.reload.creator_id).to eq current_user.id
       end
 
+      context "the rules link is wrong" do
+        it "emails the owner the rules again, rather than a confirmation" do
+          b_param = register_e_scooter
+          allow(User).to receive(:from_auth).and_call_original
+          sent_at = Time.current - BikeServices::Register::CONFIRMATION_EMAIL_INTERVAL - 1.minute
+          b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => sent_at))
+          expect {
+            post confirm_email_register_path, params: {b_param_token: b_param.id_token, confirmation_token: "wrong-token"}
+          }.to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
+          expect(EmailJobs::PartialRegistrationJob.jobs.last["args"]).to eq [b_param.id, "partial_registration"]
+          expect(flash[:error]).to be_present
+          expect(User.where(email: owner_email)).to be_none
+        end
+      end
+
       context "registering their own" do
         let(:owner_email) { current_user.email }
 
