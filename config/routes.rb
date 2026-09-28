@@ -362,6 +362,7 @@ Rails.application.routes.draw do
       collection do
         get :tables
         get :variable
+        get :bikes_table
       end
     end
     resources :ownerships, only: %i[show edit update index]

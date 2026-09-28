@@ -31,7 +31,7 @@ RSpec.describe base_url, type: :request do
         expect(response.body).to match(%r{/admin/users/#{subject.creator_id}})
         expect(response.body).to match(%r{/admin/organizations/#{organization.id}})
         expect(response.body).to match(%r{/admin/bikes/#{bike.id}})
-        expect(response.body).to match(/Embed partial/)
+        expect(response.body).to match(/old landing page/)
         expect(response.body).to match(/Frame material is not valid/)
         expect(response.body).to match(/owner_email/)
       end
