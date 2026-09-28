@@ -171,7 +171,7 @@ class RegisterController < ApplicationController
     return redirect_to_current_step if @b_param.email_confirmed?
 
     unless BikeServices::Register.confirmation_token_valid?(@b_param, params[:confirmation_token])
-      BikeServices::Register.send_confirmation_email(@b_param)
+      BikeServices::Register.resend_email_link(@b_param)
       flash[:error] = translation(:confirmation_link_expired)
       return redirect_to_current_step
     end
