@@ -122,10 +122,11 @@ en:
           step_listing_tag: 5 min
           step_listing_title: Add the case number and photos
           step_police_action: Find your local report line
-          step_police_body: >-
+          step_police_bring_body: >-
             Do this first. The case number is what lets an officer hand your bike
             back instead of impounding it, and every later step references it. Bring
-            the serial number, photos, and the address and time it was taken.
+            photos, the address and time it was taken and the serial number (if you
+            have it).
           step_police_tag: 15 min
           step_police_title: File a police report
           step_register_action: Register your stolen bike
