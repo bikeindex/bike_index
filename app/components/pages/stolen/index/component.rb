@@ -38,7 +38,7 @@ module Pages
             body: translation(".step_police_body"), action: translation(".step_police_action"),
             href: get_your_stolen_bike_back_path},
             {title: translation(".step_register_title"), tag: translation(".step_register_tag"),
-             body: translation(".step_register_body"), action: translation(".step_register_action"),
+             body: translation(".step_register_minimal_body"), action: translation(".step_register_action"),
              href: register_stolen_path},
             {title: translation(".step_listing_title"), tag: translation(".step_listing_tag"),
              body: translation(".step_listing_body"), action: translation(".step_listing_action"),

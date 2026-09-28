@@ -125,10 +125,12 @@ en:
           step_police_tag: 15 min
           step_police_title: File a police report
           step_register_action: Register your stolen bike
-          step_register_body: >-
-            This is the switch that turns everything else on. Your serial number goes
-            into a public registry that bike shops, police departments, pawn databases,
-            and used-bike buyers check before they touch a secondhand frame.
+          step_register_minimal_body: >-
+            This is the switch that turns everything else on. Your bike goes into
+            a public registry that bike shops, police departments, pawn databases,
+            and used-bike buyers check before they touch a secondhand frame. If you
+            have a serial number and photo of the bike it helps — but even a minimal
+            registration with just the color and model recovers stolen bikes.
           step_register_tag: 3 min · free
           step_register_title: Register it as stolen on Bike Index
           step_shops_action: Find partner shops
