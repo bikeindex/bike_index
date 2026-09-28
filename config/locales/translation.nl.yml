@@ -2269,12 +2269,21 @@ nl:
         signed_in_as_other: Je bent ingelogd als %{email}, dus we hebben je in dat
           account behouden. De registratiegegevens zijn nog steeds opgeslagen op het
           e-mailadres waarnaar we je hebben gemaild.
+        sign_out_to_agree: Je bent ingelogd als %{email}. Log uit en open de link
+          opnieuw om akkoord te gaan met de veiligheidsregels.
       find_b_param:
         registration_not_found: We konden die registratie niet vinden. Start hieronder
           een nieuwe registratie.
       sign_in_confirmed_user:
         unable_to_sign_in: We hebben je e-mailadres bevestigd, maar konden je niet
           inloggen op dat account.
+      redirect_to_single_page:
+        registered_for_owner: De %{bike_display} is geregistreerd - we hebben %{email}
+          een e-mail gestuurd zodat zij het kunnen claimen.
+        registered_own: Uw %{bike_display} is geregistreerd.
+        safety_rules_sent: De %{bike_display} is geregistreerd - we hebben %{email}
+          de veiligheidsregels gemaild ter goedkeuring, waarmee de registratie is
+          voltooid.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -3780,6 +3789,7 @@ nl:
     register_step_2: Voeg de gegevens van uw %{cycle_type} toe
     search_marketplace_index: Fietsindex Marktplaats
     strava_search_index: Fietsindex Strava-zoekfunctie
+    registration_form_settings: Instellingen voor het registratieformulier
   organized:
     ambassador_dashboards:
       getting_started:
@@ -3916,6 +3926,8 @@ nl:
         search_org_bikes_html: Of zoek de fietsen van %{org_name}, bekijk de fiets
           en klik <em>erop</em> om <em>hem</em> te verbinden met deze %{bike_sticker_kind}
         update: Bijwerken
+      new:
+        registration_form_settings: Instellingen voor het registratieformulier
     bulk_imports:
       index:
         added: Toegevoegd
@@ -4492,6 +4504,7 @@ nl:
       registrations_index: Organisatieregistraties
       search_all_registrations: Zoek alle registraties
       add_a_registration: Voeg een registratie toe
+      registration_form_settings: Instellingen voor het registratieformulier
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5437,6 +5450,11 @@ nl:
           het registreren van uw <strong>%{color_and_brand}</strong> in 's werelds
           meest uitgebreide <strong>fietsregister</strong> !
         youre_almost_done: Je bent bijna klaar!
+        agree_to_the_safety_rules: Ga akkoord met de veiligheidsregels.
+        review_the_rules: Bekijk de regels.
+        safety_rules_owed_html: Uw <strong>%{color_and_brand}</strong> is geregistreerd
+          bij %{org_name} op Bike Index. Ga akkoord met de veiligheidsregels van %{org_name}
+          om de registratie te voltooien.
       confirmation_email:
         click_to_sign_in_html: Klik op de knop <em>'Inloggen'</em> om je registratie
           te voltooien!
@@ -5793,6 +5811,23 @@ nl:
             created: Gemaakt
             notification_number: Kennisgeving#
             resolved: Vastbesloten
+        register_settings:
+          browser_only: Deze instellingen gelden alleen voor uw browser; ze hebben
+            geen invloed op andere gebruikers.
+          form_options: Formulieropties
+          old_view: Gebruik de oude registratiepagina.
+          registration_form_settings: Instellingen voor het registratieformulier
+          registration_page: Registratiepagina
+          separate_attestation: De registrant vult de registratieverklaring apart
+            in.
+          separate_attestation_helper: Ze ontvangen een e-mail met de melding dat
+            hun registratie nog niet is voltooid, inclusief een link om deze af te
+            ronden.
+          single_page: Registratieformulier van één pagina
+          update: Bijwerken
+        registrations:
+          new:
+            registration_form_settings: Instellingen voor het registratieformulier
       registrations:
         show:
           bike_details:
@@ -6330,9 +6365,6 @@ nl:
           act_in_the_first_24_hours: Handel binnen de eerste 24 uur.
           bike_stolen: Fiets gestolen
           bikes_that_came_home: Fietsen die mee naar huis zijn genomen
-          call_police_with_the_case_number: Neem contact op met de politie en vermeld
-            het zaaknummer en uw adres.
-          do_not_go_get_it_yourself: Ga het niet zelf halen.
           email: E-mailadres
           every_hour_it_sits_unregistered: Elk uur dat het ongeregistreerd blijft,
             is een uur waarin niemand het kan identificeren.
@@ -6349,41 +6381,17 @@ nl:
             vinden honderden kilometers van de diefstal plaats. Uw advertentie blijft
             actief en vindbaar totdat u de fiets als teruggevonden markeert.
           faq_other_city_question: Wat als het in een andere stad opduikt?
-          faq_serial_answer: Registreer de fiets in elk geval. Foto's, een aankoopbewijs,
-            onderhoudsgegevens van de winkel, verzekeringspapieren of een Strava-foto
-            kunnen allemaal helpen bij de identificatie van een fiets. Voeg alles
-            toe wat je hebt en neem contact op met de winkel waar je de fiets hebt
-            gekocht – zij hebben het serienummer vaak in hun systeem staan.
           faq_serial_question: Ik heb mijn serienummer niet.
-          faq_unregistered_answer: Dat is de meest voorkomende situatie. Je kunt het
-            nu meteen als gestolen opgeven; het hoeft niet eerder geregistreerd te
-            zijn.
           faq_unregistered_question: Mijn fiets was nooit geregistreerd voordat hij
             gestolen werd.
           here_is_the_next_hour: Dit is het komende uur.
           how_alerts_work: Hoe waarschuwingen werken
-          lede: 'Zes stappen, in de juiste volgorde. De eerste twee zijn het belangrijkst:
-            doe aangifte bij de politie om een dossiernummer te krijgen, en registreer
-            de fiets vervolgens als gestolen op Bike Index, zodat elke winkel, agent
-            en koper die een serienummer controleert, jouw fiets kan vinden.'
-          lede_short: Eerst het politierapport, voor het zaaknummer. Daarna de fietsindex,
-            zodat het serienummer openbaar is.
           more_resources: Meer bronnen
           no_account_yet: Nog geen account? Registreer een gestolen fiets en maak
             er een aan. Registratie is altijd gratis.
           partner_organizations: partnerwinkels, politiekorpsen en steden
-          pillar_alerts_body: Je melding wordt gedeeld op onze sociale mediakanalen
-            en, optioneel, gepromoot in berichten in de buurt van de diefstallocatie.
-            Iedereen die de melding ziet, kan je direct een bericht sturen.
           pillar_alerts_title: Waarschuwingen die reizen
-          pillar_network_body: Honderdduizenden motorrijders, plus ambassadeurs, winkels
-            en partners van de politie, houden advertenties voor tweedehands motoren
-            in de gaten en signaleren illegale werkplaatsen.
           pillar_network_title: Een vrijwilligersnetwerk
-          pillar_serial_body: 'Iedereen kan gratis een serienummer opzoeken in Bike
-            Index: winkels bij de ontvangst, agenten in het veld en kopers voordat
-            ze afrekenen.'
-          pillar_serial_title: Een openbaar serieel record
           promoted_alerts: Gepromote meldingen
           promoted_alerts_body: Een gepromote melding zorgt ervoor dat uw advertentie
             voor de gestolen fiets verschijnt in Facebook-feeds in de omgeving van
@@ -6439,32 +6447,17 @@ nl:
             foto's en eventuele identificerende kenmerken is er een waarop een agent
             binnen enkele minuten actie kan ondernemen. Vage meldingen vertragen het
             proces.
-          step_listing_tag: 5 min
-          step_listing_title: Voeg het dossiernummer en de foto's toe.
           step_police_action: Vind de meldlijn bij u in de buurt
-          step_police_body: Doe dit eerst. Het dossiernummer zorgt ervoor dat een
-            agent je fiets teruggeeft in plaats van hem in beslag te nemen, en elke
-            volgende stap verwijst ernaar. Neem het serienummer, foto's en het adres
-            en tijdstip waarop de fiets is meegenomen mee.
           step_police_tag: 15 min
           step_police_title: Doe aangifte bij de politie
           step_register_action: Registreer je gestolen fiets
-          step_register_body: Dit is de schakelaar die al het andere inschakelt. Je
-            serienummer wordt opgenomen in een openbaar register dat fietsenwinkels,
-            politiebureaus, pandjeshuizen en kopers van tweedehands fietsen raadplegen
-            voordat ze een tweedehands frame aanraken.
           step_register_tag: 3 min · gratis
           step_register_title: Registreer het als gestolen op Bike Index.
           step_shops_action: Vind partnerwinkels
-          step_shops_body: Dieven brengen gestolen fietsen binnen voor reparatie en
-            onderdelen. Winkels die bij binnenkomst de Bike Index raadplegen, zorgen
-            ervoor dat een groot deel van de gemelde fietsen wordt teruggevonden.
           step_shops_tag: 20 min
           step_shops_title: Vertel het aan de winkels bij jou in de buurt.
           stolen_bikes_recovered: Gestolen fietsen teruggevonden
           the_first_24_hours: De eerste 24 uur
-          three_minutes_no_cost: Drie minuten, geen kosten, en het enige wat je nodig
-            hebt om te beginnen is het serienummer.
           to_register_always: om je altijd te registreren.
           value_returned_to_owners: waarde teruggegeven aan eigenaren
           where_is_this_happening: Waar gebeurt dit? Een URL, een adres, alle informatie
@@ -6475,6 +6468,48 @@ nl:
             voor de mensen die dagelijks met tweedehands fietsen werken.
           work_top_to_bottom: Werk van boven naar beneden.
           your_bike_is_gone: Je fiets is verdwenen.
+          faq_serial_proof_answer: Registreer de fiets in elk geval. Foto's, een aankoopbewijs,
+            onderhoudsgegevens van de winkel of verzekeringspapieren kunnen allemaal
+            helpen bij de identificatie van een fiets. Voeg alles toe wat je hebt
+            en neem contact op met de winkel waar je de fiets hebt gekocht – zij hebben
+            het serienummer vaak in hun systeem staan.
+          faq_unregistered_recovered_answer: Dat is vaak het geval. Je kunt de fiets
+            nu meteen als gestolen opgeven; registratie is niet verplicht — veel fietsen
+            die pas na de diefstal geregistreerd werden, worden teruggevonden.
+          lede_register_first: 'Zes stappen, in de juiste volgorde. De eerste twee
+            zijn het belangrijkst: registreer je fiets op Bike Index zodat iedereen
+            die hem vindt contact met je kan opnemen, en doe vervolgens aangifte bij
+            de politie.'
+          pillar_alerts_promoted_body: Je advertentie wordt gedeeld op onze sociale
+            mediakanalen en gepromoot in berichten in de buurt van de diefstallocatie.
+            Iedereen die de advertentie ziet, kan je direct een bericht sturen.
+          pillar_network_millions_body: Miljoenen motorrijders, plus ambassadeurs,
+            winkels en partners van de wetshandhaving, houden advertenties voor tweedehands
+            motoren in de gaten en signaleren illegale werkplaatsen.
+          pillar_record_body: 'Iedereen kan gratis een fiets opzoeken op Bike Index:
+            fietsenwinkels, agenten in het veld en kopers voordat ze betalen.'
+          pillar_record_title: Een openbaar document
+          report_on_the_stolen_bike_page: Als er een gestolen fiets op Bike Index
+            staat waarover je een melding wilt maken, stuur dan een bericht via de
+            betreffende pagina van de gestolen fiets.
+          step_listing_report_number_tag: 1 minuut
+          step_listing_report_number_title: Voeg het politierapportnummer toe aan
+            de fietsindex.
+          step_police_bring_body: Het dossiernummer zorgt ervoor dat een agent je
+            fiets teruggeeft in plaats van hem in beslag te nemen, en in elke volgende
+            stap wordt ernaar verwezen. Zorg dat je het adres en tijdstip van inbeslagname
+            en het serienummer (indien beschikbaar) bij de hand hebt.
+          step_register_minimal_registration: Als je het serienummer en een foto van
+            de fiets hebt, helpt dat, maar zelfs een minimale registratie met alleen
+            de kleur en het model kan al helpen bij het terugvinden van gestolen fietsen.
+          step_register_registry_body: Dit is de schakelaar die alles inschakelt.
+            Je fiets wordt opgenomen in een openbaar register dat fietsenwinkels,
+            politiebureaus, pandjeshuizen en kopers van tweedehands fietsen raadplegen
+            voordat ze een tweedehands frame aanraken.
+          step_shops_recovered_body: Dieven brengen gestolen fietsen binnen voor reparatie
+            en onderdelen. Winkels die Bike Index raadplegen, zorgen ervoor dat een
+            groot deel van de gestolen fietsen wordt teruggevonden.
+          three_minutes_and_no_cost: Drie minuten en helemaal gratis.
       register:
         parts:
           acknowledgment_check:
@@ -6647,6 +6682,9 @@ nl:
             we_will_keep_watch: Jouw %{bike_display} staat geregistreerd bij Bike
               Index. We houden het in de gaten — mocht het ooit als gestolen worden
               opgegeven, dan zoekt de hele gemeenschap mee.
+            safety_rules_sent_html: De %{bike_display} is geregistreerd bij Bike Index.
+              We hebben %{email} de veiligheidsregels gemaild ter goedkeuring, waarmee
+              de registratie is afgerond.
           step_report:
             about_the_one_you_found: Over de %{cycle_type} die je gevonden hebt
             address_where_you_found_it: Adres waar u het gevonden heeft
