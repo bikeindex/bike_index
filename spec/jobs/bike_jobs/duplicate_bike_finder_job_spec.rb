@@ -118,31 +118,21 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
       ActionMailer::Base.deliveries.clear
     end
 
-    def run_job(id)
-      described_class.perform_async(id)
-      described_class.drain
-    end
-
-    def run_for_both_bikes
-      run_job(listed_bike.id)
-      run_job(stolen_bike.id)
-    end
-
     it "emails admins once, however many times it runs for either bike" do
       expect(marketplace_listing.reload.status).to eq "for_sale"
       expect(stolen_bike.status).to eq "status_stolen"
-      expect { run_job(bike_id) }.to change(Notification, :count).by 1
+      expect { instance.perform(bike_id) }.to change(Notification, :count).by 1
       expect(Notification.last).to have_attributes(target_attributes)
       expect(ActionMailer::Base.deliveries.count).to eq 1
 
-      expect { run_for_both_bikes }.to_not change(Notification, :count)
+      expect { [listed_bike, stolen_bike].each { instance.perform(it.id) } }.to_not change(Notification, :count)
       expect(ActionMailer::Base.deliveries.count).to eq 1
     end
 
     context "run for the stolen bike" do
       let(:bike_id) { stolen_bike.id }
       it "emails admins with the listed bike as the bike" do
-        expect { run_job(bike_id) }.to change(Notification, :count).by 1
+        expect { instance.perform(bike_id) }.to change(Notification, :count).by 1
         expect(Notification.last).to have_attributes(target_attributes)
         expect(ActionMailer::Base.deliveries.count).to eq 1
       end
@@ -154,7 +144,7 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
         NormalizedSerialSegment.update_all(duplicate_bike_group_id: duplicate_bike_group.id)
       end
       it "doesn't email" do
-        expect { run_for_both_bikes }.to_not change(Notification, :count)
+        expect { [listed_bike, stolen_bike].each { instance.perform(it.id) } }.to_not change(Notification, :count)
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
@@ -162,7 +152,7 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
     context "listing not for sale" do
       let(:status) { :draft }
       it "doesn't email" do
-        expect { run_for_both_bikes }.to_not change(Notification, :count)
+        expect { [listed_bike, stolen_bike].each { instance.perform(it.id) } }.to_not change(Notification, :count)
         expect(stolen_bike.reload.duplicate_bikes.pluck(:id)).to eq([listed_bike.id])
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
