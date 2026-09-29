@@ -472,6 +472,9 @@ class Bike < ApplicationRecord
     !example? && !user_hidden && deleted_at.blank? && !likely_spam
   end
 
+  # The register flow creates the bike ahead of its organization's safety rules
+  def unfinished_registration? = persisted? && RegistrationSequenceAcknowledgment.pending.exists?(bike_id: id)
+
   def current_parking_notification
     parking_notifications.current.first
   end
@@ -503,10 +506,10 @@ class Bike < ApplicationRecord
     updated_by_user_at || updated_at
   end
 
-  def serial_display(u = nil)
+  def serial_display(u = nil, organization: nil)
     if serial_hidden?
       # show the serial to the user, even if authorization_requires_impound_organization?
-      return "Hidden" unless can_see_hidden_serial?(u)
+      return "Hidden" unless can_see_hidden_serial?(u, organization:)
     end
     return serial_number.humanize if no_serial?
 
@@ -960,7 +963,10 @@ class Bike < ApplicationRecord
     current_impound_record.present? && current_impound_record.organized?
   end
 
-  def can_see_hidden_serial?(u = nil)
+  def can_see_hidden_serial?(u = nil, organization: nil)
+    # An organization stands in for its members, so a page cached for it renders one serial
+    return true if organization.present? &&
+      (current_impound_record&.organization_id == organization.id || organized?(organization))
     return false if u.blank?
     return true if authorized?(u) || u.id.present? && u.id == user&.id ||
       current_impound_record.present? && current_impound_record.authorized?(u)

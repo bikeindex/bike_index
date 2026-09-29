@@ -7,5 +7,5 @@ class SitemapPages
     ascend why-donate membership].freeze
 
   ADDITIONAL = %w[organizations/new documentation/api_v3 recovery_stories
-    strava_search manufacturers search/registrations search/marketplace].freeze
+    strava_search manufacturers search/registrations search/marketplace stolen].freeze
 end

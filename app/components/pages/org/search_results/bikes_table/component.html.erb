@@ -1,10 +1,9 @@
 <%# Locals, not @ivars: UI::Table instance_execs cell blocks against itself, %>
 <%# so instance variables resolve to nil inside them — closures capture these. %>
 <% organization = @organization %>
-<% current_user = @current_user %>
 
 <%= tag.div(class: WRAPPER_CLASSES, data: table_wrapper_data_attributes) do %>
-  <%= render(UI::Table::Component.new(records: @bikes, cache_key: "org-#{@organization.id}-#{self.class.cache_digest}", render_sortable: @render_sortable, sort_state: @sort_state, classes: TABLE_CLASSES, unbordered: true)) do |table| %>
+  <%= render(UI::Table::Component.new(records: @bikes, cache_key: [@organization, self.class.cache_digest], render_sortable: @render_sortable, sort_state: @sort_state, classes: TABLE_CLASSES, unbordered: true)) do |table| %>
     <%# Called per cell rather than captured: each tooltip mints its own id %>
     <% hidden_html = method(:hidden_not_registered_tag) %>
     <% email_hidden = translation(".email_hidden") %>
@@ -114,7 +113,7 @@
     <% end %>
 
     <% table.column(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
-      <%= render(Atoms::Serial::Component.new(bike:, user: current_user)) %>
+      <%= render(Atoms::Serial::Component.new(bike:, organization:)) %>
     <% end %>
 
     <% reg_fields_after(:serial_number).each(&reg_field_column) %>
@@ -158,7 +157,7 @@
       <% table.column(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
         <% if bike.organized?(organization) %>
           <% if bike.status_impounded? && bike.current_impound_record.present? %>
-            <%= number_display(bike.current_impound_record.id) %>
+            <%= bike.current_impound_record.display_id %>
           <% end %>
         <% else %>
           <%= hidden_html.call %>

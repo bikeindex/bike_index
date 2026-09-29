@@ -1,0 +1,7 @@
+<%# A template rather than a controller render: FeedbacksController re-renders it when a report fails validation %>
+<% recoveries_count, recoveries_value, organizations_count =
+  Counts.retrieve_many("recoveries", "recoveries_value", "organizations") %>
+
+<%= render(Pages::Stolen::Index::Component.new(recoveries_count:, recoveries_value:, organizations_count:,
+  recovery_displays: RecoveryDisplay.with_photo,
+  feedback: @feedback, current_user:)) %>

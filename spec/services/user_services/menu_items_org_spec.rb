@@ -54,7 +54,7 @@ RSpec.describe UserServices::MenuItemsOrg do
             link_item("Organization Registrations", "/o/#{organization.to_param}/registrations"),
             link_item("Search all registrations", "/search/registrations?stolenness=all")
           ]),
-          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new",
+          link_item("Add a registration", "/o/#{organization.to_param}/registrations/new",
             icon: "plus-circle", match_params: {parking_notification: nil})
         ]
       end
@@ -66,8 +66,8 @@ RSpec.describe UserServices::MenuItemsOrg do
       context "gone back to the old view" do
         subject(:items) { described_class.for(organization:, current_user:, old_register_view: true) }
 
-        it "points add a bike at the embed form" do
-          expect(items.last).to eq(link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
+        it "points add a registration at the embed form" do
+          expect(items.last).to eq(link_item("Add a registration", "/o/#{organization.to_param}/bikes/new",
             icon: "plus-circle", match_params: {parking_notification: nil}))
         end
       end
@@ -171,6 +171,7 @@ RSpec.describe UserServices::MenuItemsOrg do
           link_item("Manage users", "/o/#{slug}/users", match_paths: "/o/#{slug}/users/**"),
           link_item("Impounding", "/o/#{slug}/manage_impounding/edit"),
           link_item("Stolen Bike Hot Sheet", "/o/#{slug}/hot_sheet/edit"),
+          link_item("Registration form settings", "/o/#{slug}/registrations/settings"),
           link_item("Registration sequences", "/o/#{slug}/registration_sequences",
             match_paths: ["/o/#{slug}/registration_sequences/**", "/o/#{slug}/registration_sequence_pages/**"])
         ])

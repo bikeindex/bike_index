@@ -86,6 +86,23 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "find_token" do
+    let(:creator) { FactoryBot.create(:user_confirmed) }
+    let(:b_param) do
+      BParam.create(origin: "register_flow", creator_id: creator.id, created_bike_id: FactoryBot.create(:bike).id,
+        params: {bike: bike_params}.as_json)
+    end
+    let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:) }
+
+    it "only resumes a bike's registration for its creator until the safety rules are agreed to" do
+      expect(described_class.resume(params_token: b_param.id_token, user: nil)).to eq([nil, true])
+      expect(described_class.find_token(params_token: b_param.id_token, user: creator)&.id).to eq b_param.id
+
+      acknowledgment.update(acknowledged_at: Time.current)
+      expect(described_class.find_token(params_token: b_param.id_token, user: nil)&.id).to eq b_param.id
+    end
+  end
+
   describe "discard_extra" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:oldest) do
@@ -110,6 +127,19 @@ RSpec.describe BikeServices::Register do
       it "keeps it - the email promises the address it can still finish that registration" do
         expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-1)
         expect(BParam.pluck(:id)).to match_array([middle.id, most_recent.id])
+      end
+    end
+
+    context "with a more recent one owing the safety rules" do
+      let!(:pending) do
+        FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: FactoryBot.create(:bike).id)
+          .tap { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param: it) }
+      end
+
+      it "keeps it, and the most recent without a bike" do
+        expect(BParam.unfinished_registrations.reorder(updated_at: :desc).first.id).to eq pending.id
+        expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-2)
+        expect(BParam.pluck(:id)).to match_array([most_recent.id, pending.id])
       end
     end
   end
@@ -347,6 +377,48 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "single_page" do
+    it "drops step 2 - the one page asks for both, so step 1 isn't done without the details" do
+      flow = described_class.flow(b_param, sequence: nil, single_page: true)
+      expect(flow.steps).to eq %w[1]
+      expect(flow.single_page?).to be_truthy
+      expect(described_class.permitted_step(b_param, nil, sequence: nil, flow:)).to eq "1"
+      # The same registration is past step 1 when the flow has a step 2 to move on to
+      expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "2"
+    end
+
+    context "a theft to report" do
+      let(:bike_params) { super().merge(status: "status_stolen") }
+
+      it "keeps the report after the one page" do
+        expect(described_class.flow(b_param, sequence: nil, single_page: true).steps).to eq %w[1 report]
+      end
+    end
+  end
+
+  describe "settings" do
+    let(:bike_params) { super().merge(creation_organization_id: 12) }
+    let(:session_settings) { {"organization_id" => 12, "single_page" => true, "separate_attestation" => false} }
+
+    it "is the session's, for the organization they were set on" do
+      expect(described_class.settings(b_param, session_settings)).to eq(single_page: true, separate_attestation: false)
+      expect(described_class.settings(b_param, session_settings.merge("organization_id" => 13)))
+        .to eq(single_page: false, separate_attestation: false)
+      expect(described_class.settings(b_param, nil)).to eq(single_page: false, separate_attestation: false)
+    end
+
+    context "saved by step 1" do
+      let(:b_param) do
+        BParam.new(origin: "register_flow", params: {bike: bike_params, register_single_page: false,
+                                                     register_separate_attestation: true}.as_json)
+      end
+
+      it "is what the registration saved, whatever the session holds now" do
+        expect(described_class.settings(b_param, session_settings)).to eq(single_page: false, separate_attestation: true)
+      end
+    end
+  end
+
   describe "report step" do
     let(:creator) { FactoryBot.create(:user) }
     let(:bike_params) { {owner_email: "owner@example.com", manufacturer_id: 12, status: "status_stolen"} }
@@ -362,9 +434,10 @@ RSpec.describe BikeServices::Register do
 
     it "comes after step 2, and saves the stolen record the bike is created with" do
       expect(described_class.report_step?(b_param.status)).to be_truthy
-      expect(described_class.steps(b_param, sequence: nil).count).to eq 3
-      expect(described_class.steps(b_param, sequence: nil)).to eq %w[1 2 report]
-      expect(described_class.step_before("report", steps: described_class.steps(b_param, sequence: nil))).to eq "2"
+      flow = described_class.flow(b_param, sequence: nil)
+      expect(flow.steps).to eq %w[1 2 report]
+      expect(flow.single_page?).to be_falsey
+      expect(flow.before("report")).to eq "2"
       # Not finished: the theft is still to be reported
       expect(described_class.finished?(b_param, sequence: nil)).to be_falsey
       expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "report"
@@ -381,7 +454,6 @@ RSpec.describe BikeServices::Register do
 
       # Everything's in - the submission that saved it creates the bike
       expect(described_class.send(:report_completed?, b_param)).to be_truthy
-      expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
     end
 
     describe "when and where a theft has to answer" do
@@ -436,7 +508,7 @@ RSpec.describe BikeServices::Register do
         expect(b_param.reload.status).to eq "status_with_owner"
         expect(b_param.stolen_attrs).to be_blank
         expect(described_class.report_step?(b_param.status)).to be_falsey
-        expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
+        expect(described_class.send(:report_completed?, b_param)).to be_truthy
       end
 
       it "asks the other report's questions when it's still a status that reports" do
@@ -484,7 +556,7 @@ RSpec.describe BikeServices::Register do
 
       it "has no report to make" do
         expect(described_class.report_step?(b_param.status)).to be_falsey
-        expect(described_class.steps(b_param, sequence: nil)).to eq %w[1 2]
+        expect(described_class.flow(b_param, sequence: nil).steps).to eq %w[1 2]
         expect(described_class.permitted_step(b_param, "report", sequence: nil)).to eq "2"
       end
     end
@@ -516,13 +588,14 @@ RSpec.describe BikeServices::Register do
       it "comes before them" do
         expect(described_class.registration_sequence(b_param)).to eq sequence
         # Two detail steps, the report, a page each and the review
-        expect(described_class.steps(b_param, sequence:)).to eq %w[1 2 report 3 4 review]
+        flow = described_class.flow(b_param, sequence:)
+        expect(flow.steps).to eq %w[1 2 report 3 4 review]
         expect(described_class.permitted_step(b_param, "3", sequence:)).to eq "report"
-        expect(described_class.step_before("3", steps: described_class.steps(b_param, sequence:))).to eq "report"
+        expect(flow.before("3")).to eq "report"
 
         described_class.save_report(b_param, report_params:)
         expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
-        expect(described_class.steps(b_param, sequence:).index("3")).to eq 3
+        expect(flow.position("3")).to eq 4
       end
 
       context "without a creator" do
@@ -533,7 +606,7 @@ RSpec.describe BikeServices::Register do
 
         it "comes after them - the emailed link is clicked once they're acknowledged" do
           pages = described_class.sequence_pages(sequence)
-          expect(described_class.steps(b_param, sequence:)).to eq %w[1 2 3 4 review report]
+          expect(described_class.flow(b_param, sequence:).steps).to eq %w[1 2 3 4 review report]
           expect(described_class.permitted_step(b_param, "report", sequence:)).to eq "3"
 
           pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
@@ -543,7 +616,7 @@ RSpec.describe BikeServices::Register do
           # Confirming the email is what opens the report
           b_param.update(creator_id: creator.id)
           expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "report"
-          expect(described_class.step_before("report", steps: described_class.steps(b_param, sequence:))).to eq "2"
+          expect(described_class.flow(b_param, sequence:).before("report")).to eq "2"
         end
       end
     end
@@ -562,11 +635,27 @@ RSpec.describe BikeServices::Register do
         params: {details_completed: true, bike: bike_params}.as_json)
     end
 
+    describe "complete" do
+      let(:bike_params) do
+        super().merge(manufacturer_id: FactoryBot.create(:manufacturer).id, serial_number: "XYZ 123",
+          primary_frame_color_id: FactoryBot.create(:color).id, status: "status_with_owner")
+      end
+
+      # Only the switch leaves the rules to the owner - a caller without a sequence doesn't
+      it "doesn't hold the bike for the owner without separate attestation" do
+        b_param.update(creator_id: FactoryBot.create(:user_confirmed).id)
+        bike = described_class.complete(b_param, user: nil, sequence: nil, ip_address: nil)
+        expect(bike.id).to be_present
+        expect(RegistrationSequenceAcknowledgment.count).to eq 0
+        expect(EmailJobs::PartialRegistrationJob.jobs).to be_empty
+      end
+    end
+
     describe "registration_sequence" do
       it "is the organization's active sequence" do
         expect(described_class.registration_sequence(b_param)).to eq sequence
         # Two detail steps, a page each and the review
-        expect(described_class.steps(b_param, sequence:).count).to eq 5
+        expect(described_class.flow(b_param, sequence:).steps.count).to eq 5
       end
 
       context "not an e-vehicle" do
@@ -575,7 +664,7 @@ RSpec.describe BikeServices::Register do
         it "is nil - only e-vehicles acknowledge safety rules" do
           expect(b_param.motorized?).to be_falsey
           expect(described_class.registration_sequence(b_param)).to be_nil
-          expect(described_class.steps(b_param, sequence: nil).count).to eq 2
+          expect(described_class.flow(b_param, sequence: nil).steps.count).to eq 2
         end
       end
 
@@ -585,6 +674,62 @@ RSpec.describe BikeServices::Register do
         it "is nil - a draft isn't shown to registrants" do
           expect(sequence).to be_draft
           expect(described_class.registration_sequence(b_param)).to be_nil
+        end
+      end
+
+      context "separate_attestation" do
+        let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
+        let(:registrant) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
+
+        it "is nil for a registration made for someone else, whose owner the rules are left to" do
+          expect(described_class.registration_sequence(b_param, separate_attestation: true, user: member)).to be_nil
+          expect(described_class.flow(b_param, sequence: nil).steps.count).to eq 2
+        end
+
+        it "is the sequence when the registrant is the one registering" do
+          expect(described_class.registration_sequence(b_param, separate_attestation: true, user: registrant))
+            .to eq sequence
+        end
+      end
+
+      describe "motorized_review" do
+        let(:bike_params) { super().merge(cycle_type: "bike") }
+        let(:single_page) { described_class.flow(b_param, sequence: nil, single_page: true) }
+
+        it "is what an e-vehicle would get, before the registration says it's one" do
+          expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to be true
+          expect(described_class.motorized_review(b_param, single_page, separate_attestation: true)).to eq :own_emails
+          # Two steps, so the submit label never has to guess
+          expect(described_class.motorized_review(b_param, described_class.flow(b_param, sequence: nil),
+            separate_attestation: false)).to be false
+        end
+      end
+
+      context "with a page acknowledged, then a newer version activated" do
+        let(:new_sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+        before do
+          described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
+          new_sequence.make_active!
+        end
+
+        it "stays on the version being agreed to, until resumed on the newer one" do
+          started = described_class.registration_sequence(b_param)
+          expect(started).to eq sequence
+
+          expect(described_class.resume_registration_sequence(b_param, sequence: started)).to eq([new_sequence, true])
+          expect(described_class.acknowledged_page_ids(b_param)).to eq([])
+          expect(described_class.registration_sequence(b_param)).to eq new_sequence
+          expect(described_class.resume_registration_sequence(b_param, sequence: new_sequence)).to eq([new_sequence, false])
+        end
+
+        context "already agreed to" do
+          before { described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1") }
+
+          it "isn't restarted" do
+            started = described_class.registration_sequence(b_param)
+            expect(started.archived?).to be_truthy
+            expect(described_class.resume_registration_sequence(b_param, sequence: started)).to eq([sequence, false])
+          end
         end
       end
     end

@@ -77,7 +77,7 @@ RSpec.describe "Search without JavaScript", type: :system, driver: :rack_test do
     let!(:cheap_listing_la) { FactoryBot.create(:marketplace_listing, :for_sale, address_in: :los_angeles, amount_cents: 300_00) }
     let!(:pricey_listings_nyc) { FactoryBot.create_list(:marketplace_listing, 2, :for_sale, amount_cents: 900_00) }
 
-    let(:thumbnail) { "[data-test-id^='vehicle-thumbnail-linkspan-']" }
+    let(:card) { "[data-test-id^='search-result-card-']" }
 
     it "renders listings server-side, paginates and filters via standard form submission" do
       visit "/"
@@ -87,24 +87,24 @@ RSpec.describe "Search without JavaScript", type: :system, driver: :rack_test do
       # rendered until the form is submitted, and the spinner stays hidden.
       expect(page).to have_css("turbo-frame#marketplace_results_frame[src]", visible: :all)
       expect(page).to have_css("[data-search-loading]", visible: :hidden)
-      expect(page).to have_no_css(thumbnail)
+      expect(page).to have_no_css(card)
 
       # Submitting renders the first page of the 14 for-sale listings synchronously
       submit_search
-      expect(page).to have_css(thumbnail, count: 12)
+      expect(page).to have_css(card, count: 12)
 
       # The lazy-loading frame that appends page 2 on scroll can't fetch itself
       # without JS, so its spinner stays hidden and the links carry the user instead
       expect(page).to have_css("turbo-frame#page_2", visible: :all)
       expect(page).to have_no_text("Loading more...")
       click_link(exact_text: "2")
-      expect(page).to have_css(thumbnail, count: 2)
+      expect(page).to have_css(card, count: 2)
 
       # A max price drops both $900 listings, leaving a single page - so the
       # pagination links go away
       fill_in "price_max_amount", with: "500"
       submit_search
-      expect(page).to have_css(thumbnail, count: 12)
+      expect(page).to have_css(card, count: 12)
       expect(page).to have_no_link(exact_text: "2")
 
       # Proximity around NYC drops the LA listing. The price filter is re-rendered
@@ -113,7 +113,7 @@ RSpec.describe "Search without JavaScript", type: :system, driver: :rack_test do
       fill_in "distance", with: "200"
       fill_in "location", with: "New York, NY"
       submit_search
-      expect(page).to have_css(thumbnail, count: 11)
+      expect(page).to have_css(card, count: 11)
       expect(page).to have_current_path(/search_no_js/)
     end
   end
