@@ -12,6 +12,7 @@ module Pages
         # form of its own, which can't nest. The radios reach the search with form:.
         class Component < ApplicationComponent
           delegate :filter_groups, :active_search_filter_descriptions, :notes_search_label,
+            :location_search_label, :location_search_disabled?, :location_search_disabled_hint,
             :organization, to: :@settings
 
           def initialize(settings:, period:, start_time:, end_time:, sortable_search_params: {})

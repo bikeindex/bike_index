@@ -3389,7 +3389,8 @@ CREATE TABLE public.registration_sequence_acknowledgments (
     user_id bigint,
     owner_email character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    acknowledged_at timestamp(6) without time zone
 );
 
 
@@ -7413,6 +7414,13 @@ CREATE UNIQUE INDEX index_registration_sequence_acknowledgments_one_per_b_param 
 
 
 --
+-- Name: index_registration_sequence_acknowledgments_pending; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequence_acknowledgments_pending ON public.registration_sequence_acknowledgments USING btree (b_param_id) WHERE (acknowledged_at IS NULL);
+
+
+--
 -- Name: index_registration_sequence_pages_on_registration_sequence_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7814,6 +7822,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260926005700'),
 ('20260915181500'),
 ('20260915110042'),
 ('20260912102406'),

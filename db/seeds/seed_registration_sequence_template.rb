@@ -70,7 +70,7 @@ if brakebills.present?
   acknowledged.each do |bike|
     SeedHelpers.tick
     RegistrationSequenceAcknowledgment.create!(registration_sequence: sequence, bike:, user: bike.creator,
-      owner_email: bike.owner_email)
+      owner_email: bike.owner_email, acknowledged_at: Time.current)
   end
   puts "Acknowledged the Brakebills registration sequence for #{acknowledged.count} e-vehicles\n"
 end

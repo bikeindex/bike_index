@@ -90,6 +90,36 @@ module ComponentStructs
     # Listed in the panel, but checked and disabled - the table always shows them
     ALWAYS_VISIBLE_COLUMNS = %w[view_cell].freeze
 
+    # The CSV header an export writes each column under - the names existing files have, which
+    # spreadsheets and the Avery service read. Not Avery Exportable: it restates the address
+    # columns, at several queries a row
+    EXPORT_HEADERS = {
+      "url_cell" => "link",
+      "photo_cell" => "thumbnail",
+      "created_at_cell" => "registered_at",
+      "updated_at_cell" => "updated_at",
+      "occurred_at_cell" => "occurred_at",
+      "status_cell" => "status",
+      "manufacturer_cell" => "manufacturer",
+      "model_cell" => "model",
+      "color_cell" => "color",
+      "serial_number_cell" => "serial",
+      "cycle_type_cell" => "vehicle_type",
+      "propulsion_type_cell" => "propulsion_type",
+      "creation_description_cell" => "registration_method",
+      "owner_email_cell" => "owner_email",
+      "owner_name_cell" => "owner_name",
+      "reg_address_cell" => "address",
+      "reg_phone_cell" => "phone",
+      "reg_extra_registration_number_cell" => "extra_registration_number",
+      "reg_organization_affiliation_cell" => "organization_affiliation",
+      "reg_student_id_cell" => "student_id",
+      "notes_cell" => "organization_notes",
+      "sticker_cell" => "bike_sticker",
+      "impound_id_cell" => "impound_id",
+      "acknowledgment_cell" => "acknowledged_at"
+    }.freeze
+
     attr_reader :organization
 
     # The values an organization's panel offers for a filter, blank first — empty if the
@@ -134,6 +164,20 @@ module ComponentStructs
     end
 
     def notes_search_label = translation(:show_notes_search)
+
+    def location_search_label = translation(:show_location_search)
+
+    def location_search_disabled?
+      !BikeServices::OrganizedSearch.location_searchable?(organization: @organization,
+        search_all: @search_all, search_status: @filter_values[:search_status])
+    end
+
+    # Why it's disabled - with registration addresses, only because the search reaches past them
+    def location_search_disabled_hint
+      return translation(:location_search_disabled_search_all) if @organization.enabled?("reg_address")
+
+      translation(:location_search_disabled_no_address, org_name: @organization.short_name)
+    end
 
     def render_export? = @organization.enabled?("csv_exports")
 
@@ -186,6 +230,19 @@ module ComponentStructs
 
     def additional_registration_fields
       @additional_registration_fields ||= @organization.additional_registration_fields - ["reg_bike_sticker"]
+    end
+
+    def export_headers = EXPORT_HEADERS.values_at(*enabled_columns).compact
+
+    def default_export_headers = EXPORT_HEADERS.values_at(*initially_checked_columns).compact
+
+    # In the panel's order
+    def export_columns = EXPORT_HEADERS.slice(*panel_columns)
+
+    # The panel's label for a written header - a legacy one, or an address part, by its name
+    def export_header_label(header)
+      cell_name = EXPORT_HEADERS.key(header)
+      cell_name ? panel_labels[cell_name.to_sym] : header.humanize(keep_id_suffix: true)
     end
 
     def search_params

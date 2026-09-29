@@ -19,6 +19,11 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response).to render_template("admin/organizations/index")
         expect(assigns(:organizations)).to eq([organization])
       end
+      it "renders the chart" do
+        get base_url, params: {search_query: "cool", render_chart: true}
+        expect(response.status).to eq 200
+        expect(assigns(:organizations)).to eq([organization])
+      end
     end
   end
 

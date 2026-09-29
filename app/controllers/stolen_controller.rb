@@ -6,7 +6,7 @@ class StolenController < ApplicationController
   before_action :set_permitted_format, only: [:index]
 
   def index
-    @feedback = Feedback.new
+    @feedback = Feedback.new(email: current_user&.email)
   end
 
   def current_tsv
@@ -19,10 +19,6 @@ class StolenController < ApplicationController
 
   def show
     redirect_to stolen_index_url
-  end
-
-  def multi_serial_search
-    render layout: "multi_serial"
   end
 
   private

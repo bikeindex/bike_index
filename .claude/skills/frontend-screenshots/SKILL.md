@@ -43,7 +43,9 @@ get back local PNG paths.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
 - **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
   back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the
-  per-workspace throwaway DB), or capture previews.
+  per-workspace throwaway DB), or capture previews. In the web sandbox the seed is already running
+  in the background — wait on `/tmp/seed.status` (`sandbox-test-setup`) rather than starting a
+  second one, which dies on duplicates.
 
 ## Sign in (with the PII gate)
 
@@ -55,7 +57,7 @@ Pick the user the caller specified, or default to `user@bikeindex.org` (lowest p
 - `dev@bikeindex.org` — `SuperuserAbility` **and** `developer`. Use for the pages gated on both: the `Dev:` navbar entries and `/admin/organizations/:slug/custom_layouts/...`, which redirect for `admin@`.
 - `:anonymous` — skip sign-in entirely. Use for public pages where the signed-out rendering is the point.
 
-Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), sign in. In development every page carries a **"sign in as superadmin"** button in the top banner — one click, no credentials, and it lands back on the page you were on; use it whenever the target needs a superuser. Otherwise drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. It's two steps (email → Continue → password), and **both** submits need addressing by value — `input[name='commit'][value='Continue']` then `input[name='commit'][value='Log in']`. A `[type=submit]` selector fails strict mode on either, and so does `input[name='commit']` on the second step, where "Email me the link" is the other match. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
+Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), sign in. In development every page carries a **"sign in as superadmin"** button in the top banner — one click, no credentials, and it lands back on the page you were on; use it whenever the target needs a superuser. Otherwise drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. It's two steps (email → Continue → password). The fields are `input[name="session[email]"]` and `input[name="session[password]"]` — the scope is `session`, not `user`, which is the guess that costs a round trip. **Both** submits need addressing by value — `input[name='commit'][value='Continue']` then `input[name='commit'][value='Log in']`. A `[type=submit]` selector fails strict mode on either, and so does `input[name='commit']` on the second step, where "Email me the link" is the other match. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
 
 **Picking an org slug.** When the URL is org-scoped (`/o/<slug>/...`) and the caller didn't specify a slug, default to `brakebills`
 
@@ -90,9 +92,11 @@ browser_evaluate: () => {
   document.querySelectorAll('.close, [data-dismiss="modal"], [aria-label="Close"]').forEach(c => c.click());
   document.querySelectorAll('.modal-backdrop').forEach(b => b.style.setProperty('display', 'none'));
   document.body.classList.remove('modal-open');
-  document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
+  document.querySelector('.primary-footer')?.style.setProperty('display', 'none');
   document.getElementById('review-app-banner')?.style.setProperty('display', 'none');
-  document.querySelector('.profiler-results')?.style.setProperty('display', 'none');
+  // A same-origin iframe (the legacy org add-a-bike page, the embeds) carries its own badge
+  [document, ...[...document.querySelectorAll('iframe')].map(f => f.contentDocument).filter(Boolean)]
+    .forEach(d => d.querySelector('.profiler-results')?.style.setProperty('display', 'none'));
   return document.body.scrollHeight; // content height with the chrome gone
 }
 ```
@@ -116,6 +120,8 @@ If the returned content height is **less than the viewport height**, `browser_re
 **One capture's `?organization_id=` or `?view_as=<org>` changes what the *next* param-less URL renders.** `set_passive_organization` writes the org into the session, and `/registrations/:id` with no params then resolves through `default_view_for` to that org's admin view — so a `/registrations/54` shot taken after a `view_as=brakebills.staff` one is the org page, in the org layout, at the same URL. Nothing errors, and the pair only looks wrong once you open it. Navigate `?organization_id=false` before any capture whose URL carries no `view_as`, and remember the session survives the base-branch checkout, so the branch and base loops can drift apart on this if their orders differ.
 
 **`localStorage` survives that checkout too, and a mid-capture interaction writes to it.** The org search column toggle persists the checked set to `orgRegistrationColumns`, so a base loop run after a branch loop that toggled columns loads the branch's column set — the pair then compares different tables at the same URL. Clear the key, or re-apply the interaction, at the start of each loop rather than once per run.
+
+**Being signed in is that same drifting state, and it reaches every page.** A run that captures public pages signed out and then signs in for one org-scoped page leaves the session behind for whatever it captures next — so the base loop's public pages come back with a signed-in navbar against a signed-out branch shot, and the pair differs on chrome the PR never touched. Capture each loop's pages in the same order, and `/goodbye` back to signed out before the public ones.
 
 **An element missing from the shot may be a stale asset build, not the code.** `bin/dev`'s watchers don't pick up a new `@theme` token, so a class keyed off one (`tw:navbar:block!`) is absent from what the server serves while the specs — whose builds you regenerated — pass. Confirm with `getComputedStyle` on the element, then run `bin/rails tailwindcss:build` (or `dartsass:build` for a `.scss` edit); sprockets serves the new digest on the next request, so this needs no `bin/dev` restart and isn't `assets:precompile`.
 

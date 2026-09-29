@@ -84,10 +84,9 @@ export default class extends Controller {
     // here it can't mean the frame is ahead of the address bar
     this.requestedURL = null
     const params = new URLSearchParams(window.location.search)
-    ;['search_email', 'serial', 'search_notes'].forEach(name => {
-      const input = this.formTarget.querySelector(`input[name="${name}"]`)
-      if (input) input.value = params.get(name) || ''
-    })
+    // Opted in, where the server renders no default for a URL without the param
+    this.formTarget.querySelectorAll('input[name=search_email], input[name=serial], input[name=search_notes], input[data-restores-from-url]')
+      .forEach(input => { input.value = params.get(input.name) || '' })
   }
 
   // A back/forward restoration can leave the results frame showing a snapshot for

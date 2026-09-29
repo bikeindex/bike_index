@@ -1,18 +1,9 @@
 require "rails_helper"
 
 RSpec.describe IpSpoofAttackFilter, type: :request do
-  # Reproduce production's exception handling. Test defaults to show_exceptions = :rescuable,
-  # which re-raises the (non-rescuable) IpSpoofAttackError up to the filter and masked this bug
-  # for months. Production uses :all, where ShowExceptions renders the error into a 500 before
-  # the filter — sitting above it in the stack — could ever rescue it.
-  around do |example|
-    env = Rails.application.env_config
-    original = env["action_dispatch.show_exceptions"]
-    env["action_dispatch.show_exceptions"] = :all
-    example.run
-  ensure
-    env["action_dispatch.show_exceptions"] = original
-  end
+  # Test's :rescuable re-raised IpSpoofAttackError up to the filter, masking for months that
+  # production's ShowExceptions renders it into a 500 before the filter above it can rescue it
+  include_context :request_spec_production_exceptions
 
   let(:client_ip) { "251.252.74.114" }
   let(:forwarded_for) { "211.112.215.202,109.123.246.221, 172.71.131.189" }

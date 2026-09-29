@@ -1,6 +1,5 @@
 class OrganizationExportJob < ApplicationJob
-  LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
-  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation student_id].freeze
+  ADDRESS_KEYS = {"address" => "street", "address_2" => "street_2", "city" => "city", "state" => "state", "zipcode" => "zipcode"}.freeze
 
   sidekiq_options retry: false, queue: "med_priority"
 
@@ -39,26 +38,11 @@ class OrganizationExportJob < ApplicationJob
     axlsx_package = Axlsx::Package.new
     axlsx_package.workbook.add_worksheet(name: "Basic Worksheet") do |sheet|
       sheet.add_row(export_headers)
-      row_index = 0
-      @export.bikes_scoped.find_each(batch_size: 100) do |bike|
-        check_export_ebrake(row_index) # Run first thing in case it's already broken
-        next unless export_bike?(bike)
-
-        row_index += 1
-        sheet.add_row(bike_to_row(bike))
-      end
-      @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
-        check_export_ebrake(row_index) # Run first thing in case it's already broken
-        next unless export_bike?(b_param)
-
-        row_index += 1
-        sheet.add_row(b_param_to_row(b_param))
-      end
-      @export.rows = row_index
+      @export.rows = each_row { |row| sheet.add_row(row) }
     end
     return if @export_ebraked
 
-    file.write(axlsx_package.to_stream.read)
+    axlsx_package.serialize(file.path)
     @export.tmp_file.close
     true
   end
@@ -66,22 +50,22 @@ class OrganizationExportJob < ApplicationJob
   def write_csv(file)
     require "csv"
     file.write(comma_wrapped_string(export_headers))
-    row_index = 0
-    @export.bikes_scoped.find_each(batch_size: 100) do |bike|
-      check_export_ebrake(row_index) # Run first thing in case it's already broken
-      next unless export_bike?(bike)
-
-      row_index += 1
-      file.write(comma_wrapped_string(bike_to_row(bike)))
-    end
-    @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
-      check_export_ebrake(row_index) # Run first thing in case it's already broken
-      next unless export_bike?(b_param)
-
-      row_index += 1
-      file.write(comma_wrapped_string(b_param_to_row(b_param)))
-    end
+    each_row { |row| file.write(comma_wrapped_string(row)) }
     true
+  end
+
+  def each_row
+    row_index = 0
+    [@export.bikes_scoped, @export.incompletes_scoped].each do |scope|
+      scope.find_each(batch_size: 100) do |bike_or_b_param|
+        check_export_ebrake(row_index) # Run first thing in case it's already broken
+        next unless export_bike?(bike_or_b_param)
+
+        row_index += 1
+        yield(bike_or_b_param.is_a?(Bike) ? bike_to_row(bike_or_b_param) : b_param_to_row(bike_or_b_param))
+      end
+    end
+    row_index
   end
 
   def comma_wrapped_string(array)
@@ -110,16 +94,19 @@ class OrganizationExportJob < ApplicationJob
   def b_param_to_row(b_param)
     export_headers.map do |header|
       case header
-      when "registered_at" then b_param.created_at.utc
-      when "manufacturer" then b_param.manufacturer&.name
+      when "registered_at", "manufacturer", "owner_email", "vehicle_type", "status", *ADDRESS_KEYS.keys
+        value_for_header(header, b_param)
+      when "phone", "organization_affiliation", "student_id" then b_param.send(header)
+      when "model" then b_param.bike["frame_model"]
+      when "serial" then b_param.bike["serial_number"]
+      when "extra_registration_number" then b_param.bike["extra_registration_number"]
       when "color"
         %w[primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id].map { |key|
           color_id = b_param.bike[key]
           color_id.present? ? Color.find(color_id).name : nil
         }.compact.join(", ")
-      when "owner_email" then b_param.owner_email
-      when "vehicle_type" then CycleType.slug_translation_short(b_param.cycle_type)
-      when "motorized" then b_param.motorized?
+      when "owner_name" then b_param.user_name
+      when "bike_sticker" then b_param.bike_sticker_code
       when "partial_registration" then true
       end
     end
@@ -131,7 +118,7 @@ class OrganizationExportJob < ApplicationJob
     @export_headers = @export.headers
     if @export_headers.include?("address")
       # Remove address and re-add, because we want to keep them in line
-      @export_headers = (@export_headers - ["address"]) + %w[address address_2 city state zipcode]
+      @export_headers = (@export_headers - ["address"]) + ADDRESS_KEYS.keys
     end
     # If there are partial registrations, always include partial_registration
     if @export.partial_registrations.present? && @export_headers.exclude?("partial_registration")
@@ -146,33 +133,40 @@ class OrganizationExportJob < ApplicationJob
     @export_headers
   end
 
+  # Each column's value as the registrations search table shows it
   def value_for_header(header, bike)
-    return bike.send(header) if MATCHING_KEYS.include?(header)
+    return bike.registration_address[ADDRESS_KEYS[header]] if ADDRESS_KEYS.key?(header)
+    if ComponentStructs::OrgSearchSettings::EXPORT_HEADERS.key?("reg_#{header}_cell")
+      return OrgServices::RegistrationFields.value(bike:, organization: @export.organization, reg_field: "reg_#{header}")
+    end
 
     case header
-    when "link" then LINK_BASE + bike.id.to_s
-    when "registration_method" then Ownership.creation_kind_humanized(bike.creation_kind)
-    when "thumbnail" then bike.thumb_path
+    when "link" then bike.html_url
+    when "thumbnail" then BikeServices::Displayer.thumb_image_url(bike)
     when "registered_at" then bike.created_at.utc
+    when "updated_at" then bike.updated_by_user_fallback.utc
+    when "occurred_at" then bike.occurred_at&.utc
+    when "status" then Atoms::RegistrationStatusBadge::Component.status_humanized(bike, skip_with_owner: true)
     when "manufacturer" then bike.mnfg_name
     when "model" then bike.frame_model
     when "color" then bike.frame_colors.join(", ")
     when "serial" then bike.serial_number
-    when "is_stolen" then bike.status_stolen? ? "true" : nil
-    when "is_impounded" then bike.status_impounded? ? "true" : nil
-    when "impounded_at" then bike.current_impound_record&.impounded_at&.utc
-    when "address" then bike.registration_address["street"] # These are the expanded values for bike registration address
-    when "address_2" then bike.registration_address["street_2"]
-    when "city" then bike.registration_address["city"]
-    when "state" then bike.registration_address["state"]
-    when "zipcode" then bike.registration_address["zipcode"]
+    when "vehicle_type" then bike.type_titleize
+    when "propulsion_type" then bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal"
+    when "registration_method" then Ownership.creation_kind_humanized(bike.creation_kind)
+    when "owner_email", "owner_name" then bike.send(header)
+    when "organization_notes" then organization_note_bodies[bike.id]
     when "bike_sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
-    when "vehicle_type" then bike.type_titleize
-    when "motorized" then bike.motorized?
-    when "status" then Atoms::RegistrationStatusBadge::Component.status_humanized(bike, skip_with_owner: true)
-    when "organization_notes" then organization_note_bodies[bike.id]
+    when "impound_id" then bike.current_impound_record&.display_id if bike.status_impounded?
+    when "acknowledged_at" then acknowledged_ats[bike.id]&.utc if bike.motorized?
     end
+  end
+
+  # Ordered so each bike keeps its latest, as RegistrationSequenceAcknowledgment.find_for does
+  def acknowledged_ats
+    @acknowledged_ats ||= RegistrationSequenceAcknowledgment.acknowledged.for_organization(@export.organization)
+      .order(:id).pluck(:bike_id, :acknowledged_at).to_h
   end
 
   # to_h can't collide: unique index on (bike_id, organization_id)
