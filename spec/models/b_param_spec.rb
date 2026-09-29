@@ -229,6 +229,12 @@ RSpec.describe BParam, type: :model do
       expect(b_param.bike["handlebar_type_slug"].present?).to be_falsey
       expect(b_param.bike["handlebar_type"]).to eq(:forward)
     end
+
+    it "sets the removed bmx to flat" do
+      b_param = BParam.new(params: {bike: {handlebar_type_slug: "bmx"}})
+      b_param.set_handlebar_type_key
+      expect(b_param.bike["handlebar_type"]).to eq(:flat)
+    end
   end
 
   describe "set_manufacturer_key" do

@@ -19,6 +19,11 @@ class HandlebarType
 
   attr_reader :slug, :id
 
+  # BMX was folded into flat, and API clients still send it
+  def self.find_sym(str)
+    str.to_s.strip.match?(/\Abmx( style)?\z/i) ? :flat : super
+  end
+
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]
