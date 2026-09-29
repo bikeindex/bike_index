@@ -3,8 +3,6 @@
 module Pages
   module Stolen
     module Index
-      # Below lg it's the design's mobile layout, which drops the promoted alerts band
-      # and the FAQ
       class Component < ApplicationComponent
         include MoneyHelper
 
