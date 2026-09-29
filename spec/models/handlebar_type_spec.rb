@@ -2,11 +2,11 @@ require "rails_helper"
 
 RSpec.describe HandlebarType, type: :model do
   describe "normalized name" do
-    let(:slug) { :bmx }
+    let(:slug) { :flat }
 
     it "returns the slug's normalized name" do
       ht = HandlebarType.new(slug)
-      expect(ht.name).to eq("BMX style")
+      expect(ht.name).to eq("Flat / riser (horizontal facing)")
     end
   end
 
@@ -16,14 +16,14 @@ RSpec.describe HandlebarType, type: :model do
     end
 
     it "returns nil" do
-      expect(HandlebarType.friendly_find("not-known-type")).to be_nil
+      expect(HandlebarType.friendly_find("bmx")).to be_nil
     end
 
     context "slug" do
-      let(:name) { "Bmx " }
+      let(:name) { "Horizontal facing " }
       it "tries to find the slug, given a name" do
         finder = HandlebarType.friendly_find(name)
-        expect(finder.slug).to eq :bmx
+        expect(finder.slug).to eq :flat
       end
     end
   end

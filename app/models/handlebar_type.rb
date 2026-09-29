@@ -6,7 +6,6 @@ class HandlebarType
     forward: 4,
     rearward: 3,
     other: 2,
-    bmx: 1,
     flat: 0
   }.freeze
 
@@ -15,8 +14,7 @@ class HandlebarType
     forward: "Forward facing",
     rearward: "Rear facing",
     other: "Not handlebars",
-    bmx: "BMX style",
-    flat: "Flat or riser"
+    flat: "Flat / riser (horizontal facing)"
   }.freeze
 
   attr_reader :slug, :id
