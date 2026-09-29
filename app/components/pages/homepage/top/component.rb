@@ -4,12 +4,10 @@ module Pages
   module Homepage
     module Top
       class Component < ApplicationComponent
-        include MoneyHelper
-
         def initialize(recoveries_value:, organization_count:, recovery_displays:)
           @recoveries_value = recoveries_value
           @organization_count = organization_count
-          @recovery_displays = recovery_displays.select { it.photo_url.present? }
+          @recovery_displays = recovery_displays
         end
 
         private
@@ -17,18 +15,6 @@ module Pages
         def bike_tile_images
           (0..16).map { it.to_s.rjust(2, "0") }
             .map { image_url("kelsey/bike_tiles/bike-entry_00#{it}.png") }
-        end
-
-        def recoveries_value
-          recoveries_as_currency.gsub(/\D/, "")
-        end
-
-        def recoveries_value_symbol
-          recoveries_as_currency.gsub(/\d/, "")
-        end
-
-        def recoveries_as_currency
-          as_currency(@recoveries_value / 1_000_000)
         end
 
         def recovery_steps

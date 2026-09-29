@@ -44,11 +44,10 @@ module Pages
             "tw:data-overflowing:after:shadow-[-2px_0_6px_rgba(26,26,31,0.04)] tw:dark:data-overflowing:after:border-gray-700 " \
             "tw:data-scrolled-end:after:hidden tw:@max-[672px]/twwiderow:after:hidden"
 
-          def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
+          def initialize(organization:, bikes:, render_sortable: false,
             sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
             @bikes = bikes
-            @current_user = current_user
             @render_sortable = render_sortable
             @sort_state = sort_state
             @bike_sticker = bike_sticker

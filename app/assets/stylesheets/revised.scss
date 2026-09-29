@@ -209,9 +209,6 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import 'revised/pages/bikes/show_photo';
 @import 'revised/pages/bikes/stolen_bike_listings'; // Sorta fits here...
 
-// separated because it's a lot
-@import 'revised/pages/bikes/multi_serial_search';
-
 // My Account pages
 @import 'revised/pages/my_accounts/show';
 @import 'revised/pages/my_accounts/edit';
@@ -255,9 +252,6 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import 'revised/sections/legacy_content';
 
 // general legacy content styles
-@import 'revised/pages/legacy_stolen';
-
-// legacy stolen page - including multi-serial search
 @import 'revised/sections/oauth';
 
 html {

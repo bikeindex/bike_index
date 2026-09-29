@@ -12,8 +12,7 @@ if ENV["LOCAL_CHROME_OVERRIDE"]
       args: [
         "--no-sandbox",
         "--disable-dev-shm-usage",
-        "--disable-site-isolation-trials",
-        "--host-resolver-rules=MAP cdn.jsdelivr.net 127.0.0.1:8443"
+        "--disable-site-isolation-trials"
       ])
   end
 end

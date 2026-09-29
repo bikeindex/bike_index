@@ -26,16 +26,26 @@ RSpec.describe Admin::GraphsController, type: :request do
       end
     end
     context "bikes" do
-      it "renders" do
+      it "renders, leaving the tables to their lazy frames" do
         get base_url, params: {search_kind: "bikes"}
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
+        frames = Nokogiri::HTML(response.body).css("turbo-frame[loading=lazy]")
+        expect(frames.map { it["id"] }).to eq(Pages::Admin::Graphs::BikesTable::Component::KINDS.map { "bikes_table_#{it}" })
+
+        Pages::Admin::Graphs::BikesTable::Component::KINDS.each do |table_kind|
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", table_kind:}
+          expect(response.status).to eq(200)
+          frame = Nokogiri::HTML(response.body).at_css("turbo-frame#bikes_table_#{table_kind}")
+          expect(frame["src"]).to be_nil
+          expect(frame.css("table")).to be_present
+        end
       end
 
       context "with bikes registered different ways" do
         let!(:sticker_bikes) { FactoryBot.create_list(:bike, 2, :with_ownership, creation_state_origin: "sticker") }
         let!(:web_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "web") }
-        let(:origin_colors) { Ownership.origins.zip(Admin::GraphsController::ORIGIN_COLORS).to_h }
+        let(:origin_colors) { Pages::Admin::Graphs::BikesTable::Component::ORIGIN_COLORS }
         # [origin, swatch color, bike count] per row of the origin table, as rendered
         let(:origin_rows) do
           Nokogiri::HTML(response.body).css("td span[style*='background-color']").map do |swatch|
@@ -44,20 +54,71 @@ RSpec.describe Admin::GraphsController, type: :request do
         end
 
         it "sorts the origin table highest count first, each swatch the chart's color for that origin" do
-          get base_url, params: {search_kind: "bikes", period: "week"}
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "origin"}
           expect(response.status).to eq(200)
-          expect(origin_rows.first(2)).to eq([["Sticker", origin_colors["sticker"], "2"],
-            ["Web", origin_colors["web"], "1"]])
+          expect(origin_rows.first(2)).to eq([["sticker", origin_colors["sticker"], "2"],
+            ["web", origin_colors["web"], "1"]])
           # The origins with no bikes keep Ownership.origins order, rather than reshuffling
           expect(origin_rows.map(&:first))
-            .to eq(%w[sticker web].map(&:humanize) + (Ownership.origins - %w[sticker web]).map(&:humanize))
+            .to eq((%w[sticker web] | Ownership.origins).map { Ownership.creation_kind_humanized(it) })
 
           get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "origin"}
           expect(json_result.to_h { [it["name"], it["color"]] })
-            .to eq(origin_colors.transform_keys(&:humanize))
+            .to eq(origin_colors.transform_keys { Ownership.creation_kind_humanized(it) })
           # Every origin gets a zero-filled series, not just the ones the grouped query found
           totals = json_result.to_h { |series| [series["name"], series["data"].sum(&:last)] }
-          expect(totals).to eq(Ownership.origins.to_h { [it.humanize, 0] }.merge("Sticker" => 2, "Web" => 1))
+          expect(totals).to eq(Ownership.origins.to_h { [Ownership.creation_kind_humanized(it), 0] }.merge("sticker" => 2, "web" => 1))
+        end
+      end
+
+      context "with bikes registered with the organization registration form settings" do
+        let!(:single_page_bikes) do
+          FactoryBot.create_list(:bike, 2, :with_ownership,
+            creation_registration_info: {register_single_page: true, register_separate_attestation: false})
+        end
+        let!(:both_bike) do
+          FactoryBot.create(:bike, :with_ownership,
+            creation_registration_info: {register_single_page: true, register_separate_attestation: true})
+        end
+        let!(:web_bike) { FactoryBot.create(:bike, :with_ownership) }
+        let!(:organization_form_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "organization_form") }
+        let!(:embed_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "embed") }
+        # The label without the origin's description tooltip
+        let(:setting_rows) do
+          document = Nokogiri::HTML(response.body).tap { it.css("[data-controller='ui--tooltip']").each(&:remove) }
+          document.css("tbody tr").map { |row| row.css("td").map { it.text.strip } }
+        end
+
+        it "counts the bikes registered with each, and on the legacy org form" do
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "register_setting"}
+          expect(response.status).to eq(200)
+          expect(setting_rows).to eq([["Separate attestation", "1"], ["Single page", "3"], ["legacy org form", "1"]])
+
+          get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "register_setting"}
+          expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
+            .to eq([["Separate attestation", 1], ["Single page", 3], ["legacy org form", 1]])
+        end
+      end
+
+      context "with bikes registered from the iOS app" do
+        let!(:bikes_old_version) do
+          FactoryBot.create_list(:bike, 2, :with_ownership, creation_registration_info: {ios_version: "1.6.9"})
+        end
+        let!(:bike_new_version) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: {ios_version: "2.0.1"}) }
+        let!(:web_bike) { FactoryBot.create(:bike, :with_ownership) }
+        let(:ios_version_rows) do
+          Nokogiri::HTML(response.body).css("tr").map { |row| row.css("td").map { it.text.strip } }
+            .select { |cells| cells.first&.match?(/\A\d+\.\d+\.\d+\z/) }
+        end
+
+        it "counts bikes by iOS version, highest count first" do
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "ios_version"}
+          expect(response.status).to eq(200)
+          expect(ios_version_rows).to eq([%w[1.6.9 2], %w[2.0.1 1]])
+
+          get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "ios_version"}
+          expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
+            .to eq([["iOS 1.6.9", 2], ["iOS 2.0.1", 1]])
         end
       end
     end

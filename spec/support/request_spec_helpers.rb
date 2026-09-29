@@ -42,6 +42,19 @@ module RequestSpecHelpers
     before { log_in(current_user) }
   end
 
+  # Test's :rescuable re-raises what production renders through exceptions_app
+  RSpec.shared_context :request_spec_production_exceptions do
+    around do |example|
+      env_config = Rails.application.env_config
+      production = {"action_dispatch.show_exceptions" => :all, "action_dispatch.show_detailed_exceptions" => false}
+      original = env_config.slice(*production.keys)
+      env_config.merge!(production)
+      example.run
+    ensure
+      env_config.except!(*production.keys).merge!(original)
+    end
+  end
+
   RSpec.shared_context :request_spec_logged_in_as_user_if_present do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
     before { log_in(current_user) if current_user.present? }

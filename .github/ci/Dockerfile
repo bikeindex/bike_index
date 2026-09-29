@@ -16,7 +16,7 @@
 # Rebuilt automatically (ci.yml's build_ci_image job) whenever this file,
 # .tool-versions, package.json, Gemfile.lock or package-lock.json changes.
 
-ARG RUBY_VERSION=4.0.6
+ARG RUBY_VERSION=4.0.7
 
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 

@@ -80,6 +80,17 @@ module IntegrationSpecHelpers
     move_mouse(element, cap:) { |mouse| mouse.up.tap { mouse.move(0, 0) } }
   end
 
+  def drag_select(element, past:)
+    box = element.native.bounding_box
+    middle = box["y"] + box["height"] / 2
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.mouse.move(box["x"] + 2, middle)
+      playwright_page.mouse.down
+      playwright_page.mouse.move(box["x"] + box["width"] + past, middle, steps: 12)
+      playwright_page.mouse.up
+    end
+  end
+
   def browser_cookie_value(name)
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.cookies.find { |cookie| cookie["name"] == name }&.fetch("value")
@@ -216,7 +227,7 @@ module IntegrationSpecHelpers
 
   # search--form#handlePopstate reconciles these to the address bar on a
   # back/forward; the results frame reloads separately and faster.
-  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes].freeze
+  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes location distance].freeze
 
   # Navigate back, then wait for the filters to settle to the address bar so
   # callers don't read or fill against the restoration preview.

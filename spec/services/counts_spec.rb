@@ -12,6 +12,14 @@ RSpec.describe Counts do
     end
   end
 
+  describe "retrieve_many" do
+    it "reads the keys in order, with 0 for a missing one" do
+      Counts.assign_for("recoveries", 12)
+      Counts.assign_for("organizations", 3)
+      expect(Counts.retrieve_many("organizations", "recoveries_value", "recoveries")).to eq [3, 0, 12]
+    end
+  end
+
   context "total_bikes" do
     it "saves things to redis" do
       Counts.assign_total_bikes

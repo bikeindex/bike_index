@@ -51,6 +51,14 @@ module Pages
           def render_notes_field?
             @settings_and_filters_component&.notes_search?
           end
+
+          def render_location_fields?
+            @settings_and_filters_component.present?
+          end
+
+          def location_search_disabled?
+            @settings_and_filters_component.location_search_disabled?
+          end
         end
       end
     end

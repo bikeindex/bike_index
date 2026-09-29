@@ -44,7 +44,9 @@
             <% if render_notes_field? %>
               <div
                 class="tw:hidden tw:flex-1"
-                data-org--search-target="notesField"
+                data-org--search-target="optionalField"
+                data-field="notes"
+                data-storage-key="orgRegistrationNotesSearchOpen"
               >
                 <%= label_tag :search_notes,
                   translation(".search_notes"),
@@ -57,6 +59,33 @@
               </div>
             <% end %>
           </div>
+
+          <% if render_location_fields? %>
+            <div
+              class="tw:hidden"
+              data-org--search-target="optionalField"
+              data-field="location"
+              data-storage-key="orgRegistrationLocationSearchOpen"
+            >
+              <div class="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                <span><%= translation(".within") %></span>
+
+                <%= label_tag :distance, translation(".search_distance"), class: "twlabel tw:sr-only" %>
+
+                <%= number_field_tag :distance, @interpreted_params[:distance], placeholder: GeocodeHelper::DEFAULT_DISTANCE,
+                  min: GeocodeHelper::MIN_DISTANCE, disabled: location_search_disabled?, data: {restores_from_url: true},
+                  class: "twinput tw:w-24 fieldResetsCounts" %>
+
+                <span><%= translation(".miles_of") %></span>
+
+                <%= label_tag :location, translation(".search_location"), class: "twlabel tw:sr-only" %>
+
+                <%= text_field_tag :location, @interpreted_params[:location],
+                  placeholder: translation(".search_location"), disabled: location_search_disabled?, data: {restores_from_url: true},
+                  class: "twinput tw:min-w-50 tw:flex-1 fieldResetsCounts" %>
+              </div>
+            </div>
+          <% end %>
         </div>
       </div>
 
