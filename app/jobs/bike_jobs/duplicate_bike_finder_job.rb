@@ -68,7 +68,7 @@ module BikeJobs
     end
 
     def notify_admins(listed_bike, stolen_bike)
-      return if Notification.stolen_serial_marketplace_match.where(bike: listed_bike, notifiable: stolen_bike).exists?
+      return if Notification.stolen_serial_marketplace_match.exists?(bike: listed_bike, notifiable: stolen_bike)
 
       notification = Notification.create!(kind: :stolen_serial_marketplace_match, bike: listed_bike,
         notifiable: stolen_bike, message_channel_target: AdminMailer::STOLEN_SERIAL_MATCH_EMAILS.join(", "))

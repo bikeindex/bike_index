@@ -114,7 +114,6 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
     end
     before do
       [listed_bike, stolen_bike].each(&:create_normalized_serial_segments)
-      Sidekiq::Job.clear_all
       ActionMailer::Base.deliveries.clear
     end
 
