@@ -2491,17 +2491,27 @@ nb:
     register:
       acknowledge:
         acknowledge_everything: Kryss av i hver boks for å godta disse reglene
+        safety_rules_updated: Sikkerhetsreglene er oppdatert – vennligst gjennomgå
+          dem på nytt
       confirm_email:
         confirmation_link_expired: Bekreftelseslenken er utløpt – sjekk e-posten din
           for en ny.
         signed_in_as_other: Du er logget på som %{email}, så vi beholdt deg på den
           kontoen. Registreringen er fortsatt lagret på adressen vi sendte e-post
           til.
+        sign_out_to_agree: Du er logget på som %{email}. Logg ut, og åpne deretter
+          lenken på nytt for å godta sikkerhetsreglene.
       find_b_param:
         registration_not_found: Vi fant ikke den registreringen – start en ny nedenfor
       sign_in_confirmed_user:
         unable_to_sign_in: Vi bekreftet e-postadressen din, men kunne ikke logge deg
           på den kontoen
+      redirect_to_single_page:
+        registered_for_owner: "%{bike_display} er registrert – vi har sendt en e-post
+          til %{email} slik at de kan gjøre krav på den."
+        registered_own: Din %{bike_display} er registrert.
+        safety_rules_sent: "%{bike_display} er registrert – vi har sendt en e-post
+          med sikkerhetsreglene til %{email} for å godta dem, noe som fullfører registreringen."
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4020,6 +4030,7 @@ nb:
     register_step_2: Legg til detaljene dine for %{cycle_type}
     search_marketplace_index: Sykkelindeksmarkedsplass
     strava_search_index: Sykkelindeks Strava-søk
+    registration_form_settings: Innstillinger for registreringsskjema
   money:
     currencies:
       en: USD
@@ -4125,26 +4136,16 @@ nb:
     show:
       add_a_bike: Legg til en sykkel
       add_a_lock: Legg til en lås
-      add_a_photo: Legg til et bilde
-      add_it_now: Legg det til nå!
-      bike_sticker: Sykkel-klistremerke
       bikes: sykler
       combination: Kombinasjon
       edit: Endre
-      generally_connect_to_org: Noen av syklene dine er assosiert med %{org_name},
-        men denne er det ikke. Vanligvis bør du koble alle syklene dine til %{org_name}
-        -
-      ignore: overse
       key_serial: Nøkkelserie
-      location: plassering
       lock_type: Lås type
       locks: låser
       manufacturer: Produsent
       next: Neste skritt
-      primary_colors: Primærfarger
       register_new_items: Registrer nye varer
       registered: Registrert
-      serial: Serienummer
       sorry_your_bike_was_stolen: Vi beklager at %{bikes_last_type} ble stjålet, men
         forhåpentligvis, med alle som kan søke etter den, får du den tilbake!
       tell_us_more_about_yourself: Fortell oss mer om deg selv.
@@ -4154,16 +4155,11 @@ nb:
         deg!
       update_your_profile: Oppdater profilen din
       updated: Oppdatert
-      user_hidden: Skjult for andre brukere
       welcome: Velkommen
       you_have_no_registered_bikes: Du har ingen registrerte sykler
       you_have_no_registered_locks: Du har ingen registrerte låser
       header_title: "%{current_user_name} på Bike Index"
       membership_subtitle: Takk for at du er medlem av Bike Index %{level}!
-      edit_registration: Rediger %{bike_type}
-      list_for_sale: Liste til salgs
-      mark_stolen: Merke %{bike_type} stjålet
-      update_marketplace_listing: Oppdater markedsplassoppføringen!
     delete_account:
       delete_account: Slett konto
       delete_my_account: Slett kontoen min og alle mine registrerte sykler
@@ -4422,6 +4418,8 @@ nb:
         search_org_bikes_html: Eller søk på %{org_name} sine sykler, se på sykkelen
           og klikk på <em>linken</em> for å koble den til denne %{bike_sticker_kind}
         update: Oppdater
+      new:
+        registration_form_settings: Innstillinger for registreringsskjema
     bulk_imports:
       index:
         added: La til
@@ -5019,7 +5017,6 @@ nb:
       viewing_without_org: Visning uten organisering
       your_registrations: Dine registreringer
     menu_items_org:
-      add_a_bike: Legg til en sykkel
       add_an_impounded_vehicle: Legg til et beslaglagt kjøretøy
       ascend_imports: Ascend Import
       bulk_import_and_export: Import og eksport av store mengder
@@ -5057,61 +5054,8 @@ nb:
       in_super_admin: "%{org_name} i superadministrator"
       registrations_index: Organisasjonsregistreringer
       search_all_registrations: Søk i alle registreringer
-  stolen:
-    index:
-      ambassador: ambassadør
-      bike_index: Bike Index
-      bike_index_will_broadcast: Bike Index vil kringkaste informasjon om den stjålne
-        sykkelen via sosiale kanaler. Vår stjålne sykkeldata er knyttet til LeadsOnline,
-        så hvis sykkelen din havner i "systemet" og ditt lokale politikontor bruker
-        LeadsOnline vil den bli flagget og du vil bli kontaktet. Bike Index-felleskapet
-        vil være på utkikk på ulike videresalgskanaler.
-      check_out_your_local_flea_market: Sjekk ut ditt lokale loppemarked for sykkelen
-        din.
-      donation: donasjon
-      error: feil
-      file_a_police_report: Send inn en politianmeldelse.
-      if_you_are_here_your_bike_was_probably_stolen: 'Hvis du er her, er sannsynligvis
-        sykkelen din stjålet. Det er kjipt, men vi er her for å hjelpe. Her er hva
-        du bør gjøre:'
-      keep_an_eye_on_craigslist: 'Hold et øye med finn.no. Sett opp et søkevarsel
-        som samsvarer med sykkelen din. '
-      list_recent_stolen_bikes_html: Vis nylige stjålne sykler på nettstedet ditt
-        med vår %{stolen_widget_link}
-      look_for_local_stolen_bike_groups_on_face: Se etter lokale sykkelgrupper på
-        Facebook. Mange av disse gruppene finnes over hele verden og kan bistå i gjenopprettingsarbeidet.
-      make_sure_your_bike_is_registered_html: Sørg for at sykkelen din er registrert
-        på %{new_bike_link} og eventuelle registre i lokalsamfunnet ditt. Merk sykkelen
-        din som <strong>stjålet</strong> på Bike Index for å ta nytte av fellesskapet
-        vårt.
-      other_recovery_tools: Andre gjenopprettingsverktøy
-      please_fix_the_following: Vennligst fiks følgende %{errors}
-      please_login_to_make_report_html: Vennligst %{login_link} for å lage denne rapporten
-      register_it: registrer den
-      report_a_bicycle_chop_shop: Rapporter et sykkelhoggeri
-      report_bike_theft_issues: 'Rapporter problemer med sykkeltyveri:'
-      report_someone_selling_a_stolen_bike: Rapporter noen som selger en stjålet sykkel
-      reporting_your_own_bike_stolen_html: Melde din egen sykkel stjålet? Du må %{register_it_link}
-        først
-      send_alert: Send varsel!
-      sign_in: logg inn
-      stolen_widget: stjålet widget
-      tell_everyone_you_know: Fortell alle du kjenner om den stjålne sykkelen din.
-        Bruk alle dine sosiale nettverk (Facebook, Instagram, Twitter, etc.) og send
-        en e-post til alle du kjenner.
-      we_wish_you_the_best_of_luck_html: Vi ønsker deg lykke til med å få tilbake
-        sykkelen din. Vi vil gjerne legge til historien din til våre %{recoveries_count}
-        gjenopprettede sykler. Hvis du ønsker å støtte saken vår, kan du vurdere en
-        %{donations_link} eller bli med i vårt %{ambassadors_link}-program.
-      what_happens_next: Hva skjer nå?
-      what_to_do_if_your_bike_is_stolen: Hva gjør du hvis sykkelen din blir stjålet
-      where_is_this_happening: Hvor skjer dette? URL, adresse - all informasjon du
-        har
-      your_email_address: Din epostadresse
-      your_local_police_department_will_do_what: Ditt lokale politikontor vil gjøre
-        det de gjør for å forsøke å finne sykkelen din. Du kan kontakte dem på et
-        senere tidspunkt for å høre om de har funnet sykkelen. Følg med om de publiserer
-        informasjon om sykkelauksjoner e.l.
+      add_a_registration: Legg til en registrering
+      registration_form_settings: Innstillinger for registreringsskjema
   theft_alert_plans:
     theft_alert_plan:
       days: Dager
@@ -5351,6 +5295,13 @@ nb:
         just_a_few_steps_away_html: Du er bare noen få skritt unna å registrere din
           <strong>%{color_and_brand}</strong> i verdens mest omfattende sykkelregister!
         youre_almost_done: Du er nesten ferdig!
+        agree_to_the_safety_rules: Godta sikkerhetsreglene
+        review_the_rules: Gjennomgå reglene
+        safety_rules_owed_html: Din <strong>%{color_and_brand}</strong> er registrert
+          hos %{org_name} på Bike Index. Godta sikkerhetsreglene til %{org_name} for
+          å fullføre registreringen.
+        link_signs_you_in: Denne lenken logger deg på Bike Index, så ikke videresend
+          den. Den fungerer i %{days} dager.
       confirmation_email:
         click_to_sign_in_html: Klikk på <em>Logg inn</em> -knappen for å fullføre
           registreringen!
@@ -5640,6 +5591,7 @@ nb:
               søker etter alle registreringer, med mindre du bare søker etter beslaglagte
               og/eller stjålne registreringer.
             show_location_search: vis stedssøk
+            included_columns: Inkluderte kolonner
           column_settings_toggle:
             column_settings: Kolonneinnstillinger
           settings_and_filters:
@@ -5670,10 +5622,6 @@ nb:
             serial_label: 'Serie:'
             sticker_label: 'Klistremerke:'
             view_all: se alle
-          bike_card:
-            e_vehicle: Elbil
-            not_registered_with: Ikke registrert hos %{org_name}
-            registered_with: Registrert hos %{org_name}
         impound_records:
           index:
             all_bikes: Alle sykler
@@ -5700,196 +5648,21 @@ nb:
             created: Opprettet
             notification_number: Melding#
             resolved: Løst
-      register:
-        acknowledgment_check:
-          i_name_html: Jeg, %{name},
-          registrants_name: registrantens navn
-        acknowledgment_progress:
-          progress_saved: Fremdrift lagret · Bekreftelse av elbil · Trinn %{number}
-            av %{total}
-        back_link:
-          back: Tilbake
-        page:
-          retry_failed: Vi kunne ikke lagre det akkurat nå – ingenting av det du skrev
-            inn er tapt. Prøv igjen om et øyeblikk.
-        page_content:
-          electric_detected: "⚡️ Elektrisk (motorisert) oppdaget"
-          have_questions: Har du spørsmål om disse retningslinjene?
-          read_the_faq: Vanlige spørsmål om bekreftelse av elbiler
-        review_summary:
-          a_quick_review: En rask gjennomgang av alt du har bekreftet.
-          a_quick_review_tap: En rask gjennomgang av alt du har bekreftet. Trykk på
-            Se gjennom for å se på en protokoll igjen.
-          review: Anmeldelse
-          youre_almost_done: Du er nesten ferdig.
-        step1:
-          bike_info_html: "%{cycle_type} informasjon"
-          electric_helper: Sjekk elektriske slik at vi flagger elsykler og verifiserer
-            sertifisering.
-          electric_motorized: "⚡️ Elektrisk (motorisert)"
-          email: E-post
-          email_placeholder: du@eksempel.com
-          email_school: "%{org_name} e-post"
-          just_the_essentials: Bare det viktigste for å komme i gang.
-          next: Neste
-          no_need_to_wait: Vi sender deg en bekreftelseslenke på e-post – du trenger
-            ikke å vente på at den skal fortsette.
-          register_your_vehicle: Registrer kjøretøyet ditt!
-          register_your_vehicle_with_org: Registrer kjøretøyet ditt med %{org_name}!
-          start_over: Start på nytt
-          start_over_certain: Starte på nytt?
-          start_over_discards: Dette starter en ny registrering – ingenting du har
-            skrevet inn her overføres.
-          vehicle_type: Bil type
-          yes_start_over: Ja, start på nytt
-          your_info: Din informasjon
-        step2:
-          add_another_color: Legg til en annen farge
-          add_your_bikes_details: Legg til detaljene dine for %{cycle_type}
-          additional_serial_sticker_number: Ekstra serie-/klistremerkenummer
-          affiliation: "%{org_name} tilknytning"
-          are_you_certain: Er du sikker?
-          attach_photo: Legg ved bilde av %{cycle_type}
-          bike_details: "%{cycle_type} detaljer"
-          bottom_bracket: Kranklager
-          cm: cm
-          color: Farge
-          complete_registration: Fullfør registreringen %{cycle_type}
-          confirmation_link_sent: Vi har sendt en bekreftelseslenke til e-posten din.
-            Du trenger ikke å vente – du kan fullføre registreringen nå.
-          contact_info: Kontaktinformasjon
-          database_public_note: Databasen vår er offentlig! Du kan justere personverninnstillingene
-            for individuelle bilder fra registreringen din senere.
-          email: E-post
-          enter_size: Angi størrelse
-          found: Funnet/Forlatt
-          found_description: Jeg fant dette %{cycle_type}
-          frame_size: Rammestørrelse
-          from_step_1: Fra trinn 1
-          head_tube: Styrerør
-          how_to_find_serial: hvordan du finner serienummeret ditt
-          i_just_dont_know_the_serial: Jeg kjenner bare ikke serien
-          im_100_sure: Jeg er 100% sikker
-          inches: tommer
-          information_for_org: Informasjon for %{org_name}
-          is_a_handmade_frame: Er en håndlaget ramme
-          it_probably_has_a_serial_number: Den har sannsynligvis et serienummer.
-          missing_serial: Mangler serie
-          model: Modell
-          model_placeholder: f.eks. Marlin 7
-          model_year: Årsmodell
-          model_year_placeholder: f.eks. 2023
-          more_useful_registration: Jo mer du legger til, desto mer nyttig er registreringen.
-          nevermind: Glem det
-          next: Neste
-          optional: valgfri
-          or: eller
-          owner_name: Eiers navn
-          owner_name_placeholder: For- og etternavn
-          owner_registration: Eierregistrering
-          owner_registration_description: Registrerer meg selv eller på vegne av eier
-          phone: Telefon
-          phone_placeholder: "(555) 000–0000"
-          phone_required_found: Telefon er nødvendig for å registrere en funnet %{cycle_type}
-          phone_required_stolen: Telefon kreves for å registrere en stjålet %{cycle_type}
-          primary_color_blank: Primærfarge — f.eks. svart
-          read_how_to_find_html: Les om %{how_to_find_link} <small>(åpnes i eget vindu)</small>
-          rear_dropouts: Bakre gaffelender
-          register_with_org: Registrer deg hos %{org_name}
-          register_with_org_description: "%{org_name} vil kunne se og hjelpe til med
-            å administrere denne registreringen."
-          registration_type: Registreringstype
-          remove_additional_color: Fjern farge
-          second_color_blank: Andre farge — f.eks. rød
-          serial_help_intro: 'De fleste sykler har serienummeret sitt gravert inn
-            i rammen. Se etter serienummeret ditt:'
-          serial_location_bottom_bracket: undersiden av kranklageret
-          serial_location_head_tube: på hoderøret
-          serial_location_rear_dropouts: på bakre utfall
-          serial_number: Serienummer
-          serial_placeholder: Obligatorisk — eller merk av for manglende
-          sticker_number: Sykkelindeksklistremerkenummer
-          sticker_placeholder: f.eks. A 471 829
-          stolen: Stjålet
-          stolen_description: Denne %{cycle_type} har blitt stjålet
-          student_id: Student ID
-          third_color_blank: Tredje farge
-          up_to_3: opptil 3
-          very_very_few_bikes_html: "<em>Svært</em> få %{cycle_types} lages uten serienummer.
-            Med mindre denne %{cycle_type}:"
-          view_serial_guide: Se hele serienummerguiden
-          was_made_before_1970: Ble laget før 1970
-          wheres_my_serial: Hvor er serienummeret mitt?
-          without_serial: Denne %{cycle_type} ble laget uten serienummer
-          without_serial_number: Denne %{cycle_type} ble laget uten serienummer
-          phone_required_org: Telefonnummer kreves for å registrere seg hos %{org_name}
-        step_acknowledgment:
-          continue: Fortsette
-        step_acknowledgment_review:
-          complete_registration: Fullfør registreringen %{cycle_type}
-        step_confirm:
-          confirming_your_email: Bekrefter e-postadressen din
-          continue: Fortsette
-          continue_where_you_left_off: Fortsett, så fortsetter vi der du slapp.
-        step_finished:
-          add_impound_details: Legg til detaljer om hvor du fant %{cycle_type}
-          add_photos: Legg til bilder av din %{cycle_type}
-          confirming_lets_you: 'Ved å bekrefte e-postadressen din kan du:'
-          do_these_things: Gjør disse tingene for best mulig sjanse til å få det tilbake
-          finish_adding: Fullfør å legge til %{cycle_type}-en din i sykkelindeksen
-          listed_as_found: "%{bike_display} er oppført som funnet på Bike Index"
-          listed_as_stolen: Din %{bike_display} er oppført som stjålet på Bike Index
-          owner_can_claim: Eieren kan finne den her og gjøre krav på den – vi sender
-            deg en e-post når noen gjør det.
-          progress_saved: Fremdriften er lagret
-          register_another: Registrer et annet kjøretøy
-          registered_for_owner_html: "%{bike_display} er registrert hos Bike Index.
-            Vi har sendt en e-post til %{email} slik at de kan gjøre krav på registreringen."
-          registration_complete: Registreringen er fullført!
-          report_it_stolen: Fullfør rapporteringen av stjålet %{cycle_type} og dra
-            nytte av fellesskapsnettverket vårt
-          reported_stolen: Meldt stjålet
-          verify_your_email_html: Ett steg til – bekreft e-postadressen din. Vi sendte
-            en bekreftelseslenke til %{email}; klikk på den for å fullføre registreringen.
-            Alt du har skrevet inn er lagret.
-          view_the_registration: Se registreringen
-          view_your_registration: Se registreringen din
-          we_will_keep_watch: Din %{bike_display} er registrert hos Bike Index. Vi
-            holder utkikk – hvis den noen gang blir meldt stjålet, leter hele lokalsamfunnet
-            etter den.
-        step_report:
-          about_the_one_you_found: Om %{cycle_type} du fant
-          address_where_you_found_it: Adressen der du fant den
-          complete_registration: Fullfør registreringen %{cycle_type}
-          contact_and_sharing: Kontakt og deling
-          department_city: Avdeling/by
-          estimated_value: Estimert verdi (%{currency})
-          have_proof_of_ownership: Jeg har bevis på at jeg eier denne %{cycle_type}
-          help_us_reunite: Hjelp oss å få den tilbake til eieren.
-          how_did_you_find_it: Hvordan fant du %{cycle_type}?
-          how_was_it_locked: Hvordan ble %{cycle_type} låst?
-          how_was_the_lock_defeated: Hvordan ble låsen beseiret?
-          next: Neste
-          police_report: Politianmeldelse
-          receive_notifications: Send meg en e-post hvis vi tweeter om dette %{cycle_type},
-            eller finner en mulig match
-          report_number: Rapportnummer
-          report_your_stolen: Rapporter stjålet %{cycle_type}
-          show_phone_police: Politi
-          show_phone_shops: Sykkelbutikker
-          show_phone_users: Innloggede Bike Index-brukere
-          the_more_we_know: Jo mer vi vet, desto bedre er sjansene for å få det tilbake.
-          theft_details: Tyveridetaljer
-          what_happened: Hva skjedde?
-          what_happened_placeholder: f.eks. låst til et stativ utenfor kaffebaren,
-            borte da jeg kom ut igjen
-          when_and_where: Når og hvor
-          when_did_you_find_it: Når fant du den?
-          when_was_it_stolen: Når ble %{cycle_type} stjålet?
-          where_was_it_stolen: Hvor ble det stjålet?
-          who_can_see_your_phone: Hvem kan se telefonnummeret ditt?
-          without_a_report: Å sende inn en politianmeldelse gir din %{cycle_type}
-            den beste sjansen til å komme tilbake – du kan legge til nummeret senere.
+        register_settings:
+          browser_only: Disse innstillingene brukes kun i nettleseren din – de påvirker
+            ikke andre brukere
+          form_options: Skjemaalternativer
+          old_view: Bruk den gamle registreringssiden
+          registration_form_settings: Innstillinger for registreringsskjema
+          registration_page: Registreringsside
+          separate_attestation: Registranten fyller ut registreringsbekreftelsen separat
+          separate_attestation_helper: De vil motta en e-post som forteller dem at
+            registreringen ikke er fullført, med en lenke for å fullføre den.
+          single_page: Registreringsskjema på én side
+          update: Oppdater
+        registrations:
+          new:
+            registration_form_settings: Innstillinger for registreringsskjema
       registrations:
         show:
           bike_details:
@@ -6209,29 +5982,8 @@ nb:
           stolenness_stolen: Stjålet hvor som helst
           within: innenfor
         result_view_select:
-          bike_box_view: Vis som liste
-          thumbnail_view: Vis som miniatyrbilder
-      search_results:
-        bike_box:
-          ended_at: Avsluttet
-          location: plassering
-          not_applicable: Ikke aktuelt
-          posted_at: Oppført
-          price: Pris
-          primary_colors: Primærfarger
-          removed_from: Fjernet fra sykkelindeksen
-          serial: Serienummer
-        container:
-          no_results: Ingen registreringer samsvarte nøyaktig med søket ditt
-        frame:
-          fetch_failed: Kunne ikke laste inn disse resultatene – sjekk tilkoblingen
-            din og prøv på nytt.
-          rate_limited: For mange søk for raskt – du er frekvensbegrenset. Vent et
-            øyeblikk, og prøv på nytt.
-          retry: Prøv igjen
-        vehicle_thumbnail:
-          member: Medlem av sykkelindeksen
-          registered_not_stolen: registrert, ikke stjålet
+          cards_view: Vis som kort
+          list_view: Vis som liste
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Klikk på knappen nedenfor for å fortsette
@@ -6412,12 +6164,375 @@ nb:
           sync_running_in_background: Synkroniseringen kjører i bakgrunnen. Denne
             siden oppdateres automatisk.
           syncing_activities: Synkroniserer aktiviteter ...
+        show:
+          bike_box:
+            add_a_photo: Legg til et bilde
+            add_it_now: Legg det til nå!
+            bike_sticker: Sykkel-klistremerke
+            edit_registration: Rediger %{bike_type}
+            generally_connect_to_org: Noen av syklene dine er assosiert med %{org_name},
+              men denne er det ikke. Vanligvis bør du koble alle syklene dine til
+              %{org_name} -
+            ignore_this_suggestion: Ignorer dette forslaget
+            list_for_sale: Liste til salgs
+            location: plassering
+            mark_stolen: Merke %{bike_type} stjålet
+            primary_colors: Primærfarger
+            registered: Registrert
+            serial: Serienummer
+            update_marketplace_listing: Oppdater markedsplassoppføringen!
+            updated: Oppdatert
+            user_hidden: Skjult for andre brukere
       sales:
         new_form:
           record_sale: Rekordsalg
           sold_for: Beløp solgt for
           transfer_to_html: Dette vil overføre registreringen til %{buyer_html} og
             lukke markedsplassen.
+      stolen:
+        index:
+          act_in_the_first_24_hours: Handle i løpet av de første 24 timene
+          bike_stolen: Sykkel stjålet
+          bikes_that_came_home: Sykler som ble med hjem
+          email: E-post
+          every_hour_it_sits_unregistered: Hver time den står uregistrert er en time
+            ingen kan identifisere den.
+          faq_confront_answer: Nei. Ring politiet, gi dem saksnummeret ditt og en
+            lenke til sykkelindeksen din, og la dem ta kontakt. Folk har blitt skadet
+            mens de prøvde å ta tilbake en sykkel selv.
+          faq_confront_question: Bør jeg konfrontere personen som har sykkelen min?
+          faq_cost_answer: Det er gratis å registrere en sykkel, merke den som stjålet
+            og bruke gjenopprettingsverktøyene. Bike Index er en ideell organisasjon
+            finansiert av donasjoner, partnerorganisasjoner og valgfrie promoterte
+            varsler.
+          faq_cost_question: Koster noe av dette penger?
+          faq_other_city_answer: Registeret er internasjonalt, og gjenfinninger skjer
+            hundrevis av kilometer fra tyveriet. Oppføringen din forblir aktiv og
+            søkbar inntil du merker sykkelen som gjenfunnet.
+          faq_other_city_question: Hva om den dukker opp i en annen by?
+          faq_serial_question: Jeg har ikke serienummeret mitt.
+          faq_unregistered_question: Sykkelen min var aldri registrert før den ble
+            stjålet.
+          here_is_the_next_hour: Her er den neste timen.
+          how_alerts_work: Hvordan varsler fungerer
+          more_resources: Flere ressurser
+          no_account_yet: Ingen konto ennå? Registrering av en stjålet sykkel oppretter
+            en. Registrering er gratis, alltid.
+          partner_organizations: partnerbutikker, politiavdelinger og byer
+          pillar_alerts_title: Varsler som reiser
+          pillar_network_title: Et frivillignettverk
+          promoted_alerts: Promoterte varsler
+          promoted_alerts_body: Et reklamevarsel legger ut den stjålne sykkelen din
+            i Facebook-feeder i området rundt tyveriet, i tillegg til våre egne sosiale
+            kanaler. Det når ut til folk som ikke leter etter sykkelen din, men som
+            vil gjenkjenne den låst til feil veranda.
+          promoted_alerts_title: Sett sykkelen foran nabolaget den ble tatt fra
+          questions_people_ask_at_2am: Spørsmål folk stiller klokken 02:00
+          read_more_recovery_stories: Les flere historier om gjenoppretting
+          recovered: Gjenopprettet
+          recoveries_reported_by_owners: Nylige gjenopprettinger, rapportert av eierne.
+          recovery_record: Gjenopprettingslogg
+          register_it: Registrer det
+          register_your_stolen_bike: Registrer den stjålne sykkelen din
+          register_your_stolen_bike_free: Registrer den stjålne sykkelen din – gratis
+          report_a_bicycle_chop_shop: En sykkelbutikk
+          report_bike_theft_issues: Rapporter problemer med sykkeltyveri
+          report_bike_theft_issues_subhead: Har du sett en stjålet sykkel til salgs,
+            eller en sykkelbutikk? Fortell oss hvor.
+          report_someone_selling_a_stolen_bike: Noen selger en stjålet sykkel
+          reporting_your_own_bike_html: Skal du melde din egen sykkel stjålet? %{register_it_link}
+            i stedet.
+          resource_bay_area: Stjålet i Bay Area
+          resource_portland: Stjålet i Portland, Oregon
+          resource_register_found: Registrer en funnet sykkel
+          resource_safety_tips: Sikkerhetstips for å berge din egen sykkel
+          resource_seattle: Stjålet i Seattle
+          resource_what_to_do: Hva gjør du hvis sykkelen din blir stjålet
+          resource_why_register: Hvorfor registrere syklene dine på Bike Index?
+          search_the_registry: Søk i registeret
+          send_report: Send rapport
+          sign_in: Logg inn
+          sign_in_to_report_html: "%{sign_in_link} for å lage en rapport."
+          step_alert_action: Del varselet ditt
+          step_alert_body: Oppføringen din genererer et delbart varsel om stjålet
+            sykkel, laget for sosiale medier. Legg det ut, send det til lokale motorsykkelgrupper
+            og nabolagssider, og vurder et promotert varsel for å nå ut til kvartalene
+            rundt tyveriet.
+          step_alert_tag: 10 minutter
+          step_alert_title: Send ut varselet ditt
+          step_google_alerts_action: Konfigurer Google-varsler
+          step_google_alerts_body: Sett opp flere Google-varsler med detaljer som
+            samsvarer med sykkelen din (merke, modell, særegne komponenter, farge),
+            slik at du får se nye oppføringer og innlegg som nevner den.
+          step_google_alerts_tag: 5 minutter
+          step_google_alerts_title: Konfigurer Google-varsler
+          step_listing_action: Rediger oppføringen din
+          step_listing_body: En oppføring med politirapportnummeret, tydelige bilder
+            og eventuelle identifiserende merker er noe en politibetjent kan gjøre
+            noe med i løpet av minutter. Vage oppføringer stopper opp.
+          step_police_action: Finn din lokale rapportlinje
+          step_police_tag: 15 minutter
+          step_police_title: Send inn en politirapport
+          step_register_action: Registrer den stjålne sykkelen din
+          step_register_tag: 3 min · gratis
+          step_register_title: Registrer den som stjålet på Bike Index
+          step_shops_action: Finn partnerbutikker
+          step_shops_tag: 20 minutter
+          step_shops_title: Si ifra til butikkene i nærheten av deg
+          stolen_bikes_recovered: stjålne sykler funnet
+          the_first_24_hours: De første 24 timene
+          to_register_always: å registrere seg, alltid
+          value_returned_to_owners: verdi tilbakeført til eierne
+          where_is_this_happening: Hvor skjer dette? En URL, en adresse, all informasjon
+            du har
+          why_registering_changes_the_odds: Hvorfor registrering endrer oddsen
+          why_registering_subhead: En stjålet sykkel som ingen kan identifisere er
+            bare en brukt sykkel. Registrering gjør din identifiserbar for de som
+            håndterer brukte sykler hele dagen.
+          work_top_to_bottom: Arbeid ovenfra og ned.
+          your_bike_is_gone: Sykkelen din er borte.
+          faq_serial_proof_answer: Registrer deg likevel. Bilder, en kjøpskvittering,
+            servicejournaler eller forsikringspapirer kan alle identifisere en sykkel.
+            Legg til det du har, og sjekk med butikken som solgte den – de har ofte
+            serienummeret registrert.
+          faq_unregistered_recovered_answer: Det er ofte tilfelle. Du kan registrere
+            den som stjålet med en gang; det er ikke noe krav om at den ble registrert
+            på forhånd – mange sykler blir funnet som ikke ble registrert før etter
+            at de ble stjålet.
+          lede_register_first: 'Seks trinn, i rekkefølge. De to første er viktigst:
+            registrer deg på Bike Index slik at alle som finner sykkelen din kan kontakte
+            deg, og send deretter inn en politianmeldelse.'
+          pillar_alerts_promoted_body: Annonsen din blir delt på våre sosiale kanaler
+            og promotert i feeder i nærheten av tyveriet. Alle som oppdager den kan
+            sende deg en direkte melding.
+          pillar_network_millions_body: Millioner av passasjerer pluss ambassadører,
+            butikker og politipartnere ser på videresalgsannonser og flaggverksteder.
+          pillar_record_body: Hvem som helst kan søke etter en sykkel på Bike Index
+            gratis – sykkelbutikker, betjenter i felten, kjøpere før de gir fra seg
+            kontanter.
+          pillar_record_title: En offentlig registrering
+          report_on_the_stolen_bike_page: Hvis det finnes en stjålet sykkel på Bike
+            Index som du rapporterer om, send heller en melding på den stjålne sykkelsiden.
+          step_listing_report_number_tag: 1 minutt
+          step_listing_report_number_title: Legg til politirapportnummeret i Bike
+            Index
+          step_police_bring_body: Saksnummeret er det som lar en betjent levere sykkelen
+            din tilbake i stedet for å beslaglegge den, og hvert senere trinn refererer
+            til den. Ha adressen og tidspunktet den ble tatt, og serienummeret (hvis
+            du har det).
+          step_register_minimal_registration: Hvis du har serienummer og bilde av
+            sykkelen, hjelper det – men selv en minimal registrering med bare farge
+            og modell gjenoppretter stjålne sykler.
+          step_register_registry_body: Dette er bryteren som slår på alt annet. Sykkelen
+            din havner i et offentlig register som sykkelbutikker, politiavdelinger,
+            pantedatabaser og kjøpere av brukte sykler sjekker før de berører en bruktramme.
+          step_shops_recovered_body: Tyver tar med seg stjålne sykler for reparasjon
+            og deler. Butikker som sjekker Bike Index er måten en stor andel av stjålne
+            sykler blir funnet.
+          three_minutes_and_no_cost: Tre minutter og ingen kostnader.
+      register:
+        parts:
+          acknowledgment_check:
+            i_name_html: Jeg, %{name},
+            registrants_name: registrantens navn
+          acknowledgment_progress:
+            progress_saved: Fremdrift lagret · Bekreftelse av elbil · Trinn %{number}
+              av %{total}
+          back_link:
+            back: Tilbake
+          page_content:
+            electric_detected: "⚡️ Elektrisk (motorisert) oppdaget"
+            have_questions: Har du spørsmål om disse retningslinjene?
+            read_the_faq: Vanlige spørsmål om bekreftelse av elbiler
+          review_summary:
+            a_quick_review: En rask gjennomgang av alt du har bekreftet.
+            a_quick_review_tap: En rask gjennomgang av alt du har bekreftet. Trykk
+              på Se gjennom for å se på en protokoll igjen.
+            review: Anmeldelse
+            youre_almost_done: Du er nesten ferdig.
+          shell:
+            retry_failed: Vi kunne ikke lagre det akkurat nå – ingenting av det du
+              skrev inn er tapt. Prøv igjen om et øyeblikk.
+          step1_fields:
+            bike_info_html: "%{cycle_type} informasjon"
+            electric_helper: Sjekk elektriske slik at vi flagger elsykler og verifiserer
+              sertifisering.
+            electric_motorized: "⚡️ Elektrisk (motorisert)"
+            email: E-post
+            email_placeholder: du@eksempel.com
+            email_school: "%{org_name} e-post"
+            vehicle_type: Bil type
+            your_info: Din informasjon
+          step1_submit:
+            next: Neste
+            no_need_to_wait: Vi sender deg en bekreftelseslenke på e-post – du trenger
+              ikke å vente på at den skal fortsette.
+            start_over: Start på nytt
+            start_over_certain: Starte på nytt?
+            start_over_discards: Dette starter en ny registrering – ingenting du har
+              skrevet inn her overføres.
+            yes_start_over: Ja, start på nytt
+          step2_fields:
+            add_another_color: Legg til en annen farge
+            additional_serial_sticker_number: Ekstra serie-/klistremerkenummer
+            affiliation: "%{org_name} tilknytning"
+            are_you_certain: Er du sikker?
+            attach_photo: Legg ved bilde av %{cycle_type}
+            bike_details: "%{cycle_type} detaljer"
+            bottom_bracket: Kranklager
+            cm: cm
+            color: Farge
+            complete_registration: Fullfør registreringen %{cycle_type}
+            contact_info: Kontaktinformasjon
+            database_public_note: Databasen vår er offentlig! Du kan justere personverninnstillingene
+              for individuelle bilder fra registreringen din senere.
+            email: E-post
+            enter_size: Angi størrelse
+            found: Funnet/Forlatt
+            found_description: Jeg fant dette %{cycle_type}
+            frame_size: Rammestørrelse
+            from_step_1: Fra trinn 1
+            head_tube: Styrerør
+            how_to_find_serial: hvordan du finner serienummeret ditt
+            i_just_dont_know_the_serial: Jeg kjenner bare ikke serien
+            im_100_sure: Jeg er 100% sikker
+            inches: tommer
+            information_for_org: Informasjon for %{org_name}
+            is_a_handmade_frame: Er en håndlaget ramme
+            it_probably_has_a_serial_number: Den har sannsynligvis et serienummer.
+            missing_serial: Mangler serie
+            model: Modell
+            model_placeholder: f.eks. Marlin 7
+            model_year: Årsmodell
+            model_year_placeholder: f.eks. 2023
+            nevermind: Glem det
+            next: Neste
+            optional: valgfri
+            or: eller
+            owner_name: Eiers navn
+            owner_name_placeholder: For- og etternavn
+            owner_registration: Eierregistrering
+            owner_registration_description: Registrerer meg selv eller på vegne av
+              eier
+            phone: Telefon
+            phone_placeholder: "(555) 000–0000"
+            phone_required_found: Telefon er nødvendig for å registrere en funnet
+              %{cycle_type}
+            phone_required_org: Telefonnummer kreves for å registrere seg hos %{org_name}
+            phone_required_stolen: Telefon kreves for å registrere en stjålet %{cycle_type}
+            primary_color_blank: Primærfarge — f.eks. svart
+            read_how_to_find_html: Les om %{how_to_find_link} <small>(åpnes i eget
+              vindu)</small>
+            rear_dropouts: Bakre gaffelender
+            register_with_org: Registrer deg hos %{org_name}
+            register_with_org_description: "%{org_name} vil kunne se og hjelpe til
+              med å administrere denne registreringen."
+            registration_type: Registreringstype
+            remove_additional_color: Fjern farge
+            second_color_blank: Andre farge — f.eks. rød
+            serial_help_intro: 'De fleste sykler har serienummeret sitt gravert inn
+              i rammen. Se etter serienummeret ditt:'
+            serial_location_bottom_bracket: undersiden av kranklageret
+            serial_location_head_tube: på hoderøret
+            serial_location_rear_dropouts: på bakre utfall
+            serial_number: Serienummer
+            serial_placeholder: Obligatorisk — eller merk av for manglende
+            sticker_number: Sykkelindeksklistremerkenummer
+            sticker_placeholder: f.eks. A 471 829
+            stolen: Stjålet
+            stolen_description: Denne %{cycle_type} har blitt stjålet
+            student_id: Student ID
+            third_color_blank: Tredje farge
+            up_to_3: opptil 3
+            very_very_few_bikes_html: "<em>Svært</em> få %{cycle_types} lages uten
+              serienummer. Med mindre denne %{cycle_type}:"
+            view_serial_guide: Se hele serienummerguiden
+            was_made_before_1970: Ble laget før 1970
+            wheres_my_serial: Hvor er serienummeret mitt?
+            without_serial: Denne %{cycle_type} ble laget uten serienummer
+            without_serial_number: Denne %{cycle_type} ble laget uten serienummer
+        views:
+          confirm:
+            confirming_your_email: Bekrefter e-postadressen din
+            continue: Fortsette
+            continue_where_you_left_off: Fortsett, så fortsetter vi der du slapp.
+          step1:
+            just_the_essentials: Bare det viktigste for å komme i gang.
+            register_your_vehicle: Registrer kjøretøyet ditt!
+            register_your_vehicle_with_org: Registrer kjøretøyet ditt med %{org_name}!
+          step2:
+            add_your_bikes_details: Legg til detaljene dine for %{cycle_type}
+            confirmation_link_sent: Vi har sendt en bekreftelseslenke til e-posten
+              din. Du trenger ikke å vente – du kan fullføre registreringen nå.
+            more_useful_registration: Jo mer du legger til, desto mer nyttig er registreringen.
+          step_acknowledgment:
+            continue: Fortsette
+          step_finished:
+            add_impound_details: Legg til detaljer om hvor du fant %{cycle_type}
+            add_photos: Legg til bilder av din %{cycle_type}
+            confirming_lets_you: 'Ved å bekrefte e-postadressen din kan du:'
+            do_these_things: Gjør disse tingene for best mulig sjanse til å få det
+              tilbake
+            finish_adding: Fullfør å legge til %{cycle_type}-en din i sykkelindeksen
+            listed_as_found: "%{bike_display} er oppført som funnet på Bike Index"
+            listed_as_stolen: Din %{bike_display} er oppført som stjålet på Bike Index
+            owner_can_claim: Eieren kan finne den her og gjøre krav på den – vi sender
+              deg en e-post når noen gjør det.
+            progress_saved: Fremdriften er lagret
+            register_another: Registrer et annet kjøretøy
+            registered_for_owner_html: "%{bike_display} er registrert hos Bike Index.
+              Vi har sendt en e-post til %{email} slik at de kan gjøre krav på registreringen."
+            registration_complete: Registreringen er fullført!
+            report_it_stolen: Fullfør rapporteringen av stjålet %{cycle_type} og dra
+              nytte av fellesskapsnettverket vårt
+            reported_stolen: Meldt stjålet
+            verify_your_email_html: Ett steg til – bekreft e-postadressen din. Vi
+              sendte en bekreftelseslenke til %{email}; klikk på den for å fullføre
+              registreringen. Alt du har skrevet inn er lagret.
+            view_the_registration: Se registreringen
+            view_your_registration: Se registreringen din
+            we_will_keep_watch: Din %{bike_display} er registrert hos Bike Index.
+              Vi holder utkikk – hvis den noen gang blir meldt stjålet, leter hele
+              lokalsamfunnet etter den.
+            safety_rules_sent_html: "%{bike_display} er registrert hos Bike Index.
+              Vi har sendt en e-post til %{email} med sikkerhetsreglene som må godtas,
+              noe som fullfører registreringen."
+          step_report:
+            about_the_one_you_found: Om %{cycle_type} du fant
+            address_where_you_found_it: Adressen der du fant den
+            complete_registration: Fullfør registreringen %{cycle_type}
+            contact_and_sharing: Kontakt og deling
+            department_city: Avdeling/by
+            estimated_value: Estimert verdi (%{currency})
+            have_proof_of_ownership: Jeg har bevis på at jeg eier denne %{cycle_type}
+            help_us_reunite: Hjelp oss å få den tilbake til eieren.
+            how_did_you_find_it: Hvordan fant du %{cycle_type}?
+            how_was_it_locked: Hvordan ble %{cycle_type} låst?
+            how_was_the_lock_defeated: Hvordan ble låsen beseiret?
+            next: Neste
+            police_report: Politianmeldelse
+            receive_notifications: Send meg en e-post hvis vi tweeter om dette %{cycle_type},
+              eller finner en mulig match
+            report_number: Rapportnummer
+            report_your_stolen: Rapporter stjålet %{cycle_type}
+            show_phone_police: Politi
+            show_phone_shops: Sykkelbutikker
+            show_phone_users: Innloggede Bike Index-brukere
+            the_more_we_know: Jo mer vi vet, desto bedre er sjansene for å få det
+              tilbake.
+            theft_details: Tyveridetaljer
+            what_happened: Hva skjedde?
+            what_happened_placeholder: f.eks. låst til et stativ utenfor kaffebaren,
+              borte da jeg kom ut igjen
+            when_and_where: Når og hvor
+            when_did_you_find_it: Når fant du den?
+            when_was_it_stolen: Når ble %{cycle_type} stjålet?
+            where_was_it_stolen: Hvor ble det stjålet?
+            who_can_see_your_phone: Hvem kan se telefonnummeret ditt?
+            without_a_report: Å sende inn en politianmeldelse gir din %{cycle_type}
+              den beste sjansen til å komme tilbake – du kan legge til nummeret senere.
+          step_review:
+            complete_registration: Fullfør registreringen %{cycle_type}
     shared_blocks:
       footer:
         about: Om
@@ -6505,7 +6620,6 @@ nb:
           subscription_expired_html: Ditt abonnement på Bike Index har utløpt. Ta
             kontakt med %{email_link} for å få den aktivert på nytt.
         organized_shop_integration_alert:
-          add_a_bike: Legg til en sykkel
           already_viewing_add_a_bike_page: Du ser allerede på denne siden
           ascend_card_title: Stige
           dismiss: Avskjedige
@@ -6522,6 +6636,7 @@ nb:
           pos_callout_subhead: Koble til POS-en din, så registreres hver sykkel du
             selger til kunden din på Bike Index.
           pos_callout_title: Registrer sykler automatisk fra salgsstedet ditt
+          add_a_registration: Legg til en registrering
       navbar:
         org_sidebar:
           admin_panel: ADMINISTRASJONSPANEL
@@ -6580,6 +6695,34 @@ nb:
           finish_the_required_steps: fullfør de nødvendige trinnene
           not_registered_yet_html: Din %{manufacturer} %{cycle_type} er ikke registrert
             ennå! Vennligst %{finish_link}
+      search_results:
+        bike_box:
+          ended_at: Avsluttet
+          location: plassering
+          not_applicable: Ikke aktuelt
+          posted_at: Oppført
+          price: Pris
+          primary_colors: Primærfarger
+          removed_from: Fjernet fra sykkelindeksen
+          serial: Serienummer
+        bike_card:
+          e_vehicle: Elbil
+          member_listing: Medlem av sykkelindeksen
+          member_listing_tooltip: Denne selgeren er medlem av Bike Index
+          not_registered_with: Ikke registrert hos %{org_name}
+          registered_with: Registrert hos %{org_name}
+        bike_list_item:
+          e_vehicle: Elbil
+          member_listing: Medlem av sykkelindeksen
+          member_listing_tooltip: Denne selgeren er medlem av Bike Index
+          not_registered_with: Ikke registrert hos %{org_name}
+          registered_with: Registrert hos %{org_name}
+        frame:
+          fetch_failed: Kunne ikke laste inn disse resultatene – sjekk tilkoblingen
+            din og prøv på nytt.
+          rate_limited: For mange søk for raskt – du er frekvensbegrenset. Vent et
+            øyeblikk, og prøv på nytt.
+          retry: Prøv igjen
   user_emails:
     confirm:
       confirm_email: Bekreft e-post

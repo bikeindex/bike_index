@@ -1,10 +1,9 @@
-<ul class="<%= container_class %>">
+<ul class="bike-boxes">
   <%= render(
-    @component_class.new(
+    SharedBlocks::SearchResults::BikeBox::Component.new(
       bike: @vehicle,
       current_user: @current_user,
-      skip_cache:,
-      search_kind:,
+      skip_cache: true,
       event_record: @marketplace_listing,
       render_deleted: true
     )

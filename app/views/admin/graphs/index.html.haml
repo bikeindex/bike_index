@@ -1,5 +1,4 @@
--# Make sure that period is passed - because it's a different period than other places
-- sortable_params = {period: default_period}.merge(sortable_search_params).symbolize_keys
+- sortable_params = graphs_sortable_params
 = render partial: "admin/graphs/graphs_subnav", locals: {sortable_params: sortable_params}
 
 - if @kind == "general"
@@ -17,7 +16,7 @@
   = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "bikes", period: "year"), stacked: true))
 
 - elsif @kind == "bikes"
-  = render(Pages::Admin::Graphs::Bikes::Component.new(bikes: matching_bikes, index: admin_index_state,
+  = render(Pages::Admin::Graphs::Bikes::Component.new(index: admin_index_state,
     sortable_params:, total_count: @total_count, ignored_only: @ignored_only, manufacturer: @manufacturer,
     searched_statuses: @searched_statuses, default_statuses: @default_statuses, not_default_statuses: @not_default_statuses))
 

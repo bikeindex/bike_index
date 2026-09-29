@@ -618,6 +618,20 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "rules_left_to_owner?" do
+    let(:b_param) { BParam.new(params: {register_separate_attestation: true, bike: {owner_email: "owner@example.com"}}.as_json) }
+    let(:owner) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
+
+    it "is the switch, for anyone but the owner" do
+      expect(b_param.rules_left_to_owner?(FactoryBot.create(:user_confirmed))).to be_truthy
+      expect(b_param.rules_left_to_owner?(nil)).to be_truthy
+      expect(b_param.rules_left_to_owner?(owner)).to be_falsey
+
+      b_param.params = b_param.params.merge("register_separate_attestation" => false)
+      expect(b_param.rules_left_to_owner?(nil)).to be_falsey
+    end
+  end
+
   describe "self_made?" do
     let(:b_param) { BParam.new(params: {bike: {owner_email: "owner@example.com"}}.as_json) }
     let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
@@ -907,6 +921,37 @@ RSpec.describe BParam, type: :model do
 
         expect(b_param.unfinished_registration?).to be_falsey
         expect(creator.reload.alert_slugs).to eq []
+      end
+
+      context "with the safety rules still to agree to" do
+        let!(:acknowledgment) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:) }
+
+        it "alerts until they're agreed to" do
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+
+          expect(b_param.unfinished_registration?).to be_truthy
+          expect(BParam.unfinished_registrations.pluck(:id)).to eq [b_param.id]
+          expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+
+          acknowledgment.update(acknowledged_at: Time.current)
+
+          expect(b_param.unfinished_registration?).to be_falsey
+          expect(BParam.unfinished_registrations.pluck(:id)).to eq []
+          expect(creator.reload.alert_slugs).to eq []
+        end
+
+        it "doesn't expire until they're agreed to" do
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id, created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day)
+
+          expect(b_param.unfinished_registration?).to be_truthy
+          expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq [b_param.id]
+          expect(BParam.unfinished_registrations.pluck(:id)).to eq [b_param.id]
+
+          acknowledgment.update(acknowledged_at: Time.current)
+
+          expect(b_param.unfinished_registration?).to be_falsey
+          expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq []
+        end
       end
     end
 

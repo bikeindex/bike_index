@@ -13,8 +13,12 @@ module Search
 
       if @render_results
         # Member listings (seller_member) sort first, then by recency, paginated together.
+        # The listing is in each result's cache key, so without preloading it every card
+        # queries for one before its cache can answer. preload, not includes: the relation
+        # already eager-loads, and joins would go through the DISTINCT subquery LIMIT needs
         @pagy, @bikes = pagy(:countish,
-          searched_bikes.reorder("marketplace_listings.seller_member DESC, marketplace_listings.published_at DESC"),
+          searched_bikes.reorder("marketplace_listings.seller_member DESC, marketplace_listings.published_at DESC")
+            .preload(current_marketplace_listing: {address_record: %i[country region_record]}),
           limit: 12, page: @page, max_pages: MAX_INDEX_PAGE)
       end
 
@@ -83,10 +87,8 @@ module Search
       end
 
       @page = permitted_page(max: MAX_INDEX_PAGE)
-      @search_kind = :marketplace
       @search_obj_name = "Listings"
-      @result_view = Pages::SearchResults::Container::Component
-        .permitted_result_view(params[:search_result_view], default: :thumbnail)
+      @result_view = SharedBlocks::SearchResults::Container::Component.permitted_result_view(params[:search_result_view])
     end
 
     def permitted_search_params

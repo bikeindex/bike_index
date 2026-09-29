@@ -45,6 +45,8 @@ class BParam < ApplicationRecord
     phone
     postal_code
     region_string
+    register_separate_attestation
+    register_single_page
     street
     student_id
     user_name
@@ -68,6 +70,8 @@ class BParam < ApplicationRecord
     propulsion_type
     propulsion_type_slug
     rear_gear_type_slug
+    register_separate_attestation
+    register_single_page
     revised_new
     state_id
     stolen
@@ -103,11 +107,13 @@ class BParam < ApplicationRecord
   # at submit) - only seeds and a prefilled email, nothing worth keeping
   scope :without_bike_values, -> { bike_params_empty.or(where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
   scope :step_1_submitted, -> { where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL") }
-  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
+  # One owing the safety rules never expires - its bike is unfinished until they're agreed to
+  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION).or(acknowledgment_pending) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
-  scope :unfinished_registrations, -> { unexpired.without_bike.step_1_submitted }
+  scope :acknowledgment_pending, -> { where(id: RegistrationSequenceAcknowledgment.pending.select(:b_param_id)) }
+  scope :unfinished_registrations, -> { unexpired.step_1_submitted.and(without_bike.or(acknowledgment_pending)) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -303,14 +309,23 @@ class BParam < ApplicationRecord
     created_bike_id.present?
   end
 
+  # The bike is created ahead of its organization's safety rules, which are still required -
+  # so the registration isn't finished until they're agreed to
+  def acknowledgment_pending?
+    persisted? && RegistrationSequenceAcknowledgment.pending.exists?(b_param_id: id)
+  end
+
+  def finished_registration? = with_bike? && !acknowledgment_pending?
+
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
-  # after_commit a destroy fires resolves its alert rather than re-saving it.
-  # self_made? last, and taking the user callers already hold, since it's the only clause
-  # that queries: one made for someone else isn't the creator's bike to alert about
+  # after_commit a destroy fires resolves its alert rather than re-saving it. One with a
+  # bike here owes the safety rules, which don't expire.
+  # self_made? last, taking the user callers already hold: one made for someone else
+  # isn't the creator's bike to alert about
   def unfinished_registration?(user = creator)
-    !destroyed? && register_flow? && !with_bike? && manufacturer_id.present? &&
-      created_at.present? && created_at > Time.current - TOKEN_EXPIRATION && self_made?(user)
+    !destroyed? && register_flow? && !finished_registration? && manufacturer_id.present? &&
+      (with_bike? || created_at.present? && created_at > Time.current - TOKEN_EXPIRATION) && self_made?(user)
   end
 
   def register_flow? = Ownership::ORIGIN_REG_FLOW.include?(origin)
@@ -363,6 +378,8 @@ class BParam < ApplicationRecord
 
     "status_with_owner"
   end
+
+  def status_humanized = Bike.status_humanized(status)
 
   def status_stolen?
     status == "status_stolen"
@@ -447,10 +464,13 @@ class BParam < ApplicationRecord
     bike["user_name"]
   end
 
+  # The separate attestation switch hands the safety rules to an owner who isn't user
+  def rules_left_to_owner?(user) = params["register_separate_attestation"].present? && !self_made?(user)
+
   def self_made?(user = creator)
     return false if user.blank?
 
-    ([user.email] + user.confirmed_emails).include?(EmailNormalizer.normalize(owner_email))
+    user.own_emails.include?(EmailNormalizer.normalize(owner_email))
   end
 
   def creation_organization
@@ -467,6 +487,9 @@ class BParam < ApplicationRecord
 
   # Unsaved - read through the same whitelist that turns these into the created bike's address
   def address_record = AddressRecord.new(self.class.address_record_attributes(bike))
+
+  # Mirrors Bike#registration_address
+  def registration_address = @registration_address ||= address_record.address_hash_legacy
 
   def email_confirmed?
     params["email_confirmed_at"].present?
@@ -770,8 +793,6 @@ class BParam < ApplicationRecord
       .merge(addy_hash.blank? ? {} : {"address_record_attributes" => addy_hash})
   end
 
-  private
-
   # origin, so the API and embed forms don't pay for a lookup that can't alert. Only with a
   # creator: anonymously, anyone could alert any account by typing in its email
   def update_unfinished_registration_alerts
@@ -782,6 +803,8 @@ class BParam < ApplicationRecord
       UserAlert.refresh_alert_slugs(user)
     end
   end
+
+  private
 
   def ensure_valid_params
     self.params ||= {"bike" => {}}

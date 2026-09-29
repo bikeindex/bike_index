@@ -38,7 +38,8 @@ bin/workspace_setup --without_seeds
 
 It allocates an ID from the `dev_workspaces` registry, writes `.workspace_id`, and runs
 `bin/setup`, which creates this workspace's databases and builds the CSS. Run `bundle
-exec rails db:seed` when you need records. Expect a full `npm install`.
+exec rails db:seed` when you need records. `node_modules` starts as a clone of the root
+checkout's, so `npm install` only fetches what this branch changed.
 
 **Never write `.workspace_id` yourself** — `bin/workspace_setup` then skips allocation,
 leaving an ID the registry never handed out. And skipping setup entirely silently falls

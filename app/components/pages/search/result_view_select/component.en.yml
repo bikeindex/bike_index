@@ -4,5 +4,5 @@ en:
     pages:
       search:
         result_view_select:
-          bike_box_view: View as List
-          thumbnail_view: View as thumbnails
+          cards_view: View as cards
+          list_view: View as list
