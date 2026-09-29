@@ -45,7 +45,7 @@ module Admin
     end
 
     def create
-      @recovery_display = RecoveryDisplay.create(permitted_parameters)
+      @recovery_display = RecoveryDisplay.new(permitted_parameters)
       if @recovery_display.save
         flash[:success] = "Recovery display created!"
         redirect_to admin_recoveries_path
