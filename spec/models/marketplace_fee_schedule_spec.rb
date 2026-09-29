@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe MarketplaceFeeSchedule, type: :model do
   describe "current" do
     let(:time) { Time.at(1_760_000_000) }
-    let!(:first_schedule) { FactoryBot.create(:marketplace_fee_schedule, start_at: time - 2.days) }
-    let!(:second_schedule) { FactoryBot.create(:marketplace_fee_schedule, start_at: time + 2.days) }
+    let!(:first_schedule) { FactoryBot.create(:marketplace_fee_schedule, :started, started_at: time - 2.days) }
+    let!(:second_schedule) { FactoryBot.create(:marketplace_fee_schedule, :started, started_at: time + 2.days) }
     let!(:future_schedule) { FactoryBot.create(:marketplace_fee_schedule, start_at: Time.current + 1.day) }
 
     it "is the latest schedule that has started" do
@@ -75,6 +75,15 @@ RSpec.describe MarketplaceFeeSchedule, type: :model do
       end
     end
 
+    context "with a start_at in the past" do
+      let(:attributes) { {start_at: Time.current - 1.second} }
+
+      it "is invalid" do
+        expect(marketplace_fee_schedule).to be_invalid
+        expect(marketplace_fee_schedule.errors.full_messages).to eq(["Start at must be in the future"])
+      end
+    end
+
     context "with a start_at another schedule has" do
       let(:existing_schedule) { FactoryBot.create(:marketplace_fee_schedule) }
       let(:attributes) { {start_at: existing_schedule.start_at} }
@@ -87,8 +96,7 @@ RSpec.describe MarketplaceFeeSchedule, type: :model do
   end
 
   describe "readonly?" do
-    let!(:marketplace_fee_schedule) { FactoryBot.create(:marketplace_fee_schedule, start_at:) }
-    let(:start_at) { Time.current - 1.minute }
+    let!(:marketplace_fee_schedule) { FactoryBot.create(:marketplace_fee_schedule, :started, started_at: Time.current - 1.minute) }
 
     it "can't be changed or destroyed once started" do
       expect { marketplace_fee_schedule.update(platform_fee_percent: 10) }.to raise_error(ActiveRecord::ReadOnlyRecord)
@@ -97,11 +105,13 @@ RSpec.describe MarketplaceFeeSchedule, type: :model do
     end
 
     context "starting in the future" do
-      let(:start_at) { Time.current + 1.day }
+      let!(:marketplace_fee_schedule) { FactoryBot.create(:marketplace_fee_schedule, start_at: Time.current + 1.day) }
 
-      it "can still be changed and destroyed" do
+      it "can still be changed and destroyed, but not moved into the past" do
         expect(marketplace_fee_schedule.update(platform_fee_percent: 10)).to be true
         expect(marketplace_fee_schedule.reload.platform_fee_percent).to eq 10
+        expect(marketplace_fee_schedule.update(start_at: Time.current - 1.day)).to be false
+        expect(marketplace_fee_schedule.errors.attribute_names).to eq([:start_at])
         marketplace_fee_schedule.destroy
         expect(MarketplaceFeeSchedule.count).to eq 0
       end
