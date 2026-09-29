@@ -56,7 +56,7 @@ module BikeJobs
 
     private
 
-    # A stolen bike is never the listed side, so the unique index sees each pair one way round
+    # A stolen bike is never the listed side, so the existence check sees each pair one way round
     def notify_stolen_serial_marketplace_matches(bike)
       duplicate_bikes = bike.duplicate_bikes.distinct
       pairs = if bike.status_stolen?
@@ -68,10 +68,10 @@ module BikeJobs
     end
 
     def notify_admins(listed_bike, stolen_bike)
+      return if Notification.stolen_serial_marketplace_match.where(bike: listed_bike, notifiable: stolen_bike).exists?
+
       notification = Notification.create!(kind: :stolen_serial_marketplace_match, bike: listed_bike,
         notifiable: stolen_bike, message_channel_target: AdminMailer::STOLEN_SERIAL_MATCH_EMAILS.join(", "))
-    rescue ActiveRecord::RecordNotUnique # another run already sent it
-    else
       Notifications::Deliver.track_email(notification) do
         AdminMailer.stolen_serial_marketplace_match_email(notification).deliver_now
       end
