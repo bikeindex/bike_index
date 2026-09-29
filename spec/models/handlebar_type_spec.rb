@@ -19,6 +19,10 @@ RSpec.describe HandlebarType, type: :model do
       expect(HandlebarType.friendly_find("not-known-type")).to be_nil
     end
 
+    it "returns flat for its names" do
+      %w[flat Riser horizontal].each { expect(HandlebarType.friendly_find(it).slug).to eq :flat }
+    end
+
     it "returns flat for the removed bmx" do
       expect(HandlebarType.friendly_find(" BMX ").slug).to eq :flat
       expect(HandlebarType.friendly_find(:bmx).slug).to eq :flat
