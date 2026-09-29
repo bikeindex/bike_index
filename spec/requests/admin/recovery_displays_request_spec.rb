@@ -72,6 +72,7 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
         recovery_display = RecoveryDisplay.last
         expect(recovery_display.quote).to eq valid_attrs[:quote]
         expect(recovery_display.photo.attached?).to be_truthy
+        expect(ImageJobs::ProcessRecoveryDisplayPhotoJob.jobs.count).to eq 1
 
         Sidekiq::Job.drain_all # Process the photo in background
 
