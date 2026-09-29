@@ -281,7 +281,7 @@ RSpec.describe MarketplaceFees do
 
     context "a later schedule" do
       let!(:later_schedule) do
-        FactoryBot.create(:marketplace_fee_schedule, :started, platform_fee_percent: 12.5, platform_fee_cap_cents: 100_00, processing_fee_percent: 2, started_at: Time.current - 1.day)
+        FactoryBot.create(:marketplace_fee_schedule, :started, platform_fee_percent: 12.5, platform_fee_cap_cents: 100_00, processing_fee_percent: 2, start_at: Time.current - 1.day)
       end
       let(:schedule) { MarketplaceFeeSchedule.current(Time.current - 1.week) }
       let(:fees_at_earlier_time) { MarketplaceFees.calculate(item_amount_cents:, shipping_amount_cents:, boxing_amount_cents:, schedule:) }

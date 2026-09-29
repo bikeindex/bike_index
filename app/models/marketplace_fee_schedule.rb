@@ -17,20 +17,12 @@ class MarketplaceFeeSchedule < ApplicationRecord
   validates :platform_fee_cap_cents, numericality: {only_integer: true, greater_than_or_equal_to: 0}
   validates_presence_of :start_at
   validates_uniqueness_of :start_at
-  validate :start_at_in_future, if: :will_save_change_to_start_at?
+  # Starting in the past would change the fees for times that have already been charged
+  validates :start_at, comparison: {greater_than: -> { Time.current }, message: "must be in the future"}, allow_nil: true, if: :will_save_change_to_start_at?
 
   # In effect from its start_at until the next row's
   def self.current(time = Time.current) = where(start_at: ..time).order(start_at: :desc).first
 
   # A new rate is a new row, so the table keeps the fees as they were applied
   def readonly? = super || (persisted? && start_at_in_database <= Time.current)
-
-  private
-
-  # Starting in the past would change the fees for times that have already been charged
-  def start_at_in_future
-    return if start_at.blank? || start_at > Time.current
-
-    errors.add(:start_at, "must be in the future")
-  end
 end

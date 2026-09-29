@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe MarketplaceFeeSchedule, type: :model do
   describe "current" do
     let(:time) { Time.at(1_760_000_000) }
-    let!(:first_schedule) { FactoryBot.create(:marketplace_fee_schedule, :started, started_at: time - 2.days) }
-    let!(:second_schedule) { FactoryBot.create(:marketplace_fee_schedule, :started, started_at: time + 2.days) }
+    let!(:first_schedule) { FactoryBot.create(:marketplace_fee_schedule, :started, start_at: time - 2.days) }
+    let!(:second_schedule) { FactoryBot.create(:marketplace_fee_schedule, :started, start_at: time + 2.days) }
     let!(:future_schedule) { FactoryBot.create(:marketplace_fee_schedule, start_at: Time.current + 1.day) }
 
     it "is the latest schedule that has started" do
@@ -96,7 +96,7 @@ RSpec.describe MarketplaceFeeSchedule, type: :model do
   end
 
   describe "readonly?" do
-    let!(:marketplace_fee_schedule) { FactoryBot.create(:marketplace_fee_schedule, :started, started_at: Time.current - 1.minute) }
+    let!(:marketplace_fee_schedule) { FactoryBot.create(:marketplace_fee_schedule, :started, start_at: Time.current - 1.minute) }
 
     it "can't be changed or destroyed once started" do
       expect { marketplace_fee_schedule.update(platform_fee_percent: 10) }.to raise_error(ActiveRecord::ReadOnlyRecord)

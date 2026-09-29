@@ -5,10 +5,10 @@ FactoryBot.define do
     processing_fee_percent { 3.0 }
     sequence(:start_at) { |n| 1.day.from_now + n.minutes }
 
-    # A schedule can't be created to start in the past, so a started one is moved back once it's saved
+    # A schedule can't be created to start in the past, so a started one skips validation to be inserted with its past start_at
     trait :started do
-      transient { sequence(:started_at) { |n| 1.year.ago + n.minutes } }
-      after(:create) { |schedule, evaluator| schedule.update_columns(start_at: evaluator.started_at) }
+      sequence(:start_at) { |n| 1.year.ago + n.minutes }
+      to_create { |schedule| schedule.save!(validate: false) }
     end
   end
 end
