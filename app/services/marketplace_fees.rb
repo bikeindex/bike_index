@@ -3,13 +3,9 @@
 module MarketplaceFees
   extend Functionable
 
-  PLATFORM_FEE_RATE = Rational(9, 100)
-  # The same number in every currency, not converted from USD
-  PLATFORM_FEE_CAP_CENTS = 69_00
-  # A service fee charged on every payment method
-  PROCESSING_FEE_RATE = Rational(3, 100)
+  def calculate(item_amount_cents:, shipping_amount_cents: 0, boxing_amount_cents: 0, currency: nil, schedule: MarketplaceFeeSchedule.current)
+    raise ArgumentError, "No marketplace fee schedule" if schedule.blank?
 
-  def calculate(item_amount_cents:, shipping_amount_cents: 0, boxing_amount_cents: 0, currency: nil)
     currency_slug = Currency.new(currency || Currency.default.slug).slug
     raise ArgumentError, "Unknown currency: #{currency}" if currency_slug.blank?
 
@@ -17,10 +13,12 @@ module MarketplaceFees
     raise ArgumentError, "Amounts can't be negative" if [item, shipping, boxing].any?(&:negative?)
 
     subtotal_cents = item + shipping + boxing
-    processing_fee_cents = (subtotal_cents * PROCESSING_FEE_RATE).round
-    platform_fee_cents = [(item * PLATFORM_FEE_RATE).round, PLATFORM_FEE_CAP_CENTS].min
+    processing_fee_cents = (subtotal_cents * schedule.processing_fee_percent.to_r / 100).round
+    # The cap is the same number in every currency, not converted from USD
+    platform_fee_cents = [(item * schedule.platform_fee_percent.to_r / 100).round, schedule.platform_fee_cap_cents].min
 
     {
+      marketplace_fee_schedule_id: schedule.id,
       currency: currency_slug,
       item_amount_cents: item,
       shipping_amount_cents: shipping,

@@ -7,11 +7,13 @@ RSpec.describe MarketplaceFees do
     let(:shipping_amount_cents) { 90_00 }
     let(:boxing_amount_cents) { 75_00 }
     let(:currency) { nil }
+    let!(:marketplace_fee_schedule) { FactoryBot.create(:marketplace_fee_schedule) }
     let(:shares_cents) { fees.values_at(:seller_payout_cents, :shop_payout_cents, :shipping_cost_cents, :bike_index_cents) }
 
     it "takes 9% of the item from the seller and adds 3% of everything to the buyer's total" do
       # 9% of $500 is $45. 3% of $665 is $19.95
       expect(fees).to eq({
+        marketplace_fee_schedule_id: marketplace_fee_schedule.id,
         currency: :usd,
         item_amount_cents: 500_00,
         shipping_amount_cents: 90_00,
@@ -34,6 +36,7 @@ RSpec.describe MarketplaceFees do
       it "leaves the seller a positive payout" do
         # 9% of $20 is $1.80. 3% of $245 is $7.35
         expect(fees).to eq({
+          marketplace_fee_schedule_id: marketplace_fee_schedule.id,
           currency: :usd,
           item_amount_cents: 20_00,
           shipping_amount_cents: 150_00,
@@ -56,6 +59,7 @@ RSpec.describe MarketplaceFees do
       it "caps the platform fee at $69 and still charges the full processing fee" do
         # 3% of $1,165 is $34.95
         expect(fees).to eq({
+          marketplace_fee_schedule_id: marketplace_fee_schedule.id,
           currency: :usd,
           item_amount_cents: 1_000_00,
           shipping_amount_cents: 90_00,
@@ -82,6 +86,7 @@ RSpec.describe MarketplaceFees do
         it "charges the uncapped fee" do
           # 9% of $766.61 is $68.9949. 3% of $766.61 is $22.9983
           expect(fees).to eq({
+            marketplace_fee_schedule_id: marketplace_fee_schedule.id,
             currency: :usd,
             item_amount_cents: 766_61,
             shipping_amount_cents: 0,
@@ -103,6 +108,7 @@ RSpec.describe MarketplaceFees do
         it "charges exactly the cap" do
           # 9% of $766.62 is $68.9958
           expect(fees).to eq({
+            marketplace_fee_schedule_id: marketplace_fee_schedule.id,
             currency: :usd,
             item_amount_cents: 766_62,
             shipping_amount_cents: 0,
@@ -124,6 +130,7 @@ RSpec.describe MarketplaceFees do
         it "charges the cap" do
           # 9% of $766.67 is $69.0003. 3% of $766.67 is $23.0001
           expect(fees).to eq({
+            marketplace_fee_schedule_id: marketplace_fee_schedule.id,
             currency: :usd,
             item_amount_cents: 766_67,
             shipping_amount_cents: 0,
@@ -150,6 +157,7 @@ RSpec.describe MarketplaceFees do
         it "rounds them up" do
           # 3% of $123.50 is $3.705; 9% is $11.115
           expect(fees).to eq({
+            marketplace_fee_schedule_id: marketplace_fee_schedule.id,
             currency: :usd,
             item_amount_cents: 123_50,
             shipping_amount_cents: 0,
@@ -172,6 +180,7 @@ RSpec.describe MarketplaceFees do
         it "rounds them down" do
           # 3% of $123.45 is $3.7035; 9% is $11.1105
           expect(fees).to eq({
+            marketplace_fee_schedule_id: marketplace_fee_schedule.id,
             currency: :usd,
             item_amount_cents: 123_45,
             shipping_amount_cents: 0,
@@ -194,6 +203,7 @@ RSpec.describe MarketplaceFees do
       let(:boxing_amount_cents) { 0 }
       let(:target_fees) do
         {
+          marketplace_fee_schedule_id: marketplace_fee_schedule.id,
           currency: :usd,
           item_amount_cents: 500_00,
           shipping_amount_cents: 0,
@@ -235,6 +245,7 @@ RSpec.describe MarketplaceFees do
 
         it "uses the same rates and the same cap, unconverted" do
           expect(fees).to eq({
+            marketplace_fee_schedule_id: marketplace_fee_schedule.id,
             currency: :cad,
             item_amount_cents: 1_000_00,
             shipping_amount_cents: 90_00,
@@ -255,6 +266,7 @@ RSpec.describe MarketplaceFees do
 
         it "keeps the currency" do
           expect(fees).to eq({
+            marketplace_fee_schedule_id: marketplace_fee_schedule.id,
             currency: :eur,
             item_amount_cents: 500_00,
             shipping_amount_cents: 90_00,
@@ -276,6 +288,62 @@ RSpec.describe MarketplaceFees do
         it "raises rather than charging in dollars" do
           expect { fees }.to raise_error(ArgumentError, /currency/)
         end
+      end
+    end
+
+    context "a different schedule" do
+      let!(:marketplace_fee_schedule) do
+        FactoryBot.create(:marketplace_fee_schedule, platform_fee_percent: 12.5, platform_fee_cap_cents: 100_00, processing_fee_percent: 2)
+      end
+
+      it "follows the schedule's percents" do
+        # 12.5% of $500 is $62.50. 2% of $665 is $13.30
+        expect(fees).to eq({
+          marketplace_fee_schedule_id: marketplace_fee_schedule.id,
+          currency: :usd,
+          item_amount_cents: 500_00,
+          shipping_amount_cents: 90_00,
+          boxing_amount_cents: 75_00,
+          processing_fee_cents: 13_30,
+          buyer_total_cents: 678_30,
+          platform_fee_cents: 62_50,
+          seller_payout_cents: 437_50,
+          shop_payout_cents: 75_00,
+          shipping_cost_cents: 90_00,
+          bike_index_cents: 75_80
+        })
+        expect(shares_cents.sum).to eq fees[:buyer_total_cents]
+      end
+
+      context "above its cap" do
+        let(:item_amount_cents) { 1_000_00 }
+
+        it "follows the schedule's cap" do
+          expect(fees).to include(platform_fee_cents: 100_00, seller_payout_cents: 900_00)
+        end
+      end
+    end
+
+    context "a later schedule" do
+      let!(:later_schedule) do
+        FactoryBot.create(:marketplace_fee_schedule, platform_fee_percent: 12.5, platform_fee_cap_cents: 100_00, processing_fee_percent: 2, start_at: Time.current - 1.day)
+      end
+      let(:schedule) { MarketplaceFeeSchedule.current(Time.current - 1.week) }
+      let(:fees_at_earlier_time) { MarketplaceFees.calculate(item_amount_cents:, shipping_amount_cents:, boxing_amount_cents:, schedule:) }
+
+      it "uses the rates in effect at the time it's given" do
+        expect(schedule).to eq marketplace_fee_schedule
+        expect(fees).to include(marketplace_fee_schedule_id: later_schedule.id, platform_fee_cents: 62_50, processing_fee_cents: 13_30)
+        expect(fees_at_earlier_time).to include(marketplace_fee_schedule_id: marketplace_fee_schedule.id, platform_fee_cents: 45_00, processing_fee_cents: 19_95)
+      end
+    end
+
+    context "without a schedule" do
+      let!(:marketplace_fee_schedule) { nil }
+
+      it "raises rather than falling back to rates" do
+        expect { fees }.to raise_error(ArgumentError, /schedule/)
+        expect { MarketplaceFees.calculate(item_amount_cents:, schedule: nil) }.to raise_error(ArgumentError, /schedule/)
       end
     end
 
