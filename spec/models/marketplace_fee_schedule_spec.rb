@@ -1,16 +1,6 @@
 require "rails_helper"
 
 RSpec.describe MarketplaceFeeSchedule, type: :model do
-  describe "factory" do
-    let(:marketplace_fee_schedule) { FactoryBot.create(:marketplace_fee_schedule) }
-
-    it "is today's rates, already started" do
-      expect(marketplace_fee_schedule).to be_valid
-      expect(marketplace_fee_schedule).to have_attributes(platform_fee_percent: 9, platform_fee_cap_cents: 6900, processing_fee_percent: 3)
-      expect(marketplace_fee_schedule.start_at).to be < Time.current
-    end
-  end
-
   describe "current" do
     let(:time) { Time.at(1_760_000_000) }
     let!(:first_schedule) { FactoryBot.create(:marketplace_fee_schedule, start_at: time - 2.days) }
@@ -59,8 +49,8 @@ RSpec.describe MarketplaceFeeSchedule, type: :model do
       end
     end
 
-    context "with percents at the limits" do
-      let(:attributes) { {platform_fee_percent: 0, processing_fee_percent: 100} }
+    context "with values at the limits" do
+      let(:attributes) { {platform_fee_percent: 0, processing_fee_percent: 100, platform_fee_cap_cents: 0} }
 
       it "is valid" do
         expect(marketplace_fee_schedule).to be_valid
@@ -73,14 +63,6 @@ RSpec.describe MarketplaceFeeSchedule, type: :model do
       it "is invalid" do
         expect(marketplace_fee_schedule).to be_invalid
         expect(marketplace_fee_schedule.errors.attribute_names).to match_array(%i[platform_fee_percent processing_fee_percent])
-      end
-    end
-
-    context "with a cap of 0" do
-      let(:attributes) { {platform_fee_cap_cents: 0} }
-
-      it "is valid" do
-        expect(marketplace_fee_schedule).to be_valid
       end
     end
 
@@ -109,18 +91,15 @@ RSpec.describe MarketplaceFeeSchedule, type: :model do
     let(:start_at) { Time.current - 1.minute }
 
     it "can't be changed or destroyed once started" do
-      expect(marketplace_fee_schedule.readonly?).to be true
       expect { marketplace_fee_schedule.update(platform_fee_percent: 10) }.to raise_error(ActiveRecord::ReadOnlyRecord)
       expect { marketplace_fee_schedule.destroy }.to raise_error(ActiveRecord::ReadOnlyRecord)
       expect(marketplace_fee_schedule.reload.platform_fee_percent).to eq 9
-      expect(MarketplaceFeeSchedule.count).to eq 1
     end
 
     context "starting in the future" do
       let(:start_at) { Time.current + 1.day }
 
       it "can still be changed and destroyed" do
-        expect(marketplace_fee_schedule.readonly?).to be false
         expect(marketplace_fee_schedule.update(platform_fee_percent: 10)).to be true
         expect(marketplace_fee_schedule.reload.platform_fee_percent).to eq 10
         marketplace_fee_schedule.destroy

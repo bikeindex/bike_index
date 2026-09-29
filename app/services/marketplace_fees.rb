@@ -6,7 +6,7 @@ module MarketplaceFees
   def calculate(item_amount_cents:, shipping_amount_cents: 0, boxing_amount_cents: 0, currency: nil, schedule: MarketplaceFeeSchedule.current)
     raise ArgumentError, "No marketplace fee schedule" if schedule.blank?
 
-    currency_slug = Currency.new(currency || Currency.default.slug).slug
+    currency_slug = Currency.find_sym(currency || Currency.default.slug)
     raise ArgumentError, "Unknown currency: #{currency}" if currency_slug.blank?
 
     item, shipping, boxing = [item_amount_cents, shipping_amount_cents, boxing_amount_cents].map(&:to_i)
@@ -14,7 +14,6 @@ module MarketplaceFees
 
     subtotal_cents = item + shipping + boxing
     processing_fee_cents = (subtotal_cents * schedule.processing_fee_percent.to_r / 100).round
-    # The cap is the same number in every currency, not converted from USD
     platform_fee_cents = [(item * schedule.platform_fee_percent.to_r / 100).round, schedule.platform_fee_cap_cents].min
 
     {

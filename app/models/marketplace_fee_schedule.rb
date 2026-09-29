@@ -12,9 +12,10 @@
 #  updated_at             :datetime         not null
 #
 class MarketplaceFeeSchedule < ApplicationRecord
-  validates_presence_of :platform_fee_percent, :platform_fee_cap_cents, :processing_fee_percent, :start_at
-  validates :platform_fee_percent, :processing_fee_percent, numericality: {in: 0..100}, allow_nil: true
-  validates :platform_fee_cap_cents, numericality: {only_integer: true, greater_than_or_equal_to: 0}, allow_nil: true
+  # platform_fee_cap_cents is the same number in every currency, not converted from USD
+  validates :platform_fee_percent, :processing_fee_percent, numericality: {in: 0..100}
+  validates :platform_fee_cap_cents, numericality: {only_integer: true, greater_than_or_equal_to: 0}
+  validates_presence_of :start_at
   validates_uniqueness_of :start_at
 
   # In effect from its start_at until the next row's
