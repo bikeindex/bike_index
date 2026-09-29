@@ -170,7 +170,8 @@ jobs:
           cache-to: type=gha,mode=max
 
   test:
-    name: "Run tests"
+    # No total in the required check names, so adding a shard doesn't rename them
+    name: "Run tests shard ${{ matrix.ci_node_index }}"
     needs: build_ci_image
     runs-on: ubuntu-latest
     permissions:
