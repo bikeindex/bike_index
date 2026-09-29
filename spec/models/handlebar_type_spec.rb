@@ -6,7 +6,7 @@ RSpec.describe HandlebarType, type: :model do
 
     it "returns the slug's normalized name" do
       ht = HandlebarType.new(slug)
-      expect(ht.name).to eq("Flat / riser (horizontal facing)")
+      expect(ht.name).to eq("Flat or riser (horizontal facing)")
     end
   end
 

@@ -14,7 +14,7 @@ class HandlebarType
     forward: "Forward facing",
     rearward: "Rear facing",
     other: "Not handlebars",
-    flat: "Flat / riser (horizontal facing)"
+    flat: "Flat or riser (horizontal facing)"
   }.freeze
 
   attr_reader :slug, :id
