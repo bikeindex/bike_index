@@ -14,6 +14,12 @@ module RegistrationInfoable
     longitude
   ].freeze
 
+  # The organization registration form settings, stored as booleans
+  REGISTER_SETTING_KEYS = %w[register_separate_attestation register_single_page].freeze
+
+  # Describe one registration rather than the user, so they aren't shared across the user's ownerships
+  REGISTRATION_ONLY_KEYS = ["bike_sticker", *REGISTER_SETTING_KEYS].freeze
+
   # Currently not used, keeping it around for reference
   # REGISTRATION_INFO_KEYS = %w[
   #   organization_affiliation
@@ -31,6 +37,10 @@ module RegistrationInfoable
 
     def with_student_id(org)
       where("(registration_info -> 'student_id') is not null OR (registration_info -> 'student_id_#{org_id_for_org(org)}') is not null")
+    end
+
+    def with_register_setting(key)
+      where("registration_info ->> ? = 'true'", key)
     end
 
     def with_organization_affiliation(org)

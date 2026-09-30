@@ -157,7 +157,7 @@
       <% table.column(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
         <% if bike.organized?(organization) %>
           <% if bike.status_impounded? && bike.current_impound_record.present? %>
-            <%= number_display(bike.current_impound_record.id) %>
+            <%= bike.current_impound_record.display_id %>
           <% end %>
         <% else %>
           <%= hidden_html.call %>

@@ -362,6 +362,7 @@ Rails.application.routes.draw do
       collection do
         get :tables
         get :variable
+        get :bikes_table
       end
     end
     resources :ownerships, only: %i[show edit update index]
@@ -485,6 +486,8 @@ Rails.application.routes.draw do
       collection do
         get :multi_search
         get :multi_search_response
+        get :settings
+        post :switches
       end
     end
     resources :bikes, only: %i[new create show update] do
