@@ -1,0 +1,17 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New fee schedule", href: new_admin_marketplace_fee_schedule_path, color: :primary, size: :sm)) %>
+  </li>
+<% end %>
+
+<% table_view = render(partial: "table", locals: {collection: @marketplace_fee_schedules, current_schedule: @current_schedule}) %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @marketplace_fee_schedules,
+  viewing: "Fee Schedules",
+  skip_charting: true,
+  render_sortable: false,
+  nav_header_list_items:,
+  table_view:,
+)) %>

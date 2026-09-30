@@ -159,6 +159,7 @@ module Pages
             {title: "Bulk Imports", path: admin_bulk_imports_path},
             {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, exact: true},
             {title: "Model Audits", path: admin_model_audits_path},
+            {title: "Marketplace Fee Schedules", path: admin_marketplace_fee_schedules_path},
             {title: "Marketplace Listings", path: admin_marketplace_listings_path},
             {title: "Marketplace Messages", path: admin_marketplace_messages_path},
             {title: "Sales", path: admin_sales_path},

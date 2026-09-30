@@ -1,0 +1,8 @@
+.container
+  %h1 New Fee Schedule
+
+  = render "form",
+    schedule: @marketplace_fee_schedule,
+    action: admin_marketplace_fee_schedules_path,
+    method: :post,
+    submit_label: "Create"

@@ -1,0 +1,35 @@
+= render(UI::Alerts::ObjectError::Component.new(object: schedule))
+
+= form_for schedule,
+  url: action,
+  method: method,
+  html: { class: "form" } do |f|
+
+  .row
+    .col-md-6
+      .form-group
+        = f.label :platform_fee_percent, "Platform fee (%, from the seller, on the item price)", class: "form-label"
+        = f.number_field :platform_fee_percent, class: "form-control", step: 0.01, min: 0, max: 100, required: true
+    .col-md-6
+      .form-group
+        = f.label :platform_fee_cap, "Platform fee cap ($, the same number in every currency)", class: "form-label"
+        = f.number_field :platform_fee_cap, class: "form-control", step: 0.01, min: 0, required: true
+    .col-md-6
+      .form-group
+        = f.label :processing_fee_percent, "Processing fee (%, from the buyer, on item + shipping + boxing)", class: "form-label"
+        = f.number_field :processing_fee_percent, class: "form-control", step: 0.01, min: 0, max: 100, required: true
+    .col-md-6
+      .form-group
+        = f.label :start_at, "Starts", class: "form-label"
+        = hidden_field_tag "marketplace_fee_schedule[timezone]", "", class: "hiddenFieldTimezone"
+        = f.datetime_local_field :start_at,
+          value: schedule.start_at&.strftime("%Y-%m-%dT%H:%M"),
+          step: 60,
+          required: true,
+          class: "form-control dateInputUpdateZone",
+          "data-initialtime" => schedule.start_at ? l(schedule.start_at, format: :convert_time) : ""
+        %small.below-input-help
+          %em Must be in the future. Once it starts, this schedule can't be changed
+
+  .mt-4
+    = render(UI::Button::Component.new(text: submit_label, color: :primary, size: :lg, type: "submit"))
