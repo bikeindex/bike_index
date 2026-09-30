@@ -101,6 +101,8 @@ module Pages
         def section_inner = "tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-6 tw:lg:px-14 tw:lg:py-12"
 
         def h2_classes = "tw:m-0 tw:font-header tw:text-[23px] tw:font-extrabold tw:text-slate-900 tw:lg:text-[34px]"
+
+        def subhead_classes = "tw:mt-1 tw:mb-4 tw:text-[15px] tw:lg:mb-6 tw:lg:text-[17px]"
       end
     end
   end
