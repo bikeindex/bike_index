@@ -19,7 +19,7 @@ class HandlebarType
 
   attr_reader :slug, :id
 
-  # Words from flat's name, and BMX - which was folded into flat, and API clients still send
+  # Words from flat's name, and the removed BMX, which API clients still send
   def self.find_sym(str)
     str.to_s.strip.match?(/\A(riser|horizontal|bmx( style)?)\z/i) ? :flat : super
   end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Backfills
-  # BMX was removed from HandlebarType. Its enum value no longer maps, so those records read as
-  # having no handlebar type until they're moved to flat
+  # BMX was removed from HandlebarType, so until they're moved to flat its records read as having
+  # no handlebar type
   class BmxHandlebarTypeJob < ApplicationJob
     sidekiq_options queue: "low_priority", retry: false
 

@@ -24,9 +24,7 @@ RSpec.describe HandlebarType, type: :model do
     end
 
     it "returns flat for the removed bmx" do
-      expect(HandlebarType.friendly_find(" BMX ").slug).to eq :flat
-      expect(HandlebarType.friendly_find(:bmx).slug).to eq :flat
-      expect(HandlebarType.friendly_find("BMX style").slug).to eq :flat
+      [" BMX ", :bmx, "BMX style"].each { expect(HandlebarType.friendly_find(it).slug).to eq :flat }
     end
 
     context "slug" do
