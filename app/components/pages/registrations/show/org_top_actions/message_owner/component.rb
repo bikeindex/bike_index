@@ -39,24 +39,6 @@ module Pages
               end
             end
 
-            def message_placeholder
-              if impounded?
-                translation(".what_do_you_need_to_ask", bike_type: @bike.type)
-              else
-                translation(".where_did_you_see_this_bike", bike_type: @bike.type)
-              end
-            end
-
-            def message_notification
-              @message_notification ||= StolenNotification.new(bike: @bike)
-            end
-
-            # Keyed per bike, so a half-typed message doesn't surface on another bike's form
-            def form_data(persist_key)
-              {controller: "csrf-refresh form-persist", "form-persist-key-value": "#{persist_key}-#{@bike.id}",
-               action: "input->form-persist#save submit->form-persist#clear"}
-            end
-
             def owner_phone
               @bike.phone if @bike.phoneable_by?(@current_user)
             end

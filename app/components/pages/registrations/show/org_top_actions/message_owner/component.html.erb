@@ -23,15 +23,7 @@
           class="tw:mt-3"
           data-registrations--show--message-owner-target="organizationMessage"
         >
-          <%= form_with(model: [@organization, OrganizationMessage.new], data: form_data("organization-message")) do |form| %>
-            <%= form.hidden_field :bike_id, value: @bike.id %>
-
-            <%= form.text_area :message, required: true, rows: 6, placeholder: translation(".what_do_you_want_to_tell_the_owner", bike_type: @bike.type), class: "twinput tw:w-full" %>
-
-            <div class="tw:mt-3">
-              <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :primary, type: "submit")) %>
-            </div>
-          <% end %>
+          <%= render(Pages::Registrations::Show::OrgTopActions::OrganizationMessageForm::Component.new(bike: @bike, organization: @organization)) %>
         </div>
       <% end %>
 
@@ -39,17 +31,7 @@
         class="tw:mt-3 <%= "tw:hidden" if organization_message? %>"
         data-registrations--show--message-owner-target="stolenNotification"
       >
-        <%= form_with(model: message_notification, url: stolen_notifications_path, data: form_data("contact-owner")) do |form| %>
-          <%= form.hidden_field :bike_id, value: @bike.id %>
-
-          <%= form.text_area :message, required: true, rows: 6, placeholder: message_placeholder, class: "twinput tw:w-full" %>
-
-          <%= form.text_field :reference_url, placeholder: translation(".link_url"), class: "twinput tw:mt-2 tw:w-full" %>
-
-          <div class="tw:mt-3">
-            <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :primary, type: "submit")) %>
-          </div>
-        <% end %>
+        <%= render(Pages::Registrations::Show::StolenNotificationForm::Component.new(bike: @bike, placeholder: (translation(".what_do_you_need_to_ask", bike_type: @bike.type) if impounded?))) %>
       </div>
     <% end %>
 
