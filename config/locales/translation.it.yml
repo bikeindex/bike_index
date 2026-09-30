@@ -885,7 +885,6 @@ it:
         steel: Acciaio
         titanium: Titanio
       handlebar_type:
-        bmx: Stile BMX
         drop_bar: Piega
         flat: Dritto o riser
         forward: Rivolto in avanti
