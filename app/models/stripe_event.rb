@@ -23,8 +23,7 @@ class StripeEvent < ApplicationRecord
 
   def self.create_from(event)
     # Stripe redelivers an event until it gets a 2xx, so a retry finds the stored row
-    create_with(name: event["type"], stripe_id: event["data"]["object"]["id"],
-      stripe_account_id: event["account"], payload: event.to_hash)
+    create_with(name: event["type"], stripe_account_id: event["account"], payload: event.to_hash)
       .create_or_find_by!(stripe_event_id: event["id"])
   end
 

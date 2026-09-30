@@ -9,7 +9,7 @@ RSpec.describe StripeEvent, type: :model do
       {
         name: "checkout.session.completed",
         stripe_event_id: "evt_0Tb1opm0T0GBfX0veedyxQTJ",
-        stripe_id: "cs_test_a1XzIICn9NZ2p5RoNzP8GLCSMog4c2noU1G4d4V8sgs3MVjZxEYysztFHl",
+        stripe_id: nil,
         stripe_account_id: nil,
         payload: webhook_payload
       }
@@ -32,7 +32,7 @@ RSpec.describe StripeEvent, type: :model do
         }
       end
       let(:target_attributes) do
-        {name: "account.updated", stripe_event_id: "evt_1Connect", stripe_id: "acct_1Seller",
+        {name: "account.updated", stripe_event_id: "evt_1Connect",
          stripe_account_id: "acct_1Seller", payload: webhook_payload}
       end
 
