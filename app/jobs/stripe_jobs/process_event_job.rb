@@ -9,10 +9,8 @@ module StripeJobs
       return if stripe_event.blank? || stripe_event.processed_at.present?
 
       data_object = Stripe::Event.construct_from(stripe_event.payload).data.object
-      if stripe_event.checkout?
-        if data_object.subscription.present?
-          update_stripe_subscription(Stripe::Subscription.retrieve(data_object.subscription), data_object)
-        end
+      if stripe_event.checkout? && data_object.subscription.present?
+        update_stripe_subscription(Stripe::Subscription.retrieve(data_object.subscription), data_object)
       elsif stripe_event.subscription?
         update_stripe_subscription(data_object)
       end

@@ -72,7 +72,7 @@ RSpec.describe StripeJobs::ProcessEventJob, type: :job do
 
     context "create_or_update_from_stripe! called twice" do
       it "only creates the things once" do
-        stripe_checkout_session = Stripe::Event.construct_from(stripe_event.reload.payload).data.object
+        stripe_checkout_session = Stripe::Event.construct_from(webhook_payload).data.object
         expect do
           VCR.use_cassette("StripeEvent-update_bike_index-success", **cassette_options) do
             stripe_subscription_obj = Stripe::Subscription.retrieve(stripe_checkout_session.subscription)
@@ -96,7 +96,7 @@ RSpec.describe StripeJobs::ProcessEventJob, type: :job do
         expect(processed_at).to be_present
 
         # No cassette, so any Stripe request would raise
-        expect { process_event(webhook_payload) }.not_to change(Payment, :count)
+        expect { instance.perform(stripe_event.id) }.not_to change(Payment, :count)
         expect(stripe_event.reload.processed_at).to eq processed_at
       end
     end
