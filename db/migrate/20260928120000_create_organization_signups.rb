@@ -13,8 +13,7 @@ class CreateOrganizationSignups < ActiveRecord::Migration[8.1]
       t.string :email_confirmation_token
       t.datetime :email_confirmation_sent_at
       t.datetime :email_confirmed_at
-      t.datetime :details_completed_at
-      t.references :creator, index: true
+      t.string :return_to
       t.references :organization, index: true
 
       t.timestamps

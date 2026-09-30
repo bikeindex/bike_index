@@ -4,7 +4,6 @@ class OrganizationSignupController < ApplicationController
   SESSION_KEY = :organization_signup_token
 
   before_action :find_signup, except: %i[new confirm confirm_email]
-  # The emailed link resumes a signup the session may know nothing about
   before_action :find_signup_for_confirmation, only: %i[confirm confirm_email]
   # The step shown is server state - a cached page could show one the signup is past
   before_action { response.set_header("Cache-Control", "no-store") }
@@ -12,7 +11,9 @@ class OrganizationSignupController < ApplicationController
   before_action :force_html_response
 
   def new
-    signup = OrgServices::Signup.start(user: current_user)
+    # Only a path of our own, so the link can't send a new admin off-site
+    return_to = params[:return_to] if params[:return_to].to_s.match?(%r{\A/(?!/)})
+    signup = OrgServices::Signup.start(user: current_user, return_to:)
     session[SESSION_KEY] = signup.id_token
     redirect_to organization_signup_path(step: 1)
   end
@@ -51,8 +52,6 @@ class OrganizationSignupController < ApplicationController
     render Pages::OrgSignup::Views::Confirm::Component.new(organization_signup: @signup, token: params[:confirmation_token])
   end
 
-  # The confirmation itself - the proven address gets an account, created here if it
-  # doesn't have one, and then the organization
   def confirm_email
     # Single use, so a second click has nothing left to do
     return redirect_to(organization_signup_path) if @signup.email_confirmed?
@@ -63,13 +62,12 @@ class OrganizationSignupController < ApplicationController
       return redirect_to(organization_signup_path)
     end
 
-    user = User.fuzzy_confirmed_or_unconfirmed_email_find(@signup.email)
-    if current_user.present? && current_user != user
+    if current_user.present? && current_user != User.fuzzy_confirmed_or_unconfirmed_email_find(@signup.email)
       flash[:error] = translation(:sign_out_to_confirm, email: current_user.email)
       return redirect_to(confirm_organization_signup_path(signup_token: @signup.id_token,
         confirmation_token: params[:confirmation_token]))
     end
-    return redirect_to(organization_signup_path) if current_user.blank? && sign_in_confirmed_user.blank?
+    return redirect_to(organization_signup_path) if current_user.blank? && sign_in_confirmed_user(@signup.email).blank?
 
     OrgServices::Signup.confirm_email!(@signup)
     return redirect_to(organization_signup_path(step: 2)) unless @signup.details_completed?
@@ -96,23 +94,7 @@ class OrganizationSignupController < ApplicationController
 
     session.delete(SESSION_KEY)
     flash[:success] = translation(:organization_created, controller_method: :complete_signup, name: organization.name)
-    # lightspeed_interface sends people here to come back once they have an organization
-    redirect_to organization_manage_path(organization_id: organization.to_param) unless return_to_if_present
-  end
-
-  # The account the confirmed address belongs to, created if it doesn't have one yet
-  def sign_in_confirmed_user
-    user, signed_up = UserServices::PasswordlessCreator.find_or_create(@signup.email)
-    if user.blank? || user.banned?
-      flash[:error] = translation(:unable_to_sign_in)
-      return nil
-    end
-
-    # The link proved the address, so an account that had never confirmed it now has
-    user.confirm(user.confirmation_token) unless user.confirmed?
-    sign_in_user(user)
-    set_sign_in_flash(user, signed_up)
-    @current_user = user
+    redirect_to @signup.return_to || organization_manage_path(organization_id: organization.to_param)
   end
 
   def find_signup
@@ -120,18 +102,15 @@ class OrganizationSignupController < ApplicationController
     redirect_to(new_organization_signup_path) if @signup.blank?
   end
 
-  # Not find_signup: the emailed token authorizes this, not the session - which follows it,
-  # since it's the only way back to a signup opened in another browser
+  # The emailed token authorizes this, not the session - which follows it, since it's the
+  # only way back to a signup opened in another browser
   def find_signup_for_confirmation
-    signup = OrganizationSignup.find_by(id_token: params[:signup_token]) if params[:signup_token].present?
-    if signup&.with_organization?
-      flash[:notice] = translation(:already_activated, controller_method: :find_signup_for_confirmation)
-      return redirect_to(organization_manage_path(organization_id: signup.organization.to_param))
-    end
-
-    @signup = OrgServices::Signup.find(signup&.id_token)
-    if @signup.blank?
-      flash[:notice] = translation(:signup_not_found, controller_method: :find_signup_for_confirmation)
+    @signup = OrganizationSignup.find_by(id_token: params[:signup_token]) if params[:signup_token].present?
+    if @signup&.organization.present?
+      flash[:notice] = translation(:already_activated)
+      return redirect_to(organization_manage_path(organization_id: @signup.organization.to_param))
+    elsif @signup.blank? || @signup.expired?
+      flash[:notice] = translation(:signup_not_found)
       return redirect_to(new_organization_signup_path)
     end
 

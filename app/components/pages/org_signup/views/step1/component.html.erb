@@ -1,5 +1,5 @@
 <%= render Pages::Register::Parts::Shell::Component.new do %>
-  <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup::FLOW, step: 1) %>
+  <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup, step: 1) %>
 
   <%= render UI::Header::Component.new(text: translation(".add_your_organization"), subtitle: translation(".free_to_start")) %>
 

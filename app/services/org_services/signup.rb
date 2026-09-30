@@ -9,22 +9,19 @@ module OrgServices
 
     CONFIRMATION_EMAIL_INTERVAL = 5.minutes
     STEPS = %w[1 2 finished].freeze
-    # The state (or region) isn't here: which one a country has is the form's to decide
-    REQUIRED_ADDRESS_ATTRS = %w[street city postal_code country_id].freeze
-    # What Pages::Register::Parts::Progress reads off a flow
-    FLOW = Data.define do
-      def steps = STEPS
-
-      def position(step) = STEPS.index(step.to_s).to_i + 1
-    end.new
 
     # The session's signup, while it's still one - once its organization exists there's
     # nothing left to go back to
     def find(token)
-      OrganizationSignup.unexpired.without_organization.find_by(id_token: token) if token.present?
+      OrganizationSignup.unexpired.where(organization_id: nil).find_by(id_token: token) if token.present?
     end
 
-    def start(user:) = OrganizationSignup.create!(creator: user, email: user&.email)
+    def start(user:, return_to: nil) = OrganizationSignup.create!(email: user&.email, return_to:)
+
+    # What Pages::Register::Parts::Progress reads off a flow
+    def steps = STEPS
+
+    def position(step) = STEPS.index(step.to_s).to_i + 1
 
     # The step asked for, if the signup has reached it - otherwise the furthest it has.
     # Step 1 is only saved once it's valid, so a name means it's done
@@ -52,12 +49,12 @@ module OrgServices
 
     # Saved whether or not it passes, so a re-render has everything they entered
     def save_details(signup, website:, phone:, publicly_visible:, address:)
-      address = address.to_h.stringify_keys.slice(*AddressRecord.permitted_params.map(&:to_s)).compact_blank
-      missing = REQUIRED_ADDRESS_ATTRS.any? { address[it].blank? }
-      signup.update(website:, phone:, address:, publicly_visible: Binxtils::InputNormalizer.boolean(publicly_visible),
-        details_completed_at: (Time.current unless missing))
-      signup.errors.add(:base, translation(:address_required)) if missing
-      !missing
+      signup.update(website:, phone:, publicly_visible: Binxtils::InputNormalizer.boolean(publicly_visible),
+        address: address.to_h.stringify_keys.slice(*AddressRecord.permitted_params.map(&:to_s)).compact_blank)
+      return true if signup.details_completed?
+
+      signup.errors.add(:base, translation(:address_required))
+      false
     end
 
     # Rate limited: anyone holding the signup's session can ask for a resend. The link already
@@ -91,7 +88,7 @@ module OrgServices
         next unless organization.save
 
         OrganizationRole.create!(user:, organization:, role: "admin")
-        signup.update!(organization:, creator: signup.creator || user)
+        signup.update!(organization:)
       end
       return organization unless organization.persisted?
 
@@ -103,28 +100,21 @@ module OrgServices
     # private below here
     #
 
-    # What Organization's own validations would say about the name, before it's too late to fix
+    # Checked here rather than left to complete, when it's too late to pick another name
     def start_errors(signup)
       [(translation(:name_required) if signup.name.blank?),
         (translation(:kind_required) if signup.kind.blank?),
-        (translation(:email_required) unless signup.email.to_s.match?(URI::MailTo::EMAIL_REGEXP)),
-        *(name_errors(signup.name) if signup.name.present?)].compact
-    end
-
-    def name_errors(name)
-      organization = Organization.new(name:)
-      organization.valid?
-      organization.errors.full_messages_for(:short_name) +
-        (OrganizationNameValidator.valid?(name) ? [] : [translation(:name_unavailable)])
+        (translation(:email_required) unless signup.email.to_s.match?(User::EMAIL_REGEX)),
+        (translation(:name_unavailable) if signup.name.present? && !Organization.name_available?(signup.name))].compact
     end
 
     def location_attributes(signup)
       {name: signup.name, phone: signup.phone, publicly_visible: signup.publicly_visible,
-       address_record_attributes: signup.address_record.attributes.slice(*AddressRecord.permitted_params.map(&:to_s))}
+       address_record_attributes: signup.address}
     end
 
     def translation(key) = I18n.t(key, scope: "shared.organization_signup")
 
-    conceal :start_errors, :name_errors, :location_attributes, :translation
+    conceal :start_errors, :location_attributes, :translation
   end
 end

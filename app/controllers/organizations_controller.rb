@@ -11,10 +11,9 @@ class OrganizationsController < ApplicationController
       redirect_to("https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}", allow_other_host: true) && return
     end
 
-    session[:return_to] = lightspeed_interface_path
     # Signing up makes the account too, so it's where everyone without an organization goes
     flash[:notice] = translation(:must_create_an_organization_first)
-    redirect_to new_organization_signup_path
+    redirect_to new_organization_signup_path(return_to: lightspeed_interface_path)
   end
 
   # Additional parameter included in shop printouts: shop_display=true

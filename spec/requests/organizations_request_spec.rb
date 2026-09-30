@@ -200,16 +200,13 @@ RSpec.describe OrganizationsController, type: :request do
       it "redirects to the signup flow" do
         get "/lightspeed_interface"
         expect(flash[:notice]).to match(/organization/)
-        expect(response).to redirect_to new_organization_signup_path
-        expect(session[:return_to]).to eq lightspeed_interface_path
+        expect(response).to redirect_to new_organization_signup_path(return_to: lightspeed_interface_path)
       end
     end
     context "without user" do
       it "redirects to the signup flow, which makes the account too" do
         get "/lightspeed_interface"
-        expect(response).to redirect_to new_organization_signup_path
-        expect(flash[:notice]).to match(/organization/)
-        expect(session[:return_to]).to eq lightspeed_interface_path
+        expect(response).to redirect_to new_organization_signup_path(return_to: lightspeed_interface_path)
       end
     end
   end

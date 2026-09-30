@@ -4,12 +4,7 @@ module Pages
   module OrgSignup
     module Views
       module Step1
-        # Who the organization is, and the address its activation link goes to
         class Component < ApplicationComponent
-          # The chips' order: related kinds side by side, other last
-          KIND_ORDER = %w[bike_shop bike_advocacy law_enforcement school municipality bike_manufacturer
-            software property_management other].freeze
-
           def initialize(organization_signup:, current_user: nil)
             @organization_signup = organization_signup
             @current_user = current_user
@@ -18,7 +13,7 @@ module Pages
           private
 
           def kind_entries
-            (KIND_ORDER & Organization.user_creatable_kinds).map { |kind| {value: kind, label: kind_label(kind)} }
+            Organization.user_creatable_kinds.map { |kind| {value: kind, label: kind_label(kind)} }
           end
 
           def kind_label(kind)

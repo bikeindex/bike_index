@@ -60,7 +60,7 @@ RSpec.describe OrgServices::Signup do
 
       it "doesn't save" do
         expect(saved).to be_falsey
-        expect(organization_signup.errors.full_messages.to_sentence).to match(/already in use/)
+        expect(organization_signup.errors.full_messages).to eq(["That name isn't available - please choose another"])
       end
     end
 
@@ -130,7 +130,8 @@ RSpec.describe OrgServices::Signup do
       it "saves what's there, without completing" do
         expect(saved).to be_falsey
         expect(organization_signup.errors.full_messages).to eq(["Please enter the organization's full address"])
-        expect(organization_signup.reload).to have_attributes(website: "shiftybikes.com", details_completed_at: nil)
+        expect(organization_signup.reload.website).to eq "shiftybikes.com"
+        expect(organization_signup.details_completed?).to be_falsey
       end
     end
   end
@@ -168,7 +169,7 @@ RSpec.describe OrgServices::Signup do
       expect(organization.locations.first.address_record)
         .to have_attributes(street: "10544 82 Ave NW", city: "Edmonton", country_id: Country.canada_id)
       expect(organization.organization_roles.pluck(:user_id, :role)).to eq([[user.id, "admin"]])
-      expect(organization_signup.reload).to have_attributes(organization_id: organization.id, creator_id: user.id)
+      expect(organization_signup.reload.organization_id).to eq organization.id
       expect(Feedback.last.feedback_type).to eq "organization_created"
     end
 

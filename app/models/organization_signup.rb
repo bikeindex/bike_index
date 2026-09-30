@@ -5,7 +5,6 @@
 #
 #  id                         :bigint           not null, primary key
 #  address                    :jsonb            not null
-#  details_completed_at       :datetime
 #  email                      :string
 #  email_confirmation_sent_at :datetime
 #  email_confirmation_token   :string
@@ -16,50 +15,48 @@
 #  name                       :string
 #  phone                      :string
 #  publicly_visible           :boolean          default(TRUE), not null
+#  return_to                  :string
 #  website                    :string
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
-#  creator_id                 :bigint
 #  organization_id            :bigint
 #
 # Indexes
 #
-#  index_organization_signups_on_creator_id       (creator_id)
 #  index_organization_signups_on_id_token         (id_token) UNIQUE
 #  index_organization_signups_on_organization_id  (organization_id)
 #
 class OrganizationSignup < ApplicationRecord
   # How long a signup resumes by token, and so how long its emailed link works
   TOKEN_EXPIRATION = 30.days
+  # The state (or region) isn't here: which one a country has is the form's to decide
+  REQUIRED_ADDRESS_ATTRS = %w[street city postal_code country_id].freeze
 
   enum :kind, Organization::KIND_ENUM
 
-  belongs_to :creator, class_name: "User"
   belongs_to :organization
 
   before_validation :set_calculated_attributes
   before_create { self.id_token = SecurityTokenizer.new_token }
 
   scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
-  scope :without_organization, -> { where(organization_id: nil) }
+
+  def expired? = created_at < Time.current - TOKEN_EXPIRATION
 
   def email_confirmed? = email_confirmed_at.present?
 
-  def details_completed? = details_completed_at.present?
-
-  def with_organization? = organization_id.present?
+  def details_completed? = REQUIRED_ADDRESS_ATTRS.all? { address[it].present? }
 
   # A blank token reads as expired - token_time floors at EARLIEST_TOKEN_TIME
   def email_confirmation_token_expired?
     SecurityTokenizer.token_time(email_confirmation_token) < Time.current - TOKEN_EXPIRATION
   end
 
-  def address_record = AddressRecord.new(address.slice(*AddressRecord.permitted_params.map(&:to_s)))
+  def address_record = AddressRecord.new(address)
 
   private
 
   def set_calculated_attributes
-    self.email = EmailNormalizer.normalize(email)
     self.name = name&.strip
     self.website = website&.strip.presence
   end

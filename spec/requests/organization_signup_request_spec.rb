@@ -9,8 +9,6 @@ RSpec.describe OrganizationSignupController, type: :request do
   def organization_signup = OrganizationSignup.order(:id).last
 
   it "creates the organization, and its admin's account, once the email is confirmed" do
-    get "/organizations/new"
-    expect(response).to redirect_to "#{base_url}/new"
     get "#{base_url}/new"
     expect(response).to redirect_to "#{base_url}?step=1"
     get "#{base_url}?step=2"
@@ -72,11 +70,9 @@ RSpec.describe OrganizationSignupController, type: :request do
     expect(organization.organization_roles.pluck(:user_id, :role)).to eq([[user.id, "admin"]])
     expect(organization_signup.organization_id).to eq organization.id
 
-    # Signed in as the admin
     get organization_manage_path(organization_id: organization.to_param)
     expect(response.status).to eq 200
 
-    # The link again goes to the organization
     post "#{base_url}/confirm_email", params: {signup_token: organization_signup.id_token, confirmation_token: token}
     expect(response).to redirect_to organization_manage_path(organization_id: organization.to_param)
     expect(Organization.count).to eq 1
@@ -114,7 +110,7 @@ RSpec.describe OrganizationSignupController, type: :request do
       expect(response.body).to include current_user.email
       expect(response.body).to_not include "organization_signup[email]"
       post base_url, params: {organization_signup: start_params}
-      expect(organization_signup).to have_attributes(email: current_user.email, creator_id: current_user.id)
+      expect(organization_signup.email).to eq current_user.email
       patch base_url, params: {organization_signup: details_params}
       expect(response).to redirect_to "#{base_url}?step=finished"
       expect(Organization.count).to eq 0
@@ -130,7 +126,7 @@ RSpec.describe OrganizationSignupController, type: :request do
     context "arriving from lightspeed_interface" do
       it "goes back there once the organization exists" do
         get "/lightspeed_interface"
-        get "#{base_url}/new"
+        get response.location
         post base_url, params: {organization_signup: start_params}
         patch base_url, params: {organization_signup: details_params}
         post "#{base_url}/confirm_email", params: {signup_token: organization_signup.id_token,

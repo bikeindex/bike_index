@@ -2917,8 +2917,7 @@ CREATE TABLE public.organization_signups (
     email_confirmation_token character varying,
     email_confirmation_sent_at timestamp(6) without time zone,
     email_confirmed_at timestamp(6) without time zone,
-    details_completed_at timestamp(6) without time zone,
-    creator_id bigint,
+    return_to character varying,
     organization_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -7247,13 +7246,6 @@ CREATE INDEX index_organization_roles_on_user_id ON public.organization_roles US
 --
 
 CREATE UNIQUE INDEX index_organization_saml_configurations_on_organization_id ON public.organization_saml_configurations USING btree (organization_id);
-
-
---
--- Name: index_organization_signups_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_organization_signups_on_creator_id ON public.organization_signups USING btree (creator_id);
 
 
 --

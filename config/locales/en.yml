@@ -1746,6 +1746,9 @@ en:
           user_is_banned: >-
             We're sorry, but it appears that your account has been locked. If you
             are unsure as to the reasons for this, please contact us.
+        sign_in_confirmed_user:
+          unable_to_sign_in: We confirmed your email, but couldn't sign you in to
+            that account
         skip_if_signed_in:
           already_signed_in: You're already signed in!
         turnstile_verified:
@@ -1825,9 +1828,6 @@ en:
       find_signup_for_confirmation:
         already_activated: That organization is already active
         signup_not_found: We couldn't find that signup — start a new one below
-      sign_in_confirmed_user:
-        unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
-          account
     organizations:
       find_organization:
         not_found: >-
@@ -1983,9 +1983,6 @@ en:
         safety_rules_sent: >-
           The %{bike_display} is registered - we've emailed %{email} the safety rules
           to agree to, which finishes the registration.
-      sign_in_confirmed_user:
-        unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
-          account
     search:
       marketplace:
         set_interpreted_params:

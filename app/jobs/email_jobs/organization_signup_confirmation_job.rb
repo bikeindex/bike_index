@@ -18,7 +18,8 @@ module EmailJobs
         return if email_domain&.provisional_ban?
       end
 
-      notification = Notification.create(kind: "organization_signup_confirmation", message_channel: "email", notifiable: signup)
+      notification = Notification.create(kind: "organization_signup_confirmation", message_channel: "email",
+        notifiable: signup, message_channel_target: signup.email)
       Notifications::Deliver.track_email(notification) { OrganizedMailer.organization_signup_confirmation(signup).deliver_now }
     end
   end

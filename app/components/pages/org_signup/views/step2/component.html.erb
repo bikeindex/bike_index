@@ -1,5 +1,5 @@
 <%= render Pages::Register::Parts::Shell::Component.new do %>
-  <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup::FLOW, step: 2) %>
+  <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup, step: 2) %>
 
   <% unless @organization_signup.email_confirmed? %>
     <%= render UI::Alerts::Base::Component.new(kind: :purple, text: translation(".activation_link_sent", email: @organization_signup.email),
