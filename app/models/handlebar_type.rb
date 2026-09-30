@@ -2,19 +2,19 @@ class HandlebarType
   include Enumable
 
   SLUGS = {
+    flat: 0,
     drop_bar: 5,
     forward: 4,
     rearward: 3,
-    other: 2,
-    flat: 0
+    other: 2
   }.freeze
 
   NAMES = {
+    flat: "Flat or riser (horizontal facing)",
     drop_bar: "Drop bars",
     forward: "Forward facing",
     rearward: "Rear facing",
-    other: "Not handlebars",
-    flat: "Flat or riser (horizontal facing)"
+    other: "Not handlebars"
   }.freeze
 
   attr_reader :slug, :id
