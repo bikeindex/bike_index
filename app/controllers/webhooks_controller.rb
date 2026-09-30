@@ -34,7 +34,9 @@ class WebhooksController < ApplicationController
 
     stripe_event = StripeEvent.create_from(event)
     # Stripe retries anything but a 2xx, and the unhandled event is already stored
-    stripe_event.update_bike_index_record! if stripe_event.known_event?
+    if stripe_event.known_event? && stripe_event.processed_at.blank?
+      StripeJobs::ProcessEventJob.perform_async(stripe_event.id)
+    end
 
     render json: {success: true}
   end
