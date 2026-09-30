@@ -1,4 +1,6 @@
-<%# locals: (collection:, current_schedule:) %>
+<%# locals: (collection:, render_sortable: false) %>
+
+<% current_schedule = MarketplaceFeeSchedule.current %>
 
 <%= render(UI::Table::Component.new(records: collection)) do |table| %>
   <% table.column(label: "Starts") do |schedule| %>

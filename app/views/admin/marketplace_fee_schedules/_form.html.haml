@@ -21,9 +21,8 @@
     .col-md-6
       .form-group
         = f.label :start_at, "Starts", class: "form-label"
-        = hidden_field_tag "marketplace_fee_schedule[timezone]", "", class: "hiddenFieldTimezone"
+        = hidden_field_tag :timezone, "", class: "hiddenFieldTimezone"
         = f.datetime_local_field :start_at,
-          value: schedule.start_at&.strftime("%Y-%m-%dT%H:%M"),
           step: 60,
           required: true,
           class: "form-control dateInputUpdateZone",

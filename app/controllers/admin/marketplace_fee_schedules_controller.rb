@@ -10,7 +10,6 @@ module Admin
 
     def index
       @marketplace_fee_schedules = MarketplaceFeeSchedule.order(start_at: :desc)
-      @current_schedule = MarketplaceFeeSchedule.current
     end
 
     def new
@@ -50,17 +49,16 @@ module Admin
 
     private
 
-    # timezone first: start_at is read in it, and permit keeps this order
     def marketplace_fee_schedule_params
       params.require(:marketplace_fee_schedule)
-        .permit(:timezone, :start_at, :platform_fee_percent, :platform_fee_cap, :processing_fee_percent)
+        .permit(:start_at, :platform_fee_percent, :platform_fee_cap, :processing_fee_percent)
     end
 
     def find_marketplace_fee_schedule
       @marketplace_fee_schedule = MarketplaceFeeSchedule.find(params[:id])
     end
 
-    # A started schedule is how past fees are reconstructed, so it can't change. readonly? would raise
+    # readonly? would raise ReadOnlyRecord on update and destroy
     def reject_started_schedule
       return unless @marketplace_fee_schedule.readonly?
 
