@@ -20,6 +20,17 @@ RSpec.describe RecoveryDisplay, type: :model do
     it "includes only displays with a processed photo" do
       expect(RecoveryDisplay.with_photo.pluck(:id)).to eq([recovery_display.id])
     end
+
+    context "with two processed photo attachments" do
+      before do
+        ActiveStorage::Attachment.create!(record: recovery_display, name: "photo_processed",
+          blob: ActiveStorage::Blob.create_and_upload!(io: StringIO.new("reprocessed"), filename: "processed.jpg"))
+      end
+
+      it "includes the display once" do
+        expect(RecoveryDisplay.with_photo.limit(10).map(&:id)).to eq([recovery_display.id])
+      end
+    end
   end
 
   describe "photo_processed? and image_processing" do

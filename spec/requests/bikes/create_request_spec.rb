@@ -122,7 +122,7 @@ RSpec.describe "BikesController#create", type: :request do
         .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
       bike = Bike.last
       expect(response).to redirect_to(edit_bike_url(bike))
-      expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[BParam.last.id]])
+      expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[BParam.last.id, "partial_registration"]])
     end
   end
 
@@ -616,7 +616,7 @@ RSpec.describe "BikesController#create", type: :request do
       it "leaves the rules to the owner" do
         expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
           .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
-        expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id]])
+        expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id, "partial_registration"]])
       end
     end
 
@@ -816,7 +816,7 @@ RSpec.describe "BikesController#create", type: :request do
         it "still leaves the rules to the email, since the form never shows them" do
           expect { post base_url, params: e_vehicle_params }
             .to change(RegistrationSequenceAcknowledgment.pending, :count).by 1
-          expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id]])
+          expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id, "partial_registration"]])
         end
       end
     end

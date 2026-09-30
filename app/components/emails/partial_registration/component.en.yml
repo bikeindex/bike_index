@@ -9,6 +9,9 @@ en:
         just_a_few_steps_away_html: >-
           You're just a few steps away from registering your <strong>%{color_and_brand}</strong>
           on the world's most comprehensive bike registry!
+        link_signs_you_in: >-
+          This link signs you in to Bike Index, so don't forward it. It works for
+          %{days} days.
         review_the_rules: Review the rules
         safety_rules_owed_html: >-
           Your <strong>%{color_and_brand}</strong> is registered with %{org_name}
