@@ -8,7 +8,7 @@ RSpec.describe API::V1::BikesController, type: :request do
       get base_url, params: {format: :json}
       bike = json_result["bikes"].first
       expect(bike["id"]).to be_present
-      expect(bike["handlebar_type"]).to eq "Flat or riser"
+      expect(bike["handlebar_type"]).to eq "Flat or riser (horizontal facing)"
       expect(bike.key?("user_hidden")).to be_falsey
       expect(response.code).to eq("200")
     end
