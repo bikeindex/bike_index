@@ -149,6 +149,37 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
     end
   end
 
+  context "registered with the organization, with the owner's non-stolen notifications off" do
+    let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false, phone: "7183914410") }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: owner).reload }
+
+    it "renders the message action, saying there's nothing to send" do
+      expect(bike.contact_owner?(current_user, organization)).to be_falsey
+      expect(action_panels).to eq(%w[message impound parking notifications_show])
+      expect(page).to have_css("p", text: "This User has turned off notifications for non-stolen vehicles", visible: :all)
+      expect(page).to_not have_field("message_kind", visible: :all)
+      expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
+    end
+
+    context "stolen" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, :with_stolen_record, creation_organization: organization, user: owner).reload }
+
+      it "renders the message forms" do
+        expect(action_panels).to include("message")
+        expect(page).to_not have_text("turned off notifications")
+        expect(page).to have_css("textarea[name='organization_message[message]']", visible: :all)
+      end
+    end
+
+    context "viewed by a non-member" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+      it "renders no message action" do
+        expect(action_panels).to_not include("message")
+      end
+    end
+  end
+
   context "an unregistered parking notification" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "bike", user: owner, status: "unregistered_parking_notification").reload }
 

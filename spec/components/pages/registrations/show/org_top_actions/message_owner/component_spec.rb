@@ -91,6 +91,18 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
         expect(page).to have_css(".tw\\:hidden[data-registrations--show--message-owner-target='stolenNotification'] input[name='stolen_notification[reference_url]']", visible: :all)
       end
 
+      context "with the owner's notifications off" do
+        it "only says so" do
+          render_inline(described_class.new(bike:, organization:, current_user:, owner_notifications_off: true, active_parking_notification: true))
+
+          expect(page).to have_css("p", text: "This User has turned off notifications for non-stolen vehicles", visible: :all)
+          expect(page).to_not have_field("message_kind", visible: :all)
+          expect(page).to_not have_css("textarea", visible: :all)
+          expect(page).to_not have_button("Send parking notification", visible: :all)
+          expect(page).to_not have_text("Or call")
+        end
+      end
+
       context "with an active parking notification" do
         it "only links to a new parking notification" do
           render_inline(described_class.new(bike:, organization:, current_user:, active_parking_notification: true))

@@ -10,11 +10,13 @@ module Pages
           # action-panel accordion (data-panel-name="message")
           class Component < ApplicationComponent
             # active_parking_notification: the owner is reached through a new parking notification instead
-            def initialize(bike:, organization:, current_user: nil, active_parking_notification: false)
+            # owner_notifications_off: the owner turned off non-stolen notifications, so there's nothing to send
+            def initialize(bike:, organization:, current_user: nil, active_parking_notification: false, owner_notifications_off: false)
               @bike = bike
               @organization = organization
               @current_user = current_user
               @active_parking_notification = active_parking_notification
+              @owner_notifications_off = owner_notifications_off
             end
 
             private
