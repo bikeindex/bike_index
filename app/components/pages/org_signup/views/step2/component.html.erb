@@ -1,0 +1,44 @@
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup, step: 2) %>
+
+  <% unless @organization_signup.email_confirmed? %>
+    <%= render UI::Alerts::Base::Component.new(kind: :purple, text: translation(".activation_link_sent", email: @organization_signup.email),
+        icon: helpers.inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)) %>
+  <% end %>
+
+  <%= render UI::Header::Component.new(text: translation(".where_is_org", name: @organization_signup.name),
+      subtitle: translation(".shown_to_people")) %>
+
+  <% if @organization_signup.errors.any? %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @organization_signup.errors.full_messages.to_sentence) %>
+  <% end %>
+
+  <%= form_with(model: @organization_signup, url: organization_signup_path, method: :patch, scope: :organization_signup,
+      data: {turbo: true, controller: "autofocus form-persist register--retry",
+        form_persist_key_value: "organization-signup-details-#{@organization_signup.id_token}",
+        action: "input->form-persist#save submit->form-persist#clear"}) do |f| %>
+    <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".location")) %>
+
+    <%# _attributes explicitly: the signup holds the address as json, not an association %>
+    <%= f.fields_for :address_record_attributes, @organization_signup.address_record do |address_form| %>
+      <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form, required: true) %>
+    <% end %>
+
+    <%= render UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :publicly_visible,
+        checked: @organization_signup.publicly_visible, label: translation(".publicly_visible"), class_name: "tw:mb-6") %>
+
+    <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".contact"), divider: true) %>
+
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :website, label_text: translation(".website"),
+        html_options: {value: @organization_signup.website, placeholder: translation(".website_placeholder"), autocomplete: "url"}) %>
+
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :phone, kind: :telephone_field,
+        label_text: translation(".phone"), wrapper_class: "tw:mb-6",
+        html_options: {value: @organization_signup.phone, autocomplete: "tel"}) %>
+
+    <%= render UI::Button::Component.new(text: translation(".finish"), color: :primary, size: :lg,
+        type: "submit", spinner: true, html_class: "tw:w-full") %>
+
+    <%= render Pages::Register::Parts::BackLink::Component.new(href: organization_signup_path(step: 1)) %>
+  <% end %>
+<% end %>

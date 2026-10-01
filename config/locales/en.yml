@@ -1745,6 +1745,9 @@ en:
           user_is_banned: >-
             We're sorry, but it appears that your account has been locked. If you
             are unsure as to the reasons for this, please contact us.
+        sign_in_confirmed_user:
+          unable_to_sign_in: We confirmed your email, but couldn't sign you in to
+            that account
         skip_if_signed_in:
           already_signed_in: You're already signed in!
         turnstile_verified:
@@ -1812,20 +1815,24 @@ en:
       applications:
         ensure_app_owner!:
           not_your_application: That isn't your application
+    organization_signup:
+      complete_signup:
+        organization_created: "%{name} is active on Bike Index!"
+      confirm_email:
+        confirmation_link_expired: That link has expired — check your email for a
+          new one
+        sign_out_to_confirm: >-
+          You're signed in as %{email}. Sign out, then open the link again to activate
+          the organization.
+      find_signup_for_confirmation:
+        already_activated: That organization is already active
+        signup_not_found: We couldn't find that signup — start a new one below
     organizations:
-      create:
-        must_create_an_account_first: >-
-          You have to sign up for an account on Bike Index before you can create an
-          organization
-        organization_created: Organization Created successfully!
       find_organization:
         not_found: >-
           We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org
           if this seems like an error.
       lightspeed_interface:
-        must_create_an_account_first: >-
-          You have to sign up for an account on Bike Index before you can connect
-          with Lightspeed
         must_create_an_organization_first: >-
           You have to create an organization on Bike Index before you can connect
           with Lightspeed
@@ -1975,9 +1982,6 @@ en:
         safety_rules_sent: >-
           The %{bike_display} is registered - we've emailed %{email} the safety rules
           to agree to, which finishes the registration.
-      sign_in_confirmed_user:
-        unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
-          account
     search:
       marketplace:
         set_interpreted_params:
@@ -2520,6 +2524,7 @@ en:
         created for every bicycle you sell. All you need to do is add the customer's
         email address and the bicycle's serial number during a normal Lightspeed Retail
         checkout.
+      add_your_shop: Add your shop to Bike Index
       all_you_have_to_do_is_html: >-
         All you have to do is go to %{link}, where you'll be asked to authorize Bike
         Index to access your Lightspeed Account. Curious about what we collect? Read
@@ -3899,6 +3904,10 @@ en:
     manufacturers_index: Bike Manufacturers
     my_accounts_show: You on Bike Index
     news_index: Bike Index Blog
+    organization_signup_confirm: Activate your organization
+    organization_signup_create: Add your organization to Bike Index
+    organization_signup_show: Add your organization to Bike Index
+    organization_signup_update: Add your organization to Bike Index
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
     register_acknowledgment: Safety check for your %{cycle_type}
@@ -4210,32 +4219,6 @@ en:
       when_was_it_stolen: When was it stolen?
       where_was_it_stolen: Where was it stolen?
       zipcode: Postal Code
-    new:
-      bike_index_for_organizations: Bike Index for organizations
-    new_form:
-      add_organization: add organization
-      add_your_organization_to_bike_index: 'Add your organization to Bike Index, for
-        free, in three easy steps:'
-      bike_index_account: Bike Index account
-      confirm_your_email: Confirm your email
-      error: error
-      fill_out_the_form_that_will_appear: Fill out the form that will appear on this
-        page once you're signed in.
-      filling_out_this_form_will_create_a_new_org: Filling out this form will create
-        a new, different organization
-      if_you_dont_want_that_to_be_the_case_html: >-
-        If you don't want that to be the case, %{logout_link} and sign up with the
-        email you would like to use instead.
-      log_out: log out
-      new_organization: New organization
-      organization_kind: Organization kind
-      organization_name: Organization name
-      please_fix_the_following_errors: Please fix the following %{errors}
-      sign_up_for_a_new_account_html: Sign up for a %{new_account_link}
-      you_are_already_a_member_of_org_html: You are already a member of %{org_link}.
-      your_current_account_will_be_a_member_html: >-
-        Your current account (<strong>%{user_email}</strong>) will be a member of
-        the organization you create.
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4673,6 +4656,8 @@ en:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    organization_signup_confirmation:
+      subject: Confirm your email to activate %{name} on Bike Index
     partial_register_confirmation:
       subject: Confirm your email to finish your %{organization_name}registration
     partial_register_confirmation_abandoned:
@@ -5043,6 +5028,12 @@ en:
       search_registrations: Search Registrations
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_message: Stolen Message
+    organization_signup:
+      address_required: Please enter the organization's full address
+      email_required: A valid email is required
+      kind_required: Please choose what kind of organization this is
+      name_required: Organization name is required
+      name_unavailable: That name isn't available - please choose another
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}

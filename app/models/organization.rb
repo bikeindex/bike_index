@@ -216,8 +216,25 @@ class Organization < ApplicationRecord
       %w[ambassador bike_depot].freeze
     end
 
+    # In the order they're offered: related kinds side by side, other last
     def user_creatable_kinds
-      kinds - admin_required_kinds
+      %w[bike_shop bike_advocacy law_enforcement school municipality bike_manufacturer software
+        property_management other].freeze
+    end
+
+    # The name validations, without building an organization - whose callbacks query, and can write
+    def name_available?(name)
+      return false unless OrganizationNameValidator.valid?(name)
+
+      where("LOWER(short_name) = ?", shorten_name(sanitize_name(name)).downcase).none?
+    end
+
+    def sanitize_name(str) = Binxtils::InputNormalizer.sanitize(str&.strip).gsub("&amp;", "&")
+
+    def shorten_name(str)
+      # Remove parens if the name is too long
+      str = str.gsub(/\(.*\)/, "") if str.length > 30 && str.match?(/\(.*\)/)
+      str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
     end
 
     def kind_humanized(str)
@@ -678,16 +695,10 @@ class Organization < ApplicationRecord
       .reorder(id: :asc)
   end
 
-  def strip_name_tags(str)
-    Binxtils::InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
-  end
+  def strip_name_tags(str) = self.class.sanitize_name(name)
 
   def name_shortener(str)
-    # Remove parens if the name is too long
-    if str.length > 30 && str.match?(/\(.*\)/)
-      str = str.gsub(/\(.*\)/, "")
-    end
-    str = str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
+    str = self.class.shorten_name(str)
     return str unless deleted_at.present?
 
     str.match?("-deleted") ? str : "#{str}-deleted"

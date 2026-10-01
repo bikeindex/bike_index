@@ -1,0 +1,19 @@
+---
+en:
+  components:
+    pages:
+      org_signup:
+        views:
+          step2:
+            activation_link_sent: >-
+              We've emailed %{email} a link to activate the organization — finish
+              up here first.
+            contact: Contact
+            finish: Finish
+            location: Location
+            phone: Phone
+            publicly_visible: Show this location on the Bike Index map
+            shown_to_people: So people registering with you can find you.
+            website: Website
+            website_placeholder: example.com
+            where_is_org: Where is %{name}?

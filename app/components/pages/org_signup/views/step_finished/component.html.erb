@@ -1,0 +1,45 @@
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup, step: :finished) %>
+
+  <div class="tw:px-1 tw:py-6 tw:text-center">
+    <div
+      class="
+        tw:mx-auto tw:mb-4 tw:flex tw:h-16 tw:w-16 tw:items-center
+        tw:justify-center tw:rounded-full tw:bg-purple-100
+        tw:text-purple-600 tw:dark:bg-purple-950 tw:dark:text-purple-400
+      "
+    >
+      <%= helpers.inline_svg_tag("icons/envelope.svg", class: "tw:h-7.5 tw:w-7.5", aria_hidden: true) %>
+    </div>
+
+    <%= render UI::Header::Component.new(text: translation(".check_your_email"),
+        subtitle: translation(".activate_html", email: tag.strong(@organization_signup.email), name: @organization_signup.name)) %>
+
+    <div
+      class="
+        tw:mb-6 tw:rounded-lg tw:bg-white tw:px-4 tw:py-3 tw:text-left
+        tw:dark:bg-gray-800
+      "
+    >
+      <p class="tw:mb-1.5 tw:text-sm tw:font-semibold">
+        <%= translation(".activating_lets_you") %>
+      </p>
+
+      <ul
+        class="
+          tw:mb-0 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm
+          tw:text-gray-600 tw:dark:text-gray-300
+        "
+      >
+        <li><%= translation(".register_for_customers") %></li>
+        <li><%= translation(".invite_your_team") %></li>
+        <li><%= translation(".share_your_link") %></li>
+      </ul>
+    </div>
+
+    <p class="tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+      <%= translation(".wrong_address") %>
+      <%= link_to translation(".change_it"), organization_signup_path(step: 1), class: "twlink" %>
+    </p>
+  </div>
+<% end %>
