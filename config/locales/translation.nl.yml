@@ -879,11 +879,11 @@ nl:
         titanium: Titanium
         magnesium: Magnesium
       handlebar_type:
-        flat: Plat of riser
         forward: Naar voren gericht
         other: Geen stuur
         rearward: Achterzijde gericht
         drop_bar: Laten vallen
+        horizontal: Plat of riser
       propulsion_type:
         foot_pedal: Voetpedaal
         hand_pedal: Handpedaal
