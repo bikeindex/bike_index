@@ -735,8 +735,8 @@ en:
         titanium: Titanium
       handlebar_type:
         drop_bar: Drop bars
-        flat: Flat or riser (horizontal facing)
         forward: Forward facing
+        horizontal: Flat or riser (horizontal facing)
         other: Not handlebars
         rearward: Rear facing
       marketplace_listing:

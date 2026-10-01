@@ -194,7 +194,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
     save_bike
 
     bike.reload
-    expect(bike.handlebar_type).to eq "flat"
+    expect(bike.handlebar_type).to eq "horizontal"
     expect(bike.components.count).to eq 2
     expect(bike.components.map { |c| c.ctype }).to match_array([ctype_saddle, ctype_fork])
 
