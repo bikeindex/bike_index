@@ -2293,6 +2293,40 @@ ALTER SEQUENCE public.manufacturers_id_seq OWNED BY public.manufacturers.id;
 
 
 --
+-- Name: marketplace_fee_schedules; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_fee_schedules (
+    id bigint NOT NULL,
+    platform_fee_percent numeric(5,2) NOT NULL,
+    platform_fee_cap_cents integer NOT NULL,
+    processing_fee_percent numeric(5,2) NOT NULL,
+    start_at timestamp(6) without time zone NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: marketplace_fee_schedules_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_fee_schedules_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_fee_schedules_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_fee_schedules_id_seq OWNED BY public.marketplace_fee_schedules.id;
+
+
+--
 -- Name: marketplace_listings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4915,6 +4949,13 @@ ALTER TABLE ONLY public.manufacturers ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: marketplace_fee_schedules id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_fee_schedules ALTER COLUMN id SET DEFAULT nextval('public.marketplace_fee_schedules_id_seq'::regclass);
+
+
+--
 -- Name: marketplace_listings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5754,6 +5795,14 @@ ALTER TABLE ONLY public.mailchimp_values
 
 ALTER TABLE ONLY public.manufacturers
     ADD CONSTRAINT manufacturers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: marketplace_fee_schedules marketplace_fee_schedules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_fee_schedules
+    ADD CONSTRAINT marketplace_fee_schedules_pkey PRIMARY KEY (id);
 
 
 --
@@ -7822,6 +7871,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260929193517'),
 ('20260926005700'),
 ('20260915181500'),
 ('20260915110042'),

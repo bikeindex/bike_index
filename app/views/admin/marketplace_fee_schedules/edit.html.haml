@@ -1,0 +1,10 @@
+.container
+  %h1 Edit Fee Schedule
+  .text-right
+    = render(UI::ButtonLink::Component.new(text: "Delete fee schedule", href: admin_marketplace_fee_schedule_path(@marketplace_fee_schedule), method: :delete, color: :error, size: :sm, confirm: "Are you sure you want to delete this fee schedule? This can't be undone"))
+
+  = render "form",
+    schedule: @marketplace_fee_schedule,
+    action: admin_marketplace_fee_schedule_path(@marketplace_fee_schedule),
+    method: :patch,
+    submit_label: "Save"

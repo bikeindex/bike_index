@@ -1,0 +1,38 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<% current_schedule = MarketplaceFeeSchedule.current %>
+
+<%= render(UI::Table::Component.new(records: collection)) do |table| %>
+  <% table.column(label: "Starts") do |schedule| %>
+    <%= render UI::Time::Component.new(time: schedule.start_at) %>
+  <% end %>
+
+  <% table.column(label: "Status") do |schedule| %>
+    <% if schedule == current_schedule %>
+      <%= render UI::Badge::Component.new(text: "In effect now", color: :success, size: :sm) %>
+    <% elsif !schedule.readonly? %>
+      <%= render UI::Badge::Component.new(text: "Upcoming", color: :notice, size: :sm) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Platform fee") do |schedule| %>
+    <%= number_display(number_with_precision(schedule.platform_fee_percent, precision: 2, strip_insignificant_zeros: true)) %>%
+  <% end %>
+
+  <% table.column(label: "Platform fee cap") do |schedule| %>
+    <%= MoneyFormatter.money_format(schedule.platform_fee_cap_cents) %>
+  <% end %>
+
+  <% table.column(label: "Processing fee") do |schedule| %>
+    <%= number_display(number_with_precision(schedule.processing_fee_percent, precision: 2, strip_insignificant_zeros: true)) %>%
+  <% end %>
+
+  <% table.column(label: "") do |schedule| %>
+    <% unless schedule.readonly? %>
+      <div class="tw:flex tw:gap-2">
+        <%= render UI::ButtonLink::Component.new(text: "Edit", href: edit_admin_marketplace_fee_schedule_path(schedule), size: :sm) %>
+        <%= render UI::ButtonLink::Component.new(text: "Delete", href: admin_marketplace_fee_schedule_path(schedule), method: :delete, color: :error, size: :sm, confirm: "Are you sure you want to delete this fee schedule? This can't be undone") %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

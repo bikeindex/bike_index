@@ -258,6 +258,7 @@ Rails.application.routes.draw do
     resources :ambassador_tasks, except: :show
     resources :ambassador_task_assignments, only: %i[index]
     resources :exchange_rates, only: %i[index new create edit update destroy]
+    resources :marketplace_fee_schedules, except: :show
 
     resources :external_registry_bikes, only: %i[index show]
     resources :external_registry_credentials, only: %i[index new create edit update] do
