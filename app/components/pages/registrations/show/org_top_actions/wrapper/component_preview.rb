@@ -53,7 +53,7 @@ module Pages
             # A live count and the notification panel are DB queries, so this variety
             # needs a real org bike that already carries a notification
             def bike_with_parking_notification
-              notifications = lookbook_organization.parking_notifications
+              notifications = lookbook_organization.parking_notifications.where(unregistered_bike: false)
               (notifications.current.last || notifications.last)&.bike ||
                 preview_bike(:status_with_owner)
             end
