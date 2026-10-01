@@ -1,0 +1,31 @@
+<li
+  class="
+    tw:flex-col tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]
+    <%= @html_class %>
+  "
+>
+  <%= image_tag(@recovery_display.photo_url, alt: @recovery_display.image_alt,
+    class: "tw:h-45 tw:w-full tw:object-cover tw:lg:h-42", loading: "lazy") %>
+
+  <div
+    class="
+      tw:flex tw:flex-1 tw:flex-col tw:justify-between tw:gap-3 tw:p-3
+      tw:lg:p-4
+    "
+  >
+    <blockquote class="tw:m-0 tw:border-0 tw:p-0 tw:text-[15px] tw:text-gray-700">
+      <%= @recovery_display.quote %>
+    </blockquote>
+
+    <p class="tw:m-0 tw:text-[11.5px]">
+      <% if @recovery_display.quote_by.present? %>
+        <strong class="tw:mr-1 tw:text-[13.5px] tw:font-extrabold tw:text-slate-900">
+          <%= @recovery_display.quote_by %>
+        </strong>
+      <% end %>
+
+      <%= translation(".recovered") %>
+      <%= render(UI::Time::Component.new(time: @recovery_display.recovered_at)) %>
+    </p>
+  </div>
+</li>

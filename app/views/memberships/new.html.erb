@@ -1,1 +1,6 @@
-<%= render(Pages::Memberships::ChooseMembership::Component.new(currency: current_currency, referral_source: @referral_source, level: @initial_level)) %>
+<% bikes_count, recoveries_count, recoveries_value, organizations_count =
+  Counts.retrieve_many("total_bikes", "recoveries", "recoveries_value", "organizations") %>
+
+<%= render(Pages::Memberships::New::Component.new(currency: current_currency, level: @initial_level,
+  referral_source: @referral_source, bikes_count:, recoveries_count:, recoveries_value:,
+  organizations_count:, recovery_displays: RecoveryDisplay.with_photo)) %>

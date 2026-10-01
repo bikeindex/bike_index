@@ -1,8 +1,6 @@
 class MembershipsController < ApplicationController
   before_action :store_return_and_authenticate_user, only: %i[edit]
 
-  layout "payments_layout"
-
   def new
     if current_user&.membership_active.present?
       redirect_to edit_membership_path
@@ -16,10 +14,6 @@ class MembershipsController < ApplicationController
     stripe_subscription = StripeSubscription.create_for(stripe_price:, user: current_user,
       referral_source: referral_source_from_params)
     redirect_to(stripe_subscription.stripe_checkout_session_url, allow_other_host: true)
-  end
-
-  def success
-    render layout: "application"
   end
 
   def edit
