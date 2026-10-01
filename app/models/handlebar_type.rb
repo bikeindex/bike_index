@@ -2,7 +2,7 @@ class HandlebarType
   include Enumable
 
   SLUGS = {
-    flat: 0,
+    horizontal: 0,
     drop_bar: 5,
     forward: 4,
     rearward: 3,
@@ -10,7 +10,7 @@ class HandlebarType
   }.freeze
 
   NAMES = {
-    flat: "Flat or riser (horizontal facing)",
+    horizontal: "Flat or riser (horizontal facing)",
     drop_bar: "Drop bars",
     forward: "Forward facing",
     rearward: "Rear facing",
@@ -19,10 +19,15 @@ class HandlebarType
 
   attr_reader :slug, :id
 
-  # Words from flat's name, and the removed BMX, which API clients still send
+  # Former slugs (flat, and the removed BMX) and riser, which API clients still send
   def self.find_sym(str)
-    str.to_s.strip.match?(/\A(riser|horizontal|bmx( style)?)\z/i) ? :flat : super
+    str.to_s.strip.match?(/\A(flat|riser|bmx( style)?)\z/i) ? :horizontal : super
   end
+
+  # The API still emits horizontal's slug from before the rename
+  def self.api_slug(slug) = (slug.to_s == "horizontal") ? "flat" : slug
+
+  def self.legacy_selections = super.map { it.merge(slug: api_slug(it[:slug])) }
 
   def initialize(slug)
     @slug = slug&.to_sym
