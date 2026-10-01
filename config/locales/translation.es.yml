@@ -891,12 +891,11 @@ es:
         steel: Acero
         titanium: Titanio
       handlebar_type:
-        bmx: estilo BMX
         drop_bar: manillar de caída
-        flat: Plano o escalonado
         forward: Orientado hacia adelante
         other: No son manillares
         rearward: Orientación hacia atrás
+        horizontal: Plano o escalonado
       propulsion_type:
         foot_pedal: Pedal
         hand_pedal: Bicicleta de mano (pedal de mano)

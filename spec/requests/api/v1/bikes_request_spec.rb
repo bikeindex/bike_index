@@ -4,11 +4,11 @@ base_url = "/api/v1/bikes"
 RSpec.describe API::V1::BikesController, type: :request do
   describe "index" do
     it "loads the page and have the correct headers" do
-      FactoryBot.create(:bike, handlebar_type: "flat")
+      FactoryBot.create(:bike, handlebar_type: "horizontal")
       get base_url, params: {format: :json}
       bike = json_result["bikes"].first
       expect(bike["id"]).to be_present
-      expect(bike["handlebar_type"]).to eq "Flat or riser"
+      expect(bike["handlebar_type"]).to eq "Flat or riser (horizontal facing)"
       expect(bike.key?("user_hidden")).to be_falsey
       expect(response.code).to eq("200")
     end
