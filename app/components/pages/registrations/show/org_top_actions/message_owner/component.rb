@@ -6,7 +6,7 @@ module Pages
       module OrgTopActions
         module MessageOwner
           # Org-admin panel messaging the owner, as an organization message for the org's own
-          # registration or a stolen notification otherwise. Rendered inside the org-admin
+          # with-owner registration or a stolen notification. Rendered inside the org-admin
           # action-panel accordion (data-panel-name="message")
           class Component < ApplicationComponent
             def initialize(bike:, organization:, current_user: nil)
@@ -17,10 +17,27 @@ module Pages
 
             private
 
-            def organization_message?
-              return @organization_message if defined?(@organization_message)
+            def unavailable_reason
+              return @unavailable_reason if defined?(@unavailable_reason)
 
-              @organization_message = OrganizationMessage.for?(bike: @bike, organization: @organization)
+              @unavailable_reason = OrganizationMessage.unavailable_reason(bike: @bike, organization: @organization)
+            end
+
+            def organization_message?
+              unavailable_reason.nil?
+            end
+
+            def unavailable_reason_text
+              case unavailable_reason
+              when :stolen
+                translation(".unavailable_stolen", bike_type: @bike.type)
+              when :not_with_owner
+                translation(".unavailable_not_with_owner", bike_type: @bike.type)
+              when :phone_registration
+                translation(".unavailable_phone_registration")
+              when :not_registered_with_organization
+                translation(".unavailable_not_registered_with_organization", organization_name: @organization.short_name)
+              end
             end
 
             # Whoever holds an impounded vehicle already knows where it is, so the

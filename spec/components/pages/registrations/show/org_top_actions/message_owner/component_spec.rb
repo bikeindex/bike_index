@@ -7,12 +7,17 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
   let(:organization) { FactoryBot.create(:organization) }
   let(:bike) { FactoryBot.create(:bike) }
 
-  it "renders the message form" do
+  it "renders the stolen notification form, with the general message disabled" do
     render_inline(described_class.new(bike:, organization:, current_user:))
 
     expect(page).to have_text("Know something about this bike")
+    expect(page.all("input[name='message_kind']", visible: :all).map(&:value)).to eq(%w[theft general])
+    expect(page).to have_checked_field("Message about theft", visible: :all)
+    expect(page).to have_field("General message", disabled: true, visible: :all)
+    expect(page).to have_css("[role='tooltip']", text: "Only for registrations with #{organization.short_name}", visible: :all)
     expect(page).to have_css("textarea[name='stolen_notification[message]'][required]", visible: :all)
     expect(page).to have_css("input[name='stolen_notification[bike_id]'][value='#{bike.id}']", visible: :all)
+    expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
     expect(page).not_to have_text("Or call")
   end
 
@@ -25,6 +30,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
       render_inline(described_class.new(bike: bike.reload, organization:, current_user: FactoryBot.create(:user_confirmed)))
 
       expect(page).not_to have_text("Or call")
+      expect(page).to have_css("[role='tooltip']", text: "Not available for a stolen bike", visible: :all)
     end
 
     context "viewed by a law enforcement member" do
@@ -51,6 +57,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
       expect(page).to have_text("Know who has this e-scooter?")
       expect(page).to_not have_text("Know something about this e-scooter")
       expect(page).to have_css("textarea[placeholder^='What do you need to ask about this e-scooter']", visible: :all)
+      expect(page).to have_field("General message", disabled: true, visible: :all)
+      expect(page).to have_css("[role='tooltip']", text: "Not available while this e-scooter isn't with its owner", visible: :all)
       expect(page).to have_link("718-391-4410", href: "tel:718-391-4410")
     end
   end
@@ -65,7 +73,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
       render_inline(described_class.new(bike:, organization:, current_user:))
 
       expect(page).to have_link("718-391-4410", href: "tel:718-391-4410")
-      expect(page).to_not have_field("message_kind", visible: :all)
+      expect(page).to have_field("General message", disabled: true, visible: :all)
     end
 
     context "registered with the viewer's organization" do
@@ -76,6 +84,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
 
         expect(page).to have_text("Message the owner of this e-scooter")
         expect(page).to have_checked_field("General message", visible: :all)
+        expect(page).to have_field("Message about theft", disabled: false, visible: :all)
+        expect(page).to_not have_css("[role='tooltip']", visible: :all)
         expect(page).to have_css("form[action='/o/#{organization.to_param}/organization_messages'] textarea[name='organization_message[message]'][placeholder='What do you want to tell the owner of this e-scooter?']", visible: :all)
         expect(page).to_not have_css("input[name='organization_message[reference_url]']", visible: :all)
         expect(page).to have_css(".tw\\:hidden[data-registrations--show--message-owner-target='stolenNotification'] input[name='stolen_notification[reference_url]']", visible: :all)
@@ -84,11 +94,13 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
       context "by phone" do
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership, :phone_registration, creation_organization: organization, owner_email: "7183914410") }
 
-        it "shows the stolen notification form, with no toggle" do
+        it "shows the stolen notification form, with the general message disabled" do
           render_inline(described_class.new(bike:, organization:, current_user:))
 
           expect(page).to have_text("Know something about this bike")
-          expect(page).to_not have_field("message_kind", visible: :all)
+          expect(page).to have_checked_field("Message about theft", visible: :all)
+          expect(page).to have_field("General message", disabled: true, visible: :all)
+          expect(page).to have_css("[role='tooltip']", text: "Registered by phone, so there's no email to send to", visible: :all)
           expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
           expect(page).to_not have_css(".tw\\:hidden[data-registrations--show--message-owner-target='stolenNotification']", visible: :all)
           expect(page).to have_css("textarea[name='stolen_notification[message]']", visible: :all)

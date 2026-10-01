@@ -13,12 +13,16 @@
       <%= heading %>
     </h2>
 
-    <%= tag.div(data: {controller: ("registrations--show--message-owner" if organization_message?)}) do %>
-      <% if organization_message? %>
-        <div class="tw:mt-3">
-          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "message_kind", selected: "general", entries: [{value: "general", label: translation(".general_message")}, {value: "theft", label: translation(".message_about_theft")}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
-        </div>
+    <div data-controller="registrations--show--message-owner">
+      <div class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
+        <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "message_kind", selected: organization_message? ? "general" : "theft", entries: [{value: "theft", label: translation(".message_about_theft")}, {value: "general", label: translation(".general_message"), disabled: !organization_message?}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
 
+        <% if unavailable_reason_text %>
+          <%= render(UI::Tooltip::Component.new(text: unavailable_reason_text)) %>
+        <% end %>
+      </div>
+
+      <% if organization_message? %>
         <div
           class="tw:mt-3"
           data-registrations--show--message-owner-target="organizationMessage"
@@ -33,7 +37,7 @@
       >
         <%= render(Pages::Registrations::Show::StolenNotificationForm::Component.new(bike: @bike, placeholder: (translation(".what_do_you_need_to_ask", bike_type: @bike.type) if impounded?))) %>
       </div>
-    <% end %>
+    </div>
 
     <%= render(Pages::Registrations::Show::OwnerPhone::Component.new(phone: owner_phone)) %>
   <% end %>

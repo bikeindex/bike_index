@@ -32,16 +32,32 @@ RSpec.describe OrganizationMessage, type: :model do
     end
   end
 
-  describe "for?" do
-    it "is for a with-owner bike registered with the organization" do
+  describe "unavailable_reason" do
+    it "is nil for a with-owner bike registered with the organization" do
+      expect(OrganizationMessage.unavailable_reason(bike:, organization:)).to be_nil
       expect(OrganizationMessage.for?(bike:, organization:)).to be_truthy
-      expect(OrganizationMessage.for?(bike:, organization: FactoryBot.create(:organization))).to be_falsey
+      expect(OrganizationMessage.unavailable_reason(bike:, organization: FactoryBot.create(:organization))).to eq :not_registered_with_organization
+    end
+
+    context "stolen" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
+      it "is stolen" do
+        expect(OrganizationMessage.unavailable_reason(bike: bike.reload, organization:)).to eq :stolen
+        expect(OrganizationMessage.for?(bike:, organization:)).to be_falsey
+      end
     end
 
     context "impounded" do
       let(:bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization) }
-      it "isn't" do
-        expect(OrganizationMessage.for?(bike: bike.reload, organization:)).to be_falsey
+      it "is not with owner" do
+        expect(OrganizationMessage.unavailable_reason(bike: bike.reload, organization:)).to eq :not_with_owner
+      end
+    end
+
+    context "phone registration" do
+      let(:bike) { FactoryBot.create(:bike_organized, :phone_registration, creation_organization: organization) }
+      it "is phone_registration" do
+        expect(OrganizationMessage.unavailable_reason(bike:, organization:)).to eq :phone_registration
       end
     end
   end

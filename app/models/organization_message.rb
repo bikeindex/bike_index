@@ -36,9 +36,19 @@ class OrganizationMessage < ApplicationRecord
   before_validation :set_calculated_attributes
   after_create_commit { EmailJobs::OrganizationMessageJob.perform_async(id) }
 
+  def self.for?(bike:, organization:) = unavailable_reason(bike:, organization:).nil?
+
   # A phone registration's owner_email is the phone number, so there's nothing to email
-  def self.for?(bike:, organization:)
-    bike.status_with_owner? && !bike.phone_registration? && bike.organized?(organization)
+  def self.unavailable_reason(bike:, organization:)
+    if bike.status_stolen?
+      :stolen
+    elsif !bike.status_with_owner?
+      :not_with_owner
+    elsif bike.phone_registration?
+      :phone_registration
+    elsif !bike.organized?(organization)
+      :not_registered_with_organization
+    end
   end
 
   private
