@@ -19,7 +19,7 @@ class HandlebarType
 
   attr_reader :slug, :id
 
-  # Former slugs (flat, and the removed BMX) and riser, which API clients still send
+  # API clients still send the former slugs
   def self.find_sym(str)
     str.to_s.strip.match?(/\A(flat|riser|bmx( style)?)\z/i) ? :horizontal : super
   end

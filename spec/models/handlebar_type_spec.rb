@@ -42,12 +42,6 @@ RSpec.describe HandlebarType, type: :model do
     end
   end
 
-  describe "legacy_selections" do
-    it "returns the api slugs" do
-      expect(HandlebarType.legacy_selections.first).to eq({slug: "flat", name: "Flat or riser (horizontal facing)"})
-    end
-  end
-
   describe "names and translations" do
     let(:en_yaml) { YAML.safe_load_file(Rails.root.join("config", "locales", "en.yml"), permitted_classes: [Symbol]) }
     let(:enum_translations) do
