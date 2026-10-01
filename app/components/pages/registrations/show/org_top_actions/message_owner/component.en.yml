@@ -16,11 +16,11 @@ en:
               send_new_parking_notification_to_message_owner: Send a new parking notification
                 to message the owner
               send_parking_notification: Send parking notification
-              unavailable_not_registered_with_organization: General messages can only
-                be sent to registrations with %{organization_name}
               unavailable_phone_registration: Registered by phone, so there's no email
                 to send to
               unavailable_status: General messages aren't available to send to %{status}
+              unavailable_vehicle_not_registered_with_organization: >-
+                General messages can only be sent to vehicles registered with %{organization_name}
               what_do_you_need_to_ask: >-
                 What do you need to ask about this %{bike_type}? Include a link in
                 the field below if there's one that helps

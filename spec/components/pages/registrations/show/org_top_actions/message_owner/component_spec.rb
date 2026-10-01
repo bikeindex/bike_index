@@ -14,7 +14,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
     expect(page.all("input[name='message_kind']", visible: :all).map(&:value)).to eq(%w[theft general])
     expect(page).to have_checked_field("Message about theft", visible: :all)
     expect(page).to have_field("General message", disabled: true, visible: :all)
-    expect(page).to have_css("[role='tooltip']", text: "General messages can only be sent to registrations with #{organization.short_name}", visible: :all)
+    expect(page).to have_css("[role='tooltip']", text: "General messages can only be sent to vehicles registered with #{organization.short_name}", visible: :all)
     expect(page).to have_css("textarea[name='stolen_notification[message]'][required]", visible: :all)
     expect(page).to have_css("input[name='stolen_notification[bike_id]'][value='#{bike.id}']", visible: :all)
     expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
@@ -30,7 +30,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
       render_inline(described_class.new(bike: bike.reload, organization:, current_user: FactoryBot.create(:user_confirmed)))
 
       expect(page).not_to have_text("Or call")
-      expect(page).to have_css("[role='tooltip']", text: "General messages can only be sent to registrations with #{organization.short_name}", visible: :all)
+      expect(page).to have_css("[role='tooltip']", text: "General messages can only be sent to vehicles registered with #{organization.short_name}", visible: :all)
     end
 
     context "viewed by a law enforcement member" do

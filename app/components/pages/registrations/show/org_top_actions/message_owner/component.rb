@@ -40,7 +40,7 @@ module Pages
               when :phone_registration
                 translation(".unavailable_phone_registration")
               when :not_registered_with_organization
-                translation(".unavailable_not_registered_with_organization", organization_name: @organization.short_name)
+                translation(".unavailable_vehicle_not_registered_with_organization", organization_name: @organization.short_name)
               end
             end
 
