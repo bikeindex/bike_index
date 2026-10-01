@@ -113,6 +113,10 @@ module Pages
               show_parking_notifications? && !impounded?
             end
 
+            def active_parking_notification?
+              show_create_parking_notification? && active_notifications_count.positive?
+            end
+
             def parking_notifications
               @parking_notifications ||= @organization.parking_notifications.where(bike_id: @bike.id)
             end

@@ -9,10 +9,12 @@ module Pages
           # with-owner registration or a stolen notification. Rendered inside the org-admin
           # action-panel accordion (data-panel-name="message")
           class Component < ApplicationComponent
-            def initialize(bike:, organization:, current_user: nil)
+            # active_parking_notification: the owner is reached through a new parking notification instead
+            def initialize(bike:, organization:, current_user: nil, active_parking_notification: false)
               @bike = bike
               @organization = organization
               @current_user = current_user
+              @active_parking_notification = active_parking_notification
             end
 
             private

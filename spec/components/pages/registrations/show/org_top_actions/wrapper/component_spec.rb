@@ -135,6 +135,19 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
   end
 
   # The panel keeps the sighting question - the org is the one who saw it sitting there
+  context "registered with the organization, with an active parking notification" do
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: owner).reload }
+    before { FactoryBot.create(:parking_notification, bike:, organization:, user: current_user) }
+
+    it "points the message panel at a new parking notification" do
+      expect(action_panels).to eq(%w[message impound parking notifications_show])
+      expect(page).to have_css("p", text: "This registration has an active Parking Notification. Send a new parking notification to message the owner", visible: :all)
+      expect(page).to have_css("button[data-panel-name='parking'][data-action='registrations--show--action-panels#toggle']", text: "Parking notification", visible: :all)
+      expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
+      expect(page).to have_css("textarea[name='stolen_notification[message]']", visible: :all)
+    end
+  end
+
   context "an unregistered parking notification" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "bike", user: owner, status: "unregistered_parking_notification").reload }
 

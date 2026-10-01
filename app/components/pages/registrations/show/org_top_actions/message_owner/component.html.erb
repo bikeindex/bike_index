@@ -27,7 +27,15 @@
           class="tw:mt-3"
           data-registrations--show--message-owner-target="organizationMessage"
         >
-          <%= render(Pages::Registrations::Show::OrgTopActions::OrganizationMessageForm::Component.new(bike: @bike, organization: @organization)) %>
+          <% if @active_parking_notification %>
+            <p><%= translation(".active_parking_notification") %></p>
+
+            <div class="tw:mt-3">
+              <%= render(UI::Button::Component.new(text: translation(".parking_notification"), color: :primary, data: {"panel-name": "parking", action: "registrations--show--action-panels#toggle"})) %>
+            </div>
+          <% else %>
+            <%= render(Pages::Registrations::Show::OrgTopActions::OrganizationMessageForm::Component.new(bike: @bike, organization: @organization)) %>
+          <% end %>
         </div>
       <% end %>
 

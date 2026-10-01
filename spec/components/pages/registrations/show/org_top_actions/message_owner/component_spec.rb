@@ -91,6 +91,17 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
         expect(page).to have_css(".tw\\:hidden[data-registrations--show--message-owner-target='stolenNotification'] input[name='stolen_notification[reference_url]']", visible: :all)
       end
 
+      context "with an active parking notification" do
+        it "replaces the organization message form with a link to a new parking notification" do
+          render_inline(described_class.new(bike:, organization:, current_user:, active_parking_notification: true))
+
+          expect(page).to have_checked_field("General message", visible: :all)
+          expect(page).to have_css("[data-registrations--show--message-owner-target='organizationMessage'] button[data-panel-name='parking']", text: "Parking notification", visible: :all)
+          expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
+          expect(page).to have_css("textarea[name='stolen_notification[message]']", visible: :all)
+        end
+      end
+
       context "stolen" do
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, :with_stolen_record, user: owner, creation_organization: organization).reload }
 

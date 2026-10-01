@@ -6,11 +6,15 @@ en:
         show:
           org_top_actions:
             message_owner:
+              active_parking_notification: >-
+                This registration has an active Parking Notification. Send a new parking
+                notification to message the owner
               general_message: General message
               know_something_about_this_bike_type: Know something about this %{bike_type}?
               know_who_has_this_bike_type: Know who has this %{bike_type}?
               message_about_theft: Message about theft
               message_the_owner_of_this_bike_type: Message the owner of this %{bike_type}
+              parking_notification: Parking notification
               unavailable_not_registered_with_organization: General messages can only
                 be sent to registrations with %{organization_name}
               unavailable_phone_registration: Registered by phone, so there's no email
