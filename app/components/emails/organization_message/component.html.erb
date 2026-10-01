@@ -1,0 +1,13 @@
+<p>
+  <%= translation("sender_sent_you_a_message_html", sender_email:, organization_name:, link: link_to(bike.type, bike_url(bike))) %>
+</p>
+
+<div style="padding: 0.5rem 1rem; border: 1px solid #ccc; margin: 1rem 0 2rem;">
+  <%= simple_format(@organization_message.message) %>
+</div>
+
+<p class="less-strong">
+  <%= translation("reply_to_respond", sender_email:) %>
+</p>
+
+<%= render(Emails::Partials::BikeBox::Component.new(bike:, ownership: bike.current_ownership, bike_url_path: bike_url(bike))) %>

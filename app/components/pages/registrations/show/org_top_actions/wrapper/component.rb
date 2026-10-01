@@ -76,13 +76,25 @@ module Pages
               @bike.status_impounded?
             end
 
-            # What the submit answers to, so a panel this opens is one that's accepted.
             # Their own impound belongs to the update action below, not this one
             def contactable?
               return @contactable if defined?(@contactable)
 
-              @contactable = !impounded_by_organization? &&
-                @bike.contact_owner?(@current_user, @organization)
+              @contactable = !impounded_by_organization? && !@bike.unregistered_parking_notification? &&
+                (contact_owner? || owner_notifications_off?)
+            end
+
+            # What the submit answers to
+            def contact_owner?
+              return @contact_owner if defined?(@contact_owner)
+
+              @contact_owner = @bike.contact_owner?(@current_user, @organization)
+            end
+
+            # Only the owner's own setting stands between the viewer and contact_owner?
+            def owner_notifications_off?
+              !contact_owner? && @bike.owner.present? && !@bike.owner.notification_unstolen &&
+                @organization.enabled?("unstolen_notifications") && @current_user&.member_of?(@organization)
             end
 
             def show_impound?
@@ -111,6 +123,10 @@ module Pages
             # No point filing a new parking notification against an already-impounded bike
             def show_create_parking_notification?
               show_parking_notifications? && !impounded?
+            end
+
+            def active_parking_notification?
+              show_create_parking_notification? && active_notifications_count.positive?
             end
 
             def parking_notifications
