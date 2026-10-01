@@ -125,8 +125,7 @@ RSpec.describe SpamEstimator::User do
       end
 
       it "is above the spam threshold" do
-        expect(described_class.seo_spam_matches(user)).to eq({"buy revolut accounts" => 1,
-          "verified revolut accounts" => 1, "buy-verified-revolut-account" => 1})
+        expect(described_class.seo_spam_matches(user)).to eq({"buy" => 1, "verified" => 1, "buy verified" => 1})
         expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
       end
 

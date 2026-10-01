@@ -59,9 +59,11 @@ module SpamEstimator
       )\b | 18\+ |
       # spam usernames run it into digits (pills4cure), so a word boundary won't match
       (?<![a-z])pills?(?![a-z]) |
-      # account resellers ("Buy Verified Revolut Accounts"); the lookaheads keep "verified my account"
-      \bbuy[\s-]+(?:(?!(?:an?|the|my|your|our|their|his|her|with|from|on|in|through|via|using)\b)[a-z]+[\s-]+){1,3}accounts?\b |
-      \bverified[\s-]+(?!(?:an?|the|my|your|our|their|his|her)\b)[a-z]+[\s-]+accounts?\b |
+      # Account resellers ("Buy 100% Verified Revolut Accounts", buy_verified_revolut_accounts).
+      # Only the verb is matched, so a spam term in the brand slot still counts on its own;
+      # the stop words keep "verified both accounts" and "buy parts for wholesale accounts" out
+      (?<![a-z])buy[\s_-]*(?:\d+%?[\s_-]*)?verified |
+      (?<![a-z])(?:buy|verified)(?=[\s_-]*(?:\d+%?[\s_-]*)?(?:(?!(?:an?|the|this|that|these|those|its|my|your|our|their|his|her|both|all|and|or|for|to|with|from|on|in|via|using|now)(?![a-z]))[a-z]+[\s_-]*){0,3}accounts(?![a-z])) |
       # Gift-card "check your balance" farms run the brand together in usernames and
       # domains (mcgiftgiftcardmall3, vanillaprepaid.io), so these can't be \b-anchored.
       gift\s?(?:cards?|code) | prepaid |
@@ -89,7 +91,7 @@ module SpamEstimator
     def seo_spam_matches(str)
       return {} if str.blank?
 
-      strip_diacritics(str).scan(SEO_SPAM_REGEX).map { |term| term.downcase.gsub(/\s+/, " ") }.tally
+      strip_diacritics(str).scan(SEO_SPAM_REGEX).map { |term| term.downcase.gsub(/[\s_-]+/, " ") }.tally
     end
 
     # eariot are the most frequent letters - this could be incorporated into calculations
