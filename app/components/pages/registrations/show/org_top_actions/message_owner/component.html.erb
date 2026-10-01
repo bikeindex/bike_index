@@ -13,40 +13,40 @@
       <%= heading %>
     </h2>
 
-    <div data-controller="registrations--show--message-owner">
-      <div class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
-        <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "message_kind", selected: organization_message? ? "general" : "theft", entries: [{value: "theft", label: translation(".message_about_theft")}, {value: "general", label: translation(".general_message"), disabled: !organization_message?}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
+    <% if parking_notification_only? %>
+      <p class="tw:mt-3"><%= translation(".active_parking_notification") %></p>
 
-        <% if unavailable_reason_text %>
-          <%= render(UI::Tooltip::Component.new(text: unavailable_reason_text)) %>
-        <% end %>
+      <div class="tw:mt-3">
+        <%= render(UI::Button::Component.new(text: translation(".send_parking_notification"), color: :secondary, data: {"panel-name": "parking", action: "registrations--show--action-panels#toggle"})) %>
       </div>
+    <% else %>
+      <div data-controller="registrations--show--message-owner">
+        <div class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
+          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "message_kind", selected: organization_message? ? "general" : "theft", entries: [{value: "theft", label: translation(".message_about_theft")}, {value: "general", label: translation(".general_message"), disabled: !organization_message?}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
 
-      <% if organization_message? %>
-        <div
-          class="tw:mt-3"
-          data-registrations--show--message-owner-target="organizationMessage"
-        >
-          <% if @active_parking_notification %>
-            <p><%= translation(".active_parking_notification") %></p>
-
-            <div class="tw:mt-3">
-              <%= render(UI::Button::Component.new(text: translation(".parking_notification"), color: :primary, data: {"panel-name": "parking", action: "registrations--show--action-panels#toggle"})) %>
-            </div>
-          <% else %>
-            <%= render(Pages::Registrations::Show::OrgTopActions::OrganizationMessageForm::Component.new(bike: @bike, organization: @organization)) %>
+          <% if unavailable_reason_text %>
+            <%= render(UI::Tooltip::Component.new(text: unavailable_reason_text)) %>
           <% end %>
         </div>
-      <% end %>
 
-      <div
-        class="tw:mt-3 <%= "tw:hidden" if organization_message? %>"
-        data-registrations--show--message-owner-target="stolenNotification"
-      >
-        <%= render(Pages::Registrations::Show::StolenNotificationForm::Component.new(bike: @bike, placeholder: (translation(".what_do_you_need_to_ask", bike_type: @bike.type) if impounded?))) %>
+        <% if organization_message? %>
+          <div
+            class="tw:mt-3"
+            data-registrations--show--message-owner-target="organizationMessage"
+          >
+            <%= render(Pages::Registrations::Show::OrgTopActions::OrganizationMessageForm::Component.new(bike: @bike, organization: @organization)) %>
+          </div>
+        <% end %>
+
+        <div
+          class="tw:mt-3 <%= "tw:hidden" if organization_message? %>"
+          data-registrations--show--message-owner-target="stolenNotification"
+        >
+          <%= render(Pages::Registrations::Show::StolenNotificationForm::Component.new(bike: @bike, placeholder: (translation(".what_do_you_need_to_ask", bike_type: @bike.type) if impounded?))) %>
+        </div>
       </div>
-    </div>
 
-    <%= render(Pages::Registrations::Show::OwnerPhone::Component.new(phone: owner_phone)) %>
+      <%= render(Pages::Registrations::Show::OwnerPhone::Component.new(phone: owner_phone)) %>
+    <% end %>
   <% end %>
 </div>

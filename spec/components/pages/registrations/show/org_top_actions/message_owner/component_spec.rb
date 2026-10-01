@@ -92,13 +92,14 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
       end
 
       context "with an active parking notification" do
-        it "replaces the organization message form with a link to a new parking notification" do
+        it "only links to a new parking notification" do
           render_inline(described_class.new(bike:, organization:, current_user:, active_parking_notification: true))
 
-          expect(page).to have_checked_field("General message", visible: :all)
-          expect(page).to have_css("[data-registrations--show--message-owner-target='organizationMessage'] button[data-panel-name='parking']", text: "Parking notification", visible: :all)
-          expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
-          expect(page).to have_css("textarea[name='stolen_notification[message]']", visible: :all)
+          expect(page).to have_text("This registration has an active Parking Notification")
+          expect(page).to have_css("button[data-panel-name='parking']", text: "Send parking notification", visible: :all)
+          expect(page).to_not have_field("message_kind", visible: :all)
+          expect(page).to_not have_css("textarea", visible: :all)
+          expect(page).to_not have_text("Or call")
         end
       end
 

@@ -14,7 +14,7 @@ en:
               know_who_has_this_bike_type: Know who has this %{bike_type}?
               message_about_theft: Message about theft
               message_the_owner_of_this_bike_type: Message the owner of this %{bike_type}
-              parking_notification: Parking notification
+              send_parking_notification: Send parking notification
               unavailable_not_registered_with_organization: General messages can only
                 be sent to registrations with %{organization_name}
               unavailable_phone_registration: Registered by phone, so there's no email

@@ -29,6 +29,10 @@ module Pages
               unavailable_reason.nil?
             end
 
+            def parking_notification_only?
+              @active_parking_notification && organization_message?
+            end
+
             def unavailable_reason_text
               case unavailable_reason
               when :status
