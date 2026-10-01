@@ -19,6 +19,10 @@ RSpec.describe HandlebarType, type: :model do
       expect(HandlebarType.friendly_find("not-known-type")).to be_nil
     end
 
+    it "returns drop_bar for its slug" do
+      ["drop_bar", "drop-bar", :drop_bar].each { expect(HandlebarType.friendly_find(it).slug).to eq :drop_bar }
+    end
+
     it "returns horizontal for its names and former slugs" do
       ["horizontal", "Riser", " FLAT ", :flat, " BMX ", :bmx, "BMX style"].each do
         expect(HandlebarType.friendly_find(it).slug).to eq :horizontal
