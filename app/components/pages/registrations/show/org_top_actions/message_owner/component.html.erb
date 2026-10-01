@@ -14,7 +14,12 @@
     </h2>
 
     <% if parking_notification_only? %>
-      <p class="tw:mt-3"><%= translation(".active_parking_notification") %></p>
+      <p class="tw:mt-3">
+        <%= translation(".has_active_parking_notification") %>
+      </p>
+      <p>
+        <%= translation(".send_new_parking_notification_to_message_owner") %>
+      </p>
 
       <div class="tw:mt-3">
         <%= render(UI::Button::Component.new(text: translation(".send_parking_notification"), color: :secondary, data: {"panel-name": "parking", action: "registrations--show--action-panels#toggle"})) %>

@@ -141,7 +141,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
 
     it "points the message panel at a new parking notification" do
       expect(action_panels).to eq(%w[message impound parking notifications_show])
-      expect(page).to have_css("p", text: "This registration has an active Parking Notification. Send a new parking notification to message the owner", visible: :all)
+      expect(page.all("p", visible: :all).map { it.text.strip }).to include("This registration has an active Parking Notification.",
+        "Send a new parking notification to message the owner")
       expect(page).to have_css("button[data-panel-name='parking'][data-action='registrations--show--action-panels#toggle']", text: "Send parking notification", visible: :all)
       expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
       expect(page).to_not have_field("message_kind", visible: :all)
