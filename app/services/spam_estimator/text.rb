@@ -59,6 +59,9 @@ module SpamEstimator
       )\b | 18\+ |
       # spam usernames run it into digits (pills4cure), so a word boundary won't match
       (?<![a-z])pills?(?![a-z]) |
+      # account resellers ("Buy Verified Revolut Accounts"); the lookaheads keep "verified my account"
+      \bbuy[\s-]+(?:(?!(?:an?|the|my|your|our|their|his|her|with|from|on|in|through|via|using)\b)[a-z]+[\s-]+){1,3}accounts?\b |
+      \bverified[\s-]+(?!(?:an?|the|my|your|our|their|his|her)\b)[a-z]+[\s-]+accounts?\b |
       # Gift-card "check your balance" farms run the brand together in usernames and
       # domains (mcgiftgiftcardmall3, vanillaprepaid.io), so these can't be \b-anchored.
       gift\s?(?:cards?|code) | prepaid |
