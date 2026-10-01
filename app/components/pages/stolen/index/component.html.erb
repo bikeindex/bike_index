@@ -297,17 +297,20 @@
 
       <ul
         class="
-          tw:m-0 tw:mt-4 tw:grid tw:list-none tw:gap-4 tw:p-0
-          tw:sm:grid-cols-2 tw:lg:mt-6 tw:lg:grid-cols-4
+          tw:m-0 tw:-mx-5 tw:mt-4 tw:flex tw:snap-x tw:snap-mandatory
+          tw:scroll-px-5 tw:list-none tw:gap-4 tw:overflow-x-auto tw:p-0
+          tw:px-5 tw:sm:mx-0 tw:sm:grid tw:sm:grid-cols-2
+          tw:sm:overflow-visible tw:sm:px-0 tw:lg:mt-6 tw:lg:grid-cols-4
         "
       >
         <% @recovery_displays.each do |recovery_display| %>
           <li
             class="
-              tw:flex tw:flex-col tw:overflow-hidden tw:rounded-lg tw:border
-              tw:border-gray-200 tw:bg-white tw:transition-all
-              tw:duration-300 tw:hover:-translate-y-1.25
-              tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]
+              tw:flex tw:w-4/5 tw:shrink-0 tw:snap-start tw:flex-col
+              tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200
+              tw:bg-white tw:transition-all tw:duration-300
+              tw:hover:-translate-y-1.25
+              tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:sm:w-auto
             "
           >
             <%= image_tag(recovery_display.photo_url, alt: recovery_display.image_alt,
