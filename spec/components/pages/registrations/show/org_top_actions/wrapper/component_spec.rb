@@ -156,7 +156,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
     it "renders the message action, saying there's nothing to send" do
       expect(bike.contact_owner?(current_user, organization)).to be_falsey
       expect(action_panels).to eq(%w[message impound parking notifications_show])
-      expect(page).to have_css("p", text: "This User has turned off notifications for non-stolen vehicles", visible: :all)
+      expect(page).to have_css("p", text: "This User has turned off notifications for non-stolen vehicles.", visible: :all)
       expect(page).to_not have_field("message_kind", visible: :all)
       expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
     end
