@@ -1733,7 +1733,7 @@ RSpec.describe Bike, type: :model do
       bike.update(year: 1999, frame_material: "steel",
         secondary_frame_color_id: FactoryBot.create(:color).id,
         tertiary_frame_color_id: FactoryBot.create(:color).id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         propulsion_type: "throttle",
         cycle_type: "unicycle",
         frame_size: "56", frame_size_unit: "foo",

@@ -734,10 +734,9 @@ en:
         steel: Steel
         titanium: Titanium
       handlebar_type:
-        bmx: BMX style
         drop_bar: Drop bars
-        flat: Flat or riser
         forward: Forward facing
+        horizontal: Flat or riser (horizontal facing)
         other: Not handlebars
         rearward: Rear facing
       marketplace_listing:

@@ -215,7 +215,7 @@ RSpec.describe BikeServices::Creator do
             serial_number: "BIKE TOKENd",
             rear_tire_narrow: false,
             rear_wheel_size_id: wheel_size.id,
-            handlebar_type: "bmx",
+            handlebar_type: "forward",
             owner_email: "stuff@stuff.com",
             user_name: "Sally",
             address_record_attributes: {

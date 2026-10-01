@@ -879,12 +879,11 @@ nb:
         steel: Stål
         titanium: Titanium
       handlebar_type:
-        bmx: BMX stil
         drop_bar: Miste
-        flat: Flat eller stigerør
         forward: Forovervendt
         other: Ikke styre
         rearward: Bakovervendt
+        horizontal: Flat eller stigerør
       propulsion_type:
         foot_pedal: Fotpedal
         hand_pedal: Håndpedal
