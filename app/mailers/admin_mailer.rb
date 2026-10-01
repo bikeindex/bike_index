@@ -1,4 +1,6 @@
 class AdminMailer < ApplicationMailer
+  STOLEN_SERIAL_MATCH_EMAILS = %w[bryan@bikeindex.org gavin@bikeindex.org].freeze
+
   helper TranslationHelper
   helper ApplicationComponentHelper
 
@@ -37,6 +39,14 @@ class AdminMailer < ApplicationMailer
   def blocked_marketplace_message_email(marketplace_message)
     @marketplace_message = marketplace_message
     mail(subject: "Marketplace message blocked!")
+  end
+
+  def stolen_serial_marketplace_match_email(notification)
+    @listed_bike = notification.bike
+    @stolen_bike = notification.notifiable
+    @marketplace_listing = @listed_bike.current_marketplace_listing
+    mail(to: STOLEN_SERIAL_MATCH_EMAILS,
+      subject: "Marketplace listing's serial matches a stolen registration")
   end
 
   def unknown_organization_for_ascend_import(notification)

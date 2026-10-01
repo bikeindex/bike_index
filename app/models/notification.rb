@@ -115,7 +115,8 @@ class Notification < ApplicationRecord
     end
 
     def admin_kinds
-      %w[stolen_notification_blocked marketplace_message_blocked unknown_organization_for_ascend].freeze +
+      %w[stolen_notification_blocked marketplace_message_blocked unknown_organization_for_ascend
+        stolen_serial_marketplace_match].freeze +
         pos_integration_broken_kinds
     end
 
@@ -275,6 +276,7 @@ class Notification < ApplicationRecord
 
   def calculated_user_id
     return notifiable&.receiver_id if notifiable_type == "StolenNotification"
+    return if stolen_serial_marketplace_match? # notifiable is the stolen bike, not a recipient
 
     notifiable&.user_id if defined?(notifiable.user_id)
   end
