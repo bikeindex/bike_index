@@ -2784,6 +2784,42 @@ ALTER SEQUENCE public.organization_manufacturers_id_seq OWNED BY public.organiza
 
 
 --
+-- Name: organization_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_messages (
+    id bigint NOT NULL,
+    bike_id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    sender_id bigint NOT NULL,
+    receiver_id bigint,
+    receiver_email character varying,
+    message text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_messages_id_seq OWNED BY public.organization_messages.id;
+
+
+--
 -- Name: organization_model_audits; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -5006,6 +5042,13 @@ ALTER TABLE ONLY public.organization_manufacturers ALTER COLUMN id SET DEFAULT n
 
 
 --
+-- Name: organization_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_messages ALTER COLUMN id SET DEFAULT nextval('public.organization_messages_id_seq'::regclass);
+
+
+--
 -- Name: organization_model_audits id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5858,6 +5901,14 @@ ALTER TABLE ONLY public.organization_landing_pages
 
 ALTER TABLE ONLY public.organization_manufacturers
     ADD CONSTRAINT organization_manufacturers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_messages organization_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_messages
+    ADD CONSTRAINT organization_messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -7148,6 +7199,34 @@ CREATE INDEX index_organization_manufacturers_on_organization_id ON public.organ
 
 
 --
+-- Name: index_organization_messages_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_bike_id ON public.organization_messages USING btree (bike_id);
+
+
+--
+-- Name: index_organization_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_organization_id ON public.organization_messages USING btree (organization_id);
+
+
+--
+-- Name: index_organization_messages_on_receiver_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_receiver_id ON public.organization_messages USING btree (receiver_id);
+
+
+--
+-- Name: index_organization_messages_on_sender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_sender_id ON public.organization_messages USING btree (sender_id);
+
+
+--
 -- Name: index_organization_model_audits_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7823,6 +7902,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260926005700'),
+('20260925220034'),
 ('20260915181500'),
 ('20260915110042'),
 ('20260912102406'),

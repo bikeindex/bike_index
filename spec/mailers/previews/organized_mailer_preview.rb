@@ -44,6 +44,11 @@ class OrganizedMailerPreview < ActionMailer::Preview
     OrganizedMailer.organization_invitation(role)
   end
 
+  def organization_message(organization_message_id: params[:organization_message_id])
+    message = organization_message_id ? OrganizationMessage.find(organization_message_id) : OrganizationMessage.last
+    OrganizedMailer.organization_message(message)
+  end
+
   def parking_notification(parking_notification_id: params[:parking_notification_id])
     notification = parking_notification_id ? ParkingNotification.find(parking_notification_id) : ParkingNotification.send_email.last
     OrganizedMailer.parking_notification(notification)
