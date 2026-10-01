@@ -880,10 +880,10 @@ nb:
         titanium: Titanium
       handlebar_type:
         drop_bar: Miste
-        flat: Flat eller stigerør
         forward: Forovervendt
         other: Ikke styre
         rearward: Bakovervendt
+        horizontal: Flat eller stigerør
       propulsion_type:
         foot_pedal: Fotpedal
         hand_pedal: Håndpedal
@@ -2363,6 +2363,10 @@ nb:
         available_impound_records:
           we_dont_know_location: Beklager, vi vet ikke hvor «%{location}» ligger.
             Prøv en annen plassering.
+      organization_messages:
+        create:
+          sent: Melding sendt til eieren
+          unable_to_send: Kan ikke sende – %{errors}
     ownerships:
       show:
         no_longer_your_bike: Det pleide å være din %{bike_type}, men er det ikke lenger!
@@ -4714,6 +4718,8 @@ nb:
       subject: Fullfør rapporteringen av funnet %{cycle_type}
     partial_register_confirmation_stolen:
       subject: Fullfør rapporteringen av stjålet %{cycle_type}
+    organization_message:
+      subject: Melding fra %{organization_name} om din %{bike_type}
   payments:
     form:
       donation_header: Bidra til å støtte vår innsats!
@@ -5316,6 +5322,12 @@ nb:
           den. Den fungerer i %{days} dager.
         we_saved_your_registration_html: Vi lagret registreringen din for en <strong>%{color_and_brand}</strong>
           i verdens mest omfattende sykkelregister.
+      organization_message:
+        reply_to_respond: Svar på denne e-posten for å svare på %{sender_email}.
+        sender_sent_you_a_message: "%{sender_email} fra %{organization_name} sendte
+          deg en melding om din %{bike_type}:"
+        sender_sent_you_a_message_html: "%{sender_email} fra %{organization_name}
+          sendte deg en melding om din %{link}:"
     ui:
       definition_list:
         row:
@@ -5708,10 +5720,6 @@ nb:
           contact_owner:
             contact_the_owner: Kontakt eieren
             know_something_about_this_bike_type: Vet du noe om dette %{bike_type}?
-            link_url: Link url
-            send_message: Sende melding
-            where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
-              om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
           current_alerts:
             claim_impound:
               add_a_stolen_bike: legg til en stjålet %{bike_type}
@@ -5811,14 +5819,25 @@ nb:
               title: Oppdater beslagsregister
             message_owner:
               know_something_about_this_bike_type: Vet du noe om dette %{bike_type}?
-              link_url: Link url
-              send_message: Sende melding
-              where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du
-                kontakter om en annonse du fant på nettet, inkluderer du en lenke
-                i feltet nedenfor
               know_who_has_this_bike_type: Vet du hvem som har denne %{bike_type}?
               what_do_you_need_to_ask: Hva trenger du å spørre om om dette %{bike_type}?
                 Legg inn en lenke i feltet nedenfor hvis det finnes en som kan hjelpe.
+              general_message: Generell melding
+              has_active_parking_notification: Denne registreringen har et aktivt
+                parkeringsvarsel.
+              message_about_theft: Melding om tyveri
+              message_the_owner_of_this_bike_type: Send melding til eieren av dette
+                %{bike_type}
+              owner_turned_off_non_stolen_notifications: Denne brukeren har slått
+                av varsler for ikke-stjålne kjøretøy.
+              send_a_new_parking_notification_to_message_the_owner: 'Send et nytt
+                parkeringsvarsel for å sende melding til eieren:'
+              send_parking_notification: Send parkeringsvarsel
+              unavailable_phone_registration: Registrert via telefon, så det er ingen
+                e-postadresse å sende til
+              unavailable_status: Generelle meldinger kan ikke sendes til %{status}
+              unavailable_vehicle_not_registered_with_organization: Generelle meldinger
+                kan bare sendes til kjøretøy registrert med %{organization_name}
             parking_notification_form:
               address_or_intersection: Adresse eller veikryss
               create_parking_notification: Opprett et nytt parkeringsvarsel
@@ -5841,6 +5860,10 @@ nb:
               view_notifications: Vis varsler
               view_notifications_active_html: "<strong>%{count}</strong> Aktiv"
               view_notifications_resolved_html: "<strong>%{count}</strong> Løst"
+            organization_message_form:
+              send_message: Sende melding
+              what_do_you_want_to_tell_the_owner: Hva vil du si til eieren av denne
+                %{bike_type}?
           owner_phone:
             or_call: Eller ring
           photos:
@@ -5951,6 +5974,11 @@ nb:
             updated_by: Oppdatert av %{user}
           subtitle:
             nickname: 'kallenavn: %{name}'
+          stolen_notification_form:
+            link_url: Link url
+            send_message: Sende melding
+            where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
+              om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
       search:
         everything_combobox:
           made_by: laget av

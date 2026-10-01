@@ -50,6 +50,10 @@ module BikeServices
         @bike.propulsion_type_slug = update_attrs["propulsion_type"] || update_attrs["propulsion_type_slug"] || @bike.propulsion_type
         update_attrs = update_attrs.except(*propulsion_updates)
       end
+      # Forms rendered before a slug rename still submit the former slug
+      if update_attrs.key?("handlebar_type")
+        update_attrs["handlebar_type"] = HandlebarType.find_sym(update_attrs["handlebar_type"])
+      end
 
       if @bike.update(update_attrs.merge(self.class.updator_attrs(@user)))
         BikeServices::StolenRecordUpdator.new(bike: @bike, b_param: BParam.new(params: @bike_params))
