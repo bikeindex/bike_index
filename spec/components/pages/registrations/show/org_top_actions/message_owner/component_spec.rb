@@ -11,7 +11,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
     render_inline(described_class.new(bike:, organization:, current_user:))
 
     expect(page).to have_text("Know something about this bike")
-    expect(page.all("input[name='message_kind']", visible: :all).map(&:value)).to eq(%w[theft general])
+    expect(page.all("input[type='radio']", visible: :all).map(&:value)).to eq(%w[theft general])
     expect(page).to have_checked_field("Message about theft", visible: :all)
     expect(page).to have_field("General message", disabled: true, visible: :all)
     expect(page).to have_css("[role='tooltip']", text: "General messages can only be sent to vehicles registered with #{organization.short_name}", visible: :all)
@@ -19,6 +19,17 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
     expect(page).to have_css("input[name='stolen_notification[bike_id]'][value='#{bike.id}']", visible: :all)
     expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
     expect(page).not_to have_text("Or call")
+  end
+
+  # Previews stack several panels on a page, and radios outside a form group by name page-wide
+  it "names each panel's radios apart, so each keeps its own selection" do
+    names = Array.new(2) do
+      render_inline(described_class.new(bike:, organization:, current_user:))
+      page.all("input[type='radio']", visible: :all).map { it[:name] }.uniq
+    end
+
+    expect(names.map(&:count)).to eq [1, 1]
+    expect(names.flatten.uniq.count).to eq 2
   end
 
   context "with a stolen bike" do
@@ -95,8 +106,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
         it "only says so" do
           render_inline(described_class.new(bike:, organization:, current_user:, owner_notifications_off: true, active_parking_notification: true))
 
-          expect(page).to have_css("p", text: "This User has turned off notifications for non-stolen vehicles.", visible: :all)
-          expect(page).to_not have_field("message_kind", visible: :all)
+          expect(page).to have_css("p", text: "This user has turned off notifications for non-stolen vehicles.", visible: :all)
+          expect(page).to_not have_css("input[type='radio']", visible: :all)
           expect(page).to_not have_css("textarea", visible: :all)
           expect(page).to_not have_button("Send parking notification", visible: :all)
           expect(page).to_not have_text("Or call")
@@ -109,7 +120,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::MessageOwner::Componen
 
           expect(page).to have_text("This registration has an active Parking Notification")
           expect(page).to have_css("button[data-panel-name='parking']", text: "Send parking notification", visible: :all)
-          expect(page).to_not have_field("message_kind", visible: :all)
+          expect(page).to_not have_css("input[type='radio']", visible: :all)
           expect(page).to_not have_css("textarea", visible: :all)
           expect(page).to_not have_text("Or call")
         end

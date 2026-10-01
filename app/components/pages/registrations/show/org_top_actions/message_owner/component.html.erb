@@ -15,7 +15,7 @@
 
     <% if @owner_notifications_off %>
       <p class="tw:mt-3">
-        <%= translation(".owner_has_turned_off_notifications") %>
+        <%= translation(".owner_turned_off_non_stolen_notifications") %>
       </p>
     <% elsif parking_notification_only? %>
       <p class="tw:mt-3">
@@ -31,7 +31,7 @@
     <% else %>
       <div data-controller="registrations--show--message-owner">
         <div class="tw:mt-3 tw:flex tw:items-center tw:gap-2">
-          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "message_kind", selected: organization_message? ? "general" : "theft", entries: [{value: "theft", label: translation(".message_about_theft")}, {value: "general", label: translation(".general_message"), disabled: !organization_message?}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
+          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: message_kind_name, selected: organization_message? ? "general" : "theft", entries: [{value: "theft", label: translation(".message_about_theft")}, {value: "general", label: translation(".general_message"), disabled: !organization_message?}], html_options: {data: {action: "registrations--show--message-owner#select"}})) %>
 
           <% if unavailable_reason_text %>
             <%= render(UI::Tooltip::Component.new(text: unavailable_reason_text)) %>

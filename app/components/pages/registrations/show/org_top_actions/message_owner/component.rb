@@ -31,6 +31,11 @@ module Pages
               unavailable_reason.nil?
             end
 
+            # The radios sit outside any form, so a shared name would group every panel on the page
+            def message_kind_name
+              @message_kind_name ||= "message_kind_#{SecureRandom.hex(4)}"
+            end
+
             def parking_notification_only?
               @active_parking_notification && organization_message?
             end
