@@ -23,7 +23,7 @@ module Pages
                 "Impounded" => component(impounded_bike),
                 "Unregistered parking notification" => component(preview_bike(:unregistered_parking_notification)),
                 "With parking notification" => component(bike_with_parking_notification),
-                "Limited (non-staff) member" => component(preview_bike(:status_with_owner), org_role: :limited),
+                "Limited (non-staff) member" => component(organization_bike, org_role: :limited),
                 "No features" => component(preview_bike(:status_with_owner), organization: ::Organization.new(short_name: "Preview", enabled_feature_slugs: []))
               }
             end
@@ -48,6 +48,12 @@ module Pages
               preview_bike(:status_impounded).tap do |bike|
                 bike.current_impound_record = ::ImpoundRecord.new(organization_id: lookbook_organization.id, display_id: "0001")
               end
+            end
+
+            # organized? plucks bike_organizations, so an in-memory bike can't be registered with the org
+            def organization_bike
+              lookbook_organization.bikes.status_with_owner.where(is_phone: false)
+                .detect { it.contact_owner?(lookbook_user, lookbook_organization) } || preview_bike(:status_with_owner)
             end
 
             # A live count and the notification panel are DB queries, so this variety
