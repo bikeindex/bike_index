@@ -5,31 +5,37 @@ module Pages
     module Show
       module OrgTopActions
         module Wrapper
-          # One page stacking every action-button setup. Each variety is an in-memory
-          # bike rendered against the persisted lookbook_organization (a featureless
-          # org for the no-features case), so nothing is written to the database
+          # One page per org role, stacking every action-button setup against the persisted
+          # lookbook_organization (a featureless org for the no-features case). Nothing is
+          # written to the database
           class ComponentPreview < ApplicationComponentPreview
-            def default
-              render_with_template(template: "pages/registrations/show/org_top_actions/wrapper/preview/default",
-                locals: {scenarios:})
+            def staff
+              render_scenarios(org_role: :staff)
+            end
+
+            def limited
+              render_scenarios(org_role: :limited)
             end
 
             private
 
-            def scenarios
-              {
-                "With owner" => component(preview_bike(:status_with_owner)),
-                "Stolen" => component(stolen_bike),
-                "Impounded" => component(impounded_bike),
-                "Unregistered parking notification" => component(preview_bike(:unregistered_parking_notification)),
-                "With parking notification" => component(bike_with_parking_notification),
-                "Limited (non-staff) member" => component(organization_bike, org_role: :limited),
-                "No features" => component(preview_bike(:status_with_owner), organization: ::Organization.new(short_name: "Preview", enabled_feature_slugs: []))
-              }
+            def render_scenarios(org_role:)
+              render_with_template(template: "pages/registrations/show/org_top_actions/wrapper/preview/scenarios",
+                locals: {scenarios: scenarios(org_role:)})
             end
 
-            def component(bike, org_role: :staff, organization: lookbook_organization)
-              Component.new(bike:, organization:, org_role:, current_user: lookbook_user)
+            def scenarios(org_role:)
+              component = ->(bike, organization: lookbook_organization) { Component.new(bike:, organization:, org_role:, current_user: lookbook_user) }
+              {
+                "With owner" => component.call(organization_bike),
+                "With owner not organization registration" => component.call(preview_bike(:status_with_owner)),
+                "With owner, notification unstolen off" => component.call(notification_unstolen_off_bike),
+                "Stolen" => component.call(stolen_bike),
+                "Impounded" => component.call(impounded_bike),
+                "Unregistered parking notification" => component.call(preview_bike(:unregistered_parking_notification)),
+                "With parking notification" => component.call(bike_with_parking_notification),
+                "No features" => component.call(preview_bike(:status_with_owner), organization: ::Organization.new(short_name: "Preview", enabled_feature_slugs: []))
+              }
             end
 
             # An unclaimed bike has no owner to message, and contact_owner? reads one
@@ -54,6 +60,13 @@ module Pages
             def organization_bike
               lookbook_organization.bikes.status_with_owner.where(is_phone: false)
                 .detect { it.contact_owner?(lookbook_user, lookbook_organization) } || preview_bike(:status_with_owner)
+            end
+
+            # A real registration, so organized? holds - assigning the belongs_to saves nothing
+            def notification_unstolen_off_bike
+              organization_bike.tap do |bike|
+                bike.current_ownership = ::Ownership.new(claimed: true, user: ::User.new(notification_unstolen: false))
+              end
             end
 
             # A live count and the notification panel are DB queries, so this variety
