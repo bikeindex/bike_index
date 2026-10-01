@@ -41,16 +41,17 @@ RSpec.describe OrganizationMessage, type: :model do
 
     context "stolen" do
       let(:bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
-      it "is stolen" do
-        expect(OrganizationMessage.unavailable_reason(bike: bike.reload, organization:)).to eq :stolen
-        expect(OrganizationMessage.for?(bike:, organization:)).to be_falsey
+      it "is available" do
+        expect(bike.reload.status).to eq "status_stolen"
+        expect(OrganizationMessage.unavailable_reason(bike:, organization:)).to be_nil
       end
     end
 
     context "impounded" do
       let(:bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization) }
-      it "is not with owner" do
-        expect(OrganizationMessage.unavailable_reason(bike: bike.reload, organization:)).to eq :not_with_owner
+      it "is status" do
+        expect(OrganizationMessage.unavailable_reason(bike: bike.reload, organization:)).to eq :status
+        expect(OrganizationMessage.for?(bike:, organization:)).to be_falsey
       end
     end
 

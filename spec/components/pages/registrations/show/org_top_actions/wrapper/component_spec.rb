@@ -135,6 +135,16 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
   end
 
   # The panel keeps the sighting question - the org is the one who saw it sitting there
+  context "an unregistered parking notification" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "bike", user: owner, status: "unregistered_parking_notification").reload }
+
+    it "renders no message action" do
+      expect(bike.contact_owner?(current_user, organization)).to be_truthy
+      expect(action_panels).to_not include("message")
+      expect(page).to_not have_button("Message Owner")
+    end
+  end
+
   context "when abandoned, viewed by a trusted organization's staff" do
     let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, status: :status_abandoned, user: owner).reload }

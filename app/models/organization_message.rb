@@ -40,10 +40,8 @@ class OrganizationMessage < ApplicationRecord
 
   # A phone registration's owner_email is the phone number, so there's nothing to email
   def self.unavailable_reason(bike:, organization:)
-    if bike.status_stolen?
-      :stolen
-    elsif !bike.status_with_owner?
-      :not_with_owner
+    if !bike.status_with_owner? && !bike.status_stolen?
+      :status
     elsif bike.phone_registration?
       :phone_registration
     elsif !bike.organized?(organization)

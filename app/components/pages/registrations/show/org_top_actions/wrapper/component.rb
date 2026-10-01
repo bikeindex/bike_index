@@ -81,7 +81,7 @@ module Pages
             def contactable?
               return @contactable if defined?(@contactable)
 
-              @contactable = !impounded_by_organization? &&
+              @contactable = !impounded_by_organization? && !@bike.unregistered_parking_notification? &&
                 @bike.contact_owner?(@current_user, @organization)
             end
 

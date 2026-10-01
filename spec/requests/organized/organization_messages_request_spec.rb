@@ -48,12 +48,12 @@ RSpec.describe Organized::OrganizationMessagesController, type: :request do
 
     context "stolen bike" do
       let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: owner, creation_organization: current_organization) }
-      it "doesn't create" do
+      it "creates" do
         expect(bike.reload.organized?(current_organization)).to be_truthy
         expect {
           post base_url, params:
-        }.to_not change(OrganizationMessage, :count)
-        expect(flash[:error]).to be_present
+        }.to change(OrganizationMessage, :count).by(1)
+        expect(flash[:success]).to be_present
       end
     end
   end

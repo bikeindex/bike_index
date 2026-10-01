@@ -11,13 +11,11 @@ en:
               know_who_has_this_bike_type: Know who has this %{bike_type}?
               message_about_theft: Message about theft
               message_the_owner_of_this_bike_type: Message the owner of this %{bike_type}
-              unavailable_not_registered_with_organization: Only for registrations
-                with %{organization_name}
-              unavailable_not_with_owner: Not available while this %{bike_type} isn't
-                with its owner
+              unavailable_not_registered_with_organization: General messages can only
+                be sent to registrations with %{organization_name}
               unavailable_phone_registration: Registered by phone, so there's no email
                 to send to
-              unavailable_stolen: Not available for a stolen %{bike_type}
+              unavailable_status: General messages aren't available to send to %{status}
               what_do_you_need_to_ask: >-
                 What do you need to ask about this %{bike_type}? Include a link in
                 the field below if there's one that helps

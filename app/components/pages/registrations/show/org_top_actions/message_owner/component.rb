@@ -29,10 +29,8 @@ module Pages
 
             def unavailable_reason_text
               case unavailable_reason
-              when :stolen
-                translation(".unavailable_stolen", bike_type: @bike.type)
-              when :not_with_owner
-                translation(".unavailable_not_with_owner", bike_type: @bike.type)
+              when :status
+                translation(".unavailable_status", status: @bike.status_humanized_translated)
               when :phone_registration
                 translation(".unavailable_phone_registration")
               when :not_registered_with_organization
