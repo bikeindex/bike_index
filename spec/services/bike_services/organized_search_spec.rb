@@ -116,6 +116,16 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.status(Bike.all, "stolen_or_impounded").pluck(:id)).to match_array([bike_stolen.id, bike_impounded.id])
       expect(described_class.status(Bike.all, "all").count).to eq 3
 
+      bike_hidden_impounded = FactoryBot.create(:bike, :impounded, user_hidden: true)
+      FactoryBot.create(:bike, :with_stolen_record, user_hidden: true)
+      expect(described_class.status(Bike.all, "impounded").pluck(:id)).to eq([bike_impounded.id])
+      expect(described_class.status(Bike.all, "impounded", organization_bikes: true).pluck(:id))
+        .to match_array([bike_impounded.id, bike_hidden_impounded.id])
+      expect(described_class.status(Bike.all, "stolen_or_impounded", organization_bikes: true).pluck(:id))
+        .to match_array([bike_stolen.id, bike_impounded.id, bike_hidden_impounded.id])
+      expect(described_class.status(Bike.all, "all").count).to eq 3
+      expect(described_class.status(Bike.all, "all", organization_bikes: true).count).to eq 4
+
       # The panel offers street; none and with still arrive from older links
       expect(described_class.address(Bike.all, "none").to_sql).to_not eq(Bike.all.to_sql)
       expect(described_class.address(Bike.all, "with").to_sql).to_not eq(Bike.all.to_sql)
