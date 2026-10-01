@@ -296,7 +296,7 @@ it after any navigation into a jQuery-driven control.
 began — so a `fill_in` landing in that frame types into the field before it (the failure reads as
 one field empty and its neighbour holding both values). A multiselect pick's chip is one such
 stream: wait for it, as `combobox_select` in `spec/components/pages/search/form/component_system_spec.rb`
-does. An async combobox pick sends a filter request whose response lands pages of steps later;
+does. An async combobox pick sends a filter request whose response can land several steps later;
 `click_combobox_option` waits that one out.
 
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
