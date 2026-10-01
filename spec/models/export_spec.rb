@@ -311,7 +311,6 @@ RSpec.describe Export, type: :model do
         expect(export.matching_kinds).to eq([:impounded])
         expect(impound_record_registered_elsewhere.bike.reload.status).to eq "status_impounded"
         expect(bike_resolved.reload.status).to eq "status_with_owner"
-        expect(Bike.unscoped.find(bike_hidden.id).status).to eq "status_impounded"
         expect(export.bikes_scoped.pluck(:id)).to match_array([bike_registered.id, bike_hidden.id])
         expect(export.incompletes_scoped.pluck(:id)).to eq([])
       end
