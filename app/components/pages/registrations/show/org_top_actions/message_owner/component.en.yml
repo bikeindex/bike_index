@@ -13,8 +13,8 @@ en:
               know_who_has_this_bike_type: Know who has this %{bike_type}?
               message_about_theft: Message about theft
               message_the_owner_of_this_bike_type: Message the owner of this %{bike_type}
-              send_new_parking_notification_to_message_owner: Send a new parking notification
-                to message the owner
+              send_a_new_parking_notification_to_message_the_owner: 'Send a new parking
+                notification to message the owner:'
               send_parking_notification: Send parking notification
               unavailable_phone_registration: Registered by phone, so there's no email
                 to send to
