@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    emails:
+      organization_message:
+        reply_to_respond: Reply to this email to respond to %{sender_email}.
+        sender_sent_you_a_message: >-
+          %{sender_email} from %{organization_name} sent you a message about your
+          %{bike_type}:
+        sender_sent_you_a_message_html: "%{sender_email} from %{organization_name}
+          sent you a message about your %{link}:"

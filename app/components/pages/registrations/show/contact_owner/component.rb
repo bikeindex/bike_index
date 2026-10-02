@@ -20,10 +20,6 @@ module Pages
 
           private
 
-          def stolen_notification
-            @stolen_notification ||= StolenNotification.new(bike: @bike)
-          end
-
           # Logged-out viewers are sent to sign-in and returned with the form open
           def sign_in_redirect
             return if @current_user.present?

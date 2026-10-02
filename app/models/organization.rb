@@ -122,6 +122,7 @@ class Organization < ApplicationRecord
   has_many :invoices
   has_many :payments
   has_many :graduated_notifications
+  has_many :organization_messages
   has_many :organization_statuses
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
