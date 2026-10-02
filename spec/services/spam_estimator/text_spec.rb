@@ -260,18 +260,23 @@ RSpec.describe SpamEstimator::Text do
 
     it "counts account resellers, however they join the words" do
       {
-        "Buy 100% verified accounts" => {"buy 100% verified" => 1},
-        "Aged verified cash app accounts for sale" => {"verified" => 1},
-        "buy_verified_revolut_accounts" => {"buy verified" => 1},
-        "buyverifiedrevolutaccounts" => {"buyverified" => 1},
-        "buy bitcoin casino accounts" => {"buy" => 1, "bitcoin" => 1, "casino" => 1}
+        "Buy 100% verified accounts" => {"buy 100% verified accounts" => 1},
+        "Aged verified cash app accounts for sale" => {"verified cash app accounts" => 1},
+        "buy-verified-revolut-account" => {"buy verified" => 1},
+        "buyverifiedrevolutaccounts" => {"buyverifiedrevolutaccounts" => 1},
+        "buy bitcoin casino accounts" => {"bitcoin" => 1, "casino" => 1, "buy bitcoin casino accounts" => 1}
       }.each { |text, matches| expect(described_class.seo_spam_matches(text)).to eq(matches) }
+    end
+
+    # inside SEO_SPAM_REGEX it backtracked past Regexp.timeout on "buy" + 1,000 letters
+    it "matches account resellers in linear time" do
+      expect(Regexp.linear_time?(described_class::ACCOUNT_RESELLER_REGEX)).to be true
     end
 
     it "doesn't count ordinary talk of buying or verified accounts" do
       ["Verified seller account on eBay", "Follow my verified Strava account", "We buy parts for wholesale accounts.",
         "Buy and sell accounts", "Buy now pay later account", "I verified this account last week",
-        "I verified both accounts"].each do |text|
+        "I verified both accounts", "I verified my account", "Buy the bike with your account credit."].each do |text|
         expect(described_class.seo_spam_matches(text)).to eq({})
       end
     end

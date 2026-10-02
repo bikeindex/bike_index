@@ -59,11 +59,6 @@ module SpamEstimator
       )\b | 18\+ |
       # spam usernames run it into digits (pills4cure), so a word boundary won't match
       (?<![a-z])pills?(?![a-z]) |
-      # Account resellers ("Buy 100% Verified Revolut Accounts", buy_verified_revolut_accounts).
-      # Only the verb is matched, so a spam term in the brand slot still counts on its own;
-      # the stop words keep "verified both accounts" and "buy parts for wholesale accounts" out
-      (?<![a-z])buy[\s_-]*(?:\d+%?[\s_-]*)?verified |
-      (?<![a-z])(?:buy|verified)(?=[\s_-]*(?:\d+%?[\s_-]*)?(?:(?!(?:an?|the|this|that|these|those|its|my|your|our|their|his|her|both|all|and|or|for|to|with|from|on|in|via|using|now)(?![a-z]))[a-z]+[\s_-]*){0,3}accounts(?![a-z])) |
       # Gift-card "check your balance" farms run the brand together in usernames and
       # domains (mcgiftgiftcardmall3, vanillaprepaid.io), so these can't be \b-anchored.
       gift\s?(?:cards?|code) | prepaid |
@@ -74,6 +69,15 @@ module SpamEstimator
       card\s?activation | activate\s+(?:my\s|your\s|the\s)?(?:gift\s?)?card |
       redeem\s+(?:code|card) |
       #{PHARMACY_REGEX}
+    )/xi
+
+    # Scanned on its own, so a spam term in the brand slot ("buy bitcoin accounts") still counts,
+    # and so the nested repetition stays linear-time, which SEO_SPAM_REGEX isn't
+    ACCOUNT_RESELLER_REGEX = /(?<![a-z])(?:
+      (?:buy|verified)[\s_-]*(?:\d+%?[\s_-]*)?
+        (?:(?!(?:an?|the|these|those|my|your|our|their|both|all|and|or|for|to|with|from)(?![a-z]))[a-z]+[\s_-]*){0,3}
+        accounts(?![a-z]) |
+      buy[\s_-]*(?:\d+%?[\s_-]*)?verified
     )/xi
 
     def looks_malicious?(str)
@@ -91,7 +95,9 @@ module SpamEstimator
     def seo_spam_matches(str)
       return {} if str.blank?
 
-      strip_diacritics(str).scan(SEO_SPAM_REGEX).map { |term| term.downcase.gsub(/[\s_-]+/, " ") }.tally
+      text = strip_diacritics(str)
+      [SEO_SPAM_REGEX, ACCOUNT_RESELLER_REGEX].flat_map { text.scan(it) }
+        .map { |term| term.downcase.gsub(/[\s_-]+/, " ") }.tally
     end
 
     # eariot are the most frequent letters - this could be incorporated into calculations
