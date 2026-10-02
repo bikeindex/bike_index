@@ -85,7 +85,8 @@ class OrganizedMailer < ApplicationMailer
     I18n.with_locale(organization_message.receiver&.preferred_language) do
       mail(reply_to: organization_message.sender.email,
         to: organization_message.receiver_email,
-        subject: default_i18n_subject(organization_name: @organization.short_name, bike_type: organization_message.bike.type),
+        subject: organization_message.mail_snippet&.subject.presence ||
+          default_i18n_subject(organization_name: @organization.short_name, bike_type: organization_message.bike.type),
         tag: __callee__) do |format|
         render_html_and_text(format, Emails::OrganizationMessage::Component, organization_message:)
       end

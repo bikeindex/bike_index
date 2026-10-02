@@ -11,7 +11,15 @@ RSpec.describe OrganizationMessage, type: :model do
       expect {
         expect(organization_message.save).to be_truthy
       }.to change(EmailJobs::OrganizationMessageJob.jobs, :count).by(1)
-      expect(organization_message).to have_attributes(receiver_id: nil, receiver_email: "owner@bikeindex.org")
+      expect(organization_message).to have_attributes(receiver_id: nil, receiver_email: "owner@bikeindex.org", kind: "general_message")
+    end
+
+    context "unknown kind" do
+      it "is invalid" do
+        organization_message.kind = "e_vehicle_policy_message"
+        expect(organization_message.save).to be_falsey
+        expect(organization_message.errors.full_messages).to eq(["Kind is not included in the list"])
+      end
     end
 
     context "phone registration" do
@@ -28,6 +36,22 @@ RSpec.describe OrganizationMessage, type: :model do
       it "is invalid" do
         expect(organization_message.save).to be_falsey
         expect(organization_message.errors.full_messages).to eq(["sender can't message the owner of this bike"])
+      end
+    end
+  end
+
+  describe "mail_snippet" do
+    let!(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, kind: "general_message", organization:, is_enabled:) }
+    let(:is_enabled) { true }
+    it "is the organization's enabled snippet of the kind" do
+      expect(organization_message.mail_snippet).to eq mail_snippet
+      expect(OrganizationMessage.new(organization: FactoryBot.create(:organization)).mail_snippet).to be_nil
+    end
+
+    context "disabled" do
+      let(:is_enabled) { false }
+      it "is nil" do
+        expect(organization_message.mail_snippet).to be_nil
       end
     end
   end

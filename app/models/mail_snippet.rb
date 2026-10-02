@@ -37,7 +37,8 @@ class MailSnippet < ApplicationRecord
     theft_survey_2023: 15,
     stolen_notification_oauth: 16,
     newsletter: 17,
-    tempo: 19
+    tempo: 19,
+    general_message: 20
   }.freeze
 
   enum :kind, KIND_ENUM
@@ -108,11 +109,12 @@ class MailSnippet < ApplicationRecord
     def organization_emails_with_snippets
       # Worth noting: no snippet is named "finished_registration"
       ParkingNotification.kinds + %w[finished_registration finished_registration_stolen partial_registration
-        graduated_notification impound_claim_approved impound_claim_denied]
+        graduated_notification impound_claim_approved impound_claim_denied] + OrganizationMessage.kinds.keys
     end
 
     def organization_message_kinds
-      ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved]
+      ParkingNotification.kinds + %w[graduated_notification impound_claim_denied impound_claim_approved] +
+        OrganizationMessage.kinds.keys
     end
 
     # With `time`, reifies the snippet via paper_trail (including destroyed ones).

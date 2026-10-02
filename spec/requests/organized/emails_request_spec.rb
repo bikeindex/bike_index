@@ -6,9 +6,9 @@ RSpec.describe Organized::EmailsController, type: :request do
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
   let(:all_viewable_email_kinds) do
     %w[finished_registration partial_registration appears_abandoned_notification parked_incorrectly_notification graduated_notification
-      other_parking_notification impound_notification impound_claim_approved impound_claim_denied organization_stolen_message]
+      other_parking_notification impound_notification impound_claim_approved impound_claim_denied organization_stolen_message general_message]
   end
-  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes organization_stolen_message] }
+  let(:enabled_feature_slugs) { %w[show_partial_registrations parking_notifications graduated_notifications customize_emails impound_bikes organization_stolen_message unstolen_notifications] }
 
   context "logged_in_as_organization_user" do
     include_context :request_spec_logged_in_as_organization_user
@@ -204,6 +204,21 @@ RSpec.describe Organized::EmailsController, type: :request do
             get "#{base_url}/graduated_notification", params: {graduated_notification_id: graduated_notification.id}
             expect(response.status).to eq 404
           end
+        end
+      end
+      context "general_message" do
+        let(:enabled_feature_slugs) { %w[unstolen_notifications] }
+        let!(:organization_message) { FactoryBot.create(:organization_message, organization: current_organization, message: "Your lock is on the rack") }
+        let!(:mail_snippet) do
+          FactoryBot.create(:organization_mail_snippet, kind: "general_message", organization: current_organization,
+            is_enabled: true, body: "<p>Read our parking policy</p>")
+        end
+        it "renders the last message with the snippet" do
+          components = rendered_view_component_names { get "#{base_url}/general_message" }
+          expect(response.status).to eq(200)
+          expect(components).to include("Emails::OrganizationMessage::Component")
+          expect(response.body).to include("Read our parking policy").and include("Your lock is on the rack")
+          expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration general_message])
         end
       end
       context "finished_registration" do
@@ -409,7 +424,7 @@ RSpec.describe Organized::EmailsController, type: :request do
     include_context :request_spec_logged_in_as_superuser
     let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: enabled_feature_slugs, kind: "bike_shop") }
     # Also defined in controller
-    let(:viewable_kinds) { ParkingNotification.kinds + %w[finished_registration partial_registration graduated_notification impound_claim_approved impound_claim_denied organization_stolen_message] }
+    let(:viewable_kinds) { ParkingNotification.kinds + %w[finished_registration partial_registration graduated_notification impound_claim_approved impound_claim_denied organization_stolen_message general_message] }
     describe "edit" do
       it "renders" do
         viewable_kinds.each do |kind|

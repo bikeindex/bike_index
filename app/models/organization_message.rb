@@ -4,6 +4,7 @@
 # Database name: primary
 #
 #  id              :bigint           not null, primary key
+#  kind            :integer          default(0), not null
 #  message         :text
 #  receiver_email  :string
 #  created_at      :datetime         not null
@@ -23,6 +24,10 @@
 # An org member's message to the owner of a bike registered with the org — not a
 # StolenNotification, which is contact about a theft
 class OrganizationMessage < ApplicationRecord
+  KIND_ENUM = {general_message: 0}.freeze
+
+  enum :kind, KIND_ENUM, validate: true
+
   belongs_to :bike
   belongs_to :organization
   belongs_to :sender, class_name: "User"
@@ -48,6 +53,9 @@ class OrganizationMessage < ApplicationRecord
       :not_registered_with_organization
     end
   end
+
+  # Each kind is also a MailSnippet kind: the org's boilerplate for that message
+  def mail_snippet(time: created_at) = MailSnippet.for_organization(organization_id:, kind:, time:)
 
   private
 
