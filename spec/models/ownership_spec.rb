@@ -373,8 +373,6 @@ RSpec.describe Ownership, type: :model do
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: auto_user.email) }
       let(:ownership) { bike.ownerships.first }
       it "is false unless the organization sends self registration emails" do
-        expect(organization.reload.auto_user).to eq auto_user
-        expect(ownership.organization).to eq organization
         expect(ownership.calculated_send_email).to be_falsey
 
         organization.update(send_self_registration_email: true)

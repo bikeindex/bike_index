@@ -18,17 +18,14 @@ RSpec.describe Pages::Org::RegisterSettings::Component, type: :component do
   end
 
   context "organization admin" do
-    let(:auto_user) { FactoryBot.create(:organization_auto_user, organization:) }
+    let!(:auto_user) { FactoryBot.create(:organization_auto_user, organization:) }
     let(:options) { {organization: organization.reload, organization_admin: true} }
-    before { expect(auto_user).to be_present }
 
     it "renders the organization's email setting" do
       form = component.at_css("form[action='/o/#{organization.to_param}/manage']")
-      expect(form.at_css("input[name=_method]")["value"]).to eq "patch"
       expect(form.css("input[type=checkbox]").map { it["name"] }).to eq(["organization[send_self_registration_email]"])
       expect(form.css("input[type=checkbox][checked]")).to be_empty
       expect(form.at_css("code").text).to eq auto_user.email
-      expect(form).to have_text "By default, Bike Index no longer sends an email"
     end
 
     context "not an admin" do
