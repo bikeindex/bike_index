@@ -5944,7 +5944,6 @@ it:
             di parcheggio non registrato).
           send_self_registration_email_html: Inviare l'email per le registrazioni
             inviate a <code>%{email}</code>
-          update_organization: Aggiorna le impostazioni dell'organizzazione
         registrations:
           new:
             registration_form_settings: Impostazioni del modulo di registrazione

@@ -5677,7 +5677,6 @@ nb:
             registrerings-e-postadresse (f.eks. varsler om uregistrert parkering).
           send_self_registration_email_html: Send e-post for registreringer sendt
             til <code>%{email}</code>
-          update_organization: Oppdater organisasjonsinnstillinger
         registrations:
           new:
             registration_form_settings: Innstillinger for registreringsskjema

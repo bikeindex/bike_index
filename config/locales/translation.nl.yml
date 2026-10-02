@@ -5845,7 +5845,6 @@ nl:
             parkeren).
           send_self_registration_email_html: Stuur een e-mail voor aanmeldingen naar
             <code>%{email}</code>
-          update_organization: Organisatie-instellingen bijwerken
         registrations:
           new:
             registration_form_settings: Instellingen voor het registratieformulier
