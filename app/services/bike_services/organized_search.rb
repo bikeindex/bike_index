@@ -76,11 +76,14 @@ module BikeServices
       end
     end
 
-    def status(bikes, value)
+    # organization_bikes: the search is only the org's bikes, so it sees their hidden impounded ones
+    def status(bikes, value, organization_bikes: false)
+      impounded = organization_bikes ? bikes.status_impounded_with_user_hidden : bikes.status_impounded
       case value
-      when "all" then bikes
+      when "all" then bikes.or(impounded)
       when "not_impounded" then bikes.where.not(status: "status_impounded")
-      when "stolen_or_impounded" then bikes.stolen_or_impounded
+      when "impounded" then impounded
+      when "stolen_or_impounded" then bikes.status_stolen.or(impounded)
       else bikes.where(status: "status_#{value}")
       end
     end
