@@ -2,7 +2,8 @@
 
 module ComponentStructs
   # The column set, its labels and the active filters of an organization's registration
-  # search. Everything around the panel Pages::Org::Search::ColumnSettings renders reads the
+  # search - or with impound:, its impound records search, which adds the impound columns.
+  # Everything around the panel Pages::Org::Search::ColumnSettings renders reads the
   # same values, so it's built once and passed whole.
   #
   # Its copy sits in that panel's sidecar — the only home the component's cache digest reaches.
@@ -36,10 +37,28 @@ module ComponentStructs
       propulsion_type_cell
       status_cell
       url_cell
+      impounded_at_cell
+      impound_updated_at_cell
+      impound_user_cell
+      impounded_from_cell
+      unregistered_cell
     ].freeze
 
+    # The impound records search's own group in the panel, in this order, all on by default
+    IMPOUND_COLUMNS = %w[impounded_at_cell impound_updated_at_cell impound_user_cell impounded_from_cell
+      unregistered_cell].freeze
+
     # The panel groups the time columns under "Time - "; the table headers keep the short names
-    PANEL_LABELED_COLUMNS = %i[created_at_cell updated_at_cell occurred_at_cell acknowledgment_cell].freeze
+    PANEL_LABEL_KEYS = {
+      created_at_cell: :created_at_cell_panel,
+      updated_at_cell: :registration_updated_at_cell_panel,
+      occurred_at_cell: :registration_status_at_cell_panel,
+      acknowledgment_cell: :acknowledgment_cell_panel,
+      impounded_at_cell: :impounded_at_cell_panel,
+      impound_updated_at_cell: :impound_updated_at_cell_panel
+    }.freeze
+
+    PANEL_HINT_KEYS = {occurred_at_cell: :registration_status_at_cell_hint}.freeze
 
     # Their labels name the organization, italicized with its preposition
     ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
@@ -72,6 +91,14 @@ module ComponentStructs
       "propulsion_type" => :propulsion_type_cell,
       "acknowledged_at" => :acknowledgment_cell,
       "occurred_at" => :occurred_at_cell
+    }.freeze
+
+    # The impound records search's, which sorts by the impound record rather than the bike
+    IMPOUND_SORTABLE_COLUMN_CELLS = {
+      "created_at" => :impounded_at_cell,
+      "updated_at" => :impound_updated_at_cell,
+      "user_id" => :impound_user_cell,
+      "display_id_integer" => :impound_id_cell
     }.freeze
 
     DEFAULT_COLUMNS = %w[photo_cell created_at_cell status_cell manufacturer_cell model_cell
@@ -126,8 +153,9 @@ module ComponentStructs
 
     def initialize(organization:, interpreted_params: {}, sortable_search_params: {},
       search_stickers: nil, search_address: nil, search_status: "all", search_unregisteredness: nil,
-      search_all: false)
+      search_all: false, impound: false)
       @organization = organization
+      @impound = impound
       @interpreted_params = interpreted_params
       @sortable_search_params = sortable_search_params
       @filter_values = {search_stickers:, search_address:, search_status:, search_unregisteredness:}
@@ -153,6 +181,10 @@ module ComponentStructs
       end
     end
 
+    def notes_search? = @organization.enabled?("registration_notes")
+
+    def location_search? = true
+
     def notes_search_label = translation(:show_notes_search)
 
     def location_search_label = translation(:show_location_search)
@@ -169,7 +201,11 @@ module ComponentStructs
       translation(:location_search_stolen_only_no_address, org_name: @organization.short_name)
     end
 
-    def render_export? = @organization.enabled?("csv_exports")
+    def render_export? = !@impound && @organization.enabled?("csv_exports")
+
+    def impound? = @impound
+
+    def impound_columns = @impound ? IMPOUND_COLUMNS : []
 
     def search_all? = @search_all
 
@@ -179,7 +215,8 @@ module ComponentStructs
     def initially_checked_columns
       @initially_checked_columns ||= [
         *DEFAULT_COLUMNS,
-        ("sticker_cell" if @organization.enabled?("bike_stickers"))
+        ("sticker_cell" if @organization.enabled?("bike_stickers")),
+        ("impound_id_cell" if @impound)
       ].compact
     end
 
@@ -192,11 +229,16 @@ module ComponentStructs
     end
 
     def panel_labels
-      @panel_labels ||= column_renames.merge(PANEL_LABELED_COLUMNS.to_h { [it, translation(:"#{it}_panel")] })
+      @panel_labels ||= column_renames.merge(PANEL_LABEL_KEYS.transform_values { translation(it) })
+    end
+
+    def panel_hint(cell_name)
+      key = PANEL_HINT_KEYS[cell_name.to_sym]
+      translation(key) if key
     end
 
     def sort_column_label(sort)
-      cell = SORTABLE_COLUMN_CELLS[sort]
+      cell = (@impound ? IMPOUND_SORTABLE_COLUMN_CELLS : SORTABLE_COLUMN_CELLS)[sort]
       column_renames[cell] if cell
     end
 
