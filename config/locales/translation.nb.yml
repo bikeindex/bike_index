@@ -4592,6 +4592,11 @@ nb:
         why_no_direct_by_default: Som standard sendes e-poster til sykler som ikke
           er gjort krav på, til organisasjonen din for å gjennomgå og videresende
           til sluttbrukeren, fordi disse brukerne ikke har meldt seg på Bike Index-varsler.
+        send_self_registration_email_helper: Som standard sender ikke Bike Index lenger
+          en e-post til deg når et kjøretøy er registrert på organisasjonens registrerings-e-postadresse
+          (f.eks. varsler om uregistrert parkering).
+        send_self_registration_email_html: Send e-post for registreringer sendt til
+          <code>%{email}</code>
     stickers:
       edit:
         bike: Sykkel
@@ -5671,12 +5676,6 @@ nb:
             registreringen ikke er fullført, med en lenke for å fullføre den.
           single_page: Registreringsskjema på én side
           update: Oppdater
-          emails: E-poster
-          send_self_registration_email_helper: Som standard sender ikke Bike Index
-            lenger en e-post til deg når et kjøretøy er registrert på organisasjonens
-            registrerings-e-postadresse (f.eks. varsler om uregistrert parkering).
-          send_self_registration_email_html: Send e-post for registreringer sendt
-            til <code>%{email}</code>
         registrations:
           new:
             registration_form_settings: Innstillinger for registreringsskjema

@@ -4194,6 +4194,12 @@ nl:
         why_no_direct_by_default: Standaard worden e-mails naar niet-geclaimde fietsen
           naar uw organisatie verzonden om te bekijken en door te sturen naar de eindgebruiker,
           omdat die gebruikers zich niet hebben aangemeld voor Bike Index-meldingen.
+        send_self_registration_email_helper: Standaard stuurt Bike Index u geen e-mail
+          meer wanneer een voertuig wordt geregistreerd op het e-mailadres waarmee
+          uw organisatie is geregistreerd (bijvoorbeeld meldingen over niet-geregistreerd
+          parkeren).
+        send_self_registration_email_html: Stuur een e-mail voor aanmeldingen naar
+          <code>%{email}</code>
     manage_impoundings:
       edit:
         impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
@@ -5838,13 +5844,6 @@ nl:
             ronden.
           single_page: Registratieformulier van één pagina
           update: Bijwerken
-          emails: E-mails
-          send_self_registration_email_helper: Standaard stuurt Bike Index u geen
-            e-mail meer wanneer een voertuig wordt geregistreerd op het e-mailadres
-            waarmee uw organisatie is geregistreerd (bijvoorbeeld meldingen over niet-geregistreerd
-            parkeren).
-          send_self_registration_email_html: Stuur een e-mail voor aanmeldingen naar
-            <code>%{email}</code>
         registrations:
           new:
             registration_form_settings: Instellingen voor het registratieformulier

@@ -94,6 +94,8 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(session[:passive_organization_id]).to eq current_organization.id
         expect(assigns(:controller_namespace)).to eq "organized"
         expect(assigns(:page_id)).to eq "organized_manage_show"
+        expect(response.body).to include "<code>#{current_organization.reload.auto_user.email}</code>"
+        expect(response.body).to include 'name="organization[send_self_registration_email]"'
       end
     end
 
@@ -137,6 +139,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         let(:update) do
           {
             direct_unclaimed_notifications: true,
+            send_self_registration_email: true,
             # slug: 'short_name',
             slug: "cool name and stuffffff",
             available_invitation_count: "20",
@@ -166,7 +169,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:success]).to be_present
           current_organization.reload
           # Ensure we can update what we think we can (not that much)
-          expect(current_organization).to have_attributes update.slice(:name, :direct_unclaimed_notifications)
+          expect(current_organization).to have_attributes update.slice(:name, :direct_unclaimed_notifications, :send_self_registration_email)
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")
