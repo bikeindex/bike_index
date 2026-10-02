@@ -191,10 +191,20 @@ RSpec.describe ParkingNotification, type: :model do
       Sidekiq::Testing.inline! { parking_notification }
       expect(parking_notification.reload.impound_record).to be_present
       expect(parking_notification.unregistered_bike?).to be_falsey
-      expect(parking_notification.owner_known?).to be_falsey
+      expect(parking_notification.send_email?).to be_falsey
       expect(parking_notification.retrieval_link_token).to be_blank
       expect(parking_notification.notifications.count).to eq 0
       expect(ActionMailer::Base.deliveries).to be_empty
+    end
+    context "organization sends self registration emails" do
+      before { organization.update(send_self_registration_email: true) }
+      it "emails the auto_user" do
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Testing.inline! { parking_notification }
+        expect(parking_notification.reload.send_email?).to be_truthy
+        expect(parking_notification.email_success?).to be_truthy
+        expect(ActionMailer::Base.deliveries.map(&:to)).to eq([[auto_user.email]])
+      end
     end
   end
 
