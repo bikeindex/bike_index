@@ -3,7 +3,7 @@
 <%= form_with(model: @organization, url: switches_organization_registrations_path(organization_id: @organization.to_param),
     method: :post, data: {turbo: false, controller: "org--register-settings"}) do |f| %>
   <%= render UI::Card::Component.new(additional_classes: "tw:mb-6") do %>
-    <h4 class="uncap tw:mb-4"><%= translation(".browser_only") %></h4>
+    <h3 class="uncap tw:mb-4"><%= translation(".browser_only") %></h3>
 
     <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
       <span class="twlabel tw:sm:text-right"><%= translation(".registration_page") %></span>
