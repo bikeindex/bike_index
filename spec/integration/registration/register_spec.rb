@@ -521,7 +521,8 @@ RSpec.describe "Register flow", :js, type: :system do
         click_combobox_option("Red")
         fill_in_verified "bike[serial_number]", with: "R2UP1234"
         click_button "Complete Bike Registration"
-        expect(page).to have_content("Registration complete")
+        # The submit downloads the blob back from the bucket before it renders
+        expect(page).to have_content("Registration complete", wait: 15)
 
         public_image = Bike.last.public_images.first
         expect(public_image.file.attached?).to be_truthy
