@@ -5937,6 +5937,14 @@ it:
             la loro registrazione non è completa, con un link per terminarla.
           single_page: Modulo di registrazione a pagina singola
           update: Aggiorna
+          emails: Email
+          send_self_registration_email_helper: Per impostazione predefinita, Bike
+            Index non ti invia più un'email quando un veicolo viene registrato all'indirizzo
+            email di registrazione della tua organizzazione (ad esempio, notifiche
+            di parcheggio non registrato).
+          send_self_registration_email_html: Inviare l'email per le registrazioni
+            inviate a <code>%{email}</code>
+          update_organization: Aggiorna le impostazioni dell'organizzazione
         registrations:
           new:
             registration_form_settings: Impostazioni del modulo di registrazione

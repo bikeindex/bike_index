@@ -30,6 +30,7 @@
 #  regional_ids                    :jsonb
 #  registration_field_labels       :jsonb
 #  search_radius_miles             :float            default(50.0), not null
+#  send_self_registration_email    :boolean          default(FALSE), not null
 #  short_name                      :string(255)
 #  show_on_map                     :boolean
 #  slug                            :string(255)      not null
@@ -536,6 +537,10 @@ class Organization < ApplicationRecord
 
   def deliver_graduated_notifications?
     enabled?("graduated_notifications") && graduated_notification_interval.present?
+  end
+
+  def skip_email_to?(email)
+    !send_self_registration_email && email.present? && email == auto_user&.email
   end
 
   def graduated_notification_interval_days

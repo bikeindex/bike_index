@@ -3017,7 +3017,8 @@ CREATE TABLE public.organizations (
     direct_unclaimed_notifications boolean DEFAULT false,
     spam_registrations boolean DEFAULT false,
     opted_into_theft_survey_2023 boolean DEFAULT false,
-    paid_money boolean DEFAULT false NOT NULL
+    paid_money boolean DEFAULT false NOT NULL,
+    send_self_registration_email boolean DEFAULT false NOT NULL
 );
 
 
@@ -7912,6 +7913,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261001170000'),
 ('20260930161510'),
 ('20260930161509'),
 ('20260926005700'),
