@@ -13,6 +13,7 @@ module Organized
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
       @multi_update_open = Binxtils::InputNormalizer.boolean(params[:multi_update])
+      @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
       @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
         min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
       @search_status = params[:search_status].presence_in(available_statuses) || available_statuses.first
@@ -22,7 +23,7 @@ module Organized
         render Pages::Org::Search::ChartCard::Component.new(scope: "search", chart: impound_records_chart), layout: false
       elsif @render_results
         @pagy, @impound_records = pagy(:countish, available_impound_records.reorder(sortable_order(ImpoundRecord))
-          .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
+          .includes(:user, :impounded_from_address_record), limit: @per_page, page: permitted_page)
         respond_to do |format|
           format.html
           format.turbo_stream

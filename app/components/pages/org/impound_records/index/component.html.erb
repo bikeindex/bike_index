@@ -1,37 +1,35 @@
-<% multi_update_open_label = translation(".hide_update").downcase %>
-<% multi_update_closed_label = translation(".update_multiple_records").downcase %>
+<% multi_update_open_label = translation(".hide_update") %>
+<% multi_update_closed_label = translation(".update_multiple_records") %>
 
 <div
-  data-controller="org--impound-update-multi"
+  data-controller="org--impound-update-multi table-multi-checkbox"
   data-org--impound-update-multi-open-label-value="<%= multi_update_open_label %>"
   data-org--impound-update-multi-closed-label-value="<%= multi_update_closed_label %>"
   data-org--impound-update-multi-disabled-title-value="<%= translation(".cannot_update_with_kind") %>"
 >
-  <div class="row mt-4 mb-4">
-    <div class="col-sm-9">
-      <%= number_with_delimiter(@pagy.count) %>
-      <%= translation(".matching_impound_record", count: @pagy.count) %>
+  <%= render(Pages::Org::Search::Wrapper::Component.new(
+    organization: @current_organization,
+    pagy: @pagy,
+    per_page: @per_page,
+    params: @params,
+    bikes: @impound_records.map(&:bike),
+    impound_records: @impound_records,
+    multiselect_visible: @multi_update_open,
+    sort_state: @sort_state,
+    result_view: @result_view,
+    search_page: true
+  )) do |wrapper| %>
+    <% wrapper.with_actions do %>
+      <%= render(UI::Button::Component.new(
+        text: @multi_update_open ? multi_update_open_label : multi_update_closed_label,
+        color: :primary,
+        size: :sm,
+        data: {"org--impound-update-multi-target": "toggle", action: "org--impound-update-multi#toggle"}
+      )) %>
+    <% end %>
 
-      <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
-    </div>
-
-    <div class="col-lg-3">
-      <div class="text-right">
-        <%= render(UI::Button::Component.new(
-          text: @multi_update_open ? multi_update_open_label : multi_update_closed_label,
-          color: :link,
-          data: {"org--impound-update-multi-target": "toggle", action: "org--impound-update-multi#toggle"}
-        )) %>
-      </div>
-    </div>
-  </div>
-
-  <%# The form wraps the table too, so checked rows submit with it %>
-  <%= render(Pages::Org::ImpoundRecords::UpdateForm::Component.new(current_organization: @current_organization, multi_update_open: @multi_update_open)) do %>
-    <%= render(Pages::Org::ImpoundRecords::Table::Component.new(impound_records: @impound_records, current_organization: @current_organization, current_user: @current_user, sort_state: @sort_state, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, multiselect_visible: @multi_update_open)) %>
+    <% wrapper.with_below_header do %>
+      <%= render(Pages::Org::ImpoundRecords::UpdateForm::Component.new(current_organization: @current_organization, multi_update_open: @multi_update_open)) %>
+    <% end %>
   <% end %>
-</div>
-
-<div class="pt-4 pb-4">
-  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @params, size: :lg)) %>
 </div>

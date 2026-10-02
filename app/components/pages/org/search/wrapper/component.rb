@@ -9,7 +9,13 @@ module Pages
         # search (search_page) the header also carries the view switcher and the export, the
         # cards and list views swap the table for cards or rows, and the card renders inside
         # the results turbo-frame, so every search brings it back whole.
+        #
+        # With impound_records it's the impound records search's: its rows are the records, and
+        # its actions (in place of the export) and below_header open their multi-update form.
         class Component < ApplicationComponent
+          renders_one :actions
+          renders_one :below_header
+
           # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
           # .container-fluid padding to the page's edges
           TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:-mx-[15px]"
@@ -28,6 +34,8 @@ module Pages
             per_page:,
             params:,
             bikes: [],
+            impound_records: nil,
+            multiselect_visible: false,
             interpreted_params: {},
             sort_state: ComponentStructs::SortState.new,
             search_stickers: nil,
@@ -44,6 +52,8 @@ module Pages
             @organization = organization
             @pagy = pagy
             @bikes = bikes
+            @impound_records = impound_records
+            @multiselect_visible = multiselect_visible
             @interpreted_params = interpreted_params
             @sort_state = sort_state
             @per_page = per_page
@@ -89,7 +99,8 @@ module Pages
               search_address: @search_address,
               search_status: @search_status,
               search_unregisteredness: @search_unregisteredness,
-              search_all: @search_all
+              search_all: @search_all,
+              impound: !@impound_records.nil?
             )
           end
 
@@ -143,9 +154,9 @@ module Pages
             end
           end
 
+          # The search this card renders in, which the impound records search shares
           def result_view_path(result_view)
-            organization_registrations_path(@organization.to_param,
-              @sort_state.search_params.except(:organization_id).merge(search_result_view: result_view))
+            "#{request.path}?#{@sort_state.search_params.except(:organization_id).merge(search_result_view: result_view).to_query}"
           end
 
           def show_pagination?

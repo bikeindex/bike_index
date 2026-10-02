@@ -44,6 +44,8 @@
       <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
         <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
 
+        <%= actions %>
+
         <%# Only the search's own params describe an export of what's on the page %>
         <% if @search_page && settings.render_export? %>
           <div class="tw:hidden tw:sm:block">
@@ -67,6 +69,8 @@
 
   <% unless result_component %>
     <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings:)) %>
+
+    <%= below_header %>
   <% end %>
 
   <%# Only on the search: the model audit's own page already names the audit above this %>
@@ -102,6 +106,8 @@
       <%= render(Pages::Org::SearchResults::BikesTable::Component.new(
         organization: @organization,
         bikes: @bikes,
+        impound_records: @impound_records,
+        multiselect_visible: @multiselect_visible,
         render_sortable: true,
         sort_state: @sort_state,
         bike_sticker: @bike_sticker,
