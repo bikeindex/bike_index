@@ -1,11 +1,11 @@
 <%#
-  minmax(0, …) keeps the unscrolled ID from setting the row's minimum width, which it would push past its container.
-  Overflowing, the button floats over pr-9 -- at least the width it took beside the ID, so moving it can't end the overflow
+  minmax(0, …) stops the unscrolled ID from setting the grid's minimum width.
+  pr-9 is at least the button's width, so floating the button over it can't end the overflow
 %>
 
 <span
   class="
-    tw:group/id tw:relative tw:inline-grid tw:max-w-full
+    tw:group tw:relative tw:inline-grid tw:max-w-full
     tw:grid-cols-[minmax(0,1fr)_auto] tw:items-center tw:gap-1
     tw:data-overflowing:grid-cols-1
   "
@@ -15,7 +15,7 @@
     class="
       tw:overflow-x-auto tw:rounded-sm tw:border tw:border-gray-200
       tw:bg-transparent tw:px-2 tw:py-0.5 tw:font-mono tw:text-xs
-      tw:whitespace-nowrap tw:text-inherit tw:group-data-overflowing/id:pr-9
+      tw:whitespace-nowrap tw:text-inherit tw:group-data-overflowing:pr-9
       tw:dark:border-gray-700
     "
     data-overflowing-target="text"
@@ -25,13 +25,11 @@
 
   <span
     class="
-      tw:flex tw:group-data-overflowing/id:absolute
-      tw:group-data-overflowing/id:inset-y-px
-      tw:group-data-overflowing/id:right-px
-      tw:group-data-overflowing/id:items-center
-      tw:group-data-overflowing/id:rounded-sm
-      tw:group-data-overflowing/id:bg-white
-      tw:dark:group-data-overflowing/id:bg-gray-800
+      tw:flex tw:items-center tw:rounded-sm
+      tw:group-data-overflowing:absolute
+      tw:group-data-overflowing:inset-y-px
+      tw:group-data-overflowing:right-px tw:group-data-overflowing:bg-white
+      tw:dark:group-data-overflowing:bg-gray-800
     "
   >
     <%= render(UI::CopyButton::Component.new(value: @short_id, label: translation(".copy_id"))) %>

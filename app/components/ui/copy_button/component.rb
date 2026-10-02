@@ -17,8 +17,8 @@ module UI
         tag.button(type: "button", class: BUTTON_CLASS, title: @label,
           data: {controller: "ui--copy-button", "ui--copy-button-text-value": @value, action: "ui--copy-button#copy"}) do
           safe_join([
-            helpers.inline_svg_tag("icons/copy.svg", class: "tw:h-3.5 tw:w-3.5 tw:group-data-copied:hidden", aria_hidden: true),
-            helpers.inline_svg_tag("icons/check.svg", class: "tw:hidden tw:h-3.5 tw:w-3.5 tw:text-green-600 tw:group-data-copied:block", aria_hidden: true)
+            helpers.inline_svg_tag("icons/copy.svg", class: "tw:size-3.5 tw:group-data-copied:hidden", aria_hidden: true),
+            helpers.inline_svg_tag("icons/check.svg", class: "tw:hidden tw:size-3.5 tw:text-green-600 tw:group-data-copied:block", aria_hidden: true)
           ])
         end
       end

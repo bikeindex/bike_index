@@ -6,7 +6,7 @@ export default class extends Controller {
   static targets = ['text']
 
   connect () {
-    this.observer = new ResizeObserver(() => this.update())
+    this.observer = new ResizeObserver(() => this.#update())
     this.observer.observe(this.element)
   }
 
@@ -14,7 +14,7 @@ export default class extends Controller {
     this.observer.disconnect()
   }
 
-  update () {
+  #update () {
     this.element.toggleAttribute('data-overflowing', this.textTarget.scrollWidth > this.textTarget.clientWidth)
   }
 }
