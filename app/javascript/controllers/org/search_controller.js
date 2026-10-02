@@ -5,6 +5,21 @@ import { collapseField } from 'utils/collapse_utils'
 
 const RESULT_VIEW_KEY = 'orgRegistrationResultView'
 
+// The registration search's fields that Organized::ImpoundRecordsController also reads, by
+// its name for each
+const IMPOUND_SEARCH_PARAMS = {
+  'query_items[]': 'query_items[]',
+  query: 'query',
+  serial: 'serial',
+  search_email: 'search_email',
+  search_unregisteredness: 'search_unregisteredness',
+  period: 'period',
+  start_time: 'start_time',
+  end_time: 'end_time',
+  location: 'search_location',
+  distance: 'search_proximity'
+}
+
 // Connects to data-controller='org--search'
 export default class extends Controller {
   static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint']
@@ -182,6 +197,19 @@ export default class extends Controller {
 
     ;[...form.elements].filter(element => element.type === 'submit')
       .forEach(element => element.dispatchEvent(new Event('spinner:reset')))
+  }
+
+  // The form as it stands, so a field typed but not yet searched carries over too. It
+  // rewrites the href rather than navigating, so a modifier-click still opens a tab
+  searchImpoundRecords (event) {
+    const form = document.getElementById('Search_Form')
+    if (!form) return
+
+    const url = new URL(event.currentTarget.href)
+    url.search = new URLSearchParams([...new FormData(form)]
+      .filter(([name, value]) => IMPOUND_SEARCH_PARAMS[name] && value !== '')
+      .map(([name, value]) => [IMPOUND_SEARCH_PARAMS[name], value]))
+    event.currentTarget.href = url
   }
 
   perPageChanged () {
