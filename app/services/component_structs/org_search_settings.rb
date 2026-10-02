@@ -163,6 +163,10 @@ module ComponentStructs
       end
     end
 
+    def notes_search? = @organization.enabled?("registration_notes")
+
+    def location_search? = true
+
     def notes_search_label = translation(:show_notes_search)
 
     def location_search_label = translation(:show_location_search)

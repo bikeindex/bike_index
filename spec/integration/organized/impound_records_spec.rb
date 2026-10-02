@@ -3,7 +3,7 @@
 require "rails_helper"
 
 # Verifies the impound records index browser behavior: results load into a
-# turbo-frame, the dropdown/location filters drive it, and the multi-update
+# turbo-frame, the settings panel/location filters drive it, and the multi-update
 # flow (`org--impound-update-multi` + `org--impound-update`) reacts to the
 # rendered DOM. Lives at the integration layer because the controllers react
 # to the rendered DOM.
@@ -69,15 +69,15 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # search_no_js should NOT be in the URL (removed by the JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
 
-    # Unregisteredness dropdown link advances the URL (data-turbo-action="advance")
-    # and updates the frame in place
-    within("turbo-frame#impound_records_results_frame") do
-      all("[data-ui--dropdown-target='button']").last.click
-    end
-    click_link "Only unregistered"
+    # The settings panel's radios submit the search, which advances the URL and
+    # updates the frame in place
+    expect(page).to have_text("Current records")
+    click_button "Search settings and filters"
+    choose("search_unregisteredness_only_unregistered", allow_label_click: true, visible: :all)
 
     expect(page).to have_current_path(/search_unregisteredness=only_unregistered/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 1)
+    expect(page).to have_text("Current records · Only unregistered")
 
     # Back navigation restores the unfiltered listing. The page opts out of
     # Turbo's snapshot cache (no-cache meta), so back/forward re-fetch it and the
@@ -85,6 +85,9 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     page.go_back
     expect(page).not_to have_current_path(/search_unregisteredness/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
+    # search--form puts the panel's radios back in step with the address bar
+    expect(find("#search_unregisteredness_all", visible: :all)).to be_checked
+    expect(page).not_to have_text("Current records · Only unregistered")
 
     # Search form submit + direct back-nav: regression guard for the stale
     # turbo-frame state the no-cache meta prevents. The form submit updates the

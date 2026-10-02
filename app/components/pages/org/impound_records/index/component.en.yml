@@ -14,5 +14,7 @@ en:
               other: matching impound records
             only_unregistered: Only unregistered
             only_user_registered: Only user registered
+            registration: 'Registration:'
+            status: 'Status:'
             status_records: "%{status} records"
             update_multiple_records: Update multiple records

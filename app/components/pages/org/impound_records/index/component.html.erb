@@ -13,27 +13,6 @@
       <%= translation(".matching_impound_record", count: @pagy.count) %>
 
       <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
-
-      <div class="tw:ml-2 tw:inline-block">
-        <%= render(UI::Dropdown::Component.new(name: status_dropdown_text, button_color: :primary, active: @search_status != "current")) do |dropdown| %>
-          <% @available_statuses.each do |status| %>
-            <% status_active = @search_status == status %>
-            <% status_link_params = @sort_state.search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
-            <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: display_status_for(status), path: organization_impound_records_path(status_link_params), match_params: status_params(status), data: {turbo_action: "advance"}) } %>
-
-            <%# Divider after "all" %>
-            <% dropdown.with_entry_divider if status == "all" %>
-          <% end %>
-        <% end %>
-      </div>
-
-      <div class="tw:ml-2 tw:inline-block">
-        <%= render(UI::Dropdown::Component.new(name: unregisteredness_dropdown_text, button_size: :sm, active: @search_unregisteredness != "all")) do |dropdown| %>
-          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".all_bikes"), path: organization_impound_records_path(@sort_state.search_params.except(:search_unregisteredness)), match_params: {search_unregisteredness: nil}, data: {turbo_action: "advance"}) } %>
-          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_unregistered"), path: organization_impound_records_path(@sort_state.search_params.merge(search_unregisteredness: "only_unregistered")), match_params: {search_unregisteredness: "only_unregistered"}, data: {turbo_action: "advance"}) } %>
-          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_user_registered"), path: organization_impound_records_path(@sort_state.search_params.merge(search_unregisteredness: "only_registered")), match_params: {search_unregisteredness: "only_registered"}, data: {turbo_action: "advance"}) } %>
-        <% end %>
-      </div>
     </div>
 
     <div class="col-lg-3">
