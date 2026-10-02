@@ -1,5 +1,5 @@
 <%#
-  minmax(0, …) stops the unscrolled ID from setting the grid's minimum width.
+  minmax(0, …) stops the unscrolled value from setting the grid's minimum width.
   pr-9 is at least the button's width, so floating the button over it can't end the overflow
 %>
 
@@ -20,7 +20,7 @@
     "
     data-overflowing-target="text"
   >
-    <%= @short_id %>
+    <%= @value %>
   </code>
 
   <span
@@ -32,6 +32,6 @@
       tw:dark:group-data-overflowing:bg-gray-800
     "
   >
-    <%= render(UI::CopyButton::Component.new(value: @short_id, label: translation(".copy_id"))) %>
+    <%= render(UI::CopyButton::Component.new(value: @value, label: @label)) %>
   </span>
 </span>

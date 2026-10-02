@@ -14,11 +14,6 @@ module Atoms
       def decimal
         render(Atoms::ShortId::Component.new(short_id: "r/36"))
       end
-
-      # @label too narrow for the ID: scrolls, with the copy button over its right edge
-      def overflowing
-        {template: "atoms/short_id/component_preview/overflowing"}
-      end
       # @!endgroup
     end
   end
