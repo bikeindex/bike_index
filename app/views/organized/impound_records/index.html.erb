@@ -2,53 +2,50 @@
   <%= render(UI::Header::Component.new(text: t(".impound_records"), html_class: "uncap")) %>
 </div>
 
-<% form_interpreted_params = @interpreted_params.merge(search_email: params[:search_email]).compact %>
+<%#
+  Preserve search_status in the form's default hidden field (@interpreted_params
+  doesn't include it). Reads params, not @search_status, which is unset on
+  non-turbo renders.
+%>
+<% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status], search_email: params[:search_email]).compact %>
 
-<%# The impound columns make a column set of its own, so it's stored apart from the registrations search's %>
-<%= tag.div(data: Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes
-  .merge("org--search-column-settings-storage-key-value": "orgImpoundColumns",
-    "org--search-result-view-value": @result_view)) do %>
-  <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
-  <% unless turbo_frame_request? %>
-    <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
-    <div class="twwiderow tw:mt-4 tw:gap-y-4">
-      <div class="tw:min-w-0">
-        <%= render(Pages::Org::Search::Form::Component.new(
-          target_search_path: organization_impound_records_path(organization_id: current_organization.to_param),
-          target_frame: :impound_records_results_frame,
-          interpreted_params: form_interpreted_params,
-          heading: t(".find_an_impound_record"),
-          submit_text: t(".search_impound_records"),
-          settings_and_filters_component: Pages::Org::Search::SettingsAndFilters::Component.new(
-            settings: ComponentStructs::OrgImpoundSearchSettings.new(statuses: available_statuses,
-              search_status: @search_status, search_unregisteredness: @search_unregisteredness),
-            period: @period,
-            start_time: @start_time,
-            end_time: @end_time,
-            sortable_search_params:
-          )
-        )) do %>
-          <%# Carries the view the results' chips advance to into the searched URL %>
-          <%= hidden_field_tag :search_result_view, @result_view %>
-
-          <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-2">
-            <em class="tw:text-sm tw:text-gray-500">impounded within</em>
-            <%= number_field_tag :search_proximity, @search_proximity, class: "twinput tw:w-20", step: 0.01 %>
-            <em class="tw:text-sm tw:text-gray-500">miles of</em>
-            <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "twinput tw:flex-1" %>
-          </div>
+<%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
+<% unless turbo_frame_request? %>
+  <%# twwiderow is what the cards' full_bleed reads to meet the gutter once it's one column %>
+  <div class="twwiderow tw:mt-4 tw:gap-y-4">
+    <div class="tw:min-w-0">
+      <%= render(Pages::Org::Search::Form::Component.new(
+        target_search_path: organization_impound_records_path(organization_id: current_organization.to_param),
+        target_frame: :impound_records_results_frame,
+        interpreted_params: form_interpreted_params,
+        heading: t(".find_an_impound_record"),
+        submit_text: t(".search_impound_records"),
+      )) do %>
+        <% if params[:search_unregisteredness].present? %>
+          <%= hidden_field_tag :search_unregisteredness, params[:search_unregisteredness] %>
         <% end %>
-      </div>
 
-      <div class="tw:min-w-0">
-        <%= render("organized/search_chart_card", id: :impound_records_chart,
-          src: organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param))) %>
-      </div>
+        <div class="tw:mt-2 tw:flex tw:items-center tw:justify-end tw:gap-2">
+          <em class="tw:text-sm tw:text-gray-500">impounded within</em>
+          <%= number_field_tag :search_proximity, @search_proximity, class: "twinput tw:w-20", step: 0.01 %>
+          <em class="tw:text-sm tw:text-gray-500">miles of</em>
+          <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "twinput tw:flex-1" %>
+        </div>
+      <% end %>
     </div>
-  <% end %>
 
-  <%= render SharedBlocks::SearchResults::Frame::Component.new(frame_id: :impound_records_results_frame,
-    render_results: @render_results, current_path: request.original_fullpath) do %>
-    <%= render partial: "results" %>
-  <% end %>
+    <div class="tw:min-w-0">
+      <%= render("organized/search_chart_card", id: :impound_records_chart,
+        src: organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1"))) %>
+    </div>
+  </div>
+<% end %>
+
+<%= render SharedBlocks::SearchResults::Frame::Component.new(frame_id: :impound_records_results_frame,
+  render_results: @render_results, current_path: request.original_fullpath) do %>
+  <div class="tw:mt-4 tw:flex tw:justify-end">
+    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
+  </div>
+
+  <%= render partial: "results" %>
 <% end %>

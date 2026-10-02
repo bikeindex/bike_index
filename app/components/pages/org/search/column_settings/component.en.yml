@@ -24,14 +24,7 @@ en:
             filter_stolen_html: only <strong>stolen</strong>
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
-            impound_columns: Impound columns
             impound_id_cell: Impound ID
-            impound_updated_at_cell: Impound updated
-            impound_updated_at_cell_panel: Time - impound record Updated
-            impound_user_cell: Last updator
-            impounded_at_cell: Impounded
-            impounded_at_cell_panel: Time - Impounded
-            impounded_from_cell: Impounded from
             included_columns: Included columns
             location_search_stolen_only_no_address: >-
               %{org_name} doesn't collect registration addresses, so only stolen registrations
@@ -65,7 +58,6 @@ en:
             sticker_cell: Sticker
             stickers: 'Stickers:'
             unregistered: 'Unregistered:'
-            unregistered_cell: Unregistered
             updated_at_cell: Updated
             url_cell: URL
             view_cell: View

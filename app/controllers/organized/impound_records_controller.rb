@@ -13,17 +13,14 @@ module Organized
       @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
       @multi_update_open = Binxtils::InputNormalizer.boolean(params[:multi_update])
-      @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
       @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
         min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
-      @search_status = params[:search_status].presence_in(available_statuses) || available_statuses.first
-      @search_unregisteredness = params[:search_unregisteredness].presence_in(%w[only_unregistered only_registered]) || "all"
 
       if chart_only?
         render Pages::Org::Search::ChartCard::Component.new(scope: "search", chart: impound_records_chart), layout: false
       elsif @render_results
         @pagy, @impound_records = pagy(:countish, available_impound_records.reorder(sortable_order(ImpoundRecord))
-          .includes(:user, :impounded_from_address_record), limit: @per_page, page: permitted_page)
+          .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
         respond_to do |format|
           format.html
           format.turbo_stream
@@ -92,17 +89,27 @@ module Organized
     def available_impound_records
       return @available_impound_records if defined?(@available_impound_records)
 
-      a_impound_records = if ImpoundRecord.statuses.include?(@search_status)
-        impound_records.where(status: @search_status)
+      if params[:search_status] == "all"
+        @search_status = "all"
+        a_impound_records = impound_records
       else
-        impound_records.public_send(@search_status)
+        @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
+        a_impound_records = if ImpoundRecord.statuses.include?(@search_status)
+          impound_records.where(status: @search_status)
+        else
+          impound_records.public_send(@search_status)
+        end
       end
 
-      if @search_unregisteredness == "only_registered"
-        a_impound_records = a_impound_records.registered_bike
-      elsif @search_unregisteredness == "only_unregistered"
-        a_impound_records = a_impound_records.unregistered_bike
+      if %w[only_unregistered only_registered].include?(params[:search_unregisteredness])
+        @search_unregisteredness = params[:search_unregisteredness]
+        a_impound_records = if @search_unregisteredness == "only_registered"
+          a_impound_records.registered_bike
+        else
+          a_impound_records.unregistered_bike
+        end
       end
+      @search_unregisteredness ||= "all"
 
       if bike_search_params_present?
         bikes = a_impound_records.bikes.search(@interpreted_params)

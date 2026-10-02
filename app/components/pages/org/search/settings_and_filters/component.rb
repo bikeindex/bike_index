@@ -6,15 +6,14 @@ module Pages
       module SettingsAndFilters
         # The row under the search fields - the gear, the date range, and what the search is
         # filtered to - and the settings panel the gear opens. Every label comes from
-        # ComponentStructs::OrgSearchSettings, which the table reads its column names out of too -
-        # or ComponentStructs::OrgImpoundSearchSettings, which has no notes or location toggles.
+        # ComponentStructs::OrgSearchSettings, which the table reads its column names out of too.
         #
         # It renders beside the search form rather than inside it: the custom date range is a
         # form of its own, which can't nest. The radios reach the search with form:.
         class Component < ApplicationComponent
-          delegate :filter_groups, :active_search_filter_descriptions, :notes_search?, :location_search?,
-            :excludes_impounded?, :notes_search_label, :location_search_label, :location_search_disabled?,
-            :location_search_disabled_hint, :organization, to: :@settings
+          delegate :filter_groups, :active_search_filter_descriptions, :notes_search_label,
+            :location_search_label, :location_search_disabled?, :location_search_disabled_hint,
+            :organization, to: :@settings
 
           def initialize(settings:, period:, start_time:, end_time:, sortable_search_params: {})
             @settings = settings
@@ -22,6 +21,10 @@ module Pages
             @start_time = start_time
             @end_time = end_time
             @sortable_search_params = sortable_search_params
+          end
+
+          def notes_search?
+            organization.enabled?("registration_notes")
           end
 
           private

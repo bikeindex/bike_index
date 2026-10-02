@@ -1,10 +1,14 @@
 <%= render(Pages::Org::ImpoundRecords::Index::Component.new(
   pagy: @pagy,
   impound_records: @impound_records,
+  search_status: @search_status,
+  search_unregisteredness: @search_unregisteredness,
+  time_range: @time_range,
+  period: @period,
+  available_statuses: available_statuses,
   current_organization: current_organization,
-  per_page: @per_page,
+  current_user:,
   params:,
   sort_state:,
-  result_view: @result_view,
   multi_update_open: @multi_update_open
 )) %>

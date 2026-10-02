@@ -1,27 +1,19 @@
 <%# Locals, not @ivars: UI::Table instance_execs cell blocks against itself, %>
 <%# so instance variables resolve to nil inside them — closures capture these. %>
 <% organization = @organization %>
-<% impound = impound? %>
-<% multiselect_classes = multiselect_cell_classes %>
 
 <%= tag.div(class: WRAPPER_CLASSES, data: table_wrapper_data_attributes) do %>
-  <%= render(UI::Table::Component.new(records: @impound_records || @bikes, cache_key:, cache_records:, render_sortable: @render_sortable, sort_state: @sort_state, classes: TABLE_CLASSES, unbordered: true)) do |table| %>
-    <%#
-      An impound search's rows are its impound records, so a registration column takes the
-      record's bike - and doesn't sort, since the search orders by the record
-    %>
-    <% column = ->(sortable: nil, **options, &cell) { table.column(sortable: (sortable unless impound), **options) { |row| instance_exec(impound ? row.bike : row, &cell) } } %>
-
+  <%= render(UI::Table::Component.new(records: @bikes, cache_key: [@organization, self.class.cache_digest], render_sortable: @render_sortable, sort_state: @sort_state, classes: TABLE_CLASSES, unbordered: true)) do |table| %>
     <%# Called per cell rather than captured: each tooltip mints its own id %>
     <% hidden_html = method(:hidden_not_registered_tag) %>
     <% email_hidden = translation(".email_hidden") %>
     <% view_label = translation(".view") %>
 
-    <% column.(label: settings.column_renames[:view_cell], classes: VIEW_COLUMN_CLASSES) do |bike| %>
+    <% table.column(label: settings.column_renames[:view_cell], classes: VIEW_COLUMN_CLASSES) do |bike| %>
       <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
     <% end %>
 
-    <% column.(label: settings.column_renames[:photo_cell], classes: "hideableColumn photo_cell") do |bike| %>
+    <% table.column(label: settings.column_renames[:photo_cell], classes: "hideableColumn photo_cell") do |bike| %>
       <% thumb_url = BikeServices::Displayer.thumb_image_url(bike) %>
 
       <% if thumb_url.present? %>
@@ -31,45 +23,13 @@
       <% end %>
     <% end %>
 
-    <% if impound %>
-      <% table.column(sortable: "created_at", label: settings.column_renames[:impounded_at_cell], classes: "hideableColumn impounded_at_cell") do |impound_record| %>
-        <a
-          class="twlink tw:font-bold tw:whitespace-nowrap"
-          href="<%= organization_impound_record_path(impound_record.display_id, organization_id: organization.to_param) %>"
-          data-turbo-frame="_top"
-        >
-          <%= render(UI::Time::Component.new(time: impound_record.created_at)) %>
-        </a>
-      <% end %>
-
-      <% table.column(sortable: "updated_at", label: settings.column_renames[:impound_updated_at_cell], classes: "hideableColumn impound_updated_at_cell") do |impound_record| %>
-        <small>
-          <%= render(UI::Time::Component.new(time: impound_record.updated_at)) %>
-        </small>
-      <% end %>
-
-      <% table.column(sortable: "user_id", label: settings.column_renames[:impound_user_cell], classes: "hideableColumn impound_user_cell") do |impound_record| %>
-        <%= impound_record.user&.display_name&.truncate(20) %>
-      <% end %>
-
-      <% table.column(label: settings.column_renames[:impounded_from_cell], classes: "hideableColumn impounded_from_cell tw:leading-none") do |impound_record| %>
-        <small>
-          <%= render(UI::AddressDisplay::Component.new(address_record: impound_record.impounded_from_address_record, visible_attribute: :street, kind: :single_line)) %>
-        </small>
-      <% end %>
-
-      <% table.column(label: settings.column_renames[:unregistered_cell], classes: "hideableColumn unregistered_cell") do |impound_record| %>
-        <%= check_mark if impound_record.unregistered_bike? %>
-      <% end %>
-    <% end %>
-
-    <% column.(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>
+    <% table.column(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>
       <code class="tw:p-0 tw:text-xs!" style="word-break: normal">
         <%= bike.html_url %>
       </code>
     <% end %>
 
-    <% column.(sortable: "id", label: settings.column_renames[:created_at_cell], classes: "hideableColumn created_at_cell") do |bike| %>
+    <% table.column(sortable: "id", label: settings.column_renames[:created_at_cell], classes: "hideableColumn created_at_cell") do |bike| %>
       <a
         class="twlink tw:font-bold tw:whitespace-nowrap"
         href="<%= bike_path(bike, organization_id: organization.to_param) %>"
@@ -79,14 +39,14 @@
       </a>
     <% end %>
 
-    <% column.(sortable: "updated_by_user_at", label: settings.column_renames[:updated_at_cell], classes: "hideableColumn updated_at_cell") do |bike| %>
+    <% table.column(sortable: "updated_by_user_at", label: settings.column_renames[:updated_at_cell], classes: "hideableColumn updated_at_cell") do |bike| %>
       <small>
         <%= render(UI::Time::Component.new(time: bike.updated_by_user_fallback)) %>
       </small>
     <% end %>
 
     <% if organization.enabled?("registration_sequences") %>
-      <% column.(sortable: "acknowledged_at", label: tag.span(settings.column_renames[:acknowledgment_cell], title: translation(".acknowledgment_title")), classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
+      <% table.column(sortable: "acknowledged_at", label: tag.span(settings.column_renames[:acknowledgment_cell], title: translation(".acknowledgment_title")), classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
         <% if bike.motorized? %>
           <% if bike.organized?(organization) %>
             <small>
@@ -99,23 +59,23 @@
       <% end %>
     <% end %>
 
-    <% column.(label: settings.column_renames[:status_cell], classes: "hideableColumn status_cell tw:text-xs") do |bike| %>
+    <% table.column(label: settings.column_renames[:status_cell], classes: "hideableColumn status_cell tw:text-xs") do |bike| %>
       <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
     <% end %>
 
-    <% column.(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell") do |bike| %>
+    <% table.column(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell") do |bike| %>
       <%= render(UI::Time::Component.new(time: bike.occurred_at)) %>
     <% end %>
 
-    <% column.(sortable: "mnfg_name", label: settings.column_renames[:manufacturer_cell], classes: "hideableColumn manufacturer_cell") do |bike| %>
+    <% table.column(sortable: "mnfg_name", label: settings.column_renames[:manufacturer_cell], classes: "hideableColumn manufacturer_cell") do |bike| %>
       <strong class="tw:text-gray-900 tw:dark:text-gray-100"><%= bike.mnfg_name %></strong>
     <% end %>
 
-    <% column.(sortable: "frame_model", label: settings.column_renames[:model_cell], classes: "hideableColumn model_cell") do |bike| %>
+    <% table.column(sortable: "frame_model", label: settings.column_renames[:model_cell], classes: "hideableColumn model_cell") do |bike| %>
       <%= bike.frame_model %>
     <% end %>
 
-    <% column.(label: settings.column_renames[:color_cell], classes: "hideableColumn color_cell") do |bike| %>
+    <% table.column(label: settings.column_renames[:color_cell], classes: "hideableColumn color_cell") do |bike| %>
       <span class="tw:whitespace-nowrap tw:text-gray-500 tw:dark:text-gray-400">
         <% bike.frame_color_records.each do |color| %>
           <span class="tw:mr-2 tw:inline-flex tw:items-center tw:gap-1.5">
@@ -128,7 +88,7 @@
 
     <%# Called where REG_FIELDS_AFTER places each of the organization's fields %>
     <% reg_field_column = lambda do |reg_field| %>
-      <% column.(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
+      <% table.column(label: settings.column_renames[:"#{reg_field}_cell"], classes: "hideableColumn #{reg_field}_cell tw:leading-none") do |bike| %>
         <% if !bike.organized?(organization) %>
           <%= hidden_html.call %>
         <% elsif reg_field != "reg_address" %>
@@ -141,23 +101,23 @@
       <% end %>
     <% end %>
 
-    <% column.(sortable: "cycle_type", label: settings.column_renames[:cycle_type_cell], classes: "hideableColumn cycle_type_cell") do |bike| %>
+    <% table.column(sortable: "cycle_type", label: settings.column_renames[:cycle_type_cell], classes: "hideableColumn cycle_type_cell") do |bike| %>
       <span class="<%= 'tw:text-gray-400' if bike.cycle_type == 'bike' %>">
         <%= bike.type_titleize %>
       </span>
     <% end %>
 
-    <% column.(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
+    <% table.column(sortable: "propulsion_type", label: settings.column_renames[:propulsion_type_cell], classes: "hideableColumn propulsion_type_cell") do |bike| %>
       <%= bike.propulsion_titleize unless bike.propulsion_type == "foot-pedal" %>
     <% end %>
 
-    <% column.(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
+    <% table.column(label: settings.column_renames[:serial_number_cell], classes: "hideableColumn serial_number_cell") do |bike| %>
       <%= render(Atoms::Serial::Component.new(bike:, organization:)) %>
     <% end %>
 
     <% reg_fields_after(:serial_number).each(&reg_field_column) %>
 
-    <% column.(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
+    <% table.column(label: settings.column_renames[:creation_description_cell], classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
       <% if bike.creation_kind %>
         <small class="tw:text-gray-400">
           <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
@@ -165,7 +125,7 @@
       <% end %>
     <% end %>
 
-    <% column.(sortable: "owner_email", label: settings.column_renames[:owner_email_cell], classes: "hideableColumn owner_email_cell tw:leading-none") do |bike| %>
+    <% table.column(sortable: "owner_email", label: settings.column_renames[:owner_email_cell], classes: "hideableColumn owner_email_cell tw:leading-none") do |bike| %>
       <% if !bike.organized?(organization) %>
         <%= hidden_html.call %>
       <% elsif bike.email_visible_for?(organization) %>
@@ -178,7 +138,7 @@
       <% end %>
     <% end %>
 
-    <% column.(label: settings.column_renames[:owner_name_cell], classes: "hideableColumn owner_name_cell tw:leading-none") do |bike| %>
+    <% table.column(label: settings.column_renames[:owner_name_cell], classes: "hideableColumn owner_name_cell tw:leading-none") do |bike| %>
       <% if bike.organized?(organization) %>
         <% if bike.owner_name.present? %>
           <em><%= bike.owner_name %></em>
@@ -192,12 +152,8 @@
 
     <% reg_fields_after(:rest).each(&reg_field_column) %>
 
-    <% if impound %>
-      <% table.column(sortable: "display_id_integer", label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell") do |impound_record| %>
-        <%= impound_record.display_id %>
-      <% end %>
-    <% elsif organization.enabled?("impound_bikes") %>
-      <% column.(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
+    <% if organization.enabled?("impound_bikes") %>
+      <% table.column(label: settings.column_renames[:impound_id_cell], classes: "hideableColumn impound_id_cell tw:leading-none") do |bike| %>
         <% if bike.organized?(organization) %>
           <% if bike.status_impounded? && bike.current_impound_record.present? %>
             <%= bike.current_impound_record.display_id %>
@@ -209,13 +165,13 @@
     <% end %>
 
     <% if organization.enabled?("avery_export") %>
-      <% column.(label: settings.column_renames[:avery_cell], classes: "hideableColumn avery_cell") do |bike| %>
+      <% table.column(label: settings.column_renames[:avery_cell], classes: "hideableColumn avery_cell") do |bike| %>
         <% check_mark if bike.organized?(organization) && bike.avery_exportable? %>
       <% end %>
     <% end %>
 
     <% if organization.enabled?("bike_stickers") %>
-      <% column.(label: settings.column_renames[:sticker_cell], classes: "hideableColumn sticker_cell tw:pt-0", header_classes: "tw:pt-1") do |bike| %>
+      <% table.column(label: settings.column_renames[:sticker_cell], classes: "hideableColumn sticker_cell tw:pt-0", header_classes: "tw:pt-1") do |bike| %>
         <% bike.bike_stickers.each do |bs| %>
           <% if bs.organization.present? && bs.organization_id == organization.id %>
             <%= link_to bs.pretty_code, edit_organization_sticker_path(id: bs.code, organization_id: bs.organization&.to_param), class: "tw:text-xs tw:block tw:mt-1", data: {turbo_frame: "_top"} %>
@@ -226,7 +182,7 @@
           <% end %>
         <% end %>
       <% end %>
-      <% column.(label: translation(".assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
+      <% table.column(label: translation(".assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
         <small>
           <a data-bike-id="<%= bike.id %>">
             <%= t("components.pages.org.search_results.bikes_table.link_sticker") %>
@@ -236,17 +192,10 @@
     <% end %>
 
     <% if organization.enabled?("registration_notes") %>
-      <% column.(label: settings.column_renames[:notes_cell], classes: "hideableColumn notes_cell tw:leading-none") do |bike| %>
+      <% table.column(label: settings.column_renames[:notes_cell], classes: "hideableColumn notes_cell tw:leading-none") do |bike| %>
         <small>
           <%= BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: organization.id)&.body %>
         </small>
-      <% end %>
-    <% end %>
-
-    <% if impound %>
-      <% select_all = button_tag(check_mark, type: "button", title: translation(".toggle_all_checked"), aria: {label: translation(".toggle_all_checked")}, class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", data: {action: "click->table-multi-checkbox#toggleAll click->org--impound-update-multi#hideErrorIfChecked"}) %>
-      <% table.column(label: select_all, classes: multiselect_classes) do |impound_record| %>
-        <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, form: Pages::Org::ImpoundRecords::UpdateForm::Component::MULTI_FORM_ID, data: {"table-multi-checkbox-target" => "checkbox", "update-kinds" => impound_record.update_multi_kinds.join(" "), action: "change->org--impound-update-multi#hideErrorIfChecked"} %>
       <% end %>
     <% end %>
   <% end %>

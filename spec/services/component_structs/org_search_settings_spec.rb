@@ -115,17 +115,6 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
-  describe "impound" do
-    it "adds the impound columns and sorts, and drops the export" do
-      expect(instance.impound_columns).to eq []
-      impound_settings = described_class.new(organization:, impound: true)
-      expect(impound_settings.impound_columns).to eq described_class::IMPOUND_COLUMNS
-      expect(impound_settings.initially_checked_columns).to include("impound_id_cell")
-      expect(impound_settings.sort_column_label("user_id")).to eq "Last updator"
-      expect(impound_settings.render_export?).to be_falsey
-    end
-  end
-
   describe "initially_checked_columns" do
     it "returns default columns" do
       cols = instance.initially_checked_columns

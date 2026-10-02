@@ -13,17 +13,17 @@ RSpec.describe Pages::Org::ImpoundRecords::Index::Component, type: :component do
     {
       pagy:,
       impound_records: ImpoundRecord.none,
+      search_status: "current",
+      search_unregisteredness: "all",
+      time_range: (Time.current - 1.year)..Time.current,
+      period: "year",
+      available_statuses: %w[current all],
       current_organization: organization,
-      per_page: 25,
       sort_state: ComponentStructs::SortState.new(sort: "created_at", direction: "desc")
     }
   end
 
-  it "renders the results card, with the multi-update toggle and its form" do
-    expect(component).to have_content(/0\s+matches/)
-    expect(component).to have_button("Update multiple records")
-    expect(component).to have_button("Column settings")
-    expect(component).to have_css("form##{Pages::Org::ImpoundRecords::UpdateForm::Component::MULTI_FORM_ID}", visible: :all)
-    expect(component).to have_link("Cards")
+  it "renders" do
+    expect(component).to have_content(/0\s+matching impound records/)
   end
 end

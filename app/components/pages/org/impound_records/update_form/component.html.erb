@@ -1,4 +1,4 @@
-<%= form_for @impound_record_update, url: form_url, method: :patch, html: {id: form_id}, data: form_data do |f| %>
+<%= form_for @impound_record_update, url: form_url, method: :patch, data: form_data do |f| %>
   <% card_content = capture do %>
     <div class="card-title">
       <% if @card %>
@@ -99,4 +99,6 @@
   <% else %>
     <%= card %>
   <% end %>
+
+  <%= content %>
 <% end %>

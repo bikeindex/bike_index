@@ -53,7 +53,7 @@ module Pages
           end
 
           def render_location_fields?
-            @settings_and_filters_component&.location_search?
+            @settings_and_filters_component.present?
           end
 
           def location_search_disabled?

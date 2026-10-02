@@ -3,7 +3,7 @@
 require "rails_helper"
 
 # Verifies the impound records index browser behavior: results load into a
-# turbo-frame, the settings panel/location filters drive it, and the multi-update
+# turbo-frame, the dropdown/location filters drive it, and the multi-update
 # flow (`org--impound-update-multi` + `org--impound-update`) reacts to the
 # rendered DOM. Lives at the integration layer because the controllers react
 # to the rendered DOM.
@@ -69,33 +69,15 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # search_no_js should NOT be in the URL (removed by the JS controller)
     expect(page).not_to have_current_path(/search_no_js/)
 
-    # The impound columns are a group of their own in the column settings, all on by default
-    click_button "Column settings"
-    impound_columns = find("h3", text: "Impound columns").find(:xpath, "../..")
-    expect(page).to have_css("th.impound_user_cell", text: /last updator/i)
-    within(impound_columns) { click_button "none" }
-    expect(page).to have_no_css("th.impound_user_cell")
-    within(impound_columns) { click_button "default" }
-    expect(page).to have_css("th.impound_user_cell")
-    click_button "Column settings"
-
-    # The view switcher swaps the table for cards, and back
-    click_link "Cards"
-    expect(page).to have_current_path(/search_result_view=cards/, wait: 10)
-    expect(page).to have_no_css("turbo-frame#impound_records_results_frame table")
-    expect(page).to have_no_button("Update multiple records")
-    click_link "Table"
-    expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
-
-    # The settings panel's radios submit the search, which advances the URL and
-    # updates the frame in place
-    expect(page).to have_text("Current records")
-    click_button "Search settings and filters"
-    choose("search_unregisteredness_only_unregistered", allow_label_click: true, visible: :all)
+    # Unregisteredness dropdown link advances the URL (data-turbo-action="advance")
+    # and updates the frame in place
+    within("turbo-frame#impound_records_results_frame") do
+      all("[data-ui--dropdown-target='button']").last.click
+    end
+    click_link "Only unregistered"
 
     expect(page).to have_current_path(/search_unregisteredness=only_unregistered/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 1)
-    expect(page).to have_text("Current records · Only unregistered")
 
     # Back navigation restores the unfiltered listing. The page opts out of
     # Turbo's snapshot cache (no-cache meta), so back/forward re-fetch it and the
@@ -103,9 +85,6 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     page.go_back
     expect(page).not_to have_current_path(/search_unregisteredness/, wait: 10)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
-    # search--form puts the panel's radios back in step with the address bar
-    expect(find("#search_unregisteredness_all", visible: :all)).to be_checked
-    expect(page).not_to have_text("Current records · Only unregistered")
 
     # Search form submit + direct back-nav: regression guard for the stale
     # turbo-frame state the no-cache meta prevents. The form submit updates the
@@ -157,7 +136,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # Cells are hidden until the user opts into multi-update.
     expect(page).not_to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
 
-    click_button "Update multiple records"
+    click_button "update multiple records"
 
     # Wait for the makeMultiUpdate panel to be expanded — the kind <select> is
     # inside it, so its visibility is the signal the Stimulus controller has run.
@@ -186,15 +165,15 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(unregistered.impound_record_updates).to be_empty
 
     # redirect_back keeps multi_update=true, so the index reloads with the
-    # panel server-rendered open — the toggle now reads "Hide update".
+    # panel server-rendered open — the toggle now reads "hide update".
     expect(page).to have_current_path(/multi_update=true/)
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
 
     # "hide update" collapses the panel; clicking the toggle again reopens it
-    click_button "Hide update"
+    click_button "hide update"
     expect(page).to have_select("impound_record_update_kind", visible: :hidden, wait: 5)
     expect(page).not_to have_current_path(/multi_update=true/)
-    click_button "Update multiple records"
+    click_button "update multiple records"
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)
     # registered is resolved now, so the three remaining active rows stay
     expect(page).to have_css("table tbody tr", count: 3)

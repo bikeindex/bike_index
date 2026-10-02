@@ -12,9 +12,8 @@ export default class extends Controller {
 
   connect () {
     // The panel may be rendered already-open (multi_update=true) — in that
-    // case sync the checkbox enabled state, since toggle() never runs. The cards
-    // and list views render no panel.
-    if (this.hasPanelTarget && this.panelOpen) {
+    // case sync the checkbox enabled state, since toggle() never runs.
+    if (this.panelOpen) {
       this.refreshChecks()
     }
   }
