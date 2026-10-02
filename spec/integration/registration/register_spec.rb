@@ -521,7 +521,9 @@ RSpec.describe "Register flow", :js, type: :system do
         click_combobox_option("Red")
         fill_in_verified "bike[serial_number]", with: "R2UP1234"
         click_button "Complete Bike Registration"
-        expect(page).to have_content("Registration complete")
+        # Attaching the blob reads its first bytes back from R2 to identify it, inside the submit.
+        # Outwaited, the example's teardown truncates the blob out from under the request.
+        expect(page).to have_content("Registration complete", wait: 15)
 
         public_image = Bike.last.public_images.first
         expect(public_image.file.attached?).to be_truthy
