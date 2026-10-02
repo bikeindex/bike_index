@@ -144,6 +144,17 @@ RSpec.describe PaymentsController, type: :request do
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
+    # The donate page's other amount is in dollars, and without javascript its checked
+    # preset submits alongside it
+    it "prefers a typed amount over amount_cents" do
+      VCR.use_cassette("payments_controller-onetime-nouser", match_requests_on: [:method], re_record_interval:) do
+        expect {
+          post base_url, params: {payment: {amount_cents: 5000, amount: "37.5", currency: "USD", kind: "donation"}}
+        }.to change(Payment, :count).by(1)
+        expect(Payment.last.amount_cents).to eq 3750
+      end
+    end
+
     context "with invalid amount" do
       shared_examples "redirects back and shows flash message" do
         it "does not raise an error" do
