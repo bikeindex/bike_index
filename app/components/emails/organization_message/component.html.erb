@@ -1,6 +1,4 @@
-<% if mail_snippet.present? %>
-  <%= mail_snippet.body.html_safe %>
-<% end %>
+<%= mail_snippet&.body&.html_safe %>
 
 <p>
   <%= translation("sender_sent_you_a_message_html", sender_email:, organization_name:, link: link_to(bike.type, bike_url(bike))) %>

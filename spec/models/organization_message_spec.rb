@@ -14,14 +14,6 @@ RSpec.describe OrganizationMessage, type: :model do
       expect(organization_message).to have_attributes(receiver_id: nil, receiver_email: "owner@bikeindex.org", kind: "general_message")
     end
 
-    context "unknown kind" do
-      it "is invalid" do
-        organization_message.kind = "e_vehicle_policy_message"
-        expect(organization_message.save).to be_falsey
-        expect(organization_message.errors.full_messages).to eq(["Kind is not included in the list"])
-      end
-    end
-
     context "phone registration" do
       let(:bike) { FactoryBot.create(:bike_organized, :phone_registration, creation_organization: organization) }
       it "is invalid" do

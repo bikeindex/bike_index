@@ -26,7 +26,7 @@
 class OrganizationMessage < ApplicationRecord
   KIND_ENUM = {general_message: 0}.freeze
 
-  enum :kind, KIND_ENUM, validate: true
+  enum :kind, KIND_ENUM
 
   belongs_to :bike
   belongs_to :organization
@@ -54,7 +54,7 @@ class OrganizationMessage < ApplicationRecord
     end
   end
 
-  # Each kind is also a MailSnippet kind: the org's boilerplate for that message
+  # Kinds double as MailSnippet kinds
   def mail_snippet(time: created_at) = MailSnippet.for_organization(organization_id:, kind:, time:)
 
   private

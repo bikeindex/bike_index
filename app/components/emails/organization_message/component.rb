@@ -26,11 +26,7 @@ module Emails
         @organization_message.organization.short_name
       end
 
-      def mail_snippet
-        return @mail_snippet if defined?(@mail_snippet)
-
-        @mail_snippet = @organization_message.mail_snippet(time: snippet_time)
-      end
+      def mail_snippet = @mail_snippet ||= @organization_message.mail_snippet(time: snippet_time)
     end
   end
 end

@@ -101,22 +101,14 @@ RSpec.describe OrgServices::EmailPreview do
         end
       end
 
-      context "with an organization_message_id param" do
+      context "with an existing organization_message" do
         let!(:organization_message) { FactoryBot.create(:organization_message, created_at: 1.day.ago) }
         let(:organization) { organization_message.organization }
-        let(:params) { ActionController::Parameters.new(organization_message_id: organization_message.id) }
         let(:versioned) { true }
 
         it "loads it, versioned on created_at" do
           expect(component.instance_variable_get(:@organization_message)).to eq organization_message
           expect(component.snippet_time).to eq organization_message.created_at
-        end
-
-        context "for a different organization" do
-          let(:organization) { FactoryBot.create(:organization) }
-          it "raises" do
-            expect { component }.to raise_error(ActiveRecord::RecordNotFound)
-          end
         end
       end
     end

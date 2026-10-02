@@ -15,7 +15,7 @@ module OrgServices
         bike = graduated_notification.bike || default_bike(organization:, user:)
         Emails::GraduatedNotification::Component.new(graduated_notification:, bike:, email_preview: true, versioned:)
       elsif OrganizationMessage.kinds.key?(kind)
-        organization_message = find_or_build_organization_message(kind:, organization:, user:, params:)
+        organization_message = find_or_build_organization_message(kind:, organization:, user:)
         Emails::OrganizationMessage::Component.new(organization_message:, versioned:)
       elsif %w[impound_claim_approved impound_claim_denied].include?(kind)
         Emails::ImpoundClaimApprovedOrDenied::Component.new(
@@ -69,11 +69,9 @@ module OrgServices
         GraduatedNotification.new(organization_id: organization.id, bike: default_bike(organization:, user:))
     end
 
-    def find_or_build_organization_message(kind:, organization:, user:, params:)
+    def find_or_build_organization_message(kind:, organization:, user:)
       organization_messages = organization.organization_messages
-      organization_message = organization_messages.find(params[:organization_message_id]) if params[:organization_message_id].present?
-      organization_message ||= organization_messages.where(kind:).last
-      organization_message ||
+      organization_messages.where(kind:).last ||
         organization_messages.build(kind:, sender: user, bike: default_bike(organization:, user:),
           message: "The message you write to the owner")
     end
