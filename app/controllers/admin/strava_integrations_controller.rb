@@ -25,9 +25,7 @@ module Admin
     end
 
     def sortable_opts
-      return sortable_order("strava_integrations.strava_id::bigint") if sort_column == "strava_id"
-
-      sortable_order(StravaIntegration)
+      sortable_order((sort_column == "strava_id") ? "strava_id::bigint" : StravaIntegration)
     end
 
     def permission_levels

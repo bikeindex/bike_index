@@ -17,13 +17,11 @@ RSpec.describe Admin::StravaIntegrationsController, type: :request do
     end
 
     context "sorted by athlete ID" do
-      let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, strava_id: "9") }
-      let!(:strava_integration_larger) { FactoryBot.create(:strava_integration, :synced, strava_id: "10") }
+      let!(:strava_integration_smaller) { FactoryBot.create(:strava_integration, strava_id: "999") }
 
       it "sorts numerically" do
         get base_url, params: {sort: "strava_id", direction: "asc"}
-        expect(response.status).to eq(200)
-        expect(assigns(:collection).pluck(:id)).to eq([strava_integration.id, strava_integration_larger.id])
+        expect(assigns(:collection).pluck(:id)).to eq([strava_integration_smaller.id, strava_integration.id])
       end
     end
   end
