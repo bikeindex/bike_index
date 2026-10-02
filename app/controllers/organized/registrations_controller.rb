@@ -125,7 +125,7 @@ module Organized
     def update_organization_settings
       return if params[:organization].blank? || !current_user.admin_of?(current_organization)
 
-      current_organization.update(params.require(:organization).permit(:send_self_registration_email))
+      current_organization.update(params[:organization].permit(:send_self_registration_email))
     end
 
     def normalized_search_kind
