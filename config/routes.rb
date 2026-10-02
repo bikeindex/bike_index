@@ -309,7 +309,7 @@ Rails.application.routes.draw do
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
-      notifications organization_landing_pages organization_statuses paper_trail_versions
+      notifications organization_landing_pages organization_messages organization_statuses paper_trail_versions
       parking_notifications public_images
       strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
@@ -504,6 +504,7 @@ Rails.application.routes.draw do
     resources :emails, only: %i[index show edit update]
     resources :parking_notifications
     resources :graduated_notifications, only: %w[index show]
+    resources :organization_messages, only: %i[create]
     resources :impound_records, only: %i[index show update]
     resources :impound_claims, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]

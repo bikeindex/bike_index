@@ -251,8 +251,25 @@ module IntegrationSpecHelpers
 
   # Click an async hotwire_combobox option, re-finding it if a later async
   # response re-renders the listbox and detaches the node between find and click.
+  # The pick filters once more, debounced, and Turbo renders that response by putting focus
+  # back where it was when the render began - so a fill landing in that frame types into the
+  # field filled before it. This waits for the response and the frame after it.
   def click_combobox_option(text)
-    retry_on_detach { find(".hw-combobox__option", text:, match: :first).click }
+    combobox = nil
+    retry_on_detach do
+      option = find(".hw-combobox__option", text:, match: :first)
+      combobox = option.ancestor("[data-controller~='hw-combobox']")
+      option.click
+    end
+    page.evaluate_async_script(<<~JS, combobox)
+      const [element, done] = arguments
+      const controller = window.Stimulus.getControllerForElementAndIdentifier(element, "hw-combobox")
+      if (!controller?.hasAsyncSrcValue) return done()
+      const giveUpAt = performance.now() + 10000
+      const settle = () => (controller.callbackQueue.length && performance.now() < giveUpAt)
+        ? setTimeout(settle, 50) : requestAnimationFrame(() => requestAnimationFrame(done))
+      setTimeout(settle, controller.debounceIntervalValue)
+    JS
   end
 
   # Takes the trigger (a page with two of them opens the same modal from either), which names

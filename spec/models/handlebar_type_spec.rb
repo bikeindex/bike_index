@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe HandlebarType, type: :model do
   describe "normalized name" do
-    let(:slug) { :flat }
+    let(:slug) { :horizontal }
 
     it "returns the slug's normalized name" do
       ht = HandlebarType.new(slug)
@@ -19,20 +19,30 @@ RSpec.describe HandlebarType, type: :model do
       expect(HandlebarType.friendly_find("not-known-type")).to be_nil
     end
 
-    it "returns flat for its names" do
-      %w[flat Riser horizontal].each { expect(HandlebarType.friendly_find(it).slug).to eq :flat }
+    it "returns drop_bar for its slug" do
+      ["drop_bar", "drop-bar", :drop_bar].each { expect(HandlebarType.friendly_find(it).slug).to eq :drop_bar }
     end
 
-    it "returns flat for the removed bmx" do
-      [" BMX ", :bmx, "BMX style"].each { expect(HandlebarType.friendly_find(it).slug).to eq :flat }
+    it "returns horizontal for its names and former slugs" do
+      ["horizontal", "Riser", " FLAT ", :flat, " BMX ", :bmx, "BMX style"].each do
+        expect(HandlebarType.friendly_find(it).slug).to eq :horizontal
+      end
     end
 
     context "slug" do
       let(:name) { "Horizontal facing " }
       it "tries to find the slug, given a name" do
         finder = HandlebarType.friendly_find(name)
-        expect(finder.slug).to eq :flat
+        expect(finder.slug).to eq :horizontal
       end
+    end
+  end
+
+  describe "api_slug" do
+    it "returns flat for horizontal" do
+      expect(HandlebarType.api_slug("horizontal")).to eq "flat"
+      expect(HandlebarType.api_slug("drop_bar")).to eq "drop_bar"
+      expect(HandlebarType.api_slug(nil)).to be_nil
     end
   end
 

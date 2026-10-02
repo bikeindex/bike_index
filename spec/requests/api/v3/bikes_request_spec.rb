@@ -1060,7 +1060,7 @@ RSpec.describe "Bikes API V3", type: :request do
       end
 
       context "organization_pre_registration" do
-        let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop") }
+        let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop", send_self_registration_email: true) }
         let(:email) { auto_user.email }
         before { Sidekiq::Testing.inline! }
         after { Sidekiq::Testing.fake! }

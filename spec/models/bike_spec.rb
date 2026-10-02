@@ -1989,5 +1989,12 @@ RSpec.describe Bike, type: :model do
         expect(bike.reload.messages_count).to eq 4
       end
     end
+    context "organization_message" do
+      let!(:organization_message) { FactoryBot.create(:organization_message) }
+      let(:bike) { organization_message.bike }
+      it "is 1" do
+        expect(bike.reload.messages_count).to eq 1
+      end
+    end
   end
 end

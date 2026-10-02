@@ -87,6 +87,7 @@ module Organized
     def settings
       @page_title = I18n.t("meta_titles.registration_form_settings")
       render Pages::Org::RegisterSettings::Component.new(organization: current_organization, old_view: old_register_view?,
+        organization_admin: current_user.admin_of?(current_organization),
         **BikeServices::Register.session_settings(session[:register_settings], current_organization.id))
     end
 
@@ -251,7 +252,8 @@ module Organized
       end
       bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
       bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
-      bikes = BikeServices::OrganizedSearch.status(bikes, search_status)
+      bikes = BikeServices::OrganizedSearch.status(bikes, search_status,
+        organization_bikes: org.present? && !@search_all)
       bikes = unregisteredness_scoped(bikes)
       if params[:search_model_audit_id].present?
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])

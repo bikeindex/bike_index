@@ -13,7 +13,7 @@
             <%= render(UI::Badge::Component.new(text: translation(".bike_stolen"), color: :error, size: :lg, indicator: true)) %>
           </span>
 
-          <span class="tw:hidden tw:text-xs tw:sm:inline">
+          <span class="tw:text-xs">
             <%= translation(".act_in_the_first_24_hours") %>
           </span>
         </div>
@@ -45,17 +45,15 @@
             tw:sm:items-center
           "
         >
-          <%= render(UI::ButtonLink::Component.new(href: register_stolen_path, color: :primary, size: :callout)) do %>
-            <span class="tw:sm:hidden"><%= translation(".register_your_stolen_bike") %></span>
-            <span class="tw:hidden tw:sm:inline"><%= translation(".register_your_stolen_bike_free") %></span>
-          <% end %>
+          <%= render(UI::ButtonLink::Component.new(href: register_stolen_path,
+            text: translation(".register_your_stolen_bike_free"), color: :primary, size: :callout)) %>
 
           <%= render(UI::ButtonLink::Component.new(href: search_registrations_path,
             text: translation(".search_the_registry"), color: :purple,
             html_class: "#{PILL} tw:px-6! tw:py-3.5! tw:text-[15.5px]! tw:border-2! tw:bg-white! tw:text-purple-500! tw:hover:bg-purple-500! tw:hover:text-white!")) %>
         </div>
 
-        <p class="tw:m-0 tw:hidden tw:text-[14.5px] tw:sm:block">
+        <p class="tw:m-0 tw:text-[14.5px]">
           <%= translation(".no_account_yet") %>
         </p>
       </div>
@@ -70,18 +68,18 @@
       >
         <h2
           class="
-            tw:m-0 tw:hidden tw:text-[11.5px] tw:font-extrabold
-            tw:tracking-widest tw:text-gray-400 tw:uppercase tw:lg:block
+            tw:col-span-2 tw:m-0 tw:text-[11.5px] tw:font-extrabold
+            tw:tracking-widest tw:text-gray-400 tw:uppercase
           "
         >
           <%= translation(".recovery_record") %>
         </h2>
 
-        <% stats.each_with_index do |stat, index| %>
+        <% stats.each do |stat| %>
           <div
             class="
-              tw:lg:border-gray-200 tw:lg:not-last:border-b tw:lg:not-last:pb-3
-              <%= "tw:hidden tw:lg:block" if index > 1 %>
+              tw:lg:border-gray-200 tw:lg:not-last:border-b
+              tw:lg:not-last:pb-3
             "
           >
             <div
@@ -108,7 +106,7 @@
         <%= translation(".the_first_24_hours") %>
       </h2>
 
-      <p class="tw:mt-1 tw:mb-4 tw:text-[15px] tw:lg:mb-6 tw:lg:text-[17px]">
+      <p class="<%= subhead_classes %>">
         <%= translation(".work_top_to_bottom") %>
       </p>
 
@@ -189,16 +187,11 @@
         <%= translation(".why_registering_changes_the_odds") %>
       </h2>
 
-      <p
-        class="
-          tw:mt-1 tw:mb-4 tw:hidden tw:max-w-190 tw:text-[17px] tw:sm:block
-          tw:lg:mb-6
-        "
-      >
+      <p class="tw:max-w-190 <%= subhead_classes %>">
         <%= translation(".why_registering_subhead") %>
       </p>
 
-      <div class="tw:mt-4 tw:grid tw:gap-3 tw:sm:mt-0 tw:md:grid-cols-3 tw:md:gap-4.5">
+      <div class="tw:grid tw:gap-3 tw:md:grid-cols-3 tw:md:gap-4.5">
         <% pillars.each do |pillar| %>
           <div
             class="
@@ -240,8 +233,9 @@
 
       <div
         class="
-          tw:mt-4.5 tw:hidden tw:items-center tw:gap-7.5 tw:rounded-lg
-          tw:border tw:border-gray-200 tw:bg-purple-100 tw:p-6.5 tw:lg:flex
+          tw:mt-4.5 tw:flex tw:flex-col tw:items-start tw:gap-4
+          tw:rounded-lg tw:border tw:border-gray-200 tw:bg-purple-100 tw:p-4
+          tw:lg:flex-row tw:lg:items-center tw:lg:gap-7.5 tw:lg:p-6.5
         "
       >
         <div class="tw:flex-1">
@@ -256,14 +250,19 @@
 
           <h3
             class="
-              tw:m-0 tw:mt-1.5 tw:font-header tw:text-[26px]
-              tw:font-extrabold tw:text-slate-900
+              tw:m-0 tw:mt-1.5 tw:font-header tw:text-[19px]
+              tw:font-extrabold tw:text-slate-900 tw:lg:text-[26px]
             "
           >
             <%= translation(".promoted_alerts_title") %>
           </h3>
 
-          <p class="tw:m-0 tw:mt-2 tw:max-w-190 tw:text-base tw:text-gray-700">
+          <p
+            class="
+              tw:m-0 tw:mt-2 tw:max-w-190 tw:text-[14.5px] tw:text-gray-700
+              tw:lg:text-base
+            "
+          >
             <%= translation(".promoted_alerts_body") %>
           </p>
         </div>
@@ -287,26 +286,31 @@
             <%= translation(".bikes_that_came_home") %>
           </h2>
 
-          <p class="tw:m-0 tw:mt-1 tw:hidden tw:text-[17px] tw:sm:block">
+          <p class="tw:m-0 tw:mt-1 tw:text-[15px] tw:lg:text-[17px]">
             <%= translation(".recoveries_reported_by_owners") %>
           </p>
         </div>
 
         <%= link_to(translation(".read_more_recovery_stories"), recovery_stories_path,
-          class: "twlink tw:hidden tw:text-[15.5px] tw:font-bold tw:sm:inline") %>
+          class: "twlink tw:text-[15.5px] tw:font-bold") %>
       </div>
 
       <ul
         class="
-          tw:m-0 tw:mt-4 tw:grid tw:list-none tw:gap-4 tw:p-0
-          tw:sm:grid-cols-2 tw:lg:mt-6 tw:lg:grid-cols-4
+          tw:m-0 tw:-mx-5 tw:mt-4 tw:flex tw:snap-x tw:snap-mandatory
+          tw:scroll-px-5 tw:list-none tw:gap-4 tw:overflow-x-auto tw:p-0
+          tw:px-5 tw:sm:mx-0 tw:sm:grid tw:sm:grid-cols-2
+          tw:sm:overflow-visible tw:sm:px-0 tw:lg:mt-6 tw:lg:grid-cols-4
         "
       >
-        <% @recovery_displays.each_with_index do |recovery_display, index| %>
+        <% @recovery_displays.each do |recovery_display| %>
           <li
             class="
-              tw:flex-col tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]
-              <%= index > 1 ? "tw:hidden tw:sm:flex" : "tw:flex" %>
+              tw:flex tw:w-4/5 tw:shrink-0 tw:snap-start tw:flex-col
+              tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200
+              tw:bg-white tw:transition-all tw:duration-300
+              tw:hover:-translate-y-1.25
+              tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:sm:w-auto
             "
           >
             <%= image_tag(recovery_display.photo_url, alt: recovery_display.image_alt,
@@ -336,9 +340,6 @@
           </li>
         <% end %>
       </ul>
-
-      <%= link_to(translation(".read_more_recovery_stories"), recovery_stories_path,
-        class: "twlink tw:mt-4 tw:inline-block tw:text-[15.5px] tw:font-bold tw:sm:hidden") %>
     </div>
   </section>
 
@@ -413,12 +414,7 @@
         <%= translation(".report_bike_theft_issues") %>
       </h2>
 
-      <div
-        class="
-          tw:mt-1 tw:mb-4 tw:flex tw:max-w-190 tw:flex-col tw:gap-2
-          tw:text-[15px] tw:lg:mb-6 tw:lg:text-[17px]
-        "
-      >
+      <div class="tw:flex tw:max-w-190 tw:flex-col tw:gap-2 <%= subhead_classes %>">
         <p class="tw:m-0">
           <%= translation(".report_bike_theft_issues_subhead") %>
           <%= translation(".reporting_your_own_bike_html", register_it_link: link_to(translation(".register_it"), register_stolen_path, class: "twlink")) %>
