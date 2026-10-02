@@ -24,7 +24,8 @@ BUG_REPORTS = "/admin/bug_reports" # Admin pages rather than API routes, same ad
 PATHS = {
   "sidekiq" => "/api/admin_data/sidekiq",
   "pghero" => "/api/admin_data/pghero",
-  "bug_reports" => "#{BUG_REPORTS}.json"
+  "bug_reports" => "#{BUG_REPORTS}.json",
+  "missing_manufacturers" => "/admin/bikes/missing_manufacturer.json"
 }.freeze
 
 def env_get(key)
@@ -216,6 +217,14 @@ when "create-manufacturer" # create-manufacturer name="Cool Bikes" website=cool.
     form: attributes.transform_keys { "manufacturer[#{it}]" }) or exit(22)
   puts body
 
+when "update-manufacturer" # update-manufacturer <slug> name="Cool Bikes (Cool)"
+  slug = ARGV[1] or abort("usage: update-manufacturer <slug> [param=value …]")
+  attributes = parse_params(ARGV.drop(2))
+  abort("nothing to update") if attributes.empty?
+  body = with_token(:patch, "/admin/manufacturers/#{slug}.json",
+    form: attributes.transform_keys { "manufacturer[#{it}]" }) or exit(22)
+  puts body
+
 when "check" # full health check: sidekiq, then pghero — summary + OK/ABNORMAL verdict each
   puts "== SIDEKIQ =="
   body = get_endpoint("sidekiq") or exit(22)
@@ -237,6 +246,7 @@ when "refresh" # refresh the token pair now (needs ADMIN_DOORKEEPER_APP_CLIENT_S
 else
   warn "usage: admin_data.rb {check | get <#{PATHS.keys.join("|")}> [param=value …] | " \
     "show-bug-report <id> | update-bug-report <id> [param=value …] | create-manufacturer name=… | " \
+    "update-manufacturer <slug> [param=value …] | " \
     "authorize-url | set-tokens <access> <refresh> | refresh}"
   exit 64
 end

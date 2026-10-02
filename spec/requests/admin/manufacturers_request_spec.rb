@@ -66,6 +66,35 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       expect(flash[:success]).to be_present
       expect(subject.reload).to have_attributes permitted_attributes
     end
+
+    context "authenticated with an API token" do
+      let(:current_user) { false }
+      include_context :admin_doorkeeper_token
+      include_context :test_csrf_token
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Cool Bikes") }
+      let(:url) { "/admin/manufacturers/#{manufacturer.slug}.json" }
+      include_examples "rejects_unauthorized_token", :patch
+
+      context "token for a manufacturers superuser" do
+        before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "manufacturers") }
+
+        it "updates" do
+          patch url, params: token_param.merge(manufacturer: {name: "Cool Bikes (Rad Bikes)"})
+          expect(response.status).to eq 200
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool", "secondary_slug" => "rad")
+        end
+
+        context "with a name that is taken" do
+          let!(:other) { FactoryBot.create(:manufacturer, name: "Rad Bikes") }
+          it "returns the errors" do
+            patch url, params: token_param.merge(manufacturer: {name: "Rad Bikes"})
+            expect(response.status).to eq 422
+            expect(json_result["errors"]).to be_present
+            expect(manufacturer.reload.name).to eq "Cool Bikes"
+          end
+        end
+      end
+    end
   end
 
   describe "create" do

@@ -23,9 +23,9 @@ Production JSON reachable with the admin OAuth token:
 - `GET https://bikeindex.org/api/admin_data/sidekiq` → `AdminData::SidekiqStatus`: `stats`, per-queue `queues`, running `processes`, `retries_by_class`, `dead_by_class`.
 - `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats`, `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
 - `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
-- `POST /admin/manufacturers.json` → `create-manufacturer`; the `manufacturers` skill walks through it.
+- `GET /admin/bikes/missing_manufacturer.json` → `get missing_manufacturers`, `POST /admin/manufacturers.json` → `create-manufacturer`, and `PATCH /admin/manufacturers/:slug.json` → `update-manufacturer`; the `manufacturers` skill walks through them.
 
-Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `manufacturers`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the admin controllers that include `Admin::TokenAccessible`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
+Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `bikes`, `manufacturers`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the admin controllers that include `Admin::TokenAccessible`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 
 All operations go through the helper:
 
@@ -99,6 +99,6 @@ The authorization code expires 10 minutes after the page loads — if it shows a
 
 ## Notes
 
-- These hit **production** with a superuser token. `update-bug-report` and `create-manufacturer` are the writes — confirm the values with the user before running either.
+- These hit **production** with a superuser token. `update-bug-report`, `create-manufacturer` and `update-manufacturer` are the writes — confirm the values with the user before running any of them.
 - Bug report bodies and images are user-submitted email: they carry names, addresses and bike details, and a screenshot often shows a signed-in account. Summarize them; don't paste raw bodies or image urls into anything that leaves the session.
 - `.env.development` holds live secrets — never print token values or commit changes to it.
