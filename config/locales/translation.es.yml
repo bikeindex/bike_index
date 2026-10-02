@@ -5931,7 +5931,6 @@ es:
             de aparcamiento no registrado).
           send_self_registration_email_html: Enviar correo electrónico para inscripciones
             enviadas a <code>%{email}</code>
-          update_organization: Actualizar la configuración de la organización
         registrations:
           new:
             registration_form_settings: Configuración del formulario de registro
