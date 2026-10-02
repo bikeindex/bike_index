@@ -15,9 +15,9 @@ module Atoms
         render(Atoms::ShortId::Component.new(short_id: "r/36"))
       end
 
-      # @label with extra classes appended
-      def with_html_class
-        render(Atoms::ShortId::Component.new(short_id: "r/21J-HW", html_class: "tw:text-base"))
+      # @label too narrow for the ID: scrolls, with the copy button over its right edge
+      def overflowing
+        {template: "atoms/short_id/component_preview/overflowing"}
       end
       # @!endgroup
     end
