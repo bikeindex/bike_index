@@ -43,7 +43,7 @@ module BikeServices
 
       bounding_box = proximity[:bounding_box]
       stolen = bikes.status_stolen.within_bounding_box(bounding_box)
-      return stolen if search_status == "stolen" || !registration_address_searchable?(organization:, search_all:)
+      return stolen if search_status == "stolen"
 
       # EXISTS rather than IN: an IN subquery inside an OR can't use an index, so it scans
       # every address record
@@ -72,7 +72,7 @@ module BikeServices
 
     # Currently impounded bikes are the impound records search's, never this one's
     def status(bikes, value)
-      (value == "all") ? bikes.where.not(status: "status_impounded") : bikes.where(status: "status_#{value}")
+      (value == "all") ? bikes.not_status_impounded : bikes.where(status: "status_#{value}")
     end
 
     #
