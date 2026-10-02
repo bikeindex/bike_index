@@ -688,6 +688,20 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(form_field_names("bike")).to eq([])
       end
 
+      it "only updates the organization's email setting for an admin" do
+        post "#{base_url}/switches", params: {single_page: true, organization: {send_self_registration_email: "1"}}
+        expect(current_organization.reload.send_self_registration_email).to be_falsey
+        expect(session[:register_settings]).to include("single_page" => true)
+
+        current_user.organization_roles.first.update(role: "admin")
+        post "#{base_url}/switches", params: {single_page: true, organization: {send_self_registration_email: "1"}}
+        expect(response).to redirect_to "#{base_url}/new"
+        expect(current_organization.reload.send_self_registration_email).to be_truthy
+
+        post "#{base_url}/switches", params: {organization: {send_self_registration_email: "0"}}
+        expect(current_organization.reload.send_self_registration_email).to be_falsey
+      end
+
       it "stores the separate attestation switch" do
         set_switches(separate_attestation: true)
         expect(session[:register_settings]).to include("separate_attestation" => true)
