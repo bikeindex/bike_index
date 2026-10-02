@@ -2796,7 +2796,8 @@ CREATE TABLE public.organization_messages (
     receiver_email character varying,
     message text,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    kind integer DEFAULT 0 NOT NULL
 );
 
 
@@ -7912,6 +7913,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261001182202'),
 ('20260930161510'),
 ('20260930161509'),
 ('20260926005700'),

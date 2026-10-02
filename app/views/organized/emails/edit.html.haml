@@ -60,11 +60,6 @@
       .form-group
         = f.label :subject, "Custom email subject", class: "control-label"
         = f.text_field :subject, class: "form-control"
-
-    - if @object.editable_subject?
-      .form-group
-        = f.label :subject, "Custom email subject", class: "control-label"
-        = f.text_field :subject, class: "form-control"
     .form-group
       = f.label :body, class: "control-label" do
         - if @kind == "organization_stolen_message"
