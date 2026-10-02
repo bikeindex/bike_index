@@ -3,9 +3,7 @@
 <%= form_with(model: @organization, url: switches_organization_registrations_path(organization_id: @organization.to_param),
     method: :post, data: {turbo: false, controller: "org--register-settings"}) do |f| %>
   <%= render UI::Card::Component.new(additional_classes: "tw:mb-6") do %>
-    <p class="tw:mb-4 tw:text-sm tw:text-gray-500 tw:italic tw:dark:text-gray-400">
-      <%= translation(".browser_only") %>
-    </p>
+    <h4 class="uncap tw:mb-4"><%= translation(".browser_only") %></h4>
 
     <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
       <span class="twlabel tw:sm:text-right"><%= translation(".registration_page") %></span>
@@ -42,8 +40,15 @@
     </div>
   <% end %>
 
+  <div class="tw:mb-6 tw:gap-x-8 tw:px-4 tw:sm:grid tw:sm:grid-cols-3">
+    <div class="tw:sm:col-span-2 tw:sm:col-start-2">
+      <%= render UI::Button::Component.new(text: translation(".update"), color: :primary, size: :lg,
+          type: "submit") %>
+    </div>
+  </div>
+
   <% if organization_settings? %>
-    <div class="tw:mb-6 tw:gap-x-8 tw:px-4 tw:sm:grid tw:sm:grid-cols-3">
+    <div class="tw:gap-x-8 tw:px-4 tw:sm:grid tw:sm:grid-cols-3">
       <span class="twlabel tw:sm:text-right"><%= translation(".emails") %></span>
 
       <div class="tw:sm:col-span-2">
@@ -62,11 +67,4 @@
       </div>
     </div>
   <% end %>
-
-  <div class="tw:gap-x-8 tw:px-4 tw:sm:grid tw:sm:grid-cols-3">
-    <div class="tw:sm:col-span-2 tw:sm:col-start-2">
-      <%= render UI::Button::Component.new(text: translation(".update"), color: :primary, size: :lg,
-          type: "submit") %>
-    </div>
-  </div>
 <% end %>
