@@ -251,7 +251,8 @@ module Organized
       end
       bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
       bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
-      bikes = BikeServices::OrganizedSearch.status(bikes, search_status)
+      bikes = BikeServices::OrganizedSearch.status(bikes, search_status,
+        organization_bikes: org.present? && !@search_all)
       bikes = unregisteredness_scoped(bikes)
       if params[:search_model_audit_id].present?
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
