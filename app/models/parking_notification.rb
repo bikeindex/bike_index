@@ -213,8 +213,11 @@ class ParkingNotification < ActiveRecord::Base
     initial_record_id.present?
   end
 
+  # A bike registered to the organization's own account has no owner to tell
   def owner_known?
-    !unregistered_bike? && bike&.owner_email.present?
+    return false if unregistered_bike? || email.blank?
+
+    email != organization&.auto_user&.email
   end
 
   def send_email?

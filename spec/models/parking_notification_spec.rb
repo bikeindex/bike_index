@@ -180,6 +180,24 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe "registered to the organization's auto_user" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+    let(:auto_user) { FactoryBot.create(:organization_auto_user, organization:) }
+    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: auto_user.email) }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization:, user: auto_user, bike:, kind: "impound_notification") }
+    it "doesn't email the auto_user" do
+      expect(organization.reload.auto_user).to eq auto_user
+      ActionMailer::Base.deliveries = []
+      Sidekiq::Testing.inline! { parking_notification }
+      expect(parking_notification.reload.impound_record).to be_present
+      expect(parking_notification.unregistered_bike?).to be_falsey
+      expect(parking_notification.owner_known?).to be_falsey
+      expect(parking_notification.retrieval_link_token).to be_blank
+      expect(parking_notification.notifications.count).to eq 0
+      expect(ActionMailer::Base.deliveries).to be_empty
+    end
+  end
+
   describe ".build_for" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications], approved: true) }
