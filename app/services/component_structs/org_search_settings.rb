@@ -185,6 +185,9 @@ module ComponentStructs
 
     def location_search? = true
 
+    # Its status filter leaves out currently impounded bikes, which the impound records search finds
+    def excludes_impounded? = true
+
     def notes_search_label = translation(:show_notes_search)
 
     def location_search_label = translation(:show_location_search)

@@ -53,7 +53,7 @@
           >
             <%= render(group_chips(group)) %>
 
-            <% if group[:name] == :search_status %>
+            <% if group[:name] == :search_status && excludes_impounded? %>
               <span class="tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
                 <%= translation(".excludes_impounded") %>
 

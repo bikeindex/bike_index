@@ -22,6 +22,8 @@ module ComponentStructs
 
     def location_search? = false
 
+    def excludes_impounded? = false
+
     def filter_groups
       [
         {name: :search_status, label: translation(:status), selected: @search_status,

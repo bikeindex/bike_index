@@ -26,6 +26,8 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
 
       expect(response.body).to include("Search settings and filters")
       expect(response.body).to include("Current records")
+      # The registrations search's note, which its own settings panel leaves out here
+      expect(response.body).to_not include("Results don&#39;t include currently impounded vehicles.")
 
       get base_url, headers: {"Turbo-Frame" => Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s}
       expect(response.status).to eq(200)
