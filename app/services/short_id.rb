@@ -2,7 +2,7 @@ module ShortId
   extend Functionable
 
   # Prefix per model class, so a short_id self-identifies
-  PREFIXES = {"Bike" => "r", "BikeVersion" => "v", "MarketplaceListing" => "m", "BikeSticker" => "s"}.freeze
+  PREFIXES = {"Bike" => "r", "BikeVersion" => "v", "MarketplaceListing" => "f", "BikeSticker" => "s"}.freeze
 
   # Compact, prefixed alias for an id, e.g. ShortId.encode("Bike", 3431156) => "r/21J-HW".
   # Ids whose base36 form is under 3 digits stay decimal, so they never collide with

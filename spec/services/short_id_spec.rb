@@ -5,7 +5,7 @@ RSpec.describe ShortId do
     it "returns the class-prefixed base36 id, grouped in threes" do
       expect(ShortId.encode("Bike", 3431156)).to eq "r/21J-HW"
       expect(ShortId.encode("BikeVersion", 3431156)).to eq "v/21J-HW"
-      expect(ShortId.encode("MarketplaceListing", 3431156)).to eq "m/21J-HW"
+      expect(ShortId.encode("MarketplaceListing", 3431156)).to eq "f/21J-HW"
       expect(ShortId.encode("Bike", nil)).to be_nil
     end
     it "keeps ids with an under-3-digit base36 form as decimals, round-tripping cleanly" do
