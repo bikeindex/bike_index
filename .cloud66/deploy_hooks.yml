@@ -12,8 +12,7 @@ production:
       target: rails
       run_on: all_servers
       sudo: true
-    # Make the uploads cache folder writable. Not -R: Sidekiq deletes cached files mid-walk,
-    # which fails the hook and with it the migrations every other server waits on
+    # Make the uploads cache folder writable. Not -R: Sidekiq deletes cached files mid-walk
     - command: sudo chown nginx:app_writers $RAILS_STACK_PATH/tmp/cache && chmod 775 $RAILS_STACK_PATH/tmp/cache
       target: rails
       run_on: all_servers
