@@ -155,6 +155,7 @@ class Bike < ApplicationRecord
   has_many :parking_notifications
   has_many :graduated_notifications
   has_many :notifications
+  has_many :organization_messages
   has_many :theft_surveys, -> { theft_survey }, class_name: "Notification"
   has_many :theft_alerts
   has_many :marketplace_listings, as: :item
@@ -483,7 +484,7 @@ class Bike < ApplicationRecord
 
   def messages_count
     notifications.count + parking_notifications.count + Feedback.bike(id).count +
-      UserAlert.where(bike_id: id).count
+      UserAlert.where(bike_id: id).count + organization_messages.count
   end
 
   # The appropriate edit template to use in the edit view.
