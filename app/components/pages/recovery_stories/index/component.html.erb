@@ -1,0 +1,319 @@
+<% stories = capture do %>
+  <% @recovery_displays.each do |recovery_display| %>
+    <% link = recovery_display.link.presence %>
+
+    <%= content_tag(link ? :a : :article, href: link, class: class_names(CARD_CLASSES, LINKED_CARD_CLASSES => link)) do %>
+      <% if recovery_display.photo_url.present? %>
+        <%= image_tag(recovery_display.photo_url, alt: recovery_display.image_alt, loading: "lazy",
+          class: "tw:block tw:h-50 tw:w-full tw:bg-gray-100 tw:object-cover") %>
+      <% else %>
+        <div class="tw:h-50 tw:bg-gray-100"></div>
+      <% end %>
+
+      <div class="tw:flex tw:flex-col tw:gap-3 tw:p-5">
+        <blockquote class="tw:m-0 tw:border-0 tw:p-0 tw:text-base tw:leading-[1.55]">
+          <%= recovery_display.quote %>
+        </blockquote>
+
+        <p class="tw:m-0 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
+          <% if recovery_display.quote_by.present? %>
+            <strong class="tw:text-sm tw:font-extrabold tw:text-slate-900">
+              <%= recovery_display.quote_by %>
+            </strong>
+          <% end %>
+
+          <span class="tw:text-[12.5px] tw:text-gray-600">
+            <%= translation(".recovered") %>
+            <%= render(UI::Time::Component.new(time: recovery_display.recovered_at)) %>
+          </span>
+        </p>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if @pagy.next %>
+    <%= helpers.turbo_frame_tag("recovery_stories_page_#{@pagy.next}", class: "tw:contents") do %>
+      <div class="tw:col-span-full tw:mt-4 tw:flex tw:justify-center">
+        <%= render(UI::ButtonLink::Component.new(href: next_page_path, text: translation(".load_more_stories"),
+          color: :secondary, size: :callout, data: {turbo: true},
+          html_class: PURPLE_OUTLINE)) %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% page_frame = helpers.turbo_frame_tag("recovery_stories_page_#{@pagy.page}", class: "tw:contents") { stories } %>
+
+<% if helpers.turbo_frame_request? %>
+  <%= page_frame %>
+<% else %>
+  <div class="tw:bg-white tw:text-gray-700">
+    <section class="tw:border-b tw:border-gray-200">
+      <div
+        class="
+          tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] tw:items-start tw:gap-x-10 tw:gap-y-6 tw:pt-8 tw:pb-7
+          <%= container %>
+        "
+      >
+        <div class="tw:flex tw:flex-col tw:gap-3">
+          <p
+            class="
+              tw:m-0 tw:text-xs tw:font-extrabold tw:tracking-widest
+              tw:text-[#cc0000] tw:uppercase
+            "
+          >
+            <%= translation(".recovery_stories") %>
+          </p>
+
+          <h1
+            class="
+              tw:m-0 tw:font-header tw:text-[clamp(32px,3.8vw,44px)]
+              tw:leading-[1.08] tw:font-extrabold tw:tracking-tight
+              tw:text-balance tw:text-slate-900
+            "
+          >
+            <%= translation(".every_one_found_its_way_home") %>
+          </h1>
+
+          <p
+            class="
+              tw:m-0 tw:max-w-145 tw:text-[17px] tw:leading-[1.6]
+              tw:text-gray-600
+            "
+          >
+            <%= translation(".lede") %>
+          </p>
+        </div>
+
+        <div class="tw:flex tw:flex-col tw:gap-5.5 tw:pt-1.5">
+          <dl
+            class="
+              tw:m-0 tw:grid tw:grid-cols-2 tw:items-start tw:gap-x-7
+              tw:gap-y-4
+            "
+          >
+            <% stats.each do |stat| %>
+              <div
+                class="
+                  tw:flex tw:flex-col-reverse tw:gap-0.5 tw:border-t-2
+                  tw:border-gray-200 tw:pt-2.5
+                "
+              >
+                <dt class="tw:text-sm tw:font-normal tw:text-gray-600">
+                  <%= stat[:label] %>
+                </dt>
+
+                <dd
+                  class="
+                    tw:m-0 tw:font-header tw:text-[30px] tw:font-extrabold
+                    tw:tracking-tight tw:text-blue-600
+                  "
+                >
+                  <%= stat[:value] %>
+                </dd>
+              </div>
+            <% end %>
+          </dl>
+
+          <div class="tw:flex tw:flex-wrap tw:gap-3">
+            <%= render(UI::ButtonLink::Component.new(href: "#fund-the-next-recovery",
+              text: translation(".fund_the_next_recovery"), color: :primary, size: :callout,
+              html_class: "tw:px-8! tw:py-3!")) %>
+
+            <%= render(UI::ButtonLink::Component.new(href: new_register_path,
+              text: translation(".register_your_bike"), color: :secondary, size: :callout,
+              html_class: "#{PURPLE_OUTLINE} tw:px-8! tw:py-3!")) %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tw:pt-9 tw:pb-18 <%= container %>">
+      <div
+        class="
+          tw:mb-5.5 tw:flex tw:flex-wrap tw:items-baseline
+          tw:justify-between tw:gap-x-6 tw:gap-y-1.5
+        "
+      >
+        <h2 class="tw:text-[28px] <%= h2_classes %>">
+          <%= translation(".in_their_own_words") %>
+        </h2>
+
+        <p class="tw:m-0 tw:text-[15px] tw:text-gray-600">
+          <%= translation(".shared_by_the_person") %>
+        </p>
+      </div>
+
+      <div
+        class="
+          tw:grid
+          tw:grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))]
+          tw:gap-6
+        "
+      >
+        <%= page_frame %>
+      </div>
+    </section>
+
+    <section id="fund-the-next-recovery" class="tw:bg-blue-600 tw:text-white">
+      <div
+        class="
+          tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] tw:items-center tw:gap-x-16 tw:gap-y-12 tw:py-18
+          <%= container %>
+        "
+      >
+        <div class="tw:flex tw:flex-col tw:items-start tw:gap-4.5">
+          <%= image_tag("kelsey/illustrations/comic-assets_bike-love-1.png", alt: "",
+            class: "tw:block tw:h-auto tw:w-30") %>
+
+          <h2
+            class="
+              tw:text-[clamp(30px,3.6vw,42px)] tw:leading-[1.1] tw:text-balance tw:text-white
+              <%= h2_classes %>
+            "
+          >
+            <%= translation(".help_it_come_home") %>
+          </h2>
+
+          <p class="tw:m-0 tw:max-w-125 tw:text-lg tw:leading-[1.6]">
+            <%= translation(".donors_keep_it_free") %>
+          </p>
+        </div>
+
+        <div
+          class="
+            tw:group tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:bg-white
+            tw:p-7 tw:text-gray-700 tw:shadow-lg
+          "
+        >
+          <h3 class="tw:text-2xl <%= h2_classes %>">
+            <%= translation(".fund_the_next_recovery") %>
+          </h3>
+
+          <fieldset class="tw:m-0 tw:flex tw:border-0 tw:border-b tw:border-gray-200 tw:p-0">
+            <legend class="tw:sr-only"><%= translation(".how_often") %></legend>
+
+            <% cadences.each do |cadence| %>
+              <label
+                class="
+                  tw:-mb-px tw:flex-1 tw:cursor-pointer tw:border-b-3
+                  tw:border-transparent tw:py-2.75 tw:text-center
+                  tw:text-[15px] tw:font-semibold tw:tracking-wider
+                  tw:text-gray-600 tw:uppercase
+                  tw:has-checked:border-blue-500
+                  tw:has-checked:text-blue-500 tw:has-focus-visible:ring-2
+                  tw:has-focus-visible:ring-blue-500/40
+                "
+              >
+                <%= radio_button_tag(:gift_cadence, cadence[:id], cadence[:checked], id: cadence[:id], class: "tw:sr-only") %>
+                <%= cadence[:label] %>
+              </label>
+            <% end %>
+          </fieldset>
+
+          <% gift_forms.each do |gift_form| %>
+            <%= form_tag(gift_form[:url], method: :get, id: gift_form[:id], enforce_utf8: false,
+              class: "#{gift_form[:classes]} tw:flex-col tw:gap-4",
+              data: {controller: "recovery-stories--gift-picker"}) do %>
+              <% gift_form[:hidden].each do |name, value| %>
+                <%= hidden_field_tag(name, value, id: nil) %>
+              <% end %>
+
+              <fieldset class="tw:m-0 tw:flex tw:flex-col tw:gap-2.25 tw:border-0 tw:p-0">
+                <legend class="tw:sr-only">
+                  <%= translation(".choose_an_amount") %>
+                </legend>
+
+                <% gift_form[:options].each do |option| %>
+                  <label
+                    class="
+                      tw:group/amount tw:flex tw:cursor-pointer
+                      tw:items-center tw:gap-3.5 tw:rounded-lg tw:border-2
+                      tw:border-gray-200 tw:bg-white tw:px-4.25 tw:py-3.75
+                      tw:transition-colors tw:has-checked:border-blue-600
+                      tw:has-focus-visible:ring-2
+                      tw:has-focus-visible:ring-blue-500/40
+                    "
+                  >
+                    <%= radio_button_tag(gift_form[:name], option[:value], option[:checked],
+                      id: "#{gift_form[:id]}_#{option[:value]}", class: "tw:sr-only",
+                      data: {label: option[:label], action: "change->recovery-stories--gift-picker#update"}) %>
+
+                    <span
+                      class="
+                        tw:min-w-14 tw:font-header tw:text-[22px]
+                        tw:font-extrabold tw:text-slate-900
+                        tw:group-has-checked/amount:text-blue-600
+                      "
+                    >
+                      <%= option[:amount] %>
+                    </span>
+
+                    <span
+                      class="
+                        tw:min-w-0 tw:flex-1 tw:text-sm tw:leading-[1.45]
+                        tw:text-gray-600
+                      "
+                    >
+                      <%= option[:note] %>
+                    </span>
+
+                    <span
+                      class="
+                        tw:size-5.5 tw:flex-none tw:rounded-full
+                        tw:border-[1.5px] tw:border-gray-300 tw:bg-white
+                        tw:group-has-checked/amount:border-blue-600
+                        tw:group-has-checked/amount:bg-blue-600
+                      "
+                      aria-hidden="true"
+                    ></span>
+                  </label>
+                <% end %>
+              </fieldset>
+
+              <%= render(UI::Button::Component.new(color: :yellow, size: :callout, type: "submit",
+                html_class: "tw:w-full tw:px-4! tw:py-3.5!")) do %>
+                <span data-recovery-stories--gift-picker-target="cta">
+                  <%= gift_form[:options].find { it[:checked] }[:label] %>
+                </span>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <p class="tw:m-0 tw:text-[13px] tw:leading-normal tw:text-gray-600">
+            <%= translation(".tax_deductible") %>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="tw:border-b tw:border-gray-200 tw:bg-gray-50">
+      <div
+        class="
+          tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-8 tw:gap-y-5 tw:py-9
+          <%= container %>
+        "
+      >
+        <div class="tw:flex tw:flex-col tw:gap-1">
+          <h2 class="tw:text-[22px] <%= h2_classes %>">
+            <%= translation(".started_with_a_registration") %>
+          </h2>
+
+          <p class="tw:m-0 tw:text-base tw:text-gray-600">
+            <%= translation(".takes_two_minutes") %>
+          </p>
+        </div>
+
+        <div class="tw:flex tw:flex-wrap tw:gap-3">
+          <%= render(UI::ButtonLink::Component.new(href: new_register_path,
+            text: translation(".register_your_bike"), color: :primary, size: :callout,
+            html_class: "tw:px-8! tw:py-3! tw:normal-case!")) %>
+
+          <%= render(UI::ButtonLink::Component.new(href: my_account_path,
+            text: translation(".share_your_story"), color: :link,
+            html_class: "tw:px-6! tw:py-3! tw:font-semibold")) %>
+        </div>
+      </div>
+    </section>
+  </div>
+<% end %>
