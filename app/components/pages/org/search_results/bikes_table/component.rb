@@ -33,6 +33,10 @@ module Pages
             serial_number: %w[reg_extra_registration_number]
           }.freeze
 
+          # The impound records' multi-update form, which the checkboxes reach with form= - here
+          # rather than on the form, which the cached rows would then have to digest
+          MULTI_UPDATE_FORM_ID = "impoundRecordsMultiUpdateForm"
+
           THUMB_CLASSES = "tw:block tw:h-8 tw:w-11 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700"
 
           # [&>div] is UI::Table's scroller, whose bottom spacing would part the table from what

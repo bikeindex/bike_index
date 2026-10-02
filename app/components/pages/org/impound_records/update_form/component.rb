@@ -5,9 +5,6 @@ module Pages
     module ImpoundRecords
       module UpdateForm
         class Component < ApplicationComponent
-          # The results table's checkboxes reach the multi-update form with form=
-          MULTI_FORM_ID = "impoundRecordsMultiUpdateForm"
-
           # Pass an impound_record for a single-record update, or omit it for the multi-update form
           def initialize(current_organization:, impound_record: nil, impound_record_update: nil, approved_impound_claim: nil, parking_notification: nil, multi_update_open: false, card: true)
             @current_organization = current_organization
@@ -38,7 +35,8 @@ module Pages
             {controller: "form-persist", action: actions.join(" ")}
           end
 
-          def form_id = (MULTI_FORM_ID if @multi)
+          # The results table's checkboxes reach the multi-update form with form=
+          def form_id = (Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID if @multi)
 
           # The kind <select> change is handled by org--impound-update (field
           # visibility) and, in multi mode, org--impound-update-multi (checkboxes)

@@ -48,7 +48,7 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       expect(component).not_to have_css("th.manufacturer_cell a")
       expect(component).not_to have_css("th.occurred_at_cell [data-controller='ui--tooltip']")
       checkbox = component.at_css("td.multi-update-cell input[type='checkbox']")
-      expect(checkbox[:form]).to eq Pages::Org::ImpoundRecords::UpdateForm::Component::MULTI_FORM_ID
+      expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
       expect(component.at_css("td.multi-update-cell")[:class]).to include("tw:hidden")
     end
   end

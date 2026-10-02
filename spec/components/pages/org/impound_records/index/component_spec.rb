@@ -23,7 +23,7 @@ RSpec.describe Pages::Org::ImpoundRecords::Index::Component, type: :component do
     expect(component).to have_content(/0\s+matches/)
     expect(component).to have_button("Update multiple records")
     expect(component).to have_button("Column settings")
-    expect(component).to have_css("form##{Pages::Org::ImpoundRecords::UpdateForm::Component::MULTI_FORM_ID}", visible: :all)
+    expect(component).to have_css("form##{Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID}", visible: :all)
     expect(component).to have_link("Cards")
   end
 end
