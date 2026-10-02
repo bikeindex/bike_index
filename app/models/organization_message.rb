@@ -4,7 +4,7 @@
 # Database name: primary
 #
 #  id              :bigint           not null, primary key
-#  kind            :integer          default(0), not null
+#  kind            :integer          default("general_message"), not null
 #  message         :text
 #  receiver_email  :string
 #  created_at      :datetime         not null
