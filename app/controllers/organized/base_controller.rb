@@ -43,10 +43,10 @@ module Organized
       redirect_to(organization_root_path) && return
     end
 
-    # The chart card's frame asking, or a src that names it
+    # The chart card's frame asking, with no param: its scope links put the URL in the
+    # address bar, where a reload has to be the whole page
     def chart_only?
-      turbo_frame_request_id == Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s ||
-        Binxtils::InputNormalizer.boolean(params[:chart_only])
+      turbo_frame_request_id == Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s
     end
   end
 end

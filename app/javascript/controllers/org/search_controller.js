@@ -63,7 +63,7 @@ export default class extends Controller {
   // for it again - only when the address bar names no view, which every search and every
   // chip leaves it doing.
   syncResultView () {
-    // Only the registrations search has result views
+    // multi_search and the registration page's org search have no result views
     if (!this.hasResultViewValue) return
     const params = new URLSearchParams(window.location.search)
     const inUrl = params.get('search_result_view')

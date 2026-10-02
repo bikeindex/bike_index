@@ -2,7 +2,6 @@
 <%# so instance variables resolve to nil inside them — closures capture these. %>
 <% organization = @organization %>
 <% impound = impound? %>
-<% multiselect_classes = multiselect_cell_classes %>
 
 <%= tag.div(class: WRAPPER_CLASSES, data: table_wrapper_data_attributes) do %>
   <%= render(UI::Table::Component.new(records: @impound_records || @bikes, cache_key:, cache_records:, render_sortable: @render_sortable, sort_state: @sort_state, classes: TABLE_CLASSES, unbordered: true)) do |table| %>
@@ -245,7 +244,7 @@
 
     <% if impound %>
       <% select_all = button_tag(check_mark, type: "button", title: translation(".toggle_all_checked"), aria: {label: translation(".toggle_all_checked")}, class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", data: {action: "click->table-multi-checkbox#toggleAll click->org--impound-update-multi#hideErrorIfChecked"}) %>
-      <% table.column(label: select_all, classes: multiselect_classes) do |impound_record| %>
+      <% table.column(label: select_all, classes: multiselect_cell_classes) do |impound_record| %>
         <%= check_box_tag "ids[#{impound_record.id}]", impound_record.id, false, form: Pages::Org::ImpoundRecords::UpdateForm::Component::MULTI_FORM_ID, data: {"table-multi-checkbox-target" => "checkbox", "update-kinds" => impound_record.update_multi_kinds.join(" "), action: "change->org--impound-update-multi#hideErrorIfChecked"} %>
       <% end %>
     <% end %>

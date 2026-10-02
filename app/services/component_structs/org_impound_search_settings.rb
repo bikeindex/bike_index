@@ -2,10 +2,8 @@
 
 module ComponentStructs
   # The impound records search's filters, in the shape Pages::Org::Search::SettingsAndFilters
-  # reads off ComponentStructs::OrgSearchSettings
+  # reads off ComponentStructs::OrgSearchSettings - whose sidecar holds their copy too
   class OrgImpoundSearchSettings
-    TRANSLATION_SCOPE = %i[components pages org impound_records index].freeze
-
     UNREGISTEREDNESS_LABELS = {
       "all" => :all_bikes,
       "only_unregistered" => :only_unregistered,
@@ -52,7 +50,7 @@ module ComponentStructs
     end
 
     def translation(key, **)
-      ActiveSupport::HtmlSafeTranslation.translate(key, scope: TRANSLATION_SCOPE, **)
+      ActiveSupport::HtmlSafeTranslation.translate(key, scope: ComponentStructs::OrgSearchSettings::TRANSLATION_SCOPE, **)
     end
   end
 end

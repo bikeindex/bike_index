@@ -17,7 +17,8 @@ module Organized
       @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
         min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
       @search_status = params[:search_status].presence_in(available_statuses) || available_statuses.first
-      @search_unregisteredness = params[:search_unregisteredness].presence_in(%w[only_unregistered only_registered]) || "all"
+      @search_unregisteredness = params[:search_unregisteredness]
+        .presence_in(ComponentStructs::OrgImpoundSearchSettings::UNREGISTEREDNESS_LABELS.keys) || "all"
 
       if chart_only?
         render Pages::Org::Search::ChartCard::Component.new(scope: "search", chart: impound_records_chart), layout: false

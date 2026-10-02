@@ -51,7 +51,7 @@ module Pages
           )
             @organization = organization
             @pagy = pagy
-            @bikes = bikes
+            @bikes = impound_records&.map(&:bike) || bikes
             @impound_records = impound_records
             @multiselect_visible = multiselect_visible
             @interpreted_params = interpreted_params
@@ -156,7 +156,7 @@ module Pages
 
           # The search this card renders in, which the impound records search shares
           def result_view_path(result_view)
-            "#{request.path}?#{@sort_state.search_params.except(:organization_id).merge(search_result_view: result_view).to_query}"
+            url_for(@sort_state.search_params.merge(organization_id: @organization.to_param, search_result_view: result_view))
           end
 
           def show_pagination?

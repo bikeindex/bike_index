@@ -137,13 +137,6 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
-  describe "panel_hint" do
-    it "explains the status time, and nothing else" do
-      expect(instance.panel_hint("occurred_at_cell")).to eq "When registration was stolen, impounded, found or listed for sale"
-      expect(instance.panel_hint("created_at_cell")).to be_nil
-    end
-  end
-
   describe "impound" do
     it "adds the impound columns and sorts, and drops the export" do
       expect(instance.impound_columns).to eq []

@@ -1,9 +1,8 @@
 <% kind ||= "admin" %>
 <% skip_organization ||= false %>
 
-<%# A caller whose own period and status controls belong to this form sends them itself %>
-<% skip_period ||= false %>
-<% skip_status ||= false %>
+<%# A caller whose settings panel has its own period and status controls sends them itself %>
+<% skip_settings_fields ||= false %>
 
 <% include_primary_activity ||= false %>
 
@@ -19,7 +18,7 @@
 
 <%# Period %>
 <%= hidden_field_tag :render_chart, @render_chart %>
-<%= hidden_field_tag :period, params[:period] unless skip_period %>
+<%= hidden_field_tag :period, params[:period] unless skip_settings_fields %>
 <%= hidden_field_tag :end_time, params[:end_time] %>
 <%= hidden_field_tag :start_time, params[:start_time] %>
 <%= hidden_field_tag :user_id, params[:user_id] %>
@@ -27,7 +26,7 @@
 <%= hidden_field_tag :search_marketplace_listing_id, params[:search_marketplace_listing_id] %>
 
 <%# common things that might be around %>
-<%= hidden_field_tag :search_status, params[:search_status] unless skip_status %>
+<%= hidden_field_tag :search_status, params[:search_status] unless skip_settings_fields %>
 <%= hidden_field_tag :search_kind, params[:search_kind] %>
 <%= hidden_field_tag :search_deleted, params[:search_deleted] %>
 

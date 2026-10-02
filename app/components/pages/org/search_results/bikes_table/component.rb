@@ -70,7 +70,7 @@ module Pages
 
           def cache_key = [@organization, self.class.cache_digest, (@multiselect_visible if impound?)]
 
-          # Everything an impound row renders besides its record, as the controller includes it
+          # Everything an impound row renders besides its record
           def cache_records
             ->(impound_record) { [impound_record.bike, impound_record.user, impound_record.impounded_from_address_record] } if impound?
           end

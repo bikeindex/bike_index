@@ -58,8 +58,6 @@ module ComponentStructs
       impound_updated_at_cell: :impound_updated_at_cell_panel
     }.freeze
 
-    PANEL_HINT_KEYS = {occurred_at_cell: :registration_status_at_cell_hint}.freeze
-
     # Their labels name the organization, italicized with its preposition
     ORG_NAMED_COLUMNS = %i[notes_cell reg_organization_affiliation_cell reg_student_id_cell].freeze
 
@@ -212,9 +210,6 @@ module ComponentStructs
     end
 
     def render_export? = !@impound && @organization.enabled?("csv_exports")
-
-    def impound? = @impound
-
     def impound_columns = @impound ? IMPOUND_COLUMNS : []
 
     def search_all? = @search_all
@@ -243,8 +238,7 @@ module ComponentStructs
     end
 
     def panel_hint(cell_name)
-      key = PANEL_HINT_KEYS[cell_name.to_sym]
-      translation(key) if key
+      translation(:registration_status_at_cell_hint) if cell_name == "occurred_at_cell"
     end
 
     def sort_column_label(sort)

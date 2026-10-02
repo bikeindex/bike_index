@@ -9,6 +9,8 @@ en:
             acknowledgment_cell_panel: Time - Registration sequence acknowledged
             address: 'Address:'
             all: all
+            all_bikes: All bikes
+            all_statuses: All statuses
             avery_cell: Avery Exportable
             color_cell: Color
             created_at_cell: Registered
@@ -48,6 +50,8 @@ en:
             none: none
             notes_cell_html: Registration Notes <em>by %{org_name}</em>
             occurred_at_cell: Status at
+            only_unregistered: Only unregistered
+            only_user_registered: Only user registered
             owner_email_cell: Sent to
             owner_name_cell: Owner name
             photo_cell: Photo
@@ -57,6 +61,7 @@ en:
             reg_organization_affiliation_cell_html: Affiliation <em>in %{org_name}</em>
             reg_phone_cell: Phone
             reg_student_id_cell_html: Student ID <em>for %{org_name}</em>
+            registration: 'Registration:'
             registration_status_at_cell_hint: When registration was stolen, impounded,
               found or listed for sale
             registration_status_at_cell_panel: Time - Registration status
@@ -66,6 +71,7 @@ en:
             show_notes_search: show notes search
             status: 'Status:'
             status_cell: Status
+            status_records: "%{status} records"
             sticker_cell: Sticker
             stickers: 'Stickers:'
             unregistered: 'Unregistered:'
