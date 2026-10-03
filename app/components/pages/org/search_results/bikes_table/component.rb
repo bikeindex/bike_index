@@ -33,6 +33,10 @@ module Pages
             serial_number: %w[reg_extra_registration_number]
           }.freeze
 
+          # The impound records' multi-update form, which the checkboxes reach with form= - here
+          # rather than on the form, which the cached rows would then have to digest
+          MULTI_UPDATE_FORM_ID = "impoundRecordsMultiUpdateForm"
+
           THUMB_CLASSES = "tw:block tw:h-8 tw:w-11 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700"
 
           # [&>div] is UI::Table's scroller, whose bottom spacing would part the table from what
@@ -44,10 +48,14 @@ module Pages
             "tw:data-overflowing:after:shadow-[-2px_0_6px_rgba(26,26,31,0.04)] tw:dark:data-overflowing:after:border-gray-700 " \
             "tw:data-scrolled-end:after:hidden tw:@max-[672px]/twwiderow:after:hidden"
 
-          def initialize(organization:, bikes:, render_sortable: false,
-            sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
+          # impound_records: an impound search's rows, in place of bikes - which adds the impound
+          # columns and the multi-update checkboxes, shown with multiselect_visible
+          def initialize(organization:, bikes: [], impound_records: nil, multiselect_visible: false,
+            render_sortable: false, sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
             @bikes = bikes
+            @impound_records = impound_records
+            @multiselect_visible = multiselect_visible
             @render_sortable = render_sortable
             @sort_state = sort_state
             @bike_sticker = bike_sticker
@@ -59,7 +67,20 @@ module Pages
           # Column labels and additional fields derive from the organization alone, so bare
           # settings are enough when a caller (e.g. Wrapper) doesn't pass its own in.
           def settings
-            @settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
+            @settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization, impound: impound?)
+          end
+
+          def impound? = !@impound_records.nil?
+
+          def cache_key = [@organization, self.class.cache_digest, (@multiselect_visible if impound?)]
+
+          # Everything an impound row renders besides its record
+          def cache_records
+            ->(impound_record) { [impound_record.bike, impound_record.user, impound_record.impounded_from_address_record] } if impound?
+          end
+
+          def multiselect_cell_classes
+            ["multi-update-cell table-cell-check", ("tw:hidden" unless @multiselect_visible)].compact.join(" ")
           end
 
           # The organization's fields placed after column, or with :rest the ones placed nowhere

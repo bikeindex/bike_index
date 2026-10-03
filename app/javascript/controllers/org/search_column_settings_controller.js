@@ -5,7 +5,8 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--search-column-settings'
 export default class extends Controller {
   static targets = ['checkboxes']
-  static values = { enabledColumns: Array, assignBikeSticker: Boolean }
+  // The impound records search keeps a column set of its own, with its impound columns in it
+  static values = { enabledColumns: Array, assignBikeSticker: Boolean, storageKey: { type: String, default: 'orgRegistrationColumns' } }
 
   connect () {
     this.refreshEnabledColumns()
@@ -48,10 +49,10 @@ export default class extends Controller {
   }
 
   selectStoredVisibleColumns () {
-    const stored = localStorage.getItem('orgRegistrationColumns')
+    const stored = localStorage.getItem(this.storageKeyValue)
     let columns = null
     if (stored) {
-      try { columns = JSON.parse(stored) } catch { localStorage.removeItem('orgRegistrationColumns') }
+      try { columns = JSON.parse(stored) } catch { localStorage.removeItem(this.storageKeyValue) }
     }
 
     this.toggleableCheckboxes.forEach(cb => {
@@ -65,7 +66,7 @@ export default class extends Controller {
     this.toggleableCheckboxes.forEach(cb => {
       if (cb.checked) checked.push(cb.name)
     })
-    localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
+    localStorage.setItem(this.storageKeyValue, JSON.stringify(checked))
 
     if (this.assignBikeStickerValue) {
       checked.push('assign_bike_sticker_cell')

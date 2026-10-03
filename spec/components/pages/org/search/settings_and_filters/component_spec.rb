@@ -36,6 +36,22 @@ RSpec.describe Pages::Org::Search::SettingsAndFilters::Component, type: :compone
     end
   end
 
+  context "with impound settings" do
+    let(:settings) do
+      ComponentStructs::OrgImpoundSearchSettings.new(statuses: %w[current resolved all retrieved_by_owner],
+        search_status: "current", search_unregisteredness: "only_unregistered")
+    end
+
+    it "renders the status and registration radios, with no notes or location toggles" do
+      expect(component).to have_css("input[type='radio'][name='search_status'][value='retrieved_by_owner']", visible: :all)
+      expect(component).to have_css("input[type='radio'][name='search_unregisteredness'][value='all']", visible: :all)
+      expect(component).to have_css("input[type='radio'][name='period'][form='Search_Form']", visible: :all)
+      expect(component).to have_text("Current records · Only unregistered")
+      expect(component).not_to have_css("#show_location_search", visible: :all)
+      expect(component).not_to have_text("show notes search")
+    end
+  end
+
   context "with registration_notes enabled" do
     let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
 

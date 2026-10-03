@@ -102,7 +102,7 @@
       <%= content %>
 
       <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search",
-        skip_organization: true, skip_period: @settings_and_filters_component.present?} %>
+        skip_organization: true, skip_settings_fields: @settings_and_filters_component.present?} %>
 
       <% unless @settings_and_filters_component %>
         <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>

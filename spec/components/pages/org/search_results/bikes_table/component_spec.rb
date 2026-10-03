@@ -28,6 +28,31 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     expect(component).to have_css("tbody td.color_cell", text: bike.primary_frame_color.name)
   end
 
+  context "with impound_records" do
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization:, bike:, unregistered_bike: true) }
+    let(:options) do
+      {organization:, impound_records: [impound_record], render_sortable: true,
+       sort_state: ComponentStructs::SortState.new(sort: "created_at", direction: "desc")}
+    end
+
+    it "renders the record's bike, its impound columns, and a hidden multi-update checkbox" do
+      expect(component).to have_css("tbody tr", count: 1)
+      expect(component).to have_text(bike.mnfg_name)
+      expect(component).to have_css("td.impounded_at_cell a[href*='/impound_records/#{impound_record.display_id}']")
+      expect(component).to have_css("td.impound_id_cell", text: impound_record.display_id)
+      expect(component).to have_css("td.impound_user_cell", text: impound_record.user.display_name.truncate(20))
+      expect(component).to have_css("td.unregistered_cell", text: /\S/)
+      # The search orders by the record, so only its columns sort
+      expect(component).to have_css("th.impounded_at_cell a")
+      expect(component).not_to have_css("th.manufacturer_cell a")
+      expect(component).not_to have_css("th.occurred_at_cell [data-controller='ui--tooltip']")
+      checkbox = component.at_css("td.multi-update-cell input[type='checkbox']")
+      expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
+      expect(component.at_css("td.multi-update-cell")[:class]).to include("tw:hidden")
+    end
+  end
+
   context "with a pedal bike and an e-bike" do
     let(:e_bike) { FactoryBot.create(:bike_organized, creation_organization: organization, propulsion_type: "pedal-assist") }
     let(:bikes) { [bike, e_bike] }

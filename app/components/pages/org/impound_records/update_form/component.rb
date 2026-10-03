@@ -5,8 +5,7 @@ module Pages
     module ImpoundRecords
       module UpdateForm
         class Component < ApplicationComponent
-          # Pass an impound_record for a single-record update, or omit it for the
-          # multi-update form (which wraps the records table passed as a block).
+          # Pass an impound_record for a single-record update, or omit it for the multi-update form
           def initialize(current_organization:, impound_record: nil, impound_record_update: nil, approved_impound_claim: nil, parking_notification: nil, multi_update_open: false, card: true)
             @current_organization = current_organization
             @impound_record = impound_record
@@ -26,21 +25,18 @@ module Pages
           end
 
           # form-persist keeps a draft of the notes/text fields across reloads. Multi
-          # mode adds table-multi-checkbox (select-all) and org--impound-update-multi
-          # (blocks empty submissions).
+          # mode adds org--impound-update-multi, which blocks empty submissions
           def form_data
-            controllers = ["form-persist"]
             actions = ["input->form-persist#save"]
-
-            if @multi
-              controllers << "table-multi-checkbox"
-              actions << "submit->org--impound-update-multi#validate"
-            end
+            actions << "submit->org--impound-update-multi#validate" if @multi
             # Clear runs after validate so a blocked (empty) multi submit keeps the draft
             actions << "submit->form-persist#clear"
 
-            {controller: controllers.join(" "), action: actions.join(" ")}
+            {controller: "form-persist", action: actions.join(" ")}
           end
+
+          # The results table's checkboxes reach the multi-update form with form=
+          def form_id = (Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID if @multi)
 
           # The kind <select> change is handled by org--impound-update (field
           # visibility) and, in multi mode, org--impound-update-multi (checkboxes)

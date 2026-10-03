@@ -9,6 +9,8 @@ en:
             acknowledgment_cell_panel: Time - Registration sequence acknowledged
             address: 'Address:'
             all: all
+            all_bikes: All bikes
+            all_statuses: All statuses
             avery_cell: Avery Exportable
             color_cell: Color
             created_at_cell: Registered
@@ -27,7 +29,14 @@ en:
             filter_stolen_or_impounded_html: only <strong>stolen</strong> or <strong>impounded</strong>
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
+            impound_columns: Impound columns
             impound_id_cell: Impound ID
+            impound_updated_at_cell: Impound updated
+            impound_updated_at_cell_panel: Time - impound record Updated
+            impound_user_cell: Last updator
+            impounded_at_cell: Impounded
+            impounded_at_cell_panel: Time - Impounded
+            impounded_from_cell: Impounded from
             included_columns: Included columns
             location_search_disabled_no_address: >-
               %{org_name} doesn't collect registration addresses, so only stolen and
@@ -41,7 +50,8 @@ en:
             none: none
             notes_cell_html: Registration Notes <em>by %{org_name}</em>
             occurred_at_cell: Status at
-            occurred_at_cell_panel: Time - status
+            only_unregistered: Only unregistered
+            only_user_registered: Only user registered
             owner_email_cell: Sent to
             owner_name_cell: Owner name
             photo_cell: Photo
@@ -51,16 +61,22 @@ en:
             reg_organization_affiliation_cell_html: Affiliation <em>in %{org_name}</em>
             reg_phone_cell: Phone
             reg_student_id_cell_html: Student ID <em>for %{org_name}</em>
+            registration: 'Registration:'
+            registration_status_at_cell_hint: When registration was stolen, impounded,
+              found or listed for sale
+            registration_status_at_cell_panel: Time - Registration status
+            registration_updated_at_cell_panel: Time - registration updated
             serial_number_cell: Serial
             show_location_search: show location search
             show_notes_search: show notes search
             status: 'Status:'
             status_cell: Status
+            status_records: "%{status} records"
             sticker_cell: Sticker
             stickers: 'Stickers:'
             unregistered: 'Unregistered:'
+            unregistered_cell: Unregistered
             updated_at_cell: Updated
-            updated_at_cell_panel: Time - updated
             url_cell: URL
             view_cell: View
             visible_columns: Visible columns
