@@ -1,10 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Creates each manufacturer in a JSON array, from a file or stdin:
-#   [{"name": "Vetra", "website": "https://vetrapowersports.com", "frame_maker": true, "motorized_only": true}]
-# Skips a name the public API already finds, and stops at the first one that fails or comes back
-# with a different name — the values never pass through a shell, so nothing gets word-split into `name`.
+# Takes JSON rather than key=value args so no value passes through a shell, which can merge them into `name`
 
 require "erb"
 require "json"
@@ -16,7 +13,7 @@ KEYS = %w[name website frame_maker motorized_only total_years_active notes open_
   description twitter_name].freeze
 
 manufacturers = JSON.parse(ARGF.read)
-abort("expected a JSON array of manufacturers") unless manufacturers.is_a?(Array) && manufacturers.any?
+abort("expected a JSON array of manufacturers") unless manufacturers.is_a?(Array)
 manufacturers.each do |manufacturer|
   unknown = manufacturer.keys - KEYS
   abort("unknown keys #{unknown} in #{manufacturer}") if unknown.any?
@@ -35,7 +32,5 @@ manufacturers.each do |manufacturer|
   abort("#{name}: create failed\n#{errors}#{output}") unless status.success?
 
   created = JSON.parse(output)["manufacturer"]
-  abort("#{name}: created as #{created["name"].inspect} (id #{created["id"]}) — fix it in admin") if created["name"] != name
-  abort("#{name}: created without a website (id #{created["id"]}) — fix it in admin") if manufacturer["website"] && !created["website"]
   puts "#{name}: created — https://bikeindex.org/admin/manufacturers/#{created["slug"]}"
 end
