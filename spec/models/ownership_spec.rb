@@ -378,6 +378,21 @@ RSpec.describe Ownership, type: :model do
         organization.update(send_self_registration_email: true)
         expect(ownership.reload.calculated_send_email).to be_truthy
       end
+
+      context "auto_user is contact@bikeindex.org" do
+        let(:auto_user) { FactoryBot.create(:organization_auto_user, organization:, email: "contact@bikeindex.org") }
+
+        it "is false even when the organization sends self registration emails" do
+          organization.update(send_self_registration_email: true)
+          expect(ownership.reload.calculated_send_email).to be_falsey
+        end
+      end
+    end
+    context "registered to contact@bikeindex.org" do
+      let(:ownership) { Ownership.new(bike:, owner_email: "contact@bikeindex.org") }
+      it "is false" do
+        expect(ownership.calculated_send_email).to be_falsey
+      end
     end
   end
 

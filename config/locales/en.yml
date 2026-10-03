@@ -4553,11 +4553,13 @@ en:
           Bike Index?
         select_email: Select email
         send_emails_directly: Send emails directly to unclaimed bike owners.
-        send_self_registration_email_helper: >-
-          By default, Bike Index no longer sends an email to you when a vehicle is
-          registered to your organization registration email (e.g. unregistered parking
-          notifications).
         send_self_registration_email_html: Send email for registrations sent to <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: This includes unregistered
+          notifications.
+        send_self_registration_email_note: >-
+          By default, Bike Index no longer sends email when a vehicle is registered
+          to your organization registration email. Check this box if you want to receive
+          email for registrations with an owner email of %{email}.
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
         unclaimed_registration_definition: >-
