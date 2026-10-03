@@ -190,6 +190,10 @@ module ControllerHelpers
     session[:old_register_view].present?
   end
 
+  def old_unregistered_notification_view?
+    session[:old_unregistered_notification_view].present?
+  end
+
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank? ||
       render_donation_request?
