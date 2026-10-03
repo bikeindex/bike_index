@@ -59,11 +59,7 @@ class BikeVersionsController < ApplicationController
   protected
 
   def find_bike_version
-    begin
-      @bike_version = BikeVersion.unscoped.find_id(params[:id])
-    rescue ActiveRecord::StatementInvalid => e
-      raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
-    end
+    @bike_version = BikeVersion.unscoped.find_id(params[:id])
     @bike = @bike_version
     @bike_og = @bike_version.bike
     return @bike_version if @bike_version.visible_by?(current_user)

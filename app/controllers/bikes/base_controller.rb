@@ -8,47 +8,23 @@ end
 
 module Bikes
   class BaseController < ApplicationController
+    SCANNED_ID_MATCHER = /scanned(uc|ui)\d+/i
+
     before_action :find_bike
     before_action :assign_current_organization
     before_action :ensure_user_allowed_to_edit
 
     protected
 
-    # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
-    # Also provides testable protection against seeing organization info on bikes
-    def assign_current_organization
-      org = current_organization || passive_organization # actually call #current_organization first
-      # If forced false, or no user present, skip everything else
-      return true if @current_organization_force_blank || current_user.blank?
-
-      # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
-      # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
-      default_organization = OrganizationRole.default_organization(current_user) if params[:organization_id].present?
-      if default_organization.present?
-        return true if org.present? && current_user.authorized?(org)
-
-        set_passive_organization(default_organization)
-      else
-        # If current_user isn't authorized for the organization, force assign nil
-        return true if org.blank? || org.present? && current_user.authorized?(org)
-
-        set_passive_organization(nil)
-      end
-    end
-
     def find_bike
       # Fix issue with sticker batches #35 & #38
-      if params[:id].present? && params[:id].match?(/scanned(uc|ui)\d+/i)
+      if params[:id].present? && params[:id].match?(SCANNED_ID_MATCHER)
         permitted_params = params.except(:action, :controller, :id).as_json
           .merge(id: params[:id].gsub("scanned", ""))
         redirect_to(scanned_bike_path(permitted_params))
         return
       end
-      begin
-        @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
-      rescue ActiveRecord::StatementInvalid => e
-        raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
-      end
+      @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
       return @bike if @bike.visible_by?(current_user)
 
       fail ActiveRecord::RecordNotFound

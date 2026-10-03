@@ -118,8 +118,11 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # Create a parking notification through the bike show interface. Regression:
     # the "New parking notification" button must open the form (it was wired to
     # Bootstrap's collapse plugin, which is no longer loaded).
+    # The example above covers the same flow on the redesigned page
     visit bike_path(bike)
+    click_button "Switch back to the legacy viewer"
     expect(page).to have_css(".organized-access-panel")
+    wait_for_page_script
     click_on "New parking notification"
     choose "Parked incorrectly"
 
