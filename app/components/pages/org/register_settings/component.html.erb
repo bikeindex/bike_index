@@ -41,6 +41,17 @@
     </div>
   </div>
 
+  <% if @organization.enabled?("parking_notifications") %>
+    <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
+      <span class="twlabel tw:sm:text-right"><%= translation(".unregistered_notification_page") %></span>
+
+      <div class="tw:sm:col-span-2">
+        <%= render UI::Forms::Checkbox::Component.new(name: :old_unregistered_notification_view,
+            checked: @old_unregistered_notification_view, label: translation(".old_unregistered_notification_view")) %>
+      </div>
+    </div>
+  <% end %>
+
   <div class="tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
     <div class="tw:sm:col-span-2 tw:sm:col-start-2">
       <%= render UI::Button::Component.new(text: translation(".update"), color: :primary, size: :lg,

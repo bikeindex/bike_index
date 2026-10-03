@@ -68,9 +68,11 @@ RSpec.describe SharedBlocks::Navbar::OrgSidebar::Component, type: :component do
       text: "New unregistered notification"
   end
 
-  # The old view puts both rows on organized/bikes#new, so the param tells them apart
-  context "with the old registration page" do
-    let(:instance) { described_class.new(organization:, current_user:, old_register_view: true) }
+  # The old views put both rows on organized/bikes#new, so the param tells them apart
+  context "with the old registration and unregistered notification pages" do
+    let(:instance) do
+      described_class.new(organization:, current_user:, old_register_view: true, old_unregistered_notification_view: true)
+    end
 
     it "matches the two add-a-bike rows on the param" do
       rows = component.css("nav a[data-ui--active-link-match-params-value*='parking_notification']")

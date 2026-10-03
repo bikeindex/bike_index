@@ -8,6 +8,8 @@ en:
             These settings are just applied to your browser - they will not affect
             other users
           form_options: Form options
+          old_unregistered_notification_view: Use the old New unregistered notification
+            page
           old_view: Use the old registration page
           registration_form_settings: Registration form settings
           registration_page: Registration page
@@ -17,4 +19,5 @@ en:
             They'll receive an email telling them their registration isn't finished
             with a link to finish it.
           single_page: Single page registration form
+          unregistered_notification_page: Unregistered Notification page
           update: Update

@@ -37,7 +37,7 @@ module Organized
 
     # Submits to organized/bikes#create, which registers the vehicle along with the notification
     def new
-      if old_register_view?
+      if old_unregistered_notification_view?
         return redirect_to(new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true))
       end
 

@@ -87,11 +87,13 @@ module Organized
     def settings
       @page_title = I18n.t("meta_titles.registration_form_settings")
       render Pages::Org::RegisterSettings::Component.new(organization: current_organization, old_view: old_register_view?,
+        old_unregistered_notification_view: old_unregistered_notification_view?,
         **BikeServices::Register.session_settings(session[:register_settings], current_organization.id))
     end
 
     # An unchecked box turns its setting off; the old view disables them, so the session keeps theirs
     def switches
+      session[:old_unregistered_notification_view] = params[:old_unregistered_notification_view].present?
       if params[:old_view].present?
         session[:old_register_view] = true
         return redirect_to new_organization_bike_path(organization_id: current_organization.to_param)

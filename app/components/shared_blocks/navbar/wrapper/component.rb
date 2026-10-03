@@ -10,12 +10,13 @@ module SharedBlocks
         # Template Dependency: SharedBlocks::Navbar::OrgSidebar::Component
         # Template Dependency: SharedBlocks::Navbar::PrimaryMenu::Component
         def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
-          passive_organization: nil, old_register_view: false)
+          passive_organization: nil, old_register_view: false, old_unregistered_notification_view: false)
           @logo_only = logo_only
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
           @passive_organization = passive_organization
           @old_register_view = old_register_view
+          @old_unregistered_notification_view = old_unregistered_notification_view
         end
 
         # The layout asks, since the sidebar is a column the page is laid out around
@@ -28,7 +29,8 @@ module SharedBlocks
 
         def org_sidebar
           @org_sidebar ||= SharedBlocks::Navbar::OrgSidebar::Component.new(organization: @passive_organization,
-            current_user: @current_user, old_register_view: @old_register_view)
+            current_user: @current_user, old_register_view: @old_register_view,
+            old_unregistered_notification_view: @old_unregistered_notification_view)
         end
 
         # logo_only renders none of the elements the controller drives
