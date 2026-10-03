@@ -1,0 +1,181 @@
+<div
+  class="
+    tw:group tw:flex tw:flex-col tw:gap-6 tw:rounded-lg tw:border
+    tw:border-gray-200 tw:bg-white tw:px-4 tw:py-6 tw:sm:gap-8 tw:sm:px-8
+    tw:sm:py-7 tw:lg:flex-row
+  "
+  data-controller="register--landing-donation"
+  data-register--landing-donation-custom-href-value="<%= donate_path %>"
+  data-register--landing-donation-custom-label-value="<%= translation(".donate", amount: "$%{amount}") %>"
+>
+  <div class="tw:flex tw:items-start tw:gap-4 tw:sm:gap-5 tw:lg:flex-1">
+    <%= image_tag("kelsey/illustrations/comic-assets_bike-love-1.png", alt: "",
+      class: "tw:w-14 tw:shrink-0 tw:sm:w-22", loading: "lazy") %>
+
+    <div>
+      <div
+        class="
+          tw:text-xs tw:font-extrabold tw:tracking-widest tw:text-purple-500
+          tw:uppercase
+        "
+      >
+        <%= translation(".keep_it_free") %>
+      </div>
+
+      <h2
+        class="
+          tw:m-0 tw:mt-1 tw:font-header tw:text-xl tw:leading-tight
+          tw:font-extrabold tw:text-slate-900 tw:sm:text-2xl
+        "
+      >
+        <%= translation(".a_million_bikes") %>
+      </h2>
+
+      <p class="tw:m-0 tw:mt-2 tw:text-[14.5px]">
+        <%= translation(".donations_keep_it_free") %>
+      </p>
+    </div>
+  </div>
+
+  <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-3.5 tw:lg:flex-2">
+    <div
+      class="
+        tw:flex tw:flex-wrap tw:items-end tw:justify-between tw:gap-3
+        tw:border-b tw:border-gray-200
+      "
+    >
+      <h3
+        class="
+          tw:m-0 tw:pb-2 tw:font-header tw:text-xl tw:font-extrabold
+          tw:text-slate-900
+        "
+      >
+        <%= translation(".fund_the_next_recovery") %>
+      </h3>
+
+      <fieldset class="tw:m-0 tw:flex tw:border-0 tw:p-0">
+        <legend class="tw:sr-only"><%= translation(".how_often") %></legend>
+
+        <label class="<%= cadence_classes %>">
+          <input
+            type="radio"
+            name="landing_donation_cadence"
+            value="monthly"
+            class="tw:sr-only"
+            checked
+            data-action="register--landing-donation#update"
+          >
+
+          <%= translation(".monthly") %>
+        </label>
+
+        <label class="<%= cadence_classes %>">
+          <input
+            type="radio"
+            name="landing_donation_cadence"
+            value="one_time"
+            class="tw:sr-only"
+            data-one-time
+            data-action="register--landing-donation#update"
+          >
+
+          <%= translation(".one_time") %>
+        </label>
+      </fieldset>
+    </div>
+
+    <fieldset
+      class="
+        tw:m-0 tw:grid tw:gap-2.5 tw:border-0 tw:p-0
+        tw:group-has-[[data-one-time]:checked]:hidden tw:sm:grid-cols-3
+      "
+    >
+      <legend class="tw:sr-only"><%= translation(".monthly") %></legend>
+
+      <% membership_tiles.each do |tile| %>
+        <label class="<%= tile_classes %>">
+          <span class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-3 tw:sm:block">
+            <span
+              class="
+                tw:block tw:font-header tw:text-[22px] tw:font-extrabold
+                tw:text-slate-900
+              "
+            >
+              <%= tile[:amount] %>
+            </span>
+
+            <span class="tw:block tw:text-[13px] tw:font-bold tw:text-gray-700">
+              <%= tile[:name] %>
+            </span>
+          </span>
+
+          <%= radio_button_tag("landing_donation_monthly", tile[:amount], tile[:checked], id: nil,
+            class: RADIO_CLASSES, data: {href: tile[:href], label: tile[:label], action: "register--landing-donation#update"}) %>
+        </label>
+      <% end %>
+    </fieldset>
+
+    <fieldset
+      class="
+        tw:m-0 tw:hidden tw:grid-cols-2 tw:gap-2.5 tw:border-0 tw:p-0
+        tw:group-has-[[data-one-time]:checked]:grid tw:sm:grid-cols-4
+      "
+    >
+      <legend class="tw:sr-only"><%= translation(".one_time") %></legend>
+
+      <% one_time_tiles.each do |tile| %>
+        <label class="<%= tile_classes %>">
+          <span
+            class="
+              tw:font-header tw:text-[22px] tw:font-extrabold
+              tw:text-slate-900
+            "
+          >
+            <%= tile[:amount] %>
+          </span>
+
+          <%= radio_button_tag("landing_donation_one_time", tile[:amount], tile[:checked], id: nil,
+            class: RADIO_CLASSES, data: {href: tile[:href], label: tile[:label], action: "register--landing-donation#select"}) %>
+        </label>
+      <% end %>
+
+      <label
+        class="
+          tw:mb-0 tw:flex tw:min-w-0 tw:items-center tw:gap-1 tw:rounded-lg
+          tw:border tw:border-gray-200 tw:bg-white tw:px-4 tw:font-normal
+          tw:focus-within:border-blue-600 tw:focus-within:ring-1
+          tw:focus-within:ring-blue-600
+        "
+      >
+        <span class="tw:font-semibold tw:text-gray-700">$</span>
+        <span class="tw:sr-only"><%= translation(".other_amount") %></span>
+
+        <input
+          type="number"
+          min="1"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="<%= translation(".other") %>"
+          class="
+            tw:w-full tw:min-w-0 tw:border-0 tw:bg-transparent tw:py-3
+            tw:outline-none tw:sm:py-4
+          "
+          data-register--landing-donation-target="custom"
+          data-action="input->register--landing-donation#customize"
+        >
+      </label>
+    </fieldset>
+
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-5 tw:gap-y-3">
+      <%= render(UI::ButtonLink::Component.new(href: default_tile[:href],
+        text: default_tile[:label], color: :primary, size: :callout,
+        html_class: "tw:w-full tw:px-4! tw:text-sm! tw:sm:w-auto tw:sm:px-8! tw:sm:text-base!",
+        data: {"register--landing-donation-target": "cta"})) %>
+
+      <p class="tw:m-0 tw:flex-1 tw:basis-60 tw:text-[13px]">
+        <%= translation(".tax_deductible") %>
+        <%= link_to(translation(".what_membership_includes"), membership_path, class: "twlink tw:font-bold") %>
+      </p>
+    </div>
+  </div>
+</div>
