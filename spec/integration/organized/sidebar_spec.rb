@@ -137,7 +137,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
 
     # Going back to both old views moves add-a-registration onto organized/bikes#new alongside the
-    # notification's row, where the query string is all that tells the two apart
+    # legacy notification page, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
     click_link "Registration form settings"
     check "Use the old registration page"
@@ -156,7 +156,6 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     visit "/o/#{slug}/parking_notifications/new"
 
     expect(page).to have_current_path("/o/#{slug}/bikes/new?parking_notification=true")
-    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
   end
 

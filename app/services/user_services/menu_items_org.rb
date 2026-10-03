@@ -9,13 +9,13 @@ module UserServices
     extend Functionable
 
     # Nothing here depends on which page is current
-    def for(organization:, current_user:, old_register_view: false, old_unregistered_notification_view: false)
+    def for(organization:, current_user:, old_register_view: false)
       return [] if organization.nil? || current_user.nil?
 
       # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
       Rails.cache.fetch(["menu_items_org_v2", organization, current_user,
-        old_register_view, old_unregistered_notification_view, I18n.locale]) do
-        build_items(organization, current_user, old_register_view, old_unregistered_notification_view)
+        old_register_view, I18n.locale]) do
+        build_items(organization, current_user, old_register_view)
       end
     end
 
@@ -25,22 +25,22 @@ module UserServices
 
     # Sections rather than a flat list, so a section gated off entirely takes the
     # divider above it with it
-    def build_items(organization, current_user, old_register_view, old_unregistered_notification_view)
-      sections = organization_sections(organization, current_user, old_register_view, old_unregistered_notification_view) +
+    def build_items(organization, current_user, old_register_view)
+      sections = organization_sections(organization, current_user, old_register_view) +
         [[super_admin_link(organization, current_user)]]
 
       sections.map(&:compact).reject(&:empty?)
         .inject { |rows, section| rows + [ComponentStructs::Shapes.divider] + section }
     end
 
-    def organization_sections(organization, current_user, old_register_view, old_unregistered_notification_view)
+    def organization_sections(organization, current_user, old_register_view)
       return [ambassador_items(organization)] if organization.ambassador?
 
       admin = current_user.admin_of?(organization)
 
       [[registrations_group(organization), add_registration_link(organization, old_register_view)],
         [impounded_group(organization),
-          parking_group(organization, old_unregistered_notification_view),
+          parking_group(organization),
           bulk_group(organization),
           lightspeed_link(organization),
           messaging_link(organization, admin),
@@ -107,8 +107,8 @@ module UserServices
           routes.search_registrations_path(stolenness: "all"))]
     end
 
-    # The old view puts this row on organized/bikes#new, which the parking notification row
-    # also links, so the param is what tells them apart
+    # The old view puts this row on organized/bikes#new, which the legacy unregistered
+    # notification page shares, so the param is what tells them apart
     def add_registration_link(organization, old_register_view)
       path = if old_register_view
         routes.new_organization_bike_path(organization.to_param)
@@ -141,24 +141,17 @@ module UserServices
       ComponentStructs::Shapes.group(:impounded, translation(:impounded_vehicles), "impound", children)
     end
 
-    def parking_group(organization, old_view)
+    def parking_group(organization)
       return nil unless organization.enabled?("parking_notifications")
 
       children = [
         ComponentStructs::Shapes.link(translation(:search_parking_notifications),
           routes.organization_parking_notifications_path(organization_id: organization.to_param)),
-        unregistered_notification_link(organization, old_view)
+        ComponentStructs::Shapes.link(translation(:parking_notification_unregistered),
+          routes.new_organization_parking_notification_path(organization.to_param))
       ]
 
       ComponentStructs::Shapes.group(:parking, translation(:parking_notifications_group), "map-pin", children)
-    end
-
-    def unregistered_notification_link(organization, old_view)
-      label = translation(:parking_notification_unregistered)
-      return ComponentStructs::Shapes.link(label, routes.new_organization_parking_notification_path(organization.to_param)) unless old_view
-
-      ComponentStructs::Shapes.link(label, routes.new_organization_bike_path(organization.to_param, parking_notification: true),
-        match_params: {parking_notification: true})
     end
 
     def bulk_group(organization)
@@ -270,7 +263,7 @@ module UserServices
 
     conceal :build_items, :organization_sections, :super_admin_link, :ambassador_items,
       :registrations_group, :registrations_links, :add_registration_link, :impounded_group,
-      :parking_group, :unregistered_notification_link, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
+      :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
       :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :translation, :routes
   end
 end

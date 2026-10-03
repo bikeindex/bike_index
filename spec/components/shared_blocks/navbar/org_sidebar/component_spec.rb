@@ -68,20 +68,17 @@ RSpec.describe SharedBlocks::Navbar::OrgSidebar::Component, type: :component do
       text: "New unregistered notification"
   end
 
-  # The old views put both rows on organized/bikes#new, so the param tells them apart
-  context "with the old registration and unregistered notification pages" do
-    let(:instance) do
-      described_class.new(organization:, current_user:, old_register_view: true, old_unregistered_notification_view: true)
-    end
+  # The old view puts it on organized/bikes#new, which the legacy unregistered notification
+  # page shares, so the param tells them apart
+  context "with the old registration page" do
+    let(:instance) { described_class.new(organization:, current_user:, old_register_view: true) }
 
-    it "matches the two add-a-bike rows on the param" do
+    it "matches add a registration on the param" do
       rows = component.css("nav a[data-ui--active-link-match-params-value*='parking_notification']")
 
-      expect(rows.map { |row| row["href"] })
-        .to eq(["/o/#{organization.to_param}/bikes/new",
-          "/o/#{organization.to_param}/bikes/new?parking_notification=true"])
+      expect(rows.map { |row| row["href"] }).to eq(["/o/#{organization.to_param}/bikes/new"])
       expect(rows.map { |row| row["data-ui--active-link-match-params-value"] })
-        .to eq([{parking_notification: [""]}.to_json, {parking_notification: ["true"]}.to_json])
+        .to eq([{parking_notification: [""]}.to_json])
     end
   end
 
