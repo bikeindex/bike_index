@@ -45,8 +45,25 @@
           <span class="tw:text-sm tw:font-bold tw:text-gray-500"><%= group[:label] %></span>
 
           <%# flex-1: the chips shrink and wrap beside their label rather than below it %>
-          <div class="tw:min-w-0 tw:flex-1">
+          <div
+            class="
+              tw:flex tw:min-w-0 tw:flex-1 tw:flex-wrap tw:items-center
+              tw:gap-x-4 tw:gap-y-2
+            "
+          >
             <%= render(group_chips(group)) %>
+
+            <% if group[:name] == :search_status %>
+              <span class="tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+                <%= translation(".excludes_impounded") %>
+
+                <% if organization.enabled?("impound_bikes") %>
+                  <%= link_to translation(".search_impound_records"),
+                    organization_impound_records_path(organization_id: organization.to_param),
+                    class: "twlink", data: {action: "org--search#searchImpoundRecords"} %>
+                <% end %>
+              </span>
+            <% end %>
           </div>
         </div>
       <% end %>

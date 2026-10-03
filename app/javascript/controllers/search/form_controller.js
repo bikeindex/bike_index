@@ -84,9 +84,16 @@ export default class extends Controller {
     // here it can't mean the frame is ahead of the address bar
     this.requestedURL = null
     const params = new URLSearchParams(window.location.search)
-    // Opted in, where the server renders no default for a URL without the param
-    this.formTarget.querySelectorAll('input[name=search_email], input[name=serial], input[name=search_notes], input[data-restores-from-url]')
-      .forEach(input => { input.value = params.get(input.name) || '' })
+    // Opted in, where the server renders no default for a URL without the param. elements,
+    // not querySelectorAll: the settings panel's radios reach the form with form=
+    ;[...this.formTarget.elements]
+      .filter(input => input.matches('input[name=search_email], input[name=serial], input[name=search_notes], input[data-restores-from-url]'))
+      .forEach(input => {
+        if (input.type !== 'radio') return (input.value = params.get(input.name) || '')
+        // A radio group the URL doesn't name is on its first, which isn't filtering
+        const group = this.formTarget.elements.namedItem(input.name)
+        group.value = params.get(input.name) ?? group[0].value
+      })
   }
 
   // A back/forward restoration can leave the results frame showing a snapshot for

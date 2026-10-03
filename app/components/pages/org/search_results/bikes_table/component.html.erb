@@ -63,8 +63,7 @@
       <%= render(Atoms::RegistrationStatusBadge::Component.new(bike:, skip_with_owner: true, size: :xs)) %>
     <% end %>
 
-    <% table.column(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell",
-      header_tooltip: translation(".occurred_at_tooltip")) do |bike| %>
+    <% table.column(sortable: "occurred_at", label: settings.column_renames[:occurred_at_cell], classes: "hideableColumn occurred_at_cell") do |bike| %>
       <%= render(UI::Time::Component.new(time: bike.occurred_at)) %>
     <% end %>
 

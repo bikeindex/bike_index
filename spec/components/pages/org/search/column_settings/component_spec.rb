@@ -36,6 +36,13 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     expect(component.at_css("[data-ui--collapse-target='content']")[:class]).to include("tw:hidden!")
   end
 
+  it "labels the registration time columns, with the status column's hint" do
+    expect(component).to have_text("Time - registration updated")
+    expect(component).to have_text("Time - Registration status")
+    expect(component.at_css("label:has(#occurred_at_cell_occurred_at_cell) small").text)
+      .to eq "When registration was stolen, impounded, found or listed for sale"
+  end
+
   context "with export_headers" do
     let(:instance) { described_class.new(settings:, export_headers: %w[serial]) }
 
