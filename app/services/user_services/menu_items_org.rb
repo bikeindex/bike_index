@@ -40,7 +40,7 @@ module UserServices
 
       [[registrations_group(organization), add_registration_link(organization, old_register_view)],
         [impounded_group(organization),
-          parking_group(organization),
+          parking_group(organization, old_register_view),
           bulk_group(organization),
           lightspeed_link(organization),
           messaging_link(organization, admin),
@@ -141,18 +141,24 @@ module UserServices
       ComponentStructs::Shapes.group(:impounded, translation(:impounded_vehicles), "impound", children)
     end
 
-    def parking_group(organization)
+    def parking_group(organization, old_register_view)
       return nil unless organization.enabled?("parking_notifications")
 
       children = [
         ComponentStructs::Shapes.link(translation(:search_parking_notifications),
           routes.organization_parking_notifications_path(organization_id: organization.to_param)),
-        ComponentStructs::Shapes.link(translation(:parking_notification_unregistered),
-          routes.new_organization_bike_path(organization.to_param, parking_notification: true),
-          match_params: {parking_notification: true})
+        unregistered_notification_link(organization, old_register_view)
       ]
 
       ComponentStructs::Shapes.group(:parking, translation(:parking_notifications_group), "map-pin", children)
+    end
+
+    def unregistered_notification_link(organization, old_register_view)
+      label = translation(:parking_notification_unregistered)
+      return ComponentStructs::Shapes.link(label, routes.new_organization_parking_notification_path(organization.to_param)) unless old_register_view
+
+      ComponentStructs::Shapes.link(label, routes.new_organization_bike_path(organization.to_param, parking_notification: true),
+        match_params: {parking_notification: true})
     end
 
     def bulk_group(organization)
@@ -264,7 +270,7 @@ module UserServices
 
     conceal :build_items, :organization_sections, :super_admin_link, :ambassador_items,
       :registrations_group, :registrations_links, :add_registration_link, :impounded_group,
-      :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
+      :parking_group, :unregistered_notification_link, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
       :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :translation, :routes
   end
 end

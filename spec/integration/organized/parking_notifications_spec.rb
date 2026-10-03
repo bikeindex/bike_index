@@ -65,6 +65,46 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     expect(notification.user).to eq user
   end
 
+  context "with an unregistered vehicle" do
+    let!(:surly) { FactoryBot.create(:manufacturer, name: "Surly") }
+    let!(:black) { Color.black }
+
+    before do
+      Autocomplete::Loader.clear_redis
+      Autocomplete::Loader.load_all(%w[Manufacturer])
+    end
+
+    it "registers it along with the notification, serial optional" do
+      page.current_window.resize_to(1400, 2000)
+      visit base_url
+      click_link "New notification for unregistered bike"
+      expect(page).to have_link "Registration form settings"
+
+      type_into("#bike_manufacturer_id", "Surly")
+      click_combobox_option("Surly")
+      type_into("#bike_primary_frame_color_id", "Black")
+      click_combobox_option("Black")
+      fill_in "bike[frame_model]", with: "Cross-Check"
+
+      choose "Enter address manually", allow_label_click: true
+      fill_in "parking_notification_street", with: "100 Main St"
+      fill_in "parking_notification_city", with: "New York"
+      choose "Parked incorrectly", allow_label_click: true
+      fill_in "parking_notification[internal_notes]", with: "Locked to the rail"
+
+      expect {
+        click_button "Create parking notification"
+        expect(page).to have_content("Parking notification created for bike", wait: 10)
+      }.to change(Bike.unscoped, :count).by(1)
+
+      bike = Bike.unscoped.reorder(:id).last
+      expect(bike).to have_attributes(status: "unregistered_parking_notification", serial_number: "unknown",
+        manufacturer: surly, frame_model: "Cross-Check", primary_frame_color: black, creation_organization: organization)
+      expect(bike.parking_notifications.last).to have_attributes(kind: "parked_incorrectly_notification",
+        internal_notes: "Locked to the rail", organization:, user:)
+    end
+  end
+
   # A pin in the middle of a park has no address of its own, so the reverse geocode
   # answers with somewhere else entirely (the suite-wide New York stub). The pin is
   # the location; the geocoded address only describes it, and must not move it.

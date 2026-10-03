@@ -76,6 +76,34 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
     end
   end
 
+  describe "new" do
+    it "renders the unregistered notification form, which submits to organized bikes" do
+      get "#{base_url}/new"
+      expect(response.status).to eq(200)
+      expect(response.body).to include(%(action="/o/#{current_organization.to_param}/bikes"))
+      expect(response.body).to include("parking_notification[kind]")
+      expect(response.body).to include("/o/#{current_organization.to_param}/registrations/settings")
+    end
+
+    context "with the old registration page" do
+      it "redirects to the legacy form" do
+        post "/o/#{current_organization.to_param}/registrations/switches", params: {old_view: true}
+        get "#{base_url}/new"
+        expect(response).to redirect_to new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true)
+      end
+    end
+
+    context "organization without parking_notifications" do
+      let(:enabled_feature_slugs) { [] }
+
+      it "redirects" do
+        get "#{base_url}/new"
+        expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
+        expect(flash[:error]).to be_present
+      end
+    end
+  end
+
   describe "show" do
     let(:parking_notification) { FactoryBot.create(:parking_notification, organization: current_organization) }
     it "renders" do

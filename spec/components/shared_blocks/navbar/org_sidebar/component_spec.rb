@@ -63,15 +63,24 @@ RSpec.describe SharedBlocks::Navbar::OrgSidebar::Component, type: :component do
         "/o/#{organization.to_param}/registration_sequence_pages/**"
   end
 
-  # The old view puts both rows on organized/bikes#new, so the param tells them apart
-  it "matches the two add-a-bike rows on the param" do
-    rows = component.css("nav a[data-ui--active-link-match-params-value*='parking_notification']")
+  it "links the unregistered notification row to its own page" do
+    expect(component).to have_css "nav a[href='/o/#{organization.to_param}/parking_notifications/new']",
+      text: "New unregistered notification"
+  end
 
-    expect(rows.map { |row| row["href"] })
-      .to eq(["/o/#{organization.to_param}/registrations/new",
-        "/o/#{organization.to_param}/bikes/new?parking_notification=true"])
-    expect(rows.map { |row| row["data-ui--active-link-match-params-value"] })
-      .to eq([{parking_notification: [""]}.to_json, {parking_notification: ["true"]}.to_json])
+  # The old view puts both rows on organized/bikes#new, so the param tells them apart
+  context "with the old registration page" do
+    let(:instance) { described_class.new(organization:, current_user:, old_register_view: true) }
+
+    it "matches the two add-a-bike rows on the param" do
+      rows = component.css("nav a[data-ui--active-link-match-params-value*='parking_notification']")
+
+      expect(rows.map { |row| row["href"] })
+        .to eq(["/o/#{organization.to_param}/bikes/new",
+          "/o/#{organization.to_param}/bikes/new?parking_notification=true"])
+      expect(rows.map { |row| row["data-ui--active-link-match-params-value"] })
+        .to eq([{parking_notification: [""]}.to_json, {parking_notification: ["true"]}.to_json])
+    end
   end
 
   # Which group holds the current page is the browser's to say, so the server opens the
