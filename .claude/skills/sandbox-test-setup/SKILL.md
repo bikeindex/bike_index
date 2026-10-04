@@ -36,6 +36,14 @@ Before the first `rspec`, `bundle`, `bin/lint`, `bin/env` or dev server:
 bin/workspace_setup --without_seeds
 ```
 
+The `SessionStart` hook `.claude/hooks/worktree-setup.sh` runs this on a worktree's
+first session, so a `.workspace_id` is usually already there. When it isn't, the
+hook's output went to `tmp/workspace_setup.log`; read that, then run the command by hand.
+When Claude Code removes the worktree, `.claude/hooks/worktree-teardown.sh` runs
+`bin/workspace_teardown`, which removes it with `git worktree remove` and then drops
+its databases. A worktree git refuses to remove (uncommitted changes, locked) stays,
+databases and all.
+
 It allocates an ID from the `dev_workspaces` registry, writes `.workspace_id`, and runs
 `bin/setup`, which creates this workspace's databases and builds the CSS. Run `bundle
 exec rails db:seed` when you need records. `node_modules` starts as a clone of the root

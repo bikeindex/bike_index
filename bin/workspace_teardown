@@ -3,10 +3,11 @@
 
 # Clean up workspace-specific resources for this checkout: stops bin/dev,
 # drops postgres databases whose names end in `_<workspace_id>` (optionally
-# followed by `_replica` and/or a single digit 1-8 for parallel test DBs),
+# followed by `_replica` and/or the TEST_ENV_NUMBER of a parallel test DB),
 # soft-deletes the row in dev_workspaces.workspace_ids (so the ID can be
 # reused after DELETED_REUSE_DELAY in bin/workspace_setup), and deletes
-# .workspace_id.
+# .workspace_id. A linked worktree is first removed with `git worktree remove`,
+# so one git refuses to remove keeps its databases.
 #
 # All output is teed to ~/.workspace_teardown.log so it survives the terminal
 # closing or the workspace folder being removed.
@@ -35,6 +36,13 @@ if (workspace_id.nil? || workspace_id.empty?) && File.exist?(WORKSPACE_FILE)
   workspace_id = File.read(WORKSPACE_FILE).strip
 end
 
+main_root = File.dirname(`git rev-parse --path-format=absolute --git-common-dir`.strip)
+unless [APP_ROOT, "."].include?(main_root)
+  log_line("Removing worktree #{APP_ROOT}")
+  system("git", "worktree", "remove", APP_ROOT, chdir: main_root) || abort("git worktree remove failed for #{APP_ROOT}")
+  Dir.chdir(main_root)
+end
+
 if workspace_id.nil? || workspace_id.empty?
   log_line("WORKSPACE_ID not set and .workspace_id missing, skipping teardown.")
   exit 0
@@ -60,16 +68,29 @@ if listener_pid
   end
 end
 
-# Discover postgres databases tied to this workspace_id.
-databases = psql("postgres", "SELECT datname FROM pg_database WHERE datname ~ '_#{workspace_id}(_replica)?[1-8]?$' ORDER BY datname")
+# Discover postgres databases tied to this workspace_id. config/database.yml
+# appends TEST_ENV_NUMBER straight onto the id with no separator, so a parallel
+# test DB ends in any run of digits — one process per core, well past 8.
+candidates = psql("postgres", "SELECT datname FROM pg_database WHERE datname ~ '_#{workspace_id}(_replica)?[0-9]*$' ORDER BY datname")
   .split("\n").map(&:strip).reject(&:empty?)
 
+# Which makes `_<id><n>` indistinguishable from workspace `<id><n>`'s own base
+# database, so leave anything another registered workspace owns alone.
+other_ids = psql(WORKSPACE_DB, "SELECT id FROM workspace_ids WHERE id <> #{workspace_id}")
+  .split("\n").map(&:strip).reject(&:empty?)
+databases = candidates.reject { |db| other_ids.any? { |id| db.match?(/_#{id}(_replica)?\z/) } }
+
+undropped = []
 if databases.empty?
   log_line("No databases found matching workspace_id #{workspace_id}")
 else
   databases.each do |db|
     log_line("Dropping database: #{db}")
-    system("dropdb", "--if-exists", db, out: File::NULL, err: File::NULL)
+    # --force: a leftover console or test process holding a connection would
+    # otherwise block the drop, and this workspace is going away regardless.
+    next if system("dropdb", "--force", "--if-exists", db, out: File::NULL, err: File::NULL)
+    undropped << db
+    log_line("  FAILED to drop #{db}")
   end
 end
 
@@ -77,5 +98,10 @@ log_line("Soft-deleting workspace_ids row: #{workspace_id}")
 psql(WORKSPACE_DB, "UPDATE workspace_ids SET deleted_at = NOW() WHERE id = #{workspace_id}")
 
 FileUtils.rm_f(WORKSPACE_FILE)
+
+if undropped.any?
+  log_line("Workspace teardown finished, but #{undropped.count} database(s) survived: #{undropped.join(", ")}")
+  exit 1
+end
 
 log_line("Workspace teardown complete!")
