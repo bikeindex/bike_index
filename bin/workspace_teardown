@@ -6,8 +6,7 @@
 # followed by `_replica` and/or the TEST_ENV_NUMBER of a parallel test DB),
 # soft-deletes the row in dev_workspaces.workspace_ids (so the ID can be
 # reused after DELETED_REUSE_DELAY in bin/workspace_setup), and deletes
-# .workspace_id. A linked worktree is first removed with `git worktree remove`,
-# so one git refuses to remove keeps its databases.
+# .workspace_id.
 #
 # All output is teed to ~/.workspace_teardown.log so it survives the terminal
 # closing or the workspace folder being removed.
@@ -34,13 +33,6 @@ end
 workspace_id = ENV["WORKSPACE_ID"]
 if (workspace_id.nil? || workspace_id.empty?) && File.exist?(WORKSPACE_FILE)
   workspace_id = File.read(WORKSPACE_FILE).strip
-end
-
-main_root = File.dirname(`git rev-parse --path-format=absolute --git-common-dir`.strip)
-unless [APP_ROOT, "."].include?(main_root)
-  log_line("Removing worktree #{APP_ROOT}")
-  system("git", "worktree", "remove", APP_ROOT, chdir: main_root) || abort("git worktree remove failed for #{APP_ROOT}")
-  Dir.chdir(main_root)
 end
 
 if workspace_id.nil? || workspace_id.empty?
