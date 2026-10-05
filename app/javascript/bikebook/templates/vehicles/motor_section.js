@@ -1,4 +1,4 @@
-import { copyableId } from 'bikebook/templates/copyable_id'
+import { copyableCode } from 'bikebook/templates/ui/copyable_code'
 import { section } from 'bikebook/templates/vehicles/section'
 import { array, blank, compact, join, present, slice } from 'bikebook/templates/values'
 
@@ -11,7 +11,7 @@ export const motorSection = ({ presenter, heading, motor, others }) => {
   const display = (each) => ({
     ...each,
     name: [each.manufacturer, each.model].filter(present).join(' '),
-    id: each.id ? copyableId({ id: each.id }) : null,
+    id: each.id ? copyableCode({ value: each.id, label: 'Copy ID' }) : null,
     us_e_bike_class: each.us_e_bike_class == null ? null : `Class ${sentence(each.us_e_bike_class)}`,
     ...Object.fromEntries(Object.entries(slice(each, humanized)).map(([key, value]) => [key, value == null ? value : presenter.humanize(value)]))
   })

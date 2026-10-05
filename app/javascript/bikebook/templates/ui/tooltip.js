@@ -16,7 +16,7 @@ export const tooltip = ({ text, body, content }) => {
   return html`<span class="tw:inline-block" data-controller="ui--tooltip" data-action=${TRIGGER_ACTIONS}><button type="button"
     aria-label=${text || nothing} aria-describedby=${id} data-ui--tooltip-target="trigger"
     class=${content ? TRIGGER_CLASS : BUTTON_CLASS}>${content ?? '?'}</button> <span role="tooltip" id=${id}
-    data-ui--tooltip-target="tooltip" class="tw:twtext-color tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:text-left tw:rounded
-    tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:normal-case tw:border tw:shadow-lg tw:z-50 ${SURFACE_CLASS}">${body ?? text}<span
+    data-ui--tooltip-target="tooltip" class="tw:twtext-color tw:hidden tw:pointer-events-none tw:whitespace-normal tw:w-max tw:max-w-[min(24rem,90vw)]
+    tw:rounded tw:text-left tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:normal-case tw:border tw:shadow-lg tw:z-50 ${SURFACE_CLASS}">${body ?? text}<span
     aria-hidden="true" data-ui--tooltip-target="arrow" class="tw:absolute tw:h-2 tw:w-2 tw:rotate-45 tw:border-solid ${SURFACE_CLASS}"></span></span></span>`
 }

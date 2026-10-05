@@ -1,5 +1,5 @@
 import { html, nothing, render } from 'lit-html'
-import { copyableId } from 'bikebook/templates/copyable_id'
+import { copyableCode } from 'bikebook/templates/ui/copyable_code'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { x } from 'bikebook/templates/icons'
 import { collapse } from 'bikebook/templates/ui/collapse'
@@ -187,7 +187,7 @@ class ModelViewer {
     const yearRangeDiffers = this.others.some((other) => !equal([other.first_year, other.final_year], [vehicle.first_year, vehicle.final_year]))
     return section({
       content: join([
-        definitionListRow({ label: 'ID', content: copyableId({ id: this.value }) }),
+        definitionListRow({ label: 'ID', content: copyableCode({ value: this.value, label: 'Copy ID' }) }),
         row('Model group', 'vehicle_model_group'),
         configuration !== 'complete' || this.differs('model_configuration')
           ? row('Configuration', 'model_configuration', configuration === 'complete' ? html`<span class="twless-strong">${label}</span>` : label)
