@@ -17,13 +17,13 @@
 
 <div
   class="bikebook twgutter tw:mx-auto tw:max-w-screen-xl tw:pb-6"
-  data-controller="bikebook"
-  data-bikebook-manifest-url-value="<%= @manifest_url %>"
-  data-bikebook-standard-wheel-sizes-value="<%= @standard_wheel_sizes.to_json %>"
-  data-bikebook-failed-text-value="<%= translation(".failed") %>"
-  data-action="submit->bikebook#visit click->bikebook#follow popstate@window->bikebook#restore scroll@window->bikebook#track"
+  data-controller="bikebook--page"
+  data-bikebook--page-manifest-url-value="<%= @manifest_url %>"
+  data-bikebook--page-standard-wheel-sizes-value="<%= @standard_wheel_sizes.to_json %>"
+  data-bikebook--page-failed-text-value="<%= translation(".failed") %>"
+  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track"
 >
-  <template data-bikebook-target="shell">
+  <template data-bikebook--page-target="shell">
     <div
       class="tw:group"
       data-controller="bikebook--catalog-filters ui--collapse"
@@ -128,7 +128,7 @@
               </div>
 
               <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-4">
-                <% [["year", translation(".year"), 1900, "tw:sm:w-24", nil, year_placeholders],
+                <% [["year", translation(".year"), 1900, "tw:sm:w-24", nil, {min: 1990, max: Time.current.year + 1}],
                     ["price", translation(".price"), 0, "tw:sm:w-28", "$", {}]].each do |name, legend, min_attr, width, prefix, placeholders| %>
                   <fieldset
                     class="
@@ -190,13 +190,13 @@
     <div id="vehicle-viewers"></div>
   </template>
 
-  <div data-bikebook-target="page">
+  <div data-bikebook--page-target="page">
     <p
       class="
         tw:py-12 tw:text-center tw:text-sm tw:text-gray-500
         tw:dark:text-gray-400
       "
-      data-bikebook-target="status"
+      data-bikebook--page-target="status"
     >
       <%= translation(".loading") %>
     </p>

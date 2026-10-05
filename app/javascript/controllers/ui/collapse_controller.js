@@ -11,10 +11,9 @@ import { collapse } from 'utils/collapse_utils'
 // (?param=1, ?param=0 collapsed) so it survives reloads and navigation; with
 // data-ui--collapse-storage-key-value it persists to localStorage instead, for a panel
 // whose state is the rider's preference rather than part of the address.
-// data-ui--collapse-direction-value="horizontal" collapses the width instead of the height.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
-  static values = { param: String, storageKey: String, direction: { type: String, default: 'vertical' } }
+  static values = { param: String, storageKey: String, direction: String }
 
   connect () {
     // Restore the persisted state without animating on load. Restoring applies rather than

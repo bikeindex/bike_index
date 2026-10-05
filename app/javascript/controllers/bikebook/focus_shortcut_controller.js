@@ -1,10 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='bikebook--focus-shortcut'
-// Jumps to the field target when "/" is pressed, the way a search box on a
-// listing page does. Listens on the document, so the key works from anywhere on
-// the page — and stands aside whenever the visitor is already typing, since "/"
-// is an ordinary character in a field.
+// "/" focuses the field target from anywhere on the page, except while typing in a field
 export default class extends Controller {
   static targets = ['field']
 

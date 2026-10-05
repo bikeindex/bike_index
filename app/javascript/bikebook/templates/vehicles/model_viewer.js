@@ -42,7 +42,7 @@ class ModelViewer {
       data-action="ui--alert#close bikebook--remove-vehicle#remove"
       data-turbo-prefetch="false" class="tw:-my-1.5 tw:-mr-1.5 tw:ml-auto tw:inline-flex tw:h-8 tw:w-8 tw:shrink-0 tw:items-center tw:justify-center
       tw:rounded-sm tw:text-gray-500 tw:hover:bg-vellum tw:focus:ring-2 tw:focus:ring-gray-400 tw:dark:text-gray-400" href=${this.removePath}>${
-        x({ className: 'tw:h-3 tw:w-3', ariaHidden: true })}</a></div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4"><h1
+        x('tw:h-3 tw:w-3')}</a></div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4"><h1
       class="tw:font-display tw:text-2xl tw:leading-tight tw:font-semibold">${vehicle.model}</h1>${collapse({
         size: 'sm',
         htmlClass: 'tw:shrink-0 tw:whitespace-nowrap',

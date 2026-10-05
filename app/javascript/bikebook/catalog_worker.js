@@ -6,7 +6,6 @@ const FORMAT = 2
 let models = []
 let byId = new Map()
 let activities = []
-let stockPhotos = null
 let manifest = null
 let base = null
 let last = null
@@ -34,9 +33,11 @@ async function load ({ manifestUrl, ids }) {
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
   activities = index.primary_activities
-  stockPhotos = index.stock_photos
+  // a photo stored under its model's id is published as its extension alone
+  const photo = ({ id, photo }) => photo?.includes('/') ? photo : photo && `${index.stock_photos}/${path(id)}.${photo}`
   models = index.models.map((model) => ({
     ...model,
+    stock_photo: model.stock_photo ?? photo(model),
     manufacturer_name: index.manufacturers[model.manufacturer],
     activity_name: activityNames[model.primary_activity],
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
@@ -44,7 +45,6 @@ async function load ({ manifestUrl, ids }) {
     sortPrice: model.msrp_cents ?? 0
   }))
   byId = new Map(models.map((model) => [model.id, model]))
-  orders.clear()
   return { vocabulary, options: options(index) }
 }
 
@@ -73,11 +73,11 @@ const block = (key) => {
 }
 
 async function vehicles ({ ids }) {
-  const found = await Promise.all(ids.map(async (id) => {
-    const key = blockKey(id)
-    return manifest.blocks[key] && (await block(key))[id]
+  const found = await Promise.all(ids.map(async (value) => {
+    const key = blockKey(value)
+    return { value, display: byId.get(value)?.display, data: manifest.blocks[key] && (await block(key))[value] }
   }))
-  return ids.map((value, index) => ({ data: found[index], value })).filter(({ data }) => data)
+  return found.filter(({ data }) => data)
 }
 
 function displays ({ ids }) {
@@ -92,16 +92,10 @@ function search ({ params, page, perPage }) {
   return {
     total: last.matches.length,
     filteredCount: last.filteredCount,
-    models: last.matches.slice(start, start + perPage).map(withPhoto),
+    models: last.matches.slice(start, start + perPage),
     nextPage: last.matches.length > start + perPage ? page + 1 : null
   }
 }
-
-// The index names each stock photo by its URL, or by its extension alone when it's stored under its model's id
-const withPhoto = (model) => ({
-  ...model,
-  stock_photo: model.stock_photo ?? (model.photo?.includes('/') ? model.photo : model.photo && `${stockPhotos}/${path(model.id)}.${model.photo}`)
-})
 
 function matching (params) {
   const filtered = sorted(params).filter(filter(params))

@@ -2,15 +2,12 @@ import { Controller } from '@hotwired/stimulus'
 /* global ResizeObserver */
 
 // Connects to data-controller='bikebook--wrapped-scroll'
-// Once the vehicle cards wrap onto more than one row, caps each panel at 75% of
-// the viewport height and scrolls it within its own frame, so every card's top
-// stays reachable. The scroll sits on the bordered panel, not the bare row child,
-// so a space-taking scrollbar doesn't inset the card.
+// Once the vehicle cards wrap onto more than one row, each scrolls within 75% of the viewport,
+// keeping every card's top reachable. On the bordered panel, so a scrollbar doesn't inset the card
 export default class extends Controller {
   connect () {
     this.observer = new ResizeObserver(() => this.update())
     this.observer.observe(this.element)
-    this.update()
   }
 
   disconnect () {

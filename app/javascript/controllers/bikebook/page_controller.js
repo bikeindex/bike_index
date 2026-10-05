@@ -1,12 +1,12 @@
 import { Controller } from '@hotwired/stimulus'
 import kit from 'bikebook/kit'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
-import { hydrate, wire } from 'bikebook/hydrate'
+import { hydrate } from 'bikebook/hydrate'
 import { uuid } from 'bikebook/templates/helpers'
 
 const stamped = (state) => ({ ...state, bikebook: uuid() })
 
-// Connects to data-controller='bikebook'
+// Connects to data-controller='bikebook--page'
 // Searches and compares the published catalog in the browser. A pick submits the form, and it, a
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
@@ -35,12 +35,12 @@ export default class extends Controller {
     this.#render(url)
   }
 
+  // The form's fields over the URL's other params, such as an open panel's
   visit (event) {
     event.preventDefault()
-    const url = new URL(window.location.pathname, window.location.href)
-    new FormData(event.target).forEach((value, name) => url.searchParams.append(name, value))
-    window.history.pushState(stamped(), '', url)
-    this.#render(url, [0, 0])
+    const url = new URL(window.location.href)
+    new FormData(event.target).forEach((value, name) => url.searchParams.set(name, value))
+    this.#go(url)
   }
 
   // A plain click on a link to this page, such as a card's remove link
@@ -52,8 +52,7 @@ export default class extends Controller {
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
-    window.history.pushState(stamped(), '', url)
-    this.#render(url, [0, 0])
+    this.#go(url)
   }
 
   restore () {
@@ -73,21 +72,23 @@ export default class extends Controller {
     if (!this.#entry) window.history.replaceState(stamped(window.history.state), '')
   }
 
+  #go (url) {
+    window.history.pushState(stamped(), '', url)
+    this.#render(url, [0, 0])
+  }
+
   async #render (url, scroll) {
     const render = ++this.#renders
-    const rendered = await hydrate(this.catalog, this.shellTarget, url, this.standardWheelSizesValue).catch((error) => error)
+    const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url, this.standardWheelSizesValue).catch((error) => error)
     if (render !== this.#renders) return
     if (rendered instanceof Error) return this.#fail(rendered)
 
-    const { content, title } = rendered
-    wire(content, this.source)
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
-    this.pageTarget.replaceChildren(content)
-    document.title = title ?? this.title
+    this.pageTarget.replaceChildren(rendered.content)
+    document.title = rendered.title ?? this.title
     this.pageTarget.querySelector('[autofocus]')?.focus()
     if (scroll) window.scrollTo(...scroll)
-    this.element.dataset.bikebookReady = ''
   }
 
   #fail (error) {

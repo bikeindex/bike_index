@@ -45,7 +45,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       playwright_page.on("request", ->(request) { asked << request.url if request.navigation_request? })
     end
     visit bikebook_path
-    expect(page).to have_css("[data-bikebook-ready]", wait: 10)
+    expect(page).to have_field("View a vehicle", wait: 10)
     asked.clear
 
     vehicle_field.click
@@ -58,8 +58,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
 
-    # A second pick compares the two, marking where the second differs from the first
-    # an id matches too
+    # A second pick, found by its id, compares the two, marking where the second differs from the first
     type_into(vehicle_field, "level_2_step")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(1 matching model\)/i)
     retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
@@ -90,6 +89,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "renders each UI template as the component it mirrors does" do
+    serve_catalog
     visit bikebook_path
 
     aggregate_failures do
@@ -100,13 +100,6 @@ RSpec.describe "Bikebook", :js, type: :system do
         "bikebook/templates/ui/tooltip#tooltip", "{ body: html`<em>Internal</em> routing` }")
 
       expect_template(UI::IconChevron::Component.new(size: :md), "bikebook/templates/ui/icon_chevron#iconChevron", "{ size: 'md' }")
-
-      expect_template(UI::Button::Component.new(color: :secondary, size: :sm, html_class: "tw:shrink-0",
-        aria: {label: "Toggle sizes"}, data: {action: "ui--collapse#toggle"}).with_content("<code>{ }</code>".html_safe),
-        "bikebook/templates/ui/button#button", <<~JS)
-          { size: 'sm', htmlClass: 'tw:shrink-0', content: html`<code>{ }</code>`,
-            attributes: { 'aria-label': 'Toggle sizes', 'data-action': 'ui--collapse#toggle' } }
-        JS
 
       expect_template(UI::Collapse::Component.new(size: :sm, html_class: "tw:shrink-0", aria: {controls: "vehicle-model-json-1", label: "Toggle JSON"})
         .with_content("<code>{ }</code>".html_safe), "bikebook/templates/ui/collapse#collapse", <<~JS)

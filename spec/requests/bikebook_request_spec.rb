@@ -10,12 +10,12 @@ RSpec.describe BikebookController, type: :request do
 
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
-      bikebook = page.find("[data-controller='bikebook']")
-      expect(bikebook["data-bikebook-manifest-url-value"]).to eq BikebookController::MANIFEST_URL
-      expect(JSON.parse(bikebook["data-bikebook-standard-wheel-sizes-value"])).to eq [622]
+      bikebook = page.find("[data-controller='bikebook--page']")
+      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq BikebookController::MANIFEST_URL
+      expect(JSON.parse(bikebook["data-bikebook--page-standard-wheel-sizes-value"])).to eq [622]
       expect(bikebook).to have_text("Loading the catalog…")
 
-      shell = Capybara.string(Nokogiri::HTML5(response.body).at_css("template[data-bikebook-target='shell']").inner_html)
+      shell = Capybara.string(Nokogiri::HTML5(response.body).at_css("template[data-bikebook--page-target='shell']").inner_html)
       expect(shell).to have_field("vehicle_models", placeholder: "Search by manufacturer or model…")
         .and have_css("#manufacturer-hw-listbox", visible: :all)
         .and have_css("#vehicle-viewers", visible: :all)

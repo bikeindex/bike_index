@@ -3,10 +3,8 @@ import { replaceUrl } from 'bikebook/replace_url'
 
 /* global CSS */
 
-// Threads the filter panel's values into the vehicle combobox's async src and
-// mirrors them into the page URL via replaceState (ui--collapse owns the panel's ?filters).
-// The page renders the controls from that URL, so filters survive a reload and
-// the auto-submit form (which carries the params it doesn't own across the GET).
+// Threads the filter panel's values into the vehicle combobox's async src and mirrors them
+// into the page URL, which the page renders the controls from (ui--collapse owns ?filters)
 export default class extends Controller {
   static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field']
   static values = {
@@ -16,6 +14,8 @@ export default class extends Controller {
 
   // Rewritten on connect too: a GET form submit escapes the commas, and rendering drops stale values
   connect () {
+    this.yearArrowTarget.textContent = this.#arrow(this.yearDirValue)
+    this.priceArrowTarget.textContent = this.#arrow(this.priceDirValue)
     this.#refreshSummary()
     this.#writeUrl()
   }
@@ -59,13 +59,7 @@ export default class extends Controller {
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
       price_dir: this.priceDirValue === 'asc' ? 'asc' : ''
     }
-    for (const [key, value] of Object.entries(params)) {
-      if (value == null || value === '') {
-        url.searchParams.delete(key)
-      } else {
-        url.searchParams.set(key, value)
-      }
-    }
+    for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
   #refreshSummary () {

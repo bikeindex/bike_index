@@ -15,11 +15,10 @@ export async function loadCatalog (manifestUrl, ids = []) {
     pending.delete(id)
     error ? reject(new Error(error)) : resolve(result)
   }
-  const rejectAll = (error) => {
-    pending.forEach(({ reject }) => reject(error))
+  worker.onerror = worker.onmessageerror = ({ message }) => {
+    pending.forEach(({ reject }) => reject(new Error(message || "The catalog's worker failed")))
     pending.clear()
   }
-  worker.onerror = worker.onmessageerror = ({ message }) => rejectAll(new Error(message || "The catalog's worker failed"))
   const call = (type, args) => new Promise((resolve, reject) => {
     pending.set(nextId, { resolve, reject })
     worker.postMessage({ id: nextId++, type, ...args })
@@ -73,13 +72,13 @@ export class CatalogComboboxSource {
 
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
-    const options = models.map((model) => this.option(model))
+    const options = models.map((model) => comboboxOption({ model, placeholderUrl: this.placeholderUrl, currencies: kit.currencies }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
       data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} data-callback-id=${callbackId ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
-      listbox.replaceChildren(fragmentOf(html`${group(matching(total, total.toLocaleString('en-US')), options)}${pagination}`))
-      renderInto(document.getElementById('vehicle-models-count'), matching(filteredCount, numberDisplay(filteredCount)))
+      listbox.replaceChildren(fragmentOf(html`${group(matching(total), options)}${pagination}`))
+      renderInto(document.getElementById('vehicle-models-count'), matching(filteredCount))
     } else {
       listbox.append(fragmentOf(html`${options}${pagination}`))
     }
@@ -107,10 +106,6 @@ export class CatalogComboboxSource {
 
     renderChips(combobox.element, ids.map((value, index) => ({ value, display: displays[index] })).filter(({ display }) => display != null))
   }
-
-  option (model) {
-    return comboboxOption({ model, placeholderUrl: this.placeholderUrl, currencies: kit.currencies })
-  }
 }
 
 // The gem's selection chip partial, ahead of the field
@@ -125,4 +120,4 @@ const group = (label, options) => {
     role="presentation">${label}</li>${options}</ul>`
 }
 
-export const matching = (count, shown) => html`(${shown} matching ${count === 1 ? 'model' : 'models'})`
+export const matching = (count) => html`(${numberDisplay(count)} matching ${count === 1 ? 'model' : 'models'})`

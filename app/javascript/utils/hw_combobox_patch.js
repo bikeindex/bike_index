@@ -9,8 +9,10 @@ export const localSources = new WeakMap()
 
 const connect = HwComboboxController.prototype.connect
 HwComboboxController.prototype.connect = function () {
+  const source = localSources.get(this.element)
+  if (source?.prime) this.element.querySelector('.hw_combobox__pagination__wrapper turbo-frame')?.remove()
   connect.call(this)
-  localSources.get(this.element)?.prime?.(this)
+  source?.prime?.(this)
 }
 
 const requestChips = HwComboboxController.prototype._requestChips
@@ -119,7 +121,7 @@ Object.defineProperty(HwComboboxController.prototype, '_isSmallViewport', {
 // Neither Turbo event covers the other: only `before-cache` runs early enough to keep an open
 // dialog out of a cached snapshot, and it's skipped on the no-cache pages the comboboxes are on.
 // /bikebook renders its pages without Turbo, and says so itself.
-const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render', 'bikebook:before-render']
+const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render', 'bikebook--page:before-render']
 
 // On small viewports it opens in a modal dialog and locks body scroll, but only
 // unlocks along its own collapse path, which a keypress or a click has to start.

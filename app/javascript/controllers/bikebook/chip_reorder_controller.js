@@ -1,10 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Pointer drag-to-reorder for multiselect combobox chips (native HTML5 drag is
-// flaky across browsers and dead on touch). The dragged chip dims in place while a
-// thin bar marks where it will land; on release it moves there, the hidden field's
-// comma-joined value is rewritten to match, and the form re-submits — reordering
-// the compared-model grid.
+// Drag a multiselect combobox's chips to reorder its value, and so the compared vehicles.
+// Pointer events rather than native HTML5 drag, which is flaky across browsers and dead on touch
 export default class extends Controller {
   connect () {
     this.element.addEventListener('pointerdown', this.#onPointerDown)
@@ -29,7 +26,8 @@ export default class extends Controller {
     this.moved = false
     document.addEventListener('pointermove', this.#onPointerMove)
     document.addEventListener('pointerup', this.#onPointerUp, { once: true })
-    document.addEventListener('pointercancel', this.#onPointerCancel, { once: true })
+    // a touch gesture the browser takes over (scroll/zoom) fires pointercancel
+    document.addEventListener('pointercancel', this.#reset, { once: true })
   }
 
   #onPointerMove = (event) => {
@@ -56,32 +54,22 @@ export default class extends Controller {
     this.#reset()
   }
 
-  // The browser can hijack a touch gesture (scroll/zoom) and fire pointercancel; abort cleanly.
-  #onPointerCancel = () => {
-    this.#reset()
-  }
-
-  #reset () {
+  #reset = () => {
     this.dragging?.classList.remove('tw:opacity-50')
     this.dragging = null
     document.removeEventListener('pointermove', this.#onPointerMove)
     document.removeEventListener('pointerup', this.#onPointerUp)
-    document.removeEventListener('pointercancel', this.#onPointerCancel)
-    this.indicator?.remove()
+    document.removeEventListener('pointercancel', this.#reset)
+    this.indicator.remove()
   }
 
   #syncOrder () {
     const hiddenField = this.element.querySelector("[data-hw-combobox-target='hiddenField']")
-    if (!hiddenField) return
-
-    const value = Array.from(this.element.querySelectorAll('[data-hw-combobox-chip]'))
-      .map(chip => chip.querySelector('[data-hw-combobox-value-param]')?.dataset.hwComboboxValueParam)
-      .filter(Boolean)
-      .join(',')
+    const value = Array.from(this.element.querySelectorAll('[data-hw-combobox-value-param]'), (remover) => remover.dataset.hwComboboxValueParam).join(',')
 
     if (value === hiddenField.value) return
 
     hiddenField.value = value
-    this.element.closest('form')?.requestSubmit()
+    this.element.closest('form').requestSubmit()
   }
 }
