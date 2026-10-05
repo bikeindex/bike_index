@@ -10,7 +10,8 @@ Capybara.register_driver :playwright do |app|
   Capybara::Playwright::Driver.new(app,
     browser_type: :chromium,
     headless: true,
-    viewport: {width: 1920, height: 1080})
+    viewport: {width: 1920, height: 1080},
+    permissions: ["clipboard-read", "clipboard-write"])
 end
 
 # The same browser with scripting turned off, for specs about what a rider without
