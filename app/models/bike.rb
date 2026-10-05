@@ -644,7 +644,7 @@ class Bike < ApplicationRecord
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
     # Only grab the phone number from registration_info if this is the first_ownership (otherwise it should be user, etc)
-    @phone ||= registration_info&.dig("phone") if first_ownership?
+    @phone ||= registration_info&.dig("phone") if @phone.nil? && first_ownership?
     @phone
   end
 
