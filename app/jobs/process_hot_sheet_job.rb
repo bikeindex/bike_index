@@ -20,7 +20,8 @@ class ProcessHotSheetJob < ScheduledJob
   def perform(org_id = nil)
     return self.class.enqueue_workers unless org_id.present?
 
-    hot_sheets = HotSheet.for(org_id, Time.current.to_date)
+    # The org's own day, matching what send_today_now? checked
+    hot_sheets = HotSheet.for(org_id, HotSheetConfiguration.find_by(organization_id: org_id)&.current_date)
     return hot_sheets if hot_sheets.all?(&:settled?)
 
     # Saved before any delivery, so a run that dies leaves the rest of the day's batches

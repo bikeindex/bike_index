@@ -891,6 +891,16 @@ RSpec.describe UsersController, type: :request do
           expect(flash).to be_blank
           expect(current_user.reload.token_for_password_reset).to be_blank
         end
+        context "with a password" do
+          let(:current_user) { FactoryBot.create(:user_confirmed) }
+          it "redirects to change it on my account" do
+            get "#{base_url}/update_password_form_with_reset_token"
+            expect(response).to redirect_to edit_my_account_path(edit_template: "password")
+            post "#{base_url}/update_password_with_reset_token", params: {user: {password: "new-password-1234", password_confirmation: "new-password-1234"}}
+            expect(response).to redirect_to edit_my_account_path(edit_template: "password")
+            expect(current_user.reload.authenticate("new-password-1234")).to be_falsey
+          end
+        end
       end
     end
     context "token not found" do

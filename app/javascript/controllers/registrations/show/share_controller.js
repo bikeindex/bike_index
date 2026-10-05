@@ -32,7 +32,7 @@ export default class extends Controller {
     const label = this.hasLabelTarget ? this.labelTarget : this.element
     // Read once, so a second click mid-flash doesn't keep "Link copied" as the label
     this.originalLabel ??= label.textContent
-    label.textContent = this.copiedValue || 'Link copied'
+    label.textContent = this.copiedValue
     clearTimeout(this.resetTimeout)
     this.resetTimeout = setTimeout(() => { label.textContent = this.originalLabel }, 1500)
   }

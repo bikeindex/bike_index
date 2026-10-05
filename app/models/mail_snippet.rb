@@ -40,6 +40,11 @@ class MailSnippet < ApplicationRecord
     tempo: 19
   }.freeze
 
+  # Org admins write bodies as raw HTML; keep what email markup uses, including inline styles
+  SANITIZED_TAGS = (Rails::HTML5::SafeListSanitizer.allowed_tags + %w[table thead tbody tfoot tr td th center font u s]).freeze
+  SANITIZED_ATTRIBUTES = (Rails::HTML5::SafeListSanitizer.allowed_attributes +
+    %w[style align valign bgcolor border cellpadding cellspacing colspan rowspan target color]).freeze
+
   enum :kind, KIND_ENUM
 
   belongs_to :organization
@@ -181,6 +186,10 @@ class MailSnippet < ApplicationRecord
 
   def kind_humanized
     self.class.kind_humanized(kind)
+  end
+
+  def sanitized_body
+    ActionController::Base.helpers.sanitize(body, tags: SANITIZED_TAGS, attributes: SANITIZED_ATTRIBUTES)
   end
 
   def body_stripped

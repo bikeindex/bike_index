@@ -29,7 +29,7 @@ module Emails
       end
 
       def organization_snippet_body
-        MailSnippet.for_organization(organization_id: organization.id, kind: "graduated_notification", time: snippet_time)&.body
+        MailSnippet.for_organization(organization_id: organization.id, kind: "graduated_notification", time: snippet_time)&.sanitized_body
       end
 
       def tokenized_url

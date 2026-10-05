@@ -479,7 +479,7 @@ class Organization < ApplicationRecord
   def mail_snippet_body(snippet_kind, time: nil)
     return nil unless MailSnippet.organization_snippet_kinds.include?(snippet_kind)
 
-    MailSnippet.for_organization(organization_id: id, kind: snippet_kind, time:)&.body
+    MailSnippet.for_organization(organization_id: id, kind: snippet_kind, time:)&.sanitized_body
   end
 
   def current_organization_status

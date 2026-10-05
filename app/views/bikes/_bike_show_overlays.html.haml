@@ -20,7 +20,7 @@
             = @matching_notification.message
         - organization_message_snippet = @matching_notification.organization&.mail_snippets&.enabled&.where(kind: @token_type)&.first
         - if organization_message_snippet.present?
-          = sanitize(organization_message_snippet.body)
+          = organization_message_snippet.sanitized_body
 
         .text-center.mt-4
           - if @matching_notification&.resolved?

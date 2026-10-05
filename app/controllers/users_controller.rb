@@ -227,10 +227,15 @@ class UsersController < ApplicationController
     params.require(:user).permit(:password, :password_confirmation)
   end
 
-  # Signed in users (e.g. passwordless users setting their first password) don't need the emailed token
+  # Signed in passwordless users setting their first password don't need the emailed token.
+  # Anyone else signed in changes it on my account, which asks for the current password
   def find_user_from_token_for_password_reset!
     @token = params[:token].presence
-    return @user = current_user if @token.blank? && current_user.present?
+    if @token.blank? && current_user.present?
+      return @user = current_user if current_user.passwordless_user?
+
+      return redirect_to(edit_my_account_path(edit_template: "password"))
+    end
 
     @user = User.find_for_auth_token("token_for_password_reset", @token)
     return redirect_forced_saml(@user.email) if @user.present? && !@user.auth_token_expired?("token_for_password_reset")

@@ -1754,6 +1754,16 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "fetch_current_stolen_record" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+    it "repairs a stale current_stolen_record_id on save" do
+      bike.update_column :current_stolen_record_id, nil
+      Bike.find(bike.id).save
+      expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
+    end
+  end
+
   describe "set_calculated_unassociated_attributes extra_registration_number" do
     let(:bike) { FactoryBot.create(:bike, serial_number: serial, extra_registration_number: extra_registration_number, frame_model: frame_model) }
     let(:frame_model) { "Something  1" }

@@ -56,7 +56,7 @@ module Pages
             def organization_snippet
               return @organization_snippet if defined?(@organization_snippet)
 
-              @organization_snippet = organization&.mail_snippets&.enabled&.find_by(kind: @token_type)&.body
+              @organization_snippet = organization&.mail_snippets&.enabled&.find_by(kind: @token_type)&.sanitized_body
             end
 
             def organization_email
