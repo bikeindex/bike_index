@@ -2,6 +2,31 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 
 /* global AbortController, requestAnimationFrame */
 
+// A combobox element mapped here answers its async filter (`source.filter(controller, inputType)`),
+// renders its chips (`source.chips(controller, values)`) and lists as it connects, in place of the
+// gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
+export const localSources = new WeakMap()
+
+const connect = HwComboboxController.prototype.connect
+HwComboboxController.prototype.connect = function () {
+  const source = localSources.get(this.element)
+  if (source?.prime) this.element.querySelector('.hw_combobox__pagination__wrapper turbo-frame')?.remove()
+  connect.call(this)
+  source?.prime?.(this)
+}
+
+const requestChips = HwComboboxController.prototype._requestChips
+HwComboboxController.prototype._requestChips = function (values) {
+  const source = localSources.get(this.element)
+  return source ? source.chips(this, values) : requestChips.call(this, values)
+}
+
+const filterAsync = HwComboboxController.prototype._filterAsync
+HwComboboxController.prototype._filterAsync = function (inputType) {
+  const source = localSources.get(this.element)
+  return source ? source.filter(this, inputType) : filterAsync.call(this, inputType)
+}
+
 // hotwire_combobox 0.4.1 finds an option by interpolating the raw value into
 // `[data-value='<value>']`; a value containing a quote (e.g. a search term like
 // `2011'`) builds an invalid selector and throws a SyntaxError, which aborts the
@@ -93,9 +118,10 @@ Object.defineProperty(HwComboboxController.prototype, '_isSmallViewport', {
   }
 })
 
-// Neither covers the other: only `before-cache` runs early enough to keep an open dialog
-// out of a cached snapshot, and it's skipped on the no-cache pages the comboboxes are on
-const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render']
+// Neither Turbo event covers the other: only `before-cache` runs early enough to keep an open
+// dialog out of a cached snapshot, and it's skipped on the no-cache pages the comboboxes are on.
+// /bikebook renders its pages without Turbo, and says so itself.
+const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render', 'bikebook--page:before-render']
 
 // On small viewports it opens in a modal dialog and locks body scroll, but only
 // unlocks along its own collapse path, which a keypress or a click has to start.

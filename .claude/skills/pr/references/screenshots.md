@@ -2,21 +2,19 @@
 
 This is SKILL.md's **Screenshots** section — read it once the PR exists and **Publish** classified the diff as frontend. It needs the base branch from **Orient** and the PR number from **Publish**; substitute both as literals, since shell state doesn't carry between commands. The numbered steps below are this file's own.
 
-The flow: decide what to capture → capture the branch → upload → capture the same URLs on the base branch → post one `## Screenshots` PR comment. Screenshots go in a **comment**, never the PR body, so the human-written summary stays first and recaptures don't churn the description.
+The flow: decide what to capture → capture the branch → capture the same URLs on the base branch → post one `## Screenshots` PR comment, which uploads the images. Screenshots go in a **comment**, never the PR body, so the human-written summary stays first and recaptures don't churn the description.
 
 ## Preflight: no `gh`, no screenshots
 
-**This phase needs `gh` *and* a browser signed in to GitHub. Missing either, skip the whole thing** — don't capture, don't upload, don't post anything in its place. Say in your summary that screenshots need a machine with both, and hand back the PR URL.
+**This phase needs `gh`. Without it, skip the whole thing** — don't capture, don't upload, don't post anything in its place. Say in your summary that screenshots need `gh`, and hand back the PR URL. Run `github-pr-images`' preflight here, before step 1 — it upgrades a `gh` too old to `--attach`.
 
-**Check the browser session here, before step 1, not when you reach the upload** — unless `$CLAUDE_CODE_REMOTE` is `true`, where no browser posts anything and this check would stop a working run. The MCP browser's github.com cookies come from a storage-state file that expires on its own schedule, so a run that captured fine last week signs out mid-workflow — and finding out at step 3 wastes both capture loops and a base-branch checkout. One `browser_navigate` to the PR plus `browser_snapshot` settles it: a "Sign in" link in the header means signed out. Re-login can't be driven headlessly, so this is a stop-and-ask: show the message in `github-pr-images`' `references/headless-relogin.md`.
-
-**The web sandbox is the exception to that skip.** It has neither, but hosts in the PR branch's own history instead — capture and post normally, following `github-pr-images`' [references/web-sandbox.md](../../github-pr-images/references/web-sandbox.md) for the hosting. Those URLs last only as long as the branch's objects, so say in your summary that a merged PR's screenshots aren't archival.
+**The web sandbox is the exception to that skip.** It has no `gh`, but hosts in the PR branch's own history instead — capture and post normally, following `github-pr-images`' [references/web-sandbox.md](../../github-pr-images/references/web-sandbox.md) for the hosting. Those URLs last only as long as the branch's objects, so say in your summary that a merged PR's screenshots aren't archival.
 
 **Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment; that's how #4126 ended up with three comments telling one story. If it's worth having, put it in your summary and let the user decide where it goes.
 
 ## Preflight: a CSS diff needs a fresh tailwind build
 
-When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. `bin/rails tailwindcss:build` is the fix — the same command step 4 runs on each checkout.
+When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. `bin/rails tailwindcss:build` is the fix — the same command step 3 runs on each checkout.
 
 **Count occurrences, not lines.** The built file is minified onto very few lines, so `grep -c '<selector>'` reports `0` or `1` for a selector that's present many times, and a fresh build reads as a missing one. Use `grep -o '<selector>' app/assets/builds/tailwind.css | wc -l`, and compare the file's mtime against the source's before concluding anything.
 
@@ -45,28 +43,26 @@ Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs f
 
 If it returns failures it couldn't diagnose, report them and leave the PR without screenshots — don't post partial results. Abandoning the phase after a capture is the one path where nothing else closes the browser, so close it yourself.
 
-## 3. Host the branch screenshots and get inline URLs
+Collect the PNG paths, keyed by `(page-slug, viewport)`. Nothing is uploaded until step 4 posts — `--attach` uploads as part of the post.
 
-Invoke `github-pr-images` with the PNGs from step 2 and **no body** — that's its host-only call, and it returns one URL per image without posting anything. Don't assume their shape — it differs by route, and both render the same. This runs before step 4: the upload is the first thing to touch GitHub, so an expired browser session surfaces having cost one capture round rather than two and a base checkout. **Not in the sandbox**: no session to expire, and each call costs two commits and a push — capture the base first, host both sets in one call after step 4. Step 5 composes the comment and that same skill posts it in one go, so nothing lands on the PR until the before/after is complete.
-
-Collect the returned URLs, keyed by `(page-slug, viewport)`.
-
-## 4. Capture and upload the same URLs on the base branch
+## 3. Capture the same URLs on the base branch
 
 Capture the **base-branch** version (the base from SKILL.md's **Orient**) of every screenshot from step 2 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured.
 
 Skip per-page only when the URL didn't exist on the base (a brand-new route or page added in this PR) — there's nothing to compare to.
 
-Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless **Orient** chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-pr-images` for those PNGs, host-only exactly as in step 3.
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless **Orient** chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`.
 
 Two things the checkout itself does, either side of it:
 
 - **`bin/rails tailwindcss:build` after each checkout when the diff deletes or rewrites a template, as well as when it touches `app/assets/tailwind/**`; `bin/rails dartsass:build` too when it touches `app/assets/stylesheets/**`.** Tailwind builds from a scan of the templates, so a branch that deletes one drops that template's classes from the build — #4414 removed `VehicleThumbnail` and with it `tw:aspect-square`, leaving the base's own grid to render unstyled in a shot the PR then gets blamed for. The watcher doesn't rebuild on a checkout, so the base capture otherwise renders the branch's CSS — a before/after that silently shows the same styling twice. A diff that moves a rule *between* the two pipelines needs both, or the base renders the rule twice over. Verify by grepping `app/assets/builds/{tailwind,revised,admin}.css` for a selector the branch moves; build both again on the way back.
 - **`bin/dev` restarts, so the first navigate after a checkout can hit `ERR_CONNECTION_REFUSED`.** Poll `curl -fs "$BASE_URL/"` until it answers rather than treating it as a failed capture.
 
-## 5. Compose the Screenshots comment and hand it back
+## 4. Compose the Screenshots comment and hand it back
 
-Write the body to a temp file and invoke `github-pr-images` with it. That skill owns the comment — finding the existing one, creating or editing it, verifying it rendered — and it posts what you hand it verbatim. Everything below is what goes *in* the body.
+`browser_close` first — the captures are done and posting doesn't use the browser. Then write the body to a temp file and invoke `github-pr-images` with it. That skill owns the comment — finding the existing one, creating or editing it, verifying it rendered — and it posts what you hand it verbatim. Everything below is what goes *in* the body.
+
+Each `src` is the PNG's repo-relative path (`tmp/pr_screenshots/…png`); `github-pr-images` uploads each one and swaps the path for its asset URL. **In the sandbox**, host both sets in one `commit_images.sh` call first and use the URLs it prints instead.
 
 Its first line is always `## Screenshots`, because that heading is the handle it's found by next time.
 
@@ -85,19 +81,19 @@ gh pr list --head <base-branch> --state all --json number --jq '.[0].number // e
 
 | Desktop | Mobile |
 | --- | --- |
-| <img src="<base-desktop-url>" width="500"> | <img src="<base-mobile-url>" width="250"> |
+| <img src="<base-desktop-path>" width="500"> | <img src="<base-mobile-path>" width="250"> |
 | <base-label> 👆 | this branch 👇 |
-| <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
+| <img src="<branch-desktop-path>" width="500"> | <img src="<branch-mobile-path>" width="250"> |
 ```
 
-Brand-new page (URL didn't exist on the base — see step 4), no comparison row:
+Brand-new page (URL didn't exist on the base — see step 3), no comparison row:
 
 ```markdown
 ### <url-path>
 
 | Desktop | Mobile |
 | --- | --- |
-| <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
+| <img src="<branch-desktop-path>" width="500"> | <img src="<branch-mobile-path>" width="250"> |
 ```
 
 Rules:
@@ -106,6 +102,6 @@ Rules:
 - **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 
-When updating an existing screenshots comment, ask `github-pr-images` for its current body first, replace the `### <url-path>` block for any page you recaptured, and leave every other page's block alone — you're handing back a whole body, so anything you drop is dropped.
+When updating an existing screenshots comment, ask `github-pr-images` for its current body first, replace the `### <url-path>` block for any page you recaptured, and leave every other page's block alone, URLs and all — you're handing back a whole body, so anything you drop is dropped.
 
 Return the PR URL.

@@ -15,6 +15,7 @@ RSpec.describe Pages::Registrations::Show::CurrentAlerts::ScannedSticker::Compon
       render_inline(component)
       expect(page).to have_text("You scanned")
       expect(page).to have_text(bike_sticker.pretty_code)
+      expect(page).to have_button("Copy sticker")
       expect(page).to_not have_button("Change the bike it links to")
     end
   end
