@@ -8,7 +8,14 @@ class NewsController < ApplicationController
     @blogs_count ||= @blogs.count
     @page_updated_at = matching_blogs.maximum(:updated_at)
     @show_discuss = Binxtils::InputNormalizer.boolean(ENV["SHOW_DISCOURSE"])
-    redirect_to news_index_url(format: "atom") if request.format == "xml"
+    respond_to do |format|
+      format.html do
+        # A plain preload loses each post's tag order
+        ActiveRecord::Associations::Preloader.new(records: @blogs.to_a, associations: :content_tags, scope: ContentTag.commonness).call
+      end
+      format.atom
+      format.xml { redirect_to news_index_url(format: "atom") }
+    end
   end
 
   def show
