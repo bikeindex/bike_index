@@ -141,7 +141,7 @@ class UsersController < ApplicationController
   # this action should only be for terms of service (or vendor_terms_of_service)
   def update
     @user = current_user
-    if @user.present? && params[:user].present? && @user.update(params.require(:user).permit(:terms_of_service, :notification_newsletters))
+    if @user.present? && params[:user].present? && @user.update(permitted_terms_parameters)
       if params.dig(:user, :terms_of_service).present?
         if Binxtils::InputNormalizer.boolean(params.dig(:user, :terms_of_service))
           flash[:success] = translation(:you_can_use_bike_index)
@@ -217,6 +217,10 @@ class UsersController < ApplicationController
   # after_commit callback, two jobs from here - so anything it needs has to be stored
   def signup_context
     {sign_up: sign_in_partner, return_to: emailable_return_to}.compact_blank
+  end
+
+  def permitted_terms_parameters
+    params.require(:user).permit(:terms_of_service, :notification_newsletters)
   end
 
   def permitted_password_reset_parameters

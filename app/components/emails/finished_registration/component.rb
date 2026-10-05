@@ -83,10 +83,9 @@ module Emails
 
         if registered_by_owner?
           translation("you_added_a_bike_type_on_bike_index", bike_type: bike_type_for_message)
-        elsif new_bike?
-          safe_join([tag.strong(org_name), translation("org_added_a_bike", bike_type: bike_type_for_message)], " ")
         else
-          safe_join([tag.strong(org_name), translation("org_sent_a_bike", bike_type: bike_type_for_message)], " ")
+          message = new_bike? ? translation("org_added_a_bike", bike_type: bike_type_for_message) : translation("org_sent_a_bike", bike_type: bike_type_for_message)
+          safe_join([tag.strong(org_name), message], " ")
         end
       end
 

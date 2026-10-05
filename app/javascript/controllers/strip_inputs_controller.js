@@ -11,7 +11,6 @@ export default class extends Controller {
 
   connect () {
     // Strip all inputs when any input loses focus
-    this.stripAllInputs = this.stripAllInputs.bind(this)
     this.element.addEventListener('focusout', this.stripAllInputs)
   }
 
@@ -19,7 +18,7 @@ export default class extends Controller {
     this.element.removeEventListener('focusout', this.stripAllInputs)
   }
 
-  stripAllInputs () {
+  stripAllInputs = () => {
     const textInputs = this.element.querySelectorAll(this.constructor.inputSelector)
     textInputs.forEach(input => {
       input.value = input.value.trim()

@@ -9,8 +9,6 @@ export default class extends Controller {
   static values = { apiCountUrl: String, optionKinds: String }
 
   connect () {
-    this.updateForSaleLink = this.updateForSaleLink.bind(this)
-    this.performSubmitActions = this.performSubmitActions.bind(this)
     this.setSearchProximity()
     this.updateForSaleLink()
     this.form?.addEventListener('change', this.updateForSaleLink)
@@ -64,7 +62,7 @@ export default class extends Controller {
     return window.inComponentPreview ? 'preview-' : ''
   }
 
-  updateForSaleLink () {
+  updateForSaleLink = () => {
     const link = document.getElementById('kindSelectForSaleLink')
 
     if (link) {
@@ -72,7 +70,7 @@ export default class extends Controller {
     }
   }
 
-  performSubmitActions () {
+  performSubmitActions = () => {
     // store search proximity on form submit
     this.setSearchProximity()
     // Update kind counts

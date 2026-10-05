@@ -23,7 +23,7 @@ export default class extends Controller {
     try {
       await navigator.clipboard.writeText(url)
       this.flashCopied()
-    } catch (error) {
+    } catch {
       // Clipboard denied or unavailable (e.g. an insecure context)
     }
   }

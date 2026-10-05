@@ -5,8 +5,9 @@ module ShortId
   PREFIXES = {"Bike" => "r", "BikeVersion" => "v", "MarketplaceListing" => "f", "BikeSticker" => "s"}.freeze
 
   # Compact, prefixed alias for an id, e.g. ShortId.encode("Bike", 3431156) => "r/21J-HW".
-  # Ids whose base36 form is under 3 digits or has no letters stay decimal, since decode
-  # reads an all-digit body back verbatim (e.g. 1296 => "r/1296", not "r/100").
+  # Ids whose base36 form has no letters stay decimal, since decode reads an all-digit
+  # body back verbatim (e.g. 1296 => "r/1296", not "r/100"). Under-3-digit ids stay
+  # decimal too, keeping existing short ids stable.
   def encode(class_name, id)
     return if id.blank?
 
