@@ -14,7 +14,7 @@ module Organized
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
       @multi_update_open = Binxtils::InputNormalizer.boolean(params[:multi_update])
       @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
-        min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
+        min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE, unit: search_distance_unit)
 
       if chart_only?
         render Pages::Org::Search::ChartCard::Component.new(scope: "search", chart: impound_records_chart), layout: false
@@ -120,7 +120,7 @@ module Organized
       end
 
       if params[:search_location].present?
-        bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity)
+        bounding_box = GeocodeHelper.bounding_box(params[:search_location], UnitSystem.to_miles(@search_proximity, search_distance_unit))
         if bounding_box.present?
           a_impound_records = a_impound_records.within_bounding_box(bounding_box)
         else

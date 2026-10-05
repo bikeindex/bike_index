@@ -64,12 +64,9 @@ module Search
       return {} if location.blank?
 
       distance = GeocodeHelper.permitted_distance(params[:distance],
-        default_distance: GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE)
-      bounding_box = if coordinates.present?
-        GeocodeHelper.bounding_box(coordinates, distance)
-      else
-        GeocodeHelper.bounding_box(location, distance)
-      end
+        default_distance: GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE, unit: search_distance_unit)
+      bounding_box = GeocodeHelper.bounding_box(coordinates.presence || location,
+        UnitSystem.to_miles(distance, search_distance_unit))
       return {} if bounding_box.empty?
 
       {distance:, location:, bounding_box:}
@@ -93,7 +90,7 @@ module Search
 
     def permitted_search_params
       # Switching to for_sale will get location, but it doesn't currently work
-      params.permit(*Bike.permitted_search_params).merge(stolenness: "all")
+      params.permit(*Bike.permitted_search_params).merge(stolenness: "all", distance_unit: search_distance_unit)
     end
 
     def listing_search_params

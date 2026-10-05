@@ -511,7 +511,8 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       it "updates the organization attributes" do
         expect(organization_stolen_message).to be_present # Because of organization feature
         expect(organization_stolen_message.kind).to eq "area"
-        expect(organization_stolen_message.search_radius_miles).to eq 10.0
+        # No location, so metric - and the default is a round number of kilometers
+        expect(organization_stolen_message.search_radius_kilometers).to eq 100
         put "#{base_url}/#{organization.to_param}", params: {
           organization: update_params,
           organization_stolen_message_search_radius_miles: 44,

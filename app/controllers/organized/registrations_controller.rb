@@ -28,7 +28,9 @@ module Organized
         @chart_open = Binxtils::InputNormalizer.boolean(params[:chart_open]) ? "1" : "0"
         @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
-        @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
+        @interpreted_params = BikeSearchable.searchable_interpreted_params(
+          permitted_org_registration_search_params.merge(distance_unit: search_distance_unit), ip: forwarded_ip_address
+        )
         @per_page = permitted_per_page(default: 10)
 
         if create_export?
@@ -247,7 +249,8 @@ module Organized
       bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
       if org.present?
         bikes = BikeServices::OrganizedSearch.location(bikes, @interpreted_params[:location], @interpreted_params[:distance],
-          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address)
+          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address,
+          distance_unit: @interpreted_params[:distance_unit])
       end
       bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
       bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
@@ -368,7 +371,7 @@ module Organized
       return false if @interpreted_params[:stolenness]&.downcase != "all"
 
       # A distance is only a search alongside a location
-      @interpreted_params.except(:stolenness, :distance).values.reject(&:blank?).none?
+      @interpreted_params.except(:stolenness, :distance, :distance_unit).values.reject(&:blank?).none?
     end
 
     def directly_create_export?(bikes_count)

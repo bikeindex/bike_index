@@ -122,10 +122,14 @@
                       >
                         <%= gear.name %>
 
-                        <% if gear.total_distance_miles.present? %>
-                          (
-                          <%= number_with_delimiter(gear.total_distance_miles) %>
-                          miles)
+                        <% if gear.total_distance_kilometers.present? %>
+                          <% if metric_units? %>
+                            (<%= number_with_delimiter(gear.total_distance_kilometers) %>
+                            km)
+                          <% else %>
+                            (<%= number_with_delimiter(gear.total_distance_miles) %>
+                            miles)
+                          <% end %>
                         <% end %>
                       </option>
                     <% end %>

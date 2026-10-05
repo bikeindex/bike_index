@@ -52,7 +52,7 @@ module Geocodeable
   end
 
   def metric_units?
-    Country.metric_units?(country_id)
+    UnitSystem.metric?(country_id:)
   end
 
   def to_coordinates

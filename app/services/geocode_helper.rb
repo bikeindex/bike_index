@@ -22,11 +22,12 @@ module GeocodeHelper
   end
 
   # WARNING! min_distance shouldn't be passed in except in organized or admin situations -
-  # or else people will be able to find specific stolen locations
-  def permitted_distance(distance = nil, default_distance: DEFAULT_DISTANCE, min_distance: MIN_DISTANCE)
+  # or else people will be able to find specific stolen locations. The bounds are miles, whatever the unit
+  def permitted_distance(distance = nil, default_distance: DEFAULT_DISTANCE, min_distance: MIN_DISTANCE, unit: "mi")
     return default_distance if distance.blank? || (distance.is_a?(String) && !distance.match?(/\d/))
 
-    clamped_distance = distance.to_f.clamp(min_distance, MAX_DISTANCE)
+    bounds = [min_distance, MAX_DISTANCE].map { |miles| UnitSystem.from_miles(miles, unit).round(2) }
+    clamped_distance = distance.to_f.clamp(*bounds)
     (clamped_distance % 1 == 0) ? clamped_distance.to_i : clamped_distance
   end
 

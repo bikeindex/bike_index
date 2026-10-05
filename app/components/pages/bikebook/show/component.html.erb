@@ -1,13 +1,3 @@
-<% content_for :header do %>
-  <script>
-    // before paint, so measurements don't flash from metric
-    (function() {
-      var units = localStorage.getItem("units");
-      if (units ? units === "imperial" : navigator.language.startsWith("en-US")) document.documentElement.classList.add("imperial");
-    })();
-  </script>
-<% end %>
-
 <div
   class="bikebook twgutter tw:mx-auto tw:max-w-screen-xl tw:pb-6"
   data-controller="bikebook--page"

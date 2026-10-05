@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="<%= I18n.locale %>">
+<html lang="<%= I18n.locale %>" class="<%= "imperial" unless metric_units? %>">
   <head>
     <%= capybara_lockstep if defined?(Capybara::Lockstep) %>
     <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>

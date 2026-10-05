@@ -194,7 +194,7 @@ module GeocodeableLegacy
   end
 
   def metric_units?
-    country.blank? || !country.united_states?
+    UnitSystem.metric?(country_id:)
   end
 
   private

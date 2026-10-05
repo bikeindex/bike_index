@@ -50,7 +50,7 @@ module Search
     end
 
     def permitted_search_params
-      params.permit(*Bike.permitted_search_params)
+      params.permit(*Bike.permitted_search_params).merge(distance_unit: search_distance_unit)
     end
 
     def render_ad
