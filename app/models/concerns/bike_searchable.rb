@@ -233,9 +233,10 @@ module BikeSearchable
       return non_serial_matches(interpreted_params) if serial.blank?
 
       # Postgres guesses a serial matches 0.5% of bikes, so it walks the listing_order index
-      # for the first page - every bike when nothing matches. OFFSET 0 stops it flattening
-      # the subquery, which leaves the serial indexes as the only way in
-      from(unscoped.current.matching_serial(serial, serial_no_space).offset(0), :bikes)
+      # for the first page - every bike when nothing matches. NULLS LAST is an order that
+      # index can't produce
+      matching_serial(serial, serial_no_space)
+        .reorder(Arel.sql("bikes.listing_order DESC NULLS LAST"))
         .non_serial_matches(interpreted_params)
     end
 
