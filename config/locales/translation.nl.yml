@@ -6761,6 +6761,34 @@ nl:
               kans dat je %{cycle_type} terugkomt — je kunt het nummer later toevoegen.
           step_review:
             complete_registration: Voltooi de %{cycle_type}-registratie
+      bikebook:
+        show:
+          activity: Activiteit
+          any_activity: Elke activiteit
+          any_configuration: Elke configuratie
+          any_manufacturer: Elke fabrikant
+          any_motorized: Elke gemotoriseerde
+          any_suspension: Elke ophanging
+          any_vehicle_type: Elk type voertuig
+          applied_filters: Toegepaste filters
+          configuration: Configuratie
+          failed: De catalogus is niet geladen. Vernieuw de pagina om het opnieuw
+            te proberen.
+          loading: De catalogus wordt geladen…
+          manufacturer: Fabrikant
+          max: Max
+          min: Min
+          more_filters: Meer filters
+          motorized: Gemotoriseerd
+          price: Prijs
+          search_placeholder: Zoeken op fabrikant of model…
+          sort: Soort
+          suspension: Oponthoud
+          vehicle_type: 'Voertuigtype:'
+          view_a_vehicle: Bekijk een voertuig
+          year: jaar
+          filter_combobox:
+            any: Elk
     shared_blocks:
       footer:
         about: Over
