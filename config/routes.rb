@@ -56,6 +56,7 @@ Rails.application.routes.draw do
 
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "bikebook", to: "bikebook#show"
+  get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
   if BikebookController::LOCAL_CATALOG_DIRECTORY
     mount Rack::Files.new(BikebookController::LOCAL_CATALOG_DIRECTORY) => BikebookController::LOCAL_CATALOG_PATH
   end

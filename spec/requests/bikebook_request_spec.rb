@@ -19,4 +19,18 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("#vehicle-viewers", visible: :all)
     end
   end
+
+  describe "vehicle" do
+    it "redirects to the page with that vehicle picked" do
+      get "/bikebook/m/segway/2025/gt3_pro"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro")
+    end
+
+    context "without its m/, and with vehicles already picked" do
+      it "picks it ahead of them, keeping the query" do
+        get "/bikebook/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro", filters: "1"}
+        expect(response).to redirect_to("/bikebook?filters=1&vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2")
+      end
+    end
+  end
 end
