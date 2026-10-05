@@ -74,11 +74,26 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
       Autocomplete::Loader.load_all(%w[Manufacturer])
     end
 
-    it "registers it along with the notification, serial optional" do
+    def latitude_field(latitude)
+      have_field("parking_notification[latitude]", type: :hidden, with: latitude.to_s, wait: 15)
+    end
+
+    it "registers it along with the notification, serial optional, and locates the next one afresh" do
       page.current_window.resize_to(1400, 2000)
+      page.driver.with_playwright_page do |playwright_page|
+        @browser_context = playwright_page.context
+        @browser_context.grant_permissions(["geolocation"])
+        @browser_context.set_geolocation({latitude: 37.759681, longitude: -122.4275348, accuracy: 20})
+        @browser_context.route("https://maps.bikeindex.org/**", proc { |route, _request|
+          route.fulfill(status: 200, json: {version: 8, sources: {}, layers: []})
+        })
+      end
       visit base_url
       click_link "New notification for unregistered bike"
       expect(page).to have_link "Registration form settings"
+      expect(page).to latitude_field(37.759681)
+      # Where the officer has walked to by the next vehicle
+      @browser_context.set_geolocation({latitude: 37.77, longitude: -122.45, accuracy: 20})
 
       type_into("#bike_manufacturer_id", "Surly")
       click_combobox_option("Surly")
@@ -102,6 +117,8 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
         manufacturer: surly, frame_model: "Cross-Check", primary_frame_color: black, creation_organization: organization)
       expect(bike.parking_notifications.last).to have_attributes(kind: "parked_incorrectly_notification",
         internal_notes: "Locked to the rail", organization:, user:)
+
+      expect(page).to latitude_field(37.77)
     end
   end
 

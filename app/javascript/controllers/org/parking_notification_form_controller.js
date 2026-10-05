@@ -289,9 +289,11 @@ export default class extends Controller {
   }
 
   // The pin + zoom live in the URL so a reload (or shared link) restores them. An
-  // unchosen pin isn't worth restoring, and restoring it would make it look chosen
+  // unchosen pin isn't worth restoring, and restoring it would make it look chosen.
+  // The standalone page redirects back to itself after each notification, so a
+  // stored pin there would seed the next vehicle's location
   persistMapState () {
-    if (!this.pinChosen) return
+    if (!this.pinChosen || this.standaloneValue) return
     const url = new URL(window.location)
     url.searchParams.set('map_lat', this.pinLatitude.toFixed(6))
     url.searchParams.set('map_lng', this.pinLongitude.toFixed(6))
