@@ -30,8 +30,7 @@ export default class extends Controller {
     } catch (error) {
       return this.#fail(error)
     }
-    const { kit } = this.catalog
-    this.source = new CatalogComboboxSource(this.catalog, { placeholderUrl: kit.placeholder_url, perPage: kit.per_page })
+    this.source = new CatalogComboboxSource(this.catalog)
     this.#render(url)
   }
 

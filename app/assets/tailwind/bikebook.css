@@ -29,7 +29,7 @@
 }
 
 @layer components {
-  /* Undoes legacy bootstrap's red inline code, leaving the element's own utilities to style it */
+  /* Undoes legacy bootstrap's red inline code */
   .bikebook code {
     color: inherit;
     background-color: transparent;

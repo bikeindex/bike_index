@@ -44,10 +44,8 @@ export async function loadCatalog (manifestUrl, ids = []) {
 export class CatalogComboboxSource {
   #generation = 0
 
-  constructor (catalog, { placeholderUrl, perPage }) {
+  constructor (catalog) {
     this.catalog = catalog
-    this.placeholderUrl = placeholderUrl
-    this.perPage = perPage
   }
 
   // A pick re-renders the page, leaving the gem's debounced refilter behind on the combobox it replaced
@@ -67,12 +65,12 @@ export class CatalogComboboxSource {
 
   async #render (combobox, page, { inputType, callbackId }) {
     const generation = this.#generation
-    const { total, filteredCount, models, nextPage } = await this.catalog.search(this.params, page, this.perPage)
+    const { total, filteredCount, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
     if ((page && generation !== this.#generation) || !combobox.element.isConnected) return
 
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
-    const options = models.map((model) => comboboxOption({ model, placeholderUrl: this.placeholderUrl, currencies: this.catalog.vocabulary.currencies }))
+    const options = models.map((model) => comboboxOption({ model, placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
       data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} data-callback-id=${callbackId ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()

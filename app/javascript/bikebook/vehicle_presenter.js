@@ -6,8 +6,7 @@ import { array, blank, compact, equal, isHash, isTemplate, join } from 'bikebook
 
 const roundHalfUp = (value) => Math.sign(value) * Math.round(Math.abs(value))
 
-// The names, units and lookups the vehicle templates present a model's data with, from the catalog's
-// vocabulary and its page's kit
+// The names, units and lookups the vehicle templates present a model's data with
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
     this.kit = kit
