@@ -5450,6 +5450,10 @@ nb:
         stolen: Meldt stjålet
         unregistered: Ikke registrert av eieren – opprettet fra et parkeringsvarsel
         with_owner: Registrert og beskyttet. Med eieren sin (ikke stjålet)
+      short_id:
+        copy_id: Kopier ID
+      sticker:
+        copy_sticker: Kopier klistremerke
     pages:
       messages:
         thread_show:
