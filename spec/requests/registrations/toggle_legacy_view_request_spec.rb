@@ -85,10 +85,14 @@ RSpec.describe "RegistrationsController#toggle_legacy_view", type: :request do
   context "user logged in" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
 
-    it "opts into the legacy view and redirects to the legacy page" do
+    it "opts into the legacy view, and follows the account when another device opts back in" do
       post toggle_legacy_view_registration_path(bike)
       expect(response).to redirect_to(bike_path(bike))
       expect(current_user.reload.feature_registration_show_legacy).to be_truthy
+
+      current_user.update(feature_registration_show_legacy: false)
+      get bike_path(bike)
+      expect(response).to redirect_to(registration_path(bike))
     end
 
     context "user opted into the legacy view" do

@@ -43,7 +43,8 @@ class RegistrationsController < ApplicationController
       flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
       return redirect_to(bike_view_path(bike, show_legacy: !show_legacy))
     end
-    session[:registration_show_legacy] = show_legacy
+    # Signed in, the account holds it - a session copy would outlast a change on another device
+    session[:registration_show_legacy] = current_user.blank? && show_legacy
     redirect_to(bike_view_path(bike, show_legacy:))
   end
 
