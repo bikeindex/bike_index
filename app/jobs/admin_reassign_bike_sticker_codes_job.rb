@@ -1,7 +1,7 @@
 class AdminReassignBikeStickerCodesJob < ApplicationJob
   def perform(user_id, organization_id, bike_sticker_batch_id, first_sticker_id, last_sticker_id = nil)
     bike_sticker1 = BikeSticker.find(first_sticker_id)
-    bike_sticker2 = BikeSticker.find_by(id: last_sticker_id)
+    bike_sticker2 = BikeSticker.find(last_sticker_id) if last_sticker_id.present?
     # If updating this query - also update the query in Admin::BikeStickersController
     bike_stickers = BikeSticker.where(bike_sticker_batch_id: bike_sticker_batch_id)
       .where("code_integer >= ?", bike_sticker1.code_integer)

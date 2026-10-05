@@ -118,6 +118,12 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(current_user.superuser?).to be_falsey
         expect(current_user.superuser_abilities.pluck(:kind)).to eq(["controller"])
       end
+      it "doesn't change another superuser" do
+        superuser = FactoryBot.create(:superuser)
+        patch "#{base_url}/#{superuser.id}", params: {user: ban_user_params.merge(email: "new@example.com", banned: false)}
+        expect(response).to redirect_to(edit_admin_user_path(superuser.id))
+        expect(superuser.reload.email).to_not eq "new@example.com"
+      end
     end
     context "non developer" do
       it "updates all the things that can be edited (finding via user id)" do

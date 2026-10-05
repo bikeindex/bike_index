@@ -12,12 +12,12 @@ RSpec.describe MailSnippet, type: :model do
   end
 
   describe "sanitized_body" do
-    let(:mail_snippet) { MailSnippet.new(body: %(<table><tr><td style="color: red;">Hi</td></tr></table><img src=x onerror="alert(1)"><script>alert(2)</script>)) }
-    it "keeps email markup and strips scripts" do
+    let(:mail_snippet) { MailSnippet.new(body: %(<style>.x{color:red}</style><table><tr><td style="color: red;">Hi</td></tr></table><img src=x onerror="alert(1)"><script>alert(2)</script>)) }
+    it "keeps email markup and drops scripts and style blocks" do
       sanitized_body = mail_snippet.sanitized_body
       expect(sanitized_body).to include(%(<td style="color:red;">Hi</td>))
       expect(sanitized_body).to include(%(<img src="x">))
-      expect(sanitized_body).not_to match(/onerror|<script/)
+      expect(sanitized_body).not_to match(/onerror|alert|color:red\}/)
     end
   end
 

@@ -3,6 +3,7 @@ module Admin
     include Binxtils::SortableTable
 
     before_action :find_user, only: %i[show edit update destroy]
+    before_action :ensure_can_change_user!, only: %i[update destroy]
     helper_method :invalid_user_options
 
     def index
@@ -91,6 +92,14 @@ module Admin
     def find_user
       @user = User.unscoped.friendly_find(params[:id])
       raise ActiveRecord::RecordNotFound unless @user.present?
+    end
+
+    # Changing another superuser's email would let a limited superuser take over their access
+    def ensure_can_change_user!
+      return if current_user.superuser? || @user == current_user || @user.superuser_abilities.none?
+
+      flash[:error] = "Only a universal superuser can change another superuser"
+      redirect_to edit_admin_user_path(@user.id)
     end
 
     def permitted_ban_parameters

@@ -691,7 +691,7 @@ class Bike < ApplicationRecord
   end
 
   def fetch_current_stolen_record
-    return current_stolen_record if manual_csr
+    return current_stolen_record if manual_csr || id.blank?
 
     # Don't access through association, or else it won't find without a reload
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last

@@ -8,9 +8,9 @@ export default class extends Controller {
   connect () {
     this.generateTiles()
 
-    // Mobile URL bars fire resize on scroll; the 1.2x overflow covers the height change
+    // Mobile URL bars fire resize on scroll; the 1.2x overflow covers that height change
     this.handleResize = this.debounce(() => {
-      if (window.innerWidth !== this.tilesWidth) this.generateTiles()
+      if (window.innerWidth !== this.tilesWidth || window.innerHeight > this.tilesHeight * 1.2) this.generateTiles()
     }, 250)
 
     window.addEventListener('resize', this.handleResize)
@@ -30,6 +30,7 @@ export default class extends Controller {
 
   generateTiles () {
     this.tilesWidth = window.innerWidth
+    this.tilesHeight = window.innerHeight
     this.gridTarget.replaceChildren()
     // Calculate how many tiles we need to fill the screen plus overflow
     const tilesNeeded = Math.ceil((window.innerWidth * 1.2) / 130) * Math.ceil((window.innerHeight * 1.2) / 130)
