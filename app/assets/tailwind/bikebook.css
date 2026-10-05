@@ -29,6 +29,14 @@
 }
 
 @layer components {
+  /* Undoes legacy bootstrap's red inline code, leaving the element's own utilities to style it */
+  .bikebook code {
+    color: inherit;
+    background-color: transparent;
+    padding: 0;
+    font-size: inherit;
+  }
+
   /* The model viewer's JSON sits beside the spec card, so it takes that card's chrome
    * rather than UI::JsonDisplay's gray, and fills the column on desktop rather than
    * scrolling inside a box of its own */
