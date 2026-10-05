@@ -101,6 +101,8 @@ RSpec.shared_examples "bike_searchable" do
           expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
         end
       end
+      # Organizations search their hidden impounded bikes by serial, so a serial match can't
+      # assume the default scope
       context "with a user hidden match" do
         let(:bike) { FactoryBot.create(:bike, serial_number: "K10DY00047") }
         let!(:bike_hidden) { FactoryBot.create(:bike, :with_ownership, serial_number: "K10DY00047") }

@@ -7834,6 +7834,13 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
+-- Name: bikes_serial_normalized_tsvector; Type: STATISTICS; Schema: public; Owner: -
+--
+
+CREATE STATISTICS public.bikes_serial_normalized_tsvector ON to_tsvector('simple'::regconfig, serial_normalized::text) FROM public.bikes;
+
+
+--
 -- Name: bikes bikes_search_vector_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -7927,6 +7934,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261004225108'),
 ('20261004180000'),
 ('20261001170000'),
 ('20260930161510'),

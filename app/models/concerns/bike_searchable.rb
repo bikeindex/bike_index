@@ -229,14 +229,7 @@ module BikeSearchable
 
   module ClassMethods
     def search(interpreted_params)
-      serial, serial_no_space = interpreted_params.values_at(:serial, :serial_no_space)
-      return non_serial_matches(interpreted_params) if serial.blank?
-
-      # Postgres guesses a serial matches 0.5% of bikes, so it walks the listing_order index
-      # for the first page - every bike when nothing matches. NULLS LAST is an order that
-      # index can't produce
-      matching_serial(serial, serial_no_space)
-        .reorder(Arel.sql("bikes.listing_order DESC NULLS LAST"))
+      matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
         .non_serial_matches(interpreted_params)
     end
 

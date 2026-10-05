@@ -40,10 +40,10 @@ module Search
       10
     end
 
-    # Pagination stops at MAX_INDEX_PAGE, and counting every bike took ~500ms. Text and serial
-    # matches are estimated too loosely to trust a LIMIT with, so they count in full (nil)
+    # Pagination stops at MAX_INDEX_PAGE, so count no further. Text matches count in full (nil):
+    # their estimates are too loose to trust a LIMIT with
     def paginatable_count(bikes)
-      return if @interpreted_params[:query].present? || @interpreted_params[:serial].present?
+      return if @interpreted_params[:query].present?
 
       bikes.limit(MAX_INDEX_PAGE * limit + 1).count
     end
