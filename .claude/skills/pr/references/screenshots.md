@@ -62,7 +62,7 @@ Two things the checkout itself does, either side of it:
 
 `browser_close` first — the captures are done and posting doesn't use the browser. Then write the body to a temp file and invoke `github-pr-images` with it. That skill owns the comment — finding the existing one, creating or editing it, verifying it rendered — and it posts what you hand it verbatim. Everything below is what goes *in* the body.
 
-Each `src` is the PNG's repo-relative path (`tmp/pr_screenshots/…png`); `github-pr-images` attaches each one and GitHub swaps the path for its asset URL. **In the sandbox**, host both sets in one `commit_images.sh` call first and use the URLs it prints instead.
+Each `src` is the PNG's repo-relative path (`tmp/pr_screenshots/…png`); `github-pr-images` uploads each one and swaps the path for its asset URL. **In the sandbox**, host both sets in one `commit_images.sh` call first and use the URLs it prints instead.
 
 Its first line is always `## Screenshots`, because that heading is the handle it's found by next time.
 

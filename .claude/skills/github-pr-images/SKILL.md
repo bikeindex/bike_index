@@ -10,12 +10,12 @@ description: >-
   history instead. It also owns the PR's one `## Screenshots` comment — finding, creating, editing
   and verifying it — so other workflows (the `pr` skill's screenshot phase) hand it a composed body
   that references local image paths, and it posts it.
-allowed-tools: Bash(gh:*), Bash(brew upgrade gh), Bash(cp:*), Bash(bash .claude/skills/github-pr-images/assets/commit_images.sh:*), Bash(curl -sI https://raw.githubusercontent.com/:*), Read, Write, mcp__github__list_pull_requests, mcp__github__get_me, mcp__github__issue_read, mcp__github__add_issue_comment, mcp__github__update_issue_comment
+allowed-tools: Bash(gh:*), Bash(rtk proxy gh:*), Bash(ruby .claude/skills/github-pr-images/assets/inline_attachments.rb:*), Bash(brew upgrade gh), Bash(cp:*), Bash(bash .claude/skills/github-pr-images/assets/commit_images.sh:*), Bash(curl -sI https://raw.githubusercontent.com/:*), Read, Write, mcp__github__list_pull_requests, mcp__github__get_me, mcp__github__issue_read, mcp__github__add_issue_comment, mcp__github__update_issue_comment
 ---
 
 # Upload Image to PR
 
-`gh pr comment`, `gh pr edit` and `gh pr create` take `--attach '<file>#<alt text>'`, up to 50 per command. A body reference to an attached path — `![alt](tmp/x.png)` or `<img src="tmp/x.png">` — is rewritten in place to the uploaded `user-attachments/assets/` URL. An attached file the body doesn't reference is appended to the end.
+`gh pr comment`, `gh pr edit` and `gh pr create` take `--attach '<file>#<alt text>'`, up to 50 per command. A markdown `![alt](tmp/x.png)` reference to an attached path is rewritten in place to the uploaded `user-attachments/assets/` URL. **An `<img src="tmp/x.png">` isn't** — it keeps its path, and the upload is appended to the end as `![<basename>](url)`, as is any attached file the body doesn't reference.
 
 **There's no upload-only call**: assets upload as part of posting, so callers hand over a body that references local paths, never URLs they need back first.
 
@@ -41,7 +41,7 @@ If the user didn't specify a PR number or URL, auto-detect it:
 gh pr view --json number,url -q '"\(.number) \(.url)"'
 ```
 
-Reference each image by a path **relative to the repo root, spelled identically in the body and in `--attach`** — that's the match the rewrite keys on. A path with special characters (Unicode narrow spaces from CleanShot X) goes through the project's `tmp/` first:
+Reference each image by its path from the repo root, the same in the body as in `--attach`. A path with special characters (Unicode narrow spaces from CleanShot X) goes through the project's `tmp/` first:
 
 ```bash
 cp /path/to/CleanShot*keyword*.png tmp/screenshot.png
@@ -57,7 +57,7 @@ A caller's body is posted verbatim — don't recompose it. Composing it yourself
 <img src="tmp/screenshot.png" width="500">
 ```
 
-Images in table cells want `<img … width=…>`; elsewhere `![alt](path)` is fine. Alt text is the filename unless `--attach` gives `#alt` or the body reference has its own.
+Images in table cells want `<img … width=…>`; elsewhere `![alt](path)` is fine. Don't give an `<img>`'s file a `#alt` on `--attach` — step 3's script finds its upload by the basename gh uses as the default alt.
 
 ## Step 3: Post it
 
@@ -69,24 +69,22 @@ gh api --paginate "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" \
   --jq ".[] | select(.user.login == \"$ME\") | {id, body: .body[:14]}"
 ```
 
-The comment whose body starts `## Screenshots` is `$SCREENSHOT_COMMENT_ID`; whether it's the **last** of yours decides the route below. `--paginate` matters — on a busy PR it often isn't on the first page.
+The comment whose body starts `## Screenshots` is `$SCREENSHOT_COMMENT_ID`. `--paginate` matters — on a busy PR it often isn't on the first page.
 
 A caller updating one page of a multi-page comment needs the current body to edit — hand it back on request: `gh api repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID --jq .body`.
 
-Write the body to a file, then, with one `--attach` per image the body references:
+Write the body to a file. **With images to upload**, post a new comment, one `--attach` per image the body references:
 
-| State | Command |
-| --- | --- |
-| No screenshots comment | `gh pr comment $PR_NUMBER --body-file <file> --attach tmp/a.png --attach tmp/b.png` |
-| It's your last comment | same, plus `--edit-last` |
-| It isn't, and the body has images to upload | post a new one as in the first row, **then** `gh api -X DELETE repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID` |
-| Body has nothing to upload | `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -F body=@<absolute-path> --jq .html_url` |
+```bash
+rtk proxy gh pr comment $PR_NUMBER --body-file <file> --attach tmp/a.png --attach tmp/b.png
+ruby .claude/skills/github-pr-images/assets/inline_attachments.rb {owner}/{repo} <new-comment-id>
+```
 
-`--edit-last` is the only edit that attaches, so an older comment is replaced rather than edited. Post before deleting, so a failed upload never loses the existing screenshots.
+`rtk proxy` because the hook reduces the output to "ok commented", and the comment URL it prints carries the id. The script moves each appended upload into its `<img src>` and PATCHes the comment; it stops without patching if a local `src` has no upload to take. Then, if `$SCREENSHOT_COMMENT_ID` was set, `gh api -X DELETE repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID`. An edit can't attach, so an existing comment is replaced; post before deleting so a failed upload never loses the old screenshots.
 
-For the PATCH: `-F` reads a file from `@`; `-f` would post the literal `@<file>`. The path is absolute because `gh` resolves `@` against the shell's cwd.
+**With nothing to upload**, edit in place: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -F body=@<absolute-path> --jq .html_url`. `-F` reads a file from `@`; `-f` would post the literal `@<file>`. The path is absolute because `gh` resolves `@` against the shell's cwd.
 
-Only edit the PR description when the user explicitly asks: `gh pr edit $PR_NUMBER --body-file <file> --attach …`, with the existing body plus a `## Screenshots` section — replace that section if it's already there rather than adding a second. The `pr-guardrails` hook denies `gh pr edit` until the `pr` skill is loaded.
+Only edit the PR description when the user explicitly asks: `gh pr edit $PR_NUMBER --body-file <file> --attach …`, referencing images as `![alt](path)` — the script patches comments only — with the existing body plus a `## Screenshots` section — replace that section if it's already there rather than adding a second. The `pr-guardrails` hook denies `gh pr edit` until the `pr` skill is loaded.
 
 ## Step 4: Verify
 
@@ -103,6 +101,6 @@ Pass: no `tmp/` path left, and one `https://github.com/user-attachments/assets/`
 | Issue | Solution |
 |-------|----------|
 | `unknown flag: --attach` | `brew upgrade gh` |
-| Path left in the body, image appended at the end instead | The body's path and the `--attach` path differ — spell them identically |
+| `no upload matched: <path>` | The `<img>`'s file wasn't attached, or its `--attach` gave a `#alt` — the script matches on the default alt, the basename |
 | File path with special characters (e.g., Unicode narrow spaces from CleanShot) | `cp /path/CleanShot*keyword*.png tmp/screenshot.png` |
 | Upload refused | `--attach` needs push access to the repo, and takes images and video only |
