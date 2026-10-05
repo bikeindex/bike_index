@@ -13,7 +13,8 @@ export const motorSection = ({ presenter, heading, motor, others }) => {
     name: [each.manufacturer, each.model].filter(present).join(' '),
     id: each.id ? copyableCode({ value: each.id, label: 'Copy ID' }) : null,
     us_e_bike_class: each.us_e_bike_class == null ? null : `Class ${sentence(each.us_e_bike_class)}`,
-    ...Object.fromEntries(Object.entries(slice(each, humanized)).map(([key, value]) => [key, value == null ? value : presenter.humanize(value)]))
+    // a merged motor lists each of its drive wheels
+    ...Object.fromEntries(Object.entries(slice(each, humanized)).map(([key, value]) => [key, value == null ? value : array(value).map((part) => presenter.humanize(part)).join(', ')]))
   })
   const temperatureRange = (temperature) => blank(temperature)
     ? null

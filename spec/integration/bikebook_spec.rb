@@ -49,7 +49,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     asked.clear
 
     vehicle_field.click
-    expect(page).to have_css(".hw-combobox__group__label", text: /\(26 matching models\)/i)
+    expect(page).to have_css(".hw-combobox__group__label", text: /\(27 matching models\)/i)
 
     type_into(vehicle_field, "level 4 rec")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(2 matching models\)/i)
@@ -140,6 +140,15 @@ RSpec.describe "Bikebook", :js, type: :system do
                     { label: 'Position', classes: 'tw:w-[12%]', cell: (record) => record.position }] }
       JS
     end
+  end
+
+  it "merges motors that match but for their drive wheel" do
+    serve_catalog
+    visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
+
+    motor = find("section", text: /front and rear motor/i, wait: 10)
+    expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
+    expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
   end
 
   it "says so when the catalog doesn't load" do

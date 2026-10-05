@@ -333,13 +333,16 @@ class ModelViewer {
     return truthy(value) ? join(compact([this.presenter.measurement(value, 'mm'), suffix])) : null
   }
 
-  // One per motor index across the compared vehicles
+  // One per motor index across the compared vehicles, motors alike but for their drive wheel as one
   motorSections () {
-    const [motors, ...othersMotors] = [this.vehicle, ...this.others].map((vehicle) => vehicle.motors ?? [])
+    const [motors, ...othersMotors] = [this.vehicle, ...this.others].map((vehicle) => mergedMotors(vehicle.motors ?? []))
     const count = Math.max(motors.length, ...othersMotors.map((each) => each.length))
     return Array.from({ length: count }, (_, index) => {
       const motor = motors[index]
-      const heading = count === 1 ? 'Motor & Battery' : motor?.drive_wheel ? `${this.presenter.humanize(motor.drive_wheel)} motor` : `Motor ${index + 1}`
+      const wheels = array(motor?.drive_wheel).map((wheel) => this.presenter.humanize(wheel))
+      const heading = wheels.length > 1
+        ? `${andSentence(wheels)} Motor`
+        : count === 1 ? 'Motor & Battery' : wheels.length ? `${wheels[0]} motor` : `Motor ${index + 1}`
       return motorSection({ presenter: this.presenter, heading, motor: motor ?? {}, others: othersMotors.map((each) => each[index] ?? {}) })
     })
   }
@@ -509,6 +512,17 @@ class ModelViewer {
     return html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${tables}</section>`
   }
 }
+
+// to_sentence: "Front, Middle and Rear"
+const andSentence = (words) => words.length < 2 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`
+
+// Motors that match but for their drive wheel, as one listing each drive wheel
+const mergedMotors = (motors) => motors.reduce((merged, motor) => {
+  const index = merged.findIndex((each) => equal(except(each, ['drive_wheel']), except(motor, ['drive_wheel'])))
+  return index < 0
+    ? [...merged, motor]
+    : merged.map((each, at) => at === index ? { ...each, drive_wheel: [...array(each.drive_wheel), ...array(motor.drive_wheel)] } : each)
+}, [])
 
 // A section whose heading's chevron opens and closes its content (ui--collapse), rendered open
 // unless the content is hidden
