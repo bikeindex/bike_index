@@ -109,6 +109,16 @@ RSpec.describe Admin::UsersController, type: :request do
       {email: user_subject.email, banned: true,
        can_send_many_stolen_notifications: false, can_send_many_marketplace_messages: false}
     end
+    context "superuser limited to users" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:superuser_ability) { SuperuserAbility.create(user: current_user, controller_name: "users") }
+      it "doesn't grant universal superuser" do
+        patch "#{base_url}/#{current_user.id}", params: {user: ban_user_params.merge(name: "New Name", email: current_user.email, banned: false, superuser: true)}
+        expect(current_user.reload.name).to eq "New Name"
+        expect(current_user.superuser?).to be_falsey
+        expect(current_user.superuser_abilities.pluck(:kind)).to eq(["controller"])
+      end
+    end
     context "non developer" do
       it "updates all the things that can be edited (finding via user id)" do
         user_subject.reload

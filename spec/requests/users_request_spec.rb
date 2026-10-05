@@ -376,6 +376,13 @@ RSpec.describe UsersController, type: :request do
       expect(current_user.address_set_manually).to be_falsey
     end
 
+    it "doesn't update the email" do
+      email = current_user.email
+      patch "#{base_url}/#{current_user.username}", params: {user: {terms_of_service: "1", email: "new@example.com", name: "New name"}}
+      expect(current_user.reload.email).to eq email
+      expect(current_user.terms_of_service).to be_truthy
+    end
+
     context "vendor terms" do
       let(:current_user) { FactoryBot.create(:user_confirmed, terms_of_service: false, notification_newsletters: false) }
       it "updates the vendor terms of service and emailable" do

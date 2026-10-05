@@ -20,15 +20,20 @@ export default class extends Controller {
       return
     }
 
-    await navigator.clipboard.writeText(url)
-    this.flashCopied()
+    try {
+      await navigator.clipboard.writeText(url)
+      this.flashCopied()
+    } catch (error) {
+      // Clipboard denied or unavailable (e.g. an insecure context)
+    }
   }
 
   flashCopied () {
     const label = this.hasLabelTarget ? this.labelTarget : this.element
-    const original = label.textContent
+    // Read once, so a second click mid-flash doesn't keep "Link copied" as the label
+    this.originalLabel ??= label.textContent
     label.textContent = this.copiedValue || 'Link copied'
     clearTimeout(this.resetTimeout)
-    this.resetTimeout = setTimeout(() => { label.textContent = original }, 1500)
+    this.resetTimeout = setTimeout(() => { label.textContent = this.originalLabel }, 1500)
   }
 }

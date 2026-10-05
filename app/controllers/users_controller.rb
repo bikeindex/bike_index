@@ -141,7 +141,7 @@ class UsersController < ApplicationController
   # this action should only be for terms of service (or vendor_terms_of_service)
   def update
     @user = current_user
-    if @user.present? && params[:user].present? && @user.update(permitted_parameters)
+    if @user.present? && params[:user].present? && @user.update(params.require(:user).permit(:terms_of_service, :notification_newsletters))
       if params.dig(:user, :terms_of_service).present?
         if Binxtils::InputNormalizer.boolean(params.dig(:user, :terms_of_service))
           flash[:success] = translation(:you_can_use_bike_index)

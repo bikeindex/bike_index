@@ -807,6 +807,13 @@ RSpec.describe Bike, type: :model do
           expect(bike.frame_size_unit).to eq("ordinal")
         end
       end
+      it "distinguishes small from extra small and large from extra large" do
+        {"small" => "s", "x-small" => "xs", "Extra Small" => "xs", "large" => "l", "x-large" => "xl", "extra large" => "xl"}.each do |input, size|
+          bike = Bike.new(frame_size: input)
+          bike.send(:clean_frame_size)
+          expect(bike.frame_size).to eq(size), "#{input} => #{bike.frame_size}"
+        end
+      end
     end
 
     context "ordinal string" do

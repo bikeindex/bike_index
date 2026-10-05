@@ -15,7 +15,11 @@ module SharedBlocks
       # No page_id: the links resolve their own active state in the browser and the locale
       # form submits to whatever URL it's on, so one render serves every page
       def cache_key
-        [self.class.cache_digest, @current_user, @skip_facebook]
+        [self.class.cache_digest, @current_user, @skip_facebook, strava_integration?]
+      end
+
+      def strava_integration?
+        Flipper.enabled?(:strava_integration, @current_user)
       end
     end
   end

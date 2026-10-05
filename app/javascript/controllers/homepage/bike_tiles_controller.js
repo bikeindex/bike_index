@@ -8,8 +8,10 @@ export default class extends Controller {
   connect () {
     this.generateTiles()
 
+    // Mobile browsers fire resize as the URL bar shows and hides on scroll - the 1.2x
+    // overflow already covers that height, so only a width change regenerates
     this.handleResize = this.debounce(() => {
-      this.generateTiles()
+      if (window.innerWidth !== this.tilesWidth) this.generateTiles()
     }, 250)
 
     window.addEventListener('resize', this.handleResize)
@@ -28,6 +30,8 @@ export default class extends Controller {
   }
 
   generateTiles () {
+    this.tilesWidth = window.innerWidth
+    this.gridTarget.replaceChildren()
     // Calculate how many tiles we need to fill the screen plus overflow
     const tilesNeeded = Math.ceil((window.innerWidth * 1.2) / 130) * Math.ceil((window.innerHeight * 1.2) / 130)
 
@@ -103,11 +107,6 @@ export default class extends Controller {
         return inOuterEllipse && !inInnerEllipse &&
              rect.top >= 0 &&
              rect.bottom <= window.innerHeight
-      })
-
-      // Remove any existing stolen alert tiles (important when resizing the window)
-      this.gridTarget.querySelectorAll('.bike-tile.stolen-alert').forEach(tile => {
-        tile.classList.remove('stolen-alert', 'tw:cursor-pointer')
       })
 
       // Select from ring tiles only

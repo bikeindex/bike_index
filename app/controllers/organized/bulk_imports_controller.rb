@@ -83,6 +83,8 @@ module Organized
       @is_api = request.headers["Authorization"].present?
       unless @is_api
         verify_authenticity_token
+        return if performed?
+
         return ensure_access_to_bulk_import!
       end
 

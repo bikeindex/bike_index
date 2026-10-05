@@ -9,10 +9,12 @@ export default class extends Controller {
   static values = { apiCountUrl: String, optionKinds: String }
 
   connect () {
+    this.updateForSaleLink = this.updateForSaleLink.bind(this)
+    this.performSubmitActions = this.performSubmitActions.bind(this)
     this.setSearchProximity()
     this.updateForSaleLink()
-    this.form?.addEventListener('change', this.updateForSaleLink.bind(this))
-    this.form?.addEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
+    this.form?.addEventListener('change', this.updateForSaleLink)
+    this.form?.addEventListener('turbo:submit-end', this.performSubmitActions)
     // Plain filter comboboxes (eg primary_activity) don't fire a native change
     // event, so reset the counts when their selection changes
     this.form?.addEventListener('hw-combobox:selection', this.onComboboxSelection)
@@ -28,8 +30,8 @@ export default class extends Controller {
 
   disconnect () {
     this.resetKindCounts() // also removes the bindings
-    this.form?.removeEventListener('change', this.updateForSaleLink.bind(this))
-    this.form?.removeEventListener('turbo:submit-end', this.performSubmitActions.bind(this))
+    this.form?.removeEventListener('change', this.updateForSaleLink)
+    this.form?.removeEventListener('turbo:submit-end', this.performSubmitActions)
     // Remove reset count function from window
     window.kindControllerUpdateAfterComboboxChange = null
     this.form?.removeEventListener('hw-combobox:selection', this.onComboboxSelection)

@@ -31,10 +31,13 @@ module Admin
       else
         @user.name = params[:user][:name]
         @user.email = params[:user][:email]
-        if Binxtils::InputNormalizer.boolean(params[:user][:superuser])
-          @user.superuser_abilities.find_or_create_by(controller_name: nil, action_name: nil)
-        else
-          @user.superuser_abilities.universal.destroy_all
+        # Only a universal superuser can grant or revoke universal access
+        if current_user.superuser?
+          if Binxtils::InputNormalizer.boolean(params[:user][:superuser])
+            @user.superuser_abilities.find_or_create_by(controller_name: nil, action_name: nil)
+          else
+            @user.superuser_abilities.universal.destroy_all
+          end
         end
         @user.developer = params[:user][:developer] if current_user.developer? && params[:user].key?(:developer)
         ban_params = permitted_ban_parameters

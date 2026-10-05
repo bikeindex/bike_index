@@ -7,10 +7,10 @@ module API
       def index
         manufacturers = Manufacturer.reorder(:name)
         if params[:query]
-          if params[:query].strip == "frame_makers"
-            Manufacturer.frame_makers
+          manufacturers = if params[:query].strip == "frame_makers"
+            manufacturers.frame_makers
           else
-            manufacturers = Manufacturer.friendly_find(params[:query].to_s)
+            Manufacturer.friendly_find(params[:query].to_s)
           end
         end
         if params[:just_names] && manufacturers.count > 1
