@@ -229,7 +229,13 @@ module BikeSearchable
 
   module ClassMethods
     def search(interpreted_params)
-      matching_serial(interpreted_params[:serial], interpreted_params[:serial_no_space])
+      serial, serial_no_space = interpreted_params.values_at(:serial, :serial_no_space)
+      return non_serial_matches(interpreted_params) if serial.blank?
+
+      # Postgres guesses a serial matches 0.5% of bikes, so it walks the listing_order index
+      # for the first page - every bike when nothing matches. OFFSET 0 stops it flattening
+      # the subquery, which leaves the serial indexes as the only way in
+      from(unscoped.current.matching_serial(serial, serial_no_space).offset(0), :bikes)
         .non_serial_matches(interpreted_params)
     end
 
