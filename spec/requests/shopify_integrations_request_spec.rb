@@ -69,6 +69,26 @@ RSpec.describe ShopifyIntegrationsController, type: :request do
       expect(response).to redirect_to(my_account_path)
       expect(flash[:error]).to match(/state/i)
     end
+
+    context "the shop is connected to another organization" do
+      let!(:other_integration) { FactoryBot.create(:shopify_integration, :active, shop_domain:) }
+      let(:secret) { Integrations::Shopify::Client::SHOPIFY_SECRET }
+
+      def signed(params)
+        params.merge(hmac: OpenSSL::HMAC.hexdigest("sha256", secret, params.sort.map { |k, v| "#{k}=#{v}" }.join("&")))
+      end
+
+      it "leaves that connection alone" do
+        post base_url, params: {organization_id: organization.to_param, shop_domain:}
+        state = session[:shopify_oauth]["state"]
+        expect {
+          get "#{base_url}/callback", params: signed({code: "abc123", shop: shop_domain, state:, timestamp: "1700000000"})
+        }.to_not change(ShopifyIntegration, :count)
+        expect(response).to redirect_to(organization_manage_path(organization_id: organization.to_param))
+        expect(flash[:error]).to match(/another organization/)
+        expect(other_integration.reload.organization_id).to_not eq organization.id
+      end
+    end
   end
 
   describe "destroy" do

@@ -153,8 +153,8 @@ class CredibilityScorer
     return false unless organization.present?
     return true if organization.is_invoiced?
 
-    organization.manual_pos_kind.present? &&
-      !Organization.broken_pos_kinds.include?(organization.manual_pos_kind)
+    organization.manual_does_not_need_pos? ||
+      Organization.with_pos_kinds.include?(organization.manual_pos_kind)
   end
 
   #

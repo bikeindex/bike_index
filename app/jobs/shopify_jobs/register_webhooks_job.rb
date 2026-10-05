@@ -19,12 +19,13 @@ module ShopifyJobs
     private
 
     # A GraphQL mutation reports a rejected subscription in userErrors with a 200 status, and
-    # each topic answers under its own alias
+    # each topic answers under its own alias. Disconnecting leaves the app installed, so a
+    # reconnect finds its subscriptions "already taken" - and still delivering here
     def user_errors(response)
       return ["#{response.status} from Shopify"] unless response.success?
 
-      (response.body["data"] || {}).values.flat_map { it["userErrors"] || [] }.map { it["message"] } +
-        (response.body["errors"] || []).map { it["message"] }
+      (response.body["data"] || {}).values.flat_map { it["userErrors"] || [] }.map { it["message"] }
+        .grep_v(/already been taken/i) + (response.body["errors"] || []).map { it["message"] }
     end
   end
 end
