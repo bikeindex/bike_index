@@ -56,8 +56,8 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
       expect(impound_group.css("input[type='checkbox']").map { it[:name] })
         .to eq ComponentStructs::OrgSearchSettings::IMPOUND_COLUMNS
       expect(impound_group.css("input[type='checkbox']").map { it["data-default"] }.uniq).to eq ["true"]
-      expect(impound_group.text).to include("Time - Impounded", "Time - impound record Updated", "Last updator",
-        "Impounded from", "Unregistered")
+      expect(impound_group.text).to include("Time - Impounded", "Time - impound record Updated", "Time - Resolved",
+        "Impound status", "Last updator", "Impounded from", "Unregistered")
       expect(component.at_css("input[name='impound_id_cell']")["data-default"]).to eq "true"
     end
   end

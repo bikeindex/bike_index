@@ -31,6 +31,7 @@ en:
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_columns: Impound columns
             impound_id_cell: Impound ID
+            impound_status_cell: Impound status
             impound_updated_at_cell: Impound updated
             impound_updated_at_cell_panel: Time - impound record Updated
             impound_user_cell: Last updator
@@ -66,6 +67,8 @@ en:
               found or listed for sale
             registration_status_at_cell_panel: Time - Registration status
             registration_updated_at_cell_panel: Time - registration updated
+            resolved_at_cell: Resolved
+            resolved_at_cell_panel: Time - Resolved
             serial_number_cell: Serial
             show_location_search: show location search
             show_notes_search: show notes search

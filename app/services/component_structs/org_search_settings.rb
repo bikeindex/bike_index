@@ -39,14 +39,16 @@ module ComponentStructs
       url_cell
       impounded_at_cell
       impound_updated_at_cell
+      resolved_at_cell
+      impound_status_cell
       impound_user_cell
       impounded_from_cell
       unregistered_cell
     ].freeze
 
     # The impound records search's own group in the panel, in this order, all on by default
-    IMPOUND_COLUMNS = %w[impounded_at_cell impound_updated_at_cell impound_user_cell impounded_from_cell
-      unregistered_cell].freeze
+    IMPOUND_COLUMNS = %w[impounded_at_cell impound_updated_at_cell resolved_at_cell impound_status_cell
+      impound_user_cell impounded_from_cell unregistered_cell].freeze
 
     # The panel groups the time columns under "Time - "; the table headers keep the short names
     PANEL_LABEL_KEYS = {
@@ -55,7 +57,8 @@ module ComponentStructs
       occurred_at_cell: :registration_status_at_cell_panel,
       acknowledgment_cell: :acknowledgment_cell_panel,
       impounded_at_cell: :impounded_at_cell_panel,
-      impound_updated_at_cell: :impound_updated_at_cell_panel
+      impound_updated_at_cell: :impound_updated_at_cell_panel,
+      resolved_at_cell: :resolved_at_cell_panel
     }.freeze
 
     # Their labels name the organization, italicized with its preposition
@@ -100,8 +103,9 @@ module ComponentStructs
 
     # The impound records search's, which sorts by the impound record rather than the bike
     IMPOUND_SORTABLE_COLUMN_CELLS = {
-      "created_at" => :impounded_at_cell,
+      "impounded_at" => :impounded_at_cell,
       "updated_at" => :impound_updated_at_cell,
+      "resolved_at" => :resolved_at_cell,
       "user_id" => :impound_user_cell,
       "display_id_integer" => :impound_id_cell
     }.freeze

@@ -33,13 +33,15 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization:, bike:, unregistered_bike: true) }
     let(:options) do
       {organization:, impound_records: [impound_record], render_sortable: true,
-       sort_state: ComponentStructs::SortState.new(sort: "created_at", direction: "desc")}
+       sort_state: ComponentStructs::SortState.new(sort: "impounded_at", direction: "desc")}
     end
 
     it "renders the record's bike, its impound columns, and a hidden multi-update checkbox" do
       expect(component).to have_css("tbody tr", count: 1)
       expect(component).to have_text(bike.mnfg_name)
       expect(component).to have_css("td.impounded_at_cell a[href*='/impound_records/#{impound_record.display_id}']")
+      expect(component).to have_css("td.impound_status_cell", text: impound_record.status_humanized_short)
+      expect(component).to have_css("th.resolved_at_cell a", text: "Resolved")
       expect(component).to have_css("td.impound_id_cell", text: impound_record.display_id)
       expect(component).to have_css("td.impound_user_cell", text: impound_record.user.display_name.truncate(20))
       expect(component).to have_css("td.unregistered_cell", text: /\S/)
@@ -50,6 +52,31 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
       checkbox = component.at_css("td.multi-update-cell input[type='checkbox']")
       expect(checkbox[:form]).to eq Pages::Org::SearchResults::BikesTable::Component::MULTI_UPDATE_FORM_ID
       expect(component.at_css("td.multi-update-cell")[:class]).to include("tw:hidden")
+    end
+
+    it "renders when the bike was impounded, rather than when the record was created" do
+      impound_record.update(impounded_at: Time.current - 1.week)
+      expect(component).to have_css("td.impounded_at_cell .localizeTime",
+        exact_text: I18n.l(impound_record.reload.impounded_at, format: :convert_time))
+    end
+
+    context "with caching", :caching do
+      include_context :caching_basic
+
+      def render_table
+        with_request_url("/o/#{organization.to_param}/registrations") do
+          render_inline(described_class.new(**options, impound_records: [impound_record.reload]))
+        end
+      end
+
+      it "busts the row when a claim is submitted, which leaves the record untouched" do
+        render_table
+        expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).to include("transferred_to_new_owner")
+
+        FactoryBot.create(:impound_claim, impound_record:, organization:, status: "submitting")
+        expect(fragments_written { render_table }.count).to eq 1
+        expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).not_to include("transferred_to_new_owner")
+      end
     end
   end
 

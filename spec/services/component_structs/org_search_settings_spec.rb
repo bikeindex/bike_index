@@ -144,6 +144,8 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       expect(impound_settings.impound_columns).to eq described_class::IMPOUND_COLUMNS
       expect(impound_settings.initially_checked_columns).to include("impound_id_cell")
       expect(impound_settings.sort_column_label("user_id")).to eq "Last updator"
+      expect(impound_settings.sort_column_label("impounded_at")).to eq "Impounded"
+      expect(impound_settings.sort_column_label("resolved_at")).to eq "Resolved"
       expect(impound_settings.render_export?).to be_falsey
     end
   end

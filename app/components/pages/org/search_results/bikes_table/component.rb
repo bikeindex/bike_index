@@ -74,9 +74,15 @@ module Pages
 
           def cache_key = [@organization, self.class.cache_digest, (@multiselect_visible if impound?)]
 
-          # Everything an impound row renders besides its record
+          # Everything an impound row renders besides its record. The claims decide its checkbox's
+          # update kinds, and a claim's submission doesn't touch the record
           def cache_records
-            ->(impound_record) { [impound_record.bike, impound_record.user, impound_record.impounded_from_address_record] } if impound?
+            return unless impound?
+
+            ->(impound_record) {
+              [impound_record.bike, impound_record.user, impound_record.impounded_from_address_record,
+                *impound_record.impound_claims]
+            }
           end
 
           def multiselect_cell_classes
