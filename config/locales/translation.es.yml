@@ -6852,6 +6852,33 @@ es:
               la mejor oportunidad de regresar; puede agregar el número más tarde.
           step_review:
             complete_registration: Registro completo %{cycle_type}
+      bikebook:
+        show:
+          activity: Actividad
+          any_activity: Cualquier actividad
+          any_configuration: Cualquier configuración
+          any_manufacturer: Cualquier fabricante
+          any_motorized: Cualquier motorizado
+          any_suspension: Cualquier suspensión
+          any_vehicle_type: Cualquier tipo de vehículo
+          applied_filters: Filtros aplicados
+          configuration: Configuración
+          failed: El catálogo no se cargó. Recarga la página para intentarlo de nuevo.
+          loading: Cargando el catálogo…
+          manufacturer: Fabricante
+          max: Máximo
+          min: Min
+          more_filters: Más filtros
+          motorized: Motorizado
+          price: Precio
+          search_placeholder: Buscar por fabricante o modelo…
+          sort: Clasificar
+          suspension: Suspensión
+          vehicle_type: Tipo de vehículo
+          view_a_vehicle: Ver un vehículo
+          year: Año
+          filter_combobox:
+            any: Cualquier
     shared_blocks:
       footer:
         about: Acerca
