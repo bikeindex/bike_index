@@ -193,4 +193,4 @@ The seeded DB persists across checkouts, so the existing session usually still w
 
 Once every screenshot is captured, quit Chrome with `browser_close` — including when the capture failed partway. Leaving it running holds the shared browser profile lock, so the next `browser_navigate` (this skill or another) fails with "Browser is already in use".
 
-**Who closes is decided by who invoked you, so you never have to be told.** Invoked by the user — "grab a screenshot of X" — you're the last one in the browser: close it. Invoked by a workflow that uploads what you captured (`github-pr-images`, and so the `pr` screenshot phase), leave it open; that skill drives the same session straight afterwards and closing between the two just pays the startup again.
+**Who closes is decided by who invoked you, so you never have to be told.** Invoked by the user — "grab a screenshot of X" — you're the last one in the browser: close it. Invoked by a workflow that captures again straight afterwards — the `pr` screenshot phase, which captures the base next — leave it open; closing between the two just pays the startup again.
