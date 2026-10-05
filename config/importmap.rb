@@ -33,3 +33,8 @@ pin_all_from "app/javascript/utils", under: "utils", to: "utils"
 # Lexxy rich text editor (Action Text). Assets served by the lexxy/activestorage gems.
 pin "lexxy", to: "lexxy.js"
 pin "@rails/activestorage", to: "activestorage.esm.js"
+
+# /bikebook's modules, which only its controller imports
+pin_all_from "app/javascript/bikebook", under: "bikebook", preload: false
+pin "lit-html", to: "lit-html.js", preload: false
+pin "lit-html/directive.js", to: "lit-html--directive.js", preload: false

@@ -55,6 +55,7 @@ Rails.application.routes.draw do
   end
 
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
+  get "bikebook", to: "bikebook#show"
 
   resource :session, only: %i[new create destroy] do
     collection do

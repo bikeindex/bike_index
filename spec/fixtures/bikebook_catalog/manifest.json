@@ -1,0 +1,11 @@
+{
+  "format": 2,
+  "published_at": "2026-10-05T02:50:00Z",
+  "schema_version": "0.21.0",
+  "index": "index.json",
+  "vocabulary": "vocabulary.json",
+  "blocks": {
+    "aventon/2022": "models/aventon/2022.json",
+    "aventon/2026": "models/aventon/2026.json"
+  }
+}
