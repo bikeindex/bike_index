@@ -8,8 +8,7 @@ export default class extends Controller {
   connect () {
     this.generateTiles()
 
-    // Mobile browsers fire resize as the URL bar shows and hides on scroll - the 1.2x
-    // overflow already covers that height, so only a width change regenerates
+    // Mobile URL bars fire resize on scroll; the 1.2x overflow covers the height change
     this.handleResize = this.debounce(() => {
       if (window.innerWidth !== this.tilesWidth) this.generateTiles()
     }, 250)
