@@ -117,6 +117,26 @@ RSpec.describe NewsController, type: :request do
         get "/news.atom"
         expect(response.status).to eq(200)
       end
+      context "with caching", :caching do
+        include_context :caching_basic
+        let(:content_tag) { FactoryBot.create(:content_tag) }
+        def create_tagged_blog(title)
+          FactoryBot.create(:blog, :published, title:).tap { |blog| BlogContentTag.create!(blog:, content_tag:) }
+        end
+        it "shows a new post in the full and the tagged feed" do
+          create_tagged_blog("First post")
+          get "/news.atom"
+          get "/news.atom", params: {search_tags: content_tag.slug}
+          expect(response.body).to include("First post")
+
+          create_tagged_blog("Second post")
+          get "/news.atom"
+          expect(response.body).to include("Second post")
+          # A tag search groups the blogs, which the whole-feed cache key can't follow
+          get "/news.atom", params: {search_tags: content_tag.slug}
+          expect(response.body).to include("Second post")
+        end
+      end
     end
   end
 end

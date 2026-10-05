@@ -1,5 +1,6 @@
 xml.instruct!
-cache(@blogs) do
+# A tag search groups @blogs, and a grouped relation's cache version reads only its first group
+cache_if(@search_tags.nil?, @blogs) do
   xml.feed("xml:lang" => "en-US", :xmlns => "http://www.w3.org/2005/Atom") do |feed|
     feed.id "https://bikeindex.org/news.atom"
     feed.link rel: "alternate", type: "text/html", href: news_index_url
