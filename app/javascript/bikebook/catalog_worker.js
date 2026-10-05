@@ -29,23 +29,21 @@ async function load ({ manifestUrl, ids }) {
 
   base = new URL(manifestUrl, self.location)
   ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
-  const [index, vocabulary] = await Promise.all([manifest.index, manifest.vocabulary].map((file) => fetchJson(new URL(file, base))))
+  const [index, vocabulary, page] = await Promise.all([manifest.index, manifest.vocabulary, manifest.page].map((file) => fetchJson(new URL(file, base))))
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
   activities = index.primary_activities
-  // a photo stored under its model's id is published as its extension alone
-  const photo = ({ id, photo }) => photo?.includes('/') ? photo : photo && `${index.stock_photos}/${path(id)}.${photo}`
   models = index.models.map((model) => ({
     ...model,
-    stock_photo: model.stock_photo ?? photo(model),
-    manufacturer_name: index.manufacturers[model.manufacturer],
+    // a photo stored under its model's id is published as its extension alone
+    stock_photo: model.photo?.includes('/') ? model.photo : model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
     activity_name: activityNames[model.primary_activity],
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
     sortYear: model.final_year ?? currentYear,
     sortPrice: model.msrp_cents ?? 0
   }))
   byId = new Map(models.map((model) => [model.id, model]))
-  return { vocabulary, options: options(index) }
+  return { vocabulary, kit: page.kit, options: options(index) }
 }
 
 // Each filter's choices, with how many models choosing it alone matches

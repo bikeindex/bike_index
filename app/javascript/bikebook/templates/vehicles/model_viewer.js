@@ -429,7 +429,7 @@ class ModelViewer {
   wheelSizeName (bsd) {
     const size = this.presenter.vocabulary.wheel_sizes[bsd]
     if (!size) return join([this.presenter.measurement(bsd, 'mm'), ' BSD'])
-    if (this.presenter.standardWheelSizes.has(Number(bsd))) return size.name
+    if (size.standard) return size.name
     return this.keepTogether(size.name, tooltip({ body: join(compact([presence(size.description), `${bsd} mm BSD`]).map((line) => html`<span class="tw:block">${line}</span>`)) }))
   }
 

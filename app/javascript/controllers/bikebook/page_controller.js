@@ -1,5 +1,4 @@
 import { Controller } from '@hotwired/stimulus'
-import kit from 'bikebook/kit'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
 import { uuid } from 'bikebook/templates/helpers'
@@ -11,7 +10,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status']
-  static values = { manifestUrl: String, standardWheelSizes: Array, failedText: String }
+  static values = { manifestUrl: String, failedText: String }
 
   #scrolls = new Map()
   #renders = 0
@@ -31,6 +30,7 @@ export default class extends Controller {
     } catch (error) {
       return this.#fail(error)
     }
+    const { kit } = this.catalog
     this.source = new CatalogComboboxSource(this.catalog, { placeholderUrl: kit.placeholder_url, perPage: kit.per_page })
     this.#render(url)
   }
@@ -79,7 +79,7 @@ export default class extends Controller {
 
   async #render (url, scroll) {
     const render = ++this.#renders
-    const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url, this.standardWheelSizesValue).catch((error) => error)
+    const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url).catch((error) => error)
     if (render !== this.#renders) return
     if (rendered instanceof Error) return this.#fail(rendered)
 

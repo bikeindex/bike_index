@@ -16,7 +16,7 @@ export const modelYears = ({ presenter, years, others }) => {
     const label = blank(year.url) ? year.year : html`<a class="twlink" title=${year.url_is_official ? 'Official page' : nothing} href=${year.url}>${year.year}</a>`
     const money = blank(year.original_msrp)
       ? nothing
-      : html`<span class="tw:font-spec tw:text-sm">${amountDisplay(year.original_msrp, year.original_msrp_currency, presenter.kit.currencies)}</span>`
+      : html`<span class="tw:font-spec tw:text-sm">${amountDisplay(year.original_msrp, year.original_msrp_currency, presenter.vocabulary.currencies)}</span>`
     const swatches = array(year.paint_descriptions).map((paint, index) => {
       const hex = year.paint_color_codes?.[index]
       const swatch = present(hex)

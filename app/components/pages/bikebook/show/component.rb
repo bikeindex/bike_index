@@ -7,9 +7,8 @@ module Pages
       # The page is a <template> bikebook--page fills in from the URL and the catalog,
       # and renders again for each pick and history step
       class Component < ApplicationComponent
-        def initialize(manifest_url:, standard_wheel_sizes:)
+        def initialize(manifest_url:)
           @manifest_url = manifest_url
-          @standard_wheel_sizes = standard_wheel_sizes
         end
       end
     end

@@ -5,7 +5,6 @@ class BikebookController < ApplicationController
 
   def show
     @page_title = "Bikebook"
-    render Pages::Bikebook::Show::Component.new(manifest_url: MANIFEST_URL,
-      standard_wheel_sizes: WheelSize.standard.pluck(:iso_bsd))
+    render Pages::Bikebook::Show::Component.new(manifest_url: MANIFEST_URL)
   end
 end

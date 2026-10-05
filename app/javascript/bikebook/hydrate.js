@@ -1,5 +1,4 @@
 import { html } from 'lit-html'
-import kit from 'bikebook/kit'
 import { localSources } from 'utils/hw_combobox_patch'
 import { matching, renderChips } from 'bikebook/catalog'
 import { numberDisplay } from 'bikebook/templates/helpers'
@@ -21,7 +20,8 @@ const combobox = (root, name) => root.getElementById(`${name}-hw-hidden-field`).
 // The page at `url`: the shell, with the catalog's filter options, filled in from the URL. Its
 // comboboxes answer from the catalog: the vehicle combobox through `source`, the filters' chips
 // from their own options
-export async function hydrate (catalog, source, shell, url, standardWheelSizes) {
+export async function hydrate (catalog, source, shell, url) {
+  const { kit } = catalog
   const root = shell.content.cloneNode(true)
   const params = url.searchParams
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-listbox`).append(fragmentOf(catalog.options[name].map(filterOption)))
@@ -54,7 +54,7 @@ export async function hydrate (catalog, source, shell, url, standardWheelSizes) 
   }
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
 
-  renderInto(root.getElementById('vehicle-viewers'), new VehicleViewer(catalog.vocabulary, standardWheelSizes).render(vehicles, url))
+  renderInto(root.getElementById('vehicle-viewers'), new VehicleViewer(kit, catalog.vocabulary).render(vehicles, url))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

@@ -1,13 +1,12 @@
 import { html } from 'lit-html'
 import { modelViewer } from 'bikebook/templates/vehicles/model_viewer'
 import { toQuery } from 'bikebook/query'
-import kit from 'bikebook/kit'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
 
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
-  constructor (vocabulary, standardWheelSizes) {
-    this.presenter = new VehiclePresenter(kit, vocabulary, standardWheelSizes)
+  constructor (kit, vocabulary) {
+    this.presenter = new VehiclePresenter(kit, vocabulary)
   }
 
   // The vehicles at `url`, whose remove links keep its other params

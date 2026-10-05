@@ -6,13 +6,12 @@ import { array, blank, compact, equal, isHash, isTemplate, join } from 'bikebook
 
 const roundHalfUp = (value) => Math.sign(value) * Math.round(Math.abs(value))
 
-// The names, units and lookups the vehicle templates present a model's data with: the catalog's
-// vocabulary, the kit's constants, and Bike Index's standard wheel sizes (an ISO BSD each)
+// The names, units and lookups the vehicle templates present a model's data with, from the catalog's
+// vocabulary and its page's kit
 export class VehiclePresenter {
-  constructor (kit, vocabulary, standardWheelSizes) {
+  constructor (kit, vocabulary) {
     this.kit = kit
     this.vocabulary = vocabulary
-    this.standardWheelSizes = new Set(standardWheelSizes)
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
     this.imperialLengths = kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))

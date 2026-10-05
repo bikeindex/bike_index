@@ -7,5 +7,6 @@
   "blocks": {
     "aventon/2022": "models/aventon/2022.json",
     "aventon/2026": "models/aventon/2026.json"
-  }
+  },
+  "page": "page.json"
 }
