@@ -5699,6 +5699,10 @@ es:
         unregistered: 'No registrado por su propietario: creado a partir de una notificación
           de estacionamiento.'
         with_owner: Registrado y protegido. Con su dueño (no robado).
+      short_id:
+        copy_id: Copiar ID
+      sticker:
+        copy_sticker: Copiar pegatina
     pages:
       messages:
         thread_show:

@@ -5710,6 +5710,10 @@ it:
         unregistered: Non registrato dal proprietario - generato da una notifica di
           parcheggio
         with_owner: Registrato e protetto. Con il suo proprietario (non rubato).
+      short_id:
+        copy_id: Copia ID
+      sticker:
+        copy_sticker: Copia adesivo
     pages:
       messages:
         thread_show:
