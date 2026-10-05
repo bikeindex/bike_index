@@ -92,6 +92,8 @@ When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-h
 
 Delegate the enumeration rather than eyeballing a grep — a hand-written grep anchors on one method name and misses the call sites that don't use it.
 
+**Tell a backgrounded reviewer not to spawn its own subagents.** It hands part of its scope to them, then finishes with "still running" and none of their findings — three of five did on #4505, and each needed a follow-up message to report.
+
 ## Testing
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.
