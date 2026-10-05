@@ -54,8 +54,7 @@ class ModelViewer {
       modelYears({ presenter, years: vehicle.years, others: this.others.map((other) => other.years) }),
       this.suspension(),
       section({ heading: 'Frame', content: presenter.measurementRows(this.specRows('frame')) })
-    ], [
-      ...this.motorSections(),
+    ], this.motorSections(), [
       section({ heading: 'Cargo', content: presenter.measurementRows(this.specRows('cargo')) }),
       this.wheels(),
       this.positioned('Brakes', 'brakes', 'Brake', (brake) => this.brakeSummary(brake)),
@@ -149,24 +148,28 @@ class ModelViewer {
     return names ? join(compact([content, `on ${this.sizeRange(names)}`]), ' ') : content
   }
 
-  // one order, down the left column and on under the photo, breaking where the taller column is shortest
-  specColumns (photo, left, rest) {
-    const shown = left.filter((block) => block !== nothing)
-    const blocks = [...shown, ...rest.filter((block) => block !== nothing)].map((block) => {
+  // Down the left column and on under the photo and the motors, which stay beneath it, breaking where
+  // the taller column is shortest. Stacked, the sections keep their order: motors after the frame
+  specColumns (photo, left, motors, rest) {
+    const [shown, pinned, after] = [left, motors, rest].map((blocks) => blocks.filter((block) => block !== nothing).map((block) => {
       const fragment = document.createDocumentFragment()
       render(block, fragment)
       return fragment
-    })
+    }))
+    ;[...shown, ...pinned, ...after].forEach((fragment, index) => { fragment.firstElementChild.style.order = index })
+    const blocks = [...shown, ...after]
     // compared panels sit side by side, so each breaks at the same section
-    const split = this.comparing ? shown.length : this.#shortestSplit(blocks, shown.length)
-    return [blocks.slice(0, split), [photo, ...blocks.slice(split)]]
+    const split = this.comparing ? shown.length : this.#shortestSplit(blocks, pinned, shown.length)
+    return [blocks.slice(0, split), [photo, ...pinned, ...blocks.slice(split)]]
   }
 
-  // the first split, from `from` on, whose taller column is shortest beside the photo
-  #shortestSplit (blocks, from) {
+  // the first split, from `from` on, whose taller column is shortest beside the photo and motors
+  #shortestSplit (blocks, pinned, from) {
     // a <br> line is about ⅔ of a row, and a section's bottom margin ¾
-    const rows = blocks.map((block) => block.querySelectorAll('h2, h3, dt, tr').length + block.querySelectorAll('br').length * 0.66 + 0.75)
-    const height = (at) => Math.max(sum(rows.slice(0, at)), this.kit.viewer.photo_rows + sum(rows.slice(at)))
+    const rows = (block) => block.querySelectorAll('h2, h3, dt, tr').length + block.querySelectorAll('br').length * 0.66 + 0.75
+    const heights = blocks.map(rows)
+    const beneath = this.kit.viewer.photo_rows + sum(pinned.map(rows))
+    const height = (at) => Math.max(sum(heights.slice(0, at)), beneath + sum(heights.slice(at)))
     return Array.from({ length: blocks.length - from + 1 }, (_, index) => from + index).reduce((best, at) => height(at) < height(best) ? at : best)
   }
 
