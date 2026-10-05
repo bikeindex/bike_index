@@ -29,7 +29,7 @@ module Emails
       end
 
       def organization_snippet_body
-        MailSnippet.for_organization(organization_id: organization.id, kind: @parking_notification.kind, time: snippet_time)&.sanitized_body
+        MailSnippet.for_organization(organization_id: organization.id, kind: @parking_notification.kind, time: snippet_time)&.body
       end
 
       def impound_record

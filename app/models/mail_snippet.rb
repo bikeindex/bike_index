@@ -183,12 +183,6 @@ class MailSnippet < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
-  # Org admins write bodies as raw HTML. Loofah's safelist keeps email markup (tables, inline
-  # styles), and :prune drops unsafe elements with their contents, so a <style> block doesn't render as text
-  def sanitized_body
-    Loofah.html5_fragment(body.to_s).scrub!(:prune).to_s.html_safe
-  end
-
   def body_stripped
     @body_stripped ||= Binxtils::InputNormalizer.plain_text(body)
   end

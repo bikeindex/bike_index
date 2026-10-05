@@ -33,7 +33,7 @@ module Emails
       def organization_message_snippet_body
         return nil unless @impound_claim.organized? && snippet_kind.present?
 
-        MailSnippet.for_organization(organization_id: organization.id, kind: snippet_kind, time: snippet_time)&.sanitized_body
+        MailSnippet.for_organization(organization_id: organization.id, kind: snippet_kind, time: snippet_time)&.body
       end
 
       def snippet_kind
