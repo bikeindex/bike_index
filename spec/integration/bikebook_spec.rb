@@ -45,7 +45,8 @@ RSpec.describe "Bikebook", :js, type: :system do
       playwright_page.on("request", ->(request) { asked << request.url if request.navigation_request? })
     end
     visit bikebook_path
-    expect(page).to have_field("View a vehicle", wait: 10)
+    # the search is an unusable placeholder until the catalog loads
+    expect(page).to have_no_css("[inert]", wait: 10)
     asked.clear
 
     vehicle_field.click

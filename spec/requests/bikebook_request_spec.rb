@@ -2,14 +2,16 @@ require "rails_helper"
 
 RSpec.describe BikebookController, type: :request do
   describe "show" do
-    it "renders the shell the browser fills in from the catalog" do
+    it "renders the search and a spinner, and the shell the browser fills in from the catalog" do
       get "/bikebook"
 
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
       bikebook = page.find("[data-controller='bikebook--page']")
       expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq BikebookController::MANIFEST_URL
-      expect(bikebook).to have_text("Loading the catalog…")
+      # the search shows, unusable, with a spinner below it until the catalog loads
+      expect(bikebook).to have_css("[inert] #vehicle_models")
+        .and have_css("[role='status'] svg.tw\\:animate-spin")
 
       shell = Capybara.string(Nokogiri::HTML5(response.body).at_css("template[data-bikebook--page-target='shell']").inner_html)
       expect(shell).to have_field("vehicle_models", placeholder: "Search by manufacturer or model…")
