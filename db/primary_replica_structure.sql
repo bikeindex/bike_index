@@ -6462,6 +6462,20 @@ CREATE INDEX index_bike_stickers_on_bike_sticker_batch_id ON public.bike_sticker
 
 
 --
+-- Name: index_bike_stickers_on_code_integer; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_integer ON public.bike_stickers USING btree (code_integer);
+
+
+--
+-- Name: index_bike_stickers_on_code_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_trgm ON public.bike_stickers USING gin (code public.gin_trgm_ops);
+
+
+--
 -- Name: index_bike_versions_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7913,6 +7927,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261004180000'),
 ('20261001170000'),
 ('20260930161510'),
 ('20260930161509'),

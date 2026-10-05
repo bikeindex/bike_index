@@ -25,6 +25,8 @@
 #
 #  index_bike_stickers_on_bike_id                (bike_id)
 #  index_bike_stickers_on_bike_sticker_batch_id  (bike_sticker_batch_id)
+#  index_bike_stickers_on_code_integer           (code_integer)
+#  index_bike_stickers_on_code_trgm              (code) USING gin
 #
 class BikeSticker < ApplicationRecord
   KIND_ENUM = {sticker: 0, spokecard: 1}.freeze
