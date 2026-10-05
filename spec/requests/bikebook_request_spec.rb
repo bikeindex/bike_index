@@ -9,7 +9,6 @@ RSpec.describe BikebookController, type: :request do
       page = Capybara.string(response.body)
       bikebook = page.find("[data-controller='bikebook--page']")
       expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq BikebookController::MANIFEST_URL
-      # the search shows, unusable, with a spinner below it until the catalog loads
       expect(bikebook).to have_css("[inert] #vehicle_models")
         .and have_css("[role='status'] svg.tw\\:animate-spin")
 

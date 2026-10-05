@@ -19,7 +19,7 @@ HwComboboxController.prototype.connect = function () {
 // doesn't carry, so it asks for chips on connect with nothing selected
 const requestChips = HwComboboxController.prototype._requestChips
 HwComboboxController.prototype._requestChips = function (values) {
-  if (String(values ?? '') === '') return
+  if (!values) return
 
   const source = localSources.get(this.element)
   return source ? source.chips(this, values) : requestChips.call(this, values)
