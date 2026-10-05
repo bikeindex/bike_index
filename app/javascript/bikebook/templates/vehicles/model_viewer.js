@@ -448,7 +448,9 @@ class ModelViewer {
     const counted = Object.fromEntries(Object.entries(this.kit.viewer.gearing_labels)
       .map(([position, label]) => [position, array(vehicle.gearing?.[position]).length === 1 ? label : `${label}s`]))
     const rows = [...this.specRows('gearing', this.kit.schemas.vehicle.gearing.fields, counted), ...this.specRows('frame', fields)]
-    if (blank(vehicle.drivetrain) && rows.length === 0) return nothing
+    // a compared model's values give this one rows it has nothing for
+    const content = presenter.measurementRows(rows)
+    if (blank(vehicle.drivetrain) && blank(content)) return nothing
 
     const sorted = (gearing) => array(gearing).sort()
     const differs = this.others.some((other) => !equal(sorted(other.drivetrain), sorted(vehicle.drivetrain)))
@@ -457,7 +459,7 @@ class ModelViewer {
     return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2 ${this.highlight(differs)}"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Drivetrain</h2>${present(vehicle.drivetrain)
       ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${labels.map((label) => html`<span class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:px-2 tw:py-0.5 tw:font-mono
         tw:text-xs">${this.tooltipped(label, this.kit.viewer.drivetrain_tooltips)}</span>`)}</div>`
-      : nothing}${rows.length ? definitionListContainer({ content: presenter.measurementRows(rows) }) : nothing}</section>`
+      : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
   }
 
   description () {
