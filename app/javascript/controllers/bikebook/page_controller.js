@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
+import { readable } from 'bikebook/replace_url'
 import { uuid } from 'bikebook/templates/helpers'
 
 const stamped = (state) => ({ ...state, bikebook: uuid() })
@@ -59,6 +60,12 @@ export default class extends Controller {
     this.#render(new URL(window.location.href), this.#scrolls.get(this.#entry) ?? [0, 0])
   }
 
+  // ui--collapse writes its param through URLSearchParams, escaping the rest of the query again
+  readableUrl () {
+    const href = readable(new URL(window.location.href))
+    if (href !== window.location.href) window.history.replaceState(window.history.state, '', href)
+  }
+
   track () {
     this.#scrolls.set(this.#entry, [window.scrollX, window.scrollY])
   }
@@ -72,7 +79,7 @@ export default class extends Controller {
   }
 
   #go (url) {
-    window.history.pushState(stamped(), '', url)
+    window.history.pushState(stamped(), '', readable(url))
     this.#render(url, [0, 0])
   }
 

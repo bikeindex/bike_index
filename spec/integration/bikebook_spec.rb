@@ -58,12 +58,14 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("article h1", text: "Level 4 REC Step-Through")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through")
 
     # A second pick, found by its id, compares the two, marking where the second differs from the first
     type_into(vehicle_field, "level_2_step")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(1 matching model\)/i)
     retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
     expect(page).to have_css("article", count: 2)
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
     expect(all("article").last).to have_css(".tw\\:spec-diff")
     expect(all("article").first).to have_no_css(".tw\\:spec-diff")
 

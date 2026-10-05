@@ -179,7 +179,7 @@
   data-controller="bikebook--page"
   data-bikebook--page-manifest-url-value="<%= @manifest_url %>"
   data-bikebook--page-failed-text-value="<%= translation(".failed") %>"
-  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track"
+  data-action="submit->bikebook--page#visit click->bikebook--page#follow click->bikebook--page#readableUrl keyup->bikebook--page#readableUrl popstate@window->bikebook--page#restore scroll@window->bikebook--page#track"
 >
   <template data-bikebook--page-target="shell">
     <%= search %>
