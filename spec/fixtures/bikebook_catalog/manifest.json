@@ -4,10 +4,10 @@
   "schema_version": "0.21.0",
   "index": "index.json",
   "vocabulary": "vocabulary.json",
-  "page": "page.json",
   "blocks": {
     "aventon/2022": "models/aventon/2022.json",
     "aventon/2026": "models/aventon/2026.json",
     "segway/2025": "models/segway/2025.json"
-  }
+  },
+  "kit": "kit.json"
 }
