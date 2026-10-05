@@ -57,8 +57,7 @@ class EmailBan < ApplicationRecord
 
     private
 
-    # Asks whether the address should exist, not whether it accepts mail - and
-    # REPLACE(email) has no index, so it can't run on every send
+    # Asks whether the address should exist, not whether it accepts mail
     def banned_new_email_address?(user, user_email)
       # Only the account's own address condemns the account - an additional one is just an address
       additional = user_email if user_email&.email != user.email

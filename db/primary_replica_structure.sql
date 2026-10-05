@@ -7813,6 +7813,13 @@ CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.g
 
 
 --
+-- Name: index_users_on_email_without_periods; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email_without_periods ON public.users USING btree (replace((email)::text, '.'::text, ''::text)) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_users_on_magic_link_token_outstanding; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7948,6 +7955,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261005003717'),
 ('20261004233815'),
 ('20261004230843'),
 ('20261004225108'),
