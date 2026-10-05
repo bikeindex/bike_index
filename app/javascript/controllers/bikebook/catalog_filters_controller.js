@@ -72,7 +72,6 @@ export default class extends Controller {
     }))
   }
 
-  // Read off the panel, so a field added to it needs no change here
   get #summary () {
     return this.fieldTargets.map((field) => [field.dataset.filterLabel, this.#describe(field)])
       .filter(([, value]) => value)

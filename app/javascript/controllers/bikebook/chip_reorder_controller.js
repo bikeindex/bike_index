@@ -8,7 +8,7 @@ export default class extends Controller {
     // Slid into the target gap during a drag; pointer-events:none so it never blocks hit-testing.
     this.indicator = document.createElement('span')
     this.indicator.setAttribute('aria-hidden', 'true')
-    this.indicator.style.cssText = 'width:2px;align-self:stretch;border-radius:9999px;background:var(--color-blueprint,#2563eb);pointer-events:none;'
+    this.indicator.style.cssText = 'width:2px;align-self:stretch;border-radius:9999px;background:var(--tw-color-blueprint);pointer-events:none;'
   }
 
   disconnect () {
