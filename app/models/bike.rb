@@ -74,6 +74,7 @@
 # Indexes
 #
 #  index_bikes_current_listing_order               (listing_order) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_current_manufacturer_listing_order  (manufacturer_id,listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
 #  index_bikes_on_creation_organization_id         (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
 #  index_bikes_on_current_ownership_id             (current_ownership_id)
 #  index_bikes_on_current_stolen_record_id         (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL)

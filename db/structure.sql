@@ -6511,6 +6511,13 @@ CREATE INDEX index_bikes_current_listing_order ON public.bikes USING btree (list
 
 
 --
+-- Name: index_bikes_current_manufacturer_listing_order; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_manufacturer_listing_order ON public.bikes USING btree (manufacturer_id, listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_bikes_on_creation_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7934,6 +7941,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261004230843'),
 ('20261004225108'),
 ('20261004180000'),
 ('20261001170000'),
