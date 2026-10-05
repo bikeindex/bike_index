@@ -37,13 +37,13 @@ class ModelViewer {
     const base = 'tw:flex tw:flex-col tw:gap-6 tw:transition tw:duration-300 tw:lg:flex-row tw:lg:items-stretch'
     const titleText = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
     const header = html`<header><div class="tw:flex tw:items-start tw:gap-4">${present(vehicle.manufacturer)
-      ? html`<p class="tw:mb-1 tw:font-display tw:text-lg tw:font-semibold tw:tracking-wide tw:text-blueprint tw:uppercase">${vehicle.manufacturer}</p>`
+      ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</p>`
       : nothing}<a aria-label=${`Remove ${titleText}`} data-controller="bikebook--remove-vehicle"
       data-action="ui--alert#close bikebook--remove-vehicle#remove"
       data-turbo-prefetch="false" class="tw:-my-1.5 tw:-mr-1.5 tw:ml-auto tw:inline-flex tw:h-8 tw:w-8 tw:shrink-0 tw:items-center tw:justify-center
-      tw:rounded-sm tw:text-gray-500 tw:hover:bg-vellum tw:focus:ring-2 tw:focus:ring-gray-400 tw:dark:text-gray-400" href=${this.removePath}>${
+      tw:rounded-sm tw:text-gray-500 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 tw:focus:ring-2 tw:focus:ring-gray-400 tw:dark:text-gray-400" href=${this.removePath}>${
         x('tw:h-3 tw:w-3')}</a></div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4"><h1
-      class="tw:font-display tw:text-2xl tw:leading-tight tw:font-semibold">${vehicle.model}</h1>${collapse({
+      class="tw:text-2xl tw:leading-tight tw:font-extrabold">${vehicle.model}</h1>${collapse({
         size: 'sm',
         htmlClass: 'tw:shrink-0 tw:whitespace-nowrap',
         attributes: { 'aria-controls': jsonPanelId, 'aria-label': 'Toggle JSON' },
@@ -66,7 +66,7 @@ class ModelViewer {
     return html`<div class=${comparing ? `${base} tw:md:min-w-[22rem] tw:md:has-[[aria-controls^=vehicle-model-json][aria-expanded=true]]:min-w-[64rem] tw:md:flex-1 tw:md:max-w-max` : base}
       data-controller="ui--collapse ui--alert" data-ui--collapse-param-value="json"
       data-ui--collapse-direction-value="horizontal"><article class="twgutter tw:w-full tw:min-w-0 tw:space-y-6
-      tw:rounded-lg tw:border tw:border-t-4 tw:border-vellum tw:border-t-blueprint tw:bg-paper tw:pt-4 tw:pb-6 tw:text-ink tw:[--gutter:--spacing(6)]
+      tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]
       ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizes()}${this.components()}</article><aside
       id=${jsonPanelId} class="twjson-panel tw:hidden tw:w-full tw:min-w-0 tw:lg:relative tw:lg:w-[28rem] tw:lg:shrink-0" data-ui--collapse-target="content">${
         jsonDisplay({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
@@ -74,10 +74,10 @@ class ModelViewer {
 
   #photo (photo, titleText) {
     return html`<div class="tw:group tw:order-first" data-controller=${present(photo) ? 'bikebook--image-fallback' : nothing} data-broken=${present(photo) ? nothing : ''}>${present(photo)
-      ? html`<a target="_blank" rel="noopener" class="tw:mb-6 tw:block tw:aspect-[3/2] tw:rounded-md tw:border tw:border-vellum tw:bg-white tw:p-2 tw:group-data-broken:hidden"
+      ? html`<a target="_blank" rel="noopener" class="tw:mb-6 tw:block tw:aspect-[3/2] tw:rounded-md tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:p-2 tw:group-data-broken:hidden"
         href=${photo}><img alt=${titleText} loading="lazy" class="tw:size-full tw:rounded-sm tw:object-contain" data-action="error->bikebook--image-fallback#fail" src=${photo}></a>`
       : nothing}<div class="tw:mb-6 tw:hidden tw:aspect-[3/2] tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md
-      tw:border tw:border-dashed tw:border-vellum tw:text-gray-400 tw:group-data-broken:flex tw:dark:text-gray-500"><img
+      tw:border tw:border-dashed tw:border-gray-200 tw:dark:border-gray-700 tw:text-gray-400 tw:group-data-broken:flex tw:dark:text-gray-500"><img
       alt="" class="tw:h-16 tw:w-16" src=${this.kit.placeholder_url}><span class="tw:text-sm">No photo</span></div></div>`
   }
 
@@ -323,7 +323,7 @@ class ModelViewer {
   }
 
   shisCode (code, size = 'tw:text-xs') {
-    return html`<code class="tw:rounded-sm tw:border tw:border-vellum tw:px-1.5 tw:py-0.5 tw:font-spec tw:whitespace-nowrap ${size}">${code}</code>`
+    return html`<code class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:px-1.5 tw:py-0.5 tw:font-mono tw:whitespace-nowrap ${size}">${code}</code>`
   }
 
   millimeters (value, suffix = null) {
@@ -451,9 +451,9 @@ class ModelViewer {
     const differs = this.others.some((other) => !equal(sorted(other.drivetrain), sorted(vehicle.drivetrain)))
     const gearing = array(vehicle.drivetrain)
     const labels = equal(sorted(gearing), ['1 Front', '1 Rear']) ? ['Singlespeed'] : gearing
-    return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2 ${this.highlight(differs)}"><h2 class="tw:spec-eyebrow">Drivetrain</h2>${present(vehicle.drivetrain)
-      ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${labels.map((label) => html`<span class="tw:rounded-sm tw:border tw:border-vellum tw:bg-paper tw:px-2 tw:py-0.5 tw:font-spec
-        tw:text-xs tw:text-ink">${this.tooltipped(label, this.kit.viewer.drivetrain_tooltips)}</span>`)}</div>`
+    return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2 ${this.highlight(differs)}"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Drivetrain</h2>${present(vehicle.drivetrain)
+      ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${labels.map((label) => html`<span class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:px-2 tw:py-0.5 tw:font-mono
+        tw:text-xs">${this.tooltipped(label, this.kit.viewer.drivetrain_tooltips)}</span>`)}</div>`
       : nothing}${rows.length ? definitionListContainer({ content: presenter.measurementRows(rows) }) : nothing}</section>`
   }
 
@@ -480,7 +480,7 @@ class ModelViewer {
     return disclosure({
       param: 'sizes',
       label: 'sizes',
-      heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-spec tw:text-sm tw:font-normal tw:tracking-normal tw:text-ink/50 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
+      heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-mono tw:text-sm tw:font-normal tw:tracking-normal tw:opacity-65 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
       content: html`<div data-ui--collapse-target="content" class="twgutter-bleed tw:flex tw:gap-4 tw:overflow-x-auto tw:pb-3.5">${
         sizes.map((size) => geometryCard({ presenter: this.presenter, size, others }))}</div>`
     })
@@ -501,7 +501,7 @@ class ModelViewer {
       const sorted = [...members].sort((a, b) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)
       return [componentGroup({ presenter: this.presenter, name, components: sorted, others })]
     })
-    return html`<section class="tw:space-y-4"><h2 class="tw:spec-eyebrow">Components</h2>${tables}</section>`
+    return html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${tables}</section>`
   }
 }
 
@@ -509,7 +509,7 @@ class ModelViewer {
 // unless the content is hidden
 const disclosure = ({ param, label, heading, content }) => html`<section class="tw:group/disclosure tw:space-y-2"
   data-controller="ui--collapse" data-ui--collapse-param-value=${param}><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-3"><h2
-  class="tw:spec-eyebrow">${heading}</h2>${collapse({ chevron: true, size: 'sm', attributes: { 'aria-label': `Toggle ${label}` } })}</div>${content}</section>`
+  class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${heading}</h2>${collapse({ chevron: true, size: 'sm', attributes: { 'aria-label': `Toggle ${label}` } })}</div>${content}</section>`
 
 // simple_format
 const simpleFormat = (text) => String(text).replace(/\r\n?/g, '\n').split(/\n\n+/).map((paragraph) => {

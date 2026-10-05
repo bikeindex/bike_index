@@ -16,7 +16,7 @@ export const modelYears = ({ presenter, years, others }) => {
     const label = blank(year.url) ? year.year : html`<a class="twlink" title=${year.url_is_official ? 'Official page' : nothing} href=${year.url}>${year.year}</a>`
     const money = blank(year.original_msrp)
       ? nothing
-      : html`<span class="tw:font-spec tw:text-sm">${amountDisplay(year.original_msrp, year.original_msrp_currency, presenter.vocabulary.currencies)}</span>`
+      : html`<span class="tw:font-mono tw:text-sm">${amountDisplay(year.original_msrp, year.original_msrp_currency, presenter.vocabulary.currencies)}</span>`
     const swatches = array(year.paint_descriptions).map((paint, index) => {
       const hex = year.paint_color_codes?.[index]
       const swatch = present(hex)
@@ -27,6 +27,6 @@ export const modelYears = ({ presenter, years, others }) => {
     return html`<tr class="tw:even:bg-gray-100 tw:dark:even:bg-gray-800"><td class="${CELL} ${differs ? 'tw:spec-diff' : ''}">${label}</td><td class=${CELL}>${money}</td><td
       class=${CELL}><div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1">${swatches}</div></td></tr>`
   })
-  return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2"><h2 class="tw:border-b tw:border-vellum tw:pb-1.5 tw:spec-eyebrow">Model years</h2><table
+  return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2"><h2 class="tw:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:pb-1.5 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Model years</h2><table
     class="tw:w-full tw:border-collapse tw:text-left"><tbody>${rows}</tbody></table></section>`
 }

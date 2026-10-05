@@ -1,11 +1,4 @@
 <% content_for :header do %>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet"
-  >
-
   <script>
     // before paint, so measurements don't flash from metric
     (function() {
@@ -64,9 +57,9 @@
         data-bikebook--catalog-filters-target="summary"
         class="
           tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:rounded-lg
-          tw:border tw:border-vellum tw:px-4 tw:py-2 tw:text-sm
+          tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm
           tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden
-          tw:empty:hidden
+          tw:empty:hidden tw:dark:border-gray-700
         "
       ></ul>
 
@@ -78,7 +71,7 @@
         <div
           class="
             tw:mt-3 tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:border
-            tw:border-vellum tw:p-4
+            tw:border-gray-200 tw:p-4 tw:dark:border-gray-700
           "
         >
           <div class="tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start">
@@ -131,8 +124,9 @@
                     ["price", translation(".price"), 0, "tw:sm:w-28", "$", {}]].each do |name, legend, min_attr, width, prefix, placeholders| %>
                   <fieldset
                     class="
-                      tw:w-full tw:rounded-lg tw:border tw:border-vellum
+                      tw:w-full tw:rounded-lg tw:border tw:border-gray-200
                       tw:px-3 tw:pt-1 tw:pb-3 tw:sm:w-auto
+                      tw:dark:border-gray-700
                     "
                     data-bikebook--catalog-filters-target="field"
                     data-filter-label="<%= legend %>"

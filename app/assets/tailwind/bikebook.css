@@ -1,31 +1,8 @@
-/* /bikebook's spec-sheet palette and vocabulary (Pages::Bikebook::Show and app/javascript/bikebook) */
+/* /bikebook (Pages::Bikebook::Show and app/javascript/bikebook) */
 
-@theme {
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-spec: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
-  --color-paper: #fbf9f3;
-  --color-ink: #1a2233;
-  --color-blueprint: #2c4a73;
-  --color-vellum: #dbd4c2;
-  --color-grease: #c1440e;
-}
-
-.dark {
-  --tw-color-paper: #12161f;
-  --tw-color-ink: #e7e2d3;
-  --tw-color-blueprint: #8fadd1;
-  --tw-color-vellum: #2a3040;
-  --tw-color-grease: #ff7a45;
-}
-
-@utility spec-eyebrow {
-  @apply tw:font-display tw:text-[0.6875rem] tw:font-semibold tw:tracking-[0.16em] tw:text-blueprint tw:uppercase;
-}
-
-/* Marks a differing spec like a grease pencil note in the margin, not a highlighter wash */
+/* Marks where a compared vehicle's spec differs from the first one's */
 @utility spec-diff {
-  @apply tw:bg-grease/8;
-  box-shadow: inset 3px 0 0 0 var(--tw-color-grease);
+  @apply tw:bg-yellow-50 tw:dark:bg-yellow-950;
 }
 
 @layer components {
@@ -37,35 +14,23 @@
     font-size: inherit;
   }
 
-  /* The model viewer's JSON sits beside the spec card, so it takes that card's chrome
-   * rather than UI::JsonDisplay's gray, and fills the column on desktop rather than
+  /* The model viewer's JSON fills the column beside its card on desktop, rather than
    * scrolling inside a box of its own */
   .twjson-panel .highlightjs-json {
     @apply tw:lg:absolute tw:lg:inset-0;
   }
 
   .twjson-panel .highlightjs-json pre {
-    @apply tw:max-h-[70vh] tw:rounded-lg tw:border-vellum tw:bg-paper tw:lg:h-full tw:lg:max-h-none;
+    @apply tw:max-h-[70vh] tw:lg:h-full tw:lg:max-h-none;
   }
 }
 
-.bikebook {
-  --hw-focus-color: var(--tw-color-blueprint);
-}
-
-/* The vehicle combobox lists hundreds of models under its matching count */
+/* The vehicle combobox lists hundreds of models under its matching count, which stays in view */
 .bikebook .hw-combobox {
   --hw-listbox-height: 24rem;
 }
 
-.bikebook .hw-combobox__option + .hw-combobox__option {
-  border-top: 1px solid var(--tw-color-vellum);
-}
-
 .bikebook .hw-combobox__group__label {
-  @apply tw:spec-eyebrow tw:border-b tw:border-vellum;
-
-  padding: var(--hw-padding--slim) var(--hw-padding--thick) var(--hw-padding--slimmer);
   position: sticky;
   top: 0;
   z-index: 1;

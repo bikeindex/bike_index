@@ -15,9 +15,9 @@ export const geometryCard = ({ presenter, size, others }) => {
     const [label, unit] = key.split(presenter.unitSuffix)
     return [presenter.humanize(label), value, unit || 'mm', otherExtras.some((each) => !equal(each[key], value)), key]
   })
-  return html`<div class="tw:w-max tw:shrink-0 tw:space-y-3 tw:rounded-md tw:border tw:border-vellum tw:bg-paper tw:p-4"><h3
-    class="tw:font-display tw:text-lg tw:font-semibold tw:text-ink">${presence(size.name) ?? 'Geometry'}</h3>${
+  return html`<div class="tw:w-max tw:shrink-0 tw:space-y-3 tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:p-4"><h3
+    class="tw:text-lg tw:font-bold">${presence(size.name) ?? 'Geometry'}</h3>${
     definitionListContainer({ term: 'right_align', content: presenter.measurementRows(rows) })}${extras.length
-      ? html`<h4 class="tw:pt-2 tw:spec-eyebrow">Additional measurements</h4>${definitionListContainer({ term: 'right_align', content: presenter.measurementRows(extras) })}`
+      ? html`<h4 class="tw:pt-2 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Additional measurements</h4>${definitionListContainer({ term: 'right_align', content: presenter.measurementRows(extras) })}`
       : nothing}</div>`
 }

@@ -109,7 +109,7 @@ export class VehiclePresenter {
   }
 
   labeled (value, unit, meta = this.kit.units[unit] ?? {}) {
-    const number = html`<span class="tw:font-spec">${numberDisplay(value)}</span>`
+    const number = html`<span class="tw:font-mono">${numberDisplay(value)}</span>`
     if (blank(unit)) return number
     // a thin space, so the unit reads as part of the value
     const gap = ['°', "'", '"'].includes(meta.label) ? '' : ' '
