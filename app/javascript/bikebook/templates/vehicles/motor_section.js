@@ -7,7 +7,9 @@ const sentence = (words) => words.length < 2 ? words.join('') : `${words.slice(0
 
 // A motor's specs, with a subsection per operating mode
 export const motorSection = ({ presenter, heading, motor, others }) => {
-  const { fields, mode_fields: modeFields, humanized, labels } = presenter.kit.motor
+  const { fields, mode_fields: modeFields, humanized } = presenter.kit.motor
+  // the kit labels it "US e-bike class", but each value names its own jurisdiction
+  const labels = { ...presenter.kit.motor.labels, e_vehicle_classifications: 'Classification' }
   const display = (each) => ({
     ...each,
     name: [each.manufacturer, each.model].filter(present).join(' '),

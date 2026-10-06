@@ -154,7 +154,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
 
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us")
-    expect(page).to have_css("section div", text: /US e-bike class\s*Off-highway electric motorcycle/, wait: 10)
+    expect(page).to have_css("section div", text: /Classification\s*US-CA Off-highway electric motorcycle/, wait: 10)
   end
 
   it "says so when the catalog doesn't load" do
