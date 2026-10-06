@@ -323,7 +323,6 @@ RSpec.describe Organized::EmailsController, type: :request do
         end
       end
       context "impound_claim_denied with an impound_record but no claims" do
-        let(:enabled_feature_slugs) { %w[customize_emails impound_bikes] }
         let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization) }
         let!(:mail_snippet) do
           FactoryBot.create(:organization_mail_snippet, organization: current_organization, kind: "impound_claim_denied", body: "<p>Snippet body</p>")
