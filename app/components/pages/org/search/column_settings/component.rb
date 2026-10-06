@@ -46,7 +46,8 @@ module Pages
             @settings.panel_columns.map do |cell_name|
               always_visible = @settings.always_visible?(cell_name)
               {name: cell_name, value: cell_name, label: @settings.panel_labels[cell_name.to_sym],
-               checked: always_visible, disabled: always_visible, default: default?(cell_name)}
+               hint: @settings.panel_hint(cell_name), checked: always_visible, disabled: always_visible,
+               default: default?(cell_name)}
             end
           end
 
@@ -67,6 +68,12 @@ module Pages
 
             {controller: "org--column-checkboxes", "org--search-column-settings-target": "checkboxes",
              action: "change->org--search-column-settings#updateVisibleColumns"}
+          end
+
+          def checkbox_label(column)
+            return column[:label] unless column[:hint]
+
+            safe_join([column[:label], tag.small(column[:hint], class: "tw:block tw:text-gray-400 tw:dark:text-gray-500")])
           end
         end
       end

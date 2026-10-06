@@ -68,27 +68,6 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
       end
     end
 
-    context "with search_status: impounded" do
-      let(:search_status) { "impounded" }
-
-      it "returns impounded filter description" do
-        descriptions = instance.active_search_filter_descriptions
-        expect(descriptions.length).to eq(1)
-        expect(descriptions.first).to include("impounded")
-      end
-    end
-
-    context "with search_status: not_impounded" do
-      let(:search_status) { "not_impounded" }
-
-      it "returns not impounded filter description" do
-        descriptions = instance.active_search_filter_descriptions
-        expect(descriptions.length).to eq(1)
-        expect(descriptions.first).to include("not")
-        expect(descriptions.first).to include("impounded")
-      end
-    end
-
     context "with search_status: with_owner" do
       let(:search_status) { "with_owner" }
 
@@ -96,14 +75,6 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
         descriptions = instance.active_search_filter_descriptions
         expect(descriptions.length).to eq(1)
         expect(descriptions.first).to include("not stolen or impounded")
-      end
-    end
-
-    context "with search_status: stolen_or_impounded" do
-      let(:search_status) { "stolen_or_impounded" }
-
-      it "returns stolen or impounded filter description" do
-        expect(instance.active_search_filter_descriptions).to eq(["only <strong>stolen</strong> or <strong>impounded</strong>"])
       end
     end
 
@@ -129,11 +100,18 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   describe "panel_labels" do
     it "prefixes the time columns, leaving the table headers short" do
       expect(instance.panel_labels[:created_at_cell]).to eq "Time - registered"
-      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - updated"
-      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - status"
+      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - registration updated"
+      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - Registration status"
       expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Registration sequence acknowledged"
       expect(instance.column_renames[:created_at_cell]).to eq "Registered"
       expect(instance.panel_labels[:color_cell]).to eq "Color"
+    end
+  end
+
+  describe "panel_hint" do
+    it "explains the status time, and nothing else" do
+      expect(instance.panel_hint("occurred_at_cell")).to eq "When registration was stolen, impounded, found or listed for sale"
+      expect(instance.panel_hint("created_at_cell")).to be_nil
     end
   end
 
@@ -190,24 +168,24 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
 
   describe "filter_groups" do
     let(:enabled_feature_slugs) { %w[bike_search bike_stickers reg_address impound_bikes] }
-    let(:search_status) { "impounded" }
+    let(:search_status) { "stolen" }
 
     it "returns a group per enabled filter, carrying the searched value" do
       groups = instance.filter_groups
       expect(groups.map { it[:name] })
         .to eq(%i[search_stickers search_address search_status search_unregisteredness])
-      expect(groups.find { it[:name] == :search_status }[:selected]).to eq "impounded"
+      expect(groups.find { it[:name] == :search_status }[:selected]).to eq "stolen"
       expect(groups.find { it[:name] == :search_stickers }[:entries].map { it[:value] })
         .to eq ["", "with", "none"]
       expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
-        .to eq %w[all not_impounded impounded stolen stolen_or_impounded with_owner]
+        .to eq %w[all stolen with_owner]
     end
 
     context "with no optional features" do
       let(:enabled_feature_slugs) { %w[bike_search] }
       let(:search_status) { "all" }
 
-      it "returns only the ungated ones, without the impound statuses" do
+      it "returns only the ungated ones" do
         groups = instance.filter_groups
         expect(groups.map { it[:name] }).to eq %i[search_status search_unregisteredness]
         expect(groups.find { it[:name] == :search_status }[:selected]).to eq "all"

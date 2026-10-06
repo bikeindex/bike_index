@@ -42,8 +42,6 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.location(Bike.all, "New York", "50", organization:)).to eq(Bike.all)
       expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen").pluck(:id))
         .to eq([stolen_nyc.id])
-      expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen_or_impounded")
-        .pluck(:id)).to match_array([stolen_nyc.id, impounded_nyc.id])
       expect(described_class.location(Bike.all, "", "50", organization:, search_status: "stolen")).to eq(Bike.all)
       expect(described_class.location(Bike.all, "Anywhere", "50", organization:, search_status: "stolen")).to eq(Bike.all)
     end
@@ -58,12 +56,12 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       it "matches registration addresses, except searching all" do
         expect(bike_without_address.reload.latitude).to eq bike_nyc.reload.latitude
         expect(described_class.location(Bike.all, "New York", "50", organization:).pluck(:id))
-          .to match_array([bike_nyc.id, stolen_nyc.id, impounded_nyc.id, impounded_from_nowhere.id])
+          .to match_array([bike_nyc.id, stolen_nyc.id, impounded_from_nowhere.id])
+        expect(described_class.location(Bike.all, "New York", "50", organization:, search_status: "stolen").pluck(:id))
+          .to eq([stolen_nyc.id])
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true)).to eq(Bike.all)
         expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
-          search_status: "impounded").pluck(:id)).to eq([impounded_nyc.id])
-        expect(described_class.location(Bike.all, "New York", "50", organization:, search_all: true,
-          search_status: "stolen_or_impounded").pluck(:id)).to match_array([stolen_nyc.id, impounded_nyc.id])
+          search_status: "stolen").pluck(:id)).to eq([stolen_nyc.id])
       end
     end
 
@@ -112,19 +110,8 @@ RSpec.describe BikeServices::OrganizedSearch, type: :service do
       expect(described_class.address(Bike.all, false).count).to eq 3
 
       expect(described_class.status(Bike.all, "stolen").pluck(:id)).to eq([bike_stolen.id])
-      expect(described_class.status(Bike.all, "not_impounded").pluck(:id)).to match_array([bike_with_sticker.id, bike_stolen.id])
-      expect(described_class.status(Bike.all, "stolen_or_impounded").pluck(:id)).to match_array([bike_stolen.id, bike_impounded.id])
-      expect(described_class.status(Bike.all, "all").count).to eq 3
-
-      bike_hidden_impounded = FactoryBot.create(:bike, :impounded, user_hidden: true)
-      FactoryBot.create(:bike, :with_stolen_record, user_hidden: true)
-      expect(described_class.status(Bike.all, "impounded").pluck(:id)).to eq([bike_impounded.id])
-      expect(described_class.status(Bike.all, "impounded", organization_bikes: true).pluck(:id))
-        .to match_array([bike_impounded.id, bike_hidden_impounded.id])
-      expect(described_class.status(Bike.all, "stolen_or_impounded", organization_bikes: true).pluck(:id))
-        .to match_array([bike_stolen.id, bike_impounded.id, bike_hidden_impounded.id])
-      expect(described_class.status(Bike.all, "all").count).to eq 3
-      expect(described_class.status(Bike.all, "all", organization_bikes: true).count).to eq 4
+      expect(described_class.status(Bike.all, "with_owner").pluck(:id)).to eq([bike_with_sticker.id])
+      expect(described_class.status(Bike.all, "all").pluck(:id)).to match_array([bike_with_sticker.id, bike_stolen.id])
 
       # The panel offers street; none and with still arrive from older links
       expect(described_class.address(Bike.all, "none").to_sql).to_not eq(Bike.all.to_sql)

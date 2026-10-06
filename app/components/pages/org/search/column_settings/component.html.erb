@@ -25,7 +25,7 @@
       <% columns.each do |column| %>
         <%# Unchecked columns read quieter than the ones showing %>
         <%= render(UI::Forms::Checkbox::Component.new(name: column[:name], value: column[:value],
-          checked: column[:checked], label: column[:label],
+          checked: column[:checked], label: checkbox_label(column),
           class_name: "tw:mb-0! tw:leading-[1.25]! tw:text-gray-400 tw:has-checked:text-gray-900 tw:dark:has-checked:text-gray-100",
           html_options: { id: "#{column[:name]}_#{column[:value]}".parameterize(separator: "_"),
                           class: "tw:accent-blue-600", disabled: column[:disabled],

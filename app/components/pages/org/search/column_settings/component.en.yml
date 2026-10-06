@@ -16,32 +16,27 @@ en:
             creation_description_cell: Source
             cycle_type_cell: Vehicle type
             default: default
-            filter_impounded_html: only <strong>impounded</strong>
             filter_no_address_html: only <strong>no</strong> address
             filter_no_sticker_html: only <strong>no</strong> sticker
-            filter_not_impounded_html: only <strong>not</strong> impounded
             filter_not_stolen_or_impounded_html: not stolen or impounded
             filter_not_unregistered_html: "<strong>not</strong> unregistered"
             filter_only_unregistered_html: only <strong>unregistered</strong>
             filter_stolen_html: only <strong>stolen</strong>
-            filter_stolen_or_impounded_html: only <strong>stolen</strong> or <strong>impounded</strong>
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_id_cell: Impound ID
             included_columns: Included columns
-            location_search_disabled_no_address: >-
-              %{org_name} doesn't collect registration addresses, so only stolen and
-              impounded registrations have a location. Filter to one of those statuses
-              to search by location.
-            location_search_disabled_search_all: >-
+            location_search_stolen_only_no_address: >-
+              %{org_name} doesn't collect registration addresses, so only stolen registrations
+              have a location. Filter to stolen to search by location.
+            location_search_stolen_only_search_all: >-
               You can't search location when searching all registrations, unless you
-              are searching just impounded and/or stolen registrations.
+              are searching just stolen registrations.
             manufacturer_cell: Manufacturer
             model_cell: Model
             none: none
             notes_cell_html: Registration Notes <em>by %{org_name}</em>
             occurred_at_cell: Status at
-            occurred_at_cell_panel: Time - status
             owner_email_cell: Sent to
             owner_name_cell: Owner name
             photo_cell: Photo
@@ -51,6 +46,10 @@ en:
             reg_organization_affiliation_cell_html: Affiliation <em>in %{org_name}</em>
             reg_phone_cell: Phone
             reg_student_id_cell_html: Student ID <em>for %{org_name}</em>
+            registration_status_at_cell_hint: When registration was stolen, impounded,
+              found or listed for sale
+            registration_status_at_cell_panel: Time - Registration status
+            registration_updated_at_cell_panel: Time - registration updated
             serial_number_cell: Serial
             show_location_search: show location search
             show_notes_search: show notes search
@@ -60,7 +59,6 @@ en:
             stickers: 'Stickers:'
             unregistered: 'Unregistered:'
             updated_at_cell: Updated
-            updated_at_cell_panel: Time - updated
             url_cell: URL
             view_cell: View
             visible_columns: Visible columns
