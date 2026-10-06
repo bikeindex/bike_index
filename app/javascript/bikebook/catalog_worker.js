@@ -29,9 +29,7 @@ async function load ({ manifestUrl, ids }) {
 
   base = new URL(manifestUrl, self.location)
   ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
-  // a catalog published before its kit had a file of its own carries it in its page
-  const [index, vocabulary, { kit }] = await Promise.all([manifest.index, manifest.vocabulary, manifest.kit ?? manifest.page]
-    .map((file) => fetchJson(new URL(file, base))))
+  const [index, vocabulary, { kit }] = await Promise.all([manifest.index, manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base))))
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
   activities = index.primary_activities

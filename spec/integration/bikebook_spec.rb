@@ -145,20 +145,16 @@ RSpec.describe "Bikebook", :js, type: :system do
     end
   end
 
-  it "merges motors that match but for their drive wheel" do
+  it "merges motors that match but for their drive wheel, and names a motor's e-vehicle classifications" do
     serve_catalog
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
 
     motor = find("section", text: /front and rear motor/i, wait: 10)
     expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
-  end
 
-  it "lists a motor's e-vehicle classifications" do
-    serve_catalog
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us")
-
-    expect(page).to have_css("section div", text: %r{US e-bike class\s*ec/us/ca/off_highway_electric_motorcycle}, wait: 10)
+    expect(page).to have_css("section div", text: /US e-bike class\s*Off-highway electric motorcycle/, wait: 10)
   end
 
   it "says so when the catalog doesn't load" do
