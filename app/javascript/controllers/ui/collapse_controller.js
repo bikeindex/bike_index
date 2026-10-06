@@ -13,7 +13,7 @@ import { collapse } from 'utils/collapse_utils'
 // whose state is the rider's preference rather than part of the address.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
-  static values = { param: String, storageKey: String }
+  static values = { param: String, storageKey: String, direction: String }
 
   connect () {
     // Restore the persisted state without animating on load. Restoring applies rather than
@@ -78,7 +78,7 @@ export default class extends Controller {
   }
 
   applyExpanded (expanding, duration) {
-    collapse(expanding ? 'show' : 'hide', this.contentTargets, duration)
+    collapse(expanding ? 'show' : 'hide', this.contentTargets, duration, this.directionValue)
     this.syncTriggers(expanding)
   }
 

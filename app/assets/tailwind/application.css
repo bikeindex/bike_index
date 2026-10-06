@@ -22,6 +22,9 @@
  * field and the chart card fold away on it */
 @custom-variant search-all-checked (&:where(:has([data-org--search-target=searchAll]:checked) *));
 
+/* /bikebook reads lengths, weights and speeds in imperial units below an `.imperial` ancestor */
+@custom-variant imperial (&:where(.imperial, .imperial *));
+
 /* The selected/pressed state of a button, link or menu item, however it's flagged —
  * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
@@ -115,6 +118,7 @@
 }
 
 @import "./bike_index_components.css";
+@import "./bikebook.css";
 
 @layer components {
   /* Style tables with CSS selectors to prevent caching issues */
