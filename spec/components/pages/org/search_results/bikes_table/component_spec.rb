@@ -3,17 +3,16 @@
 require "rails_helper"
 
 RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :component do
-  let(:instance) { described_class.new(**options) }
-  let(:component) do
-    with_request_url("/o/#{organization.to_param}/registrations") do
-      render_inline(instance)
-    end
-  end
+  let(:component) { render_table }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
   let(:enabled_feature_slugs) { %w[bike_search] }
   let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
   let(:bikes) { [bike] }
   let(:options) { {organization:, bikes:} }
+
+  def render_table(**overrides)
+    with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options, **overrides)) }
+  end
 
   it "renders a table row with the bike data" do
     expect(component).to have_css("table")
@@ -57,24 +56,18 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     it "renders when the bike was impounded, rather than when the record was created" do
       impound_record.update(impounded_at: Time.current - 1.week)
       expect(component).to have_css("td.impounded_at_cell .localizeTime",
-        exact_text: I18n.l(impound_record.reload.impounded_at, format: :convert_time))
+        exact_text: I18n.l(impound_record.impounded_at, format: :convert_time))
     end
 
     context "with caching", :caching do
       include_context :caching_basic
 
-      def render_table
-        with_request_url("/o/#{organization.to_param}/registrations") do
-          render_inline(described_class.new(**options, impound_records: [impound_record.reload]))
-        end
-      end
-
       it "busts the row when a claim is submitted, which leaves the record untouched" do
-        render_table
+        render_table(impound_records: [impound_record.reload])
         expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).to include("transferred_to_new_owner")
 
         FactoryBot.create(:impound_claim, impound_record:, organization:, status: "submitting")
-        expect(fragments_written { render_table }.count).to eq 1
+        expect(fragments_written { render_table(impound_records: [impound_record.reload]) }.count).to eq 1
         expect(page.find("td.multi-update-cell input", visible: :all)["data-update-kinds"]).not_to include("transferred_to_new_owner")
       end
     end
@@ -256,10 +249,6 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
   # Which columns render follows the organization's features and fields
   context "with caching", :caching do
     include_context :caching_basic
-
-    def render_table
-      with_request_url("/o/#{organization.to_param}/registrations") { render_inline(described_class.new(**options)) }
-    end
 
     it "keys each row to the organization's version" do
       expect(fragments_written { render_table }.first).to include(organization.cache_key_with_version)

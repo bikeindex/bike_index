@@ -62,9 +62,7 @@ module Organized
       current_organization.impound_records
     end
 
-    def sortable_columns
-      %w[impounded_at created_at display_id_integer updated_at user_id resolved_at location_id]
-    end
+    def sortable_columns = ComponentStructs::OrgSearchSettings::IMPOUND_SORTABLE_COLUMN_CELLS.keys
 
     def impound_records_chart
       return nil if available_impound_records.blank?

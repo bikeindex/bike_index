@@ -101,7 +101,8 @@ module ComponentStructs
       "occurred_at" => :occurred_at_cell
     }.freeze
 
-    # The impound records search's, which sorts by the impound record rather than the bike
+    # The impound records search's, which sorts by the impound record rather than the bike. The
+    # first is the default sort
     IMPOUND_SORTABLE_COLUMN_CELLS = {
       "impounded_at" => :impounded_at_cell,
       "updated_at" => :impound_updated_at_cell,
