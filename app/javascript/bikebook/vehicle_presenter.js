@@ -1,5 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay } from 'bikebook/templates/helpers'
+import { copyableCode } from 'bikebook/templates/ui/copyable_code'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { array, blank, compact, equal, isHash, isTemplate, join } from 'bikebook/templates/values'
@@ -41,7 +42,8 @@ export class VehiclePresenter {
   classificationTooltips (path) {
     return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {}).map(([id, { title, description }]) => [
       this.vocabulary.names[CLASSIFICATIONS][id],
-      html`<h3 class="tw:font-bold"><a class="twlink" href=${path(id)}>${title}</a></h3><p class="tw:mt-1">${description}</p>`
+      html`<h3 class="tw:font-bold"><a class="twlink" href=${path(id)}>${title}</a></h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
+        copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${description}</p>`
     ]))
   }
 

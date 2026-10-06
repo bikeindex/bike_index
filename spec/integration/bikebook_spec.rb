@@ -158,6 +158,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     classification = find("section div", text: /Classification\s*US-CA Off-highway electric motorcycle/, wait: 10)
     classification.find("button", text: "?").click
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
+    expect(tooltip).to have_css("code", exact_text: "ec/us/ca/off_highway_electric_motorcycle")
+      .and have_button("Copy ID")
 
     # its heading picks the classification, whose card sits beside the vehicles' with everything it has
     tooltip.click_link("US-CA Off-highway electric motorcycle")
