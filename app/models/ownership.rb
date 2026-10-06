@@ -137,11 +137,11 @@ class Ownership < ApplicationRecord
     end
 
     def current_at(time)
-      where("created_at < ?", time).order(created_at: :desc).first
+      where("created_at < ?", time).reorder(created_at: :desc).first
     end
 
     def claimed_at(time)
-      where("claimed_at <= ?", time).order(created_at: :desc).first
+      where("claimed_at <= ?", time).reorder(created_at: :desc).first
     end
   end
 

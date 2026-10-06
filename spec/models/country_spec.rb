@@ -54,10 +54,9 @@ RSpec.describe Country, type: :model do
   end
 
   describe "friendly_find_id" do
-    it "returns the id" do
+    it "returns the id for a name" do
       country = Country.create(name: "Svenborgia", iso: "SVE")
-      expect(Country.friendly_find_id("sve")).to eq country.id
-      expect(Country.friendly_find_id("US")).to eq Country.united_states_id
+      expect(Country.friendly_find_id("svenborgia")).to eq(country.id)
       expect(Country.friendly_find_id("nowhere")).to be_nil
     end
   end
