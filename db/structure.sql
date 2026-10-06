@@ -7730,6 +7730,13 @@ CREATE INDEX index_user_bans_on_user_id ON public.user_bans USING btree (user_id
 
 
 --
+-- Name: index_user_emails_on_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_emails_on_email ON public.user_emails USING btree (email);
+
+
+--
 -- Name: index_user_emails_on_email_confirmed; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7915,6 +7922,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20261005170000'),
+('20261005120000'),
 ('20261001170000'),
 ('20260930161510'),
 ('20260930161509'),
