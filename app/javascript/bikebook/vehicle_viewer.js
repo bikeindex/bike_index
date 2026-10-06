@@ -1,9 +1,10 @@
 import { html } from 'lit-html'
+import { classificationCard } from 'bikebook/templates/vehicles/classification_card'
 import { modelViewer } from 'bikebook/templates/vehicles/model_viewer'
 import { toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
 
-// The compared vehicles' cards, from catalog blocks
+// The compared vehicles' cards, from catalog blocks, and any e-vehicle classification picked beside them
 export class VehicleViewer {
   constructor (kit, vocabulary) {
     this.presenter = new VehiclePresenter(kit, vocabulary)
@@ -21,9 +22,14 @@ export class VehicleViewer {
       ? 'tw:md:max-[1152px]:[&>*:first-child]:basis-full tw:md:max-[1152px]:[&>*:first-child>article]:mx-auto tw:md:max-[1152px]:[&>*:first-child>article]:max-w-[calc(50%-1rem)]'
       : ''
     const values = vehicles.map(({ value }) => value)
-    const cards = vehicles.map(({ data, value }, index) => modelViewer({
-      presenter: this.presenter, data, value, comparing, idSuffix: index + 1, others: index === 0 ? [] : [vehicles[0].data], removePath: removePath(url, values, value)
-    }))
+    const baseline = vehicles.find(({ value }) => !value.startsWith('ec/'))
+    const classificationPath = (id) => pathWith(url, { vehicle_models: [...new Set([...values, id])].join(',') })
+    const cards = vehicles.map(({ data, value }, index) => {
+      const remove = pathWith(url, { vehicle_models: values.filter((each) => each !== value).join(',') })
+      return value.startsWith('ec/')
+        ? classificationCard({ presenter: this.presenter, id: value, classification: data, removePath: remove })
+        : modelViewer({ presenter: this.presenter, data, value, comparing, idSuffix: index + 1, others: value === baseline.value ? [] : [baseline.data], removePath: remove, classificationPath })
+    })
     return html`<div class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
       : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:flex-col tw:gap-8 ${comparing ? 'tw:md:flex-row tw:md:flex-wrap tw:md:justify-center' : 'tw:lg:flex-row tw:lg:justify-center'}
@@ -31,8 +37,8 @@ export class VehicleViewer {
   }
 }
 
-// This page's URL with the other vehicles picked
-const removePath = (url, values, value) => {
-  const query = toQuery({ ...Object.fromEntries(url.searchParams), vehicle_models: values.filter((each) => each !== value).join(',') })
+// This page's URL with `params` laid over its own
+const pathWith = (url, params) => {
+  const query = toQuery({ ...Object.fromEntries(url.searchParams), ...params })
   return query ? `${url.pathname}?${query}` : url.pathname
 }

@@ -158,8 +158,22 @@ RSpec.describe "Bikebook", :js, type: :system do
     classification = find("section div", text: /Classification\s*US-CA Off-highway electric motorcycle/, wait: 10)
     classification.find("button", text: "?").click
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
-    expect(tooltip).to have_css("h3", exact_text: "US-CA Off-highway electric motorcycle")
-    expect(tooltip).to have_css("li", text: "No driver's license needed off the highway")
+
+    # its heading picks the classification, whose card sits beside the vehicles' with everything it has
+    tooltip.click_link("US-CA Off-highway electric motorcycle")
+    card = find("article", text: /E-vehicle classification\s*US-CA Off-highway electric motorcycle/i)
+    expect(page).to have_css("article", count: 3)
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro,ec/us/ca/off_highway_electric_motorcycle")
+    expect(card).to have_css("li", text: "No driver's license needed off the highway")
+      .and have_link(href: /ohv\.parks\.ca\.gov/)
+
+    card.find("[aria-label='Remove US-CA Off-highway electric motorcycle']").click
+    expect(page).to have_css("article", count: 2)
+
+    # and its id finds it in the search
+    type_into(vehicle_field, "ec/us/ca/off_highway_e")
+    retry_on_detach { find("[role='option']", text: "US-CA Off-highway electric motorcycle").click }
+    expect(page).to have_css("article h1", text: "US-CA Off-highway electric motorcycle")
   end
 
   it "says so when the catalog doesn't load" do

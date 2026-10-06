@@ -1,7 +1,6 @@
 import { html, nothing, render } from 'lit-html'
 import { copyableCode } from 'bikebook/templates/ui/copyable_code'
 import { numberDisplay } from 'bikebook/templates/helpers'
-import { x } from 'bikebook/templates/icons'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
@@ -11,6 +10,7 @@ import { componentGroup } from 'bikebook/templates/vehicles/component_group'
 import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
 import { modelYears } from 'bikebook/templates/vehicles/model_years'
 import { motorSection } from 'bikebook/templates/vehicles/motor_section'
+import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { section } from 'bikebook/templates/vehicles/section'
 import { array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
 
@@ -22,13 +22,13 @@ const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 export const modelViewer = (args) => new ModelViewer(args).render()
 
 class ModelViewer {
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath })
+    Object.assign(this, { value, comparing, idSuffix, removePath, classificationPath })
   }
 
   render () {
@@ -38,11 +38,7 @@ class ModelViewer {
     const titleText = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
     const header = html`<header><div class="tw:flex tw:items-start tw:gap-4">${present(vehicle.manufacturer)
       ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</p>`
-      : nothing}<a aria-label=${`Remove ${titleText}`} data-controller="bikebook--remove-vehicle"
-      data-action="ui--alert#close bikebook--remove-vehicle#remove"
-      data-turbo-prefetch="false" class="tw:-my-1.5 tw:-mr-1.5 tw:ml-auto tw:inline-flex tw:h-8 tw:w-8 tw:shrink-0 tw:items-center tw:justify-center
-      tw:rounded-sm tw:text-gray-500 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 tw:focus:ring-2 tw:focus:ring-gray-400 tw:dark:text-gray-400" href=${this.removePath}>${
-        x('tw:h-3 tw:w-3')}</a></div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4"><h1
+      : nothing}${removeLink({ label: `Remove ${titleText}`, href: this.removePath })}</div><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4"><h1
       class="tw:text-2xl tw:leading-tight tw:font-extrabold">${vehicle.model}</h1>${collapse({
         size: 'sm',
         htmlClass: 'tw:shrink-0 tw:whitespace-nowrap',
@@ -343,7 +339,7 @@ class ModelViewer {
       const heading = wheels.length > 1
         ? `${andSentence(wheels)} Motor`
         : count === 1 ? 'Motor & Battery' : wheels.length ? `${wheels[0]} motor` : `Motor ${index + 1}`
-      return motorSection({ presenter: this.presenter, heading, motor: motor ?? {}, others: othersMotors.map((each) => each[index] ?? {}), tooltipped: (value, tooltips) => this.tooltipped(value, tooltips) })
+      return motorSection({ presenter: this.presenter, heading, motor: motor ?? {}, others: othersMotors.map((each) => each[index] ?? {}), tooltipped: (value, tooltips) => this.tooltipped(value, tooltips), classificationPath: this.classificationPath })
     })
   }
 
