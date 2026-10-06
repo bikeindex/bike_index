@@ -29,7 +29,7 @@ async function load ({ manifestUrl, ids }) {
 
   base = new URL(manifestUrl, self.location)
   ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
-  const [index, vocabulary, page] = await Promise.all([manifest.index, manifest.vocabulary, manifest.page].map((file) => fetchJson(new URL(file, base))))
+  const [index, vocabulary, { kit }] = await Promise.all([manifest.index, manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base))))
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
   activities = index.primary_activities
@@ -43,7 +43,7 @@ async function load ({ manifestUrl, ids }) {
     sortPrice: model.msrp_cents ?? 0
   }))
   byId = new Map(models.map((model) => [model.id, model]))
-  return { vocabulary, kit: page.kit, options: options(index) }
+  return { vocabulary, kit, options: options(index) }
 }
 
 // Each filter's choices, with how many models choosing it alone matches

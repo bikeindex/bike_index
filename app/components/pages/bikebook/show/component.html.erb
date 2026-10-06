@@ -1,3 +1,169 @@
+<% search = capture do %>
+  <div
+    class="tw:group"
+    data-controller="bikebook--catalog-filters ui--collapse"
+    data-ui--collapse-param-value="filters"
+  >
+    <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-x-4">
+      <%# Labels the combobox below, which renders none of its own %>
+      <label class="twlabel" for="vehicle_models">
+        <%= translation(".view_a_vehicle") %>
+        <small id="vehicle-models-count" class="twless-strong"></small>
+      </label>
+
+      <%= render UI::Collapse::Component.new(text: translation(".more_filters"), chevron: :trailing, color: :link,
+      aria: {controls: "vehicle-filters"}) %>
+    </div>
+
+    <div
+      data-bikebook--catalog-filters-target="vehicleCombobox"
+      data-controller="bikebook--focus-shortcut"
+    >
+      <%= form_with url: bikebook_path, method: :get,
+          data: {controller: "bikebook--auto-submit",
+                 action: "hw-combobox:selection->bikebook--auto-submit#submit hw-combobox:removal->bikebook--auto-submit#submit"} do %>
+        <%= render(UI::Forms::Combobox::Component.new(
+        name: "vehicle_models",
+        src: bikebook_path,
+        multiselect_chip_src: bikebook_path,
+        dialog_label: translation(".view_a_vehicle"),
+        html_options: {value: "",
+                       placeholder: translation(".search_placeholder"),
+                       data: {controller: "bikebook--chip-reorder"},
+                       input: {autofocus: true, data: {"bikebook--focus-shortcut-target": "field"}}}
+      )) %>
+      <% end %>
+    </div>
+
+    <ul
+      aria-label="<%= translation(".applied_filters") %>"
+      data-bikebook--catalog-filters-target="summary"
+      class="
+        tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:rounded-lg
+        tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm
+        tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden
+        tw:empty:hidden tw:dark:border-gray-700
+      "
+    ></ul>
+
+    <div
+      id="vehicle-filters"
+      data-ui--collapse-target="content"
+      class="tw:hidden"
+    >
+      <div
+        class="
+          tw:mt-3 tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:border
+          tw:border-gray-200 tw:p-4 tw:dark:border-gray-700
+        "
+      >
+        <div class="tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start">
+          <div class="tw:flex tw:flex-col tw:gap-4">
+            <div>
+              <span class="twlabel"><%= translation(".sort") %></span>
+
+              <div class="tw:mt-1 tw:flex tw:gap-2">
+                <%= render(UI::Button::Component.new(color: :secondary, size: :sm,
+                data: {action: "bikebook--catalog-filters#toggleSort", "bikebook--catalog-filters-field-param": "year"})) do %>
+                  <%= translation(".year") %>
+                  <span data-bikebook--catalog-filters-target="yearArrow"><%= render UI::IconSorting::Component.new %></span>
+                <% end %>
+
+                <%= render(UI::Button::Component.new(color: :secondary, size: :sm,
+                data: {action: "bikebook--catalog-filters#toggleSort", "bikebook--catalog-filters-field-param": "price"})) do %>
+                  <%= translation(".price") %>
+                  <span data-bikebook--catalog-filters-target="priceArrow"><%= render UI::IconSorting::Component.new %></span>
+                <% end %>
+              </div>
+            </div>
+
+            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "primary_activity",
+            label: translation(".activity"), placeholder: translation(".any_activity"), multiselect: true)) %>
+
+            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "manufacturer",
+            label: translation(".manufacturer"), placeholder: translation(".any_manufacturer"), multiselect: true)) do %>
+              <span id="manufacturer-count"></span>
+            <% end %>
+          </div>
+
+          <div class="tw:flex tw:flex-col tw:gap-4">
+            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "vehicle_type",
+            label: translation(".vehicle_type"), placeholder: translation(".any_vehicle_type"), multiselect: true,
+            full_width: true)) %>
+
+            <div class="tw:grid tw:gap-4 tw:sm:grid-cols-3">
+              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "electric",
+              label: translation(".motorized"), placeholder: translation(".any_motorized"))) %>
+
+              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "suspension",
+              label: translation(".suspension"), placeholder: translation(".any_suspension"))) %>
+
+              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "model_configuration",
+              label: translation(".configuration"), placeholder: translation(".any_configuration"))) %>
+            </div>
+
+            <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-4">
+              <% [["year", translation(".year"), 1900, "tw:sm:w-24", nil, {min: 1990, max: Time.current.year + 1}],
+                ["price", translation(".price"), 0, "tw:sm:w-28", "$", {}]].each do |name, legend, min_attr, width, prefix, placeholders| %>
+                <fieldset
+                  class="
+                    tw:w-full tw:rounded-lg tw:border tw:border-gray-200
+                    tw:px-3 tw:pt-1 tw:pb-3 tw:sm:w-auto
+                    tw:dark:border-gray-700
+                  "
+                  data-bikebook--catalog-filters-target="field"
+                  data-filter-label="<%= legend %>"
+                  data-filter-prefix="<%= prefix %>"
+                >
+                  <legend class="twlabel tw:px-1"><%= legend %></legend>
+
+                  <div
+                    class="
+                      tw:flex tw:items-end tw:gap-2 tw:[&>div]:flex-1
+                      tw:sm:[&>div]:flex-none
+                    "
+                  >
+                    <% {min: translation(".min"), max: translation(".max")}.each do |bound, bound_label| %>
+                      <div>
+                        <label
+                          class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"
+                          for="filter-<%= name %>-<%= bound %>"
+                        >
+                          <%= bound_label %>
+                        </label>
+
+                        <div class="tw:relative <%= "tw:mt-1" if prefix %>">
+                          <% if prefix %>
+                            <span
+                              class="
+                                tw:pointer-events-none tw:absolute
+                                tw:inset-y-0 tw:left-0 tw:flex
+                                tw:items-center tw:pl-2 tw:text-sm
+                                tw:text-gray-500 tw:dark:text-gray-400
+                              "
+                            >
+                              <%= prefix %>
+                            </span>
+                          <% end %>
+
+                          <%= tag.input(type: "number", id: "filter-#{name}-#{bound}", name: "#{name}_#{bound}",
+                          min: min_attr, step: 1, autocomplete: "off", placeholder: placeholders[bound],
+                          class: ["twinput", prefix ? "tw:pl-6" : "tw:mt-1", width],
+                          data: {action: "change->bikebook--catalog-filters#apply"}) %>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                </fieldset>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
 <div
   class="bikebook twgutter tw:mx-auto tw:max-w-screen-xl tw:pb-6"
   data-controller="bikebook--page"
@@ -6,182 +172,24 @@
   data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track"
 >
   <template data-bikebook--page-target="shell">
-    <div
-      class="tw:group"
-      data-controller="bikebook--catalog-filters ui--collapse"
-      data-ui--collapse-param-value="filters"
-    >
-      <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-x-4">
-        <%# Labels the combobox below, which renders none of its own %>
-        <label class="twlabel" for="vehicle_models">
-          <%= translation(".view_a_vehicle") %>
-          <small id="vehicle-models-count" class="twless-strong"></small>
-        </label>
-
-        <%= render UI::Collapse::Component.new(text: translation(".more_filters"), chevron: :trailing, color: :link,
-          aria: {controls: "vehicle-filters"}) %>
-      </div>
-
-      <div
-        data-bikebook--catalog-filters-target="vehicleCombobox"
-        data-controller="bikebook--focus-shortcut"
-      >
-        <%= form_with url: bikebook_path, method: :get,
-              data: {controller: "bikebook--auto-submit",
-                     action: "hw-combobox:selection->bikebook--auto-submit#submit hw-combobox:removal->bikebook--auto-submit#submit"} do %>
-          <%= render(UI::Forms::Combobox::Component.new(
-            name: "vehicle_models",
-            src: bikebook_path,
-            multiselect_chip_src: bikebook_path,
-            dialog_label: translation(".view_a_vehicle"),
-            html_options: {value: "",
-                           placeholder: translation(".search_placeholder"),
-                           data: {controller: "bikebook--chip-reorder"},
-                           input: {autofocus: true, data: {"bikebook--focus-shortcut-target": "field"}}}
-          )) %>
-        <% end %>
-      </div>
-
-      <ul
-        aria-label="<%= translation(".applied_filters") %>"
-        data-bikebook--catalog-filters-target="summary"
-        class="
-          tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:rounded-lg
-          tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm
-          tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden
-          tw:empty:hidden tw:dark:border-gray-700
-        "
-      ></ul>
-
-      <div
-        id="vehicle-filters"
-        data-ui--collapse-target="content"
-        class="tw:hidden"
-      >
-        <div
-          class="
-            tw:mt-3 tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:border
-            tw:border-gray-200 tw:p-4 tw:dark:border-gray-700
-          "
-        >
-          <div class="tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start">
-            <div class="tw:flex tw:flex-col tw:gap-4">
-              <div>
-                <span class="twlabel"><%= translation(".sort") %></span>
-
-                <div class="tw:mt-1 tw:flex tw:gap-2">
-                  <%= render(UI::Button::Component.new(color: :secondary, size: :sm,
-                    data: {action: "bikebook--catalog-filters#toggleSort", "bikebook--catalog-filters-field-param": "year"})) do %>
-                    <%= translation(".year") %>
-                    <span data-bikebook--catalog-filters-target="yearArrow"><%= render UI::IconSorting::Component.new %></span>
-                  <% end %>
-
-                  <%= render(UI::Button::Component.new(color: :secondary, size: :sm,
-                    data: {action: "bikebook--catalog-filters#toggleSort", "bikebook--catalog-filters-field-param": "price"})) do %>
-                    <%= translation(".price") %>
-                    <span data-bikebook--catalog-filters-target="priceArrow"><%= render UI::IconSorting::Component.new %></span>
-                  <% end %>
-                </div>
-              </div>
-
-              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "primary_activity",
-                label: translation(".activity"), placeholder: translation(".any_activity"), multiselect: true)) %>
-
-              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "manufacturer",
-                label: translation(".manufacturer"), placeholder: translation(".any_manufacturer"), multiselect: true)) do %>
-                <span id="manufacturer-count"></span>
-              <% end %>
-            </div>
-
-            <div class="tw:flex tw:flex-col tw:gap-4">
-              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "vehicle_type",
-                label: translation(".vehicle_type"), placeholder: translation(".any_vehicle_type"), multiselect: true,
-                full_width: true)) %>
-
-              <div class="tw:grid tw:gap-4 tw:sm:grid-cols-3">
-                <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "electric",
-                  label: translation(".motorized"), placeholder: translation(".any_motorized"))) %>
-
-                <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "suspension",
-                  label: translation(".suspension"), placeholder: translation(".any_suspension"))) %>
-
-                <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "model_configuration",
-                  label: translation(".configuration"), placeholder: translation(".any_configuration"))) %>
-              </div>
-
-              <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-4">
-                <% [["year", translation(".year"), 1900, "tw:sm:w-24", nil, {min: 1990, max: Time.current.year + 1}],
-                    ["price", translation(".price"), 0, "tw:sm:w-28", "$", {}]].each do |name, legend, min_attr, width, prefix, placeholders| %>
-                  <fieldset
-                    class="
-                      tw:w-full tw:rounded-lg tw:border tw:border-gray-200
-                      tw:px-3 tw:pt-1 tw:pb-3 tw:sm:w-auto
-                      tw:dark:border-gray-700
-                    "
-                    data-bikebook--catalog-filters-target="field"
-                    data-filter-label="<%= legend %>"
-                    data-filter-prefix="<%= prefix %>"
-                  >
-                    <legend class="twlabel tw:px-1"><%= legend %></legend>
-
-                    <div
-                      class="
-                        tw:flex tw:items-end tw:gap-2 tw:[&>div]:flex-1
-                        tw:sm:[&>div]:flex-none
-                      "
-                    >
-                      <% {min: translation(".min"), max: translation(".max")}.each do |bound, bound_label| %>
-                        <div>
-                          <label
-                            class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"
-                            for="filter-<%= name %>-<%= bound %>"
-                          >
-                            <%= bound_label %>
-                          </label>
-
-                          <div class="tw:relative <%= "tw:mt-1" if prefix %>">
-                            <% if prefix %>
-                              <span
-                                class="
-                                  tw:pointer-events-none tw:absolute
-                                  tw:inset-y-0 tw:left-0 tw:flex
-                                  tw:items-center tw:pl-2 tw:text-sm
-                                  tw:text-gray-500 tw:dark:text-gray-400
-                                "
-                              >
-                                <%= prefix %>
-                              </span>
-                            <% end %>
-
-                            <%= tag.input(type: "number", id: "filter-#{name}-#{bound}", name: "#{name}_#{bound}",
-                              min: min_attr, step: 1, autocomplete: "off", placeholder: placeholders[bound],
-                              class: ["twinput", prefix ? "tw:pl-6" : "tw:mt-1", width],
-                              data: {action: "change->bikebook--catalog-filters#apply"}) %>
-                          </div>
-                        </div>
-                      <% end %>
-                    </div>
-                  </fieldset>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    <%= search %>
     <div id="vehicle-viewers"></div>
   </template>
 
   <div data-bikebook--page-target="page">
-    <p
+    <%# Placeholder until the catalog loads %>
+    <div inert><%= search %></div>
+
+    <div
       class="
-        tw:py-12 tw:text-center tw:text-sm tw:text-gray-500
+        tw:flex tw:justify-center tw:py-12 tw:text-sm tw:text-gray-500
         tw:dark:text-gray-400
       "
+      role="status"
       data-bikebook--page-target="status"
     >
-      <%= translation(".loading") %>
-    </p>
+      <%= render UI::LoadingSpinner::Component.new %>
+      <span class="tw:sr-only"><%= translation(".loading") %></span>
+    </div>
   </div>
 </div>

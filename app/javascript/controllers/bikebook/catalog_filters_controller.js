@@ -12,12 +12,13 @@ export default class extends Controller {
     priceDir: { type: String, default: 'desc' }
   }
 
-  // Rewritten on connect too: a GET form submit escapes the commas, and rendering drops stale values
+  // Rewritten on connect too, as rendering drops stale values. Not from the loading placeholder,
+  // whose empty fields would clear the URL's filters
   connect () {
     this.yearArrowTarget.textContent = this.#arrow(this.yearDirValue)
     this.priceArrowTarget.textContent = this.#arrow(this.priceDirValue)
     this.#refreshSummary()
-    this.#writeUrl()
+    if (!this.element.closest('[inert]')) this.#writeUrl()
   }
 
   toggleSort ({ params: { field } }) {
