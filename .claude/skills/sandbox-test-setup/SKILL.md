@@ -13,7 +13,8 @@ description: >-
   (4.0.x)`, `command not found: rspec`, `uninitialized constant Pathname` or `undefined method 'intersect?' for Array` from a
   `bin/` script, `Sprockets::Rails::Helper::AssetNotFound`, `tailwind.css is not
   present`, `LoadError: Could not open library 'vips.so.42'`, `executable not found:
-  "identify"`, or a Playwright browser-not-found, build-number mismatch or `Running as
+  "identify"`, or a Playwright browser-not-found, build-number mismatch, `timeout:
+  expected float, got undefined` or `Running as
   root without --no-sandbox is not supported`. The fix is almost never a reinstall or a
   Gemfile edit — it's a PATH, an env var, or a service that isn't running.
 ---

@@ -9,8 +9,10 @@ module Pages
         class Component < ApplicationComponent
           # Template Dependency: Pages::Registrations::Show::WrapperConsumer::Component
           # Template Dependency: Pages::Registrations::Show::WrapperOrgAdmin::Component
-          def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {}, display_dev_info: false)
+          def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {},
+            show_legacy: false, display_dev_info: false)
             @bike = bike
+            @show_legacy = show_legacy
             @display_dev_info = display_dev_info
             @current_user = current_user
             @view = view
@@ -19,12 +21,13 @@ module Pages
             @current_alerts = current_alerts
           end
 
-          # The dialog renders outside the cache block: it's per-request, and caching it
-          # would serve one token-holder's modal to everyone after them
+          # Outside the cache block: the dialog is per-request, and the opt-out varies
+          # per viewer rather than per cache key
           def call
             safe_join([
               token_prompt ? render(token_prompt) : "",
-              capture { cache(cache_key) { concat(render(inner_component)) } }
+              capture { cache(cache_key) { concat(render(inner_component)) } },
+              render(Pages::Registrations::Show::LegacyViewLink::Component.new(bike: @bike, show_legacy: @show_legacy))
             ])
           end
 
@@ -37,7 +40,6 @@ module Pages
           # them client-side from the meta tag
           def cache_key
             [self.class.cache_digest, @current_user&.id,
-              @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
               BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
               token_prompt && [@current_alerts.sort, *token_prompt.try(:cache_version)],
               @bike.cache_key_with_version, *inner_component.try(:cache_version)]

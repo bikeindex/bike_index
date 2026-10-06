@@ -489,10 +489,10 @@ RSpec.describe BikesController, type: :request do
 
       it "redirects to the bike however the code arrives, and to user root when it matches none" do
         get "#{base_url}/scanned", params: {card_id: " 000000900"}
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_path(bike)
 
         get "#{base_url}/scanned", params: {id: 900}
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_path(bike)
 
         get "#{base_url}/scanned", params: {card_id: " 1393242"}
         expect(response).to redirect_to root_path
@@ -503,14 +503,14 @@ RSpec.describe BikesController, type: :request do
         let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "sss", bike:) }
         it "redirects, preserving scanned_id" do
           get "#{base_url}/scanned", params: {scanned_id: "sss"}
-          expect(response).to redirect_to bike_url(bike, scanned_id: "sss")
+          expect(response).to redirect_to registration_path(bike, scanned_id: "sss")
         end
 
         context "organization sticker" do
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XD934292", organization:, bike:) }
           it "redirects, preserving scanned_id and organization_id" do
             get "#{base_url}/scanned", params: {scanned_id: "XD934292", organization_id: organization.id}
-            expect(response).to redirect_to bike_url(bike, scanned_id: "XD934292", organization_id: organization.id)
+            expect(response).to redirect_to registration_path(bike, scanned_id: "XD934292", organization_id: organization.id)
           end
         end
       end
@@ -603,6 +603,8 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template("scanned")
         expect(assigns(:bike_sticker)&.id).to eq bike_sticker3.id
         get "/bikes/scannedU01101"
+        expect(response).to redirect_to("/registrations/scannedU01101")
+        follow_redirect!
         expect(response.status).to eq 404
       end
     end
