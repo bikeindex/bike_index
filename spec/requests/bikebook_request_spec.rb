@@ -17,6 +17,35 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("#manufacturer-hw-listbox", visible: :all)
         .and have_css("#vehicle-viewers", visible: :all)
     end
+
+    describe "units" do
+      let(:headers) { {} }
+      let(:html_class) do
+        get("/bikebook", headers:)
+        Nokogiri::HTML5(response.body).at_css("html")["class"]
+      end
+
+      it "is metric" do
+        expect(html_class).to be_blank
+      end
+
+      context "from the US" do
+        let(:headers) { {"HTTP_CF_IPCOUNTRY" => "US"} }
+
+        it "is imperial" do
+          expect(html_class).to eq "imperial"
+        end
+
+        context "with a user who prefers metric" do
+          include_context :request_spec_logged_in_as_user
+          before { current_user.update(preferred_unit_system: "metric") }
+
+          it "is metric" do
+            expect(html_class).to be_blank
+          end
+        end
+      end
+    end
   end
 
   describe "vehicle" do

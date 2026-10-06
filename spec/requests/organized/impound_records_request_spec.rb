@@ -57,6 +57,11 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record2.id])
         expect(assigns(:available_statuses)).to eq(available_statuses + ["expired"])
 
+        # The form posts distance_unit on every search, which isn't a bike search term
+        get "#{base_url}?search_no_js=true&search_bike_id=#{bike2.id}&distance_unit=km"
+        expect(response.status).to eq(200)
+        expect(assigns(:impound_records).pluck(:id)).to eq([impound_record2.id])
+
         get "#{base_url}?search_no_js=true&search_email=&serial=yar1s"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record2.id])
@@ -108,11 +113,16 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
         expect(assigns(:search_proximity)).to eq 50
 
-        # with below minimum distance (0.01)
+        # with below minimum distance (0.01 miles)
         get "#{base_url}?search_no_js=true&search_location=New+York&search_proximity=0.001"
         expect(response.status).to eq(200)
-        expect(assigns(:search_proximity)).to eq(0.01)
+        expect(assigns(:search_proximity)).to eq(0.02)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
+
+        get "#{base_url}?search_no_js=true&search_location=New+York&search_proximity=0.001&distance_unit=mi"
+        expect(response.status).to eq(200)
+        expect(assigns(:search_proximity)).to eq(0.01)
+        expect(response.body).to match(/miles of/)
       end
 
       context "unknown location" do

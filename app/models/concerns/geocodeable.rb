@@ -51,10 +51,6 @@ module Geocodeable
     belongs_to :region_record, class_name: "State"
   end
 
-  def metric_units?
-    Country.metric_units?(country_id)
-  end
-
   def to_coordinates
     [latitude, longitude]
   end

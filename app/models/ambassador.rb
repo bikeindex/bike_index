@@ -37,6 +37,7 @@
 #  passwordless_user                  :boolean          default(FALSE), not null
 #  phone                              :string(255)
 #  preferred_language                 :string
+#  preferred_unit_system              :integer
 #  show_bikes                         :boolean          default(FALSE), not null
 #  show_instagram                     :boolean          default(FALSE)
 #  show_phone                         :boolean          default(TRUE)

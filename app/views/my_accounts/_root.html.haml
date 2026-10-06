@@ -79,6 +79,14 @@
           options_for_select(language_choices, selected: current_user.preferred_language),
           {prompt: t(".choose_language"), include_blank: true},
           {class: "language-select-input form-control"} )
+    .form-group.row.fancy-select.unfancy
+      = f.label :preferred_unit_system, class: "form-well-label" do
+        = t(".preferred_unit_system")
+      .form-well-input
+        = f.select(:preferred_unit_system,
+          [[t(".unit_system_metric"), "metric"], [t(".unit_system_imperial"), "imperial"]],
+          {include_blank: t(".unit_system_automatic")},
+          {class: "form-control"})
     .form-group.row.mt-3
       %label.form-well-label
       %label.form-well-input.form-well-input-checks
