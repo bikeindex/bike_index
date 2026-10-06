@@ -155,7 +155,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     # beside a vehicle that has none
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro")
-    classification = find("section div", text: /E-vehicle classification\s*US-CA Off-highway electric motorcycle/, wait: 10)
+    classification = find("section div", text: /E-vehicle class\s*US-CA Off-highway electric motorcycle/, wait: 10)
     expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     classification.find("button", text: "?").click
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
@@ -180,8 +180,8 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
-    expect(page).to have_css("section div", text: /\AE-vehicle classification\s*US Class 3 \?\s*with optional throttle US Class 2 \?\z/, wait: 10)
-    expect(page).to have_css("dd > span.tw\\:block", text: /\Awith optional throttle US Class 2/)
+    expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
+    expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
   end
 
   it "says so when the catalog doesn't load" do

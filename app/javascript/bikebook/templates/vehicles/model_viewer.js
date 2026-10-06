@@ -216,10 +216,10 @@ class ModelViewer {
     const mine = sorted(this.vehicle)
     const differs = this.others.some((other) => !equal(sorted(other), mine))
     const tooltips = this.presenter.classificationTooltips(this.classificationPath)
-    const optional = mine.optional.map(([name, mode]) => html`<span class="tw:block"><span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">with optional
+    const optional = mine.optional.map(([name, mode]) => html`<span class="tw:block"><span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">w/ optional
       ${this.presenter.humanize(mode).toLowerCase()}</span> ${this.tooltipped(name, tooltips)}</span>`)
     return definitionListRow({
-      label: this.presenter.diffLabel('E-vehicle classification', differs),
+      label: this.presenter.diffLabel('E-vehicle class', differs),
       value: join([join(mine.standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optional])
     })
   }
