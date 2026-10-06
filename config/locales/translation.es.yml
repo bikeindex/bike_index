@@ -4300,6 +4300,10 @@ es:
       unconfirmed_emails: Correos electrónicos no confirmados
       verified: verificado
       why_you_should_text: lee por qué deberías
+      preferred_unit_system: Unidades
+      unit_system_automatic: Automático, desde tu ubicación
+      unit_system_imperial: Sistema imperial (millas, pulgadas)
+      unit_system_metric: Sistema métrico (kilómetros, milímetros)
     sharing:
       choose_file: Seleccione archivo...
       create_page: Crear página
@@ -5772,6 +5776,7 @@ es:
             search_distance: Distancia de búsqueda
             search_location: Buscar ubicación
             within: dentro
+            kilometers_of: kilómetros de
           wrapper:
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
             view_matching_any_audit: ver coincidencia con cualquier auditoría
@@ -6278,6 +6283,7 @@ es:
           stolenness_proximity: Robado en la zona de búsqueda
           stolenness_stolen: Robado en cualquier lugar
           within: dentro
+          kilometers_of: kilómetros de
         result_view_select:
           cards_view: Ver como tarjetas
           list_view: Ver como lista
