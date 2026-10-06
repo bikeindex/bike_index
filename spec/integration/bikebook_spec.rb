@@ -145,7 +145,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     end
   end
 
-  it "merges motors that match but for their drive wheel, and names a motor's e-vehicle classifications" do
+  it "merges motors that match but for their drive wheel, and names an operating mode's e-vehicle classification" do
     serve_catalog
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
 
@@ -153,19 +153,19 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
 
-    # compared with a motor that has none, whose row then has no value
+    # compared with a mode that has none, whose row then has no value
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro")
-    classification = find("section div", text: /Classification\s*US-CA Off-highway electric motorcycle/, wait: 10)
+    classification = find("section div", text: /E-vehicle classification\s*US-CA Off-highway electric motorcycle/, wait: 10)
     classification.find("button", text: "?").click
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
-    expect(tooltip).to have_css("code", exact_text: "ec/us/ca/off_highway_electric_motorcycle")
+    expect(tooltip).to have_css("code", exact_text: "evc/us/ca/off_highway_electric_motorcycle")
       .and have_button("Copy ID")
 
     # its heading picks the classification, whose card sits beside the vehicles' with everything it has
     tooltip.click_link("US-CA Off-highway electric motorcycle")
-    card = find("article", text: /E-vehicle classification\s*US-CA Off-highway electric motorcycle/i)
+    card = find("article h1", text: "US-CA Off-highway electric motorcycle").ancestor("article")
     expect(page).to have_css("article", count: 3)
-    expect(page).to have_current_path("/bikebook?vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro,ec/us/ca/off_highway_electric_motorcycle")
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
     expect(card).to have_css("li", text: "No driver's license needed off the highway")
       .and have_link(href: /ohv\.parks\.ca\.gov/)
 
@@ -173,7 +173,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("article", count: 2)
 
     # and its id finds it in the search
-    type_into(vehicle_field, "ec/us/ca/off_highway_e")
+    type_into(vehicle_field, "evc/us/ca/off_highway_e")
     retry_on_detach { find("[role='option']", text: "US-CA Off-highway electric motorcycle").click }
     expect(page).to have_css("article h1", text: "US-CA Off-highway electric motorcycle")
   end

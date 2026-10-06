@@ -6,7 +6,7 @@ import { array, blank, compact, join, present, slice } from 'bikebook/templates/
 export const motorSection = ({ presenter, heading, motor, others, tooltipped, classificationPath }) => {
   const { fields, mode_fields: modeFields, humanized } = presenter.kit.motor
   // the kit's "US e-bike class" doesn't fit a California classification
-  const labels = { ...presenter.kit.motor.labels, e_vehicle_classifications: 'Classification' }
+  const labels = { ...presenter.kit.motor.labels, e_vehicle_classification: 'E-vehicle classification' }
   const display = (each) => ({
     ...each,
     name: [each.manufacturer, each.model].filter(present).join(' '),
@@ -23,13 +23,13 @@ export const motorSection = ({ presenter, heading, motor, others, tooltipped, cl
     operating_temperature: temperatureRange(mode.operating_temperature)
   })
   const classificationTooltips = presenter.classificationTooltips(classificationPath)
-  // tooltipped after the diff, which a tooltip's random id would always mark
   const rows = presenter.rowsFor(fields, display(motor), { labels, others: others.map(display) })
-    .map(([label, value, ...rest]) => [label, rest.at(-1) === 'e_vehicle_classifications' ? join(array(value).map((name) => tooltipped(name, classificationTooltips)), ', ') : value, ...rest])
   const modes = array(motor.operating_modes).map((mode) => {
     const otherModes = others.map((other) => array(other.operating_modes).find((each) => each.mode === mode.mode))
     const modeHeading = presenter.diffLabel(presenter.humanize(mode.mode), otherModes.some((each) => each == null))
+    // tooltipped after the diff, which a tooltip's random id would always mark
     const modeRows = presenter.rowsFor(modeFields, displayMode(mode), { labels, others: otherModes.map((each) => each ? displayMode(each) : null) })
+      .map(([label, value, ...rest]) => [label, rest.at(-1) === 'e_vehicle_classification' ? tooltipped(value, classificationTooltips) : value, ...rest])
     return [modeHeading, presenter.measurementRows(modeRows)]
   })
   return section({ heading, content: presenter.measurementRows(rows), subsections: modes })

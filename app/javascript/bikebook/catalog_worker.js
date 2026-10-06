@@ -77,7 +77,7 @@ const block = (key) => {
 // An e-vehicle classification's data is its vocabulary record
 async function vehicles ({ ids }) {
   const found = await Promise.all(ids.map(async (value) => {
-    if (classifications[value]) return { value, display: classifications[value].title, data: classifications[value] }
+    if (classifications[value]) return { value, display: classifications[value].title, data: classifications[value], classification: true }
     const key = blockKey(value)
     return { value, display: byId.get(value)?.display, data: manifest.blocks[key] && (await block(key))[value] }
   }))
@@ -106,7 +106,7 @@ function matching (params) {
   const needle = (params.q ?? '').trim().toLowerCase()
   const selected = new Set(list(params.vehicle_models))
   // a classification is found by its id alone, which every filter passes
-  if (needle.startsWith('ec/')) {
+  if (needle.startsWith('evc/')) {
     const matches = Object.entries(classifications).filter(([id]) => id.startsWith(needle) && !selected.has(id)).map(([id, { title }]) => ({ id, display: title, classification: true }))
     return { filteredCount: filtered.length, matches }
   }

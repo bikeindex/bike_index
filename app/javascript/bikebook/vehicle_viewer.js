@@ -22,11 +22,11 @@ export class VehicleViewer {
       ? 'tw:md:max-[1152px]:[&>*:first-child]:basis-full tw:md:max-[1152px]:[&>*:first-child>article]:mx-auto tw:md:max-[1152px]:[&>*:first-child>article]:max-w-[calc(50%-1rem)]'
       : ''
     const values = vehicles.map(({ value }) => value)
-    const baseline = vehicles.find(({ value }) => !value.startsWith('ec/'))
+    const baseline = vehicles.find(({ classification }) => !classification)
     const classificationPath = (id) => pathWith(url, { vehicle_models: [...new Set([...values, id])].join(',') })
-    const cards = vehicles.map(({ data, value }, index) => {
+    const cards = vehicles.map(({ data, value, classification }, index) => {
       const remove = pathWith(url, { vehicle_models: values.filter((each) => each !== value).join(',') })
-      return value.startsWith('ec/')
+      return classification
         ? classificationCard({ presenter: this.presenter, id: value, classification: data, removePath: remove })
         : modelViewer({ presenter: this.presenter, data, value, comparing, idSuffix: index + 1, others: value === baseline.value ? [] : [baseline.data], removePath: remove, classificationPath })
     })

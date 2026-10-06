@@ -27,8 +27,8 @@ RSpec.describe BikebookController, type: :request do
 
     context "an e-vehicle classification" do
       it "picks it, without an m/" do
-        get "/bikebook/ec/us/class_3"
-        expect(response).to redirect_to("/bikebook?vehicle_models=ec/us/class_3")
+        get "/bikebook/evc/us/class_3"
+        expect(response).to redirect_to("/bikebook?vehicle_models=evc/us/class_3")
       end
     end
 
