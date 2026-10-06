@@ -165,9 +165,7 @@
             </div>
           </div>
 
-          <% if Flipper.enabled?(:strava_integration, current_user) %>
-            <%= render(Pages::MyAccount::StravaIntegration::Component.new(user: current_user)) %>
-          <% end %>
+          <%= render(Pages::MyAccount::StravaIntegration::Component.new(user: current_user)) %>
         </div>
       </div>
     </div>

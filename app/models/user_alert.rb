@@ -49,7 +49,7 @@ class UserAlert < ApplicationRecord
 
   scope :dismissed, -> { where.not(dismissed_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }
-  scope :inactive, -> { where.not(resolved_at: nil).or(where(dismissed_at: nil)) }
+  scope :inactive, -> { resolved.or(dismissed) }
   scope :active, -> { where(resolved_at: nil, dismissed_at: nil) }
   scope :ignored_member, -> { where(kind: ignored_kinds_member) }
   scope :ignored_superuser, -> { where(kind: ignored_kinds_superuser) }
@@ -162,7 +162,7 @@ class UserAlert < ApplicationRecord
   end
 
   def self.update_stolen_bike_without_location(user:, bike:)
-    user_alert = UserAlert.find_or_build_by(kind: "stolen_bike_without_location",
+    user_alert = UserAlert.active.find_or_build_by(kind: "stolen_bike_without_location",
       user_id: user.id, bike_id: bike.id)
     if bike.current_stolen_record&.without_street?
       user_alert.save

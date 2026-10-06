@@ -16,7 +16,7 @@ xml.feed("xml:lang" => "en-US", :xmlns => "http://www.w3.org/2005/Atom") do |fee
         entry.title blog.title
         entry.updated blog.published_at.to_datetime.rfc3339
         entry.author do |author|
-          author.name(blog.user.name)
+          author.name(blog.user&.name.to_s)
         end
 
         entry.content(blog.feed_content, type: "html")

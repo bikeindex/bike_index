@@ -100,11 +100,9 @@
                 <%= link_to translation(".status_page"), "https://status.bikeindex.org" %>
               </li>
 
-              <% if Flipper.enabled?(:strava_integration, @current_user) %>
-                <li>
-                  <%= render UI::ActiveLink::Component.new(text: translation(".strava_search"), path: strava_search_path) %>
-                </li>
-              <% end %>
+              <li>
+                <%= render UI::ActiveLink::Component.new(text: translation(".strava_search"), path: strava_search_path) %>
+              </li>
             </ul>
           </nav>
 

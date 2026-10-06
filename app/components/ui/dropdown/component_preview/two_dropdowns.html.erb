@@ -1,0 +1,9 @@
+<div class="tw:flex tw:gap-4">
+  <%= render(UI::Dropdown::Component.new(name: "First")) do |dropdown| %>
+    <% dropdown.with_entry_item { content_tag(:a, "First item", href: "#") } %>
+  <% end %>
+
+  <%= render(UI::Dropdown::Component.new(name: "Second")) do |dropdown| %>
+    <% dropdown.with_entry_item { content_tag(:a, "Second item", href: "#") } %>
+  <% end %>
+</div>

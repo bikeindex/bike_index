@@ -109,6 +109,14 @@ RSpec.describe Geocodeable do
       end
     end
 
+    context "all-caps multi-word city" do
+      let(:city) { "NEW YORK" }
+      it "keeps every word" do
+        address_record.valid?
+        expect(address_record.city).to eq "New York"
+      end
+    end
+
     context "bare trailing capitalized state" do
       let(:city) { "Chicago IL" }
       it "removes it" do
