@@ -83,7 +83,7 @@ module Organized
     end
 
     def bike_search_params_present?
-      @interpreted_params.except(:stolenness).values.any? || @selected_query_items_options.any? || params[:search_email].present?
+      @interpreted_params.except(:stolenness, :distance_unit).values.any? || @selected_query_items_options.any? || params[:search_email].present?
     end
 
     def available_impound_records
