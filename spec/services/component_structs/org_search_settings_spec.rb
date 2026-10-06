@@ -129,11 +129,24 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
   describe "panel_labels" do
     it "prefixes the time columns, leaving the table headers short" do
       expect(instance.panel_labels[:created_at_cell]).to eq "Time - registered"
-      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - updated"
-      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - status"
+      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - registration updated"
+      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - Registration status"
       expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Registration sequence acknowledged"
       expect(instance.column_renames[:created_at_cell]).to eq "Registered"
       expect(instance.panel_labels[:color_cell]).to eq "Color"
+    end
+  end
+
+  describe "impound" do
+    it "adds the impound columns and sorts, and drops the export" do
+      expect(instance.impound_columns).to eq []
+      impound_settings = described_class.new(organization:, impound: true)
+      expect(impound_settings.impound_columns).to eq described_class::IMPOUND_COLUMNS
+      expect(impound_settings.initially_checked_columns).to include("impound_id_cell")
+      expect(impound_settings.sort_column_label("user_id")).to eq "Last updator"
+      expect(impound_settings.sort_column_label("impounded_at")).to eq "Impounded"
+      expect(impound_settings.sort_column_label("resolved_at")).to eq "Resolved"
+      expect(impound_settings.render_export?).to be_falsey
     end
   end
 

@@ -36,6 +36,32 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     expect(component.at_css("[data-ui--collapse-target='content']")[:class]).to include("tw:hidden!")
   end
 
+  it "labels the registration time columns, with the status column's hint, and no impound columns" do
+    expect(component).to have_field("updated_at_cell", visible: :all)
+    expect(component).to have_text("Time - registration updated")
+    expect(component).to have_text("Time - Registration status")
+    expect(component.at_css("label:has(#occurred_at_cell_occurred_at_cell) small").text)
+      .to eq "When registration was stolen, impounded, found or listed for sale"
+    expect(component).not_to have_text("Impound columns")
+  end
+
+  context "with impound settings" do
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let(:settings) { ComponentStructs::OrgSearchSettings.new(organization:, impound: true) }
+
+    it "renders the impound columns as a group of their own, all on by default" do
+      expect(component).to have_text("Impound columns")
+      expect(component).to have_css("[data-controller='org--column-checkboxes']", count: 2, visible: :all)
+      impound_group = component.css("[data-controller='org--column-checkboxes']").last
+      expect(impound_group.css("input[type='checkbox']").map { it[:name] })
+        .to eq ComponentStructs::OrgSearchSettings::IMPOUND_COLUMNS
+      expect(impound_group.css("input[type='checkbox']").map { it["data-default"] }.uniq).to eq ["true"]
+      expect(impound_group.text).to include("Time - Impounded", "Time - impound record Updated", "Time - Resolved",
+        "Impound status", "Last updator", "Impounded from", "Unregistered")
+      expect(component.at_css("input[name='impound_id_cell']")["data-default"]).to eq "true"
+    end
+  end
+
   context "with export_headers" do
     let(:instance) { described_class.new(settings:, export_headers: %w[serial]) }
 

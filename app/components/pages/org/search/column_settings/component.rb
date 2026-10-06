@@ -37,16 +37,21 @@ module Pages
 
           def export? = !@export_headers.nil?
 
-          def columns
-            @columns ||= export? ? export_columns : search_columns
+          # Each with its own all/none/default
+          def column_groups
+            return [{title: translation(".included_columns"), columns: export_columns}] if export?
+
+            [{title: translation(".visible_columns"), columns: search_columns(@settings.panel_columns)},
+              ({title: translation(".impound_columns"), columns: search_columns(@settings.impound_columns)} if @settings.impound_columns.any?)].compact
           end
 
           # Named for their cell, which the search's controller shows and hides by
-          def search_columns
-            @settings.panel_columns.map do |cell_name|
+          def search_columns(cell_names)
+            cell_names.map do |cell_name|
               always_visible = @settings.always_visible?(cell_name)
               {name: cell_name, value: cell_name, label: @settings.panel_labels[cell_name.to_sym],
-               checked: always_visible, disabled: always_visible, default: default?(cell_name)}
+               hint: @settings.panel_hint(cell_name), checked: always_visible, disabled: always_visible,
+               default: default?(cell_name)}
             end
           end
 
@@ -57,16 +62,24 @@ module Pages
             end
           end
 
-          def default?(cell_name) = @settings.initially_checked_columns.include?(cell_name)
+          def default?(cell_name)
+            @settings.initially_checked_columns.include?(cell_name) || @settings.impound_columns.include?(cell_name)
+          end
 
-          def column_rows = (columns.size / 3.0).ceil
+          def column_rows(columns) = (columns.size / 3.0).ceil
 
-          # The search's controller hears each change, all/none/default's included
+          # The search's controller hears each group's changes, all/none/default's included
           def checkboxes_data
-            return {controller: "org--column-checkboxes"} if export?
+            return {} if export?
 
-            {controller: "org--column-checkboxes", "org--search-column-settings-target": "checkboxes",
+            {"org--search-column-settings-target": "checkboxes",
              action: "change->org--search-column-settings#updateVisibleColumns"}
+          end
+
+          def checkbox_label(column)
+            return column[:label] unless column[:hint]
+
+            safe_join([column[:label], tag.small(column[:hint], class: "tw:block tw:text-gray-400 tw:dark:text-gray-500")])
           end
         end
       end
