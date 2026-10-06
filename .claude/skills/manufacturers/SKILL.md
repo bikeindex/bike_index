@@ -30,8 +30,12 @@ The rest of `Admin::ManufacturersController#permitted_parameters` is optional.
 
 ## 3. Create
 
+Always through `references/create_manufacturers.rb`, one or several at a time — never `admin_data.rb create-manufacturer` directly:
+
 ```
-.claude/skills/admin-data-api/scripts/admin_data.rb create-manufacturer name="Zoomo" website=https://zoomo.com frame_maker=true motorized_only=true
+.claude/skills/manufacturers/references/create_manufacturers.rb <<'JSON'
+[{"name": "Zoomo", "website": "https://zoomo.com", "frame_maker": true, "motorized_only": true}]
+JSON
 ```
 
-Returns the new manufacturer; a 422 prints the validation errors (`Manufacturer` validations — a taken name or slug, a color name, a quote). Link the user to `https://bikeindex.org/admin/manufacturers/<slug>`.
+It skips names that already exist and stops at the first failure — a 422 prints the `Manufacturer` validation errors (a taken name or slug, a color name, a quote). Link the user to each admin URL it prints.
