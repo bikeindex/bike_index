@@ -6160,6 +6160,8 @@ nl:
             where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als
               u contact opneemt over een advertentie die u online hebt gevonden, neemt
               u een link op in het onderstaande veld
+          share:
+            link_copied: Link gekopieerd
       search:
         everything_combobox:
           made_by: gemaakt door
