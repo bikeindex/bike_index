@@ -132,7 +132,6 @@ RSpec.describe NewsController, type: :request do
           create_tagged_blog("Second post")
           get "/news.atom"
           expect(response.body).to include("Second post")
-          # A tag search groups the blogs, which the whole-feed cache key can't follow
           get "/news.atom", params: {search_tags: content_tag.slug}
           expect(response.body).to include("Second post")
         end

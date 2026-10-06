@@ -5,8 +5,8 @@ class NewsController < ApplicationController
 
   def index
     @blogs = matching_blogs
-    @blogs_count ||= @blogs.count
-    @page_updated_at = matching_blogs.maximum(:updated_at)
+    @blogs_count = @blogs.count
+    @page_updated_at = @blogs.maximum(:updated_at)
     @show_discuss = Binxtils::InputNormalizer.boolean(ENV["SHOW_DISCOURSE"])
     respond_to do |format|
       format.html do
@@ -46,7 +46,6 @@ class NewsController < ApplicationController
     if params[:search_tags].present?
       @search_tags = ContentTag.matching(params[:search_tags])
       blogs = blogs.with_tag_ids(@search_tags.pluck(:id))
-      @blogs_count = blogs.count.keys.count
     end
     blogs
   end
