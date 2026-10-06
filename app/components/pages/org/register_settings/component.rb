@@ -8,10 +8,8 @@ module Pages
       # The switches that change the shape of the organization's add-a-registration page, or send it
       # back to the legacy one
       class Component < ApplicationComponent
-        def initialize(organization:, organization_admin: false, old_view: false, single_page: false,
-          separate_attestation: false)
+        def initialize(organization:, old_view: false, single_page: false, separate_attestation: false)
           @organization = organization
-          @organization_admin = organization_admin
           @old_view = old_view
           @single_page = single_page
           @separate_attestation = separate_attestation
@@ -21,10 +19,6 @@ module Pages
 
         # Nothing to leave to the registrant until the organization has rules to agree to
         def safety_rules? = @organization.registration_sequences.active.exists?
-
-        def registration_email = @organization.auto_user&.email
-
-        def organization_settings? = @organization_admin && registration_email.present?
       end
     end
   end

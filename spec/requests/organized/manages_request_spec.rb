@@ -94,6 +94,8 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(session[:passive_organization_id]).to eq current_organization.id
         expect(assigns(:controller_namespace)).to eq "organized"
         expect(assigns(:page_id)).to eq "organized_manage_show"
+        expect(response.body).to include "<code>#{current_organization.reload.auto_user.email}</code>"
+        expect(response.body).to include 'name="organization[send_self_registration_email]"'
       end
     end
 

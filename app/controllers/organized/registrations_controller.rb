@@ -87,7 +87,6 @@ module Organized
     def settings
       @page_title = I18n.t("meta_titles.registration_form_settings")
       render Pages::Org::RegisterSettings::Component.new(organization: current_organization, old_view: old_register_view?,
-        organization_admin: current_user.admin_of?(current_organization),
         **BikeServices::Register.session_settings(session[:register_settings], current_organization.id))
     end
 

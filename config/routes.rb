@@ -55,6 +55,7 @@ Rails.application.routes.draw do
   end
 
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
+  get "bikebook", to: "bikebook#show"
 
   resource :session, only: %i[new create destroy] do
     collection do
@@ -545,8 +546,8 @@ Rails.application.routes.draw do
   get "*id", to: "registrations#show", constraints: {id: %r{[rR]/.*}}, format: false
   # Short bike_version URLs: /v/<short_id> (and /V/...)
   get "*id", to: "bike_versions#show", constraints: {id: %r{[vV]/.*}}, format: false
-  # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
-  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
+  # Short marketplace_listing URLs: /f/<short_id> (and /F/...)
+  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[fF]/.*}}, format: false
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.sandbox? # Handle 404s with lograge
 end

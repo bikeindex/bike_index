@@ -7,17 +7,10 @@ en:
           browser_only: >-
             These settings are just applied to your browser - they will not affect
             other users
-          emails: Emails
           form_options: Form options
           old_view: Use the old registration page
           registration_form_settings: Registration form settings
           registration_page: Registration page
-          send_self_registration_email_helper: >-
-            By default, Bike Index no longer sends an email to you when a vehicle
-            is registered to your organization registration email (e.g. unregistered
-            parking notifications).
-          send_self_registration_email_html: Send email for registrations sent to
-            <code>%{email}</code>
           separate_attestation: Registrant fills out the registration attestation
             separately
           separate_attestation_helper: >-
@@ -25,4 +18,3 @@ en:
             with a link to finish it.
           single_page: Single page registration form
           update: Update
-          update_organization: Update organization settings

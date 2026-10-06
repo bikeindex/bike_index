@@ -57,34 +57,3 @@
     </div>
   </div>
 <% end %>
-
-<% if organization_settings? %>
-  <%= form_with(model: @organization, url: organization_manage_path(organization_id: @organization.to_param),
-      method: :patch, data: {turbo: false}, class: "tw:mt-12") do |f| %>
-    <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
-      <span class="twlabel tw:sm:text-right"><%= translation(".emails") %></span>
-
-      <div class="tw:sm:col-span-2">
-        <%= render UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :send_self_registration_email) do %>
-          <%= translation(".send_self_registration_email_html", email: registration_email) %>
-        <% end %>
-
-        <p
-          class="
-            tw:mt-1 tw:mb-0 tw:pl-6 tw:text-xs tw:text-gray-500
-            tw:dark:text-gray-400
-          "
-        >
-          <%= translation(".send_self_registration_email_helper") %>
-        </p>
-      </div>
-    </div>
-
-    <div class="tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
-      <div class="tw:sm:col-span-2 tw:sm:col-start-2">
-        <%= render UI::Button::Component.new(text: translation(".update_organization"), color: :primary,
-            size: :lg, type: "submit") %>
-      </div>
-    </div>
-  <% end %>
-<% end %>

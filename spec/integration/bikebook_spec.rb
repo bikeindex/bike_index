@@ -1,0 +1,160 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe "Bikebook", :js, type: :system do
+  let(:fixtures) { Rails.root.join("spec/fixtures/bikebook_catalog") }
+
+  # A fixture catalog in place of the published one, and no stock photos, which render
+  # their placeholder
+  def serve_catalog(manifest_status: 200)
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.route(%r{^https://bikebook-catalog\.bikeindex\.org/catalog/}, ->(route, request) {
+        path = request.url.delete_prefix("https://bikebook-catalog.bikeindex.org/catalog/")
+        status = (path == "manifest.json") ? manifest_status : 200
+        route.fulfill(status:, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"},
+          body: (status == 200) ? fixtures.join(path).read : "")
+      })
+      playwright_page.context.route(%r{^https://bikebook\.bikeindex\.org/}, ->(route, _request) { route.abort })
+    end
+  end
+
+  def vehicle_field = find_field("View a vehicle")
+
+  # A component's markup from the server beside its template's from the browser, as canonical_html.js's
+  # lines. `args` is the template's argument as JavaScript source, with lit-html's `html` in scope
+  def expect_template(component, template, args)
+    server = component.is_a?(String) ? component : ApplicationController.render(component, layout: false)
+    page.execute_script(Rails.root.join("spec/support/canonical_html.js").read)
+    server_lines, browser_lines = page.evaluate_script(<<~JS)
+      (async (template, server) => {
+        const [module, name] = template.split('#')
+        const [{ html, render }, templates] = await Promise.all([import('lit-html'), import(module)])
+        const container = document.createElement('div')
+        render(templates[name](#{args}), container)
+        return [window.canonicalHtml(server), window.canonicalHtml(container.innerHTML)]
+      })(#{template.to_json}, #{server.to_json})
+    JS
+    expect(browser_lines).to eq(server_lines), "#{template} renders differently from its component with #{args}"
+  end
+
+  it "searches, compares and filters the catalog in the browser, a pick and each history step rendering without a request" do
+    serve_catalog
+    asked = []
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.on("request", ->(request) { asked << request.url if request.navigation_request? })
+    end
+    visit bikebook_path
+    expect(page).to have_field("View a vehicle", wait: 10)
+    asked.clear
+
+    vehicle_field.click
+    expect(page).to have_css(".hw-combobox__group__label", text: /\(27 matching models\)/i)
+
+    type_into(vehicle_field, "level 4 rec")
+    expect(page).to have_css(".hw-combobox__group__label", text: /\(2 matching models\)/i)
+    retry_on_detach { find("[role='option']", text: "Aventón Level 4 REC Step-Through").click }
+    expect(page).to have_css("article h1", text: "Level 4 REC Step-Through")
+    expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
+    expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
+
+    # A second pick, found by its id, compares the two, marking where the second differs from the first
+    type_into(vehicle_field, "level_2_step")
+    expect(page).to have_css(".hw-combobox__group__label", text: /\(1 matching model\)/i)
+    retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
+    expect(page).to have_css("article", count: 2)
+    expect(all("article").last).to have_css(".tw\\:spec-diff")
+    expect(all("article").first).to have_no_css(".tw\\:spec-diff")
+
+    find("[aria-label='Remove Aventón Level 2 Step-Through']").click
+    expect(page).to have_css("article", count: 1)
+    expect(page).to have_css(".hw-combobox__chip", count: 1)
+
+    page.go_back
+    expect(page).to have_css("article", count: 2)
+    expect(page).to have_css(".hw-combobox__chip", count: 2)
+
+    # The JSON panel opens beside its card
+    first("[aria-label='Toggle JSON']").click
+    expect(page).to have_css(".twjson-panel code", text: '"model": "Level 4 REC Step-Through"')
+
+    # A filter's options count the catalog's models, and its chips come from them
+    click_on "More filters"
+    find_field("Manufacturer").click
+    find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (5)").click
+    expect(page).to have_css("[data-async-id='manufacturer'] .hw-combobox__chip", text: "Kris Holm")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
+
+    expect(asked).to be_empty
+  end
+
+  it "renders each UI template as the component it mirrors does" do
+    serve_catalog
+    visit bikebook_path
+
+    aggregate_failures do
+      expect_template(UI::Tooltip::Component.new(text: "622 mm BSD"), "bikebook/templates/ui/tooltip#tooltip", "{ text: '622 mm BSD' }")
+      expect_template(UI::Tooltip::Component.new(text: "#ff0000").with_content("<span>red</span>".html_safe),
+        "bikebook/templates/ui/tooltip#tooltip", "{ text: '#ff0000', content: html`<span>red</span>` }")
+      expect_template(UI::Tooltip::Component.new.with_body_content("<em>Internal</em> routing".html_safe),
+        "bikebook/templates/ui/tooltip#tooltip", "{ body: html`<em>Internal</em> routing` }")
+
+      expect_template(UI::IconChevron::Component.new(size: :md), "bikebook/templates/ui/icon_chevron#iconChevron", "{ size: 'md' }")
+
+      expect_template(UI::Collapse::Component.new(size: :sm, html_class: "tw:shrink-0", aria: {controls: "vehicle-model-json-1", label: "Toggle JSON"})
+        .with_content("<code>{ }</code>".html_safe), "bikebook/templates/ui/collapse#collapse", <<~JS)
+          { size: 'sm', htmlClass: 'tw:shrink-0', content: html`<code>{ }</code>`,
+            attributes: { 'aria-controls': 'vehicle-model-json-1', 'aria-label': 'Toggle JSON' } }
+        JS
+      expect_template(UI::Collapse::Component.new(chevron: true, size: :sm, aria: {label: "Toggle sizes"}),
+        "bikebook/templates/ui/collapse#collapse", "{ chevron: true, size: 'sm', attributes: { 'aria-label': 'Toggle sizes' } }")
+
+      expect_template(UI::CopyableCode::Component.new(value: "m/trek/2025/fetch", label: "Copy ID"),
+        "bikebook/templates/ui/copyable_code#copyableCode", "{ value: 'm/trek/2025/fetch', label: 'Copy ID' }")
+
+      expect_template(UI::JsonDisplay::Component.new(data: {model: "Level 2", years: [2022]}, small: true, no_max_height: true),
+        "bikebook/templates/ui/json_display#jsonDisplay", "{ data: { model: 'Level 2', years: [2022] }, small: true, noMaxHeight: true }")
+      expect_template(UI::JsonDisplay::Component.new(data: {}), "bikebook/templates/ui/json_display#jsonDisplay", "{ data: {} }")
+
+      expect_template(UI::DefinitionList::Container::Component.new.with_content("<div>row</div>".html_safe),
+        "bikebook/templates/ui/definition_list/container#definitionListContainer", "{ content: html`<div>row</div>` }")
+      expect_template(UI::DefinitionList::Container::Component.new(term: :right_align).with_content("<div>row</div>".html_safe),
+        "bikebook/templates/ui/definition_list/container#definitionListContainer", "{ term: 'right_align', content: html`<div>row</div>` }")
+
+      expect_template(UI::DefinitionList::Row::Component.new(label: "Frame material", value: "Aluminum"),
+        "bikebook/templates/ui/definition_list/row#definitionListRow", "{ label: 'Frame material', value: 'Aluminum' }")
+      expect_template(UI::DefinitionList::Row::Component.new(label: "Years").with_content("<b>2025</b>".html_safe),
+        "bikebook/templates/ui/definition_list/row#definitionListRow", "{ label: 'Years', content: html`<b>2025</b>` }")
+      expect_template(UI::DefinitionList::Row::Component.new(label: "Markets", value: ""),
+        "bikebook/templates/ui/definition_list/row#definitionListRow", "{ label: 'Markets', value: '' }")
+
+      table = ApplicationController.render(inline: <<~ERB, layout: false, locals: {rows: [{type: "Disc", position: "Front"}, {type: "Rim", position: "Rear"}]})
+        <%= render(UI::Table::Component.new(records: rows, classes: "tw:table-fixed")) do |table|
+          table.column(label: "Brakes", classes: "tw:w-[18%]", header_classes: "tw:spec-eyebrow") { |record| record[:type] }
+          table.column(label: "Position", classes: "tw:w-[12%]") { |record| record[:position] }
+        end %>
+      ERB
+      expect_template(table, "bikebook/templates/ui/table#table", <<~JS)
+        { records: [{ type: 'Disc', position: 'Front' }, { type: 'Rim', position: 'Rear' }], classes: 'tw:table-fixed',
+          columns: [{ label: 'Brakes', classes: 'tw:w-[18%]', headerClasses: 'tw:spec-eyebrow', cell: (record) => record.type },
+                    { label: 'Position', classes: 'tw:w-[12%]', cell: (record) => record.position }] }
+      JS
+    end
+  end
+
+  it "merges motors that match but for their drive wheel" do
+    serve_catalog
+    visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
+
+    motor = find("section", text: /front and rear motor/i, wait: 10)
+    expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
+    expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
+  end
+
+  it "says so when the catalog doesn't load" do
+    serve_catalog(manifest_status: 404)
+    visit bikebook_path
+
+    expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
+  end
+end
