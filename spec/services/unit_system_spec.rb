@@ -44,13 +44,4 @@ RSpec.describe UnitSystem do
       expect(described_class.permitted_distance_unit(nil)).to eq "mi"
     end
   end
-
-  describe "to_miles and from_miles" do
-    it "converts kilometers, and leaves miles alone" do
-      expect(described_class.to_miles(100, "km")).to be_within(0.01).of 62.14
-      expect(described_class.to_miles(100, "mi")).to eq 100
-      expect(described_class.from_miles(100, "km")).to be_within(0.01).of 160.93
-      expect(described_class.from_miles(100, "mi")).to eq 100
-    end
-  end
 end

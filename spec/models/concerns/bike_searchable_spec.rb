@@ -208,9 +208,9 @@ RSpec.describe BikeSearchable do
           context "in kilometers" do
             let(:query_params) { {stolenness: "proximity", location: "these parts", distance: "100", distance_unit: "km"} }
             let(:target) { {stolenness: "proximity", location: "these parts", distance: 100, distance_unit: "km", bounding_box:} }
-            it "boxes the distance in miles" do
+            it "boxes the distance in kilometers" do
               expect(BikeSearchable.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
-              expect(Geocoder::Calculations).to have_received(:bounding_box).with("these parts", be_within(0.01).of(62.14))
+              expect(Geocoder::Calculations).to have_received(:bounding_box).with("these parts", 100, units: :km)
             end
           end
           context "with a broken bounding box" do

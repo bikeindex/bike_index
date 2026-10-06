@@ -193,10 +193,6 @@ module GeocodeableLegacy
     country&.iso
   end
 
-  def metric_units?
-    UnitSystem.metric?(country_id:)
-  end
-
   private
 
   # remove ", CA" for things like "Sacramento, CA"

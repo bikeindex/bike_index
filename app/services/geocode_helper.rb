@@ -26,18 +26,18 @@ module GeocodeHelper
   def permitted_distance(distance = nil, default_distance: DEFAULT_DISTANCE, min_distance: MIN_DISTANCE, unit: "mi")
     return default_distance if distance.blank? || (distance.is_a?(String) && !distance.match?(/\d/))
 
-    bounds = [min_distance, MAX_DISTANCE].map { |miles| UnitSystem.from_miles(miles, unit).round(2) }
+    bounds = [min_distance, MAX_DISTANCE].map { |miles| (unit == "km") ? UnitSystem.miles_to_kilometers(miles).round(2) : miles }
     clamped_distance = distance.to_f.clamp(*bounds)
     (clamped_distance % 1 == 0) ? clamped_distance.to_i : clamped_distance
   end
 
-  def bounding_box(lookup_string, distance)
+  def bounding_box(lookup_string, distance, unit: "mi")
     box_param = if lookup_string.is_a?(Array) && lookup_string.length == 2
       lookup_string # It's a coordinate array, use it (rather than doing a lookup)
     else
       geocoder_lookup_string(lookup_string)
     end
-    box_coords = Geocoder::Calculations.bounding_box(box_param, distance)
+    box_coords = Geocoder::Calculations.bounding_box(box_param, distance, units: unit.to_sym)
     box_coords.detect(&:nan?) ? [] : box_coords
   end
 

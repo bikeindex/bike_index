@@ -24,9 +24,7 @@ module Emails
         parts.reject(&:blank?).join(", ")
       end
 
-      def distance_unit
-        UnitSystem.distance_unit(organization.metric_units?)
-      end
+      def distance_unit = UnitSystem.distance_unit(organization.metric_units?)
 
       def thumb_url(bike)
         bike.thumb_path || bike.stock_photo_url || "https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"

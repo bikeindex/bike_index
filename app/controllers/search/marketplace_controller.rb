@@ -60,16 +60,8 @@ module Search
     end
 
     def proximity_hash
-      location, coordinates = BikeSearchable.search_location(params[:location], forwarded_ip_address)
-      return {} if location.blank?
-
-      distance = GeocodeHelper.permitted_distance(params[:distance],
-        default_distance: GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE, unit: search_distance_unit)
-      bounding_box = GeocodeHelper.bounding_box(coordinates.presence || location,
-        UnitSystem.to_miles(distance, search_distance_unit))
-      return {} if bounding_box.empty?
-
-      {distance:, location:, bounding_box:}
+      BikeSearchable.proximity_bounding_box(params[:location], params[:distance], forwarded_ip_address,
+        distance_unit: search_distance_unit, default_distance: GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE) || {}
     end
 
     def set_interpreted_params

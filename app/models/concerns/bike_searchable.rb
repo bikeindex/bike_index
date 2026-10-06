@@ -86,13 +86,14 @@ module BikeSearchable
     end
 
     # returns nil OR {location:, distance:, bounding_box:} - nil if the location can't be boxed
-    def proximity_bounding_box(location, distance, ip_address = nil, distance_unit: nil)
+    def proximity_bounding_box(location, distance, ip_address = nil, distance_unit: nil,
+      default_distance: GeocodeHelper::DEFAULT_DISTANCE)
       location, coordinates = search_location(location, ip_address)
       return if location.blank?
 
-      distance_unit = UnitSystem.permitted_distance_unit(distance_unit)
-      distance = GeocodeHelper.permitted_distance(distance, unit: distance_unit)
-      bounding_box = GeocodeHelper.bounding_box(coordinates.presence || location, UnitSystem.to_miles(distance, distance_unit))
+      unit = UnitSystem.permitted_distance_unit(distance_unit)
+      distance = GeocodeHelper.permitted_distance(distance, default_distance:, unit:)
+      bounding_box = GeocodeHelper.bounding_box(coordinates.presence || location, distance, unit:)
       return if bounding_box.empty?
 
       {bounding_box:, location:, distance:}

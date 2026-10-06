@@ -88,7 +88,7 @@ export default class extends Controller {
   }
 
   // The notes and location fields, each named by data-field. One opens if an input in it has
-  // a value, or if it was left open. Hidden inputs (the distance unit) always have one
+  // a value, or if it was left open. A hidden input's value isn't something entered
   initOptionalFields (duration) {
     this.optionalFieldTargets.forEach(field => {
       const hasValue = [...field.querySelectorAll('input:not([type=hidden])')].some(input => input.value.length > 0)

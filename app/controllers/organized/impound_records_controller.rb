@@ -120,7 +120,7 @@ module Organized
       end
 
       if params[:search_location].present?
-        bounding_box = GeocodeHelper.bounding_box(params[:search_location], UnitSystem.to_miles(@search_proximity, search_distance_unit))
+        bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity, unit: search_distance_unit)
         if bounding_box.present?
           a_impound_records = a_impound_records.within_bounding_box(bounding_box)
         else
