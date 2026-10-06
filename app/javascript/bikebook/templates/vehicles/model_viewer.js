@@ -202,13 +202,26 @@ class ModelViewer {
     })
   }
 
-  // Each classification any operating mode has, compared by name: a tooltip's random id never equals another's
+  // Each classification any operating mode has, compared by name: a tooltip's random id never equals another's.
+  // One only an optional mode has goes on its own line, after the mode
   classifications () {
-    const names = (vehicle) => [...new Set(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes).map((mode) => mode.e_vehicle_classification)).filter(present))].sort()
-    const mine = names(this.vehicle)
-    const differs = this.others.some((other) => !equal(names(other), mine))
+    const sorted = (vehicle) => {
+      const modes = array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).filter((mode) => present(mode.e_vehicle_classification))
+      const stock = (mode) => (mode.availability ?? 'stock') === 'stock'
+      const standard = [...new Set(modes.filter(stock).map((mode) => mode.e_vehicle_classification))].sort()
+      const optional = [...new Map(modes.filter((mode) => !stock(mode) && !standard.includes(mode.e_vehicle_classification))
+        .map((mode) => [mode.e_vehicle_classification, mode.mode]))]
+      return { standard, optional }
+    }
+    const mine = sorted(this.vehicle)
+    const differs = this.others.some((other) => !equal(sorted(other), mine))
     const tooltips = this.presenter.classificationTooltips(this.classificationPath)
-    return definitionListRow({ label: this.presenter.diffLabel('E-vehicle classification', differs), value: join(mine.map((name) => this.tooltipped(name, tooltips)), ', ') })
+    const optional = mine.optional.map(([name, mode]) => html`<span class="tw:block"><span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">with optional
+      ${this.presenter.humanize(mode).toLowerCase()}</span> ${this.tooltipped(name, tooltips)}</span>`)
+    return definitionListRow({
+      label: this.presenter.diffLabel('E-vehicle classification', differs),
+      value: join([join(mine.standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optional])
+    })
   }
 
   yearRange () {

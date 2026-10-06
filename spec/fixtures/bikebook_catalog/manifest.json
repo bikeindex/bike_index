@@ -8,6 +8,7 @@
     "aventon/2022": "models/aventon/2022.json",
     "aventon/2026": "models/aventon/2026.json",
     "segway/2025": "models/segway/2025.json",
+    "specialized/2025": "models/specialized/2025.json",
     "sur_ron/2026": "models/sur_ron/2026.json"
   },
   "kit": "kit.json"

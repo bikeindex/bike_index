@@ -50,7 +50,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     asked.clear
 
     vehicle_field.click
-    expect(page).to have_css(".hw-combobox__group__label", text: /\(28 matching models\)/i)
+    expect(page).to have_css(".hw-combobox__group__label", text: /\(29 matching models\)/i)
 
     type_into(vehicle_field, "level 4 rec")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(2 matching models\)/i)
@@ -177,6 +177,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     type_into(vehicle_field, "evc/us/ca/off_highway_e")
     retry_on_detach { find("[role='option']", text: "US-CA Off-highway electric motorcycle").click }
     expect(page).to have_css("article h1", text: "US-CA Off-highway electric motorcycle")
+
+    # a class that only comes with an optional mode goes on its own line, after the mode
+    visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
+    expect(page).to have_css("section div", text: /\AE-vehicle classification\s*US Class 3 \?\s*with optional throttle US Class 2 \?\z/, wait: 10)
+    expect(page).to have_css("dd > span.tw\\:block", text: /\Awith optional throttle US Class 2/)
   end
 
   it "says so when the catalog doesn't load" do
