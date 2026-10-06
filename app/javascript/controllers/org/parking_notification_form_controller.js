@@ -289,17 +289,22 @@ export default class extends Controller {
   }
 
   // The pin + zoom live in the URL so a reload (or shared link) restores them. An
-  // unchosen pin isn't worth restoring, and restoring it would make it look chosen.
-  // The standalone page redirects back to itself after each notification, so a
-  // stored pin there would seed the next vehicle's location
+  // unchosen pin isn't worth restoring, and restoring it would make it look chosen
   persistMapState () {
-    if (!this.pinChosen || this.standaloneValue) return
+    if (!this.pinChosen) return
     const url = new URL(window.location)
     url.searchParams.set('map_lat', this.pinLatitude.toFixed(6))
     url.searchParams.set('map_lng', this.pinLongitude.toFixed(6))
     url.searchParams.set('map_zoom', (this.map?.getZoom() ?? this.pinZoom).toFixed(2))
     // Revealing the map fires a moveend that changed nothing; skip the no-op write
     if (url.search === window.location.search) return
+    window.history.replaceState(window.history.state, '', url)
+  }
+
+  // Submitting redirects back to this URL, where a kept pin would seed the next notification
+  clearMapState () {
+    const url = new URL(window.location)
+    for (const param of ['map_lat', 'map_lng', 'map_zoom']) url.searchParams.delete(param)
     window.history.replaceState(window.history.state, '', url)
   }
 

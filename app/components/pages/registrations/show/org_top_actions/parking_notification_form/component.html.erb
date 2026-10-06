@@ -7,7 +7,7 @@
   data-org--parking-notification-form-default-kind-value="<%= new_parking_notification.kind %>"
   data-org--parking-notification-form-org-latitude-value="<%= org_map_coordinates[:latitude] %>"
   data-org--parking-notification-form-org-longitude-value="<%= org_map_coordinates[:longitude] %>"
-  data-action="registrations--show--action-panels:shown->org--parking-notification-form#panelShown"
+  data-action="registrations--show--action-panels:shown->org--parking-notification-form#panelShown submit->org--parking-notification-form#clearMapState"
   class="tw:hidden"
 >
   <%= render(UI::Card::Component.new) do %>

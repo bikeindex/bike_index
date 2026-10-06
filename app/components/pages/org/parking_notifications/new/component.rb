@@ -25,7 +25,7 @@ module Pages
           def form_data
             coordinates = @organization.map_focus_coordinates
 
-            {controller: "org--parking-notification-form",
+            {controller: "org--parking-notification-form", action: "submit->org--parking-notification-form#clearMapState",
              "org--parking-notification-form-standalone-value": true,
              "org--parking-notification-form-org-latitude-value": coordinates[:latitude],
              "org--parking-notification-form-org-longitude-value": coordinates[:longitude]}

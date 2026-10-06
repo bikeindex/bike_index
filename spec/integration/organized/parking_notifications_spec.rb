@@ -25,6 +25,17 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     sign_in(user)
   end
 
+  # Serves an empty MapLibre style so the map builds without fetching basemap tiles
+  def locate_device(latitude, longitude)
+    page.driver.with_playwright_page(&:context).tap do |browser_context|
+      browser_context.grant_permissions(["geolocation"])
+      browser_context.set_geolocation({latitude:, longitude:, accuracy: 20})
+      browser_context.route("https://maps.bikeindex.org/**", proc { |route, _request|
+        route.fulfill(status: 200, json: {version: 8, sources: {}, layers: []})
+      })
+    end
+  end
+
   # Each filter loads a new page, and a click before ui--dropdown connects doesn't open it
   def click_filter(menu, text)
     wait_for_stimulus("ui--dropdown")
@@ -80,20 +91,13 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
     it "registers it along with the notification, serial optional, and locates the next one afresh" do
       page.current_window.resize_to(1400, 2000)
-      page.driver.with_playwright_page do |playwright_page|
-        @browser_context = playwright_page.context
-        @browser_context.grant_permissions(["geolocation"])
-        @browser_context.set_geolocation({latitude: 37.759681, longitude: -122.4275348, accuracy: 20})
-        @browser_context.route("https://maps.bikeindex.org/**", proc { |route, _request|
-          route.fulfill(status: 200, json: {version: 8, sources: {}, layers: []})
-        })
-      end
+      browser_context = locate_device(37.759681, -122.4275348)
       visit base_url
       click_link "New notification for unregistered bike"
       expect(page).to have_link "Registration form settings"
       expect(page).to latitude_field(37.759681)
       # Where the officer has walked to by the next vehicle
-      @browser_context.set_geolocation({latitude: 37.77, longitude: -122.45, accuracy: 20})
+      browser_context.set_geolocation({latitude: 37.77, longitude: -122.45, accuracy: 20})
 
       type_into("#bike_manufacturer_id", "Surly")
       click_combobox_option("Surly")
@@ -136,15 +140,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
     it "creates the notification at the pin, not at the geocoded address" do
       page.current_window.resize_to(1400, 2000)
-      page.driver.with_playwright_page do |playwright_page|
-        browser_context = playwright_page.context
-        browser_context.grant_permissions(["geolocation"])
-        browser_context.set_geolocation({latitude:, longitude:, accuracy: 20})
-        # Serve an empty MapLibre style so the map builds without fetching basemap tiles
-        browser_context.route("https://maps.bikeindex.org/**", proc { |route, _request|
-          route.fulfill(status: 200, json: {version: 8, sources: {}, layers: []})
-        })
-      end
+      locate_device(latitude, longitude)
       visit registration_path(bike)
 
       # Opening the panel geolocates, which stamps the hidden coordinate fields and
