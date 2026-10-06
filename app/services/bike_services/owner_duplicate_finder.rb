@@ -41,7 +41,7 @@ module BikeServices
       (matching_user_ids(:email, email, UserEmail) + matching_user_ids(:phone, phone, UserPhone)).uniq
     end
 
-    # A query per table, because an OR across them joined can't use their indexes
+    # An OR across the joined tables can't use their indexes
     def self.matching_user_ids(attribute, value, user_attribute_class)
       return [] if value.blank?
 
