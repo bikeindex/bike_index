@@ -50,7 +50,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     asked.clear
 
     vehicle_field.click
-    expect(page).to have_css(".hw-combobox__group__label", text: /\(28 matching models\)/i)
+    expect(page).to have_css(".hw-combobox__group__label", text: /\(29 matching models\)/i)
 
     type_into(vehicle_field, "level 4 rec")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(2 matching models\)/i)
@@ -145,7 +145,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     end
   end
 
-  it "merges motors that match but for their drive wheel, and names a motor's e-vehicle classifications" do
+  it "merges motors that match but for their drive wheel, and names the operating modes' e-vehicle classifications" do
     serve_catalog
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
 
@@ -153,8 +153,36 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
 
-    visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us")
-    expect(page).to have_css("section div", text: /US e-bike class\s*Off-highway electric motorcycle/, wait: 10)
+    # beside a vehicle that has none
+    visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro")
+    classification = find("section div", text: /E-vehicle class\s*US-CA Off-highway electric motorcycle/, wait: 10)
+    expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
+    classification.find("button", text: "?").click
+    tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
+    expect(tooltip).to have_css("code", exact_text: "evc/us/ca/off_highway_electric_motorcycle")
+      .and have_button("Copy ID")
+
+    # its heading picks the classification, whose card sits beside the vehicles' with everything it has
+    tooltip.click_link("US-CA Off-highway electric motorcycle")
+    card = find("article h1", text: "US-CA Off-highway electric motorcycle").ancestor("article")
+    expect(page).to have_css("article", count: 3)
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
+    expect(card).to have_css("li", text: "No driver's license needed off the highway")
+      .and have_link(href: /ohv\.parks\.ca\.gov/)
+
+    card.find("[aria-label='Remove US-CA Off-highway electric motorcycle']").click
+    expect(page).to have_css("article", count: 2)
+
+    # and its id finds it in the search
+    type_into(vehicle_field, "evc/us/ca/off_highway_e")
+    retry_on_detach { find("[role='option']", text: "e-Vehicle Classification: US-CA Off-highway electric motorcycle").click }
+    expect(page).to have_css(".hw-combobox__chip", text: "e-Vehicle Classification: US-CA Off-highway electric motorcycle")
+    expect(page).to have_css("article h1", text: "US-CA Off-highway electric motorcycle")
+
+    # a class that only comes with an optional mode goes on its own line, after the mode
+    visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
+    expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
+    expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
   end
 
   it "says so when the catalog doesn't load" do
