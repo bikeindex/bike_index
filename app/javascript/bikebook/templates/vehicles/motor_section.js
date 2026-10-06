@@ -7,7 +7,9 @@ const sentence = (words) => words.length < 2 ? join(words) : join([join(words.sl
 
 // A motor's specs, with a subsection per operating mode
 export const motorSection = ({ presenter, heading, motor, others, tooltipped }) => {
-  const { fields, mode_fields: modeFields, humanized, labels, classification_tooltips: classificationTooltips } = presenter.kit.motor
+  const { fields, mode_fields: modeFields, humanized } = presenter.kit.motor
+  // the kit's "US e-bike class" doesn't fit a California classification
+  const labels = { ...presenter.kit.motor.labels, e_vehicle_classifications: 'Classification' }
   const display = (each) => ({
     ...each,
     name: [each.manufacturer, each.model].filter(present).join(' '),
@@ -25,7 +27,7 @@ export const motorSection = ({ presenter, heading, motor, others, tooltipped }) 
   })
   // tooltipped after the diff, which a tooltip's random id would always mark
   const rows = presenter.rowsFor(fields, display(motor), { labels, others: others.map(display) })
-    .map(([label, value, ...rest]) => [label, rest.at(-1) === 'e_vehicle_classifications' ? sentence(array(value).map((name) => tooltipped(name, classificationTooltips))) : value, ...rest])
+    .map(([label, value, ...rest]) => [label, rest.at(-1) === 'e_vehicle_classifications' ? sentence(array(value).map((name) => tooltipped(name, presenter.classificationTooltips))) : value, ...rest])
   const modes = array(motor.operating_modes).map((mode) => {
     const otherModes = others.map((other) => array(other.operating_modes).find((each) => each.mode === mode.mode))
     const modeHeading = presenter.diffLabel(presenter.humanize(mode.mode), otherModes.some((each) => each == null))

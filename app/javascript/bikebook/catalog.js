@@ -2,7 +2,6 @@ import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
-import { withUnpublished } from 'bikebook/unpublished'
 
 /* global IntersectionObserver, Worker */
 
@@ -25,7 +24,7 @@ export async function loadCatalog (manifestUrl, ids = []) {
   })
 
   try {
-    const { vocabulary, kit, options } = withUnpublished(await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids }))
+    const { vocabulary, kit, options } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids })
     return {
       vocabulary,
       kit,

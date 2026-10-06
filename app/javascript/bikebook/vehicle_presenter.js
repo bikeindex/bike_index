@@ -6,11 +6,17 @@ import { array, blank, compact, equal, isHash, isTemplate, join } from 'bikebook
 
 const roundHalfUp = (value) => Math.sign(value) * Math.round(Math.abs(value))
 
+const CLASSIFICATIONS = 'motors.e_vehicle_classifications'
+
 // The names, units and lookups the vehicle templates present a model's data with
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
     this.kit = kit
-    this.vocabulary = vocabulary
+    // `names` leaves off a classification's jurisdiction: "Moped", where it's "US-CA Moped"
+    const classifications = Object.entries(vocabulary.e_vehicle_classifications ?? {})
+    const names = Object.fromEntries(classifications.map(([id, { jurisdiction, name }]) => [id, `${jurisdiction} ${name}`]))
+    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [CLASSIFICATIONS]: { ...vocabulary.names[CLASSIFICATIONS], ...names } } }
+    this.classificationTooltips = Object.fromEntries(classifications.map(([id, { description }]) => [names[id], description]))
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
     this.imperialLengths = kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))
