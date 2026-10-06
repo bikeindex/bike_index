@@ -194,7 +194,7 @@ class ModelViewer {
         row('Years', null, this.yearRange(), yearRangeDiffers),
         row('Markets', 'markets', vehicle.markets?.join(', ')),
         row('Vehicle type', 'type'),
-        row('Propulsion', 'propulsion'),
+        row('Propulsion', 'propulsion', array(vehicle.propulsion).join(', ')),
         row('Primary activity', 'primary_activity', this.withoutParenthetical(vehicle.primary_activity)),
         row('Handlebar', 'handlebar_type', this.withoutParenthetical(vehicle.handlebar_type))
       ])
