@@ -1733,7 +1733,7 @@ RSpec.describe Bike, type: :model do
       bike.update(year: 1999, frame_material: "steel",
         secondary_frame_color_id: FactoryBot.create(:color).id,
         tertiary_frame_color_id: FactoryBot.create(:color).id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         propulsion_type: "throttle",
         cycle_type: "unicycle",
         frame_size: "56", frame_size_unit: "foo",
@@ -1987,6 +1987,13 @@ RSpec.describe Bike, type: :model do
       let!(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location, bike: bike, user: owner) }
       it "counts all them" do
         expect(bike.reload.messages_count).to eq 4
+      end
+    end
+    context "organization_message" do
+      let!(:organization_message) { FactoryBot.create(:organization_message) }
+      let(:bike) { organization_message.bike }
+      it "is 1" do
+        expect(bike.reload.messages_count).to eq 1
       end
     end
   end

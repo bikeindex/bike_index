@@ -55,6 +55,7 @@ Rails.application.routes.draw do
   end
 
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
+  get "bikebook", to: "bikebook#show"
 
   resource :session, only: %i[new create destroy] do
     collection do
@@ -309,7 +310,7 @@ Rails.application.routes.draw do
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
-      notifications organization_landing_pages organization_statuses paper_trail_versions
+      notifications organization_landing_pages organization_messages organization_statuses paper_trail_versions
       parking_notifications public_images
       strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
@@ -504,6 +505,7 @@ Rails.application.routes.draw do
     resources :emails, only: %i[index show edit update]
     resources :parking_notifications
     resources :graduated_notifications, only: %w[index show]
+    resources :organization_messages, only: %i[create]
     resources :impound_records, only: %i[index show update]
     resources :impound_claims, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
@@ -544,8 +546,8 @@ Rails.application.routes.draw do
   get "*id", to: "registrations#show", constraints: {id: %r{[rR]/.*}}, format: false
   # Short bike_version URLs: /v/<short_id> (and /V/...)
   get "*id", to: "bike_versions#show", constraints: {id: %r{[vV]/.*}}, format: false
-  # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
-  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
+  # Short marketplace_listing URLs: /f/<short_id> (and /F/...)
+  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[fF]/.*}}, format: false
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.sandbox? # Handle 404s with lograge
 end

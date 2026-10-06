@@ -734,10 +734,9 @@ en:
         steel: Steel
         titanium: Titanium
       handlebar_type:
-        bmx: BMX style
         drop_bar: Drop bars
-        flat: Flat or riser
         forward: Forward facing
+        horizontal: Flat or riser (horizontal facing)
         other: Not handlebars
         rearward: Rear facing
       marketplace_listing:
@@ -1899,6 +1898,10 @@ en:
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
+      organization_messages:
+        create:
+          sent: Message sent to the owner
+          unable_to_send: Unable to send - %{errors}
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
@@ -4550,6 +4553,11 @@ en:
           Bike Index?
         select_email: Select email
         send_emails_directly: Send emails directly to unclaimed bike owners.
+        send_self_registration_email_helper: >-
+          By default, Bike Index no longer sends an email to you when a vehicle is
+          registered to your organization registration email (e.g. unregistered parking
+          notifications).
+        send_self_registration_email_html: Send email for registrations sent to <code>%{email}</code>
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
         unclaimed_registration_definition: >-
@@ -4674,6 +4682,8 @@ en:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    organization_message:
+      subject: Message from %{organization_name} about your %{bike_type}
     partial_register_confirmation:
       subject: Confirm your email to finish your %{organization_name}registration
     partial_register_confirmation_abandoned:

@@ -885,12 +885,11 @@ it:
         steel: Acciaio
         titanium: Titanio
       handlebar_type:
-        bmx: Stile BMX
         drop_bar: Piega
-        flat: Dritto o riser
         forward: Rivolto in avanti
         other: Non manubri
         rearward: Rivolto all'indietro
+        horizontal: Dritto o riser
       propulsion_type:
         foot_pedal: Pedale
         hand_pedal: Hand bike
@@ -2416,6 +2415,10 @@ it:
         available_impound_records:
           we_dont_know_location: Spiacenti, non conosciamo la posizione "%{location}".
             Si prega di provare con una posizione diversa.
+      organization_messages:
+        create:
+          sent: Messaggio inviato al proprietario
+          unable_to_send: Impossibile inviare - %{errors}
     ownerships:
       show:
         no_longer_your_bike: Quello era il tuo %{bike_type} ma non lo è più! Contattaci
@@ -4817,6 +4820,12 @@ it:
           reclamate vengono inviate alla vostra organizzazione per essere esaminate
           e inoltrate all'utente finale, poiché tali utenti non hanno attivato le
           notifiche di Bike Index.
+        send_self_registration_email_helper: Per impostazione predefinita, Bike Index
+          non ti invia più un'email quando un veicolo viene registrato all'indirizzo
+          email di registrazione della tua organizzazione (ad esempio, notifiche di
+          parcheggio non registrato).
+        send_self_registration_email_html: Inviare l'email per le registrazioni inviate
+          a <code>%{email}</code>
     stickers:
       edit:
         bike: Bicicletta
@@ -4944,6 +4953,8 @@ it:
       subject: Completa la segnalazione del tuo ritrovamento %{cycle_type}
     partial_register_confirmation_stolen:
       subject: Completa la segnalazione del tuo %{cycle_type} rubato
+    organization_message:
+      subject: Messaggio da %{organization_name} riguardo al tuo %{bike_type}
   payments:
     form:
       donation_header: Aiutaci a sostenere i nostri sforzi!
@@ -5574,6 +5585,12 @@ it:
         we_saved_your_registration_html: Abbiamo salvato la tua registrazione per
           un <strong>%{color_and_brand}</strong> nel registro di biciclette più completo
           al mondo.
+      organization_message:
+        reply_to_respond: Rispondi a questa email per rispondere a %{sender_email}.
+        sender_sent_you_a_message: "%{sender_email} da %{organization_name} ti ha
+          inviato un messaggio riguardo al tuo %{bike_type}:"
+        sender_sent_you_a_message_html: "%{sender_email} da %{organization_name} ti
+          ha inviato un messaggio riguardo al tuo %{link}:"
     ui:
       definition_list:
         row:
@@ -5693,6 +5710,10 @@ it:
         unregistered: Non registrato dal proprietario - generato da una notifica di
           parcheggio
         with_owner: Registrato e protetto. Con il suo proprietario (non rubato).
+      short_id:
+        copy_id: Copia ID
+      sticker:
+        copy_sticker: Copia adesivo
     pages:
       messages:
         thread_show:
@@ -5975,11 +5996,6 @@ it:
           contact_owner:
             contact_the_owner: Contatta il proprietario
             know_something_about_this_bike_type: Sapete qualcosa di questa %{bike_type}?
-            link_url: Collegamento
-            send_message: Invia il messaggio
-            where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci
-              contatti in merito a un annuncio che hai trovato online, includi il
-              link nel campo sottostante.
           current_alerts:
             claim_impound:
               add_a_stolen_bike: aggiungi un %{bike_type} rubato
@@ -6082,15 +6098,26 @@ it:
               title: Aggiornare il registro dei sequestri
             message_owner:
               know_something_about_this_bike_type: Sapete qualcosa di questa %{bike_type}?
-              link_url: Collegamento
-              send_message: Invia il messaggio
-              where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se
-                ci contatti in merito a un annuncio che hai trovato online, includi
-                il link nel campo sottostante.
               know_who_has_this_bike_type: Sai chi ha questo %{bike_type}?
               what_do_you_need_to_ask: Cosa devi chiedere a riguardo %{bike_type}?
                 Inserisci un link nel campo sottostante se ne trovi uno che ti può
                 essere d'aiuto.
+              general_message: Messaggio generale
+              has_active_parking_notification: Questa targa ha una notifica di parcheggio
+                attiva.
+              message_about_theft: Messaggio relativo al furto
+              message_the_owner_of_this_bike_type: Invia un messaggio al proprietario
+                di questo %{bike_type}
+              owner_turned_off_non_stolen_notifications: Questo utente ha disattivato
+                le notifiche per i veicoli non rubati.
+              send_a_new_parking_notification_to_message_the_owner: 'Invia una nuova
+                notifica di parcheggio al proprietario:'
+              send_parking_notification: Invia notifica di parcheggio
+              unavailable_phone_registration: Registrato tramite telefono, quindi
+                non c'è un'e-mail da inviare a
+              unavailable_status: Non è possibile inviare messaggi generici a %{status}
+              unavailable_vehicle_not_registered_with_organization: I messaggi generici
+                possono essere inviati solo ai veicoli registrati con %{organization_name}
             parking_notification_form:
               address_or_intersection: Indirizzo o incrocio
               create_parking_notification: Crea una nuova notifica di parcheggio
@@ -6113,6 +6140,10 @@ it:
               view_notifications: Visualizza le notifiche
               view_notifications_active_html: "<strong>%{count}</strong> Attivo"
               view_notifications_resolved_html: "<strong>%{count}</strong> Risolto"
+            organization_message_form:
+              send_message: Invia il messaggio
+              what_do_you_want_to_tell_the_owner: Cosa vuoi dire al proprietario di
+                questo %{bike_type}?
           owner_phone:
             or_call: O chiamare
           photos:
@@ -6225,6 +6256,12 @@ it:
             updated_by: Aggiornato da %{user}
           subtitle:
             nickname: 'soprannome: %{name}'
+          stolen_notification_form:
+            link_url: Collegamento
+            send_message: Invia il messaggio
+            where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci
+              contatti in merito a un annuncio che hai trovato online, includi il
+              link nel campo sottostante.
       search:
         everything_combobox:
           made_by: realizzato da
@@ -6836,6 +6873,33 @@ it:
               le migliori possibilità di tornare — puoi aggiungere il numero in seguito.
           step_review:
             complete_registration: Completare la registrazione %{cycle_type}
+      bikebook:
+        show:
+          activity: Attività
+          any_activity: Qualsiasi attività
+          any_configuration: Qualsiasi configurazione
+          any_manufacturer: Qualsiasi produttore
+          any_motorized: Qualsiasi motorizzato
+          any_suspension: Qualsiasi sospensione
+          any_vehicle_type: Qualsiasi tipo di veicolo
+          applied_filters: Filtri applicati
+          configuration: Configurazione
+          failed: Impossibile caricare il catalogo. Ricarica la pagina per riprovare.
+          loading: Caricamento del catalogo…
+          manufacturer: Produttore
+          max: Massimo
+          min: Min
+          more_filters: Altri filtri
+          motorized: Motorizzato
+          price: Prezzo
+          search_placeholder: Cerca per produttore o modello…
+          sort: Ordinare
+          suspension: Sospensione
+          vehicle_type: Tipo di veicolo
+          view_a_vehicle: Visualizza un veicolo
+          year: Anno
+          filter_combobox:
+            any: Qualunque
     shared_blocks:
       footer:
         about: Di

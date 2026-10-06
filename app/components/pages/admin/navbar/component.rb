@@ -141,6 +141,7 @@ module Pages
             {title: "Recoveries", path: admin_recoveries_path},
             {title: "Recovery Displays", path: admin_recovery_displays_path},
             {title: "Organization Roles", path: admin_organization_roles_path},
+            {title: "Organization Messages", path: admin_organization_messages_path},
             {title: "Manufacturers", path: admin_manufacturers_path},
             {title: "Config: TSV Exports", path: admin_tsvs_path, exact: true},
             {title: "Credibility badges", path: admin_credibility_badges_path, exact: true},

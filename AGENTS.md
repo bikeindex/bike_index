@@ -6,7 +6,7 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
-**A spawned `.claude/worktrees/…` checkout runs `bin/workspace_setup --without_seeds` before anything else** — until it has, `bin/env` falls back to the *main* checkout's port, database and Redis. The `sandbox-test-setup` skill has it.
+**A spawned `.claude/worktrees/…` checkout runs `bin/workspace_setup --without_seeds` before anything else** — until it has, `bin/env` falls back to the *main* checkout's port, database and Redis. `.claude/hooks/worktree-setup.sh` runs it at the first session start. The `sandbox-test-setup` skill has it.
 
 **A workspace's database generally starts empty** — created and migrated, but not seeded, so `Bike.count` is 0 and real pages render nothing. Run `bundle exec rails db:seed` when you need records to try something in development; `bikeindex_development_$WORKSPACE_ID` is a per-workspace throwaway, so seeding or re-seeding it is safe and never needs asking.
 
@@ -126,7 +126,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 
 - When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs and captures desktop+mobile screenshots, which it posts as a `## Screenshots` comment (never in the body, so the summary stays first). `.claude/hooks/pr-guardrails.sh` denies the authoring commands until that skill is loaded.
 - **Merging a PR is the human's, including when they ask you to do it in the moment.** Say the PR is ready and leave it. The same hook denies it, and won't be talked round — but it only covers agents running here, so treat the rule as the thing to follow rather than the hook as the thing to get past.
-- To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, the `gh` CLI **cannot upload images** — use the `github-pr-images` skill, which drives a real browser to GitHub's user-attachments uploader.
+- To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, use the `github-pr-images` skill — it uploads with `gh … --attach` and owns the PR's `## Screenshots` comment.
 
 ## Architecture notes
 

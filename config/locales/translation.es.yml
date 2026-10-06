@@ -891,12 +891,11 @@ es:
         steel: Acero
         titanium: Titanio
       handlebar_type:
-        bmx: estilo BMX
         drop_bar: manillar de caída
-        flat: Plano o escalonado
         forward: Orientado hacia adelante
         other: No son manillares
         rearward: Orientación hacia atrás
+        horizontal: Plano o escalonado
       propulsion_type:
         foot_pedal: Pedal
         hand_pedal: Bicicleta de mano (pedal de mano)
@@ -2420,6 +2419,10 @@ es:
         available_impound_records:
           we_dont_know_location: Lo sentimos, no conocemos la ubicación "%{location}".
             Por favor, intente con otra ubicación.
+      organization_messages:
+        create:
+          sent: Mensaje enviado al propietario
+          unable_to_send: No se puede enviar - %{errors}
     ownerships:
       show:
         no_longer_your_bike: Eso solía ser tu %{bike_type}, ¡pero ya no lo es! Contáctanos
@@ -4798,6 +4801,12 @@ es:
           no reclamadas se envían a su organización para su revisión y posterior reenvío
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
+        send_self_registration_email_helper: Por defecto, Bike Index ya no te envía
+          un correo electrónico cuando se registra un vehículo con la dirección de
+          correo electrónico de registro de tu organización (por ejemplo, notificaciones
+          de aparcamiento no registrado).
+        send_self_registration_email_html: Enviar correo electrónico para inscripciones
+          enviadas a <code>%{email}</code>
     stickers:
       edit:
         bike: Bicicleta
@@ -4926,6 +4935,8 @@ es:
       subject: Finaliza el informe de tu hallazgo %{cycle_type}
     partial_register_confirmation_stolen:
       subject: Finaliza la denuncia de tu %{cycle_type} robado.
+    organization_message:
+      subject: Mensaje de %{organization_name} sobre tu %{bike_type}
   payments:
     form:
       donation_header: "¡Ayúdanos a apoyar nuestros esfuerzos!"
@@ -5563,6 +5574,12 @@ es:
           Funciona durante %{days} días.
         we_saved_your_registration_html: Hemos guardado tu registro para una <strong>%{color_and_brand}</strong>
           en el registro de bicicletas más completo del mundo.
+      organization_message:
+        reply_to_respond: Responda a este correo electrónico para responder a %{sender_email}.
+        sender_sent_you_a_message: "%{sender_email} de %{organization_name} te envió
+          un mensaje sobre tu %{bike_type}:"
+        sender_sent_you_a_message_html: "%{sender_email} de %{organization_name} te
+          envió un mensaje sobre tu %{link}:"
     ui:
       definition_list:
         row:
@@ -5682,6 +5699,10 @@ es:
         unregistered: 'No registrado por su propietario: creado a partir de una notificación
           de estacionamiento.'
         with_owner: Registrado y protegido. Con su dueño (no robado).
+      short_id:
+        copy_id: Copiar ID
+      sticker:
+        copy_sticker: Copiar pegatina
     pages:
       messages:
         thread_show:
@@ -5962,11 +5983,6 @@ es:
           contact_owner:
             contact_the_owner: Contacta con el propietario
             know_something_about_this_bike_type: "¿Sabes algo sobre esto %{bike_type}?"
-            link_url: URL del enlace
-            send_message: Enviar mensaje
-            where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos contactas
-              por un anuncio que encontraste en línea, incluye un enlace en el campo
-              a continuación."
           current_alerts:
             claim_impound:
               add_a_stolen_bike: agregar un %{bike_type} robado
@@ -6067,14 +6083,26 @@ es:
               title: Actualizar el registro de incautación
             message_owner:
               know_something_about_this_bike_type: "¿Sabes algo sobre esto %{bike_type}?"
-              link_url: URL del enlace
-              send_message: Enviar mensaje
-              where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos
-                contactas por un anuncio que encontraste en línea, incluye un enlace
-                en el campo a continuación."
               know_who_has_this_bike_type: "¿Sabes quién tiene este %{bike_type}?"
               what_do_you_need_to_ask: "¿Qué necesitas preguntar sobre esto %{bike_type}?
                 Incluye un enlace en el campo de abajo si hay alguno que te ayude."
+              general_message: Mensaje general
+              has_active_parking_notification: Este registro tiene una notificación
+                de estacionamiento activa.
+              message_about_theft: Mensaje sobre robo
+              message_the_owner_of_this_bike_type: Envía un mensaje al propietario
+                de este %{bike_type}
+              owner_turned_off_non_stolen_notifications: Este usuario ha desactivado
+                las notificaciones para vehículos que no han sido robados.
+              send_a_new_parking_notification_to_message_the_owner: 'Enviar una nueva
+                notificación de estacionamiento para avisar al propietario:'
+              send_parking_notification: Enviar notificación de estacionamiento
+              unavailable_phone_registration: Registrado por teléfono, por lo que
+                no hay correo electrónico que enviar.
+              unavailable_status: Los mensajes generales no están disponibles para
+                enviar a %{status}.
+              unavailable_vehicle_not_registered_with_organization: Los mensajes generales
+                solo se pueden enviar a vehículos registrados con %{organization_name}.
             parking_notification_form:
               address_or_intersection: Dirección o intersección
               create_parking_notification: Crear una nueva notificación de estacionamiento
@@ -6098,6 +6126,10 @@ es:
               view_notifications: Ver notificaciones
               view_notifications_active_html: "<strong>%{count}</strong> Activo"
               view_notifications_resolved_html: "<strong>%{count}</strong> Resuelto"
+            organization_message_form:
+              send_message: Enviar mensaje
+              what_do_you_want_to_tell_the_owner: "¿Qué quieres decirle al dueño de
+                este %{bike_type}?"
           owner_phone:
             or_call: O llame
           photos:
@@ -6209,6 +6241,12 @@ es:
             updated_by: Actualizado por %{user}
           subtitle:
             nickname: 'apodo: %{name}'
+          stolen_notification_form:
+            link_url: URL del enlace
+            send_message: Enviar mensaje
+            where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos contactas
+              por un anuncio que encontraste en línea, incluye un enlace en el campo
+              a continuación."
       search:
         everything_combobox:
           made_by: hecho por
@@ -6814,6 +6852,33 @@ es:
               la mejor oportunidad de regresar; puede agregar el número más tarde.
           step_review:
             complete_registration: Registro completo %{cycle_type}
+      bikebook:
+        show:
+          activity: Actividad
+          any_activity: Cualquier actividad
+          any_configuration: Cualquier configuración
+          any_manufacturer: Cualquier fabricante
+          any_motorized: Cualquier motorizado
+          any_suspension: Cualquier suspensión
+          any_vehicle_type: Cualquier tipo de vehículo
+          applied_filters: Filtros aplicados
+          configuration: Configuración
+          failed: El catálogo no se cargó. Recarga la página para intentarlo de nuevo.
+          loading: Cargando el catálogo…
+          manufacturer: Fabricante
+          max: Máximo
+          min: Min
+          more_filters: Más filtros
+          motorized: Motorizado
+          price: Precio
+          search_placeholder: Buscar por fabricante o modelo…
+          sort: Clasificar
+          suspension: Suspensión
+          vehicle_type: Tipo de vehículo
+          view_a_vehicle: Ver un vehículo
+          year: Año
+          filter_combobox:
+            any: Cualquier
     shared_blocks:
       footer:
         about: Acerca
