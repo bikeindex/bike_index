@@ -57,6 +57,11 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record2.id])
         expect(assigns(:available_statuses)).to eq(available_statuses + ["expired"])
 
+        # The form posts distance_unit on every search, which isn't a bike search term
+        get "#{base_url}?search_no_js=true&search_bike_id=#{bike2.id}&distance_unit=km"
+        expect(response.status).to eq(200)
+        expect(assigns(:impound_records).pluck(:id)).to eq([impound_record2.id])
+
         get "#{base_url}?search_no_js=true&search_email=&serial=yar1s"
         expect(response.status).to eq(200)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record2.id])
