@@ -1,0 +1,29 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        show:
+          activity: Activity
+          any_activity: Any activity
+          any_configuration: Any configuration
+          any_manufacturer: Any manufacturer
+          any_motorized: Any motorized
+          any_suspension: Any suspension
+          any_vehicle_type: Any vehicle type
+          applied_filters: Applied filters
+          configuration: Configuration
+          failed: The catalog didn't load. Reload the page to try again.
+          loading: Loading the catalog…
+          manufacturer: Manufacturer
+          max: Max
+          min: Min
+          more_filters: More filters
+          motorized: Motorized
+          price: Price
+          search_placeholder: Search by manufacturer or model…
+          sort: Sort
+          suspension: Suspension
+          vehicle_type: Vehicle type
+          view_a_vehicle: View a vehicle
+          year: Year

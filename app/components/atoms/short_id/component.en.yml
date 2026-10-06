@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    atoms:
+      short_id:
+        copy_id: Copy ID
