@@ -145,7 +145,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     end
   end
 
-  it "merges motors that match but for their drive wheel, and names an operating mode's e-vehicle classification" do
+  it "merges motors that match but for their drive wheel, and names the operating modes' e-vehicle classifications" do
     serve_catalog
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
 
@@ -153,9 +153,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
 
-    # compared with a mode that has none, whose row then has no value
+    # beside a vehicle that has none
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro")
     classification = find("section div", text: /E-vehicle classification\s*US-CA Off-highway electric motorcycle/, wait: 10)
+    expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     classification.find("button", text: "?").click
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
     expect(tooltip).to have_css("code", exact_text: "evc/us/ca/off_highway_electric_motorcycle")

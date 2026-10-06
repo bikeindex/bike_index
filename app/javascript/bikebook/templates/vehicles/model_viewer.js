@@ -195,10 +195,20 @@ class ModelViewer {
         row('Markets', 'markets', vehicle.markets?.join(', ')),
         row('Vehicle type', 'type'),
         row('Propulsion', 'propulsion', array(vehicle.propulsion).join(', ')),
+        this.classifications(),
         row('Primary activity', 'primary_activity', this.withoutParenthetical(vehicle.primary_activity)),
         row('Handlebar', 'handlebar_type', this.withoutParenthetical(vehicle.handlebar_type))
       ])
     })
+  }
+
+  // Each classification any operating mode has, compared by name: a tooltip's random id never equals another's
+  classifications () {
+    const names = (vehicle) => [...new Set(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes).map((mode) => mode.e_vehicle_classification)).filter(present))].sort()
+    const mine = names(this.vehicle)
+    const differs = this.others.some((other) => !equal(names(other), mine))
+    const tooltips = this.presenter.classificationTooltips(this.classificationPath)
+    return definitionListRow({ label: this.presenter.diffLabel('E-vehicle classification', differs), value: join(mine.map((name) => this.tooltipped(name, tooltips)), ', ') })
   }
 
   yearRange () {
@@ -339,7 +349,7 @@ class ModelViewer {
       const heading = wheels.length > 1
         ? `${andSentence(wheels)} Motor`
         : count === 1 ? 'Motor & Battery' : wheels.length ? `${wheels[0]} motor` : `Motor ${index + 1}`
-      return motorSection({ presenter: this.presenter, heading, motor: motor ?? {}, others: othersMotors.map((each) => each[index] ?? {}), tooltipped: (value, tooltips) => this.tooltipped(value, tooltips), classificationPath: this.classificationPath })
+      return motorSection({ presenter: this.presenter, heading, motor: motor ?? {}, others: othersMotors.map((each) => each[index] ?? {}) })
     })
   }
 

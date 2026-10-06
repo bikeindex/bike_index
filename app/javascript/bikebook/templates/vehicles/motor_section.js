@@ -1,12 +1,12 @@
 import { copyableCode } from 'bikebook/templates/ui/copyable_code'
 import { section } from 'bikebook/templates/vehicles/section'
-import { array, blank, compact, join, present, slice } from 'bikebook/templates/values'
+import { array, blank, compact, except, join, present, slice } from 'bikebook/templates/values'
 
 // A motor's specs, with a subsection per operating mode
-export const motorSection = ({ presenter, heading, motor, others, tooltipped, classificationPath }) => {
-  const { fields, mode_fields: modeFields, humanized } = presenter.kit.motor
-  // the kit's "US e-bike class" doesn't fit a California classification
-  const labels = { ...presenter.kit.motor.labels, e_vehicle_classification: 'E-vehicle classification' }
+export const motorSection = ({ presenter, heading, motor, others }) => {
+  const { fields, humanized, labels } = presenter.kit.motor
+  // the identity rows list every mode's classification
+  const modeFields = except(presenter.kit.motor.mode_fields, ['e_vehicle_classification'])
   const display = (each) => ({
     ...each,
     name: [each.manufacturer, each.model].filter(present).join(' '),
@@ -22,14 +22,11 @@ export const motorSection = ({ presenter, heading, motor, others, tooltipped, cl
     availability: mode.availability === 'stock' || mode.availability == null ? null : presenter.humanize(mode.availability),
     operating_temperature: temperatureRange(mode.operating_temperature)
   })
-  const classificationTooltips = presenter.classificationTooltips(classificationPath)
   const rows = presenter.rowsFor(fields, display(motor), { labels, others: others.map(display) })
   const modes = array(motor.operating_modes).map((mode) => {
     const otherModes = others.map((other) => array(other.operating_modes).find((each) => each.mode === mode.mode))
     const modeHeading = presenter.diffLabel(presenter.humanize(mode.mode), otherModes.some((each) => each == null))
-    // tooltipped after the diff, which a tooltip's random id would always mark
     const modeRows = presenter.rowsFor(modeFields, displayMode(mode), { labels, others: otherModes.map((each) => each ? displayMode(each) : null) })
-      .map(([label, value, ...rest]) => [label, rest.at(-1) === 'e_vehicle_classification' ? tooltipped(value, classificationTooltips) : value, ...rest])
     return [modeHeading, presenter.measurementRows(modeRows)]
   })
   return section({ heading, content: presenter.measurementRows(rows), subsections: modes })
