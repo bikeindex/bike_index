@@ -5,6 +5,13 @@ RSpec.describe Invoice, type: :model do
 
   let(:organization) { invoice.organization }
 
+  describe "amount_due=" do
+    it "rounds to the nearest cent" do
+      expect(Invoice.new(amount_due: "19.99").amount_due_cents).to eq 1999
+      expect(Invoice.new(amount_due: "0.29").amount_due_cents).to eq 29
+    end
+  end
+
   describe "friendly_find" do
     let!(:invoice) { FactoryBot.create(:invoice) }
     it "finds or doesn't appropriately" do

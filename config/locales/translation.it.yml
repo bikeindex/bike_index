@@ -6262,6 +6262,8 @@ it:
             where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci
               contatti in merito a un annuncio che hai trovato online, includi il
               link nel campo sottostante.
+          share:
+            link_copied: Link copiato
       search:
         everything_combobox:
           made_by: realizzato da

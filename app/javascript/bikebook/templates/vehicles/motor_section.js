@@ -12,7 +12,7 @@ export const motorSection = ({ presenter, heading, motor, others }) => {
     ...each,
     name: [each.manufacturer, each.model].filter(present).join(' '),
     id: each.id ? copyableCode({ value: each.id, label: 'Copy ID' }) : null,
-    us_e_bike_class: each.us_e_bike_class == null ? null : `Class ${sentence(each.us_e_bike_class)}`,
+    e_vehicle_classifications: each.e_vehicle_classifications == null ? null : sentence(each.e_vehicle_classifications),
     // a merged motor lists each of its drive wheels
     ...Object.fromEntries(Object.entries(slice(each, humanized)).map(([key, value]) => [key, value == null ? value : array(value).map((part) => presenter.humanize(part)).join(', ')]))
   })

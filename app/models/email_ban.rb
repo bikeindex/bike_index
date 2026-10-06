@@ -115,9 +115,9 @@ class EmailBan < ApplicationRecord
 
     def email_plus_duplicate_matches(email)
       email_start, email_end = email.split("@")
-      email_start.gsub!(/\+.*/, "")
+      pattern = "^#{Regexp.escape(email_start.sub(/\+.*/, ""))}(\\+.*)?@#{Regexp.escape(email_end)}$"
 
-      User.where("email ~ ?", "^#{email_start}(\\+.*)?@#{email_end}").where.not(email:)
+      User.where("email ~ ?", pattern).where.not(email:)
     end
 
     def process_email_domain_if_required(email_domain)

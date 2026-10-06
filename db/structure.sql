@@ -4499,7 +4499,8 @@ CREATE TABLE public.users (
     address_record_id bigint,
     can_send_many_marketplace_messages boolean DEFAULT false NOT NULL,
     feature_registration_show_legacy boolean DEFAULT false NOT NULL,
-    passwordless_user boolean DEFAULT false NOT NULL
+    passwordless_user boolean DEFAULT false NOT NULL,
+    preferred_unit_system integer
 );
 
 
@@ -7920,6 +7921,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261005170000'),
 ('20261005120000'),
 ('20261001170000'),
 ('20260930161510'),

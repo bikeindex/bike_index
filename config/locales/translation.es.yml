@@ -6247,6 +6247,8 @@ es:
             where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos contactas
               por un anuncio que encontraste en línea, incluye un enlace en el campo
               a continuación."
+          share:
+            link_copied: Enlace copiado
       search:
         everything_combobox:
           made_by: hecho por

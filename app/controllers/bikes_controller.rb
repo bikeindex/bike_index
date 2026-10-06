@@ -99,9 +99,7 @@ class BikesController < Bikes::BaseController
     find_or_new_b_param
     org_param = (@b_param.organization || current_organization)&.slug # Protect from nil - see #2308
     if params.dig(:bike, :embeded).present? && org_param.present? # NOTE: if embeded, doesn't verify csrf token
-      if @b_param.created_bike.present?
-        redirect_to edit_bike_url(@b_param.created_bike)
-      end
+      redirect_to(edit_bike_url(@b_param.created_bike)) && return if @b_param.created_bike.present?
       # Have to do in the controller, before assigning
       @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
       # These params replace the b_param's rather than merging into them, so a resubmission
@@ -160,11 +158,13 @@ class BikesController < Bikes::BaseController
     end
     assign_bike_stickers(params[:bike_sticker]) if params[:bike_sticker].present?
     assign_strava_gear if params.key?(:strava_gear_id)
+    # reload clears errors, so a failed save's messages go in the flash first
+    flash[:error] ||= @bike.errors.full_messages.to_sentence if @bike.errors.any?
     @bike = @bike.reload
 
     @edit_templates = nil # update templates in case bike state has changed
-    if @bike.errors.any? || flash[:error].present?
-      edit_bike_url(@bike, edit_template: params[:edit_template])
+    if flash[:error].present?
+      redirect_to(edit_bike_url(@bike, edit_template: params[:edit_template])) && return
     else
       flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present

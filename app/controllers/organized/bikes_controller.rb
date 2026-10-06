@@ -88,7 +88,7 @@ module Organized
       @b_param = find_or_new_b_param
       iframe_redirect_params = {organization_id: current_organization.to_param}
       if @b_param.created_bike.present?
-        flash[:success] = "#{@bike.created_bike.type} Created"
+        flash[:success] = "#{@b_param.created_bike.type} Created"
       else
         if params.dig(:bike, :image).present? # Have to do in the controller, before assigning
           @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
