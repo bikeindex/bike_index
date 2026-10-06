@@ -6,7 +6,7 @@ import { array, blank, compact, equal, isHash, isTemplate, join } from 'bikebook
 
 const roundHalfUp = (value) => Math.sign(value) * Math.round(Math.abs(value))
 
-const CLASSIFICATIONS = 'motors.e_vehicle_classifications'
+export const CLASSIFICATIONS = 'motors.e_vehicle_classifications'
 
 // "ec/us/class_3" names "Class 3"; the jurisdiction between makes it "US Class 3", "US-CA Moped"
 const withJurisdictions = (names = {}) => Object.fromEntries(Object.entries(names)
