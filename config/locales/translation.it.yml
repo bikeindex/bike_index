@@ -4820,6 +4820,12 @@ it:
           reclamate vengono inviate alla vostra organizzazione per essere esaminate
           e inoltrate all'utente finale, poiché tali utenti non hanno attivato le
           notifiche di Bike Index.
+        send_self_registration_email_helper: Per impostazione predefinita, Bike Index
+          non ti invia più un'email quando un veicolo viene registrato all'indirizzo
+          email di registrazione della tua organizzazione (ad esempio, notifiche di
+          parcheggio non registrato).
+        send_self_registration_email_html: Inviare l'email per le registrazioni inviate
+          a <code>%{email}</code>
     stickers:
       edit:
         bike: Bicicletta
@@ -5704,6 +5710,10 @@ it:
         unregistered: Non registrato dal proprietario - generato da una notifica di
           parcheggio
         with_owner: Registrato e protetto. Con il suo proprietario (non rubato).
+      short_id:
+        copy_id: Copia ID
+      sticker:
+        copy_sticker: Copia adesivo
     pages:
       messages:
         thread_show:
@@ -6863,6 +6873,33 @@ it:
               le migliori possibilità di tornare — puoi aggiungere il numero in seguito.
           step_review:
             complete_registration: Completare la registrazione %{cycle_type}
+      bikebook:
+        show:
+          activity: Attività
+          any_activity: Qualsiasi attività
+          any_configuration: Qualsiasi configurazione
+          any_manufacturer: Qualsiasi produttore
+          any_motorized: Qualsiasi motorizzato
+          any_suspension: Qualsiasi sospensione
+          any_vehicle_type: Qualsiasi tipo di veicolo
+          applied_filters: Filtri applicati
+          configuration: Configurazione
+          failed: Impossibile caricare il catalogo. Ricarica la pagina per riprovare.
+          loading: Caricamento del catalogo…
+          manufacturer: Produttore
+          max: Massimo
+          min: Min
+          more_filters: Altri filtri
+          motorized: Motorizzato
+          price: Prezzo
+          search_placeholder: Cerca per produttore o modello…
+          sort: Ordinare
+          suspension: Sospensione
+          vehicle_type: Tipo di veicolo
+          view_a_vehicle: Visualizza un veicolo
+          year: Anno
+          filter_combobox:
+            any: Qualunque
     shared_blocks:
       footer:
         about: Di

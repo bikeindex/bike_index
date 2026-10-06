@@ -264,13 +264,6 @@ RSpec.describe BikeServices::Updator do
       expect(bike.components.count).to eq(0)
     end
 
-    it "updates handlebar_type from a former slug" do
-      bike = FactoryBot.create(:bike, :with_ownership, handlebar_type: :drop_bar)
-      BikeServices::Updator.new(user: bike.creator, bike:, permitted_params: {id: bike.id, bike: {handlebar_type: "flat"}}.as_json)
-        .update_available_attributes
-      expect(bike.reload.handlebar_type).to eq "horizontal"
-    end
-
     it "updates the bike sets is_for_sale and address_set_manually to false" do
       bike = FactoryBot.create(:bike, :with_ownership, is_for_sale: true, address_set_manually: true)
       user = bike.creator

@@ -4592,6 +4592,11 @@ nb:
         why_no_direct_by_default: Som standard sendes e-poster til sykler som ikke
           er gjort krav på, til organisasjonen din for å gjennomgå og videresende
           til sluttbrukeren, fordi disse brukerne ikke har meldt seg på Bike Index-varsler.
+        send_self_registration_email_helper: Som standard sender ikke Bike Index lenger
+          en e-post til deg når et kjøretøy er registrert på organisasjonens registrerings-e-postadresse
+          (f.eks. varsler om uregistrert parkering).
+        send_self_registration_email_html: Send e-post for registreringer sendt til
+          <code>%{email}</code>
     stickers:
       edit:
         bike: Sykkel
@@ -5445,6 +5450,10 @@ nb:
         stolen: Meldt stjålet
         unregistered: Ikke registrert av eieren – opprettet fra et parkeringsvarsel
         with_owner: Registrert og beskyttet. Med eieren sin (ikke stjålet)
+      short_id:
+        copy_id: Kopier ID
+      sticker:
+        copy_sticker: Kopier klistremerke
     pages:
       messages:
         thread_show:
@@ -6560,6 +6569,33 @@ nb:
               den beste sjansen til å komme tilbake – du kan legge til nummeret senere.
           step_review:
             complete_registration: Fullfør registreringen %{cycle_type}
+      bikebook:
+        show:
+          activity: Aktivitet
+          any_activity: Enhver aktivitet
+          any_configuration: Enhver konfigurasjon
+          any_manufacturer: Enhver produsent
+          any_motorized: Enhver motorisert
+          any_suspension: Enhver suspensjon
+          any_vehicle_type: Enhver kjøretøytype
+          applied_filters: Anvendte filtre
+          configuration: Konfigurasjon
+          failed: Katalogen lastet ikke inn. Last inn siden på nytt for å prøve igjen.
+          loading: Laster inn katalogen…
+          manufacturer: Produsent
+          max: Maks
+          min: Min.
+          more_filters: Flere filtre
+          motorized: Motorisert
+          price: Pris
+          search_placeholder: Søk etter produsent eller modell…
+          sort: Sortere
+          suspension: Suspensjon
+          vehicle_type: Bil type
+          view_a_vehicle: Se et kjøretøy
+          year: år
+          filter_combobox:
+            any: Noen
     shared_blocks:
       footer:
         about: Om

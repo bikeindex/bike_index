@@ -112,6 +112,8 @@ RSpec.describe "Signup", type: :system do
       click_link "Update your profile"
       wait_for_page_script
       click_link "Add additional email"
+      # Typed into mid-collapse, the final keystroke lands at the start of the value
+      expect(page).to have_css("#additional_email_fields .form-group.collapse.in")
       fill_in "Additional email", with: additional_email
 
       # The form has a save button at the top and the bottom - this is the one by the field

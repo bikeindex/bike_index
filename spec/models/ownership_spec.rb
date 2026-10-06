@@ -367,6 +367,18 @@ RSpec.describe Ownership, type: :model do
         expect(ownership2.calculated_send_email).to be_truthy
       end
     end
+    context "registered to the organization's auto_user" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:auto_user) { FactoryBot.create(:organization_auto_user, organization:) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: auto_user.email) }
+      let(:ownership) { bike.ownerships.first }
+      it "is false unless the organization sends self registration emails" do
+        expect(ownership.calculated_send_email).to be_falsey
+
+        organization.update(send_self_registration_email: true)
+        expect(ownership.reload.calculated_send_email).to be_truthy
+      end
+    end
   end
 
   describe "spam_risky_email?" do
