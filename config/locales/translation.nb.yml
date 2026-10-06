@@ -5988,6 +5988,8 @@ nb:
             send_message: Sende melding
             where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
               om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
+          share:
+            link_copied: Lenken er kopiert
       search:
         everything_combobox:
           made_by: laget av
