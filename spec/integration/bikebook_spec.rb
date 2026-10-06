@@ -157,7 +157,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro")
     classification = find("section div", text: /Classification\s*US-CA Off-highway electric motorcycle/, wait: 10)
     classification.find("button", text: "?").click
-    expect(classification).to have_css("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
+    tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
+    expect(tooltip).to have_css("h3", exact_text: "US-CA Off-highway electric motorcycle")
+    expect(tooltip).to have_css("li", text: "No driver's license needed off the highway")
   end
 
   it "says so when the catalog doesn't load" do

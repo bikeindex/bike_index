@@ -16,7 +16,7 @@ export class VehiclePresenter {
     const classifications = Object.entries(vocabulary.e_vehicle_classifications ?? {})
     const names = Object.fromEntries(classifications.map(([id, { jurisdiction, name }]) => [id, `${jurisdiction} ${name}`]))
     this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [CLASSIFICATIONS]: { ...vocabulary.names[CLASSIFICATIONS], ...names } } }
-    this.classificationTooltips = Object.fromEntries(classifications.map(([id, { description }]) => [names[id], description]))
+    this.classificationTooltips = Object.fromEntries(classifications.map(([id, record]) => [names[id], this.#classificationTooltip(names[id], record)]))
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
     this.imperialLengths = kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))
@@ -36,6 +36,12 @@ export class VehiclePresenter {
       if (names) return [key, Array.isArray(value) ? value.map((item) => names[item] ?? item) : names[value] ?? value]
       return [key, value]
     }))
+  }
+
+  // the US jurisdiction's classifications are the three e-bike classes
+  #classificationTooltip (name, { jurisdiction, description, restrictions }) {
+    return html`<h3 class="tw:font-bold">${name}${jurisdiction === 'US' ? ' e-bike' : ''}</h3><p class="tw:my-1">${description}</p><ul
+      class="tw:list-disc tw:pl-4">${array(restrictions).map((restriction) => html`<li>${restriction}</li>`)}</ul>`
   }
 
   measurement (value, unit = null, key = null) {
