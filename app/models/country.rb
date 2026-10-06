@@ -43,7 +43,7 @@ class Country < ApplicationRecord
       return united_states_id if %w[us usa].include?(name_or_iso)
       return canada_id if name_or_iso == "ca"
 
-      friendly_find(name_or_iso)
+      super
     end
 
     def united_states
