@@ -175,7 +175,8 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     # and its id finds it in the search
     type_into(vehicle_field, "evc/us/ca/off_highway_e")
-    retry_on_detach { find("[role='option']", text: "US-CA Off-highway electric motorcycle").click }
+    retry_on_detach { find("[role='option']", text: "e-Vehicle Classification: US-CA Off-highway electric motorcycle").click }
+    expect(page).to have_css(".hw-combobox__chip", text: "e-Vehicle Classification: US-CA Off-highway electric motorcycle")
     expect(page).to have_css("article h1", text: "US-CA Off-highway electric motorcycle")
 
     # a class that only comes with an optional mode goes on its own line, after the mode
