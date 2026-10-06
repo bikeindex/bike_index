@@ -56,7 +56,7 @@ RSpec.describe "RegistrationsController#toggle_legacy_view", type: :request do
     context "user invalid for an unrelated reason" do
       before { user.update_column(:preferred_language, "xx") }
 
-      it "keeps the opt-out in the session" do
+      it "keeps the opt-out in the session, until a signed-in toggle clears it" do
         RearGearType.fixed
         post toggle_legacy_view_registration_path(bike)
         post "/session", params: {session: {email: user.email, password:}}
@@ -64,6 +64,12 @@ RSpec.describe "RegistrationsController#toggle_legacy_view", type: :request do
         expect(session[:registration_show_legacy]).to be_truthy
         get bike_path(bike)
         expect(response).to render_template(:show)
+
+        user.update_column(:preferred_language, "en")
+        post toggle_legacy_view_registration_path(bike)
+        expect(response).to redirect_to(registration_path(bike))
+        get bike_path(bike)
+        expect(response).to redirect_to(registration_path(bike))
       end
     end
   end
