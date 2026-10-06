@@ -14,6 +14,10 @@ module Atoms
       def with_url
         render(Atoms::Sticker::Component.new(pretty_code: "BR 000 1", url: "#"))
       end
+
+      def copyable
+        render(Atoms::Sticker::Component.new(pretty_code: "BR 000 1", copyable: true))
+      end
       # @!endgroup
     end
   end
