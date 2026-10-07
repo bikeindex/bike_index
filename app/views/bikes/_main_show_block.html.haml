@@ -3,10 +3,10 @@
     - bike_image_url = @bike.image_url(:large) # corrects the URL for remote images in development
     - bike_image = @bike.public_images.first
     - if bike_image_url.present? && bike_image.present?
-      #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
+      #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.size == 1}" }
         .current-photo{ id: "image#{bike_image.id}"}
-          = image_tag(bike_image_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: @bike.image_url })
-      - if @bike.public_images.count > 1
+          = image_tag(bike_image_url, alt: t(".bike_photo", bike_type: @bike.type_titleize), id: "i|#{bike_image.listing_order}", data: { action: "zoom", original: @bike.image_url })
+      - if @bike.public_images.size > 1
         %span.thumbnail-shadow
         %span.thumbnail-shadow-r
         #thumbnail-photos.photo-list
@@ -116,18 +116,15 @@
             = render(UI::DefinitionList::Row::Component.new(label: t(".description_of_incident"), full_width: true, value: impound_record.impounded_description))
 
 
-  -# I think it's more performant to make the query once for all the components and then run through them all for each cgroup
-  - components = @bike.components
+  - components = @bike.components.includes(:ctype).group_by(&:cgroup_id)
   - if components.any?
     - Cgroup.commonness.each do |cgroup|
-      - cgroup_components = components.select { |c| c.cgroup_id == cgroup.id }
-      - next unless cgroup_components.any?
+      - cgroup_components = components[cgroup.id]
+      - next unless cgroup_components
 
       %h3.mt-4.mb-3= cgroup.name
       = render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do
         - cgroup_components.each do |component|
-          - next if component.cgroup_id != cgroup.id
-
           - label = if component.front && component.rear
             - t(".front_rear")
           - elsif component.front

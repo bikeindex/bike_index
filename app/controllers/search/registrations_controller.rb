@@ -13,8 +13,9 @@ module Search
       @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
 
       if @render_results
-        @pagy, @bikes = pagy(:countish, Bike.search(@interpreted_params), limit:, page: @page,
-          max_pages: MAX_INDEX_PAGE)
+        bikes = Bike.search(@interpreted_params)
+        @pagy, @bikes = pagy(:countish, bikes, limit:, page: @page, max_pages: MAX_INDEX_PAGE,
+          count: paginatable_count(bikes))
       end
 
       respond_to do |format|
@@ -37,6 +38,14 @@ module Search
 
     def limit
       10
+    end
+
+    # Pagination stops at MAX_INDEX_PAGE, so count no further. Text matches count in full (nil):
+    # their estimates are too loose to trust a LIMIT with
+    def paginatable_count(bikes)
+      return if @interpreted_params[:query].present?
+
+      bikes.limit(MAX_INDEX_PAGE * limit + 1).count
     end
 
     def set_interpreted_params

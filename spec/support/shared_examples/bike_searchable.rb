@@ -101,6 +101,19 @@ RSpec.shared_examples "bike_searchable" do
           expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
         end
       end
+      # Organizations search their hidden impounded bikes by serial, so a serial match can't
+      # assume the default scope
+      context "with a user hidden match" do
+        let(:bike) { FactoryBot.create(:bike, serial_number: "K10DY00047") }
+        let!(:bike_hidden) { FactoryBot.create(:bike, :with_ownership, serial_number: "K10DY00047") }
+        let(:query_params) { {serial: "K10DY00047", stolenness: "all"} }
+        it "matches within the scope it's called on" do
+          bike_hidden.update(marked_user_hidden: true)
+          expect(bike_hidden.reload.user_hidden).to be_truthy
+          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
+          expect(Bike.unscoped.search(interpreted_params).pluck(:id)).to match_array([bike.id, bike_hidden.id])
+        end
+      end
     end
     context "query" do
       it "selects matching the query" do

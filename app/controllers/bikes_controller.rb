@@ -30,7 +30,10 @@ class BikesController < Bikes::BaseController
     @show_for_sale = show_for_sale?(@bike)
     find_token
     respond_to do |format|
-      format.html { render :show }
+      format.html do
+        ActiveRecord::Associations::Preloader.new(records: [@bike], associations: {public_images: {file_attachment: :blob}}).call
+        render :show
+      end
       format.png do
         qrcode = RQRCode::QRCode.new(bike_url(@bike))
         render plain: qrcode.as_png(size: 1200, border_modules: 0), template: nil, format: :png
