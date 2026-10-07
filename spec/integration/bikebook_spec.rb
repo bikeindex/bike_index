@@ -86,6 +86,9 @@ RSpec.describe "Bikebook", :js, type: :system do
       expect(colors).to have_attributes(size: 2).and all(satisfy { |number, unit| number != unit })
       expect(find("tr", text: "Range")).to have_css(".tw\\:text-red-700", text: "−24")
       expect(find("tr", text: "Top speed")).to have_css("td span", exact_text: "-")
+      # gearing counts its drivetrain's speeds
+      expect(find("tr", text: "Chainrings").all("td").map(&:text)).to match([/\A1: 48\W*t\z/, /\A1: 46\W*t\z/])
+      expect(find("tr", text: "Cogs").all("td").map(&:text)).to match([/\A8: 12–32\W*t\z/, /\A8: 12–32\W*t\z/])
     end
 
     find("[aria-label='Remove Aventón Level 2 Step-Through']").click
@@ -207,6 +210,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     retry_on_detach { find("[role='option']", text: "Aventón Soltera 3 ADV").click }
     expect_size.call("Soltera 3 ADV", "Medium")
     expect_size.call("Current EXP", "Small")
+    # a belt drive's drivetrain counts nothing, so its one cog counts itself
+    expect(find("[aria-label='Comparison'] tr", text: "Cogs").all("td").map(&:text)).to match([/\A12: 10–52\W*t\z/, /\A1: 22\W*t\z/])
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
     # the first vehicle's last pick is what a comparison with none picked starts nearest

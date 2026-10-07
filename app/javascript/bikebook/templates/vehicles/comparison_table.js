@@ -2,7 +2,7 @@ import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { card } from 'bikebook/templates/ui/card'
 import { table } from 'bikebook/templates/ui/table'
-import { array, present, slice } from 'bikebook/templates/values'
+import { array, join, present, slice } from 'bikebook/templates/values'
 
 const isNumber = (value) => typeof value === 'number'
 const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
@@ -11,6 +11,20 @@ const currency = (vehicle) => priced(vehicle)?.original_msrp_currency ?? 'USD'
 const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(isNumber)) : null
 const motors = (key) => (vehicle) => highest(array(vehicle.motors).map((motor) => motor[key]))
 const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode[key]))
+// A position's teeth, and how many: drivetrain's "12_rear", else as many as are listed, which rear can't say when it
+// lists only its smallest and largest cog
+const gearing = (position) => (vehicle) => {
+  const teeth = array(vehicle.gearing?.[position])
+  const speeds = array(vehicle.drivetrain).map((each) => String(each).match(new RegExp(`^(\\d+)[ _]${position}$`, 'i'))?.[1]).find(Boolean)
+  if (teeth.length === 0 && !speeds) return null
+  return { teeth, count: speeds ? Number(speeds) : position === 'rear' && teeth.length === 2 ? null : teeth.length }
+}
+const teethList = (presenter, teeth, separator) => join([...teeth.slice(0, -1).map((each) => presenter.measurement(each)), presenter.measurement(teeth.at(-1), 'teeth')], separator)
+// a count with no teeth listed stands alone
+const counted = (count, teeth, content) => {
+  if (teeth.length === 0) return String(count)
+  return count == null ? content : join([`${count}: `, content])
+}
 
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'wheelbase', 'standover']
 
@@ -36,6 +50,12 @@ const SPECS = [
   { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear_travel, better: 1, unit: 'mm' }
 ]
 const DETAILS = [
+  { label: 'Chainrings', read: gearing('front'), format: ({ count, teeth }, vehicle, presenter) => counted(count, teeth, teethList(presenter, teeth, ', ')) },
+  {
+    label: 'Cogs',
+    read: gearing('rear'),
+    format: ({ count, teeth }, vehicle, presenter) => counted(count, teeth, teethList(presenter, [...new Set([teeth[0], teeth.at(-1)])], '–'))
+  },
   { label: 'Vehicle type', read: (vehicle) => vehicle.type },
   { label: 'Frame material', read: (vehicle) => vehicle.frame?.material }
 ]

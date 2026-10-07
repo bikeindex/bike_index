@@ -242,7 +242,7 @@ class ModelViewer {
     if (key === 'headset') return this.withTooltip(this.shisCode(value, 'tw:text-sm'), this.headsetTooltip(value))
     if (key === 'bottom_bracket') return this.bottomBracket(value)
     if (key === 'cable_routing') return this.tooltipped(value, this.kit.viewer.cable_routing_tooltips)
-    if (key === 'front') return this.measurements(value, 'teeth', '/')
+    if (key === 'front') return this.measurements(value, 'teeth', ', ')
     if (key === 'rear') return this.cogRange(value)
     return value
   }
