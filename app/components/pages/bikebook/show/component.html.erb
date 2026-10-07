@@ -163,7 +163,8 @@
     </div>
 
     <div class="tw:mt-3 tw:flex tw:justify-end">
-      <%= render(UI::Button::Component.new(color: :secondary, size: :sm)) do %>
+      <%= render(UI::Button::Component.new(color: :secondary, size: :sm, id: "comparison-view",
+      aria: {pressed: false}, data: {action: "bikebook--page#toggleComparison"})) do %>
         <%= translation(".comparison_view") %>
       <% end %>
     </div>

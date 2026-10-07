@@ -55,6 +55,13 @@ export default class extends Controller {
     this.#go(url)
   }
 
+  // From the URL rather than the render's, which a filter edit since has moved on
+  toggleComparison () {
+    const url = new URL(window.location.href)
+    url.searchParams.get('view') === 'comparison' ? url.searchParams.delete('view') : url.searchParams.set('view', 'comparison')
+    this.#go(url, [window.scrollX, window.scrollY])
+  }
+
   restore () {
     this.#stamp()
     this.#render(new URL(window.location.href), this.#scrolls.get(this.#entry) ?? [0, 0])
@@ -72,9 +79,9 @@ export default class extends Controller {
     if (!this.#entry) window.history.replaceState(stamped(window.history.state), '')
   }
 
-  #go (url) {
+  #go (url, scroll = [0, 0]) {
     window.history.pushState(stamped(), '', readable(url))
-    this.#render(url, [0, 0])
+    this.#render(url, scroll)
   }
 
   async #render (url, scroll) {

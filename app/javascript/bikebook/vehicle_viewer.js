@@ -30,7 +30,7 @@ export class VehicleViewer {
         ? classificationCard({ presenter: this.presenter, id: value, classification: data, removePath: remove })
         : modelViewer({ presenter: this.presenter, data, value, comparing, idSuffix: index + 1, others: value === baseline.value ? [] : [baseline.data], removePath: remove, classificationPath })
     })
-    return html`<div class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
+    return html`<div ?data-comparison=${url.searchParams.get('view') === 'comparison'} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
       : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:flex-col tw:gap-8 ${comparing ? 'tw:md:flex-row tw:md:flex-wrap tw:md:justify-center' : 'tw:lg:flex-row tw:lg:justify-center'}
       ${baselineSolo}" data-controller="bikebook--wrapped-scroll">${cards}</div></div>`
