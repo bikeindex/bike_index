@@ -99,8 +99,8 @@ RSpec.describe "Bikebook", :js, type: :system do
         })()
       JS
       expect(material).to eq "Carbon/Composite"
-      # each position's wheel in the size compared, its sizes and widest tire out of the summary, and the widest tire a
-      # position takes, a wheel the build doesn't come with included
+      # each position's wheel in the size compared, its sizes, cassette, dropout and widest tire out of the summary, and
+      # the widest tire a position takes, a wheel the build doesn't come with included
       wheels = page.evaluate_script(<<~JS)
         (async () => {
           const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
@@ -108,7 +108,7 @@ RSpec.describe "Bikebook", :js, type: :system do
             import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
           const data = { wheels: [
             { position: ['front', 'rear'], sizes: ['S'], bsd: 584, tire_width: 28 },
-            { position: ['front'], sizes: ['M', 'L'], bsd: 622, tire_width: 28, max_tire_width: 32 },
+            { position: ['front'], sizes: ['M', 'L'], bsd: 622, tire_width: 28, max_tire_width: 32, cassette_interface: 'Shimano HG', dropout: 'vertical' },
             { position: ['rear'], sizes: ['M', 'L'], bsd: 622, tire_width: 28 },
             { position: ['front', 'rear'], configured: false, bsd: 584, max_tire_width: 50 }
           ] }

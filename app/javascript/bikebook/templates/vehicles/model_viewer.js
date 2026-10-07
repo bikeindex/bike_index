@@ -22,7 +22,7 @@ const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 export const modelViewer = (args) => new ModelViewer(args).render()
 
 // A vehicle's front and rear in `size`, as the comparison table lists them: the built wheel's summary, less the
-// sizes it's for and the widest tire, which is the widest any of its wheels there takes
+// sizes it's for, its cassette and dropout, and the widest tire, which is the widest any of its wheels there takes
 export const wheelsAt = (presenter, data, size) => {
   const viewer = new ModelViewer({ presenter, data, others: [] })
   const fits = (wheel) => !wheel.sizes || array(wheel.sizes).includes(size?.name)
@@ -30,7 +30,7 @@ export const wheelsAt = (presenter, data, size) => {
     const at = (wheels) => wheels.filter((wheel) => array(wheel.position).includes(position) && fits(wheel))
     const built = at(viewer.builtWheels())[0]
     const widths = at(array(viewer.vehicle.wheels)).map((wheel) => wheel.max_tire_width).filter((width) => typeof width === 'number')
-    return [position, { summary: built && viewer.wheelSummary({ ...built, sizes: null, max_tire_width: null }), maxTire: widths.length ? Math.max(...widths) : null }]
+    return [position, { summary: built && viewer.wheelSummary({ ...built, sizes: null, max_tire_width: null, cassette_interface: null, dropout: null }), maxTire: widths.length ? Math.max(...widths) : null }]
   }))
 }
 
