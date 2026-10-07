@@ -116,7 +116,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
       }
     }))
   const geometryRecords = records(geometry)
-  const geometryHeading = { label: html`<span class="tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
+  const geometryHeading = { label: html`<span class="tw:mt-2 tw:block tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
 
   return html`<section aria-label="Comparison" class="tw:mt-6">${table({
     records: [
@@ -128,7 +128,9 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
       { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
       ...named.map((vehicle, index) => ({
         label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
-        classes: 'tw:min-w-36 tw:align-top',
+        classes: 'tw:min-w-48 tw:align-top',
+        // a model's name can wrap in its header, but not a value
+        cellClass: () => 'tw:whitespace-nowrap',
         cell: (record) => record.cell(index)
       }))
     ]
