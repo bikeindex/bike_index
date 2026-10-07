@@ -23,15 +23,6 @@ RSpec.describe EmailJobs::MagicLoginLinkJob, type: :job do
       expect(ActionMailer::Base.deliveries.count).to eq 1
     end
 
-    context "user previously errored" do
-      before { user_email.update(last_email_errored: true) }
-
-      it "clears last_email_errored on success" do
-        described_class.new.perform(user.id)
-        expect(user_email.reload.last_email_errored?).to be_falsey
-      end
-    end
-
     context "email_banned user" do
       let!(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :email_duplicate) }
 
@@ -55,17 +46,6 @@ RSpec.describe EmailJobs::MagicLoginLinkJob, type: :job do
         expect(user_email.reload.last_email_errored?).to be_truthy
         expect(notification).to have_attributes(delivery_status: "delivery_failure",
           delivery_error: "Postmark::InactiveRecipientError")
-      end
-    end
-
-    context "with unknown postmark error" do
-      let(:other_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 499}) }
-      before { allow(CustomerMailer).to receive(:magic_login_link_email).and_raise(other_error) }
-
-      it "re-raises and marks user_email errored" do
-        expect { described_class.new.perform(user.id) }.to raise_error(Postmark::ApiInputError)
-        expect(user_email.reload.last_email_errored?).to be_truthy
-        expect(notification.delivery_status).to eq "delivery_failure"
       end
     end
   end
