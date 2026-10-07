@@ -18,17 +18,24 @@ const gearing = (position) => (vehicle) => {
   if (teeth.length === 0 && !speeds) return null
   return { teeth, count: speeds ? Number(speeds) : position === 'rear' && teeth.length === 2 ? null : teeth.length }
 }
-const teethList = (presenter, teeth, separator) => join([...teeth.slice(0, -1).map((each) => presenter.measurement(each)), presenter.measurement(teeth.at(-1), 'teeth')], separator)
-// a count with no teeth listed stands alone
-const counted = (count, teeth, content) => {
-  if (teeth.length === 0) return String(count)
-  return count == null ? content : join([`${count}: `, content])
+// Gearing as [key, number, content] parts, each compared with the first vehicle's part of the same key: its count,
+// then each chainring, or the smallest and largest cog
+const gearingParts = (cogs) => (presenter, { count, teeth }) => {
+  const shown = cogs ? [...new Set([teeth[0], teeth.at(-1)])] : teeth
+  const key = (index) => cogs ? (index === shown.length - 1 ? 'largest' : 'smallest') : `chainring_${index}`
+  return [
+    ...(count == null ? [] : [['count', count, shown.length ? `${count}:` : String(count)]]),
+    ...shown.map((tooth, index) => {
+      const last = index === shown.length - 1
+      return [key(index), tooth, join([presenter.measurement(tooth, last ? 'teeth' : null), last ? '' : cogs ? '–' : ','])]
+    })
+  ]
 }
 
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'wheelbase', 'standover']
 
 // `better` is the sign of a difference that's an improvement: a lower price, a longer range. None for a value
-// that isn't compared. `number` is what's compared of a value that isn't one
+// that isn't compared. `parts` splits a value whose parts are each compared
 const SPECS = [
   { label: 'Year', read: (vehicle) => latest(array(vehicle.years))?.year, better: 1, format: String },
   {
@@ -49,20 +56,8 @@ const SPECS = [
   { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear_travel, better: 1, unit: 'mm' }
 ]
 const DETAILS = [
-  {
-    label: 'Chainrings',
-    read: gearing('front'),
-    better: 1,
-    number: ({ count }) => count,
-    format: ({ count, teeth }, vehicle, presenter) => counted(count, teeth, teethList(presenter, teeth, ', '))
-  },
-  {
-    label: 'Cogs',
-    read: gearing('rear'),
-    better: 1,
-    number: ({ count }) => count,
-    format: ({ count, teeth }, vehicle, presenter) => counted(count, teeth, teethList(presenter, [...new Set([teeth[0], teeth.at(-1)])], '–'))
-  },
+  { label: 'Chainrings', read: gearing('front'), better: 1, parts: gearingParts(false) },
+  { label: 'Cogs', read: gearing('rear'), better: 1, parts: gearingParts(true) },
   { label: 'Vehicle type', read: (vehicle) => vehicle.type },
   { label: 'Frame material', read: (vehicle) => vehicle.frame?.material }
 ]
@@ -81,16 +76,26 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   }))
   const missing = html`<span class="twless-strong">—</span>`
 
-  const difference = (row, value, base, vehicle) => {
-    const [number, baseNumber] = [value, base].map((each) => row.number && each != null ? row.number(each) : each)
-    if (vehicle === first || row.better === undefined || !isNumber(number) || !isNumber(baseNumber) || !(row.comparable?.(vehicle, first) ?? true)) return nothing
-
-    const change = presenter.rounded(number - baseNumber)
+  // `amount` shows the change's size
+  const changed = (row, number, base, amount) => {
+    const change = presenter.rounded(number - base)
     if (change === 0) return html`<span class="tw:block tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">-</span>`
     const color = Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
     // a unit or currency symbol carries its name as a title, and stays gray
     return html`<span class="tw:block tw:text-xs ${color} tw:[&_span[title]]:text-gray-400 tw:dark:[&_span[title]]:text-gray-500">${
-      change > 0 ? '+' : '−'}${row.number ? Math.abs(change) : show(row, Math.abs(change), vehicle)}</span>`
+      change > 0 ? '+' : '−'}${amount(Math.abs(change))}</span>`
+  }
+  const compared = (row, vehicle) => vehicle !== first && row.better !== undefined && (row.comparable?.(vehicle, first) ?? true)
+
+  const difference = (row, value, base, vehicle) => compared(row, vehicle) && isNumber(value) && isNumber(base)
+    ? changed(row, value, base, (amount) => show(row, amount, vehicle))
+    : nothing
+
+  // each part beside the next, its change under it
+  const partsCell = (row, value, base, vehicle) => {
+    const baseParts = new Map(base == null ? [] : row.parts(presenter, base).map(([key, number]) => [key, number]))
+    return html`<span class="tw:inline-flex tw:items-start tw:gap-x-1">${row.parts(presenter, value).map(([key, number, content]) =>
+      html`<span>${content}${compared(row, vehicle) && baseParts.has(key) ? changed(row, number, baseParts.get(key), String) : nothing}</span>`)}</span>`
   }
 
   // a select where there's a size to pick, and the page renders again from each pick
@@ -107,7 +112,12 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   const records = (rows) => rows.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
     .filter(([, values]) => values.some(present)).map(([row, values]) => ({
       label: row.label,
-      cell: (index) => html`${present(values[index]) ? show(row, values[index], named[index]) : missing}${difference(row, values[index], values[0], named[index])}`
+      cell: (index) => {
+        if (!present(values[index])) return missing
+        return row.parts
+          ? partsCell(row, values[index], values[0], named[index])
+          : html`${show(row, values[index], named[index])}${difference(row, values[index], values[0], named[index])}`
+      }
     }))
   const geometryRecords = records(geometry)
 

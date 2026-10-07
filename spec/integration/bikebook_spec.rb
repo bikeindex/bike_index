@@ -96,9 +96,11 @@ RSpec.describe "Bikebook", :js, type: :system do
         })()
       JS
       expect(material).to eq "Carbon/Composite"
-      # gearing counts its drivetrain's speeds, and compares the counts
-      expect(find("tr", text: "Chainrings").all("td").map(&:text)).to match([/\A1: 48\W*t\z/, /\A1: 46\W*t\s*-\z/])
-      expect(find("tr", text: "Cogs").all("td").map(&:text)).to match([/\A8: 12–32\W*t\z/, /\A8: 12–32\W*t\s*-\z/])
+      # gearing counts its drivetrain's speeds, and compares each count and each number of teeth on its own
+      chainrings = find("tr", text: "Chainrings")
+      expect(chainrings.all("td").map(&:text)).to match([/\A1:\s*48\W*t\z/, /\A1:\s*-\s*46\W*t\s*−2\z/])
+      expect(chainrings).to have_css(".tw\\:text-red-700", exact_text: "−2")
+      expect(find("tr", text: "Cogs").all("td").map(&:text)).to match([/\A8:\s*12–\s*32\W*t\z/, /\A8:\s*-\s*12–\s*-\s*32\W*t\s*-\z/])
     end
 
     find("[aria-label='Remove Aventón Level 2 Step-Through']").click
@@ -220,10 +222,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     retry_on_detach { find("[role='option']", text: "Aventón Soltera 3 ADV").click }
     expect_size.call("Soltera 3 ADV", "Medium")
     expect_size.call("Current EXP", "Small")
-    # a belt drive's drivetrain counts nothing, so its one cog counts itself, eleven fewer
+    # a belt drive's drivetrain counts nothing, so its one cog counts itself, and is its largest
     cogs = find("[aria-label='Comparison'] tr", text: "Cogs")
-    expect(cogs.all("td").map(&:text)).to match([/\A12: 10–52\W*t\z/, /\A1: 22\W*t\s*−11\z/])
-    expect(cogs).to have_css(".tw\\:text-red-700", exact_text: "−11")
+    expect(cogs.all("td").map(&:text)).to match([/\A12:\s*10–\s*52\W*t\z/, /\A1:\s*−11\s*22\W*t\s*−30\z/])
+    expect(cogs).to have_css(".tw\\:text-red-700", exact_text: "−11").and have_css(".tw\\:text-red-700", exact_text: "−30")
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
     # the first vehicle's last pick is what a comparison with none picked starts nearest
