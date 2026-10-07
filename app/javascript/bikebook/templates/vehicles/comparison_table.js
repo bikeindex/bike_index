@@ -77,12 +77,15 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
     ? html`<tr class="tw:even:bg-gray-50 tw:dark:even:bg-gray-800/50">${header('Size')}${vehicles.map((vehicle, index) => html`<td class=${CELL}>${sizeCell(vehicle, index)}</td>`)}</tr>`
     : nothing
 
-  const rows = [...SPECS, ...geometry, ...DETAILS].map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
+  const rowsFor = (group) => group.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
     .filter(([, values]) => values.some(present)).map(([row, values]) => html`<tr class="tw:even:bg-gray-50 tw:dark:even:bg-gray-800/50">${header(row.label)}${
       named.map((vehicle, index) => html`<td class=${CELL}>${present(values[index]) ? show(row, values[index], vehicle) : html`<span class="twless-strong">—</span>`}${
         difference(row, values[index], values[0], vehicle)}</td>`)}</tr>`)
+  const geometryRows = rowsFor(geometry)
 
   return html`<section aria-label="Comparison" class="tw:mx-auto tw:mt-6 tw:max-w-4xl tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700"><table
     class="tw:w-full tw:border-collapse tw:text-left tw:text-sm"><thead><tr><td class=${CELL}></td>${named.map((vehicle) => html`<th scope="col" class="${CELL} tw:min-w-36"><span
-    class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}</th>`)}</tr></thead><tbody>${sizeRow}${rows}</tbody></table></section>`
+    class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}</th>`)}</tr></thead><tbody>${sizeRow}${rowsFor([...SPECS, ...DETAILS])}</tbody>${geometryRows.length
+      ? html`<tbody><tr><th scope="rowgroup" colspan=${named.length + 1} class="${CELL} tw:pt-5 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</th></tr>${geometryRows}</tbody>`
+      : nothing}</table></section>`
 }
