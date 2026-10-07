@@ -339,6 +339,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     motor = find("section", text: /front and rear motor/i, wait: 10)
     expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
+    expect(motor).to have_css("div", text: /Certification\s*Unknown/)
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
 
     # beside a vehicle that has none

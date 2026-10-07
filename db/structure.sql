@@ -6463,6 +6463,20 @@ CREATE INDEX index_bike_stickers_on_bike_sticker_batch_id ON public.bike_sticker
 
 
 --
+-- Name: index_bike_stickers_on_code_integer; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_integer ON public.bike_stickers USING btree (code_integer);
+
+
+--
+-- Name: index_bike_stickers_on_code_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_trgm ON public.bike_stickers USING gin (code public.gin_trgm_ops);
+
+
+--
 -- Name: index_bike_versions_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6495,6 +6509,13 @@ CREATE INDEX index_bike_versions_on_primary_activity_id ON public.bike_versions 
 --
 
 CREATE INDEX index_bikes_current_listing_order ON public.bikes USING btree (listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_bikes_current_manufacturer_listing_order; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_manufacturer_listing_order ON public.bikes USING btree (manufacturer_id, listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
 
 
 --
@@ -7793,6 +7814,13 @@ CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.g
 
 
 --
+-- Name: index_users_on_email_without_periods; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email_without_periods ON public.users USING btree (replace((email)::text, '.'::text, ''::text)) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_users_on_magic_link_token_outstanding; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7825,6 +7853,13 @@ CREATE UNIQUE INDEX unique_assignment_to_ambassador ON public.ambassador_task_as
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
+-- Name: bikes_serial_normalized_tsvector; Type: STATISTICS; Schema: public; Owner: -
+--
+
+CREATE STATISTICS public.bikes_serial_normalized_tsvector ON to_tsvector('simple'::regconfig, serial_normalized::text) FROM public.bikes;
 
 
 --
@@ -7923,6 +7958,10 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20261005170000'),
 ('20261005120000'),
+('20261005003717'),
+('20261004230843'),
+('20261004225108'),
+('20261004180000'),
 ('20261001170000'),
 ('20260930161510'),
 ('20260930161509'),
