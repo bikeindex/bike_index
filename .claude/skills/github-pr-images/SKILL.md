@@ -73,14 +73,23 @@ The comment whose body starts `## Screenshots` is `$SCREENSHOT_COMMENT_ID`. `--p
 
 A caller updating one page of a multi-page comment needs the current body to edit — hand it back on request: `gh api repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID --jq .body`.
 
-Write the body to a file. **With images to upload**, post a new comment, one `--attach` per image the body references:
+Write the body to a file. **With images to upload**, attach one `--attach` per image the body references, and **update `$SCREENSHOT_COMMENT_ID` in place rather than replacing it** — a re-capture never posts a second comment. Which command depends on whether it's your last comment on the PR:
 
 ```bash
-rtk proxy gh pr comment $PR_NUMBER --body-file <file> --attach tmp/a.png --attach tmp/b.png
-ruby .claude/skills/github-pr-images/assets/inline_attachments.rb {owner}/{repo} <new-comment-id>
+gh api --paginate "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" --jq ".[] | select(.user.login == \"$ME\") | .id" | tail -1
 ```
 
-`rtk proxy` because the hook reduces the output to "ok commented", and the comment URL it prints carries the id. The script moves each appended upload into its `<img src>` and PATCHes the comment; it stops without patching if a local `src` has no upload to take. Then, if `$SCREENSHOT_COMMENT_ID` was set, `gh api -X DELETE repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID`. An edit can't attach, so an existing comment is replaced; post before deleting so a failed upload never loses the old screenshots.
+- **No `$SCREENSHOT_COMMENT_ID` yet** — post it: `rtk proxy gh pr comment $PR_NUMBER --body-file <file> --attach tmp/a.png --attach tmp/b.png`.
+- **It's your last comment** — `--edit-last` takes `--attach`, so the same command with `--edit-last` edits it in place and keeps its id.
+- **You've commented since** — `--edit-last` would hit that later one. Upload through a stand-in: post the body as a new comment with its `--attach`es, run the script below on it, write its body to a file (`gh api …/issues/comments/<stand-in-id> --jq .body`), PATCH that into `$SCREENSHOT_COMMENT_ID` as under **With nothing to upload**, then `gh api -X DELETE` the stand-in.
+
+Then, on the comment the uploads landed on:
+
+```bash
+ruby .claude/skills/github-pr-images/assets/inline_attachments.rb {owner}/{repo} <comment-id>
+```
+
+`rtk proxy` because the hook reduces the output to "ok commented", and the comment URL it prints carries the id. The script moves each appended upload into its `<img src>` and PATCHes the comment; it stops without patching if a local `src` has no upload to take. An image already uploaded stays in the body as its asset URL — attach only what was recaptured.
 
 **With nothing to upload**, edit in place: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -F body=@<absolute-path> --jq .html_url`. `-F` reads a file from `@`; `-f` would post the literal `@<file>`. The path is absolute because `gh` resolves `@` against the shell's cwd.
 
@@ -94,7 +103,7 @@ Read the posted body back:
 gh api repos/{owner}/{repo}/issues/comments/<id> --jq .body
 ```
 
-Pass: no `tmp/` path left, and one `https://github.com/user-attachments/assets/` URL per attached file. Don't `curl` those URLs — they 302 to a session-signed S3 URL that 403s unauthenticated.
+Pass: no `tmp/` path left, an `https://github.com/user-attachments/assets/` URL in place of each attached file, and still one `## Screenshots` comment on the PR — rerun Step 3's listing. Don't `curl` those URLs — they 302 to a session-signed S3 URL that 403s unauthenticated.
 
 ## Troubleshooting
 
