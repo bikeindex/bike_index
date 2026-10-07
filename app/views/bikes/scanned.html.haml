@@ -21,7 +21,7 @@
         .col-sm-4.col-lg-2
           = submit_tag t(".update"), class: "btn btn-success"
       %p.mt-5.mb-5
-        - new_bike_link = link_to(t(".new_bike_link_text"), new_bike_url(bike_sticker: @bike_sticker.code), class: "btn ml-1 mr-1 btn-primary")
+        - new_bike_link = link_to(t(".new_bike_link_text"), new_register_url(bike_sticker: @bike_sticker.pretty_code, organization_id: @bike_sticker.organization_id), class: "btn ml-1 mr-1 btn-primary")
         = t(".register_a_new_bike_html", new_bike_link: new_bike_link)
 
       - if current_user.bikes.any?
