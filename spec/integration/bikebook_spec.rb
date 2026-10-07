@@ -238,6 +238,18 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect_size.call("Current EXP", "Extra Large")
   end
 
+  it "shows every weight in pounds to a viewer who prefers imperial units" do
+    serve_catalog
+    sign_in(FactoryBot.create(:user_confirmed, preferred_unit_system: "imperial"))
+    visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/level_4_adv", view: "comparison")
+    expect(page).to have_css("[aria-label='Comparison']", wait: 10)
+
+    # the comparison's weight and difference, and each size's weight and payload
+    expect(find("[aria-label='Comparison'] tr", text: "Weight")).to have_text(/56\W*lb.*61\.1\W*lb\W*\+5\.1\W*lb/m)
+    expect(page).to have_css("dd", text: /\A[\d.,]+\W*lb\z/, minimum: 2)
+    expect(page).to have_no_text(/\d\W*kg\b/)
+  end
+
   it "renders each UI template as the component it mirrors does" do
     serve_catalog
     visit bikebook_path
