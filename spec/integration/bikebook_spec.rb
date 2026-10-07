@@ -79,7 +79,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       expect(page).to have_css("th[scope='col']", text: "Level 2 Step-Through")
       expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$1,000")
       expect(find("tr", text: "Range")).to have_css(".tw\\:text-red-700", text: "−24")
-      expect(find("tr", text: "Top speed")).to have_text("Same")
+      expect(find("tr", text: "Top speed")).to have_css("td span", exact_text: "-")
     end
 
     find("[aria-label='Remove Aventón Level 2 Step-Through']").click

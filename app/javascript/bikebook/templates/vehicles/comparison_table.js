@@ -46,7 +46,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
     if (vehicle === first || !row.better || !isNumber(value) || !isNumber(base) || !(row.comparable?.(vehicle, first) ?? true)) return nothing
 
     const change = presenter.rounded(value - base)
-    if (change === 0) return html`<span class="tw:block tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">Same</span>`
+    if (change === 0) return html`<span class="tw:block tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">-</span>`
     const color = Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
     return html`<span class="tw:block tw:text-xs ${color}">${change > 0 ? '+' : '−'}${show(row, Math.abs(change), vehicle)}</span>`
   }
