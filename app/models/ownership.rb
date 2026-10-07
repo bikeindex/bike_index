@@ -292,8 +292,8 @@ class Ownership < ApplicationRecord
     self.owner_name ||= user&.name.presence || fallback_owner_name
     if claimed?
       self.claimed_at ||= Time.current
-      # Update owner name always! Keep it in track
-      self.owner_name = user.name if user.present?
+      # Track the account's name - but a nameless account (SSO, emailed link) keeps the one typed at registration
+      self.owner_name = user.name if user&.name.present?
     end
     self.address_record ||= address_record_from_registration_info
   end

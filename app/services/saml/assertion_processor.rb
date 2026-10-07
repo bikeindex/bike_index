@@ -6,11 +6,20 @@ module Saml
   module AssertionProcessor
     extend Functionable
 
+    # The names IdPs release these under: the LDAP OID (Shibboleth, InCommon), the friendly
+    # name (Okta, Google), and the claim URI (Entra)
+    DISPLAY_NAME_ATTRIBUTES = %w[urn:oid:2.16.840.1.113730.3.1.241 displayName
+      http://schemas.microsoft.com/identity/claims/displayname].freeze
+    GIVEN_NAME_ATTRIBUTES = %w[urn:oid:2.5.4.42 givenName firstName
+      http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname].freeze
+    SURNAME_ATTRIBUTES = %w[urn:oid:2.5.4.4 sn surname lastName
+      http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname].freeze
+
     # The asserted fields are carried whether or not resolution succeeded, so the test page
     # can tell an attribute-release problem from a domain mismatch. They are set only once
     # the signature validated, so their absence means there is no assertion to report.
     Result = Struct.new(:user, :error, :signed_up, :name_id, :name_id_format, :attributes,
-      :email_attribute, :email, :email_domain) do
+      :email_attribute, :email, :email_domain, :name) do
       def success?
         error.nil?
       end
@@ -41,6 +50,7 @@ module Saml
       # The IdP vouched for this email, so confirm the account (as the magic-link path
       # does) — otherwise sign-in bounces an unconfirmed user to the confirm-email page.
       user.confirm(user.confirmation_token) unless user.confirmed?
+      user.update(name: asserted[:name]) if user.name.blank? && asserted[:name].present?
 
       identity.update(user:, email: asserted[:email], name_id_format: asserted[:name_id_format],
         last_sign_in_at: Time.current)
@@ -67,7 +77,13 @@ module Saml
       email = EmailNormalizer.normalize(response.attributes[email_attribute].presence || response.name_id)
       {name_id: response.name_id.presence, name_id_format: response.name_id_format,
        attributes: response.attributes.all, email_attribute:, email:,
-       email_domain: Organization.email_domain(email)}
+       email_domain: Organization.email_domain(email), name: asserted_name(response.attributes)}
+    end
+
+    def asserted_name(attributes)
+      value = ->(names) { names.filter_map { attributes[it].to_s.strip.presence }.first }
+      value.call(DISPLAY_NAME_ATTRIBUTES) ||
+        [GIVEN_NAME_ATTRIBUTES, SURNAME_ATTRIBUTES].filter_map(&value).join(" ").presence
     end
 
     def resolution_error(name_id:, email:, organization:)
@@ -85,6 +101,6 @@ module Saml
       Result.new(error: message)
     end
 
-    conceal :provider, :parse_response, :asserted_fields, :resolution_error, :failure
+    conceal :provider, :parse_response, :asserted_fields, :asserted_name, :resolution_error, :failure
   end
 end
