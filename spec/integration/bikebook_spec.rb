@@ -99,7 +99,7 @@ RSpec.describe "Bikebook", :js, type: :system do
         })()
       JS
       expect(material).to eq "Carbon/Composite"
-      # each position's wheel in the size compared, its sizes, cassette, dropout and widest tire out of the summary, and
+      # each position's wheel in the size compared, its sizes, cassette, dropout, axle and widest tire out of the summary, and
       # the widest tire a position takes, a wheel the build doesn't come with included
       wheels = page.evaluate_script(<<~JS)
         (async () => {
@@ -108,7 +108,7 @@ RSpec.describe "Bikebook", :js, type: :system do
             import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
           const data = { wheels: [
             { position: ['front', 'rear'], sizes: ['S'], bsd: 584, tire_width: 28 },
-            { position: ['front'], sizes: ['M', 'L'], bsd: 622, tire_width: 28, max_tire_width: 32, cassette_interface: 'Shimano HG', dropout: 'vertical' },
+            { position: ['front'], sizes: ['M', 'L'], bsd: 622, tire_width: 28, max_tire_width: 32, cassette_interface: 'Shimano HG', dropout: 'vertical', axle: 'thru_axle', axle_diameter: 12 },
             { position: ['rear'], sizes: ['M', 'L'], bsd: 622, tire_width: 28 },
             { position: ['front', 'rear'], configured: false, bsd: 584, max_tire_width: 50 }
           ] }
@@ -126,7 +126,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       expect(wheels).to match([/\A700 C, 28\W*mm tire\z/, 50, 50, /\A650 B, 28\W*mm tire\z/,
         /\AHydraulic disc, 160\W*mm \/ 140\W*mm rotors\z/, /\AHydraulic disc, 160\W*mm rotor \/ Caliper\z/, "Caliper"])
       expect(find("tr", text: "Brakes").all("td").map(&:text)).to match([/\AHydraulic disc, 180\W*mm rotor\z/, "Hydraulic disc"])
-      expect(find("tr", text: "Front wheel").all("td").map(&:text)).to match([/\A650 B, 2\.2\W+in tire\W+thru axle/, /\A650 B, 2\.1\W+in tire\W+thru axle/])
+      expect(find("tr", text: "Front wheel").all("td").map(&:text)).to match([/\A650 B, 2\.2\W+in tire\W*\z/, /\A650 B, 2\.1\W+in tire\W*\z/])
       # gearing counts its drivetrain's speeds, and compares each count and each number of teeth on its own
       chainrings = find("tr", text: "Chainrings")
       expect(chainrings.all("td").map(&:text)).to match([/\A1:\s*48\W*t\z/, /\A1:\s*-\s*46\W*t\s*−2\z/])

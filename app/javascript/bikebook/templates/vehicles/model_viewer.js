@@ -22,7 +22,7 @@ const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 export const modelViewer = (args) => new ModelViewer(args).render()
 
 // A vehicle's front and rear in `size`, as the comparison table lists them: the built wheel's summary, less the
-// sizes it's for, its cassette and dropout, and the widest tire, which is the widest any of its wheels there takes
+// sizes it's for, how it fits the frame and the widest tire, which is the widest any of its wheels there takes
 export const wheelsAt = (presenter, data, size) => {
   const viewer = new ModelViewer({ presenter, data, others: [] })
   const fits = (wheel) => !wheel.sizes || array(wheel.sizes).includes(size?.name)
@@ -30,7 +30,7 @@ export const wheelsAt = (presenter, data, size) => {
     const at = (wheels) => wheels.filter((wheel) => array(wheel.position).includes(position) && fits(wheel))
     const built = at(viewer.builtWheels())[0]
     const widths = at(array(viewer.vehicle.wheels)).map((wheel) => wheel.max_tire_width).filter((width) => typeof width === 'number')
-    return [position, { summary: built && viewer.wheelSummary({ ...built, sizes: null, max_tire_width: null, cassette_interface: null, dropout: null }), maxTire: widths.length ? Math.max(...widths) : null }]
+    return [position, { summary: built && viewer.wheelSummary({ ...built, sizes: null, max_tire_width: null }, { fitting: false }), maxTire: widths.length ? Math.max(...widths) : null }]
   }))
 }
 
@@ -464,14 +464,16 @@ class ModelViewer {
     }), '; ')
   }
 
-  wheelSummary (wheel) {
+  // `fitting`: how the wheel fits the frame, its cassette, dropout and axle
+  wheelSummary (wheel, { fitting = true } = {}) {
     const summary = join(compact([
       this.onSizes(wheel.bsd != null ? this.wheelSizeName(wheel.bsd) : null, wheel.sizes),
       wheel.tire_width != null ? this.tireWidthSummary(wheel.tire_width) : null,
       wheel.tire_system?.replaceAll('_', ' '),
-      wheel.cassette_interface != null ? `${wheel.cassette_interface} cassette` : null,
-      wheel.dropout != null ? `${wheel.dropout.replaceAll('_', ' ')} dropout` : null,
-      this.axleSummary(wheel)
+      ...(fitting
+        ? [wheel.cassette_interface != null ? `${wheel.cassette_interface} cassette` : null,
+            wheel.dropout != null ? `${wheel.dropout.replaceAll('_', ' ')} dropout` : null, this.axleSummary(wheel)]
+        : [])
     ]), ', ')
     return wheel.max_tire_width != null ? join([summary, this.tireWidthSummary(wheel.max_tire_width, 'tire max')], html`<br>`) : summary
   }
