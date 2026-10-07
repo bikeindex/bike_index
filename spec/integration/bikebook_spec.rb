@@ -87,6 +87,15 @@ RSpec.describe "Bikebook", :js, type: :system do
       expect(colors).to have_attributes(size: 2).and all(satisfy { |number, unit| number != unit })
       expect(find("tr", text: "Range")).to have_css(".tw\\:text-red-700", text: "−24")
       expect(find("tr", text: "Top speed")).to have_css("td span", exact_text: "-")
+      # no fixture is carbon, which the catalog names "Carbon or Composite"
+      material = page.evaluate_script(<<~JS)
+        (async () => {
+          const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+          const [{ VehiclePresenter }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'), catalog('kit.json'), catalog('vocabulary.json')])
+          return new VehiclePresenter(kit, vocabulary).named(kit.schemas.vehicle, { frame: { material: 'carbon' } }).frame.material
+        })()
+      JS
+      expect(material).to eq "Carbon/Composite"
       # gearing counts its drivetrain's speeds, and compares the counts
       expect(find("tr", text: "Chainrings").all("td").map(&:text)).to match([/\A1: 48\W*t\z/, /\A1: 46\W*t\s*-\z/])
       expect(find("tr", text: "Cogs").all("td").map(&:text)).to match([/\A8: 12–32\W*t\z/, /\A8: 12–32\W*t\s*-\z/])
