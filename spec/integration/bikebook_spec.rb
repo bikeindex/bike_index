@@ -78,6 +78,12 @@ RSpec.describe "Bikebook", :js, type: :system do
     within("[aria-label='Comparison']") do
       expect(page).to have_css("thead th", text: "Level 2 Step-Through")
       expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$1,000")
+      # only the number is colored: the currency symbol and unit keep their gray
+      colors = page.evaluate_script(<<~JS)
+        [...document.querySelectorAll("[aria-label='Comparison'] .tw\\\\:text-green-700")].slice(0, 2).map((difference) =>
+          [difference.querySelector('span:not([title])'), difference.querySelector('span[title]')].map((part) => getComputedStyle(part).color))
+      JS
+      expect(colors).to have_attributes(size: 2).and all(satisfy { |number, unit| number != unit })
       expect(find("tr", text: "Range")).to have_css(".tw\\:text-red-700", text: "−24")
       expect(find("tr", text: "Top speed")).to have_css("td span", exact_text: "-")
     end
@@ -160,10 +166,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect_size.call("Current ADV", "Extra Large")
     expect_size.call("Current EXP", "Small")
     expect(page).to have_current_path(/[?&]vehicle_sizes=Extra\+Large,Small(&|\z)/)
-    # the geometry is each one's size, under its own heading, its differences neither better nor worse
+    # the geometry is each one's size, under its own heading, and less of it is red
     expect(page).to have_css("[aria-label='Comparison'] tbody:last-child tr:first-child th[scope='rowgroup']", text: /\Ageometry\z/i)
     expect(find("[aria-label='Comparison'] tbody:last-child tr", text: "Reach")).to have_css("td", text: /\A425\.5.+−74\.7/m)
-      .and have_css(".tw\\:text-gray-500", text: "−74.7")
+      .and have_css(".tw\\:text-red-700", text: "−74.7")
 
     visit current_url
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)

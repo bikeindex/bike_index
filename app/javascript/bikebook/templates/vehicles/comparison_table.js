@@ -14,8 +14,8 @@ const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor
 
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'wheelbase', 'standover']
 
-// `better` is the sign of a difference that's an improvement: a lower price, a longer range. 0 for a difference
-// that's neither, and none for a value that isn't compared
+// `better` is the sign of a difference that's an improvement: a lower price, a longer range. None for a value
+// that isn't compared
 const SPECS = [
   { label: 'Year', read: (vehicle) => latest(array(vehicle.years))?.year, better: 1, format: String },
   {
@@ -48,7 +48,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   const geometry = GEOMETRY.map((key) => ({
     label: presenter.kit.geometry.labels[key] ?? presenter.humanize(key),
     read: (vehicle, size) => size?.geometry?.[key],
-    better: 0,
+    better: 1,
     unit: presenter.kit.schemas.geometry[key]?.unit,
     key
   }))
@@ -59,10 +59,10 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
 
     const change = presenter.rounded(value - base)
     if (change === 0) return html`<span class="tw:block tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">-</span>`
-    const color = row.better === 0
-      ? 'tw:text-gray-500 tw:dark:text-gray-400'
-      : Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
-    return html`<span class="tw:block tw:text-xs ${color}">${change > 0 ? '+' : '−'}${show(row, Math.abs(change), vehicle)}</span>`
+    const color = Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
+    // a unit or currency symbol carries its name as a title, and stays gray
+    return html`<span class="tw:block tw:text-xs ${color} tw:[&_span[title]]:text-gray-400 tw:dark:[&_span[title]]:text-gray-500">${
+      change > 0 ? '+' : '−'}${show(row, Math.abs(change), vehicle)}</span>`
   }
 
   // a select where there's a size to pick, and the page renders again from each pick
