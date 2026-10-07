@@ -99,6 +99,27 @@ RSpec.describe "Bikebook", :js, type: :system do
         })()
       JS
       expect(material).to eq "Carbon/Composite"
+      # each position's wheel in the size compared, its sizes and widest tire out of the summary, and the widest tire a
+      # position takes, a wheel the build doesn't come with included
+      wheels = page.evaluate_script(<<~JS)
+        (async () => {
+          const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+          const [{ VehiclePresenter }, { wheelsAt }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+            import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+          const data = { wheels: [
+            { position: ['front', 'rear'], sizes: ['S'], bsd: 584, tire_width: 28 },
+            { position: ['front'], sizes: ['M', 'L'], bsd: 622, tire_width: 28, max_tire_width: 32 },
+            { position: ['rear'], sizes: ['M', 'L'], bsd: 622, tire_width: 28 },
+            { position: ['front', 'rear'], configured: false, bsd: 584, max_tire_width: 50 }
+          ] }
+          const text = (content) => fragmentOf(content).textContent.replace(/\\s+/g, ' ').trim()
+          const presenter = new VehiclePresenter(kit, vocabulary)
+          const [medium, small] = [{ name: 'M' }, { name: 'S' }].map((size) => wheelsAt(presenter, data, size))
+          return [text(medium.front.summary), medium.front.maxTire, medium.rear.maxTire, text(small.front.summary)]
+        })()
+      JS
+      expect(wheels).to match([/\A700 C, 28\W*mm tire\z/, 50, 50, /\A650 B, 28\W*mm tire\z/])
+      expect(find("tr", text: "Front wheel").all("td").map(&:text)).to match([/\A650 B, 2\.2\W+in tire\W+thru axle/, /\A650 B, 2\.1\W+in tire\W+thru axle/])
       # gearing counts its drivetrain's speeds, and compares each count and each number of teeth on its own
       chainrings = find("tr", text: "Chainrings")
       expect(chainrings.all("td").map(&:text)).to match([/\A1:\s*48\W*t\z/, /\A1:\s*-\s*46\W*t\s*−2\z/])
