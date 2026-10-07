@@ -76,7 +76,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(all("article").last).to have_css(".tw\\:spec-diff")
     expect(all("article").first).to have_no_css(".tw\\:spec-diff")
     within("[aria-label='Comparison']") do
-      expect(page).to have_css("th[scope='col']", text: "Level 2 Step-Through")
+      expect(page).to have_css("thead th", text: "Level 2 Step-Through")
       expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$1,000")
       expect(find("tr", text: "Range")).to have_css(".tw\\:text-red-700", text: "−24")
       expect(find("tr", text: "Top speed")).to have_css("td span", exact_text: "-")
@@ -113,7 +113,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(card_rows.call).to be > 1
 
     click_on "Comparison view"
-    expect(page).to have_css("[aria-label='Comparison'] th[scope='col']", count: 5)
+    # the label column's header and the five vehicles'
+    expect(page).to have_css("[aria-label='Comparison'] thead th", count: 6)
     expect(page).to have_css("[data-comparison] article", count: 5)
     expect(card_rows.call).to eq 1
     expect(page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth")).to be true
@@ -225,6 +226,20 @@ RSpec.describe "Bikebook", :js, type: :system do
           columns: [{ label: 'Brakes', classes: 'tw:w-[18%]', headerClasses: 'tw:spec-eyebrow', cell: (record) => record.type },
                     { label: 'Position', classes: 'tw:w-[12%]', cell: (record) => record.position }] }
       JS
+
+      grouped = ApplicationController.render(inline: <<~ERB, layout: false, locals: {groups: [[nil, [{label: "Year", value: 2026}]], ["Geometry", [{label: "Reach", value: 450}]]]})
+        <%= render(UI::Table::Component.new(record_groups: groups)) do |table|
+          table.column(label: "", row_header: true) { |record| record[:label] }
+          table.column(label: "Level 2") { |record| record[:value].to_s }
+        end %>
+      ERB
+      expect_template(grouped, "bikebook/templates/ui/table#table", <<~JS)
+        { groups: [[null, [{ label: 'Year', value: 2026 }]], ['Geometry', [{ label: 'Reach', value: 450 }]]],
+          columns: [{ label: '', rowHeader: true, cell: (record) => record.label }, { label: 'Level 2', cell: (record) => record.value }] }
+      JS
+
+      expect_template(UI::Card::Component.new(additional_classes: "tw:mt-6").with_content("<p>Compared</p>".html_safe),
+        "bikebook/templates/ui/card#card", "{ additionalClasses: 'tw:mt-6', content: html`<p>Compared</p>` }")
     end
   end
 

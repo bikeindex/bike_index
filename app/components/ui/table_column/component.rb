@@ -5,10 +5,12 @@ module UI
     class Component < ApplicationComponent
       NBSP = "\u00A0"
 
-      attr_reader :sortable, :cell_block, :footer, :header_tooltip
+      attr_reader :sortable, :cell_block, :footer, :header_tooltip, :row_header
 
-      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, &block)
+      # row_header: each cell is a <th scope="row"> naming its row, as a transposed table's labels are
+      def initialize(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, row_header: false, &block)
         @header_tooltip = header_tooltip
+        @row_header = row_header
         @label = label
         @sortable = sortable
         @sort_indicator = sort_indicator

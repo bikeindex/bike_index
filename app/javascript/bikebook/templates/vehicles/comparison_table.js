@@ -1,8 +1,8 @@
 import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
+import { card } from 'bikebook/templates/ui/card'
+import { table } from 'bikebook/templates/ui/table'
 import { array, present } from 'bikebook/templates/values'
-
-const CELL = 'tw:border-b tw:border-gray-100 tw:px-3 tw:py-2 tw:align-top tw:dark:border-gray-700'
 
 const isNumber = (value) => typeof value === 'number'
 const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
@@ -52,7 +52,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
     unit: presenter.kit.schemas.geometry[key]?.unit,
     key
   }))
-  const header = (label) => html`<th scope="row" class="${CELL} tw:font-medium tw:whitespace-nowrap tw:text-gray-600 tw:dark:text-gray-400">${label}</th>`
+  const missing = html`<span class="twless-strong">—</span>`
 
   const difference = (row, value, base, vehicle) => {
     if (vehicle === first || row.better === undefined || !isNumber(value) || !isNumber(base) || !(row.comparable?.(vehicle, first) ?? true)) return nothing
@@ -66,26 +66,38 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   }
 
   // a select where there's a size to pick, and the page renders again from each pick
-  const sizeCell = ({ data, value }, index) => {
+  const sizeCell = (index) => {
+    const { data, value } = vehicles[index]
     const options = array(data.sizes)
-    if (options.length < 2) return options[0]?.name ?? html`<span class="twless-strong">—</span>`
+    if (options.length < 2) return options[0]?.name ?? missing
     return html`<select class="twinput tw:w-auto tw:py-1 tw:text-sm" aria-label=${`Size of ${named[index].model}`} data-action="bikebook--page#pickSize"
       data-bikebook--page-vehicle-param=${value} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
         html`<option value=${size.name} ?selected=${size === sizes[index]}>${size.name}</option>`)}</select>`
   }
-  const sizeRow = sizes.some(Boolean)
-    ? html`<tr class="tw:even:bg-gray-50 tw:dark:even:bg-gray-800/50">${header('Size')}${vehicles.map((vehicle, index) => html`<td class=${CELL}>${sizeCell(vehicle, index)}</td>`)}</tr>`
-    : nothing
 
-  const rowsFor = (group) => group.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
-    .filter(([, values]) => values.some(present)).map(([row, values]) => html`<tr class="tw:even:bg-gray-50 tw:dark:even:bg-gray-800/50">${header(row.label)}${
-      named.map((vehicle, index) => html`<td class=${CELL}>${present(values[index]) ? show(row, values[index], vehicle) : html`<span class="twless-strong">—</span>`}${
-        difference(row, values[index], values[0], vehicle)}</td>`)}</tr>`)
-  const geometryRows = rowsFor(geometry)
+  // a table record per row with a value: its label, and its cell in each vehicle's column
+  const records = (rows) => rows.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
+    .filter(([, values]) => values.some(present)).map(([row, values]) => ({
+      label: row.label,
+      cell: (index) => html`${present(values[index]) ? show(row, values[index], named[index]) : missing}${difference(row, values[index], values[0], named[index])}`
+    }))
+  const geometryRecords = records(geometry)
 
-  return html`<section aria-label="Comparison" class="tw:mx-auto tw:mt-6 tw:max-w-4xl tw:overflow-x-auto tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700"><table
-    class="tw:w-full tw:border-collapse tw:text-left tw:text-sm"><thead><tr><td class=${CELL}></td>${named.map((vehicle) => html`<th scope="col" class="${CELL} tw:min-w-36"><span
-    class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}</th>`)}</tr></thead><tbody>${sizeRow}${rowsFor([...SPECS, ...DETAILS])}</tbody>${geometryRows.length
-      ? html`<tbody><tr><th scope="rowgroup" colspan=${named.length + 1} class="${CELL} tw:pt-5 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</th></tr>${geometryRows}</tbody>`
-      : nothing}</table></section>`
+  return html`<section aria-label="Comparison">${card({
+    additionalClasses: 'tw:mx-auto tw:mt-6 tw:max-w-4xl tw:[--gutter:--spacing(4)]',
+    content: table({
+      groups: [
+        [null, [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...records([...SPECS, ...DETAILS])]],
+        ...(geometryRecords.length ? [['Geometry', geometryRecords]] : [])
+      ],
+      columns: [
+        { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-medium tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
+        ...named.map((vehicle, index) => ({
+          label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
+          classes: 'tw:min-w-36 tw:align-top',
+          cell: (record) => record.cell(index)
+        }))
+      ]
+    })
+  })}</section>`
 }
