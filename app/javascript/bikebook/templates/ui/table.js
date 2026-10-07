@@ -3,7 +3,7 @@ import { html, nothing } from 'lit-html'
 const join = (...classes) => classes.filter(Boolean).join(' ')
 
 // UI::Table::Component's GROUP_HEADING_CLASSES
-const GROUP_HEADING_CLASSES = 'tw:px-1 tw:pt-4 tw:pb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:uppercase tw:text-gray-500 tw:dark:text-gray-400'
+const GROUP_HEADING_CLASSES = 'tw:px-1 tw:pt-4 tw:pb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:uppercase tw:text-[#715eb2]'
 
 // UI::Table::Component bordered and unsorted, with UI::TableColumn::Component's header and cells. `groups` is its
 // record_groups, [heading, records] pairs in place of `records`. A column's `cell` and `cellClass` take the row's

@@ -111,7 +111,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
         ...(geometryRecords.length ? [['Geometry', geometryRecords]] : [])
       ],
       columns: [
-        { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-medium tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
+        { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
         ...named.map((vehicle, index) => ({
           label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
           classes: 'tw:min-w-36 tw:align-top',
