@@ -48,7 +48,6 @@ const SPECS = [
   },
   { label: 'Vehicle type', read: (vehicle) => vehicle.type },
   { label: 'Frame material', read: (vehicle) => vehicle.frame?.material },
-  { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' },
   { label: 'Rated power', read: motors('rated_power'), better: 1, unit: 'w' },
   { label: 'Peak power', read: motors('peak_power'), better: 1, unit: 'w' },
   { label: 'Torque', read: motors('max_torque'), better: 1, unit: 'nm' },
@@ -58,6 +57,8 @@ const SPECS = [
   { label: 'Front travel', read: (vehicle, size) => size?.geometry?.travel_front ?? vehicle.suspension?.front_travel, better: 1, unit: 'mm' },
   { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear_travel, better: 1, unit: 'mm' }
 ]
+// the size's, so it closes the geometry
+const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' }
 const GEARING = [
   { label: 'Chainrings', read: gearing('front'), better: 1, parts: gearingParts(false) },
   { label: 'Cogs', read: gearing('rear'), better: 1, parts: gearingParts(true) }
@@ -126,7 +127,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
           : html`${show(row, values[index], named[index])}${difference(row, values[index], values[0], named[index])}`
       }
     }))
-  const geometryRecords = records(geometry)
+  const geometryRecords = records([...geometry, WEIGHT])
   const geometryHeading = { label: html`<span class="tw:mt-2 tw:block tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
 
   return html`<section aria-label="Comparison" class="tw:mt-6">${table({
