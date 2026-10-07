@@ -4824,12 +4824,15 @@ it:
           reclamate vengono inviate alla vostra organizzazione per essere esaminate
           e inoltrate all'utente finale, poiché tali utenti non hanno attivato le
           notifiche di Bike Index.
-        send_self_registration_email_helper: Per impostazione predefinita, Bike Index
-          non ti invia più un'email quando un veicolo viene registrato all'indirizzo
-          email di registrazione della tua organizzazione (ad esempio, notifiche di
-          parcheggio non registrato).
         send_self_registration_email_html: Inviare l'email per le registrazioni inviate
           a <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: Ciò include le notifiche
+          non registrate.
+        send_self_registration_email_note: Per impostazione predefinita, Bike Index
+          non invia più email quando un veicolo viene registrato all'indirizzo email
+          di registrazione della tua organizzazione. Seleziona questa casella se desideri
+          ricevere email per le registrazioni con un indirizzo email del proprietario
+          del tipo %{email}.
     stickers:
       edit:
         bike: Bicicletta

@@ -4805,12 +4805,15 @@ es:
           no reclamadas se envían a su organización para su revisión y posterior reenvío
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
-        send_self_registration_email_helper: Por defecto, Bike Index ya no te envía
-          un correo electrónico cuando se registra un vehículo con la dirección de
-          correo electrónico de registro de tu organización (por ejemplo, notificaciones
-          de aparcamiento no registrado).
         send_self_registration_email_html: Enviar correo electrónico para inscripciones
           enviadas a <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: Esto incluye las notificaciones
+          no registradas.
+        send_self_registration_email_note: Por defecto, Bike Index ya no envía correos
+          electrónicos cuando se registra un vehículo con la dirección de correo electrónico
+          de registro de su organización. Marque esta casilla si desea recibir correos
+          electrónicos para los registros con una dirección de correo electrónico
+          del propietario de %{email}.
     stickers:
       edit:
         bike: Bicicleta
