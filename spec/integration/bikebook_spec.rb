@@ -200,7 +200,9 @@ RSpec.describe "Bikebook", :js, type: :system do
       .and have_link(href: /ohv\.parks\.ca\.gov/)
 
     card.find("[aria-label='Remove US-CA Off-highway electric motorcycle']").click
+    # the card closes ahead of the render that replaces the search, which the chips wait out
     expect(page).to have_css("article", count: 2)
+    expect(page).to have_css(".hw-combobox__chip", count: 2)
 
     # and its id finds it in the search
     type_into(vehicle_field, "evc/us/ca/off_highway_e")
