@@ -78,7 +78,9 @@ export class CatalogComboboxSource {
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
       listbox.replaceChildren(fragmentOf(html`${group(matching(total), options)}${pagination}`))
-      renderInto(document.getElementById('vehicle-models-count'), matching(filteredCount))
+      // /bikebook counts its matches beside its label; /ebike-rules has no count
+      const count = document.getElementById('vehicle-models-count')
+      if (count) renderInto(count, matching(filteredCount))
     } else {
       listbox.append(fragmentOf(html`${options}${pagination}`))
     }

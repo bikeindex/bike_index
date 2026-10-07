@@ -60,6 +60,7 @@ Rails.application.routes.draw do
   if BikebookController::LOCAL_CATALOG_DIRECTORY
     mount Rack::Files.new(BikebookController::LOCAL_CATALOG_DIRECTORY) => BikebookController::LOCAL_CATALOG_PATH
   end
+  get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
 
   resource :session, only: %i[new create destroy] do
     collection do

@@ -1,0 +1,137 @@
+<section
+  id="state-laws"
+  class="
+    tw:mx-auto tw:max-w-[1120px] tw:px-[clamp(16px,4vw,32px)]
+    tw:py-[clamp(44px,8vw,72px)]
+  "
+  data-controller="ebike-rules--state-filter"
+>
+  <div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-end tw:gap-x-8 tw:gap-y-4">
+    <div class="tw:flex-[1_1_360px]">
+      <h2
+        class="
+          tw:font-header tw:text-[clamp(26px,4vw,34px)] tw:leading-tight
+          tw:font-extrabold
+        "
+      >
+        <%= translation(".heading") %>
+      </h2>
+
+      <p class="tw:mt-2 tw:text-[17px] tw:text-gray-700 tw:dark:text-gray-300">
+        <%= translation(".subheading") %>
+      </p>
+    </div>
+
+    <div class="tw:flex tw:min-w-60 tw:flex-[0_1_300px] tw:flex-col tw:gap-1.5">
+      <label class="twlabel" for="state-filter"><%= translation(".filter_states") %></label>
+
+      <input
+        id="state-filter"
+        type="search"
+        class="twinput tw:min-h-12 tw:text-base!"
+        placeholder="<%= translation(".filter_placeholder") %>"
+        autocomplete="off"
+        data-action="ebike-rules--state-filter#filter"
+        data-ebike-rules--state-filter-target="field"
+      >
+    </div>
+  </div>
+
+  <p
+    class="tw:mb-3 tw:text-sm tw:text-gray-700 tw:dark:text-gray-300"
+    data-ebike-rules--state-filter-target="count"
+    data-matching-template="<%= translation(".matching", number: "__number__") %>"
+  >
+    <%= translation(".on_file_html", number: number_display(on_file_count)) %>
+  </p>
+
+  <div
+    class="
+      tw:grid tw:grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))]
+      tw:gap-x-6 tw:border-t tw:border-gray-200 tw:dark:border-gray-700
+    "
+  >
+    <% states.each do |state| %>
+      <div
+        id="state-<%= state[:abbr].downcase %>"
+        class="
+          tw:border-b tw:border-gray-200
+          tw:has-[[aria-expanded=true]]:col-span-full
+          tw:dark:border-gray-700
+        "
+        data-controller="ui--collapse"
+        data-ebike-rules--state-filter-target="state"
+        data-name="<%= state[:name] %>"
+      >
+        <h3>
+          <%= render(UI::Collapse::Component.new(chevron: :trailing, color: :link,
+            html_class: "tw:flex! tw:min-h-13 tw:w-full tw:items-center tw:gap-3 tw:px-1 tw:py-3 tw:text-left tw:text-base tw:font-semibold tw:text-slate-900! tw:no-underline! tw:dark:text-gray-100!",
+            aria: {controls: "state-panel-#{state[:abbr].downcase}"})) do %>
+            <span class="tw:flex-1"><%= state[:name] %></span>
+
+            <% unless state[:law] %>
+              <%= render(UI::Badge::Component.new(text: translation(".in_review"))) %>
+            <% end %>
+          <% end %>
+        </h3>
+
+        <div
+          id="state-panel-<%= state[:abbr].downcase %>"
+          class="tw:hidden tw:px-1 tw:pb-5"
+          data-ui--collapse-target="content"
+        >
+          <% if (law = state[:law]) %>
+            <p
+              class="
+                tw:mb-3 tw:max-w-[720px] tw:text-[15px] tw:text-gray-700
+                tw:dark:text-gray-300
+              "
+            >
+              <%= law[:summary] %>
+            </p>
+            <dl
+              class="
+                tw:grid
+                tw:grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))]
+                tw:gap-x-8
+              "
+            >
+              <% RULE_IDS.each do |id| %>
+                <div
+                  class="
+                    tw:border-t tw:border-gray-100 tw:py-2.5
+                    tw:dark:border-gray-800
+                  "
+                >
+                  <dt class="tw:text-sm tw:font-bold"><%= rule_label(id) %></dt>
+
+                  <dd
+                    class="
+                      tw:mt-0.5 tw:text-[15px] tw:text-gray-700
+                      tw:dark:text-gray-300
+                    "
+                  >
+                    <%= rule_value(law, id) %>
+                    <%= link_to law[:cite][id][:code], law[:cite][id][:url], target: "_blank", rel: "noopener", class: "twlink tw:text-[13px] tw:whitespace-nowrap" %>
+                  </dd>
+                </div>
+              <% end %>
+            </dl>
+            <p class="tw:mt-3 tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
+              <%= translation(".last_reviewed", reviewed: law[:reviewed]) %>
+            </p>
+          <% else %>
+            <p
+              class="
+                tw:max-w-[720px] tw:text-[15px] tw:text-gray-700
+                tw:dark:text-gray-300
+              "
+            >
+              <%= translation(".compiling", state: state[:name]) %>
+            </p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>

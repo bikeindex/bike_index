@@ -1,0 +1,560 @@
+<div class="tw:text-base tw:leading-normal tw:text-slate-900 tw:dark:text-gray-100">
+  <section
+    class="
+      tw:border-b tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
+      tw:dark:bg-gray-900
+    "
+  >
+    <div class="tw:pt-[clamp(36px,6vw,64px)] tw:pb-28 <%= SECTION_CLASSES %>">
+      <span
+        class="
+          tw:mb-4.5 tw:inline-block tw:rounded-full tw:bg-blue-100 tw:px-3.5
+          tw:py-1.5 tw:text-[13px] tw:font-bold tw:tracking-[.08em]
+          tw:text-blue-600 tw:uppercase tw:dark:bg-blue-950
+          tw:dark:text-blue-300
+        "
+      >
+        <%= translation(".pill") %>
+      </span>
+
+      <h1
+        class="
+          tw:mb-3.5 tw:font-header tw:text-[clamp(34px,6vw,54px)]
+          tw:leading-[1.05] tw:font-black tw:tracking-[-.01em]
+        "
+      >
+        <%= translation(".heading") %>
+      </h1>
+
+      <p
+        class="
+          tw:max-w-[620px] tw:text-[clamp(16px,2vw,19px)] tw:text-gray-700
+          tw:dark:text-gray-300
+        "
+      >
+        <%= translation(".subheading") %>
+      </p>
+    </div>
+  </section>
+
+  <div class="tw:relative tw:-mt-20 <%= SECTION_CLASSES %>">
+    <%= form_with url: ebike_rules_path, method: :get, html: {aria: {label: translation(".form_label")}},
+      class: "tw:flex tw:flex-col tw:gap-3.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-[clamp(18px,4vw,32px)] tw:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:dark:border-gray-700 tw:dark:bg-gray-800",
+      data: {controller: "ebike-rules--lookup", "ebike-rules--lookup-manifest-url-value": @manifest_url,
+             "ebike-rules--lookup-display-value": bike_display,
+             "ebike-rules--lookup-failed-text-value": translation(".bikebook_failed")} do %>
+      <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-4">
+        <div class="tw:flex tw:min-w-0 tw:flex-[2_1_220px] tw:flex-col tw:gap-2">
+          <%= label_tag :state, translation(".state"), class: "twlabel" %>
+
+          <%= select_tag :state, state_option_tags, include_blank: translation(".select_state"),
+            class: "twinput tw:min-h-12 tw:text-base!", aria: {invalid: (true if error?(:state))},
+            data: {"ebike-rules--lookup-target": "state"} %>
+
+          <% if error?(:state) %>
+            <p
+              role="alert"
+              class="
+                tw:text-[13px] tw:font-semibold tw:text-red-700
+                tw:dark:text-red-400
+              "
+            >
+              <%= translation(".state_error") %>
+            </p>
+          <% elsif detected? %>
+            <p
+              class="
+                tw:flex tw:items-center tw:gap-1.5 tw:text-[13px]
+                tw:text-gray-700 tw:dark:text-gray-300
+              "
+            >
+              <%= helpers.inline_svg_tag("icons/map-pin.svg", class: "tw:size-3.5 tw:flex-none tw:text-blue-600", aria_hidden: true) %>
+
+              <span>
+                <%= translation(".detected_html", state: @lookup.detected_state[:name]) %>
+
+                <%= render(UI::Button::Component.new(text: translation(".change"), color: :link,
+                  data: {action: "ebike-rules--lookup#focusState"})) %>
+              </span>
+            </p>
+          <% elsif @lookup.state.nil? %>
+            <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
+              <%= translation(".location_not_shared") %>
+            </p>
+          <% end %>
+        </div>
+
+        <div class="tw:flex tw:min-w-0 tw:flex-[4_1_300px] tw:flex-col tw:gap-2">
+          <label class="twlabel" for="bike"><%= translation(".bike_model") %></label>
+
+          <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
+          <template data-ebike-rules--lookup-target="combobox">
+            <%= render(UI::Forms::Combobox::Component.new(name: "bike", src: bikebook_path(electric: 1),
+              dialog_label: translation(".bike_model"),
+              html_options: {value: @lookup.bikebook_id, placeholder: translation(".bike_placeholder"),
+                             aria: {invalid: (true if error?(:bike))}})) %>
+          </template>
+
+          <div data-ebike-rules--lookup-target="comboboxSlot">
+            <input
+              id="bike"
+              type="text"
+              class="twinput tw:min-h-12 tw:text-base!"
+              placeholder="<%= translation(".loading_bikebook") %>"
+              autocomplete="off"
+              disabled
+            >
+          </div>
+
+          <% if error?(:bike) %>
+            <p
+              role="alert"
+              class="
+                tw:text-[13px] tw:font-semibold tw:text-red-700
+                tw:dark:text-red-400
+              "
+            >
+              <%= translation(".bike_error") %>
+            </p>
+          <% end %>
+
+          <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
+            <%= render(UI::Button::Component.new(text: translation(".enter_manually"), color: :link,
+              data: {action: "ebike-rules--lookup#openManual"})) %>
+
+            <%= translation(".compare_html", link: link_to(translation(".visit_bikebook"), bikebook_path, class: "twlink")) %>
+          </p>
+        </div>
+
+        <div class="tw:flex tw:flex-[1_0_170px] tw:sm:pt-7">
+          <%= render(UI::Button::Component.new(text: translation(".check_my_bike"), color: :primary, size: :lg,
+            type: "submit", html_class: "tw:min-h-12 tw:w-full tw:justify-center")) %>
+        </div>
+      </div>
+
+      <%= tag.fieldset(disabled: !@lookup.manual, data: {"ebike-rules--lookup-target": "manualPanel"},
+        class: ["tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-[clamp(14px,3vw,22px)] tw:py-4.5 tw:dark:border-gray-700 tw:dark:bg-gray-900",
+                ("tw:hidden" unless @lookup.manual)]) do %>
+        <legend class="tw:px-1.5 tw:text-[15px] tw:font-bold">
+          <%= translation(".manual_legend") %>
+        </legend>
+
+        <%# Disabled with the panel, so a search submits none of this %>
+        <%= hidden_field_tag :manual, "1", id: nil %>
+
+        <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-5">
+          <div class="tw:flex tw:flex-[2_1_260px] tw:flex-col tw:gap-1.5">
+            <span id="manual-class-label" class="twlabel"><%= translation(".e_bike_class") %></span>
+
+            <div role="radiogroup" aria-labelledby="manual-class-label">
+              <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "e_bike_class", entries: class_entries,
+                selected: @lookup.manual_class || 2, full_width: true)) %>
+            </div>
+          </div>
+
+          <div class="tw:flex tw:flex-[1_1_150px] tw:flex-col tw:gap-1.5">
+            <%= label_tag :watts, translation(".motor_wattage"), class: "twlabel" %>
+
+            <%= number_field_tag :watts, @lookup.manual_watts, min: 1, inputmode: "numeric", autocomplete: "off",
+              placeholder: translation(".watts_placeholder"), class: "twinput tw:min-h-12 tw:text-base!",
+              aria: {invalid: (true if error?(:watts))} %>
+
+            <% if error?(:watts) %>
+              <p
+                role="alert"
+                class="
+                  tw:text-[13px] tw:font-semibold tw:text-red-700
+                  tw:dark:text-red-400
+                "
+              >
+                <%= translation(".watts_error") %>
+              </p>
+            <% end %>
+          </div>
+
+          <div class="tw:flex tw:flex-[1_1_150px] tw:flex-col tw:gap-1.5">
+            <span id="manual-throttle-label" class="twlabel"><%= translation(".has_throttle") %></span>
+
+            <div role="radiogroup" aria-labelledby="manual-throttle-label">
+              <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "throttle", entries: throttle_entries,
+                selected: @lookup.manual_throttle ? 1 : 0, full_width: true)) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="tw:flex tw:flex-wrap tw:gap-x-5 tw:gap-y-2 tw:text-sm">
+          <%= render(UI::Button::Component.new(text: translation(".search_bikebook_instead"), color: :link,
+            data: {action: "ebike-rules--lookup#closeManual"})) %>
+
+          <span class="tw:text-gray-700 tw:dark:text-gray-300">
+            <%= translation(".add_to_bikebook_html", link: link_to(translation(".add_it_to_bikebook"), bikebook_path, class: "twlink")) %>
+          </span>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @lookup.result? %>
+    <%= render(Pages::EbikeRules::Results::Component.new(lookup: @lookup)) %>
+  <% end %>
+
+  <section class="tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900 <%= @lookup.result? ? "tw:mt-10" : "tw:mt-14" %>">
+    <div class="tw:py-[clamp(40px,7vw,64px)] <%= SECTION_CLASSES %>">
+      <h2 class="<%= HEADING_CLASSES %>">
+        <%= translation(".classes_heading") %>
+      </h2>
+
+      <p
+        class="
+          tw:mt-2 tw:mb-7 tw:max-w-[640px] tw:text-[17px] tw:text-gray-700
+          tw:dark:text-gray-300
+        "
+      >
+        <%= translation(".classes_intro") %>
+      </p>
+
+      <div
+        class="
+          tw:grid
+          tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
+          tw:gap-4
+        "
+      >
+        <% class_cards.each do |card| %>
+          <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) do %>
+            <div class="tw:flex tw:items-center tw:gap-3.5">
+              <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: card[:n])) %>
+
+              <div>
+                <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
+                  <%= translation(".class_n", n: card[:n]) %>
+                </h3>
+
+                <p class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
+                  <%= card[:tag] %>
+                </p>
+              </div>
+            </div>
+
+            <dl
+              class="
+                tw:grid tw:grid-cols-3 tw:gap-2 tw:border-y
+                tw:border-gray-200 tw:py-3 tw:dark:border-gray-700
+              "
+            >
+              <% [[translation(".assist"), card[:assist]], [translation(".top_assist"), card[:speed]], [translation(".motor"), translation(".motor_cap")]].each do |label, value| %>
+                <div>
+                  <dt
+                    class="
+                      tw:text-xs tw:font-bold tw:tracking-[.06em]
+                      tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
+                    "
+                  >
+                    <%= label %>
+                  </dt>
+
+                  <dd class="tw:mt-0.5 tw:text-[15px] tw:font-bold">
+                    <%= value %>
+                  </dd>
+                </div>
+              <% end %>
+            </dl>
+
+            <p
+              class="
+                tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+                tw:dark:text-gray-300
+              "
+            >
+              <%= card[:body] %>
+            </p>
+          <% end %>
+        <% end %>
+
+        <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) do %>
+          <div class="tw:flex tw:items-center tw:gap-3.5">
+            <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: nil)) %>
+
+            <div>
+              <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
+                <%= translation(".not_an_ebike") %>
+              </h3>
+
+              <p class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
+                <%= translation(".not_a_legal_ebike") %>
+              </p>
+            </div>
+          </div>
+
+          <dl
+            class="
+              tw:grid tw:grid-cols-3 tw:gap-2 tw:border-y tw:border-gray-200
+              tw:py-3 tw:dark:border-gray-700
+            "
+          >
+            <% [[translation(".assist"), translation(".throttle")], [translation(".top_assist"), translation(".emoto_speed")], [translation(".motor"), translation(".emoto_motor")]].each do |label, value| %>
+              <div>
+                <dt
+                  class="
+                    tw:text-xs tw:font-bold tw:tracking-[.06em]
+                    tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
+                  "
+                >
+                  <%= label %>
+                </dt>
+
+                <dd class="tw:mt-0.5 tw:text-[15px] tw:font-bold">
+                  <%= value %>
+                </dd>
+              </div>
+            <% end %>
+          </dl>
+
+          <p
+            class="
+              tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+              tw:dark:text-gray-300
+            "
+          >
+            <%= translation(".emoto_body") %>
+          </p>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
+    <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-x-14 tw:gap-y-8 tw:py-[clamp(44px,8vw,72px)] <%= SECTION_CLASSES %>">
+      <div class="tw:max-w-[400px] tw:flex-[1_1_300px]">
+        <span class="<%= EYEBROW_CLASSES %>"><%= translation(".for_parents") %></span>
+
+        <h2 class="tw:mt-1.5 tw:mb-2.5 <%= HEADING_CLASSES %>">
+          <%= translation(".parents_heading") %>
+        </h2>
+
+        <p
+          class="
+            tw:mb-5 tw:text-[17px] tw:leading-relaxed tw:text-gray-700
+            tw:dark:text-gray-300
+          "
+        >
+          <%= translation(".parents_body") %>
+        </p>
+
+        <a
+          href="#state-laws"
+          class="
+            twlink tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[15px]
+            tw:font-semibold
+          "
+        >
+          <%= translation(".parents_link") %>
+          <%= helpers.inline_svg_tag("icons/arrow-right.svg", class: "tw:size-4", aria_hidden: true) %>
+        </a>
+      </div>
+
+      <ol
+        class="
+          tw:grid tw:flex-[2_1_420px]
+          tw:grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))]
+          tw:gap-x-8
+        "
+      >
+        <% parent_steps.each.with_index(1) do |(title, body), n| %>
+          <li
+            class="
+              tw:grid tw:grid-cols-[32px_minmax(0,1fr)] tw:gap-3.5
+              tw:border-t tw:border-gray-200 tw:py-4.5
+              tw:dark:border-gray-700
+            "
+          >
+            <span
+              aria-hidden="true"
+              class="
+                tw:flex tw:size-8 tw:items-center tw:justify-center
+                tw:rounded-full tw:bg-slate-900 tw:font-header
+                tw:text-[15px] tw:font-extrabold tw:text-white
+              "
+            >
+              <%= n %>
+            </span>
+
+            <div>
+              <h3 class="tw:my-1 tw:font-bold"><%= title %></h3>
+
+              <p
+                class="
+                  tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+                  tw:dark:text-gray-300
+                "
+              >
+                <%= body %>
+              </p>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  </section>
+
+  <section class="tw:py-[clamp(44px,8vw,72px)] <%= SECTION_CLASSES %>">
+    <span class="<%= EYEBROW_CLASSES %>"><%= translation(".battery_safety") %></span>
+
+    <h2 class="tw:mt-1.5 tw:mb-2.5 <%= HEADING_CLASSES %>">
+      <%= translation(".ul_heading") %>
+    </h2>
+
+    <p
+      class="
+        tw:mb-7 tw:max-w-[640px] tw:text-[17px] tw:leading-relaxed
+        tw:text-gray-700 tw:dark:text-gray-300
+      "
+    >
+      <%= translation(".ul_intro") %>
+    </p>
+
+    <div
+      class="
+        tw:mb-9 tw:grid
+        tw:grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] tw:gap-5
+      "
+    >
+      <% ul_standards.each do |standard| %>
+        <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-3 tw:rounded-lg tw:p-6!")) do %>
+          <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-3">
+            <span class="tw:font-header tw:text-[32px] tw:leading-none tw:font-black"><%= standard[:code] %></span>
+
+            <span
+              class="
+                tw:text-[15px] tw:font-bold tw:text-blue-600
+                tw:dark:text-blue-400
+              "
+            >
+              <%= standard[:scope] %>
+            </span>
+          </div>
+
+          <p
+            class="
+              tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+              tw:dark:text-gray-300
+            "
+          >
+            <%= standard[:body] %>
+          </p>
+
+          <ul
+            class="
+              tw:list-disc tw:pl-4.5 tw:text-[15px] tw:leading-relaxed
+              tw:text-gray-700 tw:dark:text-gray-300
+            "
+          >
+            <% standard[:tests].each do |test| %>
+              <li><%= test %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div
+      class="
+        tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))]
+        tw:gap-x-9 tw:gap-y-7 tw:border-t tw:border-gray-200 tw:pt-7
+        tw:dark:border-gray-700
+      "
+    >
+      <div>
+        <h3 class="tw:mb-2 tw:text-[17px] tw:font-bold">
+          <%= translation(".certification_involves_heading") %>
+        </h3>
+
+        <p
+          class="
+            tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+            tw:dark:text-gray-300
+          "
+        >
+          <%= translation(".certification_involves_body") %>
+        </p>
+      </div>
+
+      <div>
+        <h3 class="tw:mb-2 tw:text-[17px] tw:font-bold">
+          <%= translation(".banned_heading") %>
+        </h3>
+
+        <p
+          class="
+            tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+            tw:dark:text-gray-300
+          "
+        >
+          <%= translation(".banned_body") %>
+        </p>
+      </div>
+
+      <div class="tw:flex tw:items-start tw:gap-4">
+        <div class="tw:flex-1">
+          <h3 class="tw:mb-2 tw:text-[17px] tw:font-bold">
+            <%= translation(".how_to_check_heading") %>
+          </h3>
+
+          <ol
+            class="
+              tw:list-decimal tw:pl-4.5 tw:text-[15px] tw:leading-relaxed
+              tw:text-gray-700 tw:dark:text-gray-300
+            "
+          >
+            <li><%= translation(".how_to_check_1") %></li>
+            <li><%= translation(".how_to_check_2") %></li>
+            <li><%= translation(".how_to_check_3") %></li>
+          </ol>
+        </div>
+
+        <%= image_tag "kelsey/partners/assets-law_2.png", alt: "", class: "tw:w-22 tw:flex-none" %>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:bg-linear-160 tw:from-slate-900 tw:to-[#233140] tw:text-white">
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-9 tw:gap-y-5 tw:py-8 <%= SECTION_CLASSES %>">
+      <%= image_tag "ebike_rules/bike-hero.png", alt: "", class: "tw:w-30 tw:flex-none" %>
+
+      <div class="tw:flex-[1_1_300px]">
+        <h2
+          class="
+            tw:font-header tw:text-[clamp(20px,3vw,26px)] tw:leading-tight
+            tw:font-extrabold
+          "
+        >
+          <%= translation(".register_band_heading") %>
+        </h2>
+
+        <div
+          class="
+            tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-7 tw:gap-y-1.5
+            tw:text-[15px] tw:text-white/90
+          "
+        >
+          <span><%= translation(".bikes_registered_html", number: tag.strong(number_display(@registered_count), class: "tw:font-header tw:text-lg tw:font-extrabold tw:text-[#ffd660]")) %></span>
+          <span><%= translation(".recoveries_html", number: tag.strong(number_display(@recoveries_count), class: "tw:font-header tw:text-lg tw:font-extrabold tw:text-[#ffd660]")) %></span>
+        </div>
+      </div>
+
+      <%= render(UI::ButtonLink::Component.new(href: new_register_path, text: translation(".register_your_bike"),
+        color: :yellow, size: :callout)) %>
+    </div>
+  </section>
+
+  <%= render(Pages::EbikeRules::StateReference::Component.new) %>
+
+  <p
+    class="
+      tw:bg-slate-900 tw:px-[clamp(16px,4vw,32px)] tw:py-7 tw:text-center
+      tw:text-[13px] tw:text-white/75
+    "
+  >
+    <%= translation(".disclaimer") %>
+  </p>
+</div>
