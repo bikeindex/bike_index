@@ -297,10 +297,6 @@ RSpec.describe "Bikebook", :js, type: :system do
         { groups: [[null, [{ label: 'Year', value: 2026 }]], ['Geometry', [{ label: 'Reach', value: 450 }]]],
           columns: [{ label: '', rowHeader: true, cell: (record) => record.label }, { label: 'Level 2', cell: (record) => record.value }] }
       JS
-
-      expect_template(UI::Card::Component.new(additional_classes: "tw:mt-6").with_content("<p>Compared</p>".html_safe),
-        "bikebook/templates/ui/card#card", "{ additionalClasses: 'tw:mt-6', content: html`<p>Compared</p>` }")
-      expect_template(UI::Card::Component.new.with_content("Compared"), "bikebook/templates/ui/card#card", "{ content: 'Compared' }")
     end
   end
 

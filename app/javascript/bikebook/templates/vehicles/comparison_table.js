@@ -1,6 +1,5 @@
 import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
-import { card } from 'bikebook/templates/ui/card'
 import { table } from 'bikebook/templates/ui/table'
 import { array, join, present, slice } from 'bikebook/templates/values'
 
@@ -103,21 +102,18 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
     }))
   const geometryRecords = records(geometry)
 
-  return html`<section aria-label="Comparison">${card({
-    additionalClasses: 'tw:mx-auto tw:mt-6 tw:max-w-4xl tw:[--gutter:--spacing(4)]',
-    content: table({
-      groups: [
-        [null, [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...records([...SPECS, ...DETAILS])]],
-        ...(geometryRecords.length ? [['Geometry', geometryRecords]] : [])
-      ],
-      columns: [
-        { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
-        ...named.map((vehicle, index) => ({
-          label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
-          classes: 'tw:min-w-36 tw:align-top',
-          cell: (record) => record.cell(index)
-        }))
-      ]
-    })
+  return html`<section aria-label="Comparison" class="tw:mt-6">${table({
+    groups: [
+      [null, [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...records([...SPECS, ...DETAILS])]],
+      ...(geometryRecords.length ? [['Geometry', geometryRecords]] : [])
+    ],
+    columns: [
+      { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
+      ...named.map((vehicle, index) => ({
+        label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
+        classes: 'tw:min-w-36 tw:align-top',
+        cell: (record) => record.cell(index)
+      }))
+    ]
   })}</section>`
 }
