@@ -132,6 +132,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     five = %w[m/aventon/2026/level_4_rec_step_through m/aventon/2022/level_2_step_through m/segway/2025/gt3_pro
       m/specialized/2025/haul_st m/sur_ron/2026/ultra_bee_hp_x_us].join(",")
     card_rows = -> { page.evaluate_script("new Set([...document.querySelectorAll('article')].map((card) => Math.round(card.getBoundingClientRect().top))).size") }
+    scrolls_sideways = -> { page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth") }
     visit bikebook_path(vehicle_models: five)
     expect(page).to have_css("article", count: 5, wait: 10)
     expect(card_rows.call).to be > 1
@@ -141,12 +142,12 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[aria-label='Comparison'] thead th", count: 6)
     expect(page).to have_css("[data-comparison] article", count: 5)
     expect(card_rows.call).to eq 1
-    expect(page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth")).to be true
+    expect(scrolls_sideways.call).to be true
 
     # and on a phone too, rather than stacking
     page.current_window.resize_to(390, 844)
     expect(card_rows.call).to eq 1
-    expect(page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth")).to be true
+    expect(scrolls_sideways.call).to be true
     page.current_window.resize_to(1920, 1080)
   end
 

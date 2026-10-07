@@ -29,11 +29,10 @@ export class VehicleViewer {
     const baselineSolo = vehicles.length === 3 && !comparisonView
       ? 'tw:md:max-[1152px]:[&>*:first-child]:basis-full tw:md:max-[1152px]:[&>*:first-child>article]:mx-auto tw:md:max-[1152px]:[&>*:first-child>article]:max-w-[calc(50%-1rem)]'
       : ''
-    // the comparison view scrolls its cards sideways at any width, a phone's each most of the screen and snapping to it
     const rowClasses = !comparing
       ? 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
       : comparisonView
-        ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw]! tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
+        ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
         : 'tw:flex-col tw:md:flex-row tw:md:flex-wrap tw:md:justify-center'
     const values = vehicles.map(({ value }) => value)
     const baseline = models[0]
@@ -48,7 +47,7 @@ export class VehicleViewer {
     return html`${comparisonView && models.length ? comparisonTable({ presenter: this.presenter, vehicles: models, sizes }) : nothing}<div ?data-comparison=${comparisonView} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
       : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses} ${baselineSolo}"
-      data-controller="bikebook--wrapped-scroll">${cards}</div></div>`
+      data-controller=${comparisonView ? nothing : 'bikebook--wrapped-scroll'}>${cards}</div></div>`
   }
 }
 
