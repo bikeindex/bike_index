@@ -253,14 +253,14 @@ class RegisterController < ApplicationController
   # reuses a token whose origin matches
   def start_registration(token_id: nil, origin: "register_flow")
     @b_param = BikeServices::Register.b_param_for(user: current_user, token_id:, origin:,
-      status: start_status, email: params[:email])
+      status: start_status, email: params[:email], bike_sticker: start_params[:bike_sticker])
     session[:register_b_param_token] = @b_param.id_token
   end
 
   # Everything new seeds a registration from, so arriving on an organization's link
   # (or a stolen one) without a registration doesn't lose how they got there
   def start_params
-    params.permit(:organization_id, :status, :email).to_h.compact_blank
+    params.permit(:organization_id, :status, :email, :bike_sticker).to_h.compact_blank
   end
 
   # ?status=stolen and ?stolen=true as well as the full status_stolen - a link to report

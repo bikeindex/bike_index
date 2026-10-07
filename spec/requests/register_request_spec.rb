@@ -1195,6 +1195,27 @@ RSpec.describe RegisterController, type: :request do
           expect(response.body).to include "keep watch"
           expect(response.body).to include "View your registration"
         end
+
+        # SSO and emailed-link accounts are made from an address alone
+        context "whose account has no name" do
+          let(:current_user) { FactoryBot.create(:user_confirmed, name: nil) }
+
+          it "asks for it, naming the account and the registration" do
+            get register_path(b_param_token: b_param.id_token, step: 2)
+            expect(response.body).to include "bike[user_name]"
+
+            expect {
+              patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.except(:user_name)}
+            }.to_not change(Bike, :count)
+            expect(response.status).to eq 422
+            expect(response.body).to include "Owner name is required to register"
+
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+            expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+            expect(current_user.reload.name).to eq user_name
+            expect(Bike.last.owner_name).to eq user_name
+          end
+        end
       end
 
       context "with an automatically assigned organization" do

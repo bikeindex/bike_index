@@ -30,13 +30,13 @@ module BikeServices
     MATCH_INPUTS = (MATCHED_ATTRS.keys + %w[owner_email manufacturer_id manufacturer_other cycle_type frame_size_unit]).freeze
 
     # The token's registration when step 1 was never submitted, otherwise a new one.
-    # A signed-in user's email prefills owner_email
-    def b_param_for(user:, token_id: nil, status: nil, email: nil, origin: "register_flow")
+    # A signed-in user's email prefills owner_email, a scanned sticker's code bike_sticker
+    def b_param_for(user:, token_id: nil, status: nil, email: nil, bike_sticker: nil, origin: "register_flow")
       status = nil unless Bike.statuses.include?(status)
       existing = find_token(session_token: token_id, user:)
       return assign_start_params(existing, user, email:, status:) if reusable?(existing, origin)
 
-      bike_params = {owner_email: owner_email_for(user, email), status:}.compact
+      bike_params = {owner_email: owner_email_for(user, email), status:, bike_sticker:}.compact
       BParam.create(origin:, creator_id: user&.id, params: {bike: bike_params}.as_json)
     end
 
@@ -292,14 +292,18 @@ module BikeServices
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
     # fields into the params json. The photo arrives one of two ways: as bytes from a plain
     # file field, or as the signed id of a blob the browser already uploaded.
-    # Returns whether the step passed - a registration for someone else needs their name.
+    # Returns whether the step passed - it needs the owner's name, which a registrant's own
+    # account answers once it has one (an SSO or emailed-link account starts without).
     # A failed step still saves, it just isn't marked complete, so nothing entered is lost.
     # Not past an earlier error on the submission, which saving would clear
     def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil, additional: nil)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
       bike_params = honeypot_spam(bike_params, additional)
-      completed = b_param.self_made?(user) || bike_params["user_name"].present?
+      self_made = b_param.self_made?(user)
+      # A claimed ownership takes its owner_name from the account, so the name has to land there
+      user.update(name: bike_params["user_name"]) if self_made && user.name.blank? && bike_params["user_name"].present?
+      completed = self_made && user.name.present? || bike_params["user_name"].present?
       clear_stale_report(b_param, bike_params["status"])
       set_auto_organization(b_param, register_with_organization)
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
