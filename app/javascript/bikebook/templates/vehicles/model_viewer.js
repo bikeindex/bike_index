@@ -22,7 +22,7 @@ const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 export const modelViewer = (args) => new ModelViewer(args).render()
 
 class ModelViewer {
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath, selectedSize = null }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath, selectedSize }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
@@ -237,8 +237,15 @@ class ModelViewer {
   }
 
   specRows (key, fields = key === 'frame' ? this.kit.viewer.frame_fields : this.kit.schemas.vehicle[key].fields, labels = {}) {
-    return this.presenter.rowsFor(fields, this.vehicle[key], { labels, others: this.others.map((other) => other[key]), collapse: ['bottom_bracket'] })
-      .map(([label, value, unit, differs, key, otherValues]) => [label, this.specValue(value, key), unit, differs, key, otherValues.map((other) => this.specValue(other, key))])
+    return this.presenter.rowsFor(fields, this.vehicle[key], {
+      labels, others: this.others.map((other) => other[key]), collapse: ['bottom_bracket'], display: (value, field) => this.specValue(value, field)
+    })
+  }
+
+  // `summary` of `item`, marked where the others' `counterparts` differ
+  againstCounterparts (item, counterparts, summary) {
+    const differs = counterparts.some((other) => !equal(other, item))
+    return this.presenter.highlighted(summary(item), differs, differs && counterparts.map((other) => other && summary(other)))
   }
 
   specValue (value, key) {
@@ -298,8 +305,7 @@ class ModelViewer {
     const { presenter } = this
     const rows = Object.entries(this.vehicle.suspension).map(([position, values]) => definitionListRow({
       label: presenter.positionLabel(position),
-      value: presenter.highlighted(this.suspensionSummary(position, values), this.differs('suspension', position),
-        this.others.map((other) => other.suspension[position] && this.suspensionSummary(position, other.suspension[position])))
+      value: this.againstCounterparts(values, this.others.map((other) => other.suspension[position]), (each) => this.suspensionSummary(position, each))
     }))
     return section({ heading: 'Suspension', content: rows.length ? join(rows) : null })
   }
@@ -383,14 +389,10 @@ class ModelViewer {
     if (blank(this.vehicle[key])) return nothing
     return section({
       heading,
-      content: join(this.vehicle[key].map((item) => {
-        const counterparts = this.others.map((other) => this.byPosition(other[key], item.position))
-        const differs = counterparts.some((other) => !equal(other, item))
-        return definitionListRow({
-          label: presenter.positionLabel(item.position) ?? fallback,
-          content: presenter.highlighted(summary(item), differs, counterparts.map((other) => other && summary(other)))
-        })
-      }))
+      content: join(this.vehicle[key].map((item) => definitionListRow({
+        label: presenter.positionLabel(item.position) ?? fallback,
+        content: this.againstCounterparts(item, this.others.map((other) => this.byPosition(other[key], item.position)), summary)
+      })))
     })
   }
 
@@ -413,20 +415,15 @@ class ModelViewer {
     const { presenter } = this
     if (blank(this.vehicle.wheels)) return nothing
 
-    const rows = this.builtWheels().map((wheel) => {
-      const counterparts = this.others.map((other) => this.byPosition(this.builtWheels(other), wheel.position))
-      const differs = counterparts.some((other) => !equal(other, wheel))
-      return definitionListRow({
-        label: presenter.positionLabel(wheel.position) ?? 'Wheel',
-        content: presenter.highlighted(this.wheelSummary(wheel), differs, counterparts.map((other) => other && this.wheelSummary(other)))
-      })
-    })
+    const rows = this.builtWheels().map((wheel) => definitionListRow({
+      label: presenter.positionLabel(wheel.position) ?? 'Wheel',
+      content: this.againstCounterparts(wheel, this.others.map((other) => this.byPosition(this.builtWheels(other), wheel.position)), (each) => this.wheelSummary(each))
+    }))
     const clearances = this.clearances()
-    const differs = this.others.some((other) => !equal(this.clearances(other), clearances))
     const alsoFits = clearances.length
       ? definitionListRow({
         label: 'Also fits',
-        content: presenter.highlighted(this.clearanceSummary(clearances), differs, this.others.map((other) => presence(this.clearanceSummary(this.clearances(other)))))
+        content: this.againstCounterparts(clearances, this.others.map((other) => this.clearances(other)), (each) => this.clearanceSummary(each))
       })
       : nothing
     return section({ heading: 'Wheels', content: join([...rows, alsoFits]) })

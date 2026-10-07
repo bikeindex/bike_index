@@ -30,7 +30,7 @@ export class VehicleViewer {
       ? 'tw:md:max-[1152px]:[&>*:first-child]:basis-full tw:md:max-[1152px]:[&>*:first-child>article]:mx-auto tw:md:max-[1152px]:[&>*:first-child>article]:max-w-[calc(50%-1rem)]'
       : ''
     const values = vehicles.map(({ value }) => value)
-    const baseline = vehicles.find(({ classification }) => !classification)
+    const baseline = models[0]
     const classificationPath = (id) => pathWith(url, { vehicle_models: [...new Set([...values, id])].join(',') })
     const cards = vehicles.map(({ data, value, classification }, index) => {
       const remaining = values.filter((each) => each !== value)

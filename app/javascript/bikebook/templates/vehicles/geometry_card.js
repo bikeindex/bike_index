@@ -3,16 +3,14 @@ import { definitionListContainer } from 'bikebook/templates/ui/definition_list/c
 import { array, equal, except, isHash, presence, present } from 'bikebook/templates/values'
 
 // A size's geometry, marked where the same-named size in `others` differs, and ringed when it's the size compared
-export const geometryCard = ({ presenter, size, others, selected = false }) => {
+export const geometryCard = ({ presenter, size, others, selected }) => {
   const { labels, extras_key: extrasKey, dimensions } = presenter.kit.geometry
   const geometry = size.geometry ?? {}
   const othersGeometry = others.map((sizes) => array(sizes).find((other) => equal(other.name, size.name))?.geometry)
   const sizeTravels = Object.values(presenter.kit.viewer.suspensions).map(({ size_travel: sizeTravel }) => sizeTravel)
-  const rows = presenter.rowsFor(except(presenter.kit.schemas.geometry, [extrasKey, ...sizeTravels]), geometry, { labels, others: othersGeometry, collapse: dimensions })
-    .map(([label, value, unit, differs, key, otherValues]) => {
-      const shown = (each) => isHash(each) ? presenter.dimensions(each) : each
-      return [label, shown(value), unit, differs, key, otherValues.map(shown)]
-    })
+  const rows = presenter.rowsFor(except(presenter.kit.schemas.geometry, [extrasKey, ...sizeTravels]), geometry, {
+    labels, others: othersGeometry, collapse: dimensions, display: (value) => isHash(value) ? presenter.dimensions(value) : value
+  })
   const otherExtras = othersGeometry.map((each) => each?.[extrasKey] ?? {})
   const extras = Object.entries(geometry[extrasKey] ?? {}).filter(([, value]) => present(value)).map(([key, value]) => {
     const [label, unit] = key.split(presenter.unitSuffix)

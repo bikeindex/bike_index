@@ -25,8 +25,8 @@ const canonical = (name) => {
 
 const matching = (sizes, name) => name == null
   ? null
-  : sizes.find((size) => size.name === name) ?? sizes.find((size) => canonical(size.name) === canonical(name)) ?? null
-const medium = (sizes) => matching(sizes, 'M') ?? sizes[Math.floor((sizes.length - 1) / 2)] ?? null
+  : sizes.find((size) => size.name === name) ?? sizes.find((size) => canonical(size.name) === canonical(name))
+const medium = (sizes) => matching(sizes, 'M') ?? sizes[Math.floor((sizes.length - 1) / 2)]
 
 const gap = (a, b) => typeof a === 'number' && typeof b === 'number' ? Math.abs(a - b) : Infinity
 // The size whose effective top tube is nearest `target`'s, reach breaking a tie
@@ -42,19 +42,19 @@ const nearest = (sizes, target) => {
 // The first vehicle's last picked size, { name, geometry }, which a first vehicle with none picked takes the nearest of
 export const preferredSize = () => {
   try {
-    return JSON.parse(window.localStorage.getItem(KEY))?.preferred ?? null
+    return JSON.parse(window.localStorage.getItem(KEY))
   } catch {
     return null
   }
 }
 
-export const storePreferredSize = (size) => window.localStorage.setItem(KEY, JSON.stringify({ preferred: size }))
+export const storePreferredSize = (size) => window.localStorage.setItem(KEY, JSON.stringify(size))
 
 // vehicle_sizes is each vehicle's picked size in vehicle_models' order, blank where it has none
-const listed = (url, param) => url.searchParams.get(param)?.split(',') ?? []
+const paramList = (url, param) => url.searchParams.get(param)?.split(',') ?? []
 export const pickedSizes = (url) => {
-  const sizes = listed(url, PARAM)
-  return Object.fromEntries(listed(url, 'vehicle_models').map((id, index) => [id, sizes[index]]).filter(([, size]) => size))
+  const sizes = paramList(url, PARAM)
+  return Object.fromEntries(paramList(url, 'vehicle_models').map((id, index) => [id, sizes[index]]).filter(([, size]) => size))
 }
 export const sizesParam = (ids, picked) => {
   const sizes = ids.map((id) => picked[id] ?? '')
@@ -62,19 +62,22 @@ export const sizesParam = (ids, picked) => {
 }
 const withPicked = (url, picked) => {
   const next = new URL(url)
-  const value = sizesParam(listed(next, 'vehicle_models'), picked)
+  const value = sizesParam(paramList(next, 'vehicle_models'), picked)
   value ? next.searchParams.set(PARAM, value) : next.searchParams.delete(PARAM)
   return next
 }
 export const withSize = (url, id, name) => withPicked(url, { ...pickedSizes(url), [id]: name })
 // `url` with each size following its vehicle from `previous`, whose vehicles it's reordered, added to or removed from
-export const realigned = (url, previous) => withPicked(url, pickedSizes(previous))
+export const realigned = (url, previous = new URL(window.location.href)) => withPicked(url, pickedSizes(previous))
 
 // Each vehicle's size: its pick, else the first's preferred size and the others' the first's, each the nearest
 // by top tube, else by name, else medium
-export const chosenSizes = (vehicles, { picked = {}, preferred = null } = {}) => {
-  const [first, ...others] = vehicles.map(({ data }) => array(data.sizes))
-  const near = (sizes, target) => nearest(sizes, target) ?? matching(sizes, target?.name) ?? medium(sizes)
-  const firstSize = first && (matching(first, picked[vehicles[0].value]) ?? near(first, preferred))
-  return [firstSize, ...others.map((sizes, index) => matching(sizes, picked[vehicles[index + 1].value]) ?? near(sizes, firstSize ?? preferred))]
+export const chosenSizes = (vehicles, { picked = {}, preferred } = {}) => {
+  const choose = ({ value, data }, target) => {
+    const sizes = array(data.sizes)
+    return matching(sizes, picked[value]) ?? nearest(sizes, target) ?? matching(sizes, target?.name) ?? medium(sizes)
+  }
+  const [first, ...others] = vehicles
+  const firstSize = first && choose(first, preferred)
+  return [firstSize, ...others.map((vehicle) => choose(vehicle, firstSize ?? preferred))]
 }

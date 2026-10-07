@@ -20,9 +20,9 @@ class BikebookController < ApplicationController
     vehicle_models = [id, *picked].uniq
     query = request.query_parameters.merge("vehicle_models" => vehicle_models.join(","))
     # vehicle_sizes is in vehicle_models' order, so each size moves with its vehicle
-    sizes = params[:vehicle_sizes].to_s.split(",")
-    if sizes.any?
-      query["vehicle_sizes"] = vehicle_models.map { |each| sizes[picked.index(each) || sizes.length] }.join(",").sub(/,+\z/, "")
+    if params[:vehicle_sizes].present?
+      sizes = picked.zip(params[:vehicle_sizes].split(",")).to_h
+      query["vehicle_sizes"] = vehicle_models.map { sizes[it] }.join(",").sub(/,+\z/, "")
     end
     # unescaped, as the page writes its own URLs
     query = query.to_query.gsub("%2F", "/").gsub("%2C", ",")

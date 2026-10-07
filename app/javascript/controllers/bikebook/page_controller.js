@@ -41,10 +41,9 @@ export default class extends Controller {
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles
   visit (event) {
     event.preventDefault()
-    const previous = new URL(window.location.href)
-    const url = new URL(previous)
+    const url = new URL(window.location.href)
     new FormData(event.target).forEach((value, name) => url.searchParams.set(name, value))
-    this.#go(realigned(url, previous))
+    this.#go(realigned(url))
   }
 
   // A plain click on a link to this page, such as a card's remove link

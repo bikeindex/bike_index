@@ -7,10 +7,9 @@ import { realigned } from 'bikebook/sizes'
 // so an early click finds none
 export default class extends Controller {
   remove () {
-    const previous = new URL(window.location)
-    const url = new URL(previous)
+    const url = new URL(window.location)
     const remaining = new URL(this.element.href).searchParams.get('vehicle_models')
     remaining ? url.searchParams.set('vehicle_models', remaining) : url.searchParams.delete('vehicle_models')
-    this.element.href = readable(realigned(url, previous))
+    this.element.href = readable(realigned(url))
   }
 }

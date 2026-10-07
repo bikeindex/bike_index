@@ -22,12 +22,12 @@ const gearing = (position) => (vehicle) => {
 // then each chainring, or the smallest and largest cog
 const gearingParts = (cogs) => (presenter, { count, teeth }) => {
   const shown = cogs ? [...new Set([teeth[0], teeth.at(-1)])] : teeth
-  const key = (index) => cogs ? (index === shown.length - 1 ? 'largest' : 'smallest') : `chainring_${index}`
   return [
     ...(count == null ? [] : [['count', count, shown.length ? `${count}:` : String(count)]]),
     ...shown.map((tooth, index) => {
       const last = index === shown.length - 1
-      return [key(index), tooth, join([presenter.measurement(tooth, last ? 'teeth' : null), last ? '' : cogs ? '–' : ','])]
+      const key = cogs ? (last ? 'largest' : 'smallest') : `chainring_${index}`
+      return [key, tooth, join([presenter.measurement(tooth, last ? 'teeth' : null), last ? '' : cogs ? '–' : ','])]
     })
   ]
 }
@@ -76,12 +76,11 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   }))
   const missing = html`<span class="twless-strong">—</span>`
 
-  // `amount` shows the change's size
   const changed = (row, number, base, amount) => {
     const change = presenter.rounded(number - base)
     if (change === 0) return html`<span class="tw:block tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">-</span>`
     const color = Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
-    // a unit or currency symbol carries its name as a title, and stays gray
+    // a currency symbol, which carries its name as a title, stays gray like a unit
     return html`<span class="tw:block tw:text-xs ${color} tw:[&_span[title]]:text-gray-400 tw:dark:[&_span[title]]:text-gray-500">${
       change > 0 ? '+' : '−'}${amount(Math.abs(change))}</span>`
   }
@@ -91,24 +90,21 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
     ? changed(row, value, base, (amount) => show(row, amount, vehicle))
     : nothing
 
-  // each part beside the next, its change under it
   const partsCell = (row, value, base, vehicle) => {
-    const baseParts = new Map(base == null ? [] : row.parts(presenter, base).map(([key, number]) => [key, number]))
+    const baseParts = new Map(base == null ? [] : row.parts(presenter, base))
     return html`<span class="tw:inline-flex tw:items-start tw:gap-x-1">${row.parts(presenter, value).map(([key, number, content]) =>
       html`<span>${content}${compared(row, vehicle) && baseParts.has(key) ? changed(row, number, baseParts.get(key), String) : nothing}</span>`)}</span>`
   }
 
-  // a select where there's a size to pick, and the page renders again from each pick
   const sizeCell = (index) => {
     const { data, value } = vehicles[index]
     const options = array(data.sizes)
     if (options.length < 2) return options[0]?.name ?? missing
     return html`<select class="twinput tw:w-auto tw:py-1 tw:text-sm" aria-label=${`Size of ${named[index].model}`} data-action="bikebook--page#pickSize"
       data-bikebook--page-vehicle-param=${value} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
-        html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: slice(size.geometry ?? {}, ['top_tube_effective', 'reach']) })}>${size.name}</option>`)}</select>`
+        html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: slice(size.geometry, ['top_tube_effective', 'reach']) })}>${size.name}</option>`)}</select>`
   }
 
-  // a table record per row with a value: its label, and its cell in each vehicle's column
   const records = (rows) => rows.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
     .filter(([, values]) => values.some(present)).map(([row, values]) => ({
       label: row.label,
