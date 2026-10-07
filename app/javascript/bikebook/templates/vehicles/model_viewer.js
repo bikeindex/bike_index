@@ -22,13 +22,13 @@ const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 export const modelViewer = (args) => new ModelViewer(args).render()
 
 class ModelViewer {
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath, selectedSize = null }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, classificationPath })
+    Object.assign(this, { value, comparing, idSuffix, removePath, classificationPath, selectedSize })
   }
 
   render () {
@@ -509,7 +509,7 @@ class ModelViewer {
       label: 'sizes',
       heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-mono tw:text-sm tw:font-normal tw:tracking-normal tw:opacity-65 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
       content: html`<div data-ui--collapse-target="content" class="twgutter-bleed tw:flex tw:gap-4 tw:overflow-x-auto tw:pb-3.5">${
-        sizes.map((size) => geometryCard({ presenter: this.presenter, size, others }))}</div>`
+        sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize }))}</div>`
     })
   }
 

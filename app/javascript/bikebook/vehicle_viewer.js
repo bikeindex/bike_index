@@ -1,5 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { classificationCard } from 'bikebook/templates/vehicles/classification_card'
+import { chosenSizes } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { modelViewer } from 'bikebook/templates/vehicles/model_viewer'
 import { toQuery } from 'bikebook/query'
@@ -11,8 +12,8 @@ export class VehicleViewer {
     this.presenter = new VehiclePresenter(kit, vocabulary)
   }
 
-  // The vehicles at `url`, whose remove links keep its other params
-  render (vehicles, url) {
+  // The vehicles at `url`, whose remove links keep its other params, compared in the `storedSizes` picked
+  render (vehicles, url, storedSizes) {
     if (vehicles.length === 0) {
       return html`<div class="tw:mx-auto tw:mt-6 tw:max-w-4xl tw:rounded-lg tw:border tw:border-dashed tw:border-gray-200 tw:dark:border-gray-700 tw:px-4 tw:py-6 tw:text-center"><p
         class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500 tw:dark:text-gray-500">Pick a vehicle above to start comparing.</p></div>`
@@ -21,6 +22,8 @@ export class VehicleViewer {
     const comparing = vehicles.length > 1
     const comparisonView = url.searchParams.get('view') === 'comparison'
     const models = vehicles.filter(({ classification }) => !classification)
+    const sizes = comparisonView ? chosenSizes(models, storedSizes) : []
+    const selectedSizes = new Map(models.map(({ value }, index) => [value, sizes[index]?.name]))
     const baselineSolo = vehicles.length === 3 && !comparisonView
       ? 'tw:md:max-[1152px]:[&>*:first-child]:basis-full tw:md:max-[1152px]:[&>*:first-child>article]:mx-auto tw:md:max-[1152px]:[&>*:first-child>article]:max-w-[calc(50%-1rem)]'
       : ''
@@ -31,9 +34,9 @@ export class VehicleViewer {
       const remove = pathWith(url, { vehicle_models: values.filter((each) => each !== value).join(',') })
       return classification
         ? classificationCard({ presenter: this.presenter, id: value, classification: data, removePath: remove })
-        : modelViewer({ presenter: this.presenter, data, value, comparing, idSuffix: index + 1, others: value === baseline.value ? [] : [baseline.data], removePath: remove, classificationPath })
+        : modelViewer({ presenter: this.presenter, data, value, comparing, idSuffix: index + 1, others: value === baseline.value ? [] : [baseline.data], removePath: remove, classificationPath, selectedSize: selectedSizes.get(value) })
     })
-    return html`${comparisonView && models.length ? comparisonTable({ presenter: this.presenter, vehicles: models }) : nothing}<div ?data-comparison=${comparisonView} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
+    return html`${comparisonView && models.length ? comparisonTable({ presenter: this.presenter, vehicles: models, sizes }) : nothing}<div ?data-comparison=${comparisonView} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
       : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:flex-col tw:gap-8 ${comparing
       ? `tw:md:flex-row ${comparisonView ? 'tw:md:justify-center-safe tw:md:overflow-x-auto' : 'tw:md:flex-wrap tw:md:justify-center'}`

@@ -120,6 +120,56 @@ RSpec.describe "Bikebook", :js, type: :system do
     page.current_window.resize_to(1920, 1080)
   end
 
+  it "keeps each compared vehicle in a size, the others following the first's unless picked, and remembers them" do
+    serve_catalog
+    visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/current_exp", view: "comparison")
+    expect(page).to have_css("[aria-label='Comparison'] tbody tr:first-child th", text: "Size", wait: 10)
+
+    # sizes no fixture has: medium by default, a name read the ways it's written, the first's size for the rest
+    chosen = page.evaluate_script(<<~JS)
+      (async () => {
+        const { chosenSizes } = await import('bikebook/sizes')
+        const vehicle = (value, ...names) => ({ value, data: { sizes: names.map((name) => ({ name })) } })
+        const names = (vehicles, stored) => chosenSizes(vehicles, stored).map((size) => size?.name ?? 'none')
+        return [
+          names([vehicle('a', 'S', 'M', 'L'), vehicle('b', 'Regular', 'Large'), vehicle('c', 'S/M', 'M/L'), vehicle('d')]),
+          names([vehicle('a', 'Small', 'Medium'), vehicle('b', 'XS', 'S', 'M'), vehicle('c', 'MD', 'LG')], { preferred: 'Small', picked: { c: 'LG' } }),
+          names([vehicle('a', 'S', 'M', 'L'), vehicle('b', '52', '54', '56')], { preferred: 'L' })
+        ]
+      })()
+    JS
+    expect(chosen).to eq([["M", "Regular", "S/M", "none"], ["Small", "S", "LG"], ["L", "54"]])
+
+    # a rendered size is its option's selected attribute, which a pick alone doesn't set, so it waits out the render
+    size_select = ->(model) { find("select[aria-label='Size of #{model}']") }
+    expect_size = ->(model, size) { expect(page).to have_css("select[aria-label='Size of #{model}'] option[selected]", exact_text: size) }
+    expect_size.call("Current ADV", "Medium")
+    expect_size.call("Current EXP", "Medium")
+
+    size_select.call("Current ADV").select("Large")
+    expect_size.call("Current EXP", "Large")
+
+    size_select.call("Current EXP").select("Small")
+    expect_size.call("Current EXP", "Small")
+    size_select.call("Current ADV").select("Extra Large")
+    expect_size.call("Current ADV", "Extra Large")
+    expect_size.call("Current EXP", "Small")
+
+    visit current_url
+    expect(page).to have_css("[aria-label='Comparison']", wait: 10)
+    expect_size.call("Current ADV", "Extra Large")
+    expect_size.call("Current EXP", "Small")
+    # each card's geometry rings its size
+    current_size = ->(model) { find("article h1", exact_text: model).ancestor("article").all("[aria-current='true'] h3", visible: :all).map { it.text(:all) } }
+    expect(current_size.call("Current ADV")).to eq(["Extra Large"])
+    expect(current_size.call("Current EXP")).to eq(["Small"])
+
+    type_into(vehicle_field, "soltera")
+    retry_on_detach { find("[role='option']", text: "Aventón Soltera 3 ADV").click }
+    expect_size.call("Soltera 3 ADV", "Extra Large")
+    expect_size.call("Current EXP", "Small")
+  end
+
   it "renders each UI template as the component it mirrors does" do
     serve_catalog
     visit bikebook_path

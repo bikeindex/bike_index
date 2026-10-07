@@ -2,7 +2,10 @@ import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
 import { readable } from 'bikebook/replace_url'
+import { storeSize } from 'bikebook/sizes'
 import { uuid } from 'bikebook/templates/helpers'
+
+/* global CSS */
 
 const stamped = (state) => ({ ...state, bikebook: uuid() })
 
@@ -60,6 +63,13 @@ export default class extends Controller {
     const url = new URL(window.location.href)
     url.searchParams.get('view') === 'comparison' ? url.searchParams.delete('view') : url.searchParams.set('view', 'comparison')
     this.#go(url, [window.scrollX, window.scrollY])
+  }
+
+  // A comparison table's size, which the others follow when it's the first vehicle's
+  async pickSize ({ target, params: { vehicle, first } }) {
+    storeSize({ id: vehicle, name: target.value, first })
+    await this.#render(new URL(window.location.href), [window.scrollX, window.scrollY])
+    this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
   }
 
   restore () {
