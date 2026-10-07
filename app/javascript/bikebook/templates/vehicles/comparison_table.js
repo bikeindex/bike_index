@@ -128,7 +128,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
       }
     }))
   const geometryRecords = records([...geometry, WEIGHT])
-  const geometryHeading = { label: html`<span class="tw:mt-2 tw:block tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
+  const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
 
   return html`<section aria-label="Comparison" class="tw:mt-6">${table({
     records: [
