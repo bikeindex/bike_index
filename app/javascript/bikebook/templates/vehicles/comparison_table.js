@@ -46,6 +46,8 @@ const SPECS = [
     format: (cents, vehicle, presenter) => amountDisplay(cents, currency(vehicle), presenter.vocabulary.currencies),
     comparable: (vehicle, first) => currency(vehicle) === currency(first)
   },
+  { label: 'Vehicle type', read: (vehicle) => vehicle.type },
+  { label: 'Frame material', read: (vehicle) => vehicle.frame?.material },
   { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' },
   { label: 'Rated power', read: motors('rated_power'), better: 1, unit: 'w' },
   { label: 'Peak power', read: motors('peak_power'), better: 1, unit: 'w' },
@@ -56,11 +58,9 @@ const SPECS = [
   { label: 'Front travel', read: (vehicle, size) => size?.geometry?.travel_front ?? vehicle.suspension?.front_travel, better: 1, unit: 'mm' },
   { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear_travel, better: 1, unit: 'mm' }
 ]
-const DETAILS = [
+const GEARING = [
   { label: 'Chainrings', read: gearing('front'), better: 1, parts: gearingParts(false) },
-  { label: 'Cogs', read: gearing('rear'), better: 1, parts: gearingParts(true) },
-  { label: 'Vehicle type', read: (vehicle) => vehicle.type },
-  { label: 'Frame material', read: (vehicle) => vehicle.frame?.material }
+  { label: 'Cogs', read: gearing('rear'), better: 1, parts: gearingParts(true) }
 ]
 
 // The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's
@@ -132,7 +132,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   return html`<section aria-label="Comparison" class="tw:mt-6">${table({
     records: [
       ...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []),
-      ...records([...SPECS, ...wheelRows, ...maxTireRows, brakesRow, ...DETAILS]),
+      ...records([...SPECS, ...wheelRows, ...maxTireRows, brakesRow, ...GEARING]),
       ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])
     ],
     columns: [
