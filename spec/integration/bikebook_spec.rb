@@ -73,8 +73,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#comparison-view[aria-pressed='true']")
     expect(page).to have_css("[data-comparison] article", count: 2)
     expect(page).to have_current_path(/view=comparison/)
-    # what differs is marked, not what it's called
+    # what differs is marked, not what it's called, and of a list just the items that differ
     expect(all("article").last).to have_css("dd .tw\\:spec-diff").and have_no_css("dt .tw\\:spec-diff")
+    front_wheel = all("article").last.find("section", text: /\AWheels/i).find("dd", match: :first)
+    # the tire's narrower, and the axle's tooltip has less in it; the wheel size is the same
+    expect(front_wheel.all(".tw\\:spec-diff").map(&:text)).to match([/\A2\.1\W+in tire/, /\Athru axle/])
     expect(all("article").first).to have_no_css(".tw\\:spec-diff")
     within("[aria-label='Comparison']") do
       expect(page).to have_css("thead th", text: "Level 2 Step-Through")

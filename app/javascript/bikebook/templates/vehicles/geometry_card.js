@@ -9,7 +9,10 @@ export const geometryCard = ({ presenter, size, others, selected = false }) => {
   const othersGeometry = others.map((sizes) => array(sizes).find((other) => equal(other.name, size.name))?.geometry)
   const sizeTravels = Object.values(presenter.kit.viewer.suspensions).map(({ size_travel: sizeTravel }) => sizeTravel)
   const rows = presenter.rowsFor(except(presenter.kit.schemas.geometry, [extrasKey, ...sizeTravels]), geometry, { labels, others: othersGeometry, collapse: dimensions })
-    .map(([label, value, ...rest]) => [label, isHash(value) ? presenter.dimensions(value) : value, ...rest])
+    .map(([label, value, unit, differs, key, otherValues]) => {
+      const shown = (each) => isHash(each) ? presenter.dimensions(each) : each
+      return [label, shown(value), unit, differs, key, otherValues.map(shown)]
+    })
   const otherExtras = othersGeometry.map((each) => each?.[extrasKey] ?? {})
   const extras = Object.entries(geometry[extrasKey] ?? {}).filter(([, value]) => present(value)).map(([key, value]) => {
     const [label, unit] = key.split(presenter.unitSuffix)

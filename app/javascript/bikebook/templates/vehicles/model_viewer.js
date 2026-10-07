@@ -180,24 +180,29 @@ class ModelViewer {
 
   identity () {
     const { presenter, vehicle } = this
-    const row = (label, key, value = vehicle[key], differs = this.differs(key)) => definitionListRow({ label, value: presenter.highlighted(value, differs) })
+    // `shown` presents the field's value, the others' as well as this one's
+    const row = (label, key, shown = (value) => value) =>
+      definitionListRow({ label, value: presenter.highlighted(shown(vehicle[key]), this.differs(key), this.others.map((other) => shown(other[key]))) })
     const configuration = vehicle.model_configuration
-    const label = this.kit.model_configurations[configuration]
+    const configurationName = (each) => each === 'complete'
+      ? html`<span class="twless-strong">${this.kit.model_configurations[each]}</span>`
+      : this.kit.model_configurations[each]
     const yearRangeDiffers = this.others.some((other) => !equal([other.first_year, other.final_year], [vehicle.first_year, vehicle.final_year]))
+    const list = (value) => join(array(value), ', ')
     return section({
       content: join([
         definitionListRow({ label: 'ID', content: copyableCode({ value: this.value, label: 'Copy ID' }) }),
         row('Model group', 'vehicle_model_group'),
         configuration !== 'complete' || this.differs('model_configuration')
-          ? row('Configuration', 'model_configuration', configuration === 'complete' ? html`<span class="twless-strong">${label}</span>` : label)
+          ? row('Configuration', 'model_configuration', configurationName)
           : '',
-        row('Years', null, this.yearRange(), yearRangeDiffers),
-        row('Markets', 'markets', vehicle.markets?.join(', ')),
+        definitionListRow({ label: 'Years', value: presenter.highlighted(this.yearRange(), yearRangeDiffers) }),
+        row('Markets', 'markets', list),
         row('Vehicle type', 'type'),
-        row('Propulsion', 'propulsion', array(vehicle.propulsion).join(', ')),
+        row('Propulsion', 'propulsion', list),
         this.classifications(),
-        row('Primary activity', 'primary_activity', this.withoutParenthetical(vehicle.primary_activity)),
-        row('Handlebar', 'handlebar_type', this.withoutParenthetical(vehicle.handlebar_type))
+        row('Primary activity', 'primary_activity', (each) => this.withoutParenthetical(each)),
+        row('Handlebar', 'handlebar_type', (each) => this.withoutParenthetical(each))
       ])
     })
   }
@@ -233,7 +238,7 @@ class ModelViewer {
 
   specRows (key, fields = key === 'frame' ? this.kit.viewer.frame_fields : this.kit.schemas.vehicle[key].fields, labels = {}) {
     return this.presenter.rowsFor(fields, this.vehicle[key], { labels, others: this.others.map((other) => other[key]), collapse: ['bottom_bracket'] })
-      .map(([label, value, ...rest]) => [label, this.specValue(value, rest.at(-1)), ...rest])
+      .map(([label, value, unit, differs, key, otherValues]) => [label, this.specValue(value, key), unit, differs, key, otherValues.map((other) => this.specValue(other, key))])
   }
 
   specValue (value, key) {
@@ -292,7 +297,9 @@ class ModelViewer {
   suspension () {
     const { presenter } = this
     const rows = Object.entries(this.vehicle.suspension).map(([position, values]) => definitionListRow({
-      label: presenter.positionLabel(position), value: presenter.highlighted(this.suspensionSummary(position, values), this.differs('suspension', position))
+      label: presenter.positionLabel(position),
+      value: presenter.highlighted(this.suspensionSummary(position, values), this.differs('suspension', position),
+        this.others.map((other) => other.suspension[position] && this.suspensionSummary(position, other.suspension[position])))
     }))
     return section({ heading: 'Suspension', content: rows.length ? join(rows) : null })
   }
@@ -377,8 +384,12 @@ class ModelViewer {
     return section({
       heading,
       content: join(this.vehicle[key].map((item) => {
-        const differs = this.others.some((other) => !equal(this.byPosition(other[key], item.position), item))
-        return definitionListRow({ label: presenter.positionLabel(item.position) ?? fallback, content: presenter.highlighted(summary(item), differs) })
+        const counterparts = this.others.map((other) => this.byPosition(other[key], item.position))
+        const differs = counterparts.some((other) => !equal(other, item))
+        return definitionListRow({
+          label: presenter.positionLabel(item.position) ?? fallback,
+          content: presenter.highlighted(summary(item), differs, counterparts.map((other) => other && summary(other)))
+        })
       }))
     })
   }
@@ -403,12 +414,21 @@ class ModelViewer {
     if (blank(this.vehicle.wheels)) return nothing
 
     const rows = this.builtWheels().map((wheel) => {
-      const differs = this.others.some((other) => !equal(this.byPosition(this.builtWheels(other), wheel.position), wheel))
-      return definitionListRow({ label: presenter.positionLabel(wheel.position) ?? 'Wheel', content: presenter.highlighted(this.wheelSummary(wheel), differs) })
+      const counterparts = this.others.map((other) => this.byPosition(this.builtWheels(other), wheel.position))
+      const differs = counterparts.some((other) => !equal(other, wheel))
+      return definitionListRow({
+        label: presenter.positionLabel(wheel.position) ?? 'Wheel',
+        content: presenter.highlighted(this.wheelSummary(wheel), differs, counterparts.map((other) => other && this.wheelSummary(other)))
+      })
     })
     const clearances = this.clearances()
     const differs = this.others.some((other) => !equal(this.clearances(other), clearances))
-    const alsoFits = clearances.length ? definitionListRow({ label: 'Also fits', content: presenter.highlighted(this.clearanceSummary(clearances), differs) }) : nothing
+    const alsoFits = clearances.length
+      ? definitionListRow({
+        label: 'Also fits',
+        content: presenter.highlighted(this.clearanceSummary(clearances), differs, this.others.map((other) => presence(this.clearanceSummary(this.clearances(other)))))
+      })
+      : nothing
     return section({ heading: 'Wheels', content: join([...rows, alsoFits]) })
   }
 
@@ -429,7 +449,7 @@ class ModelViewer {
       wheel.dropout != null ? `${wheel.dropout.replaceAll('_', ' ')} dropout` : null,
       this.axleSummary(wheel)
     ]), ', ')
-    return wheel.max_tire_width != null ? join([summary, html`<br>`, this.tireWidthSummary(wheel.max_tire_width, 'tire max')]) : summary
+    return wheel.max_tire_width != null ? join([summary, this.tireWidthSummary(wheel.max_tire_width, 'tire max')], html`<br>`) : summary
   }
 
   axleSummary (wheel) {
@@ -461,7 +481,7 @@ class ModelViewer {
   brakeSummary (brake) {
     const typeAndRotor = presence(join(compact([brake.type?.replace(/^Disc (\w+)$/, '$1 disc'), this.millimeters(brake.rotor_diameter, ' rotor')]), ', '))
     const summary = join(compact([this.onSizes(typeAndRotor, brake.sizes), presence(brake.caliper_mount?.replace(/^Disc /, ''))]), ', ')
-    return brake.max_rotor_diameter != null ? join([summary, html`<br>`, this.millimeters(brake.max_rotor_diameter, ' rotor max')]) : summary
+    return brake.max_rotor_diameter != null ? join([summary, this.millimeters(brake.max_rotor_diameter, ' rotor max')], html`<br>`) : summary
   }
 
   drivetrain () {

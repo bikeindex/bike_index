@@ -1,11 +1,21 @@
-import { html, nothing } from 'lit-html'
+import { html, nothing, render } from 'lit-html'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { copyableCode } from 'bikebook/templates/ui/copyable_code'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { array, blank, compact, equal, isHash, isTemplate, join } from 'bikebook/templates/values'
+import { array, blank, compact, equal, isHash, isTemplate, join, listed } from 'bikebook/templates/values'
 
 const roundHalfUp = (value) => Math.sign(value) * Math.round(Math.abs(value))
+
+// What content reads as, which a template's random tooltip ids don't change
+const textOf = (content) => {
+  const fragment = document.createDocumentFragment()
+  render(content, fragment)
+  return fragment.textContent.replace(/\s+/g, ' ').trim()
+}
+// A list's items, through the lists inside it
+const items = (content) => listed(content)?.[0].flatMap(items) ?? [content]
+const mark = (content) => html`<span class="tw:spec-diff">${content}</span>`
 
 const CLASSIFICATIONS = 'motors.operating_modes.e_vehicle_classification'
 const MATERIALS = 'frame.material'
@@ -98,13 +108,26 @@ export class VehiclePresenter {
   }
 
   measurementRows (rows) {
-    return join(rows.map(([label, value, unit, differs, key]) => definitionListRow({ label, content: this.highlighted(this.measurement(value, unit, key), differs) })))
+    return join(rows.map(([label, value, unit, differs, key, others]) => definitionListRow({
+      label, content: this.highlighted(this.measurement(value, unit, key), differs, others?.map((other) => this.measurement(other, unit, key)))
+    })))
   }
 
-  // Marks `content` where it differs from a compared vehicle's. Left alone when blank, so a row with no value
-  // still renders nothing
-  highlighted (content, differs) {
-    return differs && !blank(content) ? html`<span class="tw:spec-diff">${content}</span>` : content
+  // Marks `content` where it differs from the compared vehicles' `others`: just the items of a list the others don't
+  // all have, else all of it. Left alone when blank, so a row with no value still renders nothing
+  highlighted (content, differs, others = null) {
+    if (!differs || blank(content)) return content
+    if (!others || others.some(blank)) return mark(content)
+
+    const theirs = others.map((other) => new Set(items(other).map(textOf)))
+    const shared = (item) => theirs.every((texts) => texts.has(textOf(item)))
+    if (items(content).every(shared)) return mark(content)
+    const marked = (value) => {
+      const [parts, separator] = listed(value) ?? []
+      if (parts) return join(parts.map(marked), separator)
+      return shared(value) ? value : mark(value)
+    }
+    return marked(content)
   }
 
   positionLabel (position) {
@@ -124,7 +147,7 @@ export class VehiclePresenter {
       if (meta.fields && !collapse.includes(key) && [value, ...otherValues].some(isHash)) {
         return this.rowsFor(meta.fields, value, { others: otherValues }).map(([rowLabel, ...row]) => [`${label} ${String(rowLabel).toLowerCase()}`, ...row])
       }
-      return [[label, value, meta.unit, otherValues.some((other) => !equal(other, value)), key]]
+      return [[label, value, meta.unit, otherValues.some((other) => !equal(other, value)), key, otherValues]]
     })
   }
 
