@@ -4,9 +4,8 @@ import { localSources } from 'utils/hw_combobox_patch'
 import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='ebike-rules--lookup'
-// Searches Bike Book's electric models in the browser once its catalog loads, and trades that
-// search for the manual entry panel. The bike field is a stand-in until then, and stays one if
-// the catalog fails to load, leaving manual entry
+// The bike field is a stand-in until the catalog loads, since the combobox must have its source
+// before it connects, and stays one if the catalog fails, leaving manual entry
 export default class extends Controller {
   static targets = ['combobox', 'comboboxSlot', 'manualPanel', 'state']
   static values = { manifestUrl: String, display: String, failedText: String }

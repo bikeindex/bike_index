@@ -3,22 +3,6 @@
 require "rails_helper"
 
 RSpec.describe "Bikebook", :js, type: :system do
-  let(:fixtures) { Rails.root.join("spec/fixtures/bikebook_catalog") }
-
-  # A fixture catalog in place of the published one, and no stock photos, which render
-  # their placeholder
-  def serve_catalog(manifest_status: 200)
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route(%r{^https://bikebook-catalog\.bikeindex\.org/catalog/}, ->(route, request) {
-        path = request.url.delete_prefix("https://bikebook-catalog.bikeindex.org/catalog/")
-        status = (path == "manifest.json") ? manifest_status : 200
-        route.fulfill(status:, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"},
-          body: (status == 200) ? fixtures.join(path).read : "")
-      })
-      playwright_page.context.route(%r{^https://bikebook\.bikeindex\.org/}, ->(route, _request) { route.abort })
-    end
-  end
-
   def vehicle_field = find_field("View a vehicle")
 
   # A component's markup from the server beside its template's from the browser, as canonical_html.js's
@@ -39,7 +23,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "searches, compares and filters the catalog in the browser, a pick and each history step rendering without a request" do
-    serve_catalog
+    serve_bikebook_catalog
     asked = []
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.on("request", ->(request) { asked << request.url if request.navigation_request? })
@@ -189,7 +173,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do
-    serve_catalog
+    serve_bikebook_catalog
     visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/current_exp", view: "comparison")
     expect(page).to have_css("[aria-label='Comparison'] tbody tr:first-child th", text: "Size", wait: 10)
 
@@ -282,7 +266,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "shows every weight in pounds to a viewer who prefers imperial units" do
-    serve_catalog
+    serve_bikebook_catalog
     sign_in(FactoryBot.create(:user_confirmed, preferred_unit_system: "imperial"))
     visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/level_4_adv", view: "comparison")
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)
@@ -294,7 +278,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "renders each UI template as the component it mirrors does" do
-    serve_catalog
+    serve_bikebook_catalog
     visit bikebook_path
 
     aggregate_failures do
@@ -372,7 +356,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "merges motors that match but for their drive wheel, and names the operating modes' e-vehicle classifications" do
-    serve_catalog
+    serve_bikebook_catalog
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
 
     motor = find("section", text: /front and rear motor/i, wait: 10)
@@ -415,7 +399,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "says so when the catalog doesn't load" do
-    serve_catalog(manifest_status: 404)
+    serve_bikebook_catalog(manifest_status: 404)
     visit bikebook_path
 
     expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)

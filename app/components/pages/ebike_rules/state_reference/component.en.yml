@@ -14,14 +14,6 @@ en:
           last_reviewed: Last reviewed %{reviewed}.
           matching: "%{number} of 51 match"
           on_file_html: "%{number} of 51 states and D.C. on file · others in review"
-          rule_age: Minimum age
-          rule_classes: Classes recognized
-          rule_helmet: Helmet
-          rule_label: Classification label
-          rule_paths: Where you can ride
-          rule_power: Motor power cap
-          rule_speed: Top assisted speed
-          rule_throttle: Throttle
           subheading: All 50 states and D.C. Open a state to see its rules and statute
             citations.
           watts_html: "%{watts}W"

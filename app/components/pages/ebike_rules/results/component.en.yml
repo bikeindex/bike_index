@@ -56,14 +56,6 @@ en:
           red_headline: Your %{name} is not permitted as an e-bike under current %{state}
             rules.
           register_free: Register on Bike Index — free
-          rule_age: Minimum age
-          rule_classes: Classes recognized
-          rule_helmet: Helmet
-          rule_label: Classification label
-          rule_paths: Where you can ride
-          rule_power: Motor power cap
-          rule_speed: Top assisted speed
-          rule_throttle: Throttle
           rule_to_check: Rule to check
           rules_not_on_file: Rules not on file
           share_state_rules: Share your state's rules

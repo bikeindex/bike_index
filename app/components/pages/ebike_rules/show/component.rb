@@ -3,8 +3,7 @@
 module Pages
   module EbikeRules
     module Show
-      # The e-bike compliance checker: a state and a bike in, the state's rules for that bike out,
-      # then the explainers and every state's rules. The form is a plain GET, so a result is a link
+      # The form is a plain GET, so a result is a link
       class Component < ApplicationComponent
         EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:uppercase tw:text-blue-600 tw:dark:text-blue-400"
         HEADING_CLASSES = "tw:font-header tw:text-[clamp(26px,4vw,34px)] tw:leading-tight tw:font-extrabold"
@@ -24,6 +23,12 @@ module Pages
           options_for_select(states, @lookup.state&.dig(:abbr))
         end
 
+        def field_error(field, text)
+          return unless error?(field)
+
+          tag.p(text, role: "alert", class: "tw:text-[13px] tw:font-semibold tw:text-red-700 tw:dark:text-red-400")
+        end
+
         def error?(field) = @lookup.errors.include?(field)
 
         def detected? = @lookup.detected_state.present? && @lookup.state == @lookup.detected_state
@@ -38,11 +43,18 @@ module Pages
 
         def throttle_entries = [{value: 1, label: translation(".answer_yes")}, {value: 0, label: translation(".answer_no")}]
 
+        # The three classes, then the e-moto that's none of them
         def class_cards
+          motor_cap = translation(".motor_cap")
           [
-            {n: 1, tag: translation(".class_1_tag"), assist: translation(".pedal"), speed: translation(".mph", mph: 20), body: translation(".class_1_body")},
-            {n: 2, tag: translation(".class_2_tag"), assist: translation(".throttle"), speed: translation(".mph", mph: 20), body: translation(".class_2_body")},
-            {n: 3, tag: translation(".class_3_tag"), assist: translation(".pedal"), speed: translation(".mph", mph: 28), body: translation(".class_3_body")}
+            {n: 1, title: translation(".class_n", n: 1), tag: translation(".class_1_tag"), assist: translation(".pedal"),
+             speed: translation(".mph", mph: 20), motor: motor_cap, body: translation(".class_1_body")},
+            {n: 2, title: translation(".class_n", n: 2), tag: translation(".class_2_tag"), assist: translation(".throttle"),
+             speed: translation(".mph", mph: 20), motor: motor_cap, body: translation(".class_2_body")},
+            {n: 3, title: translation(".class_n", n: 3), tag: translation(".class_3_tag"), assist: translation(".pedal"),
+             speed: translation(".mph", mph: 28), motor: motor_cap, body: translation(".class_3_body")},
+            {n: nil, title: translation(".not_an_ebike"), tag: translation(".not_a_legal_ebike"), assist: translation(".throttle"),
+             speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), body: translation(".emoto_body")}
           ]
         end
 

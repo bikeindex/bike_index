@@ -52,15 +52,7 @@
             data: {"ebike-rules--lookup-target": "state"} %>
 
           <% if error?(:state) %>
-            <p
-              role="alert"
-              class="
-                tw:text-[13px] tw:font-semibold tw:text-red-700
-                tw:dark:text-red-400
-              "
-            >
-              <%= translation(".state_error") %>
-            </p>
+            <%= field_error(:state, translation(".state_error")) %>
           <% elsif detected? %>
             <p
               class="
@@ -106,17 +98,7 @@
             >
           </div>
 
-          <% if error?(:bike) %>
-            <p
-              role="alert"
-              class="
-                tw:text-[13px] tw:font-semibold tw:text-red-700
-                tw:dark:text-red-400
-              "
-            >
-              <%= translation(".bike_error") %>
-            </p>
-          <% end %>
+          <%= field_error(:bike, translation(".bike_error")) %>
 
           <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
             <%= render(UI::Button::Component.new(text: translation(".enter_manually"), color: :link,
@@ -148,7 +130,7 @@
 
             <div role="radiogroup" aria-labelledby="manual-class-label">
               <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "e_bike_class", entries: class_entries,
-                selected: @lookup.manual_class || 2, full_width: true)) %>
+                selected: @lookup.manual_class, full_width: true)) %>
             </div>
           </div>
 
@@ -159,17 +141,7 @@
               placeholder: translation(".watts_placeholder"), class: "twinput tw:min-h-12 tw:text-base!",
               aria: {invalid: (true if error?(:watts))} %>
 
-            <% if error?(:watts) %>
-              <p
-                role="alert"
-                class="
-                  tw:text-[13px] tw:font-semibold tw:text-red-700
-                  tw:dark:text-red-400
-                "
-              >
-                <%= translation(".watts_error") %>
-              </p>
-            <% end %>
+            <%= field_error(:watts, translation(".watts_error")) %>
           </div>
 
           <div class="tw:flex tw:flex-[1_1_150px] tw:flex-col tw:gap-1.5">
@@ -227,7 +199,7 @@
 
               <div>
                 <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
-                  <%= translation(".class_n", n: card[:n]) %>
+                  <%= card[:title] %>
                 </h3>
 
                 <p class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
@@ -242,7 +214,7 @@
                 tw:border-gray-200 tw:py-3 tw:dark:border-gray-700
               "
             >
-              <% [[translation(".assist"), card[:assist]], [translation(".top_assist"), card[:speed]], [translation(".motor"), translation(".motor_cap")]].each do |label, value| %>
+              <% [[translation(".assist"), card[:assist]], [translation(".top_assist"), card[:speed]], [translation(".motor"), card[:motor]]].each do |label, value| %>
                 <div>
                   <dt
                     class="
@@ -269,55 +241,6 @@
               <%= card[:body] %>
             </p>
           <% end %>
-        <% end %>
-
-        <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) do %>
-          <div class="tw:flex tw:items-center tw:gap-3.5">
-            <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: nil)) %>
-
-            <div>
-              <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
-                <%= translation(".not_an_ebike") %>
-              </h3>
-
-              <p class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
-                <%= translation(".not_a_legal_ebike") %>
-              </p>
-            </div>
-          </div>
-
-          <dl
-            class="
-              tw:grid tw:grid-cols-3 tw:gap-2 tw:border-y tw:border-gray-200
-              tw:py-3 tw:dark:border-gray-700
-            "
-          >
-            <% [[translation(".assist"), translation(".throttle")], [translation(".top_assist"), translation(".emoto_speed")], [translation(".motor"), translation(".emoto_motor")]].each do |label, value| %>
-              <div>
-                <dt
-                  class="
-                    tw:text-xs tw:font-bold tw:tracking-[.06em]
-                    tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
-                  "
-                >
-                  <%= label %>
-                </dt>
-
-                <dd class="tw:mt-0.5 tw:text-[15px] tw:font-bold">
-                  <%= value %>
-                </dd>
-              </div>
-            <% end %>
-          </dl>
-
-          <p
-            class="
-              tw:text-[15px] tw:leading-relaxed tw:text-gray-700
-              tw:dark:text-gray-300
-            "
-          >
-            <%= translation(".emoto_body") %>
-          </p>
         <% end %>
       </div>
     </div>

@@ -3,7 +3,7 @@
 module EbikeRules
   # A bike checked against a state's e-bike rules: a Bike Book model, or one entered by hand,
   # which has no bikebook_id. e_bike_class is nil for a motorized vehicle that isn't Class 1, 2 or 3.
-  # ul2849 and ul2271 are :certified or :unknown - Bike Book records a certification, not its absence
+  # ul2849 and ul2271 are :certified or :unknown
   Bike = Data.define(:bikebook_id, :manufacturer_name, :model, :first_year, :e_bike_class, :watts,
     :top_assist_mph, :throttle, :throttle_mph, :ul2849, :ul2271, :photo_url) do
     def self.manual(e_bike_class:, watts:, throttle:)

@@ -19,7 +19,7 @@ RSpec.describe EbikeRules::Evaluator do
   end
 
   context "with a Class 3 bike with a throttle in California" do
-    let(:law) { EbikeRules::StateLaws.find("ca") }
+    let(:law) { EbikeRules::StateLaws.find("CA") }
     let(:attributes) { super().merge(e_bike_class: 3, top_assist_mph: 28, throttle: true) }
 
     it "is legal, with rules to check" do

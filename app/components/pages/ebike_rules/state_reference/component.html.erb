@@ -103,7 +103,9 @@
                     tw:dark:border-gray-800
                   "
                 >
-                  <dt class="tw:text-sm tw:font-bold"><%= rule_label(id) %></dt>
+                  <dt class="tw:text-sm tw:font-bold">
+                    <%= render(Pages::EbikeRules::RuleLabel::Component.new(id:)) %>
+                  </dt>
 
                   <dd
                     class="

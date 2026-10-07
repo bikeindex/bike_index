@@ -4,7 +4,8 @@ class BikebookController < ApplicationController
   # In development, a catalog `load:publish_catalog` wrote, served from here: its own app sends no CORS headers
   LOCAL_CATALOG_DIRECTORY = (ENV["BIKEBOOK_CATALOG_DIRECTORY"].presence if Rails.env.development?)
   LOCAL_CATALOG_PATH = "/bikebook_catalog"
-  MANIFEST_URL = LOCAL_CATALOG_DIRECTORY ? "#{LOCAL_CATALOG_PATH}/manifest.json" : "https://bikebook-catalog.bikeindex.org/catalog/manifest.json"
+  CATALOG_URL = "https://bikebook-catalog.bikeindex.org/catalog/"
+  MANIFEST_URL = LOCAL_CATALOG_DIRECTORY ? "#{LOCAL_CATALOG_PATH}/manifest.json" : "#{CATALOG_URL}manifest.json"
 
   def show
     @page_title = "Bikebook"

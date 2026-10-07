@@ -3,7 +3,6 @@
 module Pages
   module EbikeRules
     module Results
-      # A lookup's verdict, its bike, and its state's rules for that bike
       class Component < ApplicationComponent
         VERDICTS = {
           green: {classes: "tw:bg-[#e8f5ee] tw:border-[#2e8b57]", icon: :pass},
@@ -47,7 +46,7 @@ module Pages
         end
 
         def details
-          case @verdict
+          @details ||= case @verdict
           when :yellow then notes(:check)
           when :red then [*notes(:fail), translation(".may_be_moped")]
           when :gray then [gray_detail]
@@ -89,20 +88,6 @@ module Pages
           @bike.throttle_mph ? translation(".yes_to_html", mph: number_display(@bike.throttle_mph)) : translation(".answer_yes")
         end
 
-        def rule_label(row)
-          case row[:id]
-          when :classes then translation(".rule_classes")
-          when :power then translation(".rule_power")
-          when :speed then translation(".rule_speed")
-          when :throttle then translation(".rule_throttle")
-          when :age then translation(".rule_age")
-          when :helmet then translation(".rule_helmet")
-          when :paths then translation(".rule_paths")
-          else translation(".rule_label")
-          end
-        end
-
-        # The law's watt cap reads as a number; every other rule's value is the law's own words
         def rule_value(row)
           return translation(".watts_html", watts: number_display(@law[:watt_cap])) if row[:id] == :power
 

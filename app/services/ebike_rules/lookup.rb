@@ -10,17 +10,21 @@ module EbikeRules
       state = submitted ? StateLaws.state(params[:state]) : detected_state
       manual = params[:manual] == "1"
       manual_class = params[:e_bike_class].present? ? params[:e_bike_class].to_i.clamp(1, 3) : 2
-      manual_watts = params[:watts].to_i
+      manual_watts = params[:watts].to_i.then { it if it.positive? }
       manual_throttle = params[:throttle] != "0"
       bike = if manual
-        Bike.manual(e_bike_class: manual_class, watts: manual_watts, throttle: manual_throttle) if manual_watts.positive?
+        Bike.manual(e_bike_class: manual_class, watts: manual_watts, throttle: manual_throttle) if manual_watts
       elsif submitted
         BikebookVehicles.find(params[:bike])
       end
-      errors = submitted ? [(:state if state.nil?), (:bike if !manual && bike.nil?), (:watts if manual && bike.nil?)].compact : []
+      errors = if submitted
+        [(:state if state.nil?), ((manual ? :watts : :bike) if bike.nil?)].compact
+      else
+        []
+      end
 
-      new(state:, detected_state:, bikebook_id: params[:bike].presence, manual:, manual_class:,
-        manual_watts: manual_watts.positive? ? manual_watts : nil, manual_throttle:, bike:, errors:, submitted:)
+      new(state:, detected_state:, bikebook_id: params[:bike].presence, manual:, manual_class:, manual_watts:,
+        manual_throttle:, bike:, errors:, submitted:)
     end
 
     def result? = submitted && errors.none?

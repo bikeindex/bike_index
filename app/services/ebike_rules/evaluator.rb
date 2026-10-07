@@ -12,7 +12,7 @@ module EbikeRules
       [
         classes_rule(law, e_bike_class),
         power_rule(law, bike.watts),
-        speed_rule(law, bike, e_bike_class),
+        speed_rule(law, bike.top_assist_mph, e_bike_class),
         throttle_rule(bike.throttle, e_bike_class),
         # how to ride a legal e-bike, which a bike with no class isn't
         *([age_rule(law, e_bike_class), helmet_rule(law, e_bike_class), paths_rule(law, e_bike_class)] if e_bike_class),
@@ -58,8 +58,7 @@ module EbikeRules
     end
 
     # A bike with no class is held to the fastest class's limit
-    def speed_rule(law, bike, e_bike_class)
-      mph = bike.top_assist_mph
+    def speed_rule(law, mph, e_bike_class)
       cap = law[:speed][e_bike_class] || law[:speed].values.max
       if mph.nil?
         row(:speed, :info, :speed_not_provided)

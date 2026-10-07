@@ -3,18 +3,9 @@
 require "rails_helper"
 
 RSpec.describe "E-bike rules", :js, type: :system do
-  let(:fixtures) { Rails.root.join("spec/fixtures/bikebook_catalog") }
-
-  # The fixture catalog for the browser's search, beside stub_bikebook_catalog's for the server's lookup
   before do
     stub_bikebook_catalog
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route(%r{^https://bikebook-catalog\.bikeindex\.org/catalog/}, ->(route, request) {
-        route.fulfill(status: 200, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"},
-          body: fixtures.join(request.url.delete_prefix("https://bikebook-catalog.bikeindex.org/catalog/")).read)
-      })
-      playwright_page.context.route(%r{^https://bikebook\.bikeindex\.org/}, ->(route, _request) { route.abort })
-    end
+    serve_bikebook_catalog
   end
 
   it "checks a Bike Book model picked from the search, then one entered by hand" do

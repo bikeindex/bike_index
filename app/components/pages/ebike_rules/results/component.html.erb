@@ -159,7 +159,7 @@
               <span class="tw:mt-px"><%= render(Pages::EbikeRules::StatusIcon::Component.new(status: row[:status], label: status_label(row[:status]))) %></span>
 
               <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-0.5">
-                <span class="tw:text-sm tw:font-bold"><%= rule_label(row) %></span>
+                <span class="tw:text-sm tw:font-bold"><%= render(Pages::EbikeRules::RuleLabel::Component.new(id: row[:id])) %></span>
                 <span class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300"><%= rule_value(row) %></span>
                 <span class="tw:text-sm tw:font-semibold"><%= note(row) %></span>
               </div>

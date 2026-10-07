@@ -9,7 +9,7 @@ module EbikeRules
     # The 50 states and D.C., alphabetical
     STATES = StatesAndCountries.states.reject { it[:abbr] == "PR" }.freeze
 
-    def find(abbreviation) = LAWS[abbreviation&.upcase&.to_sym]
+    def find(abbreviation) = LAWS[abbreviation&.to_sym]
 
     def state(abbreviation) = STATES.find { it[:abbr] == abbreviation&.upcase }
 
