@@ -187,6 +187,19 @@ RSpec.describe "Bikebook", :js, type: :system do
         "bikebook/templates/ui/tooltip#tooltip", "{ body: html`<em>Internal</em> routing` }")
 
       expect_template(UI::IconChevron::Component.new(size: :md), "bikebook/templates/ui/icon_chevron#iconChevron", "{ size: 'md' }")
+      expect_template(UI::IconChevron::Component.new, "bikebook/templates/ui/icon_chevron#iconChevron", "undefined")
+
+      expect_template(UI::CopyButton::Component.new(value: "m/trek/2025/fetch", label: "Copy ID"),
+        "bikebook/templates/ui/copy_button#copyButton", "{ value: 'm/trek/2025/fetch', label: 'Copy ID' }")
+
+      # a class list rather than markup, so its classes against build_classes'
+      [[:sm, "tw:shrink-0"], [:md, nil]].each do |size, html_class|
+        browser = page.evaluate_script(<<~JS)
+          import('bikebook/templates/ui/button').then(({ buttonClasses }) => buttonClasses(#{{size:, htmlClass: html_class}.to_json}))
+        JS
+        expect(browser.split.sort).to eq(UI::Button::Component.build_classes(color: :secondary, size:, html_class:).split.sort),
+          "buttonClasses differs from build_classes at size #{size}"
+      end
 
       expect_template(UI::Collapse::Component.new(size: :sm, html_class: "tw:shrink-0", aria: {controls: "vehicle-model-json-1", label: "Toggle JSON"})
         .with_content("<code>{ }</code>".html_safe), "bikebook/templates/ui/collapse#collapse", <<~JS)
@@ -240,6 +253,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
       expect_template(UI::Card::Component.new(additional_classes: "tw:mt-6").with_content("<p>Compared</p>".html_safe),
         "bikebook/templates/ui/card#card", "{ additionalClasses: 'tw:mt-6', content: html`<p>Compared</p>` }")
+      expect_template(UI::Card::Component.new.with_content("Compared"), "bikebook/templates/ui/card#card", "{ content: 'Compared' }")
     end
   end
 
