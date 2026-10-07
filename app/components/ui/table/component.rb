@@ -3,16 +3,14 @@
 module UI
   module Table
     class Component < ApplicationComponent
-      GROUP_HEADING_CLASSES = "tw:px-1 tw:pt-4 tw:pb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:uppercase tw:text-[#715eb2]"
       # Template Dependency: UI::TableColumn::Component
       # Cell blocks are instance_exec'd, so this is how they reach the sort state
       attr_reader :sort_state
 
       # Pass cache_key (normally self.class.cache_digest) to enable per-row fragment caching.
       # cache_records: mirror the controller's `includes`, or the row serves those records stale
-      # record_groups: [heading, records] pairs in place of records, each a <tbody> under its heading
-      def initialize(records: nil, record_groups: nil, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
-        @record_groups = record_groups || [[nil, records]]
+      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
+        @records = records
         @sort_state = sort_state
         @cache_key = cache_key
         @cache_records = cache_records

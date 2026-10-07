@@ -43,20 +43,17 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with record_groups and a row_header column" do
+  context "with a row_header column" do
     let(:component) do
-      render_inline(described_class.new(record_groups: [[nil, records.first(1)], ["Others", records.last(1)]])) do |table|
+      render_inline(described_class.new(records:)) do |table|
         table.column(label: "Name", row_header: true) { |r| r.name }
         table.column(label: "Email") { |r| r.email }
       end
     end
 
-    it "renders a tbody per group, a heading across the columns where there is one, and each row's header as a th" do
-      expect(component).to have_css("tbody", count: 2)
-      expect(component).to have_no_css("tbody:first-of-type th[scope='rowgroup']")
-      expect(component).to have_css("tbody:last-of-type tr:first-child th[scope='rowgroup'][colspan='2']", text: "Others")
-      expect(component).to have_css("tbody:first-of-type th[scope='row']", text: "Alice")
-      expect(component).to have_css("tbody:last-of-type th[scope='row']", text: "Bob")
+    it "renders each row's header as a th" do
+      expect(component).to have_css("tbody th[scope='row']", count: 2)
+      expect(component).to have_css("tbody th[scope='row']", text: "Bob")
       expect(component).to have_css("td", text: "bob@example.com")
       expect(component).to have_no_css("td", text: "Bob")
     end

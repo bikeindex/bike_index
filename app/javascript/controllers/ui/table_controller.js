@@ -142,7 +142,7 @@ export default class extends Controller {
       }
     }
 
-    // Body and footer rows, whose row headers and group headings are th
+    // Body and footer rows, whose row headers are th
     const bodyRows = table.querySelectorAll('tbody tr, tfoot tr')
     if (bordered) {
       bodyRows.forEach(row => {

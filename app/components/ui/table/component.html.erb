@@ -18,33 +18,19 @@
       </tr>
     </thead>
 
-    <% @record_groups.each do |heading, records| %>
-      <tbody>
-        <% if heading %>
+    <tbody>
+      <% @records.each do |record| %>
+        <% cache_if(@cache_key, [@cache_key, record, *cache_records_for(record)]) do %>
           <tr>
-            <th
-              scope="rowgroup"
-              colspan="<%= @columns.count %>"
-              class="<%= GROUP_HEADING_CLASSES %>"
-            >
-              <%= heading %>
-            </th>
+            <% @columns.each do |col| %>
+              <%= content_tag(col.row_header ? :th : :td, class: col.td_classes(bordered: @bordered), scope: ("row" if col.row_header)) do %>
+                <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
+              <% end %>
+            <% end %>
           </tr>
         <% end %>
-
-        <% records.each do |record| %>
-          <% cache_if(@cache_key, [@cache_key, record, *cache_records_for(record)]) do %>
-            <tr>
-              <% @columns.each do |col| %>
-                <%= content_tag(col.row_header ? :th : :td, class: col.td_classes(bordered: @bordered), scope: ("row" if col.row_header)) do %>
-                  <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
-                <% end %>
-              <% end %>
-            </tr>
-          <% end %>
-        <% end %>
-      </tbody>
-    <% end %>
+      <% end %>
+    </tbody>
 
     <% if footer? %>
       <tfoot>

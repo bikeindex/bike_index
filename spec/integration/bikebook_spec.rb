@@ -185,8 +185,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect_size.call("Current EXP", "Small")
     expect(page).to have_current_path(/[?&]vehicle_sizes=Extra\+Large,Small(&|\z)/)
     # the geometry is each one's size, under its own heading, and less of it is red
-    expect(page).to have_css("[aria-label='Comparison'] tbody:last-child tr:first-child th[scope='rowgroup']", text: /\Ageometry\z/i)
-    expect(find("[aria-label='Comparison'] tbody:last-child tr", text: "Reach")).to have_css("td", text: /\A425\.5.+−74\.7/m)
+    expect(page).to have_css("[aria-label='Comparison'] th[scope='row']", text: /\Ageometry\z/i)
+    expect(find("[aria-label='Comparison'] tr", text: "Reach")).to have_css("td", text: /\A425\.5.+−74\.7/m)
       .and have_css(".tw\\:text-red-700", text: "−74.7")
 
     visit current_url
@@ -315,14 +315,14 @@ RSpec.describe "Bikebook", :js, type: :system do
                     { label: 'Position', classes: 'tw:w-[12%]', cell: (record) => record.position }] }
       JS
 
-      grouped = ApplicationController.render(inline: <<~ERB, layout: false, locals: {groups: [[nil, [{label: "Year", value: 2026}]], ["Geometry", [{label: "Reach", value: 450}]]]})
-        <%= render(UI::Table::Component.new(record_groups: groups)) do |table|
+      row_headed = ApplicationController.render(inline: <<~ERB, layout: false, locals: {rows: [{label: "Year", value: 2026}, {label: "Reach", value: 450}]})
+        <%= render(UI::Table::Component.new(records: rows)) do |table|
           table.column(label: "", row_header: true) { |record| record[:label] }
           table.column(label: "Level 2") { |record| record[:value].to_s }
         end %>
       ERB
-      expect_template(grouped, "bikebook/templates/ui/table#table", <<~JS)
-        { groups: [[null, [{ label: 'Year', value: 2026 }]], ['Geometry', [{ label: 'Reach', value: 450 }]]],
+      expect_template(row_headed, "bikebook/templates/ui/table#table", <<~JS)
+        { records: [{ label: 'Year', value: 2026 }, { label: 'Reach', value: 450 }],
           columns: [{ label: '', rowHeader: true, cell: (record) => record.label }, { label: 'Level 2', cell: (record) => record.value }] }
       JS
     end

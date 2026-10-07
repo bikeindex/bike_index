@@ -116,11 +116,13 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
       }
     }))
   const geometryRecords = records(geometry)
+  const geometryHeading = { label: html`<span class="tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
 
   return html`<section aria-label="Comparison" class="tw:mt-6">${table({
-    groups: [
-      [null, [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...records([...SPECS, ...DETAILS])]],
-      ...(geometryRecords.length ? [['Geometry', geometryRecords]] : [])
+    records: [
+      ...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []),
+      ...records([...SPECS, ...DETAILS]),
+      ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])
     ],
     columns: [
       { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
