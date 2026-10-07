@@ -73,7 +73,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#comparison-view[aria-pressed='true']")
     expect(page).to have_css("[data-comparison] article", count: 2)
     expect(page).to have_current_path(/view=comparison/)
-    expect(all("article").last).to have_css(".tw\\:spec-diff")
+    # what differs is marked, not what it's called
+    expect(all("article").last).to have_css("dd .tw\\:spec-diff").and have_no_css("dt .tw\\:spec-diff")
     expect(all("article").first).to have_no_css(".tw\\:spec-diff")
     within("[aria-label='Comparison']") do
       expect(page).to have_css("thead th", text: "Level 2 Step-Through")

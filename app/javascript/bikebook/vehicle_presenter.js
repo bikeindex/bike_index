@@ -95,11 +95,13 @@ export class VehiclePresenter {
   }
 
   measurementRows (rows) {
-    return join(rows.map(([label, value, unit, differs, key]) => definitionListRow({ label: this.diffLabel(label, differs), content: this.measurement(value, unit, key) })))
+    return join(rows.map(([label, value, unit, differs, key]) => definitionListRow({ label, content: this.highlighted(this.measurement(value, unit, key), differs) })))
   }
 
-  diffLabel (label, differs) {
-    return differs ? html`<span class="tw:spec-diff">${label}</span>` : label
+  // Marks `content` where it differs from a compared vehicle's. Left alone when blank, so a row with no value
+  // still renders nothing
+  highlighted (content, differs) {
+    return differs && !blank(content) ? html`<span class="tw:spec-diff">${content}</span>` : content
   }
 
   positionLabel (position) {
