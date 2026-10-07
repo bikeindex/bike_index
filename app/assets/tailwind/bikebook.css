@@ -1,8 +1,10 @@
 /* /bikebook (Pages::Bikebook::Show and app/javascript/bikebook) */
 
-/* Marks where a compared vehicle's spec differs from the first one's */
+/* Marks where a compared vehicle's spec differs from the first one's, in the comparison view */
 @utility spec-diff {
-  @apply tw:bg-yellow-50 tw:dark:bg-yellow-950;
+  [data-comparison] & {
+    @apply tw:bg-yellow-50 tw:dark:bg-yellow-950;
+  }
 }
 
 @layer components {

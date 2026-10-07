@@ -82,7 +82,8 @@ module ControllerHelpers
   def metric_units?
     return @metric_units if defined?(@metric_units)
 
-    @metric_units = UnitSystem.metric?(user: current_user, country_id: current_country_id)
+    # local requests carry no CF country, so development reads as the US
+    @metric_units = UnitSystem.metric?(user: current_user, country_id: current_country_id || (Country.united_states_id if Rails.env.development?))
   end
 
   # A searched URL keeps the unit it was searched in

@@ -24,8 +24,8 @@ module UI
       # A cell block is instance_exec'd here, so it can't reach the calling component's
       # methods - a caller that needs one binds it to a local first
       # header_tooltip renders beside the header rather than in it, which a sort link would swallow
-      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, &block)
-        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, header_tooltip:, lower_right:, footer:, &block)
+      def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, header_tooltip: nil, lower_right: nil, footer: nil, row_header: false, &block)
+        @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, header_tooltip:, lower_right:, footer:, row_header:, &block)
         nil
       end
 

@@ -1,13 +1,21 @@
 import { html, nothing } from 'lit-html'
+import { fragmentOf } from 'bikebook/render'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { copyableCode } from 'bikebook/templates/ui/copyable_code'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { array, blank, compact, equal, isHash, isTemplate, join } from 'bikebook/templates/values'
+import { array, blank, compact, equal, isHash, isTemplate, join, listed } from 'bikebook/templates/values'
 
 const roundHalfUp = (value) => Math.sign(value) * Math.round(Math.abs(value))
 
+// What content reads as, which a template's random tooltip ids don't change
+const textOf = (content) => (typeof content === 'object' ? fragmentOf(content).textContent : String(content ?? '')).replace(/\s+/g, ' ').trim()
+// A list's items, through the lists inside it
+const items = (content) => listed(content)?.[0].flatMap(items) ?? [content]
+const mark = (content) => html`<span class="tw:spec-diff">${content}</span>`
+
 const CLASSIFICATIONS = 'motors.operating_modes.e_vehicle_classification'
+const MATERIALS = 'frame.material'
 
 // The names, units and lookups the vehicle templates present a model's data with
 export class VehiclePresenter {
@@ -16,7 +24,9 @@ export class VehiclePresenter {
     // `names` leaves off a classification's jurisdiction: "Moped", where it's "US-CA Moped"
     const classifications = Object.entries(vocabulary.e_vehicle_classifications ?? {})
     const names = Object.fromEntries(classifications.map(([id, { jurisdiction, name }]) => [id, `${jurisdiction} ${name}`]))
-    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [CLASSIFICATIONS]: { ...vocabulary.names[CLASSIFICATIONS], ...names } } }
+    // the catalog names carbon "Carbon or Composite"
+    const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
+    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [CLASSIFICATIONS]: { ...vocabulary.names[CLASSIFICATIONS], ...names }, [MATERIALS]: materials } }
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
     this.imperialLengths = kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))
@@ -95,11 +105,27 @@ export class VehiclePresenter {
   }
 
   measurementRows (rows) {
-    return join(rows.map(([label, value, unit, differs, key]) => definitionListRow({ label: this.diffLabel(label, differs), content: this.measurement(value, unit, key) })))
+    return join(rows.map(([label, value, unit, differs, key, others]) => definitionListRow({
+      label, content: this.highlighted(this.measurement(value, unit, key), differs, differs && others?.map((other) => this.measurement(other, unit, key)))
+    })))
   }
 
-  diffLabel (label, differs) {
-    return differs ? html`<span class="tw:spec-diff">${label}</span>` : label
+  // Marks `content` where it differs from the compared vehicles' `others`: just the items of a list the others don't
+  // all have, else all of it. Left alone when blank, so a row with no value still renders nothing
+  highlighted (content, differs, others) {
+    if (!differs || blank(content)) return content
+    if (!listed(content) || !others || others.some(blank)) return mark(content)
+
+    const theirs = others.map((other) => new Set(items(other).map(textOf)))
+    const texts = new Map(items(content).map((item) => [item, textOf(item)]))
+    const shared = (item) => theirs.every((each) => each.has(texts.get(item)))
+    if (items(content).every(shared)) return mark(content)
+    const marked = (value) => {
+      const [parts, separator] = listed(value) ?? []
+      if (parts) return join(parts.map(marked), separator)
+      return shared(value) ? value : mark(value)
+    }
+    return marked(content)
   }
 
   positionLabel (position) {
@@ -107,7 +133,8 @@ export class VehiclePresenter {
     return positions.length ? positions.map((part) => this.humanize(part)).join(' & ') : null
   }
 
-  rowsFor (definition, source, { labels = {}, others = [], collapse = [] } = {}) {
+  // `display` presents a field's value, as it does the others'
+  rowsFor (definition, source, { labels = {}, others = [], collapse = [], display = (value) => value } = {}) {
     const values = isHash(source) ? source : {}
     const otherSources = others.map((other) => isHash(other) ? other : {})
     return Object.entries(definition).flatMap(([key, meta]) => {
@@ -117,9 +144,9 @@ export class VehiclePresenter {
 
       const label = labels[key] ?? this.humanize(key)
       if (meta.fields && !collapse.includes(key) && [value, ...otherValues].some(isHash)) {
-        return this.rowsFor(meta.fields, value, { others: otherValues }).map(([rowLabel, ...row]) => [`${label} ${String(rowLabel).toLowerCase()}`, ...row])
+        return this.rowsFor(meta.fields, value, { others: otherValues, display }).map(([rowLabel, ...row]) => [`${label} ${String(rowLabel).toLowerCase()}`, ...row])
       }
-      return [[label, value, meta.unit, otherValues.some((other) => !equal(other, value)), key]]
+      return [[label, display(value, key), meta.unit, otherValues.some((other) => !equal(other, value)), key, otherValues.map((other) => display(other, key))]]
     })
   }
 

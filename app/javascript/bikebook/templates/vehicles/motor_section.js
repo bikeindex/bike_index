@@ -28,7 +28,8 @@ export const motorSection = ({ presenter, heading, motor, others }) => {
   const rows = presenter.rowsFor(fields, display(motor), { labels, others: others.map(display) })
   const modes = array(motor.operating_modes).map((mode) => {
     const otherModes = others.map((other) => array(other.operating_modes).find((each) => each.mode === mode.mode))
-    const modeHeading = presenter.diffLabel(presenter.humanize(mode.mode), otherModes.some((each) => each == null))
+    // a mode the others lack is all difference, so its heading is what's marked
+    const modeHeading = presenter.highlighted(presenter.humanize(mode.mode), otherModes.some((each) => each == null))
     const modeRows = presenter.rowsFor(modeFields, displayMode(mode), { labels, others: otherModes.map((each) => each ? displayMode(each) : null) })
     return [modeHeading, presenter.measurementRows(modeRows)]
   })

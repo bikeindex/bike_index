@@ -23,7 +23,7 @@ export const classificationCard = ({ presenter, id, classification, removePath }
   // a binding doesn't sanitize an href, so a source that isn't a web page isn't a link
   const links = array(sources).filter((source) => /^https?:\/\//.test(source))
     .map((source) => html`<a class="twlink tw:break-all" target="_blank" rel="noopener" href=${source}>${source}</a>`)
-  return html`<div class="tw:w-full tw:md:w-[26rem] tw:md:shrink-0" data-controller="ui--alert"><article class="twgutter tw:space-y-6 tw:rounded-sm
+  return html`<div class="tw:md:w-[26rem] tw:md:shrink-0" data-controller="ui--alert"><article class="twgutter tw:space-y-6 tw:rounded-sm
     tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]"><header><div
     class="tw:flex tw:items-start tw:gap-4"><p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">E-vehicle
     classification</p>${removeLink({ label: `Remove ${title}`, href: removePath })}</div><h1 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${
