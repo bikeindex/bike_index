@@ -154,6 +154,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     size_select.call("Current ADV").select("Extra Large")
     expect_size.call("Current ADV", "Extra Large")
     expect_size.call("Current EXP", "Small")
+    # the geometry is each one's size, its differences neither better nor worse
+    expect(find("[aria-label='Comparison'] tr", text: "Reach")).to have_css("td", text: /\A425\.5.+−74\.7/m)
+      .and have_css(".tw\\:text-gray-500", text: "−74.7")
 
     visit current_url
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)

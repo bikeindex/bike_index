@@ -12,8 +12,11 @@ const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(is
 const motors = (key) => (vehicle) => highest(array(vehicle.motors).map((motor) => motor[key]))
 const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode[key]))
 
-// `better` is the sign of a difference that's an improvement: a lower price, a longer range
-const ROWS = [
+const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'wheelbase', 'standover']
+
+// `better` is the sign of a difference that's an improvement: a lower price, a longer range. 0 for a difference
+// that's neither, and none for a value that isn't compared
+const SPECS = [
   { label: 'Year', read: (vehicle) => latest(array(vehicle.years))?.year, better: 1, format: String },
   {
     label: 'Price',
@@ -30,7 +33,9 @@ const ROWS = [
   { label: 'Range', read: modes('range_claimed'), better: 1, unit: 'km' },
   { label: 'Top speed', read: modes('max_speed'), better: 1, unit: 'km/h' },
   { label: 'Front travel', read: (vehicle, size) => size?.geometry?.travel_front ?? vehicle.suspension?.front_travel, better: 1, unit: 'mm' },
-  { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear_travel, better: 1, unit: 'mm' },
+  { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear_travel, better: 1, unit: 'mm' }
+]
+const DETAILS = [
   { label: 'Vehicle type', read: (vehicle) => vehicle.type },
   { label: 'Frame material', read: (vehicle) => vehicle.frame?.material }
 ]
@@ -39,15 +44,24 @@ const ROWS = [
 export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
-  const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit) : value)
+  const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
+  const geometry = GEOMETRY.map((key) => ({
+    label: presenter.kit.geometry.labels[key] ?? presenter.humanize(key),
+    read: (vehicle, size) => size?.geometry?.[key],
+    better: 0,
+    unit: presenter.kit.schemas.geometry[key]?.unit,
+    key
+  }))
   const header = (label) => html`<th scope="row" class="${CELL} tw:font-medium tw:whitespace-nowrap tw:text-gray-600 tw:dark:text-gray-400">${label}</th>`
 
   const difference = (row, value, base, vehicle) => {
-    if (vehicle === first || !row.better || !isNumber(value) || !isNumber(base) || !(row.comparable?.(vehicle, first) ?? true)) return nothing
+    if (vehicle === first || row.better === undefined || !isNumber(value) || !isNumber(base) || !(row.comparable?.(vehicle, first) ?? true)) return nothing
 
     const change = presenter.rounded(value - base)
     if (change === 0) return html`<span class="tw:block tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">-</span>`
-    const color = Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
+    const color = row.better === 0
+      ? 'tw:text-gray-500 tw:dark:text-gray-400'
+      : Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
     return html`<span class="tw:block tw:text-xs ${color}">${change > 0 ? '+' : '−'}${show(row, Math.abs(change), vehicle)}</span>`
   }
 
@@ -63,7 +77,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
     ? html`<tr class="tw:even:bg-gray-50 tw:dark:even:bg-gray-800/50">${header('Size')}${vehicles.map((vehicle, index) => html`<td class=${CELL}>${sizeCell(vehicle, index)}</td>`)}</tr>`
     : nothing
 
-  const rows = ROWS.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
+  const rows = [...SPECS, ...geometry, ...DETAILS].map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
     .filter(([, values]) => values.some(present)).map(([row, values]) => html`<tr class="tw:even:bg-gray-50 tw:dark:even:bg-gray-800/50">${header(row.label)}${
       named.map((vehicle, index) => html`<td class=${CELL}>${present(values[index]) ? show(row, values[index], vehicle) : html`<span class="twless-strong">—</span>`}${
         difference(row, values[index], values[0], vehicle)}</td>`)}</tr>`)
