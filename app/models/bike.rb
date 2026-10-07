@@ -692,7 +692,7 @@ class Bike < ApplicationRecord
   end
 
   def fetch_current_stolen_record
-    return current_stolen_record if defined?(manual_csr)
+    return current_stolen_record if manual_csr || id.blank?
 
     # Don't access through association, or else it won't find without a reload
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
@@ -873,18 +873,18 @@ class Bike < ApplicationRecord
       case frame_size.downcase
       when /xxs/
         "xxs"
-      when /x*sma/, "xs"
+      when /(x|extra)\W?sma/, "xs"
         "xs"
       when /sma/, "s"
         "s"
       when /med/, "m"
         "m"
-      when /(lg)|(large)/, "l"
-        "l"
       when /xxl/
         "xxl"
-      when /x*l/, "xl"
+      when /(x|extra)\W?l/, "xl"
         "xl"
+      when /(lg)|(large)/, "l"
+        "l"
       end
     end
     true

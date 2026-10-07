@@ -37,6 +37,7 @@
 #  passwordless_user                  :boolean          default(FALSE), not null
 #  phone                              :string(255)
 #  preferred_language                 :string
+#  preferred_unit_system              :integer
 #  show_bikes                         :boolean          default(FALSE), not null
 #  show_instagram                     :boolean          default(FALSE)
 #  show_phone                         :boolean          default(TRUE)
@@ -73,11 +74,15 @@ class User < ApplicationRecord
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
   # How long an emailed token stays good for - magic link sign in and password reset alike
   AUTH_TOKEN_EXPIRY = 10.minutes
+  # nil leaves it to UnitSystem
+  PREFERRED_UNIT_SYSTEM_ENUM = {metric: 0, imperial: 1}.freeze
 
   cattr_accessor :current_user
 
   acts_as_paranoid
   has_secure_password
+
+  enum :preferred_unit_system, PREFERRED_UNIT_SYSTEM_ENUM, prefix: true, validate: {allow_nil: true}
 
   has_many :ambassador_task_assignments
   has_many :b_params, foreign_key: :creator_id

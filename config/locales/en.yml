@@ -4007,6 +4007,7 @@ en:
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}
       preferred_language: Preferred language
+      preferred_unit_system: Units
       primary_email: Primary email
       receive_the_bike_index_newsletter: Receive the Bike Index newsletter
       remove_email: Remove email
@@ -4017,6 +4018,9 @@ en:
       time_single_format_small: "(not today, yesterday, etc)"
       unconfirmed: unconfirmed!
       unconfirmed_emails: Unconfirmed emails
+      unit_system_automatic: Automatic, from your location
+      unit_system_imperial: Imperial (miles, inches)
+      unit_system_metric: Metric (kilometers, millimeters)
       verified: verified
       why_you_should_text: read why you should
     sharing:

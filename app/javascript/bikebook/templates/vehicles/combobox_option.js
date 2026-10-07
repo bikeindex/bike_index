@@ -34,3 +34,9 @@ export const comboboxOption = ({ model, placeholderUrl, currencies }) => {
     class="tw:flex tw:items-center tw:gap-x-2">${thumb(model.stock_photo, placeholderUrl)}<span class="tw:min-w-0 tw:flex-1"><span
     class="tw:block tw:text-base"><strong>${model.manufacturer_name}</strong>${model.model ? ` ${model.model}` : nothing}</span>${details}</span></span></li>`
 }
+
+// An e-vehicle classification's option: its title and id
+export const classificationOption = ({ id, display }) => html`<li id=${uuid()} role="option" tabindex="-1" class="hw-combobox__option"
+  data-action="click->hw-combobox#selectOnClick" data-filterable-as=${display} data-autocompletable-as=${display} data-value=${id}
+  aria-selected="false"><span class="tw:block tw:text-base"><strong>${display}</strong></span><span class="tw:block tw:font-mono tw:text-xs
+  tw:text-gray-400 tw:dark:text-gray-500">${id}</span></li>`

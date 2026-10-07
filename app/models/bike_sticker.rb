@@ -83,6 +83,8 @@ class BikeSticker < ApplicationRecord
 
   def self.code_integer_and_prefix_search(str)
     normalized_code_with_zeroes = normalize_code(str, leading_zeros: true)
+    return none if normalized_code_with_zeroes.blank?
+
     code_integer = calculated_code_integer(normalized_code_with_zeroes)
     return none if code_integer.present? && code_integer > 9223372036854775807 # BigInt max - can't be a larger int than this
 
@@ -121,6 +123,8 @@ class BikeSticker < ApplicationRecord
     return bike_sticker if bike_sticker.present?
 
     normalized_code = normalize_code(str)
+    return nil if normalized_code.blank?
+
     bike_sticker ||= organization_search(organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
     bike_sticker || where("code ILIKE ?", "%#{normalized_code}%").first
   end

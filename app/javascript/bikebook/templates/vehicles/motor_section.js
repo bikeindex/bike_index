@@ -1,18 +1,16 @@
 import { copyableCode } from 'bikebook/templates/ui/copyable_code'
 import { section } from 'bikebook/templates/vehicles/section'
-import { array, blank, compact, join, present, slice } from 'bikebook/templates/values'
-
-// to_sentence(two_words_connector: " or ", last_word_connector: " or ")
-const sentence = (words) => words.length < 2 ? words.join('') : `${words.slice(0, -1).join(', ')} or ${words.at(-1)}`
+import { array, blank, compact, except, join, present, slice } from 'bikebook/templates/values'
 
 // A motor's specs, with a subsection per operating mode
 export const motorSection = ({ presenter, heading, motor, others }) => {
-  const { fields, mode_fields: modeFields, humanized, labels } = presenter.kit.motor
+  const { fields, humanized, labels } = presenter.kit.motor
+  // the identity rows list every mode's classification
+  const modeFields = except(presenter.kit.motor.mode_fields, ['e_vehicle_classification'])
   const display = (each) => ({
     ...each,
     name: [each.manufacturer, each.model].filter(present).join(' '),
     id: each.id ? copyableCode({ value: each.id, label: 'Copy ID' }) : null,
-    us_e_bike_class: each.us_e_bike_class == null ? null : `Class ${sentence(each.us_e_bike_class)}`,
     // a merged motor lists each of its drive wheels
     ...Object.fromEntries(Object.entries(slice(each, humanized)).map(([key, value]) => [key, value == null ? value : array(value).map((part) => presenter.humanize(part)).join(', ')]))
   })

@@ -38,14 +38,17 @@ module BikeServices
     end
 
     def self.find_matching_user_ids(email = nil, phone = nil)
-      # An OR across users and a joined table can't use either one's index
-      [[:email, :user_emails, email], [:phone, :user_phones, phone]].flat_map { |column, association, value|
-        next [] if value.blank?
-
-        User.where(column => value).pluck(:id) + User.joins(association).where(association => {column => value}).pluck(:id)
-      }.uniq
+      (matching_user_ids(:email, email, UserEmail) + matching_user_ids(:phone, phone, UserPhone)).uniq
     end
 
-    private_class_method :find_matching_user_ids
+    # An OR across the joined tables can't use their indexes
+    def self.matching_user_ids(attribute, value, user_attribute_class)
+      return [] if value.blank?
+
+      User.where(attribute => value).pluck(:id) +
+        User.where(id: user_attribute_class.where(attribute => value).select(:user_id)).pluck(:id)
+    end
+
+    private_class_method :find_matching_user_ids, :matching_user_ids
   end
 end

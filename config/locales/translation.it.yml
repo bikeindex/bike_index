@@ -4324,6 +4324,10 @@ it:
       unconfirmed_emails: Email non confermate
       verified: Verificato
       why_you_should_text: Leggi perché dovresti
+      preferred_unit_system: Unità
+      unit_system_automatic: Automatico, dalla tua posizione
+      unit_system_imperial: Sistema imperiale (miglia, pollici)
+      unit_system_metric: Sistema metrico (chilometri, millimetri)
     sharing:
       choose_file: Seleziona il file...
       create_page: Crea pagina
@@ -5782,6 +5786,7 @@ it:
             search_distance: Distanza di ricerca
             search_location: Posizione di ricerca
             within: entro
+            kilometers_of: km allevamento
           wrapper:
             e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
             view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
@@ -6262,6 +6267,8 @@ it:
             where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci
               contatti in merito a un annuncio che hai trovato online, includi il
               link nel campo sottostante.
+          share:
+            link_copied: Link copiato
       search:
         everything_combobox:
           made_by: realizzato da
@@ -6291,6 +6298,7 @@ it:
           stolenness_proximity: Rubato nell'area di ricerca
           stolenness_stolen: Rubato ovunque
           within: entro
+          kilometers_of: km allevamento
         result_view_select:
           cards_view: Visualizza come schede
           list_view: Visualizza come elenco

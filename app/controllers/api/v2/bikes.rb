@@ -135,7 +135,7 @@ module API
               # NOTE: I believe this doesn't fully cover phone number registrations,
               # but as of 2023-11, phone registrations aren't being heavily used
               email = EmailNormalizer.normalize(params[:owner_email])
-              if bike.ownerships.where(current: false).where(owner_email: email) && bike.owner_email != email
+              if bike.ownerships.where(current: false).where(owner_email: email).exists? && bike.owner_email != email
                 "transferred"
               else
                 "with_user"

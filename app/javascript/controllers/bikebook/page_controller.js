@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
+import { readable } from 'bikebook/replace_url'
 import { uuid } from 'bikebook/templates/helpers'
 
 const stamped = (state) => ({ ...state, bikebook: uuid() })
@@ -72,7 +73,7 @@ export default class extends Controller {
   }
 
   #go (url) {
-    window.history.pushState(stamped(), '', url)
+    window.history.pushState(stamped(), '', readable(url))
     this.#render(url, [0, 0])
   }
 

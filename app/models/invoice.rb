@@ -209,7 +209,7 @@ class Invoice < ApplicationRecord
   end
 
   def amount_due=(val)
-    self.amount_due_cents = val.to_f * 100
+    self.amount_due_cents = MoneyFormatter.convert_to_cents(val)
   end
 
   def amount_due_formatted

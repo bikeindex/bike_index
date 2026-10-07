@@ -9,8 +9,6 @@ module FileCacheMaintainer
   end
 
   def blocklist
-    return [] unless redis.type(info_id) == "set"
-
     RedisPool.conn { |r| r.smembers blocklist_id }
   end
 
@@ -89,15 +87,11 @@ module FileCacheMaintainer
   end
 
   def blocklist_id
-    "#{base_id}_info"
+    "#{base_id}_blocklist"
   end
 
   def base_id
     "#{Rails.env[0..2]}_tsv"
-  end
-
-  def redis
-    @redis ||= Redis.new # TODO: Switch to connection pool, preferred way of accessing redis
   end
 
   def uploader_from_filename(filename)

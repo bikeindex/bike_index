@@ -4985,6 +4985,10 @@ nl:
         meer)
       time_single_format: Alleen showdata
       time_single_format_small: "(niet vandaag, gisteren, enz.)"
+      preferred_unit_system: Eenheden
+      unit_system_automatic: Automatisch, vanaf uw locatie
+      unit_system_imperial: Imperiaal (mijlen, inches)
+      unit_system_metric: Metrisch (kilometers, millimeters)
     sharing:
       choose_file: Kies bestand...
       create_page: Creëer pagina
@@ -5681,6 +5685,7 @@ nl:
             search_distance: Zoek afstand
             search_location: Zoek locatie
             within: binnen
+            kilometers_of: km van
           wrapper:
             e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
             view_matching_any_audit: weergave die overeenkomt met elke audit
@@ -6160,6 +6165,8 @@ nl:
             where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als
               u contact opneemt over een advertentie die u online hebt gevonden, neemt
               u een link op in het onderstaande veld
+          share:
+            link_copied: Link gekopieerd
       search:
         everything_combobox:
           made_by: gemaakt door
@@ -6189,6 +6196,7 @@ nl:
           stolenness_proximity: Gestolen in zoekgebied
           stolenness_stolen: Overal gestolen
           within: binnen
+          kilometers_of: km van
         result_view_select:
           cards_view: Bekijk als kaarten
           list_view: Weergeven als lijst

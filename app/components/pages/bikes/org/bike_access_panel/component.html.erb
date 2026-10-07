@@ -411,7 +411,7 @@
               <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
                 <% if bike_organization_note.present? %>
                   <small class="tw:text-gray-500">
-                    <%= translation(".note_by", user: bike_organization_note.user.display_name) %>
+                    <%= translation(".note_by", user: bike_organization_note.user&.display_name) %>
 
                     <span class="localizeTime withPreposition">
                       <%= l bike_organization_note.updated_at, format: :convert_time %>
