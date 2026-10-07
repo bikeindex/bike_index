@@ -28,7 +28,7 @@ const counted = (count, teeth, content) => {
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'wheelbase', 'standover']
 
 // `better` is the sign of a difference that's an improvement: a lower price, a longer range. None for a value
-// that isn't compared
+// that isn't compared. `number` is what's compared of a value that isn't one
 const SPECS = [
   { label: 'Year', read: (vehicle) => latest(array(vehicle.years))?.year, better: 1, format: String },
   {
@@ -49,10 +49,18 @@ const SPECS = [
   { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear_travel, better: 1, unit: 'mm' }
 ]
 const DETAILS = [
-  { label: 'Chainrings', read: gearing('front'), format: ({ count, teeth }, vehicle, presenter) => counted(count, teeth, teethList(presenter, teeth, ', ')) },
+  {
+    label: 'Chainrings',
+    read: gearing('front'),
+    better: 1,
+    number: ({ count }) => count,
+    format: ({ count, teeth }, vehicle, presenter) => counted(count, teeth, teethList(presenter, teeth, ', '))
+  },
   {
     label: 'Cogs',
     read: gearing('rear'),
+    better: 1,
+    number: ({ count }) => count,
     format: ({ count, teeth }, vehicle, presenter) => counted(count, teeth, teethList(presenter, [...new Set([teeth[0], teeth.at(-1)])], '–'))
   },
   { label: 'Vehicle type', read: (vehicle) => vehicle.type },
@@ -74,14 +82,15 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   const missing = html`<span class="twless-strong">—</span>`
 
   const difference = (row, value, base, vehicle) => {
-    if (vehicle === first || row.better === undefined || !isNumber(value) || !isNumber(base) || !(row.comparable?.(vehicle, first) ?? true)) return nothing
+    const [number, baseNumber] = [value, base].map((each) => row.number && each != null ? row.number(each) : each)
+    if (vehicle === first || row.better === undefined || !isNumber(number) || !isNumber(baseNumber) || !(row.comparable?.(vehicle, first) ?? true)) return nothing
 
-    const change = presenter.rounded(value - base)
+    const change = presenter.rounded(number - baseNumber)
     if (change === 0) return html`<span class="tw:block tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">-</span>`
     const color = Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
     // a unit or currency symbol carries its name as a title, and stays gray
     return html`<span class="tw:block tw:text-xs ${color} tw:[&_span[title]]:text-gray-400 tw:dark:[&_span[title]]:text-gray-500">${
-      change > 0 ? '+' : '−'}${show(row, Math.abs(change), vehicle)}</span>`
+      change > 0 ? '+' : '−'}${row.number ? Math.abs(change) : show(row, Math.abs(change), vehicle)}</span>`
   }
 
   // a select where there's a size to pick, and the page renders again from each pick
