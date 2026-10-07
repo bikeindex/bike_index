@@ -73,7 +73,7 @@ class User < ApplicationRecord
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
   # How long an emailed token stays good for - magic link sign in and password reset alike
-  AUTH_TOKEN_EXPIRY = 10.minutes
+  AUTH_TOKEN_EXPIRY = 1.hour
   # nil leaves it to UnitSystem
   PREFERRED_UNIT_SYSTEM_ENUM = {metric: 0, imperial: 1}.freeze
 
@@ -455,15 +455,20 @@ class User < ApplicationRecord
   # The emailed link is often opened in another browser, which has no session
   # holding where the user was headed - so return_to rides along in the link
   def send_magic_link_email(return_to: nil)
-    # If the auth token was just created, don't create a new one, it's too error prone
-    return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
+    token_time = auth_token_time("magic_link_token")
+    # Throttles a double-submit
+    return true if token_time > Time.current - 1.minutes
 
-    update_auth_token("magic_link_token")
-    reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
+    # Filtered mail can deliver an earlier link after the re-request, so resend it rather than
+    # killing it - until it's too near expiry to survive the same delay
+    if token_time < Time.current - AUTH_TOKEN_EXPIRY / 2
+      update_auth_token("magic_link_token")
+      reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
+    end
     EmailJobs::MagicLoginLinkJob.perform_async(id, return_to)
   end
 
-  # Unlike send_magic_link_email, reuses an unexpired token and sends no email
+  # Reuses any unexpired token, and sends no email
   def refreshed_magic_link_token
     if magic_link_token.blank? || auth_token_expired?("magic_link_token")
       update_auth_token("magic_link_token")
