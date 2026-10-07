@@ -14,6 +14,8 @@ const LISTS = ['primary_activity', 'manufacturer', 'vehicle_type']
 const SINGLES = ['electric', 'suspension', 'model_configuration']
 const RANGES = ['year_min', 'year_max', 'price_min', 'price_max']
 const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'year_dir', 'price_dir']
+// rather than the kit's max_compare, which the catalog publishes as 3
+const MAX_COMPARE = 5
 
 const combobox = (root, name) => root.getElementById(`${name}-hw-hidden-field`).closest('.hw-combobox')
 
@@ -34,7 +36,7 @@ export async function hydrate (catalog, source, shell, url) {
     filters[name] = [...new Set(slugs.filter((value) => values.has(value)))].join(',')
   }
   const [found, { filteredCount }] = await Promise.all([catalog.vehicles(params.get('vehicle_models')?.split(',') ?? []), catalog.search(filters, 0, 0)])
-  const vehicles = found.slice(0, kit.max_compare)
+  const vehicles = found.slice(0, MAX_COMPARE)
   const values = vehicles.map(({ value }) => value).join(',')
 
   const panel = root.querySelector('[data-controller~="bikebook--catalog-filters"]')

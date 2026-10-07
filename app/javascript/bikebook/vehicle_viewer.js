@@ -21,7 +21,7 @@ export class VehicleViewer {
     const comparing = vehicles.length > 1
     const comparisonView = url.searchParams.get('view') === 'comparison'
     const models = vehicles.filter(({ classification }) => !classification)
-    const baselineSolo = vehicles.length === 3
+    const baselineSolo = vehicles.length === 3 && !comparisonView
       ? 'tw:md:max-[1152px]:[&>*:first-child]:basis-full tw:md:max-[1152px]:[&>*:first-child>article]:mx-auto tw:md:max-[1152px]:[&>*:first-child>article]:max-w-[calc(50%-1rem)]'
       : ''
     const values = vehicles.map(({ value }) => value)
@@ -35,7 +35,9 @@ export class VehicleViewer {
     })
     return html`${comparisonView && models.length ? comparisonTable({ presenter: this.presenter, vehicles: models }) : nothing}<div ?data-comparison=${comparisonView} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
-      : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:flex-col tw:gap-8 ${comparing ? 'tw:md:flex-row tw:md:flex-wrap tw:md:justify-center' : 'tw:lg:flex-row tw:lg:justify-center'}
+      : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:flex-col tw:gap-8 ${comparing
+      ? `tw:md:flex-row ${comparisonView ? 'tw:md:justify-center-safe tw:md:overflow-x-auto' : 'tw:md:flex-wrap tw:md:justify-center'}`
+      : 'tw:lg:flex-row tw:lg:justify-center'}
       ${baselineSolo}" data-controller="bikebook--wrapped-scroll">${cards}</div></div>`
   }
 }

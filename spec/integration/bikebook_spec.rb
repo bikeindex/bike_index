@@ -102,6 +102,22 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
 
     expect(asked).to be_empty
+
+    # Five compare, wrapping onto rows unless the comparison view lines them up side by side
+    page.current_window.resize_to(1440, 900)
+    five = %w[m/aventon/2026/level_4_rec_step_through m/aventon/2022/level_2_step_through m/segway/2025/gt3_pro
+      m/specialized/2025/haul_st m/sur_ron/2026/ultra_bee_hp_x_us].join(",")
+    card_rows = -> { page.evaluate_script("new Set([...document.querySelectorAll('article')].map((card) => Math.round(card.getBoundingClientRect().top))).size") }
+    visit bikebook_path(vehicle_models: five)
+    expect(page).to have_css("article", count: 5, wait: 10)
+    expect(card_rows.call).to be > 1
+
+    click_on "Comparison view"
+    expect(page).to have_css("[aria-label='Comparison'] th[scope='col']", count: 5)
+    expect(page).to have_css("[data-comparison] article", count: 5)
+    expect(card_rows.call).to eq 1
+    expect(page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth")).to be true
+    page.current_window.resize_to(1920, 1080)
   end
 
   it "renders each UI template as the component it mirrors does" do
