@@ -10,7 +10,7 @@ RSpec.describe EmailJobs::MagicLoginLinkJob, type: :job do
   context "with magic_link_token" do
     before { user.update_auth_token("magic_link_token") }
 
-    it "sends an email and doesn't send again for the same token" do
+    it "sends an email, and sends again for a resend of the same token" do
       token = user.magic_link_token
       expect { described_class.new.perform(user.id) }.to change(Notification, :count).by 1
       expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -19,8 +19,18 @@ RSpec.describe EmailJobs::MagicLoginLinkJob, type: :job do
         delivery_status: "delivery_success", message_channel_target: user.email)
       expect(user_email.reload.last_email_errored?).to be_falsey
 
+      expect { described_class.new.perform(user.id) }.to change(Notification, :count).by 1
+      expect(ActionMailer::Base.deliveries.count).to eq 2
+    end
+
+    it "reuses the notification when sidekiq retries a failed send" do
+      allow(CustomerMailer).to receive(:magic_login_link_email).and_raise(StandardError, "timeout")
+      expect { described_class.new.perform(user.id) }.to raise_error(/timeout/)
+      expect(notification.delivery_status).to eq "delivery_failure"
+
+      allow(CustomerMailer).to receive(:magic_login_link_email).and_call_original
       expect { described_class.new.perform(user.id) }.to change(Notification, :count).by 0
-      expect(ActionMailer::Base.deliveries.count).to eq 1
+      expect(notification.reload.delivery_status).to eq "delivery_success"
     end
 
     context "email_banned user" do

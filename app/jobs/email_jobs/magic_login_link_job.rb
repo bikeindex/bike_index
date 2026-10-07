@@ -10,8 +10,10 @@ module EmailJobs
         raise StandardError, "User #{user_id} does not have a magic_link_token"
       end
 
+      # A re-request resends the same token, so only an unsettled send (a retry) is reused
       notification = user.notifications.magic_login_link
-        .where("created_at > ?", user.auth_token_time("magic_link_token")).first_or_create
+        .where("created_at > ?", user.auth_token_time("magic_link_token"))
+        .where.not(delivery_status: Notification::SETTLED_STATUSES).first_or_create
       Notifications::Deliver.track_email(notification) do
         CustomerMailer.magic_login_link_email(user, return_to:).deliver_now
       end
