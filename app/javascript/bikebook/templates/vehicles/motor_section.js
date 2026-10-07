@@ -4,7 +4,7 @@ import { html } from 'lit-html'
 import { array, blank, compact, except, join, presence, present, slice } from 'bikebook/templates/values'
 
 // one literal, so `equal` matches it across compared motors
-const UNKNOWN = html`<span class="twless-strong">Unknown</span>`
+const UNKNOWN = html`<span class="tw:text-yellow-800 tw:dark:text-yellow-400">Unknown</span>`
 
 // A motor's specs, with a subsection per operating mode
 export const motorSection = ({ presenter, heading, motor, others }) => {
