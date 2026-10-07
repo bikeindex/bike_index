@@ -50,7 +50,6 @@ module Saml
       # The IdP vouched for this email, so confirm the account (as the magic-link path
       # does) — otherwise sign-in bounces an unconfirmed user to the confirm-email page.
       user.confirm(user.confirmation_token) unless user.confirmed?
-      # Never over one they've set - the account is theirs to name, the IdP only fills a blank
       user.update(name: asserted[:name]) if user.name.blank? && asserted[:name].present?
 
       identity.update(user:, email: asserted[:email], name_id_format: asserted[:name_id_format],

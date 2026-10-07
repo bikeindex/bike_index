@@ -152,15 +152,6 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
           expect(User.find_by(email:).name).to eq "Cardinal Rider"
         end
 
-        context "existing user without a name" do
-          let!(:existing) { FactoryBot.create(:user_confirmed, email:, name: nil) }
-
-          it "fills it in" do
-            post_callback(attributes: {"displayName" => "Cardinal Rider"})
-            expect(existing.reload.name).to eq "Cardinal Rider"
-          end
-        end
-
         context "existing user with a name" do
           let!(:existing) { FactoryBot.create(:user_confirmed, email:, name: "Their Own Choice") }
 

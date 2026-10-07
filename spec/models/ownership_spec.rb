@@ -613,6 +613,17 @@ RSpec.describe Ownership, type: :model do
         expect(bike.current_ownership.owner_name).to eq "New name"
         expect(bike.owner_name).to eq "New name"
       end
+
+      context "claimed by an account without a name" do
+        let(:user) { FactoryBot.create(:user_confirmed, name: nil, email: bike.owner_email) }
+
+        it "keeps the registration_info name" do
+          expect(user).to be_present
+          bike.current_ownership.mark_claimed
+          expect(bike.reload.user&.id).to eq user.id
+          expect(bike.owner_name).to eq "Cool Name"
+        end
+      end
       context "cleaned_registration_info" do
         let(:registration_info) { {user_name: "George", bike_code: "9998888", phone: "(111) 222-4444", student_id: "1222", organization_affiliation: "employee"} }
         let(:target_cleaned) { {user_name: "George", bike_sticker: "9998888", phone: "1112224444", student_id: "1222", organization_affiliation: "employee"}.as_json }

@@ -292,18 +292,17 @@ module BikeServices
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
     # fields into the params json. The photo arrives one of two ways: as bytes from a plain
     # file field, or as the signed id of a blob the browser already uploaded.
-    # Returns whether the step passed - it needs the owner's name, which a registrant's own
-    # account answers once it has one (an SSO or emailed-link account starts without).
+    # Returns whether the step passed - it needs the owner's name.
     # A failed step still saves, it just isn't marked complete, so nothing entered is lost.
     # Not past an earlier error on the submission, which saving would clear
     def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil, additional: nil)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
       bike_params = honeypot_spam(bike_params, additional)
-      self_made = b_param.self_made?(user)
-      # A claimed ownership takes its owner_name from the account, so the name has to land there
-      user.update(name: bike_params["user_name"]) if self_made && user.name.blank? && bike_params["user_name"].present?
-      completed = self_made && user.name.present? || bike_params["user_name"].present?
+      user_name = bike_params["user_name"]
+      completed = owner_name_known?(b_param, user) || user_name.present?
+      # So their next registration doesn't ask again
+      user.update(name: user_name) if user_name.present? && user&.name.blank? && b_param.self_made?(user)
       clear_stale_report(b_param, bike_params["status"])
       set_auto_organization(b_param, register_with_organization)
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
@@ -311,6 +310,9 @@ module BikeServices
       b_param.errors.add(:base, translation(:name_required)) unless completed
       completed
     end
+
+    # Their own registration, by an account with a name - SSO and emailed-link accounts start without
+    def owner_name_known?(b_param, user) = user&.name.present? && b_param.self_made?(user)
 
     def permitted_report_params
       %i[date timezone impounded_description] + STOLEN_REPORT_ATTRS +

@@ -325,15 +325,13 @@ RSpec.describe BikeServices::Register do
     context "registering their own bike with a user_name" do
       let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com", name:) }
       let(:name) { nil }
-      let(:submit) do
-        -> {
-          described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
-            bike_params: {"user_name" => "Sarah Rider"})
-        }
+      let(:result) do
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"})
       end
 
-      it "names their account, which the ownership takes its owner_name from" do
-        expect(submit.call).to be_truthy
+      it "names their account" do
+        expect(result).to be_truthy
         expect(user.reload.name).to eq "Sarah Rider"
       end
 
@@ -341,7 +339,7 @@ RSpec.describe BikeServices::Register do
         let(:name) { "Their Own Choice" }
 
         it "keeps it" do
-          expect(submit.call).to be_truthy
+          expect(result).to be_truthy
           expect(user.reload.name).to eq "Their Own Choice"
         end
       end

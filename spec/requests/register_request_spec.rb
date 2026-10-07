@@ -1196,7 +1196,6 @@ RSpec.describe RegisterController, type: :request do
           expect(response.body).to include "View your registration"
         end
 
-        # SSO and emailed-link accounts are made from an address alone
         context "whose account has no name" do
           let(:current_user) { FactoryBot.create(:user_confirmed, name: nil) }
 
