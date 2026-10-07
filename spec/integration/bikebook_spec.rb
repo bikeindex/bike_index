@@ -60,8 +60,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
     expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through")
 
-    # A second pick, found by its id, compares the two, and the comparison view highlights where
-    # the second differs from the first
+    # A second pick, found by its id, compares the two. The comparison view tables them, each against
+    # the first, and highlights where the second's card differs
     type_into(vehicle_field, "level_2_step")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(1 matching model\)/i)
     retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
@@ -75,6 +75,12 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_current_path(/view=comparison/)
     expect(all("article").last).to have_css(".tw\\:spec-diff")
     expect(all("article").first).to have_no_css(".tw\\:spec-diff")
+    within("[aria-label='Comparison']") do
+      expect(page).to have_css("th[scope='col']", text: "Level 2 Step-Through")
+      expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$1,000")
+      expect(find("tr", text: "Range")).to have_css(".tw\\:text-red-700", text: "−24")
+      expect(find("tr", text: "Top speed")).to have_text("Same")
+    end
 
     find("[aria-label='Remove Aventón Level 2 Step-Through']").click
     expect(page).to have_css("[data-comparison] article", count: 1)
