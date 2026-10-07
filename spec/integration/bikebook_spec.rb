@@ -104,7 +104,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       wheels = page.evaluate_script(<<~JS)
         (async () => {
           const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-          const [{ VehiclePresenter }, { wheelsAt }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          const [{ VehiclePresenter }, { brakesAt, wheelsAt }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
             import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
           const data = { wheels: [
             { position: ['front', 'rear'], sizes: ['S'], bsd: 584, tire_width: 28 },
@@ -115,10 +115,17 @@ RSpec.describe "Bikebook", :js, type: :system do
           const text = (content) => fragmentOf(content).textContent.replace(/\\s+/g, ' ').trim()
           const presenter = new VehiclePresenter(kit, vocabulary)
           const [medium, small] = [{ name: 'M' }, { name: 'S' }].map((size) => wheelsAt(presenter, data, size))
-          return [text(medium.front.summary), medium.front.maxTire, medium.rear.maxTire, text(small.front.summary)]
+          const brakes = (list, size) => text(brakesAt(presenter, { brakes: list }, size))
+          return [text(medium.front.summary), medium.front.maxTire, medium.rear.maxTire, text(small.front.summary),
+            // front then rear where they differ, and a size's own brake
+            brakes([{ type: 'disc_hydraulic', position: ['front'], rotor_diameter: 160 }, { type: 'disc_hydraulic', position: ['rear'], rotor_diameter: 140 }], { name: 'M' }),
+            brakes([{ type: 'disc_hydraulic', position: ['front'], rotor_diameter: 160 }, { type: 'caliper', position: ['rear'] }], { name: 'M' }),
+            brakes([{ type: 'disc_hydraulic', position: ['front', 'rear'], sizes: ['M', 'L'], rotor_diameter: 180 }, { type: 'caliper', position: ['front', 'rear'], sizes: ['S'] }], { name: 'S' })]
         })()
       JS
-      expect(wheels).to match([/\A700 C, 28\W*mm tire\z/, 50, 50, /\A650 B, 28\W*mm tire\z/])
+      expect(wheels).to match([/\A700 C, 28\W*mm tire\z/, 50, 50, /\A650 B, 28\W*mm tire\z/,
+        /\AHydraulic disc, 160\W*mm \/ 140\W*mm rotors\z/, /\AHydraulic disc, 160\W*mm rotor \/ Caliper\z/, "Caliper"])
+      expect(find("tr", text: "Brakes").all("td").map(&:text)).to match([/\AHydraulic disc, 180\W*mm rotor\z/, "Hydraulic disc"])
       expect(find("tr", text: "Front wheel").all("td").map(&:text)).to match([/\A650 B, 2\.2\W+in tire\W+thru axle/, /\A650 B, 2\.1\W+in tire\W+thru axle/])
       # gearing counts its drivetrain's speeds, and compares each count and each number of teeth on its own
       chainrings = find("tr", text: "Chainrings")

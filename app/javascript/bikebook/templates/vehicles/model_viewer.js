@@ -34,6 +34,18 @@ export const wheelsAt = (presenter, data, size) => {
   }))
 }
 
+// A vehicle's front and rear brakes in `size`, front first where they differ, as "Hydraulic disc, 160 mm / 140 mm rotors"
+export const brakesAt = (presenter, data, size) => {
+  const viewer = new ModelViewer({ presenter, data, others: [] })
+  const brakes = [...new Set(['front', 'rear'].map((position) => array(viewer.vehicle.brakes)
+    .find((brake) => array(brake.position).includes(position) && (!brake.sizes || array(brake.sizes).includes(size?.name)))))].filter(Boolean)
+  const type = (brake) => brake.type?.replace(/^Disc (\w+)$/, '$1 disc')
+  const summary = (brake) => join(compact([type(brake), viewer.millimeters(brake.rotor_diameter, ' rotor')]), ', ')
+  const [front, rear] = brakes
+  if (!rear || type(front) !== type(rear) || !truthy(front.rotor_diameter) || !truthy(rear.rotor_diameter)) return brakes.length ? join(brakes.map(summary), ' / ') : null
+  return join(compact([type(front), join([viewer.millimeters(front.rotor_diameter), ' / ', viewer.millimeters(rear.rotor_diameter, ' rotors')])]), ', ')
+}
+
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
 
 class ModelViewer {

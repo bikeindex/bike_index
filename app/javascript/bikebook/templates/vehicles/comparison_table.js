@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
-import { tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { brakesAt, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, join, present, slice } from 'bikebook/templates/values'
 
 const isNumber = (value) => typeof value === 'number'
@@ -78,6 +78,8 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   const missing = html`<span class="twless-strong">—</span>`
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
   const wheelRows = ['front', 'rear'].map((position) => ({ label: `${presenter.humanize(position)} wheel`, read: (vehicle) => wheels.get(vehicle)[position].summary }))
+  const brakes = new Map(named.map((vehicle, index) => [vehicle, brakesAt(presenter, vehicles[index].data, sizes[index])]))
+  const brakesRow = { label: 'Brakes', read: (vehicle) => brakes.get(vehicle) }
   const maxTireRows = ['front', 'rear'].map((position) => ({
     label: `${presenter.humanize(position)} max tire`,
     read: (vehicle) => wheels.get(vehicle)[position].maxTire,
@@ -130,7 +132,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   return html`<section aria-label="Comparison" class="tw:mt-6">${table({
     records: [
       ...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []),
-      ...records([...SPECS, ...wheelRows, ...maxTireRows, ...DETAILS]),
+      ...records([...SPECS, ...wheelRows, ...maxTireRows, brakesRow, ...DETAILS]),
       ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])
     ],
     columns: [
