@@ -2,7 +2,7 @@ import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { card } from 'bikebook/templates/ui/card'
 import { table } from 'bikebook/templates/ui/table'
-import { array, present } from 'bikebook/templates/values'
+import { array, present, slice } from 'bikebook/templates/values'
 
 const isNumber = (value) => typeof value === 'number'
 const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
@@ -72,7 +72,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
     if (options.length < 2) return options[0]?.name ?? missing
     return html`<select class="twinput tw:w-auto tw:py-1 tw:text-sm" aria-label=${`Size of ${named[index].model}`} data-action="bikebook--page#pickSize"
       data-bikebook--page-vehicle-param=${value} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
-        html`<option value=${size.name} ?selected=${size === sizes[index]}>${size.name}</option>`)}</select>`
+        html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: slice(size.geometry ?? {}, ['top_tube_effective', 'reach']) })}>${size.name}</option>`)}</select>`
   }
 
   // a table record per row with a value: its label, and its cell in each vehicle's column

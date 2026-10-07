@@ -6,7 +6,7 @@ import { filterOption } from 'bikebook/templates/filter_option'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
-import { storedSizes } from 'bikebook/sizes'
+import { preferredSize } from 'bikebook/sizes'
 import { VehicleViewer } from 'bikebook/vehicle_viewer'
 
 /* global CSS */
@@ -58,7 +58,7 @@ export async function hydrate (catalog, source, shell, url) {
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
 
   root.getElementById('comparison-view').setAttribute('aria-pressed', params.get('view') === 'comparison')
-  renderInto(root.getElementById('vehicle-viewers'), new VehicleViewer(kit, catalog.vocabulary).render(vehicles, url, storedSizes()))
+  renderInto(root.getElementById('vehicle-viewers'), new VehicleViewer(kit, catalog.vocabulary).render(vehicles, url, preferredSize()))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

@@ -16,9 +16,16 @@ class BikebookController < ApplicationController
   def vehicle
     path = params[:vehicle_model]
     id = path.start_with?("evc/") ? path : "m/#{path.delete_prefix("m/")}"
-    vehicle_models = [id, *params[:vehicle_models].to_s.split(",")].uniq.join(",")
+    picked = params[:vehicle_models].to_s.split(",")
+    vehicle_models = [id, *picked].uniq
+    query = request.query_parameters.merge("vehicle_models" => vehicle_models.join(","))
+    # vehicle_sizes is in vehicle_models' order, so each size moves with its vehicle
+    sizes = params[:vehicle_sizes].to_s.split(",")
+    if sizes.any?
+      query["vehicle_sizes"] = vehicle_models.map { |each| sizes[picked.index(each) || sizes.length] }.join(",").sub(/,+\z/, "")
+    end
     # unescaped, as the page writes its own URLs
-    query = request.query_parameters.merge("vehicle_models" => vehicle_models).to_query.gsub("%2F", "/").gsub("%2C", ",")
+    query = query.to_query.gsub("%2F", "/").gsub("%2C", ",")
     redirect_to "#{bikebook_path}?#{query}"
   end
 end

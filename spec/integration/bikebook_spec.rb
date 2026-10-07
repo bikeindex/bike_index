@@ -121,25 +121,29 @@ RSpec.describe "Bikebook", :js, type: :system do
     page.current_window.resize_to(1920, 1080)
   end
 
-  it "keeps each compared vehicle in a size, the others following the first's unless picked, and remembers them" do
+  it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do
     serve_catalog
     visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/current_exp", view: "comparison")
     expect(page).to have_css("[aria-label='Comparison'] tbody tr:first-child th", text: "Size", wait: 10)
 
-    # sizes no fixture has: medium by default, a name read the ways it's written, the first's size for the rest
+    # sizes no fixture has: the nearest top tube, reach breaking a tie, then a name read the ways it's written, then medium
     chosen = page.evaluate_script(<<~JS)
       (async () => {
         const { chosenSizes } = await import('bikebook/sizes')
-        const vehicle = (value, ...names) => ({ value, data: { sizes: names.map((name) => ({ name })) } })
-        const names = (vehicles, stored) => chosenSizes(vehicles, stored).map((size) => size?.name ?? 'none')
+        const size = (name, topTube, reach) => ({ name, geometry: { top_tube_effective: topTube, reach } })
+        const vehicle = (value, ...sizes) => ({ value, data: { sizes: sizes.map((each) => typeof each === 'string' ? { name: each } : each) } })
+        const names = (vehicles, options) => chosenSizes(vehicles, options).map((each) => each?.name ?? 'none')
+        const canyon = vehicle('canyon', size('S', 546, 390), size('M', 555, 393), size('L', 569, 401))
+        const bianchi = vehicle('bianchi', size('53', 536, 393), size('55', 550, 397), size('57', 560, 402))
         return [
+          names([canyon, bianchi]),
+          names([bianchi, canyon], { preferred: size('XL', 559, 400) }),
           names([vehicle('a', 'S', 'M', 'L'), vehicle('b', 'Regular', 'Large'), vehicle('c', 'S/M', 'M/L'), vehicle('d')]),
-          names([vehicle('a', 'Small', 'Medium'), vehicle('b', 'XS', 'S', 'M'), vehicle('c', 'MD', 'LG')], { preferred: 'Small', picked: { c: 'LG' } }),
-          names([vehicle('a', 'S', 'M', 'L'), vehicle('b', '52', '54', '56')], { preferred: 'L' })
+          names([vehicle('a', 'Small', 'Medium'), vehicle('b', 'XS', 'S', 'M'), vehicle('c', 'MD', 'LG')], { preferred: { name: 'Small' }, picked: { c: 'LG' } })
         ]
       })()
     JS
-    expect(chosen).to eq([["M", "Regular", "S/M", "none"], ["Small", "S", "LG"], ["L", "54"]])
+    expect(chosen).to eq([["M", "55"], ["57", "M"], ["M", "Regular", "S/M", "none"], ["Small", "S", "LG"]])
 
     # a rendered size is its option's selected attribute, which a pick alone doesn't set, so it waits out the render
     size_select = ->(model) { find("select[aria-label='Size of #{model}']") }
@@ -155,6 +159,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     size_select.call("Current ADV").select("Extra Large")
     expect_size.call("Current ADV", "Extra Large")
     expect_size.call("Current EXP", "Small")
+    expect(page).to have_current_path(/[?&]vehicle_sizes=Extra\+Large,Small(&|\z)/)
     # the geometry is each one's size, under its own heading, its differences neither better nor worse
     expect(page).to have_css("[aria-label='Comparison'] tbody:last-child tr:first-child th[scope='rowgroup']", text: /\Ageometry\z/i)
     expect(find("[aria-label='Comparison'] tbody:last-child tr", text: "Reach")).to have_css("td", text: /\A425\.5.+−74\.7/m)
@@ -169,10 +174,24 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(current_size.call("Current ADV")).to eq(["Extra Large"])
     expect(current_size.call("Current EXP")).to eq(["Small"])
 
+    # a size stays with its vehicle as the vehicles change
+    find("[aria-label='Remove Aventón Current ADV']").click
+    expect(page).to have_css(".hw-combobox__chip", count: 1)
+    expect_size.call("Current EXP", "Small")
+    expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
+
+    # Small's top tube is nearer Soltera's Medium than its Small
     type_into(vehicle_field, "soltera")
     retry_on_detach { find("[role='option']", text: "Aventón Soltera 3 ADV").click }
-    expect_size.call("Soltera 3 ADV", "Extra Large")
+    expect_size.call("Soltera 3 ADV", "Medium")
     expect_size.call("Current EXP", "Small")
+    expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
+
+    # the first vehicle's last pick is what a comparison with none picked starts nearest
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/aventon/2026/current_exp", view: "comparison")
+    expect(page).to have_css("[aria-label='Comparison']", wait: 10)
+    expect_size.call("Level 4 ADV", "Extra Large")
+    expect_size.call("Current EXP", "Extra Large")
   end
 
   it "renders each UI template as the component it mirrors does" do

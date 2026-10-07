@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
 import { readable } from 'bikebook/replace_url'
-import { storeSize } from 'bikebook/sizes'
+import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { uuid } from 'bikebook/templates/helpers'
 
 /* global CSS */
@@ -38,12 +38,13 @@ export default class extends Controller {
     this.#render(url)
   }
 
-  // The form's fields over the URL's other params, such as an open panel's
+  // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles
   visit (event) {
     event.preventDefault()
-    const url = new URL(window.location.href)
+    const previous = new URL(window.location.href)
+    const url = new URL(previous)
     new FormData(event.target).forEach((value, name) => url.searchParams.set(name, value))
-    this.#go(url)
+    this.#go(realigned(url, previous))
   }
 
   // A plain click on a link to this page, such as a card's remove link
@@ -65,10 +66,11 @@ export default class extends Controller {
     this.#go(url, [window.scrollX, window.scrollY])
   }
 
-  // A comparison table's size, which the others follow when it's the first vehicle's
+  // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
+  // comparison's first vehicle starts nearest
   async pickSize ({ target, params: { vehicle, first } }) {
-    storeSize({ id: vehicle, name: target.value, first })
-    await this.#render(new URL(window.location.href), [window.scrollX, window.scrollY])
+    if (first) storePreferredSize(JSON.parse(target.selectedOptions[0].dataset.size))
+    await this.#go(withSize(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY])
     this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
   }
 
@@ -91,7 +93,7 @@ export default class extends Controller {
 
   #go (url, scroll = [0, 0]) {
     window.history.pushState(stamped(), '', readable(url))
-    this.#render(url, scroll)
+    return this.#render(url, scroll)
   }
 
   async #render (url, scroll) {
