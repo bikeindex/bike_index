@@ -130,7 +130,10 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   const geometryRecords = records([...geometry, WEIGHT])
   const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
 
-  return html`<section aria-label="Comparison" class="tw:mt-6">${table({
+  // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling
+  // only once it's the window's width; its own min-w-full would make it the window's width
+  return html`<section aria-label="Comparison" class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4">${table({
+    classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: [
       ...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []),
       ...records([...SPECS, ...wheelRows, ...maxTireRows, brakesRow, ...GEARING]),

@@ -171,6 +171,15 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[data-comparison] article", count: 5)
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
+    # the table at least the page's column, scrolling only past the window's width
+    table_fit = page.evaluate_script(<<~JS)
+      (() => {
+        const table = document.querySelector("[aria-label='Comparison'] table")
+        const scroller = table.closest("[data-controller~='ui--table']")
+        return [table.getBoundingClientRect().width, scroller.scrollWidth > scroller.clientWidth]
+      })()
+    JS
+    expect(table_fit).to match([be >= 1248, false])
 
     # and on a phone too, rather than stacking
     page.current_window.resize_to(390, 844)
