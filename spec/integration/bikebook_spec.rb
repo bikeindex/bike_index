@@ -173,6 +173,22 @@ RSpec.describe "Bikebook", :js, type: :system do
     current_size = ->(model) { find("article h1", exact_text: model).ancestor("article").all("[aria-current='true'] h3", visible: :all).map { it.text(:all) } }
     expect(current_size.call("Current ADV")).to eq(["Extra Large"])
     expect(current_size.call("Current EXP")).to eq(["Small"])
+    # and scrolls it to the middle, as far as the sizes scroll: [how far it's scrolled, how far off center it can't get]
+    wait_for_stimulus("bikebook--center-current")
+    centering = ->(model) {
+      page.evaluate_script(<<~JS)
+        (() => {
+          const article = [...document.querySelectorAll('article')].find((each) => each.querySelector('h1')?.textContent.trim() === #{model.to_json})
+          const scroller = article.querySelector('[data-controller~="bikebook--center-current"]')
+          const [outer, inner] = [scroller, scroller.querySelector('[aria-current="true"]')].map((element) => element.getBoundingClientRect())
+          const centered = scroller.scrollLeft + inner.left + inner.width / 2 - (outer.left + outer.width / 2)
+          const reachable = Math.min(Math.max(centered, 0), scroller.scrollWidth - scroller.clientWidth)
+          return [scroller.scrollLeft, Math.abs(reachable - scroller.scrollLeft)]
+        })()
+      JS
+    }
+    expect(centering.call("Current ADV")).to match([be > 0, be < 2])
+    expect(centering.call("Current EXP")).to match([0, be < 2])
 
     # a size stays with its vehicle as the vehicles change
     find("[aria-label='Remove Aventón Current ADV']").click
