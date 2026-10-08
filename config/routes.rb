@@ -57,9 +57,7 @@ Rails.application.routes.draw do
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "bike_book", to: "bikebook#show"
   get "bike_book/*vehicle_model", to: "bikebook#vehicle", format: false
-  get "bikebook(/*path)", format: false, to: redirect { |params, request|
-    [["/bike_book", params[:path]].compact.join("/"), request.query_string.presence].compact.join("?")
-  }
+  get "bikebook(/*path)", to: redirect { |_, request| request.fullpath.sub("/bikebook", "/bike_book") }
   if Integrations::BikeBook::Catalog::LOCAL_DIRECTORY
     mount Rack::Files.new(Integrations::BikeBook::Catalog::LOCAL_DIRECTORY) => Integrations::BikeBook::Catalog::LOCAL_PATH
   end

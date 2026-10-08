@@ -7,7 +7,6 @@ module SharedBlocks
       DEFAULT_TWITTER = "@bikeindex"
 
       def initialize(controller_name:, action_name:, request_url:, page_url: nil, page_title: nil, page_description: nil, page_image: nil, twitter_card: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil, display_dev_info: false)
-        # TODO: Do any pages need a query string?
         @page_url = page_url || request_url.split("?").first
         @display_dev_info = display_dev_info
 

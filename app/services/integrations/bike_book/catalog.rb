@@ -10,18 +10,13 @@ module Integrations
       LOCAL_PATH = "/bikebook_catalog"
       URL = "https://bikebook-catalog.bikeindex.org/catalog/"
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/manifest.json" : "#{URL}manifest.json"
-      # A vehicle's page waits on it, so it gives up well inside rack-timeout's 30s
-      TIMEOUT_SECONDS = 5
       MODEL_ID = %r{\Am/([a-z0-9_]+/\d{4})/[a-z0-9_]+\z}
 
-      Vehicle = ::Data.define(:title, :description, :image_url)
-
-      # The model `id` names, nil for one the catalog hasn't. Raises Faraday::Error when the catalog is unreachable
+      # The model's title, description and image_url, nil for one the catalog hasn't. Raises Faraday::Error when it's unreachable
       def vehicle(id)
         blocks = Rails.cache.fetch("bikebook_catalog_blocks", expires_in: 5.minutes) { read("manifest.json")["blocks"] }
         block = blocks[id[MODEL_ID, 1]]
-        summary = block && summaries(block)[id]
-        summary && Vehicle.new(**summary)
+        block && summaries(block)[id]
       end
 
       #
@@ -41,13 +36,8 @@ module Integrations
         JSON.parse(LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection.get(path).body)
       end
 
-      def connection
-        Faraday.new(url: URL) do |conn|
-          conn.response :raise_error
-          conn.options.timeout = TIMEOUT_SECONDS
-          conn.adapter Faraday.default_adapter
-        end
-      end
+      # A vehicle's page waits on it, so it gives up well inside rack-timeout's 30s
+      def connection = Faraday.new(url: URL, request: {timeout: 5}) { it.response :raise_error }
 
       conceal :summaries, :read, :connection
     end

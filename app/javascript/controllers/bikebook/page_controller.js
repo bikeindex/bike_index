@@ -69,7 +69,6 @@ export default class extends Controller {
 
   restore () {
     this.#stamp()
-    this.#dropCanonical()
     this.#render(new URL(window.location.href), this.#scrolls.get(this.#entry) ?? [0, 0])
   }
 
@@ -87,12 +86,13 @@ export default class extends Controller {
 
   #go (url, scroll = [0, 0], options) {
     window.history.pushState(stamped(), '', readable(url))
-    this.#dropCanonical()
     return this.#render(url, scroll, options)
   }
 
   async #render (url, scroll, { focus = true } = {}) {
     const render = ++this.#renders
+    // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
+    if (render > 1) document.querySelector('link[rel="canonical"]')?.remove()
     const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url).catch((error) => error)
     if (render !== this.#renders) return
     if (rendered instanceof Error) return this.#fail(rendered)
@@ -103,11 +103,6 @@ export default class extends Controller {
     document.title = rendered.title ?? this.titleValue
     if (focus) this.pageTarget.querySelector('[autofocus]')?.focus()
     if (scroll) window.scrollTo(...scroll)
-  }
-
-  // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
-  #dropCanonical () {
-    document.querySelector('link[rel="canonical"]')?.remove()
   }
 
   // down to the thousand (a smaller catalog's leading place), so the tagline stays true as the catalog grows
