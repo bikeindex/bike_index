@@ -60,19 +60,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
     expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through")
 
-    # A second pick, found by its id, compares the two. The comparison view tables them, each against
-    # the first, and highlights where the second's card differs
+    # A second pick, found by its id, compares the two: a table of each against the first, and the
+    # second's card highlighting where it differs
     type_into(vehicle_field, "level_2_step")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(1 matching model\)/i)
     retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
-    expect(page).to have_css("article", count: 2)
-    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
-    expect(page).to have_no_css("[data-comparison] .tw\\:spec-diff")
-
-    click_on "Comparison view"
-    expect(page).to have_css("#comparison-view[aria-pressed='true']")
     expect(page).to have_css("[data-comparison] article", count: 2)
-    expect(page).to have_current_path(/view=comparison/)
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
     # what differs is marked, not what it's called, and of a list just the items that differ
     expect(all("article").last).to have_css("dd .tw\\:spec-diff").and have_no_css("dt .tw\\:spec-diff")
     front_wheel = all("article").last.find("section", text: /\AWheels/i).find("dd", match: :first)
@@ -115,27 +109,53 @@ RSpec.describe "Bikebook", :js, type: :system do
           const text = (content) => fragmentOf(content).textContent.replace(/\\s+/g, ' ').trim()
           const presenter = new VehiclePresenter(kit, vocabulary)
           const [medium, small] = [{ name: 'M' }, { name: 'S' }].map((size) => wheelsAt(presenter, data, size))
-          const brakes = (list, size) => text(brakesAt(presenter, { brakes: list }, size))
-          return [text(medium.front.summary), medium.front.maxTire, medium.rear.maxTire, text(small.front.summary),
+          const brakes = (list, size) => {
+            const { types, rotors } = brakesAt(presenter, { brakes: list }, size)
+            return [types, rotors ? text(rotors) : 'none']
+          }
+          const summary = (wheel) => wheel.parts.map(([, , content]) => text(content)).join(', ')
+          return [summary(medium.front), medium.front.maxTire, medium.rear.maxTire, summary(small.front),
             // front then rear where they differ, and a size's own brake
             brakes([{ type: 'disc_hydraulic', position: ['front'], rotor_diameter: 160 }, { type: 'disc_hydraulic', position: ['rear'], rotor_diameter: 140 }], { name: 'M' }),
             brakes([{ type: 'disc_hydraulic', position: ['front'], rotor_diameter: 160 }, { type: 'caliper', position: ['rear'] }], { name: 'M' }),
-            brakes([{ type: 'disc_hydraulic', position: ['front', 'rear'], sizes: ['M', 'L'], rotor_diameter: 180 }, { type: 'caliper', position: ['front', 'rear'], sizes: ['S'] }], { name: 'S' })]
+            brakes([{ type: 'disc_hydraulic', position: ['front', 'rear'], sizes: ['M', 'L'], rotor_diameter: 180 }, { type: 'caliper', position: ['front', 'rear'], sizes: ['S'] }], { name: 'S' }),
+            brakes([{ type: 'disc_hydraulic', position: ['front', 'rear'], rotor_diameter: 160 }], { name: 'M' })]
         })()
       JS
       expect(wheels).to match([/\A700 C, 28\W*mm tire\z/, 50, 50, /\A650 B, 28\W*mm tire\z/,
-        /\AHydraulic disc, 160\W*mm \/ 140\W*mm rotors\z/, /\AHydraulic disc, 160\W*mm rotor \/ Caliper\z/, "Caliper"])
-      expect(find("tr", text: "Brakes").all("td").map(&:text)).to match([/\AHydraulic disc, 180\W*mm rotor\z/, "Hydraulic disc"])
-      expect(find("tr", text: "Front wheel").all("td").map(&:text)).to match([/\A650 B, 2\.2\W+in tire\W*\z/, /\A650 B, 2\.1\W+in tire\W*\z/])
-      # gearing counts its drivetrain's speeds, and compares each count and each number of teeth on its own
+        ["Hydraulic disc", /\A160\W*mm front \| 140\W*mm rear\z/], ["Hydraulic disc / Caliper", /\A160\W*mm front\z/], ["Caliper", "none"],
+        ["Hydraulic disc", /\A160\W*mm\z/]])
+      expect(find("tr", text: "Brakes").all("td").map(&:text)).to eq(["Hydraulic disc", "Hydraulic disc"])
+      expect(find("tr", text: "Brake rotors").all("td").map(&:text)).to match([/\A180\W*mm\z/, "—"])
+      # the tire's difference in the unit it reads in, and neither better nor worse
+      front_tires = find("tr", text: "Front wheel")
+      expect(front_tires.all("td").map(&:text)).to match([/\A650 B,\s*2\.2\W+in tire\W*\z/, /\A650 B,\s*2\.1\W+in tire\W*−0\.1\W*in\z/])
+      # under the tire, rather than the wheel's size
+      expect(front_tires).to have_css("td > span > span", text: /\A2\.1\W+in tire\W*−0\.1\W*in\z/)
+        .and have_css(".tw\\:text-gray-500", text: "−0.1")
+      # gearing counts its drivetrain's speeds, and compares the cogs' count and each number of teeth on its own
       chainrings = find("tr", text: "Chainrings")
-      expect(chainrings.all("td").map(&:text)).to match([/\A1:\s*48\W*t\z/, /\A1:\s*-\s*46\W*t\s*−2\z/])
+      expect(chainrings.all("td").map(&:text)).to match([/\A1:\s*48\W*t\z/, /\A1:\s*46\W*t\s*−2\z/])
       expect(chainrings).to have_css(".tw\\:text-red-700", exact_text: "−2")
+      # a single chainring against the first's largest
+      single = page.evaluate_script(<<~JS)
+        (async () => {
+          const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+          const [{ VehiclePresenter }, { comparisonTable }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+            import('bikebook/templates/vehicles/comparison_table'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+          const vehicles = [[36, 52], [50]].map((front, index) => ({ value: String(index), data: { model: String(index), gearing: { front }, drivetrain: [`${front.length}_front`] } }))
+          const row = [...fragmentOf(comparisonTable({ presenter: new VehiclePresenter(kit, vocabulary), vehicles, sizes: [] })).querySelectorAll('tr')]
+            .find((each) => each.textContent.includes('Chainrings'))
+          return [...row.querySelectorAll('td')].map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim())
+        })()
+      JS
+      expect(single).to match([/\A2:\s*36,\s*52\W*t\z/, /\A1:\s*50\W*t\s*−2\z/])
       expect(find("tr", text: "Cogs").all("td").map(&:text)).to match([/\A8:\s*12–\s*32\W*t\z/, /\A8:\s*-\s*12–\s*-\s*32\W*t\s*-\z/])
     end
 
     find("[aria-label='Remove Aventón Level 2 Step-Through']").click
-    expect(page).to have_css("[data-comparison] article", count: 1)
+    expect(page).to have_css("article", count: 1)
+    expect(page).to have_no_css("[data-comparison]")
     expect(page).to have_css(".hw-combobox__chip", count: 1)
 
     page.go_back
@@ -155,22 +175,23 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     expect(asked).to be_empty
 
-    # Five compare, wrapping onto rows unless the comparison view lines them up side by side
+    # Five compare side by side, rather than wrapping onto rows
     page.current_window.resize_to(1440, 900)
     five = %w[m/aventon/2026/level_4_rec_step_through m/aventon/2022/level_2_step_through m/segway/2025/gt3_pro
       m/specialized/2025/haul_st m/sur_ron/2026/ultra_bee_hp_x_us].join(",")
     card_rows = -> { page.evaluate_script("new Set([...document.querySelectorAll('article')].map((card) => Math.round(card.getBoundingClientRect().top))).size") }
     scrolls_sideways = -> { page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth") }
     visit bikebook_path(vehicle_models: five)
-    expect(page).to have_css("article", count: 5, wait: 10)
-    expect(card_rows.call).to be > 1
-
-    click_on "Comparison view"
     # the label column's header and the five vehicles'
-    expect(page).to have_css("[aria-label='Comparison'] thead th", count: 6)
+    expect(page).to have_css("[aria-label='Comparison'] thead th", count: 6, wait: 10)
     expect(page).to have_css("[data-comparison] article", count: 5)
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
+    # of a year the first lacks just the year, and of a drivetrain just the chip it lacks
+    haul = find("article h1", text: "Haul ST").ancestor("article")
+    marked = ->(heading, selector) { haul.find("h2", text: heading).ancestor("section").all(selector).map { it.text.strip } }
+    expect(marked.call(/\Amodel years\z/i, "tr:last-child td.tw\\:spec-diff")).to eq(["2025"])
+    expect(marked.call(/\Adrivetrain\z/i, "span.tw\\:rounded-sm.tw\\:spec-diff")).to eq(["9 Rear"])
     # the table at least the page's column, scrolling only past the window's width
     table_fit = page.evaluate_script(<<~JS)
       (() => {
@@ -190,7 +211,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
   it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do
     serve_catalog
-    visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/current_exp", view: "comparison")
+    visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/current_exp")
     expect(page).to have_css("[aria-label='Comparison'] tbody tr:first-child th", text: "Size", wait: 10)
 
     # sizes no fixture has: the nearest top tube, reach breaking a tie, then a name read the ways it's written, then medium
@@ -231,6 +252,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[aria-label='Comparison'] th[scope='row']", text: /\Ageometry\z/i)
     expect(find("[aria-label='Comparison'] tr", text: "Reach")).to have_css("td", text: /\A425\.5.+−74\.7/m)
       .and have_css(".tw\\:text-red-700", text: "−74.7")
+    # in centimeters alone, without an imperial viewer's feet and inches
+    expect(find("[aria-label='Comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d.]+\W*cm(\s*[−+][\d.]+\W*cm|\s*-)?\z/))
 
     visit current_url
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)
@@ -257,10 +280,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(centering.call("Current ADV")).to match([be > 0, be < 2])
     expect(centering.call("Current EXP")).to match([0, be < 2])
 
-    # a size stays with its vehicle as the vehicles change
+    # a size stays with its vehicle as the vehicles change, through one alone, which nothing compares
     find("[aria-label='Remove Aventón Current ADV']").click
     expect(page).to have_css(".hw-combobox__chip", count: 1)
-    expect_size.call("Current EXP", "Small")
+    expect(page).to have_no_css("[aria-label='Comparison']")
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
     # Small's top tube is nearer Soltera's Medium than its Small
@@ -275,7 +298,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
     # the first vehicle's last pick is what a comparison with none picked starts nearest
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/aventon/2026/current_exp", view: "comparison")
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/aventon/2026/current_exp")
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)
     expect_size.call("Level 4 ADV", "Extra Large")
     expect_size.call("Current EXP", "Extra Large")
@@ -284,13 +307,20 @@ RSpec.describe "Bikebook", :js, type: :system do
   it "shows every weight in pounds to a viewer who prefers imperial units" do
     serve_catalog
     sign_in(FactoryBot.create(:user_confirmed, preferred_unit_system: "imperial"))
-    visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/level_4_adv", view: "comparison")
+    visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/level_4_adv")
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)
 
     # the comparison's weight and difference, and each size's weight and payload
     expect(find("[aria-label='Comparison'] tr", text: "Weight")).to have_text(/56\W*lb.*61\.1\W*lb\W*\+5\.1\W*lb/m)
     expect(page).to have_css("dd", text: /\A[\d.,]+\W*lb\z/, minimum: 2)
     expect(page).to have_no_text(/\d\W*kg\b/)
+    # wheelbase in centimeters, with feet and inches after, which its difference leaves off
+    expect(find("[aria-label='Comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d.]+\W*cm\s*\(\d'\s*\d+"\)(\s*[−+][\d.]+\W*cm|\s*-)?\z/))
+    # whose feet and inches are themselves the tooltip's trigger, which spells them out
+    wheelbase = find("[aria-label='Comparison'] tr", text: "Wheelbase").first("td")
+    expect(wheelbase).to have_no_button("?")
+    wheelbase.find("button", text: /\A\d'\s*\d+"\z/).click
+    expect(wheelbase).to have_css("[role='tooltip']", text: /\A\d+ feet, [\d.]+ inch(es)?\z/, visible: true)
   end
 
   it "renders each UI template as the component it mirrors does" do

@@ -57,7 +57,6 @@ export async function hydrate (catalog, source, shell, url) {
   }
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
 
-  root.getElementById('comparison-view').setAttribute('aria-pressed', params.get('view') === 'comparison')
   renderInto(root.getElementById('vehicle-viewers'), new VehicleViewer(kit, catalog.vocabulary).render(vehicles, url, preferredSize()))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
