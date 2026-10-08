@@ -104,7 +104,6 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
   const brakes = new Map(named.map((vehicle, index) => [vehicle, brakesAt(presenter, vehicles[index].data, sizes[index])]))
   const brakeRows = [{ label: 'Brakes', read: (vehicle) => brakes.get(vehicle).types }, { label: 'Brake rotors', read: (vehicle) => brakes.get(vehicle).rotors }]
 
-  // `fallback` shows the difference of a row with no `amount`
   const changed = (row, number, base, fallback) => {
     if (!isNumber(number) || !isNumber(base)) return nothing
     const change = presenter.rounded(number - base)
@@ -120,7 +119,6 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
 
   const difference = (row, value, base, vehicle) => compared(row, vehicle) ? changed(row, value, base, (amount) => show(row, amount, vehicle)) : nothing
 
-  // `baseParts` are the first vehicle's, by key
   const partsCell = (row, value, baseParts, vehicle) => {
     const comparing = compared(row, vehicle)
     return html`<span class="tw:inline-flex tw:items-start tw:gap-x-1">${row.parts(presenter, value).map(([key, number, content]) =>

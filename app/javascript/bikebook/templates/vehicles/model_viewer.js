@@ -480,7 +480,6 @@ class ModelViewer {
     return wheel.max_tire_width != null ? join([summary, this.tireWidthSummary(wheel.max_tire_width, 'tire max')], html`<br>`) : summary
   }
 
-  // A wheel's summary as [key, content] parts
   wheelParts (wheel, { fitting = true } = {}) {
     return [
       ['size', this.onSizes(wheel.bsd != null ? this.wheelSizeName(wheel.bsd) : null, wheel.sizes)],
