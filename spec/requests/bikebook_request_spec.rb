@@ -8,7 +8,7 @@ RSpec.describe BikebookController, type: :request do
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
       bikebook = page.find("[data-controller='bikebook--page']")
-      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq BikebookController::MANIFEST_URL
+      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq Integrations::Bikebook::Catalog::MANIFEST_URL
       expect(bikebook).to have_css("[inert] #vehicle_models")
         .and have_css("[role='status'] svg.tw\\:animate-spin")
 
@@ -16,6 +16,70 @@ RSpec.describe BikebookController, type: :request do
       expect(shell).to have_field("vehicle_models", placeholder: "Search by manufacturer or model…")
         .and have_css("#manufacturer-hw-listbox", visible: :all)
         .and have_css("#vehicle-viewers", visible: :all)
+      expect(page).to have_title("Bikebook", exact: true)
+        .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook_icon']", visible: :all)
+        .and have_css("meta[name='twitter:card'][content='summary']", visible: :all)
+      expect(response.headers["X-Robots-Tag"]).to be_nil
+    end
+
+    context "comparing" do
+      it "isn't indexed" do
+        get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2"}
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["X-Robots-Tag"]).to eq "noindex, follow"
+      end
+    end
+
+    context "a model alone" do
+      include BikebookCatalogHelpers
+
+      let(:catalog_status) { 200 }
+      let(:params) { {vehicle_models: "m/segway/2025/gt3_pro", filters: "1"} }
+      let(:page) { Capybara.string(response.body) }
+
+      before do
+        stub_bikebook_catalog(status: catalog_status)
+        get("/bikebook", params:)
+      end
+      after { WebMock.reset! }
+
+      it "renders the model's page, titled and described for it, canonically without the search" do
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["X-Robots-Tag"]).to be_nil
+        expect(page).to have_title("Segway GT3 Pro", exact: true)
+          .and have_css("[data-controller='bikebook--page'][data-bikebook--page-title-value='Bikebook']")
+        expect(page).to have_css("meta[name='description'][content^='Experience elite performance with the Segway GT3 Pro']", visible: :all)
+          .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/segway/2025/gt3_pro.png']", visible: :all)
+          .and have_css("meta[name='twitter:card'][content='summary_large_image']", visible: :all)
+          .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
+      end
+
+      context "that the catalog hasn't" do
+        let(:params) { {vehicle_models: "m/segway/2025/gt9"} }
+
+        it "is not found" do
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+
+      context "with the catalog unreachable" do
+        let(:catalog_status) { 503 }
+
+        it "renders the page for the browser to try, as unavailable to a crawler" do
+          expect(response).to have_http_status(:service_unavailable)
+          expect(page).to have_title("Bikebook", exact: true)
+            .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
+        end
+      end
+
+      context "an e-vehicle classification" do
+        let(:params) { {vehicle_models: "evc/us/class_3"} }
+
+        it "renders, unindexed" do
+          expect(response).to have_http_status(:ok)
+          expect(response.headers["X-Robots-Tag"]).to eq "noindex, follow"
+        end
+      end
     end
 
     describe "donation strip" do

@@ -5,19 +5,20 @@ module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 
   # For the server's reads. The test cache is a file store, so a catalog cached by an earlier run goes first
-  def stub_bikebook_catalog
-    Rails.cache.delete_matched(/bikebook_catalog/)
-    WebMock.stub_request(:get, /\A#{Regexp.escape(BikebookController::CATALOG_URL)}/o).to_return do |request|
-      file = FIXTURES.join(request.uri.path.delete_prefix(URI(BikebookController::CATALOG_URL).path))
-      file.file? ? {status: 200, body: file.read} : {status: 404}
+  def stub_bikebook_catalog(status: 200)
+    Rails.cache.clear
+    WebMock.stub_request(:get, /\A#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return do |request|
+      file = FIXTURES.join(request.uri.path.delete_prefix(URI(Integrations::Bikebook::Catalog::URL).path))
+      file.file? ? {status:, body: file.read} : {status: 404}
     end
   end
 
-  # For the browser's, with no stock photos, which render their placeholder
+  # For the browser's and the server's both, with no stock photos, which render their placeholder
   def serve_bikebook_catalog(manifest_status: 200)
+    stub_bikebook_catalog
     page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route("#{BikebookController::CATALOG_URL}**", ->(route, request) {
-        path = request.url.delete_prefix(BikebookController::CATALOG_URL)
+      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}**", ->(route, request) {
+        path = request.url.delete_prefix(Integrations::Bikebook::Catalog::URL)
         status = (path == "manifest.json") ? manifest_status : 200
         route.fulfill(status:, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"},
           body: (status == 200) ? FIXTURES.join(path).read : "")
