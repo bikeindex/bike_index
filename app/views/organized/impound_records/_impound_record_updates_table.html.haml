@@ -23,7 +23,7 @@
             = impound_record_update.kind_humanized
         %td
           - if impound_record_update.move_location?
-            Moved to #{impound_record_update.location.name}
+            Moved to #{impound_record_update.location&.name}
           - elsif impound_record_update.transferred_to_new_owner?
             Sent to
             %strong

@@ -809,6 +809,14 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    it "distinguishes small from extra small and large from extra large" do
+      {"small" => "s", "x-small" => "xs", "Extra Small" => "xs", "large" => "l", "x-large" => "xl", "extra large" => "xl"}.each do |input, size|
+        bike = Bike.new(frame_size: input)
+        bike.send(:clean_frame_size)
+        expect(bike.frame_size).to eq(size), "#{input} => #{bike.frame_size}"
+      end
+    end
+
     context "ordinal string" do
       let(:frame_size) { "Med" }
       it "is sets on save" do
@@ -1752,6 +1760,16 @@ RSpec.describe Bike, type: :model do
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
       expect(bike.propulsion_type_throttle?).to be_truthy
       expect(bike.propulsion_type_pedal_assist?).to be_falsey
+    end
+  end
+
+  describe "fetch_current_stolen_record" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+    it "repairs a stale current_stolen_record_id on save" do
+      bike.update_column :current_stolen_record_id, nil
+      Bike.find(bike.id).save
+      expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
     end
   end
 

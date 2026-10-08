@@ -1,7 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
+import { readable } from 'bikebook/replace_url'
+import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { uuid } from 'bikebook/templates/helpers'
+
+/* global CSS */
 
 const stamped = (state) => ({ ...state, bikebook: uuid() })
 
@@ -9,7 +13,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // Searches and compares the published catalog in the browser. A pick submits the form, and it, a
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
-  static targets = ['shell', 'page', 'status']
+  static targets = ['shell', 'page', 'status', 'tagline', 'countedTagline']
   static values = { manifestUrl: String, failedText: String }
 
   #scrolls = new Map()
@@ -31,18 +35,20 @@ export default class extends Controller {
       return this.#fail(error)
     }
     this.source = new CatalogComboboxSource(this.catalog)
+    this.#countModels()
     this.#render(url)
   }
 
-  // The form's fields over the URL's other params, such as an open panel's
+  // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles
   visit (event) {
     event.preventDefault()
     const url = new URL(window.location.href)
     new FormData(event.target).forEach((value, name) => url.searchParams.set(name, value))
-    this.#go(url)
+    this.#go(realigned(url))
   }
 
-  // A plain click on a link to this page, such as a card's remove link
+  // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
+  // scrolling or focusing the search
   follow (event) {
     const link = event.target.closest('a[href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
@@ -51,7 +57,15 @@ export default class extends Controller {
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
-    this.#go(url)
+    'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: false }) : this.#go(url)
+  }
+
+  // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
+  // comparison's first vehicle starts nearest
+  async pickSize ({ target, params: { vehicle, first } }) {
+    if (first) storePreferredSize(JSON.parse(target.selectedOptions[0].dataset.size))
+    await this.#go(withSize(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY])
+    this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
   }
 
   restore () {
@@ -71,12 +85,12 @@ export default class extends Controller {
     if (!this.#entry) window.history.replaceState(stamped(window.history.state), '')
   }
 
-  #go (url) {
-    window.history.pushState(stamped(), '', url)
-    this.#render(url, [0, 0])
+  #go (url, scroll = [0, 0], options) {
+    window.history.pushState(stamped(), '', readable(url))
+    return this.#render(url, scroll, options)
   }
 
-  async #render (url, scroll) {
+  async #render (url, scroll, { focus = true } = {}) {
     const render = ++this.#renders
     const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url).catch((error) => error)
     if (render !== this.#renders) return
@@ -86,8 +100,17 @@ export default class extends Controller {
     this.dispatch('before-render')
     this.pageTarget.replaceChildren(rendered.content)
     document.title = rendered.title ?? this.title
-    this.pageTarget.querySelector('[autofocus]')?.focus()
+    if (focus) this.pageTarget.querySelector('[autofocus]')?.focus()
     if (scroll) window.scrollTo(...scroll)
+  }
+
+  // down to the thousand (a smaller catalog's leading place), so the tagline stays true as the catalog grows
+  #countModels () {
+    const { modelsCount } = this.catalog
+    const place = 10 ** Math.min(3, String(modelsCount).length - 1)
+    const tagline = this.countedTaglineTarget.content.cloneNode(true)
+    tagline.querySelector('[data-models-count]').textContent = (Math.floor(modelsCount / place) * place).toLocaleString('en-US')
+    this.taglineTarget.replaceChildren(tagline)
   }
 
   #fail (error) {

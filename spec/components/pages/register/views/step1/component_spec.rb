@@ -92,6 +92,27 @@ RSpec.describe Pages::Register::Views::Step1::Component, type: :component do
       expect(component.to_html).to_not include "Just the essentials"
     end
 
+    context "signed in" do
+      let(:component) do
+        render_inline(described_class.new(b_param:, current_user:,
+          flow: BikeServices::Register.flow(b_param, sequence: nil, single_page: true)))
+      end
+      let(:current_user) { FactoryBot.create(:user_confirmed, email: "owner@bikeindex.org") }
+      let(:own_emails) { JSON.parse(component.at_css("[data-controller='register--owner-name']")["data-register--owner-name-own-emails-value"]) }
+
+      it "collapses the name for their own address" do
+        expect(own_emails).to include "owner@bikeindex.org"
+      end
+
+      context "whose account has no name" do
+        let(:current_user) { FactoryBot.create(:user_confirmed, email: "owner@bikeindex.org", name: nil) }
+
+        it "asks for it for their own address too" do
+          expect(own_emails).to eq []
+        end
+      end
+    end
+
     # A failed e-vehicle submission re-renders with its sequence resolved, and the electric
     # checkbox, not the server, is what says the safety pages come next
     context "re-rendered with the safety pages resolved" do

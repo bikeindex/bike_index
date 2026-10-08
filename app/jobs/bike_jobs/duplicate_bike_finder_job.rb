@@ -37,17 +37,17 @@ module BikeJobs
 
     def remove_orphaned_duplicate(duplicate_bike_group, normalized_serial_segment)
       other_segments = duplicate_bike_group.normalized_serial_segments.where.not(id: normalized_serial_segment.id)
-      not_orphaned = false
       # Check the other segments to verify that *they* aren't orphans
-      other_segments.each do |other_segment|
+      valid_segments, orphaned_segments = other_segments.partition do |other_segment|
         bike = Bike.unscoped.find_by_id(other_segment.bike_id)
-        if bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
-          not_orphaned = true
-        else
-          other_segment.destroy
-        end
+        bike.present? && bike.deleted_at.blank? && !bike.example && !bike.likely_spam
       end
-      duplicate_bike_group.destroy if not_orphaned
+      orphaned_segments.each(&:destroy)
+      return if valid_segments.count > 1
+
+      # A group needs two bikes, so release the one left to be grouped again
+      valid_segments.each { it.update_attribute :duplicate_bike_group_id, nil }
+      duplicate_bike_group.destroy
     end
   end
 end

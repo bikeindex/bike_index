@@ -4300,6 +4300,10 @@ es:
       unconfirmed_emails: Correos electrónicos no confirmados
       verified: verificado
       why_you_should_text: lee por qué deberías
+      preferred_unit_system: Unidades
+      unit_system_automatic: Automático, desde tu ubicación
+      unit_system_imperial: Sistema imperial (millas, pulgadas)
+      unit_system_metric: Sistema métrico (kilómetros, milímetros)
     sharing:
       choose_file: Seleccione archivo...
       create_page: Crear página
@@ -4801,12 +4805,15 @@ es:
           no reclamadas se envían a su organización para su revisión y posterior reenvío
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
-        send_self_registration_email_helper: Por defecto, Bike Index ya no te envía
-          un correo electrónico cuando se registra un vehículo con la dirección de
-          correo electrónico de registro de tu organización (por ejemplo, notificaciones
-          de aparcamiento no registrado).
         send_self_registration_email_html: Enviar correo electrónico para inscripciones
           enviadas a <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: Esto incluye las notificaciones
+          no registradas.
+        send_self_registration_email_note: Por defecto, Bike Index ya no envía correos
+          electrónicos cuando se registra un vehículo con la dirección de correo electrónico
+          de registro de su organización. Marque esta casilla si desea recibir correos
+          electrónicos para los registros con una dirección de correo electrónico
+          del propietario de %{email}.
     stickers:
       edit:
         bike: Bicicleta
@@ -5772,6 +5779,7 @@ es:
             search_distance: Distancia de búsqueda
             search_location: Buscar ubicación
             within: dentro
+            kilometers_of: kilómetros de
           wrapper:
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
             view_matching_any_audit: ver coincidencia con cualquier auditoría
@@ -6247,6 +6255,8 @@ es:
             where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos contactas
               por un anuncio que encontraste en línea, incluye un enlace en el campo
               a continuación."
+          share:
+            link_copied: Enlace copiado
       search:
         everything_combobox:
           made_by: hecho por
@@ -6276,6 +6286,7 @@ es:
           stolenness_proximity: Robado en la zona de búsqueda
           stolenness_stolen: Robado en cualquier lugar
           within: dentro
+          kilometers_of: kilómetros de
         result_view_select:
           cards_view: Ver como tarjetas
           list_view: Ver como lista
@@ -6879,6 +6890,19 @@ es:
           year: Año
           filter_combobox:
             any: Cualquier
+          about_bikebook: Acerca del libro sobre bicicletas
+          byline: Un enlace gratuito de Bike Index, el registro de bicicletas sin
+            ánimo de lucro.
+          tagline_html: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
+            tu próximo paseo entre más de %{models_count} modelos.'
+          tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
+            tu próxima bici.'
+        donate_strip:
+          dismiss: Despedir
+          donate: Donar
+          pitch: Este fantástico producto es posible gracias a la organización sin
+            ánimo de lucro Bike Index. Ayúdanos a cubrir los gastos de nuestro servidor.
+          region: Dona a Bike Index
     shared_blocks:
       footer:
         about: Acerca

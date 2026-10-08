@@ -1,6 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
-import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
+import { classificationOption, comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
 
 /* global IntersectionObserver, Worker */
@@ -24,11 +24,12 @@ export async function loadCatalog (manifestUrl, ids = []) {
   })
 
   try {
-    const { vocabulary, kit, options } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids })
+    const { vocabulary, kit, options, modelsCount } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids })
     return {
       vocabulary,
       kit,
       options,
+      modelsCount,
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       vehicles: (ids) => call('vehicles', { ids }),
       displays: (ids) => call('displays', { ids })
@@ -70,7 +71,9 @@ export class CatalogComboboxSource {
 
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
-    const options = models.map((model) => comboboxOption({ model, placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies }))
+    const options = models.map((model) => model.classification
+      ? classificationOption(model)
+      : comboboxOption({ model, placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
       data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} data-callback-id=${callbackId ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()

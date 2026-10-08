@@ -40,7 +40,7 @@ All operations go through the helper:
 .claude/skills/admin-data-api/scripts/admin_data.rb get pghero
 ```
 
-It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production, and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. Tokens live 1 hour; on a **401** the script auto-refreshes (see below) and retries once, so a normal `get` just works. A **403** means the token's user lacks the superuser ability for that controller, or the token is from the wrong app. Any other non-200 prints the response and exits non-zero.
+It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production (a Conductor workspace's copy has no token — run the base checkout's script instead, under mise's Ruby: `"$(mise which ruby)" <base>/.claude/skills/admin-data-api/scripts/admin_data.rb get pghero`), and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. Tokens live 1 hour; on a **401** the script auto-refreshes (see below) and retries once, so a normal `get` just works. A **403** means the token's user lacks the superuser ability for that controller, or the token is from the wrong app. Any other non-200 prints the response and exits non-zero.
 
 Ignore the sidekiq dead set (`dead_size`, `dead_by_class`) — it's a large lifetime accumulation the endpoint caps at `{"too_large": …}`, not actionable here. Don't report it.
 

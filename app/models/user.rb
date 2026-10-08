@@ -37,6 +37,7 @@
 #  passwordless_user                  :boolean          default(FALSE), not null
 #  phone                              :string(255)
 #  preferred_language                 :string
+#  preferred_unit_system              :integer
 #  show_bikes                         :boolean          default(FALSE), not null
 #  show_instagram                     :boolean          default(FALSE)
 #  show_phone                         :boolean          default(TRUE)
@@ -60,6 +61,7 @@
 #  index_users_on_address_record_id             (address_record_id)
 #  index_users_on_email                         (email) WHERE (deleted_at IS NULL)
 #  index_users_on_email_trgm                    (email) WHERE (deleted_at IS NULL) USING gin
+#  index_users_on_email_without_periods         (replace((email)::text, '.'::text, ''::text)) WHERE (deleted_at IS NULL)
 #  index_users_on_magic_link_token_outstanding  (magic_link_token) WHERE (magic_link_token IS NOT NULL)
 #  index_users_on_token_for_password_reset      (token_for_password_reset)
 #  index_users_on_username                      (username) WHERE (deleted_at IS NULL)
@@ -71,12 +73,16 @@ class User < ApplicationRecord
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
   # How long an emailed token stays good for - magic link sign in and password reset alike
-  AUTH_TOKEN_EXPIRY = 10.minutes
+  AUTH_TOKEN_EXPIRY = 1.hour
+  # nil leaves it to UnitSystem
+  PREFERRED_UNIT_SYSTEM_ENUM = {metric: 0, imperial: 1}.freeze
 
   cattr_accessor :current_user
 
   acts_as_paranoid
   has_secure_password
+
+  enum :preferred_unit_system, PREFERRED_UNIT_SYSTEM_ENUM, prefix: true, validate: {allow_nil: true}
 
   has_many :ambassador_task_assignments
   has_many :b_params, foreign_key: :creator_id
@@ -449,15 +455,20 @@ class User < ApplicationRecord
   # The emailed link is often opened in another browser, which has no session
   # holding where the user was headed - so return_to rides along in the link
   def send_magic_link_email(return_to: nil)
-    # If the auth token was just created, don't create a new one, it's too error prone
-    return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
+    token_time = auth_token_time("magic_link_token")
+    # Throttles a double-submit
+    return true if token_time > Time.current - 1.minutes
 
-    update_auth_token("magic_link_token")
-    reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
+    # Filtered mail can deliver an earlier link after the re-request, so resend it rather than
+    # killing it - until it's too near expiry to survive the same delay
+    if token_time < Time.current - AUTH_TOKEN_EXPIRY / 2
+      update_auth_token("magic_link_token")
+      reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
+    end
     EmailJobs::MagicLoginLinkJob.perform_async(id, return_to)
   end
 
-  # Unlike send_magic_link_email, reuses an unexpired token and sends no email
+  # Reuses any unexpired token, and sends no email
   def refreshed_magic_link_token
     if magic_link_token.blank? || auth_token_expired?("magic_link_token")
       update_auth_token("magic_link_token")

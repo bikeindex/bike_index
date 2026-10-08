@@ -49,4 +49,4 @@
               %span.localizeTime= l blog.published_at, format: :convert_time
               \-
           Topics:
-          = safe_join(blog.content_tags.commonness.map { |tag| link_to(tag.name, news_index_path(search_tags: tag.slug), class: "gray-link") }, ", ")
+          = safe_join(blog.content_tags.map { |tag| link_to(tag.name, news_index_path(search_tags: tag.slug), class: "gray-link") }, ", ")

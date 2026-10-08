@@ -3,10 +3,14 @@
 require "rails_helper"
 
 RSpec.describe UI::Table::Component, :js, type: :system do
-  it "sortable_with_cache is axe clean" do
+  it "sortable_with_cache and row_headers are axe clean" do
     visit("/rails/view_components/ui/table/component/sortable_with_cache")
 
     expect(page).to have_css("table")
+    expect_axe_clean
+
+    visit("/rails/view_components/ui/table/component/row_headers")
+    expect(page).to have_css("th[scope='row']", text: "Sightings")
     expect_axe_clean
   end
 
