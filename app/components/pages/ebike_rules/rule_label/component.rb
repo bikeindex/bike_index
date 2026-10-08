@@ -8,8 +8,7 @@ module Pages
           @id = id
         end
 
-        # escaped here, since a plain translation renders as HTML-unsafe
-        def call = safe_join([label])
+        def call = h(label)
 
         private
 

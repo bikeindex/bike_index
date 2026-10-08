@@ -7,13 +7,14 @@ module Pages
       class Component < ApplicationComponent
         RULE_IDS = %i[classes power speed throttle].freeze
 
-        def initialize
-          @laws = ::EbikeRules::StateLaws.laws || {}
-        end
-
         private
 
-        def states = ::EbikeRules::StateLaws::STATES.map { it.merge(law: @laws[it[:abbr]]) }
+        # A republished vocabulary has a new file name
+        def cache_key = [self.class.cache_digest, ::EbikeRules::BikebookCatalog.manifest&.dig("vocabulary")]
+
+        def laws = @laws ||= ::EbikeRules::StateLaws.laws
+
+        def states = ::EbikeRules::StateLaws::STATES.map { it.merge(law: laws[it[:abbr]]) }
       end
     end
   end

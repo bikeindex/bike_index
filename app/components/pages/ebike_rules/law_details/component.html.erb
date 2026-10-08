@@ -14,12 +14,12 @@
     </ul>
   </div>
 
-  <% if sources.any? %>
+  <% if @law[:sources].any? %>
     <div>
       <h3 class="tw:text-sm tw:font-bold"><%= translation(".sources") %></h3>
 
       <ul class="tw:mt-1.5 tw:space-y-1 tw:text-[13px]">
-        <% sources.each do |url| %>
+        <% @law[:sources].each do |url| %>
           <li>
             <%= link_to url, url, target: "_blank", rel: "noopener", class: "twlink tw:break-all" %>
           </li>

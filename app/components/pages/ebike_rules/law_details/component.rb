@@ -8,11 +8,6 @@ module Pages
         def initialize(law:)
           @law = law
         end
-
-        private
-
-        # a source that isn't a web page isn't a link
-        def sources = @law[:sources].grep(%r{\Ahttps?://})
       end
     end
   end

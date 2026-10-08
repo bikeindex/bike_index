@@ -5,6 +5,10 @@ module EbikeRules
   module BikebookCatalog
     extend Functionable
 
+    # A jurisdiction's whole e-bike law, rather than one class or tier of it
+    E_BIKE_LAW = %r{/(electric_bicycle|bicycle|low_speed_electric_bicycle)\z}
+    US_CLASS = %r{\Aevc/us/class_(\d)\z}
+
     def manifest
       Rails.cache.fetch("bikebook_catalog/manifest", expires_in: 1.hour, skip_nil: true) { fetch_json("manifest.json") }
     end

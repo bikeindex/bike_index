@@ -54,11 +54,11 @@ module EbikeRules
     # carrying another classification (a moped, a motorcycle), other than an e-bike law, makes it none.
     # Unclassified modes are classed by the federal limits: 20 mph with a throttle, 28 without
     def e_bike_class(classifications, modes, throttle_modes)
-      tiers = classifications.grep_v(StateLaws::E_BIKE_LAW)
+      tiers = classifications.grep_v(BikebookCatalog::E_BIKE_LAW)
       if tiers.any?
-        return if tiers.any? { !it.match?(StateLaws::US_CLASS) }
+        return if tiers.any? { !it.match?(BikebookCatalog::US_CLASS) }
 
-        return tiers.map { it[StateLaws::US_CLASS, 1].to_i }.max
+        return tiers.map { it[BikebookCatalog::US_CLASS, 1].to_i }.max
       end
       top_mph = mph(modes)
       return if top_mph.nil? || top_mph > 28
