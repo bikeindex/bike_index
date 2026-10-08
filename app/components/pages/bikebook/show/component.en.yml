@@ -26,6 +26,8 @@ en:
           search_placeholder: Search by manufacturer or model…
           sort: Sort
           suspension: Suspension
+          tagline: The world’s bicycle library — search, compare, and find your next
+            ride.
           tagline_html: >-
             The world’s bicycle library — search, compare, and find your next ride
             across %{models_count}+ models.
