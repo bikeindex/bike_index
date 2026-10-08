@@ -46,7 +46,7 @@ export const frameGeometry = (data, size) => {
 
   return {
     missing,
-    estimated: rear.estimated || front.estimated || !isNumber(seatAngle) || !isNumber(listedSeatTube) ||
+    estimated: rear.estimated || front.estimated || !isNumber(geometry.head_tube) || !isNumber(seatAngle) || !isNumber(listedSeatTube) ||
       (!isNumber(wheelbase) && !isNumber(frontCenter) && !isNumber(geometry.fork_rake)),
     rearAxle,
     frontAxle: [frontX, frontY],

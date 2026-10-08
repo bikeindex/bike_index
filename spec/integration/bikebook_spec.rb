@@ -83,6 +83,18 @@ RSpec.describe "Bikebook", :js, type: :system do
       # keyed to the overlay by its frame's color along its foot, which a model it doesn't draw has none of
       expect(page).to have_no_css("thead th.tw\\:border-b-4")
       expect(all("tbody tr").last.all("td").map { it[:class].include?("tw:border-b-4") }).to eq([true, false])
+      # in the frame's color in dark mode too, over the cells' own dark border
+      key_colors = page.evaluate_script(<<~JS)
+        (() => {
+          const cell = document.querySelector("[aria-label='Comparison'] tbody tr:last-child td")
+          // dark last undone, so the page is left light
+          return [true, false].map((dark) => {
+            document.documentElement.classList.toggle('dark', dark)
+            return getComputedStyle(cell).borderBottomColor
+          })
+        })()
+      JS
+      expect(key_colors).to eq(["rgb(52, 152, 219)"] * 2)
       expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$1,000")
       # only the number is colored: the currency symbol and unit keep their gray
       colors = page.evaluate_script(<<~JS)
@@ -278,10 +290,11 @@ RSpec.describe "Bikebook", :js, type: :system do
         const round = (point) => point.map(Math.round)
         const { rearAxle, frontAxle, headBottom, seatTop, bottomBracketHeight, estimated } = frame({ bb_drop: 70 })
         return [[rearAxle, frontAxle, headBottom, seatTop].map(round), bottomBracketHeight, estimated, round(frame({ bb_height: 281 }).rearAxle),
-          frame({ bb_drop: 70, seat_tube_ct: null }).estimated, frameGeometry({}, { geometry: { reach: 400 } }).missing]
+          frame({ bb_drop: 70, seat_tube_ct: null }).estimated, frame({ bb_drop: 70, head_tube: null }).estimated,
+          frameGeometry({}, { geometry: { reach: 400 } }).missing]
       })
     JS
-    expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [-146, 478]], 281, false, [-414, 70], true, %w[stack head_angle chainstay bb_drop]])
+    expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [-146, 478]], 281, false, [-414, 70], true, true, %w[stack head_angle chainstay bb_drop]])
 
     size_select.call("Current EXP").select("Small")
     expect_size.call("Current EXP", "Small")
@@ -408,7 +421,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       # the overlay's frames and the comparison columns keyed to them, in the charts' colors
       series = page.evaluate_script("import('bikebook/templates/vehicles/geometry_overlay').then(({ SERIES }) => SERIES)")
       expect(series.map { it["color"] }).to eq(UI::Chart::Component::COLORS.first(5))
-      expect(series).to all(satisfy { |each| each["border"].split.include?("tw:border-b-[#{each["color"]}]") })
+      expect(series).to all(satisfy { |each| each["border"].split.include?("tw:border-b-[#{each["color"]}]!") })
 
       expect_template(UI::CopyableCode::Component.new(value: "m/trek/2025/fetch", label: "Copy ID"),
         "bikebook/templates/ui/copyable_code#copyableCode", "{ value: 'm/trek/2025/fetch', label: 'Copy ID' }")

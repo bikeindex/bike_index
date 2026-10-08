@@ -3,13 +3,13 @@ import { buttonClasses } from 'bikebook/templates/ui/button'
 import { sectionHeading } from 'bikebook/templates/vehicles/section'
 import { present } from 'bikebook/templates/values'
 
-// UI::Chart::Component::COLORS, one per compared model
+// UI::Chart::Component::COLORS, one per compared model; forced, or the table cells' dark border color wins
 export const SERIES = [
-  { color: '#3498db', border: 'tw:border-b-[#3498db]' },
-  { color: '#DC2626', border: 'tw:border-b-[#DC2626]' },
-  { color: '#7C3AED', border: 'tw:border-b-[#7C3AED]' },
-  { color: '#D97706', border: 'tw:border-b-[#D97706]' },
-  { color: '#059669', border: 'tw:border-b-[#059669]' }
+  { color: '#3498db', border: 'tw:border-b-[#3498db]!' },
+  { color: '#DC2626', border: 'tw:border-b-[#DC2626]!' },
+  { color: '#7C3AED', border: 'tw:border-b-[#7C3AED]!' },
+  { color: '#D97706', border: 'tw:border-b-[#D97706]!' },
+  { color: '#059669', border: 'tw:border-b-[#059669]!' }
 ]
 const PADDING = 30
 // mm around the bottom bracket and up from the ground that nearly every catalog frame fits, so a larger size draws
