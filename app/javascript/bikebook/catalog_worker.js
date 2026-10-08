@@ -46,9 +46,9 @@ async function load ({ manifestUrl, ids }) {
     sortPrice: model.msrp_cents ?? 0
   }))
   byId = new Map(models.map((model) => [model.id, model]))
-  // the US jurisdiction's classifications are the three e-bike classes
+  // "US Class 3 e-bike"; a group has no jurisdiction
   classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications ?? {}).map(([id, record]) =>
-    [id, { ...record, title: `${record.jurisdiction} ${record.name}${record.jurisdiction === 'US' ? ' e-bike' : ''}` }]))
+    [id, { ...record, title: `${[record.jurisdiction, record.name].filter(Boolean).join(' ')}${/^Class \d+$/.test(record.name) ? ' e-bike' : ''}` }]))
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index), modelsCount: models.length }
 }
 

@@ -530,12 +530,14 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
     expect(motor).to have_css("div", text: /Certification\s*Unknown/)
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
+    expect(page).to have_css("section div", text: /\AFolding\s*Stem fold\z/)
 
-    # beside a vehicle that has none
+    # beside a vehicle that has none, a 0.23 mode's classifications: its jurisdiction's own and the group it fits
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro")
-    classification = find("section div", text: /E-vehicle class\s*US-CA Off-highway electric motorcycle/, wait: 10)
+    classification = find("section div", text: /\AE-vehicle class\s*Off-Highway Motorcycle \?, US-CA Off-highway electric motorcycle \?\z/, wait: 10)
     expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
-    classification.find("button", text: "?").click
+    expect(page).to have_no_css("dt", exact_text: "Classifications")
+    classification.all("button", text: "?").last.click
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
     expect(tooltip).to have_css("code", exact_text: "evc/us/ca/off_highway_electric_motorcycle")
       .and have_button("Copy ID")
@@ -568,6 +570,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
     expect(page).to have_css("[data-comparison] article", count: 2, wait: 10)
     expect(page).to have_no_css("[aria-label='Comparison']")
+
+    # a classification links to the groups it's in, and a group, which has no jurisdiction, to the classifications in it
+    find("article", text: "US-CA Off-highway electric motorcycle").find("section", text: /\AGroups/i).click_link("Off-Highway Motorcycle")
+    group = find("article h1", exact_text: "Off-Highway Motorcycle").ancestor("article")
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle,evc/off_highway_motorcycle")
+    expect(group).to have_no_css("dt", exact_text: "Jurisdiction")
+    expect(group.find("section", text: /\AClassifications in this group/i)).to have_link("US-CA Off-highway electric motorcycle")
   end
 
   it "says so when the catalog doesn't load" do

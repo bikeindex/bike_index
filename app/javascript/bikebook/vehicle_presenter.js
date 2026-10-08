@@ -14,7 +14,6 @@ const textOf = (content) => (typeof content === 'object' ? fragmentOf(content).t
 const items = (content) => listed(content)?.[0].flatMap(items) ?? [content]
 const mark = (content) => html`<span class="tw:spec-diff">${content}</span>`
 
-const CLASSIFICATIONS = 'motors.operating_modes.e_vehicle_classification'
 const MATERIALS = 'frame.material'
 // lengths in centimeters, with an imperial viewer's feet and inches after
 const IN_CENTIMETERS = ['wheelbase', 'standover']
@@ -24,12 +23,12 @@ const SINGULAR = { feet: 'foot', inches: 'inch' }
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
     this.kit = kit
-    // `names` leaves off a classification's jurisdiction: "Moped", where it's "US-CA Moped"
-    const classifications = Object.entries(vocabulary.e_vehicle_classifications ?? {})
-    const names = Object.fromEntries(classifications.map(([id, { jurisdiction, name }]) => [id, `${jurisdiction} ${name}`]))
+    // "US-CA Moped", which a 0.22 catalog's names leave off the jurisdiction of
+    this.classificationNames = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications ?? {})
+      .map(([id, { jurisdiction, name }]) => [id, compact([jurisdiction, name]).join(' ')]))
     // the catalog names carbon "Carbon or Composite"
     const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
-    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [CLASSIFICATIONS]: { ...vocabulary.names[CLASSIFICATIONS], ...names }, [MATERIALS]: materials } }
+    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials } }
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
     this.imperialLengths = kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))
@@ -54,7 +53,7 @@ export class VehiclePresenter {
   // Each classification's name to its tooltip, whose heading links to `path(id)`
   classificationTooltips (path) {
     return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {}).map(([id, { title, description }]) => [
-      this.vocabulary.names[CLASSIFICATIONS][id],
+      this.classificationNames[id],
       html`<h3 class="tw:font-bold"><a class="twlink" href=${path(id)}>${title}</a></h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
         copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${description}</p>`
     ]))

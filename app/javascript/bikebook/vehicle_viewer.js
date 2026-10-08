@@ -38,7 +38,7 @@ export class VehicleViewer {
       const remaining = values.filter((each) => each !== value)
       const remove = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
       return classification
-        ? classificationCard({ presenter: this.presenter, id: value, classification: data, removePath: remove })
+        ? classificationCard({ presenter: this.presenter, id: value, classification: data, removePath: remove, classificationPath })
         : modelViewer({ presenter: this.presenter, data, value, comparing, idSuffix: index + 1, others: value === baseline.value ? [] : [baseline.data], removePath: remove, classificationPath, selectedSize: selectedSizes.get(value) })
     })
     const compared = { presenter: this.presenter, vehicles: models, sizes, frames: models.map(({ data }, index) => frameGeometry(data, sizes[index])) }

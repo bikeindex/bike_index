@@ -116,7 +116,14 @@ class ModelViewer {
     const frame = vehicle.frame && { ...vehicle.frame, ...this.#frameMounts(vehicle.frame, vehicle.sizes) }
     const suspension = Object.fromEntries(Object.keys(this.kit.viewer.suspensions)
       .map((position) => [position, this.#suspension(vehicle, position)]).filter(([, values]) => values != null))
-    return { ...vehicle, frame, suspension }
+    return { ...vehicle, frame, suspension, classifiedModes: this.#classifiedModes(data) }
+  }
+
+  // Each operating mode's classification ids, from a 0.22 model's single id or a 0.23 model's array
+  #classifiedModes (data) {
+    return array(data.motors).flatMap((motor) => array(motor.operating_modes))
+      .map(({ mode, availability, e_vehicle_classification: id, e_vehicle_classifications: ids }) => ({ mode, availability, ids: array(ids ?? id) }))
+      .filter(({ ids }) => ids.length)
   }
 
   #frameMounts (frame, sizes) {
@@ -223,6 +230,7 @@ class ModelViewer {
       : this.kit.model_configurations[each]
     const yearRangeDiffers = this.others.some((other) => !equal([other.first_year, other.final_year], [vehicle.first_year, vehicle.final_year]))
     const list = (value) => join(array(value), ', ')
+    const typeName = (each) => compact([each.type, each.type_detail]).join(' · ')
     return section({
       content: join([
         definitionListRow({ label: 'ID', content: copyableCode({ value: this.value, label: 'Copy ID' }) }),
@@ -232,7 +240,7 @@ class ModelViewer {
           : '',
         definitionListRow({ label: 'Years', value: presenter.highlighted(this.yearRange(), yearRangeDiffers) }),
         row('Markets', 'markets', list),
-        row('Vehicle type', 'type'),
+        definitionListRow({ label: 'Vehicle type', value: presenter.highlighted(typeName(vehicle), this.differs('type') || this.differs('type_detail'), this.others.map(typeName)) }),
         row('Propulsion', 'propulsion', list),
         this.classifications(),
         row('Primary activity', 'primary_activity', (each) => this.withoutParenthetical(each)),
@@ -245,11 +253,11 @@ class ModelViewer {
   // One only an optional mode has goes on its own line, after the mode
   classifications () {
     const sorted = (vehicle) => {
-      const modes = array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).filter((mode) => present(mode.e_vehicle_classification))
+      const names = (mode) => mode.ids.map((id) => this.presenter.classificationNames[id] ?? id)
       const stock = (mode) => (mode.availability ?? 'stock') === 'stock'
-      const standard = [...new Set(modes.filter(stock).map((mode) => mode.e_vehicle_classification))].sort()
-      const optional = [...new Map(modes.filter((mode) => !stock(mode) && !standard.includes(mode.e_vehicle_classification))
-        .map((mode) => [mode.e_vehicle_classification, mode.mode]))]
+      const standard = [...new Set(vehicle.classifiedModes.filter(stock).flatMap(names))].sort()
+      const optional = [...new Map(vehicle.classifiedModes.filter((mode) => !stock(mode))
+        .flatMap((mode) => names(mode).filter((name) => !standard.includes(name)).map((name) => [name, mode.mode])))]
       return { standard, optional }
     }
     const mine = sorted(this.vehicle)
