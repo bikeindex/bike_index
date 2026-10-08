@@ -35,18 +35,18 @@ const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headT
 const sizedApart = ([bsd, tire], [baseBsd, baseTire]) => [bsd, tire, baseBsd, baseTire].every(isNumber) &&
   (bsd === baseBsd ? Math.abs(tire - baseTire) > TIRE_GAP : [bsd, baseBsd].sort().join() === '584,622')
 
-// Each model's built wheels that are `sizedApart` from the first's, and the first's they're apart from, as diameters
-// estimated with a tire as tall as it's wide. Front and rear as one where they match
+// Once any model's built wheel is `sizedApart` from the first's, every model's, as diameters estimated with a tire as
+// tall as it's wide. Front and rear as one where they match
 const diameterNotes = (presenter, compared) => {
   const [first, ...others] = compared
   const wheel = ({ wheels }, position) => {
     const { bsd, tire_width: tire } = wheels[position].built ?? {}
     return [bsd, tire]
   }
-  const apart = (vehicle, position) => sizedApart(wheel(vehicle, position), wheel(first, position))
+  if (!others.some((vehicle) => ['front', 'rear'].some((position) => sizedApart(wheel(vehicle, position), wheel(first, position))))) return []
   const mm = (value) => presenter.measurement(presenter.rounded(value), 'mm')
   return compared.flatMap((vehicle) => {
-    const positions = ['front', 'rear'].filter((position) => vehicle === first ? others.some((other) => apart(other, position)) : apart(vehicle, position))
+    const positions = ['front', 'rear'].filter((position) => wheel(vehicle, position).every(isNumber))
     const both = positions.length === 2 && equal(wheel(vehicle, 'front'), wheel(vehicle, 'rear'))
     return (both ? [null] : positions).map((position) => {
       const [bsd, tire] = wheel(vehicle, position ?? 'front')

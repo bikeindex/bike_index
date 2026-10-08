@@ -362,6 +362,34 @@ RSpec.describe "Bikebook", :js, type: :system do
     diameters = -> { all("[aria-label='Geometry overlay'] li", text: "diameter").map { it.text.gsub(/[[:space:]]+/, " ") } }
     expect(diameters.call).to eq(["Aventón Current EXP's 700 C wheel with 64 mm tires is approximately 750 mm diameter",
       "Aventón Soltera 3 ADV's 700 C wheel with 38 mm tires is approximately 698 mm diameter"])
+    # every model's wheels in its size, front and rear each its own where they differ, the rear on S though only its front
+    # differs enough
+    sized = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehiclePresenter }, { geometryOverlay }, { frameGeometry }, { render }, { kit }, vocabulary] = await Promise.all([
+          import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('bikebook/frame_geometry'),
+          import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
+        const presenter = new VehiclePresenter(kit, vocabulary)
+        const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20 }
+        const road = { model: 'Road', sizes: [{ name: 'M', geometry }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] }
+        const mullet = { model: 'Mullet', sizes: ['S', 'L', 'XL'].map((name) => ({ name, geometry })), wheels: [
+          { bsd: 622, tire_width: 64, position: ['front'] }, { bsd: 622, tire_width: 64, position: ['rear'], sizes: ['XL'] },
+          { bsd: 584, tire_width: 64, position: ['rear'], sizes: ['L'] },
+          { bsd: 559, tire_width: 64, position: ['rear'], sizes: ['S'] }] }
+        return mullet.sizes.map((size) => {
+          const [vehicles, sizes] = [[{ data: road }, { data: mullet }], [road.sizes[0], size]]
+          const container = document.createElement('div')
+          render(geometryOverlay({ presenter, vehicles, sizes, frames: vehicles.map(({ data }, index) => frameGeometry(data, sizes[index])) }), container)
+          return [...container.querySelectorAll('li')].map((item) => item.textContent.replace(/\\s+/g, ' ').trim()).filter((text) => text.includes('diameter'))
+        })
+      })()
+    JS
+    road = "Road's 700 C wheel with 25 mm tires is approximately 672 mm diameter"
+    front = "Mullet's front 700 C wheel with a 64 mm tire is approximately 750 mm diameter"
+    expect(sized).to eq([[road, front, "Mullet's rear 26in wheel with a 64 mm tire is approximately 687 mm diameter"], [road, front,
+      "Mullet's rear 650 B wheel with a 64 mm tire is approximately 712 mm diameter"],
+      [road, "Mullet's 700 C wheel with 64 mm tires is approximately 750 mm diameter"]])
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
     # the first vehicle's last pick is what a comparison with none picked starts nearest
