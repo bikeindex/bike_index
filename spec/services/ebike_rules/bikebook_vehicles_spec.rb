@@ -25,7 +25,7 @@ RSpec.describe EbikeRules::BikebookVehicles do
 
     it "gives no class to a model classified as something else" do
       expect(described_class.find("m/sur_ron/2026/ultra_bee_hp_x_us"))
-        .to have_attributes(e_bike_class: nil, e_vehicle_classifications: ["evc/us/ca/off_highway_electric_motorcycle"])
+        .to have_attributes(e_bike_class: nil, e_vehicle_classifications: %w[evc/us/ca/off_highway_electric_motorcycle evc/off_highway_motorcycle])
     end
 
     it "is nil for a model the catalog lacks, a model without a motor, and no id" do
