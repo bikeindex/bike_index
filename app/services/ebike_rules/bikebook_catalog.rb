@@ -14,7 +14,7 @@ module EbikeRules
     end
 
     def fetch_json(path)
-      response = Faraday.new(url: BikebookController::CATALOG_URL, request: {timeout: 5}).get(path)
+      response = Faraday.new(url: Integrations::Bikebook::Catalog::URL, request: {timeout: 5}).get(path)
       JSON.parse(response.body) if response.success?
     rescue Faraday::Error, JSON::ParserError
       nil

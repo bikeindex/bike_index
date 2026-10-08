@@ -3,10 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "E-bike rules", :js, type: :system do
-  before do
-    stub_bikebook_catalog
-    serve_bikebook_catalog
-  end
+  before { serve_bikebook_catalog }
 
   it "checks a Bike Book model picked from the search, then one entered by hand" do
     visit ebike_rules_path

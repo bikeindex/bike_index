@@ -15,7 +15,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_select("state", with_options: ["Select your state", "District of Columbia", "Wyoming"])
         .and have_no_css("#state option[selected]")
         .and have_text("Location not shared")
-        .and have_css("[data-ebike-rules--lookup-manifest-url-value='#{BikebookController::MANIFEST_URL}']")
+        .and have_css("[data-ebike-rules--lookup-manifest-url-value='#{Integrations::Bikebook::Catalog::MANIFEST_URL}']")
         .and have_no_css("[role='status']")
       # rendered for search engines, collapsed
       expect(page).to have_css("#state-panel-co", text: "Class 3 riders must be 16 or older", visible: :all)
