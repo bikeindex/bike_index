@@ -8,20 +8,22 @@ module Pages
         EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:uppercase tw:text-blue-600 tw:dark:text-blue-400"
         HEADING_CLASSES = "tw:font-header tw:text-[clamp(26px,4vw,34px)] tw:leading-tight tw:font-extrabold"
         SECTION_CLASSES = "tw:mx-auto tw:max-w-[1120px] tw:px-[clamp(16px,4vw,32px)]"
+        # With the gem's padding and border around it, as tall as the min-h-12 submit button
+        COMBOBOX_INPUT_CLASS = "tw:min-h-[34px]"
 
-        def initialize(lookup:, manifest_url:, registered_count:, recoveries_count:)
+        def initialize(lookup:, manifest_url:, registered_count:, recoveries_count:, page_title:, default_title:)
           @lookup = lookup
           @manifest_url = manifest_url
           @registered_count = registered_count
           @recoveries_count = recoveries_count
+          @page_title = page_title
+          @default_title = default_title
         end
 
         private
 
         # The state's own page; without JavaScript, the controller sends a chosen state there
         def form_path = @lookup.state ? ebike_rules_state_path(@lookup.state[:abbr].downcase) : ebike_rules_path
-
-        def state_options = EbikeRuleServices::StateLaws::STATES.map { [it[:name], it[:abbr]] }
 
         def field_error(field, text)
           return unless error?(field)
@@ -39,9 +41,10 @@ module Pages
           [bike.make_and_model, bike.first_year].compact.join(" ") if bike && !bike.manual?
         end
 
-        def class_entries = [1, 2, 3].map { {value: it, label: translation(".class_n", n: it)} }
-
-        def throttle_entries = [{value: 1, label: translation(".answer_yes")}, {value: 0, label: translation(".answer_no")}]
+        def top_speed_entries
+          [{value: 20, label: translation(".mph", mph: 20)}, {value: 28, label: translation(".mph", mph: 28)},
+            {value: 29, label: translation(".over_28_mph")}]
+        end
 
         # The three classes, then the e-moto that's none of them
         def class_cards
@@ -53,10 +56,11 @@ module Pages
              speed: translation(".mph", mph: 20), motor: motor_cap, body: translation(".class_2_body")},
             {n: 3, title: translation(".class_n", n: 3), tag: translation(".class_3_tag"), assist: translation(".pedal"),
              speed: translation(".mph", mph: 28), motor: motor_cap, body: translation(".class_3_body")},
-            {n: nil, title: translation(".not_an_ebike"), tag: translation(".not_a_legal_ebike"), assist: translation(".throttle"),
-             speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), body: translation(".emoto_body")}
+            {n: nil, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))), speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), body: translation(".emoto_limits_body")}
           ]
         end
+
+        def throttle_entries = [{value: 1, label: translation(".answer_yes")}, {value: 0, label: translation(".answer_no")}]
 
         def parent_steps
           [

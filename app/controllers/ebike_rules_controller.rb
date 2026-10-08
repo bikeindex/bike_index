@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class EbikeRulesController < ApplicationController
-  LOOKUP_PARAMS = %i[bike manual e_bike_class watts throttle].freeze
+  LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle].freeze
 
   def show
     # the form's state without JavaScript, which can't send it to the state's own page
@@ -28,7 +28,7 @@ class EbikeRulesController < ApplicationController
     lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), state:, detected_state:)
     registered_count, recoveries_count = Counts.retrieve_many("total_bikes", "recoveries")
     render Pages::EbikeRules::Show::Component.new(lookup:, manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
-      registered_count:, recoveries_count:)
+      registered_count:, recoveries_count:, page_title: @page_title, default_title: translation(:title, controller_method: :show))
   end
 
   private

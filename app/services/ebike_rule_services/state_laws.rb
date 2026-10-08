@@ -8,9 +8,6 @@ module EbikeRuleServices
     # The 50 states and D.C., alphabetical
     STATES = StatesAndCountries.states.reject { it[:abbr] == "PR" }.freeze
     STATE_ID = %r{\Aevc/us/([a-z]{2})/}
-    # Laws that aren't the state's road law, which the catalog can't yet say as data: Alaska defines an
-    # e-bike only for state parks, and on its roads one is a motor-driven cycle
-    OFF_ROAD_LAWS = %w[evc/us/ak/electric_bicycle].freeze
 
     # By abbreviation, empty when the catalog doesn't answer. A limit is nil where the state sets none,
     # and a date only while it's still ahead of today
@@ -52,7 +49,7 @@ module EbikeRuleServices
     end
 
     def parse(records)
-      states = records.filter_map { |id, record| [id[STATE_ID, 1].upcase, id, record] if id.match?(STATE_ID) && !OFF_ROAD_LAWS.include?(id) }
+      states = records.filter_map { |id, record| [id[STATE_ID, 1].upcase, id, record] if id.match?(STATE_ID) }
       laws, tiers = states.partition { |_abbreviation, id, _record| id.match?(BikebookCatalog::E_BIKE_LAW) }
       {
         # to_h keeps a state's last, so the law it goes by sorts last

@@ -18,6 +18,8 @@ module UI
       #   - :inline  one line, the muted part following the display text
       #   - :stacked a muted line below the display text, on a taller input
       #
+      # input_class: adds classes to the input itself, inside the gem's bordered wrapper.
+      #
       # It always renders inside a wrapper div, so the combobox sits at the same
       # depth either way -- add your own wrapper for the parent's layout.
       #
@@ -39,7 +41,7 @@ module UI
           "hw-combobox:removal->ui--forms--multiselect-required#sync"
 
         def initialize(name:, options: [], src: nil, rich_display: nil, no_js: nil, dialog_label: nil,
-          free_text: false, include_blank: nil, multiselect_chip_src: nil, open: false, html_options: {})
+          free_text: false, include_blank: nil, multiselect_chip_src: nil, open: false, input_class: nil, html_options: {})
           @name = name
           @options_or_src = src || options
           @rich_display = RICH_DISPLAYS.detect { |display| display.to_s == rich_display.to_s }
@@ -48,6 +50,7 @@ module UI
           # Group's label -- pass it when that label isn't the humanized name
           @combobox_options = {dialog_label: dialog_label || name.to_s.humanize, free_text:, include_blank:,
                                multiselect_chip_src:, open:}.compact
+          @input_class = [(STACKED_INPUT_CLASSES if stacked?), input_class].compact.join(" ").presence
           @html_options = html_options
         end
 
@@ -60,7 +63,7 @@ module UI
         def combobox
           # customize_ (rather than the input: kwarg) appends to the gem's own classes
           helpers.hw_combobox_tag(@name, @options_or_src, **@combobox_options, **default_id, **combobox_attrs) do |component|
-            component.customize_input(class: STACKED_INPUT_CLASSES) if stacked?
+            component.customize_input(class: @input_class) if @input_class
           end
         end
 
@@ -116,6 +119,7 @@ module UI
             ("ui--forms--js-required" if js_required?),
             ("ui--forms--multiselect-required" if multiselect_required?)].compact
           data = {controller: controllers.presence&.join(" "),
+                  "ui--forms--combobox-display-inline-value": (true if @rich_display == :inline),
                   action: (MULTISELECT_REQUIRED_ACTIONS if multiselect_required?),
                   js_required: (true if @no_js.present?)}.compact
           {class: ("tw:relative" if @rich_display), data:}.compact

@@ -33,7 +33,7 @@
       <ul class="tw:mt-1.5 tw:space-y-1 tw:text-[13px]">
         <% @law[:sources].each do |url| %>
           <li>
-            <%= link_to url, url, target: "_blank", rel: "noopener", class: "twlink tw:break-all" %>
+            <%= link_to source_label(url), url, target: "_blank", rel: "noopener", title: url, class: "twlink tw:block tw:truncate" %>
           </li>
         <% end %>
       </ul>

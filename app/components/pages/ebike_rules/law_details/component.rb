@@ -11,6 +11,9 @@ module Pages
 
         private
 
+        # The address without its scheme or www, which the link truncates; its title holds the whole
+        def source_label(url) = url.sub(%r{\Ahttps?://(www\.)?}, "")
+
         # calendar days, which UI::Time would shift into the viewer's time zone
         def day(date) = l(date, format: :long)
 

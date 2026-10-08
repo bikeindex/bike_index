@@ -4,18 +4,20 @@ import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
 import { collapse } from 'utils/collapse_utils'
 
+const RESULT_FRAME = 'ebike-rules-check'
+
 // Connects to data-controller='ebike-rules--lookup'
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
 // before it connects, and stays one if the catalog fails, leaving manual entry. Each state has its own
-// page, so the state is the form's path rather than a field, and choosing one goes to its page
+// page, so the state is the form's path rather than a field. There's no submit button: a pick or a
+// manual change loads its check into the result frame, advancing the URL to the check's own
 export default class extends Controller {
-  static targets = ['combobox', 'comboboxSlot', 'manualPanel', 'state', 'throttle']
-  static values = { manifestUrl: String, path: String, display: String, failedText: String }
+  static targets = ['combobox', 'comboboxSlot', 'manualPanel', 'bikeField', 'closeManual', 'state', 'stateNote', 'stateNeeded']
+  static values = { manifestUrl: String, path: String, display: String, failedText: String, title: String }
 
   async connect () {
-    this.stateTarget.removeAttribute('name')
-    // a state chosen before connecting went unheard
-    if (!this.stateTarget.selectedOptions[0]?.defaultSelected) this.chooseState()
+    this.#stateField.removeAttribute('name')
+    this.observers = [this.#watchCleared(this.#stateField, () => this.chooseState())]
     let catalog
     try {
       catalog = await loadCatalog(this.manifestUrlValue)
@@ -32,41 +34,115 @@ export default class extends Controller {
     this.comboboxSlotTarget.replaceChildren(fragment)
     this.loaded = true
     this.#searchEnabled(!this.#manual)
+    const bikeField = this.comboboxSlotTarget.querySelector('input[type=hidden]')
+    this.observers.push(this.#watchCleared(bikeField, () => { if (!this.#manual) this.chooseBike() }))
   }
 
+  disconnect () {
+    this.observers.forEach((observer) => observer.disconnect())
+  }
+
+  // A picked bike is cleared rather than hidden, so it can't come back as the check
   openManual () {
-    this.manualPanelTarget.disabled = false
-    collapse('show', this.manualPanelTarget)
-    this.#searchEnabled(false)
+    if (this.#manual) return
+
+    this.comboboxSlotTarget.querySelectorAll('input').forEach((input) => { input.value = '' })
+    this.#toggleManual(true)
+    this.#leaveCheck(`${this.element.action}?manual=1`)
   }
 
   closeManual () {
-    this.manualPanelTarget.disabled = true
-    collapse('hide', this.manualPanelTarget)
-    this.#searchEnabled(true)
-    this.comboboxSlotTarget.querySelector('input:not([type=hidden])')?.focus()
+    this.#toggleManual(false)
+    this.#leaveCheck(this.element.action)
   }
 
-  // A bike in the form comes along, checked against the new state; without one it's just the state's
-  // page, with no errors. Unchoosing one stays put, as /ebike-rules sends a located visitor back
+  // A check in the form comes along to the new state; clearing the state leaves the check waiting for one.
+  // The gem restores the field's name on a selection
   chooseState () {
-    const abbreviation = this.stateTarget.value.toLowerCase()
-    if (!abbreviation) {
-      this.element.action = this.pathValue
-      return
+    this.#stateField.removeAttribute('name')
+    const abbreviation = this.#stateField.value.toLowerCase()
+    this.element.action = abbreviation ? `${this.pathValue}/${abbreviation}` : this.pathValue
+    if (abbreviation) {
+      this.stateNoteTarget.replaceChildren()
+      return this.#visit(this.#checkUrl ?? this.element.action)
     }
-    const fields = new FormData(this.element)
-    const query = fields.get('bike') || fields.get('watts') ? `?${new URLSearchParams(fields)}` : ''
-    Turbo.visit(`${this.pathValue}/${abbreviation}${query}`)
+    document.title = this.titleValue
+    this.#awaitState()
   }
 
-  // Only Class 2 has a throttle by definition, so a class picked answers the throttle until the rider does
-  chooseClass (event) {
-    this.throttleTarget.querySelector(`input[value="${event.target.value === '2' ? 1 : 0}"]`).checked = true
+  // The gem leaves the autocompleted part of a pick selected, and the catalog's "(current)" says
+  // nothing a picked model needs
+  chooseBike ({ detail } = {}) {
+    const input = this.comboboxSlotTarget.querySelector('input[role=combobox]')
+    if (detail?.value && input) {
+      input.value = input.value.replace(/ \(current\)$/, '')
+      input.setSelectionRange(input.value.length, input.value.length)
+    }
+    this.#stateField.value ? this.#visit(this.#checkUrl ?? this.element.action) : this.#awaitState()
+  }
+
+  checkManual () {
+    const watts = this.element.elements.watts
+    if (!watts.checkValidity()) return watts.reportValidity()
+
+    this.#stateField.value ? this.#visit(this.#checkUrl) : this.#awaitState()
   }
 
   focusState () {
-    this.stateTarget.focus()
+    this.stateTarget.querySelector('input[role=combobox]').focus()
+  }
+
+  // A frame load keeps the page's title, which names the state, and shows its verdict wherever it lands
+  checkLoaded ({ target }) {
+    if (target.id !== RESULT_FRAME) return
+
+    const title = target.querySelector('[data-page-title]')?.dataset.pageTitle
+    if (title) document.title = title
+    target.querySelector('[role=status]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+
+  get #checkUrl () {
+    const fields = new FormData(this.element)
+    if (fields.get('vehicle_models') || this.#manual) return `${this.element.action}?${new URLSearchParams(fields)}`
+  }
+
+  // The gem announces a prefilled selection on connecting, which mustn't reload the check it's showing.
+  // A state's or the form's hash doesn't make it another check
+  #visit (url) {
+    if (url !== window.location.href.split('#')[0]) Turbo.visit(url, { frame: RESULT_FRAME, action: 'advance' })
+  }
+
+  // Without a state there's nothing to check a bike against, so it waits in the URL for one
+  #awaitState () {
+    const url = this.#checkUrl
+    this.#leaveCheck(url ?? this.element.action)
+    if (!url) return this.stateNoteTarget.replaceChildren()
+
+    this.stateNoteTarget.replaceChildren(this.stateNeededTarget.content.cloneNode(true))
+    this.focusState()
+  }
+
+  #leaveCheck (url) {
+    document.getElementById(RESULT_FRAME).replaceChildren()
+    window.history.replaceState(window.history.state, '', url)
+  }
+
+  #toggleManual (manual) {
+    this.manualPanelTarget.disabled = !manual
+    collapse(manual ? 'show' : 'hide', [this.manualPanelTarget, this.closeManualTarget])
+    collapse(manual ? 'hide' : 'show', this.bikeFieldTarget)
+    this.#searchEnabled(!manual)
+  }
+
+  // A combobox handle's clear empties the field without a selection event, so the field itself is watched
+  #watchCleared (field, onCleared) {
+    const observer = new window.MutationObserver(() => { if (!field.value) onCleared() })
+    observer.observe(field, { attributeFilter: ['value'] })
+    return observer
+  }
+
+  get #stateField () {
+    return this.stateTarget.querySelector('input[type=hidden]')
   }
 
   get #manual () {

@@ -10,6 +10,7 @@ import { Controller } from '@hotwired/stimulus'
 // display on a click); it steps aside once the input holds a filter query.
 export default class extends Controller {
   static targets = ['overlay']
+  static values = { inline: Boolean }
 
   connect () {
     this.input = this.element.querySelector('.hw-combobox__input')
@@ -98,7 +99,11 @@ export default class extends Controller {
       paddingLeft: computed.paddingLeft,
       paddingRight: computed.paddingRight,
       paddingTop: computed.paddingTop,
-      paddingBottom: computed.paddingBottom
+      paddingBottom: computed.paddingBottom,
+      // An input centers its line in whatever height it's given; a block overlay starts at the top
+      lineHeight: this.inlineValue
+        ? `${inputRect.height - parseFloat(computed.paddingTop) - parseFloat(computed.paddingBottom)}px`
+        : ''
     })
   }
 }

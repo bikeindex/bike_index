@@ -7,13 +7,22 @@ module EbikeRuleServices
   # ul2849 and ul2271 are :certified or :unknown
   Bike = Data.define(:bikebook_id, :manufacturer_name, :model, :first_year, :e_bike_class, :class_unknown,
     :e_vehicle_classifications, :watts, :top_assist_mph, :throttle, :throttle_mph, :ul2849, :ul2271, :photo_url) do
-    def self.manual(e_bike_class:, watts:, throttle:)
+    # Classed by the federal limits, as BikebookVehicles classes an unclassified model; over 28 mph is none
+    def self.manual(top_mph:, watts:, throttle:)
+      e_bike_class = if top_mph <= 20
+        throttle ? 2 : 1
+      elsif top_mph <= 28
+        3
+      end
       new(bikebook_id: nil, manufacturer_name: nil, model: nil, first_year: nil, e_bike_class:, class_unknown: false,
         e_vehicle_classifications: [],
-        watts:, top_assist_mph: nil, throttle:, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil)
+        watts:, top_assist_mph: (top_mph if e_bike_class), throttle:, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil)
     end
 
     def manual? = bikebook_id.nil?
+
+    # Entered by hand as faster than any class, so its top speed is only known to be past Class 3's
+    def assists_past_mph = (28 if manual? && e_bike_class.nil?)
 
     def make_and_model = [manufacturer_name, model].compact.join(" ")
   end

@@ -20,7 +20,7 @@
           tw:font-bold
         "
       >
-        <%= headline %>
+        <%= render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: headline)) %>
       </p>
 
       <% if details.any? %>
@@ -62,7 +62,7 @@
               tw:font-bold tw:tracking-[.06em] tw:text-gray-700 tw:uppercase
             "
           >
-            <%= translation(".photo_bikebook") %>
+            <%= translation(".bikebook_photo") %>
           </span>
         </div>
       <% end %>
@@ -99,8 +99,8 @@
             <%= translation(".ul_certification") %>
           </h3>
 
-          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2849, status: @bike.ul2849)) %>
-          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2271, status: @bike.ul2271)) %>
+          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2849, status: @bike.ul2849, manual: @bike.manual?)) %>
+          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2271, status: @bike.ul2271, manual: @bike.manual?)) %>
         </div>
 
         <% if @bike.manual? %>
@@ -110,11 +110,11 @@
               tw:text-gray-700 tw:dark:bg-gray-900 tw:dark:text-gray-300
             "
           >
-            <%= translation(".entered_by_you_html", link: link_to(translation(".add_it_to_bikebook"), bikebook_path, class: "twlink")) %>
+            <%= translation(".entered_unverified") %>
           </p>
         <% else %>
           <%= link_to bikebook_path(vehicle_models: @bike.bikebook_id), class: "twlink tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[15px] tw:font-semibold" do %>
-            <%= translation(".view_bikebook_entry") %>
+            <%= translation(".full_bikebook_entry") %>
             <%= helpers.inline_svg_tag("icons/external-link.svg", class: "tw:size-4", aria_hidden: true) %>
           <% end %>
         <% end %>
@@ -155,7 +155,7 @@
         <%= render(Pages::EbikeRules::LawDetails::Component.new(law: @law)) %>
 
         <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-          <%= translation(".source_html", link: link_to(translation(".bikebook"), bikebook_path(vehicle_models: @law[:id]), class: "twlink")) %>
+          <%= translation(".source_html", link: link_to(translation(".bikebook_name"), bikebook_path(vehicle_models: @law[:id]), class: "twlink")) %>
         </p>
       <% else %>
         <div

@@ -45,7 +45,9 @@ module Pages
             else
               translation(".yellow_headline_class_unknown", name:, state:, count: rule_count(:check))
             end
-          when :red then translation(".red_headline", name:, state:)
+          when :red
+            # a hand-entered bike's name is "e-bike", which this headline says it isn't
+            @bike.manual? ? translation(".red_headline_manual", state:) : translation(".red_headline", name:, state:)
           else translation(".gray_headline", state:)
           end
         end
@@ -78,18 +80,26 @@ module Pages
 
         def subline
           if @bike.manual?
-            translation(".entered_manually", n: @bike.e_bike_class)
+            @bike.e_bike_class ? translation(".entered_manually", n: @bike.e_bike_class) : translation(".entered_manually_unclassified")
           else
-            translation(".bikebook_model", year: @bike.first_year)
+            translation(".model_year_bikebook", year: @bike.first_year)
           end
         end
 
         def specs
           [
             [translation(".motor"), @bike.watts && translation(".watts_html", watts: number_display(@bike.watts))],
-            [translation(".top_speed"), @bike.top_assist_mph && translation(".mph_html", mph: number_display(@bike.top_assist_mph))],
+            [translation(".top_speed"), top_speed_display],
             [translation(".throttle"), throttle_display]
           ]
+        end
+
+        def top_speed_display
+          if @bike.assists_past_mph
+            translation(".over_mph_html", mph: number_display(@bike.assists_past_mph))
+          elsif @bike.top_assist_mph
+            translation(".mph_html", mph: number_display(@bike.top_assist_mph))
+          end
         end
 
         def throttle_display
@@ -122,7 +132,7 @@ module Pages
           when :class_recognized then translation(".class_recognized", **args)
           when :class_not_recognized then translation(".class_not_recognized", **args)
           when :not_classified then translation(".not_classified")
-          when :class_unknown then translation(".class_unknown")
+          when :class_unknown then translation(".class_unknown_check_label")
           when :own_classes then translation(".own_classes")
           when :classes_start_on then translation(".classes_start_on", **args)
           when :limits_start_on then translation(".limits_start_on", **args)
@@ -132,6 +142,8 @@ module Pages
           when :no_watt_cap then translation(".no_watt_cap")
           when :speed_within_cap then translation(".speed_within_cap_html", **args)
           when :speed_over_cap then translation(".speed_over_cap_html", **args)
+          when :speed_past_cap then translation(".speed_past_cap_html", **args)
+          when :speed_past then translation(".speed_past_html", **args)
           when :speed_not_provided then translation(".speed_not_provided")
           when :no_speed_cap then translation(".no_speed_cap")
           when :no_throttle then translation(".no_throttle")
@@ -140,6 +152,8 @@ module Pages
           when :class_1_throttle then translation(".class_1_throttle")
           when :throttle_allowed then translation(".throttle_allowed")
           when :class_3_throttle then translation(".class_3_throttle")
+          when :class_3_throttle_within then translation(".class_3_throttle_within_html", **args)
+          when :class_3_throttle_over then translation(".class_3_throttle_over_html", **args)
           else translation(".has_throttle")
           end
         end
