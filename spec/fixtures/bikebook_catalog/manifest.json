@@ -1,7 +1,7 @@
 {
   "format": 2,
   "published_at": "2026-10-05T15:05:04Z",
-  "schema_version": "0.22.1",
+  "schema_version": "0.23.0",
   "index": "index.json",
   "vocabulary": "vocabulary.json",
   "blocks": {
