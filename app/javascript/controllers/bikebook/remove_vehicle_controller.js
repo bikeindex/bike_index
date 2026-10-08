@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { queryUrl, readable } from 'bikebook/replace_url'
+import { readable } from 'bikebook/replace_url'
 import { realigned } from 'bikebook/sizes'
 
 // Lays the href's remaining models over the current URL as it's clicked, keeping URL state set
@@ -7,7 +7,7 @@ import { realigned } from 'bikebook/sizes'
 // so an early click finds none
 export default class extends Controller {
   remove () {
-    const url = queryUrl()
+    const url = new URL(window.location)
     const remaining = new URL(this.element.href).searchParams.get('vehicle_models')
     remaining ? url.searchParams.set('vehicle_models', remaining) : url.searchParams.delete('vehicle_models')
     this.element.href = readable(realigned(url))

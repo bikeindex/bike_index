@@ -243,33 +243,24 @@ RSpec.describe "Bikebook", :js, type: :system do
     page.current_window.resize_to(1920, 1080)
   end
 
-  it "renders a model's own page from its path, which a pick leaves for the query" do
+  it "titles a model picked alone for it, and drops the canonical as the page changes" do
     serve_catalog
-    asked = []
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.on("request", ->(request) { asked << request.url if request.navigation_request? && request.url.include?("/bikebook") })
-    end
-
-    visit "/bikebook/m/aventon/2026/level_4_rec_step_through"
+    canonical = "link[rel='canonical']"
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through")
     expect(page).to have_css("article h1", text: "Level 4 REC Step-Through", wait: 10)
-    expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
-    expect(page).to have_current_path("/bikebook/m/aventon/2026/level_4_rec_step_through")
-    asked.clear
+    expect(page).to have_title(/\AAventón Level 4 REC Step-Through/)
+    expect(page).to have_css(canonical, visible: :all)
 
     type_into(vehicle_field, "level_2_step")
     retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
     expect(page).to have_css("[data-comparison] article", count: 2)
-    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
+    expect(page).to have_no_css(canonical, visible: :all)
 
     page.go_back
     expect(page).to have_css("article", count: 1)
-    expect(page).to have_current_path("/bikebook/m/aventon/2026/level_4_rec_step_through")
-
     find("[aria-label='Remove Aventón Level 4 REC Step-Through']").click
     expect(page).to have_no_css("article")
-    expect(page).to have_current_path("/bikebook")
     expect(page).to have_title("Bikebook", exact: true)
-    expect(asked).to be_empty
   end
 
   it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do

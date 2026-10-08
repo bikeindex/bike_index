@@ -1,5 +1,4 @@
 import { array } from 'bikebook/templates/values'
-import { queryUrl } from 'bikebook/replace_url'
 
 const KEY = 'bikebook:sizes'
 const PARAM = 'vehicle_sizes'
@@ -69,7 +68,7 @@ const withPicked = (url, picked) => {
 }
 export const withSize = (url, id, name) => withPicked(url, { ...pickedSizes(url), [id]: name })
 // `url` with each size following its vehicle from `previous`, whose vehicles it's reordered, added to or removed from
-export const realigned = (url, previous = queryUrl()) => withPicked(url, pickedSizes(previous))
+export const realigned = (url, previous = new URL(window.location.href)) => withPicked(url, pickedSizes(previous))
 
 // Each vehicle's size: its pick, else the first's preferred size and the others' the first's, each the nearest
 // by top tube, else by name, else medium
