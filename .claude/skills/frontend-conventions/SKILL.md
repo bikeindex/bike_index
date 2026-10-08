@@ -50,7 +50,7 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 
 - **An image from a design handoff is already in the repo — use the original, never a renamed or resized copy.** `kelsey_redesign/` holds the drawn originals; a served one is a byte-identical copy under its original name in `app/assets/images/kelsey/illustrations/`, as `comic-assets_bike-love-*.png` are. Before adding any PNG/JPG, `git ls-files` the distinctive words of its name across the whole repo — a hash search misses a resized copy.
 
-- **Look for an existing icon before adding an SVG** — `app/assets/images/icons/`, `app/javascript/bikebook/templates/icons.js`, and text glyphs in templates. A link's trailing arrow is `<span aria-hidden="true">→</span>`, not an icon (`SharedBlocks::MainContent::OrganizedShopIntegrationAlert`).
+- **Look for an existing icon before adding an SVG** — `app/assets/images/icons/`, `app/javascript/bikebook/templates/icons.js`, and text glyphs in templates. A mark that's a plain character is text, not an icon: a link's trailing arrow is `<span aria-hidden="true">→</span>` (`SharedBlocks::MainContent::OrganizedShopIntegrationAlert`), and a `?`, `!` or `i` in a disc is the character (`UI::Tooltip`, `Pages::EbikeRules::StatusIcon`). A check or a cross stays an icon.
 
 - **A decorative icon is `inline_svg_tag(..., aria_hidden: true)`** — `aria: {hidden: true}` is a hash `inline_svg` drops, leaving an `svg[role=img]` with no accessible name, which only an axe audit in a `:js` spec catches.
 
