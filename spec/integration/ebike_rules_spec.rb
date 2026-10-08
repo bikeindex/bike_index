@@ -12,6 +12,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_css("[role='alert']", text: "Choose a state.")
 
     # with no bike picked, it's just the state's page
+    wait_for_stimulus("ebike-rules--lookup")
     select "Colorado", from: "State"
     expect(page).to have_current_path("/ebike-rules/co")
     expect(page).to have_title("Colorado e-bike laws")
@@ -37,6 +38,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_current_path("/ebike-rules/co?manual=1&e_bike_class=2&watts=1000&throttle=1")
 
     # the bike comes along to the new state's page, checked against it
+    wait_for_stimulus("ebike-rules--lookup")
     select "New York", from: "State"
     expect(page).to have_css("[role='status']", text: "Your e-bike is not permitted as an e-bike under current New York rules.")
     expect(page).to have_current_path("/ebike-rules/ny?manual=1&e_bike_class=2&watts=1000&throttle=1")

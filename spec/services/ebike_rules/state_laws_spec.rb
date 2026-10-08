@@ -10,7 +10,7 @@ RSpec.describe EbikeRules::StateLaws do
       expect(described_class.find("CO")).to include(id: "evc/us/co/electric_bicycle", name: "Electrical Assisted Bicycle",
         classes: [1, 2, 3], watt_cap: 750, mph: 28, throttle: true)
       expect(described_class.find("CO")[:restrictions])
-        .to include({rule: "Class 3 riders must be 16 or older; a younger passenger may ride on one designed to carry passengers", starts_on: nil})
+        .to include({rule: "Class 3 riders must be 16 or older; a younger passenger may ride on one designed to carry passengers", starts_on: nil, ends_on: nil})
       expect(described_class.find("CO")[:sources]).to include("https://leg.colorado.gov/bills/hb25-1197")
     end
 
@@ -25,14 +25,15 @@ RSpec.describe EbikeRules::StateLaws do
       expect(described_class.classification_name("AK", ["evc/us/class_1"])).to be_nil
     end
 
-    it "drops a rule once it ends, and marks one still to come until it starts" do
+    it "drops a rule once it ends, and keeps a rule's start date until it starts" do
       san_mateo = "Cities in San Mateo County may bar riders under 12 from Class 1 and Class 2 electric bicycles"
       sidewalks = /\AA 10 mph prima facie speed limit on sidewalks/
 
       expect(described_class.find("CA", today: Date.new(2026, 10, 8))[:restrictions])
-        .to include({rule: san_mateo, starts_on: Date.new(2027, 1, 1)}, {rule: sidewalks, starts_on: Date.new(2027, 1, 1)})
+        .to include({rule: san_mateo, starts_on: Date.new(2027, 1, 1), ends_on: Date.new(2031, 1, 1)},
+          {rule: sidewalks, starts_on: Date.new(2027, 1, 1), ends_on: nil})
       expect(described_class.find("CA", today: Date.new(2027, 1, 1))[:restrictions])
-        .to include({rule: san_mateo, starts_on: nil}, {rule: sidewalks, starts_on: nil})
+        .to include({rule: san_mateo, starts_on: nil, ends_on: Date.new(2031, 1, 1)}, {rule: sidewalks, starts_on: nil, ends_on: nil})
       after_san_mateo = described_class.find("CA", today: Date.new(2031, 1, 1))[:restrictions].pluck(:rule)
       expect(after_san_mateo).to include(sidewalks)
       expect(after_san_mateo).not_to include(san_mateo)
@@ -43,7 +44,7 @@ RSpec.describe EbikeRules::StateLaws do
 
       before_the_law = described_class.find("NC", today: Date.new(2026, 11, 30))
       expect(before_the_law).to include(limits_start_on: Date.new(2026, 12, 1), classes: [1, 2, 3])
-      expect(before_the_law[:restrictions].pluck(:rule)).to include(motor_alone)
+      expect(before_the_law[:restrictions]).to include({rule: motor_alone, starts_on: nil, ends_on: Date.new(2026, 12, 1)})
 
       in_force = described_class.find("NC", today: Date.new(2026, 12, 1))
       expect(in_force).to include(limits_start_on: nil)

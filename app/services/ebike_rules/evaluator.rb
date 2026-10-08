@@ -8,12 +8,13 @@ module EbikeRules
     extend Functionable
 
     def rules(law:, bike:)
-      limits = [classes_rule(law, bike.e_bike_class), power_rule(law, bike.watts), speed_rule(law, bike.top_assist_mph)]
-      # limits not yet in force describe the coming law; the law's dated rules say today's
+      throttle = throttle_rule(law, bike.throttle, bike.e_bike_class)
+      # limits not yet in force describe the coming law, so the rider checks the law's dated rules for today's
       if (date = law[:limits_start_on])
-        limits = limits.map { row(it[:id], :info, :limits_start_on, date:) }
+        classes = bike.e_bike_class ? row(:classes, :check, :classes_start_on, date:) : classes_rule(law, nil)
+        return [classes, row(:power, :info, :limits_start_on, date:), row(:speed, :info, :limits_start_on, date:), throttle]
       end
-      [*limits, throttle_rule(law, bike.throttle, bike.e_bike_class)]
+      [classes_rule(law, bike.e_bike_class), power_rule(law, bike.watts), speed_rule(law, bike.top_assist_mph), throttle]
     end
 
     # :red if any rule fails, else :yellow if any is to check, else :green - :gray without a law on file

@@ -15,6 +15,17 @@ module Pages
         private
 
         def day(date) = l(date, format: DATE_FORMAT)
+
+        def dates(restriction)
+          starts_on, ends_on = restriction.values_at(:starts_on, :ends_on)
+          if starts_on && ends_on
+            translation(".from_until", starts_on: day(starts_on), ends_on: day(ends_on))
+          elsif starts_on
+            translation(".from", date: day(starts_on))
+          elsif ends_on
+            translation(".until", date: day(ends_on))
+          end
+        end
       end
     end
   end

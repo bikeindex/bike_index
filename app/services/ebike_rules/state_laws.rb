@@ -82,7 +82,7 @@ module EbikeRules
 
     def in_force(law, today)
       restrictions = law[:restrictions].reject { it[:ends_on]&.<=(today) }
-        .map { {rule: it[:rule], starts_on: (it[:starts_on] if it[:starts_on]&.>(today))} }
+        .map { it.merge(starts_on: (it[:starts_on] if it[:starts_on]&.>(today))) }
       law.merge(restrictions:, limits_start_on: (law[:limits_start_on] if law[:limits_start_on]&.>(today)))
     end
 

@@ -14,6 +14,8 @@ en:
           class_3_throttle: Throttle must cut out at 20 mph
           class_not_recognized: Class %{e_bike_class} isn't recognized here
           class_recognized: Class %{e_bike_class} is recognized
+          classes_start_on: Classes take effect %{date}. Until then, check the state's
+            current rules
           entered_by_you_html: Entered by you, not verified by Bike Book. Don't see
             your bike? %{link}
           entered_manually: Entered manually · Class %{n}

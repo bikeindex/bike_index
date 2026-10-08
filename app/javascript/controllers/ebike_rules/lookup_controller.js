@@ -13,6 +13,8 @@ export default class extends Controller {
 
   async connect () {
     this.stateTarget.removeAttribute('name')
+    // a state chosen before connecting went unheard
+    if (!this.stateTarget.selectedOptions[0]?.defaultSelected) this.chooseState()
     let catalog
     try {
       catalog = await loadCatalog(this.manifestUrlValue)

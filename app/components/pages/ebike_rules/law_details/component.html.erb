@@ -16,8 +16,8 @@
     >
       <% @law[:restrictions].each do |restriction| %>
         <li>
-          <% if restriction[:starts_on] %>
-            <span class="tw:font-semibold"><%= translation(".from", date: day(restriction[:starts_on])) %></span>
+          <% if (dates = dates(restriction)) %>
+            <span class="tw:font-semibold"><%= dates %></span>
           <% end %>
 
           <%= restriction[:rule] %>

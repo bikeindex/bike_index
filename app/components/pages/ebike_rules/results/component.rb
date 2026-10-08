@@ -118,6 +118,7 @@ module Pages
           when :class_not_recognized then translation(".class_not_recognized", **args)
           when :not_classified then translation(".not_classified")
           when :own_classes then translation(".own_classes")
+          when :classes_start_on then translation(".classes_start_on", **args)
           when :limits_start_on then translation(".limits_start_on", **args)
           when :watts_within_cap then translation(".watts_within_cap_html", **args)
           when :watts_over_cap then translation(".watts_over_cap_html", **args)

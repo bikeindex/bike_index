@@ -5,7 +5,9 @@ en:
       ebike_rules:
         law_details:
           from: 'From %{date}:'
+          from_until: 'From %{starts_on} until %{ends_on}:'
           limits_start_on: These limits take effect %{date}. Until then, the rules
             below say what applies.
           restrictions: Rules and restrictions
           sources: Sources
+          until: 'Until %{date}:'
