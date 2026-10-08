@@ -78,10 +78,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     within("[aria-label='Geometry overlay']") do
       expect(all("li").map(&:text)).to eq(["Aventón Level 4 REC Step-Through Regular", "Aventón Level 2 Step-Through M/L"])
       frames = all("svg[role='img'] > g", visible: :all).map { |frame| [frame.all("circle", visible: :all).map { it[:cx].to_f }, frame.has_css?("path", visible: :all)] }
-      expect(frames).to match([[[be < 0, be > 0], true], [[frames.first.first.first, frames.first.first.first + 1130], false]])
+      rear_axle = frames.dig(0, 0, 0)
+      expect(frames).to match([[[be < 0, be > 0], true], [[rear_axle, rear_axle + 1130], false]])
       expect(page).to have_text("Aventón Level 2 Step-Through's frame isn't drawn without its Stack, Head Angle, Chainstay, BB Drop, only its " \
         "wheels, the rear axle on Aventón Level 4 REC Step-Through's.")
-      # the same wheel size, its tires too near each other's for a note on how large it stands
+      # the same wheel size, its tires too near each other's for the wheel note
       expect(page).to have_no_text("diameter")
     end
     within("[aria-label='Comparison']") do
@@ -369,7 +370,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     cogs = find("[aria-label='Comparison'] tr", text: "Cogs")
     expect(cogs.all("td").map(&:text)).to match([/\A12:\s*10–\s*52\W*t\z/, /\A1:\s*−11\s*22\W*t\s*−30\z/])
     expect(cogs).to have_css(".tw\\:text-red-700", exact_text: "−11").and have_css(".tw\\:text-red-700", exact_text: "−30")
-    # the same wheel size on tires far enough apart to change how large it stands, as an estimate
+    # the same wheel size on tires far enough apart, each with its estimated diameter
     diameters = -> { all("[aria-label='Geometry overlay'] li", text: "diameter").map { it.text.gsub(/[[:space:]]+/, " ") } }
     expect(page).to have_css("[aria-label='Geometry overlay'] p", text: "Note: you're comparing different diameter wheels and tires")
     expect(diameters.call).to eq(["Aventón Current EXP's 700 C wheel with 64 mm tires is approximately 750 mm diameter",
@@ -390,7 +391,8 @@ RSpec.describe "Bikebook", :js, type: :system do
           { bsd: 584, tire_width: 64, position: ['rear'], sizes: ['L'] },
           { bsd: 559, tire_width: 64, position: ['rear'], sizes: ['S'] }] }
         return mullet.sizes.map((size) => {
-          const [vehicles, sizes] = [[{ data: road }, { data: mullet }], [road.sizes[0], size]]
+          const vehicles = [{ data: road }, { data: mullet }]
+          const sizes = [road.sizes[0], size]
           const container = document.createElement('div')
           render(geometryOverlay({ presenter, vehicles, sizes, frames: vehicles.map(({ data }, index) => frameGeometry(data, sizes[index])) }), container)
           return [...container.querySelectorAll('li')].map((item) => item.textContent.replace(/\\s+/g, ' ').trim()).filter((text) => text.includes('diameter'))

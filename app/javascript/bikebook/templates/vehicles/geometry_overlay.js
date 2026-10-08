@@ -1,7 +1,7 @@
 import { html, nothing, svg } from 'lit-html'
+import { builtWheel, outerRadius } from 'bikebook/frame_geometry'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { sectionHeading } from 'bikebook/templates/vehicles/section'
-import { wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { equal, isNumber, present } from 'bikebook/templates/values'
 
 // UI::Chart::Component::COLORS, one per compared model; forced, or the table cells' dark border color wins
@@ -36,33 +36,30 @@ const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headT
 // A [bsd, tire] wheel against the first's: the same size on a tire more than TIRE_GAP mm wider or narrower, or 700c
 // against 650b
 const sizedApart = ([bsd, tire], [baseBsd, baseTire]) => [bsd, tire, baseBsd, baseTire].every(isNumber) &&
-  (bsd === baseBsd ? Math.abs(tire - baseTire) > TIRE_GAP : [bsd, baseBsd].sort().join() === '584,622')
+  (bsd === baseBsd ? Math.abs(tire - baseTire) > TIRE_GAP : [bsd, baseBsd].every((each) => [584, 622].includes(each)))
 
 // Once any model's built wheel is `sizedApart` from the first's, every model's, as diameters estimated with a tire as
 // tall as it's wide. Front and rear as one where they match
 const diameterNotes = (presenter, compared) => {
   const [first, ...others] = compared
-  const wheel = ({ wheels }, position) => {
-    const { bsd, tire_width: tire } = wheels[position].built ?? {}
-    return [bsd, tire]
-  }
+  const wheel = ({ builtWheels }, position) => [builtWheels[position]?.bsd, builtWheels[position]?.tire_width]
   if (!others.some((vehicle) => ['front', 'rear'].some((position) => sizedApart(wheel(vehicle, position), wheel(first, position))))) return []
   const mm = (value) => presenter.measurement(presenter.rounded(value), 'mm')
   return compared.flatMap((vehicle) => {
-    const positions = ['front', 'rear'].filter((position) => wheel(vehicle, position).every(isNumber))
+    const positions = ['front', 'rear'].filter((position) => isNumber(outerRadius(vehicle.builtWheels[position])))
     const both = positions.length === 2 && equal(wheel(vehicle, 'front'), wheel(vehicle, 'rear'))
-    return (both ? [null] : positions).map((position) => {
-      const [bsd, tire] = wheel(vehicle, position ?? 'front')
-      return html`<li>${vehicle.title}'s ${position ? `${position} ` : ''}${presenter.vocabulary.wheel_sizes?.[bsd]?.name ?? `${bsd} mm BSD`} wheel with ${
-        position ? html`a ${mm(tire)} tire` : html`${mm(tire)} tires`} is approximately ${mm(bsd + 2 * tire)} diameter</li>`
+    return (both ? ['front'] : positions).map((position) => {
+      const [bsd, tire] = wheel(vehicle, position)
+      return html`<li>${vehicle.title}'s ${both ? '' : `${position} `}${presenter.vocabulary.wheel_sizes?.[bsd]?.name ?? `${bsd} mm BSD`} wheel with ${
+        both ? html`${mm(tire)} tires` : html`a ${mm(tire)} tire`} is approximately ${mm(2 * outerRadius(vehicle.builtWheels[position]))} diameter</li>`
     })
   })
 }
 
 // The bottom border that keys a comparison table column to its frame, which the overlay draws in the same order
-export const seriesBorder = (frame, index) => frame && drawable(frame) ? `tw:border-b-4 ${SERIES[index].border}` : ''
+const drawable = (geometry) => geometry?.missing.length === 0 || geometry?.wheels
 
-const drawable = (geometry) => geometry.missing.length === 0 || Boolean(geometry.wheels)
+export const seriesBorder = (frame, index) => drawable(frame) ? `tw:border-b-4 ${SERIES[index].border}` : ''
 
 // The compared models' frames in their `sizes`, standing on the same ground with their bottom brackets lined up,
 // each over the ones the comparison table columns left of it. A frame it can't draw is its wheels alone where they're
@@ -72,13 +69,13 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const labelled = named.map((vehicle, index) => {
     const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
     const size = sizes[index]?.name
-    const wheels = wheelsAt(presenter, vehicles[index].data, sizes[index])
-    return { geometry: frames[index], series: SERIES[index], title, size, wheels, label: present(size) ? `${title}, ${size}` : title }
+    const builtWheels = Object.fromEntries(['front', 'rear'].map((position) => [position, builtWheel(vehicles[index].data, sizes[index], position)]))
+    return { geometry: frames[index], series: SERIES[index], title, size, builtWheels, label: present(size) ? `${title}, ${size}` : title }
   })
-  const [aligned] = labelled.filter(({ geometry }) => geometry.missing.length === 0)
+  const aligned = labelled.find(({ geometry }) => geometry.missing.length === 0)
   const rearX = aligned?.geometry.rearAxle[0] ?? REAR_AXLE
   const drawn = labelled.filter(({ geometry }) => drawable(geometry)).map((each) => {
-    if (!each.geometry.wheels) return each
+    if (each.geometry.missing.length === 0) return each
     const { rearRadius, frontRadius, wheelbase } = each.geometry.wheels
     return { ...each, geometry: { rearAxle: [rearX, rearRadius], frontAxle: [rearX + wheelbase, frontRadius], rearRadius, frontRadius, bottomBracketHeight: 0 } }
   })

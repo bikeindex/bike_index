@@ -4,7 +4,7 @@ import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
-import { array, isNumber, join, present, slice } from 'bikebook/templates/values'
+import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
 const priced = (vehicle) => latest(array(vehicle.years).filter((year) => isNumber(year.original_msrp)))
@@ -85,15 +85,12 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
   })
   const missing = html`<span class="twless-strong">—</span>`
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
-  // the wheelbase out to each built wheel's edge
   const length = {
     ...geometry.find(({ key }) => key === 'wheelbase'),
     label: html`Overall length (est.) ${tooltip({ text: 'The wheelbase plus each wheel’s radius, estimating its tire as tall as it’s wide' })}`,
-    read: (vehicle, size) => {
-      const radii = ['front', 'rear'].map((position) => wheels.get(vehicle)[position].built)
-        .map((wheel) => isNumber(wheel?.bsd) && isNumber(wheel?.tire_width) ? wheel.bsd / 2 + wheel.tire_width : null)
-      const wheelbase = size?.geometry?.wheelbase
-      return [wheelbase, ...radii].every(isNumber) ? presenter.rounded(wheelbase + radii[0] + radii[1]) : null
+    read: (vehicle) => {
+      const listed = frames[named.indexOf(vehicle)]?.wheels
+      return listed ? presenter.rounded(sum(Object.values(listed))) : null
     },
     better: 0
   }
@@ -127,7 +124,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
       : Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
     // a currency symbol, which carries its name as a title, stays gray like a unit
     return html`<span class="tw:block tw:text-xs ${color} tw:[&_span[title]]:text-gray-400 tw:dark:[&_span[title]]:text-gray-500">${
-      change > 0 ? '+' : '−'}${row.amount?.(Math.abs(change), number) ?? fallback(Math.abs(change))}</span>`
+      change > 0 ? '+' : '−'}${row.amount?.(Math.abs(change)) ?? fallback(Math.abs(change))}</span>`
   }
   const compared = (row, vehicle) => vehicle !== first && row.better !== undefined && (row.comparable?.(vehicle, first) ?? true)
 

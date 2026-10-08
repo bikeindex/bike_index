@@ -8,27 +8,31 @@ const SEAT_ANGLE = 73.5
 
 const radians = (degrees) => degrees * Math.PI / 180
 
+export const builtWheel = (data, size, position) => array(data.wheels).find((each) => each.configured !== false &&
+  array(each.position).includes(position) && (!each.sizes || array(each.sizes).includes(size?.name)))
+
+// A wheel's outside radius where it lists its bead seat and tire, estimating the tire as tall as it's wide
+export const outerRadius = (wheel) => isNumber(wheel?.bsd) && isNumber(wheel?.tire_width) ? wheel.bsd / 2 + wheel.tire_width : null
+
 // A wheel's outside radius at `position` in `size`, estimated as a 700c × 35 where it lists no bead seat or tire
 const wheelRadius = (data, size, position) => {
-  const wheel = array(data.wheels).find((each) => each.configured !== false && array(each.position).includes(position) &&
-    (!each.sizes || array(each.sizes).includes(size?.name)))
+  const wheel = builtWheel(data, size, position)
   const [bsd, tire] = [wheel?.bsd, wheel?.tire_width ?? wheel?.max_tire_width]
   return { radius: (isNumber(bsd) ? bsd : BSD) / 2 + (isNumber(tire) ? tire : TIRE_WIDTH), estimated: !isNumber(bsd) || !isNumber(tire) }
 }
 
 // A size's frame in mm, the bottom bracket at the origin and y up. `missing` names the geometry it can't be drawn
-// without, and `wheels` is then its wheels' radii and wheelbase where it lists them all. `estimated` is whether a
-// default stands in for any value the size doesn't list
+// without, and `wheels` its wheels' outer radii and wheelbase where it lists them all. `estimated` is whether a default
+// stands in for any value the size doesn't list
 export const frameGeometry = (data, size) => {
   const geometry = size?.geometry ?? {}
   const rear = wheelRadius(data, size, 'rear')
   const front = wheelRadius(data, size, 'front')
   const drop = geometry.bb_drop ?? (isNumber(geometry.bb_height) ? rear.radius - geometry.bb_height : null)
   const missing = [...REQUIRED.filter((key) => !isNumber(geometry[key])), ...(isNumber(drop) ? [] : ['bb_drop'])]
-  if (missing.length) {
-    const listed = !rear.estimated && !front.estimated && isNumber(geometry.wheelbase)
-    return { missing, wheels: listed ? { rearRadius: rear.radius, frontRadius: front.radius, wheelbase: geometry.wheelbase } : null }
-  }
+  const [rearRadius, frontRadius] = ['rear', 'front'].map((position) => outerRadius(builtWheel(data, size, position)))
+  const wheels = [rearRadius, frontRadius, geometry.wheelbase].every(isNumber) ? { rearRadius, frontRadius, wheelbase: geometry.wheelbase } : null
+  if (missing.length) return { missing, wheels }
 
   const { reach, stack, chainstay, wheelbase, front_center: frontCenter, head_tube: headTube = 0, top_tube_effective: topTube } = geometry
   const headAngle = radians(geometry.head_angle)
@@ -50,6 +54,7 @@ export const frameGeometry = (data, size) => {
 
   return {
     missing,
+    wheels,
     estimated: rear.estimated || front.estimated || !isNumber(geometry.head_tube) || !isNumber(seatAngle) || !isNumber(listedSeatTube) ||
       (!isNumber(wheelbase) && !isNumber(frontCenter) && !isNumber(geometry.fork_rake)),
     rearAxle,
