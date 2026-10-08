@@ -30,6 +30,27 @@ RSpec.describe EbikeRules::Evaluator do
     end
   end
 
+  context "with a Class 3 bike in California" do
+    let(:abbreviation) { "CA" }
+    let(:attributes) { super().merge(e_bike_class: 3, watts: 750, top_assist_mph: 28) }
+
+    it "checks it against California's law as it does any three-class state's" do
+      expect(statuses).to eq(classes: :pass, power: :pass, speed: :pass, throttle: :pass)
+      expect(described_class.verdict(rules)).to eq :green
+    end
+  end
+
+  context "with a law whose limits aren't yet in force" do
+    let(:law) { EbikeRules::StateLaws.find("NC", today: Date.new(2026, 11, 30)) }
+    let(:attributes) { super().merge(e_bike_class: 3, watts: 1_000, top_assist_mph: 28) }
+
+    it "says when they take effect rather than checking against them" do
+      expect(statuses).to eq(classes: :info, power: :info, speed: :info, throttle: :pass)
+      expect(rules.first(3)).to all(include(note: :limits_start_on, args: {date: Date.new(2026, 12, 1)}))
+      expect(described_class.verdict(rules)).to eq :green
+    end
+  end
+
   context "with a motor over the cap and a Class 1 throttle" do
     let(:attributes) { super().merge(watts: 1_000, throttle: true) }
 

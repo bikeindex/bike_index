@@ -4,5 +4,8 @@ en:
     pages:
       ebike_rules:
         law_details:
+          from: 'From %{date}:'
+          limits_start_on: These limits take effect %{date}. Until then, the rules
+            below say what applies.
           restrictions: Rules and restrictions
           sources: Sources

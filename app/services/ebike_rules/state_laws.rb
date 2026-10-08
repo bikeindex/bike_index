@@ -8,11 +8,16 @@ module EbikeRules
     # The 50 states and D.C., alphabetical
     STATES = StatesAndCountries.states.reject { it[:abbr] == "PR" }.freeze
     STATE_ID = %r{\Aevc/us/([a-z]{2})/}
+    # Laws that aren't the state's road law, which the catalog can't yet say as data: Alaska defines an
+    # e-bike only for state parks, and on its roads one is a motor-driven cycle
+    OFF_ROAD_LAWS = %w[evc/us/ak/electric_bicycle].freeze
 
-    # By abbreviation, empty when the catalog doesn't answer. A limit is nil where the state sets none
-    def laws = parsed[:laws]
+    # By abbreviation, empty when the catalog doesn't answer. A limit is nil where the state sets none.
+    # The dates are today's: a rule that has ended is gone, one still to come keeps its starts_on,
+    # and limits_start_on is there only while the limits aren't yet in force
+    def laws(today: Time.zone.today) = parsed[:laws].transform_values { in_force(it, today) }
 
-    def find(abbreviation) = laws[abbreviation]
+    def find(abbreviation, today: Time.zone.today) = laws(today:)[abbreviation]
 
     def state(abbreviation) = STATES.find { it[:abbr] == abbreviation&.upcase }
 
@@ -38,7 +43,7 @@ module EbikeRules
     # The vocabulary's file name carries its digest, so a republished one is a new key
     def parsed
       path = BikebookCatalog.manifest&.dig("vocabulary")
-      records = path && Rails.cache.fetch(["bikebook_catalog/state_laws", path], expires_in: 1.week, skip_nil: true) do
+      records = path && Rails.cache.fetch(["bikebook_catalog/dated_state_laws", path], expires_in: 1.week, skip_nil: true) do
         BikebookCatalog.fetch_json(path)&.dig("e_vehicle_classifications")&.then { parse(it) }
       end
       records || {laws: {}, tiers: {}, groups: {}}
@@ -46,7 +51,8 @@ module EbikeRules
 
     def parse(records)
       states = records.filter_map { |id, record| [id[STATE_ID, 1].upcase, id, record] if id.match?(STATE_ID) }
-      laws, tiers = states.partition { |_abbreviation, id, _record| id.match?(BikebookCatalog::E_BIKE_LAW) }
+      laws, tiers = states.reject { |_abbreviation, id, _record| OFF_ROAD_LAWS.include?(id) }
+        .partition { |_abbreviation, id, _record| id.match?(BikebookCatalog::E_BIKE_LAW) }
       {
         laws: laws.to_h { |abbreviation, id, record| [abbreviation, law(id, record)] },
         tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| [record["name"], [id, *record["groups"]]] } },
@@ -63,12 +69,27 @@ module EbikeRules
         watt_cap: record["max_power"],
         mph: record["max_speed"]&.then { UnitSystem.kilometers_to_miles(it).round },
         throttle: record["throttle"],
-        restrictions: record["restrictions"],
+        restrictions: record["restrictions"].to_a.map { restriction(it) },
+        limits_start_on: date(record["limits_start_on"]),
         # link_to doesn't sanitize an href
         sources: record["sources"].to_a.grep(%r{\Ahttps?://})
       }
     end
 
-    conceal :parsed, :parse, :law
+    # 0.23.0's restrictions are strings, 0.23.1's carry dates
+    def restriction(value)
+      value = {"rule" => value} if value.is_a?(String)
+      {rule: value["rule"], starts_on: date(value["starts_on"]), ends_on: date(value["ends_on"])}
+    end
+
+    def date(value) = value && Date.parse(value)
+
+    def in_force(law, today)
+      restrictions = law[:restrictions].reject { it[:ends_on]&.<=(today) }
+        .map { {rule: it[:rule], starts_on: (it[:starts_on] if it[:starts_on]&.>(today))} }
+      law.merge(restrictions:, limits_start_on: (law[:limits_start_on] if law[:limits_start_on]&.>(today)))
+    end
+
+    conceal :parsed, :parse, :law, :restriction, :date, :in_force
   end
 end

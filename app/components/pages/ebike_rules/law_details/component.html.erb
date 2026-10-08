@@ -1,4 +1,10 @@
 <div class="tw:flex tw:flex-col tw:gap-4">
+  <% if @law[:limits_start_on] %>
+    <p class="tw:text-[15px] tw:font-semibold">
+      <%= translation(".limits_start_on", date: day(@law[:limits_start_on])) %>
+    </p>
+  <% end %>
+
   <div>
     <h3 class="tw:text-sm tw:font-bold"><%= translation(".restrictions") %></h3>
 
@@ -9,7 +15,13 @@
       "
     >
       <% @law[:restrictions].each do |restriction| %>
-        <li><%= restriction %></li>
+        <li>
+          <% if restriction[:starts_on] %>
+            <span class="tw:font-semibold"><%= translation(".from", date: day(restriction[:starts_on])) %></span>
+          <% end %>
+
+          <%= restriction[:rule] %>
+        </li>
       <% end %>
     </ul>
   </div>

@@ -80,6 +80,13 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_text("We're still reviewing Wyoming's rules.")
     end
 
+    it "keeps Alaska in review, as its e-bike law is for state parks rather than its roads" do
+      get "/ebike-rules/ak", params: {bike: "m/specialized/2025/haul_st"}
+
+      expect(page).to have_css("[role='status']", text: "We don't have Alaska's e-bike rules on file yet.")
+      expect(meta("description")).to start_with("We're still reviewing Alaska's e-bike law.")
+    end
+
     it "moves a state from the query, or in capitals, to its own page, and 404s one that isn't a state" do
       get "/ebike-rules", params: {state: "CO", bike: "m/specialized/2025/haul_st"}
       expect(response).to redirect_to("/ebike-rules/co?bike=m%2Fspecialized%2F2025%2Fhaul_st")

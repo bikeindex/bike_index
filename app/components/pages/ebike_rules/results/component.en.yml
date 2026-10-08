@@ -35,6 +35,7 @@ en:
           is_registered: Is this bike registered?
           legal_to_ride: Legal to ride
           legal_with_rules: Legal, with rules to check
+          limits_start_on: These limits take effect %{date}
           link_copied: Link copied
           manual_bike_name: e-bike
           may_be_moped: >-

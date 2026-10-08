@@ -103,13 +103,22 @@ module Pages
         end
 
         def note(row)
-          # a class is a name rather than a quantity
-          args = row[:args].to_h { |key, value| [key, (key == :e_bike_class) ? value : number_display(value)] }
+          # a class is a name rather than a quantity, and a law's date a calendar day
+          args = row[:args].to_h do |key, value|
+            if key == :e_bike_class
+              [key, value]
+            elsif value.is_a?(Date)
+              [key, l(value, format: Pages::EbikeRules::LawDetails::Component::DATE_FORMAT)]
+            else
+              [key, number_display(value)]
+            end
+          end
           case row[:note]
           when :class_recognized then translation(".class_recognized", **args)
           when :class_not_recognized then translation(".class_not_recognized", **args)
           when :not_classified then translation(".not_classified")
           when :own_classes then translation(".own_classes")
+          when :limits_start_on then translation(".limits_start_on", **args)
           when :watts_within_cap then translation(".watts_within_cap_html", **args)
           when :watts_over_cap then translation(".watts_over_cap_html", **args)
           when :watts_not_provided then translation(".watts_not_provided")
