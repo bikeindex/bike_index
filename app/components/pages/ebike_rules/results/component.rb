@@ -127,7 +127,7 @@ module Pages
           end
         end
 
-        def share_url = ebike_rules_url(anchor: "state-#{@state[:abbr].downcase}")
+        def share_url = ebike_rules_state_url(@state[:abbr].downcase)
       end
     end
   end

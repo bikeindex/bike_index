@@ -5,12 +5,15 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='ebike-rules--lookup'
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
-// before it connects, and stays one if the catalog fails, leaving manual entry
+// before it connects, and stays one if the catalog fails, leaving manual entry. A check goes to its
+// state's own page, so the state is the form's path rather than a field
 export default class extends Controller {
   static targets = ['combobox', 'comboboxSlot', 'manualPanel', 'state']
-  static values = { manifestUrl: String, display: String, failedText: String }
+  static values = { manifestUrl: String, path: String, display: String, failedText: String }
 
   async connect () {
+    this.stateTarget.removeAttribute('name')
+    this.chooseState()
     let catalog
     try {
       catalog = await loadCatalog(this.manifestUrlValue)
@@ -40,6 +43,11 @@ export default class extends Controller {
     collapse('hide', this.manualPanelTarget)
     this.#searchEnabled(true)
     this.comboboxSlotTarget.querySelector('input:not([type=hidden])')?.focus()
+  }
+
+  chooseState () {
+    const abbreviation = this.stateTarget.value.toLowerCase()
+    this.element.action = abbreviation ? `${this.pathValue}/${abbreviation}` : this.pathValue
   }
 
   focusState () {

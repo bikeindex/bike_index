@@ -38,9 +38,10 @@
   </section>
 
   <div class="tw:relative tw:-mt-20 <%= SECTION_CLASSES %>">
-    <%= form_with url: ebike_rules_path, method: :get, html: {aria: {label: translation(".form_label")}},
+    <%= form_with url: form_path, method: :get, html: {aria: {label: translation(".form_label")}},
       class: "tw:flex tw:flex-col tw:gap-3.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-[clamp(18px,4vw,32px)] tw:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:dark:border-gray-700 tw:dark:bg-gray-800",
       data: {controller: "ebike-rules--lookup", "ebike-rules--lookup-manifest-url-value": @manifest_url,
+             "ebike-rules--lookup-path-value": ebike_rules_path,
              "ebike-rules--lookup-display-value": bike_display,
              "ebike-rules--lookup-failed-text-value": translation(".bikebook_failed")} do |f| %>
       <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-4">
@@ -50,7 +51,7 @@
             <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :state, option_tags: state_options,
               options: {selected: @lookup.state&.dig(:abbr), include_blank: translation(".select_state")},
               html_options: {class: "tw:min-h-12 tw:text-base!", aria: {invalid: (true if error?(:state))},
-                             data: {"ebike-rules--lookup-target": "state"}})) %>
+                             data: {"ebike-rules--lookup-target": "state", action: "ebike-rules--lookup#chooseState"}})) %>
           <% end %>
 
           <% if error?(:state) %>

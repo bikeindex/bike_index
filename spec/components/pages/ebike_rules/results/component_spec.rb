@@ -31,7 +31,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       .and have_css("li", text: "Class 3 riders must be 15 or older")
       .and have_link(href: "https://in.gov/dnr/rules-and-regulations/e-bike-rules")
       .and have_link("Bike Book", href: "/bikebook?vehicle_models=evc%2Fus%2Fin%2Felectric_bicycle")
-    expect(component).to have_css("[data-ui--copy-button-text-value='http://test.host/ebike-rules#state-in']")
+    expect(component).to have_css("[data-ui--copy-button-text-value='http://test.host/ebike-rules/in']")
   end
 
   context "with a bike entered by hand" do

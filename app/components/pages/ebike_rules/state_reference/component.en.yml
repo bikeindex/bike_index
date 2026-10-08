@@ -15,3 +15,4 @@ en:
             rules and sources.
           matching: "%{number} of 51 match"
           on_file_html: "%{number} of 51 states and D.C. on file · others in review"
+          show_rules: Show %{state}'s rules
