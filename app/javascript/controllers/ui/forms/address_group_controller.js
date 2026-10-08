@@ -4,19 +4,18 @@ import { Controller } from '@hotwired/stimulus'
 // US addresses use a state combobox; other countries a free-text region field
 export default class extends Controller {
   static targets = ['country', 'state', 'region']
-  static values = { usId: Number }
+  static values = { usId: Number, required: Boolean }
 
   toggleCountry () {
     const isUs = this.isUs
     // Whichever of the pair is showing carries the required attribute - the browser
     // won't submit a form with a hidden required field, and can't focus it to say why.
     // Blanked rather than disabled, so the country it no longer matches is cleared
-    const required = this.stateInput.required || this.regionInput.required
     this.stateTarget.classList.toggle('tw:hidden', !isUs)
     this.regionTarget.classList.toggle('tw:hidden', isUs)
     if (!isUs) this.#clearState()
-    this.stateInput.required = required && isUs
-    this.regionInput.required = required && !isUs
+    this.stateInput.required = this.requiredValue && isUs
+    this.regionInput.required = this.requiredValue && !isUs
   }
 
   get isUs () { return Number(this.countryTarget.value) === this.usIdValue }

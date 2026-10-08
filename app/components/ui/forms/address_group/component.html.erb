@@ -1,6 +1,7 @@
 <div
   data-controller="ui--forms--address-group"
   data-ui--forms--address-group-us-id-value="<%= us_country_id %>"
+  data-ui--forms--address-group-required-value="<%= @required %>"
 >
   <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :street, kind: :text_field, label_text: street_label, required: @required)) %>
 
@@ -17,7 +18,7 @@
     >
       <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :region_record_id, label_text: translation(".state"), required: @required)) do %>
         <%= render(UI::Forms::ComboboxState::Component.new(name: :region_record_id, ids: true,
-          html_options: {form: @form, required: (true if state_required?)})) %>
+          html_options: {form: @form, required: state_required?})) %>
       <% end %>
     </div>
 

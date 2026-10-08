@@ -13,13 +13,13 @@ RSpec.describe UI::Forms::AddressGroup::Component, :js, type: :system do
     Country.canada
     visit(preview_path)
     wait_for_stimulus("ui--forms--address-group")
-    expect_axe_clean("select-name")
+    expect_axe_clean
 
     expect(page).to have_css("#{state_input}[required]")
     expect(page).to have_css("#{region_input}:not([required])", visible: :all)
 
     type_into(find(state_input), "CA")
-    retry_on_detach { find("[role='option']", text: "California (CA)").click }
+    click_combobox_option("California (CA)")
     expect(find(state_value, visible: :all).value).to eq california.id.to_s
 
     select "Canada", from: "address_record[country_id]"
