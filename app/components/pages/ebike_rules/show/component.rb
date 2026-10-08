@@ -18,7 +18,7 @@ module Pages
 
         private
 
-        # A check goes to its state's own page; without JavaScript, the controller sends the state there
+        # The state's own page; without JavaScript, the controller sends a chosen state there
         def form_path = @lookup.state ? ebike_rules_state_path(@lookup.state[:abbr].downcase) : ebike_rules_path
 
         def state_options = ::EbikeRules::StateLaws::STATES.map { [it[:name], it[:abbr]] }

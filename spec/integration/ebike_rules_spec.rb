@@ -5,13 +5,18 @@ require "rails_helper"
 RSpec.describe "E-bike rules", :js, type: :system do
   before { serve_bikebook_catalog }
 
-  it "checks a Bike Book model picked from the search, then one entered by hand, each on its state's page" do
+  it "goes to a state's page on choosing it, and checks a Bike Book model then one entered by hand there" do
     visit ebike_rules_path
     find_field("Bike model", disabled: false, wait: 10)
     click_on "Check my bike"
     expect(page).to have_css("[role='alert']", text: "Choose a state.")
 
+    # with no bike picked, it's just the state's page
     select "Colorado", from: "State"
+    expect(page).to have_current_path("/ebike-rules/co")
+    expect(page).to have_title("Colorado e-bike laws")
+    expect(page).to have_no_css("[role='alert']")
+
     type_into(find_field("Bike model", disabled: false, wait: 10), "haul")
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     click_on "Check my bike"
@@ -19,7 +24,6 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_css("[role='status']",
       text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 3 e-bike, with 1 rule to check.")
     expect(page).to have_current_path("/ebike-rules/co?bike=m%2Fspecialized%2F2025%2Fhaul_st")
-    expect(page).to have_title("Colorado e-bike laws")
     expect(find_field("Bike model", disabled: false, wait: 10).value).to eq "Specialized Haul ST 2025"
 
     expect(page).to have_css("li", text: "Class 3 riders must be 16 or older")
@@ -32,8 +36,8 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_css("[role='status']", text: "Your e-bike is not permitted as an e-bike under current Colorado rules.")
     expect(page).to have_current_path("/ebike-rules/co?manual=1&e_bike_class=2&watts=1000&throttle=1")
 
+    # the bike comes along to the new state's page, checked against it
     select "New York", from: "State"
-    click_on "Check my bike"
     expect(page).to have_css("[role='status']", text: "Your e-bike is not permitted as an e-bike under current New York rules.")
     expect(page).to have_current_path("/ebike-rules/ny?manual=1&e_bike_class=2&watts=1000&throttle=1")
   end

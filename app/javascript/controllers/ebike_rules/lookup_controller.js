@@ -5,15 +5,14 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='ebike-rules--lookup'
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
-// before it connects, and stays one if the catalog fails, leaving manual entry. A check goes to its
-// state's own page, so the state is the form's path rather than a field
+// before it connects, and stays one if the catalog fails, leaving manual entry. Each state has its own
+// page, so the state is the form's path rather than a field, and choosing one goes to its page
 export default class extends Controller {
   static targets = ['combobox', 'comboboxSlot', 'manualPanel', 'state']
   static values = { manifestUrl: String, path: String, display: String, failedText: String }
 
   async connect () {
     this.stateTarget.removeAttribute('name')
-    this.chooseState()
     let catalog
     try {
       catalog = await loadCatalog(this.manifestUrlValue)
@@ -45,9 +44,17 @@ export default class extends Controller {
     this.comboboxSlotTarget.querySelector('input:not([type=hidden])')?.focus()
   }
 
+  // A bike in the form comes along, checked against the new state; without one it's just the state's
+  // page, with no errors. Unchoosing one stays put, as /ebike-rules sends a located visitor back
   chooseState () {
     const abbreviation = this.stateTarget.value.toLowerCase()
-    this.element.action = abbreviation ? `${this.pathValue}/${abbreviation}` : this.pathValue
+    if (!abbreviation) {
+      this.element.action = this.pathValue
+      return
+    }
+    const fields = new FormData(this.element)
+    const query = fields.get('bike') || fields.get('watts') ? `?${new URLSearchParams(fields)}` : ''
+    window.location.assign(`${this.pathValue}/${abbreviation}${query}`)
   }
 
   focusState () {
