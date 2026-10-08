@@ -29,7 +29,7 @@ const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headT
 }
 
 // The bottom border that keys a comparison table column to its frame, which the overlay draws in the same order
-export const seriesBorder = (frame, index) => frame.missing.length ? '' : `tw:border-b-4 ${SERIES[index].border}`
+export const seriesBorder = (frame, index) => frame?.missing.length === 0 ? `tw:border-b-4 ${SERIES[index].border}` : ''
 
 // The compared models' frames in their `sizes`, standing on the same ground with their bottom brackets lined up,
 // each over the ones the comparison table columns left of it

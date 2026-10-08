@@ -67,7 +67,7 @@ const GEARING = [
 ]
 
 // The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's
-export const comparisonTable = ({ presenter, vehicles, sizes, frames }) => {
+export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
