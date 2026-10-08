@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { Turbo } from '@hotwired/turbo-rails'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
 import { collapse } from 'utils/collapse_utils'
@@ -56,7 +57,7 @@ export default class extends Controller {
     }
     const fields = new FormData(this.element)
     const query = fields.get('bike') || fields.get('watts') ? `?${new URLSearchParams(fields)}` : ''
-    window.location.assign(`${this.pathValue}/${abbreviation}${query}`)
+    Turbo.visit(`${this.pathValue}/${abbreviation}${query}`)
   }
 
   focusState () {

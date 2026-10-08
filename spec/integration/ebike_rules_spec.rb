@@ -42,6 +42,14 @@ RSpec.describe "E-bike rules", :js, type: :system do
     select "New York", from: "State"
     expect(page).to have_css("[role='status']", text: "Your e-bike is not permitted as an e-bike under current New York rules.")
     expect(page).to have_current_path("/ebike-rules/ny?manual=1&e_bike_class=2&watts=1000&throttle=1")
+    expect(page).to have_title("New York e-bike laws")
+
+    # back returns to Colorado's check, rather than to a snapshot that leaves for New York again
+    page.go_back
+    expect(page).to have_css("[role='status']", text: "Your e-bike is not permitted as an e-bike under current Colorado rules.")
+    expect(page).to have_select("State", selected: "Colorado")
+    wait_for_stimulus("ebike-rules--lookup")
+    expect(page).to have_current_path("/ebike-rules/co?manual=1&e_bike_class=2&watts=1000&throttle=1")
   end
 
   it "filters the states, opens the one an old link's anchor names, and links each to its page" do
