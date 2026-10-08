@@ -10,7 +10,7 @@ const listSection = (heading, items) => items.length === 0
   : html`<section class="tw:mb-6 tw:space-y-2">${sectionHeading(heading)}<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm">${
     items.map((item) => html`<li>${item}</li>`)}</ul></section>`
 
-// a schema date is a calendar day, so it's read and written in UTC to keep it from shifting a day
+// a schema date is a calendar day; UTC both ways keeps it from shifting
 const day = (date) => date && new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', { dateStyle: 'long', timeZone: 'UTC' })
 
 const restriction = ({ rule, starts_on: startsOn, ends_on: endsOn }) => {
