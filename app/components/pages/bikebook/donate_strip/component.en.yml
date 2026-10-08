@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        donate_strip:
+          dismiss: Dismiss
+          donate: Donate
+          pitch: >-
+            This rad product is brought to you by the nonprofit, Bike Index. Help
+            pay our server costs.
+          region: Donate to Bike Index

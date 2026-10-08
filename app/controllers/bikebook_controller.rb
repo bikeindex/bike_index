@@ -8,8 +8,7 @@ class BikebookController < ApplicationController
 
   def show
     @page_title = "Bikebook"
-    render Pages::Bikebook::Show::Component.new(manifest_url: MANIFEST_URL,
-      donate_dismissed: cookies[Pages::Bikebook::Show::Component::DONATE_DISMISSED_COOKIE].present?)
+    render Pages::Bikebook::Show::Component.new(manifest_url: MANIFEST_URL)
   end
 
   # /bikebook/m/segway/2025/gt3_pro, or without its m/, picks that vehicle ahead of any already picked,

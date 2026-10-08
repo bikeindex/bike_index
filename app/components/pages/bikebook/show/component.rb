@@ -7,12 +7,8 @@ module Pages
       # The page is a <template> bikebook--page fills in from the URL and the catalog,
       # and renders again for each pick and history step
       class Component < ApplicationComponent
-        DONATE_DISMISSED_COOKIE = "bikebook_donate_dismissed"
-        MODELS_COUNT = 70_000
-
-        def initialize(manifest_url:, donate_dismissed: false)
+        def initialize(manifest_url:)
           @manifest_url = manifest_url
-          @donate_dismissed = donate_dismissed
         end
       end
     end

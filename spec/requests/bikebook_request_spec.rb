@@ -26,16 +26,16 @@ RSpec.describe BikebookController, type: :request do
 
       it "renders under the Bike Book heading" do
         expect(page).to have_css("h1", text: "across 70,000+ models")
-        expect(page.find("[role='region'][aria-label='Donate to Bike Index']")).to have_link("Donate", href: "/donate?source=bikebook")
+        expect(page.find("section[aria-label='Donate to Bike Index']")).to have_link("Donate", href: "/donate?source=bikebook")
           .and have_css("button[aria-label='Dismiss']")
       end
 
       context "dismissed" do
-        before { cookies[Pages::Bikebook::Show::Component::DONATE_DISMISSED_COOKIE] = "1" }
+        before { cookies["bikebook_donate_dismissed"] = "1" }
 
         it "renders the heading alone" do
           expect(page).to have_css("h1", text: "across 70,000+ models")
-          expect(page).to have_no_css("[role='region'][aria-label='Donate to Bike Index']")
+          expect(page).to have_no_css("section[aria-label='Donate to Bike Index']")
         end
       end
     end

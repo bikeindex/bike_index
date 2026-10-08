@@ -177,7 +177,6 @@
   <div class="tw:flex tw:shrink-0 tw:items-center tw:gap-3">
     <%= helpers.inline_svg_tag("logos/bikebook_mark.svg", class: "tw:size-12 tw:text-slate-900 tw:dark:text-slate-100", aria_hidden: true) %>
 
-    <%# DM Sans is the Bike Book logo's face, and is loaded for its letters alone %>
     <p
       class="
         tw:m-0 tw:flex tw:flex-col tw:font-['DM_Sans',sans-serif]
@@ -191,12 +190,10 @@
 
   <div
     class="
-      tw:hidden tw:w-px tw:self-stretch tw:bg-gray-200 tw:sm:block
-      tw:dark:bg-gray-700
+      tw:flex tw:flex-col tw:gap-1 tw:sm:border-l tw:sm:border-gray-200
+      tw:sm:pl-6 tw:dark:border-gray-700
     "
-  ></div>
-
-  <div class="tw:flex tw:flex-col tw:gap-1">
+  >
     <h1
       class="
         tw:m-0 tw:font-header tw:text-[17px] tw:leading-[1.3] tw:font-bold
@@ -204,7 +201,7 @@
         tw:dark:text-slate-100
       "
     >
-      <%= translation(".tagline_html", models_count: number_display(MODELS_COUNT)) %>
+      <%= translation(".tagline_html", models_count: number_display(70_000)) %>
     </h1>
 
     <p class="tw:m-0 tw:text-[13px] tw:text-gray-600 tw:dark:text-gray-400">
@@ -213,48 +210,9 @@
   </div>
 </section>
 
-<% unless @donate_dismissed %>
-  <div
-    role="region"
-    aria-label="<%= translation(".donate_region") %>"
-    data-controller="bikebook--donate-strip"
-    data-bikebook--donate-strip-cookie-value="<%= DONATE_DISMISSED_COOKIE %>"
-    class="
-      tw:relative tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2
-      tw:bg-blue-500 tw:py-3 tw:pr-14 tw:pl-5 tw:sm:flex-nowrap
-      tw:sm:justify-center tw:sm:px-16 tw:sm:py-2.5
-    "
-  >
-    <%= helpers.inline_svg_tag("icons/heart.svg", class: "tw:size-5 tw:shrink-0 tw:text-[#ffd660]", aria_hidden: true) %>
+<%= render(Pages::Bikebook::DonateStrip::Component.new) %>
 
-    <span
-      class="
-        tw:min-w-0 tw:flex-1 tw:basis-48 tw:text-[15px] tw:font-semibold
-        tw:text-pretty tw:text-white tw:sm:flex-initial
-      "
-    >
-      <%= translation(".donate_pitch") %>
-    </span>
-
-    <%= render(UI::ButtonLink::Component.new(text: translation(".donate"), href: donate_path(source: "bikebook"), color: :yellow, size: :callout,
-    html_class: "tw:shrink-0 tw:font-header tw:whitespace-nowrap tw:px-6! tw:py-1.5! tw:text-[13px]!")) %>
-
-    <button
-      type="button"
-      aria-label="<%= translation(".dismiss") %>"
-      data-action="bikebook--donate-strip#dismiss"
-      class="
-        tw:absolute tw:top-1/2 tw:right-5 tw:flex tw:size-9
-        tw:-translate-y-1/2 tw:cursor-pointer tw:items-center
-        tw:justify-center tw:rounded-full tw:border-0 tw:bg-transparent
-        tw:text-white tw:hover:bg-white/15
-      "
-    >
-      <%= helpers.inline_svg_tag("icons/x.svg", class: "tw:size-3.5", aria_hidden: true) %>
-    </button>
-  </div>
-<% end %>
-
+<%# DM Sans is the Bike Book logo's face, loaded for its letters alone %>
 <% helpers.content_for(:header) do %>
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&text=BikeBok&display=swap"

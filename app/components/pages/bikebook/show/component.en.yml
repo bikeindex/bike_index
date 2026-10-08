@@ -16,12 +16,6 @@ en:
           byline: A free reference from Bike Index, the non-profit bike registry.
           comparison_view: Comparison view
           configuration: Configuration
-          dismiss: Dismiss
-          donate: Donate
-          donate_pitch: >-
-            This rad product is brought to you by the nonprofit, Bike Index. Help
-            pay our server costs.
-          donate_region: Donate to Bike Index
           failed: The catalog didn't load. Reload the page to try again.
           loading: Loading the catalog…
           manufacturer: Manufacturer
