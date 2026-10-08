@@ -6607,7 +6607,6 @@ nb:
           year: år
           filter_combobox:
             any: Noen
-          comparison_view: Sammenligningsvisning
     shared_blocks:
       footer:
         about: Om

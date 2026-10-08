@@ -6799,7 +6799,6 @@ nl:
           year: jaar
           filter_combobox:
             any: Elk
-          comparison_view: Vergelijkingsweergave
     shared_blocks:
       footer:
         about: Over
