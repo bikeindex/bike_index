@@ -1,0 +1,22 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        ul_badge:
+          certified: UL %{standard} Certified
+          meaning_2271_certified: >-
+            The battery pack passed UL safety testing for overcharge, short circuit
+            and impact.
+          meaning_2271_unknown: We don't have battery certification data yet. Check
+            the label on the battery.
+          meaning_2849_certified: >-
+            The whole electrical system (motor, battery, charger and controller) passed
+            fire and electrical safety testing together. No UL 2849 listing on record.
+            Some campuses and buildings don't allow uncertified e-bikes indoors.
+          meaning_2849_unknown: >-
+            We don't have system certification data for this model yet. Look for the
+            UL mark on the frame label.
+          scope_2271: Battery pack
+          scope_2849: E-bike electrical system
+          status_unknown: UL %{standard} status unknown

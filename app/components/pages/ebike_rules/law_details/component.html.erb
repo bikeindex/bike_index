@@ -1,0 +1,42 @@
+<div class="tw:flex tw:flex-col tw:gap-4">
+  <% if @law[:limits_start_on] %>
+    <p class="tw:text-[15px] tw:font-semibold">
+      <%= translation(".limits_start_on", date: day(@law[:limits_start_on])) %>
+    </p>
+  <% end %>
+
+  <div>
+    <h3 class="tw:text-sm tw:font-bold"><%= translation(".restrictions") %></h3>
+
+    <ul
+      class="
+        tw:mt-1.5 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px]
+        tw:text-gray-700 tw:dark:text-gray-300
+      "
+    >
+      <% @law[:restrictions].each do |restriction| %>
+        <li>
+          <% if (dates = dates(restriction)) %>
+            <span class="tw:font-semibold"><%= dates %></span>
+          <% end %>
+
+          <%= restriction[:rule] %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <% if @law[:sources].any? %>
+    <div>
+      <h3 class="tw:text-sm tw:font-bold"><%= translation(".sources") %></h3>
+
+      <ul class="tw:mt-1.5 tw:space-y-1 tw:text-[13px]">
+        <% @law[:sources].each do |url| %>
+          <li>
+            <%= link_to url, url, target: "_blank", rel: "noopener", class: "twlink tw:break-all" %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,19 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        state_reference:
+          compiling: >-
+            We're compiling %{state}'s e-bike rules from the state legislature and
+            DMV. Check back soon.
+          filter_placeholder: Type a state name
+          filter_states: Filter states
+          heading: E-bike laws by state
+          in_review: In review
+          limits_subheading: All 50 states and D.C. Open a state to see its limits,
+            rules and sources.
+          matching_of_total: "%{number} of %{total} match"
+          on_file_of_total_html: "%{number} of %{total} states and D.C. on file ·
+            others in review"
+          show_rules: Show %{state}'s rules

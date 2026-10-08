@@ -111,6 +111,16 @@ Find what reads the old form before calling one due. A value nothing reads again
 
 State the verdict in your reply to the user either way, naming the stored values you checked. When one is due, write it without asking — a job in `app/jobs/backfills/` with its spec — and lead the PR body with it (SKILL.md's **Write the summary body**).
 
+### The asset audit
+
+**Required when the branch adds a file under `app/assets/images/`.** List them:
+
+```bash
+rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
+```
+
+Check each against `frontend-conventions`' image and icon rules: an original elsewhere in the repo (a design handoff's comes resized and renamed), an existing icon, or a plain character that should be text. Replace a duplicate with what already exists and delete it.
+
 ### The cycle-type translation check
 
 `AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:

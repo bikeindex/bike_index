@@ -12,24 +12,34 @@ module Integrations
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/manifest.json" : "#{URL}manifest.json"
       MODEL_ID = %r{\Am/([a-z0-9_]+/\d{4})/[a-z0-9_]+\z}
 
-      # The model's title, description and image_url, nil for one the catalog hasn't. Raises Faraday::Error when it's unreachable
+      Unreachable = Class.new(StandardError)
+
+      # The model's title, description and image_url, nil for one the catalog hasn't. Raises Unreachable when it doesn't answer
       def vehicle(id)
-        blocks = Rails.cache.fetch("bikebook_catalog_blocks", expires_in: 5.minutes) { read("manifest.json")["blocks"] }
-        block = blocks[id[MODEL_ID, 1]]
-        block && summaries(block)[id]
+        block = (manifest || raise(Unreachable)).dig("blocks", id[MODEL_ID, 1])
+        model = block && (file(block) || raise(Unreachable)).dig("models", id)
+        model && {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
       end
+
+      # nil while the catalog doesn't answer
+      def manifest = cached("bikebook_catalog/manifest", "manifest.json", expires_in: 5.minutes)
+
+      # A published file, nil while the catalog doesn't answer. Its name is a digest of its contents,
+      # so it keeps while it's published
+      def file(path) = cached(["bikebook_catalog/file", path], path, expires_in: 1.week)
 
       #
       # private below here
       #
 
-      # A block's filename is a digest of its contents, so its summaries keep while it's published
-      def summaries(block)
-        Rails.cache.fetch(["bikebook_catalog_block", block], expires_in: 1.week) do
-          read(block)["models"].transform_values do |model|
-            {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
-          end
-        end
+      # A failure is kept for a minute, so a page reading the catalog several times waits on it once
+      def cached(key, path, expires_in:)
+        Rails.cache.fetch(key, expires_in:) do |_key, options|
+          read(path)
+        rescue Faraday::Error, JSON::ParserError, SystemCallError
+          options.expires_in = 1.minute
+          false
+        end || nil
       end
 
       def read(path)
@@ -39,7 +49,7 @@ module Integrations
       # A vehicle's page waits on it, so it gives up well inside rack-timeout's 30s
       def connection = Faraday.new(url: URL, request: {timeout: 5}) { it.response :raise_error }
 
-      conceal :summaries, :read, :connection
+      conceal :cached, :read, :connection
     end
   end
 end
