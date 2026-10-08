@@ -57,7 +57,17 @@
              "ebike-rules--lookup-display-value": bike_display,
              "ebike-rules--lookup-failed-text-value": translation(".bikebook_didnt_load"),
              "ebike-rules--lookup-title-value": @default_title} do |f| %>
-      <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-4">
+      <%#
+        A line height rather than a min-height, which the state's "(CO)" overlay copies along with the font;
+        forced past the gem's own stylesheet, which is unlayered
+      %>
+
+      <div
+        class="
+          tw:flex tw:flex-wrap tw:items-start tw:gap-4
+          tw:[&_.hw-combobox\_\_input]:leading-[34px]!
+        "
+      >
         <div class="tw:flex tw:min-w-0 tw:flex-[2_1_220px] tw:flex-col tw:gap-2">
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :state, label_text: translation(".state"),
             optional_badge: false, wrapper_class: "tw:contents")) do %>
@@ -66,7 +76,6 @@
               data-action="hw-combobox:selection->ebike-rules--lookup#chooseState"
             >
               <%= render(UI::Forms::ComboboxState::Component.new(states: EbikeRuleServices::StateLaws::STATES,
-                input_class: COMBOBOX_INPUT_CLASS,
                 html_options: {value: @lookup.state&.dig(:abbr), placeholder: translation(".select_state"),
                                aria: {invalid: (true if error?(:state))}})) %>
             </div>
@@ -120,7 +129,7 @@
               <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
               <template data-ebike-rules--lookup-target="combobox">
                 <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path(electric: 1),
-                dialog_label: translation(".bike_model"), input_class: COMBOBOX_INPUT_CLASS,
+                dialog_label: translation(".bike_model"),
                 html_options: {value: @lookup.bikebook_id, placeholder: translation(".bike_placeholder"),
                                aria: {invalid: (true if error?(:bike))}})) %>
               </template>

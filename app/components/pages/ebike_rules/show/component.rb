@@ -8,8 +8,6 @@ module Pages
         EYEBROW_CLASSES = "tw:text-xs tw:font-bold tw:tracking-[.08em] tw:uppercase tw:text-blue-600 tw:dark:text-blue-400"
         HEADING_CLASSES = "tw:font-header tw:text-[clamp(26px,4vw,34px)] tw:leading-tight tw:font-extrabold"
         SECTION_CLASSES = "tw:mx-auto tw:max-w-[1120px] tw:px-[clamp(16px,4vw,32px)]"
-        # With the gem's padding and border around it, as tall as the min-h-12 fields beside it
-        COMBOBOX_INPUT_CLASS = "tw:min-h-[34px]"
 
         def initialize(lookup:, manifest_url:, registered_count:, recoveries_count:, page_title:, default_title:)
           @lookup = lookup
