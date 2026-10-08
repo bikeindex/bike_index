@@ -21,6 +21,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
         page_title:,
         page_description: nil,
         page_image: nil,
+        twitter_card: nil,
         page_obj:,
         updated_at: nil,
         organization_name: nil,

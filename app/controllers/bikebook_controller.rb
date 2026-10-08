@@ -43,7 +43,11 @@ class BikebookController < ApplicationController
 
   def render_page(title = "Bikebook")
     @page_title = title
-    @page_image ||= view_context.image_url("logos/bikebook_icon.png")
+    unless @page_image
+      # the icon is taller than wide, which the large card crops to a banner
+      @page_image = view_context.image_url("logos/bikebook_icon.png")
+      @twitter_card = "summary"
+    end
     render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::BikebookCatalog::MANIFEST_URL)
   end
 end

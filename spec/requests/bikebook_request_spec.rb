@@ -18,6 +18,7 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("#vehicle-viewers", visible: :all)
       expect(page).to have_title("Bikebook", exact: true)
         .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook_icon']", visible: :all)
+        .and have_css("meta[name='twitter:card'][content='summary']", visible: :all)
         .and have_css("section[aria-label='About Bike Book'] svg title", text: "Bike Book", visible: :all)
       expect(response.headers["X-Robots-Tag"]).to be_nil
     end
@@ -50,6 +51,7 @@ RSpec.describe BikebookController, type: :request do
           .and have_css("[data-controller='bikebook--page'][data-bikebook--page-title-value='Bikebook']")
         expect(page).to have_css("meta[name='description'][content^='Experience elite performance with the Segway GT3 Pro']", visible: :all)
           .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/segway/2025/gt3_pro.png']", visible: :all)
+          .and have_css("meta[name='twitter:card'][content='summary_large_image']", visible: :all)
           .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
       end
 

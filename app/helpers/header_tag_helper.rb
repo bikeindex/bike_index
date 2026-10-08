@@ -8,6 +8,7 @@ module HeaderTagHelper
       page_title:,
       page_description: @page_description,
       page_image: @page_image,
+      twitter_card: @twitter_card,
       page_obj: @page_obj || @blog || @bike || @user,
       updated_at: @page_updated_at,
       organization_name:,
