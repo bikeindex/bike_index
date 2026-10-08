@@ -145,7 +145,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     uncheck "Use the old registration page"
     expect(page).to have_field("Single page registration form", disabled: false)
     check "Use the old registration page"
-    check "Use the old New unregistered notification page"
+    check "Use the old unregistered notification page"
     within("form[action$='/registrations/switches']") { click_button "Update" }
     click_link "Add a registration"
 
