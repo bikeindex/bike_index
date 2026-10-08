@@ -47,6 +47,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path
     # the search is an unusable placeholder until the catalog loads
     expect(page).to have_no_css("[inert]", wait: 10)
+    # the catalog's 29 models, down to their leading place
+    expect(page).to have_css("h1", exact_text: "The world’s bicycle library — search, compare, and find your next ride across 20+ models.")
     asked.clear
 
     vehicle_field.click
@@ -573,5 +575,6 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path
 
     expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
+    expect(page).to have_css("h1", exact_text: "The world’s bicycle library — search, compare, and find your next ride.")
   end
 end
