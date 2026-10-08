@@ -4,9 +4,10 @@ import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATT
 
 /* global navigator */
 
-// Connects to data-controller='registrations--show--parking-notification-form'
-// The whole org-admin parking-notification panel: the accordion says which trigger
-// opened it, which retitles the heading and preselects the impound kind. "Set on
+// Connects to data-controller='org--parking-notification-form'
+// An org-admin parking-notification form - a registration's panel, or the unregistered
+// vehicle page. On a registration, the accordion says which trigger opened it, which
+// retitles the heading and preselects the impound kind. "Set on
 // map" mode shows a map under a fixed centre pin: it seeds from the browser
 // location (falling back to the organization's location), stamps the coordinates
 // onto the form, and keeps the pin + zoom in the URL so a reload restores them.
@@ -39,13 +40,16 @@ export default class extends Controller {
     impoundHeading: String,
     defaultKind: String,
     orgLatitude: Number,
-    orgLongitude: Number
+    orgLongitude: Number,
+    standalone: Boolean
   }
 
   // The accordion opens a panel as soon as its own module lands, so `shown` can be
-  // spent before this lazily loaded one arrives — it records the name it opened as
+  // spent before this lazily loaded one arrives — it records the name it opened as.
+  // A page of its own has no panel to wait on, so it locates at once
   connect () {
     if (this.element.dataset.openedAs) this.applyMode(this.element.dataset.openedAs)
+    else if (this.standaloneValue) this.startLocation()
   }
 
   panelShown (event) {
@@ -294,6 +298,13 @@ export default class extends Controller {
     url.searchParams.set('map_zoom', (this.map?.getZoom() ?? this.pinZoom).toFixed(2))
     // Revealing the map fires a moveend that changed nothing; skip the no-op write
     if (url.search === window.location.search) return
+    window.history.replaceState(window.history.state, '', url)
+  }
+
+  // Submitting redirects back to this URL, where a kept pin would seed the next notification
+  clearMapState () {
+    const url = new URL(window.location)
+    for (const param of ['map_lat', 'map_lng', 'map_zoom']) url.searchParams.delete(param)
     window.history.replaceState(window.history.state, '', url)
   }
 

@@ -5,7 +5,6 @@ en:
       register:
         parts:
           step2_fields:
-            add_another_color: Add another color
             additional_serial_sticker_number: Additional serial/sticker number
             affiliation: "%{org_name} affiliation"
             are_you_certain: Are you certain?
@@ -13,7 +12,6 @@ en:
             bike_details: "%{cycle_type} details"
             bottom_bracket: Bottom bracket
             cm: cm
-            color: Color
             complete_registration: Complete %{cycle_type} Registration
             contact_info: Contact info
             database_public_note: >-
@@ -52,7 +50,6 @@ en:
             phone_required_found: Phone is required to register a found %{cycle_type}
             phone_required_org: Phone is required to register with %{org_name}
             phone_required_stolen: Phone is required to register a stolen %{cycle_type}
-            primary_color_blank: Primary color — e.g. Black
             read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in
               a separate window)</small>
             rear_dropouts: Rear dropouts
@@ -60,8 +57,6 @@ en:
             register_with_org_description: "%{org_name} will be able to see and help
               manage this registration."
             registration_type: Registration type
-            remove_additional_color: Remove color
-            second_color_blank: Second color — e.g. Red
             serial_help_intro: >-
               Most bicycles have their serial number engraved on the frame. Look for
               your serial number:
@@ -75,8 +70,6 @@ en:
             stolen: Stolen
             stolen_description: This %{cycle_type} has been stolen
             student_id: Student ID
-            third_color_blank: Third color
-            up_to_3: up to 3
             very_very_few_bikes_html: >-
               Very <em>very</em> few %{cycle_types} are made without serials. Unless
               this %{cycle_type}:
