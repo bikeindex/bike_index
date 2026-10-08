@@ -79,8 +79,16 @@ RSpec.describe "Bikebook", :js, type: :system do
     # the tire's narrower, and the axle's tooltip has less in it; the wheel size is the same
     expect(front_wheel.all(".tw\\:spec-diff").map(&:text)).to match([/\A2\.1\W+in tire/, /\Athru axle/])
     expect(all("article").first).to have_no_css(".tw\\:spec-diff")
+    # the overlay draws what it has the geometry for, and says what it hasn't
+    within("[aria-label='Geometry overlay']") do
+      expect(page).to have_css("svg[role='img'] > g", count: 1).and have_css("li", count: 1, text: "Aventón Level 4 REC Step-Through")
+      expect(page).to have_text("Aventón Level 2 Step-Through isn't drawn without its Stack, Head Angle, Chainstay, BB Drop.")
+    end
     within("[aria-label='Comparison']") do
       expect(page).to have_css("thead th", text: "Level 2 Step-Through")
+      # keyed to the overlay by its frame's color along its foot, which a model it doesn't draw has none of
+      expect(page).to have_no_css("thead th.tw\\:border-b-4")
+      expect(all("tbody tr").last.all("td").map { it[:class].include?("tw:border-b-4") }).to eq([true, false])
       expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$1,000")
       # only the number is colored: the currency symbol and unit keep their gray
       colors = page.evaluate_script(<<~JS)
@@ -218,8 +226,41 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect_size.call("Current ADV", "Medium")
     expect_size.call("Current EXP", "Medium")
 
+    overlay = find("[aria-label='Geometry overlay'] svg[role='img']")
+    medium = [overlay[:viewBox], overlay.find("g > path", match: :first, visible: :all)[:d]]
     size_select.call("Current ADV").select("Large")
     expect_size.call("Current EXP", "Large")
+    # the overlay draws each in its size
+    within("[aria-label='Geometry overlay']") do
+      expect(all("li").map(&:text)).to eq(["Aventón Current ADV Large", "Aventón Current EXP Large"])
+      # to the same scale, so the larger frame draws larger
+      expect(find("svg[role='img']")[:viewBox]).to eq medium.first
+      expect(find("svg[role='img'] g > path", match: :first, visible: :all)[:d]).not_to eq medium.last
+      # the leftmost column's frame lowest
+      expect(all("svg[role='img'] > g > title", visible: :all).map { it.text(:all) }).to eq(["Aventón Current ADV, Large", "Aventón Current EXP, Large"])
+      # a legend button fades the other frame and draws its own on top, until it's pressed again
+      wait_for_stimulus("bikebook--geometry-overlay")
+      click_on "Aventón Current ADV"
+      expect(page).to have_css("button[aria-pressed='true']", count: 1, text: "Current ADV")
+      expect(all("svg[role='img'] > g", visible: :all).map { it[:opacity] }).to eq([nil, "0.2"])
+      expect(find("svg[role='img'] > use", visible: :all)[:href]).to eq "#geometry-frame-0"
+      click_on "Aventón Current ADV"
+      expect(page).to have_no_css("button[aria-pressed='true']")
+      expect(page).to have_no_css("svg[role='img'] > g[opacity]", visible: :all)
+    end
+    # a frame's points in mm from the bottom bracket, its height there from the wheels' radius where it lists no drop
+    frames = page.evaluate_script(<<~JS)
+      import('bikebook/frame_geometry').then(({ frameGeometry }) => {
+        const data = { wheels: [{ bsd: 622, tire_width: 40, position: ['front', 'rear'] }] }
+        const geometry = { reach: 400, stack: 600, head_angle: 72, head_tube: 150, chainstay: 420, wheelbase: 1020, seat_angle: 73, seat_tube_ct: 500 }
+        const frame = (extra) => frameGeometry(data, { geometry: { ...geometry, ...extra } })
+        const round = (point) => point.map(Math.round)
+        const { rearAxle, frontAxle, headBottom, seatTop, bottomBracketHeight, estimated } = frame({ bb_drop: 70 })
+        return [[rearAxle, frontAxle, headBottom, seatTop].map(round), bottomBracketHeight, estimated, round(frame({ bb_height: 281 }).rearAxle),
+          frame({ bb_drop: 70, seat_tube_ct: null }).estimated, frameGeometry({}, { geometry: { reach: 400 } }).missing]
+      })
+    JS
+    expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [-146, 478]], 281, false, [-414, 70], true, %w[stack head_angle chainstay bb_drop]])
 
     size_select.call("Current EXP").select("Small")
     expect_size.call("Current EXP", "Small")
@@ -257,9 +298,15 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(centering.call("Current ADV")).to match([be > 0, be < 2])
     expect(centering.call("Current EXP")).to match([0, be < 2])
 
-    # a size stays with its vehicle as the vehicles change
-    find("[aria-label='Remove Aventón Current ADV']").click
+    # a size stays with its vehicle as the vehicles change, and a card's removal leaves the reader where they were
+    remove = find("[aria-label='Remove Aventón Current ADV']")
+    scroll_to(remove, align: :center)
+    scrolled = page.evaluate_script("window.scrollY")
+    remove.click
     expect(page).to have_css(".hw-combobox__chip", count: 1)
+    expect(page.evaluate_script("window.scrollY")).to be > 0
+    expect(page.evaluate_script("window.scrollY")).to be_within(2).of(scrolled)
+    expect(vehicle_field).not_to match_css(":focus")
     expect_size.call("Current EXP", "Small")
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
@@ -326,6 +373,11 @@ RSpec.describe "Bikebook", :js, type: :system do
         JS
       expect_template(UI::Collapse::Component.new(chevron: true, size: :sm, aria: {label: "Toggle sizes"}),
         "bikebook/templates/ui/collapse#collapse", "{ chevron: true, size: 'sm', attributes: { 'aria-label': 'Toggle sizes' } }")
+
+      # the overlay's frames and the comparison columns keyed to them, in the charts' colors
+      series = page.evaluate_script("import('bikebook/templates/vehicles/geometry_overlay').then(({ SERIES }) => SERIES)")
+      expect(series.map { it["color"] }).to eq(UI::Chart::Component::COLORS.first(5))
+      expect(series).to all(satisfy { |each| each["border"].split.include?("tw:border-b-[#{each["color"]}]") })
 
       expect_template(UI::CopyableCode::Component.new(value: "m/trek/2025/fetch", label: "Copy ID"),
         "bikebook/templates/ui/copyable_code#copyableCode", "{ value: 'm/trek/2025/fetch', label: 'Copy ID' }")

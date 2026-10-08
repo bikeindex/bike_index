@@ -46,7 +46,8 @@ export default class extends Controller {
     this.#go(realigned(url))
   }
 
-  // A plain click on a link to this page, such as a card's remove link
+  // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
+  // scrolling or focusing the search
   follow (event) {
     const link = event.target.closest('a[href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
@@ -55,7 +56,7 @@ export default class extends Controller {
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
-    this.#go(url)
+    'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: false }) : this.#go(url)
   }
 
   // From the URL rather than the render's, which a filter edit since has moved on
@@ -90,12 +91,12 @@ export default class extends Controller {
     if (!this.#entry) window.history.replaceState(stamped(window.history.state), '')
   }
 
-  #go (url, scroll = [0, 0]) {
+  #go (url, scroll = [0, 0], options) {
     window.history.pushState(stamped(), '', readable(url))
-    return this.#render(url, scroll)
+    return this.#render(url, scroll, options)
   }
 
-  async #render (url, scroll) {
+  async #render (url, scroll, { focus = true } = {}) {
     const render = ++this.#renders
     const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url).catch((error) => error)
     if (render !== this.#renders) return
@@ -105,7 +106,7 @@ export default class extends Controller {
     this.dispatch('before-render')
     this.pageTarget.replaceChildren(rendered.content)
     document.title = rendered.title ?? this.title
-    this.pageTarget.querySelector('[autofocus]')?.focus()
+    if (focus) this.pageTarget.querySelector('[autofocus]')?.focus()
     if (scroll) window.scrollTo(...scroll)
   }
 
