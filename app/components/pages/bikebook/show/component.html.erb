@@ -174,8 +174,19 @@
       tw:sm:gap-6 tw:sm:py-6
     "
   >
-    <%= helpers.inline_svg_tag("logos/bikebook.svg", title: "Bike Book", aria: true,
-      class: "tw:h-12 tw:w-auto tw:shrink-0 tw:max-sm:self-start tw:text-slate-900 tw:dark:text-slate-100 tw:dark:[--bikebook-bike:var(--color-gray-400)]") %>
+    <div class="tw:flex tw:shrink-0 tw:items-center tw:gap-3">
+      <%= helpers.inline_svg_tag("logos/bikebook_mark.svg", class: "tw:h-12 tw:w-auto tw:text-[#2980ba]", aria_hidden: true) %>
+
+      <p
+        class="
+          tw:m-0 tw:flex tw:flex-col tw:font-['DM_Sans',sans-serif]
+          tw:text-2xl tw:leading-[0.95] tw:tracking-[-0.4px]
+        "
+      >
+        <span class="tw:text-[#555] tw:dark:text-gray-400">Bike</span>
+        <span class="tw:font-bold tw:text-slate-900 tw:dark:text-slate-100">Book</span>
+      </p>
+    </div>
 
     <div
       class="
@@ -204,6 +215,14 @@
   </section>
 
   <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
+
+  <%# DM Sans is the Bike Book logo's face, loaded for its letters alone %>
+  <% helpers.content_for(:header) do %>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&text=BikeBok&display=swap"
+      rel="stylesheet"
+    >
+  <% end %>
 
   <div class="bikebook twgutter tw:mx-auto tw:max-w-screen-xl tw:pt-7 tw:pb-6">
     <template data-bikebook--page-target="shell">
