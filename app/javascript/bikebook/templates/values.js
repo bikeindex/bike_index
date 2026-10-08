@@ -49,6 +49,7 @@ export const listed = (value) => separators.get(value) ? [joins.get(value).filte
 export const partsOf = (value) => joins.has(value) ? joins.get(value).flatMap(partsOf) : [value]
 
 export const compact = (values) => values.filter((value) => value != null)
+export const isNumber = (value) => typeof value === 'number'
 export const slice = (hash, keys) => Object.fromEntries(keys.filter((key) => key in (hash ?? {})).map((key) => [key, hash[key]]))
 export const except = (hash, keys) => Object.fromEntries(Object.entries(hash).filter(([key]) => !keys.includes(key)))
 export const array = (value) => value == null ? [] : [value].flat()

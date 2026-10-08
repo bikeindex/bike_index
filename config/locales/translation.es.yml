@@ -6890,7 +6890,6 @@ es:
           year: Año
           filter_combobox:
             any: Cualquier
-          comparison_view: Vista comparativa
     shared_blocks:
       footer:
         about: Acerca

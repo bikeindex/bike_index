@@ -6911,7 +6911,6 @@ it:
           year: Anno
           filter_combobox:
             any: Qualunque
-          comparison_view: Vista comparativa
     shared_blocks:
       footer:
         about: Di

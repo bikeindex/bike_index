@@ -14,7 +14,6 @@ en:
           any_vehicle_type: Any vehicle type
           applied_filters: Applied filters
           byline: A free reference from Bike Index, the non-profit bike registry.
-          comparison_view: Comparison view
           configuration: Configuration
           failed: The catalog didn't load. Reload the page to try again.
           loading: Loading the catalog…
