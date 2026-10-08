@@ -27,7 +27,7 @@ const tireInches = (presenter, millimeters) => presenter.labeled(presenter.round
 const brakeType = (brake) => brake?.type?.replace(/^Disc (\w+)$/, '$1 disc')
 const at = (items, position, size) => array(items).filter((item) => array(item.position).includes(position) && (!item.sizes || array(item.sizes).includes(size?.name)))
 
-// A vehicle's front and rear in `size`, as the comparison table lists them: the built wheel's [key, number, content]
+// A vehicle's front and rear in `size`, as the comparison table lists them: the built wheel, its [key, number, content]
 // parts, its tire's carrying its width, and the widest tire any of its wheels there takes
 export const wheelsAt = (presenter, data, size) => {
   const viewer = new ModelViewer({ presenter, data, others: [] })
@@ -35,6 +35,7 @@ export const wheelsAt = (presenter, data, size) => {
     const built = at(viewer.builtWheels(), position, size)[0]
     const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => wheel.max_tire_width).filter((width) => typeof width === 'number')
     return [position, {
+      built,
       parts: built && viewer.wheelParts({ ...built, sizes: null }, { fitting: false }).map(([key, content]) => [key, key === 'tire' ? built.tire_width : null, content]),
       maxTire: widths.length ? Math.max(...widths) : null
     }]
