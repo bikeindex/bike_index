@@ -6911,6 +6911,17 @@ it:
           year: Anno
           filter_combobox:
             any: Qualunque
+          about_bikebook: Informazioni sul libro sulle biciclette
+          byline: Un riferimento gratuito fornito da Bike Index, il registro di biciclette
+            senza scopo di lucro.
+          tagline_html: 'La biblioteca mondiale delle biciclette: cerca, confronta
+            e trova la tua prossima bici tra oltre %{models_count} modelli.'
+        donate_strip:
+          dismiss: Congedare
+          donate: Donare
+          pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
+            Bike Index. Aiutateci a coprire i costi del server.
+          region: Fai una donazione a Bike Index
     shared_blocks:
       footer:
         about: Di
