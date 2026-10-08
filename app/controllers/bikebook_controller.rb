@@ -10,8 +10,8 @@ class BikebookController < ApplicationController
     render_page
   end
 
-  # /bikebook/m/segway/2025/gt3_pro, or without its m/, picks that vehicle ahead of any already picked,
-  # as /bikebook/evc/us/class_3 does that e-vehicle classification
+  # /bike_book/m/segway/2025/gt3_pro, or without its m/, picks that vehicle ahead of any already picked,
+  # as /bike_book/evc/us/class_3 does that e-vehicle classification
   def vehicle
     path = params[:vehicle_model]
     id = path.start_with?("evc/") ? path : "m/#{path.delete_prefix("m/")}"
@@ -25,7 +25,7 @@ class BikebookController < ApplicationController
     end
     # unescaped, as the page writes its own URLs
     query = query.to_query.gsub("%2F", "/").gsub("%2C", ",")
-    redirect_to "#{bikebook_path}?#{query}"
+    redirect_to "#{bike_book_path}?#{query}"
   end
 
   private
@@ -33,7 +33,7 @@ class BikebookController < ApplicationController
   # A model picked alone is its own page, canonically without the search's other params
   def render_vehicle(id)
     vehicle = Integrations::BikeBook::Catalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
-    @page_url = "#{bikebook_url}?vehicle_models=#{id}"
+    @page_url = "#{bike_book_url}?vehicle_models=#{id}"
     @page_description = vehicle.description
     @page_image = vehicle.image_url
     render_page(vehicle.title)

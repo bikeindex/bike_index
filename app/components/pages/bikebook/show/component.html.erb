@@ -19,13 +19,13 @@
       data-bikebook--catalog-filters-target="vehicleCombobox"
       data-controller="bikebook--focus-shortcut"
     >
-      <%= form_with url: bikebook_path, method: :get,
+      <%= form_with url: bike_book_path, method: :get,
           data: {controller: "bikebook--auto-submit",
                  action: "hw-combobox:selection->bikebook--auto-submit#submit hw-combobox:removal->bikebook--auto-submit#submit"} do %>
         <%= render(UI::Forms::Combobox::Component.new(
         name: "vehicle_models",
-        src: bikebook_path,
-        multiselect_chip_src: bikebook_path,
+        src: bike_book_path,
+        multiselect_chip_src: bike_book_path,
         dialog_label: translation(".view_a_vehicle"),
         html_options: {value: "",
                        placeholder: translation(".search_placeholder"),

@@ -34,7 +34,7 @@ pin_all_from "app/javascript/utils", under: "utils", to: "utils"
 pin "lexxy", to: "lexxy.js"
 pin "@rails/activestorage", to: "activestorage.esm.js"
 
-# /bikebook's modules, preloaded nowhere. Its controllers' pin_all_from overrides the preload
+# /bike_book's modules, preloaded nowhere. Its controllers' pin_all_from overrides the preload
 # "app/javascript/controllers" gives them, which would fetch the graph they import on every page
 pin_all_from "app/javascript/bikebook", under: "bikebook", preload: false
 pin_all_from "app/javascript/controllers/bikebook", under: "controllers/bikebook", preload: false

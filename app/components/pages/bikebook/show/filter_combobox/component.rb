@@ -23,7 +23,7 @@ module Pages
               wrapper_class: ("tw:max-w-md" unless @full_width))) do |group|
               group.with_label_note { content } if content?
               render(UI::Forms::Combobox::Component.new(name: @name, dialog_label: @label,
-                multiselect_chip_src: (bikebook_path if @multiselect), include_blank: (translation(".any") unless @multiselect),
+                multiselect_chip_src: (bike_book_path if @multiselect), include_blank: (translation(".any") unless @multiselect),
                 html_options: {value: "", placeholder: @placeholder,
                                data: {"bikebook--catalog-filters-target": "field", filter_label: @label, action: SELECTION_ACTIONS}}))
             end
