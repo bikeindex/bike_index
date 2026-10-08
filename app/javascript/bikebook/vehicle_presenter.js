@@ -60,7 +60,7 @@ export class VehiclePresenter {
     ]))
   }
 
-  // A `difference` leaves off the feet and inches
+  // A `difference` of a length in centimeters leaves off its feet and inches
   measurement (value, unit = null, key = null, { difference = false } = {}) {
     if (value === true) return '✓'
     if (value === false) return '❌'
@@ -71,17 +71,16 @@ export class VehiclePresenter {
 
     const parts = this.#imperialParts(unit, key)
     const feet = parts.length === 2
-    const centimeters = this.labeled(this.rounded(value / this.kit.conversions.mm.cm), 'cm', this.kit.presenter.centimeters)
     const inCentimeters = IN_CENTIMETERS.includes(key)
-    const metric = feet || inCentimeters ? centimeters : this.labeled(value, unit)
+    const metric = feet || inCentimeters
+      ? this.labeled(this.rounded(value / this.kit.conversions.mm.cm), 'cm', this.kit.presenter.centimeters)
+      : this.labeled(value, unit)
     if (parts.length === 0 || (inCentimeters && difference)) return metric
 
     const imperial = join(parts.map(({ part, convert }) => this.labeled(this.rounded(convert(value)), unit, part)), ' ')
-    if (inCentimeters) {
-      return this.#unitSystems(metric, join([metric, ' ', html`<span class="tw:text-xs twless-strong">(${feet ? this.#tooltipped(imperial, [this.#inWords(value)]) : imperial})</span>`]))
-    }
     // rounded to the inch, so the exact length is a hover away
-    return this.#unitSystems(metric, feet ? this.#tooltipped(imperial, [this.#inWords(value), metric]) : imperial)
+    const shown = feet ? this.#tooltipped(imperial, compact([this.#inWords(value), inCentimeters ? null : metric])) : imperial
+    return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs twless-strong">(${shown})</span>`]) : shown)
   }
 
   // all three read "136.5 × 66.6 × 137 cm" (L × W × H); fewer name each, "136.5 cm long"
@@ -173,16 +172,14 @@ export class VehiclePresenter {
 
   // "3 feet, 2.6 inches", leaving off a part that's zero
   #inWords (millimeters) {
-    const inches = this.rounded(this.#inches(millimeters))
-    const feet = Math.floor(inches / 12)
-    const counts = [feet, this.rounded(inches - feet * 12)]
-    return this.kit.feet_and_inches.map(({ name }, index) => [counts[index], name]).filter(([count], index) => count !== 0 || (index === 1 && !feet))
+    const [feet, inches] = this.#feetAndInches((value) => this.rounded(value)).map(({ part, convert }) => [this.rounded(convert(millimeters)), part.name])
+    return [feet, inches].filter(([count], index) => count !== 0 || (index === 1 && !feet[0]))
       .map(([count, name]) => `${count} ${count === 1 ? SINGULAR[name] ?? name : name}`).join(', ')
   }
 
-  // Whole feet, then the inches left over
-  #feetAndInches () {
-    const inches = (length) => roundHalfUp(this.#inches(length))
+  // Whole feet, then the inches left over, to the nearest whole inch unless `round` says otherwise
+  #feetAndInches (round = roundHalfUp) {
+    const inches = (length) => round(this.#inches(length))
     return this.kit.feet_and_inches.map((part, index) => ({ part, convert: index === 0 ? (length) => Math.floor(inches(length) / 12) : (length) => inches(length) % 12 }))
   }
 
