@@ -18,7 +18,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     type_into(find_field("State"), "Colorado")
     retry_on_detach { find("[role='option']", text: "Colorado").click }
     expect(page).to have_css("[role='status']",
-      text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 3 e-bike.")
+      text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 2 and 3 e-bike.")
     expect(page).to have_current_path("/ebike-rules/co?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
     expect(page).to have_title("Colorado e-bike laws")
     expect(find_field("Bike model", disabled: false, wait: 10).value).to eq "Specialized Haul ST"

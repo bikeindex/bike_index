@@ -38,10 +38,10 @@ module Pages
           name = bike_name
           state = @state[:name]
           case @verdict
-          when :green then translation(".green_headline", name:, state:, n: @bike.e_bike_class)
+          when :green then translation(".green_headline", name:, state:, n: class_numbers)
           when :yellow
             if @bike.e_bike_class
-              translation(".yellow_headline", name:, state:, n: @bike.e_bike_class, count: rule_count(:check))
+              translation(".yellow_headline", name:, state:, n: class_numbers, count: rule_count(:check))
             else
               translation(".yellow_headline_class_unknown", name:, state:, count: rule_count(:check))
             end
@@ -51,6 +51,8 @@ module Pages
           else translation(".gray_headline", state:)
           end
         end
+
+        def class_numbers = @bike.e_bike_classes.to_sentence
 
         def details
           @details ||= case @verdict
@@ -63,7 +65,7 @@ module Pages
 
         def gray_detail
           if @bike.e_bike_class
-            translation(".gray_detail", name: bike_name, n: @bike.e_bike_class, state: @state[:name])
+            translation(".gray_detail", name: bike_name, n: class_numbers, state: @state[:name])
           else
             translation(".gray_detail_unclassified", name: bike_name, state: @state[:name])
           end
