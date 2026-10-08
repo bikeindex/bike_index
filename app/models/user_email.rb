@@ -14,6 +14,7 @@
 #
 # Indexes
 #
+#  index_user_emails_on_email            (email)
 #  index_user_emails_on_email_confirmed  (email) WHERE (confirmation_token IS NULL)
 #  index_user_emails_on_user_id          (user_id)
 #

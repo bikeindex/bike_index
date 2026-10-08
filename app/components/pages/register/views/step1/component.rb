@@ -4,10 +4,11 @@ module Pages
   module Register
     module Views
       module Step1
-        # Step 1 of the registration flow: the quick-start form
+        # Step 1 of the registration flow: the quick-start form, which ends in its own submit
+        # or, on the single page, step 2's fields
         class Component < ApplicationComponent
           def initialize(b_param:, flow:, organization: nil, current_user: nil, embed: false,
-            skip_heading: false, button_color: nil, button_hover_color: nil)
+            skip_heading: false, button_color: nil, button_hover_color: nil, motorized_review: false)
             @b_param = b_param
             @flow = flow
             @organization = organization
@@ -16,6 +17,7 @@ module Pages
             @skip_heading = skip_heading
             @button_color = button_color
             @button_hover_color = button_hover_color
+            @motorized_review = motorized_review
           end
 
           private
@@ -32,6 +34,10 @@ module Pages
             translation(".register_your_vehicle_with_org", org_name: organization.short_name)
           end
 
+          def subtitle
+            translation(".just_the_essentials") unless @flow.single_page?
+          end
+
           # What a frame can't have: a Turbo submission, which Turbo would render back inside it
           # (the target is ignored unless it names an iframe); autofocus, which scrolls the
           # embedding page down to the frame on load; and form-persist, whose localStorage is
@@ -39,11 +45,22 @@ module Pages
           def form_options
             return {data: {turbo: false}, html: {target: "_top"}} if @embed
 
-            {data: {turbo: true, controller: "autofocus form-persist register--retry ui--forms--turnstile",
-                    form_persist_key_value: "register-start-#{@b_param.id_token}",
+            details = Pages::Register::Parts::Step2Fields::Component
+            # Step 2's photo field is in a bare fields_for, whose multipart flag never reaches the form
+            {multipart: @flow.single_page?,
+             data: {turbo: true, form_persist_key_value: "register-#{@flow.single_page? ? "combined" : "start"}-#{@b_param.id_token}",
+                    controller: "autofocus form-persist register--retry ui--forms--turnstile #{details::FORM_CONTROLLERS if @flow.single_page?}",
                     **UI::Forms::Turnstile::Component.form_data(user: @current_user),
                     action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
-                      "input->ui--forms--turnstile#update submit->form-persist#clear"}}
+                      "input->ui--forms--turnstile#update submit->form-persist#clear #{single_page_actions}"}}
+          end
+
+          # The electric checkbox and the owner's email share the single page's form, and change
+          # what the submit leads to
+          def single_page_actions
+            return unless @flow.single_page?
+
+            "#{Pages::Register::Parts::Step2Fields::Component::FORM_ACTIONS} input->register--status-fields#updateSubmitLabel"
           end
         end
       end

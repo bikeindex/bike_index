@@ -223,11 +223,19 @@ RSpec.describe BParam, type: :model do
 
   describe "set_handlebar_type_key" do
     it "sets handlebar_type to the handlebar type from name submitted" do
-      bike = {serial_number: "gobble gobble", handlebar_type_slug: " bmx "}
+      bike = {serial_number: "gobble gobble", handlebar_type_slug: " forward "}
       b_param = BParam.new(params: {bike: bike})
       b_param.set_handlebar_type_key
       expect(b_param.bike["handlebar_type_slug"].present?).to be_falsey
-      expect(b_param.bike["handlebar_type"]).to eq(:bmx)
+      expect(b_param.bike["handlebar_type"]).to eq(:forward)
+    end
+
+    it "sets the former slugs to horizontal" do
+      %w[flat bmx].each do
+        b_param = BParam.new(params: {bike: {handlebar_type_slug: it}})
+        b_param.set_handlebar_type_key
+        expect(b_param.bike["handlebar_type"]).to eq(:horizontal)
+      end
     end
   end
 
@@ -615,6 +623,20 @@ RSpec.describe BParam, type: :model do
         }, bike_errors: ["Some error"])
         expect(b_param.display_email?).to be_truthy
       end
+    end
+  end
+
+  describe "rules_left_to_owner?" do
+    let(:b_param) { BParam.new(params: {register_separate_attestation: true, bike: {owner_email: "owner@example.com"}}.as_json) }
+    let(:owner) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
+
+    it "is the switch, for anyone but the owner" do
+      expect(b_param.rules_left_to_owner?(FactoryBot.create(:user_confirmed))).to be_truthy
+      expect(b_param.rules_left_to_owner?(nil)).to be_truthy
+      expect(b_param.rules_left_to_owner?(owner)).to be_falsey
+
+      b_param.params = b_param.params.merge("register_separate_attestation" => false)
+      expect(b_param.rules_left_to_owner?(nil)).to be_falsey
     end
   end
 

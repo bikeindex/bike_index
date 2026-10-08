@@ -109,6 +109,18 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
     end
 
+    context "with an organization message" do
+      let(:organization_message) { FactoryBot.create(:organization_message) }
+      let(:bike) { organization_message.bike }
+
+      it "renders it on the messages tab" do
+        get "#{base_url}/#{bike.id}?active_tab=messages"
+        expect(response.code).to eq("200")
+        expect(response.body).to include(organization_message.message)
+        expect(response.body).to include(admin_organization_messages_path(search_bike_id: bike.id))
+      end
+    end
+
     context "with an alert from a soft-deleted user" do
       let(:alert_user) { FactoryBot.create(:user_confirmed, email: "gone@example.com") }
       let!(:user_alert) { FactoryBot.create(:user_alert, user: alert_user, bike:) }

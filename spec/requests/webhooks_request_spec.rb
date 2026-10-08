@@ -19,6 +19,16 @@ RSpec.describe WebhooksController, type: :request do
       "t=#{timestamp},v1=#{signature}"
     end
 
+    def post_webhook
+      post webhook_url,
+        params: payload,
+        headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
+    end
+
+    def enqueued_stripe_event_ids
+      StripeJobs::ProcessEventJob.jobs.map { it["args"].first }
+    end
+
     context "with subscription checkout session completed" do
       let(:target_stripe_subscription) do
         {
@@ -27,62 +37,72 @@ RSpec.describe WebhooksController, type: :request do
           email:
         }
       end
-      it "processes the webhook successfully" do
-        # See stripe_event_spec for how to re-record cassettes
-        VCR.use_cassette("WebhooksController-checkout_session-completed", **cassette_options) do
-          expect do
-            post webhook_url,
-              params: payload,
-              headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
-          end.to change(StripeEvent, :count).by 1
+      it "stores the event and processes it in a job" do
+        expect { post_webhook }.to change(StripeEvent, :count).by 1
 
-          expect(response).to have_http_status(:ok)
-          expect(json_result).to eq({"success" => true})
-          stripe_event = StripeEvent.last
-          expect(stripe_event.name).to eq "checkout.session.completed"
-          expect(stripe_event.stripe_id).to be_present
-          stripe_subscription = StripeSubscription.last
-          expect(stripe_subscription.start_at).to be_within(1).of start_at
-          expect(stripe_subscription.end_at).to be_blank
-          expect(stripe_subscription).to have_attributes target_stripe_subscription
-          expect(stripe_subscription.stripe_id).to be_present
-          expect(stripe_subscription.membership_id).to be_blank
-          expect(stripe_subscription.payments.count).to eq 1
+        expect(response).to have_http_status(:ok)
+        expect(json_result).to eq({"success" => true})
+        stripe_event = StripeEvent.find_by(stripe_event_id: "evt_0Tb1opm0T0GBfX0veedyxQTJ")
+        expect(stripe_event).to have_attributes(name: "checkout.session.completed", processed_at: nil,
+          payload: JSON.parse(payload))
+        expect(enqueued_stripe_event_ids).to eq([stripe_event.id])
+
+        # See process_event_job_spec for how to re-record cassettes
+        VCR.use_cassette("WebhooksController-checkout_session-completed", **cassette_options) do
+          StripeJobs::ProcessEventJob.drain
         end
+        expect(stripe_event.reload.processed_at).to be_present
+        stripe_subscription = StripeSubscription.last
+        expect(stripe_subscription.start_at).to be_within(1).of start_at
+        expect(stripe_subscription.end_at).to be_blank
+        expect(stripe_subscription).to have_attributes target_stripe_subscription
+        expect(stripe_subscription.stripe_id).to be_present
+        expect(stripe_subscription.membership_id).to be_blank
+        expect(stripe_subscription.payments.count).to eq 1
+      end
+
+      it "doesn't process a redelivered event again" do
+        Sidekiq::Job.drain_all
+        ActionMailer::Base.deliveries = []
+
+        expect do
+          post_webhook
+          VCR.use_cassette("WebhooksController-checkout_session-completed", **cassette_options) do
+            StripeJobs::ProcessEventJob.drain
+          end
+
+          post_webhook
+          expect(response).to have_http_status(:ok)
+          expect(enqueued_stripe_event_ids).to eq([])
+        end.to change(StripeEvent, :count).by(1)
+          .and change(Payment, :count).by(1)
+
+        Sidekiq::Job.drain_all
+        expect(ActionMailer::Base.deliveries.count).to eq 1
       end
     end
 
     context "with a stripe subscription created event" do
       let(:payload) { File.read(Rails.root.join("spec/fixtures/stripe_webhook-customer.subscription.created.json")) }
-      let(:target_stripe_subscription) do
-        {
-          user_id: nil,
-          stripe_status: "active",
-          email:,
-          end_at: nil
-        }
-      end
       include_context :test_csrf_token
       it "processes the webhook successfully" do
-        VCR.use_cassette("WebhooksController-subscription-created", **cassette_options) do
-          expect do
-            post webhook_url,
-              params: payload,
-              headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
-          end.to change(StripeEvent, :count).by 1
+        expect { post_webhook }.to change(StripeEvent, :count).by 1
 
-          expect(response).to have_http_status(:ok)
-          expect(json_result).to eq({"success" => true})
-          stripe_event = StripeEvent.last
-          expect(stripe_event.name).to eq "customer.subscription.created"
-          expect(stripe_event.stripe_id).to be_present
-          stripe_subscription = StripeSubscription.last
-          expect(stripe_subscription.start_at).to be_within(1).of start_at
-          expect(stripe_subscription).to have_attributes(email: nil, stripe_status: "incomplete")
-          expect(stripe_subscription.stripe_id).to be_present
-          expect(stripe_subscription.membership_id).to be_blank
-          expect(stripe_subscription.payments.count).to eq 0
+        expect(response).to have_http_status(:ok)
+        expect(json_result).to eq({"success" => true})
+        stripe_event = StripeEvent.last
+        expect(stripe_event).to have_attributes(name: "customer.subscription.created", stripe_event_id: "evt_0Tb1oqm0T0GBfX0vz0T3oeLq")
+        expect(enqueued_stripe_event_ids).to eq([stripe_event.id])
+
+        VCR.use_cassette("WebhooksController-subscription-created", **cassette_options) do
+          StripeJobs::ProcessEventJob.drain
         end
+        stripe_subscription = StripeSubscription.last
+        expect(stripe_subscription.start_at).to be_within(1).of start_at
+        expect(stripe_subscription).to have_attributes(email: nil, stripe_status: "incomplete")
+        expect(stripe_subscription.stripe_id).to be_present
+        expect(stripe_subscription.membership_id).to be_blank
+        expect(stripe_subscription.payments.count).to eq 0
       end
     end
 
@@ -97,15 +117,12 @@ RSpec.describe WebhooksController, type: :request do
       let!(:user) { FactoryBot.create(:user_confirmed, email:, stripe_id: stripe_customer_id) }
 
       it "updates the subscription" do
-        VCR.use_cassette("WebhooksController-subscription-cancel", **cassette_options) do
-          expect do
-            post webhook_url,
-              params: payload,
-              headers: {"CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => stripe_signature}
+        expect { post_webhook }.to change(StripeEvent, :count).by 1
+        expect(response).to have_http_status(:ok)
+        expect(json_result).to eq({"success" => true})
 
-            expect(response).to have_http_status(:ok)
-            expect(json_result).to eq({"success" => true})
-          end.to change(StripeEvent, :count).by 1
+        VCR.use_cassette("WebhooksController-subscription-cancel", **cassette_options) do
+          StripeJobs::ProcessEventJob.drain
         end
 
         stripe_subscription = StripeSubscription.last
@@ -137,10 +154,24 @@ RSpec.describe WebhooksController, type: :request do
       end
     end
 
-    # TODO: Someday, handle this - not a high priority though
-    # context "unknown event type" do
-    #   it "returns 400"
-    # end
+    context "with an unhandled dispute event" do
+      let(:payload) do
+        {
+          id: "evt_1Dispute", object: "event", type: "charge.dispute.created",
+          data: {object: {id: "dp_1Dispute", object: "dispute", charge: "ch_1Charge", amount: 999}}
+        }.to_json
+      end
+
+      it "stores the payload and returns 200 without enqueuing a job" do
+        expect { post_webhook }.to change(StripeEvent, :count).by 1
+
+        expect(response).to have_http_status(:ok)
+        expect(json_result).to eq({"success" => true})
+        expect(StripeEvent.find_by(stripe_event_id: "evt_1Dispute")).to have_attributes(processed_at: nil,
+          name: "charge.dispute.created", payload: JSON.parse(payload))
+        expect(enqueued_stripe_event_ids).to eq([])
+      end
+    end
   end
 
   describe "strava" do

@@ -99,13 +99,28 @@ The `+++ b/…` lines keep each hit attached to its file; the code-path filter k
 
 Judge each against the **Comments** section of `AGENTS.md` and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome, razoring the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
 
+### The backfill audit
+
+**Required.** Ask whether rows already in the database still fit the branch's code. The shapes that leave them behind:
+
+- **A vocabulary stored as data** — an enum value, a jsonb key or list, a class name in a string column. #4458 replaced names `Export#options["headers"]` holds; `Backfills::NotificationDeliveryErrorRenameJob` is a rename.
+- **A new column whose value depends on existing data**, not its default — `Backfills::OrganizationRolePriorityJob`.
+- **A changed calculated attribute** — existing rows keep the old value until something re-saves them. `Backfills::OrganizationPaidMoneyJob`.
+
+Find what reads the old form before calling one due. A value nothing reads again doesn't need one, and one recording what happened — `Export#written_headers` describes the file that was written — shouldn't be rewritten.
+
+State the verdict in your reply to the user either way, naming the stored values you checked. When one is due, write it without asking — a job in `app/jobs/backfills/` with its spec — and lead the PR body with it (SKILL.md's **Write the summary body**).
+
 ### The cycle-type translation check
 
 `AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:
 
 ```bash
 rtk proxy git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
+rtk proxy git diff origin/main...HEAD -- '*.rb' | grep -in '^+[^+].*errors\.add.*bike'
 ```
+
+The second one is load-bearing: a model's `errors.add(:base, "…")` reaches a flash through `full_messages`, never passing a locale file, so the YAML grep can't see it. `Sale#seller_is_owner` interpolates the cycle type into one.
 
 Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` and `Pages::Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/pages/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
 

@@ -30,13 +30,13 @@ module BikeServices
     MATCH_INPUTS = (MATCHED_ATTRS.keys + %w[owner_email manufacturer_id manufacturer_other cycle_type frame_size_unit]).freeze
 
     # The token's registration when step 1 was never submitted, otherwise a new one.
-    # A signed-in user's email prefills owner_email
-    def b_param_for(user:, token_id: nil, status: nil, email: nil, origin: "register_flow")
+    # A signed-in user's email prefills owner_email, a scanned sticker's code bike_sticker
+    def b_param_for(user:, token_id: nil, status: nil, email: nil, bike_sticker: nil, origin: "register_flow")
       status = nil unless Bike.statuses.include?(status)
       existing = find_token(session_token: token_id, user:)
       return assign_start_params(existing, user, email:, status:) if reusable?(existing, origin)
 
-      bike_params = {owner_email: owner_email_for(user, email), status:}.compact
+      bike_params = {owner_email: owner_email_for(user, email), status:, bike_sticker:}.compact
       BParam.create(origin:, creator_id: user&.id, params: {bike: bike_params}.as_json)
     end
 
@@ -85,11 +85,26 @@ module BikeServices
       b_param.save
     end
 
+    # The organization add-a-registration page's switches. Step 1 saves them onto the registration;
+    # until then the session's apply only to the organization they were set on
+    def settings(b_param, from_session)
+      session_settings(from_session, b_param.creation_organization_id)
+        .to_h { |key, value| [key, b_param.params.to_h.fetch("register_#{key}", value)] }
+    end
+
+    def session_settings(settings, organization_id)
+      in_session = settings.present? && settings["organization_id"].to_s == organization_id.to_s
+      %i[single_page separate_attestation].index_with { in_session && settings[it.to_s].present? }
+    end
+
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
     # active sequence, or the one its pages are being agreed to from, even once replaced.
-    # motorized? first - it's in memory, and creation_organization is a query
-    def registration_sequence(b_param)
-      return nil unless b_param.motorized?
+    # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
+    # Checked first - it's in memory, and creation_organization is a query
+    def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?)
+      return nil unless motorized
+      # Left to the owner, so this flow has none - create_bike holds the bike for them to agree
+      return nil if separate_attestation && !b_param.self_made?(user)
 
       organization = b_param.creation_organization
       return nil if organization.blank?
@@ -136,8 +151,18 @@ module BikeServices
 
     # Placing the report asks whether there's a creator yet, which is a query, so this is
     # built once a request and passed down
-    def flow(b_param, sequence:)
-      BikeServices::RegisterFlow.new(page_count: sequence_pages(sequence).count, report: report_placement(b_param))
+    def flow(b_param, sequence:, single_page: false)
+      BikeServices::RegisterFlow.new(single_page:, page_count: sequence_pages(sequence).count,
+        report: report_placement(b_param))
+    end
+
+    # The single page's electric checkbox is on the same form as its submit button, so the
+    # button is told what it'd lead to for an e-vehicle. Separate attestation leaves the rules
+    # to an owner who isn't the registrant, which the email typed above it decides - :own_emails
+    def motorized_review(b_param, flow, separate_attestation:)
+      return false unless flow.single_page? && registration_sequence(b_param, motorized: true).present?
+
+      separate_attestation ? :own_emails : true
     end
 
     # Whether the flow includes the report step - what was stolen, or what was found
@@ -205,17 +230,18 @@ module BikeServices
     end
 
     # Anonymous registrations can't create a bike - Ownership needs a creator - so the
-    # address is emailed a link that proves it. Rate limited: anyone holding the
-    # registration's token can ask for a resend
+    # address is emailed a link that proves it
     def send_confirmation_email(b_param)
       return false unless confirmation_email_pending?(b_param)
       # Not in confirmation_email_pending? - both steps read that to render "link sent"
       return false if b_param.likely_spam?
-      return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
 
-      b_param.generate_email_confirmation_token!
-      EmailJobs::PartialRegistrationJob.perform_async(b_param.id, "partial_register_confirmation")
-      true
+      email_confirmation_link(b_param, "partial_register_confirmation")
+    end
+
+    # Whichever email the expired link came from
+    def resend_email_link(b_param)
+      b_param.acknowledgment_pending? ? send_rules_email(b_param) : send_confirmation_email(b_param)
     end
 
     # Time limited, so an old link proves nothing - the address gets a fresh one
@@ -244,36 +270,49 @@ module BikeServices
 
     # Step 1 is the least a registration can be: who owns it and what it is. The params are
     # merged in whether or not it passes, so a re-render still shows everything they entered
-    def save_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil)
-      bike_params = honeypot_spam(bike_params, additional)
-      b_param.clean_params({bike: bike_params, propulsion_type_motorized:}.as_json)
-      # Before save, which clears the errors it's about to re-run validations for
-      b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?
-      b_param.errors.add(:base, translation(:manufacturer_required)) if b_param.manufacturer_id.blank?
-      return false if b_param.errors.any?
+    def save_step_1(b_param, **)
+      return false unless assign_step_1(b_param, **)
       return true if b_param.save
 
       b_param.errors.add(:base, translation(:unable_to_save))
       false
     end
 
+    # save_step_1 without the write, for the single page - save_step_2 writes both
+    def assign_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil, single_page: false,
+      separate_attestation: false)
+      b_param.clean_params({bike: honeypot_spam(bike_params, additional), propulsion_type_motorized:,
+                            register_single_page: single_page, register_separate_attestation: separate_attestation}.as_json)
+      # Before save, which clears the errors it's about to re-run validations for
+      b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?
+      b_param.errors.add(:base, translation(:manufacturer_required)) if b_param.manufacturer_id.blank?
+      b_param.errors.none?
+    end
+
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
     # fields into the params json. The photo arrives one of two ways: as bytes from a plain
     # file field, or as the signed id of a blob the browser already uploaded.
-    # Returns whether the step passed - a registration for someone else needs their name.
-    # A failed step still saves, it just isn't marked complete, so nothing entered is lost
+    # Returns whether the step passed - it needs the owner's name.
+    # A failed step still saves, it just isn't marked complete, so nothing entered is lost.
+    # Not past an earlier error on the submission, which saving would clear
     def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil, additional: nil)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
       bike_params = honeypot_spam(bike_params, additional)
-      completed = b_param.self_made?(user) || bike_params["user_name"].present?
+      user_name = bike_params["user_name"]
+      completed = owner_name_known?(b_param, user) || user_name.present?
+      # So their next registration doesn't ask again
+      user.update(name: user_name) if user_name.present? && user&.name.blank? && b_param.self_made?(user)
       clear_stale_report(b_param, bike_params["status"])
       set_auto_organization(b_param, register_with_organization)
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
-      b_param.save
+      b_param.save if b_param.errors.none?
       b_param.errors.add(:base, translation(:name_required)) unless completed
       completed
     end
+
+    # Their own registration, by an account with a name - SSO and emailed-link accounts start without
+    def owner_name_known?(b_param, user) = user&.name.present? && b_param.self_made?(user)
 
     def permitted_report_params
       %i[date timezone impounded_description] + STOLEN_REPORT_ATTRS +
@@ -312,6 +351,12 @@ module BikeServices
         .reorder(:created_at).partition(&:register_flow?)
       embed_match = (embed.select { it.manufacturer_id == bike.manufacturer_id }.presence || embed).last
       register_flow.select { matches_bike?(it, bike) } + [embed_match].compact
+    end
+
+    # The legacy forms show no rules, so an e-vehicle's go to its owner even when self-registered
+    def create_legacy_bike(b_param, ip_address:)
+      b_param.params = b_param.params.merge("register_separate_attestation" => true)
+      create_bike(b_param, sequence: nil, ip_address:, rules_to_owner: true)
     end
 
     #
@@ -387,11 +432,20 @@ module BikeServices
       create_bike(b_param, sequence:, ip_address:)
     end
 
-    # Returns nil while the rules are owed - the bike exists, but the registration isn't finished
-    def create_bike(b_param, sequence:, ip_address:)
+    # Returns nil while the rules are owed - the bike exists, but the registration isn't finished -
+    # unless separate attestation left them to the owner, who's emailed the link back instead.
+    # The switches ride to the ownership's registration_info, so registrations can be counted by them
+    def create_bike(b_param, sequence:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
+      owners_sequence = registration_sequence(b_param) if sequence.blank? &&
+        (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
+      b_param.params = b_param.params.deep_merge("bike" => {
+        "register_single_page" => b_param.params["register_single_page"],
+        "register_separate_attestation" => owners_sequence.present?
+      })
+      owed = sequence || owners_sequence
       # Ahead of the bike, so the ownership it creates holds its email back
-      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence:) unless acknowledged?(b_param, sequence:)
+      pending = RegistrationSequenceAcknowledgment.create_pending(b_param, sequence: owed) unless acknowledged?(b_param, sequence: owed)
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
       if bike.id.blank?
         pending&.destroy
@@ -401,7 +455,23 @@ module BikeServices
       # The bike is what the acknowledgment hangs off once the b_param is swept
       acknowledgment = pending || RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
       acknowledgment&.update(bike_id: bike.id, user_id: acknowledgment.user_id || b_param.creator_id)
-      bike if pending.blank?
+      return bike if pending.blank?
+      return if owners_sequence.blank?
+
+      send_rules_email(b_param)
+      bike
+    end
+
+    # The registration is the member's, so this link signs the owner in
+    def send_rules_email(b_param) = email_confirmation_link(b_param, "partial_registration")
+
+    # Rate limited: anyone holding the registration's token can ask for a resend
+    def email_confirmation_link(b_param, kind)
+      return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
+
+      b_param.generate_email_confirmation_token!
+      EmailJobs::PartialRegistrationJob.perform_async(b_param.id, kind)
+      true
     end
 
     # Nothing to report without a status that has a record, otherwise save_report's marker
@@ -478,14 +548,17 @@ module BikeServices
     # Every step the registration has reached, in order - each one opens the next, so the
     # flow stops at the first that hasn't been done
     def permitted_steps(b_param, sequence, flow)
-      reached = flow.steps.take_while { step_completed?(b_param, it, sequence:) }.count
+      reached = flow.steps.take_while { step_completed?(b_param, it, sequence:, flow:) }.count
       flow.steps.first(reached + 1).select { editable_step?(b_param, it) }
     end
 
-    # Whether a step has been submitted with everything it asks for
-    def step_completed?(b_param, step, sequence:)
+    # Whether a step has been submitted with everything it asks for - the vehicle's steps have
+    # once a bike exists, whichever form made it
+    def step_completed?(b_param, step, sequence:, flow:)
+      return true if b_param.with_bike? && VEHICLE_STEPS.include?(step)
+
       case step
-      when "1" then b_param.manufacturer_id.present?
+      when "1" then flow.single_page? ? details_completed?(b_param) : b_param.manufacturer_id.present?
       when "2" then details_completed?(b_param)
       when "report" then report_completed?(b_param)
       when "review" then acknowledged?(b_param, sequence:)
@@ -555,7 +628,7 @@ module BikeServices
     end
 
     conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
-      :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike,
+      :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike, :send_rules_email, :email_confirmation_link,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :report_placement, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,

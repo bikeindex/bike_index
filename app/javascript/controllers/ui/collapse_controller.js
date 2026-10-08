@@ -13,7 +13,7 @@ import { collapse } from 'utils/collapse_utils'
 // whose state is the rider's preference rather than part of the address.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
-  static values = { param: String, storageKey: String }
+  static values = { param: String, storageKey: String, direction: String }
 
   connect () {
     // Restore the persisted state without animating on load. Restoring applies rather than
@@ -78,7 +78,7 @@ export default class extends Controller {
   }
 
   applyExpanded (expanding, duration) {
-    collapse(expanding ? 'show' : 'hide', this.contentTargets, duration)
+    collapse(expanding ? 'show' : 'hide', this.contentTargets, duration, this.directionValue)
     this.syncTriggers(expanding)
   }
 
@@ -96,7 +96,12 @@ export default class extends Controller {
     const url = new URL(window.location)
     // Collapsed writes 0 rather than dropping the param: a caller rebuilding the query
     // string from its own fields can't copy an absent one forward.
-    url.searchParams.set(this.paramValue, expanding ? '1' : '0')
+    const pair = `${encodeURIComponent(this.paramValue)}=${expanding ? '1' : '0'}`
+    // Its own pair alone, rather than through URLSearchParams, which would re-encode the
+    // rest of the query
+    const pairs = url.search.slice(1).split('&').filter(Boolean)
+    const at = pairs.findIndex((each) => decodeURIComponent(each.split('=')[0]) === this.paramValue)
+    url.search = (at < 0 ? [...pairs, pair] : pairs.map((each, index) => index === at ? pair : each)).join('&')
     // replaceState (not pushState) so a toggle doesn't stack history entries.
     window.history.replaceState(window.history.state, '', url)
   }

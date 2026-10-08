@@ -2,8 +2,7 @@
 # frozen_string_literal: true
 
 #
-# Helper for the production endpoints the admin OAuth app reaches: Sidekiq / PgHero
-# status and the admin bug reports.
+# Helper for the production endpoints the admin OAuth app reaches.
 # Reads/writes token values in .env.development (located relative to this script,
 # so it works from any cwd). Run it directly, e.g.
 #   .claude/skills/admin-data-api/scripts/admin_data.rb check
@@ -210,6 +209,13 @@ when "update-bug-report" # update-bug-report <id> tags=a,b github_pull_request=4
     form: attributes.transform_keys { "bug_report[#{it}]" }) or exit(22)
   puts body
 
+when "create-manufacturer" # create-manufacturer name="Cool Bikes" website=cool.com frame_maker=true
+  attributes = parse_params(ARGV.drop(1))
+  abort("usage: create-manufacturer name=… [website=…] [frame_maker=true] [motorized_only=true]") unless attributes["name"]
+  body = with_token(:post, "/admin/manufacturers.json",
+    form: attributes.transform_keys { "manufacturer[#{it}]" }) or exit(22)
+  puts body
+
 when "check" # full health check: sidekiq, then pghero — summary + OK/ABNORMAL verdict each
   puts "== SIDEKIQ =="
   body = get_endpoint("sidekiq") or exit(22)
@@ -230,7 +236,7 @@ when "refresh" # refresh the token pair now (needs ADMIN_DOORKEEPER_APP_CLIENT_S
 
 else
   warn "usage: admin_data.rb {check | get <#{PATHS.keys.join("|")}> [param=value …] | " \
-    "show-bug-report <id> | update-bug-report <id> [param=value …] | " \
+    "show-bug-report <id> | update-bug-report <id> [param=value …] | create-manufacturer name=… | " \
     "authorize-url | set-tokens <access> <refresh> | refresh}"
   exit 64
 end

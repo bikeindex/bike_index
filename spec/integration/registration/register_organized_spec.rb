@@ -187,6 +187,64 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
 
+    context "a member, on the organization's single page" do
+      let(:member) { FactoryBot.create(:organization_user, organization:, email: "member@bikeindex.org") }
+
+      it "labels the submit and asks for the owner's name off what's filled in above them" do
+        sign_in(member)
+        visit "/o/#{organization.to_param}/registrations/new"
+        click_link "Registration form settings"
+        check "Single page registration form"
+        within("form[action$='/registrations/switches']") { click_button "Update" }
+
+        expect(page).to have_button("Complete Bike Registration")
+        check "Electric (motorized)"
+        expect(page).to have_button("Next")
+        uncheck "Electric (motorized)"
+        expect(page).to have_button("Complete Bike Registration")
+
+        expect(page).to have_field("bike[user_name]")
+        fill_in "b_param[owner_email]", with: member.email
+        expect(page).to have_no_field("bike[user_name]")
+        fill_in "b_param[owner_email]", with: owner_email
+        expect(page).to have_field("bike[user_name]")
+
+        # Separate attestation leaves the rules to an owner who isn't the member
+        click_link "Registration form settings"
+        # The old view always leaves the rules to the owner
+        check "Use the old registration page"
+        expect(page).to have_checked_field("Registrant fills out the registration attestation separately", disabled: true)
+        expect(page).to have_unchecked_field("Single page registration form", disabled: true)
+        uncheck "Use the old registration page"
+        expect(page).to have_unchecked_field("Registrant fills out the registration attestation separately")
+        expect(page).to have_checked_field("Single page registration form")
+        check "Registrant fills out the registration attestation separately"
+        within("form[action$='/registrations/switches']") { click_button "Update" }
+        # The draft comes back after the reload, and would undo a check that landed before it
+        expect(page).to have_field("b_param[owner_email]", with: owner_email)
+        check "Electric (motorized)"
+        fill_in "b_param[owner_email]", with: owner_email
+        expect(page).to have_button("Complete Bike Registration")
+        fill_in "b_param[owner_email]", with: member.email
+        expect(page).to have_button("Next")
+
+        # Registered, it comes back to the single page for the next one
+        uncheck "Electric (motorized)"
+        type_into("#b_param_manufacturer_id", "Surly")
+        click_combobox_option("Surly")
+        fill_in "b_param[owner_email]", with: owner_email
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in_verified "bike[serial_number]", with: "XYZ 123"
+        fill_in "bike[user_name]", with: user_name
+        click_button "Complete Bike Registration"
+        expect(page).to have_content("The Surly is registered - we've emailed #{owner_email} so they can claim it.")
+        expect(page).to have_current_path("/o/#{organization.to_param}/registrations/new")
+        expect(page).to have_field("b_param[owner_email]", with: "")
+        expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123")
+      end
+    end
+
     # Every step submits through Turbo, so a throttle or a bad gateway is a response the
     # page can retry. This flow has one of every step, so each gets its turn at failing.
     context "when the server fails each step once" do

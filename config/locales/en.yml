@@ -734,10 +734,9 @@ en:
         steel: Steel
         titanium: Titanium
       handlebar_type:
-        bmx: BMX style
         drop_bar: Drop bars
-        flat: Flat or riser
         forward: Forward facing
+        horizontal: Flat or riser (horizontal facing)
         other: Not handlebars
         rearward: Rear facing
       marketplace_listing:
@@ -770,7 +769,7 @@ en:
           impound_import: impound import
           impound_process: impound process
           lightspeed_pos: lightspeed
-          organization_form: org form
+          organization_form: legacy org form
           other_pos: point of sale
           register_flow: new flow
           register_flow_landing_page: landing page
@@ -802,7 +801,8 @@ en:
           impound_process: transferred as part of the impound process
           lightspeed_pos: automatically registered by bike shop point of sale (Lightspeed
             POS)
-          organization_form: registered by an organization member, on the organization
+          organization_form: >-
+            registered by an organization member, on the legacy organization iframe
             form on Bike Index
           other_pos: automatically registered by bike shop point of sale
           register_flow: registered with the multi-step registration flow
@@ -1898,6 +1898,10 @@ en:
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
+      organization_messages:
+        create:
+          sent: Message sent to the owner
+          unable_to_send: Unable to send - %{errors}
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
@@ -1959,12 +1963,22 @@ en:
       confirm_email:
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
+        sign_out_to_agree: >-
+          You're signed in as %{email}. Sign out, then open the link again to agree
+          to the safety rules.
         signed_in_as_other: >-
           You're signed in as %{email}, so we kept you in that account. The registration
           is still saved to the address we emailed.
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
           below
+      redirect_to_single_page:
+        registered_for_owner: The %{bike_display} is registered - we've emailed %{email}
+          so they can claim it.
+        registered_own: Your %{bike_display} is registered.
+        safety_rules_sent: >-
+          The %{bike_display} is registered - we've emailed %{email} the safety rules
+          to agree to, which finishes the registration.
       sign_in_confirmed_user:
         unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
           account
@@ -3899,6 +3913,7 @@ en:
     register_show: Your %{cycle_type} registration
     register_step_1: Register your vehicle!
     register_step_2: Add your %{cycle_type}'s details
+    registration_form_settings: Registration form settings
     registrations_embed: Register a bike with %{organization}
     search_marketplace_index: Bike Index Marketplace
     search_registrations_index: Search results
@@ -3992,6 +4007,7 @@ en:
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}
       preferred_language: Preferred language
+      preferred_unit_system: Units
       primary_email: Primary email
       receive_the_bike_index_newsletter: Receive the Bike Index newsletter
       remove_email: Remove email
@@ -4002,6 +4018,9 @@ en:
       time_single_format_small: "(not today, yesterday, etc)"
       unconfirmed: unconfirmed!
       unconfirmed_emails: Unconfirmed emails
+      unit_system_automatic: Automatic, from your location
+      unit_system_imperial: Imperial (miles, inches)
+      unit_system_metric: Metric (kilometers, millimeters)
       verified: verified
       why_you_should_text: read why you should
     sharing:
@@ -4350,6 +4369,8 @@ en:
         sent_to_a_new_owner: sent to a new owner
         sticker: Sticker
         stickers: Stickers
+      new:
+        registration_form_settings: Registration form settings
       recoveries:
         description: Description
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
@@ -4536,6 +4557,13 @@ en:
           Bike Index?
         select_email: Select email
         send_emails_directly: Send emails directly to unclaimed bike owners.
+        send_self_registration_email_html: Send email for registrations sent to <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: This includes unregistered
+          notifications.
+        send_self_registration_email_note: >-
+          By default, Bike Index no longer sends email when a vehicle is registered
+          to your organization registration email. Check this box if you want to receive
+          email for registrations with an owner email of %{email}.
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
         unclaimed_registration_definition: >-
@@ -4660,6 +4688,8 @@ en:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    organization_message:
+      subject: Message from %{organization_name} about your %{bike_type}
     partial_register_confirmation:
       subject: Confirm your email to finish your %{organization_name}registration
     partial_register_confirmation_abandoned:
@@ -5018,6 +5048,7 @@ en:
       parking_notification_unregistered: New unregistered notification
       parking_notifications_group: Parking Notifications
       recoveries: Recoveries
+      registration_form_settings: Registration form settings
       registration_sequences: Registration sequences
       registration_stickers: Registration stickers
       registrations_index: Organization Registrations

@@ -5,18 +5,22 @@ module Pages
     module Parts
       module Step2Fields
         # What step 2 asks for, ending in the button that submits it - rendered into
-        # whichever form holds it
+        # whichever form holds it, its own or the single-page flow's
         class Component < ApplicationComponent
           # What these fields need on whichever form holds them
           FORM_CONTROLLERS = "register--status-fields register--organization"
           FORM_ACTIONS = "hw-combobox:selection->register--status-fields#update " \
             "register--organization:changed->register--status-fields#update"
 
-          def initialize(b_param:, flow:, form:, current_user: nil)
+          # motorized_review: whether an e-vehicle gets the safety pages after this form - or
+          # :own_emails, only when the owner's email is one of the registrant's own
+          def initialize(b_param:, flow:, form:, current_user: nil, organization: nil, motorized_review: false)
             @b_param = b_param
             @flow = flow
             @form = form
             @current_user = current_user
+            @organization = organization
+            @motorized_review = motorized_review
           end
 
           private
@@ -28,10 +32,12 @@ module Pages
           # A theft report and an e-vehicle's safety pages both come after this form, so it
           # doesn't always finish the registration. Which statuses have one is rechecked
           # client-side, since the status is picked in this form rather than known when it
-          # renders - so the label reads off the same answer both times
+          # renders - so the label reads off the same answer both times. The single page's
+          # safety pages follow its electric checkbox instead
           def submit_texts
             @submit_texts ||= Bike.statuses.index_with do |status|
-              next translation(".next") if @flow.acknowledgments? || BikeServices::Register.report_step?(status)
+              next translation(".next") if (@flow.acknowledgments? && !@flow.single_page?) ||
+                BikeServices::Register.report_step?(status)
 
               translation(".complete_registration", cycle_type: @b_param.type_titleize)
             end
@@ -61,13 +67,28 @@ module Pages
 
           # Step 1's email settles who this is for, so the name is only asked for here
           def user_name_required?
-            !@b_param.self_made?(@current_user)
+            !BikeServices::Register.owner_name_known?(@b_param, @current_user)
+          end
+
+          def own_emails = @own_emails ||= @current_user&.own_emails || []
+
+          # The single page matches what's typed against the addresses BParam#self_made? does
+          def owner_name_data
+            return {} unless @flow.single_page?
+
+            {controller: "register--owner-name",
+             "register--owner-name-own-emails-value": (@current_user&.name.present? ? own_emails : []).to_json,
+             action: "input@window->register--owner-name#update form-persist:restored@window->register--owner-name#update"}
           end
 
           # What the account already holds only answers the organization's fields when the
           # registration is the registrant's own - registering for someone else asks for theirs
+          # defined?, since nil is the common answer and ||= would re-ask - each ask is a
+          # user_emails query
           def reg_field_user
-            @current_user if @b_param.self_made?(@current_user)
+            return @reg_field_user if defined?(@reg_field_user)
+
+            @reg_field_user = @current_user if @b_param.self_made?(@current_user)
           end
 
           # The additional fields the organization asks for, gated exactly as bikes/new

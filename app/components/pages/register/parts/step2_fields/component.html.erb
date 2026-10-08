@@ -316,30 +316,35 @@
   </div>
 <% end %>
 
-<div class="tw:mb-4">
-  <span class="twlabel"><%= translation(".email") %></span>
+<%# The single page's form already holds step 1's address, so it isn't echoed back %>
+<% unless @flow.single_page? %>
+  <div class="tw:mb-4">
+    <span class="twlabel"><%= translation(".email") %></span>
 
-  <p
-    class="
-      tw:mt-1 tw:mb-0 tw:flex tw:items-center tw:justify-between tw:gap-2
-      tw:rounded-sm tw:border tw:border-gray-300 tw:bg-gray-50 tw:px-2.5
-      tw:py-1.5 tw:dark:border-gray-600 tw:dark:bg-gray-700
-    "
-  >
-    <span class="tw:truncate tw:text-base tw:text-gray-600 tw:dark:text-gray-300">
-      <%= @b_param.owner_email %>
-    </span>
+    <p
+      class="
+        tw:mt-1 tw:mb-0 tw:flex tw:items-center tw:justify-between tw:gap-2
+        tw:rounded-sm tw:border tw:border-gray-300 tw:bg-gray-50 tw:px-2.5
+        tw:py-1.5 tw:dark:border-gray-600 tw:dark:bg-gray-700
+      "
+    >
+      <span class="tw:truncate tw:text-base tw:text-gray-600 tw:dark:text-gray-300">
+        <%= @b_param.owner_email %>
+      </span>
 
-    <%= render UI::Badge::Component.new(text: translation(".from_step_1"), size: :xs) %>
-  </p>
-</div>
+      <%= render UI::Badge::Component.new(text: translation(".from_step_1"), size: :xs) %>
+    </p>
+  </div>
+<% end %>
 
 <%# Who the registration is for - a signed in registrant's own address arrives with a name %>
-<% if user_name_required? %>
-  <%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :user_name,
-      label_text: translation(".owner_name"), required: true,
-      html_options: {value: bike["user_name"], autocomplete: "name",
-        placeholder: translation(".owner_name_placeholder")}) %>
+<% if @flow.single_page? || user_name_required? %>
+  <%= tag.div(data: owner_name_data) do %>
+    <%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :user_name,
+        label_text: translation(".owner_name"), required: true,
+        html_options: {value: bike["user_name"], autocomplete: "name",
+          placeholder: translation(".owner_name_placeholder")}) %>
+  <% end %>
 <% end %>
 
 <%# The organization's own asks sit under its heading, alongside the contact fields %>
@@ -422,6 +427,8 @@
   <span
     data-register--status-fields-target="submitLabel"
     data-texts="<%= submit_texts.to_json %>"
+    data-motorized-text="<%= translation(".next") if @motorized_review %>"
+    data-motorized-own-emails="<%= own_emails.to_json if @motorized_review == :own_emails %>"
   >
     <%= submit_text %>
   </span>

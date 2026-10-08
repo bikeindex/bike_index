@@ -23,8 +23,9 @@ Production JSON reachable with the admin OAuth token:
 - `GET https://bikeindex.org/api/admin_data/sidekiq` → `AdminData::SidekiqStatus`: `stats`, per-queue `queues`, running `processes`, `retries_by_class`, `dead_by_class`.
 - `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats`, `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
 - `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
+- `POST /admin/manufacturers.json` → `create-manufacturer`; the `manufacturers` skill walks through it.
 
-Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability for the controller — `admin_data` for the two status endpoints, `bug_reports` for the bug reports (a universal ability covers both). Controllers: `app/controllers/api/admin_data_controller.rb`, `app/controllers/admin/bug_reports_controller.rb`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
+Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `manufacturers`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the admin controllers that include `Admin::TokenAccessible`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 
 All operations go through the helper:
 
@@ -39,7 +40,7 @@ All operations go through the helper:
 .claude/skills/admin-data-api/scripts/admin_data.rb get pghero
 ```
 
-It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production, and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. Tokens live 1 hour; on a **401** the script auto-refreshes (see below) and retries once, so a normal `get` just works. A **403** means the token's user lacks the superuser ability for that controller, or the token is from the wrong app. Any other non-200 prints the response and exits non-zero.
+It reads `ADMIN_DATA_TOKEN` from `.env.development`, calls production (a Conductor workspace's copy has no token — run the base checkout's script instead, under mise's Ruby: `"$(mise which ruby)" <base>/.claude/skills/admin-data-api/scripts/admin_data.rb get pghero`), and prints `HTTP <status>` then the JSON body. Pipe the body to `jq` for specific fields. Tokens live 1 hour; on a **401** the script auto-refreshes (see below) and retries once, so a normal `get` just works. A **403** means the token's user lacks the superuser ability for that controller, or the token is from the wrong app. Any other non-200 prints the response and exits non-zero.
 
 Ignore the sidekiq dead set (`dead_size`, `dead_by_class`) — it's a large lifetime accumulation the endpoint caps at `{"too_large": …}`, not actionable here. Don't report it.
 
@@ -98,6 +99,6 @@ The authorization code expires 10 minutes after the page loads — if it shows a
 
 ## Notes
 
-- These hit **production** with a superuser token. `update-bug-report` is the only write — confirm the tags and PR number with the user before running it.
+- These hit **production** with a superuser token. `update-bug-report` and `create-manufacturer` are the writes — confirm the values with the user before running either.
 - Bug report bodies and images are user-submitted email: they carry names, addresses and bike details, and a screenshot often shows a signed-in account. Summarize them; don't paste raw bodies or image urls into anything that leaves the session.
 - `.env.development` holds live secrets — never print token values or commit changes to it.

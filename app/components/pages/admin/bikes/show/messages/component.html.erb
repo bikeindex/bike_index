@@ -8,6 +8,15 @@
 <% end %>
 
 <h3 class="tw:mt-6">
+  <%= section_heading("Organization messages", organization_messages.size,
+        admin_organization_messages_path(search_bike_id: @bike.id)) %>
+</h3>
+
+<% if organization_messages.any? %>
+  <%= render partial: "/admin/organization_messages/table", locals: {collection: organization_messages, skip_bike: true} %>
+<% end %>
+
+<h3 class="tw:mt-6">
   <%= section_heading("Feedbacks", feedbacks.size, admin_feedbacks_path(search_bike_id: @bike.id)) %>
 </h3>
 

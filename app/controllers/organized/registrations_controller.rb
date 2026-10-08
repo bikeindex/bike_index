@@ -8,9 +8,9 @@ module Organized
 
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response]
     around_action :set_reading_role, only: :multi_search_response
-    # new renders a component, which takes its content type from the request - and index
-    # answers turbo_stream, so the format is one a link here could ask for
-    before_action :force_html_response, only: :new
+    # A component takes its content type from the request - and index answers turbo_stream,
+    # so the format is one a link here could ask for
+    before_action :force_html_response, only: %i[new settings]
 
     def index
       return head(:not_acceptable) unless request.format.html? || request.format.turbo_stream?
@@ -28,7 +28,9 @@ module Organized
         @chart_open = Binxtils::InputNormalizer.boolean(params[:chart_open]) ? "1" : "0"
         @result_view = Pages::Org::Search::Wrapper::Component.permitted_result_view(params[:search_result_view])
         @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
-        @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
+        @interpreted_params = BikeSearchable.searchable_interpreted_params(
+          permitted_org_registration_search_params.merge(distance_unit: search_distance_unit), ip: forwarded_ip_address
+        )
         @per_page = permitted_per_page(default: 10)
 
         if create_export?
@@ -77,10 +79,29 @@ module Organized
       @skip_general_alert = true
       # The form carries this registration's token, and a cached page would carry a stale one
       response.set_header("Cache-Control", "no-store")
-      sequence = BikeServices::Register.registration_sequence(@b_param)
-      flow = BikeServices::Register.flow(@b_param, sequence:)
-      render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, flow:,
-        organization: current_organization, current_user:)
+      BikeServices::Register.settings(@b_param, session[:register_settings]) => {single_page:, separate_attestation:}
+      sequence = BikeServices::Register.registration_sequence(@b_param, user: current_user, separate_attestation:)
+      flow = BikeServices::Register.flow(@b_param, sequence:, single_page:)
+      render Pages::Org::Registrations::New::Component.new(b_param: @b_param, flow:, organization: current_organization,
+        current_user:, motorized_review: BikeServices::Register.motorized_review(@b_param, flow, separate_attestation:))
+    end
+
+    def settings
+      @page_title = I18n.t("meta_titles.registration_form_settings")
+      render Pages::Org::RegisterSettings::Component.new(organization: current_organization, old_view: old_register_view?,
+        **BikeServices::Register.session_settings(session[:register_settings], current_organization.id))
+    end
+
+    # An unchecked box turns its setting off; the old view disables them, so the session keeps theirs
+    def switches
+      if params[:old_view].present?
+        session[:old_register_view] = true
+        return redirect_to new_organization_bike_path(organization_id: current_organization.to_param)
+      end
+
+      session[:register_settings] = {"organization_id" => current_organization.id,
+        "single_page" => params[:single_page].present?, "separate_attestation" => params[:separate_attestation].present?}
+      redirect_to new_organization_registration_path(organization_id: current_organization.to_param)
     end
 
     def multi_search
@@ -228,11 +249,13 @@ module Organized
       bikes = BikeServices::OrganizedSearch.notes(bikes, params[:search_notes], org) if params[:search_notes].present? && org.present?
       if org.present?
         bikes = BikeServices::OrganizedSearch.location(bikes, @interpreted_params[:location], @interpreted_params[:distance],
-          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address)
+          organization: org, search_all: @search_all, search_status:, ip_address: forwarded_ip_address,
+          distance_unit: @interpreted_params[:distance_unit])
       end
       bikes = BikeServices::OrganizedSearch.stickers(bikes, @search_stickers)
       bikes = BikeServices::OrganizedSearch.address(bikes, @search_address)
-      bikes = BikeServices::OrganizedSearch.status(bikes, search_status)
+      bikes = BikeServices::OrganizedSearch.status(bikes, search_status,
+        organization_bikes: org.present? && !@search_all)
       bikes = unregisteredness_scoped(bikes)
       if params[:search_model_audit_id].present?
         @model_audit = ModelAudit.find_by_id(params[:search_model_audit_id])
@@ -348,7 +371,7 @@ module Organized
       return false if @interpreted_params[:stolenness]&.downcase != "all"
 
       # A distance is only a search alongside a location
-      @interpreted_params.except(:stolenness, :distance).values.reject(&:blank?).none?
+      @interpreted_params.except(:stolenness, :distance, :distance_unit).values.reject(&:blank?).none?
     end
 
     def directly_create_export?(bikes_count)

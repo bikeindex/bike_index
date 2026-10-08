@@ -4,9 +4,19 @@ require "rails_helper"
 
 RSpec.describe Pages::Register::Parts::Step1Submit::Component, type: :component do
   let(:b_param) { BParam.create(origin: "register_flow", params: {bike: {owner_email: "owner@bikeindex.org"}}.as_json) }
+  let(:single_page) { false }
 
   def render_step1_submit(**options)
-    render_inline(described_class.new(b_param:, **options))
+    render_inline(described_class.new(b_param:, **options,
+      flow: BikeServices::Register.flow(b_param, sequence: nil, single_page:)))
+  end
+
+  context "single_page" do
+    let(:single_page) { true }
+
+    it "renders nothing - the single page ends in step 2's submit" do
+      expect(render_step1_submit.to_html).to be_blank
+    end
   end
 
   describe "button_color" do

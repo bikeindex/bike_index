@@ -28,7 +28,6 @@ class StripeSubscription < ApplicationRecord
   belongs_to :stripe_price, foreign_key: "stripe_price_stripe_id", primary_key: "stripe_id"
 
   has_many :payments
-  has_many :stripe_events, foreign_key: "stripe_subscription_stripe_id", primary_key: "stripe_id"
 
   validates_uniqueness_of :stripe_id, allow_nil: true
 
@@ -102,7 +101,7 @@ class StripeSubscription < ApplicationRecord
     self.start_at = Time.at(start_at_t) if start_at_t.present?
 
     end_at_t = stripe_obj.ended_at || stripe_obj.cancel_at
-    self.end_at = Time.at(end_at_t) if end_at_t.present?
+    self.end_at = end_at_t.present? ? Time.at(end_at_t) : nil
     save!
     update_membership! unless skip_membership_update
     self

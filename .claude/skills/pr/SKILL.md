@@ -57,7 +57,7 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to AGENTS.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its four audits, and the cycle-type translation check. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its five audits — spec, documentation, churn, comment and backfill — and the cycle-type translation check. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
 
 ### Freshen stale migration timestamps
 
@@ -114,6 +114,7 @@ Rules:
 - **No "Test plan" section unless the user asks.** Never list what CI already covers. Only reviewer-facing manual verification ("click X, confirm Y appears") qualifies, and only on request.
 - **No generic "covered by tests" bullet.** That a change is tested is assumed, and naming test mechanics (a fixture, a cassette) goes stale. Mention tests only when *what* is verified is the reviewer-facing point ("adds a regression test for the UTF-8 download crash").
 - **No Claude Code attribution footer**, here or in any comment this workflow posts. It should read like the human author wrote it. **Leaving it out isn't enough where `gh` is missing**: `create_pull_request` and `add_issue_comment` append one server-side (the tell is the session id in its link), while the `update_*` calls don't — so read back what you posted and strip it with an update.
+- **A backfill leads the body.** When the branch adds a `Backfills::` job, the intro says existing rows need one, and the first bullet names the job with the command that runs it once after deploy — `Backfills::…Job.perform_async`. #4429 is the pattern.
 - **Link the issue when there is one.** If the branch name, a commit message, or the user's request names an issue, close it from the body — `Closes #4103` on its own line. Don't invent a number.
 
 If a bullet is turning into an essay, compress it to one sentence naming the *kind* of change.
@@ -146,7 +147,7 @@ The one that talks itself into existence is the "still accurate" update — a la
 Two gates, either of which skips the section outright:
 
 - **Not a frontend diff** — per the classifier above. **Unless a `## Screenshots` comment already exists**: the user asked for those captures, so a commit since the last one that changes what they show stales them even here. Recapture only those pages.
-- **No `gh`, or no browser signed in to GitHub**, with `$CLAUDE_CODE_REMOTE` unset. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The web sandbox is not this case**, though it has neither: `$CLAUDE_CODE_REMOTE` is `true` there, and the section runs, because `github-pr-images` hosts through the PR branch's history — see the appendix.
+- **No `gh`**, with `$CLAUDE_CODE_REMOTE` unset. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The web sandbox is not this case**, though it has no `gh`: `$CLAUDE_CODE_REMOTE` is `true` there, and the section runs, because `github-pr-images` hosts through the PR branch's history — see the appendix.
 
 **A dev server you believe is down is not a gate.** Run `curl -fs "$BASE_URL/"` now, whatever an earlier check in the session said — the user starts `bin/dev` whenever, and #4319 went out without screenshots on a stale "isn't running". Only a failing curl *this* run is a reason to stop and ask.
 
@@ -185,4 +186,4 @@ Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_R
 
 Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
-**Screenshots do run here**, though neither `gh` nor a usable browser does: `github-pr-images`' `references/web-sandbox.md` commits the images to the PR's branch, deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com` URLs through the MCP tools. Capture as normal and follow that reference for the hosting and posting steps. Those URLs live as long as the branch's objects do, so say in your summary that a merged PR's screenshots aren't archival.
+**Screenshots do run here**, though `gh` doesn't: `github-pr-images`' `references/web-sandbox.md` commits the images to the PR's branch, deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com` URLs through the MCP tools. Capture as normal and follow that reference for the hosting and posting steps. Those URLs live as long as the branch's objects do, so say in your summary that a merged PR's screenshots aren't archival.

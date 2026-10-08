@@ -22,8 +22,8 @@ RSpec.describe Pages::Stolen::Index::Component, type: :component do
     expect(component).to have_text("18,263")
     expect(component).to have_text("$38M+")
     expect(component).to have_text("1,000+")
-    expect(component).to have_css("details[open]", count: 1)
-    expect(component).to have_css("details[name='stolen-faq']", count: 5)
+    expect(component).to have_css("[data-ui--collapse-target='content']", count: 5, visible: :all)
+    expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden", count: 4, visible: :all)
     expect(component).to have_link("Register your stolen bike", href: "/register/new?status=status_stolen")
     expect(component).to have_link("Sign in", href: "/session/new")
     expect(component).to_not have_css("form#new_feedback")
@@ -44,11 +44,10 @@ RSpec.describe Pages::Stolen::Index::Component, type: :component do
       Array.new(5) { |i| FactoryBot.create(:recovery_display_with_photo, quote: "Quote #{i}", quote_by: "Owner #{i}") }
     end
 
-    it "renders the first four, hiding the last two on mobile" do
+    it "renders the first four" do
       expect(component).to have_css("ul > li blockquote", count: 4)
       expect(component).to have_text("Quote 3")
       expect(component).to_not have_text("Quote 4")
-      expect(component).to have_css("li.tw\\:hidden blockquote", count: 2)
     end
   end
 end

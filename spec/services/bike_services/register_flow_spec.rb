@@ -7,6 +7,7 @@ RSpec.describe BikeServices::RegisterFlow do
 
   it "walks its steps in order" do
     expect(flow.steps).to eq %w[1 2 report 3 4 review]
+    expect(flow.single_page?).to be_falsey
     expect(flow.acknowledgments?).to be_truthy
     expect(flow.position("report")).to eq 3
     expect(flow.position(2)).to eq 2
@@ -30,6 +31,14 @@ RSpec.describe BikeServices::RegisterFlow do
     it "is the two detail steps" do
       expect(flow.steps).to eq %w[1 2]
       expect(flow.acknowledgments?).to be_falsey
+    end
+  end
+
+  context "the single page, without a sequence" do
+    let(:flow) { described_class.new(single_page: true) }
+
+    it "is one step" do
+      expect(flow.steps).to eq %w[1]
     end
   end
 end
