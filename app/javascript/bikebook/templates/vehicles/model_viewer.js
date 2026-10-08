@@ -21,32 +21,42 @@ const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 // One vehicle's card, marked where it differs from `others`
 export const modelViewer = (args) => new ModelViewer(args).render()
 
-// A vehicle's front and rear in `size`, as the comparison table lists them: the built wheel's summary, less the
-// sizes it's for, how it fits the frame and the widest tire, which is the widest any of its wheels there takes
+const WIDE_TIRE = 50
+// (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
+const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
+const brakeType = (brake) => brake?.type?.replace(/^Disc (\w+)$/, '$1 disc')
+const at = (items, position, size) => array(items).filter((item) => array(item.position).includes(position) && (!item.sizes || array(item.sizes).includes(size?.name)))
+
+// A vehicle's front and rear in `size`, as the comparison table lists them: the built wheel's [key, number, content]
+// parts, its tire's carrying its width, and the widest tire any of its wheels there takes
 export const wheelsAt = (presenter, data, size) => {
   const viewer = new ModelViewer({ presenter, data, others: [] })
-  const fits = (wheel) => !wheel.sizes || array(wheel.sizes).includes(size?.name)
   return Object.fromEntries(['front', 'rear'].map((position) => {
-    const at = (wheels) => wheels.filter((wheel) => array(wheel.position).includes(position) && fits(wheel))
-    const built = at(viewer.builtWheels())[0]
-    const widths = at(array(viewer.vehicle.wheels)).map((wheel) => wheel.max_tire_width).filter((width) => typeof width === 'number')
-    return [position, { summary: built && viewer.wheelSummary({ ...built, sizes: null, max_tire_width: null }, { fitting: false }), maxTire: widths.length ? Math.max(...widths) : null }]
+    const built = at(viewer.builtWheels(), position, size)[0]
+    const widths = at(viewer.vehicle.wheels, position, size).map((wheel) => wheel.max_tire_width).filter((width) => typeof width === 'number')
+    return [position, {
+      parts: built && viewer.wheelParts({ ...built, sizes: null }, { fitting: false }).map(([key, content]) => [key, key === 'tire' ? built.tire_width : null, content]),
+      maxTire: widths.length ? Math.max(...widths) : null
+    }]
   }))
 }
 
-// A vehicle's front and rear brakes in `size`, front first where they differ, as "Hydraulic disc, 160 mm / 140 mm rotors"
+// A vehicle's front and rear brakes in `size`: their types, front first where they differ, and their rotors, as
+// "160 mm", or "160 mm front | 140 mm rear" where they differ
 export const brakesAt = (presenter, data, size) => {
   const viewer = new ModelViewer({ presenter, data, others: [] })
-  const brakes = [...new Set(['front', 'rear'].map((position) => array(viewer.vehicle.brakes)
-    .find((brake) => array(brake.position).includes(position) && (!brake.sizes || array(brake.sizes).includes(size?.name)))))].filter(Boolean)
-  const type = (brake) => brake.type?.replace(/^Disc (\w+)$/, '$1 disc')
-  const summary = (brake) => join(compact([type(brake), viewer.millimeters(brake.rotor_diameter, ' rotor')]), ', ')
-  const [front, rear] = brakes
-  if (!rear || type(front) !== type(rear) || !truthy(front.rotor_diameter) || !truthy(rear.rotor_diameter)) return brakes.length ? join(brakes.map(summary), ' / ') : null
-  return join(compact([type(front), join([viewer.millimeters(front.rotor_diameter), ' / ', viewer.millimeters(rear.rotor_diameter, ' rotors')])]), ', ')
+  const brakes = ['front', 'rear'].map((position) => at(viewer.vehicle.brakes, position, size)[0])
+  const [front, rear] = brakes.map((brake) => brake?.rotor_diameter)
+  return {
+    types: presence([...new Set(compact(brakes.map(brakeType)))].join(' / ')),
+    rotors: front === rear ? viewer.millimeters(front) : join(compact([viewer.millimeters(front, ' front'), viewer.millimeters(rear, ' rear')]), ' | ')
+  }
 }
 
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
+
+// A difference in tire width, in the unit the `width` it's of reads in
+export const tireWidthDifference = (presenter, change, width) => width > WIDE_TIRE ? tireInches(presenter, change) : presenter.measurement(change, 'mm')
 
 class ModelViewer {
   constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath, selectedSize }) {
@@ -466,16 +476,20 @@ class ModelViewer {
 
   // `fitting`: how the wheel fits the frame, its cassette, dropout and axle
   wheelSummary (wheel, { fitting = true } = {}) {
-    const summary = join(compact([
-      this.onSizes(wheel.bsd != null ? this.wheelSizeName(wheel.bsd) : null, wheel.sizes),
-      wheel.tire_width != null ? this.tireWidthSummary(wheel.tire_width) : null,
-      wheel.tire_system?.replaceAll('_', ' '),
-      ...(fitting
-        ? [wheel.cassette_interface != null ? `${wheel.cassette_interface} cassette` : null,
-            wheel.dropout != null ? `${wheel.dropout.replaceAll('_', ' ')} dropout` : null, this.axleSummary(wheel)]
-        : [])
-    ]), ', ')
+    const summary = join(this.wheelParts(wheel, { fitting }).map(([, content]) => content), ', ')
     return wheel.max_tire_width != null ? join([summary, this.tireWidthSummary(wheel.max_tire_width, 'tire max')], html`<br>`) : summary
+  }
+
+  wheelParts (wheel, { fitting = true } = {}) {
+    return [
+      ['size', this.onSizes(wheel.bsd != null ? this.wheelSizeName(wheel.bsd) : null, wheel.sizes)],
+      ['tire', wheel.tire_width != null ? this.tireWidthSummary(wheel.tire_width) : null],
+      ['tire_system', wheel.tire_system?.replaceAll('_', ' ')],
+      ...(fitting
+        ? [['cassette', wheel.cassette_interface != null ? `${wheel.cassette_interface} cassette` : null],
+            ['dropout', wheel.dropout != null ? `${wheel.dropout.replaceAll('_', ' ')} dropout` : null], ['axle', this.axleSummary(wheel)]]
+        : [])
+    ].filter(([, content]) => content != null)
   }
 
   axleSummary (wheel) {
@@ -491,11 +505,9 @@ class ModelViewer {
   tireWidthSummary (tireWidth, label = 'tire') {
     const { presenter } = this
     const suffix = label ? ` ${label}` : ''
-    if (tireWidth <= 50) return join([presenter.measurement(tireWidth, 'mm'), suffix])
+    if (tireWidth <= WIDE_TIRE) return join([presenter.measurement(tireWidth, 'mm'), suffix])
 
-    // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
-    const inches = presenter.labeled(presenter.rounded(tireWidth / 25.4).toFixed(1), 'in')
-    return this.keepTogether(join([inches, suffix]), tooltip({ text: `${tireWidth} mm` }))
+    return this.keepTogether(join([tireInches(presenter, tireWidth), suffix]), tooltip({ text: `${tireWidth} mm` }))
   }
 
   wheelSizeName (bsd) {
@@ -506,7 +518,7 @@ class ModelViewer {
   }
 
   brakeSummary (brake) {
-    const typeAndRotor = presence(join(compact([brake.type?.replace(/^Disc (\w+)$/, '$1 disc'), this.millimeters(brake.rotor_diameter, ' rotor')]), ', '))
+    const typeAndRotor = presence(join(compact([brakeType(brake), this.millimeters(brake.rotor_diameter, ' rotor')]), ', '))
     const summary = join(compact([this.onSizes(typeAndRotor, brake.sizes), presence(brake.caliper_mount?.replace(/^Disc /, ''))]), ', ')
     return brake.max_rotor_diameter != null ? join([summary, this.millimeters(brake.max_rotor_diameter, ' rotor max')], html`<br>`) : summary
   }
@@ -521,12 +533,13 @@ class ModelViewer {
     const content = presenter.measurementRows(rows)
     if (blank(vehicle.drivetrain) && blank(content)) return nothing
 
-    const sorted = (gearing) => array(gearing).sort()
-    const differs = this.others.some((other) => !equal(sorted(other.drivetrain), sorted(vehicle.drivetrain)))
-    const gearing = array(vehicle.drivetrain)
-    const labels = equal(sorted(gearing), ['1 Front', '1 Rear']) ? ['Singlespeed'] : gearing
-    return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2 ${this.highlight(differs)}"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Drivetrain</h2>${present(vehicle.drivetrain)
-      ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${labels.map((label) => html`<span class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:px-2 tw:py-0.5 tw:font-mono
+    const labelsOf = (drivetrain) => equal(array(drivetrain).sort(), ['1 Front', '1 Rear']) ? ['Singlespeed'] : array(drivetrain)
+    const othersLabels = this.others.map((other) => labelsOf(other.drivetrain))
+    const differs = (label) => othersLabels.some((labels) => !labels.includes(label))
+    return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Drivetrain</h2>${present(vehicle.drivetrain)
+      ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${labelsOf(vehicle.drivetrain).map((label) => html`<span class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 ${differs(label)
+        ? 'tw:spec-diff'
+        : 'tw:bg-white tw:dark:bg-gray-800'} tw:px-2 tw:py-0.5 tw:font-mono
         tw:text-xs">${this.tooltipped(label, this.kit.viewer.drivetrain_tooltips)}</span>`)}</div>`
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
   }

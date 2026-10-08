@@ -59,13 +59,6 @@ export default class extends Controller {
     'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: false }) : this.#go(url)
   }
 
-  // From the URL rather than the render's, which a filter edit since has moved on
-  toggleComparison () {
-    const url = new URL(window.location.href)
-    url.searchParams.get('view') === 'comparison' ? url.searchParams.delete('view') : url.searchParams.set('view', 'comparison')
-    this.#go(url, [window.scrollX, window.scrollY])
-  }
-
   // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
   // comparison's first vehicle starts nearest
   async pickSize ({ target, params: { vehicle, first } }) {

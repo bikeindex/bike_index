@@ -23,19 +23,14 @@ export class VehicleViewer {
     }
 
     const comparing = vehicles.length > 1
-    const comparisonView = url.searchParams.get('view') === 'comparison'
     const models = vehicles.filter(({ classification }) => !classification)
+    const tabled = models.length > 1
     const picked = pickedSizes(url)
-    const sizes = comparisonView ? chosenSizes(models, { picked, preferred: preferredSize }) : []
+    const sizes = tabled ? chosenSizes(models, { picked, preferred: preferredSize }) : []
     const selectedSizes = new Map(models.map(({ value }, index) => [value, sizes[index]?.name]))
-    const baselineSolo = vehicles.length === 3 && !comparisonView
-      ? 'tw:md:max-[1152px]:[&>*:first-child]:basis-full tw:md:max-[1152px]:[&>*:first-child>article]:mx-auto tw:md:max-[1152px]:[&>*:first-child>article]:max-w-[calc(50%-1rem)]'
-      : ''
-    const rowClasses = !comparing
-      ? 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
-      : comparisonView
-        ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
-        : 'tw:flex-col tw:md:flex-row tw:md:flex-wrap tw:md:justify-center'
+    const rowClasses = comparing
+      ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
+      : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
     const values = vehicles.map(({ value }) => value)
     const baseline = models[0]
     const classificationPath = (id) => pathWith(url, { vehicle_models: [...new Set([...values, id])].join(',') })
@@ -47,10 +42,9 @@ export class VehicleViewer {
         : modelViewer({ presenter: this.presenter, data, value, comparing, idSuffix: index + 1, others: value === baseline.value ? [] : [baseline.data], removePath: remove, classificationPath, selectedSize: selectedSizes.get(value) })
     })
     const compared = { presenter: this.presenter, vehicles: models, sizes, frames: models.map(({ data }, index) => frameGeometry(data, sizes[index])) }
-    return html`${comparisonView && models.length ? html`${comparisonTable(compared)}${geometryOverlay(compared)}` : nothing}<div ?data-comparison=${comparisonView} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
+    return html`${tabled ? html`${comparisonTable(compared)}${geometryOverlay(compared)}` : nothing}<div ?data-comparison=${comparing} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
-      : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses} ${baselineSolo}"
-      data-controller=${comparisonView ? nothing : 'bikebook--wrapped-scroll'}>${cards}</div></div>`
+      : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
   }
 }
 
