@@ -8,7 +8,7 @@ RSpec.describe BikebookController, type: :request do
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
       bikebook = page.find("[data-controller='bikebook--page']")
-      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq Integrations::BikebookCatalog::MANIFEST_URL
+      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq Integrations::BikeBook::Catalog::MANIFEST_URL
       expect(bikebook).to have_css("[inert] #vehicle_models")
         .and have_css("[role='status'] svg.tw\\:animate-spin")
 

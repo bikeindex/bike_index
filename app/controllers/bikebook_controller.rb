@@ -3,7 +3,7 @@
 class BikebookController < ApplicationController
   def show
     model = params[:vehicle_models].to_s
-    return render_vehicle(model) if model.match?(Integrations::BikebookCatalog::MODEL_ID)
+    return render_vehicle(model) if model.match?(Integrations::BikeBook::Catalog::MODEL_ID)
 
     # comparisons and searches, whose models each have their own page
     response.headers["X-Robots-Tag"] = "noindex, follow" if request.query_parameters.present?
@@ -32,7 +32,7 @@ class BikebookController < ApplicationController
 
   # A model picked alone is its own page, canonically without the search's other params
   def render_vehicle(id)
-    vehicle = Integrations::BikebookCatalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
+    vehicle = Integrations::BikeBook::Catalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
     @page_url = "#{bikebook_url}?vehicle_models=#{id}"
     @page_description = vehicle.description
     @page_image = vehicle.image_url
@@ -48,6 +48,6 @@ class BikebookController < ApplicationController
       @page_image = view_context.image_url("logos/bikebook_icon.png")
       @twitter_card = "summary"
     end
-    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::BikebookCatalog::MANIFEST_URL)
+    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::BikeBook::Catalog::MANIFEST_URL)
   end
 end

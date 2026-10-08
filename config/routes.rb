@@ -57,8 +57,8 @@ Rails.application.routes.draw do
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "bikebook", to: "bikebook#show"
   get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
-  if Integrations::BikebookCatalog::LOCAL_DIRECTORY
-    mount Rack::Files.new(Integrations::BikebookCatalog::LOCAL_DIRECTORY) => Integrations::BikebookCatalog::LOCAL_PATH
+  if Integrations::BikeBook::Catalog::LOCAL_DIRECTORY
+    mount Rack::Files.new(Integrations::BikeBook::Catalog::LOCAL_DIRECTORY) => Integrations::BikeBook::Catalog::LOCAL_PATH
   end
 
   resource :session, only: %i[new create destroy] do
