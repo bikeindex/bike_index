@@ -442,6 +442,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
+
+    # beside its classification, side by side with nothing to table
+    visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
+    expect(page).to have_css("[data-comparison] article", count: 2, wait: 10)
+    expect(page).to have_no_css("[aria-label='Comparison']")
   end
 
   it "says so when the catalog doesn't load" do
