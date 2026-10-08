@@ -4,11 +4,7 @@ en:
     pages:
       ebike_rules:
         rule_label:
-          age: Minimum age
           classes: Classes recognized
-          helmet: Helmet
-          label: Classification label
-          paths: Where you can ride
           power: Motor power cap
           speed: Top assisted speed
           throttle: Throttle

@@ -141,7 +141,7 @@
         <h2 class="<%= NAME_CLASSES %>"><%= @state[:name] %></h2>
 
         <p class="tw:mt-1.5 tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
-          <%= @law ? @law[:summary] : translation(".being_compiled") %>
+          <%= @law ? @law[:description] : translation(".being_compiled") %>
         </p>
       </div>
 
@@ -150,41 +150,26 @@
           <% @rules.each do |row| %>
             <li
               class="
-                tw:grid tw:grid-cols-[22px_minmax(0,1fr)_auto]
-                tw:items-start tw:gap-x-3 tw:gap-y-2 tw:border-b
-                tw:border-gray-200 tw:py-3 tw:dark:border-gray-700
+                tw:grid tw:grid-cols-[22px_minmax(0,1fr)] tw:items-start
+                tw:gap-x-3 tw:border-b tw:border-gray-200 tw:py-3
+                tw:dark:border-gray-700
               "
-              data-controller="ui--collapse"
             >
               <span class="tw:mt-px"><%= render(Pages::EbikeRules::StatusIcon::Component.new(status: row[:status], label: status_label(row[:status]))) %></span>
 
               <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-0.5">
                 <span class="tw:text-sm tw:font-bold"><%= render(Pages::EbikeRules::RuleLabel::Component.new(id: row[:id])) %></span>
-                <span class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300"><%= rule_value(row) %></span>
+                <span class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300"><%= render(Pages::EbikeRules::RuleValue::Component.new(law: @law, id: row[:id])) %></span>
                 <span class="tw:text-sm tw:font-semibold"><%= note(row) %></span>
-              </div>
-
-              <%= render(UI::Collapse::Component.new(text: translation(".statute"), chevron: :trailing, size: :sm,
-                html_class: "tw:min-h-11 tw:gap-1", aria: {controls: "statute-#{row[:id]}"})) %>
-
-              <div
-                id="statute-<%= row[:id] %>"
-                class="
-                  tw:col-span-2 tw:col-start-2 tw:hidden tw:rounded-sm
-                  tw:bg-gray-50 tw:px-2.5 tw:py-2 tw:text-[13px]
-                  tw:dark:bg-gray-900
-                "
-                data-ui--collapse-target="content"
-              >
-                <% cite = @law[:cite][row[:id]] %>
-                <%= link_to cite[:code], cite[:url], target: "_blank", rel: "noopener", class: "twlink" %>
-                <span class="tw:text-gray-700 tw:dark:text-gray-300">· <%= cite[:title] %></span>
               </div>
             </li>
           <% end %>
         </ul>
+
+        <%= render(Pages::EbikeRules::LawDetails::Component.new(law: @law)) %>
+
         <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-          <%= translation(".source", reviewed: @law[:reviewed]) %>
+          <%= translation(".source_html", link: link_to(translation(".bikebook"), bikebook_path(vehicle_models: @law[:id]), class: "twlink")) %>
         </p>
       <% else %>
         <div

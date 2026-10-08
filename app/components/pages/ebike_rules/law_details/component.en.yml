@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        law_details:
+          restrictions: Rules and restrictions
+          sources: Sources

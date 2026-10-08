@@ -48,7 +48,7 @@ module Pages
         def details
           @details ||= case @verdict
           when :yellow then notes(:check)
-          when :red then [*notes(:fail), translation(".may_be_moped")]
+          when :red then [*notes(:fail), other_classification]
           when :gray then [gray_detail]
           else []
           end
@@ -60,6 +60,11 @@ module Pages
           else
             translation(".gray_detail_unclassified", name: bike_name, state: @state[:name])
           end
+        end
+
+        def other_classification
+          name = ::EbikeRules::StateLaws.classification_name(@state[:abbr], @bike.e_vehicle_classifications)
+          name ? translation(".falls_under", state: @state[:name], name:) : translation(".may_be_moped")
         end
 
         def rule_count(status) = @rules.count { it[:status] == status }
@@ -88,12 +93,6 @@ module Pages
           @bike.throttle_mph ? translation(".yes_to_html", mph: number_display(@bike.throttle_mph)) : translation(".answer_yes")
         end
 
-        def rule_value(row)
-          return translation(".watts_html", watts: number_display(@law[:watt_cap])) if row[:id] == :power
-
-          @law[:text][row[:id]]
-        end
-
         def status_label(status)
           case status
           when :pass then translation(".meets_rule")
@@ -110,26 +109,21 @@ module Pages
           when :class_recognized then translation(".class_recognized", **args)
           when :class_not_recognized then translation(".class_not_recognized", **args)
           when :not_classified then translation(".not_classified")
+          when :own_classes then translation(".own_classes")
           when :watts_within_cap then translation(".watts_within_cap_html", **args)
           when :watts_over_cap then translation(".watts_over_cap_html", **args)
           when :watts_not_provided then translation(".watts_not_provided")
+          when :no_watt_cap then translation(".no_watt_cap")
           when :speed_within_cap then translation(".speed_within_cap_html", **args)
-          when :speed_over_class_cap then translation(".speed_over_class_cap_html", **args)
           when :speed_over_cap then translation(".speed_over_cap_html", **args)
           when :speed_not_provided then translation(".speed_not_provided")
+          when :no_speed_cap then translation(".no_speed_cap")
           when :no_throttle then translation(".no_throttle")
+          when :throttle_not_allowed then translation(".throttle_not_allowed")
           when :class_1_throttle then translation(".class_1_throttle")
           when :throttle_allowed then translation(".throttle_allowed")
           when :class_3_throttle then translation(".class_3_throttle")
-          when :has_throttle then translation(".has_throttle")
-          when :minimum_age then translation(".minimum_age_html", **args)
-          when :no_minimum_age then translation(".no_minimum_age", **args)
-          when :helmet_required then translation(".helmet_required")
-          when :helmet_minors then translation(".helmet_minors")
-          when :helmet_not_required then translation(".helmet_not_required", **args)
-          when :paths_restricted then translation(".paths_restricted")
-          when :paths_allowed then translation(".paths_allowed")
-          else translation(".keep_label")
+          else translation(".has_throttle")
           end
         end
 

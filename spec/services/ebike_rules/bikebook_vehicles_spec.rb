@@ -10,7 +10,7 @@ RSpec.describe EbikeRules::BikebookVehicles do
       bike = described_class.find("m/specialized/2025/haul_st")
 
       expect(bike).to have_attributes(bikebook_id: "m/specialized/2025/haul_st", manufacturer_name: "Specialized",
-        model: "Haul ST", first_year: 2025, e_bike_class: 3, watts: 700, top_assist_mph: 28, throttle: true,
+        model: "Haul ST", first_year: 2025, e_bike_class: 3, e_vehicle_classifications: %w[evc/us/class_3 evc/us/class_2], watts: 700, top_assist_mph: 28, throttle: true,
         throttle_mph: 20, ul2849: :certified, ul2271: :certified, manual?: false)
     end
 
@@ -24,7 +24,8 @@ RSpec.describe EbikeRules::BikebookVehicles do
     end
 
     it "gives no class to a model classified as something else" do
-      expect(described_class.find("m/sur_ron/2026/ultra_bee_hp_x_us").e_bike_class).to be_nil
+      expect(described_class.find("m/sur_ron/2026/ultra_bee_hp_x_us"))
+        .to have_attributes(e_bike_class: nil, e_vehicle_classifications: ["evc/us/ca/off_highway_electric_motorcycle"])
     end
 
     it "is nil for a model the catalog lacks, a model without a motor, and no id" do

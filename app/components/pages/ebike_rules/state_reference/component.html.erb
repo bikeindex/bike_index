@@ -18,7 +18,7 @@
       </h2>
 
       <p class="tw:mt-2 tw:text-[17px] tw:text-gray-700 tw:dark:text-gray-300">
-        <%= translation(".subheading") %>
+        <%= translation(".limits_subheading") %>
       </p>
     </div>
 
@@ -42,7 +42,7 @@
     data-ebike-rules--state-filter-target="count"
     data-matching-template="<%= translation(".matching", number: "__number__") %>"
   >
-    <%= translation(".on_file_html", number: number_display(on_file_count)) %>
+    <%= translation(".on_file_html", number: number_display(@laws.count)) %>
   </p>
 
   <div
@@ -87,12 +87,12 @@
                 tw:dark:text-gray-300
               "
             >
-              <%= law[:summary] %>
+              <%= law[:description] %>
             </p>
             <dl
               class="
-                tw:grid
-                tw:grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))]
+                tw:mb-4 tw:grid
+                tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
                 tw:gap-x-8
               "
             >
@@ -113,15 +113,12 @@
                       tw:dark:text-gray-300
                     "
                   >
-                    <%= rule_value(law, id) %>
-                    <%= link_to law[:cite][id][:code], law[:cite][id][:url], target: "_blank", rel: "noopener", class: "twlink tw:text-[13px] tw:whitespace-nowrap" %>
+                    <%= render(Pages::EbikeRules::RuleValue::Component.new(law:, id:)) %>
                   </dd>
                 </div>
               <% end %>
             </dl>
-            <p class="tw:mt-3 tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-              <%= translation(".last_reviewed", reviewed: law[:reviewed]) %>
-            </p>
+            <%= render(Pages::EbikeRules::LawDetails::Component.new(law:)) %>
           <% else %>
             <p
               class="

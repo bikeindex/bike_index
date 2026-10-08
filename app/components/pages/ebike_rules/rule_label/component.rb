@@ -8,16 +8,17 @@ module Pages
           @id = id
         end
 
-        def call
+        # escaped here, since a plain translation renders as HTML-unsafe
+        def call = safe_join([label])
+
+        private
+
+        def label
           case @id
           when :classes then translation(".classes")
           when :power then translation(".power")
           when :speed then translation(".speed")
-          when :throttle then translation(".throttle")
-          when :age then translation(".age")
-          when :helmet then translation(".helmet")
-          when :paths then translation(".paths")
-          else translation(".label")
+          else translation(".throttle")
           end
         end
       end

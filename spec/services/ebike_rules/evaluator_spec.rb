@@ -3,29 +3,29 @@
 require "rails_helper"
 
 RSpec.describe EbikeRules::Evaluator do
+  before { stub_bikebook_catalog }
+
   let(:attributes) do
-    {bikebook_id: "m/x/2025/y", manufacturer_name: "X", model: "Y", first_year: 2025, e_bike_class: 1, watts: 250,
-     top_assist_mph: 20, throttle: false, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
+    {bikebook_id: "m/x/2025/y", manufacturer_name: "X", model: "Y", first_year: 2025, e_bike_class: 1, e_vehicle_classifications: [],
+     watts: 250, top_assist_mph: 20, throttle: false, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
   end
   let(:bike) { EbikeRules::Bike.new(**attributes) }
-  let(:law) { EbikeRules::StateLaws.find("IN") }
+  let(:abbreviation) { "IN" }
+  let(:law) { EbikeRules::StateLaws.find(abbreviation) }
   let(:rules) { described_class.rules(law:, bike:) }
   let(:statuses) { rules.to_h { [it[:id], it[:status]] } }
 
   it "passes a Class 1 bike in Indiana" do
-    expect(statuses).to eq(classes: :pass, power: :pass, speed: :pass, throttle: :pass, age: :pass, helmet: :pass,
-      paths: :pass, label: :info)
+    expect(statuses).to eq(classes: :pass, power: :pass, speed: :pass, throttle: :pass)
     expect(described_class.verdict(rules)).to eq :green
   end
 
-  context "with a Class 3 bike with a throttle in California" do
-    let(:law) { EbikeRules::StateLaws.find("CA") }
+  context "with a Class 3 bike with a throttle in Colorado" do
+    let(:abbreviation) { "CO" }
     let(:attributes) { super().merge(e_bike_class: 3, top_assist_mph: 28, throttle: true) }
 
-    it "is legal, with rules to check" do
-      expect(statuses).to eq(classes: :pass, power: :pass, speed: :pass, throttle: :check, age: :check, helmet: :check,
-        paths: :check, label: :info)
-      expect(rules.find { it[:id] == :age }).to include(note: :minimum_age, args: {age: 16})
+    it "is legal, with its throttle to check" do
+      expect(statuses).to eq(classes: :pass, power: :pass, speed: :pass, throttle: :check)
       expect(described_class.verdict(rules)).to eq :yellow
     end
   end
@@ -40,22 +40,41 @@ RSpec.describe EbikeRules::Evaluator do
     end
   end
 
-  context "with a bike assisting past its class's speed" do
-    let(:law) { EbikeRules::StateLaws.find("NY") }
+  context "in a state with its own limits rather than the three classes" do
+    let(:abbreviation) { "NY" }
     let(:attributes) { super().merge(e_bike_class: 3, top_assist_mph: 28) }
 
-    it "fails on speed" do
-      expect(rules.find { it[:id] == :speed }).to include(status: :fail, note: :speed_over_class_cap, args: {mph: 28, cap: 25, e_bike_class: 3})
+    it "fails on its speed cap" do
+      expect(statuses).to include(classes: :info)
+      expect(rules.find { it[:id] == :speed }).to include(status: :fail, note: :speed_over_cap, args: {mph: 28, cap: 25})
+    end
+  end
+
+  context "with a throttle in a state that allows none" do
+    let(:abbreviation) { "NJ" }
+    let(:attributes) { super().merge(e_bike_class: 2, throttle: true) }
+
+    it "fails on the throttle" do
+      expect(rules.find { it[:id] == :throttle }).to include(status: :fail, note: :throttle_not_allowed)
     end
   end
 
   context "with a bike that has no class" do
     let(:attributes) { super().merge(e_bike_class: nil, watts: 1_700, top_assist_mph: 50, throttle: true) }
 
-    it "fails, without the rules for riding an e-bike" do
-      expect(statuses).to eq(classes: :fail, power: :fail, speed: :fail, throttle: :info, label: :info)
+    it "fails" do
+      expect(statuses).to eq(classes: :fail, power: :fail, speed: :fail, throttle: :info)
       expect(rules.find { it[:id] == :speed }).to include(note: :speed_over_cap, args: {mph: 50, cap: 28})
       expect(described_class.verdict(rules)).to eq :red
+    end
+  end
+
+  context "with a law that caps neither power nor speed" do
+    let(:law) { EbikeRules::StateLaws.find("IN").merge(watt_cap: nil, mph: nil) }
+
+    it "passes" do
+      expect(rules.first(3).map { it[:note] }).to eq %i[class_recognized no_watt_cap no_speed_cap]
+      expect(described_class.verdict(rules)).to eq :green
     end
   end
 

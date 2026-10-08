@@ -1,0 +1,15 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        rule_value:
+          allowed: Allowed
+          classes:
+            one: Class %{classes}
+            other: Classes %{classes}
+          mph_html: "%{mph} mph"
+          no_cap: No cap
+          not_allowed: Not allowed
+          own_definition: 'Its own definition: %{name}'
+          watts_html: "%{watts}W"

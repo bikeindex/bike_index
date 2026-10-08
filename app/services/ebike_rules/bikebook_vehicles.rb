@@ -5,13 +5,11 @@ module EbikeRules
   module BikebookVehicles
     extend Functionable
 
-    US_CLASS = %r{\Aevc/us/class_(\d)\z}
-
     # nil for an id the catalog lacks, a model with no motor, or a catalog that doesn't answer
     def find(id)
       return if id.blank?
 
-      block = blocks&.dig(id.delete_prefix("m/").split("/").first(2).join("/"))
+      block = BikebookCatalog.manifest&.dig("blocks", id.delete_prefix("m/").split("/").first(2).join("/"))
       attributes = block && block_vehicles(block)&.dig(id)
       attributes && Bike.new(**attributes)
     end
@@ -24,7 +22,7 @@ module EbikeRules
     # so a republished block is a new key
     def block_vehicles(block)
       Rails.cache.fetch(["bikebook_catalog/block_vehicles", block], expires_in: 1.week, skip_nil: true) do
-        fetch_json(block)&.dig("models")&.filter_map { |id, record| [id, attributes_from(record)] if record["motors"].present? }&.to_h
+        BikebookCatalog.fetch_json(block)&.dig("models")&.filter_map { |id, record| [id, attributes_from(record)] if record["motors"].present? }&.to_h
       end
     end
 
@@ -33,12 +31,15 @@ module EbikeRules
       modes = motors.flat_map { it["operating_modes"] || [] }
       throttle_modes = modes.select { it["mode"] == "throttle" }
       certifications = motors.map { it["certification"] }.join(", ")
+      # a single classification is schema 0.22's, which models not yet reconciled to 0.23 still carry
+      classifications = modes.flat_map { Array(it["e_vehicle_classifications"] || it["e_vehicle_classification"]) }.uniq
       {
         bikebook_id: record["id"],
         manufacturer_name: record["manufacturer"],
         model: record["model"],
         first_year: record["first_year"],
-        e_bike_class: e_bike_class(modes, throttle_modes),
+        e_bike_class: e_bike_class(classifications, modes, throttle_modes),
+        e_vehicle_classifications: classifications,
         watts: motors.filter_map { it["rated_power"] }.max,
         top_assist_mph: mph(modes.select { it["mode"] == "assist" }),
         throttle: throttle_modes.any?,
@@ -50,14 +51,14 @@ module EbikeRules
     end
 
     # The highest US class any mode carries - assist to 28 mph with a throttle to 20 is Class 3. A mode
-    # carrying another classification (a moped, a motorcycle) makes it none. Unclassified modes are
-    # classed by the federal limits: 20 mph with a throttle, 28 without
-    def e_bike_class(modes, throttle_modes)
-      classifications = modes.filter_map { it["e_vehicle_classification"] }
-      if classifications.any?
-        return if classifications.any? { !it.match?(US_CLASS) }
+    # carrying another classification (a moped, a motorcycle), other than an e-bike law, makes it none.
+    # Unclassified modes are classed by the federal limits: 20 mph with a throttle, 28 without
+    def e_bike_class(classifications, modes, throttle_modes)
+      tiers = classifications.grep_v(StateLaws::E_BIKE_LAW)
+      if tiers.any?
+        return if tiers.any? { !it.match?(StateLaws::US_CLASS) }
 
-        return classifications.map { it[US_CLASS, 1].to_i }.max
+        return tiers.map { it[StateLaws::US_CLASS, 1].to_i }.max
       end
       top_mph = mph(modes)
       return if top_mph.nil? || top_mph > 28
@@ -71,17 +72,6 @@ module EbikeRules
       kilometers && UnitSystem.kilometers_to_miles(kilometers).round
     end
 
-    def blocks
-      Rails.cache.fetch("bikebook_catalog/blocks", expires_in: 1.hour, skip_nil: true) { fetch_json("manifest.json")&.dig("blocks") }
-    end
-
-    def fetch_json(path)
-      response = Faraday.new(url: BikebookController::CATALOG_URL, request: {timeout: 5}).get(path)
-      JSON.parse(response.body) if response.success?
-    rescue Faraday::Error, JSON::ParserError
-      nil
-    end
-
-    conceal :block_vehicles, :attributes_from, :e_bike_class, :mph, :blocks, :fetch_json
+    conceal :block_vehicles, :attributes_from, :e_bike_class, :mph
   end
 end

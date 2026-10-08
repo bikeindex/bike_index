@@ -11,9 +11,7 @@ en:
           filter_states: Filter states
           heading: E-bike laws by state
           in_review: In review
-          last_reviewed: Last reviewed %{reviewed}.
+          limits_subheading: All 50 states and D.C. Open a state to see its limits,
+            rules and sources.
           matching: "%{number} of 51 match"
           on_file_html: "%{number} of 51 states and D.C. on file · others in review"
-          subheading: All 50 states and D.C. Open a state to see its rules and statute
-            citations.
-          watts_html: "%{watts}W"
