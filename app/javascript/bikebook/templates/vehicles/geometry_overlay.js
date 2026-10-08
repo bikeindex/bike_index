@@ -30,26 +30,28 @@ const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headT
     stroke-width="4" vector-effect="non-scaling-stroke"></path></g>`
 }
 
-// Where a model's built wheel is the first's size but its tire more than TIRE_GAP mm wider or narrower, how much larger
-// or smaller across it is, estimating a tire as tall as it's wide. Front and rear together where they match
-const diameterNotes = (presenter, [first, ...others]) => {
+// A [bsd, tire] wheel against the first's: the same size on a tire more than TIRE_GAP mm wider or narrower, or 700c
+// against 650b
+const sizedApart = ([bsd, tire], [baseBsd, baseTire]) => [bsd, tire, baseBsd, baseTire].every(isNumber) &&
+  (bsd === baseBsd ? Math.abs(tire - baseTire) > TIRE_GAP : [bsd, baseBsd].sort().join() === '584,622')
+
+// Each model's built wheels that are `sizedApart` from the first's, and the first's they're apart from, as diameters
+// estimated with a tire as tall as it's wide. Front and rear as one where they match
+const diameterNotes = (presenter, compared) => {
+  const [first, ...others] = compared
+  const wheel = ({ wheels }, position) => {
+    const { bsd, tire_width: tire } = wheels[position].built ?? {}
+    return [bsd, tire]
+  }
+  const apart = (vehicle, position) => sizedApart(wheel(vehicle, position), wheel(first, position))
   const mm = (value) => presenter.measurement(presenter.rounded(value), 'mm')
-  return others.flatMap((vehicle) => {
-    const differing = ['front', 'rear'].map((position) => [position, ...[vehicle, first].map(({ wheels }) => {
-      const { bsd, tire_width: tire } = wheels[position].built ?? {}
-      return [bsd, tire]
-    })]).filter(([, [bsd, tire], [baseBsd, baseTire]]) => isNumber(bsd) && bsd === baseBsd && isNumber(tire) && isNumber(baseTire) &&
-      Math.abs(tire - baseTire) > TIRE_GAP)
-    const [front, rear] = differing
-    const merged = rear && equal(front.slice(1), rear.slice(1)) ? [['wheels', ...front.slice(1)]] : differing
-    return merged.map(([position, [bsd, tire], [, baseTire]]) => {
-      const both = position === 'wheels'
-      const larger = tire > baseTire
-      const [diameter, baseDiameter] = [tire, baseTire].map((width) => bsd + 2 * width)
-      return html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${vehicle.title}'s ${both ? 'wheels' : `${position} wheel`}: ${
-        presenter.vocabulary.wheel_sizes?.[bsd]?.name ?? `${bsd} mm BSD`} like ${first.title}'s, with ${both ? 'tires' : 'a tire'} ${
-        mm(Math.abs(tire - baseTire))} ${larger ? 'wider' : 'narrower'}, so about ${mm(Math.abs(diameter - baseDiameter))} ${
-        larger ? 'larger' : 'smaller'} across: an estimated ${mm(diameter)}, against ${mm(baseDiameter)}.</p>`
+  return compared.flatMap((vehicle) => {
+    const positions = ['front', 'rear'].filter((position) => vehicle === first ? others.some((other) => apart(other, position)) : apart(vehicle, position))
+    const both = positions.length === 2 && equal(wheel(vehicle, 'front'), wheel(vehicle, 'rear'))
+    return (both ? [null] : positions).map((position) => {
+      const [bsd, tire] = wheel(vehicle, position ?? 'front')
+      return html`<li>${vehicle.title}'s ${position ? `${position} ` : ''}${presenter.vocabulary.wheel_sizes?.[bsd]?.name ?? `${bsd} mm BSD`} wheel with ${
+        position ? html`a ${mm(tire)} tire` : html`${mm(tire)} tires`} is approximately ${mm(bsd + 2 * tire)} diameter</li>`
     })
   })
 }
@@ -77,6 +79,7 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const [left, top] = [Math.min(BOUNDS.left, ...xs) - PADDING, -Math.max(BOUNDS.top, ...ys) - PADDING]
   const [width, height] = [Math.max(BOUNDS.right, ...xs) - left + PADDING, PADDING - top]
   const labels = presenter.kit.geometry.labels
+  const notes = diameterNotes(presenter, labelled)
 
   // out to the screen's edges on a phone, as the cards below it are
   return html`<section aria-label="Geometry overlay" data-controller="bikebook--geometry-overlay" class="tw:mx-auto tw:mt-6 tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border
@@ -88,7 +91,7 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
       html`<li><button type="button" class=${buttonClasses({ size: 'sm' })} aria-pressed="false"
         data-bikebook--geometry-overlay-target="button" data-action="bikebook--geometry-overlay#toggle"><svg aria-hidden="true" class="tw:shrink-0" width="24" height="8"><line stroke=${series.color}
         x1="2" y1="4" x2="22" y2="4" stroke-width="4" stroke-linecap="round"></line></svg><span>${title}${
-        present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${diameterNotes(presenter, labelled)}${undrawn.length
+        present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${notes.length ? html`<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${notes}</ul>` : nothing}${undrawn.length
       ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing } }) =>
         `${title} isn't drawn without its ${missing.map((key) => labels[key] ?? presenter.humanize(key)).join(', ')}.`).join(' ')}</p>`
       : nothing}${drawn.some(({ geometry }) => geometry.estimated)

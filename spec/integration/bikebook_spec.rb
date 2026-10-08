@@ -78,7 +78,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       expect(page).to have_css("svg[role='img'] > g", count: 1).and have_css("li", count: 1, text: "Aventón Level 4 REC Step-Through")
       expect(page).to have_text("Aventón Level 2 Step-Through isn't drawn without its Stack, Head Angle, Chainstay, BB Drop.")
       # the same wheel size, its tires too near each other's for a note on how large it stands
-      expect(page).to have_no_text("across")
+      expect(page).to have_no_text("diameter")
     end
     within("[aria-label='Comparison']") do
       expect(page).to have_css("thead th", text: "Level 2 Step-Through")
@@ -359,8 +359,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(cogs.all("td").map(&:text)).to match([/\A12:\s*10–\s*52\W*t\z/, /\A1:\s*−11\s*22\W*t\s*−30\z/])
     expect(cogs).to have_css(".tw\\:text-red-700", exact_text: "−11").and have_css(".tw\\:text-red-700", exact_text: "−30")
     # the same wheel size on tires far enough apart to change how large it stands, as an estimate
-    expect(find("[aria-label='Geometry overlay'] p", text: "across").text.gsub(/[[:space:]]+/, " ")).to eq("Aventón Soltera 3 ADV's wheels: 700 C like Aventón Current " \
-      "EXP's, with tires 26 mm narrower, so about 52 mm smaller across: an estimated 698 mm, against 750 mm.")
+    diameters = -> { all("[aria-label='Geometry overlay'] li", text: "diameter").map { it.text.gsub(/[[:space:]]+/, " ") } }
+    expect(diameters.call).to eq(["Aventón Current EXP's 700 C wheel with 64 mm tires is approximately 750 mm diameter",
+      "Aventón Soltera 3 ADV's 700 C wheel with 38 mm tires is approximately 698 mm diameter"])
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
     # the first vehicle's last pick is what a comparison with none picked starts nearest
@@ -368,6 +369,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)
     expect_size.call("Level 4 ADV", "Extra Large")
     expect_size.call("Current EXP", "Extra Large")
+    # 650b against 700c, whatever their tires
+    expect(diameters.call).to eq(["Aventón Level 4 ADV's 650 B wheel with 56 mm tires is approximately 696 mm diameter",
+      "Aventón Current EXP's 700 C wheel with 64 mm tires is approximately 750 mm diameter"])
   end
 
   it "shows every weight in pounds to a viewer who prefers imperial units" do
