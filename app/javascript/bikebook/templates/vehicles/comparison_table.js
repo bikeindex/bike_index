@@ -3,7 +3,7 @@ import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, tireWidthDifference, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
-import { array, equal, isNumber, join, present, slice } from 'bikebook/templates/values'
+import { array, isNumber, join, present, slice } from 'bikebook/templates/values'
 
 const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
 const priced = (vehicle) => latest(array(vehicle.years).filter((year) => isNumber(year.original_msrp)))
@@ -32,33 +32,6 @@ const gearingParts = (cogs) => (presenter, { count, teeth }) => {
       return [key, tooth, join([presenter.measurement(tooth, last ? 'teeth' : null), last ? '' : cogs ? '–' : ','])]
     })
   ]
-}
-
-const TIRE_GAP = 10
-const title = (vehicle) => [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
-
-// Where a model's built wheel is the first's size but its tire more than TIRE_GAP mm wider or narrower, how much larger
-// or smaller across it is, estimating a tire as tall as it's wide. Front and rear together where they match
-const diameterNotes = (presenter, named, wheels) => {
-  const [first, ...others] = named
-  const mm = (value) => presenter.measurement(presenter.rounded(value), 'mm')
-  return others.flatMap((vehicle) => {
-    const differing = ['front', 'rear'].map((position) => [position, ...[vehicle, first].map((each) => {
-      const { bsd, tire_width: tire } = wheels.get(each)[position].built ?? {}
-      return [bsd, tire]
-    })]).filter(([, [bsd, tire], [baseBsd, baseTire]]) => isNumber(bsd) && bsd === baseBsd && isNumber(tire) && isNumber(baseTire) &&
-      Math.abs(tire - baseTire) > TIRE_GAP)
-    const [front, rear] = differing
-    const merged = rear && equal(front.slice(1), rear.slice(1)) ? [['wheels', ...front.slice(1)]] : differing
-    return merged.map(([position, [bsd, tire], [, baseTire]]) => {
-      const both = position === 'wheels'
-      const larger = tire > baseTire
-      const [diameter, baseDiameter] = [tire, baseTire].map((width) => bsd + 2 * width)
-      return html`<p>${title(vehicle)}'s ${both ? 'wheels' : `${position} wheel`}: ${presenter.vocabulary.wheel_sizes?.[bsd]?.name ?? `${bsd} mm BSD`} like ${
-        title(first)}'s, with ${both ? 'tires' : 'a tire'} ${mm(Math.abs(tire - baseTire))} ${larger ? 'wider' : 'narrower'}, so about ${
-        mm(Math.abs(diameter - baseDiameter))} ${larger ? 'larger' : 'smaller'} across: an estimated ${mm(diameter)}, against ${mm(baseDiameter)}.</p>`
-    })
-  })
 }
 
 const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'wheelbase', 'standover']
@@ -128,7 +101,6 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
       amount: tireDifference
     }
   ])
-  const notes = diameterNotes(presenter, named, wheels)
   const brakes = new Map(named.map((vehicle, index) => [vehicle, brakesAt(presenter, vehicles[index].data, sizes[index])]))
   const brakeRows = [{ label: 'Brakes', read: (vehicle) => brakes.get(vehicle).types }, { label: 'Brake rotors', read: (vehicle) => brakes.get(vehicle).rotors }]
 
@@ -201,7 +173,5 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
         }
       })
     ]
-  })}${notes.length
-    ? html`<div class="tw:mx-auto tw:mt-2 tw:max-w-[78rem] tw:space-y-1 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${notes}</div>`
-    : nothing}</section>`
+  })}</section>`
 }

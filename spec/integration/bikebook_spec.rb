@@ -77,6 +77,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     within("[aria-label='Geometry overlay']") do
       expect(page).to have_css("svg[role='img'] > g", count: 1).and have_css("li", count: 1, text: "Aventón Level 4 REC Step-Through")
       expect(page).to have_text("Aventón Level 2 Step-Through isn't drawn without its Stack, Head Angle, Chainstay, BB Drop.")
+      # the same wheel size, its tires too near each other's for a note on how large it stands
+      expect(page).to have_no_text("across")
     end
     within("[aria-label='Comparison']") do
       expect(page).to have_css("thead th", text: "Level 2 Step-Through")
@@ -95,8 +97,6 @@ RSpec.describe "Bikebook", :js, type: :system do
         })()
       JS
       expect(key_colors).to eq(["rgb(52, 152, 219)"] * 2)
-      # the same wheel size, its tires too near each other's for a note on how large it stands
-      expect(page).to have_no_css("p")
       expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$1,000")
       # only the number is colored: the currency symbol and unit keep their gray
       colors = page.evaluate_script(<<~JS)
@@ -359,7 +359,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(cogs.all("td").map(&:text)).to match([/\A12:\s*10–\s*52\W*t\z/, /\A1:\s*−11\s*22\W*t\s*−30\z/])
     expect(cogs).to have_css(".tw\\:text-red-700", exact_text: "−11").and have_css(".tw\\:text-red-700", exact_text: "−30")
     # the same wheel size on tires far enough apart to change how large it stands, as an estimate
-    expect(find("[aria-label='Comparison'] p").text.gsub(/[[:space:]]+/, " ")).to eq("Aventón Soltera 3 ADV's wheels: 700 C like Aventón Current " \
+    expect(find("[aria-label='Geometry overlay'] p", text: "across").text.gsub(/[[:space:]]+/, " ")).to eq("Aventón Soltera 3 ADV's wheels: 700 C like Aventón Current " \
       "EXP's, with tires 26 mm narrower, so about 52 mm smaller across: an estimated 698 mm, against 750 mm.")
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 

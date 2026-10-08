@@ -1,7 +1,8 @@
 import { html, nothing, svg } from 'lit-html'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { sectionHeading } from 'bikebook/templates/vehicles/section'
-import { present } from 'bikebook/templates/values'
+import { wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { equal, isNumber, present } from 'bikebook/templates/values'
 
 // UI::Chart::Component::COLORS, one per compared model; forced, or the table cells' dark border color wins
 export const SERIES = [
@@ -12,6 +13,7 @@ export const SERIES = [
   { color: '#059669', border: 'tw:border-b-[#059669]!' }
 ]
 const PADDING = 30
+const TIRE_GAP = 10
 // mm around the bottom bracket and up from the ground that nearly every catalog frame fits, so a larger size draws
 // larger rather than the drawing refitting
 const BOUNDS = { left: -850, right: 1250, top: 1010 }
@@ -28,6 +30,30 @@ const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headT
     stroke-width="4" vector-effect="non-scaling-stroke"></path></g>`
 }
 
+// Where a model's built wheel is the first's size but its tire more than TIRE_GAP mm wider or narrower, how much larger
+// or smaller across it is, estimating a tire as tall as it's wide. Front and rear together where they match
+const diameterNotes = (presenter, [first, ...others]) => {
+  const mm = (value) => presenter.measurement(presenter.rounded(value), 'mm')
+  return others.flatMap((vehicle) => {
+    const differing = ['front', 'rear'].map((position) => [position, ...[vehicle, first].map(({ wheels }) => {
+      const { bsd, tire_width: tire } = wheels[position].built ?? {}
+      return [bsd, tire]
+    })]).filter(([, [bsd, tire], [baseBsd, baseTire]]) => isNumber(bsd) && bsd === baseBsd && isNumber(tire) && isNumber(baseTire) &&
+      Math.abs(tire - baseTire) > TIRE_GAP)
+    const [front, rear] = differing
+    const merged = rear && equal(front.slice(1), rear.slice(1)) ? [['wheels', ...front.slice(1)]] : differing
+    return merged.map(([position, [bsd, tire], [, baseTire]]) => {
+      const both = position === 'wheels'
+      const larger = tire > baseTire
+      const [diameter, baseDiameter] = [tire, baseTire].map((width) => bsd + 2 * width)
+      return html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${vehicle.title}'s ${both ? 'wheels' : `${position} wheel`}: ${
+        presenter.vocabulary.wheel_sizes?.[bsd]?.name ?? `${bsd} mm BSD`} like ${first.title}'s, with ${both ? 'tires' : 'a tire'} ${
+        mm(Math.abs(tire - baseTire))} ${larger ? 'wider' : 'narrower'}, so about ${mm(Math.abs(diameter - baseDiameter))} ${
+        larger ? 'larger' : 'smaller'} across: an estimated ${mm(diameter)}, against ${mm(baseDiameter)}.</p>`
+    })
+  })
+}
+
 // The bottom border that keys a comparison table column to its frame, which the overlay draws in the same order
 export const seriesBorder = (frame, index) => frame?.missing.length === 0 ? `tw:border-b-4 ${SERIES[index].border}` : ''
 
@@ -38,7 +64,8 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const labelled = named.map((vehicle, index) => {
     const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
     const size = sizes[index]?.name
-    return { geometry: frames[index], series: SERIES[index], title, size, label: present(size) ? `${title}, ${size}` : title }
+    const wheels = wheelsAt(presenter, vehicles[index].data, sizes[index])
+    return { geometry: frames[index], series: SERIES[index], title, size, wheels, label: present(size) ? `${title}, ${size}` : title }
   })
   const drawn = labelled.filter(({ geometry }) => geometry.missing.length === 0)
   const undrawn = labelled.filter(({ geometry }) => geometry.missing.length)
@@ -59,7 +86,7 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
       html`<li><button type="button" class=${buttonClasses({ size: 'sm' })} aria-pressed="false"
         data-bikebook--geometry-overlay-target="button" data-action="bikebook--geometry-overlay#toggle"><svg aria-hidden="true" class="tw:shrink-0" width="24" height="8"><line stroke=${series.color}
         x1="2" y1="4" x2="22" y2="4" stroke-width="4" stroke-linecap="round"></line></svg><span>${title}${
-        present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${undrawn.length
+        present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${diameterNotes(presenter, labelled)}${undrawn.length
       ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing } }) =>
         `${title} isn't drawn without its ${missing.map((key) => labels[key] ?? presenter.humanize(key)).join(', ')}.`).join(' ')}</p>`
       : nothing}${drawn.some(({ geometry }) => geometry.estimated)
