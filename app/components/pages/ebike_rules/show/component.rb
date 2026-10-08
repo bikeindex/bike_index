@@ -18,10 +18,7 @@ module Pages
 
         private
 
-        def state_option_tags
-          states = ::EbikeRules::StateLaws::STATES.map { [it[:name], it[:abbr]] }
-          options_for_select(states, @lookup.state&.dig(:abbr))
-        end
+        def state_options = ::EbikeRules::StateLaws::STATES.map { [it[:name], it[:abbr]] }
 
         def field_error(field, text)
           return unless error?(field)

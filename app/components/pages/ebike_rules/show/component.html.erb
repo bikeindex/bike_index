@@ -42,14 +42,16 @@
       class: "tw:flex tw:flex-col tw:gap-3.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-[clamp(18px,4vw,32px)] tw:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:dark:border-gray-700 tw:dark:bg-gray-800",
       data: {controller: "ebike-rules--lookup", "ebike-rules--lookup-manifest-url-value": @manifest_url,
              "ebike-rules--lookup-display-value": bike_display,
-             "ebike-rules--lookup-failed-text-value": translation(".bikebook_failed")} do %>
+             "ebike-rules--lookup-failed-text-value": translation(".bikebook_failed")} do |f| %>
       <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-4">
         <div class="tw:flex tw:min-w-0 tw:flex-[2_1_220px] tw:flex-col tw:gap-2">
-          <%= label_tag :state, translation(".state"), class: "twlabel" %>
-
-          <%= select_tag :state, state_option_tags, include_blank: translation(".select_state"),
-            class: "twinput tw:min-h-12 tw:text-base!", aria: {invalid: (true if error?(:state))},
-            data: {"ebike-rules--lookup-target": "state"} %>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :state, label_text: translation(".state"),
+            optional_badge: false, wrapper_class: "tw:contents")) do %>
+            <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :state, option_tags: state_options,
+              options: {selected: @lookup.state&.dig(:abbr), include_blank: translation(".select_state")},
+              html_options: {class: "tw:min-h-12 tw:text-base!", aria: {invalid: (true if error?(:state))},
+                             data: {"ebike-rules--lookup-target": "state"}})) %>
+          <% end %>
 
           <% if error?(:state) %>
             <%= field_error(:state, translation(".state_error")) %>
@@ -77,26 +79,27 @@
         </div>
 
         <div class="tw:flex tw:min-w-0 tw:flex-[4_1_300px] tw:flex-col tw:gap-2">
-          <label class="twlabel" for="bike"><%= translation(".bike_model") %></label>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :bike, label_text: translation(".bike_model"),
+            optional_badge: false, wrapper_class: "tw:contents")) do %>
+            <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
+            <template data-ebike-rules--lookup-target="combobox">
+              <%= render(UI::Forms::Combobox::Component.new(name: "bike", src: bikebook_path(electric: 1),
+                dialog_label: translation(".bike_model"),
+                html_options: {value: @lookup.bikebook_id, placeholder: translation(".bike_placeholder"),
+                               aria: {invalid: (true if error?(:bike))}})) %>
+            </template>
 
-          <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
-          <template data-ebike-rules--lookup-target="combobox">
-            <%= render(UI::Forms::Combobox::Component.new(name: "bike", src: bikebook_path(electric: 1),
-              dialog_label: translation(".bike_model"),
-              html_options: {value: @lookup.bikebook_id, placeholder: translation(".bike_placeholder"),
-                             aria: {invalid: (true if error?(:bike))}})) %>
-          </template>
-
-          <div data-ebike-rules--lookup-target="comboboxSlot">
-            <input
-              id="bike"
-              type="text"
-              class="twinput tw:min-h-12 tw:text-base!"
-              placeholder="<%= translation(".loading_bikebook") %>"
-              autocomplete="off"
-              disabled
-            >
-          </div>
+            <div data-ebike-rules--lookup-target="comboboxSlot">
+              <input
+                id="bike"
+                type="text"
+                class="twinput tw:min-h-12 tw:text-base!"
+                placeholder="<%= translation(".loading_bikebook") %>"
+                autocomplete="off"
+                disabled
+              >
+            </div>
+          <% end %>
 
           <%= field_error(:bike, translation(".bike_error")) %>
 
@@ -135,11 +138,11 @@
           </div>
 
           <div class="tw:flex tw:flex-[1_1_150px] tw:flex-col tw:gap-1.5">
-            <%= label_tag :watts, translation(".motor_wattage"), class: "twlabel" %>
-
-            <%= number_field_tag :watts, @lookup.manual_watts, min: 1, inputmode: "numeric", autocomplete: "off",
-              placeholder: translation(".watts_placeholder"), class: "twinput tw:min-h-12 tw:text-base!",
-              aria: {invalid: (true if error?(:watts))} %>
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :watts, kind: :number_field,
+              label_text: translation(".motor_wattage"), optional_badge: false, wrapper_class: "tw:contents",
+              html_options: {value: @lookup.manual_watts, min: 1, inputmode: "numeric", autocomplete: "off",
+                             placeholder: translation(".watts_placeholder"), class: "tw:min-h-12 tw:text-base!",
+                             aria: {invalid: (true if error?(:watts))}})) %>
 
             <%= field_error(:watts, translation(".watts_error")) %>
           </div>
