@@ -17,6 +17,8 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("#manufacturer-hw-listbox", visible: :all)
         .and have_css("#vehicle-viewers", visible: :all)
       expect(page).to have_title("Bikebook", exact: true)
+        .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook_icon']", visible: :all)
+        .and have_css("section[aria-label='About Bike Book'] svg title", text: "Bike Book", visible: :all)
       expect(response.headers["X-Robots-Tag"]).to be_nil
     end
 

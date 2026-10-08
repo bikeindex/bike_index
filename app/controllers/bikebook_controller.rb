@@ -43,6 +43,7 @@ class BikebookController < ApplicationController
 
   def render_page(title = "Bikebook")
     @page_title = title
+    @page_image ||= view_context.image_url("logos/bikebook_icon.png")
     render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::BikebookCatalog::MANIFEST_URL)
   end
 end
