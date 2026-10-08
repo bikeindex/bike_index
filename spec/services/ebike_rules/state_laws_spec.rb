@@ -25,10 +25,6 @@ RSpec.describe EbikeRules::StateLaws do
       expect(described_class.classification_name("AK", ["evc/us/class_1"])).to be_nil
     end
 
-    it "reads 0.23.0's restrictions, which are strings" do
-      expect(described_class.find("NJ")[:restrictions]).to all(match(rule: a_kind_of(String), starts_on: nil))
-    end
-
     it "drops a rule once it ends, and marks one still to come until it starts" do
       san_mateo = "Cities in San Mateo County may bar riders under 12 from Class 1 and Class 2 electric bicycles"
       sidewalks = /\AA 10 mph prima facie speed limit on sidewalks/

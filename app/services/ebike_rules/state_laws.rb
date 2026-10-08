@@ -76,11 +76,7 @@ module EbikeRules
       }
     end
 
-    # 0.23.0's restrictions are strings, 0.23.1's carry dates
-    def restriction(value)
-      value = {"rule" => value} if value.is_a?(String)
-      {rule: value["rule"], starts_on: date(value["starts_on"]), ends_on: date(value["ends_on"])}
-    end
+    def restriction(value) = {rule: value["rule"], starts_on: date(value["starts_on"]), ends_on: date(value["ends_on"])}
 
     def date(value) = value && Date.parse(value)
 
