@@ -7,24 +7,14 @@ module EbikeRuleServices
 
     # nil for an id the catalog lacks, a model with no motor, or a catalog that doesn't answer
     def find(id)
-      return if id.blank?
-
-      block = BikebookCatalog.manifest&.dig("blocks", id.delete_prefix("m/").split("/").first(2).join("/"))
-      attributes = block && block_vehicles(block)&.dig(id)
-      attributes && Bike.new(**attributes)
+      block = id.present? && Integrations::Bikebook::Catalog.manifest&.dig("blocks", id[Integrations::Bikebook::Catalog::MODEL_ID, 1])
+      record = block && Integrations::Bikebook::Catalog.file(block)&.dig("models", id)
+      Bike.new(**attributes_from(record)) if record && record["motors"].present?
     end
 
     #
     # private below here
     #
-
-    # Each motorized model in a block, a manufacturer's year. A block's file name carries its digest,
-    # so a republished block is a new key
-    def block_vehicles(block)
-      Rails.cache.fetch(["bikebook_catalog/block_vehicles", block], expires_in: 1.week, skip_nil: true) do
-        BikebookCatalog.fetch_json(block)&.dig("models")&.filter_map { |id, record| [id, attributes_from(record)] if record["motors"].present? }&.to_h
-      end
-    end
 
     def attributes_from(record)
       motors = record["motors"]
@@ -39,8 +29,10 @@ module EbikeRuleServices
         model: record["model"],
         first_year: record["first_year"],
         e_bike_class: e_bike_class(classifications, modes, throttle_modes),
+        class_unknown: classifications.grep_v(BikebookCatalog::E_BIKE_LAW).none? && mph(modes).nil?,
         e_vehicle_classifications: classifications,
-        watts: motors.filter_map { it["rated_power"] }.max,
+        # a state's cap is on the motors together
+        watts: motors.filter_map { it["rated_power"] }.then { it.sum if it.any? },
         top_assist_mph: mph(modes.select { it["mode"] == "assist" }),
         throttle: throttle_modes.any?,
         throttle_mph: mph(throttle_modes),
@@ -72,6 +64,6 @@ module EbikeRuleServices
       kilometers && UnitSystem.kilometers_to_miles(kilometers).round
     end
 
-    conceal :block_vehicles, :attributes_from, :e_bike_class, :mph
+    conceal :attributes_from, :e_bike_class, :mph
   end
 end

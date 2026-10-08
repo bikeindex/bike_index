@@ -10,7 +10,8 @@ module EbikeRuleServices
       submitted = manual || params.key?(:bike)
       manual_class = params[:e_bike_class].present? ? params[:e_bike_class].to_i.clamp(1, 3) : 2
       manual_watts = params[:watts].to_i.then { it if it.positive? }
-      manual_throttle = params[:throttle] != "0"
+      # only Class 2 has a throttle by definition
+      manual_throttle = params.key?(:throttle) ? params[:throttle] == "1" : manual_class == 2
       bike = if manual
         Bike.manual(e_bike_class: manual_class, watts: manual_watts, throttle: manual_throttle) if manual_watts
       elsif submitted

@@ -7,7 +7,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
 
   let(:bike) do
     EbikeRuleServices::Bike.new(bikebook_id: "m/trek/2025/verve", manufacturer_name: "Trek", model: "Verve+ 2", first_year: 2025,
-      e_bike_class: 1, e_vehicle_classifications: [], watts: 250, top_assist_mph: 20, throttle: false, throttle_mph: nil,
+      e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [], watts: 250, top_assist_mph: 20, throttle: false, throttle_mph: nil,
       ul2849: :certified, ul2271: :unknown, photo_url: "https://bikebook.bikeindex.org/trek/2025/verve.jpg")
   end
   let(:abbreviation) { "IN" }

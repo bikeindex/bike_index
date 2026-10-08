@@ -31,6 +31,11 @@ RSpec.describe "E-bike rules", :js, type: :system do
 
     click_on "Can't find your bike? Enter its details."
     expect(page).to have_field("Bike model", disabled: true)
+    # only a Class 2 has a throttle by default
+    find("label", text: "Class 1").click
+    expect(page).to have_checked_field("throttle", with: "0", visible: :all)
+    find("label", text: "Class 2").click
+    expect(page).to have_checked_field("throttle", with: "1", visible: :all)
     fill_in "Motor wattage (W)", with: "1000"
     click_on "Check my bike"
 

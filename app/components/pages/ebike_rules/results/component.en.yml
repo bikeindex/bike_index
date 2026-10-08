@@ -14,6 +14,8 @@ en:
           class_3_throttle: Throttle must cut out at 20 mph
           class_not_recognized: Class %{e_bike_class} isn't recognized here
           class_recognized: Class %{e_bike_class} is recognized
+          class_unknown: Bike Book doesn't list its class or top speed, so check the
+            class on its label
           classes_start_on: Classes take effect %{date}. Until then, check the state's
             current rules
           entered_by_you_html: Entered by you, not verified by Bike Book. Don't see
@@ -76,6 +78,7 @@ en:
           throttle: Throttle
           throttle_allowed: Throttle allowed for Class 2
           throttle_not_allowed: The state doesn't allow a throttle
+          throttle_not_stated: The state's law doesn't say whether a throttle is allowed
           top_speed: Top speed
           ul_certification: UL certification
           view_bikebook_entry: View full Bike Book entry
@@ -90,6 +93,11 @@ en:
             other: >-
               Your %{name} is legal to ride in %{state} as a Class %{n} e-bike, with
               %{count} rules to check.
+          yellow_headline_class_unknown:
+            one: Your %{name} may be legal to ride in %{state}, with %{count} rule
+              to check.
+            other: Your %{name} may be legal to ride in %{state}, with %{count} rules
+              to check.
           yes_to_html: Yes, to %{mph}
           your_bike: Your bike
           your_ebike: Your e-bike

@@ -39,7 +39,12 @@ module Pages
           state = @state[:name]
           case @verdict
           when :green then translation(".green_headline", name:, state:, n: @bike.e_bike_class)
-          when :yellow then translation(".yellow_headline", name:, state:, n: @bike.e_bike_class, count: rule_count(:check))
+          when :yellow
+            if @bike.e_bike_class
+              translation(".yellow_headline", name:, state:, n: @bike.e_bike_class, count: rule_count(:check))
+            else
+              translation(".yellow_headline_class_unknown", name:, state:, count: rule_count(:check))
+            end
           when :red then translation(".red_headline", name:, state:)
           else translation(".gray_headline", state:)
           end
@@ -117,6 +122,7 @@ module Pages
           when :class_recognized then translation(".class_recognized", **args)
           when :class_not_recognized then translation(".class_not_recognized", **args)
           when :not_classified then translation(".not_classified")
+          when :class_unknown then translation(".class_unknown")
           when :own_classes then translation(".own_classes")
           when :classes_start_on then translation(".classes_start_on", **args)
           when :limits_start_on then translation(".limits_start_on", **args)
@@ -130,6 +136,7 @@ module Pages
           when :no_speed_cap then translation(".no_speed_cap")
           when :no_throttle then translation(".no_throttle")
           when :throttle_not_allowed then translation(".throttle_not_allowed")
+          when :throttle_not_stated then translation(".throttle_not_stated")
           when :class_1_throttle then translation(".class_1_throttle")
           when :throttle_allowed then translation(".throttle_allowed")
           when :class_3_throttle then translation(".class_3_throttle")

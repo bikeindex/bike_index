@@ -37,7 +37,7 @@ class BikebookController < ApplicationController
     @page_description = vehicle[:description]
     @page_image = vehicle[:image_url]
     render_page(vehicle[:title])
-  rescue Faraday::Error
+  rescue Integrations::Bikebook::Catalog::Unreachable
     # the browser loads the catalog itself, and a crawler keeps the model's page and comes back
     render_page(status: :service_unavailable)
   end

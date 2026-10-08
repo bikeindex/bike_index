@@ -18,7 +18,10 @@ module EbikeRuleServices
 
     def find(abbreviation, today: Time.zone.today) = parsed[:laws][abbreviation]&.then { in_force(it, today) }
 
-    def state(abbreviation) = STATES.find { it[:abbr] == abbreviation&.upcase }
+    # nil for anything but an abbreviation, such as a query's array
+    def state(abbreviation)
+      STATES.find { it[:abbr] == abbreviation.upcase } if abbreviation.is_a?(String)
+    end
 
     # The state's name for a vehicle with these classifications, other than its e-bike law: its own, or one sharing their group
     def classification_name(abbreviation, ids)
@@ -41,9 +44,9 @@ module EbikeRuleServices
 
     # The vocabulary's file name carries its digest, so a republished one is a new key
     def parsed
-      path = BikebookCatalog.manifest&.dig("vocabulary")
+      path = Integrations::Bikebook::Catalog.manifest&.dig("vocabulary")
       records = path && Rails.cache.fetch(["bikebook_catalog/dated_state_laws", path], expires_in: 1.week, skip_nil: true) do
-        BikebookCatalog.fetch_json(path)&.dig("e_vehicle_classifications")&.then { parse(it) }
+        Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { parse(it) }
       end
       records || {laws: {}, tiers: {}, groups: {}}
     end
@@ -52,7 +55,9 @@ module EbikeRuleServices
       states = records.filter_map { |id, record| [id[STATE_ID, 1].upcase, id, record] if id.match?(STATE_ID) && !OFF_ROAD_LAWS.include?(id) }
       laws, tiers = states.partition { |_abbreviation, id, _record| id.match?(BikebookCatalog::E_BIKE_LAW) }
       {
-        laws: laws.to_h { |abbreviation, id, record| [abbreviation, law(id, record)] },
+        # to_h keeps a state's last, so the law it goes by sorts last
+        laws: laws.sort_by { |_abbreviation, id, _record| -BikebookCatalog::E_BIKE_LAWS.index(id[BikebookCatalog::E_BIKE_LAW, 1]) }
+          .to_h { |abbreviation, id, record| [abbreviation, law(id, record)] },
         tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| [record["name"], [id, *record["groups"]]] } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h
       }

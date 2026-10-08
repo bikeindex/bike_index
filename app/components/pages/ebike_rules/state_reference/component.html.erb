@@ -1,4 +1,5 @@
-<% cache(cache_key) do %>
+<%# a catalog that didn't answer has no laws, which would otherwise be kept for the day %>
+<% cache_if(laws.any?, cache_key) do %>
   <section
     id="state-laws"
     class="
@@ -41,9 +42,9 @@
     <p
       class="tw:mb-3 tw:text-sm tw:text-gray-700 tw:dark:text-gray-300"
       data-ebike-rules--state-filter-target="count"
-      data-matching-template="<%= translation(".matching", number: "__number__") %>"
+      data-matching-template="<%= translation(".matching_of_total", number: "__number__", total: states.size) %>"
     >
-      <%= translation(".on_file_html", number: number_display(laws.count)) %>
+      <%= translation(".on_file_of_total_html", number: number_display(laws.count), total: states.size) %>
     </p>
 
     <div

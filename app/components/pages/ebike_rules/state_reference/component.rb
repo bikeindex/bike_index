@@ -10,7 +10,7 @@ module Pages
         private
 
         # A republished vocabulary has a new file name, and a law's dated rules move on each day
-        def cache_key = [self.class.cache_digest, EbikeRuleServices::BikebookCatalog.manifest&.dig("vocabulary"), Time.zone.today]
+        def cache_key = [self.class.cache_digest, Integrations::Bikebook::Catalog.manifest&.dig("vocabulary"), Time.zone.today]
 
         def laws = @laws ||= EbikeRuleServices::StateLaws.laws
 

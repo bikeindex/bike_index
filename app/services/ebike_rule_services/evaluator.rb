@@ -8,7 +8,7 @@ module EbikeRuleServices
     extend Functionable
 
     def rules(law:, bike:)
-      [classes_rule(law, bike.e_bike_class), power_rule(law, bike.watts), speed_rule(law, bike.top_assist_mph),
+      [classes_rule(law, bike), power_rule(law, bike.watts), speed_rule(law, bike.top_assist_mph),
         throttle_rule(law, bike.throttle, bike.e_bike_class)]
     end
 
@@ -28,8 +28,11 @@ module EbikeRuleServices
 
     def row(id, status, note, **args) = {id:, status:, note:, args:}
 
-    def classes_rule(law, e_bike_class)
-      if e_bike_class.nil?
+    def classes_rule(law, bike)
+      e_bike_class = bike.e_bike_class
+      if bike.class_unknown
+        row(:classes, :check, :class_unknown)
+      elsif e_bike_class.nil?
         row(:classes, :fail, :not_classified)
       # limits not yet in force describe the coming law, so the rider checks the law's dated rules for today's
       elsif (date = law[:limits_start_on])
@@ -75,7 +78,8 @@ module EbikeRuleServices
 
     def throttle_rule(law, throttle, e_bike_class)
       return row(:throttle, :pass, :no_throttle) unless throttle
-      return row(:throttle, :fail, :throttle_not_allowed) unless law[:throttle]
+      return row(:throttle, :fail, :throttle_not_allowed) if law[:throttle] == false
+      return row(:throttle, :check, :throttle_not_stated) if law[:throttle].nil?
 
       case e_bike_class
       when 1 then row(:throttle, :fail, :class_1_throttle)

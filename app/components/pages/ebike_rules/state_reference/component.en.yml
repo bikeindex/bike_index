@@ -13,6 +13,7 @@ en:
           in_review: In review
           limits_subheading: All 50 states and D.C. Open a state to see its limits,
             rules and sources.
-          matching: "%{number} of 51 match"
-          on_file_html: "%{number} of 51 states and D.C. on file · others in review"
+          matching_of_total: "%{number} of %{total} match"
+          on_file_of_total_html: "%{number} of %{total} states and D.C. on file ·
+            others in review"
           show_rules: Show %{state}'s rules

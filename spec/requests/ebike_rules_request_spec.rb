@@ -71,6 +71,36 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(meta("og:url")).to eq "http://www.example.com/ebike-rules/co"
     end
 
+    context "with the catalog failing", :caching do
+      include_context :caching_basic
+      include ActiveSupport::Testing::TimeHelpers
+
+      it "asks it once a minute, however much of the page reads it" do
+        requests = 0
+        WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}manifest.json").to_return do
+          requests += 1
+          {status: 503}
+        end
+
+        2.times { get "/ebike-rules/ca", params: {bike: "m/specialized/2025/haul_st"} }
+
+        expect(response).to have_http_status(:ok)
+        expect(page).to have_css("[role='alert']", text: "Pick a bike from the list")
+        expect(requests).to eq 1
+      end
+
+      it "doesn't keep the states list it didn't answer for" do
+        WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json")
+          .to_return({status: 503}, {body: BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read})
+
+        get "/ebike-rules/co"
+        expect(page).to have_css("#state-panel-co", text: "We're compiling Colorado's e-bike rules", visible: :all)
+
+        travel(61.seconds) { get "/ebike-rules/co" }
+        expect(page).to have_css("#state-panel-co", text: "Class 3 riders must be 16 or older", visible: :all)
+      end
+    end
+
     it "describes a state the catalog has no law for, and says so on a check" do
       get "/ebike-rules/wy", params: {bike: "m/specialized/2025/haul_st"}
 
@@ -100,6 +130,9 @@ RSpec.describe EbikeRulesController, type: :request do
 
       get "/ebike-rules/zz"
       expect(response).to have_http_status(:not_found)
+
+      get "/ebike-rules", params: {state: ["ca"]}
+      expect(response).to redirect_to("/ebike-rules")
     end
 
     it "checks a bike entered by hand" do
@@ -109,6 +142,13 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("[role='status'] li", text: "1,000W motor exceeds the 750W cap.")
         .and have_field("watts", with: "1000")
       expect(page.find("fieldset[data-ebike-rules--lookup-target='manualPanel']")[:disabled]).to be_nil
+    end
+
+    it "takes a bike entered by hand without a throttle answer as having one only if it's Class 2" do
+      get "/ebike-rules/co", params: {manual: "1", e_bike_class: "1", watts: "250"}
+
+      expect(page).to have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 1 e-bike.")
+        .and have_checked_field("throttle", with: "0")
     end
 
     it "explains what's missing" do

@@ -81,7 +81,8 @@
             </p>
           </div>
 
-          <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: @bike.e_bike_class, size: :lg)) %>
+          <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: @bike.e_bike_class,
+            class_unknown: @bike.class_unknown, size: :lg)) %>
         </div>
 
         <div class="tw:border-y tw:border-gray-200 tw:py-4 tw:dark:border-gray-700">

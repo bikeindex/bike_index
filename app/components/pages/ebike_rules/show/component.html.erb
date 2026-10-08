@@ -135,7 +135,11 @@
           <div class="tw:flex tw:flex-[2_1_260px] tw:flex-col tw:gap-1.5">
             <span id="manual-class-label" class="twlabel"><%= translation(".e_bike_class") %></span>
 
-            <div role="radiogroup" aria-labelledby="manual-class-label">
+            <div
+              role="radiogroup"
+              aria-labelledby="manual-class-label"
+              data-action="change->ebike-rules--lookup#chooseClass"
+            >
               <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "e_bike_class", entries: class_entries,
                 selected: @lookup.manual_class, full_width: true)) %>
             </div>
@@ -154,7 +158,11 @@
           <div class="tw:flex tw:flex-[1_1_150px] tw:flex-col tw:gap-1.5">
             <span id="manual-throttle-label" class="twlabel"><%= translation(".has_throttle") %></span>
 
-            <div role="radiogroup" aria-labelledby="manual-throttle-label">
+            <div
+              role="radiogroup"
+              aria-labelledby="manual-throttle-label"
+              data-ebike-rules--lookup-target="throttle"
+            >
               <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "throttle", entries: throttle_entries,
                 selected: @lookup.manual_throttle ? 1 : 0, full_width: true)) %>
             </div>

@@ -9,7 +9,7 @@ import { collapse } from 'utils/collapse_utils'
 // before it connects, and stays one if the catalog fails, leaving manual entry. Each state has its own
 // page, so the state is the form's path rather than a field, and choosing one goes to its page
 export default class extends Controller {
-  static targets = ['combobox', 'comboboxSlot', 'manualPanel', 'state']
+  static targets = ['combobox', 'comboboxSlot', 'manualPanel', 'state', 'throttle']
   static values = { manifestUrl: String, path: String, display: String, failedText: String }
 
   async connect () {
@@ -58,6 +58,11 @@ export default class extends Controller {
     const fields = new FormData(this.element)
     const query = fields.get('bike') || fields.get('watts') ? `?${new URLSearchParams(fields)}` : ''
     Turbo.visit(`${this.pathValue}/${abbreviation}${query}`)
+  }
+
+  // Only Class 2 has a throttle by definition, so a class picked answers the throttle until the rider does
+  chooseClass (event) {
+    this.throttleTarget.querySelector(`input[value="${event.target.value === '2' ? 1 : 0}"]`).checked = true
   }
 
   focusState () {

@@ -6,7 +6,7 @@ RSpec.describe EbikeRuleServices::Evaluator do
   before { stub_bikebook_catalog }
 
   let(:attributes) do
-    {bikebook_id: "m/x/2025/y", manufacturer_name: "X", model: "Y", first_year: 2025, e_bike_class: 1, e_vehicle_classifications: [],
+    {bikebook_id: "m/x/2025/y", manufacturer_name: "X", model: "Y", first_year: 2025, e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [],
      watts: 250, top_assist_mph: 20, throttle: false, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
   end
   let(:bike) { EbikeRuleServices::Bike.new(**attributes) }
@@ -88,6 +88,26 @@ RSpec.describe EbikeRuleServices::Evaluator do
       expect(statuses).to eq(classes: :fail, power: :fail, speed: :fail, throttle: :info)
       expect(rules.find { it[:id] == :speed }).to include(note: :speed_over_cap, args: {mph: 50, cap: 28})
       expect(described_class.verdict(rules)).to eq :red
+    end
+  end
+
+  context "with a bike whose class Bike Book can't tell" do
+    let(:attributes) { super().merge(e_bike_class: nil, class_unknown: true, watts: 500, top_assist_mph: nil) }
+
+    it "is one to check rather than a failure" do
+      expect(statuses).to eq(classes: :check, power: :pass, speed: :info, throttle: :pass)
+      expect(rules.first).to include(note: :class_unknown)
+      expect(described_class.verdict(rules)).to eq :yellow
+    end
+  end
+
+  context "with a throttle under a law that doesn't say whether one is allowed" do
+    let(:law) { EbikeRuleServices::StateLaws.find("IN").merge(throttle: nil) }
+    let(:attributes) { super().merge(e_bike_class: 2, throttle: true) }
+
+    it "is one to check rather than a failure" do
+      expect(rules.last).to include(status: :check, note: :throttle_not_stated)
+      expect(described_class.verdict(rules)).to eq :yellow
     end
   end
 

@@ -50,12 +50,31 @@ RSpec.describe EbikeRuleServices::StateLaws do
       expect(in_force[:restrictions].pluck(:rule)).not_to include(motor_alone)
     end
 
+    it "goes by a state's electric_bicycle law when it has another, whichever comes first" do
+      vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
+      classifications = vocabulary["e_vehicle_classifications"]
+      vocabulary["e_vehicle_classifications"] = {"evc/us/co/bicycle" => {"name" => "Bicycle"}, **classifications,
+                                                 "evc/us/co/low_speed_electric_bicycle" => {"name" => "Low-Speed Electric Bicycle"}}
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(body: vocabulary.to_json)
+
+      expect(described_class.find("CO")).to include(id: "evc/us/co/electric_bicycle")
+    end
+
     context "when the catalog is down" do
       before { WebMock.stub_request(:get, %r{bikebook-catalog\.bikeindex\.org}).to_return(status: 503) }
 
       it "is empty" do
         expect(described_class.laws).to eq({})
       end
+    end
+  end
+
+  describe "state" do
+    it "finds a state by its abbreviation in either case, and nothing else" do
+      expect(described_class.state("co")).to include(name: "Colorado")
+      expect(described_class.state("PR")).to be_nil
+      expect(described_class.state(["co"])).to be_nil
+      expect(described_class.state(nil)).to be_nil
     end
   end
 
