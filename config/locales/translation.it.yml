@@ -6916,6 +6916,8 @@ it:
             senza scopo di lucro.
           tagline_html: 'La biblioteca mondiale delle biciclette: cerca, confronta
             e trova la tua prossima bici tra oltre %{models_count} modelli.'
+          tagline: 'La biblioteca mondiale delle biciclette: cerca, confronta e trova
+            la tua prossima bici.'
         donate_strip:
           dismiss: Congedare
           donate: Donare

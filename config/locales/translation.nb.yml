@@ -6611,6 +6611,7 @@ nb:
           byline: En gratis referanse fra Bike Index, det ideelle sykkelregisteret.
           tagline_html: Verdens sykkelbibliotek – søk, sammenlign og finn din neste
             sykkeltur på tvers av %{models_count}+ modeller.
+          tagline: Verdens sykkelbibliotek – søk, sammenlign og finn din neste sykkeltur.
         donate_strip:
           dismiss: Avskjedige
           donate: Donere

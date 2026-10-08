@@ -6895,6 +6895,8 @@ es:
             ánimo de lucro.
           tagline_html: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
             tu próximo paseo entre más de %{models_count} modelos.'
+          tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
+            tu próxima bici.'
         donate_strip:
           dismiss: Despedir
           donate: Donar

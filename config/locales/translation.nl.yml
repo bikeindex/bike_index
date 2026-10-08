@@ -6803,6 +6803,8 @@ nl:
           byline: Een gratis naslagwerk van Bike Index, het non-profit fietsregister.
           tagline_html: De fietsenbibliotheek van de wereld — zoek, vergelijk en vind
             je volgende fiets tussen de %{models_count}+ modellen.
+          tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
+            volgende fiets.'
         donate_strip:
           dismiss: Afwijzen
           donate: Schenken
