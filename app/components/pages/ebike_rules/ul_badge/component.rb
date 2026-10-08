@@ -8,7 +8,7 @@ module Pages
         BACKGROUNDS = {certified: "tw:bg-[#e8f5ee]", unknown: "tw:bg-gray-100", unrecorded: "tw:bg-gray-100"}.freeze
         ICON_STATUSES = {certified: :pass, unknown: :unknown, unrecorded: :unknown}.freeze
 
-        # standard: 2849 or 2271. status: :certified, :unknown, or :unrecorded for a bike entered by hand, with no model to have data for
+        # standard: 2849 or 2271. status: :certified, :unknown, or :unrecorded for a bike entered by hand
         def initialize(standard:, status:)
           @standard = standard
           @status = status

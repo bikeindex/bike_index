@@ -100,7 +100,6 @@ export default class extends Controller {
     target.querySelector('[role=status]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }
 
-  // The state is the form's path rather than a field
   get #checkUrl () {
     const fields = new FormData(this.element)
     fields.delete('state')

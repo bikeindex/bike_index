@@ -20,13 +20,13 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("input[role='combobox'][placeholder='Select your state']")
         .and have_css("[role='option']", text: "District of Columbia", visible: :all)
         .and have_css("[role='option']", text: "Wyoming", visible: :all)
-        .and have_no_css("#state + * [data-hw-combobox-prefilled-display-value]")
         .and have_css("form[action='/ebike-rules']")
         .and have_text("Location not shared")
         .and have_css("[data-ebike-rules--lookup-manifest-url-value='#{Integrations::Bikebook::Catalog::MANIFEST_URL}']")
         .and have_no_css("[role='status']")
         .and have_no_css("[role='alert']")
         .and have_title("E-bike rules", exact: true)
+      expect(page.find("[data-ebike-rules--lookup-target='state'] .hw-combobox")["data-hw-combobox-prefilled-display-value"]).to be_nil
       # each state's page, and its rules rendered for search engines, collapsed
       expect(page).to have_link("Check an e-bike in Colorado", href: "/ebike-rules/co#check", visible: :all)
         .and have_css("#state-panel-co", text: "Class 3 riders must be 16 or older", visible: :all)

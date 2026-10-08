@@ -148,7 +148,7 @@
             </p>
           <% end %>
 
-          <%# Beside the state, below a label's height and centered in an input's, at the input's size, so it lines up with the state's text %>
+          <%# Sized and offset like the state field, so it lines up with its text %>
           <%= tag.div(class: ["tw:flex tw:flex-col tw:gap-2", ("tw:hidden" unless @lookup.manual)],
             data: {"ebike-rules--lookup-target": "closeManual"}) do %>
             <span
