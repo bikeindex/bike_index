@@ -360,6 +360,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(cogs).to have_css(".tw\\:text-red-700", exact_text: "−11").and have_css(".tw\\:text-red-700", exact_text: "−30")
     # the same wheel size on tires far enough apart to change how large it stands, as an estimate
     diameters = -> { all("[aria-label='Geometry overlay'] li", text: "diameter").map { it.text.gsub(/[[:space:]]+/, " ") } }
+    expect(page).to have_css("[aria-label='Geometry overlay'] p", text: "Note: you're comparing bikes that have different diameter wheels and tires")
     expect(diameters.call).to eq(["Aventón Current EXP's 700 C wheel with 64 mm tires is approximately 750 mm diameter",
       "Aventón Soltera 3 ADV's 700 C wheel with 38 mm tires is approximately 698 mm diameter"])
     # every model's wheels in its size, front and rear each its own where they differ, the rear on S though only its front

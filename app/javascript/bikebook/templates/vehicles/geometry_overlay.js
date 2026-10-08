@@ -91,7 +91,10 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
       html`<li><button type="button" class=${buttonClasses({ size: 'sm' })} aria-pressed="false"
         data-bikebook--geometry-overlay-target="button" data-action="bikebook--geometry-overlay#toggle"><svg aria-hidden="true" class="tw:shrink-0" width="24" height="8"><line stroke=${series.color}
         x1="2" y1="4" x2="22" y2="4" stroke-width="4" stroke-linecap="round"></line></svg><span>${title}${
-        present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${notes.length ? html`<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${notes}</ul>` : nothing}${undrawn.length
+        present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${notes.length
+      ? html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: you're comparing bikes that have different diameter wheels and tires</p><ul
+        class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${notes}</ul></div>`
+      : nothing}${undrawn.length
       ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing } }) =>
         `${title} isn't drawn without its ${missing.map((key) => labels[key] ?? presenter.humanize(key)).join(', ')}.`).join(' ')}</p>`
       : nothing}${drawn.some(({ geometry }) => geometry.estimated)
