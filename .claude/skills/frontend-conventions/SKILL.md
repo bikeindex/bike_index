@@ -48,6 +48,8 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 - **Every date/time** renders through `UI::Time::Component` — `render(UI::Time::Component.new(time: some_time))`. It emits the client-localized `localizeTime` span the frontend JS converts to the viewer's timezone. This is the *only* way to show a time: never `l(time, ...)`, `strftime`, `time_ago_in_words`, or a hand-written `localizeTime` span. Pass `format: :localize_time_precise` when you need seconds precision (default is `:localize_time`). It self-hides when `time` is nil, so no surrounding `if` guard is needed.
   - Legacy `l(time, format: :convert_time)` inside a `localizeTime` span predates the component and is still all over the admin tables. Convert one to `UI::Time::Component` whenever you touch the line it's on — including when it's the body of a `link_to`.
 
+- **An image from a design handoff is already in the repo — use the original, never a renamed or resized copy.** `kelsey_redesign/` holds the drawn originals; a served one is a byte-identical copy under its original name in `app/assets/images/kelsey/illustrations/`, as `comic-assets_bike-love-*.png` are. Before adding any PNG/JPG, `git ls-files` the distinctive words of its name across the whole repo — a hash search misses a resized copy.
+
 - **A decorative icon is `inline_svg_tag(..., aria_hidden: true)`** — `aria: {hidden: true}` is a hash `inline_svg` drops, leaving an `svg[role=img]` with no accessible name, which only an axe audit in a `:js` spec catches.
 
 **Building markup to pass into a component argument uses `capture`** — a component keyword like `UI::Alerts::Base`'s `header:` or `UI::Header`'s `text:` takes a string, so a heading that wraps a link or an `<em>` has to be captured first.
