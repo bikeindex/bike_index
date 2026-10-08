@@ -32,22 +32,23 @@ class BikebookController < ApplicationController
 
   # A model picked alone is its own page, canonically without the search's other params
   def render_vehicle(id)
-    vehicle = Integrations::BikeBook::Catalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
     @page_url = "#{bike_book_url}?vehicle_models=#{id}"
+    vehicle = Integrations::BikeBook::Catalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
     @page_description = vehicle.description
     @page_image = vehicle.image_url
     render_page(vehicle.title)
   rescue Faraday::Error
-    render_page
+    # the browser loads the catalog itself, and a crawler keeps the model's page and comes back
+    render_page(status: :service_unavailable)
   end
 
-  def render_page(title = "Bikebook")
+  def render_page(title = "Bikebook", status: :ok)
     @page_title = title
     unless @page_image
       # the icon is taller than wide, which the large card crops to a banner
       @page_image = view_context.image_url("logos/bikebook_icon.png")
       @twitter_card = "summary"
     end
-    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::BikeBook::Catalog::MANIFEST_URL)
+    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::BikeBook::Catalog::MANIFEST_URL), status:
   end
 end

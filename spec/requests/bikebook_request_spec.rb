@@ -65,9 +65,10 @@ RSpec.describe BikebookController, type: :request do
       context "with the catalog unreachable" do
         let(:catalog_status) { 503 }
 
-        it "renders the page, for the browser to try" do
-          expect(response).to have_http_status(:ok)
+        it "renders the page for the browser to try, as unavailable to a crawler" do
+          expect(response).to have_http_status(:service_unavailable)
           expect(page).to have_title("Bikebook", exact: true)
+            .and have_css("link[rel='canonical'][href='http://www.example.com/bike_book?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
         end
       end
 
