@@ -3,16 +3,16 @@
 require "rails_helper"
 
 RSpec.describe "Bikebook", :js, type: :system do
-  let(:fixtures) { Rails.root.join("spec/fixtures/bikebook_catalog") }
+  include BikebookCatalogHelpers
+
+  let(:fixtures) { BikebookCatalogHelpers::FIXTURES }
 
   after { WebMock.reset! }
 
   # A fixture catalog in place of the published one, to the browser and to a model's page,
   # and no stock photos, which render their placeholder
   def serve_catalog(manifest_status: 200)
-    Rails.cache.clear
-    WebMock.stub_request(:get, /\A#{Regexp.escape(Integrations::BikebookCatalog::URL)}/o)
-      .to_return { |request| {body: fixtures.join(request.uri.path.delete_prefix("/catalog/")).read} }
+    stub_bikebook_catalog
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.route(%r{^https://bikebook-catalog\.bikeindex\.org/catalog/}, ->(route, request) {
         path = request.url.delete_prefix("https://bikebook-catalog.bikeindex.org/catalog/")

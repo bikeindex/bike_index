@@ -53,7 +53,7 @@ export default class extends Controller {
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
 
     const url = new URL(link.href)
-    if (url.origin !== window.location.origin || url.pathname !== queryUrl().pathname) return
+    if (url.origin !== window.location.origin || url.pathname !== '/bikebook') return
 
     event.preventDefault()
     'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: false }) : this.#go(url)

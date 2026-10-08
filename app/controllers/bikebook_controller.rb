@@ -3,11 +3,8 @@
 class BikebookController < ApplicationController
   # A model picked alone is its own page, which a shared link to it should be
   def show
-    vehicle_models = params[:vehicle_models].to_s.split(",")
-    if vehicle_models.one? && vehicle_models.first.match?(Integrations::BikebookCatalog::MODEL_ID)
-      return redirect_to bikebook_url_with("#{bikebook_path}/#{vehicle_models.first}", request.query_parameters.except("vehicle_models")),
-        status: :moved_permanently
-    end
+    model = params[:vehicle_models].to_s
+    return redirect_to_model(model, request.query_parameters.except("vehicle_models")) if model.match?(Integrations::BikebookCatalog::MODEL_ID)
 
     # comparisons and searches, whose models each have their own page
     response.headers["X-Robots-Tag"] = "noindex, follow" if request.query_parameters.present?
@@ -20,7 +17,7 @@ class BikebookController < ApplicationController
     path = params[:vehicle_model]
     id = path.start_with?("evc/") ? path : "m/#{path.delete_prefix("m/")}"
     picked = params[:vehicle_models].to_s.split(",")
-    return render_vehicle(id) if picked.none? && id.start_with?("m/")
+    return render_vehicle(id) if picked.none? && id.match?(Integrations::BikebookCatalog::MODEL_ID)
 
     vehicle_models = [id, *picked].uniq
     query = request.query_parameters.merge("vehicle_models" => vehicle_models.join(","))
@@ -35,20 +32,23 @@ class BikebookController < ApplicationController
   private
 
   def render_vehicle(id)
-    vehicle = Integrations::BikebookCatalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
-    if params[:vehicle_model] != id
-      return redirect_to bikebook_url_with("#{bikebook_path}/#{id}", request.query_parameters), status: :moved_permanently
-    end
+    return redirect_to_model(id, request.query_parameters) if params[:vehicle_model] != id
 
-    render_page(vehicle)
+    vehicle = Integrations::BikebookCatalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
+    @page_description = vehicle.description
+    @page_image = vehicle.image_url
+    render_page(vehicle.title)
   rescue Faraday::Error
     render_page
   end
 
-  def render_page(vehicle = nil)
-    @page_obj = vehicle
-    @page_title = "Bikebook" unless vehicle
+  def render_page(title = "Bikebook")
+    @page_title = title
     render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::BikebookCatalog::MANIFEST_URL)
+  end
+
+  def redirect_to_model(id, query)
+    redirect_to bikebook_url_with("#{bikebook_path}/#{id}", query), status: :moved_permanently
   end
 
   # unescaped, as the page writes its own URLs

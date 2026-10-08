@@ -18,6 +18,8 @@ RSpec.describe HeaderTagHelper, type: :helper do
     let(:target) do
       {
         page_title:,
+        page_description: nil,
+        page_image: nil,
         page_obj:,
         updated_at: nil,
         organization_name: nil,

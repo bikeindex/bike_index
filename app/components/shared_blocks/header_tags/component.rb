@@ -6,7 +6,7 @@ module SharedBlocks
       DEFAULT_IMAGE = "/opengraph.png"
       DEFAULT_TWITTER = "@bikeindex"
 
-      def initialize(controller_name:, action_name:, request_url:, page_title: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil, display_dev_info: false)
+      def initialize(controller_name:, action_name:, request_url:, page_title: nil, page_description: nil, page_image: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil, display_dev_info: false)
         # TODO: Do any pages need a query string?
         @page_url = request_url.split("?").first
         @display_dev_info = display_dev_info
@@ -16,15 +16,13 @@ module SharedBlocks
         @display_auto_discovery = controller_name == "news"
 
         @page_title = page_title
+        @page_description = page_description
+        @page_image = page_image
 
         if page_obj.is_a?(Bike) || page_obj.is_a?(BikeVersion)
           assign_bike_attrs(page_obj, action_name)
         elsif page_obj.is_a?(Blog)
           assign_blog_attrs(page_obj)
-        elsif page_obj.is_a?(Integrations::BikebookCatalog::Vehicle)
-          @page_title ||= page_obj.title
-          @page_description = page_obj.description
-          @page_image = page_obj.image_url
         elsif @page_key == "users_show"
           assign_user_attrs(page_obj)
         end

@@ -97,16 +97,12 @@ RSpec.describe BikebookController, type: :request do
   end
 
   describe "vehicle" do
-    let(:fixtures) { Rails.root.join("spec/fixtures/bikebook_catalog") }
+    include BikebookCatalogHelpers
+
     let(:catalog_status) { 200 }
     let(:page) { Capybara.string(response.body) }
 
-    before do
-      Rails.cache.clear
-      WebMock.stub_request(:get, /\A#{Regexp.escape(Integrations::BikebookCatalog::URL)}/o).to_return { |request|
-        {status: catalog_status, body: (fixtures.join(request.uri.path.delete_prefix("/catalog/")).read if catalog_status == 200)}
-      }
-    end
+    before { stub_bikebook_catalog(status: catalog_status) }
     after { WebMock.reset! }
 
     it "renders the model's page, titled and described for it" do
