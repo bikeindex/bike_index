@@ -17,6 +17,7 @@ import { array, blank, compact, equal, except, join, partsOf, presence, present,
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
 const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
+const typeLabel = (each) => [each.type, each.type_detail].filter(present).join(' · ')
 
 // One vehicle's card, marked where it differs from `others`
 export const modelViewer = (args) => new ModelViewer(args).render()
@@ -116,14 +117,13 @@ class ModelViewer {
     const frame = vehicle.frame && { ...vehicle.frame, ...this.#frameMounts(vehicle.frame, vehicle.sizes) }
     const suspension = Object.fromEntries(Object.keys(this.kit.viewer.suspensions)
       .map((position) => [position, this.#suspension(vehicle, position)]).filter(([, values]) => values != null))
-    return { ...vehicle, frame, suspension, classifiedModes: this.#classifiedModes(data) }
+    return { ...vehicle, frame, suspension, type_name: typeLabel(vehicle), classifiedModes: this.#classifiedModes(data) }
   }
 
-  // Each operating mode's classification ids, from a 0.22 model's single id or a 0.23 model's array
+  // From the raw data: a 0.22 model has one id and a 0.23 model an array, and the kit's schema names only one of them
   #classifiedModes (data) {
     return array(data.motors).flatMap((motor) => array(motor.operating_modes))
       .map(({ mode, availability, e_vehicle_classification: id, e_vehicle_classifications: ids }) => ({ mode, availability, ids: array(ids ?? id) }))
-      .filter(({ ids }) => ids.length)
   }
 
   #frameMounts (frame, sizes) {
@@ -230,7 +230,6 @@ class ModelViewer {
       : this.kit.model_configurations[each]
     const yearRangeDiffers = this.others.some((other) => !equal([other.first_year, other.final_year], [vehicle.first_year, vehicle.final_year]))
     const list = (value) => join(array(value), ', ')
-    const typeName = (each) => compact([each.type, each.type_detail]).join(' · ')
     return section({
       content: join([
         definitionListRow({ label: 'ID', content: copyableCode({ value: this.value, label: 'Copy ID' }) }),
@@ -240,7 +239,7 @@ class ModelViewer {
           : '',
         definitionListRow({ label: 'Years', value: presenter.highlighted(this.yearRange(), yearRangeDiffers) }),
         row('Markets', 'markets', list),
-        definitionListRow({ label: 'Vehicle type', value: presenter.highlighted(typeName(vehicle), this.differs('type') || this.differs('type_detail'), this.others.map(typeName)) }),
+        row('Vehicle type', 'type_name'),
         row('Propulsion', 'propulsion', list),
         this.classifications(),
         row('Primary activity', 'primary_activity', (each) => this.withoutParenthetical(each)),
@@ -253,7 +252,7 @@ class ModelViewer {
   // One only an optional mode has goes on its own line, after the mode
   classifications () {
     const sorted = (vehicle) => {
-      const names = (mode) => mode.ids.map((id) => this.presenter.classificationNames[id] ?? id)
+      const names = (mode) => mode.ids.map((id) => this.presenter.classificationName(id))
       const stock = (mode) => (mode.availability ?? 'stock') === 'stock'
       const standard = [...new Set(vehicle.classifiedModes.filter(stock).flatMap(names))].sort()
       const optional = [...new Map(vehicle.classifiedModes.filter((mode) => !stock(mode))
@@ -584,7 +583,7 @@ class ModelViewer {
 
     const groups = Object.keys(this.kit.component_groups)
     const group = (type) => this.presenter.componentGroups.get(type) ?? groups.at(-1)
-    const label = (component) => [component.type, component.type_detail].filter(present).join(' · ').toLowerCase()
+    const label = (component) => typeLabel(component).toLowerCase()
     const tables = groups.flatMap((name) => {
       const members = components.filter((component) => group(component.type) === name)
       if (members.length === 0) return []

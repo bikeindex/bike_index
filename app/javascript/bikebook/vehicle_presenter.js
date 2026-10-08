@@ -23,9 +23,6 @@ const SINGULAR = { feet: 'foot', inches: 'inch' }
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
     this.kit = kit
-    // "US-CA Moped", which a 0.22 catalog's names leave off the jurisdiction of
-    this.classificationNames = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications ?? {})
-      .map(([id, { jurisdiction, name }]) => [id, compact([jurisdiction, name]).join(' ')]))
     // the catalog names carbon "Carbon or Composite"
     const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
     this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials } }
@@ -50,10 +47,14 @@ export class VehiclePresenter {
     }))
   }
 
+  classificationName (id) {
+    return this.vocabulary.e_vehicle_classifications?.[id]?.label ?? id
+  }
+
   // Each classification's name to its tooltip, whose heading links to `path(id)`
   classificationTooltips (path) {
-    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {}).map(([id, { title, description }]) => [
-      this.classificationNames[id],
+    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {}).map(([id, { label, title, description }]) => [
+      label,
       html`<h3 class="tw:font-bold"><a class="twlink" href=${path(id)}>${title}</a></h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
         copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${description}</p>`
     ]))

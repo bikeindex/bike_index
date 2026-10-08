@@ -23,8 +23,9 @@ export const classificationCard = ({ presenter, id, classification, removePath, 
     definitionListRow({ label: 'Min power', value: presenter.measurement(minPower, 'w') }),
     definitionListRow({ label: 'Max power', value: presenter.measurement(maxPower, 'w') })
   ])
-  const linked = (ids) => ids.map((each) => html`<a class="twlink" href=${classificationPath(each)}>${presenter.classificationNames[each] ?? each}</a>`)
-  const members = Object.entries(presenter.vocabulary.e_vehicle_classifications ?? {}).filter(([, record]) => array(record.groups).includes(id)).map(([each]) => each)
+  const linked = (ids) => ids.map((each) => html`<a class="twlink" href=${classificationPath(each)}>${presenter.classificationName(each)}</a>`)
+  const all = presenter.vocabulary.e_vehicle_classifications ?? {}
+  const members = Object.keys(all).filter((each) => array(all[each].groups).includes(id))
   // a binding doesn't sanitize an href, so a source that isn't a web page isn't a link
   const links = array(sources).filter((source) => /^https?:\/\//.test(source))
     .map((source) => html`<a class="twlink tw:break-all" target="_blank" rel="noopener" href=${source}>${source}</a>`)
