@@ -3,11 +3,16 @@
 require "rails_helper"
 
 RSpec.describe "Bikebook", :js, type: :system do
-  let(:fixtures) { Rails.root.join("spec/fixtures/bikebook_catalog") }
+  include BikebookCatalogHelpers
 
-  # A fixture catalog in place of the published one, and no stock photos, which render
-  # their placeholder
+  let(:fixtures) { BikebookCatalogHelpers::FIXTURES }
+
+  after { WebMock.reset! }
+
+  # A fixture catalog in place of the published one, to the browser and to a model's page,
+  # and no stock photos, which render their placeholder
   def serve_catalog(manifest_status: 200)
+    stub_bikebook_catalog
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.route(%r{^https://bikebook-catalog\.bikeindex\.org/catalog/}, ->(route, request) {
         path = request.url.delete_prefix("https://bikebook-catalog.bikeindex.org/catalog/")
@@ -236,6 +241,26 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
     page.current_window.resize_to(1920, 1080)
+  end
+
+  it "titles a model picked alone for it, and drops the canonical as the page changes" do
+    serve_catalog
+    canonical = "link[rel='canonical']"
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through")
+    expect(page).to have_css("article h1", text: "Level 4 REC Step-Through", wait: 10)
+    expect(page).to have_title(/\AAventón Level 4 REC Step-Through/)
+    expect(page).to have_css(canonical, visible: :all)
+
+    type_into(vehicle_field, "level_2_step")
+    retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
+    expect(page).to have_css("[data-comparison] article", count: 2)
+    expect(page).to have_no_css(canonical, visible: :all)
+
+    page.go_back
+    expect(page).to have_css("article", count: 1)
+    find("[aria-label='Remove Aventón Level 4 REC Step-Through']").click
+    expect(page).to have_no_css("article")
+    expect(page).to have_title("Bikebook", exact: true)
   end
 
   it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do

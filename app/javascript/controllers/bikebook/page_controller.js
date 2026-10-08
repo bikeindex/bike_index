@@ -14,7 +14,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status', 'tagline', 'countedTagline']
-  static values = { manifestUrl: String, failedText: String }
+  static values = { manifestUrl: String, failedText: String, title: String }
 
   #scrolls = new Map()
   #renders = 0
@@ -22,7 +22,6 @@ export default class extends Controller {
   // The first render replaces the status, and a failed one puts it back
   initialize () {
     this.status = this.statusTarget
-    this.title = document.title
   }
 
   async connect () {
@@ -92,6 +91,8 @@ export default class extends Controller {
 
   async #render (url, scroll, { focus = true } = {}) {
     const render = ++this.#renders
+    // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
+    if (render > 1) document.querySelector('link[rel="canonical"]')?.remove()
     const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url).catch((error) => error)
     if (render !== this.#renders) return
     if (rendered instanceof Error) return this.#fail(rendered)
@@ -99,7 +100,7 @@ export default class extends Controller {
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
     this.pageTarget.replaceChildren(rendered.content)
-    document.title = rendered.title ?? this.title
+    document.title = rendered.title ?? this.titleValue
     if (focus) this.pageTarget.querySelector('[autofocus]')?.focus()
     if (scroll) window.scrollTo(...scroll)
   }
