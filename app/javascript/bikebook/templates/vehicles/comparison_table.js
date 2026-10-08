@@ -3,7 +3,7 @@ import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
-import { brakesAt, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
@@ -49,7 +49,7 @@ const SPECS = [
     format: (cents, vehicle, presenter) => amountDisplay(cents, currency(vehicle), presenter.vocabulary.currencies),
     comparable: (vehicle, first) => currency(vehicle) === currency(first)
   },
-  { label: 'Vehicle type', read: (vehicle) => vehicle.type },
+  { label: 'Vehicle type', read: typeLabel },
   { label: 'Frame material', read: (vehicle) => vehicle.frame?.material },
   { label: 'Rated power', read: motors('rated_power'), better: 1, unit: 'w' },
   { label: 'Peak power', read: motors('peak_power'), better: 1, unit: 'w' },
