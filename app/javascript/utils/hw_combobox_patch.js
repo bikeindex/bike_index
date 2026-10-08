@@ -124,7 +124,7 @@ Object.defineProperty(HwComboboxController.prototype, '_isSmallViewport', {
 
 // Neither Turbo event covers the other: only `before-cache` runs early enough to keep an open
 // dialog out of a cached snapshot, and it's skipped on the no-cache pages the comboboxes are on.
-// /bike_book renders its pages without Turbo, and says so itself.
+// /bikebook renders its pages without Turbo, and says so itself.
 const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render', 'bikebook--page:before-render']
 
 // On small viewports it opens in a modal dialog and locks body scroll, but only

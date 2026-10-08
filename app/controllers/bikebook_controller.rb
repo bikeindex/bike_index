@@ -3,15 +3,15 @@
 class BikebookController < ApplicationController
   def show
     model = params[:vehicle_models].to_s
-    return render_vehicle(model) if model.match?(Integrations::BikeBook::Catalog::MODEL_ID)
+    return render_vehicle(model) if model.match?(Integrations::Bikebook::Catalog::MODEL_ID)
 
     # comparisons and searches, whose models each have their own page
     response.headers["X-Robots-Tag"] = "noindex, follow" if request.query_parameters.present?
     render_page
   end
 
-  # /bike_book/m/segway/2025/gt3_pro, or without its m/, picks that vehicle ahead of any already picked,
-  # as /bike_book/evc/us/class_3 does that e-vehicle classification
+  # /bikebook/m/segway/2025/gt3_pro, or without its m/, picks that vehicle ahead of any already picked,
+  # as /bikebook/evc/us/class_3 does that e-vehicle classification
   def vehicle
     path = params[:vehicle_model]
     id = path.start_with?("evc/") ? path : "m/#{path.delete_prefix("m/")}"
@@ -25,15 +25,15 @@ class BikebookController < ApplicationController
     end
     # unescaped, as the page writes its own URLs
     query = query.to_query.gsub("%2F", "/").gsub("%2C", ",")
-    redirect_to "#{bike_book_path}?#{query}"
+    redirect_to "#{bikebook_path}?#{query}"
   end
 
   private
 
   # A model picked alone is its own page, canonically without the search's other params
   def render_vehicle(id)
-    @page_url = "#{bike_book_url}?vehicle_models=#{id}"
-    vehicle = Integrations::BikeBook::Catalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
+    @page_url = "#{bikebook_url}?vehicle_models=#{id}"
+    vehicle = Integrations::Bikebook::Catalog.vehicle(id) || fail(ActiveRecord::RecordNotFound)
     @page_description = vehicle[:description]
     @page_image = vehicle[:image_url]
     render_page(vehicle[:title])
@@ -47,6 +47,6 @@ class BikebookController < ApplicationController
     # the icon is taller than wide, which the large card crops to a banner
     @twitter_card = "summary" unless @page_image
     @page_image ||= helpers.image_url("logos/bikebook_icon.png")
-    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::BikeBook::Catalog::MANIFEST_URL), status:
+    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL), status:
   end
 end

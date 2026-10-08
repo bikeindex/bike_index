@@ -55,11 +55,10 @@ Rails.application.routes.draw do
   end
 
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
-  get "bike_book", to: "bikebook#show"
-  get "bike_book/*vehicle_model", to: "bikebook#vehicle", format: false
-  get "bikebook(/*path)", to: redirect { |_, request| request.fullpath.sub("/bikebook", "/bike_book") }
-  if Integrations::BikeBook::Catalog::LOCAL_DIRECTORY
-    mount Rack::Files.new(Integrations::BikeBook::Catalog::LOCAL_DIRECTORY) => Integrations::BikeBook::Catalog::LOCAL_PATH
+  get "bikebook", to: "bikebook#show"
+  get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
+  if Integrations::Bikebook::Catalog::LOCAL_DIRECTORY
+    mount Rack::Files.new(Integrations::Bikebook::Catalog::LOCAL_DIRECTORY) => Integrations::Bikebook::Catalog::LOCAL_PATH
   end
 
   resource :session, only: %i[new create destroy] do

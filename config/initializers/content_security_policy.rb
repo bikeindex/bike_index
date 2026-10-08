@@ -22,7 +22,7 @@ Rails.application.configure do
       ENV.fetch("ACTIVE_STORAGE_HOST_TEST", "https://test-uploads.bikeindex.org"),
       "https://maps.bikeindex.org",
       "https://bikebook.s3.amazonaws.com",
-      "https://bikebook.bikeindex.org", # /bike_book's stock photos
+      "https://bikebook.bikeindex.org", # /bikebook's stock photos
       "https://www.googletagmanager.com",
       "https://maps.googleapis.com",
       "https://maps.gstatic.com",
@@ -58,7 +58,7 @@ Rails.application.configure do
       "https://api.honeybadger.io",
       "https://api.mapbox.com",
       "https://bikebook.herokuapp.com",
-      "https://bikebook-catalog.bikeindex.org", # the catalog /bike_book searches
+      "https://bikebook-catalog.bikeindex.org", # the catalog /bikebook searches
       "https://cdn.jsdelivr.net",
       "https://events.mapbox.com",
       # Our own image CDNs — third-party scripts (Facebook Pixel) fetch bike photos, not just <img> them

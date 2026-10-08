@@ -10,7 +10,7 @@ const MAX_AGE_SECONDS = 60 * 60 * 24 * 30
 // Connects to data-controller='bikebook--donate-strip'
 export default class extends Controller {
   dismiss () {
-    document.cookie = `${COOKIE_NAME}=1; path=/bike_book; max-age=${MAX_AGE_SECONDS}; samesite=lax`
+    document.cookie = `${COOKIE_NAME}=1; path=/bikebook; max-age=${MAX_AGE_SECONDS}; samesite=lax`
     collapse('hide', this.element)
   }
 }

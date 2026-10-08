@@ -1,5 +1,5 @@
 module Integrations
-  module BikeBook
+  module Bikebook
     class Data
       require "net/http"
 

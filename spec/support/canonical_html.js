@@ -1,5 +1,5 @@
 // Markup as lines a diff reads, with what legitimately differs between a component's render and
-// its /bike_book template's made equal: comments, class order, random ids, and how Ruby and
+// its /bikebook template's made equal: comments, class order, random ids, and how Ruby and
 // JSON.stringify print a whole float
 /* global Node, NodeFilter */
 

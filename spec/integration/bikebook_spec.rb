@@ -49,7 +49,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.on("request", ->(request) { asked << request.url if request.navigation_request? })
     end
-    visit bike_book_path
+    visit bikebook_path
     # the search is an unusable placeholder until the catalog loads
     expect(page).to have_no_css("[inert]", wait: 10)
     # the catalog's 29 models, down to their leading place
@@ -65,7 +65,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("article h1", text: "Level 4 REC Step-Through")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
-    expect(page).to have_current_path("/bike_book?vehicle_models=m/aventon/2026/level_4_rec_step_through")
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through")
 
     # A second pick, found by its id, compares the two: a table of each against the first, and the
     # second's card highlighting where it differs
@@ -73,7 +73,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css(".hw-combobox__group__label", text: /\(1 matching model\)/i)
     retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
     expect(page).to have_css("[data-comparison] article", count: 2)
-    expect(page).to have_current_path("/bike_book?vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
     # what differs is marked, not what it's called, and of a list just the items that differ
     expect(all("article").last).to have_css("dd .tw\\:spec-diff").and have_no_css("dt .tw\\:spec-diff")
     front_wheel = all("article").last.find("section", text: /\AWheels/i).find("dd", match: :first)
@@ -215,7 +215,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       m/specialized/2025/haul_st m/sur_ron/2026/ultra_bee_hp_x_us].join(",")
     card_rows = -> { page.evaluate_script("new Set([...document.querySelectorAll('article')].map((card) => Math.round(card.getBoundingClientRect().top))).size") }
     scrolls_sideways = -> { page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth") }
-    visit bike_book_path(vehicle_models: five)
+    visit bikebook_path(vehicle_models: five)
     # the label column's header and the five vehicles'
     expect(page).to have_css("[aria-label='Comparison'] thead th", count: 6, wait: 10)
     expect(page).to have_css("[data-comparison] article", count: 5)
@@ -246,7 +246,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   it "titles a model picked alone for it, and drops the canonical as the page changes" do
     serve_catalog
     canonical = "link[rel='canonical']"
-    visit bike_book_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through")
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through")
     expect(page).to have_css("article h1", text: "Level 4 REC Step-Through", wait: 10)
     expect(page).to have_title(/\AAventón Level 4 REC Step-Through/)
     expect(page).to have_css(canonical, visible: :all)
@@ -265,7 +265,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
   it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do
     serve_catalog
-    visit bike_book_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/current_exp")
+    visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/current_exp")
     expect(page).to have_css("[aria-label='Comparison'] tbody tr:first-child th", text: "Size", wait: 10)
 
     # sizes no fixture has: the nearest top tube, reach breaking a tie, then a name read the ways it's written, then medium
@@ -434,7 +434,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
     # the first vehicle's last pick is what a comparison with none picked starts nearest
-    visit bike_book_path(vehicle_models: "m/aventon/2026/level_4_adv,m/aventon/2026/current_exp")
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/aventon/2026/current_exp")
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)
     expect_size.call("Level 4 ADV", "Extra Large")
     expect_size.call("Current EXP", "Extra Large")
@@ -446,7 +446,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   it "shows every weight in pounds to a viewer who prefers imperial units" do
     serve_catalog
     sign_in(FactoryBot.create(:user_confirmed, preferred_unit_system: "imperial"))
-    visit bike_book_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/level_4_adv")
+    visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/level_4_adv")
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)
 
     # the comparison's weight and difference, and each size's weight and payload
@@ -466,7 +466,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
   it "renders each UI template as the component it mirrors does" do
     serve_catalog
-    visit bike_book_path
+    visit bikebook_path
 
     aggregate_failures do
       expect_template(UI::Tooltip::Component.new(text: "622 mm BSD"), "bikebook/templates/ui/tooltip#tooltip", "{ text: '622 mm BSD' }")
@@ -549,7 +549,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
   it "merges motors that match but for their drive wheel, and names the operating modes' e-vehicle classifications" do
     serve_catalog
-    visit bike_book_path(vehicle_models: "m/segway/2025/gt3_pro")
+    visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
 
     motor = find("section", text: /front and rear motor/i, wait: 10)
     expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
@@ -558,7 +558,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("section div", text: /\AFolding\s*Stem fold\z/)
 
     # beside a vehicle that has none, a 0.23 mode's classifications: its jurisdiction's own and the group it fits
-    visit bike_book_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro")
+    visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro")
     classification = find("section div", text: /\AE-vehicle class\s*Off-Highway Motorcycle \?, US-CA Off-highway electric motorcycle \?\z/, wait: 10)
     expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     expect(page).to have_no_css("dt", exact_text: "Classifications")
@@ -571,7 +571,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     tooltip.click_link("US-CA Off-highway electric motorcycle")
     card = find("article h1", text: "US-CA Off-highway electric motorcycle").ancestor("article")
     expect(page).to have_css("article", count: 3)
-    expect(page).to have_current_path("/bike_book?vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
     expect(card).to have_css("li", text: "No driver's license needed off the highway")
       .and have_link(href: /ohv\.parks\.ca\.gov/)
 
@@ -587,26 +587,26 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("article h1", text: "US-CA Off-highway electric motorcycle")
 
     # a class that only comes with an optional mode goes on its own line, after the mode
-    visit bike_book_path(vehicle_models: "m/specialized/2025/haul_st")
+    visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
 
     # beside its classification, side by side with nothing to table
-    visit bike_book_path(vehicle_models: "m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
+    visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
     expect(page).to have_css("[data-comparison] article", count: 2, wait: 10)
     expect(page).to have_no_css("[aria-label='Comparison']")
 
     # a classification links to the groups it's in, and a group, which has no jurisdiction, to the classifications in it
     find("article", text: "US-CA Off-highway electric motorcycle").find("section", text: /\AGroups/i).click_link("Off-Highway Motorcycle")
     group = find("article h1", exact_text: "Off-Highway Motorcycle").ancestor("article")
-    expect(page).to have_current_path("/bike_book?vehicle_models=m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle,evc/off_highway_motorcycle")
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle,evc/off_highway_motorcycle")
     expect(group).to have_no_css("dt", exact_text: "Jurisdiction")
     expect(group.find("section", text: /\AClassifications in this group/i)).to have_link("US-CA Off-highway electric motorcycle")
   end
 
   it "says so when the catalog doesn't load" do
     serve_catalog(manifest_status: 404)
-    visit bike_book_path
+    visit bikebook_path
 
     expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
     expect(page).to have_css("h1", exact_text: "The world’s bicycle library — search, compare, and find your next ride.")

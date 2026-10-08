@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Integrations
-  module BikeBook
+  module Bikebook
     module Catalog
       extend Functionable
 

@@ -3,12 +3,12 @@ require "rails_helper"
 RSpec.describe BikebookController, type: :request do
   describe "show" do
     it "renders the search and a spinner, and the shell the browser fills in from the catalog" do
-      get "/bike_book"
+      get "/bikebook"
 
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
       bikebook = page.find("[data-controller='bikebook--page']")
-      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq Integrations::BikeBook::Catalog::MANIFEST_URL
+      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq Integrations::Bikebook::Catalog::MANIFEST_URL
       expect(bikebook).to have_css("[inert] #vehicle_models")
         .and have_css("[role='status'] svg.tw\\:animate-spin")
 
@@ -24,7 +24,7 @@ RSpec.describe BikebookController, type: :request do
 
     context "comparing" do
       it "isn't indexed" do
-        get "/bike_book", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2"}
+        get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2"}
         expect(response).to have_http_status(:ok)
         expect(response.headers["X-Robots-Tag"]).to eq "noindex, follow"
       end
@@ -39,7 +39,7 @@ RSpec.describe BikebookController, type: :request do
 
       before do
         stub_bikebook_catalog(status: catalog_status)
-        get("/bike_book", params:)
+        get("/bikebook", params:)
       end
       after { WebMock.reset! }
 
@@ -51,7 +51,7 @@ RSpec.describe BikebookController, type: :request do
         expect(page).to have_css("meta[name='description'][content^='Experience elite performance with the Segway GT3 Pro']", visible: :all)
           .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/segway/2025/gt3_pro.png']", visible: :all)
           .and have_css("meta[name='twitter:card'][content='summary_large_image']", visible: :all)
-          .and have_css("link[rel='canonical'][href='http://www.example.com/bike_book?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
+          .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
       end
 
       context "that the catalog hasn't" do
@@ -68,7 +68,7 @@ RSpec.describe BikebookController, type: :request do
         it "renders the page for the browser to try, as unavailable to a crawler" do
           expect(response).to have_http_status(:service_unavailable)
           expect(page).to have_title("Bikebook", exact: true)
-            .and have_css("link[rel='canonical'][href='http://www.example.com/bike_book?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
+            .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
         end
       end
 
@@ -84,7 +84,7 @@ RSpec.describe BikebookController, type: :request do
 
     describe "donation strip" do
       let(:page) do
-        get "/bike_book"
+        get "/bikebook"
         Capybara.string(response.body)
       end
 
@@ -107,7 +107,7 @@ RSpec.describe BikebookController, type: :request do
     describe "units" do
       let(:headers) { {} }
       let(:html_class) do
-        get("/bike_book", headers:)
+        get("/bikebook", headers:)
         Nokogiri::HTML5(response.body).at_css("html")["class"]
       end
 
@@ -134,41 +134,29 @@ RSpec.describe BikebookController, type: :request do
     end
   end
 
-  describe "the old /bikebook" do
-    it "redirects permanently, keeping the query" do
-      get "/bikebook?vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2"
-      expect(response).to have_http_status(:moved_permanently)
-      expect(response).to redirect_to("/bike_book?vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2")
-
-      get "/bikebook/m/segway/2025/gt3_pro"
-      expect(response).to have_http_status(:moved_permanently)
-      expect(response).to redirect_to("/bike_book/m/segway/2025/gt3_pro")
-    end
-  end
-
   describe "vehicle" do
     it "redirects to the page with that vehicle picked" do
-      get "/bike_book/m/segway/2025/gt3_pro"
-      expect(response).to redirect_to("/bike_book?vehicle_models=m/segway/2025/gt3_pro")
+      get "/bikebook/m/segway/2025/gt3_pro"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro")
     end
 
     context "an e-vehicle classification" do
       it "picks it, without an m/" do
-        get "/bike_book/evc/us/class_3"
-        expect(response).to redirect_to("/bike_book?vehicle_models=evc/us/class_3")
+        get "/bikebook/evc/us/class_3"
+        expect(response).to redirect_to("/bikebook?vehicle_models=evc/us/class_3")
       end
     end
 
     context "without its m/, and with vehicles already picked" do
       it "picks it ahead of them, keeping the query" do
-        get "/bike_book/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro", filters: "1"}
-        expect(response).to redirect_to("/bike_book?filters=1&vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2")
+        get "/bikebook/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro", filters: "1"}
+        expect(response).to redirect_to("/bikebook?filters=1&vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2")
       end
 
       context "with sizes picked" do
         it "moves each size with its vehicle" do
-          get "/bike_book/m/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro,m/aventon/2026/current_adv", vehicle_sizes: "Large,,Small"}
-          expect(response).to redirect_to("/bike_book?vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2,m/aventon/2026/current_adv&vehicle_sizes=,Large,Small")
+          get "/bikebook/m/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro,m/aventon/2026/current_adv", vehicle_sizes: "Large,,Small"}
+          expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2,m/aventon/2026/current_adv&vehicle_sizes=,Large,Small")
         end
       end
     end
