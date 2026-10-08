@@ -17,14 +17,18 @@ const wheelRadius = (data, size, position) => {
 }
 
 // A size's frame in mm, the bottom bracket at the origin and y up. `missing` names the geometry it can't be drawn
-// without, and `estimated` is whether a default stands in for any value the size doesn't list
+// without, and `wheels` is then its wheels' radii and wheelbase where it lists them all. `estimated` is whether a
+// default stands in for any value the size doesn't list
 export const frameGeometry = (data, size) => {
   const geometry = size?.geometry ?? {}
   const rear = wheelRadius(data, size, 'rear')
   const front = wheelRadius(data, size, 'front')
   const drop = geometry.bb_drop ?? (isNumber(geometry.bb_height) ? rear.radius - geometry.bb_height : null)
   const missing = [...REQUIRED.filter((key) => !isNumber(geometry[key])), ...(isNumber(drop) ? [] : ['bb_drop'])]
-  if (missing.length) return { missing }
+  if (missing.length) {
+    const listed = !rear.estimated && !front.estimated && isNumber(geometry.wheelbase)
+    return { missing, wheels: listed ? { rearRadius: rear.radius, frontRadius: front.radius, wheelbase: geometry.wheelbase } : null }
+  }
 
   const { reach, stack, chainstay, wheelbase, front_center: frontCenter, head_tube: headTube = 0, top_tube_effective: topTube } = geometry
   const headAngle = radians(geometry.head_angle)

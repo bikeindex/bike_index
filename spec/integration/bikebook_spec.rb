@@ -73,18 +73,22 @@ RSpec.describe "Bikebook", :js, type: :system do
     # the tire's narrower, and the axle's tooltip has less in it; the wheel size is the same
     expect(front_wheel.all(".tw\\:spec-diff").map(&:text)).to match([/\A2\.1\W+in tire/, /\Athru axle/])
     expect(all("article").first).to have_no_css(".tw\\:spec-diff")
-    # the overlay draws what it has the geometry for, and says what it hasn't
+    # the overlay draws what it has the geometry for, and says what it hasn't: a frame without it is its wheels alone,
+    # its wheelbase apart from the first frame's rear axle
     within("[aria-label='Geometry overlay']") do
-      expect(page).to have_css("svg[role='img'] > g", count: 1).and have_css("li", count: 1, text: "Aventón Level 4 REC Step-Through")
-      expect(page).to have_text("Aventón Level 2 Step-Through isn't drawn without its Stack, Head Angle, Chainstay, BB Drop.")
+      expect(all("li").map(&:text)).to eq(["Aventón Level 4 REC Step-Through Regular", "Aventón Level 2 Step-Through M/L"])
+      frames = all("svg[role='img'] > g", visible: :all).map { |frame| [frame.all("circle", visible: :all).map { it[:cx].to_f }, frame.has_css?("path", visible: :all)] }
+      expect(frames).to match([[[be < 0, be > 0], true], [[frames.first.first.first, frames.first.first.first + 1130], false]])
+      expect(page).to have_text("Aventón Level 2 Step-Through's frame isn't drawn without its Stack, Head Angle, Chainstay, BB Drop, only its " \
+        "wheels, the rear axle on Aventón Level 4 REC Step-Through's.")
       # the same wheel size, its tires too near each other's for a note on how large it stands
       expect(page).to have_no_text("diameter")
     end
     within("[aria-label='Comparison']") do
       expect(page).to have_css("thead th", text: "Level 2 Step-Through")
-      # keyed to the overlay by its frame's color along its foot, which a model it doesn't draw has none of
+      # keyed to the overlay by its frame's color along its foot, its wheels' where it's only them
       expect(page).to have_no_css("thead th.tw\\:border-b-4")
-      expect(all("tbody tr").last.all("td").map { it[:class].include?("tw:border-b-4") }).to eq([true, false])
+      expect(all("tbody tr").last.all("td").map { it[:class].include?("tw:border-b-4") }).to eq([true, true])
       # in the frame's color in dark mode too, over the cells' own dark border
       key_colors = page.evaluate_script(<<~JS)
         (() => {
@@ -293,10 +297,12 @@ RSpec.describe "Bikebook", :js, type: :system do
         const { rearAxle, frontAxle, headBottom, seatTop, bottomBracketHeight, estimated } = frame({ bb_drop: 70 })
         return [[rearAxle, frontAxle, headBottom, seatTop].map(round), bottomBracketHeight, estimated, round(frame({ bb_height: 281 }).rearAxle),
           frame({ bb_drop: 70, seat_tube_ct: null }).estimated, frame({ bb_drop: 70, head_tube: null }).estimated,
-          frameGeometry({}, { geometry: { reach: 400 } }).missing]
+          ...[frameGeometry({}, { geometry: { reach: 400 } })].map(({ missing, wheels }) => [missing, wheels === null]),
+          frameGeometry(data, { geometry: { wheelbase: 1020 } }).wheels]
       })
     JS
-    expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [-146, 478]], 281, false, [-414, 70], true, true, %w[stack head_angle chainstay bb_drop]])
+    expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [-146, 478]], 281, false, [-414, 70], true, true,
+      [%w[stack head_angle chainstay bb_drop], true], {"rearRadius" => 351, "frontRadius" => 351, "wheelbase" => 1020}])
 
     size_select.call("Current EXP").select("Small")
     expect_size.call("Current EXP", "Small")

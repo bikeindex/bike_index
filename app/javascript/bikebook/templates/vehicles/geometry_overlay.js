@@ -17,6 +17,8 @@ const TIRE_GAP = 10
 // mm around the bottom bracket and up from the ground that nearly every catalog frame fits, so a larger size draws
 // larger rather than the drawing refitting
 const BOUNDS = { left: -850, right: 1250, top: 1010 }
+// a typical rear axle's mm behind the bottom bracket, for wheels with no frame to line up on
+const REAR_AXLE = -430
 
 const point = ([x, y]) => `${Math.round(x * 10) / 10},${Math.round(-y * 10) / 10}`
 const path = (...lines) => lines.map(([start, ...rest]) => `M${point(start)}${rest.map((each) => `L${point(each)}`).join('')}`).join('')
@@ -25,9 +27,10 @@ const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headT
   const bottomBracket = [0, 0]
   return svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" transform=${`translate(0 ${-bottomBracketHeight})`} stroke=${series.color} fill="none" stroke-linecap="round" stroke-linejoin="round"><title>${label}</title><circle
     cx=${rearAxle[0]} cy=${-rearAxle[1]} r=${rearRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle><circle
-    cx=${frontAxle[0]} cy=${-frontAxle[1]} r=${frontRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle><path
-    d=${path([rearAxle, bottomBracket, seatTop, rearAxle], [bottomBracket, headBottom, headTop, seatTop], [headBottom, frontAxle])}
-    stroke-width="4" vector-effect="non-scaling-stroke"></path></g>`
+    cx=${frontAxle[0]} cy=${-frontAxle[1]} r=${frontRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle>${headTop
+    ? svg`<path d=${path([rearAxle, bottomBracket, seatTop, rearAxle], [bottomBracket, headBottom, headTop, seatTop], [headBottom, frontAxle])}
+      stroke-width="4" vector-effect="non-scaling-stroke"></path>`
+    : nothing}</g>`
 }
 
 // A [bsd, tire] wheel against the first's: the same size on a tire more than TIRE_GAP mm wider or narrower, or 700c
@@ -57,10 +60,13 @@ const diameterNotes = (presenter, compared) => {
 }
 
 // The bottom border that keys a comparison table column to its frame, which the overlay draws in the same order
-export const seriesBorder = (frame, index) => frame?.missing.length === 0 ? `tw:border-b-4 ${SERIES[index].border}` : ''
+export const seriesBorder = (frame, index) => frame && drawable(frame) ? `tw:border-b-4 ${SERIES[index].border}` : ''
+
+const drawable = (geometry) => geometry.missing.length === 0 || Boolean(geometry.wheels)
 
 // The compared models' frames in their `sizes`, standing on the same ground with their bottom brackets lined up,
-// each over the ones the comparison table columns left of it
+// each over the ones the comparison table columns left of it. A frame it can't draw is its wheels alone where they're
+// listed, the rear axle on the first drawn frame's
 export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const labelled = named.map((vehicle, index) => {
@@ -69,13 +75,19 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
     const wheels = wheelsAt(presenter, vehicles[index].data, sizes[index])
     return { geometry: frames[index], series: SERIES[index], title, size, wheels, label: present(size) ? `${title}, ${size}` : title }
   })
-  const drawn = labelled.filter(({ geometry }) => geometry.missing.length === 0)
+  const [aligned] = labelled.filter(({ geometry }) => geometry.missing.length === 0)
+  const rearX = aligned?.geometry.rearAxle[0] ?? REAR_AXLE
+  const drawn = labelled.filter(({ geometry }) => drawable(geometry)).map((each) => {
+    if (!each.geometry.wheels) return each
+    const { rearRadius, frontRadius, wheelbase } = each.geometry.wheels
+    return { ...each, geometry: { rearAxle: [rearX, rearRadius], frontAxle: [rearX + wheelbase, frontRadius], rearRadius, frontRadius, bottomBracketHeight: 0 } }
+  })
   const undrawn = labelled.filter(({ geometry }) => geometry.missing.length)
   if (drawn.length === 0) return nothing
 
   const xs = drawn.flatMap(({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius } }) => [rearAxle[0] - rearRadius, frontAxle[0] + frontRadius])
   // the wheels stand on the ground, so only the frame's top reaches past it
-  const ys = drawn.flatMap(({ geometry: { headTop, seatTop, bottomBracketHeight } }) => [headTop[1], seatTop[1]].map((y) => y + bottomBracketHeight))
+  const ys = drawn.filter(({ geometry }) => geometry.headTop).flatMap(({ geometry: { headTop, seatTop, bottomBracketHeight } }) => [headTop[1], seatTop[1]].map((y) => y + bottomBracketHeight))
   const [left, top] = [Math.min(BOUNDS.left, ...xs) - PADDING, -Math.max(BOUNDS.top, ...ys) - PADDING]
   const [width, height] = [Math.max(BOUNDS.right, ...xs) - left + PADDING, PADDING - top]
   const labels = presenter.kit.geometry.labels
@@ -95,8 +107,11 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
       ? html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: you're comparing different diameter wheels and tires</p><ul
         class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${notes}</ul></div>`
       : nothing}${undrawn.length
-      ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing } }) =>
-        `${title} isn't drawn without its ${missing.map((key) => labels[key] ?? presenter.humanize(key)).join(', ')}.`).join(' ')}</p>`
+      ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing, wheels } }) => {
+        const without = missing.map((key) => labels[key] ?? presenter.humanize(key)).join(', ')
+        if (!wheels) return `${title} isn't drawn without its ${without}.`
+        return `${title}'s frame isn't drawn without its ${without}, only its wheels${aligned ? `, the rear axle on ${aligned.title}'s` : ''}.`
+      }).join(' ')}</p>`
       : nothing}${drawn.some(({ geometry }) => geometry.estimated)
       ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">Some tubes and wheels are estimated where a size doesn't list them.</p>`
       : nothing}</section>`
