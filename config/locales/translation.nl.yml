@@ -5841,6 +5841,19 @@ nl:
             created: Gemaakt
             notification_number: Kennisgeving#
             resolved: Vastbesloten
+          new:
+            create_parking_notification: Maak een parkeermelding aan
+            internal_notes: "%{org_name} interne notities"
+            model: Model
+            new_unregistered_notification: Niet-geregistreerde fietsmelding
+            not_shown_to_user: niet aan de gebruiker getoond
+            notification_because: Melding omdat
+            parking_notification: Parkeermelding
+            photo: Foto
+            registration_form_settings: Instellingen voor het registratieformulier
+            serial_number: Framenummer
+            vehicle_info: Voertuiginformatie
+            vehicle_type: 'Voertuigtype:'
         register_settings:
           browser_only: Deze instellingen gelden alleen voor uw browser; ze hebben
             geen invloed op andere gebruikers.
@@ -5855,9 +5868,19 @@ nl:
             ronden.
           single_page: Registratieformulier van één pagina
           update: Bijwerken
+          old_unregistered_notification_view: Gebruik de oude pagina voor meldingen
+            van niet-geregistreerde gebruikers.
+          unregistered_notification_page: Niet-geregistreerde meldingpagina
         registrations:
           new:
             registration_form_settings: Instellingen voor het registratieformulier
+        parking_notification_location:
+          address_or_intersection: Adres of kruispunt
+          enter_address_manually: Voer het adres handmatig in
+          map_hint: Verschuif de kaart zodat de speld de gewenste plek markeert.
+          map_unavailable: De kaart kon niet worden geladen; de locatie was nog steeds
+            ingesteld via uw apparaat.
+          set_on_map: Op de kaart plaatsen
       registrations:
         show:
           bike_details:
@@ -6026,12 +6049,8 @@ nl:
                 kunnen alleen worden verzonden naar voertuigen die geregistreerd staan
                 met %{organization_name}.
             parking_notification_form:
-              address_or_intersection: Adres of kruispunt
               create_parking_notification: Maak een nieuwe parkeermelding aan
               impound_this_bike_type: Neem dit in beslag %{bike_type}
-              map_hint: Verschuif de kaart zodat de speld de gewenste plek markeert.
-              map_unavailable: De kaart kon niet worden geladen; de locatie was nog
-                steeds ingesteld via uw apparaat.
               not_shown_to_user: niet aan de gebruiker getoond
               parking_notification_notes: "%{org_name} interne notities"
             parking_notification_show:
@@ -6605,7 +6624,6 @@ nl:
               van wat u hier hebt ingevoerd, wordt overgenomen.
             yes_start_over: Ja, opnieuw beginnen.
           step2_fields:
-            add_another_color: Voeg nog een kleur toe
             additional_serial_sticker_number: Extra framenummer / stickernummer
             affiliation: "%{org_name} aansluiting"
             are_you_certain: Weet je het zeker?
@@ -6613,7 +6631,6 @@ nl:
             bike_details: "%{cycle_type} details"
             bottom_bracket: Trapas
             cm: cm
-            color: Kleur
             complete_registration: Voltooi de %{cycle_type}-registratie
             contact_info: Contactgegevens
             database_public_note: Onze database is openbaar! Je kunt de privacyinstellingen
@@ -6653,7 +6670,6 @@ nl:
               bij %{org_name}
             phone_required_stolen: Een telefoon is vereist om een gestolen %{cycle_type}
               te registreren.
-            primary_color_blank: Primaire kleur — bijvoorbeeld zwart
             read_how_to_find_html: Lees over %{how_to_find_link} <small>(opent in
               een apart venster)</small>
             rear_dropouts: Achterste uitvalnaven
@@ -6661,8 +6677,6 @@ nl:
             register_with_org_description: "%{org_name} kan deze registratie bekijken
               en helpen beheren."
             registration_type: Registratietype
-            remove_additional_color: Verwijder kleur
-            second_color_blank: Tweede kleur — bijvoorbeeld rood
             serial_help_intro: 'Bij de meeste fietsen is het serienummer in het frame
               gegraveerd. Zoek uw serienummer op:'
             serial_location_bottom_bracket: onderkant van de trapas
@@ -6675,8 +6689,6 @@ nl:
             stolen: Gestolen
             stolen_description: Dit %{cycle_type} is gestolen
             student_id: Student-ID
-            third_color_blank: Derde kleur
-            up_to_3: maximaal 3
             very_very_few_bikes_html: 'Er worden <em>zeer</em> weinig %{cycle_types}-exemplaren
               zonder serienummer gemaakt. Tenzij dit %{cycle_type}:'
             view_serial_guide: Bekijk de volledige handleiding voor serienummers
@@ -6684,6 +6696,14 @@ nl:
             wheres_my_serial: Waar is mijn serienummer?
             without_serial: Deze %{cycle_type} is gemaakt zonder serienummer.
             without_serial_number: Deze %{cycle_type} is gemaakt zonder serienummer.
+          color_fields:
+            add_another_color: Voeg nog een kleur toe
+            color: Kleur
+            primary_color_blank: Primaire kleur — bijvoorbeeld zwart
+            remove_additional_color: Verwijder kleur
+            second_color_blank: Tweede kleur — bijvoorbeeld rood
+            third_color_blank: Derde kleur
+            up_to_3: maximaal 3
         views:
           confirm:
             confirming_your_email: Uw e-mailadres wordt bevestigd.

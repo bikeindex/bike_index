@@ -5929,6 +5929,19 @@ es:
             created: Creado
             notification_number: Notificación#
             resolved: Resuelto
+          new:
+            create_parking_notification: Crear notificación de estacionamiento
+            internal_notes: "%{org_name} notas internas"
+            model: Modelo
+            new_unregistered_notification: Nueva notificación no registrada
+            not_shown_to_user: no se muestra al usuario
+            notification_because: Notificación porque
+            parking_notification: Aviso de estacionamiento
+            photo: Foto
+            registration_form_settings: Configuración del formulario de registro
+            serial_number: Número de serie
+            vehicle_info: Información del vehículo
+            vehicle_type: Tipo de vehículo
         register_settings:
           browser_only: Esta configuración solo se aplica a tu navegador; no afectará
             a otros usuarios.
@@ -5942,9 +5955,19 @@ es:
             de que su registro no está completo, junto con un enlace para finalizarlo.
           single_page: Formulario de registro de una sola página
           update: Actualizar
+          old_unregistered_notification_view: Utilice la antigua página de notificación
+            para usuarios no registrados.
+          unregistered_notification_page: Página de notificación de usuarios no registrados
         registrations:
           new:
             registration_form_settings: Configuración del formulario de registro
+        parking_notification_location:
+          address_or_intersection: Dirección o intersección
+          enter_address_manually: Introduzca la dirección manualmente
+          map_hint: Arrastra el mapa para que el marcador señale el lugar.
+          map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba configurada
+            desde su dispositivo.
+          set_on_map: Colocar en el mapa
       registrations:
         show:
           bike_details:
@@ -6112,12 +6135,8 @@ es:
               unavailable_vehicle_not_registered_with_organization: Los mensajes generales
                 solo se pueden enviar a vehículos registrados con %{organization_name}.
             parking_notification_form:
-              address_or_intersection: Dirección o intersección
               create_parking_notification: Crear una nueva notificación de estacionamiento
               impound_this_bike_type: Confiscar esto %{bike_type}
-              map_hint: Arrastra el mapa para que el marcador señale el lugar.
-              map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba
-                configurada desde su dispositivo.
               not_shown_to_user: no se muestra al usuario
               parking_notification_notes: "%{org_name} notas internas"
             parking_notification_show:
@@ -6699,7 +6718,6 @@ es:
               introducido aquí se conservará.
             yes_start_over: Sí, empezar de nuevo
           step2_fields:
-            add_another_color: Añade otro color
             additional_serial_sticker_number: Número de serie/etiqueta adicional
             affiliation: "%{org_name} afiliación"
             are_you_certain: "¿Estás seguro?"
@@ -6707,7 +6725,6 @@ es:
             bike_details: "%{cycle_type} detalles"
             bottom_bracket: Soporte inferior
             cm: centímetro
-            color: Color
             complete_registration: Registro completo %{cycle_type}
             contact_info: Información de contacto
             database_public_note: "¡Nuestra base de datos es pública! Podrás ajustar
@@ -6748,7 +6765,6 @@ es:
             phone_required_org: Se requiere un teléfono para registrarse en %{org_name}.
             phone_required_stolen: Se requiere el teléfono para registrar un %{cycle_type}
               robado.
-            primary_color_blank: Color primario — por ejemplo, negro
             read_how_to_find_html: Lea sobre %{how_to_find_link} <small>(se abre en
               una ventana aparte)</small>
             rear_dropouts: punteras traseras
@@ -6756,8 +6772,6 @@ es:
             register_with_org_description: "%{org_name} podrá ver y ayudar a gestionar
               este registro."
             registration_type: Tipo de registro
-            remove_additional_color: Eliminar color
-            second_color_blank: Segundo color — por ejemplo, rojo
             serial_help_intro: 'La mayoría de las bicicletas tienen su número de serie
               grabado en el cuadro. Busca tu número de serie:'
             serial_location_bottom_bracket: parte inferior del soporte inferior
@@ -6770,8 +6784,6 @@ es:
             stolen: Robado
             stolen_description: Este %{cycle_type} ha sido robado.
             student_id: Carné de estudiante
-            third_color_blank: Tercer color
-            up_to_3: hasta 3
             very_very_few_bikes_html: "<em>Muy</em> pocos %{cycle_types} se fabrican
               sin números de serie. A menos que este %{cycle_type}:"
             view_serial_guide: Consulte la guía completa de números de serie.
@@ -6779,6 +6791,14 @@ es:
             wheres_my_serial: "¿Dónde está mi número de serie?"
             without_serial: Este %{cycle_type} se hizo sin número de serie.
             without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
+          color_fields:
+            add_another_color: Añade otro color
+            color: Color
+            primary_color_blank: Color primario — por ejemplo, negro
+            remove_additional_color: Eliminar color
+            second_color_blank: Segundo color — por ejemplo, rojo
+            third_color_blank: Tercer color
+            up_to_3: hasta 3
         views:
           confirm:
             confirming_your_email: Confirmando tu correo electrónico

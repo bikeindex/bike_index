@@ -49,7 +49,7 @@ RSpec.describe Organized::BikesController, type: :request do
             expect(response.status).to eq(200)
             expect(assigns(:unregistered_parking_notification)).to be_truthy
             expect(response).to render_template(:new)
-            expect(response.body).to_not include "/registrations/settings"
+            expect(response.body).to include "/o/#{current_organization.to_param}/registrations/settings"
           end
         end
       end
