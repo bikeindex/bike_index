@@ -17,16 +17,18 @@ RSpec.describe EbikeRulesController, type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.headers["Cache-Control"]).to eq "no-store"
-      expect(page).to have_select("state", with_options: ["Select your state", "District of Columbia", "Wyoming"])
-        .and have_no_css("#state option[selected]")
+      expect(page).to have_css("input[role='combobox'][placeholder='Select your state']")
+        .and have_css("[role='option']", text: "District of Columbia", visible: :all)
+        .and have_css("[role='option']", text: "Wyoming", visible: :all)
         .and have_css("form[action='/ebike-rules']")
         .and have_text("Location not shared")
         .and have_css("[data-ebike-rules--lookup-manifest-url-value='#{Integrations::Bikebook::Catalog::MANIFEST_URL}']")
         .and have_no_css("[role='status']")
         .and have_no_css("[role='alert']")
         .and have_title("E-bike rules", exact: true)
+      expect(page.find("[data-ebike-rules--lookup-target='state'] .hw-combobox")["data-hw-combobox-prefilled-display-value"]).to be_nil
       # each state's page, and its rules rendered for search engines, collapsed
-      expect(page).to have_link("Colorado", href: "/ebike-rules/co")
+      expect(page).to have_link("Check an e-bike in Colorado", href: "/ebike-rules/co#check", visible: :all)
         .and have_css("#state-panel-co", text: "Class 3 riders must be 16 or older", visible: :all)
         .and have_css("#state-panel-wy", text: "We're compiling Wyoming's e-bike rules", visible: :all)
       expect(page.all("[data-ebike-rules--state-filter-target='state']").count).to eq 51
@@ -40,7 +42,7 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(response.headers["Cache-Control"]).to eq "no-store"
 
       follow_redirect!(headers: indiana)
-      expect(page).to have_select("state", selected: "Indiana")
+      expect(page).to have_css("[data-hw-combobox-prefilled-display-value='Indiana (IN)']")
         .and have_text("We detected Indiana")
         .and have_no_css("[role='alert']")
     end
@@ -49,7 +51,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/co"
 
       expect(response).to have_http_status(:ok)
-      expect(page).to have_select("state", selected: "Colorado")
+      expect(page).to have_css("[data-hw-combobox-prefilled-display-value='Colorado (CO)']")
         .and have_css("form[action='/ebike-rules/co']")
         .and have_no_css("[role='alert']")
         .and have_no_css("[role='status']")
@@ -60,12 +62,13 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(meta("description").length).to be <= 200
       expect(page.find("link[rel='canonical']", visible: :all)[:href]).to eq "http://www.example.com/ebike-rules/co"
 
-      get "/ebike-rules/co", params: {bike: "m/specialized/2025/haul_st"}
+      get "/ebike-rules/co", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
       expect(page).to have_css("[role='status']",
-        text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 3 e-bike, with 1 rule to check.")
+        text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 2 and 3 e-bike.")
+        .and have_css("li", text: "Throttle stops at 20 mph")
         .and have_css("[data-ebike-rules--lookup-display-value='Specialized Haul ST 2025']")
-        .and have_link("View full Bike Book entry", href: "/bikebook?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
+        .and have_link("View full BikeBook entry", href: "/bikebook?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
         .and have_title("Colorado e-bike laws", exact: true)
       expect(page.find("link[rel='canonical']", visible: :all)[:href]).to eq "http://www.example.com/ebike-rules/co"
       expect(meta("og:url")).to eq "http://www.example.com/ebike-rules/co"
@@ -82,7 +85,7 @@ RSpec.describe EbikeRulesController, type: :request do
           {status: 503}
         end
 
-        2.times { get "/ebike-rules/ca", params: {bike: "m/specialized/2025/haul_st"} }
+        2.times { get "/ebike-rules/ca", params: {vehicle_models: "m/specialized/2025/haul_st"} }
 
         expect(response).to have_http_status(:ok)
         expect(page).to have_css("[role='alert']", text: "Pick a bike from the list")
@@ -102,7 +105,7 @@ RSpec.describe EbikeRulesController, type: :request do
     end
 
     it "describes a state the catalog has no law for, and says so on a check" do
-      get "/ebike-rules/wy", params: {bike: "m/specialized/2025/haul_st"}
+      get "/ebike-rules/wy", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
       expect(page).to have_title("Wyoming e-bike laws", exact: true)
       expect(meta("description")).to start_with("We're still reviewing Wyoming's e-bike law.")
@@ -110,20 +113,21 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_text("We're still reviewing Wyoming's rules.")
     end
 
-    it "keeps Alaska in review, as its e-bike law is for state parks rather than its roads" do
-      get "/ebike-rules/ak", params: {bike: "m/specialized/2025/haul_st"}
+    it "checks a bike against Alaska's e-bike law" do
+      get "/ebike-rules/ak", params: {vehicle_models: "m/specialized/2025/haul_st"}
 
-      expect(page).to have_css("[role='status']", text: "We don't have Alaska's e-bike rules on file yet.")
-      expect(meta("description")).to start_with("We're still reviewing Alaska's e-bike law.")
+      expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Alaska")
+      expect(page.find("#state-ak > h3")).to have_no_text("In review")
+      expect(meta("description")).to_not include("still reviewing")
     end
 
     it "moves a state from the query, or in capitals, to its own page, and 404s one that isn't a state" do
-      get "/ebike-rules", params: {state: "CO", bike: "m/specialized/2025/haul_st"}
-      expect(response).to redirect_to("/ebike-rules/co?bike=m%2Fspecialized%2F2025%2Fhaul_st")
+      get "/ebike-rules", params: {state: "CO", vehicle_models: "m/specialized/2025/haul_st"}
+      expect(response).to redirect_to("/ebike-rules/co?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
       expect(response).to have_http_status(:moved_permanently)
 
-      get "/ebike-rules/ny", params: {state: "IN", bike: ""}
-      expect(response).to redirect_to("/ebike-rules/in?bike=")
+      get "/ebike-rules/ny", params: {state: "IN", vehicle_models: ""}
+      expect(response).to redirect_to("/ebike-rules/in?vehicle_models=")
 
       get "/ebike-rules/CO"
       expect(response).to redirect_to("/ebike-rules/co")
@@ -136,36 +140,68 @@ RSpec.describe EbikeRulesController, type: :request do
     end
 
     it "checks a bike entered by hand" do
-      get "/ebike-rules/co", params: {manual: "1", e_bike_class: "2", watts: "1000", throttle: "1"}
+      get "/ebike-rules/co", params: {manual: "1", top_speed: "20", watts: "1000", throttle: "1"}
 
-      expect(page).to have_css("[role='status']", text: "Your e-bike is not permitted as an e-bike under current Colorado rules.")
+      expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
         .and have_css("[role='status'] li", text: "1,000W motor exceeds the 750W cap.")
         .and have_field("watts", with: "1000")
       expect(page.find("fieldset[data-ebike-rules--lookup-target='manualPanel']")[:disabled]).to be_nil
     end
 
-    it "takes a bike entered by hand without a throttle answer as having one only if it's Class 2" do
-      get "/ebike-rules/co", params: {manual: "1", e_bike_class: "1", watts: "250"}
+    it "opens the manual panel in place of the bike field, with nothing checked yet" do
+      get "/ebike-rules/co", params: {manual: "1"}
+
+      expect(page).to have_no_css("[role='alert']")
+        .and have_no_css("[role='status']")
+      expect(page.find("[data-ebike-rules--lookup-target='bikeField']")[:class]).to include "tw:hidden"
+      expect(page.find("[data-ebike-rules--lookup-target='closeManual']")[:class]).to_not include "tw:hidden"
+      expect(page.find("fieldset[data-ebike-rules--lookup-target='manualPanel']")[:disabled]).to be_nil
+    end
+
+    it "classes a bike entered by hand by its top speed and throttle" do
+      get "/ebike-rules/co", params: {manual: "1", top_speed: "20", watts: "250"}
 
       expect(page).to have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 1 e-bike.")
+        .and have_checked_field("top_speed", with: "20")
         .and have_checked_field("throttle", with: "0")
+
+      get "/ebike-rules/co", params: {manual: "1", top_speed: "28", watts: "250", throttle: "0"}
+      expect(page).to have_css("[role='status']", text: "as a Class 3 e-bike")
+
+      get "/ebike-rules/co", params: {manual: "1", top_speed: "29", watts: "250", throttle: "0"}
+      expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
+        .and have_css("[role='status'] li", text: "Assists past 28 mph, over the 28 mph limit.")
+        .and have_text("Entered manually").and have_no_text("Entered manually · Class")
+        .and have_css("dd", text: "Over 28 mph")
+        .and have_text("Look for the UL mark on the frame label.")
+        .and have_checked_field("top_speed", with: "29")
+    end
+
+    it "redirects /e-bike-rules, keeping the state and query" do
+      get "/e-bike-rules"
+      expect(response).to redirect_to("/ebike-rules")
+
+      get "/e-bike-rules/co?manual=1&watts=250"
+      expect(response).to redirect_to("/ebike-rules/co?manual=1&watts=250")
     end
 
     it "explains what's missing" do
       # a state left unchosen without JavaScript comes off the query, rather than being looked up
-      get "/ebike-rules", params: {state: "", bike: ""}
-      expect(response).to redirect_to("/ebike-rules?bike=")
+      get "/ebike-rules", params: {state: "", vehicle_models: ""}
+      expect(response).to redirect_to("/ebike-rules?vehicle_models=")
 
-      get "/ebike-rules", params: {bike: ""}, headers: indiana
+      get "/ebike-rules", params: {vehicle_models: ""}, headers: indiana
 
       expect(page).to have_css("[role='alert']", text: "Choose a state.")
         .and have_css("[role='alert']", text: "Pick a bike from the list, or enter its details manually.")
         .and have_no_css("[role='status']")
       expect(page.find("fieldset[data-ebike-rules--lookup-target='manualPanel']", visible: :all)[:disabled]).to eq "disabled"
 
-      get "/ebike-rules/co", params: {manual: "1", watts: ""}
+      # a manual check needs no wattage
+      get "/ebike-rules/co", params: {manual: "1", top_speed: "20", watts: ""}
 
-      expect(page).to have_css("[role='alert']", text: "Enter the motor wattage.")
+      expect(page).to have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 1 e-bike.")
+        .and have_no_css("[role='alert']")
     end
   end
 end

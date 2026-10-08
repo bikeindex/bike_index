@@ -35,6 +35,19 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
     end
 
+    it "prefills a linked bike's manufacturer and model, without counting step 1 as submitted" do
+      manufacturer = FactoryBot.create(:manufacturer, name: "Specialized", frame_maker: true)
+      get "/register/new", params: {manufacturer: "Specialized", frame_model: "Haul LT"}
+      b_param = BParam.last
+      expect(b_param.manufacturer_id).to be_nil
+      expect(b_param.params["prefill"]).to eq("manufacturer" => "Specialized", "frame_model" => "Haul LT")
+      expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 1)
+
+      follow_redirect!
+      expect(Nokogiri::HTML(response.body).at_css("input[type=hidden][name='b_param[manufacturer_id]']")["value"]).to eq manufacturer.id.to_s
+      expect(b_param.reload.manufacturer_id).to be_nil
+    end
+
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 

@@ -44,7 +44,18 @@
       data-ebike-rules--state-filter-target="count"
       data-matching-template="<%= translation(".matching_of_total", number: "__number__", total: states.size) %>"
     >
-      <%= translation(".on_file_of_total_html", number: number_display(laws.count), total: states.size) %>
+      <% if laws.count == states.size %>
+        <%= translation(".all_on_file") %>
+      <% else %>
+        <%= translation(".on_file_of_total_html", number: number_display(laws.count), total: states.size) %>
+      <% end %>
+    </p>
+
+    <p
+      class="tw:hidden tw:py-6 tw:text-gray-700 tw:dark:text-gray-300"
+      data-ebike-rules--state-filter-target="empty"
+    >
+      <%= translation(".no_match") %>
     </p>
 
     <div
@@ -56,33 +67,27 @@
       <% states.each do |state| %>
         <div
           id="state-<%= state[:abbr].downcase %>"
-          class="
-            tw:border-b tw:border-gray-200
-            tw:has-[[aria-expanded=true]]:col-span-full
-            tw:dark:border-gray-700
-          "
+          class="<%= STATE_CLASSES %>"
           data-controller="ui--collapse"
           data-ebike-rules--state-filter-target="state"
+          data-action="click->ebike-rules--state-filter#link keydown.enter->ebike-rules--state-filter#link keydown.space->ebike-rules--state-filter#link"
           data-name="<%= state[:name] %>"
         >
-          <div class="tw:flex tw:min-h-13 tw:items-center tw:gap-3 tw:px-1 tw:py-1">
-            <h3 class="tw:flex-1">
-              <%= link_to state[:name], ebike_rules_state_path(state[:abbr].downcase),
-                class: "twlink tw:text-base tw:font-semibold" %>
-            </h3>
+          <h3>
+            <%= render(UI::Collapse::Component.new(chevron: :trailing, color: :link,
+              html_class: "tw:flex! tw:min-h-13 tw:w-full tw:items-center tw:gap-3 tw:px-1 tw:py-1 tw:text-base tw:font-semibold tw:aria-expanded:px-4",
+              aria: {controls: "state-panel-#{state[:abbr].downcase}"})) do %>
+              <span class="tw:flex-1 tw:text-left"><%= state[:name] %></span>
 
-            <% unless state[:law] %>
-              <%= render(UI::Badge::Component.new(text: translation(".in_review"))) %>
+              <% unless state[:law] %>
+                <%= render(UI::Badge::Component.new(text: translation(".in_review"))) %>
+              <% end %>
             <% end %>
-
-            <%= render(UI::Collapse::Component.new(chevron: true, color: :link,
-              html_class: "tw:flex! tw:min-h-11 tw:min-w-11 tw:items-center tw:justify-center",
-              aria: {controls: "state-panel-#{state[:abbr].downcase}", label: translation(".show_rules", state: state[:name])})) %>
-          </div>
+          </h3>
 
           <div
             id="state-panel-<%= state[:abbr].downcase %>"
-            class="tw:hidden tw:px-1 tw:pb-5"
+            class="tw:hidden tw:px-4 tw:pb-5"
             data-ui--collapse-target="content"
           >
             <% if (law = state[:law]) %>
@@ -114,6 +119,11 @@
                 <%= translation(".compiling", state: state[:name]) %>
               </p>
             <% end %>
+
+            <p class="tw:mt-4">
+              <%= link_to translation(".check_in_state", state: state[:name]), ebike_rules_state_path(state[:abbr].downcase, anchor: "check"),
+                class: "twlink tw:font-semibold" %>
+            </p>
           </div>
         </div>
       <% end %>

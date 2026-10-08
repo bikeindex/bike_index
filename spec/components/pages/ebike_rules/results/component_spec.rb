@@ -13,7 +13,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   let(:abbreviation) { "IN" }
   let(:lookup) do
     EbikeRuleServices::Lookup.new(state: EbikeRuleServices::StateLaws.state(abbreviation), detected_state: nil, bikebook_id: bike.bikebook_id,
-      manual: false, manual_class: 2, manual_watts: nil, manual_throttle: true, bike:, errors: [], submitted: true)
+      manual: false, manual_mph: 20, manual_watts: nil, manual_throttle: true, bike:, errors: [], submitted: true)
   end
   let(:component) { render_inline(described_class.new(lookup:)) }
 
@@ -22,7 +22,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       .and have_css("[role='status']", text: "Your Trek Verve+ 2 is legal to ride in Indiana as a Class 1 e-bike.")
       .and have_css("img[src='https://bikebook.bikeindex.org/trek/2025/verve.jpg'][alt='Trek Verve+ 2']")
       .and have_css("[role='img'][aria-label='Class 1 e-bike']")
-      .and have_text("2025 model · Bike Book")
+      .and have_text("2025 model · BikeBook")
       .and have_css("dd", text: "Not provided", count: 0)
       .and have_text("UL 2849 Certified")
       .and have_text("UL 2271 status unknown")
@@ -30,12 +30,12 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
       .and have_css("li [role='img'][aria-label='Meets this rule']", count: 4)
       .and have_css("li", text: "Class 3 riders must be 15 or older")
       .and have_link(href: "https://in.gov/dnr/rules-and-regulations/e-bike-rules")
-      .and have_link("Bike Book", href: "/bikebook?vehicle_models=evc%2Fus%2Fin%2Felectric_bicycle")
-    expect(component).to have_css("[data-ui--copy-button-text-value='http://test.host/ebike-rules/in']")
+      .and have_link("BikeBook", href: "/bikebook?vehicle_models=evc%2Fus%2Fin%2Felectric_bicycle")
+      .and have_link("Register on Bike Index — free", href: "/register/new?frame_model=Verve%2B+2&manufacturer=Trek")
   end
 
   context "with a bike entered by hand" do
-    let(:bike) { EbikeRuleServices::Bike.manual(e_bike_class: 3, watts: 750, throttle: true) }
+    let(:bike) { EbikeRuleServices::Bike.manual(top_mph: 28, watts: 750, throttle: true) }
     let(:abbreviation) { "CO" }
 
     it "renders the rule to check, with no photo and unknown certifications" do
@@ -43,8 +43,8 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
         .and have_css("[role='status']", text: "Your e-bike is legal to ride in Colorado as a Class 3 e-bike, with 1 rule to check.")
         .and have_css("[role='status'] li", text: "Throttle must cut out at 20 mph.")
         .and have_text("Entered manually · Class 3")
-        .and have_css("dd", text: "Not provided")
-        .and have_text("Entered by you, not verified by Bike Book.")
+        .and have_css("dd", text: "28 mph")
+        .and have_text("Entered by you, not verified by BikeBook.")
         .and have_no_css("img")
     end
   end

@@ -18,10 +18,12 @@ RSpec.describe EbikeRuleServices::StateLaws do
       expect(described_class.find("NY")).to include(classes: [], mph: 25)
     end
 
-    it "is nil for a state without an e-bike law in the catalog, or whose law isn't for its roads" do
+    it "is nil for a state without an e-bike law in the catalog" do
       expect(described_class.find("WY")).to be_nil
-      expect(described_class.find("AK")).to be_nil
-      expect(described_class.classification_name("AK", ["evc/us/class_1"])).to be_nil
+    end
+
+    it "takes Alaska's e-bike law, though it's for state parks rather than roads" do
+      expect(described_class.find("AK")).to include(classes: [], watt_cap: 750, throttle: true)
     end
 
     it "drops a rule once it ends, and keeps a rule's start date until it starts" do

@@ -20,6 +20,22 @@ RSpec.describe EbikeRuleServices::Evaluator do
     expect(described_class.verdict(rules)).to eq :green
   end
 
+  context "with a bike entered by hand as faster than Class 3" do
+    let(:bike) { EbikeRuleServices::Bike.manual(top_mph: 29, watts: nil, throttle: false) }
+
+    it "fails a state capping assist at 28 mph" do
+      expect(rules.find { it[:id] == :speed }).to include(status: :fail, note: :speed_past_cap, args: {past: 28, cap: 28})
+    end
+
+    context "in a state with a higher cap" do
+      let(:law) { EbikeRuleServices::StateLaws.find("IN").merge(mph: 30) }
+
+      it "leaves the speed to check" do
+        expect(rules.find { it[:id] == :speed }).to include(status: :check, note: :speed_past, args: {past: 28, cap: 30})
+      end
+    end
+  end
+
   context "with a Class 3 bike with a throttle in Colorado" do
     let(:abbreviation) { "CO" }
     let(:attributes) { super().merge(e_bike_class: 3, top_assist_mph: 28, throttle: true) }
@@ -27,6 +43,23 @@ RSpec.describe EbikeRuleServices::Evaluator do
     it "is legal, with its throttle to check" do
       expect(statuses).to eq(classes: :pass, power: :pass, speed: :pass, throttle: :check)
       expect(described_class.verdict(rules)).to eq :yellow
+    end
+
+    context "whose throttle the catalog records stopping at 20 mph" do
+      let(:attributes) { super().merge(throttle_mph: 20) }
+
+      it "passes its throttle" do
+        expect(rules.find { it[:id] == :throttle }).to include(status: :pass, note: :class_3_throttle_within, args: {mph: 20})
+        expect(described_class.verdict(rules)).to eq :green
+      end
+    end
+
+    context "whose throttle the catalog records past 20 mph" do
+      let(:attributes) { super().merge(throttle_mph: 28) }
+
+      it "fails its throttle" do
+        expect(rules.find { it[:id] == :throttle }).to include(status: :fail, note: :class_3_throttle_over, args: {mph: 28})
+      end
     end
   end
 

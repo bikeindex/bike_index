@@ -3,7 +3,8 @@ name: frontend-conventions
 description: >-
   Bike Index's frontend conventions — Tailwind class prefixing (`tw:`),
   the standard `twinput`/`twlabel`/`twlink` form/link classes, the
-  `number_display` helper for numbers, the UI component library rule
+  `number_display` helper for numbers, `Counts` for site-wide figures
+  (bikes registered, recoveries, organizations), the UI component library rule
   (every button is `UI::Button`/`UI::ButtonLink`, every
   typeahead/autocomplete is `UI::Forms::Combobox`, never hand-rolled
   markup), that **helpers are deprecated — render a view component
@@ -44,6 +45,7 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 - **Every number** renders with `number_display(number)` — including one composed into a string: `[number_display(bike_count), organization.short_name].join(" ")` wraps the number, not the string.
   - "Number" includes counts, distances and quantities — anything whose magnitude is the point.
   - **Not a year.** `number_display` is `number_with_delimiter`, so it renders 2015 as "2,015". Emit a year bare, the way `bike_title_html` and the search result cards do — nothing in `app/` wraps one. The same delimiter argument applies to any identifier that only looks numeric.
+- **A site-wide figure comes from `Counts`** (`app/services/counts.rb`) — bikes registered (`total_bikes`), stolen (`stolen_bikes`), recoveries, the recovered value, organizations. Read several in one round trip with `Counts.retrieve_many("total_bikes", "recoveries")`. Never a live `Bike.count` / `Organization.count` on a public page, which counts the whole table on every render, and never a number typed into copy, which goes stale. `UpdateCountsJob` refreshes them hourly, so a new figure is a new `COUNT_KEYS` entry with an `assign_*`, not a query in the view. Admin screens that want the exact live number are the exception. A dev server shows whatever its Redis holds, not this workspace's database — `bin/rails setup:load_counts` recomputes them.
 - **Currency amounts** use `amount_display(obj)` instead of `number_display` directly. It takes an object that responds to `amount_cents`, `amount`, `currency_symbol`, and `currency_name` (e.g. a `MarketplaceListing`), and renders the symbol + `number_display(amount)` together. Don't reach for `number_to_currency` or roll your own.
 - **Every phone number** renders through `Atoms::Phone::Component` — never a hand-rolled `tel:` link or `number_to_phone`. It links by default; pass `skip_link: true` for plain text. See `app/components/atoms/phone/`. Non-markup callers that need the formatted string (a form field value, a translation interpolation) use `Phonifyer.display`.
 - **Every date/time** renders through `UI::Time::Component` — `render(UI::Time::Component.new(time: some_time))`. It emits the client-localized `localizeTime` span the frontend JS converts to the viewer's timezone. This is the *only* way to show a time: never `l(time, ...)`, `strftime`, `time_ago_in_words`, or a hand-written `localizeTime` span. Pass `format: :localize_time_precise` when you need seconds precision (default is `:localize_time`). It self-hides when `time` is nil, so no surrounding `if` guard is needed.

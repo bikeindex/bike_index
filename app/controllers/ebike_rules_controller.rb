@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class EbikeRulesController < ApplicationController
-  LOOKUP_PARAMS = %i[bike manual e_bike_class watts throttle].freeze
+  LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle].freeze
 
   def show
     # the form's state without JavaScript, which can't send it to the state's own page
@@ -26,18 +26,22 @@ class EbikeRulesController < ApplicationController
 
     assign_meta(state)
     lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), state:, detected_state:)
+    return render(Pages::EbikeRules::Check::Component.new(lookup:, page_title: @page_title)) if turbo_frame_request?
+
     registered_count, recoveries_count = Counts.retrieve_many("total_bikes", "recoveries")
     render Pages::EbikeRules::Show::Component.new(lookup:, manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
-      registered_count:, recoveries_count:)
+      registered_count:, recoveries_count:, page_title: @page_title, default_title:)
   end
 
   private
 
   def state_path(state, query = {}) = ebike_rules_state_path(state[:abbr].downcase, query)
 
+  def default_title = translation(:title, controller_method: :show)
+
   # The state's own, however the page was reached - a check's bike params don't change them
   def assign_meta(state)
-    return @page_title = translation(:title, controller_method: :show) if state.nil?
+    return @page_title = default_title if state.nil?
 
     name = state[:name]
     law = EbikeRuleServices::StateLaws.find(state[:abbr])
