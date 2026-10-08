@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module EbikeRules
+module EbikeRuleServices
   # Checks a bike against a state's law, one row per limit. Each row's status is :pass, :check
   # (legal, with a rule for the rider to follow), :fail or :info, and its note is a symbol
   # naming what the limit means for this bike, with the values that note needs in args

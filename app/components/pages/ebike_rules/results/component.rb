@@ -17,8 +17,8 @@ module Pages
           @bike = lookup.bike
           @state = lookup.state
           @law = lookup.law
-          @rules = @law ? ::EbikeRules::Evaluator.rules(law: @law, bike: @bike) : []
-          @verdict = ::EbikeRules::Evaluator.verdict(@rules)
+          @rules = @law ? EbikeRuleServices::Evaluator.rules(law: @law, bike: @bike) : []
+          @verdict = EbikeRuleServices::Evaluator.verdict(@rules)
         end
 
         private
@@ -63,7 +63,7 @@ module Pages
         end
 
         def other_classification
-          name = ::EbikeRules::StateLaws.classification_name(@state[:abbr], @bike.e_vehicle_classifications)
+          name = EbikeRuleServices::StateLaws.classification_name(@state[:abbr], @bike.e_vehicle_classifications)
           name ? translation(".falls_under", state: @state[:name], name:) : translation(".may_be_moped")
         end
 

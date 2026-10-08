@@ -6,13 +6,13 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   before { stub_bikebook_catalog }
 
   let(:bike) do
-    EbikeRules::Bike.new(bikebook_id: "m/trek/2025/verve", manufacturer_name: "Trek", model: "Verve+ 2", first_year: 2025,
+    EbikeRuleServices::Bike.new(bikebook_id: "m/trek/2025/verve", manufacturer_name: "Trek", model: "Verve+ 2", first_year: 2025,
       e_bike_class: 1, e_vehicle_classifications: [], watts: 250, top_assist_mph: 20, throttle: false, throttle_mph: nil,
       ul2849: :certified, ul2271: :unknown, photo_url: "https://bikebook.bikeindex.org/trek/2025/verve.jpg")
   end
   let(:abbreviation) { "IN" }
   let(:lookup) do
-    EbikeRules::Lookup.new(state: EbikeRules::StateLaws.state(abbreviation), detected_state: nil, bikebook_id: bike.bikebook_id,
+    EbikeRuleServices::Lookup.new(state: EbikeRuleServices::StateLaws.state(abbreviation), detected_state: nil, bikebook_id: bike.bikebook_id,
       manual: false, manual_class: 2, manual_watts: nil, manual_throttle: true, bike:, errors: [], submitted: true)
   end
   let(:component) { render_inline(described_class.new(lookup:)) }
@@ -35,7 +35,7 @@ RSpec.describe Pages::EbikeRules::Results::Component, type: :component do
   end
 
   context "with a bike entered by hand" do
-    let(:bike) { EbikeRules::Bike.manual(e_bike_class: 3, watts: 750, throttle: true) }
+    let(:bike) { EbikeRuleServices::Bike.manual(e_bike_class: 3, watts: 750, throttle: true) }
     let(:abbreviation) { "CO" }
 
     it "renders the rule to check, with no photo and unknown certifications" do

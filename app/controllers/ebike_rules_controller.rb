@@ -6,16 +6,16 @@ class EbikeRulesController < ApplicationController
   def show
     # the form's state without JavaScript, which can't send it to the state's own page
     if params.key?(:state)
-      chosen = EbikeRules::StateLaws.state(params[:state])
+      chosen = EbikeRuleServices::StateLaws.state(params[:state])
       query = request.query_parameters.except("state")
       return redirect_to(chosen ? state_path(chosen, query) : ebike_rules_path(query), status: :moved_permanently)
     end
 
     abbr = params[:abbr]
-    state = abbr && (EbikeRules::StateLaws.state(abbr) || raise(ActionController::RoutingError, "Not Found"))
+    state = abbr && (EbikeRuleServices::StateLaws.state(abbr) || raise(ActionController::RoutingError, "Not Found"))
     return redirect_to(state_path(state, request.query_parameters), status: :moved_permanently) if abbr && abbr != abbr.downcase
 
-    detected_state = EbikeRules::StateLaws.state_from_location(request_location_hash)
+    detected_state = EbikeRuleServices::StateLaws.state_from_location(request_location_hash)
     if state.nil?
       # which state it goes to depends on where the visitor is, so neither Cloudflare nor a browser keeps it
       response.headers["Cache-Control"] = "no-store"
@@ -25,7 +25,7 @@ class EbikeRulesController < ApplicationController
     end
 
     assign_meta(state)
-    lookup = EbikeRules::Lookup.from_params(params.permit(*LOOKUP_PARAMS), state:, detected_state:)
+    lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), state:, detected_state:)
     registered_count, recoveries_count = Counts.retrieve_many("total_bikes", "recoveries")
     render Pages::EbikeRules::Show::Component.new(lookup:, manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
       registered_count:, recoveries_count:)
@@ -40,7 +40,7 @@ class EbikeRulesController < ApplicationController
     return @page_title = translation(:title, controller_method: :show) if state.nil?
 
     name = state[:name]
-    law = EbikeRules::StateLaws.find(state[:abbr])
+    law = EbikeRuleServices::StateLaws.find(state[:abbr])
     @page_url = ebike_rules_state_url(state[:abbr].downcase)
     @page_title = translation(:state_title, state: name, controller_method: :show)
     @page_description = if law

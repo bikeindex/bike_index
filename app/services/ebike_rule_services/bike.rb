@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module EbikeRules
+module EbikeRuleServices
   # A bike checked against a state's e-bike rules: a Bike Book model, or one entered by hand,
   # which has no bikebook_id. e_bike_class is nil for a motorized vehicle that isn't Class 1, 2 or 3,
   # and e_vehicle_classifications are the ids its catalog record carries.

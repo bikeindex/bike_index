@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module EbikeRules
+module EbikeRuleServices
   # A check of one bike against one state: the state from its page's path, the bike from the query.
   # Only the bike's fields make it a check, so a state's page alone shows no errors
   Lookup = Data.define(:state, :detected_state, :bikebook_id, :manual, :manual_class, :manual_watts,

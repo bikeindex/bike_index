@@ -6,7 +6,7 @@ RSpec.describe Pages::EbikeRules::LawDetails::Component, type: :component do
   before { stub_bikebook_catalog }
 
   let(:today) { Date.new(2026, 10, 8) }
-  let(:component) { render_inline(described_class.new(law: EbikeRules::StateLaws.find(abbreviation, today:))) }
+  let(:component) { render_inline(described_class.new(law: EbikeRuleServices::StateLaws.find(abbreviation, today:))) }
 
   context "with rules still to come" do
     let(:abbreviation) { "CA" }

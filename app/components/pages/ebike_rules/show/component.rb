@@ -21,7 +21,7 @@ module Pages
         # The state's own page; without JavaScript, the controller sends a chosen state there
         def form_path = @lookup.state ? ebike_rules_state_path(@lookup.state[:abbr].downcase) : ebike_rules_path
 
-        def state_options = ::EbikeRules::StateLaws::STATES.map { [it[:name], it[:abbr]] }
+        def state_options = EbikeRuleServices::StateLaws::STATES.map { [it[:name], it[:abbr]] }
 
         def field_error(field, text)
           return unless error?(field)

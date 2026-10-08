@@ -2,16 +2,16 @@
 
 require "rails_helper"
 
-RSpec.describe EbikeRules::Evaluator do
+RSpec.describe EbikeRuleServices::Evaluator do
   before { stub_bikebook_catalog }
 
   let(:attributes) do
     {bikebook_id: "m/x/2025/y", manufacturer_name: "X", model: "Y", first_year: 2025, e_bike_class: 1, e_vehicle_classifications: [],
      watts: 250, top_assist_mph: 20, throttle: false, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
   end
-  let(:bike) { EbikeRules::Bike.new(**attributes) }
+  let(:bike) { EbikeRuleServices::Bike.new(**attributes) }
   let(:abbreviation) { "IN" }
-  let(:law) { EbikeRules::StateLaws.find(abbreviation) }
+  let(:law) { EbikeRuleServices::StateLaws.find(abbreviation) }
   let(:rules) { described_class.rules(law:, bike:) }
   let(:statuses) { rules.to_h { [it[:id], it[:status]] } }
 
@@ -41,7 +41,7 @@ RSpec.describe EbikeRules::Evaluator do
   end
 
   context "with a law whose limits aren't yet in force" do
-    let(:law) { EbikeRules::StateLaws.find("NC", today: Date.new(2026, 11, 30)) }
+    let(:law) { EbikeRuleServices::StateLaws.find("NC", today: Date.new(2026, 11, 30)) }
     let(:attributes) { super().merge(e_bike_class: 3, watts: 1_000, top_assist_mph: 28) }
 
     it "says when they take effect rather than checking against them, and points to today's rules" do
@@ -92,7 +92,7 @@ RSpec.describe EbikeRules::Evaluator do
   end
 
   context "with a law that caps neither power nor speed" do
-    let(:law) { EbikeRules::StateLaws.find("IN").merge(watt_cap: nil, mph: nil) }
+    let(:law) { EbikeRuleServices::StateLaws.find("IN").merge(watt_cap: nil, mph: nil) }
 
     it "passes" do
       expect(rules.first(3).map { it[:note] }).to eq %i[class_recognized no_watt_cap no_speed_cap]

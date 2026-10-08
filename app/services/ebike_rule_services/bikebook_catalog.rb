@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module EbikeRules
+module EbikeRuleServices
   # The published Bike Book catalog, which /bikebook searches. Each read is nil when it doesn't answer
   module BikebookCatalog
     extend Functionable

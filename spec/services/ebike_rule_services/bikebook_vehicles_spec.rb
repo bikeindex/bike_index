@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe EbikeRules::BikebookVehicles do
+RSpec.describe EbikeRuleServices::BikebookVehicles do
   before { stub_bikebook_catalog }
 
   describe "find" do
