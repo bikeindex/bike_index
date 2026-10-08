@@ -4,6 +4,7 @@ en:
     pages:
       bikebook:
         show:
+          about_bikebook: About Bike Book
           activity: Activity
           any_activity: Any activity
           any_configuration: Any configuration
@@ -12,6 +13,7 @@ en:
           any_suspension: Any suspension
           any_vehicle_type: Any vehicle type
           applied_filters: Applied filters
+          byline: A free reference from Bike Index, the non-profit bike registry.
           configuration: Configuration
           failed: The catalog didn't load. Reload the page to try again.
           loading: Loading the catalog…
@@ -24,6 +26,9 @@ en:
           search_placeholder: Search by manufacturer or model…
           sort: Sort
           suspension: Suspension
+          tagline_html: >-
+            The world’s bicycle library — search, compare, and find your next ride
+            across %{models_count}+ models.
           vehicle_type: Vehicle type
           view_a_vehicle: View a vehicle
           year: Year
