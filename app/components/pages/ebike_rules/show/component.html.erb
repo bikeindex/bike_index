@@ -211,29 +211,13 @@
               </div>
             </div>
 
-            <dl
-              class="
-                tw:grid tw:grid-cols-3 tw:gap-2 tw:border-y
-                tw:border-gray-200 tw:py-3 tw:dark:border-gray-700
-              "
-            >
-              <% [[translation(".assist"), card[:assist]], [translation(".top_assist"), card[:speed]], [translation(".motor"), card[:motor]]].each do |label, value| %>
-                <div>
-                  <dt
-                    class="
-                      tw:text-xs tw:font-bold tw:tracking-[.06em]
-                      tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
-                    "
-                  >
-                    <%= label %>
-                  </dt>
-
-                  <dd class="tw:mt-0.5 tw:text-[15px] tw:font-bold">
-                    <%= value %>
-                  </dd>
-                </div>
+            <div class="tw:border-y tw:border-gray-200 tw:py-3 tw:dark:border-gray-700">
+              <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+                <% [[translation(".assist"), card[:assist]], [translation(".top_assist"), card[:speed]], [translation(".motor"), card[:motor]]].each do |label, value| %>
+                  <%= render(UI::DefinitionList::Row::Component.new(label:, value:)) %>
+                <% end %>
               <% end %>
-            </dl>
+            </div>
 
             <p
               class="

@@ -90,35 +90,15 @@
               >
                 <%= law[:description] %>
               </p>
-              <dl
-                class="
-                  tw:mb-4 tw:grid
-                  tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
-                  tw:gap-x-8
-                "
-              >
-                <% RULE_IDS.each do |id| %>
-                  <div
-                    class="
-                      tw:border-t tw:border-gray-100 tw:py-2.5
-                      tw:dark:border-gray-800
-                    "
-                  >
-                    <dt class="tw:text-sm tw:font-bold">
-                      <%= render(Pages::EbikeRules::RuleLabel::Component.new(id:)) %>
-                    </dt>
-
-                    <dd
-                      class="
-                        tw:mt-0.5 tw:text-[15px] tw:text-gray-700
-                        tw:dark:text-gray-300
-                      "
-                    >
+              <div class="tw:mb-4">
+                <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+                  <% RULE_IDS.each do |id| %>
+                    <%= render(UI::DefinitionList::Row::Component.new(label: render(Pages::EbikeRules::RuleLabel::Component.new(id:)))) do %>
                       <%= render(Pages::EbikeRules::RuleValue::Component.new(law:, id:)) %>
-                    </dd>
-                  </div>
+                    <% end %>
+                  <% end %>
                 <% end %>
-              </dl>
+              </div>
               <%= render(Pages::EbikeRules::LawDetails::Component.new(law:)) %>
             <% else %>
               <p

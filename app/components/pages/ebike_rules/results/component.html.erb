@@ -84,29 +84,14 @@
           <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: @bike.e_bike_class, size: :lg)) %>
         </div>
 
-        <dl
-          class="
-            tw:grid tw:grid-cols-3 tw:gap-3 tw:border-y tw:border-gray-200
-            tw:py-4 tw:dark:border-gray-700
-          "
-        >
-          <% specs.each do |label, value| %>
-            <div class="tw:min-w-0">
-              <dt
-                class="
-                  tw:text-xs tw:font-bold tw:tracking-[.06em]
-                  tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
-                "
-              >
-                <%= label %>
-              </dt>
-
-              <dd class="tw:mt-1 tw:font-header tw:text-[clamp(16px,2.2vw,20px)] tw:font-bold <%= "tw:text-gray-600 tw:dark:text-gray-400" if value.nil? %>">
-                <%= value || translation(".not_provided") %>
-              </dd>
-            </div>
+        <div class="tw:border-y tw:border-gray-200 tw:py-4 tw:dark:border-gray-700">
+          <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+            <% specs.each do |label, value| %>
+              <%= render(UI::DefinitionList::Row::Component.new(label:, value:, render_with_no_value: true,
+                no_value_text: translation(".not_provided"))) %>
+            <% end %>
           <% end %>
-        </dl>
+        </div>
 
         <div class="tw:flex tw:flex-col tw:gap-3.5">
           <h3 class="tw:text-[15px] tw:font-bold">
