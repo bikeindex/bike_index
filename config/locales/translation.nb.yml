@@ -5676,6 +5676,19 @@ nb:
             created: Opprettet
             notification_number: Melding#
             resolved: Løst
+          new:
+            create_parking_notification: Opprett parkeringsvarsel
+            internal_notes: "%{org_name} interne notater"
+            model: Modell
+            new_unregistered_notification: Ny uregistrert melding
+            not_shown_to_user: ikke vist for brukeren
+            notification_because: Varsel fordi
+            parking_notification: Parkeringsvarsel
+            photo: Foto
+            registration_form_settings: Innstillinger for registreringsskjema
+            serial_number: Serienummer
+            vehicle_info: Kjøretøyinformasjon
+            vehicle_type: Bil type
         register_settings:
           browser_only: Disse innstillingene brukes kun i nettleseren din – de påvirker
             ikke andre brukere
@@ -5688,9 +5701,18 @@ nb:
             registreringen ikke er fullført, med en lenke for å fullføre den.
           single_page: Registreringsskjema på én side
           update: Oppdater
+          old_unregistered_notification_view: Bruk den gamle varslingssiden for uregistrerte
+          unregistered_notification_page: Uregistrert varslingsside
         registrations:
           new:
             registration_form_settings: Innstillinger for registreringsskjema
+        parking_notification_location:
+          address_or_intersection: Adresse eller veikryss
+          enter_address_manually: Skriv inn adressen manuelt
+          map_hint: Dra kartet slik at nålen markerer stedet
+          map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
+            angitt fra enheten din.
+          set_on_map: Sett på kartet
       registrations:
         show:
           bike_details:
@@ -5856,12 +5878,8 @@ nb:
               unavailable_vehicle_not_registered_with_organization: Generelle meldinger
                 kan bare sendes til kjøretøy registrert med %{organization_name}
             parking_notification_form:
-              address_or_intersection: Adresse eller veikryss
               create_parking_notification: Opprett et nytt parkeringsvarsel
               impound_this_bike_type: Beslaglegg dette %{bike_type}
-              map_hint: Dra kartet slik at nålen markerer stedet
-              map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
-                angitt fra enheten din.
               not_shown_to_user: ikke vist for brukeren
               parking_notification_notes: "%{org_name} interne notater"
             parking_notification_show:
@@ -6420,7 +6438,6 @@ nb:
               skrevet inn her overføres.
             yes_start_over: Ja, start på nytt
           step2_fields:
-            add_another_color: Legg til en annen farge
             additional_serial_sticker_number: Ekstra serie-/klistremerkenummer
             affiliation: "%{org_name} tilknytning"
             are_you_certain: Er du sikker?
@@ -6428,7 +6445,6 @@ nb:
             bike_details: "%{cycle_type} detaljer"
             bottom_bracket: Kranklager
             cm: cm
-            color: Farge
             complete_registration: Fullfør registreringen %{cycle_type}
             contact_info: Kontaktinformasjon
             database_public_note: Databasen vår er offentlig! Du kan justere personverninnstillingene
@@ -6467,7 +6483,6 @@ nb:
               %{cycle_type}
             phone_required_org: Telefonnummer kreves for å registrere seg hos %{org_name}
             phone_required_stolen: Telefon kreves for å registrere en stjålet %{cycle_type}
-            primary_color_blank: Primærfarge — f.eks. svart
             read_how_to_find_html: Les om %{how_to_find_link} <small>(åpnes i eget
               vindu)</small>
             rear_dropouts: Bakre gaffelender
@@ -6475,8 +6490,6 @@ nb:
             register_with_org_description: "%{org_name} vil kunne se og hjelpe til
               med å administrere denne registreringen."
             registration_type: Registreringstype
-            remove_additional_color: Fjern farge
-            second_color_blank: Andre farge — f.eks. rød
             serial_help_intro: 'De fleste sykler har serienummeret sitt gravert inn
               i rammen. Se etter serienummeret ditt:'
             serial_location_bottom_bracket: undersiden av kranklageret
@@ -6489,8 +6502,6 @@ nb:
             stolen: Stjålet
             stolen_description: Denne %{cycle_type} har blitt stjålet
             student_id: Student ID
-            third_color_blank: Tredje farge
-            up_to_3: opptil 3
             very_very_few_bikes_html: "<em>Svært</em> få %{cycle_types} lages uten
               serienummer. Med mindre denne %{cycle_type}:"
             view_serial_guide: Se hele serienummerguiden
@@ -6498,6 +6509,14 @@ nb:
             wheres_my_serial: Hvor er serienummeret mitt?
             without_serial: Denne %{cycle_type} ble laget uten serienummer
             without_serial_number: Denne %{cycle_type} ble laget uten serienummer
+          color_fields:
+            add_another_color: Legg til en annen farge
+            color: Farge
+            primary_color_blank: Primærfarge — f.eks. svart
+            remove_additional_color: Fjern farge
+            second_color_blank: Andre farge — f.eks. rød
+            third_color_blank: Tredje farge
+            up_to_3: opptil 3
         views:
           confirm:
             confirming_your_email: Bekrefter e-postadressen din
