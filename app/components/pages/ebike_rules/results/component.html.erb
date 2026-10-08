@@ -99,8 +99,8 @@
             <%= translation(".ul_certification") %>
           </h3>
 
-          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2849, status: @bike.ul2849, manual: @bike.manual?)) %>
-          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2271, status: @bike.ul2271, manual: @bike.manual?)) %>
+          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2849, status: @bike.ul2849)) %>
+          <%= render(Pages::EbikeRules::UlBadge::Component.new(standard: 2271, status: @bike.ul2271)) %>
         </div>
 
         <% if @bike.manual? %>

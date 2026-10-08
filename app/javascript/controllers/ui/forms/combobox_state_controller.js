@@ -17,24 +17,18 @@ export default class extends Controller {
     const query = target.value.trim().toLowerCase()
     this.element.querySelectorAll('[role=listbox]').forEach((listbox) => {
       const options = [...listbox.querySelectorAll(':scope > [role=option]')]
-      options.sort((a, b) => score(a, query) - score(b, query) || a.dataset.index - b.dataset.index)
-        .forEach((option) => listbox.append(option))
-    })
-  }
-
-  // the server's alphabetical order, to fall back on
-  initialize () {
-    this.element.querySelectorAll('[role=listbox]').forEach((listbox) => {
-      listbox.querySelectorAll(':scope > [role=option]').forEach((option, index) => { option.dataset.index = index })
+      const scores = new Map(options.map((option) => [option, score(option, query)]))
+      // ties fall back to the alphabetical order the server rendered
+      const ranked = options.toSorted((a, b) => scores.get(a) - scores.get(b) || a.textContent.localeCompare(b.textContent))
+      if (ranked.some((option, index) => option !== options[index])) listbox.append(...ranked)
     })
   }
 }
 
 function score (option, query) {
+  if (!query || option.dataset.value.toLowerCase() === query) return 0
+
   const name = option.textContent.trim().toLowerCase()
-  if (!query) return 0
-  if (option.dataset.value.toLowerCase() === query) return 0
   if (name.startsWith(query)) return 1
-  if (name.split(/\s+/).some((word) => word.startsWith(query))) return 2
-  return 3
+  return name.split(/\s+/).some((word) => word.startsWith(query)) ? 2 : 3
 }

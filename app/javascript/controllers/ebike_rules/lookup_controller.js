@@ -3,6 +3,7 @@ import { Turbo } from '@hotwired/turbo-rails'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
 import { collapse } from 'utils/collapse_utils'
+import { replaceUrl } from 'bikebook/replace_url'
 
 const RESULT_FRAME = 'ebike-rules-check'
 
@@ -16,7 +17,7 @@ export default class extends Controller {
   static values = { manifestUrl: String, path: String, display: String, failedText: String, title: String }
 
   async connect () {
-    this.#stateField.removeAttribute('name')
+    this.lastUrl = window.location.href.split('#')[0]
     this.observers = [this.#watchCleared(this.#stateField, () => this.chooseState())]
     let catalog
     try {
@@ -56,18 +57,18 @@ export default class extends Controller {
     this.#leaveCheck(this.element.action)
   }
 
-  // A check in the form comes along to the new state; clearing the state leaves the check waiting for one.
-  // The gem restores the field's name on a selection
+  // A check in the form comes along to the new state, whose page it loads even without one for its title;
+  // clearing the state leaves the check waiting for one
   chooseState () {
-    this.#stateField.removeAttribute('name')
     const abbreviation = this.#stateField.value.toLowerCase()
-    this.element.action = abbreviation ? `${this.pathValue}/${abbreviation}` : this.pathValue
-    if (abbreviation) {
-      this.stateNoteTarget.replaceChildren()
-      return this.#visit(this.#checkUrl ?? this.element.action)
+    if (!abbreviation) {
+      this.element.action = this.pathValue
+      document.title = this.titleValue
+      return this.#awaitState()
     }
-    document.title = this.titleValue
-    this.#awaitState()
+    this.element.action = `${this.pathValue}/${abbreviation}`
+    this.stateNoteTarget.replaceChildren()
+    this.#visit(this.#checkUrl ?? this.element.action)
   }
 
   // The gem leaves the autocompleted part of a pick selected, and the catalog's "(current)" says
@@ -78,14 +79,12 @@ export default class extends Controller {
       input.value = input.value.replace(/ \(current\)$/, '')
       input.setSelectionRange(input.value.length, input.value.length)
     }
-    this.#stateField.value ? this.#visit(this.#checkUrl ?? this.element.action) : this.#awaitState()
+    this.#check()
   }
 
   checkManual () {
     const watts = this.element.elements.watts
-    if (!watts.checkValidity()) return watts.reportValidity()
-
-    this.#stateField.value ? this.#visit(this.#checkUrl) : this.#awaitState()
+    watts.checkValidity() ? this.#check() : watts.reportValidity()
   }
 
   focusState () {
@@ -101,15 +100,28 @@ export default class extends Controller {
     target.querySelector('[role=status]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }
 
+  // The state is the form's path rather than a field
   get #checkUrl () {
     const fields = new FormData(this.element)
+    fields.delete('state')
     if (fields.get('vehicle_models') || this.#manual) return `${this.element.action}?${new URLSearchParams(fields)}`
   }
 
-  // The gem announces a prefilled selection on connecting, which mustn't reload the check it's showing.
-  // A state's or the form's hash doesn't make it another check
+  // Without a check left in the form - a cleared bike - there's nothing to ask the server for
+  #check () {
+    if (!this.#stateField.value) return this.#awaitState()
+
+    const url = this.#checkUrl
+    url ? this.#visit(url) : this.#leaveCheck(this.element.action)
+  }
+
+  // The gem announces a prefilled selection on connecting, and Enter then blur both change the panel,
+  // neither of which is another check
   #visit (url) {
-    if (url !== window.location.href.split('#')[0]) Turbo.visit(url, { frame: RESULT_FRAME, action: 'advance' })
+    if (url === this.lastUrl) return
+
+    this.lastUrl = url
+    Turbo.visit(url, { frame: RESULT_FRAME, action: 'advance' })
   }
 
   // Without a state there's nothing to check a bike against, so it waits in the URL for one
@@ -123,8 +135,9 @@ export default class extends Controller {
   }
 
   #leaveCheck (url) {
+    this.lastUrl = url
     document.getElementById(RESULT_FRAME).replaceChildren()
-    window.history.replaceState(window.history.state, '', url)
+    replaceUrl(new URL(url))
   }
 
   #toggleManual (manual) {

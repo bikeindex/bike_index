@@ -225,14 +225,7 @@
     <% end %>
   </div>
 
-  <%= helpers.turbo_frame_tag "ebike-rules-check", class: "tw:block" do %>
-    <%# A frame response's layout has no title, and the state's is in this one %>
-    <%= tag.span(hidden: true, data: {page_title: @page_title}) %>
-
-    <% if @lookup.result? %>
-      <%= render(Pages::EbikeRules::Results::Component.new(lookup: @lookup)) %>
-    <% end %>
-  <% end %>
+  <%= render(Pages::EbikeRules::Check::Component.new(lookup: @lookup, page_title: @page_title)) %>
 
   <section class="tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900 <%= @lookup.result? ? "tw:mt-10" : "tw:mt-14" %>">
     <div class="tw:py-[clamp(40px,7vw,64px)] <%= SECTION_CLASSES %>">

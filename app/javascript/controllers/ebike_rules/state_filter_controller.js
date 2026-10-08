@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
+import { replaceUrl } from 'bikebook/replace_url'
 
 // Connects to data-controller='ebike-rules--state-filter'
 // Narrows the state list to names matching the field. A state's hash is in the URL while it's open,
@@ -28,8 +29,9 @@ export default class extends Controller {
     const open = trigger.getAttribute('aria-expanded') === 'true'
     if (!open && window.location.hash !== hash) return
 
-    const { pathname, search } = window.location
-    window.history.replaceState(window.history.state, '', `${pathname}${search}${open ? hash : ''}`)
+    const url = new URL(window.location.href)
+    url.hash = open ? hash : ''
+    replaceUrl(url)
   }
 
   filter () {
