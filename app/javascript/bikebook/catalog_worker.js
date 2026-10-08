@@ -49,7 +49,7 @@ async function load ({ manifestUrl, ids }) {
   // the US jurisdiction's classifications are the three e-bike classes
   classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications ?? {}).map(([id, record]) =>
     [id, { ...record, title: `${record.jurisdiction} ${record.name}${record.jurisdiction === 'US' ? ' e-bike' : ''}` }]))
-  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index) }
+  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index), modelsCount: models.length }
 }
 
 // Each filter's choices, with how many models choosing it alone matches

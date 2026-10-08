@@ -1,9 +1,10 @@
 import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
+import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
-import { brakesAt, tireWidth, tireWidthDifference, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
-import { array, isNumber, join, present, slice } from 'bikebook/templates/values'
+import { brakesAt, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
 const priced = (vehicle) => latest(array(vehicle.years).filter((year) => isNumber(year.original_msrp)))
@@ -34,7 +35,7 @@ const gearingParts = (cogs) => (presenter, { count, teeth }) => {
   ]
 }
 
-const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'wheelbase', 'standover']
+const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
 
 // `better` is the sign of a difference that's an improvement: a lower price, a longer range. 0 for one that's
 // neither, and none for a value that isn't compared. `parts` splits a value whose parts are each compared, and
@@ -84,7 +85,17 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
   })
   const missing = html`<span class="twless-strong">—</span>`
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
-  const tireDifference = (change, width) => tireWidthDifference(presenter, change, width)
+  const length = {
+    ...geometry.find(({ key }) => key === 'wheelbase'),
+    label: html`Overall length (est.) ${tooltip({ text: 'The wheelbase plus each wheel’s radius, estimating its tire as tall as it’s wide' })}`,
+    read: (vehicle) => {
+      const listed = frames[named.indexOf(vehicle)]?.wheels
+      return listed ? presenter.rounded(sum(Object.values(listed))) : null
+    },
+    better: 0
+  }
+  // in mm, though a wide tire reads in inches
+  const tireDifference = (change) => presenter.measurement(change, 'mm')
   const wheelRows = ['front', 'rear'].flatMap((position) => [
     {
       label: `${presenter.humanize(position)} wheel`,
@@ -113,7 +124,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
       : Math.sign(change) === row.better ? 'tw:text-green-700 tw:dark:text-green-400' : 'tw:text-red-700 tw:dark:text-red-400'
     // a currency symbol, which carries its name as a title, stays gray like a unit
     return html`<span class="tw:block tw:text-xs ${color} tw:[&_span[title]]:text-gray-400 tw:dark:[&_span[title]]:text-gray-500">${
-      change > 0 ? '+' : '−'}${row.amount?.(Math.abs(change), number) ?? fallback(Math.abs(change))}</span>`
+      change > 0 ? '+' : '−'}${row.amount?.(Math.abs(change)) ?? fallback(Math.abs(change))}</span>`
   }
   const compared = (row, vehicle) => vehicle !== first && row.better !== undefined && (row.comparable?.(vehicle, first) ?? true)
 
@@ -147,7 +158,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
         }
       }
     })
-  const geometryRecords = records([...geometry, WEIGHT])
+  const geometryRecords = records([...geometry, length, WEIGHT])
   const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
   const rows = [
     ...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []),

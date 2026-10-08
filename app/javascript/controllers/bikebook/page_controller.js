@@ -13,7 +13,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // Searches and compares the published catalog in the browser. A pick submits the form, and it, a
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
-  static targets = ['shell', 'page', 'status']
+  static targets = ['shell', 'page', 'status', 'tagline', 'countedTagline']
   static values = { manifestUrl: String, failedText: String, title: String }
 
   #scrolls = new Map()
@@ -34,6 +34,7 @@ export default class extends Controller {
       return this.#fail(error)
     }
     this.source = new CatalogComboboxSource(this.catalog)
+    this.#countModels()
     this.#render(url)
   }
 
@@ -100,6 +101,15 @@ export default class extends Controller {
     document.title = rendered.title ?? this.titleValue
     if (focus) this.pageTarget.querySelector('[autofocus]')?.focus()
     if (scroll) window.scrollTo(...scroll)
+  }
+
+  // down to the thousand (a smaller catalog's leading place), so the tagline stays true as the catalog grows
+  #countModels () {
+    const { modelsCount } = this.catalog
+    const place = 10 ** Math.min(3, String(modelsCount).length - 1)
+    const tagline = this.countedTaglineTarget.content.cloneNode(true)
+    tagline.querySelector('[data-models-count]').textContent = (Math.floor(modelsCount / place) * place).toLocaleString('en-US')
+    this.taglineTarget.replaceChildren(tagline)
   }
 
   #fail (error) {

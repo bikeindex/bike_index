@@ -55,9 +55,6 @@ export const brakesAt = (presenter, data, size) => {
 
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
 
-// A difference in tire width, in the unit the `width` it's of reads in
-export const tireWidthDifference = (presenter, change, width) => width > WIDE_TIRE ? tireInches(presenter, change) : presenter.measurement(change, 'mm')
-
 class ModelViewer {
   constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath, selectedSize }) {
     this.presenter = presenter
