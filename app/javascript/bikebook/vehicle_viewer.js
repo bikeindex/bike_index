@@ -2,6 +2,7 @@ import { html, nothing } from 'lit-html'
 import { classificationCard } from 'bikebook/templates/vehicles/classification_card'
 import { chosenSizes, pickedSizes, sizesParam } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
+import { frameGeometry } from 'bikebook/frame_geometry'
 import { geometryOverlay } from 'bikebook/templates/vehicles/geometry_overlay'
 import { modelViewer } from 'bikebook/templates/vehicles/model_viewer'
 import { toQuery } from 'bikebook/query'
@@ -45,7 +46,7 @@ export class VehicleViewer {
         ? classificationCard({ presenter: this.presenter, id: value, classification: data, removePath: remove })
         : modelViewer({ presenter: this.presenter, data, value, comparing, idSuffix: index + 1, others: value === baseline.value ? [] : [baseline.data], removePath: remove, classificationPath, selectedSize: selectedSizes.get(value) })
     })
-    const compared = { presenter: this.presenter, vehicles: models, sizes }
+    const compared = { presenter: this.presenter, vehicles: models, sizes, frames: models.map(({ data }, index) => frameGeometry(data, sizes[index])) }
     return html`${comparisonView && models.length ? html`${comparisonTable(compared)}${geometryOverlay(compared)}` : nothing}<div ?data-comparison=${comparisonView} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
       : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses} ${baselineSolo}"

@@ -3,9 +3,8 @@ import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
-import { array, join, present, slice } from 'bikebook/templates/values'
+import { array, isNumber, join, present, slice } from 'bikebook/templates/values'
 
-const isNumber = (value) => typeof value === 'number'
 const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
 const priced = (vehicle) => latest(array(vehicle.years).filter((year) => isNumber(year.original_msrp)))
 const currency = (vehicle) => priced(vehicle)?.original_msrp_currency ?? 'USD'
@@ -66,7 +65,7 @@ const GEARING = [
 ]
 
 // The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's
-export const comparisonTable = ({ presenter, vehicles, sizes }) => {
+export const comparisonTable = ({ presenter, vehicles, sizes, frames }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
@@ -144,12 +143,12 @@ export const comparisonTable = ({ presenter, vehicles, sizes }) => {
     columns: [
       { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
       ...named.map((vehicle, index) => {
-        const border = seriesBorder(vehicles[index].data, sizes[index], index)
+        const border = seriesBorder(frames[index], index)
         return {
           label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
           classes: 'tw:min-w-48 tw:align-top',
           // a model's name can wrap in its header, but not a value
-          cellClass: (record) => record === rows.at(-1) ? `tw:whitespace-nowrap ${border ?? ''}` : 'tw:whitespace-nowrap',
+          cellClass: (record) => `tw:whitespace-nowrap ${record === rows.at(-1) ? border : ''}`,
           cell: (record) => record.cell(index)
         }
       })

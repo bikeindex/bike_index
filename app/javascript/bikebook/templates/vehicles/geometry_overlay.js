@@ -1,5 +1,4 @@
 import { html, nothing, svg } from 'lit-html'
-import { frameGeometry } from 'bikebook/frame_geometry'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { sectionHeading } from 'bikebook/templates/vehicles/section'
 import { present } from 'bikebook/templates/values'
@@ -13,9 +12,9 @@ export const SERIES = [
   { color: '#059669', border: 'tw:border-b-[#059669]' }
 ]
 const PADDING = 30
-// mm from the bottom bracket and up from the ground that nearly every catalog frame fits inside, so the drawing keeps its scale as sizes
-// change, and widens only for a frame that doesn't fit
-const BOUNDS = { left: -850, right: 1250, bottom: 0, top: 1010 }
+// mm around the bottom bracket and up from the ground that nearly every catalog frame fits, so a larger size draws
+// larger rather than the drawing refitting
+const BOUNDS = { left: -850, right: 1250, top: 1010 }
 
 const point = ([x, y]) => `${Math.round(x * 10) / 10},${Math.round(-y * 10) / 10}`
 const path = (...lines) => lines.map(([start, ...rest]) => `M${point(start)}${rest.map((each) => `L${point(each)}`).join('')}`).join('')
@@ -30,26 +29,26 @@ const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headT
 }
 
 // The bottom border that keys a comparison table column to its frame, which the overlay draws in the same order
-export const seriesBorder = (data, size, index) => frameGeometry(data, size).missing.length ? null : `tw:border-b-4 ${SERIES[index].border}`
+export const seriesBorder = (frame, index) => frame.missing.length ? '' : `tw:border-b-4 ${SERIES[index].border}`
 
 // The compared models' frames in their `sizes`, standing on the same ground with their bottom brackets lined up,
 // each over the ones the comparison table columns left of it
-export const geometryOverlay = ({ presenter, vehicles, sizes }) => {
+export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
-  const frames = vehicles.map(({ data }, index) => {
-    const title = [named[index].manufacturer, named[index].model].filter(present).join(' ')
+  const labelled = named.map((vehicle, index) => {
+    const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
     const size = sizes[index]?.name
-    return { geometry: frameGeometry(data, sizes[index]), series: SERIES[index], title, size, label: present(size) ? `${title}, ${size}` : title }
+    return { geometry: frames[index], series: SERIES[index], title, size, label: present(size) ? `${title}, ${size}` : title }
   })
-  const drawn = frames.filter(({ geometry }) => geometry.missing.length === 0)
-  const undrawn = frames.filter(({ geometry }) => geometry.missing.length)
+  const drawn = labelled.filter(({ geometry }) => geometry.missing.length === 0)
+  const undrawn = labelled.filter(({ geometry }) => geometry.missing.length)
   if (drawn.length === 0) return nothing
 
   const xs = drawn.flatMap(({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius } }) => [rearAxle[0] - rearRadius, frontAxle[0] + frontRadius])
-  const ys = drawn.flatMap(({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headTop, seatTop, bottomBracketHeight } }) =>
-    [rearAxle[1] - rearRadius, frontAxle[1] - frontRadius, headTop[1], seatTop[1]].map((y) => y + bottomBracketHeight))
+  // the wheels stand on the ground, so only the frame's top reaches past it
+  const ys = drawn.flatMap(({ geometry: { headTop, seatTop, bottomBracketHeight } }) => [headTop[1], seatTop[1]].map((y) => y + bottomBracketHeight))
   const [left, top] = [Math.min(BOUNDS.left, ...xs) - PADDING, -Math.max(BOUNDS.top, ...ys) - PADDING]
-  const [width, height] = [Math.max(BOUNDS.right, ...xs) - left + PADDING, -Math.min(BOUNDS.bottom, ...ys) - top + PADDING]
+  const [width, height] = [Math.max(BOUNDS.right, ...xs) - left + PADDING, PADDING - top]
   const labels = presenter.kit.geometry.labels
 
   return html`<section aria-label="Geometry overlay" data-controller="bikebook--geometry-overlay" class="tw:mx-auto tw:mt-6 tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border
