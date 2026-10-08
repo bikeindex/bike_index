@@ -1,6 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
+import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice } from 'bikebook/templates/values'
@@ -34,7 +35,7 @@ const gearingParts = (cogs) => (presenter, { count, teeth }) => {
   ]
 }
 
-const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'wheelbase', 'standover']
+const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_angle', 'chainstay', 'standover', 'wheelbase']
 
 // `better` is the sign of a difference that's an improvement: a lower price, a longer range. 0 for one that's
 // neither, and none for a value that isn't compared. `parts` splits a value whose parts are each compared, and
@@ -84,6 +85,18 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
   })
   const missing = html`<span class="twless-strong">—</span>`
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
+  // the wheelbase out to each built wheel's edge
+  const length = {
+    ...geometry.find(({ key }) => key === 'wheelbase'),
+    label: html`Overall length (est.) ${tooltip({ text: 'The wheelbase plus each wheel’s radius, estimating its tire as tall as it’s wide' })}`,
+    read: (vehicle, size) => {
+      const radii = ['front', 'rear'].map((position) => wheels.get(vehicle)[position].built)
+        .map((wheel) => isNumber(wheel?.bsd) && isNumber(wheel?.tire_width) ? wheel.bsd / 2 + wheel.tire_width : null)
+      const wheelbase = size?.geometry?.wheelbase
+      return [wheelbase, ...radii].every(isNumber) ? presenter.rounded(wheelbase + radii[0] + radii[1]) : null
+    },
+    better: 0
+  }
   // in mm, though a wide tire reads in inches
   const tireDifference = (change) => presenter.measurement(change, 'mm')
   const wheelRows = ['front', 'rear'].flatMap((position) => [
@@ -148,7 +161,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
         }
       }
     })
-  const geometryRecords = records([...geometry, WEIGHT])
+  const geometryRecords = records([...geometry, length, WEIGHT])
   const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
   const rows = [
     ...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []),

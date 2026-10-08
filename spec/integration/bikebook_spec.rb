@@ -310,6 +310,11 @@ RSpec.describe "Bikebook", :js, type: :system do
       .and have_css(".tw\\:text-red-700", text: "−74.7")
     # in centimeters alone, without an imperial viewer's feet and inches
     expect(find("[aria-label='Comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d.]+\W*cm(\s*[−+][\d.]+\W*cm|\s*-)?\z/))
+    # the wheelbase out to each wheel's edge, below it and in its units, neither longer nor shorter better
+    expect(all("[aria-label='Comparison'] th[scope='row']").map(&:text).last(4)).to match(["Standover", "Wheelbase", /\AOverall length \(est\.\)/, "Weight"])
+    overall_length = find("[aria-label='Comparison'] tr", text: "Overall length")
+    expect(overall_length.all("td").map(&:text)).to match([/\A203\.8\W*cm\z/, /\A194\.6\W*cm\s*−9\.2\W*cm\z/])
+    expect(overall_length).to have_css(".tw\\:text-gray-500", text: "−9.2")
 
     visit current_url
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)
