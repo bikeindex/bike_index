@@ -2575,6 +2575,14 @@ it:
         registered_own: Il tuo %{bike_display} è registrato.
         safety_rules_sent: "%{bike_display} è registrato: abbiamo inviato via email
           a %{email} le regole di sicurezza da accettare, completando così la registrazione."
+    ebike_rules:
+      show:
+        state_description: "%{state} Legge sulla bici elettrica: %{law}"
+        state_description_in_review: Stiamo ancora esaminando la legge sulle e-bike
+          di %{state}. Controlla la classe, il motore e la velocità della tua e-bike
+          e scopri come funzionano le classi di e-bike.
+        state_title: "%{state} leggi sulle e-bike"
+        title: Regole per le e-bike
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -6944,6 +6952,309 @@ it:
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
             Bike Index. Aiutateci a coprire i costi del server.
           region: Fai una donazione a Bike Index
+      ebike_rules:
+        class_tile:
+          class: Classe
+          class_aria: Classe %{n} e-bike
+          class_unknown_aria: Classe di e-bike sconosciuta
+          emoto: E-moto
+        law_details:
+          from: 'Da %{date}:'
+          from_until: 'Da %{starts_on} a %{ends_on}:'
+          limits_start_on: Questi limiti entrano in vigore %{date}. Fino ad allora,
+            si applicano le regole seguenti.
+          restrictions: Regole e restrizioni
+          sources: Fonti
+          until: 'Fino a %{date}:'
+        results:
+          add_it_to_bikebook: Aggiungilo al libro delle biciclette.
+          answer_no: 'No'
+          answer_yes: Sì
+          being_compiled: Le norme per questo stato vengono elaborate a partire da
+            fonti primarie.
+          bikebook: Libro di biciclette
+          bikebook_model: "%{year} modello · Bike Book"
+          class_1_throttle: Le moto di classe 1 non possono avere l'acceleratore
+          class_3_throttle: L'acceleratore deve disattivarsi a 20 mph
+          class_not_recognized: La classe %{e_bike_class} non è riconosciuta qui
+          class_recognized: La classe %{e_bike_class} è riconosciuta
+          class_unknown: Bike Book non indica la sua classe o la velocità massima,
+            quindi controlla la classe sull'etichetta.
+          classes_start_on: Le lezioni entreranno in vigore %{date}. Nel frattempo,
+            verifica le norme vigenti nello stato.
+          entered_by_you_html: Dati inseriti da te, non verificati da Bike Book. Non
+            trovi la tua bici? %{link}
+          entered_manually: Inserito manualmente · Classe %{n}
+          fails_rule: Non soddisfa questa regola
+          falls_under: In %{state}, rientra in %{name}, che può richiedere la registrazione
+            e una licenza.
+          for_your_information: Per vostra informazione
+          gray_detail: Il tuo %{name} è classificato come e-bike di classe %{n}. Consulta
+            il %{state} DMV per le normative locali.
+          gray_detail_unclassified: Il tuo %{name} non è elencato come e-bike di Classe
+            1, 2 o 3. Controlla presso la %{state} DMV le normative locali.
+          gray_headline: Non abbiamo ancora in archivio le regole per le e-bike di
+            %{state}.
+          green_headline: La tua %{name} è legale da guidare in %{state} come e-bike
+            di classe %{n}.
+          has_throttle: Ha un acceleratore
+          is_registered: Questa bicicletta è immatricolata?
+          legal_to_ride: È legale guidare
+          legal_with_rules: Legale, con regole da verificare
+          limits_start_on: Questi limiti entrano in vigore %{date}
+          link_copied: Link copiato
+          manual_bike_name: e-bike
+          may_be_moped: Potrebbe essere regolamentato come ciclomotore o veicolo a
+            motore, il che potrebbe richiedere immatricolazione e patente.
+          meets_rule: Rispetta questa regola
+          motor: Motore
+          mph_html: "%{mph} mph"
+          no_speed_cap: Nessun limite di velocità nella legge statale
+          no_throttle: Niente acceleratore
+          no_watt_cap: Nessun limite di potenza nella legge statale
+          not_classified: Non è una e-bike di classe 1, 2 o 3.
+          not_permitted: Vietato
+          not_provided: Non fornito
+          own_classes: Lo stato stabilisce i propri limiti anziché le tre classi standard
+          photo_bikebook: Foto · Libro sulle biciclette
+          recovered_more_often: Le biciclette rubate vengono recuperate con una frequenza
+            doppia se registrate.
+          red_headline: Il tuo %{name} non è ammesso come e-bike secondo le attuali
+            norme %{state}.
+          register_free: Registrati su Bike Index — gratis
+          rule_to_check: Regola da controllare
+          rules_not_on_file: Regole non presenti nel file
+          share_state_rules: Condividi le regole del tuo stato
+          source_html: 'Fonte: catalogo delle leggi statali di %{link}. I riassunti
+            sono a scopo di riferimento e non costituiscono consulenza legale.'
+          speed_not_provided: Velocità massima non fornita
+          speed_over_cap_html: Assiste fino a %{mph} mph, oltre il limite di %{cap}
+            mph
+          speed_within_cap_html: Assiste a %{mph} mph, entro il limite
+          still_reviewing: Stiamo ancora esaminando le regole di %{state}.
+          still_reviewing_body: Consulta il sito web del Dipartimento dei veicoli
+            a motore (DMV) o dell'assemblea legislativa del tuo stato per le normative
+            vigenti sulle e-bike. Nella maggior parte degli stati, la potenza massima
+            dei motori delle e-bike è limitata a 750 W e la velocità assistita a 20
+            mph (Classe 1-2) o 28 mph (Classe 3).
+          throttle: Acceleratore elettrico
+          throttle_allowed: Acceleratore consentito per la Classe 2
+          throttle_not_allowed: Lo stato non consente un acceleratore
+          throttle_not_stated: La legge statale non specifica se è consentito un acceleratore
+          top_speed: Velocità massima
+          ul_certification: Certificazione UL
+          view_bikebook_entry: Visualizza la voce completa del Bike Book
+          watts_html: "%{watts}W"
+          watts_not_provided: Potenza del motore non specificata
+          watts_over_cap_html: Il motore %{watts}W supera il limite %{cap}W
+          watts_within_cap_html: "%{watts}Il motore W è all'interno del tappo"
+          yellow_headline:
+            one: La tua %{name} è legale da guidare in %{state} come e-bike di classe
+              %{n}, con %{count} regola da verificare.
+            other: La tua %{name} è legale da guidare in %{state} come e-bike di classe
+              %{n}, con %{count} regole da verificare.
+          yellow_headline_class_unknown:
+            one: Il tuo %{name} potrebbe essere legale da guidare in %{state}, con
+              la regola %{count} da verificare.
+            other: Il tuo %{name} potrebbe essere legale da guidare in %{state}, con
+              %{count} regole da verificare.
+          yes_to_html: Sì, a %{mph}
+          your_bike: La tua bici
+          your_ebike: La tua e-bike
+          your_state: Il tuo stato
+        rule_label:
+          classes: Classi riconosciute
+          power: Limite di potenza del motore
+          speed: Massima velocità assistita
+          throttle: Acceleratore elettrico
+        rule_value:
+          allowed: Consentito
+          classes:
+            one: Classe %{classes}
+            other: Classi %{classes}
+          mph_html: "%{mph} mph"
+          no_cap: Senza limiti
+          not_allowed: Vietato
+          own_definition: 'La sua definizione: %{name}'
+          watts_html: "%{watts}W"
+        show:
+          add_it_to_bikebook: Aggiungilo al libro delle biciclette.
+          add_to_bikebook_html: Non trovi la tua bici? %{link}
+          answer_no: 'No'
+          answer_yes: Sì
+          assist: Assistenza
+          banned_body: A New York, le e-bike e le batterie vendute sul suo territorio
+            devono essere conformi agli standard UL 2849 o UL 2271 (Legge locale 39
+            del 2023). Università, enti gestori di alloggi e aziende di trasporto
+            pubblico stanno adottando norme simili per lo stoccaggio e la ricarica
+            al chiuso.
+          banned_heading: Perché le biciclette non certificate vengono vietate
+          battery_safety: Sicurezza delle batterie e antincendio
+          bike_error: Seleziona una bicicletta dall'elenco oppure inseriscine i dettagli
+            manualmente.
+          bike_model: Modello di bicicletta
+          bike_placeholder: Cerca la tua bici (marca, modello, anno)
+          bikebook_failed: Bike Book non si è caricato. Inserisci i dettagli della
+            tua bici qui sotto.
+          bikes_registered_html: "%{number} biciclette registrate"
+          certification_involves_body: Un laboratorio di prova riconosciuto a livello
+            nazionale sottopone i campioni di produzione a test di sovraccarico, cortocircuito,
+            impatto, resistenza all'acqua e instabilità termica. Lo stabilimento viene
+            poi ispezionato periodicamente per mantenere la certificazione.
+          certification_involves_heading: Cosa comporta la certificazione
+          change: modifica?
+          check_my_bike: Controlla la mia bici
+          class_1_body: Il motore aiuta solo quando si pedala e si arresta a 32 km/h.
+            È consentito nella maggior parte dei luoghi in cui può circolare una normale
+            bicicletta.
+          class_1_tag: Solo pedalata assistita
+          class_2_body: L'acceleratore permette di muovere la bicicletta senza pedalare,
+            fino a una velocità di 20 miglia orarie (circa 32 km/h). Alcuni sentieri
+            e parchi non consentono l'uso dell'acceleratore.
+          class_2_tag: Acceleratore elettrico
+          class_3_body: Bicicletta a pedalata assistita fino a 45 km/h, con tachimetro.
+            Spesso è previsto l'obbligo del casco, un'età minima e limitazioni sui
+            percorsi.
+          class_3_tag: Pedalata assistita più veloce
+          class_n: Classe %{n}
+          classes_heading: Lezioni di e-bike, spiegate
+          classes_intro: Nella maggior parte degli stati si utilizza un sistema a
+            tre classi. La classe di appartenenza determina la velocità di assistenza
+            del motore, se è consentito l'uso dell'acceleratore e dove è possibile
+            circolare.
+          compare_html: Vuoi confrontare più biciclette? %{link}
+          detected_html: Abbiamo rilevato <strong>%{state}</strong> —
+          disclaimer: Bike Index è un'organizzazione no-profit 501(c)(3). I riassunti
+            delle leggi statali sono forniti a titolo di riferimento e non costituiscono
+            consulenza legale.
+          e_bike_class: Corso di e-bike
+          emoto_body: I motori con potenza superiore a 750 W, o con assistenza alla
+            pedalata oltre i limiti previsti per la categoria, sono classificati come
+            e-moto. Nella maggior parte degli stati, questi veicoli sono equiparati
+            a ciclomotori o motociclette, il che può comportare l'obbligo di immatricolazione,
+            assicurazione e patente di guida.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          enter_manually: Non trovi la tua bici? Inserisci i suoi dati.
+          for_parents: Per i genitori
+          form_label: Verifica della conformità delle e-bike
+          has_throttle: Ha l'acceleratore?
+          heading: Informati sulle regole relative alle e-bike.
+          how_to_check_1: Trova il marchio UL e il numero di file sull'etichetta della
+            batteria e del telaio.
+          how_to_check_2: Cerca quel numero in UL Product iQ.
+          how_to_check_3: Guarda il modello qui sopra. Bike Book mostra la certificazione
+            laddove è registrata.
+          how_to_check_heading: Come controllare una bicicletta
+          loading_bikebook: Caricamento del libro sulle biciclette…
+          location_not_shared: La posizione non viene condivisa. Seleziona il tuo
+            stato dall'elenco.
+          manual_legend: Inserisci i dettagli della tua bicicletta
+          motor: Motore
+          motor_cap: "≤750W"
+          motor_wattage: Potenza del motore (W)
+          mph: "%{mph} mph"
+          not_a_legal_ebike: Non è una e-bike legale
+          not_an_ebike: Non è una bici elettrica
+          parent_step_1_body: Molti stati stabiliscono un'età minima per la Classe
+            3, e alcuni per ogni classe. Verifica le normative del tuo stato prima
+            di scegliere una bicicletta.
+          parent_step_1_title: Verifica le norme relative all'età
+          parent_step_2_body: Pedalata assistita soltanto, senza acceleratore, e l'assistenza
+            si interrompe a 32 km/h. È la categoria più facile da imparare e ammessa
+            nella maggior parte dei posti.
+          parent_step_2_title: Inizia con la Classe 1
+          parent_step_3_body: Il bambino dovrebbe già saper frenare, segnalare, guardare
+            alle spalle e mantenere la traiettoria rettilinea su una bicicletta normale.
+            Prima di iniziare, esercitatevi con la e-bike in un luogo tranquillo.
+          parent_step_3_title: Assicurati che siano in grado di gestirlo
+          parent_step_4_body: 'Verifica quali zone della tua città e del percorso
+            per andare a scuola sono consentite le e-bike: obbligo del casco, marciapiedi,
+            piste ciclabili e qualsiasi regolamento scolastico o del campus.'
+          parent_step_4_title: Imparate insieme le regole locali
+          parent_step_5_body: Scegli una bicicletta certificata UL 2849. Caricala
+            su una superficie rigida, lontano dalle uscite di corrente, utilizzando
+            il caricabatterie in dotazione e non lasciarla mai incustodita durante
+            la notte.
+          parent_step_5_title: Acquista prodotti certificati UL e ricarica in tutta
+            sicurezza.
+          parent_step_6_body: Anche le biciclette dei bambini vengono rubate. La registrazione
+            è gratuita e richiede circa due minuti.
+          parent_step_6_title: Registra la bicicletta
+          parents_body: Le e-bike sono più pesanti e veloci delle biciclette tradizionali
+            che la maggior parte dei bambini usa per imparare ad andare in bicicletta.
+            Prima di acquistarle, informatevi sulle normative vigenti nel vostro stato
+            e comune e assicuratevi che vostro figlio sia pronto a guidarne una in
+            sicurezza.
+          parents_heading: State pensando di acquistare una e-bike per vostro figlio?
+          parents_link: Consulta le normative del tuo stato in materia di età e utilizzo
+            del casco.
+          pedal: Pedale
+          pill: Bike Index · Organizzazione no-profit · Oltre 10 anni di esperienza
+          recoveries_html: "%{number} recuperi"
+          register_band_heading: Le biciclette registrate vengono ritrovate con una
+            frequenza doppia in caso di furto. La registrazione è gratuita.
+          register_your_bike: Registra la tua bicicletta
+          search_bikebook_instead: Cerca invece Bike Book
+          select_state: Seleziona il tuo stato
+          state: Stato
+          state_error: Scegli uno stato.
+          subheading: Inserisci il tuo stato e la tua bicicletta per visualizzare
+            le normative del tuo stato.
+          throttle: Acceleratore elettrico
+          top_assist: Assistenza superiore
+          ul_2271_body: Esegue un test sulla singola batteria agli ioni di litio.
+            Comune su biciclette e batterie di ricambio; non include il caricabatterie
+            o il motore.
+          ul_2271_scope: Il pacco batterie
+          ul_2271_test_1: Fuga termica della cella e del pacco
+          ul_2271_test_2: Schiacciamento, impatto e caduta
+          ul_2271_test_3: guasti al sistema di gestione della batteria
+          ul_2849_body: Questo test verifica che batteria, motore, caricabatterie
+            e controller funzionino insieme come un unico sistema. Si tratta dello
+            standard richiesto dalla maggior parte delle città e dei campus universitari.
+          ul_2849_scope: Il sistema elettrico completo per e-bike
+          ul_2849_test_1: Protezione da sovraccarico e cortocircuito
+          ul_2849_test_2: Esposizione all'acqua, vibrazioni e caduta
+          ul_2849_test_3: Sicurezza del caricabatterie e del cablaggio
+          ul_heading: Perché la certificazione UL è importante
+          ul_intro: Gli incendi delle batterie agli ioni di litio si propagano rapidamente
+            e sono difficili da spegnere. La certificazione UL significa che un laboratorio
+            indipendente ha testato la bicicletta o la batteria per verificarne la
+            resistenza al fuoco e ai guasti elettrici. Sempre più campus universitari,
+            proprietari di immobili e comuni richiedono questa certificazione prima
+            di introdurre una e-bike all'interno degli edifici.
+          visit_bikebook: Visita Bike Book.
+          watts_error: Inserisci la potenza del motore in watt.
+          watts_placeholder: ad esempio 750
+        state_reference:
+          compiling: Stiamo raccogliendo le normative sulle e-bike di %{state} provenienti
+            dalla legislatura statale e dal DMV. Tornate a trovarci presto.
+          filter_placeholder: Digita il nome di uno stato
+          filter_states: Stati del filtro
+          heading: Normative statali sulle biciclette elettriche
+          in_review: In revisione
+          limits_subheading: Tutti i 50 stati e il Distretto di Columbia. Apri uno
+            stato per visualizzarne i limiti, le regole e le fonti.
+          matching_of_total: "%{number} di %{total} corrispondono"
+          on_file_of_total_html: "%{number} degli stati %{total} e DC in archivio
+            · altri in fase di revisione"
+          show_rules: Mostra le regole di %{state}.
+        ul_badge:
+          certified: Certificato UL %{standard}
+          meaning_2271_certified: Il pacco batterie ha superato i test di sicurezza
+            UL per sovraccarico, cortocircuito e resistenza agli urti.
+          meaning_2271_unknown: Non disponiamo ancora dei dati di certificazione della
+            batteria. Controlla l'etichetta sulla batteria.
+          meaning_2849_certified: L'intero sistema elettrico (motore, batteria, caricabatterie
+            e controller) ha superato congiuntamente i test di sicurezza antincendio
+            ed elettrica. Non risulta alcuna certificazione UL 2849. Alcuni campus
+            e edifici non consentono l'utilizzo di e-bike non certificate all'interno.
+          meaning_2849_unknown: Non disponiamo ancora di dati di certificazione di
+            sistema per questo modello. Cerca il marchio UL sull'etichetta del telaio.
+          scope_2271: Pacco batterie
+          scope_2849: Sistema elettrico per e-bike
+          status_unknown: Stato UL %{standard} sconosciuto
     shared_blocks:
       footer:
         about: Di
