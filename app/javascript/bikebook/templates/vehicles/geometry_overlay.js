@@ -78,8 +78,10 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const [width, height] = [Math.max(BOUNDS.right, ...xs) - left + PADDING, PADDING - top]
   const labels = presenter.kit.geometry.labels
 
+  // out to the screen's edges on a phone, as the cards below it are
   return html`<section aria-label="Geometry overlay" data-controller="bikebook--geometry-overlay" class="tw:mx-auto tw:mt-6 tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border
-    tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800">${sectionHeading('Geometry overlay')}<svg
+    tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen
+    tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0">${sectionHeading('Geometry overlay')}<svg
     role="img" aria-label=${`Frames on the same ground, their bottom brackets lined up: ${drawn.map(({ label }) => label).join('; ')}`}
     viewBox=${[left, top, width, height].map(Math.round).join(' ')} class="tw:h-auto tw:w-full">${drawn.map(frame)}<use
     data-bikebook--geometry-overlay-target="top"></use></svg><ul class="tw:flex tw:flex-wrap tw:gap-2">${drawn.map(({ series, title, size }) =>
