@@ -86,6 +86,24 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "with_prefill" do
+    let(:params) { {"bike" => bike, "prefill" => {"manufacturer" => "Nope Cycles", "frame_model" => "Haul LT"}} }
+    let(:bike) { {"owner_email" => "owner@example.com"} }
+
+    it "fills a blank manufacturer and model, an unknown manufacturer as Other, named" do
+      expect(described_class.with_prefill(params)["bike"]).to eq("owner_email" => "owner@example.com",
+        "manufacturer_id" => Manufacturer.other.id, "manufacturer_other" => "Nope Cycles", "frame_model" => "Haul LT")
+    end
+
+    context "with the bike's own values" do
+      let(:bike) { {"manufacturer_id" => 12, "frame_model" => "Mine"} }
+
+      it "keeps them" do
+        expect(described_class.with_prefill(params)["bike"]).to eq bike
+      end
+    end
+  end
+
   describe "find_token" do
     let(:creator) { FactoryBot.create(:user_confirmed) }
     let(:b_param) do

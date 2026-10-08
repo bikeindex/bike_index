@@ -190,17 +190,6 @@
       </p>
     </div>
 
-    <div
-      class="tw:group tw:flex tw:flex-wrap tw:items-center tw:gap-2.5"
-      data-controller="ui--copy-button"
-      data-ui--copy-button-text-value="<%= share_url %>"
-    >
-      <%= render(UI::ButtonLink::Component.new(href: new_register_path, text: translation(".register_free"), color: :yellow, size: :lg)) %>
-
-      <%= render(UI::Button::Component.new(size: :lg, data: {action: "ui--copy-button#copy"})) do %>
-        <span class="tw:group-data-copied:hidden"><%= translation(".share_state_rules") %></span>
-        <span class="tw:hidden tw:group-data-copied:inline"><%= translation(".link_copied") %></span>
-      <% end %>
-    </div>
+    <%= render(UI::ButtonLink::Component.new(href: register_href, text: translation(".register_free"), color: :yellow, size: :callout)) %>
   </div>
 </section>

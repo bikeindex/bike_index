@@ -54,6 +54,13 @@ module Pages
 
         def class_numbers = @bike.e_bike_classes.to_sentence
 
+        # A BikeBook model's maker and model fill in the registration it starts
+        def register_href
+          return new_register_path if @bike.manual?
+
+          new_register_path(manufacturer: @bike.manufacturer_name, frame_model: @bike.model)
+        end
+
         def details
           @details ||= case @verdict
           when :yellow then notes(:check)
@@ -159,8 +166,6 @@ module Pages
           else translation(".has_throttle")
           end
         end
-
-        def share_url = ebike_rules_state_url(@state[:abbr].downcase)
       end
     end
   end

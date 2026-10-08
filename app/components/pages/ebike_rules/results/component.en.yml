@@ -43,7 +43,6 @@ en:
           legal_to_ride: Legal to ride
           legal_with_rules: Legal, with rules to check
           limits_start_on: These limits take effect %{date}
-          link_copied: Link copied
           manual_bike_name: e-bike
           may_be_moped: >-
             It may be regulated as a moped or motor vehicle instead, which can require
@@ -68,7 +67,6 @@ en:
           register_free: Register on Bike Index — free
           rule_to_check: Rule to check
           rules_not_on_file: Rules not on file
-          share_state_rules: Share your state's rules
           source_html: >-
             Source: %{link}'s catalog of state law. Summaries are for reference, not
             legal advice.
