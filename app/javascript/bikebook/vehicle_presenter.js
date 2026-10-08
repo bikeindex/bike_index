@@ -14,19 +14,18 @@ const textOf = (content) => (typeof content === 'object' ? fragmentOf(content).t
 const items = (content) => listed(content)?.[0].flatMap(items) ?? [content]
 const mark = (content) => html`<span class="tw:spec-diff">${content}</span>`
 
-const CLASSIFICATIONS = 'motors.operating_modes.e_vehicle_classification'
 const MATERIALS = 'frame.material'
+// lengths in centimeters, with an imperial viewer's feet and inches after
+const IN_CENTIMETERS = ['wheelbase', 'standover']
+const SINGULAR = { feet: 'foot', inches: 'inch' }
 
 // The names, units and lookups the vehicle templates present a model's data with
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
     this.kit = kit
-    // `names` leaves off a classification's jurisdiction: "Moped", where it's "US-CA Moped"
-    const classifications = Object.entries(vocabulary.e_vehicle_classifications ?? {})
-    const names = Object.fromEntries(classifications.map(([id, { jurisdiction, name }]) => [id, `${jurisdiction} ${name}`]))
     // the catalog names carbon "Carbon or Composite"
     const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
-    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [CLASSIFICATIONS]: { ...vocabulary.names[CLASSIFICATIONS], ...names }, [MATERIALS]: materials } }
+    this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials } }
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
     this.imperialLengths = kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))
@@ -48,31 +47,40 @@ export class VehiclePresenter {
     }))
   }
 
+  classificationName (id) {
+    return this.vocabulary.e_vehicle_classifications?.[id]?.label ?? id
+  }
+
   // Each classification's name to its tooltip, whose heading links to `path(id)`
   classificationTooltips (path) {
-    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {}).map(([id, { title, description }]) => [
-      this.vocabulary.names[CLASSIFICATIONS][id],
+    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {}).map(([id, { label, title, description }]) => [
+      label,
       html`<h3 class="tw:font-bold"><a class="twlink" href=${path(id)}>${title}</a></h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
         copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${description}</p>`
     ]))
   }
 
-  measurement (value, unit = null, key = null) {
+  // A `difference` of a length in centimeters leaves off its feet and inches
+  measurement (value, unit = null, key = null, { difference = false } = {}) {
     if (value === true) return '✓'
     if (value === false) return '❌'
     if (Array.isArray(value)) return join(value, ', ')
     const [, count, each] = (unit && typeof value === 'string' && value.match(/^(\d+) x (\d+(?:\.\d+)?)$/)) || []
-    if (each) return join([`${count} × `, this.measurement(this.rounded(parseFloat(each)), unit, key)])
+    if (each) return join([`${count} × `, this.measurement(this.rounded(parseFloat(each)), unit, key, { difference })])
     if (typeof value !== 'number') return isTemplate(value) ? value : String(value ?? '')
 
     const parts = this.#imperialParts(unit, key)
     const feet = parts.length === 2
-    const metric = feet ? this.labeled(this.rounded(value / this.kit.conversions.mm.cm), 'cm', this.kit.presenter.centimeters) : this.labeled(value, unit)
-    if (parts.length === 0) return metric
+    const inCentimeters = IN_CENTIMETERS.includes(key)
+    const metric = feet || inCentimeters
+      ? this.labeled(this.rounded(value / this.kit.conversions.mm.cm), 'cm', this.kit.presenter.centimeters)
+      : this.labeled(value, unit)
+    if (parts.length === 0 || (inCentimeters && difference)) return metric
 
     const imperial = join(parts.map(({ part, convert }) => this.labeled(this.rounded(convert(value)), unit, part)), ' ')
-    // rounded to the inch, so the metric value is a hover away
-    return this.#unitSystems(metric, feet ? this.#tooltipped(imperial, [metric]) : imperial)
+    // rounded to the inch, so the exact length is a hover away
+    const shown = feet ? this.#tooltipped(imperial, compact([this.#inWords(value), inCentimeters ? null : metric])) : imperial
+    return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs twless-strong">(${shown})</span>`]) : shown)
   }
 
   // all three read "136.5 × 66.6 × 137 cm" (L × W × H); fewer name each, "136.5 cm long"
@@ -88,7 +96,7 @@ export class VehiclePresenter {
       const first = feetAndInches.findIndex(({ convert }) => convert(mm) !== 0)
       return [key, join((first < 0 ? [] : feetAndInches.slice(first)).map(({ part, convert }) => this.labeled(convert(mm), 'mm', part)), ' ')]
     })
-    const exact = [(mm) => this.labeled(this.rounded(mm), 'mm'), (mm) => this.labeled(this.rounded(this.#inches(mm)), 'mm', this.kit.inches)]
+    const exact = [(mm) => this.labeled(this.rounded(mm), 'mm'), (mm) => this.#inWords(mm)]
     const [metricSystem, imperialSystem] = [metric, imperial].map((parts, index) => this.#tooltipped(
       full ? join(parts.map(([, part]) => part), ' × ') : join(parts.map(([key, part]) => join([part, ' ', this.kit.presenter.dimension_words[key]])), ', '),
       values.map(([key, mm]) => join([`${this.humanize(key)}: `, exact[index](mm)]))
@@ -162,9 +170,16 @@ export class VehiclePresenter {
     return millimeters / this.kit.conversions.mm.in
   }
 
-  // Whole feet, then the inches left over
-  #feetAndInches () {
-    const inches = (length) => roundHalfUp(this.#inches(length))
+  // "3 feet, 2.6 inches", leaving off a part that's zero
+  #inWords (millimeters) {
+    const [feet, inches] = this.#feetAndInches((value) => this.rounded(value)).map(({ part, convert }) => [this.rounded(convert(millimeters)), part.name])
+    return [feet, inches].filter(([count], index) => count !== 0 || (index === 1 && !feet[0]))
+      .map(([count, name]) => `${count} ${count === 1 ? SINGULAR[name] ?? name : name}`).join(', ')
+  }
+
+  // Whole feet, then the inches left over, to the nearest whole inch unless `round` says otherwise
+  #feetAndInches (round = roundHalfUp) {
+    const inches = (length) => round(this.#inches(length))
     return this.kit.feet_and_inches.map((part, index) => ({ part, convert: index === 0 ? (length) => Math.floor(inches(length) / 12) : (length) => inches(length) % 12 }))
   }
 

@@ -12,13 +12,16 @@ module UI
       # have nothing to tie with
       STANDARD_SHAPE = "tw:rounded-lg tw:font-medium tw:transition-colors"
 
+      # A press sinks it 2px from where it sits - back down from the hover lift, or below
+      # rest on a device that can't hover
+      CALLOUT_SHAPE = "tw:rounded-full tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:transition-all tw:duration-300 tw:not-disabled:not-aria-disabled:hover:-translate-y-0.5 tw:not-disabled:not-aria-disabled:active:translate-y-0.5 tw:hover:is-active:translate-y-0"
+
       SIZES = {
         sm: "#{STANDARD_SHAPE} tw:px-2.5 tw:py-1 tw:text-xs",
         md: "#{STANDARD_SHAPE} tw:px-3 tw:py-1.5 tw:text-sm",
         lg: "#{STANDARD_SHAPE} tw:px-4 tw:py-2 tw:text-base",
-        # A press sinks it 2px from where it sits - back down from the hover lift, or below
-        # rest on a device that can't hover
-        callout: "tw:rounded-full tw:px-10 tw:py-4 tw:text-base tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:transition-all tw:duration-300 tw:not-disabled:not-aria-disabled:hover:-translate-y-0.5 tw:not-disabled:not-aria-disabled:active:translate-y-0.5 tw:hover:is-active:translate-y-0"
+        callout: "#{CALLOUT_SHAPE} tw:px-10 tw:py-4 tw:text-base",
+        callout_sm: "#{CALLOUT_SHAPE} tw:px-6 tw:py-1.5 tw:text-[13px]"
       }.freeze
 
       # Hover is guarded against both ways an element says it's disabled — :disabled for a

@@ -6890,7 +6890,19 @@ es:
           year: Año
           filter_combobox:
             any: Cualquier
-          comparison_view: Vista comparativa
+          about_bikebook: Acerca del libro sobre bicicletas
+          byline: Un enlace gratuito de Bike Index, el registro de bicicletas sin
+            ánimo de lucro.
+          tagline_html: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
+            tu próximo paseo entre más de %{models_count} modelos.'
+          tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
+            tu próxima bici.'
+        donate_strip:
+          dismiss: Despedir
+          donate: Donar
+          pitch: Este fantástico producto es posible gracias a la organización sin
+            ánimo de lucro Bike Index. Ayúdanos a cubrir los gastos de nuestro servidor.
+          region: Dona a Bike Index
     shared_blocks:
       footer:
         about: Acerca

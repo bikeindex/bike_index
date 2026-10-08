@@ -7,7 +7,7 @@ import { array, blank, compact, except, join, presence, present, slice } from 'b
 export const motorSection = ({ presenter, heading, motor, others }) => {
   const { fields, humanized, labels } = presenter.kit.motor
   // the identity rows list every mode's classification
-  const modeFields = except(presenter.kit.motor.mode_fields, ['e_vehicle_classification'])
+  const modeFields = except(presenter.kit.motor.mode_fields, ['e_vehicle_classification', 'e_vehicle_classifications'])
   const display = (each) => ({
     ...each,
     name: [each.manufacturer, each.model].filter(present).join(' '),
