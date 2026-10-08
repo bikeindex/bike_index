@@ -6607,6 +6607,17 @@ nb:
           year: år
           filter_combobox:
             any: Noen
+          about_bikebook: Om Bike Book
+          byline: En gratis referanse fra Bike Index, det ideelle sykkelregisteret.
+          tagline_html: Verdens sykkelbibliotek – søk, sammenlign og finn din neste
+            sykkeltur på tvers av %{models_count}+ modeller.
+          tagline: Verdens sykkelbibliotek – søk, sammenlign og finn din neste sykkeltur.
+        donate_strip:
+          dismiss: Avskjedige
+          donate: Donere
+          pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
+            Index. Hjelp oss med å betale serverkostnadene våre.
+          region: Doner til Bike Index
     shared_blocks:
       footer:
         about: Om
