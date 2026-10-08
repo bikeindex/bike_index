@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
-import { readable } from 'bikebook/replace_url'
+import { queryUrl, readable } from 'bikebook/replace_url'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { uuid } from 'bikebook/templates/helpers'
 
@@ -14,7 +14,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status']
-  static values = { manifestUrl: String, failedText: String }
+  static values = { manifestUrl: String, failedText: String, title: String }
 
   #scrolls = new Map()
   #renders = 0
@@ -22,13 +22,12 @@ export default class extends Controller {
   // The first render replaces the status, and a failed one puts it back
   initialize () {
     this.status = this.statusTarget
-    this.title = document.title
   }
 
   async connect () {
     window.history.scrollRestoration = 'manual'
     this.#stamp()
-    const url = new URL(window.location.href)
+    const url = queryUrl()
     try {
       this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [])
     } catch (error) {
@@ -41,7 +40,7 @@ export default class extends Controller {
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles
   visit (event) {
     event.preventDefault()
-    const url = new URL(window.location.href)
+    const url = queryUrl()
     new FormData(event.target).forEach((value, name) => url.searchParams.set(name, value))
     this.#go(realigned(url))
   }
@@ -53,7 +52,7 @@ export default class extends Controller {
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
 
     const url = new URL(link.href)
-    if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
+    if (url.origin !== window.location.origin || url.pathname !== queryUrl().pathname) return
 
     event.preventDefault()
     'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: false }) : this.#go(url)
@@ -63,13 +62,13 @@ export default class extends Controller {
   // comparison's first vehicle starts nearest
   async pickSize ({ target, params: { vehicle, first } }) {
     if (first) storePreferredSize(JSON.parse(target.selectedOptions[0].dataset.size))
-    await this.#go(withSize(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY])
+    await this.#go(withSize(queryUrl(), vehicle, target.value), [window.scrollX, window.scrollY])
     this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
   }
 
   restore () {
     this.#stamp()
-    this.#render(new URL(window.location.href), this.#scrolls.get(this.#entry) ?? [0, 0])
+    this.#render(queryUrl(), this.#scrolls.get(this.#entry) ?? [0, 0])
   }
 
   track () {
@@ -98,7 +97,7 @@ export default class extends Controller {
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
     this.pageTarget.replaceChildren(rendered.content)
-    document.title = rendered.title ?? this.title
+    document.title = rendered.title ?? this.titleValue
     if (focus) this.pageTarget.querySelector('[autofocus]')?.focus()
     if (scroll) window.scrollTo(...scroll)
   }

@@ -8,7 +8,7 @@ RSpec.describe BikebookController, type: :request do
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
       bikebook = page.find("[data-controller='bikebook--page']")
-      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq BikebookController::MANIFEST_URL
+      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq Integrations::BikebookCatalog::MANIFEST_URL
       expect(bikebook).to have_css("[inert] #vehicle_models")
         .and have_css("[role='status'] svg.tw\\:animate-spin")
 
@@ -16,6 +16,32 @@ RSpec.describe BikebookController, type: :request do
       expect(shell).to have_field("vehicle_models", placeholder: "Search by manufacturer or model…")
         .and have_css("#manufacturer-hw-listbox", visible: :all)
         .and have_css("#vehicle-viewers", visible: :all)
+      expect(page).to have_title("Bikebook", exact: true)
+      expect(response.headers["X-Robots-Tag"]).to be_nil
+    end
+
+    context "comparing" do
+      it "isn't indexed" do
+        get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro,m/aventon/2022/level_2"}
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["X-Robots-Tag"]).to eq "noindex, follow"
+      end
+    end
+
+    context "a model alone" do
+      it "redirects to its page, keeping the query" do
+        get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3_pro", filters: "1"}
+        expect(response).to have_http_status(:moved_permanently)
+        expect(response).to redirect_to("/bikebook/m/segway/2025/gt3_pro?filters=1")
+      end
+
+      context "an e-vehicle classification" do
+        it "renders, unindexed" do
+          get "/bikebook", params: {vehicle_models: "evc/us/class_3"}
+          expect(response).to have_http_status(:ok)
+          expect(response.headers["X-Robots-Tag"]).to eq "noindex, follow"
+        end
+      end
     end
 
     describe "donation strip" do
@@ -71,9 +97,52 @@ RSpec.describe BikebookController, type: :request do
   end
 
   describe "vehicle" do
-    it "redirects to the page with that vehicle picked" do
+    let(:fixtures) { Rails.root.join("spec/fixtures/bikebook_catalog") }
+    let(:catalog_status) { 200 }
+    let(:page) { Capybara.string(response.body) }
+
+    before do
+      Rails.cache.clear
+      WebMock.stub_request(:get, /\A#{Regexp.escape(Integrations::BikebookCatalog::URL)}/o).to_return { |request|
+        {status: catalog_status, body: (fixtures.join(request.uri.path.delete_prefix("/catalog/")).read if catalog_status == 200)}
+      }
+    end
+    after { WebMock.reset! }
+
+    it "renders the model's page, titled and described for it" do
       get "/bikebook/m/segway/2025/gt3_pro"
-      expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro")
+      expect(response).to have_http_status(:ok)
+      expect(response.headers["X-Robots-Tag"]).to be_nil
+      expect(page).to have_title("Segway GT3 Pro", exact: true)
+        .and have_css("[data-controller='bikebook--page'][data-bikebook--page-title-value='Bikebook']")
+      expect(page).to have_css("meta[name='description'][content^='Experience elite performance with the Segway GT3 Pro']", visible: :all)
+        .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/segway/2025/gt3_pro.png']", visible: :all)
+        .and have_css("link[rel='canonical'][href$='/bikebook/m/segway/2025/gt3_pro']", visible: :all)
+    end
+
+    context "without its m/" do
+      it "redirects to its page" do
+        get "/bikebook/segway/2025/gt3_pro", params: {filters: "1"}
+        expect(response).to have_http_status(:moved_permanently)
+        expect(response).to redirect_to("/bikebook/m/segway/2025/gt3_pro?filters=1")
+      end
+    end
+
+    context "a model the catalog hasn't" do
+      it "is not found" do
+        get "/bikebook/m/segway/2025/gt9"
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "with the catalog unreachable" do
+      let(:catalog_status) { 503 }
+
+      it "renders the page, for the browser to try" do
+        get "/bikebook/m/segway/2025/gt3_pro"
+        expect(response).to have_http_status(:ok)
+        expect(page).to have_title("Bikebook", exact: true)
+      end
     end
 
     context "an e-vehicle classification" do

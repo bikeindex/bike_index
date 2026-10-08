@@ -21,6 +21,10 @@ module SharedBlocks
           assign_bike_attrs(page_obj, action_name)
         elsif page_obj.is_a?(Blog)
           assign_blog_attrs(page_obj)
+        elsif page_obj.is_a?(Integrations::BikebookCatalog::Vehicle)
+          @page_title ||= page_obj.title
+          @page_description = page_obj.description
+          @page_image = page_obj.image_url
         elsif @page_key == "users_show"
           assign_user_attrs(page_obj)
         end
