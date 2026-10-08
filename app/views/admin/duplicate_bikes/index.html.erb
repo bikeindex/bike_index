@@ -1,0 +1,30 @@
+<h1>Suspected duplicate registrations</h1>
+
+<p>
+  These groups share a stored serial segment. A group can contain different
+  whole serials and manufacturers. Review the records to establish whether they
+  describe the same physical bicycle.
+</p>
+
+<%= form_with url: admin_duplicate_bikes_path, method: :get, local: true do |form| %>
+  <%= form.hidden_field :search_view, value: "segments" %>
+
+  <div class="twfieldrow">
+    <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_bike_id, label_text: "Bike record ID", kind: :number_field, html_options: {value: params[:search_bike_id], min: 1, autocomplete: "off"}) %>
+
+    <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_ignored, label_text: "Review status") do %>
+      <%= render UI::Forms::Select::Component.new(form_builder: form, attribute: :search_ignored, option_tags: options_for_select([["Active", "false"], ["Ignored", "true"], ["All", "all"]], params[:search_ignored] || "false")) %>
+    <% end %>
+  </div>
+
+  <%= render UI::Button::Component.new(text: "Filter groups", color: :primary, type: :submit) %>
+<% end %>
+
+<%= form_with url: admin_duplicate_bike_path("compare"), method: :get, local: true, class: "tw:mt-6" do |form| %>
+  <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :bike_ids, label_text: "Compare bike record IDs", html_options: {placeholder: "Comma-separated IDs", autocomplete: "off"}) %>
+  <%= render UI::Button::Component.new(text: "Compare records", color: :primary, type: :submit) %>
+<% end %>
+
+<%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, count: @duplicate_groups_count) %>
+<%= render "table", groups: @duplicate_groups, segments: @segments, statistics: @group_statistics %>
+<%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, skip_total: true) %>

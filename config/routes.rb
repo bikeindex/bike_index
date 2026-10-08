@@ -278,6 +278,7 @@ Rails.application.routes.draw do
       end
       member { get :get_destroy }
     end
+    resources :duplicate_bikes, only: %i[index show update]
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"

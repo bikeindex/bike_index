@@ -42,14 +42,7 @@ module Admin
     end
 
     def duplicates
-      duplicate_groups = if params[:show_ignored]
-        DuplicateBikeGroup.order("created_at desc")
-      else
-        DuplicateBikeGroup.unignored.order("created_at desc")
-      end
-      @per_page = permitted_per_page
-      @duplicate_groups_count = duplicate_groups.size
-      @pagy, @duplicate_groups = pagy(:countish, duplicate_groups, limit: @per_page, page: permitted_page)
+      redirect_to admin_duplicate_bikes_path(search_ignored: params[:show_ignored].present? ? "all" : "false")
     end
 
     def ignore_duplicate_toggle

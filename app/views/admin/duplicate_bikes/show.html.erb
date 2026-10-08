@@ -1,0 +1,49 @@
+<h1>Compare suspected duplicate registrations</h1>
+
+<% if @serial_stolen %>
+  <p class="text-danger tw:mt-4 tw:font-bold">
+    Do not merge: this whole serial has stolen history, potentially on a record
+    outside this comparison. Recovered and deleted records still count.
+  </p>
+<% end %>
+
+<p class="tw:mt-4">
+  Review evidence only. No merge or customer-email action is available.
+</p>
+
+<p>
+  <%= link_to "Back to duplicate groups", admin_duplicate_bikes_path, class: "twlink" %>
+</p>
+
+<p>
+  Manufacturer SKU/product code: unavailable as a dedicated field in this
+  database. Model text and serials below are shown as stored.
+</p>
+
+<p>
+  Each bike ID identifies a registration record intended to describe an
+  individual physical bicycle. Matching stored serials or segments does not
+  establish that the records describe the same bicycle. Initial registration and
+  current ownership can differ after a transfer.
+</p>
+
+<% if @duplicate_group %>
+  <p>
+    Group #<%= @duplicate_group.id %>:
+    <strong><%= @duplicate_group.ignore? ? "Ignored" : "Active" %></strong>
+  </p>
+  <% if @review_read_only %>
+    <p>Review changes are unavailable in this read-only database.</p>
+  <% end %>
+<% end %>
+
+<% if @reference_bike %>
+  <p>
+    Comparison reference:
+    <%= link_to "Bike ##{@reference_bike.id}", edit_admin_bike_path(@reference_bike), class: "twlink" %>.
+  </p>
+<% end %>
+
+<%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state, count: @bikes_count, viewing: "bike records") %>
+<%= render "comparison", review: @review, stolen_record_counts: @stolen_record_counts, account_emails: @account_emails %>
+<%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state, skip_total: true, viewing: "bike records") %>

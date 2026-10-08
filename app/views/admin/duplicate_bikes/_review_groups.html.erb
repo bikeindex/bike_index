@@ -1,0 +1,58 @@
+<%# locals: (groups:, representatives:, organizations:, kind:) %>
+
+<%= render UI::Table::Component.new(records: groups) do |table| %>
+  <% table.column(label: "Review registrations") do |group| %>
+    <%= link_to "Compare #{group["record_count"]} records", admin_duplicate_bike_path("serial", reference_bike_id: group["reference_id"]), class: "twlink" %>
+
+    <div>Representative record #<%= group["reference_id"] %></div>
+  <% end %>
+
+  <% table.column(label: "Stored serial / manufacturer") do |group| %>
+    <% bike = representatives[group["reference_id"]] %>
+    <%= render Atoms::Serial::Component.new(serial: bike&.serial_number) %>
+
+    <div><%= bike&.manufacturer&.name %> <%= bike&.manufacturer_other %></div>
+    <div><%= bike&.frame_model %> <%= bike&.year %></div>
+  <% end %>
+
+  <% table.column(label: "Initial customer contacts") do |group| %>
+    <% bike = representatives[group["reference_id"]] %>
+    <% ownership = bike&.ownerships&.min_by { |record| [record.previous_ownership_id.nil? ? 0 : 1, record.created_at, record.id] } %>
+
+    <div class="tw:break-all">
+      <%= ownership&.owner_email unless ownership&.is_phone %>
+    </div>
+
+    <div>
+      <%= group["email_count"] %> distinct emails;
+      <%= group["missing_email_count"] %> unavailable
+    </div>
+
+    <div>
+      <%= group["account_count"] %> assigned accounts;
+      <%= group["claimed_count"] %> initial claims
+    </div>
+  <% end %>
+
+  <% table.column(label: "Registration sources") do |group| %>
+    <div>
+      <%= group["pos_count"] %> POS; <%= group["customer_count"] %> customer
+      channel
+    </div>
+
+    <div><%= group["test_count"] %> test-marked records</div>
+
+    <% (group["organization_ids"] || []).each do |id| %>
+      <div>
+        <%= link_to organizations[id]&.name || "Organization ##{id}", admin_duplicate_bikes_path(search_kind: kind, search_organization_id: id), class: "twlink" %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Registration dates") do |group| %>
+    <%= render UI::Time::Component.new(time: group["first_at"]) %>
+
+    <div>through</div>
+    <%= render UI::Time::Component.new(time: group["last_at"]) %>
+  <% end %>
+<% end %>

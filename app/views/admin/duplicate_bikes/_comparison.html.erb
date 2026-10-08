@@ -1,0 +1,125 @@
+<%# locals: (review:, stolen_record_counts:, account_emails:) %>
+
+<%= render UI::Table::Component.new(records: review.bikes) do |table| %>
+  <% table.column(label: "Bike record") do |bike| %>
+    <%= link_to "Bike ##{bike.id}", edit_admin_bike_path(bike), class: "twlink" %>
+
+    <div><%= link_to "Registration", bike_path(bike), class: "twlink" %></div>
+    <%= render UI::Time::Component.new(time: bike.created_at) %>
+
+    <% if bike.deleted_at %>
+      <div>Deleted record</div>
+    <% end %>
+
+    <% if bike.example %>
+      <div>Example record</div>
+    <% end %>
+
+    <% if bike.likely_spam %>
+      <div>Spam flag</div>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Manufacturer / model") do |bike| %>
+    <div><%= bike.manufacturer&.name %> <%= bike.manufacturer_other %></div>
+    <div><%= bike.frame_model %> <%= bike.year %></div>
+    <div><%= review.manufacturer_match(bike) %></div>
+  <% end %>
+
+  <% table.column(label: "Stored serial") do |bike| %>
+    <%= render Atoms::Serial::Component.new(serial: bike.serial_number) %>
+
+    <div>Whole normalized:</div>
+    <%= render Atoms::Serial::Component.new(serial: bike.serial_normalized_no_space) %>
+
+    <div><%= review.serial_match(bike) %></div>
+  <% end %>
+
+  <% table.column(label: "Initial registration") do |bike| %>
+    <% ownership = review.initial_ownership(bike) %>
+
+    <div><%= ownership&.origin&.humanize || "Unavailable" %></div>
+    <div><%= ownership&.pos_kind&.humanize %></div>
+
+    <div>
+      <%= ownership&.organization&.name || bike.creation_organization&.name %>
+    </div>
+
+    <%= render UI::Time::Component.new(time: ownership&.created_at) %>
+
+    <div class="tw:break-all">
+      Customer email: <%= review.contact_email(ownership) || "Unavailable" %>
+    </div>
+
+    <% if ownership&.user_id %>
+      <div>Assigned account #<%= ownership.user_id %></div>
+      <div class="tw:break-all">
+        Account email: <%= account_emails[ownership.user_id] || "Unavailable" %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= review.claim_status(ownership) %>
+    </div>
+
+    <%= render UI::Time::Component.new(time: ownership&.claimed_at) %>
+
+    <div><%= review.account_match(bike, initial: true) %></div>
+    <div><%= review.email_match(bike, initial: true) %></div>
+    <div><%= review.email_evidence(bike, initial: true) %></div>
+  <% end %>
+
+  <% table.column(label: "Current ownership") do |bike| %>
+    <% ownership = bike.current_ownership %>
+
+    <div class="tw:break-all">
+      Ownership email: <%= review.contact_email(ownership) || "Unavailable" %>
+    </div>
+
+    <div>
+      <%= review.claim_status(ownership) %>
+    </div>
+
+    <% if ownership&.user_id %>
+      <%= link_to "Account ##{ownership.user_id}", admin_user_path(ownership.user_id), class: "twlink" %>
+      <div class="tw:break-all">
+        Account email: <%= account_emails[ownership.user_id] || "Unavailable" %>
+      </div>
+    <% end %>
+
+    <%= render UI::Time::Component.new(time: ownership&.claimed_at) %>
+
+    <div><%= review.account_match(bike) %></div>
+    <div><%= review.email_match(bike) %></div>
+    <div><%= review.email_evidence(bike) %></div>
+
+    <div>
+      <%= number_display(bike.ownerships.count { |record| record.previous_ownership_id }) %>
+      transfers
+    </div>
+
+    <%= link_to "Ownership history", admin_bike_path(bike, active_tab: "ownerships"), class: "twlink" %>
+  <% end %>
+
+  <% table.column(label: "Status / information to preserve") do |bike| %>
+    <div><%= bike.status&.humanize %></div>
+    <% stolen_count = stolen_record_counts[bike.id] || 0 %>
+
+    <% if stolen_count.positive? || bike.status_stolen? %>
+      <strong class="text-danger">Stolen record/history: review required</strong>
+    <% end %>
+
+    <div><%= number_display(stolen_count) %> stolen/history records</div>
+
+    <div>
+      <%= number_display(bike.bike_organizations.size) %> organization links
+    </div>
+
+    <div><%= number_display(bike.bike_stickers.size) %> stickers</div>
+    <div><%= number_display(bike.public_images.size) %> photos</div>
+
+    <div>
+      <%= number_display(bike.marketplace_listings.size) %> marketplace listings
+    </div>
+  <% end %>
+<% end %>

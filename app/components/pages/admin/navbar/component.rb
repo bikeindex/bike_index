@@ -157,7 +157,7 @@ module Pages
             {title: "Sticker Updates", path: admin_bike_sticker_updates_path},
             {title: "Exports", path: admin_exports_path},
             {title: "Bulk Imports", path: admin_bulk_imports_path},
-            {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, exact: true},
+            {title: "Duplicate Bikes", path: admin_duplicate_bikes_path},
             {title: "Model Audits", path: admin_model_audits_path},
             {title: "Marketplace Listings", path: admin_marketplace_listings_path},
             {title: "Marketplace Messages", path: admin_marketplace_messages_path},

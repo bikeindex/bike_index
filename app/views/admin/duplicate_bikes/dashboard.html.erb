@@ -1,0 +1,86 @@
+<h1>Duplicate registration review</h1>
+
+<p class="tw:mt-4">
+  Review groups of live registrations with the same whole normalized serial and
+  manufacturer. Counts below are groups and registration records, not
+  comparisons or confirmed duplicate bicycles. Serials shorter than six
+  characters and partial matches remain in the
+  <%= link_to "serial-segment view", admin_duplicate_bikes_path(search_view: "segments"), class: "twlink" %>.
+</p>
+
+<p class="tw:mt-4 tw:font-bold">
+  Review only. No merging, deletion or customer emails. A stolen report anywhere
+  on a matching whole serial, including recovered, deleted and test records,
+  puts the group in Stolen history. Preserve those records separately.
+</p>
+
+<p class="tw:mt-4">
+  Test markers include the administrators organization and designated test
+  contact in current or historical links. These markers identify a review scope,
+  not permission to delete. Groups of
+  <%= BikeServices::DuplicateReviewFinder::LARGE_GROUP_MINIMUM %> or more need
+  serial validation; repeated entries may contain a placeholder or product code.
+  Shop followed by customer requires exactly two entries, an earlier POS entry
+  and a later customer-channel entry. It does not establish that the customer
+  registered it personally or owns both entries.
+</p>
+
+<p class="tw:mt-4">
+  Strongest evidence additionally requires the same known initial email and
+  account, a claimed self-registration by the customer, an unclaimed shop entry,
+  matching current identities, compatible known model/year and original serials,
+  and no transfers, impound, marketplace or generic "Other" manufacturer. Photos
+  and stickers still need preservation. Different emails and spelling
+  similarities belong in manual review; they do not authorize an email or merge.
+</p>
+
+<p class="tw:mt-4">
+  Counts computed
+  <%= render UI::Time::Component.new(time: @group_snapshot[:generated_at]) %>.
+  Cached for up to one hour. Stolen history is checked again when a comparison
+  opens.
+</p>
+
+<% kinds = BikeServices::DuplicateReviewFinder::KINDS %>
+<% summary = @summary %>
+<% active_kind = @kind %>
+
+<%= render UI::Table::Component.new(records: kinds.to_a) do |table| %>
+  <% table.column(label: "Review queue") do |(kind, label)| %>
+    <%= link_to label, admin_duplicate_bikes_path(search_kind: kind), class: kind == active_kind ? "twlink tw:font-bold" : "twlink" %>
+  <% end %>
+
+  <% table.column(label: "Groups") do |(kind, _label)| %>
+    <%= number_display(summary.fetch(kind, []).size) %>
+  <% end %>
+
+  <% table.column(label: "Registration records") do |(kind, _label)| %>
+    <%= number_display(summary.fetch(kind, []).sum { it["record_count"] }) %>
+  <% end %>
+<% end %>
+
+<h2 class="tw:mt-6"><%= kinds[@kind] %></h2>
+
+<%= form_with url: admin_duplicate_bikes_path, method: :get, local: true do |form| %>
+  <%= form.hidden_field :search_kind, value: @kind %>
+
+  <div class="twfieldrow">
+    <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_bike_id, label_text: "Find a registration in this queue", kind: :number_field, html_options: {value: params[:search_bike_id], min: 1}) %>
+    <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_organization_id, label_text: "Organization ID (includes initial registration org)", kind: :number_field, html_options: {value: params[:search_organization_id], min: 1}) %>
+  </div>
+
+  <%= render UI::Button::Component.new(text: "Filter review queue", color: :primary, type: :submit) %>
+<% end %>
+
+<p class="tw:mt-4">
+  <%= number_display(@groups_count) %> groups containing
+  <%= number_display(@registrations_count) %> registration records in this
+  filter.
+  <% if @organization %>
+    <strong><%= @organization.name %></strong>
+  <% end %>
+</p>
+
+<%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @groups, index: admin_index_state, count: @groups_count, viewing: "groups") %>
+<%= render "review_groups", groups: @groups, representatives: @representatives, organizations: @organizations, kind: @kind %>
+<%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @groups, index: admin_index_state, skip_total: true, viewing: "groups") %>
