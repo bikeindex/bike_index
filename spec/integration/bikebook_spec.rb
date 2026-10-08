@@ -149,12 +149,12 @@ RSpec.describe "Bikebook", :js, type: :system do
         ["Hydraulic disc", /\A160\W*mm\z/]])
       expect(find("tr", text: "Brakes").all("td").map(&:text)).to eq(["Hydraulic disc", "Hydraulic disc"])
       expect(find("tr", text: "Brake rotors").all("td").map(&:text)).to match([/\A180\W*mm\z/, "—"])
-      # the tire's difference in the unit it reads in, and neither better nor worse
+      # the tire's difference in mm though it reads in inches, and neither better nor worse
       front_tires = find("tr", text: "Front wheel")
-      expect(front_tires.all("td").map(&:text)).to match([/\A650 B,\s*2\.2\W+in tire\W*\z/, /\A650 B,\s*2\.1\W+in tire\W*−0\.1\W*in\z/])
+      expect(front_tires.all("td").map(&:text)).to match([/\A650 B,\s*2\.2\W+in tire\W*\z/, /\A650 B,\s*2\.1\W+in tire\W*−3\W*mm\z/])
       # under the tire, rather than the wheel's size
-      expect(front_tires).to have_css("td > span > span", text: /\A2\.1\W+in tire\W*−0\.1\W*in\z/)
-        .and have_css(".tw\\:text-gray-500", text: "−0.1")
+      expect(front_tires).to have_css("td > span > span", text: /\A2\.1\W+in tire\W*−3\W*mm\z/)
+        .and have_css(".tw\\:text-gray-500", text: "−3")
       # gearing counts its drivetrain's speeds, and compares the cogs' count and each number of teeth on its own
       chainrings = find("tr", text: "Chainrings")
       expect(chainrings.all("td").map(&:text)).to match([/\A1:\s*48\W*t\z/, /\A1:\s*46\W*t\s*−2\z/])
@@ -360,7 +360,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(cogs).to have_css(".tw\\:text-red-700", exact_text: "−11").and have_css(".tw\\:text-red-700", exact_text: "−30")
     # the same wheel size on tires far enough apart to change how large it stands, as an estimate
     diameters = -> { all("[aria-label='Geometry overlay'] li", text: "diameter").map { it.text.gsub(/[[:space:]]+/, " ") } }
-    expect(page).to have_css("[aria-label='Geometry overlay'] p", text: "Note: you're comparing bikes that have different diameter wheels and tires")
+    expect(page).to have_css("[aria-label='Geometry overlay'] p", text: "Note: you're comparing different diameter wheels and tires")
     expect(diameters.call).to eq(["Aventón Current EXP's 700 C wheel with 64 mm tires is approximately 750 mm diameter",
       "Aventón Soltera 3 ADV's 700 C wheel with 38 mm tires is approximately 698 mm diameter"])
     # every model's wheels in its size, front and rear each its own where they differ, the rear on S though only its front
@@ -413,6 +413,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(find("[aria-label='Comparison'] tr", text: "Weight")).to have_text(/56\W*lb.*61\.1\W*lb\W*\+5\.1\W*lb/m)
     expect(page).to have_css("dd", text: /\A[\d.,]+\W*lb\z/, minimum: 2)
     expect(page).to have_no_text(/\d\W*kg\b/)
+    # a tire's difference in mm all the same
+    expect(find("[aria-label='Comparison'] tr", text: "Front wheel")).to have_css(".tw\\:text-gray-500", text: /\A−8\W*mm\z/)
     # wheelbase in centimeters, with feet and inches after, which its difference leaves off
     expect(find("[aria-label='Comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d.]+\W*cm\s*\(\d'\s*\d+"\)(\s*[−+][\d.]+\W*cm|\s*-)?\z/))
     # whose feet and inches are themselves the tooltip's trigger, which spells them out

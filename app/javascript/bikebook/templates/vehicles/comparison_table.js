@@ -2,7 +2,7 @@ import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
-import { brakesAt, tireWidth, tireWidthDifference, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { brakesAt, tireWidth, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice } from 'bikebook/templates/values'
 
 const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
@@ -84,7 +84,8 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
   })
   const missing = html`<span class="twless-strong">—</span>`
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
-  const tireDifference = (change, width) => tireWidthDifference(presenter, change, width)
+  // in mm, though a wide tire reads in inches
+  const tireDifference = (change) => presenter.measurement(change, 'mm')
   const wheelRows = ['front', 'rear'].flatMap((position) => [
     {
       label: `${presenter.humanize(position)} wheel`,
