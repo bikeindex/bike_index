@@ -24,11 +24,12 @@ export async function loadCatalog (manifestUrl, ids = []) {
   })
 
   try {
-    const { vocabulary, kit, options } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids })
+    const { vocabulary, kit, options, modelsCount } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids })
     return {
       vocabulary,
       kit,
       options,
+      modelsCount,
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       vehicles: (ids) => call('vehicles', { ids }),
       displays: (ids) => call('displays', { ids })
