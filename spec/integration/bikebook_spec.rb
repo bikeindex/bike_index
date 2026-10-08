@@ -602,6 +602,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_current_path("/bikebook?vehicle_models=m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle,evc/off_highway_motorcycle")
     expect(group).to have_no_css("dt", exact_text: "Jurisdiction")
     expect(group.find("section", text: /\AClassifications in this group/i)).to have_link("US-CA Off-highway electric motorcycle")
+
+    # a rule a law starts or ends carries its date, and limits not yet in force say when they take effect
+    visit bikebook_path(vehicle_models: "evc/us/ca/motor_driven_cycle")
+    card = find("article h1", text: "US-CA Motor-driven cycle", wait: 10).ancestor("article")
+    expect(card).to have_css("li", text: /\AFrom January 1, 2027: Its motor produces 5 gross brake horsepower/)
+      .and have_css("li", text: /\AUntil January 1, 2027: The line is drawn only by an engine of 150 cc/)
+      .and have_css("dd", exact_text: "January 1, 2027")
   end
 
   it "says so when the catalog doesn't load" do
