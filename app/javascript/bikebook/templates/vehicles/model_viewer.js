@@ -17,7 +17,7 @@ import { array, blank, compact, equal, except, join, partsOf, presence, present,
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
 const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
-const typeLabel = (each) => [each.type, each.type_detail].filter(present).join(' · ')
+export const typeLabel = (each) => [each.type, each.type_detail].filter(present).join(' · ')
 
 // One vehicle's card, marked where it differs from `others`
 export const modelViewer = (args) => new ModelViewer(args).render()
