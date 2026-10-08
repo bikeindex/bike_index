@@ -13,7 +13,7 @@ class MoneyFormatter
     end
 
     def convert_to_cents(amnt)
-      amnt.to_f * 100
+      (amnt.to_f * 100).round
     end
 
     private

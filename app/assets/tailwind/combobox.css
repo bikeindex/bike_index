@@ -40,9 +40,10 @@ body.dark .hw-combobox {
   --hw-text-color: #e5e7eb; /* gray-200 */
 }
 
-/* The chevron / × handle is clickable (toggle open / clear) — the gem doesn't
-   set a cursor, so it inherits text from the input. */
-.hw-combobox__handle {
+/* The chevron / × handle (toggle open / clear) and a multiselect chip's ×
+   (remove) are clickable — the gem sets a cursor on neither. */
+.hw-combobox__handle,
+.hw-combobox__chip__remover {
   cursor: pointer;
 }
 

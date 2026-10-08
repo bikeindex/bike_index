@@ -309,6 +309,39 @@ RSpec.describe BikeServices::Register do
             bike_params: {"frame_size" => "m"})).to be_truthy
           expect(described_class.send(:details_completed?, b_param.reload)).to be_truthy
         end
+
+        context "whose account has no name" do
+          let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com", name: nil) }
+
+          it "doesn't complete the step" do
+            expect(described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+              bike_params: {"frame_size" => "m"})).to be_falsey
+            expect(described_class.send(:details_completed?, b_param.reload)).to be_falsey
+          end
+        end
+      end
+    end
+
+    context "registering their own bike with a user_name" do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com", name:) }
+      let(:name) { nil }
+      let(:result) do
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"})
+      end
+
+      it "names their account" do
+        expect(result).to be_truthy
+        expect(user.reload.name).to eq "Sarah Rider"
+      end
+
+      context "whose account already has a name" do
+        let(:name) { "Their Own Choice" }
+
+        it "keeps it" do
+          expect(result).to be_truthy
+          expect(user.reload.name).to eq "Their Own Choice"
+        end
       end
     end
 

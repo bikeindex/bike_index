@@ -3,6 +3,7 @@ import { html, nothing } from 'lit-html'
 // Ruby's blank?, == and safe_join, over vehicle data and the templates rendered from it
 
 const joins = new WeakMap()
+const separators = new WeakMap()
 
 export const isTemplate = (value) => value?._$litType$ !== undefined || value?._$litDirective$ !== undefined
 
@@ -36,8 +37,13 @@ export const join = (parts, separator = '') => {
   const list = parts.flatMap((part, index) => index ? [separator, part] : [part])
   const result = html`${list}`
   joins.set(result, list)
+  separators.set(result, separator)
   return result
 }
+
+// A list's parts, where a join separates them as ', ' or a <br> does, and its separator; null for a join that runs its
+// parts together into one, as "30 mm" and " tire" do
+export const listed = (value) => separators.get(value) ? [joins.get(value).filter((_, index) => index % 2 === 0), separators.get(value)] : null
 
 // What a join puts side by side, through any joins inside it
 export const partsOf = (value) => joins.has(value) ? joins.get(value).flatMap(partsOf) : [value]

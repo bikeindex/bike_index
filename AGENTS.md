@@ -92,6 +92,8 @@ When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-h
 
 Delegate the enumeration rather than eyeballing a grep — a hand-written grep anchors on one method name and misses the call sites that don't use it.
 
+**Tell a backgrounded reviewer not to spawn its own subagents.** It hands part of its scope to them, then finishes with "still running" and none of their findings — three of five did on #4505, and each needed a follow-up message to report.
+
 ## Testing
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.
@@ -145,7 +147,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **A version constraint in the `Gemfile` needs a matching `.github/dependabot.yml` ignore.** Dependabot widens the constraint rather than skipping the update, so a pin with no ignore entry is silently reverted by a later bump PR — `redis` went that way in #4215, undoing #4175 and leaving its comment behind to explain a pin that was no longer there.
 - **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.
 - **`Organization#is_invoiced?` is neither a money question nor a feature check.** It means an active invoice, the org's own or its `parent_organization`'s, and a $0 invoice sets it — which is how law enforcement gets features. `paid_money?` is the money question. It diverges from `enabled_feature_slugs` in both directions too: regional children and ambassadors get slugs with no invoice, and a child of an invoiced parent gets the flag with no slugs.
-- **`user_emails.email` is not unique** — no unique index, no uniqueness validation, and only confirmed rows share a partial index, so the same address can sit on two accounts. `UserEmail.where(email:)` therefore reaches rows belonging to whoever else holds it; scope an address lookup to its user (`user.user_emails.friendly_find`, or a `user_id` term) before writing to what comes back.
+- **`user_emails.email` is not unique** — no unique index, no uniqueness validation, so the same address can sit on two accounts. `UserEmail.where(email:)` therefore reaches rows belonging to whoever else holds it; scope an address lookup to its user (`user.user_emails.friendly_find`, or a `user_id` term) before writing to what comes back.
 
 # Initial setup
 

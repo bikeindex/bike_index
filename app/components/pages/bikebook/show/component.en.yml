@@ -12,6 +12,7 @@ en:
           any_suspension: Any suspension
           any_vehicle_type: Any vehicle type
           applied_filters: Applied filters
+          comparison_view: Comparison view
           configuration: Configuration
           failed: The catalog didn't load. Reload the page to try again.
           loading: Loading the catalog…

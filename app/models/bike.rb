@@ -74,6 +74,7 @@
 # Indexes
 #
 #  index_bikes_current_listing_order               (listing_order) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_current_manufacturer_listing_order  (manufacturer_id,listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
 #  index_bikes_on_creation_organization_id         (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
 #  index_bikes_on_current_ownership_id             (current_ownership_id)
 #  index_bikes_on_current_stolen_record_id         (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL)
@@ -644,7 +645,7 @@ class Bike < ApplicationRecord
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
     # Only grab the phone number from registration_info if this is the first_ownership (otherwise it should be user, etc)
-    @phone ||= registration_info&.dig("phone") if first_ownership?
+    @phone ||= (registration_info&.dig("phone") if first_ownership?)
     @phone
   end
 
@@ -691,7 +692,7 @@ class Bike < ApplicationRecord
   end
 
   def fetch_current_stolen_record
-    return current_stolen_record if defined?(manual_csr)
+    return current_stolen_record if manual_csr || id.blank?
 
     # Don't access through association, or else it won't find without a reload
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
@@ -872,18 +873,18 @@ class Bike < ApplicationRecord
       case frame_size.downcase
       when /xxs/
         "xxs"
-      when /x*sma/, "xs"
+      when /(x|extra)\W?sma/, "xs"
         "xs"
       when /sma/, "s"
         "s"
       when /med/, "m"
         "m"
-      when /(lg)|(large)/, "l"
-        "l"
       when /xxl/
         "xxl"
-      when /x*l/, "xl"
+      when /(x|extra)\W?l/, "xl"
         "xl"
+      when /(lg)|(large)/, "l"
+        "l"
       end
     end
     true

@@ -4104,6 +4104,10 @@ nb:
       why_you_should_text: Les hvorfor dette er en god ide
       time_single_format: Vis kun datoer
       time_single_format_small: "(ikke «i dag», «i går» osv.)"
+      preferred_unit_system: Enheter
+      unit_system_automatic: Automatisk, fra din posisjon
+      unit_system_imperial: Imperial (miles, tommer)
+      unit_system_metric: Metrisk (kilometer, millimeter)
     sharing:
       choose_file: Velg Fil...
       create_page: Lag side
@@ -4592,11 +4596,14 @@ nb:
         why_no_direct_by_default: Som standard sendes e-poster til sykler som ikke
           er gjort krav på, til organisasjonen din for å gjennomgå og videresende
           til sluttbrukeren, fordi disse brukerne ikke har meldt seg på Bike Index-varsler.
-        send_self_registration_email_helper: Som standard sender ikke Bike Index lenger
-          en e-post til deg når et kjøretøy er registrert på organisasjonens registrerings-e-postadresse
-          (f.eks. varsler om uregistrert parkering).
         send_self_registration_email_html: Send e-post for registreringer sendt til
           <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: Dette inkluderer uregistrerte
+          varsler.
+        send_self_registration_email_note: Som standard sender ikke Bike Index lenger
+          e-post når et kjøretøy registreres til organisasjonens registrerings-e-postadresse.
+          Kryss av i denne boksen hvis du vil motta e-post for registreringer med
+          eierens e-postadresse %{email}.
     stickers:
       edit:
         bike: Sykkel
@@ -5519,6 +5526,7 @@ nb:
             search_distance: Søkeavstand
             search_location: Søk plassering
             within: innenfor
+            kilometers_of: km av
           wrapper:
             e_vehicles_for_audit: 'Elbiler for revisjon:'
             view_matching_any_audit: visning som samsvarer med enhver revisjon
@@ -5988,6 +5996,8 @@ nb:
             send_message: Sende melding
             where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
               om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
+          share:
+            link_copied: Lenken er kopiert
       search:
         everything_combobox:
           made_by: laget av
@@ -6017,6 +6027,7 @@ nb:
           stolenness_proximity: Stjålet i søkeområdet
           stolenness_stolen: Stjålet hvor som helst
           within: innenfor
+          kilometers_of: km av
         result_view_select:
           cards_view: Vis som kort
           list_view: Vis som liste
@@ -6596,6 +6607,7 @@ nb:
           year: år
           filter_combobox:
             any: Noen
+          comparison_view: Sammenligningsvisning
     shared_blocks:
       footer:
         about: Om
