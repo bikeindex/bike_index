@@ -6919,13 +6919,13 @@ es:
           year: Año
           filter_combobox:
             any: Cualquier
-          about_bikebook: Acerca del libro sobre bicicletas
           byline: Un enlace gratuito de Bike Index, el registro de bicicletas sin
             ánimo de lucro.
           tagline_html: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
             tu próximo paseo entre más de %{models_count} modelos.'
           tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
             tu próxima bici.'
+          about_bikebook_label: Acerca de BikeBook
         donate_strip:
           dismiss: Despedir
           donate: Donar
@@ -6947,23 +6947,16 @@ es:
           sources: Fuentes
           until: 'Hasta %{date}:'
         results:
-          add_it_to_bikebook: Añádelo al libro de bicicletas.
           answer_no: 'No'
           answer_yes: Sí
           being_compiled: Las normas para este estado se están recopilando a partir
             de fuentes primarias.
-          bikebook: Libro de bicicletas
-          bikebook_model: "%{year} modelo · Libro de bicicletas"
           class_1_throttle: Las motocicletas de Clase 1 no pueden tener acelerador.
           class_3_throttle: El acelerador debe cortarse a 20 mph.
           class_not_recognized: La clase %{e_bike_class} no se reconoce aquí.
           class_recognized: Se reconoce la clase %{e_bike_class}.
-          class_unknown: Bike Book no indica su clase ni su velocidad máxima, así
-            que compruebe la clase en su etiqueta.
           classes_start_on: Las clases entran en vigor %{date}. Hasta entonces, consulte
             las reglas vigentes del estado.
-          entered_by_you_html: Ingresado por ti, no verificado por Bike Book. ¿No
-            encuentras tu bicicleta? %{link}
           entered_manually: Introducido manualmente · Clase %{n}
           fails_rule: No cumple con esta regla.
           falls_under: En %{state}, se encuentra dentro de %{name}, lo que puede requerir
@@ -6982,7 +6975,6 @@ es:
           legal_to_ride: Es legal conducirlo
           legal_with_rules: Legal, con reglas para verificar
           limits_start_on: Estos límites entran en vigor %{date}
-          link_copied: Enlace copiado
           manual_bike_name: bicicleta eléctrica
           may_be_moped: En su lugar, podría estar regulado como un ciclomotor o un
             vehículo a motor, lo que podría requerir matriculación y permiso de conducir.
@@ -6997,7 +6989,6 @@ es:
           not_provided: No se proporciona
           own_classes: El estado establece sus propios límites en lugar de las tres
             clases estándar.
-          photo_bikebook: Foto · Libro de bicicletas
           recovered_more_often: Las bicicletas robadas se recuperan dos veces más
             a menudo cuando están registradas.
           red_headline: Su %{name} no está permitido como bicicleta eléctrica según
@@ -7005,7 +6996,6 @@ es:
           register_free: Regístrate en Bike Index — gratis
           rule_to_check: Regla para comprobar
           rules_not_on_file: Reglas no archivadas
-          share_state_rules: Comparte las reglas de tu estado
           source_html: 'Fuente: Catálogo de leyes estatales de %{link}. Los resúmenes
             son solo de referencia y no constituyen asesoramiento legal.'
           speed_not_provided: Velocidad máxima no proporcionada
@@ -7024,7 +7014,6 @@ es:
           throttle_not_stated: La ley estatal no especifica si se permite un acelerador.
           top_speed: Velocidad máxima
           ul_certification: Certificación UL
-          view_bikebook_entry: Ver la entrada completa del Libro de Bicicletas
           watts_html: "%{watts}W"
           watts_not_provided: Potencia del motor no proporcionada
           watts_over_cap_html: El motor %{watts}W supera la capacidad %{cap}W
@@ -7043,6 +7032,24 @@ es:
           your_bike: Tu bicicleta
           your_ebike: Tu bicicleta eléctrica
           your_state: Tu estado
+          bikebook_name: Libro de bicicletas
+          bikebook_photo: Foto · BikeBook
+          class_3_throttle_over_html: El acelerador funciona hasta %{mph} mph, más
+            allá de las 20 mph se permite el acelerador de un Clase 3.
+          class_3_throttle_within_html: El acelerador se detiene a %{mph} mph
+          class_unknown_check_label: BikeBook no indica su clase ni su velocidad máxima,
+            así que compruebe la clase en su etiqueta.
+          entered_manually_unclassified: Introducido manualmente
+          entered_unverified: Ingresado por usted, no verificado por BikeBook.
+          full_bikebook_entry: Ver la entrada completa en BikeBook
+          model_year_bikebook: "%{year} modelo · BikeBook"
+          over_mph_html: Más de %{mph} mph
+          red_headline_manual: Esto no es una bicicleta eléctrica según las normas
+            %{state} vigentes.
+          speed_past_cap_html: Ayuda a superar %{past} mph, por encima del límite
+            de %{cap} mph
+          speed_past_html: Ayuda a superar %{past} mph; comprueba que se detenga a
+            %{cap} mph.
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
@@ -7059,8 +7066,6 @@ es:
           own_definition: 'Su propia definición: %{name}'
           watts_html: "%{watts}W"
         show:
-          add_it_to_bikebook: Añádelo al libro de bicicletas.
-          add_to_bikebook_html: "¿No encuentras tu bicicleta? %{link}"
           answer_no: 'No'
           answer_yes: Sí
           assist: Asistir
@@ -7074,8 +7079,6 @@ es:
           bike_error: Selecciona una bicicleta de la lista o introduce sus datos manualmente.
           bike_model: Modelo de bicicleta
           bike_placeholder: Busca tu bicicleta (marca, modelo, año)
-          bikebook_failed: No se pudo cargar Bike Book. Introduce los datos de tu
-            bicicleta a continuación.
           bikes_registered_html: "%{number} bicicletas registradas"
           certification_involves_body: Un laboratorio de pruebas reconocido a nivel
             nacional somete las muestras de producción a pruebas de sobrecarga, cortocircuito,
@@ -7104,11 +7107,6 @@ es:
           disclaimer: Bike Index es una organización sin fines de lucro 501(c)(3).
             Los resúmenes de las leyes estatales son solo de referencia y no constituyen
             asesoramiento legal.
-          e_bike_class: Clase de bicicletas eléctricas
-          emoto_body: Los motores de más de 750 W, o aquellos que superan los límites
-            de asistencia permitidos, se consideran motocicletas eléctricas. En la
-            mayoría de los estados, se clasifican como ciclomotores o motocicletas,
-            lo que puede requerir matriculación, seguro y permiso de conducir.
           emoto_motor: 750W+
           emoto_speed: 28+ mph
           enter_manually: "¿No encuentras tu bicicleta? Introduce sus datos."
@@ -7119,10 +7117,7 @@ es:
           how_to_check_1: Busque la marca UL y el número de archivo en la etiqueta
             de la batería y del marco.
           how_to_check_2: Busque ese número en UL Product iQ.
-          how_to_check_3: Mira el modelo de arriba. Bike Book muestra la certificación
-            cuando está registrada.
           how_to_check_heading: Cómo revisar una bicicleta
-          loading_bikebook: Cargando libro de bicicletas…
           location_not_shared: Ubicación no compartida. Seleccione su estado de la
             lista.
           manual_legend: Introduce los datos de tu bicicleta
@@ -7130,7 +7125,6 @@ es:
           motor_cap: "≤750W"
           motor_wattage: Potencia del motor (W)
           mph: "%{mph} mph"
-          not_a_legal_ebike: No es una bicicleta eléctrica legal.
           not_an_ebike: No es una bicicleta eléctrica
           parent_step_1_body: Muchos estados establecen una edad mínima para la Clase
             3, y algunos para todas las clases. Consulta la normativa de tu estado
@@ -7171,7 +7165,6 @@ es:
           register_band_heading: Las bicicletas registradas se recuperan dos veces
             más a menudo cuando son robadas. El registro es gratuito.
           register_your_bike: Registra tu bicicleta
-          search_bikebook_instead: Busque en Bike Book en su lugar.
           select_state: Seleccione su estado
           state: Estado
           state_error: Elige un estado.
@@ -7200,9 +7193,21 @@ es:
             y fallas eléctricas. Cada vez más universidades, propietarios y ciudades
             exigen esta certificación antes de permitir el acceso de bicicletas eléctricas
             a espacios cerrados.
-          visit_bikebook: Visita Bike Book.
-          watts_error: Introduzca la potencia del motor.
           watts_placeholder: p. ej. 750
+          bikebook_didnt_load: BikeBook no se cargó. Introduce los datos de tu bicicleta
+            a continuación.
+          bikebook_loading: Cargando BikeBook…
+          choose_by_bike_model: Seleccione por modelo de bicicleta
+          emoto_limits_body: Una velocidad máxima superior a 45 km/h, una velocidad
+            de aceleración superior a 32 km/h o un motor de más de 750 W la convierten
+            en una moto eléctrica. En la mayoría de los estados, se consideran ciclomotores
+            o motocicletas, lo que puede requerir matriculación, seguro y permiso
+            de conducir.
+          how_to_check_lookup: Consulta el modelo que aparece más arriba. BikeBook
+            muestra la certificación cuando está registrada.
+          over_28_mph: Más de 28 mph
+          top_speed: "¿Cuál es su velocidad máxima?"
+          visit_bikebook_link: Visita BikeBook.
         state_reference:
           compiling: Estamos recopilando las normas sobre bicicletas eléctricas de
             %{state} de la legislatura estatal y del DMV. Vuelva pronto.
@@ -7215,22 +7220,25 @@ es:
           matching_of_total: "%{number} de %{total} coincide"
           on_file_of_total_html: "%{number} de %{total} estados y DC en archivo ·
             otros en revisión"
-          show_rules: Mostrar las reglas de %{state}
+          all_on_file: Todos los 50 estados y el Distrito de Columbia están archivados.
+          check_in_state: Consulta una bicicleta eléctrica en %{state}
+          no_match: No se encontraron coincidencias de estado. Pruebe con otro nombre.
         ul_badge:
           certified: Certificado UL %{standard}
           meaning_2271_certified: La batería superó las pruebas de seguridad UL contra
             sobrecarga, cortocircuito e impacto.
           meaning_2271_unknown: Todavía no disponemos de datos de certificación de
             la batería. Consulte la etiqueta de la batería.
-          meaning_2849_certified: Todo el sistema eléctrico (motor, batería, cargador
-            y controlador) superó las pruebas de seguridad eléctrica y contra incendios.
-            No cuenta con la certificación UL 2849. Algunos campus y edificios no
-            permiten el uso de bicicletas eléctricas sin certificar en sus instalaciones.
           meaning_2849_unknown: Todavía no disponemos de datos de certificación del
             sistema para este modelo. Busque la marca UL en la etiqueta del marco.
           scope_2271: Paquete de baterías
           scope_2849: Sistema eléctrico para bicicletas eléctricas
           status_unknown: Estado desconocido de UL %{standard}
+          meaning_2271_check_label: Comprueba la etiqueta de la batería.
+          meaning_2849_check_label: Busque la marca UL en la etiqueta del marco.
+          meaning_2849_system_certified: Todo el sistema eléctrico (motor, batería,
+            cargador y controlador) superó conjuntamente las pruebas de seguridad
+            eléctrica y contra incendios.
     shared_blocks:
       footer:
         about: Acerca
@@ -7271,6 +7279,7 @@ es:
         vendor_terms: condiciones de venta
         where_we_are: Dónde estamos
         who_we_serve: A quién servimos
+        ebike_checker: comprobador de bicicletas eléctricas
       law_enforcement_donation:
         bikeindex_is_a_nonprofit: Bike Index es una organización sin fines de lucro
           501(c)(3). Dependemos de donaciones para brindar estos servicios. Recomendamos

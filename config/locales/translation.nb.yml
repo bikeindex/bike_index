@@ -6634,11 +6634,11 @@ nb:
           year: år
           filter_combobox:
             any: Noen
-          about_bikebook: Om Bike Book
           byline: En gratis referanse fra Bike Index, det ideelle sykkelregisteret.
           tagline_html: Verdens sykkelbibliotek – søk, sammenlign og finn din neste
             sykkeltur på tvers av %{models_count}+ modeller.
           tagline: Verdens sykkelbibliotek – søk, sammenlign og finn din neste sykkeltur.
+          about_bikebook_label: Om BikeBook
         donate_strip:
           dismiss: Avskjedige
           donate: Donere
@@ -6660,22 +6660,15 @@ nb:
           sources: Kilder
           until: 'Inntil %{date}:'
         results:
-          add_it_to_bikebook: Legg den til i sykkelboken.
           answer_no: Nei
           answer_yes: Ja
           being_compiled: Regler for denne staten blir satt sammen fra primærkilder.
-          bikebook: Sykkelbok
-          bikebook_model: "%{year} modell · Sykkelbok"
           class_1_throttle: Klasse 1-sykler kan ikke ha gass
           class_3_throttle: Gassen må slås av ved 32 km/t
           class_not_recognized: Klassen %{e_bike_class} gjenkjennes ikke her
           class_recognized: Klasse %{e_bike_class} er gjenkjent
-          class_unknown: Bike Book oppgir ikke klasse eller toppfart, så sjekk klassen
-            på etiketten.
           classes_start_on: Kursene trer i kraft %{date}. Inntil da, sjekk statens
             gjeldende regler
-          entered_by_you_html: Registrert av deg, ikke bekreftet av Bike Book. Ser
-            du ikke sykkelen din? %{link}
           entered_manually: Angitt manuelt · Klasse %{n}
           fails_rule: Oppfyller ikke denne regelen
           falls_under: I %{state} faller den inn under %{name}, som kan kreve registrering
@@ -6693,7 +6686,6 @@ nb:
           legal_to_ride: Lovlig å sykle
           legal_with_rules: Lovlig, med regler for å sjekke
           limits_start_on: Disse grensene trer i kraft %{date}
-          link_copied: Lenken er kopiert
           manual_bike_name: elsykkel
           may_be_moped: Det kan i stedet være regulert som moped eller motorvogn,
             noe som kan kreve registrering og førerkort.
@@ -6707,7 +6699,6 @@ nb:
           not_permitted: Ikke tillatt
           not_provided: Ikke oppgitt
           own_classes: Staten setter sine egne grenser i stedet for de tre standardklassene
-          photo_bikebook: Foto · Sykkelbok
           recovered_more_often: Stjålne sykler blir funnet dobbelt så ofte når de
             er registrert.
           red_headline: Din %{name} er ikke tillatt som elsykkel i henhold til gjeldende
@@ -6715,7 +6706,6 @@ nb:
           register_free: Registrer deg på Bike Index – gratis
           rule_to_check: Regel for å sjekke
           rules_not_on_file: Regler ikke arkivert
-          share_state_rules: Del statens regler
           source_html: 'Kilde: %{link}s katalog over statslovgivning. Sammendragene
             er kun for referanse, ikke juridisk rådgivning.'
           speed_not_provided: Toppfart ikke oppgitt
@@ -6732,7 +6722,6 @@ nb:
           throttle_not_stated: Statens lov sier ikke om det er tillatt med gass
           top_speed: Toppfart
           ul_certification: UL-sertifisering
-          view_bikebook_entry: Se hele Bike Book-oppføringen
           watts_html: "%{watts}W"
           watts_not_provided: Motoreffekt ikke oppgitt
           watts_over_cap_html: "%{watts}W-motoren overskrider %{cap}W-grensen"
@@ -6751,6 +6740,22 @@ nb:
           your_bike: Sykkelen din
           your_ebike: Elsykkelen din
           your_state: Din stat
+          bikebook_name: Sykkelbok
+          bikebook_photo: Foto · Sykkelbok
+          class_3_throttle_over_html: Gasspedalen går til %{mph} mph, over 20 mph
+            er tillatt for en klasse 3-gasspedal.
+          class_3_throttle_within_html: Gasspedalen stopper ved %{mph} mph
+          class_unknown_check_label: BikeBook oppgir ikke klasse eller toppfart, så
+            sjekk klassen på etiketten
+          entered_manually_unclassified: Angitt manuelt
+          entered_unverified: Registrert av deg, ikke bekreftet av BikeBook.
+          full_bikebook_entry: Se hele BikeBook-innlegget
+          model_year_bikebook: "%{year} modell · BikeBook"
+          over_mph_html: Over %{mph} mph
+          red_headline_manual: Dette er ikke en elsykkel i henhold til gjeldende %{state}-regler.
+          speed_past_cap_html: Assisterer forbi %{past} mph, over %{cap} mph-grensen
+          speed_past_html: Assisterer forbi %{past} mph; sjekk at den stopper ved
+            %{cap} mph
         rule_label:
           classes: Klasser anerkjent
           power: Motoreffektbegrensning
@@ -6767,8 +6772,6 @@ nb:
           own_definition: 'Sin egen definisjon: %{name}'
           watts_html: "%{watts}W"
         show:
-          add_it_to_bikebook: Legg den til i sykkelboken.
-          add_to_bikebook_html: Ser du ikke sykkelen din? %{link}
           answer_no: Nei
           answer_yes: Ja
           assist: Assistere
@@ -6781,8 +6784,6 @@ nb:
           bike_error: Velg en sykkel fra listen, eller skriv inn detaljene manuelt.
           bike_model: Sykkelmodell
           bike_placeholder: Søk etter sykkelen din (merke, modell, år)
-          bikebook_failed: Sykkelboken lastet ikke inn. Skriv inn sykkeldetaljene
-            dine nedenfor.
           bikes_registered_html: "%{number} registrerte sykler"
           certification_involves_body: Et nasjonalt anerkjent testlaboratorium utsetter
             produksjonsprøver for overlading, kortslutning, støt, vann og termisk
@@ -6808,10 +6809,6 @@ nb:
           detected_html: Vi oppdaget <strong>%{state}</strong> —
           disclaimer: Bike Index er en ideell organisasjon med 501(c)(3)-lovgivning.
             Sammendrag av statlige lover er kun for referanse, ikke juridisk rådgivning.
-          e_bike_class: Elsykkelkurs
-          emoto_body: Motorer over 750 W, eller med assistanse utover klassegrensene,
-            regnes som en elmotorsykkel. De fleste stater behandler disse som mopeder
-            eller motorsykler, som kan kreve registrering, forsikring og førerkort.
           emoto_motor: 750W+
           emoto_speed: 28+ mph
           enter_manually: Finner du ikke sykkelen din? Skriv inn detaljene.
@@ -6821,17 +6818,13 @@ nb:
           heading: Kjenn reglene for elsykkel.
           how_to_check_1: Finn UL-merket og filnummeret på batteriet og rammeetiketten.
           how_to_check_2: Søk etter nummeret i UL Product iQ.
-          how_to_check_3: Slå opp modellen ovenfor. Sykkelhåndboken viser sertifisering
-            der den er registrert.
           how_to_check_heading: Slik sjekker du en sykkel
-          loading_bikebook: Laster inn sykkelbok…
           location_not_shared: Stedet er ikke delt. Velg staten din fra listen.
           manual_legend: Skriv inn sykkelens detaljer
           motor: Motor
           motor_cap: "≤750W"
           motor_wattage: Motoreffekt (W)
           mph: "%{mph} mph"
-          not_a_legal_ebike: Ikke en lovlig elsykkel
           not_an_ebike: Ikke en elsykkel
           parent_step_1_body: Mange stater setter en minimumsalder for klasse 3, og
             noen for hver klasse. Sjekk staten din før du velger en sykkel.
@@ -6865,7 +6858,6 @@ nb:
           register_band_heading: Registrerte sykler blir funnet dobbelt så ofte når
             de blir stjålet. Registreringen er gratis.
           register_your_bike: Registrer sykkelen din
-          search_bikebook_instead: Søk etter Sykkelbok i stedet
           select_state: Velg din stat
           state: Stat
           state_error: Velg en stat.
@@ -6890,9 +6882,20 @@ nb:
             slukke. UL-sertifisering betyr at et uavhengig laboratorium har testet
             sykkelen eller batteriet mot brann og elektriske feil. Flere campuser,
             utleiere og byer ber nå om bevis på dette før en elsykkel kommer innendørs.
-          visit_bikebook: Besøk Sykkelbok.
-          watts_error: Skriv inn motorens effekt.
           watts_placeholder: f.eks. 750
+          bikebook_didnt_load: BikeBook lastet ikke inn. Skriv inn sykkeldetaljene
+            dine nedenfor.
+          bikebook_loading: Laster inn BikeBook…
+          choose_by_bike_model: Velg etter sykkelmodell
+          emoto_limits_body: Toppfart over 45 km/t, gasshastighet over 32 km/t eller
+            motorer over 750 W gjør den til en elmotorsykkel. De fleste stater behandler
+            disse som mopeder eller motorsykler, som kan kreve registrering, forsikring
+            og førerkort.
+          how_to_check_lookup: Se modellen ovenfor. BikeBook viser sertifisering der
+            den er registrert.
+          over_28_mph: Over 45 km/t
+          top_speed: Hva er toppfarten?
+          visit_bikebook_link: Besøk BikeBook.
         state_reference:
           compiling: Vi samler %{state}s elsykkelregler fra delstatsforsamlingen og
             DMV. Sjekk tilbake snart.
@@ -6905,22 +6908,24 @@ nb:
           matching_of_total: "%{number} av %{total} kamp"
           on_file_of_total_html: "%{number} av %{total} stater og DC registrert ·
             andre under vurdering"
-          show_rules: Vis reglene til %{state}
+          all_on_file: Alle 50 stater og DC registrert
+          check_in_state: Sjekk en elsykkel i %{state}
+          no_match: Ingen samsvarende stater. Prøv et annet navn.
         ul_badge:
           certified: UL %{standard}-sertifisert
           meaning_2271_certified: Batteripakken har bestått UL-sikkerhetstester for
             overlading, kortslutning og støt.
           meaning_2271_unknown: Vi har ikke data om batterisertifisering ennå. Sjekk
             etiketten på batteriet.
-          meaning_2849_certified: Hele det elektriske systemet (motor, batteri, lader
-            og kontroller) bestod brann- og elektrisk sikkerhetstesting. Ingen UL
-            2849-oppføring registrert. Enkelte campuser og bygninger tillater ikke
-            usertifiserte elsykler innendørs.
           meaning_2849_unknown: Vi har ikke systemsertifiseringsdata for denne modellen
             ennå. Se etter UL-merket på rammeetiketten.
           scope_2271: Batteripakke
           scope_2849: Elsykkelens elektriske system
           status_unknown: UL %{standard} status ukjent
+          meaning_2271_check_label: Sjekk etiketten på batteriet.
+          meaning_2849_check_label: Se etter UL-merket på rammeetiketten.
+          meaning_2849_system_certified: Hele det elektriske systemet (motor, batteri,
+            lader og kontroller) bestod brann- og elsikkerhetstester sammen.
     shared_blocks:
       footer:
         about: Om
@@ -6961,6 +6966,7 @@ nb:
         vendor_terms: leverandørens vilkår
         where_we_are: Hvor vi er
         who_we_serve: Hvem vi tjener
+        ebike_checker: Elsykkelkontrollør
       law_enforcement_donation:
         bikeindex_is_a_nonprofit: Bike Index er en 501(c)(3) ideell organisasjon.
           Vi er avhengige av donasjoner for å kunne tilby disse tjenestene. Vi anbefaler

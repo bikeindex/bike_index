@@ -6827,12 +6827,12 @@ nl:
           year: jaar
           filter_combobox:
             any: Elk
-          about_bikebook: Over het fietsboek
           byline: Een gratis naslagwerk van Bike Index, het non-profit fietsregister.
           tagline_html: De fietsenbibliotheek van de wereld — zoek, vergelijk en vind
             je volgende fiets tussen de %{models_count}+ modellen.
           tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
             volgende fiets.'
+          about_bikebook_label: Over BikeBook
         donate_strip:
           dismiss: Afwijzen
           donate: Schenken
@@ -6854,23 +6854,16 @@ nl:
           sources: Bronnen
           until: 'Tot %{date}:'
         results:
-          add_it_to_bikebook: Voeg het toe aan Bike Book.
           answer_no: Nee
           answer_yes: Ja
           being_compiled: De regels voor deze staat worden samengesteld op basis van
             primaire bronnen.
-          bikebook: Fietsboek
-          bikebook_model: "%{year} model · Fietsboek"
           class_1_throttle: Motorfietsen van klasse 1 mogen geen gashendel hebben.
           class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
           class_not_recognized: Klasse %{e_bike_class} wordt hier niet herkend.
           class_recognized: Klasse %{e_bike_class} wordt herkend
-          class_unknown: Bike Book vermeldt de klasse of topsnelheid niet, dus controleer
-            de klasse op het label.
           classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
             regels van de staat raadplegen.
-          entered_by_you_html: Ingevoerd door jou, niet geverifieerd door Bike Book.
-            Staat jouw fiets er niet tussen? %{link}
           entered_manually: Handmatig ingevoerd · Klasse %{n}
           fails_rule: Voldoet niet aan deze regel.
           falls_under: In %{state} valt het onder %{name}, waarvoor registratie en
@@ -6888,7 +6881,6 @@ nl:
           legal_to_ride: Legaal om te rijden
           legal_with_rules: Legaal, met regels om te controleren
           limits_start_on: Deze limieten treden in werking %{date}
-          link_copied: Link gekopieerd
           manual_bike_name: e-bike
           may_be_moped: Het kan ook zijn dat het voertuig wordt gereguleerd als een
             bromfiets of motorvoertuig, waarvoor registratie en een rijbewijs vereist
@@ -6904,7 +6896,6 @@ nl:
           not_provided: Niet verstrekt
           own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
             standaardklassen.
-          photo_bikebook: Foto · Fietsboek
           recovered_more_often: Gestolen fietsen worden twee keer zo vaak teruggevonden
             als ze geregistreerd zijn.
           red_headline: Uw %{name} is niet toegestaan als e-bike volgens de huidige
@@ -6912,7 +6903,6 @@ nl:
           register_free: Registreer je gratis op Bike Index
           rule_to_check: Regel om te controleren
           rules_not_on_file: Regels niet aanwezig
-          share_state_rules: Deel de regels van jouw staat.
           source_html: 'Bron: %{link}''s catalogus van staatsrecht. Samenvattingen
             dienen ter referentie en zijn geen juridisch advies.'
           speed_not_provided: Maximale snelheid niet vermeld
@@ -6931,7 +6921,6 @@ nl:
             is toegestaan.
           top_speed: Topsnelheid
           ul_certification: UL-certificering
-          view_bikebook_entry: Bekijk het volledige Bike Book-artikel
           watts_html: "%{watts}W"
           watts_not_provided: Motorvermogen niet opgegeven
           watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
@@ -6950,6 +6939,23 @@ nl:
           your_bike: Jouw fiets
           your_ebike: Jouw e-bike
           your_state: Uw staat
+          bikebook_name: BikeBook
+          bikebook_photo: Foto · BikeBook
+          class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
+            20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
+          class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
+          class_unknown_check_label: BikeBook vermeldt de klasse of topsnelheid niet,
+            dus controleer de klasse op het label.
+          entered_manually_unclassified: Handmatig ingevoerd
+          entered_unverified: Invoer door u, niet geverifieerd door BikeBook.
+          full_bikebook_entry: Bekijk het volledige BikeBook-artikel
+          model_year_bikebook: "%{year} model · BikeBook"
+          over_mph_html: Meer dan %{mph} mph
+          red_headline_manual: Dit is geen e-bike volgens de huidige %{state} regels.
+          speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
+            de %{cap} mph-limiet
+          speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
+            bij %{cap} mph
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -6966,8 +6972,6 @@ nl:
           own_definition: 'De eigen definitie: %{name}'
           watts_html: "%{watts}W"
         show:
-          add_it_to_bikebook: Voeg het toe aan Bike Book.
-          add_to_bikebook_html: Zie je je fiets niet? %{link}
           answer_no: Nee
           answer_yes: Ja
           assist: Helpen
@@ -6980,8 +6984,6 @@ nl:
           bike_error: Kies een fiets uit de lijst of voer de gegevens handmatig in.
           bike_model: Fietsmodel
           bike_placeholder: Zoek je fiets (merk, model, bouwjaar)
-          bikebook_failed: Bike Book is niet geladen. Voer hieronder de gegevens van
-            uw fiets in.
           bikes_registered_html: "%{number} geregistreerde fietsen"
           certification_involves_body: Een nationaal erkend testlaboratorium onderwerpt
             productiemonsters aan tests op overbelasting, kortsluiting, impact, waterdichtheid
@@ -7011,12 +7013,6 @@ nl:
           disclaimer: Bike Index is een 501(c)(3) non-profitorganisatie. Samenvattingen
             van de wetgeving van de betreffende staat dienen ter referentie en zijn
             geen juridisch advies.
-          e_bike_class: E-bike klasse
-          emoto_body: Motoren met een vermogen van meer dan 750 watt, of motoren met
-            trapondersteuning die de limieten van de betreffende klasse overschrijden,
-            worden beschouwd als e-moto's. In de meeste staten worden deze beschouwd
-            als bromfietsen of motorfietsen, waarvoor registratie, verzekering en
-            een rijbewijs vereist kunnen zijn.
           emoto_motor: 750W+
           emoto_speed: 28+ mph
           enter_manually: Kun je je fiets niet vinden? Voer de gegevens in.
@@ -7028,10 +7024,7 @@ nl:
           how_to_check_1: Zoek het UL-keurmerk en het bestandsnummer op het label
             van de accu en het frame.
           how_to_check_2: Zoek dat nummer op in UL Product iQ.
-          how_to_check_3: Zoek het model hierboven op. Bike Book toont de certificering
-            waar deze geregistreerd staat.
           how_to_check_heading: Hoe controleer je een fiets?
-          loading_bikebook: Fietsboek laden…
           location_not_shared: Locatie niet gedeeld. Kies uw provincie/staat uit de
             lijst.
           manual_legend: Voer de gegevens van uw fiets in.
@@ -7039,7 +7032,6 @@ nl:
           motor_cap: "≤750W"
           motor_wattage: Motorvermogen (W)
           mph: "%{mph} mph"
-          not_a_legal_ebike: Geen legale e-bike
           not_an_ebike: Geen e-bike
           parent_step_1_body: Veel staten hanteren een minimumleeftijd voor klasse
             3, en sommige voor elke klasse. Controleer de regels in uw staat voordat
@@ -7076,7 +7068,6 @@ nl:
           register_band_heading: Geregistreerde fietsen worden twee keer zo vaak teruggevonden
             als ze gestolen worden. Registratie is gratis.
           register_your_bike: Registreer uw fiets
-          search_bikebook_instead: Zoek in plaats daarvan in Bike Book.
           select_state: Selecteer uw staat
           state: Staat
           state_error: Kies een staat.
@@ -7103,9 +7094,21 @@ nl:
             de fiets of batterij heeft getest op brand- en elektrische storingen.
             Steeds meer campussen, verhuurders en gemeenten vragen nu om een dergelijk
             bewijs voordat een e-bike binnen mag worden gebruikt.
-          visit_bikebook: Bezoek Bike Book.
-          watts_error: Voer het motorvermogen in.
           watts_placeholder: bijv. 750
+          bikebook_didnt_load: BikeBook kon niet worden geladen. Voer hieronder de
+            gegevens van uw fiets in.
+          bikebook_loading: BikeBook wordt geladen…
+          choose_by_bike_model: Selecteer op fietsmodel
+          emoto_limits_body: Een e-moto wordt beschouwd als een voertuig met een topsnelheid
+            van meer dan 45 km/u, een maximale snelheid van meer dan 32 km/u of een
+            motorvermogen van meer dan 750 watt. In de meeste staten worden deze voertuigen
+            behandeld als bromfietsen of motorfietsen, waarvoor registratie, verzekering
+            en een rijbewijs vereist kunnen zijn.
+          how_to_check_lookup: Zoek het model hierboven op. BikeBook toont de certificering
+            waar deze geregistreerd staat.
+          over_28_mph: Meer dan 45 km/u
+          top_speed: Wat is de topsnelheid?
+          visit_bikebook_link: Bezoek BikeBook.
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
@@ -7119,23 +7122,26 @@ nl:
           matching_of_total: "%{number} van %{total} match"
           on_file_of_total_html: "%{number} van %{total} staten en DC geregistreerd
             · anderen in beoordeling"
-          show_rules: Toon de regels van %{state}
+          all_on_file: Alle 50 staten en DC geregistreerd.
+          check_in_state: Check een e-bike in %{state}
+          no_match: Geen enkele staat komt overeen. Probeer een andere naam.
         ul_badge:
           certified: UL %{standard} gecertificeerd
           meaning_2271_certified: Het accupakket heeft de UL-veiligheidstests voor
             overladen, kortsluiting en stoten doorstaan.
           meaning_2271_unknown: We hebben nog geen gegevens over de batterijcertificering.
             Controleer het label op de batterij.
-          meaning_2849_certified: Het complete elektrische systeem (motor, accu, lader
-            en controller) heeft gezamenlijk de brand- en elektrische veiligheidstests
-            doorstaan. Er is geen UL 2849-certificering geregistreerd. Op sommige
-            campussen en in sommige gebouwen zijn niet-gecertificeerde e-bikes niet
-            binnen toegestaan.
           meaning_2849_unknown: We hebben nog geen systeemcertificeringsgegevens voor
             dit model. Zoek naar het UL-keurmerk op het frame-etiket.
           scope_2271: Batterijpakket
           scope_2849: Elektrisch systeem van een e-bike
           status_unknown: UL %{standard} status onbekend
+          meaning_2271_check_label: Controleer het label op de batterij.
+          meaning_2849_check_label: Zoek naar het UL-keurmerk op het label van het
+            frame.
+          meaning_2849_system_certified: Het complete elektrische systeem (motor,
+            accu, lader en controller) heeft gezamenlijk de brandveiligheids- en elektrische
+            veiligheidstests doorstaan.
     shared_blocks:
       footer:
         about: Over
@@ -7176,6 +7182,7 @@ nl:
         vendor_terms: leveranciersvoorwaarden
         where_we_are: Waar we zijn
         who_we_serve: Wie we dienen
+        ebike_checker: E-bike controleur
       law_enforcement_donation:
         bikeindex_is_a_nonprofit: Bike Index is een 501 (c) (3) non-profit. We zijn
           afhankelijk van donaties om deze diensten te leveren. We raden wetshandhavingsinstanties
