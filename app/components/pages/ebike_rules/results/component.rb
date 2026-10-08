@@ -108,7 +108,7 @@ module Pages
             if key == :e_bike_class
               [key, value]
             elsif value.is_a?(Date)
-              [key, l(value, format: Pages::EbikeRules::LawDetails::Component::DATE_FORMAT)]
+              [key, l(value, format: :long)]
             else
               [key, number_display(value)]
             end

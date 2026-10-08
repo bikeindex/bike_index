@@ -12,12 +12,11 @@ module EbikeRules
     # e-bike only for state parks, and on its roads one is a motor-driven cycle
     OFF_ROAD_LAWS = %w[evc/us/ak/electric_bicycle].freeze
 
-    # By abbreviation, empty when the catalog doesn't answer. A limit is nil where the state sets none.
-    # The dates are today's: a rule that has ended is gone, one still to come keeps its starts_on,
-    # and limits_start_on is there only while the limits aren't yet in force
+    # By abbreviation, empty when the catalog doesn't answer. A limit is nil where the state sets none,
+    # and a date only while it's still ahead of today
     def laws(today: Time.zone.today) = parsed[:laws].transform_values { in_force(it, today) }
 
-    def find(abbreviation, today: Time.zone.today) = laws(today:)[abbreviation]
+    def find(abbreviation, today: Time.zone.today) = parsed[:laws][abbreviation]&.then { in_force(it, today) }
 
     def state(abbreviation) = STATES.find { it[:abbr] == abbreviation&.upcase }
 
@@ -50,9 +49,8 @@ module EbikeRules
     end
 
     def parse(records)
-      states = records.filter_map { |id, record| [id[STATE_ID, 1].upcase, id, record] if id.match?(STATE_ID) }
-      laws, tiers = states.reject { |_abbreviation, id, _record| OFF_ROAD_LAWS.include?(id) }
-        .partition { |_abbreviation, id, _record| id.match?(BikebookCatalog::E_BIKE_LAW) }
+      states = records.filter_map { |id, record| [id[STATE_ID, 1].upcase, id, record] if id.match?(STATE_ID) && !OFF_ROAD_LAWS.include?(id) }
+      laws, tiers = states.partition { |_abbreviation, id, _record| id.match?(BikebookCatalog::E_BIKE_LAW) }
       {
         laws: laws.to_h { |abbreviation, id, record| [abbreviation, law(id, record)] },
         tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| [record["name"], [id, *record["groups"]]] } },
@@ -78,14 +76,15 @@ module EbikeRules
 
     def restriction(value) = {rule: value["rule"], starts_on: date(value["starts_on"]), ends_on: date(value["ends_on"])}
 
-    def date(value) = value && Date.parse(value)
+    def date(value) = value&.to_date
 
     def in_force(law, today)
-      restrictions = law[:restrictions].reject { it[:ends_on]&.<=(today) }
-        .map { it.merge(starts_on: (it[:starts_on] if it[:starts_on]&.>(today))) }
-      law.merge(restrictions:, limits_start_on: (law[:limits_start_on] if law[:limits_start_on]&.>(today)))
+      restrictions = law[:restrictions].reject { it[:ends_on]&.<=(today) }.map { it.merge(starts_on: upcoming(it[:starts_on], today)) }
+      law.merge(restrictions:, limits_start_on: upcoming(law[:limits_start_on], today))
     end
 
-    conceal :parsed, :parse, :law, :restriction, :date, :in_force
+    def upcoming(date, today) = (date if date&.>(today))
+
+    conceal :parsed, :parse, :law, :restriction, :date, :in_force, :upcoming
   end
 end

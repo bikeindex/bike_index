@@ -20,7 +20,6 @@ RSpec.describe EbikeRules::StateLaws do
 
     it "is nil for a state without an e-bike law in the catalog, or whose law isn't for its roads" do
       expect(described_class.find("WY")).to be_nil
-      # Alaska's is for state parks; on its roads an e-bike is a motor-driven cycle
       expect(described_class.find("AK")).to be_nil
       expect(described_class.classification_name("AK", ["evc/us/class_1"])).to be_nil
     end

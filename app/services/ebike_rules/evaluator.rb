@@ -8,13 +8,8 @@ module EbikeRules
     extend Functionable
 
     def rules(law:, bike:)
-      throttle = throttle_rule(law, bike.throttle, bike.e_bike_class)
-      # limits not yet in force describe the coming law, so the rider checks the law's dated rules for today's
-      if (date = law[:limits_start_on])
-        classes = bike.e_bike_class ? row(:classes, :check, :classes_start_on, date:) : classes_rule(law, nil)
-        return [classes, row(:power, :info, :limits_start_on, date:), row(:speed, :info, :limits_start_on, date:), throttle]
-      end
-      [classes_rule(law, bike.e_bike_class), power_rule(law, bike.watts), speed_rule(law, bike.top_assist_mph), throttle]
+      [classes_rule(law, bike.e_bike_class), power_rule(law, bike.watts), speed_rule(law, bike.top_assist_mph),
+        throttle_rule(law, bike.throttle, bike.e_bike_class)]
     end
 
     # :red if any rule fails, else :yellow if any is to check, else :green - :gray without a law on file
@@ -36,6 +31,9 @@ module EbikeRules
     def classes_rule(law, e_bike_class)
       if e_bike_class.nil?
         row(:classes, :fail, :not_classified)
+      # limits not yet in force describe the coming law, so the rider checks the law's dated rules for today's
+      elsif (date = law[:limits_start_on])
+        row(:classes, :check, :classes_start_on, date:)
       elsif law[:classes].none?
         row(:classes, :info, :own_classes)
       elsif law[:classes].include?(e_bike_class)
@@ -47,7 +45,9 @@ module EbikeRules
 
     def power_rule(law, watts)
       cap = law[:watt_cap]
-      if watts.nil?
+      if (date = law[:limits_start_on])
+        row(:power, :info, :limits_start_on, date:)
+      elsif watts.nil?
         row(:power, :info, :watts_not_provided)
       elsif cap.nil?
         row(:power, :pass, :no_watt_cap)
@@ -60,7 +60,9 @@ module EbikeRules
 
     def speed_rule(law, mph)
       cap = law[:mph]
-      if mph.nil?
+      if (date = law[:limits_start_on])
+        row(:speed, :info, :limits_start_on, date:)
+      elsif mph.nil?
         row(:speed, :info, :speed_not_provided)
       elsif cap.nil?
         row(:speed, :pass, :no_speed_cap)
