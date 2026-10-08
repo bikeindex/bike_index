@@ -19,6 +19,11 @@ SitemapGenerator::Sitemap.create do
     SitemapPages::ADDITIONAL.each { |i| add("/#{i}", priority: 0.8, changefreq: "daily") }
 
     LandingPageOrganizations::SLUGS.each { |i| add("/o/#{i}", priority: 0.7, changefreq: "weekly") }
+
+    # /ebike-rules itself redirects by the visitor's location, and Puerto Rico has no page
+    State.united_states.where(abbreviation: EbikeRules::StateLaws::STATES.pluck(:abbr)).each do |state|
+      add(ebike_rules_state_path(state.abbreviation.downcase), priority: 0.8, changefreq: "weekly")
+    end
   end
 
   group(filename: :blog) do
