@@ -14,8 +14,11 @@ module BikeServices
       "handoff_priority" => "Shop followed by customer — strongest evidence",
       "shop_customer" => "Shop followed by customer — review",
       "same_identity" => "Same contact or account — review",
-      "unresolved" => "Different or missing identity"
+      "unresolved" => "Different or missing identity",
+      "not_a_serial" => "Placeholder or part-number serial — not a duplicate match"
     }.freeze
+    # Queues a future merge invitation could draw from; the rest need separate review
+    SAME_OWNER_KINDS = %w[handoff_priority shop_customer same_identity].freeze
 
     def cache
       return Rails.cache unless Rails.cache.is_a?(ActiveSupport::Cache::NullStore)
@@ -35,12 +38,14 @@ module BikeServices
       end
     end
 
-    def cache_key(database) = ["duplicate_review_groups_v4", database]
+    def cache_key(database) = ["duplicate_review_groups_v7", database]
 
-    def preparation_key(database) = ["duplicate_review_groups_preparing_v4", database]
+    def preparation_key(database) = ["duplicate_review_groups_preparing_v7", database]
 
     def groups
+      manufacturer_names = DuplicateReviewCues.manufacturer_name_serials
       ActiveRecord::Base.connection.select_all(query).to_a.map do |group|
+        group["manufacturer_name_serial"] = manufacturer_names[group["serial"]]
         group.merge("kind" => kind(group),
           "bike_ids" => JSON.parse(group["bike_ids"]),
           "organization_ids" => JSON.parse(group["organization_ids"] || "[]"),
@@ -49,7 +54,10 @@ module BikeServices
       end
     end
 
+    # A placeholder or part-number serial isn't evidence of anything, so it outranks every other queue.
+    # The stolen badge still shows in that queue
     def kind(group)
+      return "not_a_serial" if DuplicateReviewCues.not_a_serial(group["serial"], manufacturer_names: DuplicateReviewCues.group_manufacturer_names(group))
       return "stolen_history" if group["serial_stolen"]
       return "internal_test" if group["test_count"] == group["record_count"]
       return "mixed_test" if group["test_count"].positive?
@@ -57,7 +65,7 @@ module BikeServices
       return "handoff_priority" if group["handoff_priority"]
       return "pos_repeat" if group["pos_count"] == group["record_count"] && group["ever_claimed_count"].zero? && group["transfer_count"].zero? && group["email_count"] == 1 && group["missing_email_count"].zero? && group["organization_count"] == 1 && group["missing_organization_count"].zero?
       return "shop_customer" if group["record_count"] == 2 && group["pos_count"] == 1 && group["customer_count"] == 1 && group["pos_first"]
-      return "same_identity" if (group["email_count"] == 1 && group["missing_email_count"].zero?) || (group["account_count"] == 1 && group["missing_account_count"].zero?)
+      return "same_identity" if DuplicateReviewCues.single_contact?(group)
 
       "unresolved"
     end
@@ -67,8 +75,10 @@ module BikeServices
         .where(manufacturer_id: reference.manufacturer_id, serial_normalized_no_space: reference.serial_normalized_no_space)
     end
 
-    def stolen_serial?(serial)
-      stolen_serials?([serial])
+    # Current, historical or recovered: any of them vetoes merging a whole serial
+    def stolen_history_sql(table)
+      "(#{table}.status = 1 OR #{table}.current_stolen_record_id IS NOT NULL" \
+        " OR EXISTS (SELECT 1 FROM stolen_records WHERE stolen_records.bike_id = #{table}.id))"
     end
 
     def stolen_serials?(serials)
@@ -76,25 +86,40 @@ module BikeServices
       return false if serials.empty?
 
       Bike.unscoped.where(serial_normalized_no_space: serials)
-        .where("status = 1 OR current_stolen_record_id IS NOT NULL OR EXISTS (SELECT 1 FROM stolen_records WHERE stolen_records.bike_id = bikes.id)").exists?
+        .where(stolen_history_sql("bikes")).exists?
+    end
+
+    # The same test-marker rule the queues use, for records loaded outside them
+    def test_bike_ids(bike_ids)
+      return [] if bike_ids.empty?
+
+      # Not materialized, so the bike_id filter reaches each union branch's index
+      sql = "WITH #{test_bikes_sql(materialized: false)} SELECT bike_id FROM test_bikes WHERE bike_id IN (?)"
+      ActiveRecord::Base.connection.select_values(ActiveRecord::Base.sanitize_sql_array([sql, bike_ids]))
     end
 
     #
     # private below here
     #
 
-    def query
-      <<~SQL
-        WITH admin_organizations AS MATERIALIZED (
+    def test_bikes_sql(materialized: true)
+      <<~SQL.strip
+        admin_organizations AS MATERIALIZED (
           SELECT id FROM organizations WHERE slug = 'bikeindex' OR lower(btrim(name)) = 'bike index administrators'
-        ), test_bikes AS MATERIALIZED (
+        ), test_bikes AS #{"MATERIALIZED " if materialized}(
           SELECT id bike_id FROM bikes WHERE creation_organization_id IN (SELECT id FROM admin_organizations)
             OR lower(btrim(owner_email)) = 'testing@example.com'
           UNION SELECT bike_id FROM ownerships WHERE organization_id IN (SELECT id FROM admin_organizations)
             OR (is_phone IS NOT TRUE AND lower(btrim(owner_email)) = 'testing@example.com')
           UNION SELECT o.bike_id FROM ownerships o JOIN users u ON u.id = o.user_id WHERE lower(btrim(u.email)) = 'testing@example.com'
           UNION SELECT bike_id FROM bike_organizations WHERE organization_id IN (SELECT id FROM admin_organizations)
-        ), live AS MATERIALIZED (
+        )
+      SQL
+    end
+
+    def query
+      <<~SQL
+        WITH #{test_bikes_sql}, live AS MATERIALIZED (
           SELECT id, manufacturer_id, serial_normalized_no_space serial, created_at, creation_organization_id,
             current_ownership_id, status, current_impound_record_id, frame_model, year, manufacturer_other,
             regexp_replace(upper(coalesce(serial_number, '')), '[^A-Z0-9]', '', 'g') simple_serial
@@ -104,8 +129,7 @@ module BikeServices
           SELECT manufacturer_id, serial FROM live GROUP BY manufacturer_id, serial HAVING count(*) > 1
         ), stolen_serials AS MATERIALIZED (
           SELECT DISTINCT b.serial_normalized_no_space serial FROM bikes b
-          WHERE b.status = 1 OR b.current_stolen_record_id IS NOT NULL
-            OR EXISTS (SELECT 1 FROM stolen_records s WHERE s.bike_id = b.id)
+          WHERE #{stolen_history_sql("b")}
         ), registrations AS (
           SELECT b.*, o.user_id, coalesce(o.organization_id, b.creation_organization_id) organization_id,
             CASE WHEN o.is_phone IS NOT TRUE AND btrim(o.owner_email) ~ '^[^@[:space:]]+@[^@[:space:]]+$' THEN lower(btrim(o.owner_email)) END email,
@@ -138,6 +162,7 @@ module BikeServices
           count(*) FILTER (WHERE ever_claimed)::integer ever_claimed_count,
           count(*) FILTER (WHERE transferred)::integer transfer_count,
           count(DISTINCT email)::integer email_count, count(*) FILTER (WHERE email IS NULL)::integer missing_email_count,
+          count(*) FILTER (WHERE #{DuplicateReviewCues.review_contact_sql("email")})::integer review_contact_count,
           count(DISTINCT user_id)::integer account_count, count(*) FILTER (WHERE user_id IS NULL)::integer missing_account_count,
           count(DISTINCT organization_id)::integer organization_count, count(*) FILTER (WHERE organization_id IS NULL)::integer missing_organization_count,
           jsonb_agg(DISTINCT organization_id) FILTER (WHERE organization_id IS NOT NULL) organization_ids,
@@ -158,6 +183,6 @@ module BikeServices
       SQL
     end
 
-    conceal :query
+    conceal :query, :test_bikes_sql
   end
 end

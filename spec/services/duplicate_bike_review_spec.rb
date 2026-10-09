@@ -1,4 +1,9 @@
 require "spec_helper"
+require "active_support/all"
+require "functionable"
+require_relative "../../app/services/serial_normalizer"
+require_relative "../../app/services/bike_services/duplicate_review_finder"
+require_relative "../../app/services/bike_services/duplicate_review_cues"
 require_relative "../../app/services/duplicate_bike_review"
 
 RSpec.describe DuplicateBikeReview do
@@ -152,6 +157,80 @@ RSpec.describe DuplicateBikeReview do
       expect(review.manufacturer_match(bike)).to eq "Manufacturer unavailable"
       expect(review.account_match(bike, initial: true)).to eq "Account unavailable"
       expect(review.email_match(bike, initial: true)).to eq "Email unavailable"
+    end
+  end
+
+  context "summarizing a larger group" do
+    let(:summary_bike_class) do
+      Struct.new(:id, :created_at, :serial_number, :serial_normalized_no_space, :manufacturer, :manufacturer_other, :frame_model,
+        :year, :primary_frame_color, :cycle_type, :status, :ownerships, :current_ownership, :creation_organization,
+        :deleted_at, :example, :likely_spam, :marketplace_listings, :current_impound_record_id)
+    end
+    let(:named) { Struct.new(:name) }
+    let(:records) do
+      [["a@example.com", 2019, 1], ["a@example.com", 2019, 2], ["b@bikeindex.org", 2020, 3], [nil, 2019, 4]].map do |owner_email, year, id|
+        ownership = ownership_class.new(id:, created_at: Time.at(id), user_id: owner_email && id, owner_email:)
+        summary_bike_class.new(id:, created_at: Time.at(id), serial_number: "EN 14764", serial_normalized_no_space: "EN14764",
+          manufacturer: named.new("Maker"), frame_model: "Roadster", year:, cycle_type: "bike", status: "status_with_owner",
+          ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
+      end
+    end
+    let(:review) { described_class.new(bikes: records) }
+
+    it "shows shared values once and the differences per record" do
+      expect(review.shared_fields).to eq ["Manufacturer", "Model", "Primary color", "Vehicle type", "Stored serial", "Whole normalized serial", "Status"]
+      expect(review.differing_fields).to eq ["Year"]
+      expect(review.field_distribution("Year")).to eq [["2019", 3], ["2020", 1]]
+      expect(review.differences(records[2])).to eq ["Year"]
+      expect(review.differences(records[0])).to eq []
+    end
+
+    it "groups by initial contact with absent emails last" do
+      expect(review.contact_groups.map { [it.number, it.email, it.bikes.map(&:id)] })
+        .to eq [[1, "a@example.com", [1, 2]], [2, "b@bikeindex.org", [3]], [3, nil, [4]]]
+      expect(review.contact_group(records[1]).number).to eq 1
+    end
+
+    it "derives tentative cues from the loaded records" do
+      expect(review.review_contact_count).to eq 2
+      expect(review.cues(test_count: 0).map(&:key)).to eq ["standard_marking", "review_contact"]
+    end
+  end
+
+  context "assessing a pair for a future invitation" do
+    let(:pair_bike_class) do
+      Struct.new(:id, :created_at, :serial_number, :serial_normalized_no_space, :manufacturer, :manufacturer_other, :frame_model,
+        :year, :primary_frame_color, :cycle_type, :status, :ownerships, :current_ownership, :creation_organization,
+        :deleted_at, :example, :likely_spam, :marketplace_listings, :current_impound_record_id)
+    end
+    let(:second_user_id) { 10 }
+    let(:pair) do
+      [[10, true], [second_user_id, false]].each_with_index.map do |(user_id, claimed), index|
+        ownership = ownership_class.new(id: index + 1, created_at: Time.at(index), user_id:, owner_email: "rider@bikeindex.org", claimed:)
+        pair_bike_class.new(id: index + 1, created_at: Time.at(index), serial_normalized_no_space: "WTU123456", frame_model: "Roadster",
+          ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
+      end
+    end
+    let(:review) { described_class.new(bikes: pair) }
+    let(:checks) { review.readiness_checks(serial_stolen: false, test_count: 0) }
+
+    it "meets the strict evidence with one known, current, claiming account" do
+      expect(checks.map(&:status).uniq).to eq [:pass]
+      expect(review.readiness(checks)).to eq :pass
+    end
+
+    context "with the same email on different accounts" do
+      let(:second_user_id) { 11 }
+
+      it "keeps an email-only match tentative" do
+        expect(checks.map(&:label)).to include("Same initial email only — tentative; shops and shared inboxes reuse emails")
+        expect(review.readiness(checks)).to eq :uncertain
+      end
+    end
+
+    it "vetoes stolen history and keeps test records out" do
+      expect(review.readiness(review.readiness_checks(serial_stolen: true, test_count: 0))).to eq :blocked
+      expect(review.readiness(review.readiness_checks(serial_stolen: false, test_count: 1))).to eq :blocked
     end
   end
 end

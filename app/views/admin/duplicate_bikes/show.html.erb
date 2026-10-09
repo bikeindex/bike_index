@@ -1,49 +1,482 @@
-<h1>Compare suspected duplicate registrations</h1>
+<% review = @review %>
+<% shared_fields = review.shared_fields %>
+<% contact_groups = review.contact_groups %>
+<% muted = "tw:text-gray-600 tw:dark:text-gray-400" %>
 
-<% if @serial_stolen %>
-  <p class="text-danger tw:mt-4 tw:font-bold">
-    Do not merge: this whole serial has stolen history, potentially on a record
-    outside this comparison. Recovered and deleted records still count.
+<p class="tw:text-sm">
+  <%= link_to "← Duplicate review queues", admin_duplicate_bikes_path, class: "twlink" %>
+</p>
+
+<h1 class="tw:mt-2">
+  Compare <%= number_display(@bikes_count) %> registrations
+</h1>
+
+<% if shared_fields.include?("Manufacturer") || shared_fields.include?("Stored serial") %>
+  <p class="tw:mt-1 tw:text-lg">
+    <%= review.field_value(@reference_bike, "Manufacturer") if shared_fields.include?("Manufacturer") %>
+
+    <% if shared_fields.include?("Stored serial") %>
+      ·
+      <%= render Atoms::Serial::Component.new(serial: @reference_bike.serial_number) %>
+    <% end %>
   </p>
 <% end %>
 
-<p class="tw:mt-4">
-  Review evidence only. No merge or customer-email action is available.
-</p>
-
-<p>
-  <%= link_to "Back to duplicate groups", admin_duplicate_bikes_path, class: "twlink" %>
-</p>
-
-<p>
-  Manufacturer SKU/product code: unavailable as a dedicated field in this
-  database. Model text and serials below are shown as stored.
-</p>
-
-<p>
-  Each bike ID identifies a registration record intended to describe an
-  individual physical bicycle. Matching stored serials or segments does not
-  establish that the records describe the same bicycle. Initial registration and
-  current ownership can differ after a transfer.
-</p>
-
-<% if @duplicate_group %>
-  <p>
-    Group #<%= @duplicate_group.id %>:
-    <strong><%= @duplicate_group.ignore? ? "Ignored" : "Active" %></strong>
-  </p>
-  <% if @review_read_only %>
-    <p>Review changes are unavailable in this read-only database.</p>
+<% if @serial_stolen %>
+  <%= render UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mt-4", header: "Do not merge: this whole serial has stolen history") do %>
+    The stolen report may be on a record outside this comparison. Recovered and
+    deleted records still count. Preserve these records separately.
   <% end %>
 <% end %>
 
-<% if @reference_bike %>
-  <p>
-    Comparison reference:
-    <%= link_to "Bike ##{@reference_bike.id}", edit_admin_bike_path(@reference_bike), class: "twlink" %>.
+<% not_serial = review.not_a_serial %>
+
+<% if not_serial %>
+  <%= render UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mt-4", header: "Not a duplicate match: this serial is #{not_serial.part_number? ? "a part number" : "a placeholder"} (#{not_serial.value})") do %>
+    These records share the serial because it was entered in place of a frame
+    serial, so it says nothing about whether they are the same bicycle. Treat
+    each as its own registration. The placeholder and part-number list is
+    reviewer-curated and lives in
+    <span class="tw:font-mono">BikeServices::DuplicateReviewCues</span>.
+  <% end %>
+<% end %>
+
+<p class="tw:mt-3 tw:text-sm <%= muted %>">
+  Review evidence only — no merge, deletion or customer-email action is
+  available. Matching serials, contacts or similar spellings do not establish
+  that records describe the same physical bicycle, a correct address or consent.
+</p>
+
+<% if @duplicate_group %>
+  <p class="tw:text-sm">
+    Serial-segment group #<%= @duplicate_group.id %>:
+    <strong><%= @duplicate_group.ignore? ? "Ignored" : "Active" %></strong> ·
+    review changes are unavailable here
   </p>
 <% end %>
 
-<%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state, count: @bikes_count, viewing: "bike records") %>
-<%= render "comparison", review: @review, stolen_record_counts: @stolen_record_counts, account_emails: @account_emails %>
-<%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state, skip_total: true, viewing: "bike records") %>
+<% checks = review.readiness_checks(serial_stolen: @serial_stolen, test_count: @test_bike_ids.size) %>
+<% readiness = review.readiness(checks) %>
+
+<section
+  class="
+    tw:mt-6 tw:rounded-md tw:border tw:border-gray-200 tw:p-4
+    tw:dark:border-gray-700
+  "
+>
+  <h2 class="tw:text-base">
+    Same-owner evidence for a future merge invitation
+    <span class="tw:ml-1 tw:align-middle"><% case readiness %><% when :blocked %><%= render UI::Badge::Component.new(text: "Not a candidate", color: :error, size: :sm) %><% when :uncertain %><%= render UI::Badge::Component.new(text: "Uncertain — admin judgment", color: :warning, size: :sm) %><% else %><%= render UI::Badge::Component.new(text: "Meets the strict same-owner evidence", color: :success, size: :sm) %><% end %></span>
+  </h2>
+
+  <p class="tw:text-sm <%= muted %>">
+    Assessment only — no invitation, notification or merge exists here. A future
+    invitation would email a link that only opens a confirmation page; the
+    signed-in owner would confirm explicitly, and the merge would recheck
+    ownership and serial-wide stolen history and preserve lineage, photos and
+    stickers.
+  </p>
+
+  <ul class="tw:mt-2 tw:space-y-1 tw:text-sm">
+    <% checks.each do |check| %>
+      <li class="tw:flex tw:items-baseline tw:gap-2">
+        <% case check.status %>
+        <% when :blocked %>
+          <span
+            class="
+              tw:w-20 tw:flex-none tw:font-semibold tw:text-red-700
+              tw:dark:text-red-400
+            "
+          >
+            Blocks
+          </span>
+        <% when :uncertain %>
+          <span
+            class="
+              tw:w-20 tw:flex-none tw:font-semibold tw:text-amber-700
+              tw:dark:text-amber-300
+            "
+          >
+            Uncertain
+          </span>
+        <% else %>
+          <span
+            class="
+              tw:w-20 tw:flex-none tw:font-semibold tw:text-green-700
+              tw:dark:text-green-400
+            "
+          >
+            Meets
+          </span>
+        <% end %>
+
+        <span><%= check.label %></span>
+      </li>
+    <% end %>
+  </ul>
+</section>
+
+<% cues = review.cues(test_count: @test_bike_ids.size) %>
+
+<% if cues.any? %>
+  <section class="tw:mt-6">
+    <h2 class="tw:text-base">Review cues</h2>
+
+    <p class="tw:text-sm <%= muted %>">
+      Tentative — reasons to look closer, not proof of a fake serial, a test
+      record or the same bicycle.
+    </p>
+
+    <ul class="tw:mt-2 tw:space-y-1.5">
+      <% cues.each do |cue| %>
+        <li class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-2">
+          <%= render UI::Badge::Component.new(text: cue.label, color: cue.color, size: :sm) %>
+          <span class="tw:text-sm"><%= cue.reason %></span>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+
+<section class="tw:mt-6">
+  <h2 class="tw:text-base">
+    All <%= number_display(@bikes_count) %> records at a glance
+  </h2>
+
+  <% stat_classes = "tw:rounded-md tw:border tw:border-gray-200 tw:bg-white tw:px-3 tw:py-2 tw:dark:border-gray-700 tw:dark:bg-gray-800" %>
+  <% stat_label = "tw:text-xs tw:uppercase tw:tracking-wide #{muted}" %>
+  <% initial_ownerships = review.bikes.map { review.initial_ownership(it) } %>
+  <% organizations = review.distribution { review.organization(it)&.name } %>
+  <% stolen_count = @stolen_record_counts.values.sum %>
+
+  <div
+    class="
+      tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-2 tw:sm:grid-cols-3
+      tw:lg:grid-cols-6
+    "
+  >
+    <div class="<%= stat_classes %>">
+      <div class="<%= stat_label %>">Registered</div>
+
+      <div class="tw:text-sm">
+        <%= render UI::Time::Component.new(time: review.bikes.first&.created_at) %>
+        <br>
+        to
+        <%= render UI::Time::Component.new(time: review.bikes.last&.created_at) %>
+      </div>
+    </div>
+
+    <div class="<%= stat_classes %>">
+      <div class="<%= stat_label %>">Initial contacts</div>
+
+      <div class="tw:text-xl tw:font-bold">
+        <%= number_display(review.initial_emails.uniq.size) %>
+      </div>
+
+      <div class="tw:text-xs <%= muted %>">
+        <%= number_display(@bikes_count - review.initial_emails.size) %> without
+        email ·
+        <%= number_display(initial_ownerships.filter_map { it&.user_id }.uniq.size) %>
+        accounts
+      </div>
+    </div>
+
+    <div class="<%= stat_classes %>">
+      <div class="<%= stat_label %>">Organizations</div>
+
+      <div class="tw:text-xl tw:font-bold">
+        <%= number_display(organizations.count { |name, _count| name }) %>
+      </div>
+
+      <div class="tw:truncate tw:text-xs <%= muted %>">
+        <%= organizations.find { |name, _count| name }&.first || "None recorded" %>
+      </div>
+    </div>
+
+    <div class="<%= stat_classes %>">
+      <div class="<%= stat_label %>">Claimed</div>
+
+      <div class="tw:text-xl tw:font-bold">
+        <%= number_display(initial_ownerships.count { it && review.claim_status(it) == "Claimed" }) %>
+      </div>
+
+      <div class="tw:text-xs <%= muted %>">
+        initially ·
+        <%= number_display(review.bikes.count { review.transferred?(it) }) %>
+        transferred
+      </div>
+    </div>
+
+    <div class="<%= stat_classes %>">
+      <div class="<%= stat_label %>">Stolen records</div>
+
+      <div class="tw:text-xl tw:font-bold <%= "tw:text-red-700 tw:dark:text-red-400" if stolen_count.positive? || @serial_stolen %>">
+        <%= number_display(stolen_count) %>
+      </div>
+
+      <div class="tw:text-xs <%= muted %>">
+        <%= @serial_stolen ? "serial has stolen history" : "none on this serial" %>
+      </div>
+    </div>
+
+    <div class="<%= stat_classes %>">
+      <div class="<%= stat_label %>">Test-marked</div>
+
+      <div class="tw:text-xl tw:font-bold">
+        <%= number_display(@test_bike_ids.size) %>
+      </div>
+
+      <div class="tw:text-xs <%= muted %>">
+        <%= number_display(review.review_contact_count) %> example/developer
+        contacts
+      </div>
+    </div>
+  </div>
+
+  <div class="twwiderow tw:mt-4">
+    <div>
+      <h3 class="tw:text-sm tw:font-semibold">How they were registered</h3>
+
+      <ul class="tw:mt-1 tw:text-sm">
+        <% review.distribution { review.source(it) }.each do |source, count| %>
+          <li>
+            <strong><%= number_display(count) %></strong>
+            <%= source || "Unknown source" %>
+          </li>
+        <% end %>
+      </ul>
+
+      <h3 class="tw:mt-3 tw:text-sm tw:font-semibold">Initial organization</h3>
+
+      <ul class="tw:mt-1 tw:text-sm">
+        <% organizations.first(5).each do |name, count| %>
+          <li>
+            <strong><%= number_display(count) %></strong>
+            <%= name || "No organization" %>
+          </li>
+        <% end %>
+
+        <% if organizations.size > 5 %>
+          <li class="<%= muted %>">
+            + <%= number_display(organizations.size - 5) %> more organizations
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="tw:text-sm tw:font-semibold">Same on every record</h3>
+
+      <% if shared_fields.any? %>
+        <dl
+          class="
+            tw:mt-1 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-3 tw:gap-y-0.5
+            tw:text-sm
+          "
+        >
+          <% shared_fields.each do |field| %>
+            <dt class="<%= muted %>"><%= field %></dt>
+
+            <dd class="tw:mb-0 tw:break-all">
+              <%= review.field_value(review.bikes.first, field) || "Blank" %>
+            </dd>
+          <% end %>
+        </dl>
+      <% else %>
+        <p class="tw:text-sm <%= muted %>">
+          No compared field matches on every record.
+        </p>
+      <% end %>
+
+      <h3 class="tw:mt-3 tw:text-sm tw:font-semibold">
+        Differs between records
+      </h3>
+
+      <% if review.differing_fields.any? %>
+        <dl class="tw:mt-1 tw:space-y-1.5 tw:text-sm">
+          <% review.differing_fields.each do |field| %>
+            <% values = review.field_distribution(field) %>
+
+            <div>
+              <dt class="tw:font-medium">
+                <%= field %>
+
+                <span class="tw:font-normal <%= muted %>">
+                  · <%= number_display(values.size) %> values
+                </span>
+              </dt>
+
+              <dd class="tw:mb-0 tw:flex tw:flex-wrap tw:gap-1">
+                <% values.first(4).each do |value, count| %>
+                  <span
+                    class="
+                      tw:rounded-sm tw:bg-amber-50 tw:px-1.5 tw:break-all
+                      tw:dark:bg-amber-950
+                    "
+                  >
+                    <%= value || "Blank" %>
+                    <span class="<%= muted %>">×<%= number_display(count) %></span>
+                  </span>
+                <% end %>
+
+                <% if values.size > 4 %>
+                  <span class="<%= muted %>">
+                    + <%= number_display(values.size - 4) %> more
+                  </span>
+                <% end %>
+              </dd>
+            </div>
+          <% end %>
+        </dl>
+      <% else %>
+        <p class="tw:text-sm <%= muted %>">Every compared field matches.</p>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<% if contact_groups.size > 1 && @bikes_count > 3 %>
+  <% listed_contact_groups = params[:search_all_contacts].present? ? contact_groups : contact_groups.first(10) %>
+  <section class="tw:mt-6">
+    <h2 class="tw:text-base">
+      Records by initial contact
+      <span class="tw:font-normal <%= muted %>">· <%= number_display(contact_groups.size) %> contact groups</span>
+    </h2>
+
+    <p class="tw:text-sm <%= muted %>">
+      Grouped by normalized initial registration email. An email is a contact,
+      not a verified identity.
+    </p>
+
+    <%= render UI::Table::Component.new(records: listed_contact_groups, classes: "tw:mt-2") do |table| %>
+      <% table.column(label: "Contact") do |group| %>
+        <div class="tw:font-semibold">Contact <%= group.number %></div>
+
+        <div class="tw:text-sm tw:break-all">
+          <%= group.email || "No initial email" %>
+        </div>
+
+        <% if BikeServices::DuplicateReviewCues.review_contact?(group.email) %>
+          <%= render UI::Badge::Component.new(text: "Example-domain or developer contact", color: :orange, size: :sm) %>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: "Records") do |group| %>
+        <strong><%= number_display(group.bikes.size) %></strong>
+      <% end %>
+
+      <% table.column(label: "Registered") do |group| %>
+        <div class="tw:text-sm tw:whitespace-nowrap">
+          <%= render UI::Time::Component.new(time: group.bikes.first.created_at) %>
+
+          <% if group.bikes.size > 1 %>
+            <br>
+            to
+            <%= render UI::Time::Component.new(time: group.bikes.last.created_at) %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% table.column(label: "Source · organization") do |group| %>
+        <div class="tw:text-sm">
+          <%= group.bikes.map { review.source(it) }.compact.uniq.join(", ") %>
+        </div>
+
+        <div class="tw:text-sm <%= muted %>">
+          <%= group.bikes.filter_map { review.organization(it)&.name }.uniq.first(2).join(", ") %>
+        </div>
+      <% end %>
+
+      <% table.column(label: "Accounts · claims") do |group| %>
+        <div class="tw:text-sm">
+          <%= number_display(group.bikes.filter_map { review.initial_ownership(it)&.user_id }.uniq.size) %>
+          accounts ·
+          <%= number_display(group.bikes.count { review.claim_status(review.initial_ownership(it)) == "Claimed" }) %>
+          claimed
+        </div>
+      <% end %>
+
+      <% table.column(label: "") do |group| %>
+        <%= link_to "Show these records", url_for(request.query_parameters.except("page").merge("search_contact" => group.number)), class: "twlink tw:whitespace-nowrap" %>
+      <% end %>
+    <% end %>
+
+    <% if listed_contact_groups.size < contact_groups.size %>
+      <p class="tw:mt-2 tw:text-sm">
+        Showing the <%= number_display(listed_contact_groups.size) %> largest.
+        <%= link_to "Show all #{contact_groups.size} contact groups", url_for(request.query_parameters.merge("search_all_contacts" => 1)), class: "twlink" %>
+      </p>
+    <% elsif contact_groups.size > 10 %>
+      <p class="tw:mt-2 tw:text-sm">
+        <%= link_to "Show only the 10 largest contact groups", url_for(request.query_parameters.except("search_all_contacts")), class: "twlink" %>
+      </p>
+    <% end %>
+  </section>
+<% end %>
+
+<section class="tw:mt-6">
+  <h2 class="tw:text-base">
+    <% if @contact_group %>
+      Contact <%= @contact_group.number %> records
+      <span class="tw:font-normal <%= muted %>">· <%= number_display(@contact_group.bikes.size) %> of <%= number_display(@bikes_count) %></span>
+    <% else %>
+      Records
+    <% end %>
+
+    <span class="tw:font-normal <%= muted %>">· <%= (sort_direction == "desc") ? "newest" : "oldest" %> registration first</span>
+  </h2>
+
+  <% if @bikes_count > 3 %>
+    <p class="tw:text-sm">
+      <% if sort_direction == "desc" %>
+        <%= link_to "Show oldest first", url_for(request.query_parameters.except("page", "sort", "direction")), class: "twlink" %>
+      <% else %>
+        <%= link_to "Show newest first", url_for(request.query_parameters.except("page").merge("sort" => "created_at", "direction" => "desc")), class: "twlink" %>
+      <% end %>
+    </p>
+  <% end %>
+
+  <% if @contact_group %>
+    <p class="tw:text-sm">
+      Filtered to one initial contact.
+      <%= link_to "Show all #{@bikes_count} records", url_for(request.query_parameters.except("page", "search_contact")), class: "twlink" %>
+    </p>
+  <% end %>
+
+  <p class="tw:text-sm <%= muted %>">
+    Comparison reference:
+    <%= link_to "Bike ##{@reference_bike.id}", edit_admin_bike_path(@reference_bike), class: "twlink" %>.
+    Account and email evidence compares each record against it. Model, serial
+    and status differences are against the group's most common value.
+  </p>
+
+  <% if @bikes_count <= 3 %>
+    <%= render "side_by_side", review:, test_bike_ids: @test_bike_ids, stolen_record_counts: @stolen_record_counts, account_emails: @account_emails %>
+  <% else %>
+    <%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state, count: @contact_group&.bikes&.size || @bikes_count, viewing: "bike records") %>
+    <%= render "records", bikes: @bikes, review:, test_bike_ids: @test_bike_ids, stolen_record_counts: @stolen_record_counts, account_emails: @account_emails %>
+    <%= render Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state, skip_total: true, viewing: "bike records") %>
+  <% end %>
+</section>
+
+<div data-controller="ui--collapse" class="tw:mt-6 tw:text-sm">
+  <%= render UI::Collapse::Component.new(text: "About this comparison", chevron: true, color: :link) %>
+
+  <div
+    class="tw:mt-2 tw:hidden tw:max-w-4xl tw:space-y-2"
+    data-ui--collapse-target="content"
+  >
+    <p>
+      Manufacturer SKU/product code is unavailable as a dedicated field in this
+      database. Model text and serials are shown as stored, with the whole
+      normalized serial beside them.
+    </p>
+
+    <p>
+      Each bike ID identifies a registration record intended to describe an
+      individual physical bicycle. Matching stored serials or segments does not
+      establish that the records describe the same bicycle. Initial registration
+      and current ownership can differ after a transfer.
+    </p>
+  </div>
+</div>

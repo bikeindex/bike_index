@@ -1,0 +1,48 @@
+<%# locals: (bike:, review:, test_marked:, stolen_count:, account_emails:) %>
+<% contacts = [review.initial_ownership(bike), bike.current_ownership].compact.flat_map { [review.contact_email(it), account_emails[it.user_id]] } %>
+
+<div class="tw:flex tw:flex-wrap tw:gap-1">
+  <% if stolen_count.positive? || bike.status_stolen? %>
+    <%= render UI::Badge::Component.new(text: "Stolen history", color: :error, solid: true, size: :sm) %>
+  <% end %>
+
+  <% if bike.deleted_at %>
+    <%= render UI::Badge::Component.new(text: "Deleted", color: :gray, size: :sm) %>
+  <% end %>
+
+  <% if bike.example %>
+    <%= render UI::Badge::Component.new(text: "Example record", color: :gray, size: :sm) %>
+  <% end %>
+
+  <% if bike.likely_spam %>
+    <%= render UI::Badge::Component.new(text: "Spam flag", color: :gray, size: :sm) %>
+  <% end %>
+
+  <% if test_marked %>
+    <%= render UI::Badge::Component.new(text: "Test-marked", color: :purple, size: :sm, title: "Bike Index administrators organization or the designated test contact, including historical links.") %>
+  <% end %>
+
+  <% if contacts.any? { BikeServices::DuplicateReviewCues.review_contact?(it) } %>
+    <%= render UI::Badge::Component.new(text: "Example-domain or developer contact", color: :orange, size: :sm, title: "A reviewer-supplied cue on the initial, current or account email. Not a test classification.") %>
+  <% end %>
+
+  <% if review.transferred?(bike) %>
+    <%= render UI::Badge::Component.new(text: "Transferred", color: :cyan, size: :sm) %>
+  <% end %>
+
+  <% if bike.marketplace_listings.any? %>
+    <%= render UI::Badge::Component.new(text: "Marketplace", color: :cyan, size: :sm) %>
+  <% end %>
+
+  <% if bike.public_images.any? %>
+    <%= render UI::Badge::Component.new(text: "photos", color: :empty, size: :sm) do %>
+      <%= number_display(bike.public_images.size) %>&nbsp;photos
+    <% end %>
+  <% end %>
+
+  <% if bike.bike_stickers.any? %>
+    <%= render UI::Badge::Component.new(text: "stickers", color: :empty, size: :sm) do %>
+      <%= number_display(bike.bike_stickers.size) %>&nbsp;stickers
+    <% end %>
+  <% end %>
+</div>

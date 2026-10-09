@@ -1,0 +1,93 @@
+<%# locals: (review:, test_bike_ids:, stolen_record_counts:, account_emails:) %>
+<% bikes = review.bikes %>
+<% initials = bikes.map { review.initial_ownership(it) } %>
+<% currents = bikes.map(&:current_ownership) %>
+<% serial = ->(value) { render(Atoms::Serial::Component.new(serial: value)) } %>
+
+<%# [label, values to compare, markup to show] - a row whose values differ is highlighted %>
+<% rows = [
+     ["Registered", nil, bikes.map { render(UI::Time::Component.new(time: it.created_at)) }],
+     *DuplicateBikeReview::FIELDS.keys.map do |field|
+       values = bikes.map { review.field_value(it, field) }
+       [field, values, field.end_with?("serial") ? values.map { serial.call(it) } : values]
+     end,
+     ["Initial source", bikes.map { review.source(it) }],
+     ["Initial organization", bikes.map { review.organization(it)&.name }],
+     ["Initial contact email", initials.map { review.contact_email(it) }],
+     ["Initial account", initials.map { it&.user_id }, initials.map { it&.user_id && link_to("##{it.user_id}", admin_user_path(it.user_id), class: "twlink") }],
+     ["Initial account email", initials.map { account_emails[it&.user_id] }],
+     ["Initial claim", initials.map { review.claim_status(it) }, initials.map { safe_join([review.claim_status(it), " ", render(UI::Time::Component.new(time: it&.claimed_at))]) }],
+     ["Initial vs reference", nil, bikes.map { [review.account_match(it, initial: true), review.email_match(it, initial: true), review.email_evidence(it, initial: true)].join(" · ") }],
+     ["Current contact email", currents.map { review.contact_email(it) }],
+     ["Current account", currents.map { it&.user_id }, currents.map { it&.user_id && link_to("##{it.user_id}", admin_user_path(it.user_id), class: "twlink") }],
+     ["Current account email", currents.map { account_emails[it&.user_id] }],
+     ["Current claim", currents.map { review.claim_status(it) }],
+     ["Current vs reference", nil, bikes.map { [review.account_match(it), review.email_match(it), review.email_evidence(it)].join(" · ") }],
+     ["Transfers", bikes.map { it.ownerships.count(&:previous_ownership_id) }],
+     ["Stolen/history records", bikes.map { stolen_record_counts[it.id] || 0 }],
+     ["Organization links", bikes.map { it.bike_organizations.size }],
+     ["Stickers", bikes.map { it.bike_stickers.size }],
+     ["Photos", bikes.map { it.public_images.size }],
+     ["Marketplace listings", bikes.map { it.marketplace_listings.size }]
+   ] %>
+
+<div class="tw:mt-2 tw:overflow-x-auto">
+  <table
+    class="
+      ui-table ui-table-bordered tw:min-w-full tw:border-separate
+      tw:border-spacing-0 tw:text-left tw:text-sm tw:leading-[1.25]
+    "
+  >
+    <thead>
+      <tr>
+        <th class="tw:w-48"></th>
+
+        <% bikes.each do |bike| %>
+          <th class="tw:align-top">
+            <%= link_to "Bike ##{bike.id}", edit_admin_bike_path(bike), class: "twlink" %>
+            ·
+            <%= link_to "Registration", bike_path(bike), class: "twlink tw:font-normal" %>
+            <% if bike == review.reference_bike %>
+              <%= render UI::Badge::Component.new(text: "Reference", color: :notice, size: :xs) %>
+            <% else %>
+              ·
+              <%= link_to "Use as reference", url_for(request.query_parameters.merge("reference_bike_id" => bike.id)), class: "twlink tw:font-normal" %>
+            <% end %>
+            <div class="tw:mt-1 tw:font-normal">
+              <%= render "record_flags", bike:, review:, test_marked: test_bike_ids.include?(bike.id), stolen_count: stolen_record_counts[bike.id] || 0, account_emails: %>
+            </div>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% rows.each do |label, values, display| %>
+        <% differs = values && values.map(&:to_s).uniq.size > 1 %>
+
+        <tr class="<%= "tw:bg-amber-50 tw:dark:bg-amber-950" if differs %>">
+          <th class="tw:align-top tw:font-medium">
+            <%= label %>
+
+            <% if differs %>
+              <span
+                class="
+                  tw:block tw:text-xs tw:font-semibold tw:text-amber-700
+                  tw:dark:text-amber-300
+                "
+              >
+                Differs
+              </span>
+            <% end %>
+          </th>
+
+          <% (display || values).each do |value| %>
+            <td class="tw:align-top tw:break-all">
+              <%= value.is_a?(Integer) ? number_display(value) : (value.presence || "—") %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -29,6 +29,10 @@ RSpec.describe BikeServices::DuplicateReviewFinder do
     expect(described_class.kind(group.merge("record_count" => 10, "pos_count" => 10))).to eq "large_group"
   end
 
+  it "takes placeholder and part-number serials out of every duplicate queue, stolen included" do
+    expect(described_class.kind(group.merge("serial" => "N05ER1A1NUM8ER", "serial_stolen" => true, "handoff_priority" => true))).to eq "not_a_serial"
+  end
+
   it "recognizes the strictly qualified handoff evidence" do
     expect(described_class.kind(group.merge("handoff_priority" => true))).to eq "handoff_priority"
   end

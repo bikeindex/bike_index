@@ -1,83 +1,190 @@
+<% kinds = BikeServices::DuplicateReviewFinder::KINDS %>
+<% cue_filters = BikeServices::DuplicateReviewCues::FILTERS %>
+<% summary = @summary %>
+
 <h1>Duplicate registration review</h1>
 
-<p class="tw:mt-4">
-  Review groups of live registrations with the same whole normalized serial and
-  manufacturer. Counts below are groups and registration records, not
-  comparisons or confirmed duplicate bicycles. Serials shorter than six
-  characters and partial matches remain in the
-  <%= link_to "serial-segment view", admin_duplicate_bikes_path(search_view: "segments"), class: "twlink" %>.
+<p class="tw:mt-2 tw:text-gray-600 tw:dark:text-gray-400">
+  Live registrations grouped by whole normalized serial and manufacturer. Counts
+  are groups and registration records, not confirmed duplicate bicycles.
+  Computed
+  <%= render UI::Time::Component.new(time: @group_snapshot[:generated_at]) %>,
+  cached for up to an hour.
 </p>
 
-<p class="tw:mt-4 tw:font-bold">
-  Review only. No merging, deletion or customer emails. A stolen report anywhere
-  on a matching whole serial, including recovered, deleted and test records,
-  puts the group in Stolen history. Preserve those records separately.
-</p>
-
-<p class="tw:mt-4">
-  Test markers include the administrators organization and designated test
-  contact in current or historical links. These markers identify a review scope,
-  not permission to delete. Groups of
-  <%= BikeServices::DuplicateReviewFinder::LARGE_GROUP_MINIMUM %> or more need
-  serial validation; repeated entries may contain a placeholder or product code.
-  Shop followed by customer requires exactly two entries, an earlier POS entry
-  and a later customer-channel entry. It does not establish that the customer
-  registered it personally or owns both entries.
-</p>
-
-<p class="tw:mt-4">
-  Strongest evidence additionally requires the same known initial email and
-  account, a claimed self-registration by the customer, an unclaimed shop entry,
-  matching current identities, compatible known model/year and original serials,
-  and no transfers, impound, marketplace or generic "Other" manufacturer. Photos
-  and stickers still need preservation. Different emails and spelling
-  similarities belong in manual review; they do not authorize an email or merge.
-</p>
-
-<p class="tw:mt-4">
-  Counts computed
-  <%= render UI::Time::Component.new(time: @group_snapshot[:generated_at]) %>.
-  Cached for up to one hour. Stolen history is checked again when a comparison
-  opens.
-</p>
-
-<% kinds = BikeServices::DuplicateReviewFinder::KINDS %>
-<% summary = @summary %>
-<% active_kind = @kind %>
-
-<%= render UI::Table::Component.new(records: kinds.to_a) do |table| %>
-  <% table.column(label: "Review queue") do |(kind, label)| %>
-    <%= link_to label, admin_duplicate_bikes_path(search_kind: kind), class: kind == active_kind ? "twlink tw:font-bold" : "twlink" %>
-  <% end %>
-
-  <% table.column(label: "Groups") do |(kind, _label)| %>
-    <%= number_display(summary.fetch(kind, []).size) %>
-  <% end %>
-
-  <% table.column(label: "Registration records") do |(kind, _label)| %>
-    <%= number_display(summary.fetch(kind, []).sum { it["record_count"] }) %>
-  <% end %>
+<%= render UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mt-4", header: "Review only — no merging, deletion or customer emails") do %>
+  A stolen report anywhere on a matching whole serial — recovered, deleted and
+  test records included — puts the group in Stolen history, and is checked again
+  when a comparison opens. Never merge those records.
 <% end %>
 
-<h2 class="tw:mt-6"><%= kinds[@kind] %></h2>
+<div data-controller="ui--collapse" class="tw:mt-2">
+  <%= render UI::Collapse::Component.new(text: "How queues and review cues are defined", chevron: true, color: :link) %>
 
-<%= form_with url: admin_duplicate_bikes_path, method: :get, local: true do |form| %>
+  <div
+    class="tw:mt-2 tw:hidden tw:max-w-4xl tw:space-y-3 tw:text-sm"
+    data-ui--collapse-target="content"
+  >
+    <p>
+      Serials shorter than six characters and partial matches remain in the
+      <%= link_to "serial-segment view", admin_duplicate_bikes_path(search_view: "segments"), class: "twlink" %>.
+      Each group is in exactly one queue, assigned in the order listed below.
+    </p>
+
+    <p>
+      Test markers are the Bike Index administrators organization and the
+      designated test contact, in current or historical links. They identify a
+      review scope, not permission to delete. Groups of
+      <%= BikeServices::DuplicateReviewFinder::LARGE_GROUP_MINIMUM %> or more
+      need serial validation.
+    </p>
+
+    <p>
+      Shop followed by customer requires exactly two entries, an earlier POS
+      entry and a later customer-channel entry. It does not establish that the
+      customer registered it personally or owns both entries. Strongest evidence
+      additionally requires the same known initial email and account, a claimed
+      self-registration, an unclaimed shop entry, matching current identities,
+      compatible model/year and original serials, and no transfers, impound,
+      marketplace or generic "Other" manufacturer. Photos and stickers still
+      need preserving.
+    </p>
+
+    <p>
+      A serial that is a placeholder, part number or manufacturer name has its
+      own queue, since sharing it says nothing about the bicycle. Other review
+      cues are tentative and never move a group between queues: a standards
+      designation in the serial (ISO/EN and similar), a serial repeated on many
+      registrations or shared by
+      <%= BikeServices::DuplicateReviewCues::REPEATED_CONTACT_MINIMUM %> or more
+      contacts, test markers, initial contacts on
+      <%= BikeServices::DuplicateReviewCues.review_contact_description %>, and
+      one shared initial contact. Hover a cue for its reason. Same contact or
+      similar spelling does not prove the same bicycle, a correct address or
+      consent.
+    </p>
+  </div>
+</div>
+
+<% same_owner_kinds = BikeServices::DuplicateReviewFinder::SAME_OWNER_KINDS %>
+
+<% queue_sections = {
+     "Likely same owner — review for a future merge invitation" => same_owner_kinds,
+     "Separate review — not invitation candidates" => kinds.keys - same_owner_kinds
+   } %>
+
+<% queue_sections.each do |section_label, section_kinds| %>
+  <h2
+    class="
+      tw:mt-6 tw:text-sm tw:font-semibold tw:tracking-wide tw:text-gray-600
+      tw:uppercase tw:dark:text-gray-400
+    "
+  >
+    <%= section_label %>
+  </h2>
+
+  <nav
+    aria-label="<%= section_label %>"
+    class="
+      tw:mt-2 tw:grid! tw:grid-cols-1 tw:gap-2 tw:sm:grid-cols-2
+      tw:lg:grid-cols-3
+    "
+  >
+    <% section_kinds.each do |kind| %>
+      <% label = kinds[kind] %>
+      <% kind_groups = summary.fetch(kind, []) %>
+
+      <% accent = case kind
+           when "stolen_history" then "tw:border-l-red-500"
+           when "internal_test", "mixed_test" then "tw:border-l-purple-400"
+           when "large_group" then "tw:border-l-amber-400"
+           when "handoff_priority" then "tw:border-l-green-500"
+           else "tw:border-l-gray-300 tw:dark:border-l-gray-600"
+           end %>
+
+      <%= render UI::ActiveLink::Component.new(path: admin_duplicate_bikes_path(search_kind: kind), match_params: {search_kind: (kind == "handoff_priority") ? [nil, kind] : kind}, class: "tw:block tw:rounded-md tw:border tw:border-l-4 tw:border-gray-200 tw:bg-white tw:px-3 tw:py-2 tw:no-underline! tw:text-inherit! tw:hover:bg-gray-50 tw:is-active:bg-blue-50 tw:is-active:ring-2 tw:is-active:ring-blue-500 tw:dark:border-gray-700 tw:dark:bg-gray-800 tw:dark:hover:bg-gray-700 tw:dark:is-active:bg-blue-950 #{accent}") do %>
+        <span class="tw:block tw:text-sm tw:leading-tight tw:font-semibold"><%= label %></span>
+
+        <span
+          class="
+            tw:mt-1 tw:flex tw:items-baseline tw:gap-2 tw:text-sm
+            tw:text-gray-600 tw:dark:text-gray-400
+          "
+        >
+          <span class="tw:text-lg tw:font-bold tw:text-gray-900 tw:dark:text-gray-100"><%= number_display(kind_groups.size) %></span>
+          groups ·
+          <%= number_display(kind_groups.sum { it["record_count"] }) %> records
+        </span>
+      <% end %>
+    <% end %>
+  </nav>
+<% end %>
+
+<h2 class="tw:mt-8"><%= kinds[@kind] %></h2>
+
+<%= form_with url: admin_duplicate_bikes_path, method: :get, local: true, class: "tw:mt-2" do |form| %>
   <%= form.hidden_field :search_kind, value: @kind %>
+  <%= form.hidden_field :search_cue, value: @cue if @cue %>
+  <%= form.hidden_field :sort, value: params[:sort] if params[:sort].present? %>
+  <%= form.hidden_field :direction, value: params[:direction] if params[:direction].present? %>
 
   <div class="twfieldrow">
-    <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_bike_id, label_text: "Find a registration in this queue", kind: :number_field, html_options: {value: params[:search_bike_id], min: 1}) %>
-    <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_organization_id, label_text: "Organization ID (includes initial registration org)", kind: :number_field, html_options: {value: params[:search_organization_id], min: 1}) %>
+    <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_bike_id, label_text: "Find a registration in this queue", kind: :number_field, html_options: {value: params[:search_bike_id], min: 1, autocomplete: "off"}) %>
+    <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_organization_id, label_text: "Organization ID (includes initial registration org)", kind: :number_field, html_options: {value: params[:search_organization_id], min: 1, autocomplete: "off"}) %>
   </div>
 
   <%= render UI::Button::Component.new(text: "Filter review queue", color: :primary, type: :submit) %>
 <% end %>
 
+<div class="tw:mt-6">
+  <p class="tw:text-sm tw:font-semibold">
+    Narrow by tentative review cue
+    <span class="tw:font-normal tw:text-gray-600 tw:dark:text-gray-400"> — a display filter only; queues and matching rules are unchanged </span>
+  </p>
+
+  <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
+    <% cue_link_classes = "tw:rounded-full tw:border tw:border-gray-300 tw:px-3 tw:py-1 tw:text-sm tw:no-underline! tw:text-inherit! tw:hover:bg-gray-100 tw:is-active:border-blue-500 tw:is-active:bg-blue-50 tw:is-active:font-semibold tw:dark:border-gray-600 tw:dark:hover:bg-gray-700 tw:dark:is-active:bg-blue-950" %>
+
+    <%= render UI::ActiveLink::Component.new(path: url_for(request.query_parameters.except("search_cue", "page")), match_params: {search_cue: [nil]}, class: cue_link_classes) do %>
+      All groups
+      <span class="tw:text-gray-600 tw:dark:text-gray-400"><%= number_display(@queue_groups_count) %></span>
+    <% end %>
+
+    <% cue_filters.each do |cue, label| %>
+      <%= render UI::ActiveLink::Component.new(path: url_for(request.query_parameters.except("page").merge("search_cue" => cue)), match_params: {search_cue: cue}, class: cue_link_classes) do %>
+        <%= label %>
+        <span class="tw:text-gray-600 tw:dark:text-gray-400"><%= number_display(@cue_counts[cue]) %></span>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+  <span class="tw:text-sm tw:font-semibold">Sort groups</span>
+
+  <% [
+    ["Most records", "record_count", "desc"],
+    ["Latest registration", "last_at", "desc"],
+    ["Newest first registration", "first_at", "desc"],
+    ["Oldest first registration", "first_at", "asc"]
+  ].each do |label, sort, direction| %>
+    <%= render UI::ActiveLink::Component.new(path: url_for(request.query_parameters.except("page").merge("sort" => sort, "direction" => direction)), match_params: {sort: (sort == "record_count") ? [nil, sort] : sort, direction: (direction == "desc") ? [nil, direction] : direction}, class: cue_link_classes) do %>
+      <%= label %>
+    <% end %>
+  <% end %>
+</div>
+
 <p class="tw:mt-4">
-  <%= number_display(@groups_count) %> groups containing
-  <%= number_display(@registrations_count) %> registration records in this
-  filter.
+  <strong><%= number_display(@groups_count) %></strong> groups containing
+  <strong><%= number_display(@registrations_count) %></strong> registration
+  records
+  <% if @cue %>
+    with the cue <strong><%= cue_filters[@cue] %></strong>, of
+    <%= number_display(@queue_groups_count) %> groups in this queue
+    (<%= link_to "show all", url_for(request.query_parameters.except("search_cue", "page")), class: "twlink" %>)
+  <% end %>
   <% if @organization %>
-    <strong><%= @organization.name %></strong>
+    for <strong><%= @organization.name %></strong>
   <% end %>
 </p>
 
