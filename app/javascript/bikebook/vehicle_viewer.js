@@ -49,7 +49,7 @@ export class VehicleViewer {
 }
 
 // This page's URL with `params` laid over its own
-const pathWith = (url, params) => {
+export const pathWith = (url, params) => {
   const query = toQuery({ ...Object.fromEntries(url.searchParams), ...params })
   return query ? `${url.pathname}?${query}` : url.pathname
 }

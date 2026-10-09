@@ -5,25 +5,31 @@ en:
       bikebook:
         show:
           about_bikebook: About Bike Book
-          activity: Activity
+          activities: Activities
           activity_examples: "(e.g. Mountain Biking, Cyclocross, etc)"
           any_activity: Any activity
           any_configuration: Any configuration
           any_manufacturer: Any manufacturer
-          any_motorized: Any motorized
           any_suspension: Any suspension
           any_vehicle_type: Any vehicle type
           applied_filters: Applied filters
           byline: A free reference from Bike Index, the non-profit bike registry.
           configuration: Configuration
+          configuration_examples: "(complete/frameset)"
           failed: The catalog didn't load. Reload the page to try again.
+          human_powered: Human powered (Acoustic)
           loading: Loading the catalog…
-          manufacturer: Manufacturer
+          manufacturers: Manufacturers
           max: Max
           min: Min
           more_filters: More filters
           motorized: Motorized
+          out_of_class: Out of class
+          out_of_class_details: >-
+            Motorized, but none of US Classes 1, 2 or 3, like a moped, motorcycle
+            or off-highway e-moto.
           price: Price
+          propulsion: Propulsion
           search_placeholder: Search by manufacturer or model…
           select_a_bike: Select a bike, choose multiple to compare them
           sort: Sort
@@ -33,5 +39,8 @@ en:
           tagline_html: >-
             The world’s bicycle library — search, compare, and find your next ride
             across %{models_count}+ models.
-          vehicle_type: Vehicle type
+          us_class_1: US Class 1
+          us_class_2: US Class 2
+          us_class_3: US Class 3
+          vehicle_types: Vehicle types
           year: Year

@@ -85,14 +85,18 @@ export default class extends Controller {
         .map((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? value)
         .join(', ')
     }
+    if (inputs[0].type === 'checkbox') return inputs.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
     const [min, max] = inputs.map(({ value }) => value && `${field.dataset.filterPrefix}${value}`)
     if (min && max) return `${min}–${max}`
     return min ? `from ${min}` : max && `up to ${max}`
   }
 
+  // A set of checkboxes is one comma-joined value, blank when none is checked
   get #filters () {
-    return Object.fromEntries(this.fieldTargets.flatMap((field) => [...field.querySelectorAll('input[name]')])
-      .map(({ name, value }) => [name, value]))
+    const inputs = this.fieldTargets.flatMap((field) => [...field.querySelectorAll('input[name]')])
+    return Object.fromEntries([...new Set(inputs.map(({ name }) => name))].map((name) => [name, inputs
+      .filter((input) => input.name === name && (input.type !== 'checkbox' || input.checked))
+      .map(({ value }) => value).join(',')]))
   }
 
   #arrow (dir) {

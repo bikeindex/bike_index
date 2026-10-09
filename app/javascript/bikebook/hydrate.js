@@ -7,14 +7,14 @@ import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
-import { VehicleViewer } from 'bikebook/vehicle_viewer'
+import { pathWith, VehicleViewer } from 'bikebook/vehicle_viewer'
 
 /* global CSS */
 
 const LISTS = ['primary_activity', 'manufacturer', 'vehicle_type']
-const SINGLES = ['electric', 'suspension', 'model_configuration']
+const SINGLES = ['suspension', 'model_configuration']
 const RANGES = ['year_min', 'year_max', 'price_min', 'price_max']
-const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'year_dir', 'price_dir']
+const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'year_dir', 'price_dir']
 // rather than the kit's max_compare, which the catalog publishes as 3
 const MAX_COMPARE = 5
 
@@ -56,8 +56,17 @@ export async function hydrate (catalog, source, shell, url) {
     if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display
   }
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
+  for (const value of filters.electric.split(',')) root.querySelector(`input[name="electric"][value="${CSS.escape(value)}"]`)?.setAttribute('checked', '')
 
-  renderInto(root.getElementById('vehicle-viewers'), new VehicleViewer(kit, catalog.vocabulary).render(vehicles, url, preferredSize()))
+  const viewer = new VehicleViewer(kit, catalog.vocabulary)
+  const classifications = catalog.vocabulary.e_vehicle_classifications ?? {}
+  const tooltips = viewer.presenter.classificationTooltips((id) => pathWith(url, { vehicle_models: [...new Set([...vehicles.map(({ value }) => value), id])].join(',') }))
+  for (const input of root.querySelectorAll('input[name="electric"][value^="class_"]')) {
+    const { label, title } = classifications[`evc/us/${input.value}`] ?? {}
+    if (tooltips[label]) input.closest('label').after(fragmentOf(tooltip({ text: title, body: tooltips[label] })))
+  }
+
+  renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize()))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

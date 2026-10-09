@@ -55,20 +55,25 @@
         <%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:mt-3 tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start")) do %>
           <div class="tw:flex tw:flex-col tw:gap-4">
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "primary_activity",
-          label: translation(".activity"), placeholder: translation(".any_activity"), multiselect: true)) do %>
+          label: translation(".activities"), placeholder: translation(".any_activity"), multiselect: true)) do %>
               <%= translation(".activity_examples") %>
             <% end %>
 
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "manufacturer",
-          label: translation(".manufacturer"), placeholder: translation(".any_manufacturer"), multiselect: true)) do %>
+          label: translation(".manufacturers"), placeholder: translation(".any_manufacturer"), multiselect: true)) do %>
               <span id="manufacturer-count"></span>
             <% end %>
 
-            <div class="tw:flex tw:flex-col tw:gap-4 tw:sm:flex-row tw:sm:items-start">
+            <div
+              class="
+                tw:flex tw:flex-col tw:gap-4 tw:sm:flex-row
+                tw:sm:items-start tw:xl:gap-3
+              "
+            >
               <div>
                 <span class="twlabel"><%= translation(".sort") %></span>
 
-                <div class="tw:mt-1 tw:flex tw:gap-2 tw:sm:flex-col">
+                <div class="tw:mt-1 tw:flex tw:gap-2 tw:sm:flex-col tw:xl:flex-row">
                   <%= render(UI::Button::Component.new(color: :secondary, size: :sm,
                 data: {action: "bikebook--catalog-filters#toggleSort", "bikebook--catalog-filters-field-param": "year"})) do %>
                     <%= translation(".year") %>
@@ -83,13 +88,13 @@
                 </div>
               </div>
 
-              <div class="tw:flex tw:flex-wrap tw:gap-4">
+              <div class="tw:flex tw:flex-wrap tw:gap-4 tw:xl:flex-1 tw:xl:gap-3">
                 <% [["year", translation(".year"), 1900, "tw:sm:w-20", nil, {min: 1990, max: Time.current.year + 1}],
               ["price", translation(".price"), 0, "tw:sm:w-26", "$", {}]].each do |name, legend, min_attr, width, prefix, placeholders| %>
                   <fieldset
                     class="
                       tw:w-full tw:rounded-lg tw:border tw:border-gray-200
-                      tw:px-3 tw:pt-1 tw:pb-3 tw:sm:w-auto
+                      tw:px-3 tw:pt-1 tw:pb-3 tw:sm:w-auto tw:xl:flex-1
                       tw:dark:border-gray-700
                     "
                     data-bikebook--catalog-filters-target="field"
@@ -143,18 +148,38 @@
 
           <div class="tw:flex tw:flex-col tw:gap-4">
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "vehicle_type",
-          label: translation(".vehicle_type"), placeholder: translation(".any_vehicle_type"), multiselect: true)) %>
+          label: translation(".vehicle_types"), placeholder: translation(".any_vehicle_type"), multiselect: true)) %>
 
-            <div class="tw:grid tw:gap-4 tw:sm:grid-cols-3">
-              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "electric",
-            label: translation(".motorized"), placeholder: translation(".any_motorized"))) %>
-
+            <div class="tw:grid tw:gap-4 tw:sm:grid-cols-2">
               <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "suspension",
             label: translation(".suspension"), placeholder: translation(".any_suspension"))) %>
 
               <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "model_configuration",
-            label: translation(".configuration"), placeholder: translation(".any_configuration"))) %>
+            label: translation(".configuration"), placeholder: translation(".any_configuration"))) do %>
+                <%= translation(".configuration_examples") %>
+              <% end %>
             </div>
+
+            <fieldset
+              data-bikebook--catalog-filters-target="field"
+              data-filter-label="<%= translation(".propulsion") %>"
+              data-action="change->bikebook--catalog-filters#apply"
+            >
+              <legend class="twlabel"><%= translation(".propulsion") %></legend>
+
+              <div class="tw:mt-1 tw:flex tw:flex-wrap tw:gap-x-6 tw:gap-y-2">
+                <% [["0", translation(".human_powered")], ["1", translation(".motorized")], ["class_1", translation(".us_class_1")],
+                ["class_2", translation(".us_class_2")], ["class_3", translation(".us_class_3")],
+                ["out_of_class", translation(".out_of_class")]].each do |value, label| %>
+                  <span class="tw:flex tw:items-center tw:gap-1.5 tw:leading-0">
+                    <%= render UI::Forms::Checkbox::Component.new(name: "electric", value:, label:, class_name: "tw:mb-0",
+                    html_options: {id: "electric-#{value}"}) %>
+
+                    <%= render UI::Tooltip::Component.new(text: translation(".out_of_class_details")) if value == "out_of_class" %>
+                  </span>
+                <% end %>
+              </div>
+            </fieldset>
           </div>
         <% end %>
       </div>

@@ -139,6 +139,7 @@ function filter (params) {
   const chosen = list(params.primary_activity)
   const allowed = new Set(activities.filter(({ slug, family }) => chosen.includes(slug) || chosen.includes(family)).map(({ slug }) => slug))
   const manufacturers = list(params.manufacturer)
+  const propulsions = list(params.electric)
   const types = list(params.vehicle_type)
   const [yearMin, yearMax, priceMin, priceMax] = ['year_min', 'year_max', 'price_min', 'price_max']
     .map((name) => params[name] ? parseInt(params[name], 10) || 0 : null)
@@ -146,7 +147,7 @@ function filter (params) {
   return (model) =>
     (allowed.size === 0 || allowed.has(model.primary_activity)) &&
     (manufacturers.length === 0 || manufacturers.includes(model.manufacturer)) &&
-    (!params.electric || model.electric === (params.electric === '1')) &&
+    (propulsions.length === 0 || propulsions.some((propulsion) => propelled(model, propulsion))) &&
     (!params.suspension || (params.suspension === 'has' ? model.suspension !== 'rigid' : model.suspension === params.suspension)) &&
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
@@ -154,6 +155,14 @@ function filter (params) {
     (yearMax == null || (model.first_year ?? 0) <= yearMax) &&
     ((priceMin == null && priceMax == null) || (model.msrp_cents > 0 &&
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
+}
+
+// The index doesn't publish e_vehicle_classifications yet, so until it does a US class matches nothing
+function propelled ({ electric, e_vehicle_classifications: classifications }, propulsion) {
+  if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
+  if (!classifications) return false
+  const usClass = classifications.some((id) => /^evc\/us\/class_\d$/.test(id))
+  return propulsion === 'out_of_class' ? electric && !usClass : classifications.includes(`evc/us/${propulsion}`)
 }
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
