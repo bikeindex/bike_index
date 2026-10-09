@@ -5669,6 +5669,8 @@ es:
             uploading: subir
         required_marker:
           required: requerido
+        combobox_state:
+          state: Estado
       alerts:
         base:
           error: Error

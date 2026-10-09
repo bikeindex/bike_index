@@ -5420,6 +5420,8 @@ nb:
             uploading: opplasting
         required_marker:
           required: nødvendig
+        combobox_state:
+          state: Stat
       alerts:
         base:
           error: Feil
