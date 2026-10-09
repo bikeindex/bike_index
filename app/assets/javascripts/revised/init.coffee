@@ -56,7 +56,6 @@ class BikeIndex.Init extends BikeIndex
       news_show: BikeIndex.WelcomeIndex # only used by get_your_stolen_bike back, this is a gross hack
       welcome_recovery_stories: BikeIndex.WelcomeRecoveryStories
       info_where: BikeIndex.InfoWhere
-      info_donate: BikeIndex.Payments
       payments_new: BikeIndex.Payments
       bikes_new: BikeIndex.BikesNew
       bikes_edits_show: BikeIndex.BikesEdit
