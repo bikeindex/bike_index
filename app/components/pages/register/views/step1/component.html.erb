@@ -8,7 +8,7 @@
   <% end %>
 
   <% unless @skip_heading %>
-    <%= render UI::Header::Component.new(text: heading_text, subtitle:) %>
+    <%= render UI::Header::Component.new(text: heading_text, subtitle:, **heading_options) %>
   <% end %>
 
   <% if @b_param.errors.any? %>

@@ -36,6 +36,9 @@ module Pages
             translation(".register_your_vehicle_with_org", org_name: organization.short_name)
           end
 
+          # The landing page has its own h1, so the card's heading sits under it at the same size
+          def heading_options = @landing ? {tag: :h2, html_class: "tw:text-2xl!"} : {}
+
           def subtitle
             translation(".just_the_essentials") unless @flow.single_page?
           end

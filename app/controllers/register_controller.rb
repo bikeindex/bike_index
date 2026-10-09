@@ -10,7 +10,7 @@ class RegisterController < ApplicationController
   before_action -> {
     start_registration(token_id: session[:register_b_param_token], origin: "register_flow_landing_page")
   }, only: %i[embed]
-  before_action -> { start_registration(token_id: session[:register_b_param_token]) }, only: %i[landing]
+  before_action :resume_or_start_registration, only: %i[landing]
   # The emailed link resumes a registration the session knows nothing about
   before_action :find_b_param_for_confirmation, only: %i[confirm confirm_email]
   # confirm renders a self-posting form and nothing else, so it reads neither
@@ -254,6 +254,15 @@ class RegisterController < ApplicationController
 
   def step_path(step)
     register_path(b_param_token: @b_param.id_token, step:)
+  end
+
+  # One past step 1 resumes, so coming back to the page doesn't start another and send its
+  # confirmation email again
+  def resume_or_start_registration
+    @b_param = BikeServices::Register.find_token(session_token: session[:register_b_param_token], user: current_user)
+    return if @b_param&.manufacturer_id.present? && !@b_param.with_bike?
+
+    start_registration(token_id: session[:register_b_param_token])
   end
 
   # The registration new and embed start from - token_id reuses the one it names, when

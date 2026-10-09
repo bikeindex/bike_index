@@ -3,14 +3,20 @@
     id="register"
     class="tw:scroll-mt-4 tw:border-b tw:border-gray-200 tw:bg-gray-50"
   >
+    <%# Phones get the form straight after the pitch, with the checks below it %>
     <div
       class="
         tw:mx-auto tw:grid tw:max-w-6xl tw:items-center tw:gap-8 tw:px-5
         tw:pt-8 tw:pb-10 tw:sm:pt-10 tw:sm:pb-12 tw:lg:grid-cols-2
-        tw:lg:gap-12 tw:lg:px-6 tw:lg:pt-14 tw:lg:pb-16
+        tw:lg:gap-x-12 tw:lg:gap-y-5.5 tw:lg:px-6 tw:lg:pt-14 tw:lg:pb-16
       "
     >
-      <div class="tw:flex tw:flex-col tw:items-start tw:gap-4 tw:sm:gap-5.5">
+      <div
+        class="
+          tw:flex tw:flex-col tw:items-start tw:gap-4 tw:sm:gap-5.5
+          tw:lg:self-end
+        "
+      >
         <span
           class="
             tw:rounded-full tw:border tw:border-gray-200 tw:bg-white
@@ -39,7 +45,27 @@
         >
           <%= translation(".lede") %>
         </p>
+      </div>
 
+      <div
+        class="
+          tw:w-full tw:max-w-130 tw:justify-self-center tw:rounded-lg
+          tw:border tw:border-gray-200 tw:bg-white tw:p-5 tw:text-gray-900
+          tw:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:sm:p-8
+          tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1
+          tw:lg:justify-self-end
+        "
+      >
+        <%= render(Pages::Register::Views::Step1::Component.new(b_param: @b_param, flow: @flow,
+          current_user: @current_user, landing: true)) %>
+      </div>
+
+      <div
+        class="
+          tw:flex tw:flex-col tw:items-start tw:gap-4 tw:sm:gap-5.5
+          tw:lg:self-start
+        "
+      >
         <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0">
           <% checks.each do |check| %>
             <li
@@ -54,20 +80,16 @@
           <% end %>
         </ul>
 
-        <%= image_tag("register_landing/bike-hero.webp", alt: "",
-          class: "tw:hidden tw:w-full tw:max-w-75 tw:drop-shadow-[0_8px_16px_rgba(44,62,80,.18)] tw:lg:block", loading: "lazy") %>
-      </div>
+        <%# Only the lg source loads, so phones don't fetch an image they never show %>
+        <picture>
+          <source
+            media="(min-width: 64rem)"
+            srcset="<%= image_path("register_landing/bike-hero.webp") %>"
+          >
 
-      <div
-        class="
-          tw:w-full tw:max-w-130 tw:justify-self-center tw:rounded-lg
-          tw:border tw:border-gray-200 tw:bg-white tw:p-5 tw:text-gray-900
-          tw:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:sm:p-8
-          tw:lg:justify-self-end
-        "
-      >
-        <%= render(Pages::Register::Views::Step1::Component.new(b_param: @b_param, flow: @flow,
-          current_user: @current_user, landing: true)) %>
+          <%= image_tag(BLANK_IMAGE, alt: "",
+            class: "tw:hidden tw:w-full tw:max-w-75 tw:drop-shadow-[0_8px_16px_rgba(44,62,80,.18)] tw:lg:block") %>
+        </picture>
       </div>
     </div>
   </section>

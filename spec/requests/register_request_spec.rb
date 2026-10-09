@@ -385,7 +385,14 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to register_path(b_param_token: landing_b_param.id_token, step: 2)
       expect(landing_b_param.reload).to have_attributes(owner_email:, manufacturer_id: manufacturer.id)
 
-      # Submitted, so the next visit starts another
+      # Past step 1, so coming back resumes it rather than starting another
+      expect { get "/register/landing" }.to_not change(BParam, :count)
+      expect(response.body).to include(%(value="#{landing_b_param.id_token}"), owner_email, "Start over")
+      # The card's heading sits under the page's own
+      expect(response.body.scan("<h1").count).to eq 1
+
+      # Its bike created, so the next visit starts another
+      landing_b_param.update(created_bike_id: FactoryBot.create(:bike).id)
       expect { get "/register/landing" }.to change(BParam, :count).by 1
     end
   end

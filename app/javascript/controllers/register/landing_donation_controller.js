@@ -2,46 +2,59 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='register--landing-donation'
 //
-// Points the call to action at the picked tile for the chosen cadence, or at the
-// donate page for a custom one-time amount
+// Puts the picked amount on each cadence's button, and submits a custom one-time amount
+// in place of the tiles
 export default class extends Controller {
-  static targets = ['custom', 'cta']
-  static values = { customHref: String, customLabel: String }
+  static targets = ['custom', 'customField', 'monthlyCta', 'oneTimeCta']
+  static values = { customLabel: String, donateLabel: String }
 
   connect () {
+    this.customFieldTarget.classList.replace('tw:hidden', 'tw:flex')
+    this.lastPicked = this.oneTimeRadios.find((radio) => radio.checked)
     this.update()
   }
 
-  get custom () {
-    return parseInt(this.customTarget.value, 10) || 0
+  get oneTimeRadios () {
+    return [...this.element.querySelectorAll('[name=initial_amount]')]
   }
 
-  select () {
+  // Whole dollars, as the donate page reads them
+  get custom () {
+    const amount = Number(this.customTarget.value)
+    return Number.isInteger(amount) && amount > 0 ? amount : 0
+  }
+
+  // Anything typed, valid or not, so a bad amount doesn't fall back to a tile
+  get customTyped () {
+    return this.customTarget.value !== '' || this.customTarget.validity.badInput
+  }
+
+  select (event) {
+    this.lastPicked = event.target
     this.customTarget.value = ''
     this.update()
   }
 
-  // A custom amount stands in for the one-time tiles, and clearing it puts the default back
+  // Clearing the amount puts back the tile that was picked before it
   customize () {
-    this.element.querySelectorAll('[name=landing_donation_one_time]').forEach((radio) => {
-      radio.checked = this.custom <= 0 && radio.defaultChecked
-    })
+    this.oneTimeRadios.forEach((radio) => { radio.checked = !this.customTyped && radio === this.lastPicked })
     this.update()
   }
 
-  update () {
-    const cadence = this.element.querySelector('[name=landing_donation_cadence]:checked')?.value
-    const picked = this.element.querySelector(`[name=landing_donation_${cadence}]:checked`)
-
-    if (picked) {
-      this.show(picked.dataset.href, picked.dataset.label)
-    } else if (cadence === 'one_time' && this.custom > 0) {
-      this.show(`${this.customHrefValue}?initial_amount=${this.custom}`, this.customLabelValue.replace('%{amount}', this.custom))
-    }
+  formdata (event) {
+    if (this.custom > 0) event.formData.set('initial_amount', this.custom)
   }
 
-  show (href, label) {
-    this.ctaTarget.href = href
-    this.ctaTarget.textContent = label
+  update () {
+    this.monthlyCtaTarget.textContent = this.element.querySelector('[name=membership_level]:checked').dataset.label
+    this.oneTimeCtaTarget.textContent = this.oneTimeLabel()
+  }
+
+  oneTimeLabel () {
+    const picked = this.oneTimeRadios.find((radio) => radio.checked)
+    if (picked) return picked.dataset.label
+    if (this.custom === 0) return this.donateLabelValue
+
+    return this.customLabelValue.replace('%{amount}', this.custom.toLocaleString(document.documentElement.lang || undefined))
   }
 }

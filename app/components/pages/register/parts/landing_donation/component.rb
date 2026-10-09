@@ -4,8 +4,9 @@ module Pages
   module Register
     module Parts
       module LandingDonation
-        # The landing page's donation ask. Monthly tiles start a membership and one-time ones
-        # the donate page - register--landing-donation points the call to action at the pick
+        # The landing page's donation ask: a form per cadence, submitting to the membership
+        # page or the donate page. register--landing-donation puts the pick's amount on the
+        # buttons and takes a custom one-time amount
         class Component < ApplicationComponent
           # Ahead of Pages::Memberships::ChooseMembership, which still shows the old Stripe prices
           MEMBERSHIP_CENTS = {basic: 500, plus: 1500, patron: 5000}.freeze
@@ -14,25 +15,26 @@ module Pages
 
           RADIO_CLASSES = "tw:mt-1 tw:size-5 tw:shrink-0 tw:accent-blue-600"
 
+          CTA_ROW_CLASSES = "tw:flex tw:flex-wrap tw:items-center tw:gap-x-5 tw:gap-y-3"
+
+          CTA_CLASSES = "tw:w-full tw:px-4! tw:text-sm! tw:sm:w-auto tw:sm:px-8! tw:sm:text-base!"
+
+          FINE_PRINT_CLASSES = "tw:m-0 tw:flex-1 tw:basis-60 tw:text-[13px]"
+
           private
 
           def membership_tiles
             @membership_tiles ||= MEMBERSHIP_CENTS.map do |level, cents|
               price = MoneyFormatter.money_format_without_cents(cents)
               {amount: price, name: translation(".membership_level", level: Membership.level_humanized(level.to_s)),
-               checked: level == :plus, href: new_membership_path(membership_level: level),
-               label: translation(".become_a_member", amount: price)}
+               value: level, checked: level == :plus, label: translation(".become_a_member", amount: price)}
             end
           end
-
-          # What the call to action points at before the controller connects
-          def default_tile = membership_tiles.detect { it[:checked] }
 
           def one_time_tiles
             ONE_TIME_DOLLARS.map do |dollars|
               amount = MoneyFormatter.money_format_without_cents(dollars * 100)
-              {amount:, checked: dollars == 50, href: donate_path(initial_amount: dollars),
-               label: translation(".donate", amount:)}
+              {amount:, value: dollars, checked: dollars == 50, label: translation(".donate", amount:)}
             end
           end
 
