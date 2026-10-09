@@ -6611,18 +6611,15 @@ nb:
             complete_registration: Fullfør registreringen %{cycle_type}
       bikebook:
         show:
-          activity: Aktivitet
           any_activity: Enhver aktivitet
           any_configuration: Enhver konfigurasjon
           any_manufacturer: Enhver produsent
-          any_motorized: Enhver motorisert
           any_suspension: Enhver suspensjon
           any_vehicle_type: Enhver kjøretøytype
           applied_filters: Anvendte filtre
           configuration: Konfigurasjon
           failed: Katalogen lastet ikke inn. Last inn siden på nytt for å prøve igjen.
           loading: Laster inn katalogen…
-          manufacturer: Produsent
           max: Maks
           min: Min.
           more_filters: Flere filtre
@@ -6631,8 +6628,6 @@ nb:
           search_placeholder: Søk etter produsent eller modell…
           sort: Sortere
           suspension: Suspensjon
-          vehicle_type: Bil type
-          view_a_vehicle: Se et kjøretøy
           year: år
           filter_combobox:
             any: Noen
@@ -6641,8 +6636,21 @@ nb:
             sykkeltur på tvers av %{models_count}+ modeller.
           tagline: Verdens sykkelbibliotek – søk, sammenlign og finn din neste sykkeltur.
           about_bikebook_label: Om BikeBook
+          activities: Aktiviteter
+          activity_examples: "(f.eks. terrengsykling, sykkelcross osv.)"
+          configuration_examples: "(komplett/rammesett)"
+          human_powered: Menneskedrevet (akustisk)
+          manufacturers: Produsenter
+          out_of_class: Ute av klasserommet
+          out_of_class_details: Motorisert, men ingen av amerikanske klasse 1, 2 eller
+            3, som moped, motorsykkel eller elmotorsykkel for terrengkjøring.
+          propulsion: Fremdrift
+          select_a_bike: Velg en sykkel, velg flere for å sammenligne dem
+          us_class_1: Amerikansk klasse 1
+          us_class_2: Amerikansk klasse 2
+          us_class_3: Amerikansk klasse 3
+          vehicle_types: Kjøretøytyper
         donate_strip:
-          dismiss: Avskjedige
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
             Index. Hjelp oss med å betale serverkostnadene våre.

@@ -6916,18 +6916,15 @@ it:
             complete_registration: Completare la registrazione %{cycle_type}
       bikebook:
         show:
-          activity: Attività
           any_activity: Qualsiasi attività
           any_configuration: Qualsiasi configurazione
           any_manufacturer: Qualsiasi produttore
-          any_motorized: Qualsiasi motorizzato
           any_suspension: Qualsiasi sospensione
           any_vehicle_type: Qualsiasi tipo di veicolo
           applied_filters: Filtri applicati
           configuration: Configurazione
           failed: Impossibile caricare il catalogo. Ricarica la pagina per riprovare.
           loading: Caricamento del catalogo…
-          manufacturer: Produttore
           max: Massimo
           min: Min
           more_filters: Altri filtri
@@ -6936,8 +6933,6 @@ it:
           search_placeholder: Cerca per produttore o modello…
           sort: Ordinare
           suspension: Sospensione
-          vehicle_type: Tipo di veicolo
-          view_a_vehicle: Visualizza un veicolo
           year: Anno
           filter_combobox:
             any: Qualunque
@@ -6948,8 +6943,21 @@ it:
           tagline: 'La biblioteca mondiale delle biciclette: cerca, confronta e trova
             la tua prossima bici.'
           about_bikebook_label: Informazioni su BikeBook
+          activities: Attività
+          activity_examples: "(ad esempio mountain bike, ciclocross, ecc.)"
+          configuration_examples: "(completo/frameset)"
+          human_powered: Azionata dalla forza umana (acustica)
+          manufacturers: Produttori
+          out_of_class: Fuori dalla classe
+          out_of_class_details: Motorizzato, ma non appartenente alle classi 1, 2
+            o 3 statunitensi, come ciclomotori, motociclette o moto elettriche fuoristrada.
+          propulsion: Propulsione
+          select_a_bike: Seleziona una bicicletta, scegline più di una per confrontarle
+          us_class_1: Classe 1 degli Stati Uniti
+          us_class_2: Classe 2 degli Stati Uniti
+          us_class_3: Classe 3 degli Stati Uniti
+          vehicle_types: Tipi di veicoli
         donate_strip:
-          dismiss: Congedare
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
             Bike Index. Aiutateci a coprire i costi del server.
