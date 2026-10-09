@@ -16,6 +16,7 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
     expect(component).to have_css("h1", text: "Send every bike home with a sidekick.")
     expect(component).to have_css("form#new_feedback input[name='feedback[feedback_type]'][value='lead_for_bike_shop']", visible: :all)
     expect(component).to have_field("Shop name")
+    expect(component).to have_css("input#feedback_name[maxlength='255']")
     expect(component).to have_select("Your POS", with_options: ["Lightspeed", "Ascend", "Shopify (coming soon)", "Other / none"])
     expect(component).to have_text("1,234,567")
     expect(component).to have_text("18,263")
@@ -32,6 +33,7 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
 
     it "renders the success state instead of the form" do
       expect(component).to have_text("You're in.")
+      expect(component).to have_text("We'll email you about connecting your POS.")
       expect(component).to_not have_css("form#new_feedback")
     end
   end

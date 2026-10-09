@@ -47,6 +47,18 @@ RSpec.describe Feedback, type: :model do
       expect(feedback.kind).to eq "lead_for_school"
       expect(feedback.kind_humanized).to eq "School lead"
     end
+
+    context "with a lead name that fills the column" do
+      let(:name) { "S" * 255 }
+
+      it "truncates the generated title, and rejects a longer name" do
+        feedback = Feedback.create(feedback_type: "lead_for_bike_shop", email: "shop@example.com", name:)
+        expect(feedback).to be_persisted
+        expect(feedback.title.length).to eq 255
+
+        expect(Feedback.new(feedback_type: "lead_for_bike_shop", email: "shop@example.com", name: "#{name}S")).to_not be_valid
+      end
+    end
   end
 
   describe "looks_like_spam?" do

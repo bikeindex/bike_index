@@ -13,7 +13,6 @@ en:
           bikes_registered_free: bikes registered, free
           bikes_that_came_home: Bikes that came home
           browse_bike_book: Browse Bike Book
-          check_your_email: Check your email for next steps on connecting your POS.
           check_your_state: Check your state
           choose_your_pos: Choose your POS
           coming_soon: Coming soon
@@ -132,6 +131,7 @@ en:
           used_only_for_bikes: Used only for bikes
           value_returned_to_owners: value returned to owners
           we_never_sell_or_share: We never sell or share customer data.
+          well_email_you: We'll email you about connecting your POS.
           what_your_customers_get: What your customers get. What your shop gets.
           wholesale: Wholesale
           your_pos: Your POS
