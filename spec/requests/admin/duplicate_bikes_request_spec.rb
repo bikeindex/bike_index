@@ -29,7 +29,7 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(response.code).to eq "200"
       expect(assigns(:groups).map { it["record_count"] }).to eq [11]
       expect(response.body).to include("Possible standards marking: EN 14764", "Possible product, part or placeholder code",
-        "11 example-domain or developer contacts")
+        "11 example-domain contacts")
       expect(assigns(:cue_counts)).to include("standard_marking" => 1, "review_contact" => 1, "none" => 0)
 
       get base_url, params: {search_kind: "large_group", search_cue: "none"}

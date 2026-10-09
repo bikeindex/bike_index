@@ -357,7 +357,7 @@
         </div>
 
         <% if BikeServices::DuplicateReviewCues.review_contact?(group.email) %>
-          <%= render UI::Badge::Component.new(text: "Example-domain or developer contact", color: :orange, size: :sm) %>
+          <%= render UI::Badge::Component.new(text: "Example-domain contact", color: :orange, size: :sm) %>
         <% end %>
       <% end %>
 
