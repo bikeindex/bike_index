@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
-import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
+import { CatalogComboboxSource, loadCatalog, matching } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
+import { renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { uuid } from 'bikebook/templates/helpers'
@@ -13,8 +14,8 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // Searches and compares the published catalog in the browser. A pick submits the form, and it, a
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
-  static targets = ['shell', 'page', 'status']
-  static values = { manifestUrl: String, failedText: String }
+  static targets = ['shell', 'page', 'status', 'tagline', 'countedTagline']
+  static values = { manifestUrl: String, failedText: String, title: String }
 
   #scrolls = new Map()
   #renders = 0
@@ -22,7 +23,6 @@ export default class extends Controller {
   // The first render replaces the status, and a failed one puts it back
   initialize () {
     this.status = this.statusTarget
-    this.title = document.title
   }
 
   async connect () {
@@ -34,7 +34,8 @@ export default class extends Controller {
     } catch (error) {
       return this.#fail(error)
     }
-    this.source = new CatalogComboboxSource(this.catalog)
+    this.source = new CatalogComboboxSource(this.catalog, (count) => renderInto(document.getElementById('vehicle-models-count'), matching(count)))
+    this.#countModels()
     this.#render(url)
   }
 
@@ -46,7 +47,8 @@ export default class extends Controller {
     this.#go(realigned(url))
   }
 
-  // A plain click on a link to this page, such as a card's remove link
+  // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
+  // scrolling or focusing the search
   follow (event) {
     const link = event.target.closest('a[href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
@@ -55,14 +57,7 @@ export default class extends Controller {
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
-    this.#go(url)
-  }
-
-  // From the URL rather than the render's, which a filter edit since has moved on
-  toggleComparison () {
-    const url = new URL(window.location.href)
-    url.searchParams.get('view') === 'comparison' ? url.searchParams.delete('view') : url.searchParams.set('view', 'comparison')
-    this.#go(url, [window.scrollX, window.scrollY])
+    'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: false }) : this.#go(url)
   }
 
   // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
@@ -90,13 +85,15 @@ export default class extends Controller {
     if (!this.#entry) window.history.replaceState(stamped(window.history.state), '')
   }
 
-  #go (url, scroll = [0, 0]) {
+  #go (url, scroll = [0, 0], options) {
     window.history.pushState(stamped(), '', readable(url))
-    return this.#render(url, scroll)
+    return this.#render(url, scroll, options)
   }
 
-  async #render (url, scroll) {
+  async #render (url, scroll, { focus = true } = {}) {
     const render = ++this.#renders
+    // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
+    if (render > 1) document.querySelector('link[rel="canonical"]')?.remove()
     const rendered = await hydrate(this.catalog, this.source, this.shellTarget, url).catch((error) => error)
     if (render !== this.#renders) return
     if (rendered instanceof Error) return this.#fail(rendered)
@@ -104,9 +101,18 @@ export default class extends Controller {
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
     this.pageTarget.replaceChildren(rendered.content)
-    document.title = rendered.title ?? this.title
-    this.pageTarget.querySelector('[autofocus]')?.focus()
+    document.title = rendered.title ?? this.titleValue
+    if (focus) this.pageTarget.querySelector('[autofocus]')?.focus()
     if (scroll) window.scrollTo(...scroll)
+  }
+
+  // down to the thousand (a smaller catalog's leading place), so the tagline stays true as the catalog grows
+  #countModels () {
+    const { modelsCount } = this.catalog
+    const place = 10 ** Math.min(3, String(modelsCount).length - 1)
+    const tagline = this.countedTaglineTarget.content.cloneNode(true)
+    tagline.querySelector('[data-models-count]').textContent = (Math.floor(modelsCount / place) * place).toLocaleString('en-US')
+    this.taglineTarget.replaceChildren(tagline)
   }
 
   #fail (error) {

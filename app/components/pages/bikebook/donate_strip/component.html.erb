@@ -1,0 +1,37 @@
+<section
+  aria-label="<%= translation(".region") %>"
+  data-controller="bikebook--donate-strip"
+  class="
+    tw:relative tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2
+    tw:bg-blue-500 tw:py-3 tw:pr-14 tw:pl-5 tw:sm:flex-nowrap
+    tw:sm:justify-center tw:sm:px-16 tw:sm:py-2.5
+  "
+>
+  <%= helpers.inline_svg_tag("icons/heart.svg", class: "tw:size-5 tw:shrink-0 tw:text-[#ffd660]", aria_hidden: true) %>
+
+  <span
+    class="
+      tw:min-w-0 tw:flex-1 tw:basis-48 tw:text-[15px] tw:font-semibold
+      tw:text-pretty tw:text-white tw:sm:flex-initial
+    "
+  >
+    <%= translation(".pitch") %>
+  </span>
+
+  <%= render(UI::ButtonLink::Component.new(text: translation(".donate"), href: donate_path(source: "bikebook"), color: :yellow, size: :callout_sm,
+  html_class: "tw:shrink-0 tw:font-header tw:whitespace-nowrap")) %>
+
+  <button
+    type="button"
+    aria-label="<%= translation(".dismiss") %>"
+    data-action="bikebook--donate-strip#dismiss"
+    class="
+      tw:absolute tw:top-1/2 tw:right-5 tw:flex tw:size-9
+      tw:-translate-y-1/2 tw:cursor-pointer tw:items-center
+      tw:justify-center tw:rounded-full tw:border-0 tw:bg-transparent
+      tw:text-white tw:hover:bg-white/15
+    "
+  >
+    <%= helpers.inline_svg_tag("icons/x.svg", class: "tw:size-3.5", aria_hidden: true) %>
+  </button>
+</section>

@@ -160,7 +160,10 @@ RSpec.describe Pages::Org::SearchResults::BikesTable::Component, type: :componen
     # The org's own display_id, which is what its impound records index and their URLs
     # use - not the global record id
     context "with an impounded bike" do
+      # display_id counts from 1 per organization, so on a fresh database the first record's id
+      # matches it - another organization's record first keeps the two apart
       let!(:impound_record) do
+        FactoryBot.create(:impound_record_with_organization)
         FactoryBot.create(:impound_record_with_organization, organization:, bike:)
       end
 

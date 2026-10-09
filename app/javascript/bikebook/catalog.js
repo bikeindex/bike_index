@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
 import { classificationOption, comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
-import { fragmentOf, renderInto } from 'bikebook/render'
+import { fragmentOf } from 'bikebook/render'
 
 /* global IntersectionObserver, Worker */
 
@@ -24,11 +24,12 @@ export async function loadCatalog (manifestUrl, ids = []) {
   })
 
   try {
-    const { vocabulary, kit, options } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids })
+    const { vocabulary, kit, options, modelsCount } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids })
     return {
       vocabulary,
       kit,
       options,
+      modelsCount,
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       vehicles: (ids) => call('vehicles', { ids }),
       displays: (ids) => call('displays', { ids })
@@ -44,8 +45,10 @@ export async function loadCatalog (manifestUrl, ids = []) {
 export class CatalogComboboxSource {
   #generation = 0
 
-  constructor (catalog) {
+  // onCount takes each search's count of matching models
+  constructor (catalog, onCount = () => {}) {
     this.catalog = catalog
+    this.onCount = onCount
   }
 
   // A pick re-renders the page, leaving the gem's debounced refilter behind on the combobox it replaced
@@ -78,7 +81,7 @@ export class CatalogComboboxSource {
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
       listbox.replaceChildren(fragmentOf(html`${group(matching(total), options)}${pagination}`))
-      renderInto(document.getElementById('vehicle-models-count'), matching(filteredCount))
+      this.onCount(filteredCount)
     } else {
       listbox.append(fragmentOf(html`${options}${pagination}`))
     }

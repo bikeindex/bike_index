@@ -164,7 +164,7 @@ RSpec.describe "BikesController#create", type: :request do
           # We need to call clean_params on the BParam after bikebook update, so that
           # the foreign keys are assigned correctly. This is how we test that we're
           # This is also where we're testing bikebook assignment
-          expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
+          expect_any_instance_of(Integrations::Bikebook::Data).to receive(:get_model) { bb_data }
           ActionMailer::Base.deliveries = []
           Sidekiq::Job.clear_all
           expect {
@@ -910,7 +910,7 @@ RSpec.describe "BikesController#create", type: :request do
       # We need to call clean_params on the BParam after bikebook update, so that
       # the foreign keys are assigned correctly.
       # This is also where we're testing bikebook assignment
-      expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
+      expect_any_instance_of(Integrations::Bikebook::Data).to receive(:get_model) { bb_data }
       expect(state).to be_present
     end
     let!(:target_address) { {street: "212 Main St", city: "Chicago", region: "IL", postal_code: "60647", kind: "ownership"} }

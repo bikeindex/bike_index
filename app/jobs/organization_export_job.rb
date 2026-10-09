@@ -159,7 +159,7 @@ class OrganizationExportJob < ApplicationJob
     when "bike_sticker" then bike.bike_stickers.map(&:pretty_code).join(" and ")
     when "assigned_sticker" then assign_bike_code_and_increment(bike)
     when "impound_id" then bike.current_impound_record&.display_id if bike.status_impounded?
-    when "acknowledged_at" then acknowledged_ats[bike.id]&.utc if bike.motorized?
+    when "acknowledged_at" then acknowledged_ats[bike.id]&.utc if bike.registration_sequence_applies?
     end
   end
 

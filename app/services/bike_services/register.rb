@@ -31,13 +31,32 @@ module BikeServices
 
     # The token's registration when step 1 was never submitted, otherwise a new one.
     # A signed-in user's email prefills owner_email, a scanned sticker's code bike_sticker
-    def b_param_for(user:, token_id: nil, status: nil, email: nil, bike_sticker: nil, origin: "register_flow")
+    # prefill ({manufacturer:, frame_model:}, from a link that knows the bike) is kept apart from the
+    # bike's values, since a manufacturer there would count step 1 as submitted - with_prefill shows it
+    def b_param_for(user:, token_id: nil, status: nil, email: nil, bike_sticker: nil, origin: "register_flow", prefill: {})
       status = nil unless Bike.statuses.include?(status)
       existing = find_token(session_token: token_id, user:)
       return assign_start_params(existing, user, email:, status:) if reusable?(existing, origin)
 
       bike_params = {owner_email: owner_email_for(user, email), status:, bike_sticker:}.compact
-      BParam.create(origin:, creator_id: user&.id, params: {bike: bike_params}.as_json)
+      BParam.create(origin:, creator_id: user&.id, params: {bike: bike_params, prefill: prefill.presence}.compact.as_json)
+    end
+
+    # params with the prefill filling the bike's blank manufacturer and model, for a step's fields to show
+    # without saving - submitting the step is what stores them. An unknown manufacturer is Other, named
+    def with_prefill(params)
+      prefill = params["prefill"]
+      return params if prefill.blank?
+
+      bike = params["bike"] || {}
+      name = prefill["manufacturer"]
+      manufacturer = (Manufacturer.friendly_find(name) || Manufacturer.other if name.present? && bike["manufacturer_id"].blank?)
+      additions = {
+        "manufacturer_id" => manufacturer&.id,
+        "manufacturer_other" => (name if manufacturer&.other?),
+        "frame_model" => (prefill["frame_model"] if bike["frame_model"].blank?)
+      }.compact
+      params.merge("bike" => bike.merge(additions))
     end
 
     # Resume a registration by token: anonymous, or the passed user's

@@ -502,6 +502,12 @@ class Bike < ApplicationRecord
     status_impounded? || unregistered_parking_notification?
   end
 
+  # Only e-vehicles agree to an organization's safety rules, and an unregistered parking
+  # notification has no registrant to agree to them
+  def registration_sequence_applies?
+    motorized? && !unregistered_parking_notification?
+  end
+
   def not_updated_by_user?
     updated_by_user_at.blank? || updated_by_user_at == created_at
   end

@@ -2515,6 +2515,14 @@ nb:
         registered_own: Din %{bike_display} er registrert.
         safety_rules_sent: "%{bike_display} er registrert – vi har sendt en e-post
           med sikkerhetsreglene til %{email} for å godta dem, noe som fullfører registreringen."
+    ebike_rules:
+      show:
+        state_description: "%{state} e-sykkellov: %{law}"
+        state_description_in_review: Vi gjennomgår fortsatt elsykkelloven til %{state}.
+          Sjekk elsykkelens klasse, motor og hastighet, og se hvordan elsykkelklassene
+          fungerer.
+        state_title: "%{state} lover om elsykler"
+        title: Regler for elsykkel
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4596,11 +4604,14 @@ nb:
         why_no_direct_by_default: Som standard sendes e-poster til sykler som ikke
           er gjort krav på, til organisasjonen din for å gjennomgå og videresende
           til sluttbrukeren, fordi disse brukerne ikke har meldt seg på Bike Index-varsler.
-        send_self_registration_email_helper: Som standard sender ikke Bike Index lenger
-          en e-post til deg når et kjøretøy er registrert på organisasjonens registrerings-e-postadresse
-          (f.eks. varsler om uregistrert parkering).
         send_self_registration_email_html: Send e-post for registreringer sendt til
           <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: Dette inkluderer uregistrerte
+          varsler.
+        send_self_registration_email_note: Som standard sender ikke Bike Index lenger
+          e-post når et kjøretøy registreres til organisasjonens registrerings-e-postadresse.
+          Kryss av i denne boksen hvis du vil motta e-post for registreringer med
+          eierens e-postadresse %{email}.
     stickers:
       edit:
         bike: Sykkel
@@ -5673,6 +5684,19 @@ nb:
             created: Opprettet
             notification_number: Melding#
             resolved: Løst
+          new:
+            create_parking_notification: Opprett parkeringsvarsel
+            internal_notes: "%{org_name} interne notater"
+            model: Modell
+            new_unregistered_notification: Ny uregistrert melding
+            not_shown_to_user: ikke vist for brukeren
+            notification_because: Varsel fordi
+            parking_notification: Parkeringsvarsel
+            photo: Foto
+            registration_form_settings: Innstillinger for registreringsskjema
+            serial_number: Serienummer
+            vehicle_info: Kjøretøyinformasjon
+            vehicle_type: Bil type
         register_settings:
           browser_only: Disse innstillingene brukes kun i nettleseren din – de påvirker
             ikke andre brukere
@@ -5685,9 +5709,18 @@ nb:
             registreringen ikke er fullført, med en lenke for å fullføre den.
           single_page: Registreringsskjema på én side
           update: Oppdater
+          old_unregistered_notification_view: Bruk den gamle varslingssiden for uregistrerte
+          unregistered_notification_page: Uregistrert varslingsside
         registrations:
           new:
             registration_form_settings: Innstillinger for registreringsskjema
+        parking_notification_location:
+          address_or_intersection: Adresse eller veikryss
+          enter_address_manually: Skriv inn adressen manuelt
+          map_hint: Dra kartet slik at nålen markerer stedet
+          map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
+            angitt fra enheten din.
+          set_on_map: Sett på kartet
       registrations:
         show:
           bike_details:
@@ -5853,12 +5886,8 @@ nb:
               unavailable_vehicle_not_registered_with_organization: Generelle meldinger
                 kan bare sendes til kjøretøy registrert med %{organization_name}
             parking_notification_form:
-              address_or_intersection: Adresse eller veikryss
               create_parking_notification: Opprett et nytt parkeringsvarsel
               impound_this_bike_type: Beslaglegg dette %{bike_type}
-              map_hint: Dra kartet slik at nålen markerer stedet
-              map_unavailable: Kartet kunne ikke lastes inn – posisjonen var fortsatt
-                angitt fra enheten din.
               not_shown_to_user: ikke vist for brukeren
               parking_notification_notes: "%{org_name} interne notater"
             parking_notification_show:
@@ -6417,7 +6446,6 @@ nb:
               skrevet inn her overføres.
             yes_start_over: Ja, start på nytt
           step2_fields:
-            add_another_color: Legg til en annen farge
             additional_serial_sticker_number: Ekstra serie-/klistremerkenummer
             affiliation: "%{org_name} tilknytning"
             are_you_certain: Er du sikker?
@@ -6425,7 +6453,6 @@ nb:
             bike_details: "%{cycle_type} detaljer"
             bottom_bracket: Kranklager
             cm: cm
-            color: Farge
             complete_registration: Fullfør registreringen %{cycle_type}
             contact_info: Kontaktinformasjon
             database_public_note: Databasen vår er offentlig! Du kan justere personverninnstillingene
@@ -6464,7 +6491,6 @@ nb:
               %{cycle_type}
             phone_required_org: Telefonnummer kreves for å registrere seg hos %{org_name}
             phone_required_stolen: Telefon kreves for å registrere en stjålet %{cycle_type}
-            primary_color_blank: Primærfarge — f.eks. svart
             read_how_to_find_html: Les om %{how_to_find_link} <small>(åpnes i eget
               vindu)</small>
             rear_dropouts: Bakre gaffelender
@@ -6472,8 +6498,6 @@ nb:
             register_with_org_description: "%{org_name} vil kunne se og hjelpe til
               med å administrere denne registreringen."
             registration_type: Registreringstype
-            remove_additional_color: Fjern farge
-            second_color_blank: Andre farge — f.eks. rød
             serial_help_intro: 'De fleste sykler har serienummeret sitt gravert inn
               i rammen. Se etter serienummeret ditt:'
             serial_location_bottom_bracket: undersiden av kranklageret
@@ -6486,8 +6510,6 @@ nb:
             stolen: Stjålet
             stolen_description: Denne %{cycle_type} har blitt stjålet
             student_id: Student ID
-            third_color_blank: Tredje farge
-            up_to_3: opptil 3
             very_very_few_bikes_html: "<em>Svært</em> få %{cycle_types} lages uten
               serienummer. Med mindre denne %{cycle_type}:"
             view_serial_guide: Se hele serienummerguiden
@@ -6495,6 +6517,14 @@ nb:
             wheres_my_serial: Hvor er serienummeret mitt?
             without_serial: Denne %{cycle_type} ble laget uten serienummer
             without_serial_number: Denne %{cycle_type} ble laget uten serienummer
+          color_fields:
+            add_another_color: Legg til en annen farge
+            color: Farge
+            primary_color_blank: Primærfarge — f.eks. svart
+            remove_additional_color: Fjern farge
+            second_color_blank: Andre farge — f.eks. rød
+            third_color_blank: Tredje farge
+            up_to_3: opptil 3
         views:
           confirm:
             confirming_your_email: Bekrefter e-postadressen din
@@ -6604,7 +6634,298 @@ nb:
           year: år
           filter_combobox:
             any: Noen
-          comparison_view: Sammenligningsvisning
+          byline: En gratis referanse fra Bike Index, det ideelle sykkelregisteret.
+          tagline_html: Verdens sykkelbibliotek – søk, sammenlign og finn din neste
+            sykkeltur på tvers av %{models_count}+ modeller.
+          tagline: Verdens sykkelbibliotek – søk, sammenlign og finn din neste sykkeltur.
+          about_bikebook_label: Om BikeBook
+        donate_strip:
+          dismiss: Avskjedige
+          donate: Donere
+          pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
+            Index. Hjelp oss med å betale serverkostnadene våre.
+          region: Doner til Bike Index
+      ebike_rules:
+        class_tile:
+          class: Klasse
+          class_aria: Klasse %{n} elsykkel
+          class_unknown_aria: Elsykkelklasse ukjent
+          emoto: Elmotorsykkel
+        law_details:
+          from: 'Fra %{date}:'
+          from_until: 'Fra %{starts_on} til %{ends_on}:'
+          limits_start_on: Disse grensene trer i kraft %{date}. Inntil da gjelder
+            reglene nedenfor.
+          restrictions: Regler og restriksjoner
+          sources: Kilder
+          until: 'Inntil %{date}:'
+        results:
+          answer_no: Nei
+          answer_yes: Ja
+          being_compiled: Regler for denne staten blir satt sammen fra primærkilder.
+          class_1_throttle: Klasse 1-sykler kan ikke ha gass
+          class_3_throttle: Gassen må slås av ved 32 km/t
+          class_not_recognized: Klassen %{e_bike_class} gjenkjennes ikke her
+          class_recognized: Klasse %{e_bike_class} er gjenkjent
+          classes_start_on: Kursene trer i kraft %{date}. Inntil da, sjekk statens
+            gjeldende regler
+          entered_manually: Angitt manuelt · Klasse %{n}
+          fails_rule: Oppfyller ikke denne regelen
+          falls_under: I %{state} faller den inn under %{name}, som kan kreve registrering
+            og lisens.
+          for_your_information: Til din informasjon
+          gray_detail: Din %{name} er oppført som en elsykkel i klasse %{n}. Sjekk
+            %{state} DMV for lokale regler.
+          gray_detail_unclassified: Din %{name} er ikke oppført som en elsykkel i
+            klasse 1, 2 eller 3. Sjekk %{state} DMV for lokale regler.
+          gray_headline: Vi har ikke %{state} sine elsykkelregler registrert ennå.
+          green_headline: Det er lovlig å sykle på %{name}-en din %{state} som en
+            elsykkel i klasse %{n}.
+          has_throttle: Har en gasspedal
+          is_registered: Er denne sykkelen registrert?
+          legal_to_ride: Lovlig å sykle
+          legal_with_rules: Lovlig, med regler for å sjekke
+          limits_start_on: Disse grensene trer i kraft %{date}
+          manual_bike_name: elsykkel
+          may_be_moped: Det kan i stedet være regulert som moped eller motorvogn,
+            noe som kan kreve registrering og førerkort.
+          meets_rule: Oppfyller denne regelen
+          motor: Motor
+          mph_html: "%{mph} mph"
+          no_speed_cap: Ingen fartsgrense i statsloven
+          no_throttle: Ingen gass
+          no_watt_cap: Ingen maktbegrensning i statsloven
+          not_classified: Det er ikke en elsykkel i klasse 1, 2 eller 3.
+          not_permitted: Ikke tillatt
+          not_provided: Ikke oppgitt
+          own_classes: Staten setter sine egne grenser i stedet for de tre standardklassene
+          recovered_more_often: Stjålne sykler blir funnet dobbelt så ofte når de
+            er registrert.
+          red_headline: Din %{name} er ikke tillatt som elsykkel i henhold til gjeldende
+            %{state}-regler.
+          register_free: Registrer deg på Bike Index – gratis
+          rule_to_check: Regel for å sjekke
+          rules_not_on_file: Regler ikke arkivert
+          source_html: 'Kilde: %{link}s katalog over statslovgivning. Sammendragene
+            er kun for referanse, ikke juridisk rådgivning.'
+          speed_not_provided: Toppfart ikke oppgitt
+          speed_over_cap_html: Assisterer til %{mph} mph, over %{cap} mph-grensen
+          speed_within_cap_html: Hjelper opp til %{mph} mph, innenfor grensen
+          still_reviewing: Vi gjennomgår fortsatt reglene til %{state}.
+          still_reviewing_body: Sjekk nettstedet til din statlige trafikkstasjon eller
+            lovgivende forsamling for gjeldende regler for elsykler. De fleste stater
+            har en grense på 750 W for elsykkelmotorer og en assistert hastighet på
+            32 km/t (klasse 1–2) eller 45 km/t (klasse 3).
+          throttle: Gasspedal
+          throttle_allowed: Gass tillatt for klasse 2
+          throttle_not_allowed: Staten tillater ikke gassregulering
+          throttle_not_stated: Statens lov sier ikke om det er tillatt med gass
+          top_speed: Toppfart
+          ul_certification: UL-sertifisering
+          watts_html: "%{watts}W"
+          watts_not_provided: Motoreffekt ikke oppgitt
+          watts_over_cap_html: "%{watts}W-motoren overskrider %{cap}W-grensen"
+          watts_within_cap_html: "%{watts}W-motoren er innenfor hetten"
+          yellow_headline:
+            one: Det er lovlig å sykle på %{name}-en din som en elsykkel i klasse
+              %{n}, med %{count}-regelen som skal kontrolleres.
+            other: Det er lovlig å sykle på %{name}-en din som en elsykkel i klasse
+              %{n}, med %{count} regler som må kontrolleres.
+          yellow_headline_class_unknown:
+            one: Det kan være lovlig å kjøre i %{name}-en din i %{state}, med %{count}-regelen
+              for å sjekke.
+            other: Det kan være lovlig å kjøre i %{name}-en din i %{state}, med %{count}-regler
+              å sjekke.
+          yes_to_html: Ja, til %{mph}
+          your_bike: Sykkelen din
+          your_ebike: Elsykkelen din
+          your_state: Din stat
+          bikebook_name: Sykkelbok
+          bikebook_photo: Foto · Sykkelbok
+          class_3_throttle_over_html: Gasspedalen går til %{mph} mph, over 20 mph
+            er tillatt for en klasse 3-gasspedal.
+          class_3_throttle_within_html: Gasspedalen stopper ved %{mph} mph
+          class_unknown_check_label: BikeBook oppgir ikke klasse eller toppfart, så
+            sjekk klassen på etiketten
+          entered_manually_unclassified: Angitt manuelt
+          entered_unverified: Registrert av deg, ikke bekreftet av BikeBook.
+          full_bikebook_entry: Se hele BikeBook-innlegget
+          model_year_bikebook: "%{year} modell · BikeBook"
+          over_mph_html: Over %{mph} mph
+          red_headline_manual: Dette er ikke en elsykkel i henhold til gjeldende %{state}-regler.
+          speed_past_cap_html: Assisterer forbi %{past} mph, over %{cap} mph-grensen
+          speed_past_html: Assisterer forbi %{past} mph; sjekk at den stopper ved
+            %{cap} mph
+        rule_label:
+          classes: Klasser anerkjent
+          power: Motoreffektbegrensning
+          speed: Topp assistert hastighet
+          throttle: Gasspedal
+        rule_value:
+          allowed: Tillatt
+          classes:
+            one: Klasse %{classes}
+            other: Klasser %{classes}
+          mph_html: "%{mph} mph"
+          no_cap: Ingen grense
+          not_allowed: Ikke tillatt
+          own_definition: 'Sin egen definisjon: %{name}'
+          watts_html: "%{watts}W"
+        show:
+          answer_no: Nei
+          answer_yes: Ja
+          assist: Assistere
+          banned_body: New York City krever at elsykler og batterier som selges der
+            oppfyller UL 2849 eller UL 2271 (lokal lov 39 av 2023). Universiteter,
+            boligleverandører og transportbyråer innfører lignende regler for innendørs
+            lagring og lading.
+          banned_heading: Hvorfor usertifiserte sykler blir forbudt
+          battery_safety: Batteri og brannsikkerhet
+          bike_error: Velg en sykkel fra listen, eller skriv inn detaljene manuelt.
+          bike_model: Sykkelmodell
+          bike_placeholder: Søk etter sykkelen din (merke, modell, år)
+          bikes_registered_html: "%{number} registrerte sykler"
+          certification_involves_body: Et nasjonalt anerkjent testlaboratorium utsetter
+            produksjonsprøver for overlading, kortslutning, støt, vann og termisk
+            runaway. Fabrikken inspiseres deretter kontinuerlig for å opprettholde
+            godkjenningen.
+          certification_involves_heading: Hva sertifisering innebærer
+          change: endre?
+          check_my_bike: Sjekk sykkelen min
+          class_1_body: Motoren hjelper bare mens du tråkker og stopper ved 32 km/t.
+            Tillatt de fleste steder kan en vanlig sykkel kjøre.
+          class_1_tag: Kun pedalassistanse
+          class_2_body: En gasspedal kan bevege sykkelen uten å tråkke, opptil 32
+            km/t. Enkelte stier og parker tillater ikke gasspedaler.
+          class_2_tag: Gasspedal
+          class_3_body: Pedalassistanse opp til 45 km/t, med speedometer. Følger ofte
+            med hjelmregel, minimumsalder og begrensninger på stier.
+          class_3_tag: Raskere pedalassistanse
+          class_n: Klasse %{n}
+          classes_heading: Elsykkelkurs, forklart
+          classes_intro: De fleste stater bruker et treklassesystem. Klassen din bestemmer
+            hvor fort motoren hjelper, om det er tillatt med gass og hvor du kan kjøre.
+          compare_html: Vil du sammenligne flere sykler? %{link}
+          detected_html: Vi oppdaget <strong>%{state}</strong> —
+          disclaimer: Bike Index er en ideell organisasjon med 501(c)(3)-lovgivning.
+            Sammendrag av statlige lover er kun for referanse, ikke juridisk rådgivning.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          enter_manually: Finner du ikke sykkelen din? Skriv inn detaljene.
+          for_parents: For foreldre
+          form_label: Oppslag av samsvar med elsykkelregler
+          has_throttle: Har en gasspedal?
+          heading: Kjenn reglene for elsykkel.
+          how_to_check_1: Finn UL-merket og filnummeret på batteriet og rammeetiketten.
+          how_to_check_2: Søk etter nummeret i UL Product iQ.
+          how_to_check_heading: Slik sjekker du en sykkel
+          location_not_shared: Stedet er ikke delt. Velg staten din fra listen.
+          manual_legend: Skriv inn sykkelens detaljer
+          motor: Motor
+          motor_cap: "≤750W"
+          motor_wattage: Motoreffekt (W)
+          mph: "%{mph} mph"
+          not_an_ebike: Ikke en elsykkel
+          parent_step_1_body: Mange stater setter en minimumsalder for klasse 3, og
+            noen for hver klasse. Sjekk staten din før du velger en sykkel.
+          parent_step_1_title: Sjekk aldersreglene
+          parent_step_2_body: Kun pedalassistanse, ingen gass, og den slutter å hjelpe
+            ved 32 km/t. Det er den enkleste klassen å lære og tillatt de fleste steder.
+          parent_step_2_title: Start med klasse 1
+          parent_step_3_body: Barnet ditt bør allerede bremse, gi signal, se seg over
+            skulderen og holde en rett linje på en vanlig sykkel. Øv på elsykkelen
+            et sted stille først.
+          parent_step_3_title: Sørg for at de kan håndtere det
+          parent_step_4_body: 'Gå gjennom hvor elsykler kan brukes i byen din og på
+            vei til skolen: hjelmregler, fortau, stier og eventuelle retningslinjer
+            for skolen eller campusen.'
+          parent_step_4_title: Lær de lokale reglene sammen
+          parent_step_5_body: Velg en UL 2849-sertifisert sykkel. Lad den på en hard
+            overflate, unna utganger, med laderen den fulgte med, og aldri uten tilsyn
+            over natten.
+          parent_step_5_title: Kjøp UL-sertifisert og lad trygt
+          parent_step_6_body: Barnesykler blir også stjålet. Registreringen er gratis
+            og tar omtrent to minutter.
+          parent_step_6_title: Registrer sykkelen
+          parents_body: Elsykler er tyngre og raskere enn syklene de fleste barn lærer
+            å bruke. Før du kjøper, finn ut hva staten og byen din tillater, og sørg
+            for at barnet ditt er klart til å sykle på en trygt.
+          parents_heading: Skal du kjøpe en elsykkel til barnet ditt?
+          parents_link: Slå opp alders- og hjelmreglene i din stat
+          pedal: Fotpedal
+          pill: Sykkelindeks · Non-profit organisasjon · 10+ år
+          recoveries_html: "%{number} gjenvinninger"
+          register_band_heading: Registrerte sykler blir funnet dobbelt så ofte når
+            de blir stjålet. Registreringen er gratis.
+          register_your_bike: Registrer sykkelen din
+          select_state: Velg din stat
+          state: Stat
+          state_error: Velg en stat.
+          subheading: Skriv inn staten din og sykle for å se statens regler.
+          throttle: Gasspedal
+          top_assist: Topp assist
+          ul_2271_body: Tester litiumionbatteripakken alene. Vanlig på sykler og erstatningsbatterier;
+            dekker ikke laderen eller motoren.
+          ul_2271_scope: Batteripakken
+          ul_2271_test_1: Termisk runaway fra celle og pakke
+          ul_2271_test_2: Knus, støt og fall
+          ul_2271_test_3: Feil i batteristyringssystemet
+          ul_2849_body: Tester at batteriet, motoren, laderen og kontrolleren fungerer
+            sammen som ett system. Dette er standarden de fleste byer og universiteter
+            ber om.
+          ul_2849_scope: Det komplette elektriske systemet for elsykkel
+          ul_2849_test_1: Overladnings- og kortslutningsbeskyttelse
+          ul_2849_test_2: Vanneksponering, vibrasjoner og fall
+          ul_2849_test_3: Sikkerhet for ladere og kabler
+          ul_heading: Hvorfor UL-sertifisering er viktig
+          ul_intro: Branner i litiumionbatterier starter raskt og er vanskelige å
+            slukke. UL-sertifisering betyr at et uavhengig laboratorium har testet
+            sykkelen eller batteriet mot brann og elektriske feil. Flere campuser,
+            utleiere og byer ber nå om bevis på dette før en elsykkel kommer innendørs.
+          watts_placeholder: f.eks. 750
+          bikebook_didnt_load: BikeBook lastet ikke inn. Skriv inn sykkeldetaljene
+            dine nedenfor.
+          bikebook_loading: Laster inn BikeBook…
+          choose_by_bike_model: Velg etter sykkelmodell
+          emoto_limits_body: Toppfart over 45 km/t, gasshastighet over 32 km/t eller
+            motorer over 750 W gjør den til en elmotorsykkel. De fleste stater behandler
+            disse som mopeder eller motorsykler, som kan kreve registrering, forsikring
+            og førerkort.
+          how_to_check_lookup: Se modellen ovenfor. BikeBook viser sertifisering der
+            den er registrert.
+          over_28_mph: Over 45 km/t
+          top_speed: Hva er toppfarten?
+          visit_bikebook_link: Besøk BikeBook.
+        state_reference:
+          compiling: Vi samler %{state}s elsykkelregler fra delstatsforsamlingen og
+            DMV. Sjekk tilbake snart.
+          filter_placeholder: Skriv inn et delstatsnavn
+          filter_states: Filtertilstander
+          heading: Elsykkellover etter stat
+          in_review: Under gjennomgang
+          limits_subheading: Alle 50 stater og DC Åpne en stat for å se dens grenser,
+            regler og kilder.
+          matching_of_total: "%{number} av %{total} kamp"
+          on_file_of_total_html: "%{number} av %{total} stater og DC registrert ·
+            andre under vurdering"
+          all_on_file: Alle 50 stater og DC registrert
+          check_in_state: Sjekk en elsykkel i %{state}
+          no_match: Ingen samsvarende stater. Prøv et annet navn.
+        ul_badge:
+          certified: UL %{standard}-sertifisert
+          meaning_2271_certified: Batteripakken har bestått UL-sikkerhetstester for
+            overlading, kortslutning og støt.
+          meaning_2271_unknown: Vi har ikke data om batterisertifisering ennå. Sjekk
+            etiketten på batteriet.
+          meaning_2849_unknown: Vi har ikke systemsertifiseringsdata for denne modellen
+            ennå. Se etter UL-merket på rammeetiketten.
+          scope_2271: Batteripakke
+          scope_2849: Elsykkelens elektriske system
+          status_unknown: UL %{standard} status ukjent
+          meaning_2271_check_label: Sjekk etiketten på batteriet.
+          meaning_2849_check_label: Se etter UL-merket på rammeetiketten.
+          meaning_2849_system_certified: Hele det elektriske systemet (motor, batteri,
+            lader og kontroller) bestod brann- og elsikkerhetstester sammen.
     shared_blocks:
       footer:
         about: Om
@@ -6645,6 +6966,7 @@ nb:
         vendor_terms: leverandørens vilkår
         where_we_are: Hvor vi er
         who_we_serve: Hvem vi tjener
+        ebike_checker: Elsykkelkontrollør
       law_enforcement_donation:
         bikeindex_is_a_nonprofit: Bike Index er en 501(c)(3) ideell organisasjon.
           Vi er avhengige av donasjoner for å kunne tilby disse tjenestene. Vi anbefaler

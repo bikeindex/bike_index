@@ -2582,6 +2582,15 @@ es:
         safety_rules_sent: El %{bike_display} está registrado; le hemos enviado por
           correo electrónico a %{email} las normas de seguridad para que las acepte,
           lo que finaliza el registro.
+    ebike_rules:
+      show:
+        state_description: "%{state} ley de bicicletas eléctricas: %{law}"
+        state_description_in_review: Todavía estamos revisando la ley de bicicletas
+          eléctricas de %{state}. Consulta la clase, el motor y la velocidad de tu
+          bicicleta eléctrica, y descubre cómo funcionan las clases de bicicletas
+          eléctricas.
+        state_title: "%{state} Leyes sobre bicicletas eléctricas"
+        title: Normativa sobre bicicletas eléctricas
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4805,12 +4814,15 @@ es:
           no reclamadas se envían a su organización para su revisión y posterior reenvío
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
-        send_self_registration_email_helper: Por defecto, Bike Index ya no te envía
-          un correo electrónico cuando se registra un vehículo con la dirección de
-          correo electrónico de registro de tu organización (por ejemplo, notificaciones
-          de aparcamiento no registrado).
         send_self_registration_email_html: Enviar correo electrónico para inscripciones
           enviadas a <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: Esto incluye las notificaciones
+          no registradas.
+        send_self_registration_email_note: Por defecto, Bike Index ya no envía correos
+          electrónicos cuando se registra un vehículo con la dirección de correo electrónico
+          de registro de su organización. Marque esta casilla si desea recibir correos
+          electrónicos para los registros con una dirección de correo electrónico
+          del propietario de %{email}.
     stickers:
       edit:
         bike: Bicicleta
@@ -5926,6 +5938,19 @@ es:
             created: Creado
             notification_number: Notificación#
             resolved: Resuelto
+          new:
+            create_parking_notification: Crear notificación de estacionamiento
+            internal_notes: "%{org_name} notas internas"
+            model: Modelo
+            new_unregistered_notification: Nueva notificación no registrada
+            not_shown_to_user: no se muestra al usuario
+            notification_because: Notificación porque
+            parking_notification: Aviso de estacionamiento
+            photo: Foto
+            registration_form_settings: Configuración del formulario de registro
+            serial_number: Número de serie
+            vehicle_info: Información del vehículo
+            vehicle_type: Tipo de vehículo
         register_settings:
           browser_only: Esta configuración solo se aplica a tu navegador; no afectará
             a otros usuarios.
@@ -5939,9 +5964,19 @@ es:
             de que su registro no está completo, junto con un enlace para finalizarlo.
           single_page: Formulario de registro de una sola página
           update: Actualizar
+          old_unregistered_notification_view: Utilice la antigua página de notificación
+            para usuarios no registrados.
+          unregistered_notification_page: Página de notificación de usuarios no registrados
         registrations:
           new:
             registration_form_settings: Configuración del formulario de registro
+        parking_notification_location:
+          address_or_intersection: Dirección o intersección
+          enter_address_manually: Introduzca la dirección manualmente
+          map_hint: Arrastra el mapa para que el marcador señale el lugar.
+          map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba configurada
+            desde su dispositivo.
+          set_on_map: Colocar en el mapa
       registrations:
         show:
           bike_details:
@@ -6109,12 +6144,8 @@ es:
               unavailable_vehicle_not_registered_with_organization: Los mensajes generales
                 solo se pueden enviar a vehículos registrados con %{organization_name}.
             parking_notification_form:
-              address_or_intersection: Dirección o intersección
               create_parking_notification: Crear una nueva notificación de estacionamiento
               impound_this_bike_type: Confiscar esto %{bike_type}
-              map_hint: Arrastra el mapa para que el marcador señale el lugar.
-              map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba
-                configurada desde su dispositivo.
               not_shown_to_user: no se muestra al usuario
               parking_notification_notes: "%{org_name} notas internas"
             parking_notification_show:
@@ -6696,7 +6727,6 @@ es:
               introducido aquí se conservará.
             yes_start_over: Sí, empezar de nuevo
           step2_fields:
-            add_another_color: Añade otro color
             additional_serial_sticker_number: Número de serie/etiqueta adicional
             affiliation: "%{org_name} afiliación"
             are_you_certain: "¿Estás seguro?"
@@ -6704,7 +6734,6 @@ es:
             bike_details: "%{cycle_type} detalles"
             bottom_bracket: Soporte inferior
             cm: centímetro
-            color: Color
             complete_registration: Registro completo %{cycle_type}
             contact_info: Información de contacto
             database_public_note: "¡Nuestra base de datos es pública! Podrás ajustar
@@ -6745,7 +6774,6 @@ es:
             phone_required_org: Se requiere un teléfono para registrarse en %{org_name}.
             phone_required_stolen: Se requiere el teléfono para registrar un %{cycle_type}
               robado.
-            primary_color_blank: Color primario — por ejemplo, negro
             read_how_to_find_html: Lea sobre %{how_to_find_link} <small>(se abre en
               una ventana aparte)</small>
             rear_dropouts: punteras traseras
@@ -6753,8 +6781,6 @@ es:
             register_with_org_description: "%{org_name} podrá ver y ayudar a gestionar
               este registro."
             registration_type: Tipo de registro
-            remove_additional_color: Eliminar color
-            second_color_blank: Segundo color — por ejemplo, rojo
             serial_help_intro: 'La mayoría de las bicicletas tienen su número de serie
               grabado en el cuadro. Busca tu número de serie:'
             serial_location_bottom_bracket: parte inferior del soporte inferior
@@ -6767,8 +6793,6 @@ es:
             stolen: Robado
             stolen_description: Este %{cycle_type} ha sido robado.
             student_id: Carné de estudiante
-            third_color_blank: Tercer color
-            up_to_3: hasta 3
             very_very_few_bikes_html: "<em>Muy</em> pocos %{cycle_types} se fabrican
               sin números de serie. A menos que este %{cycle_type}:"
             view_serial_guide: Consulte la guía completa de números de serie.
@@ -6776,6 +6800,14 @@ es:
             wheres_my_serial: "¿Dónde está mi número de serie?"
             without_serial: Este %{cycle_type} se hizo sin número de serie.
             without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
+          color_fields:
+            add_another_color: Añade otro color
+            color: Color
+            primary_color_blank: Color primario — por ejemplo, negro
+            remove_additional_color: Eliminar color
+            second_color_blank: Segundo color — por ejemplo, rojo
+            third_color_blank: Tercer color
+            up_to_3: hasta 3
         views:
           confirm:
             confirming_your_email: Confirmando tu correo electrónico
@@ -6887,7 +6919,326 @@ es:
           year: Año
           filter_combobox:
             any: Cualquier
-          comparison_view: Vista comparativa
+          byline: Un enlace gratuito de Bike Index, el registro de bicicletas sin
+            ánimo de lucro.
+          tagline_html: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
+            tu próximo paseo entre más de %{models_count} modelos.'
+          tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
+            tu próxima bici.'
+          about_bikebook_label: Acerca de BikeBook
+        donate_strip:
+          dismiss: Despedir
+          donate: Donar
+          pitch: Este fantástico producto es posible gracias a la organización sin
+            ánimo de lucro Bike Index. Ayúdanos a cubrir los gastos de nuestro servidor.
+          region: Dona a Bike Index
+      ebike_rules:
+        class_tile:
+          class: Clase
+          class_aria: Bicicleta eléctrica de clase %{n}
+          class_unknown_aria: Clase de bicicleta eléctrica desconocida
+          emoto: Moto eléctrica
+        law_details:
+          from: 'Desde %{date}:'
+          from_until: 'Desde %{starts_on} hasta %{ends_on}:'
+          limits_start_on: Estos límites entran en vigor %{date}. Hasta entonces,
+            las reglas que se indican a continuación establecen lo que se aplica.
+          restrictions: Normas y restricciones
+          sources: Fuentes
+          until: 'Hasta %{date}:'
+        results:
+          answer_no: 'No'
+          answer_yes: Sí
+          being_compiled: Las normas para este estado se están recopilando a partir
+            de fuentes primarias.
+          class_1_throttle: Las motocicletas de Clase 1 no pueden tener acelerador.
+          class_3_throttle: El acelerador debe cortarse a 20 mph.
+          class_not_recognized: La clase %{e_bike_class} no se reconoce aquí.
+          class_recognized: Se reconoce la clase %{e_bike_class}.
+          classes_start_on: Las clases entran en vigor %{date}. Hasta entonces, consulte
+            las reglas vigentes del estado.
+          entered_manually: Introducido manualmente · Clase %{n}
+          fails_rule: No cumple con esta regla.
+          falls_under: En %{state}, se encuentra dentro de %{name}, lo que puede requerir
+            registro y licencia.
+          for_your_information: Para tu información
+          gray_detail: Tu %{name} está catalogada como una bicicleta eléctrica de
+            clase %{n}. Consulta las normas locales en el %{state} DMV.
+          gray_detail_unclassified: Tu %{name} no figura como bicicleta eléctrica
+            de Clase 1, 2 o 3. Consulta las normas locales en el DMV de %{state}.
+          gray_headline: Todavía no tenemos registradas las normas sobre bicicletas
+            eléctricas de %{state}.
+          green_headline: Tu %{name} es legal para circular en %{state} como bicicleta
+            eléctrica de Clase %{n}.
+          has_throttle: Tiene acelerador
+          is_registered: "¿Está matriculada esta bicicleta?"
+          legal_to_ride: Es legal conducirlo
+          legal_with_rules: Legal, con reglas para verificar
+          limits_start_on: Estos límites entran en vigor %{date}
+          manual_bike_name: bicicleta eléctrica
+          may_be_moped: En su lugar, podría estar regulado como un ciclomotor o un
+            vehículo a motor, lo que podría requerir matriculación y permiso de conducir.
+          meets_rule: Cumple con esta regla
+          motor: Motor
+          mph_html: "%{mph} mph"
+          no_speed_cap: No hay límite de velocidad en la ley estatal.
+          no_throttle: Sin acelerador
+          no_watt_cap: No existe límite de potencia en la ley estatal.
+          not_classified: No es una bicicleta eléctrica de Clase 1, 2 o 3.
+          not_permitted: No está permitido
+          not_provided: No se proporciona
+          own_classes: El estado establece sus propios límites en lugar de las tres
+            clases estándar.
+          recovered_more_often: Las bicicletas robadas se recuperan dos veces más
+            a menudo cuando están registradas.
+          red_headline: Su %{name} no está permitido como bicicleta eléctrica según
+            las normas %{state} vigentes.
+          register_free: Regístrate en Bike Index — gratis
+          rule_to_check: Regla para comprobar
+          rules_not_on_file: Reglas no archivadas
+          source_html: 'Fuente: Catálogo de leyes estatales de %{link}. Los resúmenes
+            son solo de referencia y no constituyen asesoramiento legal.'
+          speed_not_provided: Velocidad máxima no proporcionada
+          speed_over_cap_html: Ayuda a %{mph} mph, por encima del límite de %{cap}
+            mph
+          speed_within_cap_html: Ayuda a %{mph} mph, dentro del límite
+          still_reviewing: Todavía estamos revisando las reglas de %{state}.
+          still_reviewing_body: Consulta la página web del Departamento de Vehículos
+            Motorizados (DMV) o de la legislatura de tu estado para conocer las normas
+            vigentes sobre bicicletas eléctricas. La mayoría de los estados limitan
+            la potencia de los motores de las bicicletas eléctricas a 750 W y la velocidad
+            asistida a 20 mph (Clase 1-2) o 28 mph (Clase 3).
+          throttle: Acelerador
+          throttle_allowed: Acelerador permitido para la Clase 2
+          throttle_not_allowed: El estado no permite un acelerador
+          throttle_not_stated: La ley estatal no especifica si se permite un acelerador.
+          top_speed: Velocidad máxima
+          ul_certification: Certificación UL
+          watts_html: "%{watts}W"
+          watts_not_provided: Potencia del motor no proporcionada
+          watts_over_cap_html: El motor %{watts}W supera la capacidad %{cap}W
+          watts_within_cap_html: El motor %{watts}W está dentro de la tapa
+          yellow_headline:
+            one: Tu %{name} es legal para circular en %{state} como una bicicleta
+              eléctrica de clase %{n}, con la regla %{count} a verificar.
+            other: Tu %{name} es legal para circular en %{state} como bicicleta eléctrica
+              de clase %{n}, con %{count} reglas que debes consultar.
+          yellow_headline_class_unknown:
+            one: Tu %{name} puede ser legal para viajar en %{state}, con la regla
+              %{count} para verificar.
+            other: Tu %{name} puede ser legal para viajar en %{state}, con %{count}
+              reglas para verificar.
+          yes_to_html: Sí, a %{mph}
+          your_bike: Tu bicicleta
+          your_ebike: Tu bicicleta eléctrica
+          your_state: Tu estado
+          bikebook_name: Libro de bicicletas
+          bikebook_photo: Foto · BikeBook
+          class_3_throttle_over_html: El acelerador funciona hasta %{mph} mph, más
+            allá de las 20 mph se permite el acelerador de un Clase 3.
+          class_3_throttle_within_html: El acelerador se detiene a %{mph} mph
+          class_unknown_check_label: BikeBook no indica su clase ni su velocidad máxima,
+            así que compruebe la clase en su etiqueta.
+          entered_manually_unclassified: Introducido manualmente
+          entered_unverified: Ingresado por usted, no verificado por BikeBook.
+          full_bikebook_entry: Ver la entrada completa en BikeBook
+          model_year_bikebook: "%{year} modelo · BikeBook"
+          over_mph_html: Más de %{mph} mph
+          red_headline_manual: Esto no es una bicicleta eléctrica según las normas
+            %{state} vigentes.
+          speed_past_cap_html: Ayuda a superar %{past} mph, por encima del límite
+            de %{cap} mph
+          speed_past_html: Ayuda a superar %{past} mph; comprueba que se detenga a
+            %{cap} mph.
+        rule_label:
+          classes: Clases reconocidas
+          power: condensador de potencia del motor
+          speed: Velocidad máxima asistida
+          throttle: Acelerador
+        rule_value:
+          allowed: Permitido
+          classes:
+            one: Clase %{classes}
+            other: Clases %{classes}
+          mph_html: "%{mph} mph"
+          no_cap: Sin límite
+          not_allowed: No está permitido
+          own_definition: 'Su propia definición: %{name}'
+          watts_html: "%{watts}W"
+        show:
+          answer_no: 'No'
+          answer_yes: Sí
+          assist: Asistir
+          banned_body: La ciudad de Nueva York exige que las bicicletas eléctricas
+            y las baterías que se venden allí cumplan con las normas UL 2849 o UL
+            2271 (Ley Local 39 de 2023). Las universidades, los proveedores de vivienda
+            y las agencias de transporte público están adoptando normas similares
+            para el almacenamiento y la carga en interiores.
+          banned_heading: "¿Por qué se prohíben las bicicletas no certificadas?"
+          battery_safety: Seguridad de baterías y contra incendios
+          bike_error: Selecciona una bicicleta de la lista o introduce sus datos manualmente.
+          bike_model: Modelo de bicicleta
+          bike_placeholder: Busca tu bicicleta (marca, modelo, año)
+          bikes_registered_html: "%{number} bicicletas registradas"
+          certification_involves_body: Un laboratorio de pruebas reconocido a nivel
+            nacional somete las muestras de producción a pruebas de sobrecarga, cortocircuito,
+            impacto, resistencia al agua y sobrecalentamiento. Posteriormente, la
+            fábrica es inspeccionada periódicamente para mantener su certificación.
+          certification_involves_heading: "¿Qué implica la certificación?"
+          change: "¿cambiar?"
+          check_my_bike: Revisa mi bicicleta
+          class_1_body: El motor solo ayuda mientras pedaleas y se detiene a 32 km/h.
+            Está permitido en la mayoría de los lugares donde se permite circular
+            con una bicicleta normal.
+          class_1_tag: Solo con asistencia al pedaleo
+          class_2_body: Un acelerador permite mover la bicicleta sin pedalear, hasta
+            32 km/h. En algunos senderos y parques no se permite el uso de aceleradores.
+          class_2_tag: Acelerador
+          class_3_body: Pedaleo asistido hasta 45 km/h, con velocímetro. Suele incluir
+            la obligación de usar casco, una edad mínima y limitaciones en los caminos.
+          class_3_tag: Asistencia al pedaleo más rápida
+          class_n: Clase %{n}
+          classes_heading: Clases de bicicletas eléctricas, explicadas
+          classes_intro: La mayoría de los estados utilizan un sistema de tres clases.
+            Tu clase determina la velocidad a la que ayuda el motor, si se permite
+            el uso del acelerador y dónde puedes circular.
+          compare_html: "¿Quieres comparar varias bicicletas? %{link}"
+          detected_html: Hemos detectado <strong>%{state}</strong> —
+          disclaimer: Bike Index es una organización sin fines de lucro 501(c)(3).
+            Los resúmenes de las leyes estatales son solo de referencia y no constituyen
+            asesoramiento legal.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          enter_manually: "¿No encuentras tu bicicleta? Introduce sus datos."
+          for_parents: Para padres
+          form_label: Consulta de cumplimiento de normativas para bicicletas eléctricas
+          has_throttle: "¿Tiene acelerador?"
+          heading: Conozca las normas para bicicletas eléctricas.
+          how_to_check_1: Busque la marca UL y el número de archivo en la etiqueta
+            de la batería y del marco.
+          how_to_check_2: Busque ese número en UL Product iQ.
+          how_to_check_heading: Cómo revisar una bicicleta
+          location_not_shared: Ubicación no compartida. Seleccione su estado de la
+            lista.
+          manual_legend: Introduce los datos de tu bicicleta
+          motor: Motor
+          motor_cap: "≤750W"
+          motor_wattage: Potencia del motor (W)
+          mph: "%{mph} mph"
+          not_an_ebike: No es una bicicleta eléctrica
+          parent_step_1_body: Muchos estados establecen una edad mínima para la Clase
+            3, y algunos para todas las clases. Consulta la normativa de tu estado
+            antes de elegir una bicicleta.
+          parent_step_1_title: Consulta las normas de edad.
+          parent_step_2_body: Solo cuenta con asistencia al pedaleo, sin acelerador,
+            y deja de ayudar a 32 km/h. Es la categoría más fácil de aprender y está
+            permitida en la mayoría de los lugares.
+          parent_step_2_title: Comienza con la Clase 1
+          parent_step_3_body: Tu hijo ya debería frenar, señalizar, mirar por encima
+            del hombro y mantener una línea recta en una bicicleta normal. Practica
+            primero con la bicicleta eléctrica en un lugar tranquilo.
+          parent_step_3_title: Asegúrate de que puedan manejarlo.
+          parent_step_4_body: 'Repasemos las zonas de tu ciudad donde se pueden usar
+            bicicletas eléctricas y los caminos que llevas al colegio: normas sobre
+            el uso del casco, aceras, senderos y cualquier normativa del colegio o
+            campus.'
+          parent_step_4_title: Aprendamos juntos las normas locales.
+          parent_step_5_body: Elige una bicicleta con certificación UL 2849. Cárgala
+            sobre una superficie dura, lejos de las salidas, con el cargador incluido
+            y nunca la dejes desatendida durante la noche.
+          parent_step_5_title: Compra productos con certificación UL y cárgalos de
+            forma segura.
+          parent_step_6_body: Las bicicletas infantiles también son robadas. El registro
+            es gratuito y solo toma unos dos minutos.
+          parent_step_6_title: Registra la bicicleta
+          parents_body: Las bicicletas eléctricas son más pesadas y rápidas que las
+            bicicletas con las que la mayoría de los niños aprenden a usarlas. Antes
+            de comprar una, infórmese sobre las regulaciones estatales y municipales,
+            y asegúrese de que su hijo esté preparado para usarla de forma segura.
+          parents_heading: "¿Estás pensando en comprar una bicicleta eléctrica para
+            tu hijo/a?"
+          parents_link: Consulta las normas sobre edad y uso de casco de tu estado.
+          pedal: Pedal
+          pill: Índice de Bicicletas · Organización sin fines de lucro · Más de 10
+            años
+          recoveries_html: "%{number} recuperaciones"
+          register_band_heading: Las bicicletas registradas se recuperan dos veces
+            más a menudo cuando son robadas. El registro es gratuito.
+          register_your_bike: Registra tu bicicleta
+          select_state: Seleccione su estado
+          state: Estado
+          state_error: Elige un estado.
+          subheading: Introduce tu estado y tu bicicleta para ver las normas de tu
+            estado.
+          throttle: Acelerador
+          top_assist: Asistencia superior
+          ul_2271_body: Prueba la batería de iones de litio de forma independiente.
+            Es común en bicicletas y baterías de repuesto; no cubre el cargador ni
+            el motor.
+          ul_2271_scope: El paquete de baterías
+          ul_2271_test_1: Fuga térmica de la célula y del paquete
+          ul_2271_test_2: Aplastar, impactar y caer
+          ul_2271_test_3: Fallos en el sistema de gestión de la batería
+          ul_2849_body: Prueba la batería, el motor, el cargador y el controlador
+            funcionando conjuntamente como un solo sistema. Este es el estándar que
+            exigen la mayoría de las ciudades y campus universitarios.
+          ul_2849_scope: El sistema eléctrico completo de la bicicleta eléctrica
+          ul_2849_test_1: Protección contra sobrecarga y cortocircuito
+          ul_2849_test_2: Exposición al agua, vibración y caída
+          ul_2849_test_3: Seguridad del cargador y del cableado
+          ul_heading: Por qué es importante la certificación UL
+          ul_intro: Los incendios de baterías de iones de litio se inician rápidamente
+            y son difíciles de extinguir. La certificación UL significa que un laboratorio
+            independiente ha probado la bicicleta o la batería para detectar incendios
+            y fallas eléctricas. Cada vez más universidades, propietarios y ciudades
+            exigen esta certificación antes de permitir el acceso de bicicletas eléctricas
+            a espacios cerrados.
+          watts_placeholder: p. ej. 750
+          bikebook_didnt_load: BikeBook no se cargó. Introduce los datos de tu bicicleta
+            a continuación.
+          bikebook_loading: Cargando BikeBook…
+          choose_by_bike_model: Seleccione por modelo de bicicleta
+          emoto_limits_body: Una velocidad máxima superior a 45 km/h, una velocidad
+            de aceleración superior a 32 km/h o un motor de más de 750 W la convierten
+            en una moto eléctrica. En la mayoría de los estados, se consideran ciclomotores
+            o motocicletas, lo que puede requerir matriculación, seguro y permiso
+            de conducir.
+          how_to_check_lookup: Consulta el modelo que aparece más arriba. BikeBook
+            muestra la certificación cuando está registrada.
+          over_28_mph: Más de 28 mph
+          top_speed: "¿Cuál es su velocidad máxima?"
+          visit_bikebook_link: Visita BikeBook.
+        state_reference:
+          compiling: Estamos recopilando las normas sobre bicicletas eléctricas de
+            %{state} de la legislatura estatal y del DMV. Vuelva pronto.
+          filter_placeholder: Escribe el nombre de un estado
+          filter_states: Estados del filtro
+          heading: Leyes sobre bicicletas eléctricas por estado
+          in_review: En revisión
+          limits_subheading: Los 50 estados y el Distrito de Columbia. Abra un estado
+            para ver sus límites, reglas y fuentes.
+          matching_of_total: "%{number} de %{total} coincide"
+          on_file_of_total_html: "%{number} de %{total} estados y DC en archivo ·
+            otros en revisión"
+          all_on_file: Todos los 50 estados y el Distrito de Columbia están archivados.
+          check_in_state: Consulta una bicicleta eléctrica en %{state}
+          no_match: No se encontraron coincidencias de estado. Pruebe con otro nombre.
+        ul_badge:
+          certified: Certificado UL %{standard}
+          meaning_2271_certified: La batería superó las pruebas de seguridad UL contra
+            sobrecarga, cortocircuito e impacto.
+          meaning_2271_unknown: Todavía no disponemos de datos de certificación de
+            la batería. Consulte la etiqueta de la batería.
+          meaning_2849_unknown: Todavía no disponemos de datos de certificación del
+            sistema para este modelo. Busque la marca UL en la etiqueta del marco.
+          scope_2271: Paquete de baterías
+          scope_2849: Sistema eléctrico para bicicletas eléctricas
+          status_unknown: Estado desconocido de UL %{standard}
+          meaning_2271_check_label: Comprueba la etiqueta de la batería.
+          meaning_2849_check_label: Busque la marca UL en la etiqueta del marco.
+          meaning_2849_system_certified: Todo el sistema eléctrico (motor, batería,
+            cargador y controlador) superó conjuntamente las pruebas de seguridad
+            eléctrica y contra incendios.
     shared_blocks:
       footer:
         about: Acerca
@@ -6928,6 +7279,7 @@ es:
         vendor_terms: condiciones de venta
         where_we_are: Dónde estamos
         who_we_serve: A quién servimos
+        ebike_checker: comprobador de bicicletas eléctricas
       law_enforcement_donation:
         bikeindex_is_a_nonprofit: Bike Index es una organización sin fines de lucro
           501(c)(3). Dependemos de donaciones para brindar estos servicios. Recomendamos

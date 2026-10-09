@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationForm::Component, :js, type: :system do
-  let(:controller_id) { "registrations--show--parking-notification-form" }
+  let(:controller_id) { "org--parking-notification-form" }
   let(:map_selector) { "[data-#{controller_id}-target='map']" }
   # Defined in utils/maplibre.js since #3954, so there is no Ruby constant to reuse
   let(:maps_host) { "https://maps.bikeindex.org" }

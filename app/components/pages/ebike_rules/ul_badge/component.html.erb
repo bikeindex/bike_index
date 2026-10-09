@@ -1,0 +1,19 @@
+<div class="tw:flex tw:flex-col tw:gap-1.5">
+  <div class="tw:inline-flex tw:items-center tw:gap-2.5 tw:self-start tw:rounded-sm tw:py-2 tw:pr-4 tw:pl-2 tw:dark:bg-gray-700 <%= BACKGROUNDS.fetch(@status) %>">
+    <%= render(Pages::EbikeRules::StatusIcon::Component.new(status: ICON_STATUSES.fetch(@status), size: :md)) %>
+
+    <div class="tw:leading-tight">
+      <div class="tw:text-sm tw:font-bold tw:text-slate-900 tw:dark:text-gray-100">
+        <%= title %>
+      </div>
+
+      <div class="tw:text-xs tw:text-gray-700 tw:dark:text-gray-300">
+        <%= scope %>
+      </div>
+    </div>
+  </div>
+
+  <p class="tw:text-sm tw:text-gray-700 tw:dark:text-gray-300">
+    <%= meaning %>
+  </p>
+</div>
