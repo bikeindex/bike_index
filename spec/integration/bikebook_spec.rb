@@ -24,7 +24,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     end
   end
 
-  def vehicle_field = find_field("View a vehicle")
+  def vehicle_field = find_field("Select a bike, choose multiple to compare them")
 
   # A component's markup from the server beside its template's from the browser, as canonical_html.js's
   # lines. `args` is the template's argument as JavaScript source, with lit-html's `html` in scope

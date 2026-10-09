@@ -19,7 +19,7 @@ export class VehicleViewer {
   render (vehicles, url, preferredSize) {
     if (vehicles.length === 0) {
       return html`<div class="tw:mx-auto tw:mt-6 tw:max-w-4xl tw:rounded-lg tw:border tw:border-dashed tw:border-gray-200 tw:dark:border-gray-700 tw:px-4 tw:py-6 tw:text-center"><p
-        class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500 tw:dark:text-gray-500">Pick a vehicle above to start comparing.</p></div>`
+        class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500 tw:dark:text-gray-500">Pick a bike above to start comparing.</p></div>`
     }
 
     const comparing = vehicles.length > 1

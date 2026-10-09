@@ -24,6 +24,7 @@ en:
           motorized: Motorized
           price: Price
           search_placeholder: Search by manufacturer or model…
+          select_a_bike: Select a bike, choose multiple to compare them
           sort: Sort
           suspension: Suspension
           tagline: The world’s bicycle library — search, compare, and find your next
@@ -32,5 +33,4 @@ en:
             The world’s bicycle library — search, compare, and find your next ride
             across %{models_count}+ models.
           vehicle_type: Vehicle type
-          view_a_vehicle: View a vehicle
           year: Year

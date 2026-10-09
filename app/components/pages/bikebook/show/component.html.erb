@@ -7,7 +7,7 @@
     <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-x-4">
       <%# Labels the combobox below, which renders none of its own %>
       <label class="twlabel" for="vehicle_models">
-        <%= translation(".view_a_vehicle") %>
+        <%= translation(".select_a_bike") %>
         <small id="vehicle-models-count" class="twless-strong"></small>
       </label>
 
@@ -26,7 +26,7 @@
         name: "vehicle_models",
         src: bikebook_path,
         multiselect_chip_src: bikebook_path,
-        dialog_label: translation(".view_a_vehicle"),
+        dialog_label: translation(".select_a_bike"),
         html_options: {value: "",
                        placeholder: translation(".search_placeholder"),
                        data: {controller: "bikebook--chip-reorder"},
