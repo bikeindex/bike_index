@@ -28,21 +28,21 @@ module EbikeRuleServices
 
     def row(id, status, note, **args) = {id:, status:, note:, args:}
 
+    # A bike carrying several classes, like assist to 28 mph with a throttle to 20, needs each one recognized
     def classes_rule(law, bike)
-      e_bike_class = bike.e_bike_class
       if bike.class_unknown
         row(:classes, :check, :class_unknown)
-      elsif e_bike_class.nil?
+      elsif bike.e_bike_class.nil?
         row(:classes, :fail, :not_classified)
       # limits not yet in force describe the coming law, so the rider checks the law's dated rules for today's
       elsif (date = law[:limits_start_on])
         row(:classes, :check, :classes_start_on, date:)
       elsif law[:classes].none?
         row(:classes, :info, :own_classes)
-      elsif law[:classes].include?(e_bike_class)
-        row(:classes, :pass, :class_recognized, e_bike_class:)
+      elsif (unrecognized = bike.e_bike_classes - law[:classes]).none?
+        row(:classes, :pass, :class_recognized, e_bike_classes: bike.e_bike_classes)
       else
-        row(:classes, :fail, :class_not_recognized, e_bike_class:)
+        row(:classes, :fail, :class_not_recognized, e_bike_classes: unrecognized)
       end
     end
 

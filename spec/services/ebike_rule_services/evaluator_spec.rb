@@ -73,6 +73,24 @@ RSpec.describe EbikeRuleServices::Evaluator do
     end
   end
 
+  context "with a bike that is both Class 2 and Class 3" do
+    let(:attributes) do
+      super().merge(e_bike_class: 3, e_vehicle_classifications: %w[evc/us/class_2 evc/us/class_3], top_assist_mph: 28, throttle: true, throttle_mph: 20)
+    end
+
+    it "recognizes both" do
+      expect(rules.first).to include(status: :pass, note: :class_recognized, args: {e_bike_classes: [2, 3]})
+    end
+
+    context "under a law without Class 2" do
+      let(:law) { EbikeRuleServices::StateLaws.find("IN").merge(classes: [1, 3]) }
+
+      it "fails on the class it lacks" do
+        expect(rules.first).to include(status: :fail, note: :class_not_recognized, args: {e_bike_classes: [2]})
+      end
+    end
+  end
+
   context "with a law whose limits aren't yet in force" do
     let(:law) { EbikeRuleServices::StateLaws.find("NC", today: Date.new(2026, 11, 30)) }
     let(:attributes) { super().merge(e_bike_class: 3, watts: 1_000, top_assist_mph: 28) }

@@ -62,7 +62,7 @@
               tw:font-bold tw:tracking-[.06em] tw:text-gray-700 tw:uppercase
             "
           >
-            <%= translation(".bikebook_photo") %>
+            <%= translation(".stock_photo") %>
           </span>
         </div>
       <% end %>
@@ -81,8 +81,11 @@
             </p>
           </div>
 
-          <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: @bike.e_bike_class,
-            class_unknown: @bike.class_unknown, size: :lg)) %>
+          <div class="tw:flex tw:flex-none tw:gap-2">
+            <% tile_classes.each do |e_bike_class| %>
+              <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, class_unknown: @bike.class_unknown, size: :lg)) %>
+            <% end %>
+          </div>
         </div>
 
         <div class="tw:border-y tw:border-gray-200 tw:py-4 tw:dark:border-gray-700">
@@ -152,7 +155,13 @@
           <% end %>
         </ul>
 
-        <%= render(Pages::EbikeRules::LawDetails::Component.new(law: @law)) %>
+        <div data-controller="ui--collapse">
+          <%= render(UI::Collapse::Component.new(text: translation(".read_more"), chevron: :trailing, color: :link)) %>
+
+          <div class="tw:mt-4 tw:hidden" data-ui--collapse-target="content">
+            <%= render(Pages::EbikeRules::LawDetails::Component.new(law: @law)) %>
+          </div>
+        </div>
 
         <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
           <%= translation(".source_html", link: link_to(translation(".bikebook_name"), bikebook_path(vehicle_models: @law[:id]), class: "twlink")) %>
