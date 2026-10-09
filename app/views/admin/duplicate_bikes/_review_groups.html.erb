@@ -1,0 +1,121 @@
+<%# locals: (groups:, representatives:, organizations:, kind:) %>
+<% same_owner_queue = BikeServices::DuplicateReviewFinder::SAME_OWNER_KINDS.include?(kind) %>
+
+<%= render UI::Table::Component.new(records: groups) do |table| %>
+  <% table.column(label: "Shared serial and manufacturer · review cues") do |group| %>
+    <% bike = representatives[group["reference_id"]] %>
+
+    <div class="tw:font-semibold">
+      <%= bike&.mnfg_name %>
+    </div>
+
+    <div class="tw:mt-1">
+      <%= render Atoms::Serial::Component.new(serial: bike&.serial_number) %>
+    </div>
+
+    <div class="tw:text-xs tw:text-gray-600 tw:dark:text-gray-400">
+      normalized <span class="tw:font-mono"><%= group["serial"] %></span>
+      <% if bike&.frame_model.present? || bike&.year.present? %>
+        · representative model <%= bike.frame_model %> <%= bike.year %>
+      <% end %>
+    </div>
+
+    <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-1">
+      <% if group["serial_stolen"] %>
+        <%= render UI::Badge::Component.new(text: "Stolen history — do not merge", color: :error, solid: true, size: :sm, title: "A stolen report exists on this whole serial, possibly on a record outside this group.") %>
+      <% end %>
+
+      <% cues = BikeServices::DuplicateReviewCues.group_cues(group) %>
+
+      <% if same_owner_queue && cues.any? { DuplicateBikeReview::SEPARATE_REVIEW_CUES.include?(it.key) } %>
+        <%= render UI::Badge::Component.new(text: "Separate review before any invitation", color: :error, size: :sm, title: "A standards, product-code, test or example-contact cue keeps this group out of the same-owner path until reviewed.") %>
+      <% end %>
+
+      <% cues.each do |cue| %>
+        <%= render UI::Badge::Component.new(text: cue.label, title: cue.reason, color: cue.color, size: :sm) %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% table.column(label: "Records") do |group| %>
+    <div class="tw:text-2xl tw:leading-none tw:font-bold">
+      <%= number_display(group["record_count"]) %>
+    </div>
+
+    <div
+      class="
+        tw:mt-1 tw:text-xs tw:whitespace-nowrap tw:text-gray-600
+        tw:dark:text-gray-400
+      "
+    >
+      <%= render UI::Time::Component.new(time: group["first_at"]) %>
+      <br>
+      to <%= render UI::Time::Component.new(time: group["last_at"]) %>
+    </div>
+
+    <div class="tw:mt-2">
+      <%= render UI::ButtonLink::Component.new(href: admin_duplicate_bike_path("serial", reference_bike_id: group["reference_id"]), text: "Compare", size: :sm) %>
+    </div>
+  <% end %>
+
+  <% table.column(label: "Who registered") do |group| %>
+    <% bike = representatives[group["reference_id"]] %>
+
+    <% if group["email_count"] == 1 && group["missing_email_count"].zero? %>
+      <% ownership = DuplicateBikeReview.initial_ownership(bike) %>
+      <div class="tw:text-xs tw:text-gray-600 tw:dark:text-gray-400">
+        Every record's initial contact (unverified)
+      </div>
+      <div class="tw:break-all"><%= ownership&.owner_email %></div>
+    <% else %>
+      <div>
+        <strong><%= number_display(group["email_count"]) %></strong> initial
+        contact emails
+        <% if group["missing_email_count"].positive? %>
+          <span class="tw:text-gray-600 tw:dark:text-gray-400">
+            + <%= number_display(group["missing_email_count"]) %> without
+          </span>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="tw:mt-1">
+      <strong><%= number_display(group["account_count"]) %></strong> accounts
+      <% if group["missing_account_count"].positive? %>
+        <span class="tw:text-gray-600 tw:dark:text-gray-400">
+          + <%= number_display(group["missing_account_count"]) %> unassigned
+        </span>
+      <% end %>
+    </div>
+
+    <% organization_ids = group["organization_ids"] || [] %>
+
+    <div class="tw:mt-1 tw:text-sm">
+      <% organization_ids.first(2).each do |id| %>
+        <div>
+          <%= link_to organizations[id]&.name || "Organization ##{id}", admin_duplicate_bikes_path(search_kind: kind, search_organization_id: id), class: "twlink" %>
+        </div>
+      <% end %>
+
+      <% if organization_ids.size > 2 %>
+        <div class="tw:text-gray-600 tw:dark:text-gray-400">
+          + <%= number_display(organization_ids.size - 2) %> more organizations
+        </div>
+      <% elsif organization_ids.empty? %>
+        <div class="tw:text-gray-600 tw:dark:text-gray-400">
+          No organization
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% table.column(label: "How it was registered") do |group| %>
+    <div><%= number_display(group["pos_count"]) %> POS</div>
+    <div><%= number_display(group["customer_count"]) %> customer channel</div>
+
+    <div class="tw:mt-1 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
+      <%= number_display(group["claimed_count"]) %> initially claimed ·
+      <%= number_display(group["transfer_count"]) %> transferred
+    </div>
+  <% end %>
+<% end %>

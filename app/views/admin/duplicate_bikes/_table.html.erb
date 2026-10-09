@@ -1,0 +1,35 @@
+<%# locals: (groups:, segments:, statistics:) %>
+
+<%= render UI::Table::Component.new(records: groups) do |table| %>
+  <% table.column(label: "Group") do |group| %>
+    <%= link_to "Review group ##{group.id}", admin_duplicate_bike_path(group), class: "twlink" %>
+  <% end %>
+
+  <% table.column(label: "Shared stored segment") do |group| %>
+    <%= render Atoms::Serial::Component.new(serial: segments[group.id]) %>
+  <% end %>
+
+  <% table.column(label: "Records") do |group| %>
+    <%= number_display(statistics.dig(group.id, :count) || 0) %>
+  <% end %>
+
+  <% table.column(label: "Distinct whole serials") do |group| %>
+    <%= number_display(statistics.dig(group.id, :serials) || 0) %>
+  <% end %>
+
+  <% table.column(label: "Manufacturers") do |group| %>
+    <%= number_display(statistics.dig(group.id, :manufacturers) || 0) %>
+  <% end %>
+
+  <% table.column(label: "Stolen/history records") do |group| %>
+    <%= number_display(statistics.dig(group.id, :stolen) || 0) %>
+  <% end %>
+
+  <% table.column(label: "Status") do |group| %>
+    <%= group.ignore? ? "Ignored" : "Active" %>
+  <% end %>
+
+  <% table.column(label: "Last record added") do |group| %>
+    <%= render UI::Time::Component.new(time: group.added_bike_at) %>
+  <% end %>
+<% end %>

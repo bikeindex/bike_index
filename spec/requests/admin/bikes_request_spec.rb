@@ -33,11 +33,9 @@ RSpec.describe Admin::BikesController, type: :request do
   end
 
   describe "duplicates" do
-    it "renders" do
+    it "redirects to the duplicate registration review" do
       get "#{base_url}/duplicates"
-      expect(response.code).to eq("200")
-      expect(response).to render_template("duplicates")
-      expect(flash).to_not be_present
+      expect(response).to redirect_to(admin_duplicate_bikes_path(search_ignored: "false"))
     end
   end
 
