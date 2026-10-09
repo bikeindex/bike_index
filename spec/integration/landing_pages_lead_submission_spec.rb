@@ -64,12 +64,14 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
        contact_role: "City staff", lead_request: "trial", body: "Starting with e-bikes", title: "New City lead: Portland"}
     end
 
-    it "walks through the education flow, then submits a trial lead from the hero" do
+    it "walks through the education flow, then submits a trial lead from the hero, keeping the choice across a reload" do
       visit "/for_cities"
       expect(page).to have_content("Register every bike in your city")
 
       within("#tab-school") do
         expect(page).to have_button("Continue", disabled: true)
+        # a step can't be jumped to before it's reached
+        expect(page).to have_button(text: "Riding practices", disabled: true)
         check "I will charge only with a manufacturer-approved charger."
         check "I will never leave my battery charging unattended."
         expect(page).to have_button("Continue", disabled: true)
@@ -78,11 +80,19 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
         expect(page).to have_content("Commitments for riding to and from school.")
         click_button "Back"
         expect(page).to have_content("We have a few safety rules to go over")
+        expect(page).to have_button(text: "Final review", disabled: true)
+        find_button(text: "Riding practices").click
+        expect(page).to have_content("Commitments for riding to and from school.")
       end
 
       click_link "Start a free trial", match: :first
       expect(page).to have_button("Start my free trial")
       fill_in "City or organization", with: "Portland"
+
+      page.refresh
+      expect(page).to have_field("City or organization", with: "Portland")
+      expect(page).to have_button("Start my free trial")
+
       fill_in "Your name", with: "Jane Doe"
       select "City staff", from: "Your role"
       fill_in "Email", with: "staff@portland.gov"
@@ -90,8 +100,11 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
 
       expect {
         click_button "Start my free trial"
-        expect(page).to have_content("Thank", wait: 5)
+        expect(page).to have_content("Thanks. We'll be in touch soon.", wait: 5)
       }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
+      expect(page).to have_no_field("City or organization")
+      click_link "Send another request"
+      expect(page).to have_field("City or organization")
 
       expect(Feedback.last).to have_attributes(target_attributes)
 

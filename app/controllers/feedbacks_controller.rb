@@ -17,7 +17,7 @@ class FeedbacksController < ApplicationController
       else
         translation(:thanks_for_your_message)
       end
-      redirect_back(fallback_location: help_path)
+      redirect_to(return_location)
     else
       @page_errors = @feedback.errors
       render(:index) && return if request.referer.blank?
@@ -26,6 +26,7 @@ class FeedbacksController < ApplicationController
       template = "#{re_path[:controller]}/#{re_path[:action]}"
       @force_landing_page_render = re_path[:controller] == "landing_pages"
       @page_id = [re_path[:controller], re_path[:action]].join("_")
+      @page_title = I18n.t("meta_titles.#{@page_id}", default: nil)
       @recovery_displays = RecoveryDisplay.with_photo.limit(5) if template == "welcome/index"
       render template: template
     end
@@ -44,6 +45,13 @@ class FeedbacksController < ApplicationController
 
     flash[:error] = translation(:please_sign_in)
     redirect_back(fallback_location: root_url) && (return true)
+  end
+
+  # The page the form was on, at the part of it that says the message went through
+  def return_location
+    back = url_from(request.referer) || help_path
+    anchor = params[:return_anchor].to_s
+    anchor.match?(/\A[a-z][a-z-]*\z/) ? "#{back}##{anchor}" : back
   end
 
   def permitted_parameters

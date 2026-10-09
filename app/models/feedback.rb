@@ -180,6 +180,7 @@ class Feedback < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.name = name.to_s.strip.presence
     generate_title
     set_user_attrs
     self.email = EmailNormalizer.normalize(email)

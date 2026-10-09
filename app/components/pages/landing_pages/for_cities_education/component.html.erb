@@ -1,8 +1,8 @@
 <div data-controller="landing-pages--tabs">
   <div
     class="
-      tw:mb-8 tw:flex tw:gap-1 tw:overflow-x-auto tw:border-b
-      tw:border-gray-200 tw:dark:border-gray-700
+      tw:mb-8 tw:flex tw:gap-1 tw:border-b tw:border-gray-200
+      tw:dark:border-gray-700
     "
     role="tablist"
     aria-label="<%= translation(".tabs_label") %>"
@@ -13,10 +13,11 @@
       <button
         type="button"
         class="
-          tw:-mb-px tw:border-b-3 tw:border-transparent tw:px-4 tw:py-3
-          tw:text-[15px] tw:font-bold tw:whitespace-nowrap tw:text-gray-600
+          tw:-mb-px tw:flex-1 tw:border-b-3 tw:border-transparent tw:px-2
+          tw:py-3 tw:text-sm tw:font-bold tw:text-gray-600
           tw:hover:text-slate-900 tw:aria-selected:border-blue-600
-          tw:aria-selected:text-slate-900 tw:dark:text-gray-400
+          tw:aria-selected:text-slate-900 tw:sm:flex-none tw:sm:px-4
+          tw:sm:text-[15px] tw:sm:whitespace-nowrap tw:dark:text-gray-400
           tw:dark:hover:text-white tw:dark:aria-selected:text-white
         "
         id="tab-button-<%= organization[:key] %>"
@@ -39,7 +40,7 @@
     <div
       id="tab-<%= organization[:key] %>"
       class="
-        tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-start tw:gap-10 tw:not-[.active]:hidden
+        tw:grid tw:items-start tw:gap-x-10 tw:gap-y-6 tw:not-[.active]:hidden tw:lg:grid-cols-2
         <%= "active" if organization[:key] == DEFAULT_ORGANIZATION %>
       "
       role="tabpanel"
@@ -47,31 +48,36 @@
       data-landing-pages--tabs-target="panel"
       data-controller="landing-pages--education"
     >
-      <div class="tw:flex tw:flex-col tw:gap-5">
-        <div>
-          <div
-            class="
-              tw:mb-1.5 tw:text-[13px] tw:font-bold tw:tracking-[.06em]
-              tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
-            "
-          >
-            <%= translation(".viewing_as") %>
-          </div>
-
-          <div class="tw:font-header tw:text-[26px] tw:font-extrabold">
-            <%= organization[:name] %>
-          </div>
-
-          <p
-            class="
-              tw:mt-2 tw:text-base tw:text-pretty tw:text-gray-600
-              tw:dark:text-gray-300
-            "
-          >
-            <%= organization[:blurb] %>
-          </p>
+      <div class="tw:lg:col-start-1">
+        <div
+          class="
+            tw:mb-1.5 tw:text-[13px] tw:font-bold tw:tracking-[.06em]
+            tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
+          "
+        >
+          <%= translation(".viewing_as") %>
         </div>
 
+        <div class="tw:font-header tw:text-[26px] tw:font-extrabold">
+          <%= organization[:name] %>
+        </div>
+
+        <p
+          class="
+            tw:mt-2 tw:text-base tw:text-pretty tw:text-gray-600
+            tw:dark:text-gray-300
+          "
+        >
+          <%= organization[:blurb] %>
+        </p>
+      </div>
+
+      <div
+        class="
+          tw:order-last tw:flex tw:flex-col tw:gap-5 tw:lg:order-none
+          tw:lg:col-start-1
+        "
+      >
         <ol
           class="
             tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200
@@ -90,11 +96,14 @@
                 class="
                   tw:group tw:flex tw:w-full tw:cursor-pointer
                   tw:items-center tw:gap-3.5 tw:px-4 tw:py-3.5 tw:text-left
+                  tw:disabled:cursor-default
                   tw:aria-[current=step]:bg-blue-50
                   tw:dark:aria-[current=step]:bg-blue-950
                 "
                 <% if index.zero? %>
                   aria-current="step"
+                <% else %>
+                  disabled
                 <% end %>
                 data-landing-pages--education-target="summary"
                 data-action="landing-pages--education#go"
@@ -134,7 +143,7 @@
         </ol>
 
         <div class="<%= Pages::LandingPages::ForCities::Component::STICKER_CLASSES %>">
-          <%= image_tag "kelsey/illustrations/comic-assets_bike-bell.png", alt: "", class: "tw:h-16 tw:w-auto tw:flex-none" %>
+          <%= image_tag "kelsey/illustrations/comic-assets_bike-bell.png", alt: "", loading: "lazy", width: 65, height: 64, class: "tw:h-16 tw:w-auto tw:flex-none" %>
 
           <p class="tw:text-[15px] tw:leading-normal">
             <%= translation(".staff_edit") %>
@@ -144,19 +153,24 @@
 
       <div
         class="
-          tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg
-          tw:border tw:border-gray-200 tw:bg-white tw:px-7 tw:pt-7 tw:pb-6
-          tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:dark:border-gray-700
-          tw:dark:bg-gray-800
+          tw:grid tw:w-full tw:max-w-[520px] tw:justify-self-center
+          tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:px-7
+          tw:pt-7 tw:pb-6 tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]
+          tw:lg:col-start-2 tw:lg:row-span-2 tw:lg:row-start-1
+          tw:dark:border-gray-700 tw:dark:bg-gray-800
         "
       >
+        <%#
+          Every step shares one grid cell, hidden by visibility rather than display, so the card
+          keeps the tallest step's height instead of jumping as the rider moves through them
+        %>
         <% total = organization[:steps].size %>
 
         <% organization[:steps].each_with_index do |step, index| %>
           <div
             role="group"
             aria-labelledby="education-<%= organization[:key] %>-<%= index %>-title"
-            class="<%= "tw:hidden" unless index.zero? %>"
+            class="tw:[grid-area:1/1] <%= "tw:invisible" unless index.zero? %>"
             data-landing-pages--education-target="step"
           >
             <%= progress(filled: index + 1, total:, label: translation(".step_n_of_total_html", n: number_display(index + 1), total: number_display(total))) %>
@@ -174,9 +188,10 @@
             <h3
               id="education-<%= organization[:key] %>-<%= index %>-title"
               class="
-                tw:mb-1.5 tw:font-header tw:text-2xl tw:leading-tight
-                tw:font-extrabold
+                tw:mb-1.5 tw:scroll-mt-24 tw:font-header tw:text-2xl
+                tw:leading-tight tw:font-extrabold tw:focus:outline-none
               "
+              tabindex="-1"
             >
               <%= step[:title] %>
             </h3>
@@ -244,7 +259,10 @@
           </div>
         <% end %>
 
-        <div class="tw:hidden" data-landing-pages--education-target="done">
+        <div
+          class="tw:invisible tw:self-center tw:[grid-area:1/1]"
+          data-landing-pages--education-target="done"
+        >
           <%= progress(filled: total, total:, label: translation(".complete")) %>
 
           <div
@@ -255,7 +273,13 @@
           >
             <%= render(UI::Badge::Component.new(text: translation(".registered"), color: :notice, size: :lg)) %>
 
-            <h3 class="tw:mt-1 tw:font-header tw:text-2xl tw:font-extrabold">
+            <h3
+              class="
+                tw:mt-1 tw:scroll-mt-24 tw:font-header tw:text-2xl
+                tw:font-extrabold tw:focus:outline-none
+              "
+              tabindex="-1"
+            >
               <%= translation(".all_set") %>
             </h3>
 

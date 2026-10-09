@@ -3,21 +3,21 @@
     tw:-mt-(--nav-gap) tw:-mb-18 tw:text-base tw:leading-normal
     tw:text-slate-900 tw:dark:text-gray-100
   "
-  data-controller="landing-pages--lead-request"
 >
   <nav
-    class="tw:sticky tw:top-0 tw:z-20 tw:bg-black"
+    class="tw:z-20 tw:bg-black tw:md:sticky tw:md:top-0"
     aria-label="<%= translation(".nav_label") %>"
   >
-    <div class="tw:flex tw:items-center tw:gap-4 tw:py-2.5 <%= SECTION_CLASSES %>">
-      <div class="tw:-ml-3 tw:flex tw:min-w-0 tw:gap-1 tw:overflow-x-auto">
+    <%# Not sticky on a phone, where its links wrap onto more rows than a sticky bar should take %>
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:py-2.5 <%= SECTION_CLASSES %>">
+      <div class="tw:-ml-3 tw:flex tw:min-w-0 tw:flex-wrap tw:gap-x-1">
         <% nav_links.each do |href, text| %>
           <a
             href="<%= href %>"
             class="
-              tw:rounded tw:px-3 tw:py-2 tw:text-[15px] tw:font-semibold
+              tw:rounded tw:px-3 tw:py-1.5 tw:text-sm tw:font-semibold
               tw:whitespace-nowrap tw:text-white/85 tw:no-underline
-              tw:hover:text-white
+              tw:hover:text-white tw:md:py-2 tw:md:text-[15px]
             "
           >
             <%= text %>
@@ -25,9 +25,8 @@
         <% end %>
       </div>
 
-      <%= render(UI::ButtonLink::Component.new(href: "#contact", text: translation(".schedule_a_demo"), color: :primary,
-        html_class: "tw:ml-auto tw:flex-none",
-        data: {action: "landing-pages--lead-request#choose", "landing-pages--lead-request-value-param": "demo"})) %>
+      <%= render(UI::ButtonLink::Component.new(href: "#lead-form", text: translation(".schedule_a_demo"), color: :primary,
+        html_class: "tw:flex-none tw:md:ml-auto", data: {lead_request: "demo"})) %>
     </div>
   </nav>
 
@@ -72,28 +71,33 @@
           </p>
 
           <div class="tw:flex tw:flex-wrap tw:gap-3.5">
-            <%= render(UI::ButtonLink::Component.new(href: "#contact", text: translation(".schedule_a_demo"), color: :primary, size: :callout,
-              data: {action: "landing-pages--lead-request#choose", "landing-pages--lead-request-value-param": "demo"})) %>
+            <%= render(UI::ButtonLink::Component.new(href: "#lead-form", text: translation(".schedule_a_demo"), color: :primary, size: :callout,
+              data: {lead_request: "demo"})) %>
 
-            <%= render(UI::ButtonLink::Component.new(href: "#contact", text: translation(".start_a_free_trial"), color: :secondary, size: :callout,
-              data: {action: "landing-pages--lead-request#choose", "landing-pages--lead-request-value-param": "trial"})) %>
+            <%= render(UI::ButtonLink::Component.new(href: "#lead-form", text: translation(".start_a_free_trial"), color: :secondary, size: :callout,
+              data: {lead_request: "trial"})) %>
           </div>
         </div>
 
-        <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: translation(".hero_image_alt"),
+        <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: translation(".hero_image_alt"), width: 300, height: 224,
           class: "tw:mx-auto tw:h-auto tw:w-[300px] tw:max-w-full tw:flex-[0_1_300px]" %>
       </div>
 
-      <%# An illustration of the registration flow, which the caption describes %>
-      <figure class="tw:flex tw:flex-wrap tw:items-stretch">
+      <%# An illustration of the registration flow, which the caption describes. Its cards are inert, so their fields don't take clicks %>
+      <figure
+        class="
+          tw:grid tw:cursor-default tw:items-stretch tw:select-none
+          tw:min-[800px]:grid-cols-[1fr_auto_1fr]
+        "
+      >
         <div
           class="
-            tw:flex tw:min-w-0 tw:flex-[1_1_340px] tw:flex-col tw:gap-3
-            tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[#f3f4f6]
-            tw:px-5.5 tw:py-5 tw:text-gray-900
-            tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]
+            tw:flex tw:min-w-0 tw:flex-col tw:gap-3 tw:rounded-lg tw:border
+            tw:border-gray-200 tw:bg-[#f3f4f6] tw:px-5.5 tw:py-5
+            tw:text-gray-900 tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]
           "
           aria-hidden="true"
+          inert
         >
           <div class="tw:grid tw:grid-cols-2 tw:gap-1.5">
             <span class="tw:h-1 tw:rounded-sm tw:bg-purple-500"></span>
@@ -159,8 +163,9 @@
 
         <div
           class="
-            tw:flex tw:flex-none tw:items-center tw:justify-center tw:px-3.5
-            tw:py-2.5 tw:text-2xl tw:font-bold tw:text-purple-500
+            tw:flex tw:flex-none tw:rotate-90 tw:items-center
+            tw:justify-center tw:px-3.5 tw:py-2.5 tw:text-2xl tw:font-bold
+            tw:text-purple-500 tw:min-[800px]:rotate-0
           "
           aria-hidden="true"
         >
@@ -169,12 +174,12 @@
 
         <div
           class="
-            tw:flex tw:min-w-0 tw:flex-[1_1_340px] tw:flex-col tw:gap-2.5
-            tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[#f3f4f6]
-            tw:px-5.5 tw:py-5 tw:text-gray-900
-            tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]
+            tw:flex tw:min-w-0 tw:flex-col tw:gap-2.5 tw:rounded-lg
+            tw:border tw:border-gray-200 tw:bg-[#f3f4f6] tw:px-5.5 tw:py-5
+            tw:text-gray-900 tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]
           "
           aria-hidden="true"
+          inert
         >
           <div class="tw:grid tw:grid-cols-6 tw:gap-1.25">
             <% 6.times do |index| %>
@@ -253,8 +258,8 @@
 
         <figcaption
           class="
-            tw:mt-3.5 tw:flex-[1_1_100%] tw:text-center tw:text-[13px]
-            tw:text-gray-600 tw:dark:text-gray-400
+            tw:mt-3.5 tw:text-center tw:text-[13px] tw:text-gray-600
+            tw:min-[800px]:col-span-3 tw:dark:text-gray-400
           "
         >
           <%= translation(".mock_caption") %>
@@ -509,7 +514,7 @@
         </div>
 
         <div class="<%= STICKER_CLASSES %>">
-          <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", class: "tw:h-18 tw:w-auto tw:flex-none" %>
+          <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", loading: "lazy", width: 96, height: 72, class: "tw:h-18 tw:w-auto tw:flex-none" %>
 
           <p class="tw:text-[15px]">
             <strong><%= translation(".community_watch_lead") %></strong>
@@ -694,7 +699,9 @@
         <div class="twfieldrow">
           <div>
             <%= f.label :state, translation(".checker_state"), class: "twlabel" %>
-            <%= f.select :state, EbikeRuleServices::StateLaws::STATES.map { [it[:name], it[:abbr]] }, {selected: "CA"}, class: "twinput" %>
+
+            <%= f.select :state, EbikeRuleServices::StateLaws::STATES.map { [it[:name], it[:abbr]] },
+              {selected: @checker_state&.dig(:abbr), prompt: translation(".checker_choose_state")}, class: "twinput", required: true %>
           </div>
 
           <div>
@@ -790,7 +797,7 @@
           <%= translation(".partnership_intro") %>
         </p>
 
-        <%= image_tag "kelsey/illustrations/comic-assets_logo-cape.png", alt: translation(".cape_logo_alt"), class: "tw:h-30 tw:w-auto" %>
+        <%= image_tag "kelsey/illustrations/comic-assets_logo-cape.png", alt: translation(".cape_logo_alt"), loading: "lazy", width: 200, height: 120, class: "tw:h-30 tw:w-auto" %>
       </div>
 
       <div
@@ -894,45 +901,85 @@
         </ul>
       </div>
 
-      <%= form_for @feedback, html: {class: "tw:group #{CARD_CLASSES} tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]!",
-        data: {controller: "form-persist", action: "input->form-persist#save submit->form-persist#clear"}} do |f| %>
-        <div class="tw:mb-4">
-          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "feedback[lead_request]", kind: :toggle,
-            entries: lead_request_entries, selected: @feedback.lead_request || "demo",
-            html_options: {data: {"landing-pages--lead-request-target": "radio"}})) %>
+      <div
+        id="lead-form"
+        class="tw:scroll-mt-20 tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]! <%= CARD_CLASSES %>"
+      >
+        <%# The form returns here once a request is sent, which :target turns into a thank you in its place %>
+        <div
+          id="lead-sent"
+          class="
+            tw:peer tw:hidden tw:scroll-mt-20 tw:py-8 tw:text-center
+            tw:target:block
+          "
+        >
+          <div class="tw:font-header tw:text-[22px] tw:font-extrabold">
+            <%= translation(".sent_heading") %>
+          </div>
+
+          <p class="tw:mt-2 tw:text-[15px] tw:text-gray-600 tw:dark:text-gray-300">
+            <%= translation(".sent_body") %>
+          </p>
+
+          <a
+            href="#lead-form"
+            class="twlink tw:mt-4 tw:inline-block tw:text-sm tw:font-semibold"
+          >
+            <%= translation(".send_another") %>
+          </a>
         </div>
 
-        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: translation(".field_organization"),
-          html_options: {required: true})) %>
+        <%= form_for @feedback, html: {class: "tw:group tw:peer-target:hidden",
+          data: {controller: ["form-persist strip-inputs", ("autofocus" if @feedback.errors.any?)].compact.join(" "),
+                 action: "input->form-persist#save submit->strip-inputs#submit submit->form-persist#clear"}} do |f| %>
+          <%= render(UI::Alerts::ObjectError::Component.new(object: @feedback, name: translation(".request_name"))) %>
 
-        <div class="twfieldrow">
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: translation(".field_name"))) %>
+          <%# No default is checked here, or a draft's choice couldn't be restored over it %>
+          <div
+            class="tw:mb-4"
+            data-controller="landing-pages--lead-request"
+            data-action="click@window->landing-pages--lead-request#choose"
+          >
+            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "feedback[lead_request]", kind: :toggle,
+              entries: lead_request_entries, selected: @feedback.lead_request,
+              html_options: {data: {"landing-pages--lead-request-target": "radio"}})) %>
+          </div>
 
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_role, label_text: translation(".field_role"))) do %>
-            <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :contact_role, option_tags: role_options,
-              options: {include_blank: true})) %>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: translation(".field_organization"),
+            html_options: {required: true})) %>
+
+          <div class="twfieldrow">
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: translation(".field_name"),
+              html_options: {value: @feedback.contact_name || @current_user&.name})) %>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_role, label_text: translation(".field_role"))) do %>
+              <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :contact_role, option_tags: role_options,
+                options: {include_blank: true})) %>
+            <% end %>
+          </div>
+
+          <div class="twfieldrow">
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+              <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true, html_options: {value: @feedback.email || @current_user&.email})) %>
+            <% end %>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number, kind: :telephone_field,
+              html_options: {pattern: PHONE_PATTERN, title: translation(".phone_format")})) %>
+          </div>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
+            label_text: translation(".field_message"), html_options: {rows: 3, value: (@feedback.body unless @feedback.body == "lead")})) %>
+
+          <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
+          <%= f.hidden_field :feedback_type, value: FEEDBACK_TYPE %>
+          <%= hidden_field_tag :return_anchor, "lead-sent", id: nil %>
+
+          <%= render(UI::Button::Component.new(color: :primary, size: :lg, type: "submit", html_class: "tw:w-full tw:justify-center")) do %>
+            <span class="tw:group-has-[[value=trial]:checked]:hidden"><%= translation(".submit_demo") %></span>
+            <span class="tw:hidden tw:group-has-[[value=trial]:checked]:inline"><%= translation(".submit_trial") %></span>
           <% end %>
-        </div>
-
-        <div class="twfieldrow">
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
-            <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true, html_options: {value: @feedback.email || @current_user&.email})) %>
-          <% end %>
-
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number, kind: :telephone_field)) %>
-        </div>
-
-        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
-          label_text: translation(".field_message"), html_options: {rows: 3, value: (@feedback.body unless @feedback.body == "lead")})) %>
-
-        <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
-        <%= f.hidden_field :feedback_type, value: FEEDBACK_TYPE %>
-
-        <%= render(UI::Button::Component.new(color: :primary, size: :lg, type: "submit", html_class: "tw:w-full tw:justify-center")) do %>
-          <span class="tw:group-has-[[value=trial]:checked]:hidden"><%= translation(".submit_demo") %></span>
-          <span class="tw:hidden tw:group-has-[[value=trial]:checked]:inline"><%= translation(".submit_trial") %></span>
         <% end %>
-      <% end %>
+      </div>
     </div>
   </section>
 </div>

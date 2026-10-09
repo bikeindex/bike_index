@@ -6,6 +6,10 @@ class LandingPagesController < ApplicationController
     raise ActionController::RoutingError, "Not found" unless current_organization.present?
   end
 
+  def for_cities
+    @checker_state = EbikeRuleServices::StateLaws.state_from_location(request_location_hash)
+  end
+
   protected
 
   def instantiate_feedback

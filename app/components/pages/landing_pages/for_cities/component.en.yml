@@ -7,6 +7,7 @@ en:
           answer_no: 'No'
           answer_yes: 'Yes'
           cape_logo_alt: Bike Index shield with a cape
+          checker_choose_state: Choose a state
           checker_eyebrow: E-bike compliance checker
           checker_form_heading: Check an e-bike
           checker_form_note: Opens the full checker, with your state's rules and the
@@ -197,6 +198,7 @@ en:
             We configure your branded organization and education flow, train your
             staff, and maintain the platform.
           partnership_support_title: Setup, training, and support
+          phone_format: Numbers, spaces, and + ( ) . - x only
           pill: Bike Index for Cities · Nonprofit since 2013
           program_education_body: >-
             E-bike riders are taken into your education flow as part of registering.
@@ -263,6 +265,7 @@ en:
             Registration volume, e-bike share, and activity across programs, plus
             reports on recoveries and battery audits for city leadership.
           registration_step_4_title: You see it in the dashboard
+          request_name: request
           role_city_staff: City staff
           role_elected: Elected official
           role_housing: Housing or community program
@@ -270,6 +273,9 @@ en:
           role_other: Other
           role_school: School or district
           schedule_a_demo: Schedule a demo
+          send_another: Send another request
+          sent_body: Our team will reach out to you by email.
+          sent_heading: Thanks. We'll be in touch soon.
           start_a_free_trial: Start a free trial
           stat_agencies: law enforcement agencies
           stat_agencies_count: 100+
