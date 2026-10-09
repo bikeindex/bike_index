@@ -6983,8 +6983,6 @@ it:
             fonti primarie.
           class_1_throttle: Le moto di classe 1 non possono avere l'acceleratore
           class_3_throttle: L'acceleratore deve disattivarsi a 20 mph
-          class_not_recognized: La classe %{e_bike_class} non è riconosciuta qui
-          class_recognized: La classe %{e_bike_class} è riconosciuta
           classes_start_on: Le lezioni entreranno in vigore %{date}. Nel frattempo,
             verifica le norme vigenti nello stato.
           entered_manually: Inserito manualmente · Classe %{n}
@@ -7062,7 +7060,6 @@ it:
           your_ebike: La tua e-bike
           your_state: Il tuo stato
           bikebook_name: BikeBook
-          bikebook_photo: Foto · BikeBook
           class_3_throttle_over_html: L'acceleratore funziona fino a %{mph} mph, oltre
             i 20 mph è consentito l'acceleratore di una Classe 3
           class_3_throttle_within_html: L'acceleratore si ferma a %{mph} mph
@@ -7077,6 +7074,14 @@ it:
           speed_past_cap_html: Assiste oltre %{past} mph, oltre il limite %{cap} mph
           speed_past_html: Assiste oltre %{past} mph; verificare che si fermi entro
             %{cap} mph
+          classes_not_recognized:
+            one: La classe %{n} non è riconosciuta qui
+            other: Le classi %{n} non sono riconosciute qui
+          classes_recognized:
+            one: La classe %{n} è riconosciuta
+            other: Le classi %{n} sono riconosciute
+          read_more: Per saperne di più
+          stock_photo: Foto di repertorio
         rule_label:
           classes: Classi riconosciute
           power: Limite di potenza del motore

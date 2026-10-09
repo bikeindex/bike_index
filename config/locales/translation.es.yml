@@ -6964,8 +6964,6 @@ es:
             de fuentes primarias.
           class_1_throttle: Las motocicletas de Clase 1 no pueden tener acelerador.
           class_3_throttle: El acelerador debe cortarse a 20 mph.
-          class_not_recognized: La clase %{e_bike_class} no se reconoce aquí.
-          class_recognized: Se reconoce la clase %{e_bike_class}.
           classes_start_on: Las clases entran en vigor %{date}. Hasta entonces, consulte
             las reglas vigentes del estado.
           entered_manually: Introducido manualmente · Clase %{n}
@@ -7044,7 +7042,6 @@ es:
           your_ebike: Tu bicicleta eléctrica
           your_state: Tu estado
           bikebook_name: Libro de bicicletas
-          bikebook_photo: Foto · BikeBook
           class_3_throttle_over_html: El acelerador funciona hasta %{mph} mph, más
             allá de las 20 mph se permite el acelerador de un Clase 3.
           class_3_throttle_within_html: El acelerador se detiene a %{mph} mph
@@ -7061,6 +7058,14 @@ es:
             de %{cap} mph
           speed_past_html: Ayuda a superar %{past} mph; comprueba que se detenga a
             %{cap} mph.
+          classes_not_recognized:
+            one: La clase %{n} no se reconoce aquí.
+            other: Las clases %{n} no se reconocen aquí.
+          classes_recognized:
+            one: Se reconoce la clase %{n}.
+            other: Se reconocen las clases %{n}.
+          read_more: Leer más
+          stock_photo: Foto de archivo
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
