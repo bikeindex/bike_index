@@ -1,0 +1,103 @@
+---
+en:
+  components:
+    pages:
+      landing_pages:
+        for_community_groups:
+          a_registered_bike_can_come_home: A registered bike is a bike that can come
+            home.
+          ask_about_ebike_education: Ask us about how we are educating riders about
+            e-bikes.
+          become_an_ambassador: Become an ambassador
+          bike_index_for_bike_shops: Bike Index for bike shops
+          bikes_registered_free: bikes registered, free
+          charge_it_safely: Charge it safely.
+          charge_it_safely_detail: Battery care, storage, and certified chargers.
+          check_ebike_rules: Check e-bike rules in your state
+          create_an_organization_account: >-
+            Create an organization account and start getting your community registered
+            today.
+          ebike_education: E-bike education
+          ebike_registration_education: >-
+            When an e-bike is registered on Bike Index, the rider gets short education
+            on safe operation and ownership. Your group gets an easy way to reach
+            new riders with the basics, without building a program from scratch.
+          ebikes_bring_new_riders: >-
+            E-bikes are bringing a lot of people to riding for the first time. They're
+            heavier, faster, and more valuable than most bikes, and that comes with
+            a few things every owner should know.
+          embed_a_registration_form: Embed a registration form
+          everything_you_need: Everything you need to get your community registered.
+          eyebrow: For community groups · Free, always
+          free_forever: Free for groups and riders. Forever.
+          free_tools_for_your_group: Free tools for your group
+          get_started: Get started
+          help_your_riders: Help your riders get their bikes back.
+          host_a_registration_drive: Host a registration drive
+          join_us: Join us. It's free, forever.
+          know_where_to_ride: Know where to ride.
+          know_where_to_ride_detail: Local rules for paths, trails, and roads.
+          know_your_class: Know your class.
+          know_your_class_detail: Motor class and top assisted speed.
+          lede: >-
+            Bike Index is the free, nonprofit bike registry used by riders, shops,
+            and police worldwide. When your members register, a stolen bike has a
+            real path home. We don't charge community groups anything. We just ask
+            you to spread the word.
+          most_stolen_bikes_are_never_returned: >-
+            Most stolen bikes are never returned because nobody can prove who owns
+            them. A Bike Index registration puts the serial, photos, and owner on
+            record before anything happens. Your group is the trusted voice that gets
+            riders to do it.
+          new_for_ebike_riders: New for e-bike riders
+          nonprofit: 501(c)(3) nonprofit
+          partner_organizations: partner shops, police departments, and cities
+          protect_it: Protect it.
+          protect_it_detail: Registered, photographed, and locked right.
+          recovered: Recovered
+          recovered_in_their_own_words: Recovered, in their own words
+          recovery_stories: Recovery stories
+          ride_prepared: Ride prepared.
+          ride_prepared_detail: Braking at speed, helmets, and sharing space.
+          see_all_recovery_stories: See all recovery stories
+          sign_up_for_free: Sign up for free
+          step_home_body: >-
+            Buyers and shops check serials against the index, and matches get back
+            to their owners.
+          step_home_title: It comes home
+          step_register_body: Make, model, serial, and photos. It takes about two
+            minutes.
+          step_register_title: Riders register
+          step_spread_body: Share a link, embed the form, or run a registration drive
+            at your next ride.
+          step_spread_title: You spread the word
+          step_stolen_body: The owner marks it stolen and we alert shops, police,
+            and riders nearby.
+          step_stolen_title_html: A bike is %{stolen}
+          stolen: STOLEN
+          stolen_bikes_recovered: stolen bikes recovered
+          testimonial_attribution_html: GObike Buffalo, %{link}
+          tool_account_body: See the bikes registered through your group, all in one
+            place.
+          tool_account_title: Free organization account
+          tool_ambassadors_body: Give your most active members a way to champion registration
+            locally.
+          tool_ambassadors_title: Ambassadors program
+          tool_drives_body: Host community rides and events? Tell us and we'll send
+            Bike Index materials.
+          tool_drives_title: Registration drives
+          tool_ebike_body: Help educate e-bike riders in your community on safe operation
+            and ownership.
+          tool_ebike_title: E-bike education flow
+          tool_embed_body: Put a Bike Index form right on your website.
+          tool_embed_title: Embeddable registration form
+          tool_search_body: Search stolen bikes in your area and support recovery
+            efforts.
+          tool_search_title: Searchable database
+          valid_anywhere: One registration, valid anywhere
+          value_returned_to_owners: value returned to owners
+          we_also_work_with_bike_shops: We also work with bike shops in your community
+            through POS integrations.
+          we_love_ebikes: We love e-bikes. Let's help new riders ride ready.
+          why_it_matters: Why it matters
+          zoom: ZOOM!

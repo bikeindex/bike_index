@@ -1,0 +1,410 @@
+<div class="tw:bg-white tw:text-gray-700">
+  <section class="tw:border-b tw:border-gray-200">
+    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] tw:items-center tw:gap-10 tw:pt-16 tw:pb-15 <%= container %>">
+      <div>
+        <p
+          class="
+            tw:m-0 tw:mb-4.5 tw:inline-block tw:rounded-full tw:bg-[#e8f3fc]
+            tw:px-3.5 tw:py-1.5 tw:text-[13px] tw:font-bold
+            tw:tracking-[.08em] tw:text-blue-600 tw:uppercase
+          "
+        >
+          <%= translation(".eyebrow") %>
+        </p>
+
+        <h1
+          class="
+            tw:m-0 tw:mb-4 tw:font-header tw:text-[clamp(38px,5vw,54px)]
+            tw:leading-[1.05] tw:font-black tw:tracking-[-.01em]
+            tw:text-balance tw:text-slate-900
+          "
+        >
+          <%= translation(".help_your_riders") %>
+        </h1>
+
+        <p
+          class="
+            tw:m-0 tw:mb-7 tw:max-w-120 tw:text-[19px] tw:leading-[1.55]
+            tw:text-pretty tw:text-gray-600
+          "
+        >
+          <%= translation(".lede") %>
+        </p>
+
+        <div class="tw:flex tw:flex-wrap tw:gap-4">
+          <%= render(UI::ButtonLink::Component.new(href: new_organization_path, text: translation(".sign_up_for_free"),
+            color: :primary, size: :callout)) %>
+
+          <%= render(UI::ButtonLink::Component.new(href: recovery_stories_path, text: translation(".recovery_stories"),
+            color: :secondary, size: :callout, html_class: OUTLINE)) %>
+        </div>
+
+        <p class="tw:m-0 tw:mt-6 <%= callout_classes %>">
+          <%= helpers.inline_svg_tag("icons/bolt.svg", class: "tw:size-5.5 tw:shrink-0 tw:text-purple-500", aria_hidden: true) %>
+          <span><%= translation(".ask_about_ebike_education") %></span>
+          <a href="#ebikes" class="twlink tw:font-semibold"><%= translation(".new_for_ebike_riders") %></a>
+        </p>
+      </div>
+
+      <div class="tw:flex tw:justify-center">
+        <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.png", alt: "", class: "tw:w-full tw:max-w-105") %>
+      </div>
+    </div>
+
+    <div class="tw:border-t tw:border-gray-200 tw:bg-gray-50">
+      <ul class="tw:m-0 tw:grid tw:list-none tw:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] tw:gap-4 tw:py-5 <%= container %>">
+        <% trust_items.each do |icon, text| %>
+          <li
+            class="
+              tw:flex tw:items-center tw:gap-2.5 tw:text-[15px]
+              tw:font-semibold
+            "
+          >
+            <%= helpers.inline_svg_tag(icon, class: "tw:size-5 tw:shrink-0 tw:text-blue-600", aria_hidden: true) %>
+            <%= text %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tw:pt-18 tw:pb-16 <%= container %>">
+    <div
+      class="
+        tw:mb-12 tw:grid
+        tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))]
+        tw:items-center tw:gap-12
+      "
+    >
+      <div>
+        <p class="tw:text-[#cc0000] <%= eyebrow_classes %>">
+          <%= translation(".why_it_matters") %>
+        </p>
+
+        <h2 class="tw:mb-3.5 tw:text-[clamp(28px,3.5vw,38px)] tw:leading-[1.15] <%= h2_classes %>">
+          <%= translation(".a_registered_bike_can_come_home") %>
+        </h2>
+
+        <p
+          class="
+            tw:m-0 tw:max-w-130 tw:text-[17px] tw:leading-[1.65]
+            tw:text-pretty tw:text-gray-600
+          "
+        >
+          <%= translation(".most_stolen_bikes_are_never_returned") %>
+        </p>
+      </div>
+
+      <dl class="tw:m-0 tw:grid tw:grid-cols-2 tw:gap-x-7 tw:gap-y-4">
+        <% stats.each do |stat| %>
+          <div
+            class="
+              tw:flex tw:flex-col-reverse tw:gap-0.5 tw:border-t-2
+              tw:border-gray-200 tw:pt-2.5
+            "
+          >
+            <dt class="tw:text-sm tw:font-normal tw:text-gray-600">
+              <%= stat[:label] %>
+            </dt>
+
+            <dd
+              class="
+                tw:m-0 tw:font-header tw:text-[30px] tw:font-extrabold
+                tw:tracking-[-.01em] tw:text-blue-600
+              "
+            >
+              <%= stat[:value] %>
+            </dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+
+    <ol
+      class="
+        tw:m-0 tw:grid tw:list-none
+        tw:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] tw:gap-5 tw:p-0
+      "
+    >
+      <% steps.each_with_index do |step, index| %>
+        <li class="tw:p-6 <%= CARD %>">
+          <span class="tw:mb-2.5 tw:block tw:font-[Bangers,cursive] tw:text-[34px] tw:leading-none <%= step[:color] %>">
+            <%= index + 1 %>
+          </span>
+
+          <h3
+            class="
+              tw:m-0 tw:mb-1.5 tw:font-header tw:text-lg tw:font-bold
+              tw:text-slate-900
+            "
+          >
+            <%= step[:title] %>
+          </h3>
+
+          <p class="tw:m-0 tw:text-[15px] tw:leading-[1.6] tw:text-gray-600">
+            <%= step[:body] %>
+          </p>
+        </li>
+      <% end %>
+    </ol>
+  </section>
+
+  <% if @recovery_displays.any? %>
+    <section class="tw:pb-18 <%= container %>">
+      <div
+        class="
+          tw:mb-5.5 tw:flex tw:flex-wrap tw:items-baseline
+          tw:justify-between tw:gap-x-6 tw:gap-y-1.5
+        "
+      >
+        <h2 class="tw:text-[28px] <%= h2_classes %>">
+          <%= translation(".recovered_in_their_own_words") %>
+        </h2>
+
+        <%= link_to(recovery_stories_path, class: "tw:font-semibold twlink") do %>
+          <%= translation(".see_all_recovery_stories") %>
+          <span aria-hidden="true">→</span>
+        <% end %>
+      </div>
+
+      <ul
+        class="
+          tw:m-0 tw:grid tw:list-none
+          tw:grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))]
+          tw:gap-6 tw:p-0
+        "
+      >
+        <% @recovery_displays.each do |recovery_display| %>
+          <li class="tw:flex tw:flex-col tw:overflow-hidden tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_4px_12px_rgba(44,62,80,.12)] <%= CARD %>">
+            <%= image_tag(recovery_display.photo_url, alt: recovery_display.image_alt, loading: "lazy",
+              class: "tw:block tw:h-50 tw:w-full tw:bg-gray-100 tw:object-cover") %>
+
+            <div
+              class="
+                tw:flex tw:flex-1 tw:flex-col tw:justify-between tw:gap-3
+                tw:p-5
+              "
+            >
+              <blockquote
+                class="
+                  tw:m-0 tw:border-0 tw:p-0 tw:text-base tw:leading-[1.55]
+                  tw:text-gray-700
+                "
+              >
+                <%= recovery_display.quote %>
+              </blockquote>
+
+              <p class="tw:m-0 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
+                <% if recovery_display.quote_by.present? %>
+                  <strong class="tw:text-sm tw:font-extrabold tw:text-slate-900">
+                    <%= recovery_display.quote_by %>
+                  </strong>
+                <% end %>
+
+                <span class="tw:text-[13px] tw:text-gray-600">
+                  <%= translation(".recovered") %>
+                  <%= render(UI::Time::Component.new(time: recovery_display.recovered_at)) %>
+                </span>
+              </p>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <section
+    id="ebikes"
+    class="tw:scroll-mt-6 tw:border-y tw:border-gray-200 tw:bg-gray-50"
+  >
+    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] tw:items-center tw:gap-12 tw:py-18 <%= container %>">
+      <div>
+        <p class="tw:text-purple-500 <%= eyebrow_classes %>">
+          <%= translation(".new_for_ebike_riders") %>
+        </p>
+
+        <h2 class="tw:mb-3.5 tw:text-[clamp(28px,3.5vw,38px)] tw:leading-[1.15] <%= h2_classes %>">
+          <%= translation(".we_love_ebikes") %>
+        </h2>
+
+        <p
+          class="
+            tw:m-0 tw:mb-3.5 tw:max-w-130 tw:text-[17px] tw:leading-[1.65]
+            tw:text-gray-600
+          "
+        >
+          <%= translation(".ebikes_bring_new_riders") %>
+        </p>
+
+        <p
+          class="
+            tw:m-0 tw:max-w-130 tw:text-[17px] tw:leading-[1.65]
+            tw:text-gray-600
+          "
+        >
+          <%= translation(".ebike_registration_education") %>
+        </p>
+
+        <%= link_to(ebike_rules_path, class: "tw:mt-5.5 tw:inline-flex tw:items-center tw:gap-2 tw:text-base tw:font-semibold twlink") do %>
+          <%= helpers.inline_svg_tag("icons/map.svg", class: "tw:size-5", aria_hidden: true) %>
+          <%= translation(".check_ebike_rules") %>
+
+          <span aria-hidden="true">→</span>
+        <% end %>
+      </div>
+
+      <div class="tw:p-7 <%= COMIC_CARD %>">
+        <div class="tw:mb-4 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
+          <h3
+            class="
+              tw:m-0 tw:font-header tw:text-xl tw:font-extrabold
+              tw:text-slate-900
+            "
+          >
+            <%= translation(".ebike_education") %>
+          </h3>
+
+          <span
+            aria-hidden="true"
+            class="tw:font-[Bangers,cursive] tw:text-2xl tw:text-purple-500"
+          >
+            <%= translation(".zoom") %>
+          </span>
+        </div>
+
+        <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3.5 tw:p-0">
+          <% ebike_topics.each do |icon, title, detail| %>
+            <li class="tw:flex tw:items-start tw:gap-3">
+              <%= helpers.inline_svg_tag(icon, class: "tw:size-5.5 tw:shrink-0 tw:text-blue-600", aria_hidden: true) %>
+
+              <span class="tw:text-gray-600">
+                <strong class="tw:text-slate-900"><%= title %></strong>
+                <%= detail %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:pt-18 tw:pb-16 <%= container %>">
+    <p class="tw:text-blue-600 <%= eyebrow_classes %>">
+      <%= translation(".free_tools_for_your_group") %>
+    </p>
+
+    <h2 class="tw:mb-8 tw:max-w-160 tw:text-[clamp(28px,3.5vw,38px)] tw:leading-[1.15] <%= h2_classes %>">
+      <%= translation(".everything_you_need") %>
+    </h2>
+
+    <ul
+      class="
+        tw:m-0 tw:grid tw:list-none
+        tw:grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] tw:gap-5
+        tw:p-0
+      "
+    >
+      <% tools.each do |tool| %>
+        <li class="tw:p-6 <%= CARD %>">
+          <span class="tw:mb-4 tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-full tw:text-white <%= tool[:circle] %>">
+            <%= helpers.inline_svg_tag(tool[:icon], class: "tw:size-5.5", aria_hidden: true) %>
+          </span>
+
+          <h3
+            class="
+              tw:m-0 tw:mb-1.5 tw:font-header tw:text-lg tw:font-bold
+              tw:text-slate-900
+            "
+          >
+            <%= tool[:title] %>
+          </h3>
+
+          <p class="tw:m-0 tw:text-[15px] tw:leading-[1.6] tw:text-gray-600">
+            <%= tool[:body] %>
+          </p>
+        </li>
+      <% end %>
+    </ul>
+
+    <p class="tw:m-0 tw:mt-7 <%= callout_classes %>">
+      <%= helpers.inline_svg_tag("icons/store.svg", class: "tw:size-5.5 tw:shrink-0 tw:text-blue-600", aria_hidden: true) %>
+      <span><%= translation(".we_also_work_with_bike_shops") %></span>
+      <%= link_to(translation(".bike_index_for_bike_shops"), for_bike_shops_path, class: "tw:font-semibold twlink") %>
+    </p>
+  </section>
+
+  <section class="tw:pb-16 <%= container %>">
+    <figure class="tw:m-0 tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] tw:overflow-hidden <%= COMIC_CARD %>">
+      <%= image_tag("https://files.bikeindex.org/uploads/Tw/5/DCX27h8XkAQ9zOo.jpg", alt: "", loading: "lazy",
+        class: "tw:block tw:size-full tw:min-h-65 tw:object-cover") %>
+
+      <div class="tw:p-9">
+        <%= helpers.inline_svg_tag("icons/quote.svg", class: "tw:mb-3 tw:size-8 tw:text-purple-500", aria_hidden: true) %>
+
+        <blockquote
+          class="
+            tw:m-0 tw:border-0 tw:p-0 tw:font-header tw:text-[22px]
+            tw:leading-[1.4] tw:font-bold tw:text-slate-900
+          "
+        >
+          <%= TESTIMONIAL %>
+        </blockquote>
+
+        <figcaption class="tw:mt-4 tw:text-[15px] tw:text-gray-600">
+          <%= translation(".testimonial_attribution_html",
+            link: link_to("@GOBuffalo", "https://twitter.com/GOBuffalo", class: "tw:font-semibold twlink")) %>
+        </figcaption>
+      </div>
+    </figure>
+  </section>
+
+  <section class="tw:pb-16 <%= container %>">
+    <h2 class="tw:mb-4 tw:text-[26px] <%= h2_classes %>">
+      <%= translation(".get_started") %>
+    </h2>
+
+    <ul
+      class="
+        tw:m-0 tw:grid tw:list-none
+        tw:grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] tw:gap-4
+        tw:p-0
+      "
+    >
+      <% get_started_links.each do |text, path| %>
+        <li>
+          <%= link_to(path, class: "tw:flex tw:items-center tw:justify-between tw:gap-4 tw:rounded-lg tw:border tw:border-gray-200 tw:px-5 tw:py-4.5 tw:font-semibold tw:text-slate-900 tw:transition-colors tw:hover:border-blue-600 tw:hover:text-slate-900") do %>
+            <%= text %>
+            <span aria-hidden="true" class="tw:text-blue-600">→</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+
+  <section class="tw:pb-18 <%= container %>">
+    <div
+      class="
+        tw:mx-auto tw:flex tw:max-w-250 tw:flex-wrap tw:items-center
+        tw:justify-between tw:gap-8 tw:rounded-lg tw:bg-linear-160
+        tw:from-slate-900 tw:to-[#233140] tw:p-8 tw:sm:p-16
+      "
+    >
+      <div class="tw:flex tw:flex-[1_1_28rem] tw:flex-wrap tw:items-center tw:gap-6">
+        <%= image_tag("kelsey/illustrations/comic-assets_bike-bell.png", alt: "", class: "tw:h-27.5 tw:w-auto") %>
+
+        <div class="tw:flex-[1_1_16rem]">
+          <h2 class="tw:mb-2 tw:text-[30px] tw:text-white <%= h2_classes %>">
+            <%= translation(".join_us") %>
+          </h2>
+
+          <p class="tw:m-0 tw:text-[17px] tw:text-white/85">
+            <%= translation(".create_an_organization_account") %>
+          </p>
+        </div>
+      </div>
+
+      <%= render(UI::ButtonLink::Component.new(href: new_organization_path, text: translation(".sign_up_for_free"),
+        color: :yellow, size: :callout)) %>
+    </div>
+  </section>
+</div>

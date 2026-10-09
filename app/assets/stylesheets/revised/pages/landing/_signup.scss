@@ -13,8 +13,8 @@
   }
 }
 
-$landing-page-targets: "bike_shops", "school", "community_groups",
-  "law_enforcement", "cities", "ambassadors-how-to", "ambassadors-current",
+$landing-page-targets: "bike_shops", "school", "law_enforcement",
+  "cities", "ambassadors-how-to", "ambassadors-current",
   "shop-packages";
 
 @each $target in $landing-page-targets {
@@ -25,21 +25,7 @@ $landing-page-targets: "bike_shops", "school", "community_groups",
   }
 }
 
-@include media-breakpoint-up(lg) {
-  .signup-landing-page-community_groups {
-    .banner-header {
-      background-position: center center !important;
-    }
-  }
-}
-
 @include media-breakpoint-down(lg) {
-  .signup-landing-page-community_groups {
-    .banner-header {
-      background-position: center center !important;
-    }
-  }
-
   .signup-landing-page-shops {
     .banner-header {
       background-position: center center !important;

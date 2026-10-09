@@ -16,7 +16,6 @@ RSpec.describe LandingPagesController, type: :request do
   {
     for_bike_shops: "Bike Index for Bike Shops",
     for_cities: "Bike Index for Cities",
-    for_community_groups: "Bike Index for Community Groups",
     for_law_enforcement: "Bike Index for Law Enforcement",
     for_schools: "Bike Index for Schools",
     ascend: "Ascend POS on Bike Index",
@@ -33,6 +32,19 @@ RSpec.describe LandingPagesController, type: :request do
         expect(response.body).to match("<title>#{page_title}</title>")
         expect(response.body).to match('<html lang="en">') # Accessibility
       end
+    end
+  end
+
+  describe "#for_community_groups" do
+    let!(:recovery_display) { FactoryBot.create(:recovery_display_with_photo, quote: "Recovered in under four hours") }
+
+    it "renders the latest recovery stories" do
+      get "/for_community_groups"
+
+      expect(response.status).to eq(200)
+      expect(response.body).to match("<title>Bike Index for Community Groups</title>")
+      expect(response.body).to include("Help your riders get their bikes back.")
+      expect(response.body).to include("Recovered in under four hours")
     end
   end
 
