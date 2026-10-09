@@ -47,6 +47,13 @@ RSpec.describe Feedback, type: :model do
       expect(feedback.kind).to eq "lead_for_school"
       expect(feedback.kind_humanized).to eq "School lead"
     end
+
+    it "sets the body for a lead submitted with a blank message, and keeps its role and request" do
+      feedback = Feedback.create(feedback_type: "lead_for_city", email: "staff@example.gov", name: "Portland",
+        body: "", contact_role: "Law enforcement", lead_request: "trial")
+      expect(feedback).to be_valid
+      expect(feedback.reload).to have_attributes(body: "lead", contact_role: "Law enforcement", lead_request: "trial")
+    end
   end
 
   describe "looks_like_spam?" do

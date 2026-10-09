@@ -1,0 +1,938 @@
+<div
+  class="
+    tw:-mt-(--nav-gap) tw:-mb-18 tw:text-base tw:leading-normal
+    tw:text-slate-900 tw:dark:text-gray-100
+  "
+  data-controller="landing-pages--lead-request"
+>
+  <nav
+    class="tw:sticky tw:top-0 tw:z-20 tw:bg-black"
+    aria-label="<%= translation(".nav_label") %>"
+  >
+    <div class="tw:flex tw:items-center tw:gap-4 tw:py-2.5 <%= SECTION_CLASSES %>">
+      <div class="tw:-ml-3 tw:flex tw:min-w-0 tw:gap-1 tw:overflow-x-auto">
+        <% nav_links.each do |href, text| %>
+          <a
+            href="<%= href %>"
+            class="
+              tw:rounded tw:px-3 tw:py-2 tw:text-[15px] tw:font-semibold
+              tw:whitespace-nowrap tw:text-white/85 tw:no-underline
+              tw:hover:text-white
+            "
+          >
+            <%= text %>
+          </a>
+        <% end %>
+      </div>
+
+      <%= render(UI::ButtonLink::Component.new(href: "#contact", text: translation(".schedule_a_demo"), color: :primary,
+        html_class: "tw:ml-auto tw:flex-none",
+        data: {action: "landing-pages--lead-request#choose", "landing-pages--lead-request-value-param": "demo"})) %>
+    </div>
+  </nav>
+
+  <%# Hero %>
+  <section
+    class="
+      tw:border-b tw:border-gray-200 tw:bg-white tw:dark:border-gray-700
+      tw:dark:bg-gray-900
+    "
+  >
+    <div class="tw:flex tw:flex-col tw:gap-10 tw:pt-16 tw:pb-14 <%= SECTION_CLASSES %>">
+      <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-8">
+        <div class="tw:max-w-[780px] tw:flex-[1_1_520px]">
+          <span
+            class="
+              tw:mb-5 tw:inline-block tw:rounded-full tw:bg-blue-100
+              tw:px-3.5 tw:py-1.5 tw:text-[13px] tw:font-bold
+              tw:tracking-[.08em] tw:text-blue-600 tw:uppercase
+              tw:dark:bg-blue-950 tw:dark:text-blue-300
+            "
+          >
+            <%= translation(".pill") %>
+          </span>
+
+          <h1
+            class="
+              tw:mb-4.5 tw:font-header tw:text-[clamp(36px,5vw,54px)]
+              tw:leading-[1.05] tw:font-black tw:tracking-[-.01em]
+              tw:text-balance
+            "
+          >
+            <%= render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".heading"))) %>
+          </h1>
+
+          <p
+            class="
+              tw:mb-7.5 tw:max-w-[640px] tw:text-[19px] tw:leading-[1.55]
+              tw:text-pretty tw:text-gray-600 tw:dark:text-gray-300
+            "
+          >
+            <%= render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".subheading"))) %>
+          </p>
+
+          <div class="tw:flex tw:flex-wrap tw:gap-3.5">
+            <%= render(UI::ButtonLink::Component.new(href: "#contact", text: translation(".schedule_a_demo"), color: :primary, size: :callout,
+              data: {action: "landing-pages--lead-request#choose", "landing-pages--lead-request-value-param": "demo"})) %>
+
+            <%= render(UI::ButtonLink::Component.new(href: "#contact", text: translation(".start_a_free_trial"), color: :secondary, size: :callout,
+              data: {action: "landing-pages--lead-request#choose", "landing-pages--lead-request-value-param": "trial"})) %>
+          </div>
+        </div>
+
+        <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: translation(".hero_image_alt"),
+          class: "tw:mx-auto tw:h-auto tw:w-[300px] tw:max-w-full tw:flex-[0_1_300px]" %>
+      </div>
+
+      <%# An illustration of the registration flow, which the caption describes %>
+      <figure class="tw:flex tw:flex-wrap tw:items-stretch">
+        <div
+          class="
+            tw:flex tw:min-w-0 tw:flex-[1_1_340px] tw:flex-col tw:gap-3
+            tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[#f3f4f6]
+            tw:px-5.5 tw:py-5 tw:text-gray-900
+            tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]
+          "
+          aria-hidden="true"
+        >
+          <div class="tw:grid tw:grid-cols-2 tw:gap-1.5">
+            <span class="tw:h-1 tw:rounded-sm tw:bg-purple-500"></span>
+            <span class="tw:h-1 tw:rounded-sm tw:bg-gray-300"></span>
+          </div>
+
+          <div
+            class="
+              tw:text-[11px] tw:font-bold tw:tracking-widest
+              tw:text-[#9aa3ae] tw:uppercase
+            "
+          >
+            <%= translation(".mock_bike_info") %>
+          </div>
+
+          <% [[translation(".mock_manufacturer"), "Trek", nil], [translation(".mock_vehicle_type"), translation(".mock_traditional_bike"), translation(".mock_traditional_bike_note")]].each do |label, value, note| %>
+            <div class="tw:flex tw:flex-col tw:gap-1.25">
+              <span class="tw:text-[13px]"><%= label %> <span class="tw:text-[#cc0000]">*</span></span>
+
+              <span
+                class="
+                  tw:flex tw:items-center tw:justify-between
+                  tw:rounded-[5px] tw:border tw:border-[#d5d9de] tw:bg-white
+                  tw:px-3 tw:py-2.25 tw:text-sm
+                "
+              >
+                <span><%= value %> <span class="tw:text-[#9aa3ae]"><%= note %></span></span>
+                <%= helpers.inline_svg_tag("icons/x.svg", class: "tw:size-3.5 tw:text-gray-500", aria_hidden: true) %>
+              </span>
+            </div>
+          <% end %>
+
+          <div class="tw:flex tw:flex-col tw:gap-0.75">
+            <div class="tw:flex tw:items-center tw:gap-2 tw:text-[13px]">
+              <span
+                class="
+                  tw:flex tw:size-3.75 tw:flex-none tw:items-center
+                  tw:justify-center tw:rounded-[3px] tw:bg-blue-600
+                  tw:text-white
+                "
+              >
+                <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:size-2.5 tw:stroke-[4]", aria_hidden: true) %>
+              </span>
+
+              <%= helpers.inline_svg_tag("icons/bolt.svg", class: "tw:size-3.5 tw:text-[#f5b400]", aria_hidden: true) %>
+              <%= translation(".mock_electric") %>
+            </div>
+
+            <div class="tw:text-xs tw:text-gray-500">
+              <%= translation(".mock_electric_help") %>
+            </div>
+          </div>
+
+          <div
+            class="
+              tw:rounded-md tw:bg-blue-600 tw:py-2.25 tw:text-center
+              tw:text-sm tw:text-white
+            "
+          >
+            <%= translation(".mock_next") %>
+          </div>
+        </div>
+
+        <div
+          class="
+            tw:flex tw:flex-none tw:items-center tw:justify-center tw:px-3.5
+            tw:py-2.5 tw:text-2xl tw:font-bold tw:text-purple-500
+          "
+          aria-hidden="true"
+        >
+          →
+        </div>
+
+        <div
+          class="
+            tw:flex tw:min-w-0 tw:flex-[1_1_340px] tw:flex-col tw:gap-2.5
+            tw:rounded-lg tw:border tw:border-gray-200 tw:bg-[#f3f4f6]
+            tw:px-5.5 tw:py-5 tw:text-gray-900
+            tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]
+          "
+          aria-hidden="true"
+        >
+          <div class="tw:grid tw:grid-cols-6 tw:gap-1.25">
+            <% 6.times do |index| %>
+              <span class="tw:h-1 tw:rounded-sm <%= (index < 3) ? "tw:bg-purple-500" : "tw:bg-gray-300" %>"></span>
+            <% end %>
+          </div>
+
+          <div class="tw:text-[11px] tw:font-semibold tw:text-gray-500">
+            <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:inline tw:size-3 tw:stroke-3 tw:text-[#2e8b57]", aria_hidden: true) %>
+            <%= translation(".mock_progress") %>
+          </div>
+
+          <span
+            class="
+              tw:self-start tw:rounded-full tw:bg-[#fff6d6] tw:px-2.25
+              tw:py-0.75 tw:text-[11px] tw:font-bold tw:text-[#b45309]
+            "
+          >
+            <%= translation(".mock_detected") %>
+          </span>
+
+          <div>
+            <div class="tw:text-[19px] tw:font-bold">
+              <%= translation(".mock_title") %>
+            </div>
+
+            <div class="tw:mt-0.5 tw:text-[13px] tw:text-gray-500">
+              <%= translation(".mock_sub") %>
+            </div>
+          </div>
+
+          <div
+            class="
+              tw:text-[11px] tw:font-bold tw:tracking-widest
+              tw:text-[#9aa3ae] tw:uppercase
+            "
+          >
+            <%= translation(".mock_batteries") %>
+          </div>
+
+          <div
+            class="
+              tw:overflow-hidden tw:rounded-[10px] tw:border
+              tw:border-gray-200 tw:bg-white
+            "
+          >
+            <% [translation(".mock_rule_charger"), translation(".mock_rule_certified"), translation(".mock_rule_report")].each do |rule| %>
+              <div
+                class="
+                  tw:flex tw:items-start tw:gap-2.5 tw:px-3 tw:py-2.5
+                  tw:text-[13px] tw:leading-[1.45] tw:text-gray-800
+                  tw:not-first:border-t tw:not-first:border-gray-200
+                "
+              >
+                <span
+                  class="
+                    tw:mt-0.5 tw:size-3.5 tw:flex-none tw:rounded-[3px]
+                    tw:border-[1.5px] tw:border-[#9aa3ae] tw:bg-white
+                  "
+                ></span>
+
+                <span><%= rule %></span>
+              </div>
+            <% end %>
+          </div>
+
+          <div
+            class="
+              tw:rounded-md tw:bg-[#7fb2dd] tw:py-2.25 tw:text-center
+              tw:text-sm tw:text-white
+            "
+          >
+            <%= translation(".mock_continue") %>
+          </div>
+        </div>
+
+        <figcaption
+          class="
+            tw:mt-3.5 tw:flex-[1_1_100%] tw:text-center tw:text-[13px]
+            tw:text-gray-600 tw:dark:text-gray-400
+          "
+        >
+          <%= translation(".mock_caption") %>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <%# Stats %>
+  <section class="tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
+    <dl class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] tw:gap-6 tw:py-9 <%= SECTION_CLASSES %>">
+      <% stats.each do |number, label| %>
+        <div class="tw:flex tw:flex-col-reverse">
+          <dt class="tw:text-[15px] tw:text-gray-600 tw:dark:text-gray-400">
+            <%= label %>
+          </dt>
+
+          <dd class="tw:font-header tw:text-4xl tw:font-black">
+            <%= number %>
+          </dd>
+        </div>
+      <% end %>
+    </dl>
+  </section>
+
+  <%# What your program covers %>
+  <section class="tw:pt-18 <%= SECTION_CLASSES %>">
+    <div class="tw:mb-8 tw:max-w-[720px]">
+      <div class="tw:text-blue-600 tw:dark:text-blue-400 <%= EYEBROW_CLASSES %>">
+        <%= translation(".program_eyebrow") %>
+      </div>
+
+      <h2 class="<%= HEADING_CLASSES %>">
+        <%= translation(".program_heading") %>
+      </h2>
+
+      <p class="<%= INTRO_CLASSES %>"><%= translation(".program_intro") %></p>
+    </div>
+
+    <div
+      class="
+        tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,280px),1fr))]
+        tw:gap-5
+      "
+    >
+      <% program_cards.each do |card| %>
+        <a
+          href="<%= card[:href] %>"
+          class="
+            tw:flex tw:flex-col tw:gap-2.5 tw:rounded-lg tw:bg-white tw:p-6 tw:text-inherit tw:no-underline tw:shadow-sm tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:dark:bg-gray-800
+            <%= card[:new] ? "tw:border-2 tw:border-purple-500 tw:p-5.75" : "tw:border tw:border-gray-200 tw:dark:border-gray-700" %>
+          "
+        >
+          <span class="tw:flex tw:items-center tw:justify-between">
+            <span class="<%= ICON_DISC_CLASSES %> <%= card[:color] %>">
+              <%= helpers.inline_svg_tag(card[:icon], class: "tw:size-5.5", aria_hidden: true) %>
+            </span>
+
+            <% if card[:new] %>
+              <span
+                class="
+                  tw:rounded-full tw:bg-[#ffd660] tw:px-2.5 tw:py-0.5
+                  tw:text-xs tw:font-bold tw:text-slate-900
+                "
+              >
+                <%= translation(".new") %>
+              </span>
+            <% else %>
+              <span
+                class="tw:font-header tw:text-[15px] tw:font-black tw:text-gray-300"
+                aria-hidden="true"
+              >
+                <%= card[:number] %>
+              </span>
+            <% end %>
+          </span>
+
+          <span class="tw:font-header tw:text-xl tw:font-bold"><%= card[:title] %></span>
+
+          <span
+            class="
+              tw:text-[15px] tw:leading-relaxed tw:text-gray-600
+              tw:dark:text-gray-300
+            "
+          >
+            <%= card[:body] %>
+          </span>
+
+          <span
+            class="
+              tw:mt-auto tw:text-sm tw:font-bold tw:text-blue-600
+              tw:dark:text-blue-400
+            "
+          >
+            <%= card[:link] %>
+            <span aria-hidden="true">→</span>
+          </span>
+        </a>
+      <% end %>
+    </div>
+  </section>
+
+  <%# Registration %>
+  <section
+    id="registration"
+    class="tw:scroll-mt-16 tw:py-20 <%= SECTION_CLASSES %>"
+  >
+    <div class="tw:mb-10 tw:max-w-[720px]">
+      <div class="tw:text-blue-600 tw:dark:text-blue-400 <%= EYEBROW_CLASSES %>">
+        <%= translation(".registration_eyebrow") %>
+      </div>
+
+      <h2 class="<%= HEADING_CLASSES %>">
+        <%= translation(".registration_heading") %>
+      </h2>
+
+      <p class="<%= INTRO_CLASSES %>">
+        <%= translation(".registration_intro") %>
+      </p>
+    </div>
+
+    <ol
+      class="
+        tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
+        tw:gap-5
+      "
+    >
+      <% registration_steps.each_with_index do |(title, body), index| %>
+        <li class="<%= CARD_CLASSES %>">
+          <div
+            class="
+              tw:mb-3 tw:font-header tw:text-[15px] tw:font-black
+              tw:text-blue-600 tw:dark:text-blue-400
+            "
+            aria-hidden="true"
+          >
+            0<%= index + 1 %>
+          </div>
+
+          <h3 class="tw:mb-1.5 tw:font-header tw:text-lg tw:font-bold">
+            <%= title %>
+          </h3>
+
+          <p
+            class="
+              tw:text-[15px] tw:leading-relaxed tw:text-gray-600
+              tw:dark:text-gray-300
+            "
+          >
+            <%= body %>
+          </p>
+        </li>
+      <% end %>
+    </ol>
+
+    <p
+      class="
+        tw:mt-5 tw:border-t tw:border-gray-200 tw:pt-5 tw:text-[15px]
+        tw:leading-relaxed tw:text-gray-600 tw:dark:border-gray-700
+        tw:dark:text-gray-300
+      "
+    >
+      <strong class="tw:text-slate-900 tw:dark:text-white"><%= translation(".registration_import_lead") %></strong>
+      <%= translation(".registration_import_body") %>
+    </p>
+  </section>
+
+  <%# Stolen bike recovery %>
+  <section
+    id="recovery"
+    class="
+      tw:scroll-mt-16 tw:border-t tw:border-gray-200 tw:bg-gray-50
+      tw:dark:border-gray-700 tw:dark:bg-gray-900
+    "
+  >
+    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] tw:items-start tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
+      <div>
+        <div class="tw:text-[#cc0000] tw:dark:text-red-400 <%= EYEBROW_CLASSES %>">
+          <%= translation(".recovery_eyebrow") %>
+        </div>
+
+        <h2 class="<%= HEADING_CLASSES %>">
+          <%= translation(".recovery_heading") %>
+        </h2>
+
+        <p class="tw:mb-7 <%= INTRO_CLASSES %>">
+          <%= translation(".recovery_intro") %>
+        </p>
+
+        <ol class="tw:flex tw:flex-col tw:gap-5">
+          <% recovery_steps.each_with_index do |(color, title, body), index| %>
+            <li class="tw:flex tw:gap-4">
+              <span
+                class="tw:flex tw:size-8 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-sm tw:font-bold tw:text-white <%= color %>"
+                aria-hidden="true"
+              >
+                <%= index + 1 %>
+              </span>
+
+              <div>
+                <div class="tw:font-bold"><%= title %></div>
+
+                <div class="tw:text-[15px] tw:text-gray-600 tw:dark:text-gray-300">
+                  <%= body %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ol>
+      </div>
+
+      <div
+        class="
+          tw:flex tw:w-full tw:max-w-[480px] tw:flex-col tw:gap-5
+          tw:justify-self-center
+        "
+      >
+        <div
+          class="
+            tw:rounded-lg tw:bg-[#cc0000] tw:px-5.5 tw:py-5 tw:text-white
+            tw:shadow-sm
+          "
+        >
+          <div
+            class="
+              tw:font-header tw:text-2xl tw:font-black tw:tracking-wide
+              tw:uppercase
+            "
+          >
+            <%= translation(".stolen_banner_title") %>
+          </div>
+
+          <p class="tw:mt-1 tw:text-[15px] tw:text-white/90">
+            <%= translation(".stolen_banner_body") %>
+          </p>
+        </div>
+
+        <div class="tw:flex tw:items-start tw:gap-3.5 tw:px-5.5 tw:py-5 <%= CARD_CLASSES %>">
+          <span class="tw:size-10! tw:bg-slate-900 <%= ICON_DISC_CLASSES %>">
+            <%= helpers.inline_svg_tag("icons/list.svg", class: "tw:size-5", aria_hidden: true) %>
+          </span>
+
+          <div>
+            <h3 class="tw:mb-1 tw:font-header tw:text-[17px] tw:font-bold">
+              <%= translation(".hot_sheet_title") %>
+            </h3>
+
+            <p class="tw:text-[15px] tw:text-gray-600 tw:dark:text-gray-300">
+              <%= translation(".hot_sheet_body") %>
+            </p>
+          </div>
+        </div>
+
+        <div class="<%= STICKER_CLASSES %>">
+          <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", class: "tw:h-18 tw:w-auto tw:flex-none" %>
+
+          <p class="tw:text-[15px]">
+            <strong><%= translation(".community_watch_lead") %></strong>
+            <%= translation(".community_watch_body") %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# Organization hierarchy %>
+  <section class="tw:py-20 <%= SECTION_CLASSES %>">
+    <div class="tw:mb-12 tw:max-w-[720px]">
+      <div class="tw:text-blue-600 tw:dark:text-blue-400 <%= EYEBROW_CLASSES %>">
+        <%= translation(".hierarchy_eyebrow") %>
+      </div>
+
+      <h2 class="<%= HEADING_CLASSES %>">
+        <%= translation(".hierarchy_heading") %>
+      </h2>
+
+      <p class="<%= INTRO_CLASSES %>"><%= translation(".hierarchy_intro") %></p>
+    </div>
+
+    <div class="tw:mb-14 tw:flex tw:flex-col tw:items-center">
+      <div
+        class="
+          tw:min-w-[260px] tw:rounded-lg tw:bg-slate-900 tw:px-7 tw:py-4.5
+          tw:text-center tw:text-white
+        "
+      >
+        <div
+          class="
+            tw:text-xs tw:font-bold tw:tracking-[.08em] tw:text-[#ffd660]
+            tw:uppercase
+          "
+        >
+          <%= translation(".parent_organization") %>
+        </div>
+
+        <div class="tw:mt-1 tw:font-header tw:text-xl tw:font-extrabold">
+          <%= translation(".parent_name") %>
+        </div>
+
+        <div class="tw:mt-1 tw:text-sm tw:text-white/80">
+          <%= translation(".parent_note") %>
+        </div>
+      </div>
+
+      <div class="tw:h-7 tw:w-0.5 tw:bg-gray-300 tw:dark:bg-gray-600"></div>
+
+      <div class="tw:relative tw:w-full tw:max-w-[900px]">
+        <div
+          class="
+            tw:absolute tw:inset-x-[16.66%] tw:top-0 tw:hidden tw:h-0.5
+            tw:bg-gray-300 tw:sm:block tw:dark:bg-gray-600
+          "
+        ></div>
+
+        <div class="tw:grid tw:gap-x-4 tw:sm:grid-cols-3">
+          <% child_organizations.each do |name, note| %>
+            <div class="tw:flex tw:flex-col tw:items-center">
+              <div class="tw:h-6 tw:w-0.5 tw:bg-gray-300 tw:dark:bg-gray-600"></div>
+
+              <div class="tw:w-full tw:p-4! tw:text-center <%= CARD_CLASSES %>">
+                <div class="tw:font-header tw:text-base tw:font-bold">
+                  <%= name %>
+                </div>
+
+                <div
+                  class="
+                    tw:mt-1 tw:text-[13px] tw:text-gray-600
+                    tw:dark:text-gray-400
+                  "
+                >
+                  <%= note %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(260px,1fr))] tw:gap-8">
+      <% hierarchy_points.each do |point| %>
+        <div>
+          <span class="tw:mb-3.5 <%= ICON_DISC_CLASSES %> <%= point[:color] %>">
+            <%= helpers.inline_svg_tag(point[:icon], class: "tw:size-5.5", aria_hidden: true) %>
+          </span>
+
+          <h3 class="tw:mb-1.5 tw:font-header tw:text-[19px] tw:font-bold">
+            <%= point[:title] %>
+          </h3>
+
+          <p class="tw:leading-relaxed tw:text-gray-600 tw:dark:text-gray-300">
+            <%= point[:body] %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <%# E-bike education %>
+  <section
+    id="education"
+    class="
+      tw:scroll-mt-16 tw:border-y tw:border-gray-200 tw:bg-gray-50
+      tw:dark:border-gray-700 tw:dark:bg-gray-900
+    "
+  >
+    <div class="tw:py-20 <%= SECTION_CLASSES %>">
+      <div class="tw:mb-8 tw:max-w-[720px]">
+        <div class="tw:text-blue-600 tw:dark:text-blue-400 <%= EYEBROW_CLASSES %>">
+          <%= translation(".education_eyebrow") %>
+        </div>
+
+        <h2 class="<%= HEADING_CLASSES %>">
+          <%= translation(".education_heading") %>
+        </h2>
+
+        <p class="<%= INTRO_CLASSES %>">
+          <%= translation(".education_intro") %>
+        </p>
+      </div>
+
+      <%= render(Pages::LandingPages::ForCitiesEducation::Component.new) %>
+    </div>
+  </section>
+
+  <%# Compliance checker %>
+  <section id="checker" class="tw:scroll-mt-16 tw:py-20 <%= SECTION_CLASSES %>">
+    <div
+      class="
+        tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))]
+        tw:items-center tw:gap-12
+      "
+    >
+      <div>
+        <div class="tw:mb-2.5 tw:flex tw:items-center tw:gap-2.5">
+          <span class="tw:mb-0! tw:text-blue-600 tw:dark:text-blue-400 <%= EYEBROW_CLASSES %>"><%= translation(".checker_eyebrow") %></span>
+
+          <span
+            class="
+              tw:rounded-full tw:bg-[#ffd660] tw:px-2.5 tw:py-0.5 tw:text-xs
+              tw:font-bold tw:text-slate-900
+            "
+          >
+            <%= translation(".new") %>
+          </span>
+        </div>
+
+        <h2 class="<%= HEADING_CLASSES %>">
+          <%= translation(".checker_heading") %>
+        </h2>
+
+        <p class="tw:mb-5 <%= INTRO_CLASSES %>">
+          <%= translation(".checker_intro") %>
+        </p>
+
+        <ul class="tw:mb-7 tw:flex tw:flex-col tw:gap-3 tw:text-[15px]">
+          <% checker_points.each do |point| %>
+            <li class="tw:flex tw:items-start tw:gap-2.5">
+              <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:mt-0.5 tw:size-4.5 tw:flex-none tw:text-blue-600 tw:dark:text-blue-400", aria_hidden: true) %>
+              <%= point %>
+            </li>
+          <% end %>
+        </ul>
+
+        <%= render(UI::ButtonLink::Component.new(href: ebike_rules_path, text: translation(".open_the_checker"), color: :secondary, size: :callout)) %>
+      </div>
+
+      <%# The checker's own form for a bike entered by hand, so a check lands on its result %>
+      <%= form_with url: ebike_rules_path, method: :get, local: true,
+        class: "tw:flex tw:w-full tw:max-w-[520px] tw:flex-col tw:gap-4.5 tw:justify-self-center tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-7 tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:dark:border-gray-700 tw:dark:bg-gray-800" do |f| %>
+        <%= f.hidden_field :manual, value: 1, id: nil %>
+
+        <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
+          <%= translation(".checker_form_heading") %>
+        </h3>
+
+        <div class="twfieldrow">
+          <div>
+            <%= f.label :state, translation(".checker_state"), class: "twlabel" %>
+            <%= f.select :state, EbikeRuleServices::StateLaws::STATES.map { [it[:name], it[:abbr]] }, {selected: "CA"}, class: "twinput" %>
+          </div>
+
+          <div>
+            <%= f.label :top_speed, translation(".checker_top_speed"), class: "twlabel" %>
+            <%= f.select :top_speed, top_speed_options, {}, class: "twinput" %>
+          </div>
+
+          <div>
+            <%= f.label :throttle, translation(".checker_throttle"), class: "twlabel" %>
+            <%= f.select :throttle, throttle_options, {}, class: "twinput" %>
+          </div>
+        </div>
+
+        <%= render(UI::Button::Component.new(text: translation(".checker_submit"), color: :primary, size: :lg,
+          type: "submit", html_class: "tw:w-full tw:justify-center")) %>
+
+        <p class="tw:text-center tw:text-xs tw:text-gray-600 tw:dark:text-gray-400">
+          <%= translation(".checker_form_note") %>
+        </p>
+      <% end %>
+    </div>
+  </section>
+
+  <%# In the field %>
+  <section
+    class="
+      tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
+      tw:dark:bg-gray-900
+    "
+  >
+    <div class="tw:py-20 <%= SECTION_CLASSES %>">
+      <div class="tw:mb-10 tw:max-w-[720px]">
+        <div class="tw:text-blue-600 tw:dark:text-blue-400 <%= EYEBROW_CLASSES %>">
+          <%= translation(".field_eyebrow") %>
+        </div>
+
+        <h2 class="<%= HEADING_CLASSES %>">
+          <%= translation(".field_heading") %>
+        </h2>
+
+        <p class="<%= INTRO_CLASSES %>"><%= translation(".field_intro") %></p>
+      </div>
+
+      <div
+        class="
+          tw:grid
+          tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
+          tw:gap-5
+        "
+      >
+        <% field_tools.each do |tool| %>
+          <div class="<%= CARD_CLASSES %>">
+            <span class="tw:mb-3.5 <%= ICON_DISC_CLASSES %> <%= tool[:color] %>">
+              <%= helpers.inline_svg_tag(tool[:icon], class: "tw:size-5.5", aria_hidden: true) %>
+            </span>
+
+            <h3 class="tw:mb-1.5 tw:font-header tw:text-lg tw:font-bold">
+              <%= tool[:title] %>
+            </h3>
+
+            <p
+              class="
+                tw:text-[15px] tw:leading-relaxed tw:text-gray-600
+                tw:dark:text-gray-300
+              "
+            >
+              <%= tool[:body] %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <%# Partnership %>
+  <section class="tw:bg-linear-160 tw:from-slate-900 tw:to-[#233140] tw:text-white">
+    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] tw:items-center tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
+      <div>
+        <div class="tw:text-[#ffd660] <%= EYEBROW_CLASSES %>">
+          <%= translation(".partnership_eyebrow") %>
+        </div>
+
+        <h2 class="tw:mb-4! <%= HEADING_CLASSES %>">
+          <%= translation(".partnership_heading") %>
+        </h2>
+
+        <p
+          class="
+            tw:mb-6 tw:text-[17px] tw:leading-relaxed tw:text-pretty
+            tw:text-white/85
+          "
+        >
+          <%= translation(".partnership_intro") %>
+        </p>
+
+        <%= image_tag "kelsey/illustrations/comic-assets_logo-cape.png", alt: translation(".cape_logo_alt"), class: "tw:h-30 tw:w-auto" %>
+      </div>
+
+      <div
+        class="
+          tw:flex tw:flex-col tw:gap-px tw:overflow-hidden tw:rounded-lg
+          tw:bg-white/12
+        "
+      >
+        <% partnership_points.each do |title, body| %>
+          <div class="tw:bg-slate-900 tw:px-6 tw:py-5">
+            <div class="tw:font-header tw:text-lg tw:font-extrabold">
+              <%= title %>
+            </div>
+
+            <div class="tw:mt-1 tw:text-[15px] tw:text-white/80">
+              <%= body %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <%# FAQ %>
+  <section
+    id="faq"
+    class="tw:mx-auto tw:max-w-[840px] tw:scroll-mt-16 tw:px-6 tw:py-20"
+  >
+    <h2 class="tw:mb-7! <%= HEADING_CLASSES %>">
+      <%= translation(".faq_heading") %>
+    </h2>
+
+    <div class="tw:border-t tw:border-gray-200 tw:dark:border-gray-700">
+      <% faqs.each_with_index do |(question, answer), index| %>
+        <details
+          class="tw:group tw:border-b tw:border-gray-200 tw:dark:border-gray-700"
+          name="cities-faq"
+          <% if index.zero? %>
+            open
+          <% end %>
+        >
+          <summary
+            class="
+              tw:flex tw:cursor-pointer tw:list-none tw:items-center
+              tw:justify-between tw:gap-4 tw:py-5 tw:font-header tw:text-lg
+              tw:font-bold tw:[&::-webkit-details-marker]:hidden
+            "
+          >
+            <%= question %>
+
+            <span
+              class="
+                tw:flex-none tw:text-2xl tw:font-normal tw:text-blue-600
+                tw:transition-transform tw:group-open:rotate-45
+                tw:dark:text-blue-400
+              "
+              aria-hidden="true"
+            >
+              +
+            </span>
+          </summary>
+
+          <p
+            class="
+              tw:mb-5 tw:max-w-[720px] tw:leading-[1.65] tw:text-pretty
+              tw:text-gray-600 tw:dark:text-gray-300
+            "
+          >
+            <%= answer %>
+          </p>
+        </details>
+      <% end %>
+    </div>
+  </section>
+
+  <%# Contact %>
+  <section
+    id="contact"
+    class="
+      tw:scroll-mt-16 tw:border-t tw:border-gray-200 tw:bg-gray-50
+      tw:dark:border-gray-700 tw:dark:bg-gray-900
+    "
+  >
+    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-start tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
+      <div>
+        <h2 class="<%= HEADING_CLASSES %>">
+          <%= translation(".contact_heading") %>
+        </h2>
+
+        <p class="tw:mb-6 <%= INTRO_CLASSES %>">
+          <%= translation(".contact_intro") %>
+        </p>
+
+        <ul class="tw:flex tw:flex-col tw:gap-3 tw:text-[15px]">
+          <% next_steps.each do |step| %>
+            <li class="tw:flex tw:items-center tw:gap-2.5">
+              <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:size-4.5 tw:flex-none tw:text-blue-600 tw:dark:text-blue-400", aria_hidden: true) %>
+              <%= step %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+
+      <%= form_for @feedback, html: {class: "tw:group #{CARD_CLASSES} tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]!",
+        data: {controller: "form-persist", action: "input->form-persist#save submit->form-persist#clear"}} do |f| %>
+        <div class="tw:mb-4">
+          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "feedback[lead_request]", kind: :toggle,
+            entries: lead_request_entries, selected: @feedback.lead_request || "demo",
+            html_options: {data: {"landing-pages--lead-request-target": "radio"}})) %>
+        </div>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: translation(".field_organization"),
+          html_options: {required: true})) %>
+
+        <div class="twfieldrow">
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: translation(".field_name"))) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_role, label_text: translation(".field_role"))) do %>
+            <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :contact_role, option_tags: role_options,
+              options: {include_blank: true})) %>
+          <% end %>
+        </div>
+
+        <div class="twfieldrow">
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+            <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true, html_options: {value: @feedback.email || @current_user&.email})) %>
+          <% end %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number, kind: :telephone_field)) %>
+        </div>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
+          label_text: translation(".field_message"), html_options: {rows: 3, value: (@feedback.body unless @feedback.body == "lead")})) %>
+
+        <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
+        <%= f.hidden_field :feedback_type, value: FEEDBACK_TYPE %>
+
+        <%= render(UI::Button::Component.new(color: :primary, size: :lg, type: "submit", html_class: "tw:w-full tw:justify-center")) do %>
+          <span class="tw:group-has-[[value=trial]:checked]:hidden"><%= translation(".submit_demo") %></span>
+          <span class="tw:hidden tw:group-has-[[value=trial]:checked]:inline"><%= translation(".submit_trial") %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </section>
+</div>

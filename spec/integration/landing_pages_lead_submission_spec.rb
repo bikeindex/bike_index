@@ -58,6 +58,50 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
     end
   end
 
+  context "for_cities" do
+    let(:target_attributes) do
+      {kind: "lead_for_city", name: "Portland", email: "staff@portland.gov", contact_name: "Jane Doe",
+       contact_role: "City staff", lead_request: "trial", body: "Starting with e-bikes", title: "New City lead: Portland"}
+    end
+
+    it "walks through the education flow, then submits a trial lead from the hero" do
+      visit "/for_cities"
+      expect(page).to have_content("Register every bike in your city")
+
+      within("#tab-school") do
+        expect(page).to have_button("Continue", disabled: true)
+        check "I will charge only with a manufacturer-approved charger."
+        check "I will never leave my battery charging unattended."
+        expect(page).to have_button("Continue", disabled: true)
+        check "I will keep my battery away from flammable materials."
+        click_button "Continue"
+        expect(page).to have_content("Commitments for riding to and from school.")
+        click_button "Back"
+        expect(page).to have_content("We have a few safety rules to go over")
+      end
+
+      click_link "Start a free trial", match: :first
+      expect(page).to have_button("Start my free trial")
+      fill_in "City or organization", with: "Portland"
+      fill_in "Your name", with: "Jane Doe"
+      select "City staff", from: "Your role"
+      fill_in "Email", with: "staff@portland.gov"
+      fill_in "Anything else we should know?", with: "Starting with e-bikes"
+
+      expect {
+        click_button "Start my free trial"
+        expect(page).to have_content("Thank", wait: 5)
+      }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
+
+      expect(Feedback.last).to have_attributes(target_attributes)
+
+      EmailJobs::FeedbackNotificationJob.drain
+      body = ActionMailer::Base.deliveries.last.body.encoded
+      expect(body).to include("Role: City staff")
+      expect(body).to include("Requested: Free trial")
+    end
+  end
+
   context "for_law_enforcement" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let(:target_attributes) do

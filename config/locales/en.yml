@@ -3661,42 +3661,6 @@ en:
       use_ascend: Use Ascend?
       use_lightspeed_retail: Use Lightspeed Retail?
       used_at_bike_shops_everywhere: Used at bike shops everywhere
-    for_cities:
-      actually_get_people_registered_and_do_it_: Actually get people registered. And
-        do it for cheap.
-      bike_index_for_cities: Bike Index for Cities
-      bike_index_is_the_community_registration_: >-
-        Bike Index is the community registration system of choice. We are the bike
-        registration system of %{organization_counts} organizations - communities
-        in every corner of the world. Join the most widely used bike registration
-        network in the world.
-      bike_index_new_dashboard: New Bike Index dashboard useful for fighting bike
-        crime
-      bike_index_organization_impounding: Impounding bikes with Bike Index
-      bike_index_unveils_partnership_with_the_c: Bike Index unveils partnership with
-        the City of Palo Alto
-      bring_together_bike_shops_schools_municip: >-
-        Bring together bike shops, schools, municipal departments, and law enforcement
-        to register bikes in one system. Gone are the days of waiting for people to
-        not come in to register their bikes, or wondering if that other department
-        took care of it. Bike Index consolidates everything in one manageable place.
-      check_out: Check out our
-      cities_deck: cities partner deck
-      embed_a_bike_index_registration_form: Embed a bike registration form on your
-        website
-      engage_your_residents_and_recover_their_b: Engage your residents and recover
-        their bikes, and they will love you forever.
-      mitigate_the_registration_mess: Mitigate the registration mess
-      no_more_index_cards_or_excel_sheets_give_: >-
-        No more index cards or excel sheets. Give your citizens the tools to register
-        from a smartphone, in less than two minutes, and use these registrations to
-        recover and return stolen bikes.
-      our_community_is_your_community: Our community is your community
-      plug_your_city_in_nationally: Plug your city in nationally.
-      related_articles: 'Related articles:'
-      schedule_a_demo: Schedule a demo
-      trusted_by_municipalities_everywhere: Trusted by municipalities everywhere
-      used_by_municipalities_everywhere: Used by municipalities everywhere
     for_community_groups:
       bike_index_for_community_groups: Bike Index for Community Groups
       bike_index_launches_new_ambassadors_progr: Bike Index launches new Ambassadors

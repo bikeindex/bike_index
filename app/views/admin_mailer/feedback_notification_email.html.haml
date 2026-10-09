@@ -83,9 +83,15 @@
   - if @feedback.contact_name.present?
     %p
       Contact name: #{@feedback.contact_name}
+  - if @feedback.contact_role.present?
+    %p
+      Role: #{@feedback.contact_role}
   - if @feedback.phone_number.present?
     %p
       Phone: #{@feedback.phone_number}
+  - if @feedback.lead_request.present?
+    %p
+      Requested: #{@feedback.lead_request == "trial" ? "Free trial" : "Demo"}
   %p
     = feedback_body
 

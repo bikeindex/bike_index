@@ -1,0 +1,278 @@
+<div data-controller="landing-pages--tabs">
+  <div
+    class="
+      tw:mb-8 tw:flex tw:gap-1 tw:overflow-x-auto tw:border-b
+      tw:border-gray-200 tw:dark:border-gray-700
+    "
+    role="tablist"
+    aria-label="<%= translation(".tabs_label") %>"
+  >
+    <% organizations.each do |organization| %>
+      <% active = organization[:key] == DEFAULT_ORGANIZATION %>
+
+      <button
+        type="button"
+        class="
+          tw:-mb-px tw:border-b-3 tw:border-transparent tw:px-4 tw:py-3
+          tw:text-[15px] tw:font-bold tw:whitespace-nowrap tw:text-gray-600
+          tw:hover:text-slate-900 tw:aria-selected:border-blue-600
+          tw:aria-selected:text-slate-900 tw:dark:text-gray-400
+          tw:dark:hover:text-white tw:dark:aria-selected:text-white
+        "
+        id="tab-button-<%= organization[:key] %>"
+        role="tab"
+        aria-selected="<%= active %>"
+        aria-controls="tab-<%= organization[:key] %>"
+        <% unless active %>
+          tabindex="-1"
+        <% end %>
+        data-tab="<%= organization[:key] %>"
+        data-landing-pages--tabs-target="button"
+        data-action="click->landing-pages--tabs#select keydown->landing-pages--tabs#keydown"
+      >
+        <%= organization[:tab] %>
+      </button>
+    <% end %>
+  </div>
+
+  <% organizations.each do |organization| %>
+    <div
+      id="tab-<%= organization[:key] %>"
+      class="
+        tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-start tw:gap-10 tw:not-[.active]:hidden
+        <%= "active" if organization[:key] == DEFAULT_ORGANIZATION %>
+      "
+      role="tabpanel"
+      aria-labelledby="tab-button-<%= organization[:key] %>"
+      data-landing-pages--tabs-target="panel"
+      data-controller="landing-pages--education"
+    >
+      <div class="tw:flex tw:flex-col tw:gap-5">
+        <div>
+          <div
+            class="
+              tw:mb-1.5 tw:text-[13px] tw:font-bold tw:tracking-[.06em]
+              tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
+            "
+          >
+            <%= translation(".viewing_as") %>
+          </div>
+
+          <div class="tw:font-header tw:text-[26px] tw:font-extrabold">
+            <%= organization[:name] %>
+          </div>
+
+          <p
+            class="
+              tw:mt-2 tw:text-base tw:text-pretty tw:text-gray-600
+              tw:dark:text-gray-300
+            "
+          >
+            <%= organization[:blurb] %>
+          </p>
+        </div>
+
+        <ol
+          class="
+            tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200
+            tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800
+          "
+        >
+          <% organization[:steps].each_with_index do |step, index| %>
+            <li
+              class="
+                tw:not-first:border-t tw:not-first:border-gray-200
+                tw:dark:not-first:border-gray-700
+              "
+            >
+              <button
+                type="button"
+                class="
+                  tw:group tw:flex tw:w-full tw:cursor-pointer
+                  tw:items-center tw:gap-3.5 tw:px-4 tw:py-3.5 tw:text-left
+                  tw:aria-[current=step]:bg-blue-50
+                  tw:dark:aria-[current=step]:bg-blue-950
+                "
+                <% if index.zero? %>
+                  aria-current="step"
+                <% end %>
+                data-landing-pages--education-target="summary"
+                data-action="landing-pages--education#go"
+                data-landing-pages--education-index-param="<%= index %>"
+              >
+                <span
+                  class="
+                    tw:flex tw:size-7 tw:flex-none tw:items-center
+                    tw:justify-center tw:rounded-full tw:bg-gray-100
+                    tw:text-sm tw:font-bold tw:text-gray-600
+                    tw:group-aria-[current=step]:bg-blue-600
+                    tw:group-aria-[current=step]:text-white
+                    tw:group-data-passed:bg-blue-600
+                    tw:group-data-passed:text-white tw:dark:bg-gray-700
+                    tw:dark:text-gray-300
+                  "
+                >
+                  <span class="tw:group-data-passed:hidden"><%= index + 1 %></span>
+                  <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:hidden tw:size-3.5 tw:stroke-[3.5] tw:group-data-passed:block", aria_hidden: true) %>
+                </span>
+
+                <span class="tw:min-w-0 tw:flex-1">
+                  <span class="tw:block tw:text-[15px] tw:font-bold"><%= step[:category] %></span>
+
+                  <span
+                    class="
+                      tw:block tw:text-[13px] tw:text-gray-600
+                      tw:dark:text-gray-400
+                    "
+                  >
+                    <%= translation(".step_meta", count: step[:rules].size, set_by: step[:set_by]) %>
+                  </span>
+                </span>
+              </button>
+            </li>
+          <% end %>
+        </ol>
+
+        <div class="<%= Pages::LandingPages::ForCities::Component::STICKER_CLASSES %>">
+          <%= image_tag "kelsey/illustrations/comic-assets_bike-bell.png", alt: "", class: "tw:h-16 tw:w-auto tw:flex-none" %>
+
+          <p class="tw:text-[15px] tw:leading-normal">
+            <%= translation(".staff_edit") %>
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="
+          tw:w-full tw:max-w-[520px] tw:justify-self-center tw:rounded-lg
+          tw:border tw:border-gray-200 tw:bg-white tw:px-7 tw:pt-7 tw:pb-6
+          tw:shadow-[0_4px_12px_rgba(44,62,80,.12)] tw:dark:border-gray-700
+          tw:dark:bg-gray-800
+        "
+      >
+        <% total = organization[:steps].size %>
+
+        <% organization[:steps].each_with_index do |step, index| %>
+          <div
+            role="group"
+            aria-labelledby="education-<%= organization[:key] %>-<%= index %>-title"
+            class="<%= "tw:hidden" unless index.zero? %>"
+            data-landing-pages--education-target="step"
+          >
+            <%= progress(filled: index + 1, total:, label: translation(".step_n_of_total_html", n: number_display(index + 1), total: number_display(total))) %>
+
+            <div class="tw:mb-3 tw:flex tw:flex-wrap tw:gap-2">
+              <% if step[:detected] %>
+                <%= render(UI::Badge::Component.new(text: translation(".electric_detected"), color: :warning)) %>
+              <% end %>
+
+              <% if step[:organization_badge] %>
+                <%= render(UI::Badge::Component.new(text: organization[:name], color: :notice)) %>
+              <% end %>
+            </div>
+
+            <h3
+              id="education-<%= organization[:key] %>-<%= index %>-title"
+              class="
+                tw:mb-1.5 tw:font-header tw:text-2xl tw:leading-tight
+                tw:font-extrabold
+              "
+            >
+              <%= step[:title] %>
+            </h3>
+
+            <p
+              class="
+                tw:mb-5.5 tw:text-[15px] tw:text-gray-600
+                tw:dark:text-gray-300
+              "
+            >
+              <%= step[:sub] %>
+            </p>
+
+            <div
+              class="
+                tw:mb-2.5 tw:flex tw:items-baseline tw:justify-between
+                tw:gap-3
+              "
+            >
+              <span
+                class="
+                  tw:text-xs tw:font-bold tw:tracking-[.08em]
+                  tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
+                "
+              >
+                <%= step[:category] %>
+              </span>
+
+              <span
+                class="
+                  tw:text-right tw:text-xs tw:font-semibold
+                  tw:text-purple-500 tw:dark:text-purple-300
+                "
+              >
+                <%= translation(".set_by", set_by: step[:set_by]) %>
+              </span>
+            </div>
+
+            <div
+              class="
+                tw:overflow-hidden tw:rounded-lg tw:border
+                tw:border-gray-200 tw:dark:border-gray-700
+              "
+            >
+              <% step[:rules].each_with_index do |rule, rule_index| %>
+                <%= render(UI::Forms::Checkbox::Component.new(label: rule,
+                  name: "education_#{organization[:key]}_#{index}_#{rule_index}",
+                  class_name: "tw:mb-0 tw:gap-3.5! tw:px-4 tw:py-3.5 tw:text-[15px] tw:font-normal tw:transition-colors tw:not-first:border-t tw:not-first:border-gray-200 tw:has-checked:bg-blue-50 tw:dark:not-first:border-gray-700 tw:dark:has-checked:bg-blue-950",
+                  html_options: {data: {action: "landing-pages--education#check"}})) %>
+              <% end %>
+            </div>
+
+            <%= render(UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
+              html_class: "tw:mt-5 tw:w-full tw:justify-center", disabled: true,
+              data: {"landing-pages--education-target": "continue", action: "landing-pages--education#next"})) %>
+
+            <% unless index.zero? %>
+              <div class="tw:mt-3 tw:text-center">
+                <%= render(UI::Button::Component.new(color: :link, html_class: "tw:text-sm tw:text-gray-600",
+                  data: {action: "landing-pages--education#back"})) do %>
+                  <span aria-hidden="true">←</span> <%= translation(".back") %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <div class="tw:hidden" data-landing-pages--education-target="done">
+          <%= progress(filled: total, total:, label: translation(".complete")) %>
+
+          <div
+            class="
+              tw:flex tw:flex-col tw:items-center tw:gap-2.5 tw:px-2 tw:pt-6
+              tw:pb-2 tw:text-center
+            "
+          >
+            <%= render(UI::Badge::Component.new(text: translation(".registered"), color: :notice, size: :lg)) %>
+
+            <h3 class="tw:mt-1 tw:font-header tw:text-2xl tw:font-extrabold">
+              <%= translation(".all_set") %>
+            </h3>
+
+            <p
+              class="
+                tw:max-w-[360px] tw:text-[15px] tw:text-gray-600
+                tw:dark:text-gray-300
+              "
+            >
+              <%= translation(".done_message", count: rule_count(organization), name: organization[:name]) %>
+            </p>
+
+            <%= render(UI::Button::Component.new(text: translation(".start_over"), color: :link,
+              html_class: "tw:mt-1.5 tw:text-sm tw:font-semibold", data: {action: "landing-pages--education#restart"})) %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

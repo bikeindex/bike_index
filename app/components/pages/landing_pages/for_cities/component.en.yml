@@ -1,0 +1,288 @@
+---
+en:
+  components:
+    pages:
+      landing_pages:
+        for_cities:
+          answer_no: 'No'
+          answer_yes: 'Yes'
+          cape_logo_alt: Bike Index shield with a cape
+          checker_eyebrow: E-bike compliance checker
+          checker_form_heading: Check an e-bike
+          checker_form_note: Opens the full checker, with your state's rules and the
+            statutes behind them
+          checker_heading: Know your e-bike rules.
+          checker_intro: >-
+            A free public tool from Bike Index. Riders pick their state and bike and
+            see, in under 30 seconds, whether it's legal to ride, what certification
+            it carries, and what rules apply. The answer leads straight to registration.
+          checker_point_bikebook: >-
+            Class, motor, top speed, and UL certification from Bike Book's catalog
+            of e-bike models
+          checker_point_program: >-
+            Inside your program, staff see the class and compliance status of every
+            registered e-bike
+          checker_point_states: >-
+            State rules on classes, motor caps, top speed, and throttles, with statute
+            citations
+          checker_speed_20: 20 mph
+          checker_speed_28: 28 mph
+          checker_speed_over_28: Over 28 mph
+          checker_state: State
+          checker_submit: Check the rules
+          checker_throttle: Throttle
+          checker_top_speed: Top assisted speed
+          child_housing_name: Westbrook Housing Authority
+          child_housing_note: Charging and storage rules
+          child_neighborhood_name: Riverside Neighborhood Program
+          child_neighborhood_note: "+3 local rules"
+          child_school_name: Westbrook Middle School
+          child_school_note: Stricter riding rules + campus policies
+          community_watch_body: >-
+            Volunteers watch Craigslist, Facebook Marketplace, and OfferUp for stolen
+            bikes. Spotters can reach owners without either side's contact details
+            being shared.
+          community_watch_lead: A community watch, too.
+          contact_heading: Talk to us about your city.
+          contact_intro: >-
+            Tell us whether you're starting with e-bike management, stolen bike recovery,
+            or registration. We'll set up a branded organization for your city, or
+            get you started with a free trial.
+          contact_next_call: A short discovery call about your priorities
+          contact_next_setup: Your branded organization and education flow, set up
+            with your rules
+          contact_next_training: Staff training and documentation
+          education_eyebrow: E-bike education
+          education_heading: Riders learn the rules that apply to them.
+          education_intro: >-
+            When someone registers an e-bike, Bike Index walks them through a short
+            education flow before the registration is confirmed: batteries and charging,
+            riding practices, your own rules, and a signed consent. The goal is real
+            understanding, not a checkbox. Pick an organization to see how the flow
+            changes.
+          faq_account_answer: >-
+            The city is the parent organization. Schools, housing authorities, and
+            other programs can be child accounts with their own staff and education
+            content. Staff at each level manage only their own rules.
+          faq_account_question: Who manages the account?
+          faq_checker_answer: >-
+            Bike details come from Bike Book, a catalog of e-bike models with their
+            class, motor, speed, and UL certification. State rules are listed with
+            the statutes behind them.
+          faq_checker_question: Where does the compliance checker get its data?
+          faq_cost_answer: >-
+            There are no per-registration fees, and registering is free for residents.
+            Cities can start with a free trial before committing.
+          faq_cost_question: What does it cost?
+          faq_heading: Questions cities ask
+          faq_import_answer: No. Existing registrations can be imported from a spreadsheet.
+          faq_import_question: We already have registration data. Do we start over?
+          faq_police_answer: >-
+            Officers and city staff can share permissioned access to the same admin
+            panel, search any bike by serial, and use the Stolen Bike Hot Sheet for
+            their area.
+          faq_police_question: How do police use it?
+          faq_regular_answer: >-
+            Yes. Any bike can be registered. The e-bike education steps appear only
+            when a rider registers an e-bike.
+          faq_regular_question: Does it work for regular bikes too?
+          faq_rules_answer: >-
+            Yes, as a city partner. Start from the Bike Index standard flow or a blank
+            slate. City staff edit the language in the admin panel, with no technical
+            help needed.
+          faq_rules_question: Can we write our own e-bike rules?
+          field_attestations_body: >-
+            Each attestation is saved with the rule set in effect when the rider registered,
+            so you have a lasting, auditable record.
+          field_attestations_title: Stored attestations
+          field_battery_body: >-
+            Find which bikes in your city carry UL 2849 or UL 2271 certified batteries,
+            and use the data to shape policy and outreach.
+          field_battery_title: Battery certification audits
+          field_eyebrow: E-bike management in the field
+          field_heading: Connect any bike on the street to its record.
+          field_intro: >-
+            Education only matters if staff can check it. Parking enforcement, community
+            safety teams, and administrators can look up any bike and see what the
+            rider agreed to.
+          field_message: Anything else we should know?
+          field_name: Your name
+          field_organization: City or organization
+          field_qr_body: >-
+            Scan a bike's sticker with any phone to see its registration, including
+            whether and when the rider completed the education flow.
+          field_qr_title: QR code scan
+          field_role: Your role
+          field_serial_body: >-
+            Search by serial from the website or admin panel for the same registration
+            and attestation record.
+          field_serial_title: Serial number lookup
+          heading: Register every bike in your city. E-bike riders learn your rules
+            too.
+          hero_image_alt: A bike in a superhero cape
+          hierarchy_city_body: >-
+            Local ordinances, age limits, helmet rules, and where e-bikes can ride.
+            Every rider in the city sees them.
+          hierarchy_city_title: The city sets the baseline
+          hierarchy_dashboard_body: >-
+            City staff see registrations across every program. Staff at each program
+            manage only their own rules and riders.
+          hierarchy_dashboard_title: One dashboard for everyone
+          hierarchy_eyebrow: New · E-bike management
+          hierarchy_heading: Your city sets the baseline. Each program adds its own.
+          hierarchy_intro: >-
+            E-bike rules vary by context. A middle school may be stricter than the
+            city, and a housing authority may have its own charging and storage rules.
+            Bike Index sets up your city as the parent organization, with each program
+            as a child account. City rules apply everywhere, and each program adds
+            its own.
+          hierarchy_programs_body: >-
+            A school, housing authority, or neighborhood program can rewrite any step
+            or add its own, in its own words.
+          hierarchy_programs_title: Programs add their own
+          hot_sheet_body: >-
+            A printable list of stolen bikes in your area with owner phone numbers,
+            updated in real time for your police department.
+          hot_sheet_title: Stolen Bike Hot Sheet
+          mock_batteries: Batteries & charging
+          mock_bike_info: Bike info
+          mock_caption: Regular bikes skip the acknowledgment and finish registering.
+          mock_continue: Continue
+          mock_detected: Electric (motorized) detected
+          mock_electric: Electric (motorized)
+          mock_electric_help: Check electric so we flag e-bikes and verify certification.
+          mock_manufacturer: Manufacturer
+          mock_next: Next
+          mock_progress: Progress saved · E-Vehicle Acknowledgment · Step 1 of 4
+          mock_rule_certified: I will use only batteries certified to UL 2849 / UL
+            2271 (or equivalent).
+          mock_rule_charger: >-
+            I will charge only with the manufacturer's charger, never unattended or
+            in a hallway or exit route.
+          mock_rule_report: I will stop using and report any damaged, swollen, or
+            overheating battery.
+          mock_sub: >-
+            Westbrook has a few safety rules to go over before you can complete registration.
+          mock_title: Looks like you have an e-vehicle!
+          mock_traditional_bike: Traditional Bike
+          mock_traditional_bike_note: "(2 wheels, 1 seat, pedals)"
+          mock_vehicle_type: Vehicle type
+          mode_demo: Schedule a demo
+          mode_trial: Start a free trial
+          nav_checker: State checker
+          nav_education: E-bike rules
+          nav_faq: FAQ
+          nav_label: Bike Index for Cities
+          nav_recovery: Recovery
+          nav_registration: Registration
+          new: New
+          open_the_checker: Open the full checker
+          parent_name: City of Westbrook
+          parent_note: Battery, riding, and city rules
+          parent_organization: Parent organization
+          partnership_data_body: The city owns its data and can export it at any time.
+          partnership_data_title: Your data stays yours
+          partnership_eyebrow: Partnership
+          partnership_fees_body: Free for residents to register. Start with a free
+            trial before committing.
+          partnership_fees_title: No per-registration fees
+          partnership_heading: A nonprofit partner, running within days.
+          partnership_intro: >-
+            Bike Index has run the world's most widely used nonprofit bike registry
+            since 2013. City partnerships need no dedicated IT staff, and most are
+            running within days of setup.
+          partnership_nonprofit_body: A 501(c)(3) nonprofit, EIN 81-4296194.
+          partnership_nonprofit_title: Nonprofit since 2013
+          partnership_support_body: >-
+            We configure your branded organization and education flow, train your
+            staff, and maintain the platform.
+          partnership_support_title: Setup, training, and support
+          pill: Bike Index for Cities · Nonprofit since 2013
+          program_education_body: >-
+            E-bike riders are taken into your education flow as part of registering.
+            Staff can see any bike's class, battery certification, and signed attestation.
+          program_education_link: See the education flow
+          program_education_title: E-bike education
+          program_eyebrow: What your program covers
+          program_heading: It starts with registration.
+          program_intro: >-
+            Registration and stolen bike recovery have been the core of Bike Index
+            since 2013. E-bike education is the new layer on top: when a rider registers
+            an e-bike, they learn your rules before the registration is complete.
+          program_recovery_body: >-
+            A registered bike can be found again. Law enforcement agencies, plus shops
+            and volunteers, search the registry.
+          program_recovery_link: How recovery works
+          program_recovery_title: Stolen bike recovery
+          program_registration_body: >-
+            Every bike gets a record with serial, photos, and owner. Registrations
+            from shops, schools, city departments, and community programs land in
+            one searchable registry.
+          program_registration_link: How registration works
+          program_registration_title: Registration
+          recovery_eyebrow: Law enforcement & stolen bike recovery
+          recovery_heading: When a bike is stolen, the whole network knows.
+          recovery_intro: >-
+            Stolen bike recovery is Bike Index's founding mission. More than 100 law
+            enforcement agencies use Bike Index directly, and bike shops, pawn shops,
+            and resale platforms can check a serial before a sale goes through.
+          recovery_step_1_body: The status flips immediately and shows up for anyone
+            who searches that serial.
+          recovery_step_1_title: Owner reports it STOLEN
+          recovery_step_2_body: >-
+            At a traffic stop, a pawn shop call, or a sweep, they pull up make, model,
+            color, photo, owner contact, and status history.
+          recovery_step_2_title: Officers check in the field
+          recovery_step_3_body: >-
+            When a serial matches, officers contact the owner directly, without lengthy
+            property room processing.
+          recovery_step_3_title: The bike goes home
+          registration_eyebrow: Registration
+          registration_heading: Every bike in your city, in one searchable registry.
+          registration_import_body: >-
+            Import them from a spreadsheet. Staff can also add bikes by hand and message
+            owners by registration date, bike type, or e-vehicle status.
+          registration_import_lead: Already have registrations?
+          registration_intro: >-
+            Registrations from bike shops, schools, city departments, and community
+            programs land in one place that residents, city staff, and police all
+            use. It works for every bike, not just e-bikes.
+          registration_step_1_body: >-
+            Under two minutes from any phone, through a city-branded landing page,
+            a form on your website, or a QR sticker.
+          registration_step_1_title: Residents register
+          registration_step_2_body: >-
+            Bike Book identifies the model and its class, and the rider completes
+            your education flow. Regular bikes skip it.
+          registration_step_2_title: E-bikes get classified
+          registration_step_3_body: >-
+            Status (registered, stolen, or recovered), make, model, color, and serial.
+            Officers and staff pull it up by serial.
+          registration_step_3_title: Every bike gets a page
+          registration_step_4_body: >-
+            Registration volume, e-bike share, and activity across programs, plus
+            reports on recoveries and battery audits for city leadership.
+          registration_step_4_title: You see it in the dashboard
+          role_city_staff: City staff
+          role_elected: Elected official
+          role_housing: Housing or community program
+          role_law_enforcement: Law enforcement
+          role_other: Other
+          role_school: School or district
+          schedule_a_demo: Schedule a demo
+          start_a_free_trial: Start a free trial
+          stat_agencies: law enforcement agencies
+          stat_agencies_count: 100+
+          stat_bikes: bikes registered
+          stat_organizations: partner organizations
+          stat_recovered: in stolen bikes recovered
+          stolen_banner_body: Anyone who looks up its serial sees it's stolen, and
+            how to reach the owner.
+          stolen_banner_title: Stolen
+          subheading: >-
+            Bike Index is the nonprofit registry police and bike shops already search
+            to recover stolen bikes. Riders start by registering their bike. If it's
+            an e-bike, they go straight into a short education flow with your city's
+            rules.
+          submit_demo: Request a demo
+          submit_trial: Start my free trial
