@@ -87,6 +87,32 @@ RSpec.describe OrgServices::EmailPreview do
       end
     end
 
+    context "with general_message kind" do
+      let(:kind) { "general_message" }
+
+      context "without an existing organization_message" do
+        it "builds one for the default bike" do
+          expect(component).to be_a(Emails::OrganizationMessage::Component)
+          organization_message = component.instance_variable_get(:@organization_message)
+          expect(organization_message).to_not be_persisted
+          expect(organization_message).to have_attributes(kind: "general_message", sender: user, organization:)
+          expect(organization_message.bike).to be_present
+          expect(component.snippet_time).to be_nil
+        end
+      end
+
+      context "with an existing organization_message" do
+        let!(:organization_message) { FactoryBot.create(:organization_message, created_at: 1.day.ago) }
+        let(:organization) { organization_message.organization }
+        let(:versioned) { true }
+
+        it "loads it, versioned on created_at" do
+          expect(component.instance_variable_get(:@organization_message)).to eq organization_message
+          expect(component.snippet_time).to eq organization_message.created_at
+        end
+      end
+    end
+
     context "with impound_claim_approved kind" do
       let(:kind) { "impound_claim_approved" }
 

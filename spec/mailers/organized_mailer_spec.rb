@@ -439,6 +439,42 @@ RSpec.describe OrganizedMailer, type: :mailer do
     end
   end
 
+  describe "organization_message" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications], short_name: "UCLA") }
+    let(:organization_message) { FactoryBot.create(:organization_message, organization:, message: "Your lock is on the rack") }
+    let(:mail) { OrganizedMailer.organization_message(organization_message) }
+    it "renders email" do
+      expect(mail.subject).to eq "Message from UCLA about your bike"
+      expect(mail.to).to eq([organization_message.bike.owner_email])
+      expect(mail.reply_to).to eq([organization_message.sender.email])
+      expect(mail.tag).to eq "organization_message"
+      expect(mail.html_part.body.to_s).to include("Your lock is on the rack")
+      expect(mail.text_part.body.to_s).to include("Your lock is on the rack")
+    end
+
+    context "with general_message snippet" do
+      let!(:mail_snippet) do
+        FactoryBot.create(:organization_mail_snippet, kind: "general_message", organization:, is_enabled:,
+          subject: "Parking policy", body: "<p>Read our <strong>parking policy</strong></p>")
+      end
+      let(:is_enabled) { true }
+      it "uses the snippet subject and body" do
+        expect(mail.subject).to eq "Parking policy"
+        expect(mail.html_part.body.to_s).to include("Read our <strong>parking policy</strong>")
+        expect(mail.text_part.body.to_s).to include("Read our parking policy").and include("Your lock is on the rack")
+      end
+
+      context "disabled" do
+        let(:is_enabled) { false }
+        it "ignores the snippet" do
+          expect(mail.subject).to eq "Message from UCLA about your bike"
+          expect(mail.html_part.body.to_s).to_not include("parking policy")
+          expect(mail.text_part.body.to_s).to_not include("parking policy")
+        end
+      end
+    end
+  end
+
   describe "hot_sheet_notification" do
     let(:recipient) { FactoryBot.create(:organization_user, organization: organization) }
     let(:stolen_record) { FactoryBot.create(:stolen_record, :with_bike_image) }
