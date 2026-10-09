@@ -22,6 +22,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_current_path("/ebike-rules/co?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
     expect(page).to have_title("Colorado e-bike laws")
     expect(find_field("Bike model", disabled: false, wait: 10).value).to eq "Specialized Haul ST"
+    find("[role='button']", text: "Read more").click
     expect(page).to have_css("li", text: "Class 3 riders must be 16 or older")
 
     # clearing the bike leaves its check

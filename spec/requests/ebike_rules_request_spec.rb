@@ -66,6 +66,8 @@ RSpec.describe EbikeRulesController, type: :request do
 
       expect(page).to have_css("[role='status']",
         text: "Your Specialized Haul ST is legal to ride in Colorado as a Class 2 and 3 e-bike.")
+        .and have_css("[role='img'][aria-label='Class 2 e-bike'] + [role='img'][aria-label='Class 3 e-bike']")
+        .and have_css("li", text: "Classes 2 and 3 are recognized")
         .and have_css("li", text: "Throttle stops at 20 mph")
         .and have_css("[data-ebike-rules--lookup-display-value='Specialized Haul ST 2025']")
         .and have_link("View full BikeBook entry", href: "/bikebook?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")

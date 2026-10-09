@@ -8,16 +8,19 @@ en:
           answer_yes: 'Yes'
           being_compiled: Rules for this state are being compiled from primary sources.
           bikebook_name: BikeBook
-          bikebook_photo: Photo · BikeBook
           class_1_throttle: Class 1 bikes can't have a throttle
           class_3_throttle: Throttle must cut out at 20 mph
           class_3_throttle_over_html: Throttle runs to %{mph} mph, past the 20 mph
             a Class 3's throttle is allowed
           class_3_throttle_within_html: Throttle stops at %{mph} mph
-          class_not_recognized: Class %{e_bike_class} isn't recognized here
-          class_recognized: Class %{e_bike_class} is recognized
           class_unknown_check_label: BikeBook doesn't list its class or top speed,
             so check the class on its label
+          classes_not_recognized:
+            one: Class %{n} isn't recognized here
+            other: Classes %{n} aren't recognized here
+          classes_recognized:
+            one: Class %{n} is recognized
+            other: Classes %{n} are recognized
           classes_start_on: Classes take effect %{date}. Until then, check the state's
             current rules
           entered_manually: Entered manually · Class %{n}
@@ -60,6 +63,7 @@ en:
           over_mph_html: Over %{mph} mph
           own_classes: The state sets its own limits rather than the three standard
             classes
+          read_more: Read more
           recovered_more_often: Stolen bikes are recovered 2× more often when registered.
           red_headline: Your %{name} is not permitted as an e-bike under current %{state}
             rules.
@@ -81,6 +85,7 @@ en:
             Check your state DMV or legislature site for current e-bike rules. Most
             states cap e-bike motors at 750W and assisted speed at 20 mph (Class 1–2)
             or 28 mph (Class 3).
+          stock_photo: Stock photo
           throttle: Throttle
           throttle_allowed: Throttle allowed for Class 2
           throttle_not_allowed: The state doesn't allow a throttle

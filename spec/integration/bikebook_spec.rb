@@ -183,6 +183,14 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     # A filter's options count the catalog's models, and its chips come from them
     click_on "More filters"
+    # a class matches the models carrying it, and out of class the catalog's own marker
+    check "US Class 2"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(1 matching model)")
+    check "Out of class"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(2 matching models)")
+    uncheck "US Class 2"
+    uncheck "Out of class"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(29 matching models)")
     find_field("Manufacturers").click
     find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (5)").click
     expect(page).to have_css("[data-async-id='manufacturer'] .hw-combobox__chip", text: "Kris Holm")

@@ -28,21 +28,22 @@ module EbikeRuleServices
 
     def row(id, status, note, **args) = {id:, status:, note:, args:}
 
+    # Each class a bike carries has to be recognized
     def classes_rule(law, bike)
-      e_bike_class = bike.e_bike_class
+      classes = bike.e_bike_classes
       if bike.class_unknown
         row(:classes, :check, :class_unknown)
-      elsif e_bike_class.nil?
+      elsif bike.e_bike_class.nil?
         row(:classes, :fail, :not_classified)
       # limits not yet in force describe the coming law, so the rider checks the law's dated rules for today's
       elsif (date = law[:limits_start_on])
         row(:classes, :check, :classes_start_on, date:)
       elsif law[:classes].none?
         row(:classes, :info, :own_classes)
-      elsif law[:classes].include?(e_bike_class)
-        row(:classes, :pass, :class_recognized, e_bike_class:)
+      elsif (unrecognized = classes - law[:classes]).none?
+        row(:classes, :pass, :classes_recognized, e_bike_classes: classes)
       else
-        row(:classes, :fail, :class_not_recognized, e_bike_class:)
+        row(:classes, :fail, :classes_not_recognized, e_bike_classes: unrecognized)
       end
     end
 

@@ -55,7 +55,7 @@ async function load ({ manifestUrl, ids }) {
 }
 
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
-function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, ...filterOptions } }) {
+function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, ...filterOptions } }) {
   const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
   const perManufacturer = models.reduce((counts, { manufacturer }) => counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1), new Map())
   return {
@@ -157,13 +157,10 @@ function filter (params) {
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// The index doesn't publish e_vehicle_classifications yet, so until it does a US class matches nothing
-function propelled ({ electric, e_vehicle_classifications: classifications }, propulsion) {
+// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class
+function propelled ({ electric, e_vehicle_classifications: classifications = [] }, propulsion) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
-  if (!classifications) return false
-  return propulsion === 'out_of_class'
-    ? electric && !classifications.some((id) => /^evc\/us\/class_\d$/.test(id))
-    : classifications.includes(`evc/us/${propulsion}`)
+  return classifications.includes(propulsion === 'out_of_class' ? propulsion : `evc/us/${propulsion}`)
 }
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {

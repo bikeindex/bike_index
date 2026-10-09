@@ -127,10 +127,10 @@ module Pages
         end
 
         def note(row)
-          # a class is a name rather than a quantity, and a law's date a calendar day
+          # classes are names rather than quantities, and a law's date a calendar day
           args = row[:args].to_h do |key, value|
-            if key == :e_bike_class
-              [key, value]
+            if key == :e_bike_classes
+              [:n, value.to_sentence]
             elsif value.is_a?(Date)
               [key, l(value, format: :long)]
             else
@@ -138,8 +138,8 @@ module Pages
             end
           end
           case row[:note]
-          when :class_recognized then translation(".class_recognized", **args)
-          when :class_not_recognized then translation(".class_not_recognized", **args)
+          when :classes_recognized then translation(".classes_recognized", count: row[:args][:e_bike_classes].size, **args)
+          when :classes_not_recognized then translation(".classes_not_recognized", count: row[:args][:e_bike_classes].size, **args)
           when :not_classified then translation(".not_classified")
           when :class_unknown then translation(".class_unknown_check_label")
           when :own_classes then translation(".own_classes")
