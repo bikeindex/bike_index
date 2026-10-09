@@ -113,4 +113,46 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       end
     end
   end
+
+  describe "authenticated with an API token" do
+    let(:current_user) { false } # No session - the token is the authentication
+    include_context :admin_doorkeeper_token
+
+    let(:url) { "#{base_url}.json" }
+    include_examples "rejects_unauthorized_token"
+
+    context "token for a duplicate_bikes superuser" do
+      let(:email_pattern) { /[^@\s"]+@[^@\s"]+\.\w+/ }
+      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "duplicate_bikes") }
+
+      it "returns queues and groups without contact emails" do
+        get url, params: token_param.merge(search_kind: "large_group")
+        expect(response.status).to eq 200
+        expect(json_result[:queues][:large_group]).to eq({label: "Large groups — validate the serial", groups: 1, records: 11}.as_json)
+        group = json_result[:groups].first
+        expect(group[:bike_ids]).to match_array marked_bikes.map(&:id)
+        expect(group[:cues].map { it[:key] }).to include("standard_marking", "review_contact")
+        expect(json_result[:total_count]).to eq 1
+        expect(response.body).to_not match(email_pattern)
+      end
+
+      it "returns a comparison without contact emails" do
+        get "#{base_url}/serial.json", params: token_param.merge(reference_bike_id: pair.last.id)
+        expect(response.status).to eq 200
+        expect(json_result[:records].map { it[:id] }).to eq pair.map(&:id)
+        expect(json_result[:differing_fields].keys).to include("Model")
+        expect(json_result[:contact_groups].first).to include(number: 1, email_present: true)
+        expect(json_result[:serial_stolen]).to be false
+        expect(json_result[:checks].first.keys).to eq %w[status label]
+        expect(response.body).to_not match(email_pattern)
+      end
+
+      it "reports preparation while the cache is empty" do
+        cache.delete(cache_key)
+        get url, params: token_param
+        expect(response.status).to eq 202
+        expect(json_result[:status]).to eq "preparing"
+      end
+    end
+  end
 end
