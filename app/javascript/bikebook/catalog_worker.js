@@ -54,8 +54,8 @@ async function load ({ manifestUrl, ids }) {
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index), modelsCount: models.length }
 }
 
-// Each filter's choices, with how many models choosing it alone matches
-function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: filterOptions }) {
+// Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
+function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, ...filterOptions } }) {
   const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
   const perManufacturer = models.reduce((counts, { manufacturer }) => counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1), new Map())
   return {
@@ -161,8 +161,9 @@ function filter (params) {
 function propelled ({ electric, e_vehicle_classifications: classifications }, propulsion) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
   if (!classifications) return false
-  const usClass = classifications.some((id) => /^evc\/us\/class_\d$/.test(id))
-  return propulsion === 'out_of_class' ? electric && !usClass : classifications.includes(`evc/us/${propulsion}`)
+  return propulsion === 'out_of_class'
+    ? electric && !classifications.some((id) => /^evc\/us\/class_\d$/.test(id))
+    : classifications.includes(`evc/us/${propulsion}`)
 }
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {

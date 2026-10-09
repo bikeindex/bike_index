@@ -170,12 +170,12 @@
               <div class="tw:mt-1 tw:flex tw:flex-wrap tw:gap-x-6 tw:gap-y-2">
                 <% [["0", translation(".human_powered")], ["1", translation(".motorized")], ["class_1", translation(".us_class_1")],
                 ["class_2", translation(".us_class_2")], ["class_3", translation(".us_class_3")],
-                ["out_of_class", translation(".out_of_class")]].each do |value, label| %>
+                ["out_of_class", translation(".out_of_class"), translation(".out_of_class_details")]].each do |value, label, details| %>
                   <span class="tw:flex tw:items-center tw:gap-1.5 tw:leading-0">
                     <%= render UI::Forms::Checkbox::Component.new(name: "electric", value:, label:, class_name: "tw:mb-0",
                     html_options: {id: "electric-#{value}"}) %>
 
-                    <%= render UI::Tooltip::Component.new(text: translation(".out_of_class_details")) if value == "out_of_class" %>
+                    <%= render UI::Tooltip::Component.new(text: details) if details %>
                   </span>
                 <% end %>
               </div>

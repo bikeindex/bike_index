@@ -7,7 +7,7 @@ import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
-import { pathWith, VehicleViewer } from 'bikebook/vehicle_viewer'
+import { VehicleViewer } from 'bikebook/vehicle_viewer'
 
 /* global CSS */
 
@@ -59,11 +59,11 @@ export async function hydrate (catalog, source, shell, url) {
   for (const value of filters.electric.split(',')) root.querySelector(`input[name="electric"][value="${CSS.escape(value)}"]`)?.setAttribute('checked', '')
 
   const viewer = new VehicleViewer(kit, catalog.vocabulary)
-  const classifications = catalog.vocabulary.e_vehicle_classifications ?? {}
-  const tooltips = viewer.presenter.classificationTooltips((id) => pathWith(url, { vehicle_models: [...new Set([...vehicles.map(({ value }) => value), id])].join(',') }))
+  const classificationPath = viewer.classificationPath(url, vehicles.map(({ value }) => value))
   for (const input of root.querySelectorAll('input[name="electric"][value^="class_"]')) {
-    const { label, title } = classifications[`evc/us/${input.value}`] ?? {}
-    if (tooltips[label]) input.closest('label').after(fragmentOf(tooltip({ text: title, body: tooltips[label] })))
+    const id = `evc/us/${input.value}`
+    const classification = catalog.vocabulary.e_vehicle_classifications?.[id]
+    if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id, classificationPath) })))
   }
 
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize()))

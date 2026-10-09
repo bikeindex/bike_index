@@ -14,6 +14,11 @@ export class VehicleViewer {
     this.presenter = new VehiclePresenter(kit, vocabulary)
   }
 
+  // `url` with an e-vehicle classification added to the compared `values`
+  classificationPath (url, values) {
+    return (id) => pathWith(url, { vehicle_models: [...new Set([...values, id])].join(',') })
+  }
+
   // The vehicles at `url`, whose remove links keep its other params, compared in the sizes it picks or the nearest
   // to the `preferredSize`
   render (vehicles, url, preferredSize) {
@@ -33,7 +38,7 @@ export class VehicleViewer {
       : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
     const values = vehicles.map(({ value }) => value)
     const baseline = models[0]
-    const classificationPath = (id) => pathWith(url, { vehicle_models: [...new Set([...values, id])].join(',') })
+    const classificationPath = this.classificationPath(url, values)
     const cards = vehicles.map(({ data, value, classification }, index) => {
       const remaining = values.filter((each) => each !== value)
       const remove = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
@@ -49,7 +54,7 @@ export class VehicleViewer {
 }
 
 // This page's URL with `params` laid over its own
-export const pathWith = (url, params) => {
+const pathWith = (url, params) => {
   const query = toQuery({ ...Object.fromEntries(url.searchParams), ...params })
   return query ? `${url.pathname}?${query}` : url.pathname
 }
