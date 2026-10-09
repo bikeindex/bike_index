@@ -8,13 +8,17 @@ module Pages
         FONTS_URL = "https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@800;900&display=swap"
         COMIC_CARD = "tw:rounded-lg tw:border-3 tw:border-[#111] tw:bg-white tw:shadow-[4px_4px_0_#111]"
         CARD = "tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:shadow-[0_1px_3px_rgba(44,62,80,.12),0_1px_2px_rgba(44,62,80,.08)]"
+        STORY_CARD = "tw:flex tw:w-full tw:flex-col tw:overflow-hidden tw:text-gray-700 tw:no-underline #{CARD}"
+        LINKED_STORY_CARD = "tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:text-gray-700 tw:hover:shadow-[0_4px_12px_rgba(44,62,80,.12)]"
         OUTLINE = "tw:border-2! tw:border-blue-600! tw:normal-case! tw:text-blue-600! tw:hover:bg-blue-600! tw:hover:text-white!"
 
         # GObike Buffalo's tweet, quoted verbatim, so it isn't translated
         TESTIMONIAL = "At press conf. announcing partnership w/ @BPDAlerts, @BikeIndex, Erie Cty. DA's office & local bike shops to register bikes, prevent theft"
 
-        def initialize(recovery_displays:, total_bikes:, recoveries_count:, recoveries_value:, organizations_count:)
+        def initialize(recovery_displays:, total_bikes:, recoveries_count:, recoveries_value:, organizations_count:,
+          sign_up_path:)
           @recovery_displays = recovery_displays.first(3)
+          @sign_up_path = sign_up_path
           @total_bikes = total_bikes
           @recoveries_count = recoveries_count
           @recoveries_value = recoveries_value
@@ -39,7 +43,8 @@ module Pages
         def bikes_display
           return number_display(@total_bikes) if @total_bikes < 1_000_000
 
-          safe_join([number_display(@total_bikes / 1_000_000), "M+"])
+          millions = (@total_bikes / 100_000).fdiv(10)
+          safe_join([number_display((millions % 1).zero? ? millions.to_i : millions), "M+"])
         end
 
         def trust_items
@@ -82,7 +87,7 @@ module Pages
 
         def get_started_links
           [[translation(".host_a_registration_drive"), news_path("san-jose-registers-local-school-bikes-using-bike-index-mobile-registra")],
-            [translation(".embed_a_registration_form"), news_path("embed-a-bike-index-registration-form-on-your-website")],
+            [translation(".embed_a_registration_form"), info_path("embed-a-bike-index-registration-form-on-your-website")],
             [translation(".become_an_ambassador"), news_path("bike-index-launches-ambassadors-program")]]
         end
 

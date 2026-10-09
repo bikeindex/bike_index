@@ -18,6 +18,14 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
       end
+
+      it "preselects a creatable kind" do
+        get "#{base_url}/new", params: {kind: "bike_advocacy"}
+        expect(response.body).to match(/<input[^>]*checked="checked"[^>]*value="bike_advocacy"|<input[^>]*value="bike_advocacy"[^>]*checked="checked"/)
+
+        get "#{base_url}/new", params: {kind: "ambassador"}
+        expect(response.body).to_not include('checked="checked"')
+      end
     end
   end
 

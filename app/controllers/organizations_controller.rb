@@ -3,8 +3,9 @@ class OrganizationsController < ApplicationController
   before_action :allow_x_frame, only: %i[embed embed_extended embed_create_success]
 
   def new
-    session[:return_to] ||= new_organization_url unless current_user.present?
-    @organization = Organization.new
+    kind = params[:kind].presence_in(Organization.user_creatable_kinds)
+    session[:return_to] ||= new_organization_url(kind:) unless current_user.present?
+    @organization = Organization.new(kind:)
     @active_section = "contact"
   end
 

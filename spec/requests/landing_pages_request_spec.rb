@@ -45,6 +45,18 @@ RSpec.describe LandingPagesController, type: :request do
       expect(response.body).to match("<title>Bike Index for Community Groups</title>")
       expect(response.body).to include("Help your riders get their bikes back.")
       expect(response.body).to include("Recovered in under four hours")
+      expect(response.body).to include("/users/new?return_to=%2Forganizations%2Fnew%3Fkind%3Dbike_advocacy")
+    end
+
+    context "with a user" do
+      include_context :request_spec_logged_in_as_user
+
+      it "links straight to the organization form" do
+        get "/for_community_groups"
+
+        expect(response.body).to include('href="/organizations/new?kind=bike_advocacy"')
+        expect(response.body).to_not include("/users/new?return_to")
+      end
     end
   end
 
