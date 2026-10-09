@@ -143,8 +143,7 @@
 
           <div class="tw:flex tw:flex-col tw:gap-4">
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "vehicle_type",
-          label: translation(".vehicle_type"), placeholder: translation(".any_vehicle_type"), multiselect: true,
-          full_width: true)) %>
+          label: translation(".vehicle_type"), placeholder: translation(".any_vehicle_type"), multiselect: true)) %>
 
             <div class="tw:grid tw:gap-4 tw:sm:grid-cols-3">
               <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "electric",

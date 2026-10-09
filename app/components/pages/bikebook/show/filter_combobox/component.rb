@@ -10,17 +10,16 @@ module Pages
           SELECTION_ACTIONS = "hw-combobox:selection->bikebook--catalog-filters#applySelection " \
             "hw-combobox:removal->bikebook--catalog-filters#applySelection"
 
-          def initialize(name:, label:, placeholder:, multiselect: false, full_width: false)
+          def initialize(name:, label:, placeholder:, multiselect: false)
             @name = name
             @label = label
             @placeholder = placeholder
             @multiselect = multiselect
-            @full_width = full_width
           end
 
           def call
             render(UI::Forms::Group::Component.new(attribute: @name, label_text: @label, optional_badge: false,
-              wrapper_class: ("tw:max-w-md" unless @full_width))) do |group|
+              wrapper_class: nil)) do |group|
               group.with_label_note { content } if content?
               render(UI::Forms::Combobox::Component.new(name: @name, dialog_label: @label,
                 multiselect_chip_src: (bikebook_path if @multiselect), include_blank: (translation(".any") unless @multiselect),
