@@ -40,13 +40,15 @@ module Emails
       def pending_acknowledgment
         return @pending_acknowledgment if defined?(@pending_acknowledgment)
 
-        @pending_acknowledgment = RegistrationSequenceAcknowledgment.pending.find_by(b_param_id: @b_param.id) if @b_param.persisted?
+        @pending_acknowledgment = @b_param.pending_acknowledgment
       end
 
       def rules_owed? = pending_acknowledgment.present?
 
-      # Whose rules they are - nil for the template's, which belong to no organization
-      def rules_organization = pending_acknowledgment.registration_sequence&.organization
+      # nil for the template's
+      def rules_organization
+        organization unless pending_acknowledgment.registration_sequence.template?
+      end
 
       def organization_snippet_body
         organization&.mail_snippet_body("partial_registration", time: snippet_time)

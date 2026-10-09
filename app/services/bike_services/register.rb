@@ -118,20 +118,20 @@ module BikeServices
 
     # The safety rules a registration acknowledges, only for an e-vehicle - the organization's
     # active sequence or else the template, or the one its pages are being agreed to from, even
-    # once replaced. legacy: the legacy forms only pass on an organization's own rules.
+    # once replaced.
     # motorized: the single page asks what an e-vehicle would get, before it's said it's one.
     # Checked first - it's in memory, and creation_organization is a query
-    def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?, legacy: false)
+    def registration_sequence(b_param, separate_attestation: false, user: nil, motorized: b_param.motorized?, template: true)
       return nil unless motorized
       # Left to the owner, so this flow has none - create_bike holds the bike for them to agree
       return nil if separate_attestation && !b_param.self_made?(user)
 
       organization = b_param.creation_organization
-      return nil if legacy && organization.blank?
+      return nil if !template && organization.blank?
 
       started_id = b_param.params.dig("registration_sequence", "id")
       (RegistrationSequence.find_by(id: started_id, organization_id: [organization&.id, nil]) if started_id.present?) ||
-        RegistrationSequence.active_for(organization) || (RegistrationSequence.active_template unless legacy)
+        (template ? RegistrationSequence.active_or_template_for(organization) : RegistrationSequence.active_for(organization))
     end
 
     # registration_sequence for a link back into the flow, and whether the rules restarted:
@@ -457,7 +457,7 @@ module BikeServices
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      owners_sequence = registration_sequence(b_param, legacy: rules_to_owner) if sequence.blank? &&
+      owners_sequence = registration_sequence(b_param, template: !rules_to_owner) if sequence.blank? &&
         (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
       b_param.params = b_param.params.deep_merge("bike" => {
         "register_single_page" => b_param.params["register_single_page"],

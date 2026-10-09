@@ -1,7 +1,7 @@
-# Seeds the global RegistrationSequence template - the e-vehicle safety rules every e-vehicle
-# registration without an organization sequence of its own agrees to, and that organization
-# drafts are cloned from. The bullets become each page's `body`, a single HTML list authored
-# in the Lexxy rich-text editor on the form.
+# The global RegistrationSequence template: the safety rules for an e-vehicle registration
+# without an organization sequence of its own, and what organization drafts are cloned from
+list_html = ->(bullets) { "<ul>#{bullets.map { "<li>#{it}</li>" }.join}</ul>" }
+
 default_pages = [
   {
     title: "Riding an e-vehicle",
@@ -33,9 +33,8 @@ template = RegistrationSequence.create!(faq_url: "/info/#{Blog.e_vehicle_acknowl
   acknowledgment_text: "have read and understood the e-vehicle safety information above.")
 
 default_pages.each_with_index do |attributes, index|
-  template.registration_sequence_pages.create!(listing_order: index, title: attributes[:title],
-    heading: attributes[:heading], subtitle: attributes[:subtitle],
-    body: "<ul>#{attributes[:bullet_points].map { |bullet| "<li>#{bullet}</li>" }.join}</ul>")
+  template.registration_sequence_pages.create!(**attributes.except(:bullet_points), listing_order: index,
+    body: list_html.call(attributes[:bullet_points]))
 end
 # Organizations clone the live template, so the seeded one has to be activated
 template.make_active!
@@ -48,8 +47,8 @@ if brakebills.present?
   sequence.registration_sequence_pages.create!(title: "Campus-specific rules", organization_specific: true,
     heading: "#{brakebills.short_name} campus policies",
     subtitle: "Your school has a couple of additional rules for riding on campus.",
-    body: "<ul><li>I will ride only on designated campus paths and dismount in all posted dismount zones.</li>" \
-      "<li>I will park only in campus e-vehicle corrals — never at pedestrian entrances or building exits.</li></ul>")
+    body: list_html.call(["I will ride only on designated campus paths and dismount in all posted dismount zones.",
+      "I will park only in campus e-vehicle corrals — never at pedestrian entrances or building exits."]))
   sequence.make_active!
   puts "Registration sequence activated for Brakebills: #{sequence.registration_sequence_pages.count} pages\n"
 

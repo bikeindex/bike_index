@@ -740,7 +740,7 @@ RSpec.describe BikeServices::Register do
 
           it "is the template, except for the legacy forms" do
             expect(described_class.registration_sequence(b_param)).to eq template
-            expect(described_class.registration_sequence(b_param, legacy: true)).to be_nil
+            expect(described_class.registration_sequence(b_param, template: false)).to be_nil
           end
         end
 
@@ -749,7 +749,7 @@ RSpec.describe BikeServices::Register do
 
           it "is the template, except for the legacy forms" do
             expect(described_class.registration_sequence(b_param)).to eq template
-            expect(described_class.registration_sequence(b_param, legacy: true)).to be_nil
+            expect(described_class.registration_sequence(b_param, template: false)).to be_nil
           end
 
           it "stays on the template once started, until resumed on the organization's own" do
