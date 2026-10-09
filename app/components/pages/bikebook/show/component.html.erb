@@ -81,7 +81,7 @@
                 </div>
               </div>
 
-              <div class="tw:flex tw:flex-col tw:gap-4 tw:sm:items-start">
+              <div class="tw:flex tw:flex-wrap tw:gap-4">
                 <% [["year", translation(".year"), 1900, "tw:sm:w-20", nil, {min: 1990, max: Time.current.year + 1}],
               ["price", translation(".price"), 0, "tw:sm:w-26", "$", {}]].each do |name, legend, min_attr, width, prefix, placeholders| %>
                   <fieldset
