@@ -33,7 +33,7 @@ module UI
           @form.object.country_id || @default_country_id
         end
 
-        # US shows the state select; other countries the free-text region field
+        # US shows the state combobox; other countries the free-text region field
         def state_hidden_class
           "tw:hidden" unless us_selected?
         end

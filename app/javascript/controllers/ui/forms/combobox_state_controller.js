@@ -25,10 +25,10 @@ export default class extends Controller {
   }
 }
 
+// The abbreviation is read from the "(OR)" every option ends in, since what it submits may be an id
 function score (option, query) {
-  if (!query || option.dataset.value.toLowerCase() === query) return 0
-
   const name = option.textContent.trim().toLowerCase()
+  if (!query || name.endsWith(`(${query})`)) return 0
   if (name.startsWith(query)) return 1
   return name.split(/\s+/).some((word) => word.startsWith(query)) ? 2 : 3
 }
