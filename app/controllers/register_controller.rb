@@ -60,6 +60,8 @@ class RegisterController < ApplicationController
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, flow:)
     return redirect_to(step_path(step)) if step != params[:step]
 
+    # unsaved, so it doesn't count toward the step it's shown on
+    @b_param.params = BikeServices::Register.with_prefill(@b_param.params) if %w[1 2].include?(step)
     case step
     when "finished"
       @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)
@@ -238,14 +240,15 @@ class RegisterController < ApplicationController
   # reuses a token whose origin matches
   def start_registration(token_id: nil, origin: "register_flow")
     @b_param = BikeServices::Register.b_param_for(user: current_user, token_id:, origin:,
-      status: start_status, email: params[:email])
+      status: start_status, email: params[:email], bike_sticker: start_params[:bike_sticker],
+      prefill: params.permit(:manufacturer, :frame_model).to_h.compact_blank)
     session[:register_b_param_token] = @b_param.id_token
   end
 
   # Everything new seeds a registration from, so arriving on an organization's link
   # (or a stolen one) without a registration doesn't lose how they got there
   def start_params
-    params.permit(:organization_id, :status, :email).to_h.compact_blank
+    params.permit(:organization_id, :status, :email, :bike_sticker).to_h.compact_blank
   end
 
   # ?status=stolen and ?stolen=true as well as the full status_stolen - a link to report

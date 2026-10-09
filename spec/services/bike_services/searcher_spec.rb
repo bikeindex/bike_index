@@ -137,6 +137,14 @@ RSpec.describe BikeServices::Searcher do
       expect(search.count).to eq(1)
       expect(search.first).to eq(bike)
     end
+    it "matches every color passed" do
+      color1 = FactoryBot.create(:color)
+      color2 = FactoryBot.create(:color)
+      bike = FactoryBot.create(:bike, primary_frame_color: color1, secondary_frame_color: color2)
+      FactoryBot.create(:bike, primary_frame_color: color2)
+      search = BikeServices::Searcher.new(colors: "#{color1.name},#{color2.name}").matching_colors(Bike.all)
+      expect(search.pluck(:id)).to eq([bike.id])
+    end
   end
 
   describe "friendly_find_serial" do

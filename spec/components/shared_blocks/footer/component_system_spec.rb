@@ -11,11 +11,11 @@ RSpec.describe SharedBlocks::Footer::Component, :js, type: :system do
   # than dropping the param -- a visitor whose browser asks for Dutch needs it to reach English
   it "switches the language on the current page, and back" do
     visit "/?example=1"
-    wait_for_stimulus
+    wait_for_stimulus("shared-blocks--locale-select")
     select "Nederlands (Dutch)", from: "locale"
     expect(page).to have_current_path("/?example=1&locale=nl")
 
-    wait_for_stimulus
+    wait_for_stimulus("shared-blocks--locale-select")
     select "English (Engels)", from: "locale"
     expect(page).to have_current_path("/?example=1&locale=en")
   end

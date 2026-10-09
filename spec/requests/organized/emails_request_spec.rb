@@ -322,6 +322,18 @@ RSpec.describe Organized::EmailsController, type: :request do
           end
         end
       end
+      context "impound_claim_denied with an impound_record but no claims" do
+        let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization) }
+        let!(:mail_snippet) do
+          FactoryBot.create(:organization_mail_snippet, organization: current_organization, kind: "impound_claim_denied", body: "<p>Snippet body</p>")
+        end
+        it "renders the organization's snippet" do
+          components = rendered_view_component_names { get "#{base_url}/impound_claim_denied" }
+          expect(response.status).to eq(200)
+          expect(components).to include("Emails::ImpoundClaimApprovedOrDenied::Component")
+          expect(response.body).to include("Snippet body")
+        end
+      end
     end
 
     describe "edit" do

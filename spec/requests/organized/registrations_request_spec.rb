@@ -56,6 +56,17 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
+    it "shows hidden bikes only when they're impounded" do
+      impounded_bike.update(user_hidden: true)
+      FactoryBot.create(:bike_organized, creation_organization: current_organization, user_hidden: true)
+      FactoryBot.create(:bike, :impounded, user_hidden: true)
+      get base_url, params: {search_no_js: true, search_status: "impounded"}
+      expect(assigns(:bikes).pluck(:id)).to eq([impounded_bike.id])
+      get base_url, params: {search_no_js: true, search_status: "all"}
+      expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
+      get base_url, params: {search_no_js: true, search_status: "impounded", search_all: true}
+      expect(assigns(:bikes).pluck(:id)).to eq([])
+    end
     describe "location search" do
       include_context :geocoder_stubbed_bounding_box
       let(:enabled_feature_slugs) { %w[bike_search reg_address] }
@@ -372,7 +383,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         # Without impound_bikes there's no impoundedness to leave out
         expect(assigns(:search_status)).to eq "all"
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
-        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})
+        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all", distance_unit: "km"})
 
         # ... and no filtering by it either, the panel doesn't offer the impound statuses
         get base_url, params: {search_no_js: true, search_status: "impounded"}

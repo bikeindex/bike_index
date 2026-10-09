@@ -734,10 +734,9 @@ en:
         steel: Steel
         titanium: Titanium
       handlebar_type:
-        bmx: BMX style
         drop_bar: Drop bars
-        flat: Flat or riser
         forward: Forward facing
+        horizontal: Flat or riser (horizontal facing)
         other: Not handlebars
         rearward: Rear facing
       marketplace_listing:
@@ -1753,6 +1752,14 @@ en:
           already_signed_in: You're already signed in!
         turnstile_verified:
           verify_not_a_robot: Please confirm you're not a robot
+    ebike_rules:
+      show:
+        state_description: "%{state} e-bike law: %{law}"
+        state_description_in_review: >-
+          We're still reviewing %{state}'s e-bike law. Check your e-bike's class,
+          motor and speed, and see how the e-bike classes work.
+        state_title: "%{state} e-bike laws"
+        title: E-bike rules
     feedbacks:
       block_the_spam:
         please_sign_in: Please sign in to send that message
@@ -1919,6 +1926,10 @@ en:
         update:
           could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
+      organization_messages:
+        create:
+          sent: Message sent to the owner
+          unable_to_send: Unable to send - %{errors}
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
@@ -2316,7 +2327,7 @@ en:
     - Saturday
     formats:
       default: "%Y-%m-%d"
-      long: "%B %d, %Y"
+      long: "%B %-d, %Y"
       short: "%b %d"
     month_names:
     -
@@ -4026,6 +4037,7 @@ en:
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}
       preferred_language: Preferred language
+      preferred_unit_system: Units
       primary_email: Primary email
       receive_the_bike_index_newsletter: Receive the Bike Index newsletter
       remove_email: Remove email
@@ -4036,6 +4048,9 @@ en:
       time_single_format_small: "(not today, yesterday, etc)"
       unconfirmed: unconfirmed!
       unconfirmed_emails: Unconfirmed emails
+      unit_system_automatic: Automatic, from your location
+      unit_system_imperial: Imperial (miles, inches)
+      unit_system_metric: Metric (kilometers, millimeters)
       verified: verified
       why_you_should_text: read why you should
     sharing:
@@ -4546,6 +4561,13 @@ en:
           Bike Index?
         select_email: Select email
         send_emails_directly: Send emails directly to unclaimed bike owners.
+        send_self_registration_email_html: Send email for registrations sent to <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: This includes unregistered
+          notifications.
+        send_self_registration_email_note: >-
+          By default, Bike Index no longer sends email when a vehicle is registered
+          to your organization registration email. Check this box if you want to receive
+          email for registrations with an owner email of %{email}.
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
         unclaimed_registration_definition: >-
@@ -4670,6 +4692,8 @@ en:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    organization_message:
+      subject: Message from %{organization_name} about your %{bike_type}
     organization_signup_confirmation:
       subject: Confirm your email to activate %{name} on Bike Index
     partial_register_confirmation:

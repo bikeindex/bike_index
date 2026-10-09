@@ -8,11 +8,12 @@ module Pages
         # TODO: add Found, Found in search area
         STOLENNESS_SCOPES = %w[proximity stolen non all for_sale].freeze
 
-        def initialize(kind_scope:, location: nil, distance: nil)
+        def initialize(kind_scope:, location: nil, distance: nil, distance_unit: nil)
           @kind_scope = kind_scope
           @is_marketplace = MARKETPLACE_SCOPES.include?(@kind_scope)
 
-          @distance = GeocodeHelper.permitted_distance(distance, default_distance:)
+          @distance_unit = UnitSystem.permitted_distance_unit(distance_unit)
+          @distance = GeocodeHelper.permitted_distance(distance, default_distance:, unit: @distance_unit)
           @location = location
         end
 

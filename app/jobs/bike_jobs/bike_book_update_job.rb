@@ -5,7 +5,7 @@ module BikeJobs
     def perform(bike_id)
       bike = Bike.unscoped.where(id: bike_id).first
       if bike.present?
-        bb_data = Integrations::BikeBook.new.get_model(bike)
+        bb_data = Integrations::Bikebook::Data.new.get_model(bike)
 
         if bb_data.present?
           bb_data["components"].each do |bb_comp|

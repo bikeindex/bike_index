@@ -885,12 +885,11 @@ it:
         steel: Acciaio
         titanium: Titanio
       handlebar_type:
-        bmx: Stile BMX
         drop_bar: Piega
-        flat: Dritto o riser
         forward: Rivolto in avanti
         other: Non manubri
         rearward: Rivolto all'indietro
+        horizontal: Dritto o riser
       propulsion_type:
         foot_pedal: Pedale
         hand_pedal: Hand bike
@@ -2416,6 +2415,10 @@ it:
         available_impound_records:
           we_dont_know_location: Spiacenti, non conosciamo la posizione "%{location}".
             Si prega di provare con una posizione diversa.
+      organization_messages:
+        create:
+          sent: Messaggio inviato al proprietario
+          unable_to_send: Impossibile inviare - %{errors}
     ownerships:
       show:
         no_longer_your_bike: Quello era il tuo %{bike_type} ma non lo è più! Contattaci
@@ -2572,6 +2575,14 @@ it:
         registered_own: Il tuo %{bike_display} è registrato.
         safety_rules_sent: "%{bike_display} è registrato: abbiamo inviato via email
           a %{email} le regole di sicurezza da accettare, completando così la registrazione."
+    ebike_rules:
+      show:
+        state_description: "%{state} Legge sulla bici elettrica: %{law}"
+        state_description_in_review: Stiamo ancora esaminando la legge sulle e-bike
+          di %{state}. Controlla la classe, il motore e la velocità della tua e-bike
+          e scopri come funzionano le classi di e-bike.
+        state_title: "%{state} leggi sulle e-bike"
+        title: Regole per le e-bike
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4321,6 +4332,10 @@ it:
       unconfirmed_emails: Email non confermate
       verified: Verificato
       why_you_should_text: Leggi perché dovresti
+      preferred_unit_system: Unità
+      unit_system_automatic: Automatico, dalla tua posizione
+      unit_system_imperial: Sistema imperiale (miglia, pollici)
+      unit_system_metric: Sistema metrico (chilometri, millimetri)
     sharing:
       choose_file: Seleziona il file...
       create_page: Crea pagina
@@ -4817,6 +4832,15 @@ it:
           reclamate vengono inviate alla vostra organizzazione per essere esaminate
           e inoltrate all'utente finale, poiché tali utenti non hanno attivato le
           notifiche di Bike Index.
+        send_self_registration_email_html: Inviare l'email per le registrazioni inviate
+          a <code>%{email}</code>
+        send_self_registration_email_includes_unregistered: Ciò include le notifiche
+          non registrate.
+        send_self_registration_email_note: Per impostazione predefinita, Bike Index
+          non invia più email quando un veicolo viene registrato all'indirizzo email
+          di registrazione della tua organizzazione. Seleziona questa casella se desideri
+          ricevere email per le registrazioni con un indirizzo email del proprietario
+          del tipo %{email}.
     stickers:
       edit:
         bike: Bicicletta
@@ -4944,6 +4968,8 @@ it:
       subject: Completa la segnalazione del tuo ritrovamento %{cycle_type}
     partial_register_confirmation_stolen:
       subject: Completa la segnalazione del tuo %{cycle_type} rubato
+    organization_message:
+      subject: Messaggio da %{organization_name} riguardo al tuo %{bike_type}
   payments:
     form:
       donation_header: Aiutaci a sostenere i nostri sforzi!
@@ -5574,6 +5600,12 @@ it:
         we_saved_your_registration_html: Abbiamo salvato la tua registrazione per
           un <strong>%{color_and_brand}</strong> nel registro di biciclette più completo
           al mondo.
+      organization_message:
+        reply_to_respond: Rispondi a questa email per rispondere a %{sender_email}.
+        sender_sent_you_a_message: "%{sender_email} da %{organization_name} ti ha
+          inviato un messaggio riguardo al tuo %{bike_type}:"
+        sender_sent_you_a_message_html: "%{sender_email} da %{organization_name} ti
+          ha inviato un messaggio riguardo al tuo %{link}:"
     ui:
       definition_list:
         row:
@@ -5646,6 +5678,8 @@ it:
             uploading: caricamento
         required_marker:
           required: richiesto
+        combobox_state:
+          state: Stato
       alerts:
         base:
           error: Errore
@@ -5693,6 +5727,10 @@ it:
         unregistered: Non registrato dal proprietario - generato da una notifica di
           parcheggio
         with_owner: Registrato e protetto. Con il suo proprietario (non rubato).
+      short_id:
+        copy_id: Copia ID
+      sticker:
+        copy_sticker: Copia adesivo
     pages:
       messages:
         thread_show:
@@ -5761,6 +5799,7 @@ it:
             search_distance: Distanza di ricerca
             search_location: Posizione di ricerca
             within: entro
+            kilometers_of: km allevamento
           wrapper:
             e_vehicles_for_audit: 'Veicoli elettrici da sottoporre a verifica:'
             view_matching_any_audit: visualizzazione corrispondente a qualsiasi audit
@@ -5913,6 +5952,19 @@ it:
             created: Creato
             notification_number: Notifica#
             resolved: Risolto
+          new:
+            create_parking_notification: Crea avviso di parcheggio
+            internal_notes: "%{org_name} note interne"
+            model: Modello
+            new_unregistered_notification: Nuova notifica non registrata
+            not_shown_to_user: non mostrato all'utente
+            notification_because: Notifica perché
+            parking_notification: Avviso di parcheggio
+            photo: Foto
+            registration_form_settings: Impostazioni del modulo di registrazione
+            serial_number: Numero di serie
+            vehicle_info: Informazioni sul veicolo
+            vehicle_type: Tipo di veicolo
         register_settings:
           browser_only: Queste impostazioni vengono applicate solo al tuo browser
             e non influiranno sugli altri utenti.
@@ -5926,9 +5978,19 @@ it:
             la loro registrazione non è completa, con un link per terminarla.
           single_page: Modulo di registrazione a pagina singola
           update: Aggiorna
+          old_unregistered_notification_view: Utilizza la vecchia pagina di notifica
+            per i non registrati
+          unregistered_notification_page: Pagina di notifica per utenti non registrati
         registrations:
           new:
             registration_form_settings: Impostazioni del modulo di registrazione
+        parking_notification_location:
+          address_or_intersection: Indirizzo o incrocio
+          enter_address_manually: Inserire l'indirizzo manualmente
+          map_hint: Trascina la mappa in modo che il segnaposto indichi il punto
+          map_unavailable: 'Impossibile caricare la mappa: la posizione è ancora impostata
+            dal tuo dispositivo.'
+          set_on_map: Imposta sulla mappa
       registrations:
         show:
           bike_details:
@@ -5975,11 +6037,6 @@ it:
           contact_owner:
             contact_the_owner: Contatta il proprietario
             know_something_about_this_bike_type: Sapete qualcosa di questa %{bike_type}?
-            link_url: Collegamento
-            send_message: Invia il messaggio
-            where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci
-              contatti in merito a un annuncio che hai trovato online, includi il
-              link nel campo sottostante.
           current_alerts:
             claim_impound:
               add_a_stolen_bike: aggiungi un %{bike_type} rubato
@@ -6082,22 +6139,29 @@ it:
               title: Aggiornare il registro dei sequestri
             message_owner:
               know_something_about_this_bike_type: Sapete qualcosa di questa %{bike_type}?
-              link_url: Collegamento
-              send_message: Invia il messaggio
-              where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se
-                ci contatti in merito a un annuncio che hai trovato online, includi
-                il link nel campo sottostante.
               know_who_has_this_bike_type: Sai chi ha questo %{bike_type}?
               what_do_you_need_to_ask: Cosa devi chiedere a riguardo %{bike_type}?
                 Inserisci un link nel campo sottostante se ne trovi uno che ti può
                 essere d'aiuto.
+              general_message: Messaggio generale
+              has_active_parking_notification: Questa targa ha una notifica di parcheggio
+                attiva.
+              message_about_theft: Messaggio relativo al furto
+              message_the_owner_of_this_bike_type: Invia un messaggio al proprietario
+                di questo %{bike_type}
+              owner_turned_off_non_stolen_notifications: Questo utente ha disattivato
+                le notifiche per i veicoli non rubati.
+              send_a_new_parking_notification_to_message_the_owner: 'Invia una nuova
+                notifica di parcheggio al proprietario:'
+              send_parking_notification: Invia notifica di parcheggio
+              unavailable_phone_registration: Registrato tramite telefono, quindi
+                non c'è un'e-mail da inviare a
+              unavailable_status: Non è possibile inviare messaggi generici a %{status}
+              unavailable_vehicle_not_registered_with_organization: I messaggi generici
+                possono essere inviati solo ai veicoli registrati con %{organization_name}
             parking_notification_form:
-              address_or_intersection: Indirizzo o incrocio
               create_parking_notification: Crea una nuova notifica di parcheggio
               impound_this_bike_type: Sequestrare questo %{bike_type}
-              map_hint: Trascina la mappa in modo che il segnaposto indichi il punto
-              map_unavailable: 'Impossibile caricare la mappa: la posizione è ancora
-                impostata dal tuo dispositivo.'
               not_shown_to_user: non mostrato all'utente
               parking_notification_notes: "%{org_name} note interne"
             parking_notification_show:
@@ -6113,6 +6177,10 @@ it:
               view_notifications: Visualizza le notifiche
               view_notifications_active_html: "<strong>%{count}</strong> Attivo"
               view_notifications_resolved_html: "<strong>%{count}</strong> Risolto"
+            organization_message_form:
+              send_message: Invia il messaggio
+              what_do_you_want_to_tell_the_owner: Cosa vuoi dire al proprietario di
+                questo %{bike_type}?
           owner_phone:
             or_call: O chiamare
           photos:
@@ -6225,6 +6293,14 @@ it:
             updated_by: Aggiornato da %{user}
           subtitle:
             nickname: 'soprannome: %{name}'
+          stolen_notification_form:
+            link_url: Collegamento
+            send_message: Invia il messaggio
+            where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci
+              contatti in merito a un annuncio che hai trovato online, includi il
+              link nel campo sottostante.
+          share:
+            link_copied: Link copiato
       search:
         everything_combobox:
           made_by: realizzato da
@@ -6254,6 +6330,7 @@ it:
           stolenness_proximity: Rubato nell'area di ricerca
           stolenness_stolen: Rubato ovunque
           within: entro
+          kilometers_of: km allevamento
         result_view_select:
           cards_view: Visualizza come schede
           list_view: Visualizza come elenco
@@ -6670,7 +6747,6 @@ it:
               informazioni inserite qui verrà trasferita.'
             yes_start_over: Sì, ricomincia da capo
           step2_fields:
-            add_another_color: Aggiungi un altro colore
             additional_serial_sticker_number: Numero di serie/etichetta aggiuntivo
             affiliation: "%{org_name} affiliazione"
             are_you_certain: Ne sei certo?
@@ -6678,7 +6754,6 @@ it:
             bike_details: "%{cycle_type} dettagli"
             bottom_bracket: Movimento centrale
             cm: cm
-            color: Colore
             complete_registration: Completare la registrazione %{cycle_type}
             contact_info: Informazioni di contatto
             database_public_note: Il nostro database è pubblico! Potrai modificare
@@ -6720,7 +6795,6 @@ it:
               di telefono.
             phone_required_stolen: È necessario un telefono per registrare un %{cycle_type}
               rubato
-            primary_color_blank: Colore primario — ad esempio Nero
             read_how_to_find_html: Leggi informazioni su %{how_to_find_link} <small>(si
               apre in una nuova finestra)</small>
             rear_dropouts: Forcellini posteriori
@@ -6728,8 +6802,6 @@ it:
             register_with_org_description: "%{org_name} potrà visualizzare e gestire
               questa registrazione."
             registration_type: Tipo di registrazione
-            remove_additional_color: Rimuovere il colore
-            second_color_blank: Secondo colore — ad esempio Rosso
             serial_help_intro: 'La maggior parte delle biciclette ha il numero di
               serie inciso sul telaio. Cerca il tuo numero di serie:'
             serial_location_bottom_bracket: parte inferiore del movimento centrale
@@ -6742,8 +6814,6 @@ it:
             stolen: Rubata
             stolen_description: Questo %{cycle_type} è stato rubato
             student_id: Tessera studentesca
-            third_color_blank: Terzo colore
-            up_to_3: fino a 3
             very_very_few_bikes_html: 'Sono <em>pochissimi</em> i %{cycle_types} realizzati
               senza numero di serie. A meno che non si tratti di questo %{cycle_type}:'
             view_serial_guide: Visualizza la guida completa ai numeri di serie
@@ -6753,6 +6823,14 @@ it:
               serie
             without_serial_number: Questo %{cycle_type} è stato realizzato senza numero
               di serie
+          color_fields:
+            add_another_color: Aggiungi un altro colore
+            color: Colore
+            primary_color_blank: Colore primario — ad esempio Nero
+            remove_additional_color: Rimuovere il colore
+            second_color_blank: Secondo colore — ad esempio Rosso
+            third_color_blank: Terzo colore
+            up_to_3: fino a 3
         views:
           confirm:
             confirming_your_email: Conferma la tua email
@@ -6836,6 +6914,367 @@ it:
               le migliori possibilità di tornare — puoi aggiungere il numero in seguito.
           step_review:
             complete_registration: Completare la registrazione %{cycle_type}
+      bikebook:
+        show:
+          any_activity: Qualsiasi attività
+          any_configuration: Qualsiasi configurazione
+          any_manufacturer: Qualsiasi produttore
+          any_suspension: Qualsiasi sospensione
+          any_vehicle_type: Qualsiasi tipo di veicolo
+          applied_filters: Filtri applicati
+          configuration: Configurazione
+          failed: Impossibile caricare il catalogo. Ricarica la pagina per riprovare.
+          loading: Caricamento del catalogo…
+          max: Massimo
+          min: Min
+          more_filters: Altri filtri
+          motorized: Motorizzato
+          price: Prezzo
+          search_placeholder: Cerca per produttore o modello…
+          sort: Ordinare
+          suspension: Sospensione
+          year: Anno
+          filter_combobox:
+            any: Qualunque
+          byline: Un riferimento gratuito fornito da Bike Index, il registro di biciclette
+            senza scopo di lucro.
+          tagline_html: 'La biblioteca mondiale delle biciclette: cerca, confronta
+            e trova la tua prossima bici tra oltre %{models_count} modelli.'
+          tagline: 'La biblioteca mondiale delle biciclette: cerca, confronta e trova
+            la tua prossima bici.'
+          about_bikebook_label: Informazioni su BikeBook
+          activities: Attività
+          activity_examples: "(ad esempio mountain bike, ciclocross, ecc.)"
+          configuration_examples: "(completo/frameset)"
+          human_powered: Azionata dalla forza umana (acustica)
+          manufacturers: Produttori
+          out_of_class: Fuori dalla classe
+          out_of_class_details: Motorizzato, ma non appartenente alle classi 1, 2
+            o 3 statunitensi, come ciclomotori, motociclette o moto elettriche fuoristrada.
+          propulsion: Propulsione
+          select_a_bike: Seleziona una bicicletta, scegline più di una per confrontarle
+          us_class_1: Classe 1 degli Stati Uniti
+          us_class_2: Classe 2 degli Stati Uniti
+          us_class_3: Classe 3 degli Stati Uniti
+          vehicle_types: Tipi di veicoli
+        donate_strip:
+          donate: Donare
+          pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
+            Bike Index. Aiutateci a coprire i costi del server.
+          region: Fai una donazione a Bike Index
+      ebike_rules:
+        class_tile:
+          class: Classe
+          class_aria: Classe %{n} e-bike
+          class_unknown_aria: Classe di e-bike sconosciuta
+          emoto: E-moto
+        law_details:
+          from: 'Da %{date}:'
+          from_until: 'Da %{starts_on} a %{ends_on}:'
+          limits_start_on: Questi limiti entrano in vigore %{date}. Fino ad allora,
+            si applicano le regole seguenti.
+          restrictions: Regole e restrizioni
+          sources: Fonti
+          until: 'Fino a %{date}:'
+        results:
+          answer_no: 'No'
+          answer_yes: Sì
+          being_compiled: Le norme per questo stato vengono elaborate a partire da
+            fonti primarie.
+          class_1_throttle: Le moto di classe 1 non possono avere l'acceleratore
+          class_3_throttle: L'acceleratore deve disattivarsi a 20 mph
+          classes_start_on: Le lezioni entreranno in vigore %{date}. Nel frattempo,
+            verifica le norme vigenti nello stato.
+          entered_manually: Inserito manualmente · Classe %{n}
+          fails_rule: Non soddisfa questa regola
+          falls_under: In %{state}, rientra in %{name}, che può richiedere la registrazione
+            e una licenza.
+          for_your_information: Per vostra informazione
+          gray_detail: Il tuo %{name} è classificato come e-bike di classe %{n}. Consulta
+            il %{state} DMV per le normative locali.
+          gray_detail_unclassified: Il tuo %{name} non è elencato come e-bike di Classe
+            1, 2 o 3. Controlla presso la %{state} DMV le normative locali.
+          gray_headline: Non abbiamo ancora in archivio le regole per le e-bike di
+            %{state}.
+          green_headline: La tua %{name} è legale da guidare in %{state} come e-bike
+            di classe %{n}.
+          has_throttle: Ha un acceleratore
+          is_registered: Questa bicicletta è immatricolata?
+          legal_to_ride: È legale guidare
+          legal_with_rules: Legale, con regole da verificare
+          limits_start_on: Questi limiti entrano in vigore %{date}
+          manual_bike_name: e-bike
+          may_be_moped: Potrebbe essere regolamentato come ciclomotore o veicolo a
+            motore, il che potrebbe richiedere immatricolazione e patente.
+          meets_rule: Rispetta questa regola
+          motor: Motore
+          mph_html: "%{mph} mph"
+          no_speed_cap: Nessun limite di velocità nella legge statale
+          no_throttle: Niente acceleratore
+          no_watt_cap: Nessun limite di potenza nella legge statale
+          not_classified: Non è una e-bike di classe 1, 2 o 3.
+          not_permitted: Vietato
+          not_provided: Non fornito
+          own_classes: Lo stato stabilisce i propri limiti anziché le tre classi standard
+          recovered_more_often: Le biciclette rubate vengono recuperate con una frequenza
+            doppia se registrate.
+          red_headline: Il tuo %{name} non è ammesso come e-bike secondo le attuali
+            norme %{state}.
+          register_free: Registrati su Bike Index — gratis
+          rule_to_check: Regola da controllare
+          rules_not_on_file: Regole non presenti nel file
+          source_html: 'Fonte: catalogo delle leggi statali di %{link}. I riassunti
+            sono a scopo di riferimento e non costituiscono consulenza legale.'
+          speed_not_provided: Velocità massima non fornita
+          speed_over_cap_html: Assiste fino a %{mph} mph, oltre il limite di %{cap}
+            mph
+          speed_within_cap_html: Assiste a %{mph} mph, entro il limite
+          still_reviewing: Stiamo ancora esaminando le regole di %{state}.
+          still_reviewing_body: Consulta il sito web del Dipartimento dei veicoli
+            a motore (DMV) o dell'assemblea legislativa del tuo stato per le normative
+            vigenti sulle e-bike. Nella maggior parte degli stati, la potenza massima
+            dei motori delle e-bike è limitata a 750 W e la velocità assistita a 20
+            mph (Classe 1-2) o 28 mph (Classe 3).
+          throttle: Acceleratore elettrico
+          throttle_allowed: Acceleratore consentito per la Classe 2
+          throttle_not_allowed: Lo stato non consente un acceleratore
+          throttle_not_stated: La legge statale non specifica se è consentito un acceleratore
+          top_speed: Velocità massima
+          ul_certification: Certificazione UL
+          watts_html: "%{watts}W"
+          watts_not_provided: Potenza del motore non specificata
+          watts_over_cap_html: Il motore %{watts}W supera il limite %{cap}W
+          watts_within_cap_html: "%{watts}Il motore W è all'interno del tappo"
+          yellow_headline:
+            one: La tua %{name} è legale da guidare in %{state} come e-bike di classe
+              %{n}, con %{count} regola da verificare.
+            other: La tua %{name} è legale da guidare in %{state} come e-bike di classe
+              %{n}, con %{count} regole da verificare.
+          yellow_headline_class_unknown:
+            one: Il tuo %{name} potrebbe essere legale da guidare in %{state}, con
+              la regola %{count} da verificare.
+            other: Il tuo %{name} potrebbe essere legale da guidare in %{state}, con
+              %{count} regole da verificare.
+          yes_to_html: Sì, a %{mph}
+          your_bike: La tua bici
+          your_ebike: La tua e-bike
+          your_state: Il tuo stato
+          bikebook_name: BikeBook
+          class_3_throttle_over_html: L'acceleratore funziona fino a %{mph} mph, oltre
+            i 20 mph è consentito l'acceleratore di una Classe 3
+          class_3_throttle_within_html: L'acceleratore si ferma a %{mph} mph
+          class_unknown_check_label: BikeBook non indica la sua classe o la velocità
+            massima, quindi controlla la classe sull'etichetta.
+          entered_manually_unclassified: Inserito manualmente
+          entered_unverified: Dati inseriti da te, non verificati da BikeBook.
+          full_bikebook_entry: Visualizza la voce completa su BikeBook
+          model_year_bikebook: "%{year} modello · BikeBook"
+          over_mph_html: Oltre %{mph} mph
+          red_headline_manual: Questa non è una e-bike secondo le attuali regole %{state}.
+          speed_past_cap_html: Assiste oltre %{past} mph, oltre il limite %{cap} mph
+          speed_past_html: Assiste oltre %{past} mph; verificare che si fermi entro
+            %{cap} mph
+          classes_not_recognized:
+            one: La classe %{n} non è riconosciuta qui
+            other: Le classi %{n} non sono riconosciute qui
+          classes_recognized:
+            one: La classe %{n} è riconosciuta
+            other: Le classi %{n} sono riconosciute
+          read_more: Per saperne di più
+          stock_photo: Foto di repertorio
+        rule_label:
+          classes: Classi riconosciute
+          power: Limite di potenza del motore
+          speed: Massima velocità assistita
+          throttle: Acceleratore elettrico
+        rule_value:
+          allowed: Consentito
+          classes:
+            one: Classe %{classes}
+            other: Classi %{classes}
+          mph_html: "%{mph} mph"
+          no_cap: Senza limiti
+          not_allowed: Vietato
+          own_definition: 'La sua definizione: %{name}'
+          watts_html: "%{watts}W"
+        show:
+          answer_no: 'No'
+          answer_yes: Sì
+          assist: Assistenza
+          banned_body: A New York, le e-bike e le batterie vendute sul suo territorio
+            devono essere conformi agli standard UL 2849 o UL 2271 (Legge locale 39
+            del 2023). Università, enti gestori di alloggi e aziende di trasporto
+            pubblico stanno adottando norme simili per lo stoccaggio e la ricarica
+            al chiuso.
+          banned_heading: Perché le biciclette non certificate vengono vietate
+          battery_safety: Sicurezza delle batterie e antincendio
+          bike_error: Seleziona una bicicletta dall'elenco oppure inseriscine i dettagli
+            manualmente.
+          bike_model: Modello di bicicletta
+          bike_placeholder: Cerca la tua bici (marca, modello, anno)
+          bikes_registered_html: "%{number} biciclette registrate"
+          certification_involves_body: Un laboratorio di prova riconosciuto a livello
+            nazionale sottopone i campioni di produzione a test di sovraccarico, cortocircuito,
+            impatto, resistenza all'acqua e instabilità termica. Lo stabilimento viene
+            poi ispezionato periodicamente per mantenere la certificazione.
+          certification_involves_heading: Cosa comporta la certificazione
+          change: modifica?
+          check_my_bike: Controlla la mia bici
+          class_1_body: Il motore aiuta solo quando si pedala e si arresta a 32 km/h.
+            È consentito nella maggior parte dei luoghi in cui può circolare una normale
+            bicicletta.
+          class_1_tag: Solo pedalata assistita
+          class_2_body: L'acceleratore permette di muovere la bicicletta senza pedalare,
+            fino a una velocità di 20 miglia orarie (circa 32 km/h). Alcuni sentieri
+            e parchi non consentono l'uso dell'acceleratore.
+          class_2_tag: Acceleratore elettrico
+          class_3_body: Bicicletta a pedalata assistita fino a 45 km/h, con tachimetro.
+            Spesso è previsto l'obbligo del casco, un'età minima e limitazioni sui
+            percorsi.
+          class_3_tag: Pedalata assistita più veloce
+          class_n: Classe %{n}
+          classes_heading: Lezioni di e-bike, spiegate
+          classes_intro: Nella maggior parte degli stati si utilizza un sistema a
+            tre classi. La classe di appartenenza determina la velocità di assistenza
+            del motore, se è consentito l'uso dell'acceleratore e dove è possibile
+            circolare.
+          compare_html: Vuoi confrontare più biciclette? %{link}
+          detected_html: Abbiamo rilevato <strong>%{state}</strong> —
+          disclaimer: Bike Index è un'organizzazione no-profit 501(c)(3). I riassunti
+            delle leggi statali sono forniti a titolo di riferimento e non costituiscono
+            consulenza legale.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          enter_manually: Non trovi la tua bici? Inserisci i suoi dati.
+          for_parents: Per i genitori
+          form_label: Verifica della conformità delle e-bike
+          has_throttle: Ha l'acceleratore?
+          heading: Informati sulle regole relative alle e-bike.
+          how_to_check_1: Trova il marchio UL e il numero di file sull'etichetta della
+            batteria e del telaio.
+          how_to_check_2: Cerca quel numero in UL Product iQ.
+          how_to_check_heading: Come controllare una bicicletta
+          location_not_shared: La posizione non viene condivisa. Seleziona il tuo
+            stato dall'elenco.
+          manual_legend: Inserisci i dettagli della tua bicicletta
+          motor: Motore
+          motor_cap: "≤750W"
+          motor_wattage: Potenza del motore (W)
+          mph: "%{mph} mph"
+          not_an_ebike: Non è una bici elettrica
+          parent_step_1_body: Molti stati stabiliscono un'età minima per la Classe
+            3, e alcuni per ogni classe. Verifica le normative del tuo stato prima
+            di scegliere una bicicletta.
+          parent_step_1_title: Verifica le norme relative all'età
+          parent_step_2_body: Pedalata assistita soltanto, senza acceleratore, e l'assistenza
+            si interrompe a 32 km/h. È la categoria più facile da imparare e ammessa
+            nella maggior parte dei posti.
+          parent_step_2_title: Inizia con la Classe 1
+          parent_step_3_body: Il bambino dovrebbe già saper frenare, segnalare, guardare
+            alle spalle e mantenere la traiettoria rettilinea su una bicicletta normale.
+            Prima di iniziare, esercitatevi con la e-bike in un luogo tranquillo.
+          parent_step_3_title: Assicurati che siano in grado di gestirlo
+          parent_step_4_body: 'Verifica quali zone della tua città e del percorso
+            per andare a scuola sono consentite le e-bike: obbligo del casco, marciapiedi,
+            piste ciclabili e qualsiasi regolamento scolastico o del campus.'
+          parent_step_4_title: Imparate insieme le regole locali
+          parent_step_5_body: Scegli una bicicletta certificata UL 2849. Caricala
+            su una superficie rigida, lontano dalle uscite di corrente, utilizzando
+            il caricabatterie in dotazione e non lasciarla mai incustodita durante
+            la notte.
+          parent_step_5_title: Acquista prodotti certificati UL e ricarica in tutta
+            sicurezza.
+          parent_step_6_body: Anche le biciclette dei bambini vengono rubate. La registrazione
+            è gratuita e richiede circa due minuti.
+          parent_step_6_title: Registra la bicicletta
+          parents_body: Le e-bike sono più pesanti e veloci delle biciclette tradizionali
+            che la maggior parte dei bambini usa per imparare ad andare in bicicletta.
+            Prima di acquistarle, informatevi sulle normative vigenti nel vostro stato
+            e comune e assicuratevi che vostro figlio sia pronto a guidarne una in
+            sicurezza.
+          parents_heading: State pensando di acquistare una e-bike per vostro figlio?
+          parents_link: Consulta le normative del tuo stato in materia di età e utilizzo
+            del casco.
+          pedal: Pedale
+          pill: Bike Index · Organizzazione no-profit · Oltre 10 anni di esperienza
+          recoveries_html: "%{number} recuperi"
+          register_band_heading: Le biciclette registrate vengono ritrovate con una
+            frequenza doppia in caso di furto. La registrazione è gratuita.
+          register_your_bike: Registra la tua bicicletta
+          select_state: Seleziona il tuo stato
+          state: Stato
+          state_error: Scegli uno stato.
+          subheading: Inserisci il tuo stato e la tua bicicletta per visualizzare
+            le normative del tuo stato.
+          throttle: Acceleratore elettrico
+          top_assist: Assistenza superiore
+          ul_2271_body: Esegue un test sulla singola batteria agli ioni di litio.
+            Comune su biciclette e batterie di ricambio; non include il caricabatterie
+            o il motore.
+          ul_2271_scope: Il pacco batterie
+          ul_2271_test_1: Fuga termica della cella e del pacco
+          ul_2271_test_2: Schiacciamento, impatto e caduta
+          ul_2271_test_3: guasti al sistema di gestione della batteria
+          ul_2849_body: Questo test verifica che batteria, motore, caricabatterie
+            e controller funzionino insieme come un unico sistema. Si tratta dello
+            standard richiesto dalla maggior parte delle città e dei campus universitari.
+          ul_2849_scope: Il sistema elettrico completo per e-bike
+          ul_2849_test_1: Protezione da sovraccarico e cortocircuito
+          ul_2849_test_2: Esposizione all'acqua, vibrazioni e caduta
+          ul_2849_test_3: Sicurezza del caricabatterie e del cablaggio
+          ul_heading: Perché la certificazione UL è importante
+          ul_intro: Gli incendi delle batterie agli ioni di litio si propagano rapidamente
+            e sono difficili da spegnere. La certificazione UL significa che un laboratorio
+            indipendente ha testato la bicicletta o la batteria per verificarne la
+            resistenza al fuoco e ai guasti elettrici. Sempre più campus universitari,
+            proprietari di immobili e comuni richiedono questa certificazione prima
+            di introdurre una e-bike all'interno degli edifici.
+          watts_placeholder: ad esempio 750
+          bikebook_didnt_load: BikeBook non si è caricato. Inserisci i dettagli della
+            tua bici qui sotto.
+          bikebook_loading: Caricamento di BikeBook in corso…
+          choose_by_bike_model: Scegli in base al modello di bicicletta
+          emoto_limits_body: Una velocità massima superiore a 45 km/h, una velocità
+            di accelerazione superiore a 32 km/h o un motore di potenza superiore
+            a 750 W definiscono un veicolo elettrico come una moto. Nella maggior
+            parte degli stati, questi veicoli sono equiparati a ciclomotori o motociclette,
+            il che può comportare l'obbligo di immatricolazione, assicurazione e patente.
+          how_to_check_lookup: Guarda il modello qui sopra. BikeBook mostra la certificazione
+            laddove è registrata.
+          over_28_mph: Oltre 28 miglia orarie
+          top_speed: Qual è la sua velocità massima?
+          visit_bikebook_link: Visita BikeBook.
+        state_reference:
+          compiling: Stiamo raccogliendo le normative sulle e-bike di %{state} provenienti
+            dalla legislatura statale e dal DMV. Tornate a trovarci presto.
+          filter_placeholder: Digita il nome di uno stato
+          filter_states: Stati del filtro
+          heading: Normative statali sulle biciclette elettriche
+          in_review: In revisione
+          limits_subheading: Tutti i 50 stati e il Distretto di Columbia. Apri uno
+            stato per visualizzarne i limiti, le regole e le fonti.
+          matching_of_total: "%{number} di %{total} corrispondono"
+          on_file_of_total_html: "%{number} degli stati %{total} e DC in archivio
+            · altri in fase di revisione"
+          all_on_file: Tutti i 50 stati e il Distretto di Columbia sono archiviati.
+          check_in_state: Controlla una e-bike in %{state}
+          no_match: Nessuno stato corrisponde. Prova con un altro nome.
+        ul_badge:
+          certified: Certificato UL %{standard}
+          meaning_2271_certified: Il pacco batterie ha superato i test di sicurezza
+            UL per sovraccarico, cortocircuito e resistenza agli urti.
+          meaning_2271_unknown: Non disponiamo ancora dei dati di certificazione della
+            batteria. Controlla l'etichetta sulla batteria.
+          meaning_2849_unknown: Non disponiamo ancora di dati di certificazione di
+            sistema per questo modello. Cerca il marchio UL sull'etichetta del telaio.
+          scope_2271: Pacco batterie
+          scope_2849: Sistema elettrico per e-bike
+          status_unknown: Stato UL %{standard} sconosciuto
+          meaning_2271_check_label: Controlla l'etichetta sulla batteria.
+          meaning_2849_check_label: Cerca il marchio UL sull'etichetta del telaio.
+          meaning_2849_system_certified: L'intero sistema elettrico (motore, batteria,
+            caricabatterie e centralina) ha superato congiuntamente i test di sicurezza
+            antincendio e di sicurezza elettrica.
     shared_blocks:
       footer:
         about: Di
@@ -6876,6 +7315,7 @@ it:
         vendor_terms: termini del fornitore
         where_we_are: Dove ci troviamo
         who_we_serve: A chi ci rivolgiamo
+        ebike_checker: Controllore di e-bike
       law_enforcement_donation:
         bikeindex_is_a_nonprofit: Bike Index è un'organizzazione no-profit 501(c)(3).
           Dipendiamo dalle donazioni per fornire questi servizi. Raccomandiamo alle

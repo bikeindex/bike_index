@@ -7,8 +7,8 @@ module Pages
         module ParkingNotificationForm
           # Org-admin parking-notification / impound form panel. Rendered inside the
           # org-admin action-panel accordion (data-panel-name="parking"); the Stimulus
-          # `registrations--show--parking-notification-form` controller wires up the map
-          # pin, geolocation, the address fields and the impound/notification switch
+          # `org--parking-notification-form` controller wires up the map pin,
+          # geolocation, the address fields and the impound/notification switch
           class Component < ApplicationComponent
             def initialize(bike:, organization:)
               @bike = bike

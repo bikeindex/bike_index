@@ -30,14 +30,33 @@ module BikeServices
     MATCH_INPUTS = (MATCHED_ATTRS.keys + %w[owner_email manufacturer_id manufacturer_other cycle_type frame_size_unit]).freeze
 
     # The token's registration when step 1 was never submitted, otherwise a new one.
-    # A signed-in user's email prefills owner_email
-    def b_param_for(user:, token_id: nil, status: nil, email: nil, origin: "register_flow")
+    # A signed-in user's email prefills owner_email, a scanned sticker's code bike_sticker
+    # prefill ({manufacturer:, frame_model:}, from a link that knows the bike) is kept apart from the
+    # bike's values, since a manufacturer there would count step 1 as submitted - with_prefill shows it
+    def b_param_for(user:, token_id: nil, status: nil, email: nil, bike_sticker: nil, origin: "register_flow", prefill: {})
       status = nil unless Bike.statuses.include?(status)
       existing = find_token(session_token: token_id, user:)
       return assign_start_params(existing, user, email:, status:) if reusable?(existing, origin)
 
-      bike_params = {owner_email: owner_email_for(user, email), status:}.compact
-      BParam.create(origin:, creator_id: user&.id, params: {bike: bike_params}.as_json)
+      bike_params = {owner_email: owner_email_for(user, email), status:, bike_sticker:}.compact
+      BParam.create(origin:, creator_id: user&.id, params: {bike: bike_params, prefill: prefill.presence}.compact.as_json)
+    end
+
+    # params with the prefill filling the bike's blank manufacturer and model, for a step's fields to show
+    # without saving - submitting the step is what stores them. An unknown manufacturer is Other, named
+    def with_prefill(params)
+      prefill = params["prefill"]
+      return params if prefill.blank?
+
+      bike = params["bike"] || {}
+      name = prefill["manufacturer"]
+      manufacturer = (Manufacturer.friendly_find(name) || Manufacturer.other if name.present? && bike["manufacturer_id"].blank?)
+      additions = {
+        "manufacturer_id" => manufacturer&.id,
+        "manufacturer_other" => (name if manufacturer&.other?),
+        "frame_model" => (prefill["frame_model"] if bike["frame_model"].blank?)
+      }.compact
+      params.merge("bike" => bike.merge(additions))
     end
 
     # Resume a registration by token: anonymous, or the passed user's
@@ -292,14 +311,17 @@ module BikeServices
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
     # fields into the params json. The photo arrives one of two ways: as bytes from a plain
     # file field, or as the signed id of a blob the browser already uploaded.
-    # Returns whether the step passed - a registration for someone else needs their name.
+    # Returns whether the step passed - it needs the owner's name.
     # A failed step still saves, it just isn't marked complete, so nothing entered is lost.
     # Not past an earlier error on the submission, which saving would clear
     def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil, additional: nil)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
       bike_params = honeypot_spam(bike_params, additional)
-      completed = b_param.self_made?(user) || bike_params["user_name"].present?
+      user_name = bike_params["user_name"]
+      completed = owner_name_known?(b_param, user) || user_name.present?
+      # So their next registration doesn't ask again
+      user.update(name: user_name) if user_name.present? && user&.name.blank? && b_param.self_made?(user)
       clear_stale_report(b_param, bike_params["status"])
       set_auto_organization(b_param, register_with_organization)
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
@@ -307,6 +329,9 @@ module BikeServices
       b_param.errors.add(:base, translation(:name_required)) unless completed
       completed
     end
+
+    # Their own registration, by an account with a name - SSO and emailed-link accounts start without
+    def owner_name_known?(b_param, user) = user&.name.present? && b_param.self_made?(user)
 
     def permitted_report_params
       %i[date timezone impounded_description] + STOLEN_REPORT_ATTRS +

@@ -39,4 +39,34 @@ RSpec.describe "Viewing a registration", :js, type: :system do
     expect(stolen_notification.reference_url).to eq "https://example.com/listing"
     expect(stolen_notification.kind).to eq "stolen_permitted"
   end
+
+  context "an organization member viewing their organization's registration" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
+    let(:viewer) { FactoryBot.create(:organization_user, organization:) }
+    let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: true) }
+    let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: owner, creation_organization: organization) }
+
+    it "sends an organization message, switching to the stolen form and back" do
+      sign_in(viewer)
+      visit registration_path(bike, organization_id: organization.id)
+      click_button "Message Owner"
+
+      expect(page).to have_field("organization_message[message]")
+      expect(page).to have_no_field("stolen_notification[reference_url]")
+
+      choose "Message about theft", allow_label_click: true
+      expect(page).to have_field("stolen_notification[reference_url]")
+      expect(page).to have_no_field("organization_message[message]")
+
+      choose "General message", allow_label_click: true
+      fill_in "organization_message[message]", with: "Your lock is on the rack"
+
+      Sidekiq::Job.clear_all
+      expect {
+        within("[data-registrations--show--message-owner-target='organizationMessage']") { click_button "Send message" }
+        expect(page).to have_content("Message sent to the owner", wait: 10)
+      }.to change(OrganizationMessage, :count).by(1)
+      expect(OrganizationMessage.last).to have_attributes(sender_id: viewer.id, receiver_id: owner.id, message: "Your lock is on the rack")
+    end
+  end
 end
