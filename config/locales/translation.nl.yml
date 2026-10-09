@@ -6870,8 +6870,6 @@ nl:
             primaire bronnen.
           class_1_throttle: Motorfietsen van klasse 1 mogen geen gashendel hebben.
           class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
-          class_not_recognized: Klasse %{e_bike_class} wordt hier niet herkend.
-          class_recognized: Klasse %{e_bike_class} wordt herkend
           classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
             regels van de staat raadplegen.
           entered_manually: Handmatig ingevoerd · Klasse %{n}
@@ -6950,7 +6948,6 @@ nl:
           your_ebike: Jouw e-bike
           your_state: Uw staat
           bikebook_name: BikeBook
-          bikebook_photo: Foto · BikeBook
           class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
             20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
           class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
@@ -6966,6 +6963,14 @@ nl:
             de %{cap} mph-limiet
           speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
             bij %{cap} mph
+          classes_not_recognized:
+            one: Klasse %{n} wordt hier niet herkend.
+            other: De klassen %{n} worden hier niet herkend.
+          classes_recognized:
+            one: Klasse %{n} wordt herkend
+            other: De klassen %{n} worden erkend.
+          read_more: Lees meer
+          stock_photo: Stock foto
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit

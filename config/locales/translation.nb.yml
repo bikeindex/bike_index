@@ -6675,8 +6675,6 @@ nb:
           being_compiled: Regler for denne staten blir satt sammen fra primærkilder.
           class_1_throttle: Klasse 1-sykler kan ikke ha gass
           class_3_throttle: Gassen må slås av ved 32 km/t
-          class_not_recognized: Klassen %{e_bike_class} gjenkjennes ikke her
-          class_recognized: Klasse %{e_bike_class} er gjenkjent
           classes_start_on: Kursene trer i kraft %{date}. Inntil da, sjekk statens
             gjeldende regler
           entered_manually: Angitt manuelt · Klasse %{n}
@@ -6751,7 +6749,6 @@ nb:
           your_ebike: Elsykkelen din
           your_state: Din stat
           bikebook_name: Sykkelbok
-          bikebook_photo: Foto · Sykkelbok
           class_3_throttle_over_html: Gasspedalen går til %{mph} mph, over 20 mph
             er tillatt for en klasse 3-gasspedal.
           class_3_throttle_within_html: Gasspedalen stopper ved %{mph} mph
@@ -6766,6 +6763,14 @@ nb:
           speed_past_cap_html: Assisterer forbi %{past} mph, over %{cap} mph-grensen
           speed_past_html: Assisterer forbi %{past} mph; sjekk at den stopper ved
             %{cap} mph
+          classes_not_recognized:
+            one: Klassen %{n} gjenkjennes ikke her
+            other: Klasser %{n} gjenkjennes ikke her
+          classes_recognized:
+            one: Klasse %{n} er gjenkjent
+            other: Klasser %{n} er gjenkjent
+          read_more: Les mer
+          stock_photo: Arkivfoto
         rule_label:
           classes: Klasser anerkjent
           power: Motoreffektbegrensning
