@@ -28,7 +28,7 @@
   <% end %>
 
   <% table.column(sortable: "origin", classes: "tw:text-xs") do |b_param| %>
-    <%= b_param.origin&.humanize %>
+    <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind: b_param.origin)) %>
   <% end %>
 
   <% table.column(label: "Organization") do |b_param| %>

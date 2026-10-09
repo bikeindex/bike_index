@@ -15,6 +15,7 @@ RSpec.describe SpreadsheetJobs::ImporterJob, type: :job do
         expect(Manufacturer.friendly_find("Riese & Müller")).to be_present
         expect(PrimaryActivity.count).to be > 0
         expect(Ctype.friendly_find("Wheel")).to be_present
+        expect(WheelSize.find_by(iso_bsd: 622)&.name).to eq "700 C"
       end
     end
 

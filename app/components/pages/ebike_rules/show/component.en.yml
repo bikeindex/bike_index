@@ -1,0 +1,141 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        show:
+          answer_no: 'No'
+          answer_yes: 'Yes'
+          assist: Assist
+          banned_body: >-
+            New York City requires e-bikes and batteries sold there to meet UL 2849
+            or UL 2271 (Local Law 39 of 2023). Universities, housing providers and
+            transit agencies are adopting similar rules for indoor storage and charging.
+          banned_heading: Why uncertified bikes are being banned
+          battery_safety: Battery and fire safety
+          bike_error: Pick a bike from the list, or enter its details manually.
+          bike_model: Bike model
+          bike_placeholder: Search your bike (make, model, year)
+          bikebook_didnt_load: BikeBook didn't load. Enter your bike's details below.
+          bikebook_loading: Loading BikeBook…
+          bikes_registered_html: "%{number} bikes registered"
+          certification_involves_body: >-
+            A nationally recognized testing lab puts production samples through overcharge,
+            short-circuit, impact, water and thermal-runaway tests. The factory is
+            then inspected on an ongoing basis to keep the listing.
+          certification_involves_heading: What certification involves
+          change: change?
+          check_my_bike: Check my bike
+          choose_by_bike_model: Choose by bike model
+          class_1_body: >-
+            The motor helps only while you pedal and stops at 20 mph. Allowed in most
+            places a regular bike can go.
+          class_1_tag: Pedal-assist only
+          class_2_body: >-
+            A throttle can move the bike without pedaling, up to 20 mph. Some trails
+            and parks don't allow throttles.
+          class_2_tag: Throttle
+          class_3_body: >-
+            Pedal-assist to 28 mph, with a speedometer. Often comes with a helmet
+            rule, a minimum age, and limits on paths.
+          class_3_tag: Faster pedal-assist
+          class_n: Class %{n}
+          classes_heading: E-bike classes, explained
+          classes_intro: >-
+            Most states use a three-class system. Your class decides how fast the
+            motor helps, whether a throttle is allowed, and where you can ride.
+          compare_html: Want to compare multiple bikes? %{link}
+          detected_html: We detected <strong>%{state}</strong> —
+          disclaimer: >-
+            Bike Index is a 501(c)(3) nonprofit. State law summaries are for reference,
+            not legal advice.
+          emoto_limits_body: >-
+            Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
+            make it an e-moto. Most states treat these as mopeds or motorcycles, which
+            can require registration, insurance and a license.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          enter_manually: Can't find your bike? Enter its details.
+          for_parents: For parents
+          form_label: E-bike compliance lookup
+          has_throttle: Has a throttle?
+          heading: Know your e-bike rules.
+          how_to_check_1: Find the UL mark and file number on the battery and frame
+            label.
+          how_to_check_2: Search that number in UL Product iQ.
+          how_to_check_heading: How to check a bike
+          how_to_check_lookup: Look the model up above. BikeBook shows certification
+            where it's on record.
+          location_not_shared: Location not shared. Choose your state from the list.
+          manual_legend: Enter your bike's details
+          motor: Motor
+          motor_cap: "≤750W"
+          motor_wattage: Motor wattage (W)
+          mph: "%{mph} mph"
+          not_an_ebike: Not an e-bike
+          over_28_mph: Over 28 mph
+          parent_step_1_body: >-
+            Many states set a minimum age for Class 3, and some for every class. Look
+            up your state before you choose a bike.
+          parent_step_1_title: Check the age rules
+          parent_step_2_body: >-
+            Pedal-assist only, no throttle, and it stops helping at 20 mph. It's the
+            easiest class to learn and allowed in the most places.
+          parent_step_2_title: Start with Class 1
+          parent_step_3_body: >-
+            Your child should already brake, signal, look over their shoulder and
+            hold a straight line on a regular bike. Practice on the e-bike somewhere
+            quiet first.
+          parent_step_3_title: Make sure they can handle it
+          parent_step_4_body: >-
+            Walk through where e-bikes can ride in your town and on the way to school:
+            helmet rules, sidewalks, paths, and any school or campus policy.
+          parent_step_4_title: Learn the local rules together
+          parent_step_5_body: >-
+            Choose a UL 2849 certified bike. Charge it on a hard surface away from
+            exits, with the charger it came with, and never overnight unattended.
+          parent_step_5_title: Buy UL-certified and charge safely
+          parent_step_6_body: Kids' bikes get stolen too. Registration is free and
+            takes about two minutes.
+          parent_step_6_title: Register the bike
+          parents_body: >-
+            E-bikes are heavier and faster than the bikes most kids learn on. Before
+            you buy, find out what your state and town allow, and make sure your child
+            is ready to ride one safely.
+          parents_heading: Buying an e-bike for your child?
+          parents_link: Look up your state's age and helmet rules
+          pedal: Pedal
+          pill: Bike Index · Nonprofit · 10+ years
+          recoveries_html: "%{number} recoveries"
+          register_band_heading: Registered bikes are recovered 2× more often when
+            stolen. Registration is free.
+          register_your_bike: Register your bike
+          select_state: Select your state
+          state: State
+          state_error: Choose a state.
+          subheading: Enter your state and bike to see your state's rules.
+          throttle: Throttle
+          top_assist: Top assist
+          top_speed: What is its top speed?
+          ul_2271_body: >-
+            Tests the lithium-ion battery pack on its own. Common on bikes and replacement
+            batteries; it doesn't cover the charger or motor.
+          ul_2271_scope: The battery pack
+          ul_2271_test_1: Cell and pack thermal runaway
+          ul_2271_test_2: Crush, impact and drop
+          ul_2271_test_3: Battery management system faults
+          ul_2849_body: >-
+            Tests the battery, motor, charger and controller working together as one
+            system. This is the standard most cities and campuses ask for.
+          ul_2849_scope: The complete e-bike electrical system
+          ul_2849_test_1: Overcharge and short-circuit protection
+          ul_2849_test_2: Water exposure, vibration and drop
+          ul_2849_test_3: Charger and wiring safety
+          ul_heading: Why UL certification matters
+          ul_intro: >-
+            Lithium-ion battery fires start fast and are hard to put out. UL certification
+            means an independent lab tested the bike or battery against fire and electrical
+            failure. More campuses, landlords and cities now ask for proof of it before
+            an e-bike comes indoors.
+          visit_bikebook_link: Visit BikeBook.
+          watts_placeholder: e.g. 750

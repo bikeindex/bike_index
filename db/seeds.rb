@@ -18,10 +18,9 @@ cgroup_priorities.each do |name, priority|
   cgroup.update!(priority:)
 end
 
-# NOTE: this does not seed manufacturers, primary_activities or components, those are pulled via rake task
+# NOTE: this does not seed manufacturers, primary_activities, components or wheel sizes, those are pulled via rake task
 require File.expand_path("db/seeds/seed_helpers", Rails.root)
 SeedHelpers.with_clock do
-  require File.expand_path("db/seeds/seed_wheel_sizes", Rails.root)
   require File.expand_path("db/seeds/seed_bike_associations", Rails.root)
   require File.expand_path("db/seeds/seed_countries_and_states", Rails.root)
   require File.expand_path("db/seeds/seed_test_users", Rails.root)

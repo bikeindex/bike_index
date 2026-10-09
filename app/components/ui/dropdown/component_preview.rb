@@ -38,6 +38,11 @@ module UI
         end
       end
 
+      # Opening one closes the other
+      def two_dropdowns
+        {template: "ui/dropdown/component_preview/two_dropdowns"}
+      end
+
       # @!endgroup
     end
   end

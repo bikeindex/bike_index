@@ -9,6 +9,16 @@ RSpec.describe NewsController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template("index")
       end
+      context "with tags" do
+        let(:blog) { FactoryBot.create(:blog, published: true) }
+        let(:tag_common) { FactoryBot.create(:content_tag, name: "Zebra", priority: 5) }
+        let(:tag_rare) { FactoryBot.create(:content_tag, name: "Aardvark", priority: 1) }
+        it "lists each post's tags most common first" do
+          [tag_rare, tag_common].each { |tag| BlogContentTag.create!(blog:, content_tag: tag) }
+          get base_url
+          expect(response.body.index("Zebra")).to be < response.body.index("Aardvark")
+        end
+      end
     end
 
     describe "show" do
@@ -106,6 +116,25 @@ RSpec.describe NewsController, type: :request do
         expect(response.status).to eq(200)
         get "/news.atom"
         expect(response.status).to eq(200)
+      end
+      context "with caching", :caching do
+        include_context :caching_basic
+        let(:content_tag) { FactoryBot.create(:content_tag) }
+        def create_tagged_blog(title)
+          FactoryBot.create(:blog, :published, title:).tap { |blog| BlogContentTag.create!(blog:, content_tag:) }
+        end
+        it "shows a new post in the full and the tagged feed" do
+          create_tagged_blog("First post")
+          get "/news.atom"
+          get "/news.atom", params: {search_tags: content_tag.slug}
+          expect(response.body).to include("First post")
+
+          create_tagged_blog("Second post")
+          get "/news.atom"
+          expect(response.body).to include("Second post")
+          get "/news.atom", params: {search_tags: content_tag.slug}
+          expect(response.body).to include("Second post")
+        end
       end
     end
   end

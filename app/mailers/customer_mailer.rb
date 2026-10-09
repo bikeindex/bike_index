@@ -79,7 +79,7 @@ class CustomerMailer < ApplicationMailer
     raise "Missing theft survey mail snippet" if mail_snippet.blank?
 
     mail_body = mail_snippet.body.gsub("SURVEY_LINK_ID", notification.survey_id.to_s)
-    if notification.user.present?
+    if notification.user&.name.present?
       mail_body = mail_body.gsub(/Bike Index Registrant/i, notification.user.name)
     end
 

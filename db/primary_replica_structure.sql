@@ -2784,6 +2784,42 @@ ALTER SEQUENCE public.organization_manufacturers_id_seq OWNED BY public.organiza
 
 
 --
+-- Name: organization_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_messages (
+    id bigint NOT NULL,
+    bike_id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    sender_id bigint NOT NULL,
+    receiver_id bigint,
+    receiver_email character varying,
+    message text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_messages_id_seq OWNED BY public.organization_messages.id;
+
+
+--
 -- Name: organization_model_audits; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2981,7 +3017,8 @@ CREATE TABLE public.organizations (
     direct_unclaimed_notifications boolean DEFAULT false,
     spam_registrations boolean DEFAULT false,
     opted_into_theft_survey_2023 boolean DEFAULT false,
-    paid_money boolean DEFAULT false NOT NULL
+    paid_money boolean DEFAULT false NOT NULL,
+    send_self_registration_email boolean DEFAULT false NOT NULL
 );
 
 
@@ -4002,7 +4039,11 @@ CREATE TABLE public.stripe_events (
     stripe_id character varying,
     name character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    payload jsonb,
+    stripe_event_id character varying,
+    stripe_account_id character varying,
+    processed_at timestamp(6) without time zone
 );
 
 
@@ -4458,7 +4499,8 @@ CREATE TABLE public.users (
     address_record_id bigint,
     can_send_many_marketplace_messages boolean DEFAULT false NOT NULL,
     feature_registration_show_legacy boolean DEFAULT false NOT NULL,
-    passwordless_user boolean DEFAULT false NOT NULL
+    passwordless_user boolean DEFAULT false NOT NULL,
+    preferred_unit_system integer
 );
 
 
@@ -5003,6 +5045,13 @@ ALTER TABLE ONLY public.organization_landing_pages ALTER COLUMN id SET DEFAULT n
 --
 
 ALTER TABLE ONLY public.organization_manufacturers ALTER COLUMN id SET DEFAULT nextval('public.organization_manufacturers_id_seq'::regclass);
+
+
+--
+-- Name: organization_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_messages ALTER COLUMN id SET DEFAULT nextval('public.organization_messages_id_seq'::regclass);
 
 
 --
@@ -5861,6 +5910,14 @@ ALTER TABLE ONLY public.organization_manufacturers
 
 
 --
+-- Name: organization_messages organization_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_messages
+    ADD CONSTRAINT organization_messages_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organization_model_audits organization_model_audits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6406,6 +6463,20 @@ CREATE INDEX index_bike_stickers_on_bike_sticker_batch_id ON public.bike_sticker
 
 
 --
+-- Name: index_bike_stickers_on_code_integer; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_integer ON public.bike_stickers USING btree (code_integer);
+
+
+--
+-- Name: index_bike_stickers_on_code_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_trgm ON public.bike_stickers USING gin (code public.gin_trgm_ops);
+
+
+--
 -- Name: index_bike_versions_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6438,6 +6509,13 @@ CREATE INDEX index_bike_versions_on_primary_activity_id ON public.bike_versions 
 --
 
 CREATE INDEX index_bikes_current_listing_order ON public.bikes USING btree (listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_bikes_current_manufacturer_listing_order; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_manufacturer_listing_order ON public.bikes USING btree (manufacturer_id, listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
 
 
 --
@@ -7148,6 +7226,34 @@ CREATE INDEX index_organization_manufacturers_on_organization_id ON public.organ
 
 
 --
+-- Name: index_organization_messages_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_bike_id ON public.organization_messages USING btree (bike_id);
+
+
+--
+-- Name: index_organization_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_organization_id ON public.organization_messages USING btree (organization_id);
+
+
+--
+-- Name: index_organization_messages_on_receiver_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_receiver_id ON public.organization_messages USING btree (receiver_id);
+
+
+--
+-- Name: index_organization_messages_on_sender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_sender_id ON public.organization_messages USING btree (sender_id);
+
+
+--
 -- Name: index_organization_model_audits_on_model_audit_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7554,6 +7660,13 @@ CREATE UNIQUE INDEX index_strava_integrations_on_user_id ON public.strava_integr
 
 
 --
+-- Name: index_stripe_events_on_stripe_event_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_stripe_events_on_stripe_event_id ON public.stripe_events USING btree (stripe_event_id);
+
+
+--
 -- Name: index_stripe_subscriptions_on_membership_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7638,6 +7751,13 @@ CREATE INDEX index_user_bans_on_user_id ON public.user_bans USING btree (user_id
 
 
 --
+-- Name: index_user_emails_on_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_emails_on_email ON public.user_emails USING btree (email);
+
+
+--
 -- Name: index_user_emails_on_email_confirmed; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7694,6 +7814,13 @@ CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.g
 
 
 --
+-- Name: index_users_on_email_without_periods; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email_without_periods ON public.users USING btree (replace((email)::text, '.'::text, ''::text)) WHERE (deleted_at IS NULL);
+
+
+--
 -- Name: index_users_on_magic_link_token_outstanding; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7726,6 +7853,13 @@ CREATE UNIQUE INDEX unique_assignment_to_ambassador ON public.ambassador_task_as
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
+-- Name: bikes_serial_normalized_tsvector; Type: STATISTICS; Schema: public; Owner: -
+--
+
+CREATE STATISTICS public.bikes_serial_normalized_tsvector ON to_tsvector('simple'::regconfig, serial_normalized::text) FROM public.bikes;
 
 
 --
@@ -7822,7 +7956,17 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261005170000'),
+('20261005120000'),
+('20261005003717'),
+('20261004230843'),
+('20261004225108'),
+('20261004180000'),
+('20261001170000'),
+('20260930161510'),
+('20260930161509'),
 ('20260926005700'),
+('20260925220034'),
 ('20260915181500'),
 ('20260915110042'),
 ('20260912102406'),

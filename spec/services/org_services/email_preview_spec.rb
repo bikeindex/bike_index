@@ -105,6 +105,7 @@ RSpec.describe OrgServices::EmailPreview do
           expect(impound_claim).to be_a(ImpoundClaim)
           expect(impound_claim).to_not be_persisted
           expect(impound_claim.status).to eq "approved"
+          expect(impound_claim.organization).to eq organization
           expect(impound_claim.impound_record).to eq impound_record
           expect(component.email_sent_at).to be_nil
         end

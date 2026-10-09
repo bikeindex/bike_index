@@ -222,6 +222,13 @@ RSpec.describe GeocodeHelper do
         expect(described_class.permitted_distance(" 0")).to eq 1
       end
     end
+    context "in kilometers" do
+      it "clamps to the bounds in miles" do
+        expect(described_class.permitted_distance(50, unit: "km")).to eq 50
+        expect(described_class.permitted_distance(" 0", unit: "km")).to eq 1.61
+        expect(described_class.permitted_distance(5_000, unit: "km")).to eq 1_609.34
+      end
+    end
   end
 
   describe "ignored_coordinates?" do

@@ -38,19 +38,17 @@ module BikeServices
     end
 
     def self.find_matching_user_ids(email = nil, phone = nil)
-      return [] if email.blank? && phone.blank?
-
-      users = User.joins("LEFT JOIN user_emails ON user_emails.user_id = users.id")
-        .joins("LEFT JOIN user_phones ON user_phones.user_id = users.id")
-      if email.present? && phone.present?
-        users.where("users.email = ? OR user_emails.email = ? OR users.phone = ? OR user_phones.phone = ?", email, email, phone, phone)
-      elsif email.present?
-        users.where("users.email = ? OR user_emails.email = ?", email, email)
-      elsif phone.present?
-        users.where("users.phone = ? OR user_phones.phone = ?", phone, phone)
-      end.distinct.pluck(:id)
+      (matching_user_ids(:email, email, UserEmail) + matching_user_ids(:phone, phone, UserPhone)).uniq
     end
 
-    private_class_method :find_matching_user_ids
+    # An OR across the joined tables can't use their indexes
+    def self.matching_user_ids(attribute, value, user_attribute_class)
+      return [] if value.blank?
+
+      User.where(attribute => value).pluck(:id) +
+        User.where(id: user_attribute_class.where(attribute => value).select(:user_id)).pluck(:id)
+    end
+
+    private_class_method :find_matching_user_ids, :matching_user_ids
   end
 end

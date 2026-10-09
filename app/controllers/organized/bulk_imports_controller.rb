@@ -22,7 +22,7 @@ module Organized
         redirect_to(organization_bulk_imports_path(organization_id: current_organization.to_param)) && return
       end
       @per_page = permitted_per_page
-      @pagy, @bikes = pagy(:countish, @bulk_import.bikes.order(created_at: :desc), limit: @per_page, page: permitted_page)
+      @pagy, @bikes = pagy(:countish, @bulk_import.bikes.reorder(created_at: :desc), limit: @per_page, page: permitted_page)
     end
 
     def new
@@ -83,6 +83,8 @@ module Organized
       @is_api = request.headers["Authorization"].present?
       unless @is_api
         verify_authenticity_token
+        return if performed?
+
         return ensure_access_to_bulk_import!
       end
 

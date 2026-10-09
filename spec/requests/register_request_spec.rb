@@ -35,6 +35,19 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
     end
 
+    it "prefills a linked bike's manufacturer and model, without counting step 1 as submitted" do
+      manufacturer = FactoryBot.create(:manufacturer, name: "Specialized", frame_maker: true)
+      get "/register/new", params: {manufacturer: "Specialized", frame_model: "Haul LT"}
+      b_param = BParam.last
+      expect(b_param.manufacturer_id).to be_nil
+      expect(b_param.params["prefill"]).to eq("manufacturer" => "Specialized", "frame_model" => "Haul LT")
+      expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 1)
+
+      follow_redirect!
+      expect(Nokogiri::HTML(response.body).at_css("input[type=hidden][name='b_param[manufacturer_id]']")["value"]).to eq manufacturer.id.to_s
+      expect(b_param.reload.manufacturer_id).to be_nil
+    end
+
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 
@@ -1194,6 +1207,26 @@ RSpec.describe RegisterController, type: :request do
           # Their own registration, so the completion card is addressed to them
           expect(response.body).to include "keep watch"
           expect(response.body).to include "View your registration"
+        end
+
+        context "whose account has no name" do
+          let(:current_user) { FactoryBot.create(:user_confirmed, name: nil) }
+
+          it "asks for it, naming the account and the registration" do
+            get register_path(b_param_token: b_param.id_token, step: 2)
+            expect(response.body).to include "bike[user_name]"
+
+            expect {
+              patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.except(:user_name)}
+            }.to_not change(Bike, :count)
+            expect(response.status).to eq 422
+            expect(response.body).to include "Owner name is required to register"
+
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+            expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+            expect(current_user.reload.name).to eq user_name
+            expect(Bike.last.owner_name).to eq user_name
+          end
         end
       end
 

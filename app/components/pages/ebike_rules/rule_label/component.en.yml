@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        rule_label:
+          classes: Classes recognized
+          power: Motor power cap
+          speed: Top assisted speed
+          throttle: Throttle

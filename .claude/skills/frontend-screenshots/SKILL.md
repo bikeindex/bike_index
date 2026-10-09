@@ -79,7 +79,7 @@ The admin layout has no `#navUserSettingLink`, so on an `/admin/...` route it re
 
 ## Capture
 
-Make the directory and clear stale shots: `mkdir -p tmp/pr_screenshots && rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true`. `browser_take_screenshot` errors with `ENOENT` rather than creating the directory, so a fresh workspace fails on the first capture.
+Make the directory and clear stale shots: `mkdir -p tmp/pr_screenshots && rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true` — on the branch capture only: the pattern matches `-base-` shots too, so a cross-branch rerun would delete branch shots its caller hasn't posted yet. `browser_take_screenshot` errors with `ENOENT` rather than creating the directory, so a fresh workspace fails on the first capture.
 
 Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
@@ -111,7 +111,9 @@ If the returned content height is **less than the viewport height**, `browser_re
 
 **Viewport-only is the caller's call, never yours — except when the diff's subject is a `position: fixed` or `sticky` element.** `fullPage` paints it once, where it sits at scroll 0, and nowhere else: on the 10,007px `/accept_vendor_terms` its bottom bar landed at y=798 with the remaining 9,100px of that column bare. Capture those at `fullPage: false`, scrolled to where the element pins. When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page.
 
-**Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw.
+**`/bikebook` renders whatever catalog the dev server points it at.** With `BIKEBOOK_CATALOG_DIRECTORY` set it's a local `/bikebook_catalog/` that can trail the published one by schema versions, so a capture of a schema change shows nothing new. `page.route` `/bikebook_catalog/` to `https://bikebook-catalog.bikeindex.org/catalog/` in `browser_run_code_unsafe`, on both branches.
+
+**Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw. **`loading="lazy"` images capture blank below the fold** — `fullPage` stitching never scrolls them into view (the search results, marketplace and `/stolen` recoveries use it). Set `loading = 'eager'` on them and wait for every `naturalWidth` before the shot.
 
 **Mid-interaction states are in scope.** When the caller asks for a dropdown open, a modal showing, a hover state, a partially-filled form, etc., drive Playwright between settle and the screenshot — `browser_click`, `browser_type`, `browser_press_key`, `browser_hover`, then wait for the UI to reach the target state (`browser_wait_for` on a marker element, or check via `browser_evaluate`) before `browser_take_screenshot`. Treat the interaction sequence as part of the page-slug — e.g. capture `combobox-open` after clicking + typing, distinct from a static `search-registrations` page-load shot. For cross-branch comparisons, run the *same* interaction sequence on each branch so the screenshots actually compare like-for-like.
 
@@ -173,7 +175,7 @@ When the caller wants before/after, repeat the capture loop against the base ref
 
 1. `git status` — abort if there are uncommitted changes.
 2. Settle what you're detaching at, per the note above — `$BASE_REF`, or `$(git merge-base HEAD $BASE_REF)` when the branch is behind it. Call that `$BASE_AT`.
-3. Diff `db/migrate/` between the branch and **`$BASE_AT`**, not `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error. A migration that only shows up against the ref's tip belongs to commits the branch never took, and detaching at the merge-base is what resolves it; aborting there abandons a capture that was fine.
+3. Diff `db/migrate/` between the branch and **`$BASE_AT`**, not `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error. A migration that only shows up against the ref's tip belongs to commits the branch never took, and detaching at the merge-base is what resolves it; aborting there abandons a capture that was fine. **So does aborting on a migration that only adds a table, or a column with a default** — nothing on the base reads either, so load the target page after detaching and abort only if it errors.
 4. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_AT` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files — the watcher can lag that first request, so confirm the page shows the base's markup (the changed element gone) and re-navigate if it doesn't — repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
 
 A `Gemfile.lock` diff is **not** a reason to abort.
@@ -193,4 +195,4 @@ The seeded DB persists across checkouts, so the existing session usually still w
 
 Once every screenshot is captured, quit Chrome with `browser_close` — including when the capture failed partway. Leaving it running holds the shared browser profile lock, so the next `browser_navigate` (this skill or another) fails with "Browser is already in use".
 
-**Who closes is decided by who invoked you, so you never have to be told.** Invoked by the user — "grab a screenshot of X" — you're the last one in the browser: close it. Invoked by a workflow that uploads what you captured (`github-pr-images`, and so the `pr` screenshot phase), leave it open; that skill drives the same session straight afterwards and closing between the two just pays the startup again.
+**Who closes is decided by who invoked you, so you never have to be told.** Invoked by the user — "grab a screenshot of X" — you're the last one in the browser: close it. Invoked by a workflow that captures again straight afterwards — the `pr` screenshot phase, which captures the base next — leave it open; closing between the two just pays the startup again.

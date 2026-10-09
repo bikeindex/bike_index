@@ -75,7 +75,7 @@
       %tr
         %td Origin
         %td
-          %code= @ownership.origin
+          = render(Atoms::Org::OriginDisplay::Component.new(creation_kind: @ownership.origin))
 
 
 - if display_dev_info?

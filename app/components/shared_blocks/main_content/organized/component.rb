@@ -7,7 +7,8 @@ module SharedBlocks
       # beside, and the organization-wide alerts above it
       class Component < ApplicationComponent
         # nil is no container: the register flow supplies its own full-bleed shell
-        PAGE_CONTAINERS = {%w[registrations new] => nil, %w[registrations settings] => "container",
+        PAGE_CONTAINERS = {%w[registrations new] => nil, %w[parking_notifications new] => nil,
+                           %w[registrations settings] => "container",
                            %w[bulk_imports show] => "container-fluid"}.freeze
         FLUID_CONTROLLERS = %w[parking_notifications impound_records impound_claims graduated_notifications
           lines model_audits registrations].freeze

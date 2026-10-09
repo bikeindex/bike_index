@@ -296,10 +296,10 @@ class Payment < ApplicationRecord
     if user&.stripe_id.present?
       {customer: user.stripe_id}
     else
-      email = email.presence || user&.email
-      return {} unless email.present?
+      customer_email = email.presence || user&.email
+      return {} unless customer_email.present?
 
-      {customer_email: user.email}
+      {customer_email:}
     end
   end
 end

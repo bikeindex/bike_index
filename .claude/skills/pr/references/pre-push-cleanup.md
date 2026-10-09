@@ -111,13 +111,26 @@ Find what reads the old form before calling one due. A value nothing reads again
 
 State the verdict in your reply to the user either way, naming the stored values you checked. When one is due, write it without asking — a job in `app/jobs/backfills/` with its spec — and lead the PR body with it (SKILL.md's **Write the summary body**).
 
+### The asset audit
+
+**Required when the branch adds a file under `app/assets/images/`.** List them:
+
+```bash
+rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
+```
+
+Check each against `frontend-conventions`' image and icon rules: an original elsewhere in the repo (a design handoff's comes resized and renamed), an existing icon, or a plain character that should be text. Replace a duplicate with what already exists and delete it.
+
 ### The cycle-type translation check
 
 `AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:
 
 ```bash
 rtk proxy git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
+rtk proxy git diff origin/main...HEAD -- '*.rb' | grep -in '^+[^+].*errors\.add.*bike'
 ```
+
+The second one is load-bearing: a model's `errors.add(:base, "…")` reaches a flash through `full_messages`, never passing a locale file, so the YAML grep can't see it. `Sale#seller_is_owner` interpolates the cycle type into one.
 
 Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` and `Pages::Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/pages/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
 

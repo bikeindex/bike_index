@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          share:
+            link_copied: Link copied
