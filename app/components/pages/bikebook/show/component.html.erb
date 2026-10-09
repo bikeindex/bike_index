@@ -55,7 +55,9 @@
         <%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:mt-3 tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start")) do %>
           <div class="tw:flex tw:flex-col tw:gap-4">
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "primary_activity",
-          label: translation(".activity"), placeholder: translation(".any_activity"), multiselect: true)) %>
+          label: translation(".activity"), placeholder: translation(".any_activity"), multiselect: true)) do %>
+              <%= translation(".activity_examples") %>
+            <% end %>
 
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "manufacturer",
           label: translation(".manufacturer"), placeholder: translation(".any_manufacturer"), multiselect: true)) do %>

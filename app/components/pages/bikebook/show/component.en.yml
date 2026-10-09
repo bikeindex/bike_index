@@ -6,6 +6,7 @@ en:
         show:
           about_bikebook: About Bike Book
           activity: Activity
+          activity_examples: "(e.g. Mountain Biking, Cyclocross, etc)"
           any_activity: Any activity
           any_configuration: Any configuration
           any_manufacturer: Any manufacturer
