@@ -1749,6 +1749,14 @@ en:
           already_signed_in: You're already signed in!
         turnstile_verified:
           verify_not_a_robot: Please confirm you're not a robot
+    ebike_rules:
+      show:
+        state_description: "%{state} e-bike law: %{law}"
+        state_description_in_review: >-
+          We're still reviewing %{state}'s e-bike law. Check your e-bike's class,
+          motor and speed, and see how the e-bike classes work.
+        state_title: "%{state} e-bike laws"
+        title: E-bike rules
     feedbacks:
       block_the_spam:
         please_sign_in: Please sign in to send that message
@@ -2302,7 +2310,7 @@ en:
     - Saturday
     formats:
       default: "%Y-%m-%d"
-      long: "%B %d, %Y"
+      long: "%B %-d, %Y"
       short: "%b %d"
     month_names:
     -

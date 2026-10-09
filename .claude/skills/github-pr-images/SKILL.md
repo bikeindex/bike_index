@@ -61,21 +61,21 @@ Images in table cells want `<img … width=…>`; elsewhere `![alt](path)` is fi
 
 ## Step 3: Post it
 
-This skill owns the `## Screenshots` comment: one per PR, authored by you, body starting `## Screenshots` even when what's under it isn't screenshots — retitle it and the next run can't find it.
+This skill owns the `## Screenshots` comment: one per PR, body starting `## Screenshots` even when what's under it isn't screenshots — retitle it and the next run can't find it.
 
 ```bash
-ME=$(gh api user --jq .login)
 gh api --paginate "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" \
-  --jq ".[] | select(.user.login == \"$ME\") | {id, body: .body[:14]}"
+  --jq ".[] | {id, login: .user.login, body: .body[:14]}"
 ```
 
-The comment whose body starts `## Screenshots` is `$SCREENSHOT_COMMENT_ID`. `--paginate` matters — on a busy PR it often isn't on the first page.
+The comment whose body starts `## Screenshots` is `$SCREENSHOT_COMMENT_ID`, **whoever posted it** — the web sandbox posts as a different account than local `gh`, so filtering on your own login misses a PR's sandbox-posted comment and adds a second. One by another login is never your last comment: update it through the stand-in below. `--paginate` matters — on a busy PR it often isn't on the first page.
 
 A caller updating one page of a multi-page comment needs the current body to edit — hand it back on request: `gh api repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID --jq .body`.
 
 Write the body to a file. **With images to upload**, attach one `--attach` per image the body references, and **update `$SCREENSHOT_COMMENT_ID` in place rather than replacing it** — a re-capture never posts a second comment. Which command depends on whether it's your last comment on the PR:
 
 ```bash
+ME=$(gh api user --jq .login)
 gh api --paginate "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" --jq ".[] | select(.user.login == \"$ME\") | .id" | tail -1
 ```
 

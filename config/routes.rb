@@ -60,6 +60,9 @@ Rails.application.routes.draw do
   if Integrations::Bikebook::Catalog::LOCAL_DIRECTORY
     mount Rack::Files.new(Integrations::Bikebook::Catalog::LOCAL_DIRECTORY) => Integrations::Bikebook::Catalog::LOCAL_PATH
   end
+  get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
+  get "ebike-rules/:abbr", to: "ebike_rules#show", as: :ebike_rules_state, constraints: {abbr: /[a-z]{2}/i}
+  get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike-rules") }
 
   resource :session, only: %i[new create destroy] do
     collection do

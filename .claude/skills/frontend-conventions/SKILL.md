@@ -3,7 +3,8 @@ name: frontend-conventions
 description: >-
   Bike Index's frontend conventions — Tailwind class prefixing (`tw:`),
   the standard `twinput`/`twlabel`/`twlink` form/link classes, the
-  `number_display` helper for numbers, the UI component library rule
+  `number_display` helper for numbers, `Counts` for site-wide figures
+  (bikes registered, recoveries, organizations), the UI component library rule
   (every button is `UI::Button`/`UI::ButtonLink`, every
   typeahead/autocomplete is `UI::Forms::Combobox`, never hand-rolled
   markup), that **helpers are deprecated — render a view component
@@ -12,7 +13,8 @@ description: >-
   `helpers.` prefix in templates), and `UI::Time::Component` for every
   date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
-  controllers, Tailwind classes, or any frontend code that touches styling
+  controllers, Tailwind classes, image or icon files under `app/assets/images`
+  (which usually already exist), or any frontend code that touches styling
   or interactivity — including admin screens, whose unlayered legacy CSS
   inverts several of these rules. Stimulus.js is the
   JavaScript framework; SCSS and CoffeeScript files exist but are deprecated.
@@ -43,10 +45,15 @@ Scope it: every file a bare run rewrites that you've already read is re-injected
 - **Every number** renders with `number_display(number)` — including one composed into a string: `[number_display(bike_count), organization.short_name].join(" ")` wraps the number, not the string.
   - "Number" includes counts, distances and quantities — anything whose magnitude is the point.
   - **Not a year.** `number_display` is `number_with_delimiter`, so it renders 2015 as "2,015". Emit a year bare, the way `bike_title_html` and the search result cards do — nothing in `app/` wraps one. The same delimiter argument applies to any identifier that only looks numeric.
+- **A site-wide figure comes from `Counts`** (`app/services/counts.rb`) — bikes registered (`total_bikes`), stolen (`stolen_bikes`), recoveries, the recovered value, organizations. Read several in one round trip with `Counts.retrieve_many("total_bikes", "recoveries")`. Never a live `Bike.count` / `Organization.count` on a public page, which counts the whole table on every render, and never a number typed into copy, which goes stale. `UpdateCountsJob` refreshes them hourly, so a new figure is a new `COUNT_KEYS` entry with an `assign_*`, not a query in the view. Admin screens that want the exact live number are the exception. A dev server shows whatever its Redis holds, not this workspace's database — `bin/rails setup:load_counts` recomputes them.
 - **Currency amounts** use `amount_display(obj)` instead of `number_display` directly. It takes an object that responds to `amount_cents`, `amount`, `currency_symbol`, and `currency_name` (e.g. a `MarketplaceListing`), and renders the symbol + `number_display(amount)` together. Don't reach for `number_to_currency` or roll your own.
 - **Every phone number** renders through `Atoms::Phone::Component` — never a hand-rolled `tel:` link or `number_to_phone`. It links by default; pass `skip_link: true` for plain text. See `app/components/atoms/phone/`. Non-markup callers that need the formatted string (a form field value, a translation interpolation) use `Phonifyer.display`.
 - **Every date/time** renders through `UI::Time::Component` — `render(UI::Time::Component.new(time: some_time))`. It emits the client-localized `localizeTime` span the frontend JS converts to the viewer's timezone. This is the *only* way to show a time: never `l(time, ...)`, `strftime`, `time_ago_in_words`, or a hand-written `localizeTime` span. Pass `format: :localize_time_precise` when you need seconds precision (default is `:localize_time`). It self-hides when `time` is nil, so no surrounding `if` guard is needed.
   - Legacy `l(time, format: :convert_time)` inside a `localizeTime` span predates the component and is still all over the admin tables. Convert one to `UI::Time::Component` whenever you touch the line it's on — including when it's the body of a `link_to`.
+
+- **An image from a design handoff is already in the repo — use the original, never a renamed or resized copy.** `kelsey_redesign/` holds the drawn originals; a served one is a byte-identical copy under its original name in `app/assets/images/kelsey/illustrations/`, as `comic-assets_bike-love-*.png` are. Before adding any PNG/JPG, `git ls-files` the distinctive words of its name across the whole repo — a hash search misses a resized copy.
+
+- **Look for an existing icon before adding an SVG** — all of `app/assets/images/` (not just `icons/`), `app/javascript/bikebook/templates/icons.js`, and text glyphs in templates. A mark that's a plain character is text, not an icon: a link's trailing arrow is `<span aria-hidden="true">→</span>` (`SharedBlocks::MainContent::OrganizedShopIntegrationAlert`), and a `?`, `!` or `i` in a disc is the character (`UI::Tooltip`, `Pages::EbikeRules::StatusIcon`). A check or a cross stays an icon.
 
 - **A decorative icon is `inline_svg_tag(..., aria_hidden: true)`** — `aria: {hidden: true}` is a hash `inline_svg` drops, leaving an `svg[role=img]` with no accessible name, which only an axe audit in a `:js` spec catches.
 

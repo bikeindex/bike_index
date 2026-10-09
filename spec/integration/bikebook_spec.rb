@@ -3,26 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Bikebook", :js, type: :system do
-  include BikebookCatalogHelpers
-
-  let(:fixtures) { BikebookCatalogHelpers::FIXTURES }
-
   after { WebMock.reset! }
-
-  # A fixture catalog in place of the published one, to the browser and to a model's page,
-  # and no stock photos, which render their placeholder
-  def serve_catalog(manifest_status: 200)
-    stub_bikebook_catalog
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route(%r{^https://bikebook-catalog\.bikeindex\.org/catalog/}, ->(route, request) {
-        path = request.url.delete_prefix("https://bikebook-catalog.bikeindex.org/catalog/")
-        status = (path == "manifest.json") ? manifest_status : 200
-        route.fulfill(status:, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"},
-          body: (status == 200) ? fixtures.join(path).read : "")
-      })
-      playwright_page.context.route(%r{^https://bikebook\.bikeindex\.org/}, ->(route, _request) { route.abort })
-    end
-  end
 
   def vehicle_field = find_field("Select a bike, choose multiple to compare them")
 
@@ -44,7 +25,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "searches, compares and filters the catalog in the browser, a pick and each history step rendering without a request" do
-    serve_catalog
+    serve_bikebook_catalog
     asked = []
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.on("request", ->(request) { asked << request.url if request.navigation_request? })
@@ -254,7 +235,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "titles a model picked alone for it, and drops the canonical as the page changes" do
-    serve_catalog
+    serve_bikebook_catalog
     canonical = "link[rel='canonical']"
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through")
     expect(page).to have_css("article h1", text: "Level 4 REC Step-Through", wait: 10)
@@ -274,7 +255,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do
-    serve_catalog
+    serve_bikebook_catalog
     visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/current_exp")
     expect(page).to have_css("[aria-label='Comparison'] tbody tr:first-child th", text: "Size", wait: 10)
 
@@ -454,7 +435,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "shows every weight in pounds to a viewer who prefers imperial units" do
-    serve_catalog
+    serve_bikebook_catalog
     sign_in(FactoryBot.create(:user_confirmed, preferred_unit_system: "imperial"))
     visit bikebook_path(vehicle_models: "m/aventon/2026/current_adv,m/aventon/2026/level_4_adv")
     expect(page).to have_css("[aria-label='Comparison']", wait: 10)
@@ -475,7 +456,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "renders each UI template as the component it mirrors does" do
-    serve_catalog
+    serve_bikebook_catalog
     visit bikebook_path
 
     aggregate_failures do
@@ -558,7 +539,7 @@ RSpec.describe "Bikebook", :js, type: :system do
   end
 
   it "merges motors that match but for their drive wheel, and names the operating modes' e-vehicle classifications" do
-    serve_catalog
+    serve_bikebook_catalog
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro")
 
     motor = find("section", text: /front and rear motor/i, wait: 10)
@@ -612,10 +593,17 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_current_path("/bikebook?vehicle_models=m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle,evc/off_highway_motorcycle")
     expect(group).to have_no_css("dt", exact_text: "Jurisdiction")
     expect(group.find("section", text: /\AClassifications in this group/i)).to have_link("US-CA Off-highway electric motorcycle")
+
+    # a rule a law starts or ends carries its date, and limits not yet in force say when they take effect
+    visit bikebook_path(vehicle_models: "evc/us/ca/motor_driven_cycle")
+    card = find("article h1", text: "US-CA Motor-driven cycle", wait: 10).ancestor("article")
+    expect(card).to have_css("li", text: /\AFrom January 1, 2027: Its motor produces 5 gross brake horsepower/)
+      .and have_css("li", text: /\AUntil January 1, 2027: The line is drawn only by an engine of 150 cc/)
+      .and have_css("dd", exact_text: "January 1, 2027")
   end
 
   it "says so when the catalog doesn't load" do
-    serve_catalog(manifest_status: 404)
+    serve_bikebook_catalog(manifest_status: 404)
     visit bikebook_path
 
     expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)

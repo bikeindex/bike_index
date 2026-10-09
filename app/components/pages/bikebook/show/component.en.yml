@@ -4,7 +4,7 @@ en:
     pages:
       bikebook:
         show:
-          about_bikebook: About Bike Book
+          about_bikebook_label: About BikeBook
           activities: Activities
           activity_examples: "(e.g. Mountain Biking, Cyclocross, etc)"
           any_activity: Any activity
