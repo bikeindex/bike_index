@@ -10,10 +10,16 @@ module OrgServices
     CONFIRMATION_EMAIL_INTERVAL = 5.minutes
     STEPS = %w[1 2 finished].freeze
 
-    # The session's signup, while it's still one - once its organization exists there's
-    # nothing left to go back to
     def find(token)
-      OrganizationSignup.unexpired.where(organization_id: nil).find_by(id_token: token) if token.present?
+      OrganizationSignup.unexpired.find_by(id_token: token) if token.present?
+    end
+
+    # The session's unfinished signup - or, for someone who confirmed their email in another
+    # browser and wandered off, the one that address is still finishing
+    def resumable(token:, user:)
+      unfinished = OrganizationSignup.unexpired.where(organization_id: nil)
+      (unfinished.find_by(id_token: token) if token.present?) ||
+        (unfinished.where(email: user.email).where.not(email_confirmed_at: nil).order(:id).last if user.present?)
     end
 
     def start(user:, return_to: nil) = OrganizationSignup.create!(email: user&.email, return_to:)
@@ -75,6 +81,8 @@ module OrgServices
       Binxtils::Secure.compare?(token, signup.email_confirmation_token)
     end
 
+    def ready_to_complete?(signup) = signup.email_confirmed? && signup.details_completed?
+
     # Spends the token, so a forwarded email can't sign anyone in later
     def confirm_email!(signup)
       signup.update(email_confirmed_at: Time.current, email_confirmation_token: nil)
@@ -105,7 +113,22 @@ module OrgServices
       [(translation(:name_required) if signup.name.blank?),
         (translation(:kind_required) if signup.kind.blank?),
         (translation(:email_required) unless signup.email.to_s.match?(User::EMAIL_REGEX)),
-        (translation(:name_unavailable) if signup.name.present? && !Organization.name_available?(signup.name))].compact
+        (name_error(signup.name) if signup.name.present?)].compact
+    end
+
+    def name_error(name)
+      case Organization.name_problem(name)
+      when :too_short then translation(:name_too_short)
+      when :reserved then translation(:name_reserved)
+      when :taken then taken_name_error(name, Organization.name_taken_by(name).name)
+      end
+    end
+
+    # Naming the one that took it - which, past 30 characters, isn't necessarily the name typed
+    def taken_name_error(name, existing)
+      return translation(:name_taken, name: existing) if existing.casecmp?(Organization.sanitize_name(name))
+
+      translation(:name_taken_shortened, name: existing)
     end
 
     def location_attributes(signup)
@@ -113,8 +136,8 @@ module OrgServices
        address_record_attributes: signup.address}
     end
 
-    def translation(key) = I18n.t(key, scope: "shared.organization_signup")
+    def translation(key, **) = I18n.t(key, scope: "shared.organization_signup", **)
 
-    conceal :start_errors, :location_attributes, :translation
+    conceal :start_errors, :name_error, :taken_name_error, :location_attributes, :translation
   end
 end

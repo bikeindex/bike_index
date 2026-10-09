@@ -10,6 +10,10 @@ en:
             change_it: Change it
             check_your_email: Check your email
             invite_your_team: Invite the rest of your team
+            no_email_yet: >-
+              No email? It can take a few minutes - check your spam folder, or have
+              us send it again.
             register_for_customers: Register vehicles for your customers and community
+            send_it_again: Send it again
             share_your_link: Share your registration link and QR code
             wrong_address: Wrong address?

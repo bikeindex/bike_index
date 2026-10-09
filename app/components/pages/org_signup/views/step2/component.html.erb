@@ -1,7 +1,10 @@
 <%= render Pages::Register::Parts::Shell::Component.new do %>
   <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup, step: 2) %>
 
-  <% unless @organization_signup.email_confirmed? %>
+  <% if @organization_signup.email_confirmed? %>
+    <%= render UI::Alerts::Base::Component.new(kind: :success,
+        text: translation(".email_confirmed", name: @organization_signup.name)) %>
+  <% else %>
     <%= render UI::Alerts::Base::Component.new(kind: :purple, text: translation(".activation_link_sent", email: @organization_signup.email),
         icon: helpers.inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)) %>
   <% end %>

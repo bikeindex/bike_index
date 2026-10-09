@@ -1818,16 +1818,29 @@ en:
           not_your_application: That isn't your application
     organization_signup:
       complete_signup:
-        organization_created: "%{name} is active on Bike Index!"
+        name_taken_meanwhile: >-
+          Another organization took the name %{name} while you were signing up. Choose
+          another name to finish - everything else is saved.
       confirm_email:
-        confirmation_link_expired: That link has expired — check your email for a
-          new one
+        link_invalid: >-
+          That link doesn't work anymore. Use the newest email we sent to %{email},
+          or send another below.
+        link_invalid_resent: That link doesn't work anymore, so we've emailed a new
+          one to %{email}.
         sign_out_to_confirm: >-
           You're signed in as %{email}. Sign out, then open the link again to activate
           the organization.
       find_signup_for_confirmation:
-        already_activated: That organization is already active
         signup_not_found: We couldn't find that signup — start a new one below
+      redirect_to_organization:
+        already_activated: "%{name} is already active"
+      redirect_to_sign_in_for:
+        sign_in_to_manage: "%{name} is active! Sign in as %{email} to manage it."
+      resend:
+        link_recently_sent: >-
+          We sent a link to %{email} in the last few minutes - it can take a little
+          while to arrive, so check your spam folder too.
+        link_resent: We've sent a new link to %{email}.
     organizations:
       find_organization:
         not_found: >-
@@ -5034,7 +5047,15 @@ en:
       email_required: A valid email is required
       kind_required: Please choose what kind of organization this is
       name_required: Organization name is required
-      name_unavailable: That name isn't available - please choose another
+      name_reserved: That name is reserved on Bike Index - please choose another
+      name_taken: >-
+        There's already an organization called %{name} on Bike Index. Choose another
+        name, or contact support@bikeindex.org if it's yours
+      name_taken_shortened: >-
+        That's too close to %{name}, which is already on Bike Index - names have to
+        be different within their first 30 characters. Choose another name, or contact
+        support@bikeindex.org if it's yours
+      name_too_short: Organization name needs at least two letters or numbers
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}

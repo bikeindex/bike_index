@@ -17,7 +17,10 @@
         html_options: {value: @organization_signup.name, required: true, autocomplete: "organization"}) %>
 
     <div class="tw:mb-4">
-      <span class="twlabel"><%= translation(".organization_kind") %></span>
+      <span class="twlabel">
+        <%= translation(".organization_kind") %>
+        <%= render UI::Forms::RequiredMarker::Component.new %>
+      </span>
 
       <div class="tw:mt-2">
         <%= render UI::Forms::RadioButtonGroup::Component.new(name: "organization_signup[kind]", entries: kind_entries,
@@ -30,6 +33,10 @@
     <% if @current_user.present? %>
       <p class="tw:mb-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-300">
         <%= translation(".signed_in_as_html", email: tag.strong(@current_user.email)) %>
+
+        <% if existing_organization.present? %>
+          <%= translation(".already_part_of_html", name: tag.strong(existing_organization.short_name)) %>
+        <% end %>
       </p>
     <% else %>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email,
@@ -44,13 +51,22 @@
     <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
         type: "submit", spinner: true, html_class: "tw:w-full") %>
 
-    <p
-      class="
-        tw:mt-3 tw:text-center tw:text-xs tw:text-gray-500
-        tw:dark:text-gray-400
-      "
-    >
-      <%= translation(".activation_link") %>
-    </p>
+    <% unless @organization_signup.email_confirmed? %>
+      <p
+        class="
+          tw:mt-3 tw:text-center tw:text-xs tw:text-gray-500
+          tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".activation_link") %>
+      </p>
+    <% end %>
+
+    <%# Every signup link resumes where this browser left off, so starting another is a choice here %>
+    <% if @organization_signup.name.present? %>
+      <p class="tw:mt-3 tw:mb-0 tw:text-center tw:text-sm">
+        <%= link_to translation(".start_a_different_one"), new_organization_signup_path(restart: true), class: "twlink" %>
+      </p>
+    <% end %>
   <% end %>
 <% end %>

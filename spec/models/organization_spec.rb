@@ -10,13 +10,15 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "name_available?" do
+  describe "name_problem" do
     before { FactoryBot.create(:organization, name: "Shifty Bike Shop") }
 
-    it "is false for a taken short name, whatever the case, and for a reserved one" do
-      expect(Organization.name_available?("Shifty Cycles")).to be_truthy
-      expect(Organization.name_available?(" shifty  BIKE shop")).to be_falsey
-      expect(Organization.name_available?("Registrations")).to be_falsey
+    it "says why a name can't be used" do
+      expect(Organization.name_problem("Shifty Cycles")).to be_nil
+      expect(Organization.name_problem(" shifty  BIKE shop")).to eq :taken
+      expect(Organization.name_problem("Registrations")).to eq :reserved
+      expect(Organization.name_problem("X")).to eq :too_short
+      expect(Organization.name_problem("<b></b>!")).to eq :too_short
     end
   end
 

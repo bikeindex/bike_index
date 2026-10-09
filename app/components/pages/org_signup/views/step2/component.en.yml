@@ -9,6 +9,9 @@ en:
               We've emailed %{email} a link to activate the organization — finish
               up here first.
             contact: Contact
+            email_confirmed: >-
+              Your email is confirmed. Add where %{name} is, and it'll be active as
+              soon as you finish.
             finish: Finish
             location: Location
             phone: Phone

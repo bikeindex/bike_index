@@ -60,7 +60,17 @@ RSpec.describe OrgServices::Signup do
 
       it "doesn't save" do
         expect(saved).to be_falsey
-        expect(organization_signup.errors.full_messages).to eq(["That name isn't available - please choose another"])
+        expect(organization_signup.errors.full_messages).to eq(["There's already an organization called Shifty Bike Shop on Bike Index. Choose another name, or contact support@bikeindex.org if it's yours"])
+      end
+    end
+
+    context "a long name that's only taken in its first 30 characters" do
+      let!(:organization) { FactoryBot.create(:organization, name: "The Community Bicycle Cooperative of Springfield") }
+      let(:start_params) { {name: "The Community Bicycle Cooperative of Shelbyville", kind: "bike_shop", email: "org_admin@bikeindex.org"} }
+
+      it "names the organization that has it" do
+        expect(saved).to be_falsey
+        expect(organization_signup.errors.full_messages.first).to start_with("That's too close to The Community Bicycle Cooperative of Springfield")
       end
     end
 
@@ -69,7 +79,16 @@ RSpec.describe OrgServices::Signup do
 
       it "doesn't save" do
         expect(saved).to be_falsey
-        expect(organization_signup.errors.full_messages).to eq(["That name isn't available - please choose another"])
+        expect(organization_signup.errors.full_messages).to eq(["That name is reserved on Bike Index - please choose another"])
+      end
+    end
+
+    context "markup in the name" do
+      let(:start_params) { {name: "<b>Shifty</b> <script>alert(1)</script>Bikes", kind: "bike_shop", email: "org_admin@bikeindex.org"} }
+
+      it "saves it as the organization will be named" do
+        expect(saved).to be_truthy
+        expect(organization_signup.reload.name).to eq "Shifty Bikes"
       end
     end
 

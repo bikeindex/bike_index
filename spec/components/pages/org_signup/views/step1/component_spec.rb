@@ -23,6 +23,28 @@ RSpec.describe Pages::OrgSignup::Views::Step1::Component, type: :component do
     it "names their account rather than asking" do
       expect(component).to have_no_field("organization_signup[email]")
       expect(component).to have_text("You're signed in as #{current_user.email}")
+      expect(component).to have_no_text("You're already part of")
     end
+
+    context "already part of an organization" do
+      let(:current_user) { FactoryBot.create(:organization_role_claimed).user }
+
+      it "says this makes a separate one" do
+        expect(component).to have_text("You're already part of #{current_user.organizations.first.short_name} - this creates a separate organization.")
+      end
+    end
+  end
+
+  context "a brand new signup" do
+    let(:organization_signup) { FactoryBot.create(:organization_signup) }
+
+    it "has nothing to start over from" do
+      expect(component).to have_no_link("Start a different organization instead")
+    end
+  end
+
+  # Every signup link resumes this one, so starting another has to be offered here
+  it "offers starting a different organization" do
+    expect(component).to have_link("Start a different organization instead", href: "/organizations/signup/new?restart=true")
   end
 end

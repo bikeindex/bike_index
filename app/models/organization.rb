@@ -222,12 +222,18 @@ class Organization < ApplicationRecord
         property_management other].freeze
     end
 
-    # The name validations, without building an organization - whose callbacks query, and can write
-    def name_available?(name)
-      return false unless OrganizationNameValidator.valid?(name)
+    # What would stop a new organization taking this name: :too_short, :reserved or :taken.
+    # Without building one, whose callbacks query (and can write) far more than this needs
+    def name_problem(name)
+      short_name = shorten_name(sanitize_name(name))
+      return :too_short if Slugifyer.slugify(short_name).length < 2
+      return :reserved unless OrganizationNameValidator.valid?(name)
 
-      where("LOWER(short_name) = ?", shorten_name(sanitize_name(name)).downcase).none?
+      :taken if name_taken_by(name).present?
     end
+
+    # Short names are unique, and cut to 30 characters - so a long name can be taken by a different one
+    def name_taken_by(name) = find_by("LOWER(short_name) = ?", shorten_name(sanitize_name(name)).downcase)
 
     def sanitize_name(str) = Binxtils::InputNormalizer.sanitize(str&.strip).gsub("&amp;", "&")
 

@@ -28,6 +28,8 @@ Rails.application.routes.draw do
     controller: :organization_signup do
     get :confirm
     post :confirm_email
+    post :resend
+    get :welcome
   end
 
   resources :organizations do

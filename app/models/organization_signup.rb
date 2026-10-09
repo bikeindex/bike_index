@@ -56,8 +56,9 @@ class OrganizationSignup < ApplicationRecord
 
   private
 
+  # The organization would strip markup from the name anyway, so the steps and the email show what it'll be called
   def set_calculated_attributes
-    self.name = name&.strip
+    self.name = Organization.sanitize_name(name) if name.present?
     self.website = website&.strip.presence
   end
 end

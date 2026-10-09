@@ -12,6 +12,8 @@ module Pages
 
           private
 
+          def existing_organization = @current_user&.organizations&.first
+
           def kind_entries
             Organization.user_creatable_kinds.map { |kind| {value: kind, label: kind_label(kind)} }
           end

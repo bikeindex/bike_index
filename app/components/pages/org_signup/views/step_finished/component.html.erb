@@ -37,6 +37,13 @@
       </ul>
     </div>
 
+    <p class="tw:mb-3 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+      <%= translation(".no_email_yet") %>
+    </p>
+
+    <%= render UI::ButtonLink::Component.new(text: translation(".send_it_again"), href: resend_organization_signup_path,
+        method: :post, form: {class: "tw:mb-5"}) %>
+
     <p class="tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
       <%= translation(".wrong_address") %>
       <%= link_to translation(".change_it"), organization_signup_path(step: 1), class: "twlink" %>
