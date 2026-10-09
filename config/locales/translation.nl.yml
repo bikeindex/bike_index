@@ -5574,6 +5574,8 @@ nl:
             uploading: uploaden
         required_marker:
           required: verplicht
+        combobox_state:
+          state: Staat
       alerts:
         base:
           error: Fout

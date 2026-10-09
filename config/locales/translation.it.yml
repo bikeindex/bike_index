@@ -5678,6 +5678,8 @@ it:
             uploading: caricamento
         required_marker:
           required: richiesto
+        combobox_state:
+          state: Stato
       alerts:
         base:
           error: Errore
