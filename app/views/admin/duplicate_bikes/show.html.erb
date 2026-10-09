@@ -55,8 +55,8 @@
   </p>
 <% end %>
 
-<% checks = review.readiness_checks(serial_stolen: @serial_stolen, test_count: @test_bike_ids.size) %>
-<% readiness = review.readiness(checks) %>
+<% checks = @checks %>
+<% readiness = @readiness %>
 
 <section
   class="

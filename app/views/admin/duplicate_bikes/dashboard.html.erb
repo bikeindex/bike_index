@@ -1,6 +1,5 @@
 <% kinds = BikeServices::DuplicateReviewFinder::KINDS %>
 <% cue_filters = BikeServices::DuplicateReviewCues::FILTERS %>
-<% summary = @summary %>
 
 <h1>Duplicate registration review</h1>
 
@@ -92,7 +91,7 @@
   >
     <% section_kinds.each do |kind| %>
       <% label = kinds[kind] %>
-      <% kind_groups = summary.fetch(kind, []) %>
+      <% queue = @queues[kind] %>
 
       <% accent = case kind
            when "stolen_history" then "tw:border-l-red-500"
@@ -111,9 +110,8 @@
             tw:text-gray-600 tw:dark:text-gray-400
           "
         >
-          <span class="tw:text-lg tw:font-bold tw:text-gray-900 tw:dark:text-gray-100"><%= number_display(kind_groups.size) %></span>
-          groups ·
-          <%= number_display(kind_groups.sum { it["record_count"] }) %> records
+          <span class="tw:text-lg tw:font-bold tw:text-gray-900 tw:dark:text-gray-100"><%= number_display(queue[:groups]) %></span>
+          groups · <%= number_display(queue[:records]) %> records
         </span>
       <% end %>
     <% end %>

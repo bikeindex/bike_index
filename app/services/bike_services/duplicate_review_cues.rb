@@ -6,7 +6,13 @@ module BikeServices
   module DuplicateReviewCues
     extend Functionable
 
-    Cue = Data.define(:key, :label, :reason, :color)
+    Cue = Data.define(:key, :label, :reason, :color) do
+      # The review_contact reason names the configured addresses, so JSON gets a generic one
+      def as_json(*)
+        reason = (key == "review_contact") ? "Initial contact uses a reserved example domain or a reviewer-configured address." : self.reason
+        {key:, label:, reason:}.as_json
+      end
+    end
     NotASerial = Data.define(:kind, :value) do
       def part_number? = kind == :part_number
 

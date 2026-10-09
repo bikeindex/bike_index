@@ -1,7 +1,13 @@
 require "did_you_mean/levenshtein"
 
 class DuplicateBikeReview
-  ContactGroup = Data.define(:number, :email, :bikes)
+  ContactGroup = Data.define(:number, :email, :bikes) do
+    # Never the email itself
+    def as_json(*)
+      {number:, email_present: !email.nil?, bike_ids: bikes.map(&:id),
+       review_contact: BikeServices::DuplicateReviewCues.review_contact?(email)}.as_json
+    end
+  end
   Check = Data.define(:status, :label)
   # Separate review, never invitation candidates
   SEPARATE_REVIEW_CUES = %w[not_a_serial standard_marking possible_code test_marker review_contact].freeze
