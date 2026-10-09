@@ -28,8 +28,9 @@ module EbikeRuleServices
 
     def row(id, status, note, **args) = {id:, status:, note:, args:}
 
-    # A bike carrying several classes, like assist to 28 mph with a throttle to 20, needs each one recognized
+    # Each class a bike carries has to be recognized
     def classes_rule(law, bike)
+      classes = bike.e_bike_classes
       if bike.class_unknown
         row(:classes, :check, :class_unknown)
       elsif bike.e_bike_class.nil?
@@ -39,10 +40,10 @@ module EbikeRuleServices
         row(:classes, :check, :classes_start_on, date:)
       elsif law[:classes].none?
         row(:classes, :info, :own_classes)
-      elsif (unrecognized = bike.e_bike_classes - law[:classes]).none?
-        row(:classes, :pass, :class_recognized, e_bike_classes: bike.e_bike_classes)
+      elsif (unrecognized = classes - law[:classes]).none?
+        row(:classes, :pass, :classes_recognized, e_bike_classes: classes)
       else
-        row(:classes, :fail, :class_not_recognized, e_bike_classes: unrecognized)
+        row(:classes, :fail, :classes_not_recognized, e_bike_classes: unrecognized)
       end
     end
 

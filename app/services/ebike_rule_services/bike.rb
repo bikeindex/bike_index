@@ -20,8 +20,11 @@ module EbikeRuleServices
 
     def manual? = bikebook_id.nil?
 
-    # Every class its record carries, as assist to 28 mph with a throttle to 20 is both Class 2 and 3
+    # Every class its record carries, as assist to 28 mph with a throttle to 20 is both Class 2 and 3. [nil] for a
+    # bike with no class, whose record can still carry a US one beside a moped's
     def e_bike_classes
+      return [nil] if e_bike_class.nil?
+
       e_vehicle_classifications.filter_map { it[EbikeRuleServices::BikebookCatalog::US_CLASS, 1]&.to_i }.sort.presence || [e_bike_class]
     end
 

@@ -54,9 +54,6 @@ module Pages
 
         def class_numbers = @bike.e_bike_classes.to_sentence
 
-        # a bike with no class gets the single tile saying so
-        def tile_classes = @bike.e_bike_class ? @bike.e_bike_classes : [nil]
-
         # A BikeBook model's maker and model fill in the registration it starts
         def register_href
           return new_register_path if @bike.manual?
@@ -140,10 +137,9 @@ module Pages
               [key, number_display(value)]
             end
           end
-          classes = row[:args][:e_bike_classes]&.size
           case row[:note]
-          when :class_recognized then translation(".classes_recognized", count: classes, **args)
-          when :class_not_recognized then translation(".classes_not_recognized", count: classes, **args)
+          when :classes_recognized then translation(".classes_recognized", count: row[:args][:e_bike_classes].size, **args)
+          when :classes_not_recognized then translation(".classes_not_recognized", count: row[:args][:e_bike_classes].size, **args)
           when :not_classified then translation(".not_classified")
           when :class_unknown then translation(".class_unknown_check_label")
           when :own_classes then translation(".own_classes")

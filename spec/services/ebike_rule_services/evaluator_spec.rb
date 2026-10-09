@@ -79,14 +79,14 @@ RSpec.describe EbikeRuleServices::Evaluator do
     end
 
     it "recognizes both" do
-      expect(rules.first).to include(status: :pass, note: :class_recognized, args: {e_bike_classes: [2, 3]})
+      expect(rules.first).to include(status: :pass, note: :classes_recognized, args: {e_bike_classes: [2, 3]})
     end
 
     context "under a law without Class 2" do
       let(:law) { EbikeRuleServices::StateLaws.find("IN").merge(classes: [1, 3]) }
 
       it "fails on the class it lacks" do
-        expect(rules.first).to include(status: :fail, note: :class_not_recognized, args: {e_bike_classes: [2]})
+        expect(rules.first).to include(status: :fail, note: :classes_not_recognized, args: {e_bike_classes: [2]})
       end
     end
   end
@@ -166,7 +166,7 @@ RSpec.describe EbikeRuleServices::Evaluator do
     let(:law) { EbikeRuleServices::StateLaws.find("IN").merge(watt_cap: nil, mph: nil) }
 
     it "passes" do
-      expect(rules.first(3).map { it[:note] }).to eq %i[class_recognized no_watt_cap no_speed_cap]
+      expect(rules.first(3).map { it[:note] }).to eq %i[classes_recognized no_watt_cap no_speed_cap]
       expect(described_class.verdict(rules)).to eq :green
     end
   end

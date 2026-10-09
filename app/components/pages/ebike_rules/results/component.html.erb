@@ -82,7 +82,7 @@
           </div>
 
           <div class="tw:flex tw:flex-none tw:gap-2">
-            <% tile_classes.each do |e_bike_class| %>
+            <% @bike.e_bike_classes.each do |e_bike_class| %>
               <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, class_unknown: @bike.class_unknown, size: :lg)) %>
             <% end %>
           </div>
