@@ -121,8 +121,8 @@ module Admin
       end
     end
 
-    # Token JSON carries record IDs and review evidence. Cues and contact groups serialize without
-    # contact emails themselves; the rest is picked field by field
+    # Token JSON carries record IDs and review evidence, never contact emails: contact groups
+    # serialize without them and the rest is picked field by field
     def dashboard_json
       {generated_at: @group_snapshot[:generated_at], kind: @kind, cue: @cue, sort: sort_column, direction: sort_direction,
        queues: @queues, cue_counts: @cue_counts, registrations_count: @registrations_count,

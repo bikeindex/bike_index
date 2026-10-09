@@ -123,10 +123,7 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
 
     context "token for a duplicate_bikes superuser" do
       let(:email_pattern) { /[^@\s"]+@[^@\s"]+\.\w+/ }
-      before do
-        FactoryBot.create(:superuser_ability, user: token_user, controller_name: "duplicate_bikes")
-        stub_const("ENV", ENV.to_h.merge("DUPLICATE_REVIEW_CONTACT_EMAILS" => "rider0@example.com, reviewer@partner.bikeindex.org"))
-      end
+      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "duplicate_bikes") }
 
       it "returns queues and groups without contact emails" do
         get url, params: token_param.merge(search_kind: "large_group")
