@@ -102,6 +102,33 @@ RSpec.describe FeedbacksController, type: :request do
           expect(feedback.package_size).to eq ""
         end
       end
+
+      context "from the bike shops page" do
+        it "creates a feedback and renders the signed up state" do
+          expect {
+            post base_url, params: {feedback: {name: "Spoke Shop", feedback_type: "lead_for_bike_shop",
+                                               email: "shop@example.com", body: "POS: Ascend"}},
+              headers: {"HTTP_REFERER" => "http://www.example.com/for_bike_shops"}
+          }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
+          expect(response).to redirect_to "http://www.example.com/for_bike_shops"
+          feedback = Feedback.last
+          expect(feedback.kind).to eq "lead_for_bike_shop"
+          expect(feedback.title).to eq "New Bike shop lead: Spoke Shop"
+          expect(feedback.body).to eq "POS: Ascend"
+
+          follow_redirect!
+          expect(response.body).to include("You&#39;re in.")
+        end
+
+        context "without an email" do
+          it "re-renders the page with the form" do
+            post base_url, params: {feedback: {name: "Spoke Shop", feedback_type: "lead_for_bike_shop", body: "POS: Ascend"}},
+              headers: {"HTTP_REFERER" => "http://www.example.com/for_bike_shops"}
+            expect(response).to render_template("landing_pages/for_bike_shops")
+            expect(response.body).to include("Spoke Shop")
+          end
+        end
+      end
     end
 
     context "feedback with additional" do

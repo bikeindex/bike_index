@@ -1,0 +1,8 @@
+<%# A template rather than a controller render: FeedbacksController re-renders it when a signup fails validation %>
+<% total_bikes, recoveries_count, recoveries_value, organizations_count =
+  Counts.retrieve_many("total_bikes", "recoveries", "recoveries_value", "organizations") %>
+
+<%# The signup form is the only thing on this page that redirects back to it with a success flash %>
+<%= render(Pages::LandingPages::ForBikeShops::Component.new(total_bikes:, recoveries_count:, recoveries_value:,
+  organizations_count:, recovery_displays: RecoveryDisplay.where.not(quote_by: [nil, ""]).limit(3),
+  feedback: @feedback, signed_up: flash[:success].present?, current_user:)) %>

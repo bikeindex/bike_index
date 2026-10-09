@@ -1,0 +1,625 @@
+<% helpers.content_for(:header) do %>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@800;900&display=swap"
+    rel="stylesheet"
+  >
+<% end %>
+
+<div class="tw:bg-white tw:text-gray-500">
+  <section class="tw:border-b tw:border-gray-200">
+    <div
+      class="
+        tw:mx-auto tw:grid tw:max-w-300 tw:items-center tw:gap-16 tw:px-6
+        tw:py-10 tw:md:py-16 tw:lg:grid-cols-[1.15fr_0.85fr] tw:lg:gap-12
+      "
+    >
+      <div>
+        <span
+          class="
+            tw:mb-4.5 tw:inline-block tw:rounded-full tw:bg-blue-100
+            tw:px-3.5 tw:py-1.5 tw:text-[13px] tw:font-bold
+            tw:tracking-widest tw:text-blue-600 tw:uppercase
+          "
+        >
+          <%= translation(".for_bike_shops_free_nonprofit") %>
+        </span>
+
+        <h1
+          class="
+            tw:m-0 tw:mb-4 tw:font-header tw:text-[38px] tw:leading-[1.05]
+            tw:font-black tw:tracking-tight tw:text-balance
+            tw:text-slate-900 tw:md:text-[54px]
+          "
+        >
+          <%= translation(".send_every_bike_home_with_a_sidekick") %>
+        </h1>
+
+        <p
+          class="
+            tw:m-0 tw:mb-7 tw:max-w-125 tw:text-[17px] tw:leading-[1.55]
+            tw:md:text-[19px]
+          "
+        >
+          <%= translation(".hero_lede") %>
+        </p>
+
+        <div class="tw:grid tw:max-w-140 tw:grid-cols-3 tw:gap-3">
+          <% hero_stats.each do |value, label| %>
+            <div class="tw:border-t-2 tw:border-gray-200 tw:pt-2.5">
+              <div
+                class="
+                  tw:font-comic tw:text-[28px] tw:leading-none
+                  tw:text-blue-600 tw:uppercase tw:md:text-[34px]
+                "
+              >
+                <%= value %>
+              </div>
+
+              <div class="tw:mt-1 tw:text-sm">
+                <%= label %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div
+        id="shop-signup"
+        class="tw:relative tw:scroll-mt-20 tw:p-7 <%= COMIC_BOX %>"
+      >
+        <%= image_tag("kelsey/illustrations/comic-assets_logo-cape.png", alt: "",
+          class: "tw:absolute tw:-top-11.5 tw:-right-3 tw:h-24 tw:md:-right-6") %>
+
+        <% if @signed_up %>
+          <div class="tw:px-2 tw:py-9 tw:text-center">
+            <div class="tw:font-comic tw:text-5xl tw:leading-none tw:text-blue-600">
+              <%= translation(".ding") %>
+            </div>
+
+            <h2 class="tw:mt-2.5 tw:mb-1.5 tw:text-[22px] <%= h2_classes %>">
+              <%= translation(".youre_in") %>
+            </h2>
+
+            <p class="tw:m-0 tw:leading-relaxed">
+              <%= translation(".check_your_email") %>
+            </p>
+          </div>
+        <% else %>
+          <h2 class="tw:mb-1 tw:pr-20 tw:text-[22px] <%= h2_classes %>">
+            <%= translation(".sign_up_your_shop") %>
+          </h2>
+
+          <p class="tw:m-0 tw:mb-4.5 tw:text-sm">
+            <%= translation(".free_forever") %>
+          </p>
+
+          <%= form_for @feedback, html: {data: {controller: "form-persist", action: "input->form-persist#save submit->form-persist#clear"}} do |f| %>
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name,
+              label_text: translation(".shop_name"), required: true,
+              html_options: {required: true, placeholder: translation(".shop_name_placeholder")})) %>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+              <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true,
+                html_options: {value: @feedback.email.presence || @current_user&.email, placeholder: translation(".email_placeholder")})) %>
+            <% end %>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body,
+              label_text: translation(".your_pos"), required: true)) do %>
+              <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :body, option_tags: pos_options,
+                options: {prompt: translation(".choose_your_pos")}, required: true)) %>
+            <% end %>
+
+            <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
+
+            <%= f.hidden_field :feedback_type, value: "lead_for_bike_shop" %>
+
+            <%= render(UI::Button::Component.new(text: translation(".sign_up_free"), color: :primary,
+              size: :callout, type: "submit", html_class: "tw:w-full")) %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="tw:pt-12 tw:pb-12 tw:md:pt-18 tw:md:pb-16 <%= section_inner %>">
+    <div
+      class="
+        tw:grid tw:items-start tw:gap-10 tw:lg:grid-cols-[0.9fr_1.1fr]
+        tw:lg:gap-14
+      "
+    >
+      <div>
+        <p class="tw:text-blue-600 <%= eyebrow_classes %>">
+          <%= translation(".set_it_and_forget_it") %>
+        </p>
+
+        <h2 class="tw:mb-3.5 tw:text-[30px] tw:leading-[1.15] tw:text-balance tw:md:text-[38px] <%= h2_classes %>">
+          <%= translation(".ring_up_the_sale") %>
+        </h2>
+
+        <p class="tw:m-0 tw:mb-6 tw:text-[17px] tw:leading-relaxed">
+          <%= translation(".no_extra_forms") %>
+        </p>
+
+        <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0">
+          <% integrations.each do |name, live| %>
+            <li
+              class="
+                tw:flex tw:items-center tw:justify-between tw:gap-3
+                tw:rounded-lg tw:border tw:border-gray-200 tw:px-4.5
+                tw:py-3.5
+              "
+            >
+              <span
+                class="
+                  tw:font-header tw:text-lg tw:font-extrabold
+                  tw:text-slate-900
+                "
+              >
+                <%= name %>
+              </span>
+
+              <% if live %>
+                <span
+                  class="
+                    tw:rounded-full tw:bg-[#e6f4ec] tw:px-2.5 tw:py-1
+                    tw:text-xs tw:font-bold tw:tracking-wider
+                    tw:text-[#2e8b57] tw:uppercase
+                  "
+                >
+                  <%= translation(".live") %>
+                </span>
+              <% else %>
+                <span
+                  class="
+                    tw:rounded-full tw:bg-purple-100 tw:px-2.5 tw:py-1
+                    tw:text-xs tw:font-bold tw:tracking-wider
+                    tw:text-purple-500 tw:uppercase
+                  "
+                >
+                  <%= translation(".coming_soon") %>
+                </span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+
+      <ol class="tw:m-0 tw:list-none tw:p-0">
+        <% steps.each_with_index do |(title, body), index| %>
+          <li
+            class="
+              tw:grid tw:grid-cols-[64px_1fr] tw:gap-4.5 tw:border-b
+              tw:border-gray-200 tw:py-5.5
+            "
+          >
+            <span
+              class="
+                tw:flex tw:size-14 tw:items-center tw:justify-center
+                tw:rounded-full tw:border-2 tw:border-blue-600
+                tw:bg-blue-100 tw:font-comic tw:text-3xl tw:text-blue-600
+              "
+              aria-hidden="true"
+            >
+              <%= number_display(index + 1) %>
+            </span>
+
+            <div>
+              <h3
+                class="
+                  tw:m-0 tw:mt-1 tw:mb-1.5 tw:font-header tw:text-xl
+                  tw:font-bold tw:text-slate-900
+                "
+              >
+                <span class="tw:sr-only"><%= number_display(index + 1) %>.</span>
+                <%= title %>
+              </h3>
+
+              <p class="tw:m-0 tw:text-base tw:leading-relaxed">
+                <%= body %>
+              </p>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  </section>
+
+  <section class="tw:border-y tw:border-gray-200 tw:bg-gray-50">
+    <div class="tw:py-12 tw:md:py-18 <%= section_inner %>">
+      <h2 class="tw:mb-8 tw:max-w-170 tw:text-[30px] tw:leading-[1.15] tw:text-balance tw:md:text-[38px] <%= h2_classes %>">
+        <%= translation(".what_your_customers_get") %>
+      </h2>
+
+      <div class="twwiderow tw:gap-6">
+        <% benefit_cards.each do |card| %>
+          <div class="tw:p-7 <%= COMIC_BOX %>">
+            <div class="tw:mb-4 tw:flex tw:items-center tw:justify-between tw:gap-3">
+              <h3
+                class="
+                  tw:m-0 tw:font-header tw:text-xl tw:font-extrabold
+                  tw:text-slate-900
+                "
+              >
+                <%= card[:title] %>
+              </h3>
+
+              <span
+                class="tw:font-comic tw:text-2xl <%= card[:color] %>"
+                aria-hidden="true"
+              >
+                <%= card[:burst] %>
+              </span>
+            </div>
+
+            <ul class="tw:m-0 tw:grid tw:list-none tw:gap-4 tw:p-0">
+              <% card[:rows].each do |icon, title, body| %>
+                <li class="tw:flex tw:items-start tw:gap-3">
+                  <%= helpers.inline_svg_tag(icon, class: "tw:mt-px tw:size-5.5 tw:shrink-0 #{card[:color]}", aria_hidden: true) %>
+
+                  <div>
+                    <strong class="tw:text-slate-900"><%= title %></strong>
+                    <%= body %>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+
+      <div
+        class="
+          tw:mt-10 tw:grid tw:grid-cols-2 tw:gap-x-7 tw:gap-y-4
+          tw:md:grid-cols-4
+        "
+      >
+        <% impact_stats.each do |value, label| %>
+          <div class="tw:border-t-2 tw:border-gray-200 tw:pt-2.5">
+            <div
+              class="
+                tw:font-header tw:text-[26px] tw:font-extrabold
+                tw:text-blue-600 tw:md:text-3xl
+              "
+            >
+              <%= value %>
+            </div>
+
+            <div class="tw:text-sm">
+              <%= label %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div
+      class="
+        tw:grid tw:items-center tw:gap-12 tw:py-12 tw:md:py-18 tw:lg:grid-cols-[1.1fr_0.9fr] tw:lg:gap-14
+        <%= section_inner %>
+      "
+    >
+      <div>
+        <span
+          class="
+            tw:mb-3.5 tw:inline-block tw:rounded-full tw:bg-[#ffd660]
+            tw:px-3 tw:py-1.25 tw:text-xs tw:font-extrabold
+            tw:tracking-widest tw:text-slate-900 tw:uppercase
+          "
+        >
+          <%= translation(".new_our_first_retail_product") %>
+        </span>
+
+        <h2 class="tw:mb-3.5 tw:text-[34px] tw:leading-[1.08] tw:font-black! tw:text-balance tw:md:text-[44px] <%= h2_classes %>">
+          <%= translation(".peace_of_mind_on_a_sticker") %>
+        </h2>
+
+        <p class="tw:m-0 tw:mb-5.5 tw:max-w-135 tw:text-[17px] tw:leading-relaxed">
+          <%= translation(".sticker_body") %>
+        </p>
+
+        <div class="tw:mb-6.5 tw:flex tw:flex-wrap tw:gap-7 tw:text-slate-900">
+          <div>
+            <div class="tw:font-header tw:text-[32px] tw:font-black">
+              <%= translation(".suggested_retail_price") %>
+            </div>
+
+            <div class="tw:text-sm tw:font-semibold">
+              <%= translation(".suggested_retail") %>
+            </div>
+          </div>
+
+          <div>
+            <div class="tw:font-header tw:text-[32px] tw:font-black">
+              <%= translation(".wholesale") %>
+            </div>
+
+            <div class="tw:text-sm tw:font-semibold">
+              <%= translation(".pricing_shown_in_cart") %>
+            </div>
+          </div>
+        </div>
+
+        <%= render(UI::ButtonLink::Component.new(href: store_path, text: translation(".order_stickers"),
+          color: :primary, size: :callout)) %>
+
+        <p class="tw:m-0 tw:mt-3.5 tw:text-[15px] tw:text-slate-900">
+          <%= translation(".contact_us_for_bulk_orders_html",
+            contact_link: mail_to(support_email, translation(".contact_us"), class: "twlink-underlined tw:font-bold")) %>
+        </p>
+      </div>
+
+      <div class="tw:flex tw:justify-center">
+        <%= image_tag("landing_pages/sticker-sheet.jpg", alt: translation(".sticker_sheet_alt"), loading: "lazy",
+          class: "#{COMIC_BOX} tw:block tw:w-full tw:max-w-90 tw:rotate-2") %>
+      </div>
+    </div>
+  </section>
+
+  <section class="<%= navy_gradient %>">
+    <div class="tw:py-12 tw:md:py-16 <%= section_inner %>">
+      <div
+        class="
+          tw:grid tw:items-center tw:gap-8 tw:rounded-lg tw:bg-white/8
+          tw:p-7 tw:md:grid-cols-[auto_1fr] tw:md:gap-10 tw:md:p-10
+        "
+      >
+        <span
+          class="
+            tw:flex tw:size-24 tw:items-center tw:justify-center
+            tw:rounded-full tw:bg-white/12
+          "
+        >
+          <%= helpers.inline_svg_tag("icons/shield-check.svg", class: "tw:size-12 tw:text-[#ffd660]", aria_hidden: true) %>
+        </span>
+
+        <div>
+          <h2
+            class="
+              tw:m-0 tw:mb-2.5 tw:font-header tw:text-[26px]
+              tw:font-extrabold tw:text-white tw:md:text-3xl
+            "
+          >
+            <%= translation(".we_never_sell_or_share") %>
+          </h2>
+
+          <p
+            class="
+              tw:m-0 tw:mb-4.5 tw:max-w-190 tw:text-[17px]
+              tw:leading-relaxed tw:text-white/85
+            "
+          >
+            <%= translation(".privacy_body") %>
+          </p>
+
+          <ul class="tw:m-0 tw:flex tw:list-none tw:flex-wrap tw:gap-6 tw:p-0">
+            <% privacy_points.each do |icon, title| %>
+              <li
+                class="
+                  tw:flex tw:items-center tw:gap-2 tw:text-[15px]
+                  tw:font-semibold tw:text-white
+                "
+              >
+                <%= helpers.inline_svg_tag(icon, class: "tw:size-4.5 tw:text-[#ffd660]", aria_hidden: true) %>
+                <%= title %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <% if @recovery_displays.any? %>
+    <% featured, *others = @recovery_displays %>
+
+    <section class="tw:py-12 tw:md:py-18 <%= section_inner %>">
+      <div
+        class="
+          tw:mb-5.5 tw:flex tw:flex-wrap tw:items-baseline
+          tw:justify-between tw:gap-x-6 tw:gap-y-2
+        "
+      >
+        <div class="tw:flex tw:items-baseline tw:gap-3.5">
+          <h2 class="tw:text-3xl <%= h2_classes %>">
+            <%= translation(".bikes_that_came_home") %>
+          </h2>
+
+          <span
+            class="tw:font-comic tw:text-[26px] tw:text-blue-600"
+            aria-hidden="true"
+          >
+            <%= translation(".home") %>
+          </span>
+        </div>
+
+        <%= link_to(recovery_stories_path, class: "twlink tw:font-bold") do %>
+          <%= translation(".read_more_recovery_stories") %>
+          <span aria-hidden="true">→</span>
+        <% end %>
+      </div>
+
+      <div class="tw:grid tw:overflow-hidden tw:md:grid-cols-[1.3fr_0.7fr] <%= COMIC_BOX %>">
+        <figure class="tw:m-0 tw:flex tw:flex-col tw:gap-4.5 tw:p-7 tw:md:p-10">
+          <span
+            class="
+              tw:font-header tw:text-6xl tw:leading-[0.5] tw:font-black
+              tw:text-purple-500
+            "
+            aria-hidden="true"
+          >
+            “
+          </span>
+
+          <blockquote
+            class="
+              tw:m-0 tw:border-0 tw:p-0 tw:font-header tw:text-xl
+              tw:leading-[1.4] tw:font-bold tw:text-slate-900 tw:md:text-2xl
+            "
+          >
+            <%= featured.quote %>
+          </blockquote>
+
+          <figcaption>
+            <div class="tw:font-bold tw:text-slate-900">
+              <%= featured.quote_by %>
+            </div>
+
+            <div class="tw:text-sm">
+              <%= translation(".recovered") %>
+              <%= render(UI::Time::Component.new(time: featured.recovered_at)) %>
+            </div>
+          </figcaption>
+        </figure>
+
+        <% if others.any? %>
+          <div
+            class="
+              tw:flex tw:flex-col tw:justify-center tw:gap-5 tw:border-t-3
+              tw:border-black tw:bg-gray-50 tw:p-7 tw:md:border-t-0
+              tw:md:border-l-3
+            "
+          >
+            <% others.each do |recovery_display| %>
+              <figure class="tw:m-0">
+                <blockquote
+                  class="
+                    tw:m-0 tw:mb-1.5 tw:border-0 tw:p-0 tw:text-[15px]
+                    tw:leading-normal tw:text-gray-700
+                  "
+                >
+                  <%= recovery_display.quote %>
+                </blockquote>
+
+                <figcaption class="tw:text-[13px]">
+                  <% if recovery_display.quote_by.present? %>
+                    <strong class="tw:text-slate-900"><%= recovery_display.quote_by %></strong>
+                    ·
+                  <% end %>
+
+                  <%= translation(".recovered") %>
+                  <%= render(UI::Time::Component.new(time: recovery_display.recovered_at)) %>
+                </figcaption>
+              </figure>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="tw:pb-12 tw:md:pb-18 <%= section_inner %> <%= "tw:pt-12 tw:md:pt-18" if @recovery_displays.none? %>">
+    <p class="tw:text-purple-500 <%= eyebrow_classes %>">
+      <%= translation(".more_from_bike_index") %>
+    </p>
+
+    <h2 class="tw:mb-6 tw:text-3xl <%= h2_classes %>">
+      <%= translation(".free_tools") %>
+    </h2>
+
+    <div class="twwiderow tw:gap-6">
+      <% tools.each do |tool| %>
+        <%= link_to(tool[:href],
+          class: "tw:flex tw:flex-col tw:gap-3 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-7 tw:text-inherit tw:no-underline tw:shadow-sm tw:transition-all tw:duration-300 tw:hover:-translate-y-1.25 tw:hover:text-inherit tw:hover:no-underline tw:hover:shadow-[0_10px_30px_rgba(44,62,80,.16)]") do %>
+          <span class="tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-full tw:text-white <%= tool[:circle] %>">
+            <%= helpers.inline_svg_tag(tool[:icon], class: "tw:size-5.5", aria_hidden: true) %>
+          </span>
+
+          <h3
+            class="
+              tw:m-0 tw:font-header tw:text-[22px] tw:font-extrabold
+              tw:text-slate-900
+            "
+          >
+            <%= tool[:title] %>
+          </h3>
+
+          <p class="tw:m-0 tw:flex-1 tw:text-base tw:leading-relaxed">
+            <%= tool[:body] %>
+          </p>
+
+          <span class="tw:font-bold tw:text-blue-600">
+            <%= tool[:action] %>
+            <span aria-hidden="true">→</span>
+          </span>
+        <% end %>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="tw:border-t tw:border-gray-200 tw:bg-gray-50">
+    <div class="tw:grid tw:gap-8 tw:py-12 tw:md:py-16 tw:lg:grid-cols-[0.7fr_1.3fr] tw:lg:gap-12 <%= section_inner %>">
+      <div>
+        <h2 class="tw:mb-2.5 tw:text-3xl <%= h2_classes %>">
+          <%= translation(".faq") %>
+        </h2>
+
+        <p class="tw:m-0 tw:text-base tw:leading-relaxed">
+          <%= translation(".something_else_html",
+            email_link: mail_to(support_email, translation(".email_our_shop_team"), class: "twlink tw:font-semibold")) %>
+        </p>
+      </div>
+
+      <div class="tw:flex tw:flex-col tw:gap-2.5">
+        <% faqs.each_with_index do |(question, answer), index| %>
+          <div
+            class="
+              tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:px-5
+              tw:py-4
+            "
+            data-controller="ui--collapse"
+          >
+            <%= render(UI::Collapse::Component.new(chevron: true, color: :link,
+              html_class: "tw:w-full tw:gap-4 tw:font-header tw:text-base tw:font-bold tw:text-slate-900!")) do %>
+              <span class="tw:flex-1 tw:text-left"><%= question %></span>
+            <% end %>
+
+            <div
+              data-ui--collapse-target="content"
+              class="<%= "tw:hidden" unless index.zero? %>"
+            >
+              <p class="tw:m-0 tw:mt-2.5 tw:text-[15px] tw:leading-relaxed">
+                <%= answer %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="<%= navy_gradient %>">
+    <div
+      class="
+        tw:mx-auto tw:flex tw:max-w-250 tw:flex-col tw:items-start tw:gap-8
+        tw:px-6 tw:py-14 tw:md:flex-row tw:md:items-center
+        tw:md:justify-between
+      "
+    >
+      <div class="tw:flex tw:items-center tw:gap-6">
+        <%= image_tag("kelsey/illustrations/comic-assets_u-lock.png", alt: "", loading: "lazy",
+          class: "tw:hidden tw:h-24 tw:sm:block") %>
+
+        <div>
+          <h2
+            class="
+              tw:m-0 tw:mb-1.5 tw:font-header tw:text-2xl tw:font-extrabold
+              tw:text-white tw:md:text-[28px]
+            "
+          >
+            <%= translation(".ten_minutes_now") %>
+          </h2>
+
+          <p class="tw:m-0 tw:text-base tw:text-white/85">
+            <%= translation(".free_for_shops_and_customers") %>
+          </p>
+        </div>
+      </div>
+
+      <%= render(UI::ButtonLink::Component.new(href: "#shop-signup", text: translation(".sign_up_your_shop"),
+        color: :primary, size: :callout, html_class: "tw:shrink-0")) %>
+    </div>
+  </section>
+</div>

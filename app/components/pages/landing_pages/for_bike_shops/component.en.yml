@@ -1,0 +1,138 @@
+---
+en:
+  components:
+    pages:
+      landing_pages:
+        for_bike_shops:
+          a_reason_to_trust_you: A reason to trust you.
+          a_reason_to_trust_you_body: A free perk that shows you care after the sale.
+          bike_book: Bike Book
+          bike_book_body: >-
+            Compare specifications, geometry, and a host of other features across
+            thousands of bike models.
+          bikes_registered_free: bikes registered, free
+          bikes_that_came_home: Bikes that came home
+          browse_bike_book: Browse Bike Book
+          check_your_email: Check your email for next steps on connecting your POS.
+          check_your_state: Check your state
+          choose_your_pos: Choose your POS
+          coming_soon: Coming soon
+          contact_us: Contact us
+          contact_us_for_bulk_orders_html: "%{contact_link} for bulk orders."
+          customer_records_sold_or_shared: customer records sold or shared
+          data_stays_private: Their data stays private.
+          data_stays_private_body: Never sold, never shared.
+          ding: DING!
+          ebike_legality_checker: E-bike legality checker
+          ebike_legality_checker_body: >-
+            State-by-state guidance on e-bike classes, where they can ride, and age
+            and equipment rules. Handy when a customer asks what's legal before they
+            buy.
+          email_our_shop_team: Email our shop team
+          email_placeholder: you@yourshop.com
+          faq: FAQ
+          faq_cost_answer: >-
+            Nothing. Bike Index is free for shops and for your customers. Registration
+            stickers are an optional retail product.
+          faq_cost_question: What does it cost?
+          faq_customer_answer: >-
+            Nothing at the counter. They receive an email from Bike Index to claim
+            their registration and add photos.
+          faq_customer_question: What does my customer need to do?
+          faq_data_answer: >-
+            No. We have very restrictive privacy policies and never sell or share
+            customer data.
+          faq_data_question: Do you sell or share customer data?
+          faq_pos_answer: >-
+            Lightspeed and Ascend today. Shopify is coming soon. Shops without a supported
+            POS can still register bikes from their shop account.
+          faq_pos_question: Which POS systems do you integrate with?
+          faq_setup_answer: >-
+            About 10 minutes. Once your POS is connected, bikes register automatically
+            with every transaction.
+          faq_setup_question: How long does setup take?
+          faq_stickers_answer: >-
+            Stickers are sold by the dozen through our online store, with a suggested
+            retail price of $7.99. Wholesale pricing is shown in the cart.
+          faq_stickers_question: How do I order registration stickers?
+          for_bike_shops_free_nonprofit: For bike shops · Free · Nonprofit
+          for_you_and_your_customers: for you and your customers
+          for_your_customers: For your customers
+          for_your_shop: For your shop
+          free_for_shops_and_customers: Free for shops and customers, forever.
+          free_forever: Free, forever. We'll help you connect your POS.
+          free_registration: Free registration.
+          free_registration_body: Their bike is on record before they ride away.
+          free_tools: Free tools for you and your customers
+          help_if_stolen: Help if it's stolen.
+          help_if_stolen_body: One click sends an alert to shops, police, and riders.
+          hero_lede: >-
+            Bike Index connects to your POS and registers every bike you sell, automatically.
+            Your customers get free theft protection. You get a shop that clearly
+            puts them first.
+          home: HOME!
+          live: Live
+          min: min
+          more_from_bike_index: More from Bike Index
+          never_shared: Never shared
+          never_sold: Never sold
+          new_our_first_retail_product: New · Our first retail product
+          no_extra_forms: >-
+            No extra forms at the counter and no staff training. Once your POS is
+            connected, every bike sale becomes a Bike Index registration.
+          nothing_to_manage: Nothing to manage.
+          nothing_to_manage_body: 10 minutes to connect, then it runs on every sale.
+          order_stickers: Order stickers
+          partner_organizations: partner shops, police, and cities
+          peace_of_mind_on_a_sticker: One-time peace of mind, on a sticker.
+          pos_ascend: Ascend
+          pos_lightspeed: Lightspeed
+          pos_other_or_none: Other / none
+          pos_shopify_coming_soon: Shopify (coming soon)
+          pow: POW!
+          pricing_shown_in_cart: Pricing shown in cart
+          privacy_body: >-
+            Bike Index is a nonprofit with very restrictive privacy policies. Customer
+            information from your shop is used to register and recover bikes. It is
+            never sold, shared, or used for advertising.
+          read_more_recovery_stories: Read more recovery stories
+          recovered: Recovered
+          ring_up_the_sale: Ring up the sale. We handle the rest.
+          safe: SAFE!
+          safer_used_bike_sales: Safer used-bike sales.
+          safer_used_bike_sales_body: Check serials against the registry.
+          send_every_bike_home_with_a_sidekick: Send every bike home with a sidekick.
+          set_it_and_forget_it: Set it and forget it
+          shop_name: Shop name
+          shop_name_placeholder: Spoke & Chain Cycles
+          sign_up_free: Sign up free
+          sign_up_your_shop: Sign up your shop
+          something_else_html: Something else? %{email_link}.
+          step_connect_body: Link Lightspeed or Ascend to your free shop account.
+            It takes about 10 minutes.
+          step_connect_title: Connect your POS
+          step_covered_body: >-
+            They get an email to claim their registration, with serial and details
+            already filled in.
+          step_covered_title: Your customer is covered
+          step_sell_body: >-
+            Nothing changes at the counter. Each bike sale registers on Bike Index
+            automatically.
+          step_sell_title: Sell bikes like always
+          sticker_body: >-
+            Sell Bike Index registration stickers at the counter. Riders scan the
+            QR code, register their bike, and link the sticker to it. It works for
+            any bike, including ones that didn't come through your POS.
+          sticker_sheet_alt: Bike Index registration sticker sheet
+          stolen_bikes_recovered: stolen bikes recovered
+          suggested_retail: Suggested retail
+          suggested_retail_price: "$7.99"
+          ten_minutes_now: Ten minutes now. Protected bikes for good.
+          to_set_up: to set up
+          used_only_for_bikes: Used only for bikes
+          value_returned_to_owners: value returned to owners
+          we_never_sell_or_share: We never sell or share customer data.
+          what_your_customers_get: What your customers get. What your shop gets.
+          wholesale: Wholesale
+          your_pos: Your POS
+          youre_in: You're in.
