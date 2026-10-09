@@ -31,13 +31,11 @@ RSpec.describe BikeServices::DuplicateReviewCues do
       .to eq ["Placeholder, not a serial: TO BE SPECIFIED"]
   end
 
-  it "recognizes reserved example domains and configured reviewer contacts only" do
-    stub_const("ENV", ENV.to_h.merge("DUPLICATE_REVIEW_CONTACT_EMAILS" => " Developer@Partner.bikeindex.org ,"))
+  it "recognizes reserved example domains only" do
     expect(described_class.review_contact?(" Rider@Shop.Example.com ")).to be true
-    expect(described_class.review_contact?("developer@partner.bikeindex.org")).to be true
+    expect(described_class.review_contact?("rider@shop.test")).to be true
     expect(described_class.review_contact?("rider@example.com.au")).to be false
-    expect(described_class.review_contact?("someone@partner.bikeindex.org")).to be false
-    expect(described_class.review_contact_sql("email")).to include("IN ('developer@partner.bikeindex.org')")
+    expect(described_class.review_contact?("developer@partner.bikeindex.org")).to be false
     expect(described_class.review_contact?(nil)).to be false
   end
 

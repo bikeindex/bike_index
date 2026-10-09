@@ -23,7 +23,7 @@
   <% end %>
 
   <% if contacts.any? { BikeServices::DuplicateReviewCues.review_contact?(it) } %>
-    <%= render UI::Badge::Component.new(text: "Example-domain or developer contact", color: :orange, size: :sm, title: "A reviewer-supplied cue on the initial, current or account email. Not a test classification.") %>
+    <%= render UI::Badge::Component.new(text: "Example-domain contact", color: :orange, size: :sm, title: "A reserved example domain on the initial, current or account email. Not a test classification.") %>
   <% end %>
 
   <% if review.transferred?(bike) %>

@@ -43,7 +43,7 @@ module BikeServices
       "standard_marking" => "Standards marking in serial",
       "possible_code" => "Possible product, part or placeholder code",
       "test_marker" => "Test markers",
-      "review_contact" => "Example-domain or developer contact",
+      "review_contact" => "Example-domain contact",
       "single_contact" => "One initial contact",
       "none" => "No tentative cues"
     }.freeze
@@ -84,26 +84,10 @@ module BikeServices
       end
     end
 
-    # Supplied by the reviewer, not part of the test-marker rule. Real addresses, so they're configured
-    # rather than committed: comma separated
-    def review_contact_emails
-      ENV.fetch("DUPLICATE_REVIEW_CONTACT_EMAILS", "").split(",").map { it.strip.downcase }.reject(&:empty?)
-    end
+    # A reserved example domain; not part of the test-marker rule
+    def review_contact?(email) = email.to_s.strip.downcase.match?(REVIEW_CONTACT_DOMAIN_REGEX)
 
-    def review_contact_description
-      ["a reserved example domain", *review_contact_emails].to_sentence(last_word_connector: ", or ", two_words_connector: " or ")
-    end
-
-    def review_contact?(email)
-      email = email.to_s.strip.downcase
-      email.match?(REVIEW_CONTACT_DOMAIN_REGEX) || review_contact_emails.include?(email)
-    end
-
-    def review_contact_sql(column)
-      emails = review_contact_emails.map { "'#{it.gsub("'", "''")}'" }
-      listed = emails.any? ? " OR #{column} IN (#{emails.join(", ")})" : ""
-      "(#{column} ~ '#{REVIEW_CONTACT_DOMAIN_PATTERN}'#{listed})"
-    end
+    def review_contact_sql(column) = "(#{column} ~ '#{REVIEW_CONTACT_DOMAIN_PATTERN}')"
 
     def cues(serials:, record_count:, contact_count:, test_count:, review_contact_count:, single_contact:, model_match_count: 0, manufacturer_names: {})
       marking = standard_marking(serials)
@@ -131,8 +115,8 @@ module BikeServices
              "Bike Index administrators organization or the designated test contact, including historical links. A review scope, not permission to delete.", :purple)
          end),
         (if review_contact_count.positive?
-           Cue.new("review_contact", "#{review_contact_count} example-domain or developer #{"contact".pluralize(review_contact_count)}",
-             "Initial contact uses #{review_contact_description}. Reviewer-supplied cue; these are not classified as test records.", :orange)
+           Cue.new("review_contact", "#{review_contact_count} example-domain #{"contact".pluralize(review_contact_count)}",
+             "Initial contact uses a reserved example domain (example.com, .test, .invalid and similar). These are not classified as test records.", :orange)
          end),
         (if single_contact
            Cue.new("single_contact", "One initial contact",
