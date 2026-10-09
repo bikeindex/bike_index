@@ -157,3 +157,17 @@ HwComboboxController.prototype._openInDialog = function () {
   this.dialogTarget.addEventListener('close', dismiss, { signal: listeners.signal })
   RENDER_EVENTS.forEach(name => document.addEventListener(name, dismiss, { signal: listeners.signal }))
 }
+
+// A combobox set or cleared from code goes through the gem, so its hidden field, its input and a
+// rich display all agree - assigning the hidden field leaves the rest showing what it held
+export function selectComboboxValue (combobox, value) {
+  const option = [...combobox.querySelectorAll('[role=listbox] [role=option]')]
+    .find((element) => element.dataset.value === String(value))
+  option?.click()
+}
+
+// clear() empties the selection without an event; the keyup is what the rich display listens for
+export function clearCombobox (combobox) {
+  window.Stimulus.getControllerForElementAndIdentifier(combobox, 'hw-combobox')?.clear()
+  combobox.querySelector('[role=combobox]')?.dispatchEvent(new window.KeyboardEvent('keyup'))
+}

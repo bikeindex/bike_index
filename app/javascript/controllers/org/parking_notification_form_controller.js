@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION, showMapUnavailable } from 'utils/maplibre'
+import { selectComboboxValue } from 'utils/hw_combobox_patch'
 
 /* global navigator */
 
@@ -365,10 +366,12 @@ export default class extends Controller {
       const field = this.addressField(attribute)
       if (!field || !value) return
       if (field.value && field.value !== replaceable.get(field)) return
-      field.value = value
+      // the state is a combobox, whose hidden field alone wouldn't show what it holds
+      const combobox = field.closest('.hw-combobox')
+      combobox ? selectComboboxValue(combobox, value) : (field.value = value)
     })
-    // Let AddressGroup swap the state select for the free-text region field. Only on
-    // an actual change — it clears the state select for a non-US country
+    // Let AddressGroup swap the state combobox for the free-text region field. Only on
+    // an actual change — it clears the state for a non-US country
     if (country && country.value !== countryBefore) country.dispatchEvent(new Event('change', { bubbles: true }))
   }
 

@@ -84,7 +84,7 @@ module UI
 
           render UI::Forms::NoJsField::Component.new(name: no_js_name,
             label: @combobox_options[:dialog_label],
-            value: @no_js.is_a?(Hash) ? @no_js[:value] : @html_options[:value],
+            value: @no_js.is_a?(Hash) ? @no_js[:value] : (@html_options[:value] || @html_options[:form]&.object.try(@name)),
             options: no_js_options, required: @html_options[:required], text: no_js_text?)
         end
 

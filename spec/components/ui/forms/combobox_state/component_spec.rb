@@ -36,6 +36,8 @@ RSpec.describe UI::Forms::ComboboxState::Component, type: :component do
       expect(component).to have_css("[role='option'][data-value='#{california.id}']", text: "California (CA)", visible: :all)
       expect(component).to have_css("[data-hw-combobox-prefilled-display-value='California (CA)']")
       expect(component.css("input[type='hidden'][name='address_record[region_record_id]']").first["value"]).to eq california.id.to_s
+      # without JavaScript the fallback select is what submits, so it has to hold the saved state too
+      expect(component.css("noscript").to_html).to include("<option selected=\"selected\" value=\"#{california.id}\">California (CA)</option>")
     end
   end
 end
