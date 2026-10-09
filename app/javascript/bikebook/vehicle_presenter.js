@@ -51,13 +51,17 @@ export class VehiclePresenter {
     return this.vocabulary.e_vehicle_classifications?.[id]?.label ?? id
   }
 
-  // Each classification's name to its tooltip, whose heading links to `path(id)`
+  // A classification's tooltip, whose heading links to `path(id)`
+  classificationTooltip (id, path) {
+    const { title, description } = this.vocabulary.e_vehicle_classifications[id]
+    return html`<h3 class="tw:font-bold"><a class="twlink" href=${path(id)}>${title}</a></h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
+      copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${description}</p>`
+  }
+
+  // Each classification's name to its tooltip
   classificationTooltips (path) {
-    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {}).map(([id, { label, title, description }]) => [
-      label,
-      html`<h3 class="tw:font-bold"><a class="twlink" href=${path(id)}>${title}</a></h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
-        copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${description}</p>`
-    ]))
+    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {})
+      .map(([id, { label }]) => [label, this.classificationTooltip(id, path)]))
   }
 
   // A `difference` of a length in centimeters leaves off its feet and inches

@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "Bikebook", :js, type: :system do
   after { WebMock.reset! }
 
-  def vehicle_field = find_field("View a vehicle")
+  def vehicle_field = find_field("Select a bike, choose multiple to compare them")
 
   # A component's markup from the server beside its template's from the browser, as canonical_html.js's
   # lines. `args` is the template's argument as JavaScript source, with lit-html's `html` in scope
@@ -183,10 +183,20 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     # A filter's options count the catalog's models, and its chips come from them
     click_on "More filters"
-    find_field("Manufacturer").click
+    find_field("Manufacturers").click
     find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (5)").click
     expect(page).to have_css("[data-async-id='manufacturer'] .hw-combobox__chip", text: "Kris Holm")
     expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
+    # checked propulsions match any of them
+    check "Motorized"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(0 matching models)")
+    check "Human powered (Acoustic)"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
+    expect(page).to have_current_path(/electric=0,1/)
+    # a US class's tooltip links to its card
+    find("button[aria-label='US Class 1 e-bike']").click
+    expect(page).to have_css("[role='tooltip'] a[href*='evc/us/class_1']", text: "US Class 1 e-bike", visible: true)
+    expect(page).to have_unchecked_field("US Class 1")
 
     expect(asked).to be_empty
 
