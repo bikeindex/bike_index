@@ -6803,11 +6803,9 @@ nl:
             complete_registration: Voltooi de %{cycle_type}-registratie
       bikebook:
         show:
-          activity: Activiteit
           any_activity: Elke activiteit
           any_configuration: Elke configuratie
           any_manufacturer: Elke fabrikant
-          any_motorized: Elke gemotoriseerde
           any_suspension: Elke ophanging
           any_vehicle_type: Elk type voertuig
           applied_filters: Toegepaste filters
@@ -6815,7 +6813,6 @@ nl:
           failed: De catalogus is niet geladen. Vernieuw de pagina om het opnieuw
             te proberen.
           loading: De catalogus wordt geladen…
-          manufacturer: Fabrikant
           max: Max
           min: Min
           more_filters: Meer filters
@@ -6824,8 +6821,6 @@ nl:
           search_placeholder: Zoeken op fabrikant of model…
           sort: Soort
           suspension: Oponthoud
-          vehicle_type: 'Voertuigtype:'
-          view_a_vehicle: Bekijk een voertuig
           year: jaar
           filter_combobox:
             any: Elk
@@ -6835,8 +6830,21 @@ nl:
           tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
             volgende fiets.'
           about_bikebook_label: Over BikeBook
+          activities: Activiteiten
+          activity_examples: "(bijv. mountainbiken, cyclocross, enz.)"
+          configuration_examples: "(compleet/framework)"
+          human_powered: Aangedreven door menskracht (akoestisch)
+          manufacturers: Fabrikanten
+          out_of_class: Buiten de les
+          out_of_class_details: Gemotoriseerd, maar niet van de Amerikaanse categorieën
+            1, 2 of 3, zoals een bromfiets, motorfiets of elektrische terreinmotor.
+          propulsion: Voortstuwing
+          select_a_bike: Selecteer een fiets, kies er meerdere om ze te vergelijken.
+          us_class_1: Amerikaanse Klasse 1
+          us_class_2: Amerikaanse klasse 2
+          us_class_3: Amerikaanse klasse 3
+          vehicle_types: Voertuigtypen
         donate_strip:
-          dismiss: Afwijzen
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
             Bike Index. Help ons de serverkosten te dekken.
