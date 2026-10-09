@@ -5206,8 +5206,6 @@ en:
       total_bikes_registered: Total Bikes Registered
       total_recovery_value: Total Recovery value
       used_by: Used By
-    recovery_stories:
-      recovery_stories: Recovery Stories
     update_browser:
       go_here_to_learn_more: Go here to learn more
       oh_no: Oh No!
