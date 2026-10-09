@@ -620,6 +620,17 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
 
+    context "an e-vehicle, with only the template's safety rules" do
+      let!(:template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
+
+      it "has none to leave to the owner - only the register flow shows the template" do
+        expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
+          .to change(Bike, :count).by 1
+        expect(RegistrationSequenceAcknowledgment.count).to eq 0
+        expect(EmailJobs::PartialRegistrationJob.jobs).to be_empty
+      end
+    end
+
     # The embed form is posted from the organization's own site, so it can't carry our token
     context "unverified authenticity token" do
       include_context :test_csrf_token

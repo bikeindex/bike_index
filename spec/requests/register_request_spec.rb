@@ -1745,6 +1745,34 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to step_path("finished")
       end
     end
+
+    context "without an organization, with the template" do
+      let(:organization) { nil }
+      let(:b_param) do
+        BParam.create(origin: "register_flow",
+          params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter"}}.as_json)
+      end
+
+      it "walks the template's safety pages before finishing" do
+        expect(sequence.template?).to be_truthy
+        expect {
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        }.to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
+        expect(response).to redirect_to step_path("3")
+        follow_redirect!
+        expect(response.body).to include "Charge with the manufacturer's charger"
+
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "3",
+                                                  acknowledged: {"0" => "1", "1" => "1"}}
+        expect(response).to redirect_to step_path("4")
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "4",
+                                                  acknowledged: {"0" => "1"}}
+        expect(response).to redirect_to step_path("review")
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, registration_sequence_id: sequence.id, step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to step_path("finished")
+        expect(RegistrationSequenceAcknowledgment.acknowledged.pluck(:registration_sequence_id)).to eq([sequence.id])
+      end
+    end
   end
 
   describe "acknowledge, anonymous" do
