@@ -44,6 +44,17 @@ RSpec.describe OrganizedMailer, type: :mailer do
         expect(mail.deliver_now.text_part.body.to_s).to include("Almost Done").and include("Finish it")
         expect(mail.html_part.decoded).to include "bikes/new?b_param_token=#{b_param.id_token}"
       end
+
+      context "owing the template's safety rules" do
+        let(:template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
+        before { RegistrationSequenceAcknowledgment.create_pending(b_param, sequence: template) }
+
+        it "asks for the e-vehicle safety rules, without an organization's name" do
+          mail = OrganizedMailer.partial_registration(b_param)
+          expect(mail.body.encoded).to include("Agree to the e-vehicle safety rules")
+            .and include("register?b_param_token=#{b_param.id_token}")
+        end
+      end
     end
     context "with organization" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }

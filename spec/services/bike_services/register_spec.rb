@@ -710,6 +710,42 @@ RSpec.describe BikeServices::Register do
         end
       end
 
+      context "with the template" do
+        let!(:template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
+
+        it "is the organization's own sequence over the template" do
+          expect(described_class.registration_sequence(b_param)).to eq sequence
+        end
+
+        context "without an organization" do
+          let(:bike_params) { super().except(:creation_organization_id) }
+
+          it "is the template, except for the legacy forms" do
+            expect(described_class.registration_sequence(b_param)).to eq template
+            expect(described_class.registration_sequence(b_param, legacy: true)).to be_nil
+          end
+        end
+
+        context "the organization's sequence is still a draft" do
+          let!(:sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+
+          it "is the template, except for the legacy forms" do
+            expect(described_class.registration_sequence(b_param)).to eq template
+            expect(described_class.registration_sequence(b_param, legacy: true)).to be_nil
+          end
+
+          it "stays on the template once started, until resumed on the organization's own" do
+            described_class.acknowledge_page(b_param, template.registration_sequence_pages.first, checked: %w[1 1])
+            sequence.make_active!
+
+            expect(described_class.registration_sequence(b_param)).to eq template
+            expect(described_class.resume_registration_sequence(b_param, sequence: template)).to eq([template, false])
+            template.update(end_at: Time.current)
+            expect(described_class.resume_registration_sequence(b_param, sequence: template.reload)).to eq([sequence, true])
+          end
+        end
+      end
+
       context "separate_attestation" do
         let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
         let(:registrant) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }

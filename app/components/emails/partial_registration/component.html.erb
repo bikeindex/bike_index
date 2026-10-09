@@ -2,8 +2,12 @@
   <h1><%= translation("agree_to_the_safety_rules") %></h1>
 
   <p>
-    <%= translation("safety_rules_owed_html", color_and_brand: @b_param.color_and_brand,
-        org_name: organization.short_name) %>
+    <% if rules_organization.present? %>
+      <%= translation("safety_rules_owed_html", color_and_brand: @b_param.color_and_brand,
+          org_name: rules_organization.short_name) %>
+    <% else %>
+      <%= translation("e_vehicle_safety_rules_owed_html", color_and_brand: @b_param.color_and_brand) %>
+    <% end %>
   </p>
 <% else %>
   <h1><%= translation("youre_almost_done") %></h1>
