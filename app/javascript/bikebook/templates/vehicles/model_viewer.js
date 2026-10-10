@@ -12,7 +12,7 @@ import { modelYears } from 'bikebook/templates/vehicles/model_years'
 import { motorSection } from 'bikebook/templates/vehicles/motor_section'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { section } from 'bikebook/templates/vehicles/section'
-import { array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
+import { andSentence, array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
 
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
@@ -596,8 +596,6 @@ class ModelViewer {
 }
 
 // to_sentence: "Front, Middle and Rear"
-const andSentence = (words) => words.length < 2 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`
-
 // Motors that match but for their drive wheel, as one listing each drive wheel
 const mergedMotors = (motors) => motors.reduce((merged, motor) => {
   const index = merged.findIndex((each) => equal(except(each, ['drive_wheel']), except(motor, ['drive_wheel'])))

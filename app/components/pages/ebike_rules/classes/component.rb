@@ -24,7 +24,7 @@ module Pages
 
         def state_class_cards
           state_classes.map do |classification|
-            next us_class_cards.last if classification[:not_an_ebike]
+            next emoto_card if classification[:not_an_ebike]
 
             {state: true, either: classification[:either], title: classification[:name], body: classification[:description],
              assist: classification[:throttle] ? translation(".throttle") : translation(".pedal"),
@@ -42,11 +42,6 @@ module Pages
           end
         end
 
-        # The chosen state's own, in place of what most states do
-        def class_3_rules = @class_3_rules ||= @state && EbikeRuleServices::StateLaws.class_3_rules(@state[:abbr]).presence
-
-        def emoto_rules = @emoto_rules ||= @state && EbikeRuleServices::StateLaws.emoto_rules(@state[:abbr]).presence
-
         def watts(classification)
           if classification[:watt_cap]
             translation(".watts_max", watts: classification[:watt_cap])
@@ -55,9 +50,10 @@ module Pages
           end
         end
 
-        # The three classes, then the e-moto that's none of them
+        # The three classes, then the e-moto that's none of them, a chosen state's own rules standing in for most states'
         def us_class_cards
           motor_cap = translation(".motor_cap")
+          class_3_rules = @state && EbikeRuleServices::StateLaws.class_3_rules(@state[:abbr]).presence
           [
             {n: 1, title: translation(".class_n", n: 1), tag: translation(".class_1_tag"), assist: translation(".pedal"),
              speed: translation(".mph", mph: 20), motor: motor_cap, body: translation(".class_1_body")},
@@ -66,10 +62,15 @@ module Pages
             {n: 3, title: translation(".class_n", n: 3), tag: translation(".class_3_tag"), assist: translation(".pedal"),
              speed: translation(".mph", mph: 28), motor: motor_cap, rules: class_3_rules,
              body: class_3_rules ? translation(".class_3_summary") : translation(".class_3_body")},
-            {n: nil, either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
-             speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules: emoto_rules,
-             body: emoto_rules ? translation(".emoto_summary") : translation(".emoto_limits_body")}
+            emoto_card
           ]
+        end
+
+        def emoto_card
+          rules = @state && EbikeRuleServices::StateLaws.emoto_rules(@state[:abbr]).presence
+          {n: nil, either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
+           speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,
+           body: rules ? translation(".emoto_summary") : translation(".emoto_limits_body")}
         end
       end
     end

@@ -36,13 +36,13 @@ module EbikeRuleServices
     def details
       return {} unless submitted && bike
 
-      throttle = {true => 1, false => 0}
-      if manual
-        {top_speed: manual_mph, throttle: throttle[manual_throttle], watts: manual_watts}
-      else
-        {top_speed: model_top_speed, throttle: throttle[bike.throttle], watts: bike.watts || bike.peak_watts}
-      end
+      top_speed, throttle, watts = manual ? [manual_mph, manual_throttle, manual_watts] : [model_top_speed, bike.throttle, bike.watts || bike.peak_watts]
+      {top_speed:, throttle: {true => 1, false => 0}[throttle], watts:}
     end
+
+    def law = state && StateLaws.find(state[:abbr])
+
+    private
 
     # Its fastest mode's, or without a speed on record, the answer a hand entry would take to reach its class - over
     # 28 mph for one classified as something else. Blank for a model whose class the catalog can't tell
@@ -53,7 +53,5 @@ module EbikeRuleServices
 
       {1 => 20, 2 => 20, 3 => 28}.fetch(bike.e_bike_class, 29)
     end
-
-    def law = state && StateLaws.find(state[:abbr])
   end
 end

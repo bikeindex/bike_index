@@ -19,8 +19,12 @@ module Pages
 
         def jurisdiction_options = jurisdiction_names.map { |code, name| [name, (code unless code == "US").to_s] }
 
-        # The states with their own classes, which /ebike-rules shows too; the rest use the US ones
-        def state_classes = @state_classes ||= EbikeRuleServices::StateLaws.own_classes.transform_keys { "US-#{it}" }
+        # The US classes, then the states' own, which /ebike-rules shows too; a state without them uses the US ones
+        def class_groups
+          us = [{id: "class_1", name: translation(".us_class_1")}, {id: "class_2", name: translation(".us_class_2")},
+            {id: "class_3", name: translation(".us_class_3")}, EbikeRuleServices::StateLaws::NOT_AN_EBIKE]
+          {"US" => us}.merge(EbikeRuleServices::StateLaws.own_classes.transform_keys { "US-#{it}" })
+        end
       end
     end
   end

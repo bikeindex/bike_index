@@ -41,8 +41,9 @@ export default class extends Controller {
     const groups = [...this.jurisdictionTarget.closest('fieldset').querySelectorAll('[data-jurisdiction]')]
     const shown = groups.find(({ dataset }) => dataset.jurisdiction === this.jurisdictionTarget.value) ?? groups[0]
     for (const group of groups) {
-      group.classList.toggle('tw:hidden', group !== shown)
-      if (group !== shown) for (const input of group.querySelectorAll('input')) input.checked = false
+      const hidden = group !== shown
+      group.classList.toggle('tw:hidden', hidden)
+      if (hidden) for (const input of group.querySelectorAll('input')) input.checked = false
     }
   }
 

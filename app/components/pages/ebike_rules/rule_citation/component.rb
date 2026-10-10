@@ -10,7 +10,7 @@ module Pages
 
         def initialize(restriction:)
           @citation = restriction[:citation]
-          @sources = restriction[:sources].to_a
+          @sources = restriction[:sources]
         end
 
         def render? = @citation.present? || @sources.any?

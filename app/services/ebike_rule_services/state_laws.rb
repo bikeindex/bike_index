@@ -46,8 +46,7 @@ module EbikeRuleServices
 
     # The license, registration and insurance rules in force for the state's motorcycle, which an e-moto usually is
     def emoto_rules(abbreviation, today: Time.zone.today)
-      parsed[:motorcycles][abbreviation].to_a
-        .select { !it[:starts_on]&.>(today) && !it[:ends_on]&.<=(today) && it[:rule].match?(/licen|regist|insur/i) }
+      current(parsed[:motorcycles][abbreviation].to_a, today).select { it[:starts_on].nil? && it[:rule].match?(/licen|regist|insur/i) }
     end
 
     # nil for anything but an abbreviation, such as a query's array
@@ -94,10 +93,10 @@ module EbikeRuleServices
         tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| [record["name"], [id, *record["groups"]]] } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
-          law_id = laws.dig(abbreviation, :id)
-          next if law_id.nil? || laws.dig(abbreviation, :classes) == [1, 2, 3]
+          law = laws[abbreviation]
+          next if law.nil? || law[:classes] == [1, 2, 3]
 
-          [abbreviation, state_classes(entries, law_id)]
+          [abbreviation, state_classes(entries, law[:id])]
         }.to_h,
         motorcycles: states.filter_map { |abbreviation, id, record|
           next unless id.end_with?("/motorcycle") || record["groups"].to_a.include?(MOTORCYCLE)
@@ -132,24 +131,27 @@ module EbikeRuleServices
         throttle: record["throttle"],
         restrictions: record["restrictions"].to_a.map { restriction(it) },
         limits_start_on: date(record["limits_start_on"]),
-        # link_to doesn't sanitize an href
-        sources: record["sources"].to_a.grep(%r{\Ahttps?://})
+        sources: web_pages(record["sources"])
       }
     end
 
-    # link_to doesn't sanitize an href
-    def restriction(value) = {rule: value["rule"], citation: value["citation"], sources: value["sources"].to_a.grep(%r{\Ahttps?://}),
+    def restriction(value) = {rule: value["rule"], citation: value["citation"], sources: web_pages(value["sources"]),
                               starts_on: date(value["starts_on"]), ends_on: date(value["ends_on"])}
+
+    # link_to doesn't sanitize an href
+    def web_pages(sources) = sources.to_a.grep(%r{\Ahttps?://})
 
     def date(value) = value&.to_date
 
     def in_force(law, today)
-      restrictions = law[:restrictions].reject { it[:ends_on]&.<=(today) }.map { it.merge(starts_on: upcoming(it[:starts_on], today)) }
-      law.merge(restrictions:, limits_start_on: upcoming(law[:limits_start_on], today))
+      law.merge(restrictions: current(law[:restrictions], today), limits_start_on: upcoming(law[:limits_start_on], today))
     end
+
+    # The restrictions not yet ended, each keeping its start date only until it starts
+    def current(restrictions, today) = restrictions.reject { it[:ends_on]&.<=(today) }.map { it.merge(starts_on: upcoming(it[:starts_on], today)) }
 
     def upcoming(date, today) = (date if date&.>(today))
 
-    conceal :parsed, :parse, :state_classes, :state_class, :mph, :law, :restriction, :date, :in_force, :upcoming
+    conceal :parsed, :parse, :state_classes, :state_class, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming
   end
 end

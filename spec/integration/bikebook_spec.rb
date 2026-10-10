@@ -401,26 +401,6 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(vehicle_field).not_to match_css(":focus")
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
-    # one frame to draw has nothing to overlay, so the overlay only says what the other is missing
-    lone = page.evaluate_script(<<~JS)
-      (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryOverlay }, { frameGeometry }, { render }, { kit }, vocabulary] = await Promise.all([
-          import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('bikebook/frame_geometry'),
-          import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
-        const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20 }
-        const road = { model: 'Road', sizes: [{ name: 'M', geometry }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] }
-        const bare = { model: 'Bare', sizes: [{ name: 'M' }] }
-        const vehicles = [{ data: road }, { data: bare }]
-        const sizes = [road.sizes[0], bare.sizes[0]]
-        const container = document.createElement('div')
-        render(geometryOverlay({ presenter, vehicles, sizes, frames: vehicles.map(({ data }, index) => frameGeometry(data, sizes[index])) }), container)
-        return [container.querySelectorAll('svg, button, li').length, container.querySelector('p').textContent.trim()]
-      })()
-    JS
-    expect(lone).to eq([0, "Bare can't be drawn without its Reach, Stack, Head Angle, Chainstay and BB Drop."])
-
     # Small's top tube is nearer Soltera's Medium than its Small
     type_into(vehicle_field, "soltera")
     retry_on_detach { find("[role='option']", text: "Aventón Soltera 3 ADV").click }

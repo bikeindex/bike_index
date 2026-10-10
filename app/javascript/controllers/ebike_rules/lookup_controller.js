@@ -174,12 +174,12 @@ export default class extends Controller {
     return this.element.dataset.details
   }
 
-  #fill ({ top_speed: topSpeed, throttle, watts }) {
+  #fill (details) {
     const { elements } = this.element
-    for (const [name, value] of [['top_speed', topSpeed], ['throttle', throttle]]) {
-      for (const radio of elements[name]) radio.checked = radio.value === String(value)
+    for (const name of ['top_speed', 'throttle']) {
+      for (const radio of elements[name]) radio.checked = radio.value === String(details[name])
     }
-    elements.watts.value = watts ?? ''
+    elements.watts.value = details.watts ?? ''
   }
 
   // A combobox handle's clear empties the field without a selection event, so the field itself is watched
