@@ -26,13 +26,13 @@ en:
           certification_involves_heading: What certification involves
           change: change?
           check_my_bike: Check my bike
-          choose_by_bike_model: Choose by bike model
           compare_html: Want to compare multiple bikes? %{link}
+          custom_details: Custom details
+          details_legend: Your bike's details
           detected_html: We detected <strong>%{state}</strong> —
           disclaimer: >-
             Bike Index is a 501(c)(3) nonprofit. State law summaries are for reference,
             not legal advice.
-          enter_manually: Can't find your bike? Enter its details.
           for_parents: For parents
           form_label: E-bike compliance lookup
           has_throttle: Has a throttle?
@@ -44,7 +44,7 @@ en:
           how_to_check_lookup: Look the model up above. BikeBook shows certification
             where it's on record.
           location_not_shared: Location not shared. Choose your state from the list.
-          manual_legend: Enter your bike's details
+          model_details: "%{model} details"
           motor_wattage: Motor wattage (W)
           mph: "%{mph} mph"
           over_28_mph: Over 28 mph

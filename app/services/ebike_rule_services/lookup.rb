@@ -29,6 +29,31 @@ module EbikeRuleServices
 
     def result? = submitted && errors.none?
 
+    # A model whose details were changed, which checks the details
+    def custom? = manual && bikebook_id.present?
+
+    # The details panel's values: the entered ones, or the model's own, which the browser copies in after a pick
+    def details
+      return {} unless submitted && bike
+
+      throttle = {true => 1, false => 0}
+      if manual
+        {top_speed: manual_mph, throttle: throttle[manual_throttle], watts: manual_watts}
+      else
+        {top_speed: model_top_speed, throttle: throttle[bike.throttle], watts: bike.watts || bike.peak_watts}
+      end
+    end
+
+    # Its fastest mode's, or without a speed on record, the answer a hand entry would take to reach its class - over
+    # 28 mph for one classified as something else. Blank for a model whose class the catalog can't tell
+    def model_top_speed
+      mph = [bike.top_assist_mph, bike.throttle_mph].compact.max
+      return [20, 28].find { mph <= it } || 29 if mph
+      return if bike.class_unknown
+
+      {1 => 20, 2 => 20, 3 => 28}.fetch(bike.e_bike_class, 29)
+    end
+
     def law = state && StateLaws.find(state[:abbr])
   end
 end

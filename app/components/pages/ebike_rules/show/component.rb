@@ -31,13 +31,31 @@ module Pages
 
         def error?(field) = @lookup.errors.include?(field)
 
+        # Which of the bike's two inputs the check is of: the picked model, details changed from it, or details alone
+        def details_mode
+          if @lookup.custom?
+            "custom"
+          elsif @lookup.bikebook_id
+            "model"
+          else
+            "manual"
+          end
+        end
+
         def detected? = @lookup.detected_state.present? && @lookup.state == @lookup.detected_state
 
-        # The selected model's name, which the combobox shows once the catalog loads
-        def bike_display
-          bike = @lookup.bike
-          [bike.make_and_model, bike.first_year].compact.join(" ") if bike && !bike.manual?
+        # The picked model. Custom details are the checked bike, so it's looked up on its own
+        def model
+          return @model if defined?(@model)
+
+          @model = @lookup.bikebook_id && (@lookup.custom? ? EbikeRuleServices::BikebookVehicles.find(@lookup.bikebook_id) : @lookup.bike)
         end
+
+        # The model's name, which the combobox shows once the catalog loads
+        def bike_display = model && [model.make_and_model, model.first_year].compact.join(" ")
+
+        # Named for the model, which the browser renames for a later pick
+        def details_legend = model ? translation(".model_details", model: model.make_and_model) : translation(".details_legend")
 
         def top_speed_entries
           [{value: 20, label: translation(".mph", mph: 20)}, {value: 28, label: translation(".mph", mph: 28)},

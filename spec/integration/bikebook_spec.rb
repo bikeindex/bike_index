@@ -68,8 +68,8 @@ RSpec.describe "Bikebook", :js, type: :system do
       frames = all("svg[role='img'] > g", visible: :all).map { |frame| [frame.all("circle", visible: :all).map { it[:cx].to_f }, frame.has_css?("path", visible: :all)] }
       rear_axle = frames.dig(0, 0, 0)
       expect(frames).to match([[[be < 0, be > 0], true], [[rear_axle, rear_axle + 1130], false]])
-      expect(page).to have_text("Aventón Level 2 Step-Through's frame isn't drawn without its Stack, Head Angle, Chainstay, BB Drop, only its " \
-        "wheels, the rear axle on Aventón Level 4 REC Step-Through's.")
+      expect(page).to have_css("p.tw\\:italic", text: "Aventón Level 2 Step-Through's frame can't be drawn without its Stack, Head Angle, " \
+        "Chainstay and BB Drop, only its wheels, the rear axle on Aventón Level 4 REC Step-Through's.")
       # the same wheel size, its tires too near each other's for the wheel note
       expect(page).to have_no_text("diameter")
     end
@@ -401,6 +401,26 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(vehicle_field).not_to match_css(":focus")
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
+    # one frame to draw has nothing to overlay, so the overlay only says what the other is missing
+    lone = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehiclePresenter }, { geometryOverlay }, { frameGeometry }, { render }, { kit }, vocabulary] = await Promise.all([
+          import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('bikebook/frame_geometry'),
+          import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
+        const presenter = new VehiclePresenter(kit, vocabulary)
+        const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20 }
+        const road = { model: 'Road', sizes: [{ name: 'M', geometry }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] }
+        const bare = { model: 'Bare', sizes: [{ name: 'M' }] }
+        const vehicles = [{ data: road }, { data: bare }]
+        const sizes = [road.sizes[0], bare.sizes[0]]
+        const container = document.createElement('div')
+        render(geometryOverlay({ presenter, vehicles, sizes, frames: vehicles.map(({ data }, index) => frameGeometry(data, sizes[index])) }), container)
+        return [container.querySelectorAll('svg, button, li').length, container.querySelector('p').textContent.trim()]
+      })()
+    JS
+    expect(lone).to eq([0, "Bare can't be drawn without its Reach, Stack, Head Angle, Chainstay and BB Drop."])
+
     # Small's top tube is nearer Soltera's Medium than its Small
     type_into(vehicle_field, "soltera")
     retry_on_detach { find("[role='option']", text: "Aventón Soltera 3 ADV").click }
@@ -445,6 +465,26 @@ RSpec.describe "Bikebook", :js, type: :system do
       "Mullet's rear 650 B wheel with a 64 mm tire is approximately 712 mm diameter"],
       [road, "Mullet's 700 C wheel with 64 mm tires is approximately 750 mm diameter"]])
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
+
+    # one frame to draw has nothing to overlay, so the overlay only says what the other is missing
+    lone = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehiclePresenter }, { geometryOverlay }, { frameGeometry }, { render }, { kit }, vocabulary] = await Promise.all([
+          import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('bikebook/frame_geometry'),
+          import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
+        const presenter = new VehiclePresenter(kit, vocabulary)
+        const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20 }
+        const road = { model: 'Road', sizes: [{ name: 'M', geometry }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] }
+        const bare = { model: 'Bare', sizes: [{ name: 'M' }] }
+        const vehicles = [{ data: road }, { data: bare }]
+        const sizes = [road.sizes[0], bare.sizes[0]]
+        const container = document.createElement('div')
+        render(geometryOverlay({ presenter, vehicles, sizes, frames: vehicles.map(({ data }, index) => frameGeometry(data, sizes[index])) }), container)
+        return [container.querySelectorAll('svg, button, li').length, container.querySelector('p').textContent.trim()]
+      })()
+    JS
+    expect(lone).to eq([0, "Bare can't be drawn without its Reach, Stack, Head Angle, Chainstay and BB Drop."])
 
     # the first vehicle's last pick is what a comparison with none picked starts nearest
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/aventon/2026/current_exp")

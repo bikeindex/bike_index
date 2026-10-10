@@ -32,7 +32,6 @@ en:
           emoto_summary: >-
             Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
             make it an e-moto.
-          in_state: 'In %{state}:'
           motor: Motor
           motor_cap: "≤750W"
           mph: "%{mph} mph"
@@ -43,6 +42,7 @@ en:
           state_classes_intro: >-
             %{state} doesn’t use the three-class system most states do. Its law sorts
             e-bikes and other electric two-wheelers into these classes instead.
+          state_specifics: "%{state} specifics"
           throttle: Throttle
           top_assist: Top assist
           watts_max: "≤%{watts}W"

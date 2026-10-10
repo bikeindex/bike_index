@@ -50,11 +50,13 @@
     class="tw:relative tw:-mt-20 tw:scroll-mt-4 <%= SECTION_CLASSES %>"
   >
     <%= form_with url: form_path, method: :get, html: {aria: {label: translation(".form_label")}},
-      class: "tw:flex tw:flex-col tw:gap-3.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-[clamp(18px,4vw,32px)] tw:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:dark:border-gray-700 tw:dark:bg-gray-800",
-      data: {controller: "ebike-rules--lookup", action: "turbo:frame-load@document->ebike-rules--lookup#checkLoaded",
+      class: "tw:group/lookup tw:flex tw:flex-col tw:gap-3.5 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-[clamp(18px,4vw,32px)] tw:shadow-[0_10px_30px_rgba(44,62,80,.16)] tw:dark:border-gray-700 tw:dark:bg-gray-800",
+      data: {controller: "ebike-rules--lookup", action: "turbo:frame-load@document->ebike-rules--lookup#checkLoaded", details: details_mode,
              "ebike-rules--lookup-manifest-url-value": @manifest_url,
              "ebike-rules--lookup-path-value": ebike_rules_path,
              "ebike-rules--lookup-display-value": bike_display,
+             "ebike-rules--lookup-legend-value": translation(".details_legend"),
+             "ebike-rules--lookup-model-legend-value": translation(".model_details", model: "%{model}"),
              "ebike-rules--lookup-failed-text-value": translation(".bikebook_didnt_load"),
              "ebike-rules--lookup-title-value": @default_title} do |f| %>
       <%#
@@ -122,8 +124,13 @@
         </div>
 
         <div class="tw:flex tw:min-w-0 tw:flex-[4_1_300px] tw:flex-col tw:gap-2">
-          <%= tag.div(class: ["tw:flex tw:flex-col tw:gap-2", ("tw:hidden" if @lookup.manual)],
-            data: {"ebike-rules--lookup-target": "bikeField"}) do %>
+          <%# Grayed while custom details stand in for the model's, until it's picked from again %>
+          <div
+            class="
+              tw:flex tw:flex-col tw:gap-2 tw:transition-opacity
+              tw:group-data-[details=custom]/lookup:not-focus-within:opacity-50
+            "
+          >
             <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :vehicle_models, label_text: translation(".bike_model"),
             optional_badge: false, wrapper_class: "tw:contents")) do %>
               <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
@@ -150,28 +157,11 @@
             <% end %>
 
             <%= field_error(:bike, translation(".bike_error")) %>
+          </div>
 
-            <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
-              <%= render(UI::Button::Component.new(text: translation(".enter_manually"), color: :link,
-              data: {action: "ebike-rules--lookup#openManual"})) %>
-            </p>
-          <% end %>
-
-          <%# Sized and offset like the state field, so it lines up with its text %>
-          <%= tag.div(class: ["tw:flex tw:flex-col tw:gap-2", ("tw:hidden" unless @lookup.manual)],
-            data: {"ebike-rules--lookup-target": "closeManual"}) do %>
-            <span
-              class="twlabel tw:invisible tw:hidden tw:md:block"
-              aria-hidden="true"
-            >
-              <%= translation(".state") %>
-            </span>
-
-            <p class="tw:flex tw:items-center tw:md:min-h-12">
-              <%= render(UI::Button::Component.new(text: translation(".choose_by_bike_model"), color: :link,
-                html_class: "tw:text-base", data: {action: "ebike-rules--lookup#closeManual"})) %>
-            </p>
-          <% end %>
+          <p class="tw:text-[13px] tw:text-gray-700 tw:dark:text-gray-300">
+            <%= translation(".compare_html", link: link_to(translation(".visit_bikebook_link"), bikebook_path, class: "twlink")) %>
+          </p>
         </div>
 
         <noscript class="tw:flex tw:flex-[1_0_170px] tw:sm:pt-7">
@@ -180,15 +170,23 @@
         </noscript>
       </div>
 
-      <%= tag.fieldset(disabled: !@lookup.manual, data: {"ebike-rules--lookup-target": "manualPanel", action: "change->ebike-rules--lookup#checkManual"},
-        class: ["tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-[clamp(14px,3vw,22px)] tw:py-4.5 tw:dark:border-gray-700 tw:dark:bg-gray-900",
-                ("tw:hidden" unless @lookup.manual)]) do %>
+      <%= tag.fieldset(data: {action: "change->ebike-rules--lookup#checkDetails"},
+        class: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-[clamp(14px,3vw,22px)] tw:py-4.5 tw:dark:border-gray-700 tw:dark:bg-gray-900") do %>
         <legend class="tw:px-1.5 tw:text-[15px] tw:font-bold">
-          <%= translation(".manual_legend") %>
+          <span
+            class="tw:group-data-[details=custom]/lookup:hidden"
+            data-ebike-rules--lookup-target="legend"
+          >
+            <%= details_legend %>
+          </span>
+
+          <span class="tw:hidden tw:group-data-[details=custom]/lookup:inline">
+            <%= translation(".custom_details") %>
+          </span>
         </legend>
 
-        <%# Disabled with the panel, so a search submits none of this %>
-        <%= hidden_field_tag :manual, "1", id: nil %>
+        <%# Disabled while the model is the check, so its details stay out of the URL %>
+        <%= hidden_field_tag :manual, "1", id: nil, disabled: details_mode == "model", data: {"ebike-rules--lookup-target": "manual"} %>
 
         <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-5">
           <%# Each control centered in the wattage field's height, so their text lines up %>
@@ -201,7 +199,7 @@
               class="tw:grid tw:min-h-12 tw:items-center"
             >
               <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "top_speed", entries: top_speed_entries,
-                selected: @lookup.manual_mph)) %>
+                selected: @lookup.details[:top_speed])) %>
             </div>
           </div>
 
@@ -214,22 +212,18 @@
               class="tw:flex tw:min-h-12 tw:items-center"
             >
               <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "throttle", entries: throttle_entries, kind: :toggle,
-                selected: @lookup.manual_throttle ? 1 : 0)) %>
+                selected: @lookup.details[:throttle])) %>
             </div>
           </div>
 
           <div class="tw:flex tw:flex-[1_1_150px] tw:flex-col tw:gap-1.5">
             <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :watts, kind: :number_field,
               label_text: translation(".motor_wattage"), optional_badge: false, wrapper_class: "tw:contents",
-              html_options: {value: @lookup.manual_watts, min: 1, inputmode: "numeric", autocomplete: "off",
+              html_options: {value: @lookup.details[:watts], min: 1, inputmode: "numeric", autocomplete: "off",
                              placeholder: translation(".watts_placeholder"), class: "tw:min-h-12 tw:text-base!",
-                             data: {action: "keydown.enter->ebike-rules--lookup#checkManual:prevent"}})) %>
+                             data: {action: "keydown.enter->ebike-rules--lookup#checkDetails:prevent"}})) %>
           </div>
         </div>
-
-        <p class="tw:text-sm tw:text-gray-700 tw:dark:text-gray-300">
-          <%= translation(".compare_html", link: link_to(translation(".visit_bikebook_link"), bikebook_path, class: "twlink")) %>
-        </p>
       <% end %>
     <% end %>
   </div>

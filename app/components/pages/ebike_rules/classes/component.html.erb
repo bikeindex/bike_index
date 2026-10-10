@@ -80,12 +80,17 @@
                   tw:text-[15px] tw:leading-relaxed tw:text-gray-700
                   tw:dark:text-gray-300
                 "
+                data-controller="ui--collapse"
               >
-                <p class="tw:font-semibold">
-                  <%= translation(".in_state", state: @state[:name]) %>
-                </p>
+                <%= render(UI::Collapse::Component.new(text: translation(".state_specifics", state: @state[:name]), chevron: :trailing, color: :link)) %>
 
-                <ul class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm">
+                <ul
+                  class="
+                    tw:mt-2 tw:hidden tw:list-disc tw:space-y-1 tw:pl-5
+                    tw:text-sm
+                  "
+                  data-ui--collapse-target="content"
+                >
                   <% card[:rules].each do |restriction| %>
                     <li>
                       <%= restriction[:rule] %>

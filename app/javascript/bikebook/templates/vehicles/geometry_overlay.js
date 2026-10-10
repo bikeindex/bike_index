@@ -56,14 +56,20 @@ const diameterNotes = (presenter, compared) => {
   })
 }
 
-// The bottom border that keys a comparison table column to its frame, which the overlay draws in the same order
 const drawable = (geometry) => geometry?.missing.length === 0 || geometry?.wheels
 
-export const seriesBorder = (frame, index) => drawable(frame) ? `tw:border-b-4 ${SERIES[index].border}` : ''
+// One frame has nothing to overlay
+const overlaid = (frames) => frames.filter(drawable).length > 1
+
+// The bottom border that keys a comparison table column to its frame, which the overlay draws in the same order
+export const seriesBorder = (frames, index) => overlaid(frames) && drawable(frames[index]) ? `tw:border-b-4 ${SERIES[index].border}` : ''
+
+// "Reach, Stack and BB Drop"
+const listed = (items) => items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items[0]
 
 // The compared models' frames in their `sizes`, standing on the same ground with their bottom brackets lined up,
 // each over the ones the comparison table columns left of it. A frame it can't draw is its wheels alone where they're
-// listed, the rear axle on the first drawn frame's
+// listed, the rear axle on the first drawn frame's. With one to draw, it only says what the others are missing
 export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const labelled = named.map((vehicle, index) => {
@@ -82,18 +88,28 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const undrawn = labelled.filter(({ geometry }) => geometry.missing.length)
   if (drawn.length === 0) return nothing
 
+  const labels = presenter.kit.geometry.labels
+  const overlay = overlaid(frames)
+  const missingNote = undrawn.length
+    ? html`<p class="tw:text-xs tw:text-gray-500 tw:italic tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing, wheels } }) => {
+      const without = listed(missing.map((key) => labels[key] ?? presenter.humanize(key)))
+      if (!wheels || !overlay) return `${title} can't be drawn without its ${without}.`
+      return `${title}'s frame can't be drawn without its ${without}, only its wheels${aligned ? `, the rear axle on ${aligned.title}'s` : ''}.`
+    }).join(' ')}</p>`
+    : nothing
+  // out to the screen's edges on a phone, as the cards below it are
+  const sectionClasses = 'tw:mx-auto tw:mt-6 tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 ' +
+    'tw:dark:bg-gray-800 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0'
+  if (!overlay) return html`<section aria-label="Geometry overlay" class=${sectionClasses}>${sectionHeading('Geometry overlay')}${missingNote}</section>`
+
   const xs = drawn.flatMap(({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius } }) => [rearAxle[0] - rearRadius, frontAxle[0] + frontRadius])
   // the wheels stand on the ground, so only the frame's top reaches past it
   const ys = drawn.filter(({ geometry }) => geometry.headTop).flatMap(({ geometry: { headTop, seatTop, bottomBracketHeight } }) => [headTop[1], seatTop[1]].map((y) => y + bottomBracketHeight))
   const [left, top] = [Math.min(BOUNDS.left, ...xs) - PADDING, -Math.max(BOUNDS.top, ...ys) - PADDING]
   const [width, height] = [Math.max(BOUNDS.right, ...xs) - left + PADDING, PADDING - top]
-  const labels = presenter.kit.geometry.labels
   const notes = diameterNotes(presenter, labelled)
 
-  // out to the screen's edges on a phone, as the cards below it are
-  return html`<section aria-label="Geometry overlay" data-controller="bikebook--geometry-overlay" class="tw:mx-auto tw:mt-6 tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border
-    tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen
-    tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0">${sectionHeading('Geometry overlay')}<svg
+  return html`<section aria-label="Geometry overlay" data-controller="bikebook--geometry-overlay" class=${sectionClasses}>${sectionHeading('Geometry overlay')}<svg
     role="img" aria-label=${`Frames on the same ground, their bottom brackets lined up: ${drawn.map(({ label }) => label).join('; ')}`}
     viewBox=${[left, top, width, height].map(Math.round).join(' ')} class="tw:h-auto tw:w-full">${drawn.map(frame)}<use
     data-bikebook--geometry-overlay-target="top"></use></svg><ul class="tw:flex tw:flex-wrap tw:gap-2">${drawn.map(({ series, title, size }) =>
@@ -103,13 +119,7 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
         present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${notes.length
       ? html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: you're comparing different diameter wheels and tires</p><ul
         class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${notes}</ul></div>`
-      : nothing}${undrawn.length
-      ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing, wheels } }) => {
-        const without = missing.map((key) => labels[key] ?? presenter.humanize(key)).join(', ')
-        if (!wheels) return `${title} isn't drawn without its ${without}.`
-        return `${title}'s frame isn't drawn without its ${without}, only its wheels${aligned ? `, the rear axle on ${aligned.title}'s` : ''}.`
-      }).join(' ')}</p>`
       : nothing}${drawn.some(({ geometry }) => geometry.estimated)
       ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">Some tubes and wheels are estimated where a size doesn't list them.</p>`
-      : nothing}</section>`
+      : nothing}${missingNote}</section>`
 }

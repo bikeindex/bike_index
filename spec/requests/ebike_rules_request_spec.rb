@@ -53,7 +53,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
       # a three-class state's own Class 3 limits, and what its motorcycle needs, in place of most states'
       get "/ebike-rules/ca", headers: frame
-      expect(page).to have_css("h3", text: "Class 3").and have_text("In California:")
+      expect(page).to have_css("h3", text: "Class 3").and have_css("[role=button]", text: "California specifics")
         .and have_css("li", text: "Riders must be 16 or older to ride a Class 3")
         .and have_css("li", text: /Class 3 can.t be sold to anyone under 16 California Vehicle Code §§21212\.5, 21213 1 2 3/, normalize_ws: true)
         .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
@@ -175,17 +175,42 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
         .and have_css("[role='status'] li", text: "1,000W motor exceeds the 750W cap.")
         .and have_field("watts", with: "1000")
-      expect(page.find("fieldset[data-ebike-rules--lookup-target='manualPanel']")[:disabled]).to be_nil
+      expect(page.find("form[data-details]")["data-details"]).to eq "manual"
     end
 
-    it "opens the manual panel in place of the bike field, with nothing checked yet" do
+    it "shows the bike's details beside its model, with nothing checked or chosen yet" do
       get "/ebike-rules/co", params: {manual: "1"}
 
       expect(page).to have_no_css("[role='alert']")
         .and have_no_css("[role='status']")
-      expect(page.find("[data-ebike-rules--lookup-target='bikeField']")[:class]).to include "tw:hidden"
-      expect(page.find("[data-ebike-rules--lookup-target='closeManual']")[:class]).to_not include "tw:hidden"
-      expect(page.find("fieldset[data-ebike-rules--lookup-target='manualPanel']")[:disabled]).to be_nil
+        .and have_field("vehicle_models", disabled: true)
+        .and have_no_checked_field("top_speed")
+        .and have_no_checked_field("throttle")
+        .and have_css("legend", text: "Your bike's details")
+      expect(page.find("form[data-details]")["data-details"]).to eq "manual"
+    end
+
+    it "fills the details from a picked model, and checks the details changed from it, keeping the model" do
+      get "/ebike-rules/co", params: {vehicle_models: "m/specialized/2025/haul_st"}
+
+      expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Colorado")
+        .and have_checked_field("top_speed", with: "28")
+        .and have_checked_field("throttle", with: "1")
+        .and have_field("watts", with: "700")
+        .and have_css("legend", text: "Specialized Haul ST details")
+      expect(page.find("form[data-details]")["data-details"]).to eq "model"
+      # its id alone is the check
+      expect(page.find("input[name='manual']", visible: :all)[:disabled]).to eq "disabled"
+      expect(page.find("[data-bike-details]", visible: :all)["data-bike-details"]).to eq({top_speed: 28, throttle: 1, watts: 700}.to_json)
+
+      get "/ebike-rules/co", params: {vehicle_models: "m/specialized/2025/haul_st", manual: "1", top_speed: "28", throttle: "1", watts: "1000"}
+      expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
+        .and have_field("watts", with: "1000")
+        .and have_css("legend span.tw\\:hidden", text: "Custom details")
+        .and have_css("legend", text: "Specialized Haul ST details")
+      expect(page.find("form[data-details]")["data-details"]).to eq "custom"
+      expect(page.find("form[data-details]")["data-ebike-rules--lookup-display-value"]).to eq "Specialized Haul ST 2025"
+      expect(page.find("input[name='manual']", visible: :all)[:disabled]).to be_nil
     end
 
     it "classes a bike entered by hand by its top speed and throttle" do
@@ -207,6 +232,21 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_checked_field("top_speed", with: "29")
     end
 
+    it "fills a model's details from what its record has: its peak power without a rating, its class without a speed" do
+      block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2026.json").read)
+      block["models"]["m/aventon/2026/level_4_adv"]["motors"].each { it["operating_modes"].each { it.delete("max_speed") } }
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2026.json").to_return(body: block.to_json)
+
+      get "/ebike-rules/co", params: {vehicle_models: "m/aventon/2026/level_4_adv"}
+      expect(page).to have_checked_field("top_speed", with: "28").and have_field("watts", with: "750")
+
+      # a speed over 28 mph, and peak power, for a vehicle the catalog rates no motor of
+      get "/ebike-rules/co", params: {vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us"}
+      expect(page).to have_checked_field("top_speed", with: "29")
+        .and have_checked_field("throttle", with: "1")
+        .and have_field("watts", with: "24500")
+    end
+
     it "redirects /e-bike-rules, keeping the state and query" do
       get "/e-bike-rules"
       expect(response).to redirect_to("/ebike-rules")
@@ -225,7 +265,6 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("[role='alert']", text: "Choose a state.")
         .and have_css("[role='alert']", text: "Pick a bike from the list, or enter its details manually.")
         .and have_no_css("[role='status']")
-      expect(page.find("fieldset[data-ebike-rules--lookup-target='manualPanel']", visible: :all)[:disabled]).to eq "disabled"
 
       # a manual check needs no wattage
       get "/ebike-rules/co", params: {manual: "1", top_speed: "20", watts: ""}

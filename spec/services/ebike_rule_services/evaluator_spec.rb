@@ -7,7 +7,7 @@ RSpec.describe EbikeRuleServices::Evaluator do
 
   let(:attributes) do
     {bikebook_id: "m/x/2025/y", manufacturer_name: "X", model: "Y", first_year: 2025, e_bike_class: 1, class_unknown: false, e_vehicle_classifications: [],
-     watts: 250, top_assist_mph: 20, throttle: false, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
+     watts: 250, peak_watts: nil, top_assist_mph: 20, throttle: false, throttle_mph: nil, ul2849: :unknown, ul2271: :unknown, photo_url: nil}
   end
   let(:bike) { EbikeRuleServices::Bike.new(**attributes) }
   let(:abbreviation) { "IN" }

@@ -2,20 +2,22 @@ import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
 import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
-import { collapse } from 'utils/collapse_utils'
 import { replaceUrl } from 'bikebook/replace_url'
 
 const RESULT_FRAME = 'ebike-rules-check'
 const CLASSES_FRAME = 'ebike-rules-classes'
+const DETAILS = ['manual', 'top_speed', 'throttle', 'watts']
 
 // Connects to data-controller='ebike-rules--lookup'
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
-// before it connects, and stays one if the catalog fails, leaving manual entry. Each state has its own
+// before it connects, and stays one if the catalog fails, leaving the details. Each state has its own
 // page, so the state is the form's path rather than a field. There's no submit button: a pick or a
-// manual change loads its check into the result frame, advancing the URL to the check's own
+// change to the details loads its check into the result frame, advancing the URL to the check's own.
+// The form's data-details says which the check is of: a picked "model", whose details its check copies
+// into the panel; "custom" details changed from the model's; or "manual" details with no model
 export default class extends Controller {
-  static targets = ['combobox', 'comboboxSlot', 'manualPanel', 'bikeField', 'closeManual', 'state', 'stateNote', 'stateNeeded']
-  static values = { manifestUrl: String, path: String, display: String, failedText: String, title: String }
+  static targets = ['combobox', 'comboboxSlot', 'state', 'stateNote', 'stateNeeded', 'manual', 'legend']
+  static values = { manifestUrl: String, path: String, display: String, failedText: String, title: String, legend: String, modelLegend: String }
 
   async connect () {
     this.lastUrl = window.location.href.split('#')[0]
@@ -27,7 +29,7 @@ export default class extends Controller {
     } catch (error) {
       console.error(error)
       this.comboboxSlotTarget.querySelector('input').placeholder = this.failedTextValue
-      return this.openManual()
+      return
     }
     const fragment = this.comboboxTarget.content.cloneNode(true)
     const combobox = fragment.querySelector('.hw-combobox')
@@ -35,28 +37,13 @@ export default class extends Controller {
     if (this.displayValue) combobox.dataset.hwComboboxPrefilledDisplayValue = this.displayValue
     localSources.set(combobox, new CatalogComboboxSource(catalog))
     this.comboboxSlotTarget.replaceChildren(fragment)
-    this.loaded = true
-    this.#searchEnabled(!this.#manual)
     const bikeField = this.comboboxSlotTarget.querySelector('input[type=hidden]')
-    this.observers.push(this.#watchCleared(bikeField, () => { if (!this.#manual) this.chooseBike() }))
+    this.model = bikeField.value
+    this.observers.push(this.#watchCleared(bikeField, () => { if (this.model) this.#clearModel() }))
   }
 
   disconnect () {
     this.observers.forEach((observer) => observer.disconnect())
-  }
-
-  // A picked bike is cleared rather than hidden, so it can't come back as the check
-  openManual () {
-    if (this.#manual) return
-
-    this.comboboxSlotTarget.querySelectorAll('input').forEach((input) => { input.value = '' })
-    this.#toggleManual(true)
-    this.#leaveCheck(`${this.element.action}?manual=1`)
-  }
-
-  closeManual () {
-    this.#toggleManual(false)
-    this.#leaveCheck(this.element.action)
   }
 
   // A check in the form comes along to the new state, whose page it loads even without one for its title;
@@ -74,19 +61,30 @@ export default class extends Controller {
   }
 
   // The gem leaves the autocompleted part of a pick selected, and the catalog's "(current)" says
-  // nothing a picked model needs
+  // nothing a picked model needs. It also announces the prefilled model on connecting, which keeps the
+  // page's custom details
   chooseBike ({ detail } = {}) {
     const input = this.comboboxSlotTarget.querySelector('input[role=combobox]')
     if (detail?.value && input) {
       input.value = input.value.replace(/ \(current\)$/, '')
       input.setSelectionRange(input.value.length, input.value.length)
     }
+    if (detail?.value && detail.value !== this.model) {
+      this.model = detail.value
+      this.#setMode('model')
+      // the pick's name, without the catalog's years
+      this.legendTarget.textContent = this.modelLegendValue.replace('%{model}', input.value.replace(/ \([^)]*\)$/, ''))
+    }
     this.#check()
   }
 
-  checkManual () {
+  // Changing a picked model's details checks them instead
+  checkDetails () {
     const watts = this.element.elements.watts
-    watts.checkValidity() ? this.#check() : watts.reportValidity()
+    if (!watts.checkValidity()) return watts.reportValidity()
+
+    if (this.#mode === 'model') this.#setMode('custom')
+    this.#check()
   }
 
   focusState () {
@@ -97,15 +95,19 @@ export default class extends Controller {
   checkLoaded ({ target }) {
     if (target.id !== RESULT_FRAME) return
 
-    const title = target.querySelector('[data-page-title]')?.dataset.pageTitle
-    if (title) document.title = title
+    const { pageTitle, bikeDetails } = target.querySelector('[data-page-title]')?.dataset ?? {}
+    if (pageTitle) document.title = pageTitle
+    if (this.#mode === 'model' && bikeDetails) this.#fill(JSON.parse(bikeDetails))
     target.querySelector('[role=status]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }
 
+  // A model's check is its id alone, and details need a top speed to be one
   get #checkUrl () {
     const fields = new FormData(this.element)
     fields.delete('state')
-    if (fields.get('vehicle_models') || this.#manual) return `${this.element.action}?${new URLSearchParams(fields)}`
+    if (this.#mode === 'model') DETAILS.forEach((name) => fields.delete(name))
+    for (const [name, value] of [...fields]) if (value === '') fields.delete(name)
+    if (fields.get('vehicle_models') || fields.get('top_speed')) return `${this.element.action}?${new URLSearchParams(fields)}`
   }
 
   // Without a check left in the form - a cleared bike - there's nothing to ask the server for
@@ -141,6 +143,9 @@ export default class extends Controller {
     this.#leaveCheck(url ?? this.element.action)
     if (!url) return this.stateNoteTarget.replaceChildren()
 
+    // A model's details don't wait: without a state, its frame carries them and no check
+    if (this.#mode === 'model') document.getElementById(RESULT_FRAME).src = url
+
     this.stateNoteTarget.replaceChildren(this.stateNeededTarget.content.cloneNode(true))
     this.focusState()
   }
@@ -151,11 +156,30 @@ export default class extends Controller {
     replaceUrl(new URL(url))
   }
 
-  #toggleManual (manual) {
-    this.manualPanelTarget.disabled = !manual
-    collapse(manual ? 'show' : 'hide', [this.manualPanelTarget, this.closeManualTarget])
-    collapse(manual ? 'hide' : 'show', this.bikeFieldTarget)
-    this.#searchEnabled(!manual)
+  // Clearing the model clears the details it filled, and leaves custom ones to check on their own
+  #clearModel () {
+    this.model = ''
+    this.legendTarget.textContent = this.legendValue
+    if (this.#mode === 'model') this.#fill({})
+    this.#setMode('manual')
+    this.#check()
+  }
+
+  #setMode (mode) {
+    this.element.dataset.details = mode
+    this.manualTarget.disabled = mode === 'model'
+  }
+
+  get #mode () {
+    return this.element.dataset.details
+  }
+
+  #fill ({ top_speed: topSpeed, throttle, watts }) {
+    const { elements } = this.element
+    for (const [name, value] of [['top_speed', topSpeed], ['throttle', throttle]]) {
+      for (const radio of elements[name]) radio.checked = radio.value === String(value)
+    }
+    elements.watts.value = watts ?? ''
   }
 
   // A combobox handle's clear empties the field without a selection event, so the field itself is watched
@@ -167,16 +191,5 @@ export default class extends Controller {
 
   get #stateField () {
     return this.stateTarget.querySelector('input[type=hidden]')
-  }
-
-  get #manual () {
-    return !this.manualPanelTarget.disabled
-  }
-
-  // The stand-in is never enabled; a disabled hidden field keeps a picked bike out of a manual check
-  #searchEnabled (enabled) {
-    if (!this.loaded) return
-
-    this.comboboxSlotTarget.querySelectorAll('input').forEach((input) => { input.disabled = !enabled })
   }
 }
