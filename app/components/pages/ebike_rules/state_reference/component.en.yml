@@ -20,3 +20,6 @@ en:
           not_three_classes: Not 3 classes
           on_file_of_total_html: "%{number} of %{total} states and D.C. on file ·
             others in review"
+          only_classes:
+            one: Class %{classes} only
+            other: Classes %{classes} only

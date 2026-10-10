@@ -22,6 +22,13 @@ module Pages
         def own_classes = @own_classes ||= EbikeRuleServices::StateLaws.own_classes
 
         def states = EbikeRuleServices::StateLaws::STATES.map { it.merge(law: laws[it[:abbr]], own_classes: own_classes.key?(it[:abbr])) }
+
+        # Which of the three US classes a state's one e-bike class covers, where the catalog says
+        def class_system(law)
+          return translation(".not_three_classes") if law[:classes].none?
+
+          translation(".only_classes", count: law[:classes].size, classes: law[:classes].join(" & "))
+        end
       end
     end
   end
