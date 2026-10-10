@@ -50,7 +50,7 @@ const diameterNotes = (presenter, compared) => {
     const both = positions.length === 2 && equal(wheel(vehicle, 'front'), wheel(vehicle, 'rear'))
     return (both ? ['front'] : positions).map((position) => {
       const [bsd, tire] = wheel(vehicle, position)
-      return html`<li>${vehicle.title}'s ${both ? '' : `${position} `}${presenter.vocabulary.wheel_sizes?.[bsd]?.name ?? `${bsd} mm BSD`} wheel with ${
+      return html`<li>${vehicle.title}'s ${both ? '' : `${position} `}${presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`} wheel with ${
         both ? html`${mm(tire)} tires` : html`a ${mm(tire)} tire`} is approximately ${mm(2 * outerRadius(vehicle.builtWheels[position]))} diameter</li>`
     })
   })

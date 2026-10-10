@@ -21,8 +21,7 @@ module EbikeRuleServices
       modes = motors.flat_map { it["operating_modes"] || [] }
       throttle_modes = modes.select { it["mode"] == "throttle" }
       certifications = motors.map { it["certification"] }.join(", ")
-      # a single classification is schema 0.22's, which models not yet reconciled to 0.23 still carry
-      classifications = modes.flat_map { Array(it["e_vehicle_classifications"] || it["e_vehicle_classification"]) }.uniq
+      classifications = modes.flat_map { Array(it["e_vehicle_classifications"]) }.uniq
       {
         bikebook_id: record["id"],
         manufacturer_name: record["manufacturer"],

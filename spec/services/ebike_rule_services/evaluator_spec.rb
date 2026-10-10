@@ -114,12 +114,12 @@ RSpec.describe EbikeRuleServices::Evaluator do
   end
 
   context "in a state with its own limits rather than the three classes" do
-    let(:abbreviation) { "NY" }
+    let(:abbreviation) { "PA" }
     let(:attributes) { super().merge(e_bike_class: 3, top_assist_mph: 28) }
 
     it "fails on its speed cap" do
       expect(statuses).to include(classes: :info)
-      expect(rules.find { it[:id] == :speed }).to include(status: :fail, note: :speed_over_cap, args: {mph: 28, cap: 25})
+      expect(rules.find { it[:id] == :speed }).to include(status: :fail, note: :speed_over_cap, args: {mph: 28, cap: 20})
     end
   end
 

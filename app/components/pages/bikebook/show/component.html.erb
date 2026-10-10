@@ -160,26 +160,83 @@
               <% end %>
             </div>
 
-            <fieldset
-              data-bikebook--catalog-filters-target="field"
-              data-filter-label="<%= translation(".propulsion") %>"
-              data-action="change->bikebook--catalog-filters#apply"
-            >
-              <legend class="twlabel"><%= translation(".propulsion") %></legend>
+            <div class="tw:flex tw:flex-col tw:gap-4 tw:sm:flex-row tw:sm:items-start">
+              <fieldset
+                class="tw:shrink-0"
+                data-bikebook--catalog-filters-target="field"
+                data-filter-label="<%= translation(".propulsion") %>"
+                data-action="change->bikebook--catalog-filters#apply"
+              >
+                <legend class="twlabel">
+                  <%= translation(".propulsion") %>
+                </legend>
 
-              <div class="tw:mt-1 tw:flex tw:flex-wrap tw:gap-x-6 tw:gap-y-2">
-                <% [["0", translation(".human_powered")], ["1", translation(".motorized")], ["class_1", translation(".us_class_1")],
-                ["class_2", translation(".us_class_2")], ["class_3", translation(".us_class_3")],
-                ["out_of_class", translation(".out_of_class"), translation(".out_of_class_details")]].each do |value, label, details| %>
-                  <span class="tw:flex tw:items-center tw:gap-1.5 tw:leading-0">
+                <div class="tw:mt-1 tw:flex tw:flex-col tw:gap-y-2">
+                  <% [["0", translation(".human_powered")], ["1", translation(".e_vehicle_motorized")]].each do |value, label| %>
                     <%= render UI::Forms::Checkbox::Component.new(name: "electric", value:, label:, class_name: "tw:mb-0",
                     html_options: {id: "electric-#{value}"}) %>
+                  <% end %>
+                </div>
+              </fieldset>
 
-                    <%= render UI::Tooltip::Component.new(text: details) if details %>
-                  </span>
+              <fieldset
+                class="
+                  tw:rounded-lg tw:border tw:border-gray-200 tw:px-3 tw:pt-1
+                  tw:pb-3 tw:sm:flex-1 tw:dark:border-gray-700
+                "
+                data-bikebook--catalog-filters-target="field"
+                data-filter-label="<%= translation(".e_bike_classification") %>"
+                data-action="change->bikebook--catalog-filters#apply"
+              >
+                <legend class="twlabel tw:px-1">
+                  <%= translation(".e_bike_classification") %>
+                </legend>
+
+                <label
+                  class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"
+                  for="filter-jurisdiction"
+                >
+                  <%= translation(".jurisdiction") %>
+                </label>
+
+                <%= select_tag "jurisdiction", options_for_select(jurisdiction_options), id: "filter-jurisdiction",
+                class: "twinput tw:mt-1 tw:sm:w-auto",
+                data: {"bikebook--catalog-filters-target": "jurisdiction", action: "bikebook--catalog-filters#showJurisdiction"} %>
+
+                <div
+                  class="tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-6 tw:gap-y-2"
+                  data-jurisdiction=""
+                >
+                  <% [["class_1", translation(".us_class_1")], ["class_2", translation(".us_class_2")],
+                  ["class_3", translation(".us_class_3")],
+                  ["out_of_class", translation(".out_of_class_label"), translation(".out_of_class_details")]].each do |value, label, details| %>
+                    <span class="tw:flex tw:items-center tw:gap-1.5 tw:leading-0">
+                      <%= render UI::Forms::Checkbox::Component.new(name: "electric", value:, label:, class_name: "tw:mb-0",
+                      html_options: {id: "electric-#{value}"}) %>
+
+                      <%= render UI::Tooltip::Component.new(text: details) if details %>
+                    </span>
+                  <% end %>
+                </div>
+
+                <% state_classes.each do |jurisdiction, classes| %>
+                  <div
+                    class="tw:mt-3 tw:flex tw:hidden tw:flex-wrap tw:gap-x-6 tw:gap-y-2"
+                    data-jurisdiction="<%= jurisdiction %>"
+                  >
+                    <% classes.each do |classification| %>
+                      <span class="tw:flex tw:items-center tw:gap-1.5 tw:leading-0">
+                        <%= render UI::Forms::Checkbox::Component.new(name: "electric", value: classification[:id],
+                        label: classification[:not_an_ebike] ? translation(".out_of_class_label") : classification[:name],
+                        class_name: "tw:mb-0", html_options: {id: "electric-#{jurisdiction}-#{classification[:id]}"}) %>
+
+                        <%= render UI::Tooltip::Component.new(text: translation(".out_of_class_details")) if classification[:not_an_ebike] %>
+                      </span>
+                    <% end %>
+                  </div>
                 <% end %>
-              </div>
-            </fieldset>
+              </fieldset>
+            </div>
           </div>
         <% end %>
       </div>
@@ -190,6 +247,7 @@
 <div
   data-controller="bikebook--page"
   data-bikebook--page-manifest-url-value="<%= @manifest_url %>"
+  data-bikebook--page-jurisdictions-value="<%= jurisdiction_names.to_json %>"
   data-bikebook--page-failed-text-value="<%= translation(".failed") %>"
   data-bikebook--page-title-value="Bikebook"
   data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track"

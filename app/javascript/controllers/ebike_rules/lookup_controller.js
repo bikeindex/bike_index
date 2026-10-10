@@ -6,6 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 import { replaceUrl } from 'bikebook/replace_url'
 
 const RESULT_FRAME = 'ebike-rules-check'
+const CLASSES_FRAME = 'ebike-rules-classes'
 
 // Connects to data-controller='ebike-rules--lookup'
 // The bike field is a stand-in until the catalog loads, since the combobox must have its source
@@ -18,6 +19,7 @@ export default class extends Controller {
 
   async connect () {
     this.lastUrl = window.location.href.split('#')[0]
+    this.classesPath = window.location.pathname
     this.observers = [this.#watchCleared(this.#stateField, () => this.chooseState())]
     let catalog
     try {
@@ -61,12 +63,12 @@ export default class extends Controller {
   // clearing the state leaves the check waiting for one
   chooseState () {
     const abbreviation = this.#stateField.value.toLowerCase()
+    this.element.action = abbreviation ? `${this.pathValue}/${abbreviation}` : this.pathValue
+    this.#loadClasses()
     if (!abbreviation) {
-      this.element.action = this.pathValue
       document.title = this.titleValue
       return this.#awaitState()
     }
-    this.element.action = `${this.pathValue}/${abbreviation}`
     this.stateNoteTarget.replaceChildren()
     this.#visit(this.#checkUrl ?? this.element.action)
   }
@@ -121,6 +123,16 @@ export default class extends Controller {
 
     this.lastUrl = url
     Turbo.visit(url, { frame: RESULT_FRAME, action: 'advance' })
+  }
+
+  // A state's own classes, where it doesn't use the three. The gem announces a prefilled state on connecting,
+  // which is the page's own
+  #loadClasses () {
+    const path = new URL(this.element.action).pathname
+    if (path === this.classesPath) return
+
+    this.classesPath = path
+    document.getElementById(CLASSES_FRAME).src = path
   }
 
   // Without a state there's nothing to check a bike against, so it waits in the URL for one

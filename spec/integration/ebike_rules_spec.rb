@@ -48,11 +48,16 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current New York rules.")
     expect(page).to have_current_path("/ebike-rules/ny?manual=1&top_speed=20&throttle=1&watts=1000")
     expect(page).to have_title("New York e-bike laws")
+    # New York doesn't use the three classes, so its own replace them
+    expect(page).to have_css("#ebike-rules-classes h2", text: "New York e-bike classes")
+    expect(page).to have_css("#ebike-rules-classes h3", text: "Bicycle With Electric Assist")
+      .and have_no_css("#ebike-rules-classes h3", text: "Class 1")
 
     # back returns to Colorado's check, rather than to a snapshot that leaves for New York again
     page.go_back
     expect(page).to have_css("[role='status']", text: "This isn't an e-bike under current Colorado rules.")
     expect(page).to have_field("State", with: "Colorado (CO)")
+    expect(page).to have_css("#ebike-rules-classes h2", text: "E-bike classes, explained")
     wait_for_stimulus("ebike-rules--lookup")
     expect(page).to have_current_path("/ebike-rules/co?manual=1&top_speed=20&throttle=1&watts=1000")
 
@@ -63,8 +68,8 @@ RSpec.describe "E-bike rules", :js, type: :system do
   end
 
   it "filters the states, opens the one an old link's anchor names, and links each to its page" do
-    visit "#{ebike_rules_path}#state-ny"
-    expect(page).to have_css("#state-panel-ny", text: "Its own definition: Bicycle With Electric Assist")
+    visit "#{ebike_rules_path}#state-pa"
+    expect(page).to have_css("#state-panel-pa", text: "Its own definition: Pedalcycle With Electric Assist")
 
     fill_in "Filter states", with: "new"
     expect(page).to have_text("4 of 51 match")

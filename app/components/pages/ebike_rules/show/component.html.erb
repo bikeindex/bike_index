@@ -22,7 +22,7 @@
           tw:dark:text-blue-300
         "
       >
-        <%= translation(".pill") %>
+        <%= translation(".bike_index_nonprofit") %>
       </span>
 
       <h1
@@ -236,67 +236,7 @@
 
   <%= render(Pages::EbikeRules::Check::Component.new(lookup: @lookup, page_title: @page_title)) %>
 
-  <section class="tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900 <%= @lookup.result? ? "tw:mt-10" : "tw:mt-14" %>">
-    <div class="tw:py-[clamp(40px,7vw,64px)] <%= SECTION_CLASSES %>">
-      <h2 class="<%= HEADING_CLASSES %>">
-        <%= translation(".classes_heading") %>
-      </h2>
-
-      <p
-        class="
-          tw:mt-2 tw:mb-7 tw:max-w-[640px] tw:text-[17px] tw:text-gray-700
-          tw:dark:text-gray-300
-        "
-      >
-        <%= translation(".classes_intro") %>
-      </p>
-
-      <div
-        class="
-          tw:grid
-          tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
-          tw:gap-4
-        "
-      >
-        <% class_cards.each do |card| %>
-          <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) do %>
-            <div class="tw:flex tw:items-center tw:gap-3.5">
-              <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: card[:n])) %>
-
-              <div>
-                <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
-                  <%= card[:title] %>
-                </h3>
-
-                <% if card[:tag] %>
-                  <p class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
-                    <%= card[:tag] %>
-                  </p>
-                <% end %>
-              </div>
-            </div>
-
-            <div class="tw:border-y tw:border-gray-200 tw:py-3 tw:dark:border-gray-700">
-              <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
-                <% [[translation(".assist"), card[:assist]], [translation(".top_assist"), card[:speed]], [translation(".motor"), card[:motor]]].select(&:last).each do |label, value| %>
-                  <%= render(UI::DefinitionList::Row::Component.new(label:, value: tag.span(value, class: "tw:whitespace-nowrap"))) %>
-                <% end %>
-              <% end %>
-            </div>
-
-            <p
-              class="
-                tw:text-[15px] tw:leading-relaxed tw:text-gray-700
-                tw:dark:text-gray-300
-              "
-            >
-              <%= card[:body] %>
-            </p>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
-  </section>
+  <%= render(Pages::EbikeRules::Classes::Component.new(state: @lookup.state, additional_classes: @lookup.result? ? "tw:mt-10" : "tw:mt-14")) %>
 
   <section class="tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
     <div class="tw:flex tw:flex-wrap tw:items-start tw:gap-x-14 tw:gap-y-8 tw:py-[clamp(44px,8vw,72px)] <%= SECTION_CLASSES %>">

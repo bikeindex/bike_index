@@ -90,7 +90,7 @@ RSpec.describe "Bikebook", :js, type: :system do
         })()
       JS
       expect(key_colors).to eq(["rgb(52, 152, 219)"] * 2)
-      expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$1,000")
+      expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$100")
       # only the number is colored: the currency symbol and unit keep their gray
       colors = page.evaluate_script(<<~JS)
         [...document.querySelectorAll("[aria-label='Comparison'] .tw\\\\:text-green-700")].slice(0, 2).map((difference) =>
@@ -185,18 +185,32 @@ RSpec.describe "Bikebook", :js, type: :system do
     click_on "More filters"
     # a class matches the models carrying it, and out of class the catalog's own marker
     check "US Class 2"
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(1 matching model)")
-    check "Out of class"
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(2 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(18 matching models)")
+    check "Out of Class"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(19 matching models)")
     uncheck "US Class 2"
-    uncheck "Out of class"
+    uncheck "Out of Class"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(29 matching models)")
+    # as on /ebike-rules, a state on the three US classes keeps them and one with its own shows those,
+    # each matching the models in its groups, leaving the other jurisdiction's unchecked
+    check "US Class 2"
+    select "California", from: "Jurisdiction"
+    expect(page).to have_checked_field("US Class 2")
+    select "New Jersey", from: "Jurisdiction"
+    expect(page).to have_no_field("US Class 2")
+    expect(page).to have_unchecked_field("Low-Speed Electric Bicycle")
+    check "Out of Class"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(1 matching model)")
+    select "United States", from: "Jurisdiction"
+    expect(page).to have_no_field("Low-Speed Electric Bicycle")
+    expect(page).to have_unchecked_field("US Class 2").and have_unchecked_field("Out of Class")
     expect(page).to have_css("#vehicle-models-count", exact_text: "(29 matching models)")
     find_field("Manufacturers").click
     find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (5)").click
     expect(page).to have_css("[data-async-id='manufacturer'] .hw-combobox__chip", text: "Kris Holm")
     expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
     # checked propulsions match any of them
-    check "Motorized"
+    check "e-Vehicle (motorized)"
     expect(page).to have_css("#vehicle-models-count", exact_text: "(0 matching models)")
     check "Human powered (Acoustic)"
     expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
@@ -556,34 +570,44 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
     expect(page).to have_css("section div", text: /\AFolding\s*Stem fold\z/)
 
-    # beside a vehicle that has none, a 0.23 mode's classifications: its jurisdiction's own and the group it fits
+    # beside a vehicle that has none, a mode's classification
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro")
-    classification = find("section div", text: /\AE-vehicle class\s*Off-Highway Motorcycle \?, US-CA Off-highway electric motorcycle \?\z/, wait: 10)
+    classification = find("section div", text: /\AE-vehicle class\s*Off-Highway Motorcycle \?\z/, wait: 10)
     expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     expect(page).to have_no_css("dt", exact_text: "Classifications")
-    classification.all("button", text: "?").last.click
-    tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for riding off the highway", visible: true)
-    expect(tooltip).to have_css("code", exact_text: "evc/us/ca/off_highway_electric_motorcycle")
+    classification.find("button", text: "?").click
+    tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for off-highway use", visible: true)
+    expect(tooltip).to have_css("code", exact_text: "evc/off_highway_motorcycle")
       .and have_button("Copy ID")
 
-    # its heading picks the classification, whose card sits beside the vehicles' with everything it has
-    tooltip.click_link("US-CA Off-highway electric motorcycle")
-    card = find("article h1", text: "US-CA Off-highway electric motorcycle").ancestor("article")
+    # its heading picks the group, whose card sits beside the vehicles' and links to the classifications in it,
+    # each with everything it has
+    tooltip.click_link("Off-Highway Motorcycle")
+    group = find("article h1", exact_text: "Off-Highway Motorcycle").ancestor("article")
     expect(page).to have_css("article", count: 3)
-    expect(page).to have_current_path("/bikebook?vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
+    group.find("section", text: /\AClassifications in this group/i).click_link("California Off-Highway Electric Motorcycle")
+    card = find("article h1", text: "California Off-Highway Electric Motorcycle").ancestor("article")
+    expect(page).to have_css("article", count: 4)
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro," \
+      "evc/off_highway_motorcycle,evc/us/ca/off_highway_electric_motorcycle")
     expect(card).to have_css("li", text: "No driver's license needed off the highway")
       .and have_link(href: /ohv\.parks\.ca\.gov/)
+      .and have_css("dd", exact_text: "California (CA)")
+    # each rule's citation follows it, linked to the pages stating it, or a source link stands in
+    no_limit = card.find("li", text: /\ANo limit on motor power or speed California Vehicle Code §436\.1 1 2\z/)
+    expect(no_limit).to have_link("1", href: /ohv\.parks\.ca\.gov/).and have_link("2", href: /leginfo\.legislature\.ca\.gov/)
+    expect(card.find("li", text: /\ANo driver's license needed off the highway/)).to have_link("source", href: /ohv\.parks\.ca\.gov/)
 
-    card.find("[aria-label='Remove US-CA Off-highway electric motorcycle']").click
+    card.find("[aria-label='Remove California Off-Highway Electric Motorcycle']").click
     # the card closes ahead of the render that replaces the search, which the chips wait out
-    expect(page).to have_css("article", count: 2)
-    expect(page).to have_css(".hw-combobox__chip", count: 2)
+    expect(page).to have_css("article", count: 3)
+    expect(page).to have_css(".hw-combobox__chip", count: 3)
 
     # and its id finds it in the search
     type_into(vehicle_field, "evc/us/ca/off_highway_e")
-    retry_on_detach { find("[role='option']", text: "e-Vehicle Classification: US-CA Off-highway electric motorcycle").click }
-    expect(page).to have_css(".hw-combobox__chip", text: "e-Vehicle Classification: US-CA Off-highway electric motorcycle")
-    expect(page).to have_css("article h1", text: "US-CA Off-highway electric motorcycle")
+    retry_on_detach { find("[role='option']", text: "e-Vehicle Classification: California Off-Highway Electric Motorcycle").click }
+    expect(page).to have_css(".hw-combobox__chip", text: "e-Vehicle Classification: California Off-Highway Electric Motorcycle")
+    expect(page).to have_css("article h1", text: "California Off-Highway Electric Motorcycle")
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
@@ -596,17 +620,17 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_css("[aria-label='Comparison']")
 
     # a classification links to the groups it's in, and a group, which has no jurisdiction, to the classifications in it
-    find("article", text: "US-CA Off-highway electric motorcycle").find("section", text: /\AGroups/i).click_link("Off-Highway Motorcycle")
+    find("article", text: "California Off-Highway Electric Motorcycle").find("section", text: /\AGroups/i).click_link("Off-Highway Motorcycle")
     group = find("article h1", exact_text: "Off-Highway Motorcycle").ancestor("article")
     expect(page).to have_current_path("/bikebook?vehicle_models=m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle,evc/off_highway_motorcycle")
     expect(group).to have_no_css("dt", exact_text: "Jurisdiction")
-    expect(group.find("section", text: /\AClassifications in this group/i)).to have_link("US-CA Off-highway electric motorcycle")
+    expect(group.find("section", text: /\AClassifications in this group/i)).to have_link("California Off-Highway Electric Motorcycle")
 
     # a rule a law starts or ends carries its date, and limits not yet in force say when they take effect
     visit bikebook_path(vehicle_models: "evc/us/ca/motor_driven_cycle")
-    card = find("article h1", text: "US-CA Motor-driven cycle", wait: 10).ancestor("article")
+    card = find("article h1", text: "California Motor-Driven Cycle", wait: 10).ancestor("article")
     expect(card).to have_css("li", text: /\AFrom January 1, 2027: Its motor produces 5 gross brake horsepower/)
-      .and have_css("li", text: /\AUntil January 1, 2027: The line is drawn only by an engine of 150 cc/)
+      .and have_css("li", text: /\AUntil January 1, 2027: The line is drawn only by an engine under 150 cc/)
       .and have_css("dd", exact_text: "January 1, 2027")
   end
 

@@ -34,6 +34,34 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page.all("[data-ebike-rules--state-filter-target='state']").count).to eq 51
     end
 
+    it "renders the classes frame alone: a state's own classes where it doesn't use the three, and the three without a state" do
+      frame = {"Turbo-Frame" => Pages::EbikeRules::Classes::Component::FRAME_ID}
+      get "/ebike-rules/nj", headers: frame
+
+      expect(page).to have_css("turbo-frame#ebike-rules-classes h2", text: "New Jersey e-bike classes")
+        .and have_css("h3", text: "Low-Speed Electric Bicycle")
+        .and have_css("h3", text: "Not an e-bike")
+        .and have_no_css("h3", text: "Dirt Bike")
+        .and have_no_css("h3", text: "Class 1")
+        .and have_no_css("#ebike-rules-check")
+
+      # rather than a located visitor's state
+      get "/ebike-rules", headers: frame.merge(indiana)
+      expect(response).to have_http_status(:ok)
+      expect(page).to have_css("h2", text: "E-bike classes, explained").and have_css("h3", text: "Class 1")
+        .and have_text("Often comes with a helmet rule").and have_text("Most states treat these as mopeds or motorcycles")
+
+      # a three-class state's own Class 3 limits, and what its motorcycle needs, in place of most states'
+      get "/ebike-rules/ca", headers: frame
+      expect(page).to have_css("h3", text: "Class 3").and have_text("In California:")
+        .and have_css("li", text: "Riders must be 16 or older to ride a Class 3")
+        .and have_css("li", text: /Class 3 can.t be sold to anyone under 16 California Vehicle Code §§21212\.5, 21213 1 2 3/, normalize_ws: true)
+        .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
+        .and have_no_css("li", text: "Allowed on freeways")
+        .and have_no_text("Often comes with a helmet rule")
+        .and have_no_text("Most states treat these")
+    end
+
     it "sends a request Cloudflare locates to its state's page, which no cache keeps" do
       get "/ebike-rules", params: {utm_source: "newsletter"}, headers: indiana
 

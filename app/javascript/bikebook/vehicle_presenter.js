@@ -48,7 +48,7 @@ export class VehiclePresenter {
   }
 
   classificationName (id) {
-    return this.vocabulary.e_vehicle_classifications?.[id]?.label ?? id
+    return this.vocabulary.e_vehicle_classifications[id]?.label ?? id
   }
 
   // A classification's tooltip, whose heading links to `path(id)`
@@ -60,7 +60,7 @@ export class VehiclePresenter {
 
   // Each classification's name to its tooltip
   classificationTooltips (path) {
-    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {})
+    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications)
       .map(([id, { label }]) => [label, this.classificationTooltip(id, path)]))
   }
 

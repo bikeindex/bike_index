@@ -120,10 +120,9 @@ class ModelViewer {
     return { ...vehicle, frame, suspension, type_name: typeLabel(vehicle), classifiedModes: this.#classifiedModes(data) }
   }
 
-  // From the raw data: a 0.22 model has one id and a 0.23 model an array, and the kit's schema names only one of them
   #classifiedModes (data) {
     return array(data.motors).flatMap((motor) => array(motor.operating_modes))
-      .map(({ mode, availability, e_vehicle_classification: id, e_vehicle_classifications: ids }) => ({ mode, availability, ids: array(ids ?? id) }))
+      .map(({ mode, availability, e_vehicle_classifications: ids }) => ({ mode, availability, ids: array(ids) }))
   }
 
   #frameMounts (frame, sizes) {

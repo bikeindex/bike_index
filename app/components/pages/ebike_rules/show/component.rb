@@ -44,20 +44,6 @@ module Pages
             {value: 29, label: translation(".over_28_mph")}]
         end
 
-        # The three classes, then the e-moto that's none of them
-        def class_cards
-          motor_cap = translation(".motor_cap")
-          [
-            {n: 1, title: translation(".class_n", n: 1), tag: translation(".class_1_tag"), assist: translation(".pedal"),
-             speed: translation(".mph", mph: 20), motor: motor_cap, body: translation(".class_1_body")},
-            {n: 2, title: translation(".class_n", n: 2), tag: translation(".class_2_tag"), assist: translation(".throttle"),
-             speed: translation(".mph", mph: 20), motor: motor_cap, body: translation(".class_2_body")},
-            {n: 3, title: translation(".class_n", n: 3), tag: translation(".class_3_tag"), assist: translation(".pedal"),
-             speed: translation(".mph", mph: 28), motor: motor_cap, body: translation(".class_3_body")},
-            {n: nil, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))), speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), body: translation(".emoto_limits_body")}
-          ]
-        end
-
         def throttle_entries = [{value: 1, label: translation(".answer_yes")}, {value: 0, label: translation(".answer_no")}]
 
         def parent_steps
