@@ -79,6 +79,17 @@
               aria: {controls: "state-panel-#{state[:abbr].downcase}"})) do %>
               <span class="tw:flex-1 tw:text-left"><%= state[:name] %></span>
 
+              <% if state[:own_classes] %>
+                <span
+                  class="
+                    tw:text-sm tw:font-normal tw:text-gray-500
+                    tw:dark:text-gray-400
+                  "
+                >
+                  <%= translation(".not_three_classes") %>
+                </span>
+              <% end %>
+
               <% unless state[:law] %>
                 <%= render(UI::Badge::Component.new(text: translation(".in_review"))) %>
               <% end %>

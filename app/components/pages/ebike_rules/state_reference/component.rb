@@ -19,7 +19,9 @@ module Pages
 
         def laws = @laws ||= EbikeRuleServices::StateLaws.laws
 
-        def states = EbikeRuleServices::StateLaws::STATES.map { it.merge(law: laws[it[:abbr]]) }
+        def own_classes = @own_classes ||= EbikeRuleServices::StateLaws.own_classes
+
+        def states = EbikeRuleServices::StateLaws::STATES.map { it.merge(law: laws[it[:abbr]], own_classes: own_classes.key?(it[:abbr])) }
       end
     end
   end

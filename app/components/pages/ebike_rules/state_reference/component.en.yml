@@ -17,5 +17,6 @@ en:
             rules and sources.
           matching_of_total: "%{number} of %{total} match"
           no_match: No states match. Try another name.
+          not_three_classes: Not 3 classes
           on_file_of_total_html: "%{number} of %{total} states and D.C. on file ·
             others in review"
