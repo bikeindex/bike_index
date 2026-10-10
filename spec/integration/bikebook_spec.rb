@@ -67,7 +67,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       expect(all("li").map(&:text)).to eq(["Aventón Level 4 REC Step-Through Regular", "Aventón Level 2 Step-Through M/L"])
       frames = all("svg[role='img'] > g", visible: :all).map { |frame| [frame.all("circle", visible: :all).map { it[:cx].to_f }, frame.has_css?("path", visible: :all)] }
       expect(frames).to match([[[be < 0, be > 0], true], [[be < 0, be > 0], true]])
-      expect(frames.dig(1, 0).reverse.inject(:-)).to be_within(0.1).of(1130)
+      expect(frames.dig(1, 0, 1) - frames.dig(1, 0, 0)).to be_within(0.1).of(1130)
       expect(page).to have_text("Aventón Level 2 Step-Through's Stack, Head Angle, Chainstay, BB Drop, Seat Angle, Seat Tube center-to-top and " \
         "Fork Rake / Offset are worked out from its other figures or estimated.")
       # the same wheel size, its tires too near each other's for the wheel note

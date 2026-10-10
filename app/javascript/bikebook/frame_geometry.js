@@ -2,7 +2,7 @@ import { array, isNumber } from 'bikebook/templates/values'
 
 // figures that size the front triangle, without any of which a frame would be all estimate
 const SIZING = ['reach', 'stack', 'top_tube_effective', 'front_center', 'head_tube']
-// the catalog's medians, for figures a size neither lists nor has the figures to work out
+// the catalog's medians
 const DEFAULTS = { bb_drop: 65, head_angle: 70, chainstay: 430, fork_rake: 45, seat_angle: 74, reach: 405, head_tube: 130 }
 const BSD = 622
 const TIRE_WIDTH = 35
@@ -27,10 +27,6 @@ const wheelRadius = (data, size, position) => {
   return { radius: (isNumber(bsd) ? bsd : BSD) / 2 + (isNumber(tire) ? tire : TIRE_WIDTH), estimated: !isNumber(bsd) || !isNumber(tire) }
 }
 
-// The fork's offset as the size lists it, else as its fork does, else the one its trail makes with the front wheel
-const forkRake = (fork, geometry, frontRadius, headAngle) => geometry.fork_rake ?? fork?.dimensions?.offset ??
-  (isNumber(geometry.trail) ? frontRadius * Math.cos(headAngle) - geometry.trail * Math.sin(headAngle) : null)
-
 // A size's frame in mm, the bottom bracket at the origin and y up, drawn from any of its figures that size the front
 // triangle. `missing` names those where it lists none, and `wheels` its wheels' outer radii and wheelbase where it lists
 // them all. `estimated` names each figure it doesn't list, which is worked out from those it does or else a default
@@ -48,7 +44,9 @@ export const frameGeometry = (data, size) => {
   const drop = geometry.bb_drop ?? (listed('bb_height') ? rear.radius - geometry.bb_height : DEFAULTS.bb_drop)
   const headAngle = radians(geometry.head_angle ?? DEFAULTS.head_angle)
   const frontY = drop + front.radius - rear.radius
-  const listedRake = forkRake(fork, geometry, front.radius, headAngle)
+  // the fork's offset as the size lists it, else as its fork does, else the one its trail makes with the front wheel
+  const listedRake = geometry.fork_rake ?? fork?.dimensions?.offset ??
+    (listed('trail') ? front.radius * Math.cos(headAngle) - geometry.trail * Math.sin(headAngle) : null)
   const rake = listedRake ?? DEFAULTS.fork_rake
   const travel = geometry.travel_front ?? data.suspension?.front_travel ?? fork?.dimensions?.travel ?? 0
   // up the steering axis from the front axle's foot on it to the fork's crown
@@ -84,23 +82,21 @@ export const frameGeometry = (data, size) => {
   const seatTop = [-seatTube * Math.cos(seat), seatTube * Math.sin(seat)]
   // a seat tube slacker than the effective angle runs ahead of the bottom bracket, so it ends on the down tube
   const slope = cot(radians(actualSeatAngle))
-  const seatBottomY = actualSeatAngle < seatAngle && headBottom[1] > 0 ? (seatTop[0] + seatTop[1] * slope) / (headBottom[0] / headBottom[1] + slope) : 0
+  const seatBottom = actualSeatAngle < seatAngle && headBottom[1] > 0
+    ? headBottom.map((each) => each * (seatTop[0] + seatTop[1] * slope) / (headBottom[0] + headBottom[1] * slope))
+    : [0, 0]
+  const unlisted = {
+    bb_drop: !listed('bb_drop') && !listed('bb_height'),
+    seat_tube_ct: !isNumber(listedSeatTube),
+    fork_rake: !isNumber(listedRake),
+    wheel_size: rear.estimated || front.estimated
+  }
 
   return {
     missing: [],
     wheels,
-    estimated: Object.entries({
-      reach: !listed('reach'),
-      stack: !listed('stack'),
-      head_angle: !listed('head_angle'),
-      head_tube: !listed('head_tube'),
-      chainstay: !listed('chainstay'),
-      bb_drop: !listed('bb_drop') && !listed('bb_height'),
-      seat_angle: !listed('seat_angle'),
-      seat_tube_ct: !isNumber(listedSeatTube),
-      fork_rake: !isNumber(listedRake),
-      wheel_size: rear.estimated || front.estimated
-    }).filter(([, value]) => value).map(([key]) => key),
+    estimated: ['reach', 'stack', 'head_angle', 'head_tube', 'chainstay', 'bb_drop', 'seat_angle', 'seat_tube_ct', 'fork_rake', 'wheel_size']
+      .filter((key) => unlisted[key] ?? !listed(key)),
     rearAxle: [rearX, drop],
     frontAxle: [frontX, frontY],
     rearRadius: rear.radius,
@@ -110,6 +106,6 @@ export const frameGeometry = (data, size) => {
     headBottom,
     forkCrown: steering(headTube, rake),
     seatTop,
-    seatBottom: [seatBottomY * headBottom[0] / headBottom[1], seatBottomY]
+    seatBottom
   }
 }

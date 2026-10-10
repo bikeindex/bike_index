@@ -21,17 +21,16 @@ const BOUNDS = { left: -850, right: 1250, top: 1010 }
 const REAR_AXLE = -430
 
 const point = ([x, y]) => `${Math.round(x * 10) / 10},${Math.round(-y * 10) / 10}`
+const figures = (presenter, keys) => andSentence(keys.map((key) => presenter.kit.geometry.labels[key] ?? presenter.humanize(key)))
 const path = (...lines) => lines.map(([start, ...rest]) => `M${point(start)}${rest.map((each) => `L${point(each)}`).join('')}`).join('')
 
-const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headTop, headBottom, forkCrown, seatTop, seatBottom, bottomBracketHeight }, series, label }, index) => {
-  const bottomBracket = [0, 0]
-  return svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" transform=${`translate(0 ${-bottomBracketHeight})`} stroke=${series.color} fill="none" stroke-linecap="round" stroke-linejoin="round"><title>${label}</title><circle
+const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headTop, headBottom, forkCrown, seatTop, seatBottom, bottomBracketHeight }, series, label }, index) =>
+  svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" transform=${`translate(0 ${-bottomBracketHeight})`} stroke=${series.color} fill="none" stroke-linecap="round" stroke-linejoin="round"><title>${label}</title><circle
     cx=${rearAxle[0]} cy=${-rearAxle[1]} r=${rearRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle><circle
     cx=${frontAxle[0]} cy=${-frontAxle[1]} r=${frontRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle>${headTop
-    ? svg`<path d=${path([frontAxle, forkCrown, headBottom, headTop, seatTop, rearAxle, bottomBracket, headBottom], [seatTop, seatBottom])}
+    ? svg`<path d=${path([frontAxle, forkCrown, headBottom, headTop, seatTop, rearAxle, [0, 0], headBottom], [seatTop, seatBottom])}
       stroke-width="4" vector-effect="non-scaling-stroke"></path>`
     : nothing}</g>`
-}
 
 // A [bsd, tire] wheel against the first's: the same size on a tire more than TIRE_GAP mm wider or narrower, or 700c
 // against 650b
@@ -85,11 +84,10 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const undrawn = labelled.filter(({ geometry }) => geometry.missing.length)
   if (drawn.length === 0) return nothing
 
-  const labels = presenter.kit.geometry.labels
   const overlay = drawn.length > 1
   const missingNote = undrawn.length
     ? html`<p class="tw:text-xs tw:text-gray-500 tw:italic tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing, wheels } }) => {
-      const none = andSentence(missing.map((key) => labels[key] ?? presenter.humanize(key)))
+      const none = figures(presenter, missing)
       if (!wheels || !overlay) return `${title} lists none of its ${none}, so it can't be drawn.`
       return `${title} lists none of its ${none}, so only its wheels are drawn${aligned ? `, the rear axle on ${aligned.title}'s` : ''}.`
     }).join(' ')}</p>`
@@ -108,7 +106,6 @@ const drawing = (presenter, drawn, labelled) => {
   const ys = drawn.filter(({ geometry }) => geometry.headTop).flatMap(({ geometry: { headTop, seatTop, bottomBracketHeight } }) => [headTop[1], seatTop[1]].map((y) => y + bottomBracketHeight))
   const [left, top] = [Math.min(BOUNDS.left, ...xs) - PADDING, -Math.max(BOUNDS.top, ...ys) - PADDING]
   const [width, height] = [Math.max(BOUNDS.right, ...xs) - left + PADDING, PADDING - top]
-  const labels = presenter.kit.geometry.labels
   const notes = diameterNotes(presenter, labelled)
   const estimated = drawn.filter(({ geometry }) => geometry.estimated?.length)
 
@@ -124,7 +121,6 @@ const drawing = (presenter, drawn, labelled) => {
         class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${notes}</ul></div>`
       : nothing}${estimated.length
       ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${estimated.map(({ title, geometry }) =>
-        `${title}'s ${andSentence(geometry.estimated.map((key) => labels[key] ?? presenter.humanize(key)))} ${geometry.estimated.length > 1 ? 'are' : 'is'
-        } worked out from its other figures or estimated.`).join(' ')}</p>`
+        `${title}'s ${figures(presenter, geometry.estimated)} ${geometry.estimated.length > 1 ? 'are' : 'is'} worked out from its other figures or estimated.`).join(' ')}</p>`
       : nothing}`
 }
