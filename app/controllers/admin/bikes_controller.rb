@@ -1,13 +1,14 @@
 module Admin
   class BikesController < Admin::BaseController
     include Binxtils::SortableTable
+    include Admin::TokenAccessible
 
     # The Pages::Admin::Bikes::Tabs tabs show renders; the rest are other controllers' screens
     SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
 
     before_action :find_bike, only: %i[edit update show]
     before_action :set_period, only: %i[index missing_manufacturer]
-    around_action :set_reading_role, only: %i[index show]
+    around_action :set_reading_role, only: %i[index show missing_manufacturer]
 
     def index
       @per_page = permitted_per_page(default: 100)
@@ -17,6 +18,12 @@ module Admin
     end
 
     def missing_manufacturer
+      if request.format.json?
+        rows = missing_manufacturer_bikes.reorder(nil).group(:manufacturer_other)
+          .pluck(:manufacturer_other, Arel.star.count, Bike.arel_table[:created_at].minimum)
+        return render(json: {missing_manufacturers: rows.map { |manufacturer_other, count, first_created_at| {manufacturer_other:, count:, first_created_at:} }})
+      end
+
       @per_page = permitted_per_page(default: 100)
       @pagy, @bikes = pagy(:countish,
         missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :current_impound_record, :paint),
