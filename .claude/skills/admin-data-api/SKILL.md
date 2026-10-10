@@ -23,7 +23,7 @@ Production JSON reachable with the admin OAuth token:
 - `GET https://bikeindex.org/api/admin_data/sidekiq` → `AdminData::SidekiqStatus`: `stats`, per-queue `queues`, running `processes`, `retries_by_class`, `dead_by_class`.
 - `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats`, `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
 - `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
-- `GET /admin/bikes/missing_manufacturer.json` → `get missing_manufacturers`, `POST /admin/manufacturers.json` → `create-manufacturer`, and `PATCH /admin/manufacturers/:slug.json` → `update-manufacturer`; the `manufacturers` skill walks through them.
+- `GET /admin/bikes/missing_manufacturer.json` → `get missing_manufacturers`, `POST /admin/manufacturers.json` → `create-manufacturer`, and `PATCH /admin/manufacturers/:slug.json` → `update-manufacturer`; the `missing-manufacturers` skill (in `~/.claude/skills`) walks through them.
 
 Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability named for the controller (`admin_data`, `bug_reports`, `bikes`, `manufacturers`; a universal ability covers all). Controllers: `app/controllers/api/admin_data_controller.rb` and the admin controllers that include `Admin::TokenAccessible`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 
@@ -70,6 +70,16 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 `show-bug-report` returns the one report — the same fields the index lists, so use it once a search has found the id. `update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending), `github_pull_request` and `status` (one of `BugReport.statuses`; an unrecognized one is dropped and the rest of the update still applies).
 
 Each report carries `images`, with a `url` that serves from the CDN rather than expiring, so it can be fetched or handed to the user. Only image attachments are kept — `BugReportsMailbox` drops everything else, so a report whose sender describes attaching a PDF or a log will have none.
+
+## Against a dev server
+
+`ADMIN_DATA_BASE_URL=http://localhost:3042` before any command sends it to that server instead of production, with `ADMIN_DATA_LOCAL_TOKEN` in place of the production token. Mint that once per database:
+
+```
+ADMIN_DATA_BASE_URL=http://localhost:3042 .claude/skills/admin-data-api/scripts/admin_data.rb local-token [email]
+```
+
+It runs `bin/rails runner` in this checkout, so the server has to be this checkout's, and the user — `admin@bikeindex.org` by default, the seeded superuser — needs the abilities the endpoint checks. A local token doesn't expire or refresh.
 
 ## Refreshing the token
 

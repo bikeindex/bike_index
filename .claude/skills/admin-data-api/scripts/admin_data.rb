@@ -15,8 +15,12 @@ require "net/http"
 require "uri"
 require "json"
 require "dotenv"
+require "open3"
 
-BASE = "https://bikeindex.org"
+PRODUCTION = "https://bikeindex.org"
+# ADMIN_DATA_BASE_URL=http://localhost:3042 points every command at a dev server, with a token from `local-token`
+BASE = ENV.fetch("ADMIN_DATA_BASE_URL", PRODUCTION).chomp("/")
+TOKEN_KEY = (BASE == PRODUCTION) ? "ADMIN_DATA_TOKEN" : "ADMIN_DATA_LOCAL_TOKEN"
 REPO_ROOT = File.expand_path("../../../..", __dir__)
 ENV_FILE = File.join(REPO_ROOT, ".env.development")
 
@@ -66,6 +70,8 @@ end
 
 # Exchange ADMIN_DATA_REFRESH for a new token pair and store it. Returns true on success.
 def refresh_token!
+  return warn_false("A local token doesn't refresh — run local-token for a new one") unless BASE == PRODUCTION
+
   client_id = env_get("ADMIN_DOORKEEPER_APP_CLIENT_ID")
   secret = env_get("ADMIN_DOORKEEPER_APP_CLIENT_SECRET")
   refresh = env_get("ADMIN_DATA_REFRESH")
@@ -100,9 +106,9 @@ end
 
 # Returns [status(Integer or nil), body] - a nil status is having no token to send
 def token_request(method, path, form: nil)
-  token = env_get("ADMIN_DATA_TOKEN")
+  token = env_get(TOKEN_KEY)
   if token.to_s.empty?
-    warn "ADMIN_DATA_TOKEN missing from #{ENV_FILE} — run the authorize flow (see SKILL.md)"
+    warn "#{TOKEN_KEY} missing from #{ENV_FILE} — run the authorize flow, or local-token for a dev server (see SKILL.md)"
     return [nil, nil]
   end
   res = request(method, "#{BASE}#{path}", headers: {"Authorization" => "Bearer #{token}"}, form:)
@@ -243,10 +249,25 @@ when "set-tokens" # set-tokens <access_token> <refresh_token> — for the browse
 when "refresh" # refresh the token pair now (needs ADMIN_DOORKEEPER_APP_CLIENT_SECRET)
   exit(refresh_token! ? 0 : 1)
 
+when "local-token" # local-token [email] — with ADMIN_DATA_BASE_URL set, mint a token in this checkout's dev database
+  abort("local-token is for a dev server — set ADMIN_DATA_BASE_URL") if BASE == PRODUCTION
+  # TokenAuthenticatable only accepts its own app id, which a seeded database doesn't have
+  mint = <<~RUBY
+    user = User.find_by!(email: ARGV.first)
+    app_id = API::TokenAuthenticatable::ADMIN_DOORKEEPER_APP_ID
+    Doorkeeper::Application.find_by(id: app_id) ||
+      Doorkeeper::Application.create!(id: app_id, name: "Admin data (local)", owner: user, redirect_uri: "urn:ietf:wg:oauth:2.0:oob")
+    puts Doorkeeper::AccessToken.create!(application_id: app_id, resource_owner_id: user.id).token
+  RUBY
+  output, status = Open3.capture2("bin/rails", "runner", mint, ARGV.fetch(1, "admin@bikeindex.org"), chdir: REPO_ROOT)
+  abort("minting failed — admin@bikeindex.org is the seeded superuser; pass another email otherwise\n#{output}") unless status.success?
+  env_set(TOKEN_KEY, output.lines.last.strip)
+  puts "Updated #{TOKEN_KEY} in #{ENV_FILE}"
+
 else
   warn "usage: admin_data.rb {check | get <#{PATHS.keys.join("|")}> [param=value …] | " \
     "show-bug-report <id> | update-bug-report <id> [param=value …] | create-manufacturer name=… | " \
     "update-manufacturer <slug> [param=value …] | " \
-    "authorize-url | set-tokens <access> <refresh> | refresh}"
+    "authorize-url | set-tokens <access> <refresh> | refresh | local-token [email]}"
   exit 64
 end
