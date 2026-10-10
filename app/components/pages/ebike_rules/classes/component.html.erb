@@ -1,0 +1,108 @@
+<%= helpers.turbo_frame_tag(FRAME_ID, class: ["tw:block", @additional_classes]) do %>
+  <section
+    class="
+      tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
+      tw:dark:bg-gray-900
+    "
+  >
+    <div class="tw:py-[clamp(40px,7vw,64px)] <%= Pages::EbikeRules::Show::Component::SECTION_CLASSES %>">
+      <h2 class="<%= Pages::EbikeRules::Show::Component::HEADING_CLASSES %>">
+        <% if state_classes %>
+          <%= translation(".state_classes_heading", state: @state[:name]) %>
+        <% else %>
+          <%= translation(".classes_heading") %>
+        <% end %>
+      </h2>
+
+      <p
+        class="
+          tw:mt-2 tw:mb-7 tw:max-w-[640px] tw:text-[17px] tw:text-gray-700
+          tw:dark:text-gray-300
+        "
+      >
+        <% if state_classes %>
+          <%= translation(".state_classes_intro", state: @state[:name]) %>
+        <% else %>
+          <%= translation(".classes_intro") %>
+        <% end %>
+      </p>
+
+      <div
+        class="
+          tw:grid
+          tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
+          tw:gap-4
+        "
+      >
+        <% cards.each do |card| %>
+          <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) do %>
+            <div class="tw:flex tw:items-center tw:gap-3.5">
+              <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: card[:n])) unless card[:state] %>
+
+              <div>
+                <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
+                  <%= card[:title] %>
+                </h3>
+
+                <% if card[:tag] %>
+                  <p class="tw:text-[15px] tw:text-gray-700 tw:dark:text-gray-300">
+                    <%= card[:tag] %>
+                  </p>
+                <% end %>
+              </div>
+            </div>
+
+            <% rows = [[translation(".assist"), card[:assist]], [translation(".top_assist"), card[:speed]], [translation(".motor"), card[:motor]]].select(&:last) %>
+
+            <% if rows.any? %>
+              <%# An either card's columns are as wide as their values, which leaves room for each "or" %>
+              <div class="tw:border-y tw:border-gray-200 tw:py-3 tw:dark:border-gray-700 <%= "tw:[&>dl]:flex tw:[&>dl]:gap-x-8 tw:[&>dl>div]:relative" if card[:either] %>">
+                <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+                  <% rows.each_with_index do |(label, value), index| %>
+                    <%= render(UI::DefinitionList::Row::Component.new(label:, value: row_value(value, or_after: card[:either] && index < rows.size - 1))) %>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+
+            <p
+              class="
+                tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+                tw:dark:text-gray-300
+              "
+            >
+              <%= card[:body] %>
+            </p>
+
+            <% if card[:rules] %>
+              <div
+                class="
+                  tw:text-[15px] tw:leading-relaxed tw:text-gray-700
+                  tw:dark:text-gray-300
+                "
+                data-controller="ui--collapse"
+              >
+                <%= render(UI::Collapse::Component.new(text: translation(".state_specifics", state: @state[:name]), chevron: :trailing, color: :link)) %>
+
+                <ul
+                  class="
+                    tw:mt-2 tw:hidden tw:list-disc tw:space-y-1 tw:pl-5
+                    tw:text-sm
+                  "
+                  data-ui--collapse-target="content"
+                >
+                  <% card[:rules].each do |restriction| %>
+                    <li>
+                      <%= restriction[:rule] %>
+                      <%= render(Pages::EbikeRules::RuleCitation::Component.new(restriction:)) %>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>

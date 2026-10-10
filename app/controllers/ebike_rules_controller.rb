@@ -14,6 +14,9 @@ class EbikeRulesController < ApplicationController
     abbr = params[:abbr]
     state = abbr && (EbikeRuleServices::StateLaws.state(abbr) || raise(ActionController::RoutingError, "Not Found"))
     return redirect_to(state_path(state, request.query_parameters), status: :moved_permanently) if abbr && abbr != abbr.downcase
+    if turbo_frame_request_id == Pages::EbikeRules::Classes::Component::FRAME_ID
+      return render(Pages::EbikeRules::Classes::Component.new(state:))
+    end
 
     detected_state = EbikeRuleServices::StateLaws.state_from_location(request_location_hash)
     if state.nil?

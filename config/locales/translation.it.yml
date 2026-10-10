@@ -6928,7 +6928,6 @@ it:
           max: Massimo
           min: Min
           more_filters: Altri filtri
-          motorized: Motorizzato
           price: Prezzo
           search_placeholder: Cerca per produttore o modello…
           sort: Ordinare
@@ -6948,7 +6947,6 @@ it:
           configuration_examples: "(completo/frameset)"
           human_powered: Azionata dalla forza umana (acustica)
           manufacturers: Produttori
-          out_of_class: Fuori dalla classe
           out_of_class_details: Motorizzato, ma non appartenente alle classi 1, 2
             o 3 statunitensi, come ciclomotori, motociclette o moto elettriche fuoristrada.
           propulsion: Propulsione
@@ -6957,6 +6955,11 @@ it:
           us_class_2: Classe 2 degli Stati Uniti
           us_class_3: Classe 3 degli Stati Uniti
           vehicle_types: Tipi di veicoli
+          e_bike_classification: classificazione delle e-bike
+          e_vehicle_motorized: Veicolo elettrico (motorizzato)
+          jurisdiction: Giurisdizione
+          out_of_class_label: Fuori dalla classe
+          united_states: Stati Uniti
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
@@ -7100,7 +7103,6 @@ it:
         show:
           answer_no: 'No'
           answer_yes: Sì
-          assist: Assistenza
           banned_body: A New York, le e-bike e le batterie vendute sul suo territorio
             devono essere conformi agli standard UL 2849 o UL 2271 (Legge locale 39
             del 2023). Università, enti gestori di alloggi e aziende di trasporto
@@ -7120,32 +7122,11 @@ it:
           certification_involves_heading: Cosa comporta la certificazione
           change: modifica?
           check_my_bike: Controlla la mia bici
-          class_1_body: Il motore aiuta solo quando si pedala e si arresta a 32 km/h.
-            È consentito nella maggior parte dei luoghi in cui può circolare una normale
-            bicicletta.
-          class_1_tag: Solo pedalata assistita
-          class_2_body: L'acceleratore permette di muovere la bicicletta senza pedalare,
-            fino a una velocità di 20 miglia orarie (circa 32 km/h). Alcuni sentieri
-            e parchi non consentono l'uso dell'acceleratore.
-          class_2_tag: Acceleratore elettrico
-          class_3_body: Bicicletta a pedalata assistita fino a 45 km/h, con tachimetro.
-            Spesso è previsto l'obbligo del casco, un'età minima e limitazioni sui
-            percorsi.
-          class_3_tag: Pedalata assistita più veloce
-          class_n: Classe %{n}
-          classes_heading: Lezioni di e-bike, spiegate
-          classes_intro: Nella maggior parte degli stati si utilizza un sistema a
-            tre classi. La classe di appartenenza determina la velocità di assistenza
-            del motore, se è consentito l'uso dell'acceleratore e dove è possibile
-            circolare.
           compare_html: Vuoi confrontare più biciclette? %{link}
           detected_html: Abbiamo rilevato <strong>%{state}</strong> —
           disclaimer: Bike Index è un'organizzazione no-profit 501(c)(3). I riassunti
             delle leggi statali sono forniti a titolo di riferimento e non costituiscono
             consulenza legale.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          enter_manually: Non trovi la tua bici? Inserisci i suoi dati.
           for_parents: Per i genitori
           form_label: Verifica della conformità delle e-bike
           has_throttle: Ha l'acceleratore?
@@ -7156,12 +7137,8 @@ it:
           how_to_check_heading: Come controllare una bicicletta
           location_not_shared: La posizione non viene condivisa. Seleziona il tuo
             stato dall'elenco.
-          manual_legend: Inserisci i dettagli della tua bicicletta
-          motor: Motore
-          motor_cap: "≤750W"
           motor_wattage: Potenza del motore (W)
           mph: "%{mph} mph"
-          not_an_ebike: Non è una bici elettrica
           parent_step_1_body: Molti stati stabiliscono un'età minima per la Classe
             3, e alcuni per ogni classe. Verifica le normative del tuo stato prima
             di scegliere una bicicletta.
@@ -7195,8 +7172,6 @@ it:
           parents_heading: State pensando di acquistare una e-bike per vostro figlio?
           parents_link: Consulta le normative del tuo stato in materia di età e utilizzo
             del casco.
-          pedal: Pedale
-          pill: Bike Index · Organizzazione no-profit · Oltre 10 anni di esperienza
           recoveries_html: "%{number} recuperi"
           register_band_heading: Le biciclette registrate vengono ritrovate con una
             frequenza doppia in caso di furto. La registrazione è gratuita.
@@ -7206,8 +7181,6 @@ it:
           state_error: Scegli uno stato.
           subheading: Inserisci il tuo stato e la tua bicicletta per visualizzare
             le normative del tuo stato.
-          throttle: Acceleratore elettrico
-          top_assist: Assistenza superiore
           ul_2271_body: Esegue un test sulla singola batteria agli ioni di litio.
             Comune su biciclette e batterie di ricambio; non include il caricabatterie
             o il motore.
@@ -7233,17 +7206,15 @@ it:
           bikebook_didnt_load: BikeBook non si è caricato. Inserisci i dettagli della
             tua bici qui sotto.
           bikebook_loading: Caricamento di BikeBook in corso…
-          choose_by_bike_model: Scegli in base al modello di bicicletta
-          emoto_limits_body: Una velocità massima superiore a 45 km/h, una velocità
-            di accelerazione superiore a 32 km/h o un motore di potenza superiore
-            a 750 W definiscono un veicolo elettrico come una moto. Nella maggior
-            parte degli stati, questi veicoli sono equiparati a ciclomotori o motociclette,
-            il che può comportare l'obbligo di immatricolazione, assicurazione e patente.
           how_to_check_lookup: Guarda il modello qui sopra. BikeBook mostra la certificazione
             laddove è registrata.
           over_28_mph: Oltre 28 miglia orarie
           top_speed: Qual è la sua velocità massima?
           visit_bikebook_link: Visita BikeBook.
+          bike_index_nonprofit: Indice delle biciclette · Organizzazione no-profit
+          custom_details: Dettagli personalizzati
+          details_legend: Dettagli della tua bici
+          model_details: "%{model} dettagli"
         state_reference:
           compiling: Stiamo raccogliendo le normative sulle e-bike di %{state} provenienti
             dalla legislatura statale e dal DMV. Tornate a trovarci presto.
@@ -7275,6 +7246,54 @@ it:
           meaning_2849_system_certified: L'intero sistema elettrico (motore, batteria,
             caricabatterie e centralina) ha superato congiuntamente i test di sicurezza
             antincendio e di sicurezza elettrica.
+        classes:
+          assist: Assistenza
+          class_1_body: Il motore aiuta solo quando si pedala e si arresta a 32 km/h.
+            È consentito nella maggior parte dei luoghi in cui può circolare una normale
+            bicicletta.
+          class_1_tag: Solo pedalata assistita
+          class_2_body: L'acceleratore permette di muovere la bicicletta senza pedalare,
+            fino a una velocità di 20 miglia orarie (circa 32 km/h). Alcuni sentieri
+            e parchi non consentono l'uso dell'acceleratore.
+          class_2_tag: Acceleratore elettrico
+          class_3_body: Bicicletta a pedalata assistita fino a 45 km/h, con tachimetro.
+            Spesso è previsto l'obbligo del casco, un'età minima e limitazioni sui
+            percorsi.
+          class_3_summary: Pedalata assistita fino a 45 km/h, con tachimetro.
+          class_3_tag: Pedalata assistita più veloce
+          class_n: Classe %{n}
+          classes_heading: Lezioni di e-bike, spiegate
+          classes_intro: Nella maggior parte degli stati si utilizza un sistema a
+            tre classi. La classe di appartenenza determina la velocità di assistenza
+            del motore, se è consentito l'uso dell'acceleratore e dove è possibile
+            circolare.
+          emoto_limits_body: Una velocità massima superiore a 45 km/h, una velocità
+            di accelerazione superiore a 32 km/h o un motore di potenza superiore
+            a 750 W definiscono un veicolo elettrico come una moto. Nella maggior
+            parte degli stati, questi veicoli sono equiparati a ciclomotori o motociclette,
+            il che può comportare l'obbligo di immatricolazione, assicurazione e patente.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Una velocità massima superiore a 45 km/h, una velocità di
+            accelerazione superiore a 32 km/h o un motore con potenza superiore a
+            750 W la rendono una moto elettrica.
+          motor: Motore
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          not_an_ebike: Non è una bici elettrica
+          or: O
+          pedal: Pedale
+          state_classes_heading: "%{state} corsi di e-bike"
+          state_classes_intro: "%{state} non utilizza il sistema a tre classi impiegato
+            dalla maggior parte degli stati. La sua legge suddivide invece le e-bike
+            e gli altri veicoli elettrici a due ruote in queste classi."
+          state_specifics: "%{state} dettagli"
+          throttle: Acceleratore elettrico
+          top_assist: Assistenza superiore
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
+        rule_citation:
+          source: fonte
     shared_blocks:
       footer:
         about: Di

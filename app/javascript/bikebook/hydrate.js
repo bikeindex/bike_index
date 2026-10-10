@@ -14,7 +14,7 @@ import { VehicleViewer } from 'bikebook/vehicle_viewer'
 const LISTS = ['primary_activity', 'manufacturer', 'vehicle_type']
 const SINGLES = ['suspension', 'model_configuration']
 const RANGES = ['year_min', 'year_max', 'price_min', 'price_max']
-const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'year_dir', 'price_dir']
+const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'jurisdiction', 'year_dir', 'price_dir']
 // rather than the kit's max_compare, which the catalog publishes as 3
 const MAX_COMPARE = 5
 
@@ -56,13 +56,15 @@ export async function hydrate (catalog, source, shell, url) {
     if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display
   }
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
-  for (const value of filters.electric.split(',')) root.querySelector(`input[name="electric"][value="${CSS.escape(value)}"]`)?.setAttribute('checked', '')
+  root.getElementById('filter-jurisdiction').querySelector(`option[value="${CSS.escape(filters.jurisdiction)}"]`)?.setAttribute('selected', '')
+  // out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
+  for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 
   const viewer = new VehicleViewer(kit, catalog.vocabulary)
   const classificationPath = viewer.classificationPath(url, vehicles.map(({ value }) => value))
-  for (const input of root.querySelectorAll('input[name="electric"][value^="class_"]')) {
-    const id = `evc/us/${input.value}`
-    const classification = catalog.vocabulary.e_vehicle_classifications?.[id]
+  for (const input of root.querySelectorAll('input[name="electric"]')) {
+    const id = input.value.replace(/^class_/, 'evc/us/class_')
+    const classification = catalog.vocabulary.e_vehicle_classifications[id]
     if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id, classificationPath) })))
   }
 

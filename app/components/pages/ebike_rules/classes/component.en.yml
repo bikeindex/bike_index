@@ -1,0 +1,49 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        classes:
+          assist: Assist
+          class_1_body: >-
+            The motor helps only while you pedal and stops at 20 mph. Allowed in most
+            places a regular bike can go.
+          class_1_tag: Pedal-assist only
+          class_2_body: >-
+            A throttle can move the bike without pedaling, up to 20 mph. Some trails
+            and parks don't allow throttles.
+          class_2_tag: Throttle
+          class_3_body: >-
+            Pedal-assist to 28 mph, with a speedometer. Often comes with a helmet
+            rule, a minimum age, and limits on paths.
+          class_3_summary: Pedal-assist to 28 mph, with a speedometer.
+          class_3_tag: Faster pedal-assist
+          class_n: Class %{n}
+          classes_heading: E-bike classes, explained
+          classes_intro: >-
+            Most states use a three-class system. Your class decides how fast the
+            motor helps, whether a throttle is allowed, and where you can ride.
+          emoto_limits_body: >-
+            Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
+            make it an e-moto. Most states treat these as mopeds or motorcycles, which
+            can require registration, insurance and a license.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: >-
+            Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
+            make it an e-moto.
+          motor: Motor
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          not_an_ebike: Not an e-bike
+          or: or
+          pedal: Pedal
+          state_classes_heading: "%{state} e-bike classes"
+          state_classes_intro: >-
+            %{state} doesn’t use the three-class system most states do. Its law sorts
+            e-bikes and other electric two-wheelers into these classes instead.
+          state_specifics: "%{state} specifics"
+          throttle: Throttle
+          top_assist: Top assist
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"

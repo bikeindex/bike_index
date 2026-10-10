@@ -5,7 +5,8 @@ import { fragmentOf } from 'bikebook/render'
 
 /* global IntersectionObserver, Worker */
 
-export async function loadCatalog (manifestUrl, ids = []) {
+// `jurisdictions` names the codes classifications are in, which the catalog doesn't
+export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
   const worker = new Worker(import.meta.resolve('bikebook/catalog_worker'), { type: 'module' })
   const pending = new Map()
   let nextId = 0
@@ -24,7 +25,7 @@ export async function loadCatalog (manifestUrl, ids = []) {
   })
 
   try {
-    const { vocabulary, kit, options, modelsCount } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids })
+    const { vocabulary, kit, options, modelsCount } = await call('load', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions })
     return {
       vocabulary,
       kit,

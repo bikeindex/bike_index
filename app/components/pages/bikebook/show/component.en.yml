@@ -16,18 +16,20 @@ en:
           byline: A free reference from Bike Index, the non-profit bike registry.
           configuration: Configuration
           configuration_examples: "(complete/frameset)"
+          e_bike_classification: e-bike classification
+          e_vehicle_motorized: e-Vehicle (motorized)
           failed: The catalog didn't load. Reload the page to try again.
           human_powered: Human powered (Acoustic)
+          jurisdiction: Jurisdiction
           loading: Loading the catalog…
           manufacturers: Manufacturers
           max: Max
           min: Min
           more_filters: More filters
-          motorized: Motorized
-          out_of_class: Out of class
           out_of_class_details: >-
             Motorized, but none of US Classes 1, 2 or 3, like a moped, motorcycle
             or off-highway e-moto.
+          out_of_class_label: Out of Class
           price: Price
           propulsion: Propulsion
           search_placeholder: Search by manufacturer or model…
@@ -39,6 +41,7 @@ en:
           tagline_html: >-
             The world’s bicycle library — search, compare, and find your next ride
             across %{models_count}+ models.
+          united_states: United States
           us_class_1: US Class 1
           us_class_2: US Class 2
           us_class_3: US Class 3

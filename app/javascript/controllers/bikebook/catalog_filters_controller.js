@@ -6,7 +6,7 @@ import { replaceUrl } from 'bikebook/replace_url'
 // Threads the filter panel's values into the vehicle combobox's async src and mirrors them
 // into the page URL, which the page renders the controls from (ui--collapse owns ?filters)
 export default class extends Controller {
-  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field']
+  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'jurisdiction']
   static values = {
     yearDir: { type: String, default: 'desc' },
     priceDir: { type: String, default: 'desc' }
@@ -17,6 +17,7 @@ export default class extends Controller {
   connect () {
     this.yearArrowTarget.textContent = this.#arrow(this.yearDirValue)
     this.priceArrowTarget.textContent = this.#arrow(this.priceDirValue)
+    this.showJurisdiction()
     this.#refreshSummary()
     if (!this.element.closest('[inert]')) this.#writeUrl()
   }
@@ -32,6 +33,18 @@ export default class extends Controller {
     this.#syncCombobox()
     this.#refreshSummary()
     this.#writeUrl()
+  }
+
+  // A state without its own classes uses the US ones. Runs before its fieldset's apply, which a change
+  // bubbles on to, and a hidden class doesn't stay checked
+  showJurisdiction () {
+    const groups = [...this.jurisdictionTarget.closest('fieldset').querySelectorAll('[data-jurisdiction]')]
+    const shown = groups.find(({ dataset }) => dataset.jurisdiction === this.jurisdictionTarget.value) ?? groups[0]
+    for (const group of groups) {
+      const hidden = group !== shown
+      group.classList.toggle('tw:hidden', hidden)
+      if (hidden) for (const input of group.querySelectorAll('input')) input.checked = false
+    }
   }
 
   // A multiselect fires hw-combobox:selection before it writes the hidden field,
@@ -57,6 +70,7 @@ export default class extends Controller {
   #applyParams (url) {
     const params = {
       ...this.#filters,
+      jurisdiction: this.jurisdictionTarget.value,
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
       price_dir: this.priceDirValue === 'asc' ? 'asc' : ''
     }
@@ -85,7 +99,11 @@ export default class extends Controller {
         .map((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? value)
         .join(', ')
     }
-    if (inputs[0].type === 'checkbox') return inputs.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
+    if (inputs[0].type === 'checkbox') {
+      const checked = inputs.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
+      const jurisdiction = field.querySelector('select')?.selectedOptions[0]
+      return checked && jurisdiction?.value ? `${checked} (${jurisdiction.text})` : checked
+    }
     const [min, max] = inputs.map(({ value }) => value && `${field.dataset.filterPrefix}${value}`)
     if (min && max) return `${min}–${max}`
     return min ? `from ${min}` : max && `up to ${max}`

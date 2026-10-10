@@ -6816,7 +6816,6 @@ nl:
           max: Max
           min: Min
           more_filters: Meer filters
-          motorized: Gemotoriseerd
           price: Prijs
           search_placeholder: Zoeken op fabrikant of model…
           sort: Soort
@@ -6835,7 +6834,6 @@ nl:
           configuration_examples: "(compleet/framework)"
           human_powered: Aangedreven door menskracht (akoestisch)
           manufacturers: Fabrikanten
-          out_of_class: Buiten de les
           out_of_class_details: Gemotoriseerd, maar niet van de Amerikaanse categorieën
             1, 2 of 3, zoals een bromfiets, motorfiets of elektrische terreinmotor.
           propulsion: Voortstuwing
@@ -6844,6 +6842,11 @@ nl:
           us_class_2: Amerikaanse klasse 2
           us_class_3: Amerikaanse klasse 3
           vehicle_types: Voertuigtypen
+          e_bike_classification: classificatie van e-bikes
+          e_vehicle_motorized: e-voertuig (gemotoriseerd)
+          jurisdiction: Rechtsgebied
+          out_of_class_label: Buiten de les
+          united_states: Verenigde Staten
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
@@ -6989,7 +6992,6 @@ nl:
         show:
           answer_no: Nee
           answer_yes: Ja
-          assist: Helpen
           banned_body: In New York City moeten e-bikes en accu's die daar verkocht
             worden voldoen aan UL 2849 of UL 2271 (Local Law 39 van 2023). Universiteiten,
             woningbouworganisaties en openbaarvervoersbedrijven nemen vergelijkbare
@@ -7007,30 +7009,11 @@ nl:
           certification_involves_heading: Wat certificering inhoudt
           change: wijziging?
           check_my_bike: Kijk eens naar mijn fiets
-          class_1_body: De motor ondersteunt alleen tijdens het trappen en stopt bij
-            32 km/u. Toegestaan op de meeste plaatsen waar een gewone fiets ook mag
-            komen.
-          class_1_tag: Alleen met trapondersteuning
-          class_2_body: Met een gashendel kan de fiets zonder te trappen tot wel 32
-            km/u (20 mph) worden aangedreven. Op sommige paden en in parken zijn gashendels
-            niet toegestaan.
-          class_2_tag: Elektrisch gaspedaal
-          class_3_body: Trapondersteuning tot 45 km/u, met snelheidsmeter. Vaak gelden
-            er helmplicht, een minimumleeftijd en beperkingen voor de routes.
-          class_3_tag: Snellere trapondersteuning
-          class_n: Klasse %{n}
-          classes_heading: E-bike lessen, uitgelegd
-          classes_intro: De meeste staten hanteren een systeem met drie klassen. Je
-            klasse bepaalt hoe snel de motor ondersteuning biedt, of je een gashendel
-            mag gebruiken en waar je mag rijden.
           compare_html: Wil je meerdere fietsen vergelijken? %{link}
           detected_html: We hebben <strong>%{state}</strong> gedetecteerd —
           disclaimer: Bike Index is een 501(c)(3) non-profitorganisatie. Samenvattingen
             van de wetgeving van de betreffende staat dienen ter referentie en zijn
             geen juridisch advies.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          enter_manually: Kun je je fiets niet vinden? Voer de gegevens in.
           for_parents: Voor ouders
           form_label: Informatie opzoeken over de naleving van de regelgeving voor
             e-bikes
@@ -7042,12 +7025,8 @@ nl:
           how_to_check_heading: Hoe controleer je een fiets?
           location_not_shared: Locatie niet gedeeld. Kies uw provincie/staat uit de
             lijst.
-          manual_legend: Voer de gegevens van uw fiets in.
-          motor: Motor
-          motor_cap: "≤750W"
           motor_wattage: Motorvermogen (W)
           mph: "%{mph} mph"
-          not_an_ebike: Geen e-bike
           parent_step_1_body: Veel staten hanteren een minimumleeftijd voor klasse
             3, en sommige voor elke klasse. Controleer de regels in uw staat voordat
             u een fiets kiest.
@@ -7077,8 +7056,6 @@ nl:
             kind er veilig op kan rijden.
           parents_heading: Een e-bike kopen voor je kind?
           parents_link: Raadpleeg de leeftijds- en helmregels van jouw staat.
-          pedal: Voetpedaal
-          pill: Bike Index · Non-profitorganisatie · Meer dan 10 jaar ervaring
           recoveries_html: "%{number} herstel"
           register_band_heading: Geregistreerde fietsen worden twee keer zo vaak teruggevonden
             als ze gestolen worden. Registratie is gratis.
@@ -7088,8 +7065,6 @@ nl:
           state_error: Kies een staat.
           subheading: Voer je staat en fietstype in om de regels van jouw staat te
             bekijken.
-          throttle: Elektrisch gaspedaal
-          top_assist: Top assistentie
           ul_2271_body: Test het lithium-ion-accupakket afzonderlijk. Komt vaak voor
             bij fietsen en vervangende accu's; het testpakket dekt niet de lader of
             de motor.
@@ -7113,17 +7088,15 @@ nl:
           bikebook_didnt_load: BikeBook kon niet worden geladen. Voer hieronder de
             gegevens van uw fiets in.
           bikebook_loading: BikeBook wordt geladen…
-          choose_by_bike_model: Selecteer op fietsmodel
-          emoto_limits_body: Een e-moto wordt beschouwd als een voertuig met een topsnelheid
-            van meer dan 45 km/u, een maximale snelheid van meer dan 32 km/u of een
-            motorvermogen van meer dan 750 watt. In de meeste staten worden deze voertuigen
-            behandeld als bromfietsen of motorfietsen, waarvoor registratie, verzekering
-            en een rijbewijs vereist kunnen zijn.
           how_to_check_lookup: Zoek het model hierboven op. BikeBook toont de certificering
             waar deze geregistreerd staat.
           over_28_mph: Meer dan 45 km/u
           top_speed: Wat is de topsnelheid?
           visit_bikebook_link: Bezoek BikeBook.
+          bike_index_nonprofit: Fietsindex · Non-profit
+          custom_details: Aangepaste details
+          details_legend: De gegevens van uw fiets
+          model_details: "%{model} details"
         state_reference:
           compiling: We verzamelen momenteel de regels voor e-bikes van %{state} op
             basis van gegevens van de staatslegislatuur en de RDW. Kom binnenkort
@@ -7157,6 +7130,52 @@ nl:
           meaning_2849_system_certified: Het complete elektrische systeem (motor,
             accu, lader en controller) heeft gezamenlijk de brandveiligheids- en elektrische
             veiligheidstests doorstaan.
+        classes:
+          assist: Helpen
+          class_1_body: De motor ondersteunt alleen tijdens het trappen en stopt bij
+            32 km/u. Toegestaan op de meeste plaatsen waar een gewone fiets ook mag
+            komen.
+          class_1_tag: Alleen met trapondersteuning
+          class_2_body: Met een gashendel kan de fiets zonder te trappen tot wel 32
+            km/u (20 mph) worden aangedreven. Op sommige paden en in parken zijn gashendels
+            niet toegestaan.
+          class_2_tag: Elektrisch gaspedaal
+          class_3_body: Trapondersteuning tot 45 km/u, met snelheidsmeter. Vaak gelden
+            er helmplicht, een minimumleeftijd en beperkingen voor de routes.
+          class_3_summary: Trapondersteuning tot 45 km/u, met snelheidsmeter.
+          class_3_tag: Snellere trapondersteuning
+          class_n: Klasse %{n}
+          classes_heading: E-bike lessen, uitgelegd
+          classes_intro: De meeste staten hanteren een systeem met drie klassen. Je
+            klasse bepaalt hoe snel de motor ondersteuning biedt, of je een gashendel
+            mag gebruiken en waar je mag rijden.
+          emoto_limits_body: Een e-moto wordt beschouwd als een voertuig met een topsnelheid
+            van meer dan 45 km/u, een maximale snelheid van meer dan 32 km/u of een
+            motorvermogen van meer dan 750 watt. In de meeste staten worden deze voertuigen
+            behandeld als bromfietsen of motorfietsen, waarvoor registratie, verzekering
+            en een rijbewijs vereist kunnen zijn.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Een topsnelheid van meer dan 45 km/u, een maximale snelheid
+            van meer dan 32 km/u of een motorvermogen van meer dan 750 watt maken
+            het een e-moto.
+          motor: Motor
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          not_an_ebike: Geen e-bike
+          or: of
+          pedal: Voetpedaal
+          state_classes_heading: "%{state} e-bike lessen"
+          state_classes_intro: "%{state} gebruikt niet het drieklassensysteem dat
+            de meeste staten hanteren. De wetgeving van deze staat deelt e-bikes en
+            andere elektrische tweewielers in plaats daarvan in deze klassen in."
+          state_specifics: "%{state} specificaties"
+          throttle: Elektrisch gaspedaal
+          top_assist: Top assistentie
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
+        rule_citation:
+          source: bron
     shared_blocks:
       footer:
         about: Over
