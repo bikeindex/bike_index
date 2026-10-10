@@ -6623,7 +6623,6 @@ nb:
           max: Maks
           min: Min.
           more_filters: Flere filtre
-          motorized: Motorisert
           price: Pris
           search_placeholder: Søk etter produsent eller modell…
           sort: Sortere
@@ -6641,7 +6640,6 @@ nb:
           configuration_examples: "(komplett/rammesett)"
           human_powered: Menneskedrevet (akustisk)
           manufacturers: Produsenter
-          out_of_class: Ute av klasserommet
           out_of_class_details: Motorisert, men ingen av amerikanske klasse 1, 2 eller
             3, som moped, motorsykkel eller elmotorsykkel for terrengkjøring.
           propulsion: Fremdrift
@@ -6650,6 +6648,11 @@ nb:
           us_class_2: Amerikansk klasse 2
           us_class_3: Amerikansk klasse 3
           vehicle_types: Kjøretøytyper
+          e_bike_classification: elsykkelklassifisering
+          e_vehicle_motorized: Elkjøretøy (motorisert)
+          jurisdiction: Jurisdiksjon
+          out_of_class_label: Utenfor klasserommet
+          united_states: USA
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
@@ -6789,7 +6792,6 @@ nb:
         show:
           answer_no: Nei
           answer_yes: Ja
-          assist: Assistere
           banned_body: New York City krever at elsykler og batterier som selges der
             oppfyller UL 2849 eller UL 2271 (lokal lov 39 av 2023). Universiteter,
             boligleverandører og transportbyråer innfører lignende regler for innendørs
@@ -6807,26 +6809,10 @@ nb:
           certification_involves_heading: Hva sertifisering innebærer
           change: endre?
           check_my_bike: Sjekk sykkelen min
-          class_1_body: Motoren hjelper bare mens du tråkker og stopper ved 32 km/t.
-            Tillatt de fleste steder kan en vanlig sykkel kjøre.
-          class_1_tag: Kun pedalassistanse
-          class_2_body: En gasspedal kan bevege sykkelen uten å tråkke, opptil 32
-            km/t. Enkelte stier og parker tillater ikke gasspedaler.
-          class_2_tag: Gasspedal
-          class_3_body: Pedalassistanse opp til 45 km/t, med speedometer. Følger ofte
-            med hjelmregel, minimumsalder og begrensninger på stier.
-          class_3_tag: Raskere pedalassistanse
-          class_n: Klasse %{n}
-          classes_heading: Elsykkelkurs, forklart
-          classes_intro: De fleste stater bruker et treklassesystem. Klassen din bestemmer
-            hvor fort motoren hjelper, om det er tillatt med gass og hvor du kan kjøre.
           compare_html: Vil du sammenligne flere sykler? %{link}
           detected_html: Vi oppdaget <strong>%{state}</strong> —
           disclaimer: Bike Index er en ideell organisasjon med 501(c)(3)-lovgivning.
             Sammendrag av statlige lover er kun for referanse, ikke juridisk rådgivning.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          enter_manually: Finner du ikke sykkelen din? Skriv inn detaljene.
           for_parents: For foreldre
           form_label: Oppslag av samsvar med elsykkelregler
           has_throttle: Har en gasspedal?
@@ -6835,12 +6821,8 @@ nb:
           how_to_check_2: Søk etter nummeret i UL Product iQ.
           how_to_check_heading: Slik sjekker du en sykkel
           location_not_shared: Stedet er ikke delt. Velg staten din fra listen.
-          manual_legend: Skriv inn sykkelens detaljer
-          motor: Motor
-          motor_cap: "≤750W"
           motor_wattage: Motoreffekt (W)
           mph: "%{mph} mph"
-          not_an_ebike: Ikke en elsykkel
           parent_step_1_body: Mange stater setter en minimumsalder for klasse 3, og
             noen for hver klasse. Sjekk staten din før du velger en sykkel.
           parent_step_1_title: Sjekk aldersreglene
@@ -6867,8 +6849,6 @@ nb:
             for at barnet ditt er klart til å sykle på en trygt.
           parents_heading: Skal du kjøpe en elsykkel til barnet ditt?
           parents_link: Slå opp alders- og hjelmreglene i din stat
-          pedal: Fotpedal
-          pill: Sykkelindeks · Non-profit organisasjon · 10+ år
           recoveries_html: "%{number} gjenvinninger"
           register_band_heading: Registrerte sykler blir funnet dobbelt så ofte når
             de blir stjålet. Registreringen er gratis.
@@ -6877,8 +6857,6 @@ nb:
           state: Stat
           state_error: Velg en stat.
           subheading: Skriv inn staten din og sykle for å se statens regler.
-          throttle: Gasspedal
-          top_assist: Topp assist
           ul_2271_body: Tester litiumionbatteripakken alene. Vanlig på sykler og erstatningsbatterier;
             dekker ikke laderen eller motoren.
           ul_2271_scope: Batteripakken
@@ -6901,16 +6879,15 @@ nb:
           bikebook_didnt_load: BikeBook lastet ikke inn. Skriv inn sykkeldetaljene
             dine nedenfor.
           bikebook_loading: Laster inn BikeBook…
-          choose_by_bike_model: Velg etter sykkelmodell
-          emoto_limits_body: Toppfart over 45 km/t, gasshastighet over 32 km/t eller
-            motorer over 750 W gjør den til en elmotorsykkel. De fleste stater behandler
-            disse som mopeder eller motorsykler, som kan kreve registrering, forsikring
-            og førerkort.
           how_to_check_lookup: Se modellen ovenfor. BikeBook viser sertifisering der
             den er registrert.
           over_28_mph: Over 45 km/t
           top_speed: Hva er toppfarten?
           visit_bikebook_link: Besøk BikeBook.
+          bike_index_nonprofit: Sykkelindeks · Ideell organisasjon
+          custom_details: Tilpassede detaljer
+          details_legend: Detaljer om sykkelen din
+          model_details: "%{model} detaljer"
         state_reference:
           compiling: Vi samler %{state}s elsykkelregler fra delstatsforsamlingen og
             DMV. Sjekk tilbake snart.
@@ -6941,6 +6918,47 @@ nb:
           meaning_2849_check_label: Se etter UL-merket på rammeetiketten.
           meaning_2849_system_certified: Hele det elektriske systemet (motor, batteri,
             lader og kontroller) bestod brann- og elsikkerhetstester sammen.
+        classes:
+          assist: Assistere
+          class_1_body: Motoren hjelper bare mens du tråkker og stopper ved 32 km/t.
+            Tillatt de fleste steder kan en vanlig sykkel kjøre.
+          class_1_tag: Kun pedalassistanse
+          class_2_body: En gasspedal kan bevege sykkelen uten å tråkke, opptil 32
+            km/t. Enkelte stier og parker tillater ikke gasspedaler.
+          class_2_tag: Gasspedal
+          class_3_body: Pedalassistanse opp til 45 km/t, med speedometer. Følger ofte
+            med hjelmregel, minimumsalder og begrensninger på stier.
+          class_3_summary: Pedalassistanse til 45 km/t, med speedometer.
+          class_3_tag: Raskere pedalassistanse
+          class_n: Klasse %{n}
+          classes_heading: Elsykkelkurs, forklart
+          classes_intro: De fleste stater bruker et treklassesystem. Klassen din bestemmer
+            hvor fort motoren hjelper, om det er tillatt med gass og hvor du kan kjøre.
+          emoto_limits_body: Toppfart over 45 km/t, gasshastighet over 32 km/t eller
+            motorer over 750 W gjør den til en elmotorsykkel. De fleste stater behandler
+            disse som mopeder eller motorsykler, som kan kreve registrering, forsikring
+            og førerkort.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Toppfart over 45 km/t, gasshastighet over 32 km/t eller motorer
+            over 750 W gjør den til en elmotorsykkel.
+          motor: Motor
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          not_an_ebike: Ikke en elsykkel
+          or: eller
+          pedal: Fotpedal
+          state_classes_heading: "%{state} elsykkelkurs"
+          state_classes_intro: "%{state} bruker ikke treklassesystemet som de fleste
+            stater har. Loven deres sorterer elsykler og andre elektriske tohjulinger
+            i disse klassene i stedet."
+          state_specifics: "%{state} spesifikasjoner"
+          throttle: Gasspedal
+          top_assist: Topp assist
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
+        rule_citation:
+          source: kilde
     shared_blocks:
       footer:
         about: Om
