@@ -18,9 +18,11 @@ require "dotenv"
 require "open3"
 
 PRODUCTION = "https://bikeindex.org"
-# ADMIN_DATA_BASE_URL=http://localhost:3042 points every command at a dev server, with a token from `local-token`
 BASE = ENV.fetch("ADMIN_DATA_BASE_URL", PRODUCTION).chomp("/")
-TOKEN_KEY = (BASE == PRODUCTION) ? "ADMIN_DATA_TOKEN" : "ADMIN_DATA_LOCAL_TOKEN"
+LOCAL = BASE != PRODUCTION
+TOKEN_KEY = LOCAL ? "ADMIN_DATA_LOCAL_TOKEN" : "ADMIN_DATA_TOKEN"
+# These write or mint ADMIN_DATA_TOKEN/ADMIN_DATA_REFRESH, which must never hold a dev server's token
+PRODUCTION_ONLY_COMMANDS = %w[authorize-url set-tokens refresh].freeze
 REPO_ROOT = File.expand_path("../../../..", __dir__)
 ENV_FILE = File.join(REPO_ROOT, ".env.development")
 
@@ -70,7 +72,7 @@ end
 
 # Exchange ADMIN_DATA_REFRESH for a new token pair and store it. Returns true on success.
 def refresh_token!
-  return warn_false("A local token doesn't refresh — run local-token for a new one") unless BASE == PRODUCTION
+  return warn_false("A local token doesn't refresh — run local-token for a new one") if LOCAL
 
   client_id = env_get("ADMIN_DOORKEEPER_APP_CLIENT_ID")
   secret = env_get("ADMIN_DOORKEEPER_APP_CLIENT_SECRET")
@@ -191,6 +193,9 @@ def verdict_line(reasons)
   reasons.empty? ? "verdict: OK — nothing abnormal" : "verdict: ABNORMAL — #{reasons.join("; ")}"
 end
 
+abort("#{ARGV[0]} is production-only — unset ADMIN_DATA_BASE_URL") if LOCAL && PRODUCTION_ONLY_COMMANDS.include?(ARGV[0])
+abort("local-token is for a dev server — set ADMIN_DATA_BASE_URL") if !LOCAL && ARGV[0] == "local-token"
+
 case ARGV[0]
 when "authorize-url"
   client_id = env_get("ADMIN_DOORKEEPER_APP_CLIENT_ID")
@@ -250,7 +255,6 @@ when "refresh" # refresh the token pair now (needs ADMIN_DOORKEEPER_APP_CLIENT_S
   exit(refresh_token! ? 0 : 1)
 
 when "local-token" # local-token [email] — with ADMIN_DATA_BASE_URL set, mint a token in this checkout's dev database
-  abort("local-token is for a dev server — set ADMIN_DATA_BASE_URL") if BASE == PRODUCTION
   # TokenAuthenticatable only accepts its own app id, which a seeded database doesn't have
   mint = <<~RUBY
     user = User.find_by!(email: ARGV.first)
@@ -259,8 +263,9 @@ when "local-token" # local-token [email] — with ADMIN_DATA_BASE_URL set, mint 
       Doorkeeper::Application.create!(id: app_id, name: "Admin data (local)", owner: user, redirect_uri: "urn:ietf:wg:oauth:2.0:oob")
     puts Doorkeeper::AccessToken.create!(application_id: app_id, resource_owner_id: user.id).token
   RUBY
-  output, status = Open3.capture2("bin/rails", "runner", mint, ARGV.fetch(1, "admin@bikeindex.org"), chdir: REPO_ROOT)
-  abort("minting failed — admin@bikeindex.org is the seeded superuser; pass another email otherwise\n#{output}") unless status.success?
+  email = ARGV.fetch(1, "admin@bikeindex.org")
+  output, status = Open3.capture2("bin/rails", "runner", mint, email, chdir: REPO_ROOT)
+  abort("minting failed for #{email} — needs an existing superuser\n#{output}") unless status.success?
   env_set(TOKEN_KEY, output.lines.last.strip)
   puts "Updated #{TOKEN_KEY} in #{ENV_FILE}"
 

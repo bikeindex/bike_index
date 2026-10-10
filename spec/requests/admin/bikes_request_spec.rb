@@ -58,7 +58,7 @@ RSpec.describe Admin::BikesController, type: :request do
 
       context "token for a bikes superuser" do
         before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bikes") }
-        let!(:bike_2) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes", created_at: Time.current - 1.week) }
+        let!(:bike_2) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes", created_at: 1.week.ago) }
         let!(:bike_3) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Party") }
 
         it "renders the manufacturer_other counts and first bike times" do
