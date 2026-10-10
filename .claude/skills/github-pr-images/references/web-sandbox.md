@@ -65,8 +65,10 @@ Find it by `get_me`'s login and a body starting `## Screenshots`, paging through
 | `gh api -X PATCH …/comments/ID` | `update_issue_comment` |
 
 `add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
-the tell is the session id in its link. `update_issue_comment` doesn't, so read the
-comment back and strip it.
+the tell is the session id in its link — and can backtick the URL inside an `<img src>`
+too (#4474), leaving an image with no `src`. `update_issue_comment` does neither, so
+create the comment with `## Screenshots` alone and put the body in with an update, then
+read it back.
 
 ## Verifying
 

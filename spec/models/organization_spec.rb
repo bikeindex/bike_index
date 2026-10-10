@@ -3,6 +3,25 @@ require "rails_helper"
 RSpec.describe Organization, type: :model do
   it_behaves_like "search_radius_metricable"
 
+  describe "user_creatable_kinds" do
+    # Listed by hand for their display order, so a new kind has to be added here
+    it "is every kind but the admin-only ones" do
+      expect(Organization.user_creatable_kinds).to match_array(Organization.kinds - Organization.admin_required_kinds)
+    end
+  end
+
+  describe "name_problem" do
+    before { FactoryBot.create(:organization, name: "Shifty Bike Shop") }
+
+    it "says why a name can't be used" do
+      expect(Organization.name_problem("Shifty Cycles")).to be_nil
+      expect(Organization.name_problem(" shifty  BIKE shop")).to eq :taken
+      expect(Organization.name_problem("Registrations")).to eq :reserved
+      expect(Organization.name_problem("X")).to eq :too_short
+      expect(Organization.name_problem("<b></b>!")).to eq :too_short
+    end
+  end
+
   describe "factory" do
     let(:organization) { FactoryBot.create(:organization, :with_invoice) }
     it "is_invoiced and is valid" do
