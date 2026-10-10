@@ -605,7 +605,6 @@ RSpec.describe "Bikebook", :js, type: :system do
     tooltip.click_link("Off-Highway Motorcycle")
     group = find("article h1", exact_text: "Off-Highway Motorcycle").ancestor("article")
     expect(page).to have_css("article", count: 3)
-    # last in the card, closed and counted
     members = group.all("section").last
     expect(members).to have_css("h2", text: /\AClassifications in this group \(\d+\)\z/i).and have_no_link("California Off-Highway Electric Motorcycle")
     members.find("[aria-label='Toggle classifications in this group']").click

@@ -5,10 +5,15 @@ import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { disclosure, section, sectionHeading } from 'bikebook/templates/vehicles/section'
 import { array, join } from 'bikebook/templates/values'
 
-const listSection = (heading, items) => items.length === 0
-  ? nothing
-  : html`<section class="tw:mb-6 tw:space-y-2">${sectionHeading(heading)}<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm">${
-    items.map((item) => html`<li>${item}</li>`)}</ul></section>`
+// A headed list, or with `collapsed`, one closed under its heading's chevron and counted
+const listSection = (heading, items, { collapsed = false } = {}) => {
+  if (items.length === 0) return nothing
+  const list = html`<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm ${collapsed ? 'tw:hidden' : ''}" data-ui--collapse-target=${
+    collapsed ? 'content' : nothing}>${items.map((item) => html`<li>${item}</li>`)}</ul>`
+  return collapsed
+    ? disclosure({ label: heading.toLowerCase(), heading: `${heading} (${items.length})`, content: list })
+    : html`<section class="tw:mb-6 tw:space-y-2">${sectionHeading(heading)}${list}</section>`
+}
 
 // a schema date is a calendar day; UTC both ways keeps it from shifting
 const day = (date) => date && new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', { dateStyle: 'long', timeZone: 'UTC' })
@@ -60,12 +65,6 @@ export const classificationCard = ({ presenter, id, classification, removePath, 
     class="tw:flex tw:items-start tw:gap-4"><p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">E-vehicle
     classification</p>${removeLink({ label: `Remove ${title}`, href: removePath })}</div><h1 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${
     title}</h1></header><p>${description}</p>${section({ content: rows })}${listSection('Groups', linked(array(groups)))}${
-    listSection('Restrictions', array(restrictions).map(restriction))}${listSection('Sources', links)}${members.length
-    ? disclosure({
-      label: 'classifications in this group',
-      heading: `Classifications in this group (${members.length})`,
-      content: html`<ul class="tw:hidden tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm" data-ui--collapse-target="content">${
-        linked(members).map((item) => html`<li>${item}</li>`)}</ul>`
-    })
-    : nothing}</article></div>`
+    listSection('Restrictions', array(restrictions).map(restriction))}${listSection('Sources', links)}${
+    listSection('Classifications in this group', linked(members), { collapsed: true })}</article></div>`
 }
