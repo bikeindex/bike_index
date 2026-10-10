@@ -6,7 +6,6 @@ en:
         show:
           answer_no: 'No'
           answer_yes: 'Yes'
-          assist: Assist
           banned_body: >-
             New York City requires e-bikes and batteries sold there to meet UL 2849
             or UL 2271 (Local Law 39 of 2023). Universities, housing providers and
@@ -14,6 +13,7 @@ en:
           banned_heading: Why uncertified bikes are being banned
           battery_safety: Battery and fire safety
           bike_error: Pick a bike from the list, or enter its details manually.
+          bike_index_nonprofit: Bike Index · Nonprofit
           bike_model: Bike model
           bike_placeholder: Search your bike (make, model, year)
           bikebook_didnt_load: BikeBook didn't load. Enter your bike's details below.
@@ -26,36 +26,13 @@ en:
           certification_involves_heading: What certification involves
           change: change?
           check_my_bike: Check my bike
-          choose_by_bike_model: Choose by bike model
-          class_1_body: >-
-            The motor helps only while you pedal and stops at 20 mph. Allowed in most
-            places a regular bike can go.
-          class_1_tag: Pedal-assist only
-          class_2_body: >-
-            A throttle can move the bike without pedaling, up to 20 mph. Some trails
-            and parks don't allow throttles.
-          class_2_tag: Throttle
-          class_3_body: >-
-            Pedal-assist to 28 mph, with a speedometer. Often comes with a helmet
-            rule, a minimum age, and limits on paths.
-          class_3_tag: Faster pedal-assist
-          class_n: Class %{n}
-          classes_heading: E-bike classes, explained
-          classes_intro: >-
-            Most states use a three-class system. Your class decides how fast the
-            motor helps, whether a throttle is allowed, and where you can ride.
           compare_html: Want to compare multiple bikes? %{link}
+          custom_details: Custom details
+          details_legend: Your bike's details
           detected_html: We detected <strong>%{state}</strong> —
           disclaimer: >-
             Bike Index is a 501(c)(3) nonprofit. State law summaries are for reference,
             not legal advice.
-          emoto_limits_body: >-
-            Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
-            make it an e-moto. Most states treat these as mopeds or motorcycles, which
-            can require registration, insurance and a license.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          enter_manually: Can't find your bike? Enter its details.
           for_parents: For parents
           form_label: E-bike compliance lookup
           has_throttle: Has a throttle?
@@ -67,12 +44,9 @@ en:
           how_to_check_lookup: Look the model up above. BikeBook shows certification
             where it's on record.
           location_not_shared: Location not shared. Choose your state from the list.
-          manual_legend: Enter your bike's details
-          motor: Motor
-          motor_cap: "≤750W"
+          model_details: "%{model} details"
           motor_wattage: Motor wattage (W)
           mph: "%{mph} mph"
-          not_an_ebike: Not an e-bike
           over_28_mph: Over 28 mph
           parent_step_1_body: >-
             Many states set a minimum age for Class 3, and some for every class. Look
@@ -104,8 +78,6 @@ en:
             is ready to ride one safely.
           parents_heading: Buying an e-bike for your child?
           parents_link: Look up your state's age and helmet rules
-          pedal: Pedal
-          pill: Bike Index · Nonprofit · 10+ years
           recoveries_html: "%{number} recoveries"
           register_band_heading: Registered bikes are recovered 2× more often when
             stolen. Registration is free.
@@ -114,8 +86,6 @@ en:
           state: State
           state_error: Choose a state.
           subheading: Enter your state and bike to see your state's rules.
-          throttle: Throttle
-          top_assist: Top assist
           top_speed: What is its top speed?
           ul_2271_body: >-
             Tests the lithium-ion battery pack on its own. Common on bikes and replacement

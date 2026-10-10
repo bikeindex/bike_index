@@ -21,6 +21,7 @@
           <% end %>
 
           <%= restriction[:rule] %>
+          <%= render(Pages::EbikeRules::RuleCitation::Component.new(restriction:)) %>
         </li>
       <% end %>
     </ul>

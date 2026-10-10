@@ -26,7 +26,7 @@ const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
 
 // The blocks `ids` are in load alongside the index rather than after it
-async function load ({ manifestUrl, ids }) {
+async function load ({ manifestUrl, ids, jurisdictions }) {
   manifest = await fetchJson(manifestUrl)
   if (manifest.format !== FORMAT) throw new Error(`catalog format ${manifest.format} isn't ${FORMAT}`)
 
@@ -46,10 +46,14 @@ async function load ({ manifestUrl, ids }) {
     sortPrice: model.msrp_cents ?? 0
   }))
   byId = new Map(models.map((model) => [model.id, model]))
-  // "US-CA Moped", which a 0.22 catalog's names leave off the jurisdiction of, and a group has none; "US Class 3 e-bike"
-  classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications ?? {}).map(([id, record]) => {
-    const label = [record.jurisdiction, record.name].filter(Boolean).join(' ')
-    return [id, { ...record, label, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
+  // "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
+  classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
+    const code = record.jurisdiction
+    const state = code?.startsWith('US-') && (jurisdictions[code] ?? code)
+    const label = [state || code, record.name].filter(Boolean).join(' ')
+    // "Alabama (AL)", "United States"
+    const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
+    return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
   }))
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index), modelsCount: models.length }
 }
@@ -157,10 +161,12 @@ function filter (params) {
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class
-function propelled ({ electric, e_vehicle_classifications: classifications = [] }, propulsion) {
+// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class.
+// A state's class matches the models carrying its groups
+function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
-  return classifications.includes(propulsion === 'out_of_class' ? propulsion : `evc/us/${propulsion}`)
+  const id = propulsion.replace(/^class_/, 'evc/us/class_')
+  return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {

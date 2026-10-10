@@ -11,8 +11,8 @@ import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
 import { modelYears } from 'bikebook/templates/vehicles/model_years'
 import { motorSection } from 'bikebook/templates/vehicles/motor_section'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
-import { section } from 'bikebook/templates/vehicles/section'
-import { array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
+import { disclosure, section } from 'bikebook/templates/vehicles/section'
+import { andSentence, array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
 
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
@@ -120,10 +120,9 @@ class ModelViewer {
     return { ...vehicle, frame, suspension, type_name: typeLabel(vehicle), classifiedModes: this.#classifiedModes(data) }
   }
 
-  // From the raw data: a 0.22 model has one id and a 0.23 model an array, and the kit's schema names only one of them
   #classifiedModes (data) {
     return array(data.motors).flatMap((motor) => array(motor.operating_modes))
-      .map(({ mode, availability, e_vehicle_classification: id, e_vehicle_classifications: ids }) => ({ mode, availability, ids: array(ids ?? id) }))
+      .map(({ mode, availability, e_vehicle_classifications: ids }) => ({ mode, availability, ids: array(ids) }))
   }
 
   #frameMounts (frame, sizes) {
@@ -597,8 +596,6 @@ class ModelViewer {
 }
 
 // to_sentence: "Front, Middle and Rear"
-const andSentence = (words) => words.length < 2 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`
-
 // Motors that match but for their drive wheel, as one listing each drive wheel
 const mergedMotors = (motors) => motors.reduce((merged, motor) => {
   const index = merged.findIndex((each) => equal(except(each, ['drive_wheel']), except(motor, ['drive_wheel'])))
@@ -606,12 +603,6 @@ const mergedMotors = (motors) => motors.reduce((merged, motor) => {
     ? [...merged, motor]
     : merged.map((each, at) => at === index ? { ...each, drive_wheel: [...array(each.drive_wheel), ...array(motor.drive_wheel)] } : each)
 }, [])
-
-// A section whose heading's chevron opens and closes its content (ui--collapse), rendered open
-// unless the content is hidden
-const disclosure = ({ param, label, heading, content }) => html`<section class="tw:group/disclosure tw:space-y-2"
-  data-controller="ui--collapse" data-ui--collapse-param-value=${param}><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-3"><h2
-  class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${heading}</h2>${collapse({ chevron: true, size: 'sm', attributes: { 'aria-label': `Toggle ${label}` } })}</div>${content}</section>`
 
 // simple_format
 const simpleFormat = (text) => String(text).replace(/\r\n?/g, '\n').split(/\n\n+/).map((paragraph) => {

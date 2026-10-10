@@ -2,6 +2,8 @@ require "rails_helper"
 
 RSpec.describe BikebookController, type: :request do
   describe "show" do
+    before { stub_bikebook_catalog }
+
     it "renders the search and a spinner, and the shell the browser fills in from the catalog" do
       get "/bikebook"
 
