@@ -65,8 +65,8 @@ RSpec.describe Admin::BikesController, type: :request do
           get url, params: token_param
           expect(response.status).to eq 200
           expect(json_result["missing_manufacturers"]).to match_array([
-            {"manufacturer_other" => "Cool Bikes", "count" => 2, "first_created_at" => bike_2.created_at.utc.as_json},
-            {"manufacturer_other" => "Party", "count" => 1, "first_created_at" => bike_3.created_at.utc.as_json}
+            {"manufacturer_other" => "Cool Bikes", "count" => 2, "first_created_at" => bike_2.created_at.utc.as_json, "last_created_at" => bike.created_at.utc.as_json},
+            {"manufacturer_other" => "Party", "count" => 1, "first_created_at" => bike_3.created_at.utc.as_json, "last_created_at" => bike_3.created_at.utc.as_json}
           ])
         end
       end

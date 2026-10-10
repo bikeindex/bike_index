@@ -20,8 +20,8 @@ module Admin
     def missing_manufacturer
       if request.format.json?
         rows = missing_manufacturer_bikes.reorder(nil).group(:manufacturer_other)
-          .pluck(:manufacturer_other, Arel.star.count, Bike.arel_table[:created_at].minimum)
-        return render(json: {missing_manufacturers: rows.map { |manufacturer_other, count, first_created_at| {manufacturer_other:, count:, first_created_at:} }})
+          .pluck(:manufacturer_other, Arel.star.count, Bike.arel_table[:created_at].minimum, Bike.arel_table[:created_at].maximum)
+        return render(json: {missing_manufacturers: rows.map { |manufacturer_other, count, first_created_at, last_created_at| {manufacturer_other:, count:, first_created_at:, last_created_at:} }})
       end
 
       @per_page = permitted_per_page(default: 100)
