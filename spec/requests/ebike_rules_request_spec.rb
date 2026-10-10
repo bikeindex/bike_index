@@ -32,6 +32,9 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("#state-panel-co", text: "Class 3 riders must be 16 or older", visible: :all)
         .and have_css("#state-panel-wy", text: "We're compiling Wyoming's e-bike rules", visible: :all)
       expect(page.all("[data-ebike-rules--state-filter-target='state']").count).to eq 51
+      # a state whose law isn't the three classes says which it covers in its row, where it shows collapsed
+      expect(%w[ny nj pa ca wy].map { page.find("#state-#{it} > h3").text.squish })
+        .to eq ["New York Classes 1 & 2 only", "New Jersey Class 1 only", "Pennsylvania Not 3 classes", "California", "Wyoming In review"]
     end
 
     it "renders the classes frame alone: a state's own classes where it doesn't use the three, and the three without a state" do

@@ -20,6 +20,13 @@ module Pages
         def laws = @laws ||= EbikeRuleServices::StateLaws.laws
 
         def states = EbikeRuleServices::StateLaws::STATES.map { it.merge(law: laws[it[:abbr]]) }
+
+        def class_system(law)
+          classes = law[:classes]
+          return translation(".not_three_classes") if classes.none?
+
+          translation(".only_classes", count: classes.size, classes: classes.join(" & "))
+        end
       end
     end
   end
