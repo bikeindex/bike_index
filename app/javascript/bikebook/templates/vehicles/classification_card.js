@@ -2,7 +2,7 @@ import { html, nothing } from 'lit-html'
 import { copyableCode } from 'bikebook/templates/ui/copyable_code'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
-import { section, sectionHeading } from 'bikebook/templates/vehicles/section'
+import { disclosure, section, sectionHeading } from 'bikebook/templates/vehicles/section'
 import { array, join } from 'bikebook/templates/values'
 
 const listSection = (heading, items) => items.length === 0
@@ -59,7 +59,13 @@ export const classificationCard = ({ presenter, id, classification, removePath, 
     tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]"><header><div
     class="tw:flex tw:items-start tw:gap-4"><p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">E-vehicle
     classification</p>${removeLink({ label: `Remove ${title}`, href: removePath })}</div><h1 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${
-    title}</h1></header><p>${description}</p>${section({ content: rows })}${listSection('Groups', linked(array(groups)))}${listSection('Classifications in this group', linked(members))}${
-    listSection('Restrictions', array(restrictions).map(restriction))}${
-    listSection('Sources', links)}</article></div>`
+    title}</h1></header><p>${description}</p>${section({ content: rows })}${listSection('Groups', linked(array(groups)))}${
+    listSection('Restrictions', array(restrictions).map(restriction))}${listSection('Sources', links)}${members.length
+    ? disclosure({
+      label: 'classifications in this group',
+      heading: `Classifications in this group (${members.length})`,
+      content: html`<ul class="tw:hidden tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm" data-ui--collapse-target="content">${
+        linked(members).map((item) => html`<li>${item}</li>`)}</ul>`
+    })
+    : nothing}</article></div>`
 }

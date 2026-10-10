@@ -605,7 +605,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     tooltip.click_link("Off-Highway Motorcycle")
     group = find("article h1", exact_text: "Off-Highway Motorcycle").ancestor("article")
     expect(page).to have_css("article", count: 3)
-    group.find("section", text: /\AClassifications in this group/i).click_link("California Off-Highway Electric Motorcycle")
+    # last in the card, closed and counted
+    members = group.all("section").last
+    expect(members).to have_css("h2", text: /\AClassifications in this group \(\d+\)\z/i).and have_no_link("California Off-Highway Electric Motorcycle")
+    members.find("[aria-label='Toggle classifications in this group']").click
+    members.click_link("California Off-Highway Electric Motorcycle")
     card = find("article h1", text: "California Off-Highway Electric Motorcycle").ancestor("article")
     expect(page).to have_css("article", count: 4)
     expect(page).to have_current_path("/bikebook?vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro," \
@@ -644,7 +648,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     group = find("article h1", exact_text: "Off-Highway Motorcycle").ancestor("article")
     expect(page).to have_current_path("/bikebook?vehicle_models=m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle,evc/off_highway_motorcycle")
     expect(group).to have_no_css("dt", exact_text: "Jurisdiction")
-    expect(group.find("section", text: /\AClassifications in this group/i)).to have_link("California Off-Highway Electric Motorcycle")
+    members = group.find("section", text: /\AClassifications in this group/i)
+    members.find("[aria-label='Toggle classifications in this group']").click
+    expect(members).to have_link("California Off-Highway Electric Motorcycle")
 
     # a rule a law starts or ends carries its date, and limits not yet in force say when they take effect
     visit bikebook_path(vehicle_models: "evc/us/ca/motor_driven_cycle")
