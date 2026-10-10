@@ -1,0 +1,27 @@
+---
+en:
+  components:
+    pages:
+      register:
+        parts:
+          landing_donation:
+            a_million_bikes: A million bikes are registered. Not one owner paid to
+              be there.
+            become_a_member: Become a member — %{amount}/month
+            become_a_member_short: Become a member
+            cancel_any_time: Cancel a monthly gift any time.
+            donate: Donate %{amount}
+            donate_short: Donate
+            donations_keep_it_free: Bike Index is a nonprofit. Donations are what
+              keep it free.
+            fund_the_next_recovery: Fund the next recovery
+            how_often: How often
+            keep_it_free: Keep it free
+            membership_level: "%{level} membership"
+            monthly: Monthly
+            one_time: One-time
+            other: Other
+            other_amount: Other amount
+            tax_deductible_us: 501(c)(3) nonprofit, EIN 81-4296194. Tax-deductible
+              in the US.
+            what_membership_includes: What membership includes
