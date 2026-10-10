@@ -338,11 +338,11 @@ RSpec.describe "Bikebook", :js, type: :system do
         const geometry = { reach: 400, stack: 600, head_angle: 72, head_tube: 150, chainstay: 420, wheelbase: 1020, seat_angle: 73, seat_tube_ct: 500, fork_rake: 45 }
         const frame = (extra, components) => frameGeometry({ ...data, components }, { geometry: { ...geometry, ...extra } })
         const round = (point) => point.map(Math.round)
-        const { rearAxle, frontAxle, headBottom, forkCrown, seatTop, seatBottom, bottomBracketHeight, estimated } = frame({ bb_drop: 70 })
+        const { rearAxle, frontAxle, headBottom, seatTop, seatBottom, bottomBracketHeight, estimated } = frame({ bb_drop: 70 })
         const alone = frameGeometry({}, { geometry: { top_tube_effective: 560 } })
-        return [[rearAxle, frontAxle, headBottom, forkCrown, seatTop, seatBottom].map(round), bottomBracketHeight, estimated, round(frame({ bb_height: 281 }).rearAxle),
+        return [[rearAxle, frontAxle, headBottom, seatTop, seatBottom].map(round), bottomBracketHeight, estimated, round(frame({ bb_height: 281 }).rearAxle),
           frame({ bb_drop: 70, seat_tube_ct: null }).estimated, frame({ bb_drop: 70, fork_rake: null }).estimated,
-          round(frame({ bb_drop: 70, fork_rake: null }, [{ type: 'fork', dimensions: { offset: 50 } }]).forkCrown),
+          round(frame({ bb_drop: 70, fork_rake: null, wheelbase: null }, [{ type: 'fork', dimensions: { offset: 50 } }]).frontAxle),
           round(frame({ bb_drop: 70, fork_rake: null, wheelbase: null, trail: 70 }).frontAxle),
           round(frame({ bb_drop: 70, head_tube: null, fork_length_a2c: 400 }).headBottom), round(frame({ bb_drop: 70, head_tube: null }).headBottom),
           round(frame({ bb_drop: 70, extra_measurements: { seat_tube_angle_actual_degrees: 68 } }).seatBottom),
@@ -351,12 +351,12 @@ RSpec.describe "Bikebook", :js, type: :system do
           frameGeometry(data, { geometry: { wheelbase: 1020 } })]
       })
     JS
-    # the fork crown its rake ahead of the head tube's bottom, a rake from the fork or its trail where the size lists none; a
+    # the front axle from the fork's rake, or its fork's or its trail's where the size lists none; a
     # head tube from the fork's length, estimated from its wheel where it lists none; a seat tube slacker than its effective
     # angle ending on the down tube; the head tube's top from the fork and top tube; a frame from its top tube alone; and
     # without any figure that sizes a frame, only its wheels
-    expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [489, 471], [-146, 478], [0, 0]], 281, [], [-414, 70], ["seat_tube_ct"], ["fork_rake"],
-      [494, 473], [616, 70], [453, 438], [455, 429], [33, 34], [[405, 572], %w[reach stack]], [[-425, 65], [407, 532], [-153, 532]], 10,
+    expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [-146, 478], [0, 0]], 281, [], [-414, 70], ["seat_tube_ct"], ["fork_rake"],
+      [625, 70], [616, 70], [453, 438], [455, 429], [33, 34], [[405, 572], %w[reach stack]], [[-425, 65], [407, 532], [-153, 532]], 10,
       {"missing" => %w[reach stack top_tube_effective front_center head_tube], "wheels" => {"rearRadius" => 351, "frontRadius" => 351, "wheelbase" => 1020}}])
 
     size_select.call("Current EXP").select("Small")

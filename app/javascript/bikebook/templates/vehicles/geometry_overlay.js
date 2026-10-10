@@ -24,11 +24,11 @@ const point = ([x, y]) => `${Math.round(x * 10) / 10},${Math.round(-y * 10) / 10
 const figures = (presenter, keys) => andSentence(keys.map((key) => presenter.kit.geometry.labels[key] ?? presenter.humanize(key)))
 const path = (...lines) => lines.map(([start, ...rest]) => `M${point(start)}${rest.map((each) => `L${point(each)}`).join('')}`).join('')
 
-const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headTop, headBottom, forkCrown, seatTop, seatBottom, bottomBracketHeight }, series, label }, index) =>
+const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headTop, headBottom, seatTop, seatBottom, bottomBracketHeight }, series, label }, index) =>
   svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" transform=${`translate(0 ${-bottomBracketHeight})`} stroke=${series.color} fill="none" stroke-linecap="round" stroke-linejoin="round"><title>${label}</title><circle
     cx=${rearAxle[0]} cy=${-rearAxle[1]} r=${rearRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle><circle
     cx=${frontAxle[0]} cy=${-frontAxle[1]} r=${frontRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle>${headTop
-    ? svg`<path d=${path([frontAxle, forkCrown, headBottom, headTop, seatTop, rearAxle, [0, 0], headBottom], [seatTop, seatBottom])}
+    ? svg`<path d=${path([frontAxle, headBottom, headTop, seatTop, rearAxle, [0, 0], headBottom], [seatTop, seatBottom])}
       stroke-width="4" vector-effect="non-scaling-stroke"></path>`
     : nothing}</g>`
 

@@ -104,7 +104,6 @@ export const frameGeometry = (data, size) => {
     frontRadius: front.radius,
     headTop: [reach, stack],
     headBottom,
-    forkCrown: steering(headTube, rake),
     seatTop,
     seatBottom
   }
