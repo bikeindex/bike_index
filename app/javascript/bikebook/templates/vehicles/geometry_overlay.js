@@ -23,12 +23,12 @@ const REAR_AXLE = -430
 const point = ([x, y]) => `${Math.round(x * 10) / 10},${Math.round(-y * 10) / 10}`
 const path = (...lines) => lines.map(([start, ...rest]) => `M${point(start)}${rest.map((each) => `L${point(each)}`).join('')}`).join('')
 
-const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headTop, headBottom, seatTop, bottomBracketHeight }, series, label }, index) => {
+const frame = ({ geometry: { rearAxle, frontAxle, rearRadius, frontRadius, headTop, headBottom, forkCrown, seatTop, seatBottom, bottomBracketHeight }, series, label }, index) => {
   const bottomBracket = [0, 0]
   return svg`<g id=${`geometry-frame-${index}`} data-bikebook--geometry-overlay-target="frame" transform=${`translate(0 ${-bottomBracketHeight})`} stroke=${series.color} fill="none" stroke-linecap="round" stroke-linejoin="round"><title>${label}</title><circle
     cx=${rearAxle[0]} cy=${-rearAxle[1]} r=${rearRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle><circle
     cx=${frontAxle[0]} cy=${-frontAxle[1]} r=${frontRadius} stroke-width="2" vector-effect="non-scaling-stroke"></circle>${headTop
-    ? svg`<path d=${path([rearAxle, bottomBracket, seatTop, rearAxle], [bottomBracket, headBottom, headTop, seatTop], [headBottom, frontAxle])}
+    ? svg`<path d=${path([frontAxle, forkCrown, headBottom, headTop, seatTop, rearAxle, bottomBracket, headBottom], [seatTop, seatBottom])}
       stroke-width="4" vector-effect="non-scaling-stroke"></path>`
     : nothing}</g>`
 }
@@ -89,9 +89,9 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const overlay = drawn.length > 1
   const missingNote = undrawn.length
     ? html`<p class="tw:text-xs tw:text-gray-500 tw:italic tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing, wheels } }) => {
-      const without = andSentence(missing.map((key) => labels[key] ?? presenter.humanize(key)))
-      if (!wheels || !overlay) return `${title} can't be drawn without its ${without}.`
-      return `${title}'s frame can't be drawn without its ${without}, only its wheels${aligned ? `, the rear axle on ${aligned.title}'s` : ''}.`
+      const none = andSentence(missing.map((key) => labels[key] ?? presenter.humanize(key)))
+      if (!wheels || !overlay) return `${title} lists none of its ${none}, so it can't be drawn.`
+      return `${title} lists none of its ${none}, so only its wheels are drawn${aligned ? `, the rear axle on ${aligned.title}'s` : ''}.`
     }).join(' ')}</p>`
     : nothing
 
@@ -108,7 +108,9 @@ const drawing = (presenter, drawn, labelled) => {
   const ys = drawn.filter(({ geometry }) => geometry.headTop).flatMap(({ geometry: { headTop, seatTop, bottomBracketHeight } }) => [headTop[1], seatTop[1]].map((y) => y + bottomBracketHeight))
   const [left, top] = [Math.min(BOUNDS.left, ...xs) - PADDING, -Math.max(BOUNDS.top, ...ys) - PADDING]
   const [width, height] = [Math.max(BOUNDS.right, ...xs) - left + PADDING, PADDING - top]
+  const labels = presenter.kit.geometry.labels
   const notes = diameterNotes(presenter, labelled)
+  const estimated = drawn.filter(({ geometry }) => geometry.estimated?.length)
 
   return html`<svg
     role="img" aria-label=${`Frames on the same ground, their bottom brackets lined up: ${drawn.map(({ label }) => label).join('; ')}`}
@@ -120,7 +122,9 @@ const drawing = (presenter, drawn, labelled) => {
         present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${notes.length
       ? html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: you're comparing different diameter wheels and tires</p><ul
         class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${notes}</ul></div>`
-      : nothing}${drawn.some(({ geometry }) => geometry.estimated)
-      ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">Some tubes and wheels are estimated where a size doesn't list them.</p>`
+      : nothing}${estimated.length
+      ? html`<p class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${estimated.map(({ title, geometry }) =>
+        `${title}'s ${andSentence(geometry.estimated.map((key) => labels[key] ?? presenter.humanize(key)))} ${geometry.estimated.length > 1 ? 'are' : 'is'
+        } worked out from its other figures or estimated.`).join(' ')}</p>`
       : nothing}`
 }

@@ -61,15 +61,15 @@ RSpec.describe "Bikebook", :js, type: :system do
     # the tire's narrower, and the axle's tooltip has less in it; the wheel size is the same
     expect(front_wheel.all(".tw\\:spec-diff").map(&:text)).to match([/\A2\.1\W+in tire/, /\Athru axle/])
     expect(all("article").first).to have_no_css(".tw\\:spec-diff")
-    # the overlay draws what it has the geometry for, and says what it hasn't: a frame without it is its wheels alone,
-    # its wheelbase apart from the first frame's rear axle
+    # the overlay draws a frame from any figure that sizes it, working out the rest from what it lists - its wheelbase
+    # apart from its front axle - and says which
     within("[aria-label='Geometry overlay']") do
       expect(all("li").map(&:text)).to eq(["Aventón Level 4 REC Step-Through Regular", "Aventón Level 2 Step-Through M/L"])
       frames = all("svg[role='img'] > g", visible: :all).map { |frame| [frame.all("circle", visible: :all).map { it[:cx].to_f }, frame.has_css?("path", visible: :all)] }
-      rear_axle = frames.dig(0, 0, 0)
-      expect(frames).to match([[[be < 0, be > 0], true], [[rear_axle, rear_axle + 1130], false]])
-      expect(page).to have_css("p.tw\\:italic", text: "Aventón Level 2 Step-Through's frame can't be drawn without its Stack, Head Angle, " \
-        "Chainstay and BB Drop, only its wheels, the rear axle on Aventón Level 4 REC Step-Through's.")
+      expect(frames).to match([[[be < 0, be > 0], true], [[be < 0, be > 0], true]])
+      expect(frames.dig(1, 0).reverse.inject(:-)).to be_within(0.1).of(1130)
+      expect(page).to have_text("Aventón Level 2 Step-Through's Stack, Head Angle, Chainstay, BB Drop, Seat Angle, Seat Tube center-to-top and " \
+        "Fork Rake / Offset are worked out from its other figures or estimated.")
       # the same wheel size, its tires too near each other's for the wheel note
       expect(page).to have_no_text("diameter")
     end
@@ -234,6 +234,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[data-comparison] article", count: 5)
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
+    # a vehicle listing no figure that sizes a frame is its wheels alone, the rear axle on the first frame's
+    expect(find("[aria-label='Geometry overlay'] p.tw\\:italic").text).to include("Segway GT3 Pro lists none of its Reach, Stack, Top Tube (effective), " \
+      "Front Centre and Head Tube, so only its wheels are drawn, the rear axle on Aventón Level 4 REC Step-Through's.")
     # of a year the first lacks just the year, and of a drivetrain just the chip it lacks
     haul = find("article h1", text: "Haul ST").ancestor("article")
     marked = ->(heading, selector) { haul.find("h2", text: heading).ancestor("section").all(selector).map { it.text.strip } }
@@ -332,18 +335,29 @@ RSpec.describe "Bikebook", :js, type: :system do
     frames = page.evaluate_script(<<~JS)
       import('bikebook/frame_geometry').then(({ frameGeometry }) => {
         const data = { wheels: [{ bsd: 622, tire_width: 40, position: ['front', 'rear'] }] }
-        const geometry = { reach: 400, stack: 600, head_angle: 72, head_tube: 150, chainstay: 420, wheelbase: 1020, seat_angle: 73, seat_tube_ct: 500 }
-        const frame = (extra) => frameGeometry(data, { geometry: { ...geometry, ...extra } })
+        const geometry = { reach: 400, stack: 600, head_angle: 72, head_tube: 150, chainstay: 420, wheelbase: 1020, seat_angle: 73, seat_tube_ct: 500, fork_rake: 45 }
+        const frame = (extra, components) => frameGeometry({ ...data, components }, { geometry: { ...geometry, ...extra } })
         const round = (point) => point.map(Math.round)
-        const { rearAxle, frontAxle, headBottom, seatTop, bottomBracketHeight, estimated } = frame({ bb_drop: 70 })
-        return [[rearAxle, frontAxle, headBottom, seatTop].map(round), bottomBracketHeight, estimated, round(frame({ bb_height: 281 }).rearAxle),
-          frame({ bb_drop: 70, seat_tube_ct: null }).estimated, frame({ bb_drop: 70, head_tube: null }).estimated,
-          ...[frameGeometry({}, { geometry: { reach: 400 } })].map(({ missing, wheels }) => [missing, wheels === null]),
-          frameGeometry(data, { geometry: { wheelbase: 1020 } }).wheels]
+        const { rearAxle, frontAxle, headBottom, forkCrown, seatTop, seatBottom, bottomBracketHeight, estimated } = frame({ bb_drop: 70 })
+        const alone = frameGeometry({}, { geometry: { top_tube_effective: 560 } })
+        return [[rearAxle, frontAxle, headBottom, forkCrown, seatTop, seatBottom].map(round), bottomBracketHeight, estimated, round(frame({ bb_height: 281 }).rearAxle),
+          frame({ bb_drop: 70, seat_tube_ct: null }).estimated, frame({ bb_drop: 70, fork_rake: null }).estimated,
+          round(frame({ bb_drop: 70, fork_rake: null }, [{ type: 'fork', dimensions: { offset: 50 } }]).forkCrown),
+          round(frame({ bb_drop: 70, fork_rake: null, wheelbase: null, trail: 70 }).frontAxle),
+          round(frame({ bb_drop: 70, head_tube: null, fork_length_a2c: 400 }).headBottom), round(frame({ bb_drop: 70, head_tube: null }).headBottom),
+          round(frame({ bb_drop: 70, extra_measurements: { seat_tube_angle_actual_degrees: 68 } }).seatBottom),
+          ...[frame({ bb_drop: 70, reach: null, stack: null, top_tube_effective: 580, fork_length_a2c: 395 })].map((each) => [round(each.headTop), each.estimated]),
+          [alone.rearAxle, alone.headTop, alone.seatTop].map(round), alone.estimated.length,
+          frameGeometry(data, { geometry: { wheelbase: 1020 } })]
       })
     JS
-    expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [-146, 478]], 281, false, [-414, 70], true, true,
-      [%w[stack head_angle chainstay bb_drop], true], {"rearRadius" => 351, "frontRadius" => 351, "wheelbase" => 1020}])
+    # the fork crown its rake ahead of the head tube's bottom, a rake from the fork or its trail where the size lists none; a
+    # head tube from the fork's length, estimated from its wheel where it lists none; a seat tube slacker than its effective
+    # angle ending on the down tube; the head tube's top from the fork and top tube; a frame from its top tube alone; and
+    # without any figure that sizes a frame, only its wheels
+    expect(frames).to eq([[[-414, 70], [606, 70], [446, 457], [489, 471], [-146, 478], [0, 0]], 281, [], [-414, 70], ["seat_tube_ct"], ["fork_rake"],
+      [494, 473], [616, 70], [453, 438], [455, 429], [33, 34], [[405, 572], %w[reach stack]], [[-425, 65], [407, 532], [-153, 532]], 10,
+      {"missing" => %w[reach stack top_tube_effective front_center head_tube], "wheels" => {"rearRadius" => 351, "frontRadius" => 351, "wheelbase" => 1020}}])
 
     size_select.call("Current EXP").select("Small")
     expect_size.call("Current EXP", "Small")
@@ -464,7 +478,7 @@ RSpec.describe "Bikebook", :js, type: :system do
         return [container.querySelectorAll('svg, button, li').length, container.querySelector('p').textContent.trim()]
       })()
     JS
-    expect(lone).to eq([0, "Bare can't be drawn without its Reach, Stack, Head Angle, Chainstay and BB Drop."])
+    expect(lone).to eq([0, "Bare lists none of its Reach, Stack, Top Tube (effective), Front Centre and Head Tube, so it can't be drawn."])
 
     # the first vehicle's last pick is what a comparison with none picked starts nearest
     visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_adv,m/aventon/2026/current_exp")
