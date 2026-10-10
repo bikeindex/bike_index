@@ -58,13 +58,16 @@ RSpec.describe Admin::BikesController, type: :request do
 
       context "token for a bikes superuser" do
         before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bikes") }
-        let!(:bike_2) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes") }
+        let!(:bike_2) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes", created_at: Time.current - 1.week) }
         let!(:bike_3) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Party") }
 
-        it "renders the manufacturer_other counts" do
+        it "renders the manufacturer_other counts and first bike times" do
           get url, params: token_param
           expect(response.status).to eq 200
-          expect(json_result["manufacturer_other_counts"]).to eq({"Cool Bikes" => 2, "Party" => 1})
+          expect(json_result["missing_manufacturers"]).to match_array([
+            {"manufacturer_other" => "Cool Bikes", "count" => 2, "first_created_at" => bike_2.created_at.utc.as_json},
+            {"manufacturer_other" => "Party", "count" => 1, "first_created_at" => bike_3.created_at.utc.as_json}
+          ])
         end
       end
     end
