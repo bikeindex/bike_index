@@ -7113,6 +7113,10 @@ nl:
           all_on_file: Alle 50 staten en DC geregistreerd.
           check_in_state: Check een e-bike in %{state}
           no_match: Geen enkele staat komt overeen. Probeer een andere naam.
+          not_three_classes: Geen 3 klassen
+          only_classes:
+            one: Alleen klasse %{classes}
+            other: Alleen klassen %{classes}
         ul_badge:
           certified: UL %{standard} gecertificeerd
           meaning_2271_certified: Het accupakket heeft de UL-veiligheidstests voor

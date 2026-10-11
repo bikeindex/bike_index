@@ -6903,6 +6903,10 @@ nb:
           all_on_file: Alle 50 stater og DC registrert
           check_in_state: Sjekk en elsykkel i %{state}
           no_match: Ingen samsvarende stater. Prøv et annet navn.
+          not_three_classes: Ikke 3 klasser
+          only_classes:
+            one: Kun klasse %{classes}
+            other: Kun klasser %{classes}
         ul_badge:
           certified: UL %{standard}-sertifisert
           meaning_2271_certified: Batteripakken har bestått UL-sikkerhetstester for
