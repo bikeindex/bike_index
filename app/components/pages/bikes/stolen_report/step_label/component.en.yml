@@ -1,0 +1,16 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          step_label:
+            bike_details: "%{bike_type} details"
+            bike_info: "%{bike_type} & your info"
+            contact: Contact & visibility
+            extra: Value & ownership
+            lock: Lock & incident
+            photos: Photos
+            police: Police report
+            review: Review & submit
+            where: When & where

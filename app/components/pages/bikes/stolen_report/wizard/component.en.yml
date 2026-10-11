@@ -76,7 +76,12 @@ en:
               its serial number.
             recommended_badge: Recommended
             region: Region
+            register_group: Register your %{bike_type}
+            registered_html: "%{registered} Now let's report it stolen. Everything
+              you entered is saved."
+            registered_strong: Your %{bike_type} is registered.
             report_as_stolen: Report as stolen
+            report_group: Report the theft
             report_number: Report number
             required: Required
             required_badge: Required
@@ -91,14 +96,7 @@ en:
             skip_for_now: Skip for now
             skipped: Skipped · add later
             state: State
-            step_contact: Contact & visibility
-            step_extra: Value & ownership
-            step_lock: Lock & incident
             step_of: Step %{number} of %{total}
-            step_photos: Photos
-            step_police: Police report
-            step_review: Review & submit
-            step_where: When & where
             steps: Report steps
             stock_photo_helper: >-
               A picture of the same model helps people know what to look for. Add

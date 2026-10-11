@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          registration_frame:
+            done: Done
+            in_progress: In progress
+            register_group: Register your %{bike_type}
+            report_group: Report the theft
+            step_of: Step %{number} of %{total}
+            steps: Report steps

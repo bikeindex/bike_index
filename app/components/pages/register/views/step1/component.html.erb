@@ -1,16 +1,5 @@
-<%= render Pages::Register::Parts::Shell::Component.new(embed: @embed, data: {controller: "register--heading",
-    "register--heading-names-value": CycleType.slug_translation_hash_lowercase_short.to_json,
-    action: "hw-combobox:selection->register--heading#update " \
-      "form-persist:restored@window->register--heading#update"}) do %>
-  <%# The single page's steps turn on what it's asking, so their count isn't known yet %>
-  <% unless @flow.single_page? %>
-    <%= render Pages::Register::Parts::Progress::Component.new(flow: @flow, step: 1) %>
-  <% end %>
-
-  <% unless @skip_heading %>
-    <%= render UI::Header::Component.new(text: heading_text, subtitle:) %>
-  <% end %>
-
+<%# The form is the same either way - an owner reporting their own theft sees it framed as the report's first step %>
+<% form = capture do %>
   <% if @b_param.errors.any? %>
     <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
   <% end %>
@@ -31,5 +20,28 @@
 
     <%= render Pages::Register::Parts::SinglePageStep2::Component.new(b_param: @b_param, flow: @flow, organization:,
         current_user: @current_user, motorized_review: @motorized_review) %>
+  <% end %>
+<% end %>
+
+<% if stolen_frame? %>
+  <%= render Pages::Bikes::StolenReport::RegistrationFrame::Component.new(b_param: @b_param, step: "bike_info",
+      title: translation(".stolen_title", cycle_type: @b_param.type), helper: translation(".stolen_helper", cycle_type: @b_param.type)) do %>
+    <%= form %>
+  <% end %>
+<% else %>
+  <%= render Pages::Register::Parts::Shell::Component.new(embed: @embed, data: {controller: "register--heading",
+    "register--heading-names-value": CycleType.slug_translation_hash_lowercase_short.to_json,
+    action: "hw-combobox:selection->register--heading#update " \
+      "form-persist:restored@window->register--heading#update"}) do %>
+    <%# The single page's steps turn on what it's asking, so their count isn't known yet %>
+    <% unless @flow.single_page? %>
+      <%= render Pages::Register::Parts::Progress::Component.new(flow: @flow, step: 1) %>
+    <% end %>
+
+    <% unless @skip_heading %>
+      <%= render UI::Header::Component.new(text: heading_text, subtitle:) %>
+    <% end %>
+
+    <%= form %>
   <% end %>
 <% end %>

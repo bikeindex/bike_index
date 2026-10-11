@@ -11,3 +11,6 @@ en:
               can finish registering right now.
             more_useful_registration: The more you add, the more useful the registration
               is.
+            stolen_helper: >-
+              The more you add, the easier your %{cycle_type} is to identify. You'll
+              add photos in a few steps.

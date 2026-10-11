@@ -17,6 +17,8 @@ export default class extends Controller {
     step: String,
     steps: Array,
     optional: Array,
+    // The register flow's steps, numbered ahead of these when it handed off here
+    offset: Number,
     visited: Array,
     text: Object,
     stockPhotosUrl: String
@@ -77,7 +79,7 @@ export default class extends Controller {
       item.removeAttribute('aria-current')
     })
     const index = this.stepsValue.indexOf(step)
-    this.progressSegmentTargets.forEach((segment, segmentIndex) => { segment.dataset.filled = segmentIndex <= index })
+    this.progressSegmentTargets.forEach((segment, segmentIndex) => { segment.dataset.filled = segmentIndex <= index + this.offsetValue })
     this.backButtonTarget.classList.toggle('tw:invisible', index === 0)
     collapse(step === 'review' ? 'hide' : 'show', this.continueButtonTarget, 0)
     collapse(step === 'review' ? 'show' : 'hide', this.submitButtonTarget, 0)
@@ -110,7 +112,7 @@ export default class extends Controller {
       const done = this.complete(step)
       const skipped = !done && step !== this.stepValue && step !== 'review' && this.visited.has(step)
       item.dataset.done = done
-      this.railMarkerTargets[index].textContent = done && step !== this.stepValue ? '✓' : index + 1
+      this.railMarkerTargets[index].textContent = done && step !== this.stepValue ? '✓' : index + 1 + this.offsetValue
       this.railNoteTargets[index].dataset.skipped = skipped
       this.railNoteTargets[index].textContent = step === this.stepValue
         ? this.textValue.in_progress
@@ -128,7 +130,9 @@ export default class extends Controller {
     this.progressLabelTarget.textContent = [
       this.textValue.progress_saved,
       this.label(this.stepValue),
-      this.textValue.step_of.replace('%{number}', this.stepsValue.indexOf(this.stepValue) + 1).replace('%{total}', this.stepsValue.length)
+      this.textValue.step_of
+        .replace('%{number}', this.stepsValue.indexOf(this.stepValue) + 1 + this.offsetValue)
+        .replace('%{total}', this.stepsValue.length + this.offsetValue)
     ].join(' · ')
     this.panelTargets.forEach((panel) => this.clearFixedErrors(panel))
   }

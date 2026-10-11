@@ -187,6 +187,19 @@ module BikeServices
     # Whether the flow includes the report step - what was stolen, or what was found
     def report_step?(status) = REPORT_RECORDS.key?(status)
 
+    # An owner reporting their own theft does it in the stolen report wizard once the bike exists,
+    # rather than in this flow - the bike is created registered, and the wizard reports it stolen.
+    # Someone registering a theft for its owner still reports it here; they can't open the wizard.
+    # A registration that already saved a report here keeps it
+    def report_in_wizard?(b_param)
+      return false unless b_param.status_stolen? && b_param.stolen_attrs.blank?
+
+      b_param.creator_id.present? ? b_param.self_made? : b_param.creation_organization&.auto_user_id.blank?
+    end
+
+    # Set when the bike was created for the wizard to report stolen, which is where finishing goes
+    def stolen_report_pending?(b_param) = b_param.params&.dig("stolen_report_pending").present?
+
     # What the acknowledgment eyebrow counts: the rule pages, plus the review they end at
     def acknowledgment_step_count(sequence) = sequence_pages(sequence).count + 1
 
@@ -456,6 +469,7 @@ module BikeServices
     # The switches ride to the ownership's registration_info, so registrations can be counted by them
     def create_bike(b_param, sequence:, ip_address:, rules_to_owner: false)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
+      hold_stolen_report(b_param)
       owners_sequence = registration_sequence(b_param) if sequence.blank? &&
         (rules_to_owner || b_param.rules_left_to_owner?(b_param.creator))
       b_param.params = b_param.params.deep_merge("bike" => {
@@ -481,6 +495,13 @@ module BikeServices
       bike
     end
 
+    # Created registered rather than stolen, with nothing yet to alert anyone about
+    def hold_stolen_report(b_param)
+      return unless report_in_wizard?(b_param)
+
+      b_param.params = b_param.params.deep_merge("bike" => {"status" => "status_with_owner"}, "stolen_report_pending" => true)
+    end
+
     # The registration is the member's, so this link signs the owner in
     def send_rules_email(b_param) = email_confirmation_link(b_param, "partial_registration")
 
@@ -495,7 +516,7 @@ module BikeServices
 
     # Nothing to report without a status that has a record, otherwise save_report's marker
     def report_completed?(b_param)
-      !report_step?(b_param.status) || b_param.params["report_completed"].present?
+      !report_step?(b_param.status) || report_in_wizard?(b_param) || b_param.params["report_completed"].present?
     end
 
     # Step 2 can change the status after the report was filled in, and BParam reads the
@@ -559,7 +580,7 @@ module BikeServices
     # confirmation email: the emailed link is what proves the address the report belongs
     # to, and it's clicked after the acknowledgment pages rather than before them
     def report_placement(b_param)
-      return unless report_step?(b_param&.status)
+      return if !report_step?(b_param&.status) || report_in_wizard?(b_param)
 
       creator_available?(b_param) ? :after_details : :last
     end
@@ -647,7 +668,7 @@ module BikeServices
     end
 
     conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
-      :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike, :send_rules_email, :email_confirmation_link,
+      :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike, :hold_stolen_report, :send_rules_email, :email_confirmation_link,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :report_placement, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,

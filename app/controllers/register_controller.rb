@@ -64,6 +64,11 @@ class RegisterController < ApplicationController
     @b_param.params = BikeServices::Register.with_prefill(@b_param.params) if %w[1 2].include?(step)
     case step
     when "finished"
+      # The theft is still to report, which is the wizard's - the registration itself is done
+      if BikeServices::Register.stolen_report_pending?(@b_param) && @b_param.created_bike.present?
+        return redirect_to(new_bike_stolen_report_path(@b_param.created_bike, registered: true))
+      end
+
       @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)
       render Pages::Register::Views::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
@@ -352,6 +357,8 @@ class RegisterController < ApplicationController
     if bike.errors.any?
       flash[:error] = @b_param.bike_errors&.to_sentence
       redirect_to step_path(2)
+    elsif BikeServices::Register.stolen_report_pending?(@b_param)
+      redirect_to new_bike_stolen_report_path(bike, registered: true)
     elsif (organization = single_page_organization)
       redirect_to_single_page(bike, organization)
     else

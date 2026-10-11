@@ -1,5 +1,8 @@
 module Bikes
   class RecoveredController < Bikes::BaseController
+    # A component renders as whatever the request asks for - a Turbo submission that redirects here asks for a stream
+    before_action :force_html_response
+
     def new
       return redirect_to(bike_path(@bike)) unless @bike.status_stolen?
 

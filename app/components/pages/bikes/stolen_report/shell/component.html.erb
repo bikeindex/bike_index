@@ -18,7 +18,7 @@
           tw:text-blue-600 tw:sm:flex tw:dark:bg-gray-700
         "
       >
-        <% if (image_url = @bike.image_url(:small)).present? %>
+        <% if image_url.present? %>
           <%= image_tag image_url, alt: "", class: "tw:size-full tw:object-cover" %>
         <% else %>
           <%= helpers.inline_svg_tag("icons/bike.svg", class: "tw:size-7", aria_hidden: true) %>
@@ -31,6 +31,15 @@
           <%= render UI::Badge::Component.new(text: translation(".stolen"), color: :error, indicator: true) %>
         <% when :recovered %>
           <%= render UI::Badge::Component.new(text: translation(".recovered"), color: :success) %>
+        <% when :registration %>
+          <p
+            class="
+              tw:mb-0 tw:text-xs tw:font-bold tw:tracking-wide
+              tw:text-gray-600 tw:uppercase tw:dark:text-gray-400
+            "
+          >
+            <%= translation(".new_registration") %>
+          </p>
         <% else %>
           <p
             class="
@@ -44,7 +53,7 @@
 
         <h1 class="tw:mt-1 tw:mb-0 tw:text-2xl tw:leading-tight tw:sm:text-3xl">
           <strong class="tw:font-extrabold"><%= heading %></strong>
-          <span class="tw:font-medium"><%= @bike.frame_model %></span>
+          <span class="tw:font-medium"><%= frame_model %></span>
         </h1>
 
         <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
@@ -52,15 +61,17 @@
         </p>
       </div>
 
-      <div
-        class="
-          tw:flex tw:shrink-0 tw:gap-x-4 tw:gap-y-1 tw:text-sm tw:font-bold
-          tw:sm:flex-col tw:sm:items-end
-        "
-      >
-        <%= link_to translation(".view_bike", bike_type: @bike.type), bike_path(@bike), class: "twlink" %>
-        <%= link_to translation(".edit_bike", bike_type: @bike.type), edit_bike_path(@bike, edit_template: "bike_details"), class: "twlink" %>
-      </div>
+      <% if @bike.present? %>
+        <div
+          class="
+            tw:flex tw:shrink-0 tw:gap-x-4 tw:gap-y-1 tw:text-sm
+            tw:font-bold tw:sm:flex-col tw:sm:items-end
+          "
+        >
+          <%= link_to translation(".view_bike", bike_type: @bike.type), bike_path(@bike), class: "twlink" %>
+          <%= link_to translation(".edit_bike", bike_type: @bike.type), edit_bike_path(@bike, edit_template: "bike_details"), class: "twlink" %>
+        </div>
+      <% end %>
     </div>
   </div>
 

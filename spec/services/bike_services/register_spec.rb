@@ -441,8 +441,16 @@ RSpec.describe BikeServices::Register do
     context "a theft to report" do
       let(:bike_params) { super().merge(status: "status_stolen") }
 
-      it "keeps the report after the one page" do
-        expect(described_class.flow(b_param, sequence: nil, single_page: true).steps).to eq %w[1 report]
+      it "leaves the owner's own theft to the stolen report wizard" do
+        expect(described_class.flow(b_param, sequence: nil, single_page: true).steps).to eq %w[1]
+      end
+
+      context "registered for someone else" do
+        before { b_param.creator_id = FactoryBot.create(:user).id }
+
+        it "keeps the report after the one page" do
+          expect(described_class.flow(b_param, sequence: nil, single_page: true).steps).to eq %w[1 report]
+        end
       end
     end
   end
@@ -602,6 +610,31 @@ RSpec.describe BikeServices::Register do
       end
     end
 
+    context "the owner's own theft" do
+      let(:bike_params) do
+        super().merge(owner_email: creator.email, manufacturer_id: FactoryBot.create(:manufacturer).id,
+          serial_number: "XYZ 123", primary_frame_color_id: FactoryBot.create(:color).id)
+      end
+
+      it "is reported in the stolen report wizard, once the bike is created registered" do
+        expect(described_class.report_in_wizard?(b_param)).to be_truthy
+        expect(described_class.flow(b_param, sequence: nil).steps).to eq %w[1 2]
+        expect(described_class.permitted_step(b_param, "report", sequence: nil)).to eq "2"
+
+        bike = described_class.complete(b_param, user: creator, sequence: nil, ip_address: nil)
+        expect(bike).to have_attributes(status: "status_with_owner", current_stolen_record: nil)
+        expect(described_class.stolen_report_pending?(b_param.reload)).to be_truthy
+      end
+
+      context "with the report already saved" do
+        it "keeps it" do
+          described_class.save_report(b_param, report_params:)
+          expect(described_class.report_in_wizard?(b_param.reload)).to be_falsey
+          expect(described_class.flow(b_param, sequence: nil).steps).to eq %w[1 2 report]
+        end
+      end
+    end
+
     context "registered with the owner" do
       let(:bike_params) { super().except(:status) }
 
@@ -655,19 +688,15 @@ RSpec.describe BikeServices::Register do
             params: {details_completed: true, bike: bike_params}.as_json)
         end
 
-        it "comes after them - the emailed link is clicked once they're acknowledged" do
+        # Whoever confirms the emailed link is the owner, so the theft is theirs to report in the wizard
+        it "has no report - the emailed link is clicked once they're acknowledged" do
           pages = described_class.sequence_pages(sequence)
-          expect(described_class.flow(b_param, sequence:).steps).to eq %w[1 2 3 4 review report]
+          expect(described_class.flow(b_param, sequence:).steps).to eq %w[1 2 3 4 review]
           expect(described_class.permitted_step(b_param, "report", sequence:)).to eq "3"
 
           pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
           described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")
           expect(described_class.finished?(b_param, sequence:)).to be_truthy
-
-          # Confirming the email is what opens the report
-          b_param.update(creator_id: creator.id)
-          expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "report"
-          expect(described_class.flow(b_param, sequence:).before("report")).to eq "2"
         end
       end
     end

@@ -1,5 +1,7 @@
 module Bikes
   class StolenReportsController < Bikes::BaseController
+    # A component renders as whatever the request asks for - a Turbo submission that redirects here asks for a stream
+    before_action :force_html_response, only: %i[new edit create update show]
     before_action :redirect_unless_reportable, only: %i[new create]
     before_action :find_stolen_record, only: %i[edit update show]
 
@@ -68,7 +70,8 @@ module Bikes
 
     def render_wizard(stolen_record, step: params[:step], missing: [], submitted: {}, status: :ok)
       render Pages::Bikes::StolenReport::Wizard::Component.new(bike: @bike, stolen_record:,
-        step: BikeServices::StolenReport.step(step), missing:, submitted:), status:
+        step: BikeServices::StolenReport.step(step), missing:, submitted:,
+        registered: Binxtils::InputNormalizer.boolean(params[:registered])), status:
     end
 
     def default_country_id

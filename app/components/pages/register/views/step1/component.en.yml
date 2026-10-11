@@ -8,3 +8,8 @@ en:
             just_the_essentials: Just the essentials to start.
             register_your_vehicle: Register your vehicle!
             register_your_vehicle_with_org: Register your vehicle with %{org_name}!
+            stolen_helper: >-
+              We're sorry your %{cycle_type} was stolen. A free registration gives
+              shops and police a record to match it against. It takes about two minutes,
+              then we'll go straight to the theft report.
+            stolen_title: First, let's register your %{cycle_type}

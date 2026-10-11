@@ -10,6 +10,8 @@ module Pages
           STEPS = BikeServices::StolenReport::STEPS
           # The others only need what's required on them to move on
           OPTIONAL_STEPS = %w[photos police contact extra].freeze
+          # The register flow's, shown done ahead of these when it hands off here
+          REGISTRATION_STEPS = %w[bike_info bike_details].freeze
           PROOF_OF_OWNERSHIP = {"true" => true, "false" => false, "unsure" => nil}.freeze
           # A radio styled as a pill, filled once it's picked
           CHIP_CLASS = "tw:mb-0 tw:inline-flex tw:cursor-pointer tw:items-center tw:rounded-full tw:border-[1.5px] " \
@@ -25,12 +27,15 @@ module Pages
 
           # missing: the required answers a submission lacked, flagged on render
           # submitted: what that submission held, for the fields that aren't the record's own
-          def initialize(bike:, stolen_record:, step: STEPS.first, missing: [], submitted: {})
+          # registered: the bike was just registered for this report, which numbers the
+          # registration's two steps ahead of these
+          def initialize(bike:, stolen_record:, step: STEPS.first, missing: [], submitted: {}, registered: false)
             @bike = bike
             @stolen_record = stolen_record
             @step = STEPS.include?(step) ? step : STEPS.first
             @missing = missing.map(&:to_s)
             @submitted = submitted.to_h.with_indifferent_access
+            @registered = registered
           end
 
           private
@@ -39,23 +44,17 @@ module Pages
 
           def cycle_type = @bike.type
 
-          def step_label(step)
-            case step
-            when "where" then translation(".step_where")
-            when "lock" then translation(".step_lock")
-            when "photos" then translation(".step_photos")
-            when "police" then translation(".step_police")
-            when "contact" then translation(".step_contact")
-            when "extra" then translation(".step_extra")
-            else translation(".step_review")
-            end
-          end
+          def step_label(step) = render(Pages::Bikes::StolenReport::StepLabel::Component.new(step:, bike_type: @bike.type_titleize))
 
-          def step_number(step) = STEPS.index(step) + 1
+          def step_offset = @registered ? REGISTRATION_STEPS.count : 0
 
-          def step_heading(number, title:, helper:)
+          def total_steps = STEPS.count + step_offset
+
+          def step_number(step) = STEPS.index(step) + 1 + step_offset
+
+          def step_heading(step, title:, helper:)
             safe_join([
-              tag.p(translation(".step_of", number:, total: STEPS.count),
+              tag.p(translation(".step_of", number: step_number(step), total: total_steps),
                 class: "tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wide tw:text-blue-600 tw:uppercase tw:dark:text-blue-400"),
               tag.h2(title, class: "tw:mb-1 tw:text-2xl tw:font-bold"),
               tag.p(helper, class: "tw:mb-5 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400")
@@ -75,7 +74,8 @@ module Pages
                     "stolen-report--wizard-step-value": @step,
                     "stolen-report--wizard-steps-value": STEPS.to_json,
                     "stolen-report--wizard-optional-value": OPTIONAL_STEPS.to_json,
-                    "stolen-report--wizard-visited-value": (editing? ? STEPS : STEPS.first(step_number(@step))).to_json,
+                    "stolen-report--wizard-offset-value": step_offset,
+                    "stolen-report--wizard-visited-value": (editing? ? STEPS : STEPS.first(STEPS.index(@step) + 1)).to_json,
                     "stolen-report--wizard-text-value": summary_text.to_json,
                     "stolen-report--wizard-stock-photos-url-value": stock_photos_bike_stolen_report_path(@bike),
                     "ui--forms--address-group-us-id-value": Country.united_states_id,
