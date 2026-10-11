@@ -6,8 +6,8 @@ import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
-const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
-const priced = (vehicle) => latest(array(vehicle.years).filter((year) => isNumber(year.original_msrp)))
+// years come newest first
+const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
 const currency = (vehicle) => priced(vehicle)?.original_msrp_currency ?? 'USD'
 const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(isNumber)) : null
 const motors = (key) => (vehicle) => highest(array(vehicle.motors).map((motor) => motor[key]))
@@ -41,7 +41,7 @@ const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_an
 // neither, and none for a value that isn't compared. `parts` splits a value whose parts are each compared, and
 // `amount` shows a difference, given the number it's of
 const SPECS = [
-  { label: 'Year', read: (vehicle) => latest(array(vehicle.years))?.year, better: 1, format: String },
+  { label: 'Year', read: (vehicle) => array(vehicle.years)[0]?.year, better: 1, format: String },
   {
     label: 'Price',
     read: (vehicle) => priced(vehicle)?.original_msrp,
