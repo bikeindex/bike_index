@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          photo:
+            added: Added ✓

@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          shell:
+            edit_bike: Edit %{bike_type} details
+            recovered: Recovered
+            report_stolen_or_missing: Report stolen or missing
+            serial: Serial %{serial}
+            stolen: Stolen
+            view_bike: View %{bike_type}

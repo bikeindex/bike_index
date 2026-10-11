@@ -1,0 +1,36 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        recovered:
+          show:
+            amount: Amount
+            amount_option_html: "$%{amount}"
+            copy_link: Copy link
+            donate: Donate
+            donate_body: >-
+              Donations fund the recovery tools, partner network and support team
+              that helped you today.
+            donate_title: Make a one-time gift
+            facebook: Facebook
+            marked_recovered: >-
+              Your %{bike_type} is marked recovered. We've taken down the stolen alert
+              and let our partners know. Thanks for telling us how you got it back.
+            membership: Membership
+            membership_body: >-
+              A small monthly gift gives us steady support we can plan around, so
+              we're ready for the next rider who needs us.
+            membership_title: Become a member
+            spread_body: >-
+              Registered bikes are easier to get back. Help your friends register
+              theirs before anything happens. It's free and takes a couple of minutes.
+            spread_the_word: Spread the word
+            spread_title: Tell other cyclists
+            thanks_for_sharing: Thanks for letting us share your story. It gives other
+              riders hope.
+            ways_to_support: Ways to support Bike Index
+            ways_to_support_sub: >-
+              Bike Index is a nonprofit. If you're able, help us bring the next %{bike_type}
+              home and keep Bike Index free for every rider.
+            welcome_home: Welcome home, %{name}.

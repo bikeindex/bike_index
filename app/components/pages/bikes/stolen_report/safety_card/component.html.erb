@@ -1,0 +1,20 @@
+<div
+  class="
+    tw:rounded-lg tw:bg-blue-50 tw:px-5 tw:py-4 tw:text-sm
+    tw:leading-relaxed tw:dark:bg-blue-950
+  "
+>
+  <h2 class="tw:mb-1 tw:text-sm tw:font-bold">
+    <%= translation(".if_you_spot_it", bike_type: @bike_type) %>
+  </h2>
+
+  <p class="tw:mb-0">
+    <%= translation(".dont_confront", bike_type: @bike_type) %>
+  </p>
+
+  <hr class="tw:my-3 tw:border-blue-200 tw:dark:border-blue-800">
+
+  <p class="tw:mb-0">
+    <%= translation(".questions_html", email: mail_to("support@bikeindex.org", nil, class: "twlink tw:underline")) %>
+  </p>
+</div>

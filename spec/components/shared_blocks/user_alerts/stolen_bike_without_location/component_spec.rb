@@ -15,7 +15,7 @@ RSpec.describe SharedBlocks::UserAlerts::StolenBikeWithoutLocation::Component, t
     expect(modal.first["data-ui--modal-open-on-connect-value"]).to eq "true"
     expect(modal.text).to include "Please add theft location"
     link = modal.css("a").first
-    expect(link[:href]).to eq "/bikes/12/edit/theft_details#where-theft-happened"
+    expect(link[:href]).to eq "/bikes/12/stolen_report/edit?step=where"
     expect(link.text).to include "2018 Surly Cross Check"
   end
 
@@ -28,7 +28,7 @@ RSpec.describe SharedBlocks::UserAlerts::StolenBikeWithoutLocation::Component, t
     expect(banner.text).to include "It is critical for recovery"
     expect(banner.text).to include "2018 Surly Cross Check"
     expect(banner.text).to include "Without a location we can't spread the word"
-    expect(banner.css("a").map { |a| a[:href] }).to eq ["/bikes/12/edit/theft_details#where-theft-happened"]
+    expect(banner.css("a").map { |a| a[:href] }).to eq ["/bikes/12/stolen_report/edit?step=where"]
     # Everything bar the alert's screen-reader-only kind label
     banner.css("[class~='tw:sr-only']").remove
     expect(banner.text.squish).to eq modal_body.text.squish

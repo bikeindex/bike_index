@@ -1,0 +1,62 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          next_steps:
+            add_location: Add where it was stolen
+            add_location_cta: Add location
+            add_location_sub: Alerts go to shops, police and riders near it
+            add_lock: Add lock and incident details
+            add_lock_cta: Add details
+            add_photo: Add a photo of your %{bike_type}
+            add_photo_sub: Photos make a stolen %{bike_type} far easier to recognize
+            add_photos: Add photos
+            add_police: Add your police report number
+            add_police_cta: Add report
+            add_police_sub: We share reported thefts with LeadsOnline and law enforcement
+              databases
+            alerted: >-
+              We've alerted bike shops, police partners and riders near %{city}. Here's
+              what's done and what you can still do to improve your chances.
+            copy_link: Copy link
+            facebook: Facebook
+            from_html: From %{amount}
+            keep_us_posted: Please keep us posted if your %{bike_type} is recovered.
+            keep_us_posted_body: >-
+              Marking it recovered takes down the alert and helps us learn what works
+              for getting bikes home. We're sorry this happened, and we're wishing
+              you the best of luck.
+            listed: Listed as stolen on Bike Index
+            listed_sub: Searchable by shops, police and riders worldwide
+            location_added: Theft location added
+            location_added_sub: Alerts sent to partners near %{city}
+            lock_added: Lock and incident details
+            lock_added_sub: Helps police connect related thefts
+            mark_recovered: Mark as recovered
+            marked_stolen_html: Your %{bike_type} is now marked %{stolen}.
+            more_ways_to_share: More ways to share
+            nextdoor: Nextdoor
+            photo_added: Photo of your %{bike_type} added
+            photo_added_sub: People know what to look for
+            police_added: Police report added
+            police_added_sub: Sent to LeadsOnline and law enforcement databases
+            promoted_alert: Promoted Theft Alert
+            promoted_alert_body: >-
+              We run targeted Facebook and Instagram ads in the neighborhood where
+              your %{bike_type} was last seen. Charges go directly toward the cost
+              of the ads.
+            promoted_alert_title: Show your %{bike_type} to thousands of riders near
+              %{city}
+            see_alert_options: See alert options
+            share_sub: Friends and local groups are often the first to spot a stolen
+              %{bike_type}.
+            share_text: 'Stolen in %{city}: %{title}. Please keep an eye out!'
+            share_title: Share it with people near you
+            stock_photo_added: Bike Book stock image added
+            stock_photo_added_sub: >-
+              Add your own photos when you can. They make your %{bike_type} easier
+              to recognize.
+            stolen: STOLEN
+            you: you

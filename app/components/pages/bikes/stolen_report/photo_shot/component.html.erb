@@ -1,0 +1,68 @@
+<div class="tw:rounded-lg tw:border tw:border-gray-200 tw:p-4 tw:dark:border-gray-700">
+  <div class="tw:mb-2 tw:flex tw:items-start tw:justify-between tw:gap-2">
+    <h3 class="tw:mb-0 tw:text-base tw:font-bold"><%= @title %></h3>
+    <%= render UI::Badge::Component.new(text: @badge, color: @badge_color, size: :sm) %>
+  </div>
+
+  <p class="tw:mb-3 tw:text-sm tw:text-gray-700 tw:dark:text-gray-300">
+    <%= @hint %>
+  </p>
+
+  <div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:text-sm tw:font-semibold">
+    <div>
+      <div
+        class="
+          tw:flex tw:aspect-4/3 tw:flex-col tw:items-center
+          tw:justify-center tw:gap-1 tw:rounded-md tw:bg-gray-100 tw:p-2
+          tw:text-center tw:text-xs tw:text-gray-500 tw:dark:bg-gray-700
+          tw:dark:text-gray-400
+        "
+      >
+        <%= helpers.inline_svg_tag("icons/image.svg", class: "tw:size-5", aria_hidden: true) %>
+        <%= example_text %>
+      </div>
+
+      <p class="tw:mt-1 tw:mb-0"><%= translation(".example") %></p>
+    </div>
+
+    <div>
+      <div
+        class="tw:aspect-4/3"
+        data-controller="stolen-report--photo"
+        data-stolen-report--photo-url-value="<%= photos_bike_stolen_report_path(@bike) %>"
+        data-stolen-report--photo-uploading-value="<%= translation(".uploading") %>"
+        data-stolen-report--photo-failed-value="<%= translation(".upload_failed") %>"
+        data-photo-kind="<%= @kind %>"
+        data-photo-added="<%= @public_image.present? %>"
+      >
+        <% if @public_image.present? %>
+          <%= render Pages::Bikes::StolenReport::Photo::Component.new(public_image: @public_image) %>
+        <% else %>
+          <label
+            class="
+              tw:mb-0 tw:flex tw:size-full tw:cursor-pointer tw:flex-col
+              tw:items-center tw:justify-center tw:gap-1 tw:rounded-md
+              tw:border-2 tw:border-dashed tw:border-gray-300 tw:bg-gray-50
+              tw:text-gray-500 tw:transition-colors tw:hover:border-blue-500
+              tw:hover:text-blue-600 tw:has-focus-visible:ring-3
+              tw:has-focus-visible:ring-blue-500/40 tw:dark:border-gray-600
+              tw:dark:bg-gray-900
+            "
+          >
+            <input
+              type="file"
+              accept="image/*"
+              class="tw:sr-only"
+              data-action="stolen-report--photo#upload"
+            >
+
+            <%= helpers.inline_svg_tag("icons/camera.svg", class: "tw:size-6", aria_hidden: true) %>
+            <span data-stolen-report--photo-target="status"><%= translation(".add_photo") %></span>
+          </label>
+        <% end %>
+      </div>
+
+      <p class="tw:mt-1 tw:mb-0"><%= translation(".your_photo") %></p>
+    </div>
+  </div>
+</div>

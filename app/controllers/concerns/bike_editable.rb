@@ -1,6 +1,8 @@
 module BikeEditable
   extend ActiveSupport::Concern
 
+  REDESIGNED_TEMPLATES = %w[report_stolen theft_details report_recovered].freeze
+
   included do
     before_action :assign_versions
 
@@ -18,6 +20,8 @@ module BikeEditable
   def edit_bike_template_path_for(bike, template = nil)
     if bike.version?
       edit_bike_version_url(bike.id, edit_template: template)
+    elsif (redesigned_path = redesigned_template_path(bike, template))
+      redesigned_path
     elsif edits_controller_name_for(template) == "edits"
       edit_bike_url(bike.id, edit_template: template)
     elsif template.to_s == "alert"
@@ -129,6 +133,22 @@ module BikeEditable
   end
 
   def edits_controller_name_for(requested_page)
-    %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "theft_alerts" : "edits"
+    if %w[alert alert_purchase_confirmation].include?(requested_page.to_s)
+      "theft_alerts"
+    elsif REDESIGNED_TEMPLATES.include?(requested_page.to_s)
+      "stolen_reports"
+    else
+      "edits"
+    end
+  end
+
+  # Theft templates the stolen report wizard and the recovery pages replaced - their names stay valid
+  # for the menu and old links
+  def redesigned_template_path(bike, template)
+    case template.to_s
+    when "report_stolen" then new_bike_stolen_report_path(bike.id)
+    when "theft_details" then edit_bike_stolen_report_path(bike.id)
+    when "report_recovered" then new_bike_recovered_path(bike.id)
+    end
   end
 end

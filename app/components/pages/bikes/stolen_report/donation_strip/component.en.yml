@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          donation_strip:
+            dismiss: Dismiss
+            donate: Donate
+            nonprofit: >-
+              Bike Index is a nonprofit. Your support helps our recovery efforts and
+              keeps Bike Index free.

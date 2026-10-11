@@ -1,0 +1,20 @@
+<div
+  class="
+    tw:relative tw:size-full tw:overflow-hidden tw:rounded-md tw:border-2
+    tw:border-blue-600 tw:bg-blue-100 tw:dark:bg-blue-950
+  "
+>
+  <% if (image_url = @public_image.image_url(:small)).present? %>
+    <%= image_tag image_url, alt: "", class: "tw:size-full tw:object-cover" %>
+  <% end %>
+
+  <span
+    class="
+      tw:absolute tw:right-1 tw:bottom-1 tw:rounded-full tw:bg-white tw:px-2
+      tw:py-0.5 tw:text-xs tw:font-bold tw:text-blue-700 tw:dark:bg-gray-900
+      tw:dark:text-blue-300
+    "
+  >
+    <%= translation(".added") %>
+  </span>
+</div>

@@ -20,8 +20,8 @@ module SharedBlocks
           @bikes.first.type
         end
 
-        def edit_theft_details_path(bike)
-          edit_bike_path(bike.to_param, edit_template: "theft_details", anchor: "where-theft-happened")
+        def theft_location_path(bike)
+          edit_bike_stolen_report_path(bike.to_param, step: "where")
         end
       end
     end

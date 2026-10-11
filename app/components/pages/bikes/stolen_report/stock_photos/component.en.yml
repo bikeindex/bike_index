@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          stock_photos:
+            matches:
+              one: 1 match on Bike Book
+              other: "%{count} matches on Bike Book"
+            no_matches: No matches on Bike Book. Try fewer words in the model.
+            present: present
+            use_this_image: Use this image
+            using_this_image: Using this image ✓

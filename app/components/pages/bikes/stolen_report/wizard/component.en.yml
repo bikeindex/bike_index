@@ -1,0 +1,138 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          wizard:
+            add: Add
+            address_or_intersection: Address or intersection
+            approximate_time: Approximate time
+            back: Back
+            best_guess: Best guess is fine
+            city: City
+            city_required: Required so we can alert people nearby
+            contact_helper: >-
+              If someone finds your %{bike_type}, this is how they get in touch. You
+              choose who can see your number.
+            contact_title: How can people reach you?
+            continue: Continue
+            country: Country
+            date: Date
+            department_and_city: Department & city
+            done: Done
+            drive_side: Drive-side profile
+            drive_side_added: >-
+              Great, that's the most important shot. Add a photo of any unique marks
+              too if you have one.
+            drive_side_hint: >-
+              The whole %{bike_type} from the side, chain facing the camera. Good
+              light, nothing in front of it.
+            edit: Edit
+            estimated_value: Estimated value (%{currency})
+            extra_helper: Police and insurers usually ask for both.
+            extra_title: Value and proof of ownership
+            have_report: I have a report
+            how_to_file: How to file a report
+            how_to_file_call_html: 'If not, call the non-emergency line. Have your
+              serial number ready: %{serial}.'
+            how_to_file_call_no_serial: If not, call the non-emergency line.
+            how_to_file_come_back: Ask for the report number, then come back and add
+              it here.
+            how_to_file_search: >-
+              Search for your city's police department online. Many let you file a
+              %{bike_type} theft report on their website.
+            in_progress: In progress
+            lock_helper: Lock details help police spot patterns and connect related
+              thefts.
+            lock_title: How was it locked?
+            make: Make
+            missing_required: A few required answers are missing.
+            model: Model
+            never_shown: Never shown publicly
+            no_answer: 'No'
+            no_report_yet: I haven't filed one yet
+            not_added_yet: Not added yet
+            not_sure: Not sure
+            not_sure_value: I'm not sure
+            phone: Phone
+            photos_helper: >-
+              A %{bike_type} with photos is far more likely to be recovered. These
+              two shots give people what they need to recognize it.
+            photos_title: Photos of your %{bike_type}
+            police_helper: >-
+              With a report number, we share your %{bike_type} with LeadsOnline and
+              law enforcement databases automatically.
+            police_title: Police report
+            postal_code: Postal code
+            progress_saved: Progress saved
+            proof_of_ownership: Do you have proof of ownership?
+            proof_of_ownership_helper: >-
+              A receipt, invoice, or photo of you with the %{bike_type}. If a bike
+              shop registered this %{bike_type}, that counts.
+            receive_notifications: Send me updates about this %{bike_type}
+            receive_notifications_helper: >-
+              For example, if we share it on social media or someone searches for
+              its serial number.
+            recommended_badge: Recommended
+            region: Region
+            report_as_stolen: Report as stolen
+            report_number: Report number
+            required: Required
+            required_badge: Required
+            review_helper: You can edit any of this after submitting.
+            review_title: Review your report
+            save_changes: Save changes
+            search_bike_book: Search Bike Book
+            secondary_phone: Secondary phone
+            show_phone_police: Verified law enforcement partners
+            show_phone_shops: Bike shop employees
+            show_phone_users: Logged-in Bike Index users
+            skip_for_now: Skip for now
+            skipped: Skipped · add later
+            state: State
+            step_contact: Contact & visibility
+            step_extra: Value & ownership
+            step_lock: Lock & incident
+            step_of: Step %{number} of %{total}
+            step_photos: Photos
+            step_police: Police report
+            step_review: Review & submit
+            step_where: When & where
+            steps: Report steps
+            stock_photo_helper: >-
+              A picture of the same model helps people know what to look for. Add
+              your own photos later if you find any.
+            stock_photo_title: Don't have a photo? Use a stock image from Bike Book.
+            street_placeholder: e.g. 14th St & Broadway
+            summary_around: around
+            summary_no_report: Not filed yet
+            summary_photos_added: "%{number} of 2 photos added"
+            summary_police: police
+            summary_proof: 'Proof of ownership: %{answer}'
+            summary_shops: shops
+            summary_stock_photo: Using a Bike Book stock image
+            summary_users: users
+            summary_value_unknown: Value unknown
+            summary_visible_to: visible to
+            unique_marks: Unique marks
+            unique_marks_hint: >-
+              Stickers, scratches, custom parts or accessories. Anything that makes
+              it clearly yours.
+            what_happened: What happened?
+            what_happened_helper: 'Anything that might help: what was taken with it,
+              witnesses, cameras nearby.'
+            what_happened_placeholder: >-
+              e.g. Locked to the rack outside the library around 7pm. Came back at
+              9 and it was gone, cut cable on the ground.
+            what_happened_required: Tell us what happened, even a sentence or two
+              helps.
+            what_happened_to_lock: What happened to the lock?
+            what_lock: What lock were you using?
+            where_helper: >-
+              The location sends alerts to shops, police and riders nearby. Only your
+              postal code is shown publicly.
+            where_title: When and where was it stolen?
+            who_can_see_phone: Who can see your phone number?
+            year: Year
+            yes_answer: 'Yes'
