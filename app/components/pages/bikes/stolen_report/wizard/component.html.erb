@@ -424,7 +424,7 @@
                     data: {action: "stolen-report--wizard#searchStockPhotos"}) %>
               </div>
 
-              <%= helpers.turbo_frame_tag "stolen_report_stock_photos", src: (stock_photos_src if @bike.mnfg_name.present?), loading: :lazy,
+              <%= helpers.turbo_frame_tag Pages::Bikes::StolenReport::StockPhotos::Component::FRAME_ID, src: (stock_photos_src if @bike.mnfg_name.present?), loading: :lazy,
                   data: {"stolen-report--wizard-target": "stockPhotosFrame"} %>
             </div>
           <% end %>

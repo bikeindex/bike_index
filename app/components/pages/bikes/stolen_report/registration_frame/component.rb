@@ -13,19 +13,16 @@ module Pages
 
           # The registration's details are in, and its emailed link is what's left before the report
           CONFIRM_EMAIL = "confirm_email"
-          # The step the registration is on, where the register flow's names it
-          def self.step_for(register_step) = (register_step.to_s == "2") ? "bike_details" : "bike_info"
 
           # step: one of REGISTRATION_STEPS, or CONFIRM_EMAIL
-          # data: the step's controllers, which the register flow's shell carries for the whole page
-          def initialize(b_param:, step:, title:, helper:, data: {})
+          def initialize(b_param:, step:, title:, helper:)
             @b_param = b_param
             @step = (REGISTRATION_STEPS + [CONFIRM_EMAIL]).include?(step) ? step : REGISTRATION_STEPS.first
             @title = title
             @helper = helper
-            @data = data.merge(controller: [data[:controller], "stolen-report--registration-header"].compact.join(" "),
-              action: [data[:action], "hw-combobox:selection->stolen-report--registration-header#update",
-                "form-persist:restored@window->stolen-report--registration-header#update"].compact.join(" "))
+            @data = {controller: "stolen-report--registration-header",
+                     action: "hw-combobox:selection->stolen-report--registration-header#update " \
+                       "form-persist:restored@window->stolen-report--registration-header#update"}
           end
 
           private

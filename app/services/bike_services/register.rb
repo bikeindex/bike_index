@@ -203,7 +203,7 @@ module BikeServices
 
     # The wizard reported it, so its registration stops sending the owner back there
     def stolen_report_finished(bike)
-      BParam.where(created_bike_id: bike.id).where("params ? 'stolen_report_pending'").find_each do |b_param|
+      BParam.stolen_report_pending.where(created_bike_id: bike.id).find_each do |b_param|
         b_param.update_column(:params, b_param.params.except("stolen_report_pending"))
       end
     end

@@ -24,7 +24,7 @@ module Pages
 
         def best_value_plan = @best_value_plan ||= @plans.max_by(&:amount_cents)
 
-        def images = @images ||= @bike.public_images.to_a
+        def images = @images ||= @bike.public_images.with_attached_file.to_a
 
         # The alert falls back to the stock photo when the bike has none of its own
         def stock_only? = images.none? && @bike.stock_photo_url.present?

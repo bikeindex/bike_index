@@ -22,7 +22,7 @@ export default class extends Controller {
 
         this.fill(json.html, 'true')
         this.showInHeader(json.image_url)
-        this.dispatch('added', { detail: { kind: this.element.dataset.photoKind } })
+        this.dispatch('added')
       })
       .catch((error) => {
         target.value = ''
@@ -36,7 +36,7 @@ export default class extends Controller {
         if (!response.ok) throw new Error(response.statusText)
 
         this.fill(this.emptyTarget.innerHTML, 'false')
-        this.dispatch('removed', { detail: { kind: this.element.dataset.photoKind } })
+        this.dispatch('removed')
       })
       .catch(() => {})
   }

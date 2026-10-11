@@ -107,12 +107,12 @@ module Pages
              step_of: translation(".step_of", number: "%{number}", total: "%{total}"), progress_saved: progress_saved_text}
           end
 
-          # In the app's zone - stolen-report--wizard rewrites them into the browser's from date_stolen_iso
           # The draft is kept in the browser as it's entered, which an edit isn't - it saves on submit
           def progress_saved_text = (translation(".progress_saved") unless editing?)
 
           def future_date? = invalid?(:date) && BikeServices::StolenReport.future_date?(date_value)
 
+          # In the app's zone - stolen-report--wizard rewrites them into the browser's from date_stolen_iso
           def date_value = @submitted.key?(:date) ? @submitted[:date] : @stolen_record.date_stolen&.in_time_zone&.to_date&.iso8601
 
           def time_value = @submitted.key?(:time) ? @submitted[:time] : @stolen_record.date_stolen&.in_time_zone&.strftime("%H:%M")
@@ -146,14 +146,14 @@ module Pages
             value.nil? || value
           end
 
-          def photos = @photos ||= @bike.public_images.limit(2).to_a
+          def photos = @photos ||= @bike.public_images.with_attached_file.limit(2).to_a
 
           def stock_photos_src
             stock_photos_bike_stolen_report_path(@bike, manufacturer: @bike.mnfg_name, model: @bike.frame_model,
               year: @bike.year, selected_url: @bike.stock_photo_url)
           end
 
-          def serial = @bike.no_serial? ? nil : @bike.serial_display
+          def serial = (@bike.serial_display unless @bike.no_serial?)
 
           def submit_text
             editing? ? translation(".save_changes") : translation(".report_as_stolen")

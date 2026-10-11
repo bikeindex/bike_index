@@ -245,7 +245,7 @@ RSpec.describe Bikes::EditsController, type: :request do
         bc = Bikes::EditsController.new
         bc.instance_variable_set(:@bike, Bike.new(status: "status_stolen"))
         # Don't test alert templates, they're in theft alerts controller - or the redesigned ones, which redirect
-        bc.edit_templates.keys - %w[alert alert_purchase_confirmation] - BikeEditable::REDESIGNED_TEMPLATES
+        bc.edit_templates.keys - %w[alert alert_purchase_confirmation] - BikeEditable::REDESIGNED_TEMPLATES.keys
       end
       let(:no_global_alert_templates) { %w[photos remove] }
       before { FactoryBot.create_list(:theft_alert_plan, 3) }

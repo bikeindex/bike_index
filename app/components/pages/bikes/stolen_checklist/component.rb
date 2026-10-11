@@ -69,8 +69,8 @@ module Pages
             @stolen_record.organization_stolen_message&.shown_to?(@stolen_record)
         end
 
-        def edit_path(template, anchor: nil)
-          edit_bike_url(id: @bike.to_param, edit_template: template, anchor:)
+        def edit_path(template)
+          edit_bike_url(id: @bike.to_param, edit_template: template)
         end
 
         # The stolen report wizard, open on the step that adds it

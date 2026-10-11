@@ -19,8 +19,7 @@ module Bikes
 
       recovered_description = recovery_params.values_at(:how, :story).compact_blank.join(": ")
       Feedback.create(feedback_type: "bike_recovery", title: "Bike Recovery", body: recovered_description,
-        email: current_user&.email || @bike.owner_email, name: current_user&.name.presence || "no name",
-        user_id: current_user&.id,
+        user: current_user, email: (@bike.owner_email unless current_user), name: ("no name" unless current_user&.name.present?),
         feedback_hash: {bike_id: @bike.id, index_helped_recovery: recovery_params[:index_helped_recovery],
                         can_share_recovery: recovery_params[:can_share_recovery]})
       stolen_record.add_recovery_information(recovery_params.slice(:recovered_at, :timezone, :index_helped_recovery,

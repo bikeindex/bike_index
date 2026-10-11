@@ -6,7 +6,6 @@ module Pages
       module CurrentAlerts
         module RecoveryPrompt
           # The "mark it recovered" form, reached from a theft alert email's recovery link.
-          # A similar form lives in edit_report_stolen / edit_report_recovered
           class Component < ApplicationComponent
             include PromptVariant
 

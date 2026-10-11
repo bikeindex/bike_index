@@ -63,7 +63,7 @@ module Pages
           # @param view select [consumer, org_admin]
           def finish_stolen_report(view: "consumer")
             # State rather than a token: a registration handed to the stolen report wizard, unreported
-            b_param = ::BParam.where("params ? 'stolen_report_pending'").where.not(created_bike_id: nil).last
+            b_param = ::BParam.stolen_report_pending.with_bike.last
             return missing_notice("a registration handed to the stolen report wizard") if b_param.blank?
 
             page(view:, bike_id: b_param.created_bike_id)

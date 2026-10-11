@@ -8,14 +8,15 @@ module Pages
           # Shown to the owner of a bike registered to report stolen, until the stolen report wizard
           # it was handed to has reported it - see BikeServices::Register.report_in_wizard?
           class Component < ApplicationComponent
-            def initialize(bike:, owner: false)
+            def initialize(bike:, owner: false, margin_classes: "")
               @bike = bike
               @owner = owner
+              @margin_classes = margin_classes
             end
 
             def render?
               @owner && !@bike.status_stolen? &&
-                BParam.where(created_bike_id: @bike.id).where("params ? 'stolen_report_pending'").exists?
+                BParam.stolen_report_pending.exists?(created_bike_id: @bike.id)
             end
           end
         end

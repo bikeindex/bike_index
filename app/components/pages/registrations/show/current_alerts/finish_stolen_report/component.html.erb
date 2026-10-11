@@ -1,4 +1,4 @@
-<%= render(UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "")) do %>
+<%= render(UI::Alerts::Base::Component.new(kind: :warning, margin_classes: @margin_classes)) do %>
   <p class="tw:mb-2">
     <%= translation(".not_reported_yet", bike_type: @bike.type) %>
   </p>

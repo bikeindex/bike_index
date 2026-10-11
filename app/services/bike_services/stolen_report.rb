@@ -32,6 +32,7 @@ module BikeServices
     def save(bike:, user:, params:)
       return false if missing(params).any?
 
+      reporting = !bike.status_stolen?
       bike_params = {"stolen_records_attributes" => {"0" => stolen_attrs(params)}}
       stock_photo_url = stock_photo_url(params[:stock_photo_id])
       bike_params["stock_photo_url"] = stock_photo_url if stock_photo_url.present?
@@ -39,7 +40,7 @@ module BikeServices
         permitted_params: {"bike" => bike_params}).update_available_attributes
       return false if bike.reload.current_stolen_record.blank?
 
-      BikeServices::Register.stolen_report_finished(bike)
+      BikeServices::Register.stolen_report_finished(bike) if reporting
       true
     end
 
