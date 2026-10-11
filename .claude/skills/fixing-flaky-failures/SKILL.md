@@ -22,6 +22,10 @@ repo's `flaky:` retry harness, and the known false-flake causes — a missing
 Tailwind build, the shared Redis autocomplete cache, Turbo frame timing,
 probe-run interference.
 
+## Who runs this
+
+From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — no `model` override (finding the mechanism is judgment) — briefed with the failing spec and its CI run or output, what the branch changed, and anything already tried. It replies with the mechanism and the evidence for it, the fix left uncommitted in the working tree, and the runs that show it holds — or, if it couldn't reproduce, what it ruled out.
+
 ## The rule that overrides everything else here
 
 **You may not reduce test coverage to make a flaky test pass.** Not as a last
