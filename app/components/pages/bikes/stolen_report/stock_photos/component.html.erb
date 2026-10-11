@@ -7,7 +7,12 @@
 
   <%# The image picked before this search stays picked, until another is %>
   <% if keep_selection? %>
-    <label class="tw:mt-2 tw:mb-3 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-normal">
+    <label
+      class="
+        tw:mt-2 tw:mb-3 tw:flex tw:items-center tw:gap-2 tw:text-sm
+        tw:font-normal
+      "
+    >
       <%= radio_button_tag "stolen_record[stock_photo_id]", @selected_id, true, id: nil, data: {url: @selected_url} %>
       <%= translation(".keep_selection") %>
     </label>
