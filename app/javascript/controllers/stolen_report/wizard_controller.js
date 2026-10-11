@@ -73,7 +73,6 @@ export default class extends Controller {
     if (this.stepValue !== 'review') this.next()
   }
 
-  // The browser's back and forward, between steps
   restoreStep () {
     const step = new URL(window.location.href).searchParams.get('step') || this.stepsValue[0]
     if (this.stepsValue.includes(step) && step !== this.stepValue) this.show(step, { focus: true })

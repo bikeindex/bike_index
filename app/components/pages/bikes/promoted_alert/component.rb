@@ -4,7 +4,8 @@ module Pages
   module Bikes
     module PromotedAlert
       # Buying a Promoted Theft Alert: the plans, a preview of the ad, and the photo it uses.
-      # Posts to Bikes::TheftAlertsController#create, which hands off to Stripe checkout
+      # Posts to Bikes::TheftAlertsController#create, which hands off to Stripe checkout.
+      # The preview's "Stolen Bike" is bike-only on purpose - it copies the ad image's own banner
       class Component < ApplicationComponent
         # plans: the active plans in the viewer's language, cheapest first
         # theft_alerts: the ones already bought for this theft, listed below

@@ -179,7 +179,6 @@
           <%= render UI::Alerts::Base::Component.new(kind: :error, text: translation(".missing_required")) %>
         <% end %>
 
-        <%# When and where %>
         <section
           class="<%= panel_class("where") %>"
           data-stolen-report--wizard-target="panel"
@@ -281,7 +280,6 @@
           <% end %>
         </section>
 
-        <%# How it was locked, and what happened %>
         <section
           class="<%= panel_class("lock") %>"
           data-stolen-report--wizard-target="panel"
@@ -336,7 +334,6 @@
           <% end %>
         </section>
 
-        <%# Photos, or a stock photo in their place %>
         <section
           class="<%= panel_class("photos") %>"
           data-stolen-report--wizard-target="panel"
@@ -433,7 +430,6 @@
           <% end %>
         </section>
 
-        <%# Police report %>
         <section
           class="<%= panel_class("police") %>"
           data-stolen-report--wizard-target="panel"
@@ -515,7 +511,6 @@
           <% end %>
         </section>
 
-        <%# Contact and who sees it %>
         <section
           class="<%= panel_class("contact") %>"
           data-stolen-report--wizard-target="panel"
@@ -554,7 +549,6 @@
           <% end %>
         </section>
 
-        <%# Value and proof of ownership %>
         <section
           class="<%= panel_class("extra") %>"
           data-stolen-report--wizard-target="panel"
@@ -595,7 +589,6 @@
           <% end %>
         </section>
 
-        <%# Review %>
         <section
           class="<%= panel_class("review") %>"
           data-stolen-report--wizard-target="panel"

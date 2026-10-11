@@ -28,7 +28,6 @@ module Bikes
       render Pages::Bikes::StolenReport::NextSteps::Component.new(bike: @bike, stolen_record: @stolen_record)
     end
 
-    # The Bike Book models the photo step's search finds, in its turbo frame
     def stock_photos
       results = Integrations::Bikebook::Catalog.stock_photos(manufacturer: params[:manufacturer],
         model: params[:model], year: params[:year])
@@ -36,7 +35,6 @@ module Bikes
         selected_url: params[:selected_url], selected_id: params[:selected_id]), layout: false
     end
 
-    # A photo from the photo step, stored on the bike as soon as it's picked
     def photos
       if request.content_length.to_i > PublicImageUploader::MAX_FILE_SIZE
         max_size = ActiveSupport::NumberHelper.number_to_human_size(PublicImageUploader::MAX_FILE_SIZE)
@@ -64,7 +62,6 @@ module Bikes
         return redirect_to(bike_stolen_report_path(@bike))
       end
 
-      # Not saved - the re-render shows what they entered
       stolen_record.assign_attributes(report_params.slice(*BikeServices::StolenReport::RECORD_ATTRIBUTES))
       missing = BikeServices::StolenReport.missing(report_params)
       render_wizard(stolen_record, step: BikeServices::StolenReport::REQUIRED[missing.first], missing:,
