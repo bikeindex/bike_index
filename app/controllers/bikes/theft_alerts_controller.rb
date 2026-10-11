@@ -11,6 +11,9 @@ module Bikes
       @selected_theft_alert_plan =
         @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
         @theft_alert_plans.order(:amount_cents).second
+      render Pages::Bikes::PromotedAlert::Component.new(bike: @bike, stolen_record: @bike.current_stolen_record,
+        plans: @theft_alert_plans.to_a, selected_plan: @selected_theft_alert_plan,
+        currency: helpers.default_currency, theft_alerts: @theft_alerts)
     end
 
     def show

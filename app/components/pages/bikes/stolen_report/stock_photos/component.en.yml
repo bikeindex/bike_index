@@ -5,6 +5,7 @@ en:
       bikes:
         stolen_report:
           stock_photos:
+            keep_selection: Keep using the image you picked
             matches:
               one: 1 match on Bike Book
               other: "%{count} matches on Bike Book"

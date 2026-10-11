@@ -33,7 +33,7 @@ module Bikes
       results = Integrations::Bikebook::Catalog.stock_photos(manufacturer: params[:manufacturer],
         model: params[:model], year: params[:year])
       render Pages::Bikes::StolenReport::StockPhotos::Component.new(results:, searched: params[:manufacturer].present?,
-        selected_url: params[:selected_url]), layout: false
+        selected_url: params[:selected_url], selected_id: params[:selected_id]), layout: false
     end
 
     # A photo from the photo step, stored on the bike as soon as it's picked
@@ -44,7 +44,10 @@ module Bikes
       end
 
       public_image = @bike.public_images.build(file: params[:photo])
-      return render(json: {html: render_to_string(Pages::Bikes::StolenReport::Photo::Component.new(public_image:), layout: false)}) if public_image.save
+      if public_image.save
+        return render(json: {html: render_to_string(Pages::Bikes::StolenReport::Photo::Component.new(public_image:), layout: false),
+                             image_url: public_image.image_url(:small)})
+      end
 
       render json: {error: public_image.errors.full_messages.to_sentence}, status: :unprocessable_entity
     end
@@ -84,9 +87,13 @@ module Bikes
       redirect_to(bike_path(@bike)) if @bike.status_stolen_or_impounded? || @bike.version?
     end
 
+    # A recovered bike's report is over, so its links go to the recovery rather than a new report
     def find_stolen_record
       @stolen_record = @bike.current_stolen_record
-      redirect_to(new_bike_stolen_report_path(@bike)) if @stolen_record.blank?
+      return if @stolen_record.present?
+
+      recovered = StolenRecord.recovered.where(bike_id: @bike.id).exists?
+      redirect_to(recovered ? bike_recovered_path(@bike) : new_bike_stolen_report_path(@bike))
     end
   end
 end

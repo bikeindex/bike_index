@@ -15,7 +15,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
     it "renders" do
       get "#{base_url}/new"
       expect(response.code).to eq("200")
-      expect(response).to render_template("new")
+      expect(response.body).to include("Promoted Theft Alert")
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_falsey
       expect(assigns(:selected_theft_alert_plan)&.id).to eq theft_alert_plan2.id
@@ -34,7 +34,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
         expect(stolen_record.theft_alerts.active.pluck(:id)).to eq([])
         get "#{base_url}/new"
         expect(response.code).to eq("200")
-        expect(response).to render_template("new")
+        expect(response.body).to include("Promoted Theft Alert")
         expect(flash).to_not be_present
         expect(assigns(:show_general_alert)).to be_falsey
         expect(assigns(:selected_theft_alert_plan)&.id).to eq theft_alert_plan2.id
@@ -45,7 +45,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
         it "doesn't render" do
           get "#{base_url}/new"
           expect(response.code).to eq("200")
-          expect(response).to render_template("new")
+          expect(response.body).to include("Promoted Theft Alert")
           expect(flash).to_not be_present
           expect(assigns(:show_general_alert)).to be_falsey
           expect(assigns(:selected_theft_alert_plan)&.id).to eq theft_alert_plan2.id
@@ -56,7 +56,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
           it "renders" do
             get "#{base_url}/new"
             expect(response.code).to eq("200")
-            expect(response).to render_template("new")
+            expect(response.body).to include("Promoted Theft Alert")
             expect(flash).to_not be_present
             expect(assigns(:show_general_alert)).to be_falsey
             expect(assigns(:selected_theft_alert_plan)&.id).to eq theft_alert_plan2.id

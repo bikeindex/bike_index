@@ -1326,28 +1326,6 @@ en:
       unavailable: The map couldn't be loaded — your browser or device may not support
         it.
     theft_alerts:
-      new:
-        best_value: Best value
-        bike_index_can_help: >-
-          Bike Index can help by purchasing targeted ads on Facebook to spread the
-          word about your stolen %{bike_type}.
-        bike_index_promoted_alert: Bike Index Promoted Alert
-        city_state_country: City, State - Country
-        days: Days
-        here: here
-        no_photos_add_photos_here_html: >-
-          Uh oh. We don't have any photos of your bike available. Upload one %{link}
-          to set up a promoted alert!
-        preview: Promoted Alert Preview
-        purchase_alert: Purchase Alert
-        select_an_image: Select an image
-        select_an_image_to_see_preview: >-
-          Select an image of your bike to see a preview of what your promoted alert
-          will look like:
-        targeted_sharing_html: >-
-          We've found targeted sharing on social media to have a <em>huge</em> effect
-          on recovering stolen bikes.
-        views: Views
       show:
         stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
           processed your alert.

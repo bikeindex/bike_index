@@ -15,6 +15,7 @@ RSpec.describe Pages::Registrations::Show::Wrapper::Component, :js, type: :syste
     # The claim card's heading is uppercased in CSS, so it anchors on its claim button
     {"claim_impound" => ["claim_impound/component/with_stolen_registration", "Claim found bike"],
      "claim_invitation" => ["component/claim_invitation", "registered your bike on Bike Index"],
+     "finish_stolen_report" => ["component/finish_stolen_report", "Finish the theft report"],
      "notification_token" => ["component/notification_token", "Mark bike retrieved"],
      "recovery_prompt" => ["component/recovery_prompt", "Mark your bike recovered!"],
      "scanned_sticker" => ["component/scanned_sticker", "You scanned"],
@@ -35,6 +36,13 @@ RSpec.describe Pages::Registrations::Show::Wrapper::Component, :js, type: :syste
       owner_email: "new-owner@example.com")
   end
   let!(:stolen_bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
+  # Registered to report stolen and left unreported. No ownership, so the scenarios resolving a
+  # registration for themselves don't land on it
+  let!(:pending_stolen_report_bike) do
+    FactoryBot.create(:bike).tap do |bike|
+      BParam.create(origin: "register_flow", created_bike_id: bike.id, params: {"stolen_report_pending" => true})
+    end
+  end
   # Its own bike, with no ownership - so the scenarios resolving a claimed registration
   # don't land on the one carrying the claim card
   let!(:impound_record) { FactoryBot.create(:impound_record) }

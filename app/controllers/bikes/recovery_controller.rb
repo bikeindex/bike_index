@@ -3,11 +3,11 @@ module Bikes
     skip_before_action :ensure_user_allowed_to_edit
     before_action :ensure_token_match!
 
+    # The token goes in the session rather than the page's URL, so page js never sees it -
+    # Bikes::RecoveredController takes it from there
     def edit
-      # redirect to bike show and set session - so the token isn't available to on page js
-      # and so we can render show with a modal
       session[:recovery_link_token] = params[:token]
-      redirect_to bike_path(@bike)
+      redirect_to new_bike_recovered_path(@bike)
     end
 
     def update

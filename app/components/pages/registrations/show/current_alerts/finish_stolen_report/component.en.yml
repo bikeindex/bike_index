@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          current_alerts:
+            finish_stolen_report:
+              finish_report: Finish the theft report
+              not_reported_yet: >-
+                Your %{bike_type} is registered, but it isn't reported stolen yet.
+                Shops, police and riders aren't alerted until you finish the theft
+                report.

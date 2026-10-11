@@ -16,7 +16,17 @@ module BikeServices
 
     def step(value) = STEPS.include?(value) ? value : STEPS.first
 
-    def missing(params) = REQUIRED.keys.select { params[it].blank? }
+    # The required answers left blank - and a date that hasn't happened yet, which is as good as one
+    def missing(params)
+      REQUIRED.keys.select { params[it].blank? || (it == :date && future_date?(params[:date])) }
+    end
+
+    # Tomorrow is allowed, since the owner's day can be ahead of the server's
+    def future_date?(date)
+      date.present? && (Date.parse(date.to_s) > Time.current.to_date + 1)
+    rescue Date::Error
+      false
+    end
 
     # Saves nothing while a required answer is missing, returning false
     def save(bike:, user:, params:)
@@ -27,7 +37,10 @@ module BikeServices
       bike_params["stock_photo_url"] = stock_photo_url if stock_photo_url.present?
       BikeServices::Updator.new(user:, bike:, current_ownership: bike.current_ownership,
         permitted_params: {"bike" => bike_params}).update_available_attributes
-      bike.reload.current_stolen_record.present?
+      return false if bike.reload.current_stolen_record.blank?
+
+      BikeServices::Register.stolen_report_finished(bike)
+      true
     end
 
     #

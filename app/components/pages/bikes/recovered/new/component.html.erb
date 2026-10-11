@@ -1,6 +1,6 @@
 <%= render Pages::Bikes::StolenReport::Shell::Component.new(bike: @bike, status: :stolen) do %>
   <div class="tw:mx-auto tw:max-w-3xl">
-    <%= link_to bike_stolen_report_path(@bike), class: "twlink tw:text-sm tw:font-semibold" do %>
+    <%= link_to @back_path, class: "twlink tw:text-sm tw:font-semibold" do %>
       <span aria-hidden="true">←</span> <%= translation(".back") %>
     <% end %>
 
@@ -73,7 +73,7 @@
       <% end %>
 
       <div class="tw:mt-5 tw:flex tw:items-center tw:justify-end tw:gap-5">
-        <%= link_to translation(".never_mind"), bike_stolen_report_path(@bike), class: "tw:text-sm tw:font-semibold tw:text-gray-600 tw:dark:text-gray-400" %>
+        <%= link_to translation(".never_mind"), @back_path, class: "tw:text-sm tw:font-semibold tw:text-gray-600 tw:dark:text-gray-400" %>
 
         <%= render UI::Button::Component.new(text: translation(".mark_recovered"), color: :primary, size: :lg, type: "submit", spinner: true,
             html_class: "tw:rounded-full! tw:px-8! tw:py-2.5!") %>

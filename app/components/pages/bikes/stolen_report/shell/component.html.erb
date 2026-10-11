@@ -17,6 +17,7 @@
           tw:justify-center tw:overflow-hidden tw:rounded-md tw:bg-gray-100
           tw:text-blue-600 tw:sm:flex tw:dark:bg-gray-700
         "
+        data-stolen-report-thumbnail
       >
         <% if image_url.present? %>
           <%= image_tag image_url, alt: "", class: "tw:size-full tw:object-cover" %>
@@ -52,7 +53,9 @@
         <% end %>
 
         <h1 class="tw:mt-1 tw:mb-0 tw:text-2xl tw:leading-tight tw:sm:text-3xl">
-          <strong class="tw:font-extrabold"><%= heading %></strong>
+          <%= tag.strong(heading, class: "tw:font-extrabold",
+              data: ({"stolen-report--registration-header-target": "title"} if @bike.blank?)) %>
+
           <span class="tw:font-medium"><%= frame_model %></span>
         </h1>
 

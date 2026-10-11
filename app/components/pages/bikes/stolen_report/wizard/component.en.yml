@@ -19,6 +19,7 @@ en:
             continue: Continue
             country: Country
             date: Date
+            date_in_future: That date hasn't happened yet
             department_and_city: Department & city
             done: Done
             drive_side: Drive-side profile
@@ -59,6 +60,8 @@ en:
             photos_helper: >-
               A %{bike_type} with photos is far more likely to be recovered. These
               two shots give people what they need to recognize it.
+            photos_saved_right_away: Photos are saved to your %{bike_type} as soon
+              as you add them.
             photos_title: Photos of your %{bike_type}
             police_helper: >-
               With a report number, we share your %{bike_type} with LeadsOnline and

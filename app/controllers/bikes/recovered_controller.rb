@@ -1,5 +1,8 @@
 module Bikes
   class RecoveredController < Bikes::BaseController
+    # The theft alert email's recovery link marks the bike recovered without signing in - it parks its
+    # token in the session (Bikes::RecoveryController#edit), which stands in for being the owner here
+    skip_before_action :ensure_user_allowed_to_edit, if: :recovery_link?
     # A component renders as whatever the request asks for - a Turbo submission that redirects here asks for a stream
     before_action :force_html_response
 
@@ -16,11 +19,16 @@ module Bikes
 
       recovered_description = recovery_params.values_at(:how, :story).compact_blank.join(": ")
       Feedback.create(feedback_type: "bike_recovery", title: "Bike Recovery", body: recovered_description,
-        email: current_user.email, name: current_user.name.presence || "no name", user_id: current_user.id,
+        email: current_user&.email || @bike.owner_email, name: current_user&.name.presence || "no name",
+        user_id: current_user&.id,
         feedback_hash: {bike_id: @bike.id, index_helped_recovery: recovery_params[:index_helped_recovery],
                         can_share_recovery: recovery_params[:can_share_recovery]})
       stolen_record.add_recovery_information(recovery_params.slice(:recovered_at, :timezone, :index_helped_recovery,
-        :can_share_recovery).merge(recovered_description:, recovering_user_id: current_user.id))
+        :can_share_recovery).merge(recovered_description:, recovering_user_id: current_user&.id))
+      if session.delete(:recovery_link_token).present?
+        EmailJobs::RecoveredFromLinkJob.perform_async(stolen_record.id)
+        session[:recovered_bike_id] = @bike.id
+      end
       redirect_to bike_recovered_path(@bike)
     end
 
@@ -40,7 +48,19 @@ module Bikes
 
     def render_form(submitted: {}, status: :ok)
       @page_title = translation(:mark_recovered, bike_type: @bike.type, controller_method: :new)
-      render Pages::Bikes::Recovered::New::Component.new(bike: @bike, submitted:), status:
+      render Pages::Bikes::Recovered::New::Component.new(bike: @bike, submitted:,
+        back_path: recovery_link? ? bike_path(@bike) : bike_stolen_report_path(@bike)), status:
+    end
+
+    # The link's token for this bike's theft, or - once it's spent - the recovery it made
+    def recovery_link?
+      return @recovery_link if defined?(@recovery_link)
+
+      @recovery_link = if action_name == "show"
+        session[:recovered_bike_id] == @bike.id
+      else
+        !!StolenRecord.find_matching_token(bike_id: @bike.id, recovery_link_token: session[:recovery_link_token])&.current?
+      end
     end
   end
 end

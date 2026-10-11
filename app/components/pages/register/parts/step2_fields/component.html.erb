@@ -16,54 +16,57 @@
     primary_frame_color_id: @b_param.primary_frame_color_id, secondary_frame_color_id: bike["secondary_frame_color_id"],
     tertiary_frame_color_id: bike["tertiary_frame_color_id"]) %>
 
-<div class="tw:mb-4" data-controller="register--frame-size">
-  <span class="twlabel">
-    <%= translation(".frame_size") %><%= optional_badge %>
-  </span>
+<%# Framed as a theft report, the size is left for later and the photo step asks for photos %>
+<% unless @stolen_frame %>
+  <div class="tw:mb-4" data-controller="register--frame-size">
+    <span class="twlabel">
+      <%= translation(".frame_size") %><%= optional_badge %>
+    </span>
 
-  <div class="tw:mt-2 tw:mb-2">
-    <%= render UI::Forms::RadioButtonGroup::Component.new(name: "bike[frame_size]", full_width: true,
+    <div class="tw:mt-2 tw:mb-2">
+      <%= render UI::Forms::RadioButtonGroup::Component.new(name: "bike[frame_size]", full_width: true,
         selected: bike["frame_size"],
         html_options: {data: {"register--frame-size-target": "chip", action: "change->register--frame-size#pickChip"}},
         entries: %w[xs s m l xl].map { |size| {value: size, label: size.upcase} }) %>
-  </div>
+    </div>
 
-  <div class="tw:flex tw:items-center tw:gap-2.5">
-    <span class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
-      <%= translation(".or") %>
-    </span>
+    <div class="tw:flex tw:items-center tw:gap-2.5">
+      <span class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+        <%= translation(".or") %>
+      </span>
 
-    <div class="tw:flex tw:flex-1 tw:items-center">
-      <%= render UI::Forms::Input::Component.new(form_builder: @form, attribute: :frame_size_number, kind: :number_field,
+      <div class="tw:flex tw:flex-1 tw:items-center">
+        <%= render UI::Forms::Input::Component.new(form_builder: @form, attribute: :frame_size_number, kind: :number_field,
           html_options: {value: bike["frame_size_number"], step: 0.5, min: 0, placeholder: translation(".enter_size"),
             class: "tw:rounded-r-none",
             data: {"register--frame-size-target": "number", action: "input->register--frame-size#pickNumber"}}) %>
 
-      <%= @form.select :frame_size_unit, [[translation(".inches"), "in"], [translation(".cm"), "cm"]],
+        <%= @form.select :frame_size_unit, [[translation(".inches"), "in"], [translation(".cm"), "cm"]],
           {selected: bike["frame_size_unit"] || "in"},
           class: "tw:self-stretch tw:rounded-r-sm tw:border tw:border-l-0
             tw:border-gray-300 tw:bg-gray-50 tw:px-3 tw:py-1.5
             tw:text-sm tw:font-medium tw:text-gray-500
             tw:dark:border-gray-600 tw:dark:bg-gray-700
             tw:dark:text-gray-400" %>
+      </div>
     </div>
   </div>
-</div>
 
-<%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :image,
+  <%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :image,
     label_text: translation(".attach_photo", cycle_type:)) do |group| %>
-  <% group.with_helper_text do %>
-    <span class="tw:flex tw:items-start tw:gap-1.5">
-      <%= helpers.inline_svg_tag("icons/info.svg", class: "tw:mt-px tw:h-3.5 tw:w-3.5 tw:shrink-0", aria_hidden: true) %>
-      <%= translation(".database_public_note") %>
-    </span>
-  <% end %>
+    <% group.with_helper_text do %>
+      <span class="tw:flex tw:items-start tw:gap-1.5">
+        <%= helpers.inline_svg_tag("icons/info.svg", class: "tw:mt-px tw:h-3.5 tw:w-3.5 tw:shrink-0", aria_hidden: true) %>
+        <%= translation(".database_public_note") %>
+      </span>
+    <% end %>
 
-  <%# The token rides the query string - DirectUpload posts to this url verbatim %>
-  <%= render UI::Forms::Files::Upload::Component.new(form_builder: @form, attribute: :image,
+    <%# The token rides the query string - DirectUpload posts to this url verbatim %>
+    <%= render UI::Forms::Files::Upload::Component.new(form_builder: @form, attribute: :image,
         accept: ImageUploader.permitted_extensions,
         direct_upload_url: register_direct_uploads_path(b_param_token: @b_param.id_token),
         html_options: {"aria-describedby" => group.helper_text_id}) %>
+  <% end %>
 <% end %>
 
 <div class="tw:mb-4" data-controller="ui--collapse register--serial">
@@ -224,7 +227,11 @@
         autocomplete: "off", class: "tw:font-mono"}) %>
 <% end %>
 
-<% status_options = {"status_with_owner" => [translation(".owner_registration"), translation(".owner_registration_description")],
+<%# Framed as a theft report, there's no other registration type to pick %>
+<% if @stolen_frame %>
+  <%= hidden_field_tag "bike[status]", "status_stolen", id: "bike_status" %>
+<% else %>
+  <% status_options = {"status_with_owner" => [translation(".owner_registration"), translation(".owner_registration_description")],
     "status_stolen" => [translation(".stolen"), translation(".stolen_description", cycle_type:)],
     "status_impounded" => [translation(".found"), translation(".found_description", cycle_type:)]}.map do |status, (title, description)|
     content = safe_join([content_tag(:span, title, class: "tw:block tw:font-semibold"),
@@ -232,11 +239,12 @@
     {display: title, value: status, content:}
   end %>
 
-<%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :status,
+  <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :status,
     label_text: translation(".registration_type"), required: true)) do %>
-  <%= render UI::Forms::Combobox::Component.new(name: :status, options: status_options,
+    <%= render UI::Forms::Combobox::Component.new(name: :status, options: status_options,
       rich_display: :stacked, no_js: true, dialog_label: translation(".registration_type"),
       html_options: {form: @form, required: true, value: @b_param.status}) %>
+  <% end %>
 <% end %>
 
 <%= render Pages::Register::Parts::SectionLabel::Component.new(text: contact_section_label, divider: true) %>
@@ -329,26 +337,29 @@
   <% end %>
 </div>
 
-<div
-  class="<%= "tw:hidden" unless show_phone? %>"
-  data-register--status-fields-target="field"
-  data-register--organization-target="statusField"
-  data-organization-off="<%= "true" if organization_dropped? %>"
-  data-statuses="<%= phone_statuses.to_json %>"
-  data-texts="<%= phone_required_texts.to_json %>"
-  data-organization-off-statuses="<%= report_phone_statuses.to_json %>"
-  data-organization-off-texts="<%= report_phone_required_texts.to_json %>"
->
-  <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :phone, kind: :telephone_field,
+<%# Framed as a theft report, the report's contact step asks for it - unless the organization does %>
+<% if phone_field? %>
+  <div
+    class="<%= "tw:hidden" unless show_phone? %>"
+    data-register--status-fields-target="field"
+    data-register--organization-target="statusField"
+    data-organization-off="<%= "true" if organization_dropped? %>"
+    data-statuses="<%= phone_statuses.to_json %>"
+    data-texts="<%= phone_required_texts.to_json %>"
+    data-organization-off-statuses="<%= report_phone_statuses.to_json %>"
+    data-organization-off-texts="<%= report_phone_required_texts.to_json %>"
+  >
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :phone, kind: :telephone_field,
       label_text: translation(".phone"), wrapper_class: "tw:mb-6",
       required: phone_required?, required_toggleable: true,
       html_options: {value: bike["phone"], placeholder: translation(".phone_placeholder")})) do |group| %>
-    <% group.with_helper_text do %>
-      <%= tag.span(phone_required_text, data: {required_helper: true},
+      <% group.with_helper_text do %>
+        <%= tag.span(phone_required_text, data: {required_helper: true},
           hidden: !phone_required?) %>
+      <% end %>
     <% end %>
-  <% end %>
-</div>
+  </div>
+<% end %>
 
 <%#
   Skipped entirely without an organization asking for it - the country and state

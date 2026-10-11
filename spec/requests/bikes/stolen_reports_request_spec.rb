@@ -67,6 +67,27 @@ RSpec.describe Bikes::StolenReportsController, type: :request do
       end
     end
 
+    context "a date that hasn't happened yet" do
+      it "re-renders on the step that asks, saying so" do
+        post base_url, params: {stolen_record: report_params.merge(date: (Time.current + 10.days).to_date.iso8601)}
+        expect(response.status).to eq 422
+        expect(response.body).to match(/data-stolen-report--wizard-step-value="where"/)
+        expect(response.body).to match("That date hasn&#39;t happened yet")
+        expect(bike.reload.status_stolen?).to be_falsey
+      end
+    end
+
+    context "registered to report stolen" do
+      let!(:b_param) { BParam.create(origin: "register_flow", created_bike_id: bike.id, params: {"stolen_report_pending" => true}) }
+
+      it "stops the registration sending the owner back here" do
+        expect(BikeServices::Register.pending_stolen_report_bike(b_param)).to eq bike
+        post base_url, params: {stolen_record: report_params}
+        expect(bike.reload.status_stolen?).to be_truthy
+        expect(BikeServices::Register.stolen_report_pending?(b_param.reload)).to be_falsey
+      end
+    end
+
     context "unsure of the value and the proof" do
       it "stores neither" do
         post base_url, params: {stolen_record: report_params.merge(value_unknown: "1", proof_of_ownership: "unsure")}
@@ -109,6 +130,28 @@ RSpec.describe Bikes::StolenReportsController, type: :request do
         get base_url
         expect(response).to redirect_to new_bike_stolen_report_path(bike)
       end
+    end
+
+    context "recovered" do
+      before { bike.current_stolen_record.add_recovery_information(recovered_description: "Found it") }
+
+      it "redirects to the recovery" do
+        get base_url
+        expect(response).to redirect_to bike_recovered_path(bike)
+        get "#{base_url}/edit"
+        expect(response).to redirect_to bike_recovered_path(bike)
+      end
+    end
+  end
+
+  describe "photos" do
+    it "stores the photo on the bike, answering with its tile" do
+      expect {
+        post "#{base_url}/photos", params: {photo: Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg")}
+      }.to change(PublicImage, :count).by 1
+      expect(response.status).to eq 200
+      expect(response.parsed_body["html"]).to match("Added")
+      expect(bike.public_images.count).to eq 1
     end
   end
 

@@ -65,8 +65,8 @@ class RegisterController < ApplicationController
     case step
     when "finished"
       # The theft is still to report, which is the wizard's - the registration itself is done
-      if BikeServices::Register.stolen_report_pending?(@b_param) && @b_param.created_bike.present?
-        return redirect_to(new_bike_stolen_report_path(@b_param.created_bike, registered: true))
+      if (bike = BikeServices::Register.pending_stolen_report_bike(@b_param))
+        return redirect_to(new_bike_stolen_report_path(bike, registered: true))
       end
 
       @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)

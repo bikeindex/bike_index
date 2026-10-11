@@ -7,8 +7,10 @@ module Pages
         # The owner telling us the stolen bike is back, and how
         class Component < ApplicationComponent
           # submitted: a submission that was missing its story, re-rendered as entered
-          def initialize(bike:, submitted: {})
+          # back_path: the next steps for the owner, the bike for someone using the emailed link
+          def initialize(bike:, back_path:, submitted: {})
             @bike = bike
+            @back_path = back_path
             @submitted = submitted.to_h.with_indifferent_access
           end
 

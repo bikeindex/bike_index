@@ -24,6 +24,32 @@ RSpec.describe Pages::Register::Views::Step2::Component, type: :component do
     page.find("[data-register--status-fields-target='field']:has([name^='bike[#{field_name}'])", visible: :all)
   end
 
+  describe "an owner registering their own theft" do
+    let(:params) { {bike: {owner_email: "owner@bikeindex.org", manufacturer_id: 12, status: "status_stolen"}} }
+
+    # The stolen report wizard asks for the photo and the phone, and there's no other type to pick
+    it "is framed as the report's second step, without what the report asks for" do
+      render_step_2
+      expect(page).to have_content("Step 2 of 9")
+      expect(page).to have_no_css("[name='bike[frame_size]']", visible: :all)
+      expect(page).to have_no_css("[name='bike[image]']", visible: :all)
+      expect(page).to have_no_css("[name='bike[phone]']", visible: :all)
+      expect(page.find("input[name='bike[status]']", visible: :all)[:type]).to eq "hidden"
+    end
+
+    context "registered with the owner" do
+      let(:params) { {bike: {owner_email: "owner@bikeindex.org", manufacturer_id: 12}} }
+
+      it "asks for all of it, unframed" do
+        render_step_2
+        expect(page).to have_no_content("of 9")
+        expect(page).to have_css("[name='bike[frame_size]']", visible: :all)
+        expect(page).to have_css("[name='bike[image]']", visible: :all)
+        expect(page).to have_css("[name='bike[phone]']", visible: :all)
+      end
+    end
+  end
+
   describe "the organization checkbox" do
     # tw:hidden rather than absent, so checking the box again has something to bring back
     def organization_target(name) = page.find("[data-register--organization-target='#{name}']", visible: :all)
@@ -87,7 +113,13 @@ RSpec.describe Pages::Register::Views::Step2::Component, type: :component do
       expect(phone_element("[data-required-helper]")["hidden"]).to be_present
       expect(phone_texts).to eq report_texts
 
+      # The owner's own theft asks for it in the stolen report wizard instead
       b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
+      render_step_2
+      expect(page).to have_no_css("[name='bike[phone]']", visible: :all)
+
+      # Registered for someone else, the report is this flow's - so this form asks
+      b_param.update(creator_id: FactoryBot.create(:user_confirmed).id)
       render_step_2
       expect(phone_element("input[name='bike[phone]']")["required"]).to be_present
       expect(phone_element("[data-optional-marker]")["hidden"]).to be_present

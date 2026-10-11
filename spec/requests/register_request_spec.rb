@@ -865,9 +865,14 @@ RSpec.describe RegisterController, type: :request do
       # Only stolen and impounded reveal it, so those are what the controller watches
       expect(phone_statuses_watched).to eq %w[status_stolen status_impounded]
 
-      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
+      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_impounded"}))
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(phone_field_classes).to_not include "tw:hidden"
+
+      # The owner's own theft asks for it in the stolen report wizard instead
+      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(response.body).to_not include "bike[phone]"
     end
 
     context "with an organization" do
@@ -1476,10 +1481,14 @@ RSpec.describe RegisterController, type: :request do
         expect(response.body).to include "Step 2 of 9"
 
         patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-        # Nothing to report until the address is proven - the flow parks on finished
+        # Nothing to report until the address is proven - the flow parks on finished,
+        # framed as the next step of the theft report
         expect(response).to redirect_to step_path("finished")
         get step_path("report")
         expect(response).to redirect_to step_path("finished")
+        follow_redirect!
+        expect(response.body).to include "Check your email"
+        expect(response.body).to include "the theft report"
 
         # The confirmed address is the owner, so the bike is created registered for the wizard to report
         expect {
@@ -1497,6 +1506,13 @@ RSpec.describe RegisterController, type: :request do
         # Back on the registration, finishing goes to the theft still to report
         get step_path("finished")
         expect(response).to redirect_to new_bike_stolen_report_path(bike, registered: true)
+
+        # Once it's reported, the registration is just finished
+        post "/bikes/#{bike.to_param}/stolen_report", params: {stolen_record: {date: "2026-08-05", city: "Chicago",
+                                                                               postal_code: "60608", theft_description: "Cut lock"}}
+        expect(bike.reload.status_stolen?).to be_truthy
+        get step_path("finished")
+        expect(response.status).to eq 200
       end
     end
 

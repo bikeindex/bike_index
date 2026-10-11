@@ -37,6 +37,9 @@ module Pages
           # Their own theft, rather than one reported for whoever the registration is for
           def own_theft? = stolen? && self_made?
 
+          # The owner reports their own theft once the email is confirmed - see BikeServices::Register.report_in_wizard?
+          def stolen_frame? = @bike.blank? && BikeServices::Register.report_in_wizard?(@b_param)
+
           # Without the bike the registration is only held, waiting on the email
           def heading_text
             return translation(".progress_saved") if @bike.blank?

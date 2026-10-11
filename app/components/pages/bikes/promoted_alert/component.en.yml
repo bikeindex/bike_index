@@ -1,0 +1,28 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        promoted_alert:
+          add_a_photo: Add a photo or a Bike Book stock image
+          add_photo_first_html: "%{link} first - the alert shows people what your
+            %{bike_type} looks like."
+          alert: Alert
+          back_to_next_steps: Back to next steps
+          best_value: Best value
+          choose_image: Choose the image for your alert
+          choose_plan: Choose a plan
+          days_html: Runs for %{days} days
+          description: Bike Index Promoted Alert
+          intro: >-
+            We've found targeted sharing on social media to have a huge effect on
+            recovering stolen bikes. Bike Index buys ads that show your %{bike_type}
+            to people near where it was stolen.
+          photo_number: Photo %{number}
+          preview: Alert preview
+          purchase_plan: Purchase %{plan} alert · %{price}
+          stolen_bike: Stolen Bike
+          title: Promoted Theft Alert
+          using_stock_photo: The alert uses your %{bike_type}'s Bike Book stock image.
+          views_html: "%{views} ad views from people near where your %{bike_type}
+            was stolen"

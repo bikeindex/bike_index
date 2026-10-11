@@ -9,6 +9,7 @@ module Pages
           # prompt is the alert here — its dialog renders outside the page's fragment cache
           class Component < ApplicationComponent
             # Template Dependency: Pages::Registrations::Show::CurrentAlerts::ClaimImpound::Component
+            # Template Dependency: Pages::Registrations::Show::CurrentAlerts::FinishStolenReport::Component
             # Template Dependency: Pages::Registrations::Show::CurrentAlerts::ScannedSticker::Component
             # Template Dependency: Pages::Registrations::Show::CurrentAlerts::SentToNewOwner::Component
             # Template Dependency: Pages::Registrations::Show::CurrentAlerts::TokenPrompt::Component
@@ -41,6 +42,7 @@ module Pages
                   current_alerts: @current_alerts, variant: :alert),
                 ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user),
                 SentToNewOwner::Component.new(bike: @bike, owner: @owner),
+                FinishStolenReport::Component.new(bike: @bike, owner: @owner),
                 ClaimImpound::Component.new(bike: @bike, current_user: @current_user, owner: @owner,
                   organization: @organization)
               ]

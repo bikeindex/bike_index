@@ -56,7 +56,7 @@ module Pages
             safe_join([
               tag.p(translation(".step_of", number: step_number(step), total: total_steps),
                 class: "tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wide tw:text-blue-600 tw:uppercase tw:dark:text-blue-400"),
-              tag.h2(title, class: "tw:mb-1 tw:text-2xl tw:font-bold"),
+              tag.h2(title, class: "tw:mb-1 tw:text-2xl tw:font-bold tw:outline-none", tabindex: -1, data: {step_heading: true}),
               tag.p(helper, class: "tw:mb-5 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400")
             ])
           end
@@ -78,13 +78,18 @@ module Pages
                     "stolen-report--wizard-visited-value": (editing? ? STEPS : STEPS.first(STEPS.index(@step) + 1)).to_json,
                     "stolen-report--wizard-text-value": summary_text.to_json,
                     "stolen-report--wizard-stock-photos-url-value": stock_photos_bike_stolen_report_path(@bike),
+                    "stolen-report--wizard-editing-value": editing?,
+                    "stolen-report--wizard-currency-value": @stolen_record.currency_name,
                     "ui--forms--address-group-us-id-value": Country.united_states_id,
                     action: "input->stolen-report--wizard#refresh change->stolen-report--wizard#refresh " \
-                      "submit->stolen-report--wizard#submit stolen-report--photo:added->stolen-report--wizard#refresh"}
+                      "submit->stolen-report--wizard#submit keydown.enter->stolen-report--wizard#enter " \
+                      "popstate@window->stolen-report--wizard#restoreStep turbo:frame-load->stolen-report--wizard#refresh " \
+                      "stolen-report--photo:added->stolen-report--wizard#refresh stolen-report--photo:removed->stolen-report--wizard#refresh"}
             return data if editing?
 
             data.merge(controller: "#{data[:controller]} form-persist",
               form_persist_key_value: "stolen-report-#{@bike.id}",
+              "stolen-report--wizard-draft-key-value": "stolen-report-step-#{@bike.id}",
               action: "#{data[:action]} input->form-persist#save change->form-persist#save " \
                 "hw-combobox:selection->form-persist#save submit->form-persist#clear " \
                 "form-persist:restored@window->stolen-report--wizard#refresh")
@@ -99,10 +104,15 @@ module Pages
              no_report: translation(".summary_no_report"), visible_to: translation(".summary_visible_to"),
              police: translation(".summary_police"), shops: translation(".summary_shops"), users: translation(".summary_users"),
              value_unknown: translation(".summary_value_unknown"), proof: translation(".summary_proof", answer: "%{answer}"),
-             step_of: translation(".step_of", number: "%{number}", total: "%{total}"), progress_saved: translation(".progress_saved")}
+             step_of: translation(".step_of", number: "%{number}", total: "%{total}"), progress_saved: progress_saved_text}
           end
 
           # In the app's zone - stolen-report--wizard rewrites them into the browser's from date_stolen_iso
+          # The draft is kept in the browser as it's entered, which an edit isn't - it saves on submit
+          def progress_saved_text = (translation(".progress_saved") unless editing?)
+
+          def future_date? = invalid?(:date) && BikeServices::StolenReport.future_date?(date_value)
+
           def date_value = @submitted.key?(:date) ? @submitted[:date] : @stolen_record.date_stolen&.in_time_zone&.to_date&.iso8601
 
           def time_value = @submitted.key?(:time) ? @submitted[:time] : @stolen_record.date_stolen&.in_time_zone&.strftime("%H:%M")

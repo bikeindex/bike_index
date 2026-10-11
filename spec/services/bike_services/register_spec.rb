@@ -626,6 +626,18 @@ RSpec.describe BikeServices::Register do
         expect(described_class.stolen_report_pending?(b_param.reload)).to be_truthy
       end
 
+      context "a member registering through their organization" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let(:creator) { FactoryBot.create(:organization_user, organization:) }
+        let(:bike_params) { super().merge(creation_organization_id: organization.id) }
+
+        # Usually for someone else - whose address step 1 doesn't know yet
+        it "reports here" do
+          expect(described_class.report_in_wizard?(b_param)).to be_falsey
+          expect(described_class.flow(b_param, sequence: nil).steps).to eq %w[1 2 report]
+        end
+      end
+
       context "with the report already saved" do
         it "keeps it" do
           described_class.save_report(b_param, report_params:)

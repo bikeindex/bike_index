@@ -14,7 +14,10 @@ module Pages
 
           # motorized_review: whether an e-vehicle gets the safety pages after this form - or
           # :own_emails, only when the owner's email is one of the registrant's own
-          def initialize(b_param:, flow:, form:, current_user: nil, organization: nil, motorized_review: false)
+          # stolen_frame: an owner's own theft, whose report follows in the stolen report wizard - which
+          # asks for the photo and the phone, so these leave them out (Pages::Bikes::StolenReport::RegistrationFrame)
+          def initialize(b_param:, flow:, form:, current_user: nil, organization: nil, motorized_review: false, stolen_frame: false)
+            @stolen_frame = stolen_frame
             @b_param = b_param
             @flow = flow
             @form = form
@@ -215,6 +218,8 @@ module Pages
           end
 
           def phone_required? = phone_required_text.present?
+
+          def phone_field? = !@stolen_frame || show_reg_phone?
         end
       end
     end

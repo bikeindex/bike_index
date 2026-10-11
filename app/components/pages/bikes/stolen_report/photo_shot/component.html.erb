@@ -35,6 +35,31 @@
         data-photo-kind="<%= @kind %>"
         data-photo-added="<%= @public_image.present? %>"
       >
+        <%# The empty tile, for a photo removed from it %>
+        <template data-stolen-report--photo-target="empty">
+          <label
+            class="
+              tw:mb-0 tw:flex tw:size-full tw:cursor-pointer tw:flex-col
+              tw:items-center tw:justify-center tw:gap-1 tw:rounded-md
+              tw:border-2 tw:border-dashed tw:border-gray-300 tw:bg-gray-50
+              tw:text-gray-500 tw:transition-colors tw:hover:border-blue-500
+              tw:hover:text-blue-600 tw:has-focus-visible:ring-3
+              tw:has-focus-visible:ring-blue-500/40 tw:dark:border-gray-600
+              tw:dark:bg-gray-900
+            "
+          >
+            <input
+              type="file"
+              accept="image/*"
+              class="tw:sr-only"
+              data-action="stolen-report--photo#upload"
+            >
+
+            <%= helpers.inline_svg_tag("icons/camera.svg", class: "tw:size-6", aria_hidden: true) %>
+            <span data-stolen-report--photo-target="status"><%= translation(".add_photo") %></span>
+          </label>
+        </template>
+
         <% if @public_image.present? %>
           <%= render Pages::Bikes::StolenReport::Photo::Component.new(public_image: @public_image) %>
         <% else %>

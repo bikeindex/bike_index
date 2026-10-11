@@ -193,12 +193,26 @@ module BikeServices
     # A registration that already saved a report here keeps it
     def report_in_wizard?(b_param)
       return false unless b_param.status_stolen? && b_param.stolen_attrs.blank?
+      return b_param.creation_organization&.auto_user_id.blank? if b_param.creator_id.blank?
 
-      b_param.creator_id.present? ? b_param.self_made? : b_param.creation_organization&.auto_user_id.blank?
+      b_param.self_made? && !organization_member_registration?(b_param)
     end
 
     # Set when the bike was created for the wizard to report stolen, which is where finishing goes
     def stolen_report_pending?(b_param) = b_param.params&.dig("stolen_report_pending").present?
+
+    # The wizard reported it, so its registration stops sending the owner back there
+    def stolen_report_finished(bike)
+      BParam.where(created_bike_id: bike.id).where("params ? 'stolen_report_pending'").find_each do |b_param|
+        b_param.update_column(:params, b_param.params.except("stolen_report_pending"))
+      end
+    end
+
+    # The registration's bike, while the theft it was registered for is still to report
+    def pending_stolen_report_bike(b_param)
+      bike = b_param.created_bike if stolen_report_pending?(b_param)
+      bike unless bike.blank? || bike.status_stolen?
+    end
 
     # What the acknowledgment eyebrow counts: the rule pages, plus the review they end at
     def acknowledgment_step_count(sequence) = sequence_pages(sequence).count + 1
@@ -495,6 +509,13 @@ module BikeServices
       bike
     end
 
+    # A member registering through their organization is usually registering for someone else - whose
+    # address isn't known yet when step 1 renders, so the whole registration is treated that way
+    def organization_member_registration?(b_param)
+      organization = b_param.creation_organization
+      organization.present? && b_param.creator.member_of?(organization, no_superuser_override: true)
+    end
+
     # Created registered rather than stolen, with nothing yet to alert anyone about
     def hold_stolen_report(b_param)
       return unless report_in_wizard?(b_param)
@@ -668,7 +689,7 @@ module BikeServices
     end
 
     conceal :matches_bike?, :auto_organization, :assign_auto_organization, :set_auto_organization,
-      :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike, :hold_stolen_report, :send_rules_email, :email_confirmation_link,
+      :claim_creator, :acknowledgment_owed?, :create_bike_if_ready, :create_bike, :hold_stolen_report, :organization_member_registration?, :send_rules_email, :email_confirmation_link,
       :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :resumable_by?, :reusable?, :destroy_discardable, :report_placement, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
