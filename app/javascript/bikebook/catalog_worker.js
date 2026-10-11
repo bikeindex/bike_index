@@ -71,10 +71,28 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
   }
 }
 
+const present = ([, value]) => value != null
+// a 0.23 year's paints, index-aligned, as 0.24's colorways
+const colorways = ({ paint_descriptions: names = [], paint_color_codes: codes = [], ...year }) => names.length || codes.length
+  ? { ...year, colorways: Array.from({ length: Math.max(names.length, codes.length) }, (_, index) => Object.fromEntries([['name', names[index]], ['color_code', codes[index]]].filter(present))) }
+  : year
+
+// A model in schema 0.24's shape, which a file on an older version isn't, except that its years are records naming
+// their year, newest first, rather than keyed by it
+const current = ({ cargo: { max_weight_total: maxWeightTotal, ...cargo } = {}, ...vehicle }) => ({
+  ...vehicle,
+  ...(vehicle.years && {
+    years: (Array.isArray(vehicle.years) ? vehicle.years : Object.entries(vehicle.years).map(([year, record]) => ({ year: Number(year), ...record })))
+      .map(colorways).sort((a, b) => b.year - a.year)
+  }),
+  ...(Object.keys(cargo).length && { cargo }),
+  ...(maxWeightTotal != null && { frame: { max_weight_total: maxWeightTotal, ...vehicle.frame } })
+})
+
 // A failed fetch is forgotten, so the next ask tries again
 const block = (key) => {
   if (!blocks.has(key)) {
-    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => models, (error) => {
+    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(models).map(([id, data]) => [id, current(data)])), (error) => {
       blocks.delete(key)
       throw error
     }))

@@ -609,6 +609,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     classification = find("section div", text: /\AE-vehicle class\s*Off-Highway Motorcycle \?\z/, wait: 10)
     expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     expect(page).to have_no_css("dt", exact_text: "Classifications")
+    # a 0.23 model's paints still read as colorways
+    expect(find("article h1", text: "Ultra Bee").ancestor("article").find("h2", text: /\Amodel years\z/i).ancestor("section"))
+      .to have_text("Carbon Black").and have_text("Desert Brown")
     classification.find("button", text: "?").click
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for off-highway use", visible: true)
     expect(tooltip).to have_css("code", exact_text: "evc/off_highway_motorcycle")
@@ -650,6 +653,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
+    # a 0.24 model: years keyed by year, read newest first, each paint a colorway, and its system weight limit with the frame
+    years = find("article h1", text: "Haul ST").ancestor("article").find("h2", text: /\Amodel years\z/i).ancestor("section")
+    expect(years.all("tr").map { it.first("td").text }).to eq %w[2026 2025]
+    expect(years).to have_text("Satin Obsidian").and have_text("Gloss White Mountains")
+    expect(find("h2", text: /\Aframe\z/i).ancestor("section")).to have_text(/Max weight total\W*190\W*kg/)
 
     # beside its classification, side by side with nothing to table
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")
