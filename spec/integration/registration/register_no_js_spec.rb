@@ -75,8 +75,9 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
     click_button "Complete Bike Registration"
 
     # Anonymous, so the theft waits on the link that proves the address
-    expect(page).to have_css("h1", text: "Progress saved")
-    expect(page).to have_content("Finish reporting your stolen bike")
+    # Framed as the theft report's next step - the report follows the emailed link
+    expect(page).to have_css("h2", text: "Check your email")
+    expect(page).to have_content("straight to the theft report")
     expect(BParam.last.status).to eq "status_stolen"
 
     visit confirmation_link

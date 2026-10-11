@@ -319,7 +319,8 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         check "I, #{user_name}, agree to comply with all of the rules above."
         click_button "Complete Bike Registration"
 
-        expect(page).to have_css("h1", text: "Progress saved")
+        # Its owner's own theft, so it waits for the link framed as the report's next step
+        expect(page).to have_css("h2", text: "Check your email")
 
         # The emailed link finishes a step like any other, and fails like one
         visit confirmation_link

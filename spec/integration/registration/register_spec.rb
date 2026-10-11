@@ -223,7 +223,8 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
 
     # Anonymous, so there's nobody to own a bike yet - it's held for the emailed link
-    expect(page).to have_css("h1", text: "Progress saved")
+    # Its owner's own theft, so it waits for the link framed as the report's next step
+    expect(page).to have_css("h2", text: "Check your email")
     expect(page).to have_content("verify your email")
     expect(Bike.count).to eq 0
     b_param = BParam.last
