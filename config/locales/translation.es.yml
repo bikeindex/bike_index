@@ -7212,6 +7212,10 @@ es:
           all_on_file: Todos los 50 estados y el Distrito de Columbia están archivados.
           check_in_state: Consulta una bicicleta eléctrica en %{state}
           no_match: No se encontraron coincidencias de estado. Pruebe con otro nombre.
+          not_three_classes: No son 3 clases
+          only_classes:
+            one: Solo la clase %{classes}
+            other: Clases %{classes} solamente
         ul_badge:
           certified: Certificado UL %{standard}
           meaning_2271_certified: La batería superó las pruebas de seguridad UL contra

@@ -7230,6 +7230,10 @@ it:
           all_on_file: Tutti i 50 stati e il Distretto di Columbia sono archiviati.
           check_in_state: Controlla una e-bike in %{state}
           no_match: Nessuno stato corrisponde. Prova con un altro nome.
+          not_three_classes: Non 3 classi
+          only_classes:
+            one: Solo la classe %{classes}
+            other: Solo classi %{classes}
         ul_badge:
           certified: Certificato UL %{standard}
           meaning_2271_certified: Il pacco batterie ha superato i test di sicurezza
