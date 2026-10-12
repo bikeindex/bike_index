@@ -14,7 +14,7 @@ app.update!(
   name: "Localhost Dev iOS",
   secret: "Tcw_4Cr1-Yowsjs-E2Te0YZnVdYmeES3UJ0AhbeBE10",
   redirect_uri: "bikeindex://",
-  scopes: [:read_user, :write_user, :read_bikes, :write_bikes],
+  scopes: [:read_user, :write_user, :read_bikes, :write_bikes, :read_organization_membership],
   is_internal: true
 )
 

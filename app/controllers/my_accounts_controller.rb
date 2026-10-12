@@ -187,7 +187,7 @@ class MyAccountsController < ApplicationController
         :additional_emails, :title, :description, :phone, :street, :city, :zipcode, :country_id,
         :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :instagram, :show_instagram,
         :show_website, :show_bikes, :show_phone, :my_bikes_link_target, :time_single_format,
-        :my_bikes_link_title, :password, :password_confirmation, :preferred_language,
+        :my_bikes_link_title, :password, :password_confirmation, :preferred_language, :preferred_unit_system,
         user_registration_organization_attributes: [:all_bikes, :can_edit_claimed],
         # include address_record id so we don't create new address records
         address_record_attributes: (AddressRecord.permitted_params + [:id]))

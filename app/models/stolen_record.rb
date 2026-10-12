@@ -123,7 +123,7 @@ class StolenRecord < ApplicationRecord
   scope :current_and_not, -> { unscoped } # might exclude certain things in the future. Also feels better than calling unscoped everywhere
   scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }
   scope :not_tsved, -> { where("tsved_at IS NULL") }
-  scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'") }
+  scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= ?", Time.current.beginning_of_day) }
   scope :not_spam, -> { left_joins(:bike).where.not(bikes: {likely_spam: true}) }
 
   scope :recovered, -> { unscoped.where(current: false) }

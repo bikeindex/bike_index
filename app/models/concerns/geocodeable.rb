@@ -51,10 +51,6 @@ module Geocodeable
     belongs_to :region_record, class_name: "State"
   end
 
-  def metric_units?
-    Country.metric_units?(country_id)
-  end
-
   def to_coordinates
     [latitude, longitude]
   end
@@ -179,7 +175,7 @@ module Geocodeable
       end
       str = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
     end
-    str.gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.gsub(/\s*,\z/, "").titleize
+    str.gsub(/,?(,|\s)[A-Z]{2}\s?++\z/, "").strip.gsub(/\s*,\z/, "").titleize
   end
 
   def assign_region_record

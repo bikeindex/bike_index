@@ -14,6 +14,15 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
     end
   end
 
+  context "with a creation kind rather than an ownership" do
+    let(:instance) { described_class.new(creation_kind: "organization_form") }
+
+    it "renders its label with the description tooltip" do
+      expect(component).to have_content("legacy org form")
+      expect(component).to have_css("[role=tooltip]", text: "on the legacy organization iframe form", visible: :all)
+    end
+  end
+
   context "with a sticker origin" do
     let(:ownership) { Ownership.new(origin: "sticker") }
 

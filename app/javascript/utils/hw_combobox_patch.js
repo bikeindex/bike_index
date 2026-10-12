@@ -2,6 +2,35 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 
 /* global AbortController, requestAnimationFrame */
 
+// A combobox element mapped here answers its async filter (`source.filter(controller, inputType)`),
+// renders its chips (`source.chips(controller, values)`) and lists as it connects, in place of the
+// gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
+export const localSources = new WeakMap()
+
+const connect = HwComboboxController.prototype.connect
+HwComboboxController.prototype.connect = function () {
+  const source = localSources.get(this.element)
+  if (source?.prime) this.element.querySelector('.hw_combobox__pagination__wrapper turbo-frame')?.remove()
+  connect.call(this)
+  source?.prime?.(this)
+}
+
+// The gem reads a multiselect's value as empty only from a data attribute the server-rendered field
+// doesn't carry, so it asks for chips on connect with nothing selected
+const requestChips = HwComboboxController.prototype._requestChips
+HwComboboxController.prototype._requestChips = function (values) {
+  if (!values) return
+
+  const source = localSources.get(this.element)
+  return source ? source.chips(this, values) : requestChips.call(this, values)
+}
+
+const filterAsync = HwComboboxController.prototype._filterAsync
+HwComboboxController.prototype._filterAsync = function (inputType) {
+  const source = localSources.get(this.element)
+  return source ? source.filter(this, inputType) : filterAsync.call(this, inputType)
+}
+
 // hotwire_combobox 0.4.1 finds an option by interpolating the raw value into
 // `[data-value='<value>']`; a value containing a quote (e.g. a search term like
 // `2011'`) builds an invalid selector and throws a SyntaxError, which aborts the
@@ -93,9 +122,10 @@ Object.defineProperty(HwComboboxController.prototype, '_isSmallViewport', {
   }
 })
 
-// Neither covers the other: only `before-cache` runs early enough to keep an open dialog
-// out of a cached snapshot, and it's skipped on the no-cache pages the comboboxes are on
-const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render']
+// Neither Turbo event covers the other: only `before-cache` runs early enough to keep an open
+// dialog out of a cached snapshot, and it's skipped on the no-cache pages the comboboxes are on.
+// /bikebook renders its pages without Turbo, and says so itself.
+const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render', 'bikebook--page:before-render']
 
 // On small viewports it opens in a modal dialog and locks body scroll, but only
 // unlocks along its own collapse path, which a keypress or a click has to start.
@@ -126,4 +156,18 @@ HwComboboxController.prototype._openInDialog = function () {
 
   this.dialogTarget.addEventListener('close', dismiss, { signal: listeners.signal })
   RENDER_EVENTS.forEach(name => document.addEventListener(name, dismiss, { signal: listeners.signal }))
+}
+
+// A combobox set or cleared from code goes through the gem, so its hidden field, its input and a
+// rich display all agree - assigning the hidden field leaves the rest showing what it held
+export function selectComboboxValue (combobox, value) {
+  const option = [...combobox.querySelectorAll('[role=listbox] [role=option]')]
+    .find((element) => element.dataset.value === String(value))
+  option?.click()
+}
+
+// clear() empties the selection without an event; the keyup is what the rich display listens for
+export function clearCombobox (combobox) {
+  window.Stimulus.getControllerForElementAndIdentifier(combobox, 'hw-combobox')?.clear()
+  combobox.querySelector('[role=combobox]')?.dispatchEvent(new window.KeyboardEvent('keyup'))
 }

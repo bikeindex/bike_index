@@ -30,6 +30,7 @@
 #  regional_ids                    :jsonb
 #  registration_field_labels       :jsonb
 #  search_radius_miles             :float            default(50.0), not null
+#  send_self_registration_email    :boolean          default(FALSE), not null
 #  short_name                      :string(255)
 #  show_on_map                     :boolean
 #  slug                            :string(255)      not null
@@ -122,6 +123,7 @@ class Organization < ApplicationRecord
   has_many :invoices
   has_many :payments
   has_many :graduated_notifications
+  has_many :organization_messages
   has_many :organization_statuses
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
@@ -143,6 +145,7 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
   validate :user_email_domain_format
+  validate :slug_unchanged_while_saml_active
   # Two SSO orgs on one domain would make saml_email_matching's pick arbitrary (name order),
   # silently sending logins to the wrong org's IdP. Non-SSO orgs may still share a domain.
   validates_uniqueness_of :user_email_domain, allow_blank: true,
@@ -428,7 +431,7 @@ class Organization < ApplicationRecord
   def metric_units?
     return @metric_units if defined?(@metric_units)
 
-    @metric_units = Country.metric_units?(location_address_records.order(:id).pick(:country_id))
+    @metric_units = UnitSystem.metric?(country_id: location_address_records.order(:id).pick(:country_id))
   end
 
   def search_coordinates
@@ -496,8 +499,10 @@ class Organization < ApplicationRecord
   end
 
   def block_short_name_edit?
-    is_invoiced? # Prevent url changes breaking landing pages, etc
+    is_invoiced? || saml_active? # Prevent url changes breaking landing pages, SSO, etc
   end
+
+  def saml_active? = organization_saml_configuration&.active?
 
   def bike_actions?
     any_enabled?(OrganizationFeature::BIKE_ACTIONS)
@@ -532,6 +537,10 @@ class Organization < ApplicationRecord
 
   def deliver_graduated_notifications?
     enabled?("graduated_notifications") && graduated_notification_interval.present?
+  end
+
+  def skip_email_to?(email)
+    !send_self_registration_email && email.present? && email == auto_user&.email
   end
 
   def graduated_notification_interval_days
@@ -653,6 +662,13 @@ class Organization < ApplicationRecord
     return new_slug if holder.nil? || holder.slug != new_slug
 
     (2..).lazy.map { "#{new_slug}-#{it}" }.find { |candidate| !orgs.exists?(slug: candidate) }
+  end
+
+  # The IdP registered the SP entity ID and callback URL, which are built from the slug
+  def slug_unchanged_while_saml_active
+    return unless slug_changed? && slug_was.present? && saml_active?
+
+    errors.add(:short_name, "can't change while SAML SSO is active - it would break every SSO sign in. Deactivate SAML first")
   end
 
   def user_email_domain_format

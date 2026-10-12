@@ -30,13 +30,18 @@ module Admin
       end
     end
 
+    def bikes_table
+      render Pages::Admin::Graphs::BikesTable::Component.new(kind: params[:table_kind], bikes: matching_bikes,
+        time_range: @time_range, sortable_params: graphs_sortable_params), layout: false
+    end
+
     def tables
       @kind = ""
       @location_radius = params[:location_radius].presence&.to_i || 100
       @bounding_box = GeocodeHelper.bounding_box(params[:location], @location_radius) if params[:location].present?
     end
 
-    helper_method :matching_bikes, :default_period
+    helper_method :graphs_sortable_params
 
     protected
 
@@ -73,8 +78,13 @@ module Admin
       "year"
     end
 
+    # The period is always passed, since the graphs default to a different one than other pages
+    def graphs_sortable_params
+      {period: default_period}.merge(helpers.sortable_search_params).symbolize_keys
+    end
+
     def bike_graph_kinds
-      %w[stolen origin ios_version pos ignored]
+      %w[stolen origin ios_version pos register_setting ignored]
     end
 
     # {group => {time => count}}, grouped by both so it's one query rather than one per
@@ -89,13 +99,13 @@ module Admin
       series = grouped_time_range_counts(bikes.joins(:ownerships).group("ownerships.origin"))
       empty = helpers.empty_time_range_counts
       Ownership.origins.map do |origin|
-        {name: origin.humanize, color: Pages::Admin::Graphs::Bikes::Component::ORIGIN_COLORS[origin], data: empty.merge(series[origin] || {})}
+        {name: Ownership.creation_kind_humanized(origin), color: Pages::Admin::Graphs::BikesTable::Component::ORIGIN_COLORS[origin], data: empty.merge(series[origin] || {})}
       end
     end
 
     # Ordered like the component's table, so the chart's legend matches it
     def ios_version_chart_series
-      grouped_time_range_counts(Pages::Admin::Graphs::Bikes::Component.ios_version_bikes(matching_bikes))
+      grouped_time_range_counts(Pages::Admin::Graphs::BikesTable::Component.ios_version_bikes(matching_bikes))
         .sort_by { |version, data| [-data.values.sum, version] }
         .map { |version, data| {name: "iOS #{version}", data:} }
     end
@@ -118,8 +128,13 @@ module Admin
         origin_chart_series(bikes)
       elsif bike_graph_kind == "ios_version"
         ios_version_chart_series
+      elsif bike_graph_kind == "register_setting"
+        Pages::Admin::Graphs::BikesTable::Component.register_setting_bikes(bikes).map do |key, setting_bikes|
+          {name: Pages::Admin::Graphs::BikesTable::Component.register_setting_name(key),
+           data: helpers.time_range_counts(collection: setting_bikes)}
+        end
       elsif bike_graph_kind == "pos"
-        Pages::Admin::Graphs::Bikes::Component::POS_SEARCH_KINDS.map do |pos_kind|
+        Pages::Admin::Graphs::BikesTable::Component::POS_SEARCH_KINDS.map do |pos_kind|
           {
             name: pos_kind.humanize,
             data: helpers.time_range_counts(collection: bikes.send(pos_kind))

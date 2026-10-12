@@ -69,7 +69,7 @@ class StravaGear < ApplicationRecord
 
   def total_distance_miles
     return nil if total_distance_kilometers.blank?
-    (total_distance_kilometers * 0.621371).round
+    UnitSystem.kilometers_to_miles(total_distance_kilometers).round
   end
 
   def enriched?

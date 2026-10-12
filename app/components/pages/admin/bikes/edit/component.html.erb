@@ -126,7 +126,7 @@
 
             <div>
               <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :region_record_id, label_text: "State")) do %>
-                <%= render UI::Forms::Combobox::Component.new(name: :region_record_id, options: State.united_states.pluck(:name, :id), dialog_label: "State", include_blank: true, html_options: {form: s, placeholder: "State"}) %>
+                <%= render UI::Forms::ComboboxState::Component.new(name: :region_record_id, ids: true, html_options: {form: s, placeholder: "State"}) %>
               <% end %>
             </div>
           </div>

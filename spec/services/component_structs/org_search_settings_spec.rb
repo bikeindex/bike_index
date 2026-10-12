@@ -229,6 +229,22 @@ RSpec.describe ComponentStructs::OrgSearchSettings do
     end
   end
 
+  describe "export_columns" do
+    it "is each column an export can write, in the panel's order, without the View button" do
+      expect(instance.export_columns.keys).to eq(instance.panel_columns - ["view_cell"])
+      expect(instance.export_columns["created_at_cell"]).to eq "registered_at"
+    end
+  end
+
+  describe "export_header_label" do
+    it "is the panel's label, or a legacy header's own name" do
+      expect(instance.export_header_label("registered_at")).to eq "Time - registered"
+      expect(instance.export_header_label("owner_email")).to eq "Sent to"
+      expect(instance.export_header_label("is_stolen")).to eq "Is stolen"
+      expect(instance.export_header_label("address_2")).to eq "Address 2"
+    end
+  end
+
   describe "search_params" do
     let(:options) do
       super().merge(sortable_search_params: {sort: "id"}, interpreted_params: {query_items: ["v_1"]})

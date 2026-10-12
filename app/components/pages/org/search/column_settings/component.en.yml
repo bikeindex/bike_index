@@ -28,6 +28,7 @@ en:
             filter_with_address_html: only <strong>with</strong> address
             filter_with_stickers_html: only <strong>with</strong> stickers
             impound_id_cell: Impound ID
+            included_columns: Included columns
             location_search_disabled_no_address: >-
               %{org_name} doesn't collect registration addresses, so only stolen and
               impounded registrations have a location. Filter to one of those statuses

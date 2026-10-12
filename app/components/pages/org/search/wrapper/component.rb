@@ -157,7 +157,7 @@ module Pages
           def card_data_attributes
             return Pages::Org::Search::ColumnSettings::Component::COLLAPSE_DATA if @search_page
 
-            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(settings, collapse: true)
+            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(collapse: true)
           end
         end
       end

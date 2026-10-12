@@ -115,7 +115,7 @@ RSpec.describe "Bikes API V2", type: :request do
       FactoryBot.create(:ctype, name: "wheel")
       FactoryBot.create(:ctype, name: "Headset")
       front_gear_type = FactoryBot.create(:front_gear_type)
-      handlebar_type_slug = "bmx"
+      handlebar_type_slug = "forward"
       components = [
         {
           manufacturer: manufacturer.name,

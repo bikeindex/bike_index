@@ -30,13 +30,13 @@ module SamlHelpers
 
   def signed_saml_response(audience:, recipient:, in_response_to:, email:,
     name_id: nil, issuer: "https://idp.example.edu/", not_on_or_after: nil,
-    sign: true, tamper: false, encrypt: false, email_attribute: EMAIL_OID)
+    sign: true, tamper: false, encrypt: false, email_attribute: EMAIL_OID, attributes: {})
     name_id ||= email
     not_on_or_after ||= (Time.current + 5.minutes).utc.iso8601
     assertion_id = "_#{SecureRandom.uuid}"
 
     assertion = collapse(saml_assertion_xml(assertion_id:, issuer:, name_id:, email:, email_attribute:,
-      audience:, recipient:, in_response_to:, not_on_or_after:))
+      audience:, recipient:, in_response_to:, not_on_or_after:, attributes:))
     assertion = sign_saml_assertion(assertion, assertion_id) if sign
     if tamper
       assertion = assertion.sub(%r{(<ds:SignatureValue[^>]*>)[^<]+}, '\1TAMPEREDSIGNATUREVALUE==')
@@ -89,7 +89,7 @@ module SamlHelpers
   end
 
   def saml_assertion_xml(assertion_id:, issuer:, name_id:, email:, email_attribute:,
-    audience:, recipient:, in_response_to:, not_on_or_after:)
+    audience:, recipient:, in_response_to:, not_on_or_after:, attributes:)
     now = Time.current.utc.iso8601
     not_before = (Time.current - 5.minutes).utc.iso8601
     <<~XML
@@ -111,6 +111,7 @@ module SamlHelpers
           <saml:Attribute Name="#{email_attribute}" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
             <saml:AttributeValue>#{email}</saml:AttributeValue>
           </saml:Attribute>
+          #{attributes.map { |name, value| %(<saml:Attribute Name="#{name}"><saml:AttributeValue>#{value}</saml:AttributeValue></saml:Attribute>) }.join}
         </saml:AttributeStatement>
       </saml:Assertion>
     XML

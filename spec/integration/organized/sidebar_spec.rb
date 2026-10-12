@@ -110,7 +110,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(scroller_top).to be > 0
   end
 
-  it "lays a flash beside the sidebar, and tells the two add-a-bike rows apart by the param" do
+  it "lays a flash beside the sidebar, and tells add-a-registration from the notification row by the param" do
     # An unknown code redirects back to the index with the flash
     visit "/o/#{slug}/stickers/missing-code/edit"
 
@@ -128,22 +128,35 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
     visit "/o/#{slug}/registrations/new"
 
-    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
 
-    visit "/o/#{slug}/bikes/new?parking_notification=true"
+    visit "/o/#{slug}/parking_notifications/new"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
-    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
 
-    # Going back to the old view moves add-a-bike onto organized/bikes#new alongside the
-    # notification's row, where the query string is all that tells the two apart
+    # Going back to both old views moves add-a-registration onto organized/bikes#new alongside the
+    # legacy notification page, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
-    click_link "Go back to the old view"
-    click_link "Add a bike"
+    click_link "Registration form settings"
+    check "Use the old registration page"
+    expect(page).to have_field("Single page registration form", disabled: true)
+    uncheck "Use the old registration page"
+    expect(page).to have_field("Single page registration form", disabled: false)
+    check "Use the old registration page"
+    check "Use the old unregistered notification page"
+    within("form[action$='/registrations/switches']") { click_button "Update" }
+    click_link "Add a registration"
 
-    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
+
+    # The notification's own page hands the old view back to the legacy form
+    visit "/o/#{slug}/parking_notifications/new"
+
+    expect(page).to have_current_path("/o/#{slug}/bikes/new?parking_notification=true")
+    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
   end
 
   # The sidebar stands in for the navbar on every page a member sees, including ones no

@@ -34,6 +34,14 @@ RSpec.describe SharedBlocks::MainContent::Organized::Component, type: :component
         expect(javascript_pack).to be_falsey
       end
     end
+
+    context "settings" do
+      let(:action_name) { "settings" }
+      it "is a container, without the legacy bundle" do
+        expect(container_class).to eq "container"
+        expect(javascript_pack).to be_falsey
+      end
+    end
   end
 
   context "parking_notifications" do

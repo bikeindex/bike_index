@@ -272,8 +272,10 @@
 
         <td>
           <ul class="mb-0">
+            <% settings = ComponentStructs::OrgSearchSettings.new(organization: current_organization) %>
+
             <% @export.written_headers.each do |header| %>
-              <li><%= header.humanize(keep_id_suffix: true) %></li>
+              <li><%= settings.export_header_label(header) %></li>
             <% end %>
           </ul>
         </td>

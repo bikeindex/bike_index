@@ -23,16 +23,6 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     JS
   end
 
-  def drag_select_past(element)
-    box = element.native.bounding_box
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.mouse.move(box["x"] + 2, box["y"] + box["height"] / 2)
-      playwright_page.mouse.down
-      playwright_page.mouse.move(box["x"] + box["width"] + 120, box["y"] + box["height"] / 2, steps: 12)
-      playwright_page.mouse.up
-    end
-  end
-
   def tooltip_z_index(id)
     page.evaluate_script("document.getElementById(#{id.to_json}).style.zIndex")
   end
@@ -148,7 +138,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltip).to be_visible
     expect(selected_tooltip_id).to eq tooltip_ids.first
     # A selection dragged past the tooltip's edge ends in a click outside it
-    drag_select_past(tooltip)
+    drag_select(tooltip, past: 120)
     expect(tooltip).to be_visible
     find("body").click
     expect(tooltip).not_to be_visible

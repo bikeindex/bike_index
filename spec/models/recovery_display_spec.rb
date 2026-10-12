@@ -20,6 +20,27 @@ RSpec.describe RecoveryDisplay, type: :model do
     it "includes only displays with a processed photo" do
       expect(RecoveryDisplay.with_photo.pluck(:id)).to eq([recovery_display.id])
     end
+
+    context "with two processed photo attachments" do
+      before do
+        ActiveStorage::Attachment.create!(record: recovery_display, name: "photo_processed",
+          blob: ActiveStorage::Blob.create_and_upload!(io: StringIO.new("reprocessed"), filename: "processed.jpg"))
+      end
+
+      it "includes the display once" do
+        expect(RecoveryDisplay.with_photo.limit(10).map(&:id)).to eq([recovery_display.id])
+      end
+    end
+  end
+
+  describe "quote length" do
+    let(:recovery_display) { FactoryBot.build(:recovery_display, quote: "a" * 400) }
+    it "allows 400 characters, not 401" do
+      expect(recovery_display).to be_valid
+      recovery_display.quote += "a"
+      expect(recovery_display).not_to be_valid
+      expect(recovery_display.errors.full_messages).to eq(["Quote is too long (maximum is 400 characters)"])
+    end
   end
 
   describe "photo_processed? and image_processing" do

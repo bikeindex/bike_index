@@ -91,9 +91,8 @@ module Pages
               OrganizationModelAudit.find_by(organization_id: @organization.id, model_audit_id: @bike.model_audit_id)
           end
 
-          # Only e-vehicles go through a registration sequence
           def show_registration_sequence?
-            @bike.motorized? && @organization.enabled?("registration_sequences")
+            @bike.registration_sequence_applies? && @organization.enabled?("registration_sequences")
           end
 
           def acknowledgment

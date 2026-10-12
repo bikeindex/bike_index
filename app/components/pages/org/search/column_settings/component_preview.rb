@@ -17,6 +17,13 @@ module Pages
           def all_settings
             render_panel(enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS)
           end
+
+          # The export form's column fields, every feature enabled
+          def export_form
+            organization = ::Organization.new(short_name: "Preview org", enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS)
+            settings = ComponentStructs::OrgSearchSettings.new(organization:)
+            render(Component.new(settings:, export_headers: settings.default_export_headers))
+          end
           # @!endgroup
 
           private
@@ -26,7 +33,7 @@ module Pages
             settings = ComponentStructs::OrgSearchSettings.new(organization:)
 
             {template: "pages/org/search/column_settings/component_preview/panel",
-             locals: {settings:, data: Component.column_settings_data_attributes(settings, controllers: Component::COLLAPSE_DATA[:controller])}}
+             locals: {settings:, data: Component.column_settings_data_attributes(controllers: Component::COLLAPSE_DATA[:controller])}}
           end
         end
       end

@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq --arg root \"$CLAUDE_PROJECT_DIR\" -c 'if ((.tool_input.file_path // \"\") == \"\" or ((.tool_input.file_path) | startswith($root + \"/\")) or ((.tool_input.file_path) | test(\"^\" + env.HOME + \"/\\\\.claude/projects/[^/]+/memory/[^/]+$\"))) then empty else {hookSpecificOutput:{hookEventName:\"PreToolUse\",permissionDecision:\"deny\",permissionDecisionReason:(\"Refusing to write \" + .tool_input.file_path + \" -- it is outside this checkout (\" + $root + \"). In a worktree, the main checkout is a sibling you must not edit; use a path inside this one.\")}} end'",
+            "command": "jq --arg root \"$CLAUDE_PROJECT_DIR\" -c 'if (((.tool_input.file_path // .tool_input.notebook_path) // \"\") == \"\" or (((.tool_input.file_path // .tool_input.notebook_path)) | startswith($root + \"/\")) or (((.tool_input.file_path // .tool_input.notebook_path)) | test(\"^\" + env.HOME + \"/\\\\.claude/projects/[^/]+/memory/[^/]+$\"))) then empty else {hookSpecificOutput:{hookEventName:\"PreToolUse\",permissionDecision:\"deny\",permissionDecisionReason:(\"Refusing to write \" + (.tool_input.file_path // .tool_input.notebook_path) + \" -- it is outside this checkout (\" + $root + \"). In a worktree, the main checkout is a sibling you must not edit; use a path inside this one.\")}} end'",
             "statusMessage": "Checking the path is inside this checkout"
           }
         ]
@@ -37,6 +37,14 @@
     ],
     "SessionStart": [
       {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/mise-shims.sh"
+          }
+        ]
+      },
+      {
         "matcher": "startup",
         "hooks": [
           {
@@ -44,6 +52,24 @@
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh",
             "timeout": 900,
             "statusMessage": "Setting up the sandbox toolchain"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/worktree-setup.sh",
+            "timeout": 900,
+            "statusMessage": "Running bin/workspace_setup for this worktree"
+          }
+        ]
+      }
+    ],
+    "WorktreeRemove": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/worktree-teardown.sh",
+            "timeout": 120,
+            "statusMessage": "Dropping this worktree's databases"
           }
         ]
       }

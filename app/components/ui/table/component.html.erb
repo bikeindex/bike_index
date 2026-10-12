@@ -23,9 +23,9 @@
         <% cache_if(@cache_key, [@cache_key, record, *cache_records_for(record)]) do %>
           <tr>
             <% @columns.each do |col| %>
-              <td class="<%= col.td_classes(bordered: @bordered) %>">
+              <%= content_tag(col.row_header ? :th : :td, class: col.td_classes(bordered: @bordered), scope: ("row" if col.row_header)) do %>
                 <%= col.render_cell(record) { |r| capture { instance_exec(r, &col.cell_block) } } %>
-              </td>
+              <% end %>
             <% end %>
           </tr>
         <% end %>
