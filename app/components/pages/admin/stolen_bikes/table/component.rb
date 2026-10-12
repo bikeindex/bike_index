@@ -15,12 +15,14 @@ module Pages
             value_cell: "Value",
             theft_description_cell: "Theft info",
             location_cell: "Location",
+            police_department_cell: "Police department",
+            police_report_cell: "Police report",
             duplicates_cell: "Duplicates",
             owner_cell: "Owner",
             approved_cell: "Approved"
           }.freeze
 
-          DEFAULT_COLUMNS = (COLUMNS.keys - %i[value_cell]).map(&:to_s).freeze
+          DEFAULT_COLUMNS = (COLUMNS.keys - %i[value_cell police_department_cell police_report_cell]).map(&:to_s).freeze
 
           # What Pages::Org::Search::ColumnSettings reads its checkboxes from
           ColumnSettings = Data.define(:panel_columns, :panel_labels, :initially_checked_columns) do

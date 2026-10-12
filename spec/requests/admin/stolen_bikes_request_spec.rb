@@ -10,12 +10,13 @@ RSpec.describe Admin::StolenBikesController, type: :request do
     describe "index" do
       it "renders" do
         _bike = FactoryBot.create(:bike)
+        stolen_record.update(police_report_department: "Oakland PD", police_report_number: "26-004512")
         get base_url
         expect(response.code).to eq("200")
         expect(response).to render_template("index")
         expect(flash).to_not be_present
         expect(assigns(:stolen_records)).to match_array([stolen_record])
-        expect(response.body).to include("Contact owner")
+        expect(response.body).to include("Contact owner", "Oakland PD", "26-004512")
         # test the search_with_promoted_alert because scoping is weird
         get "#{base_url}?search_with_promoted_alert=true"
         expect(response.code).to eq("200")

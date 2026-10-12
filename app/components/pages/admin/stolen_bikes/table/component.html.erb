@@ -92,6 +92,14 @@
         <%= location.call(stolen_record) %>
       <% end %>
 
+      <% table.column(label: COLUMNS[:police_department_cell], classes: "hideableColumn police_department_cell") do |(stolen_record)| %>
+        <%= stolen_record.police_report_department %>
+      <% end %>
+
+      <% table.column(label: COLUMNS[:police_report_cell], classes: "hideableColumn police_report_cell") do |(stolen_record)| %>
+        <%= stolen_record.police_report_number %>
+      <% end %>
+
       <% table.column(label: COLUMNS[:duplicates_cell], classes: "hideableColumn duplicates_cell tw:text-center") do |(_stolen_record, bike)| %>
         <% duplicate_count = bike && duplicate_counts[bike.id] %>
 
