@@ -57,23 +57,22 @@ export default class extends Controller {
   #syncCombobox () {
     const fieldset = this.vehicleComboboxTarget.querySelector('.hw-combobox')
     const url = new URL(fieldset.dataset.hwComboboxAsyncSrcValue, window.location.origin)
-    this.#applyParams(url, this.#filters.market)
+    this.#applyParams(url)
     fieldset.dataset.hwComboboxAsyncSrcValue = url.pathname + url.search
     fieldset.querySelector('.hw-combobox__input').dispatchEvent(new Event('input', { bubbles: true }))
   }
 
-  // The page's URL leaves out the market it defaults to, so a shared link opens in its reader's
+  // The URL leaves out the default market, so a shared link opens in its reader's own
   #writeUrl () {
     const url = new URL(window.location)
-    const { market } = this.#filters
-    this.#applyParams(url, market === this.defaultMarketValue ? '' : market || 'all')
+    const filters = this.#filters
+    this.#applyParams(url, { ...filters, market: filters.market === this.defaultMarketValue ? '' : filters.market || 'all' })
     replaceUrl(url)
   }
 
-  #applyParams (url, market) {
+  #applyParams (url, filters = this.#filters) {
     const params = {
-      ...this.#filters,
-      market,
+      ...filters,
       jurisdiction: this.jurisdictionTarget.value,
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
       price_dir: this.priceDirValue === 'asc' ? 'asc' : ''

@@ -36,7 +36,7 @@ export async function hydrate (catalog, source, shell, url) {
     const slugs = filters[name].split(',').map((value) => kit.slug_aliases[name]?.[value] ?? value)
     filters[name] = [...new Set(slugs.filter((value) => values.has(value)))].join(',')
   }
-  // the visitor's own market, where the catalog has it, unless the URL names one or "all"
+  // "all" is Any, which the URL carries only when the visitor's country is a market
   const panel = root.querySelector('[data-controller~="bikebook--catalog-filters"]')
   const marketAttribute = 'data-bikebook--catalog-filters-default-market-value'
   const located = panel.getAttribute(marketAttribute)
