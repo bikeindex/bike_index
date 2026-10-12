@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="<%= I18n.locale %>">
+<%= tag.html(lang: I18n.locale, class: ("imperial" unless metric_units?)) do %>
   <head>
     <%= capybara_lockstep if defined?(Capybara::Lockstep) %>
     <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
@@ -132,4 +132,4 @@
   I18n.locale = <%== I18n.locale.to_json %>
 </script>
   <% end %>
-</html>
+<% end %>

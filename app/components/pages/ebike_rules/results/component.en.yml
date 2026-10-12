@@ -1,0 +1,114 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        results:
+          answer_no: 'No'
+          answer_yes: 'Yes'
+          being_compiled: Rules for this state are being compiled from primary sources.
+          bikebook_name: BikeBook
+          class_1_throttle: Class 1 bikes can't have a throttle
+          class_3_throttle: Throttle must cut out at 20 mph
+          class_3_throttle_over_html: Throttle runs to %{mph} mph, past the 20 mph
+            a Class 3's throttle is allowed
+          class_3_throttle_within_html: Throttle stops at %{mph} mph
+          class_unknown_check_label: BikeBook doesn't list its class or top speed,
+            so check the class on its label
+          classes_not_recognized:
+            one: Class %{n} isn't recognized here
+            other: Classes %{n} aren't recognized here
+          classes_recognized:
+            one: Class %{n} is recognized
+            other: Classes %{n} are recognized
+          classes_start_on: Classes take effect %{date}. Until then, check the state's
+            current rules
+          entered_manually: Entered manually · Class %{n}
+          entered_manually_unclassified: Entered manually
+          entered_unverified: Entered by you, not verified by BikeBook.
+          fails_rule: Does not meet this rule
+          falls_under: >-
+            In %{state}, it falls under %{name}, which can require registration and
+            a license.
+          for_your_information: For your information
+          full_bikebook_entry: View full BikeBook entry
+          gray_detail: >-
+            Your %{name} is listed as a Class %{n} e-bike. Check the %{state} DMV
+            for local rules.
+          gray_detail_unclassified: >-
+            Your %{name} isn't listed as a Class 1, 2 or 3 e-bike. Check the %{state}
+            DMV for local rules.
+          gray_headline: We don't have %{state}'s e-bike rules on file yet.
+          green_headline: Your %{name} is legal to ride in %{state} as a Class %{n}
+            e-bike.
+          has_throttle: Has a throttle
+          is_registered: Is this bike registered?
+          legal_to_ride: Legal to ride
+          legal_with_rules: Legal, with rules to check
+          limits_start_on: These limits take effect %{date}
+          manual_bike_name: e-bike
+          may_be_moped: >-
+            It may be regulated as a moped or motor vehicle instead, which can require
+            registration and a license.
+          meets_rule: Meets this rule
+          model_year_bikebook: "%{year} model · BikeBook"
+          motor: Motor
+          mph_html: "%{mph} mph"
+          no_speed_cap: No speed cap in state law
+          no_throttle: No throttle
+          no_watt_cap: No power cap in state law
+          not_classified: It isn't a Class 1, 2 or 3 e-bike
+          not_permitted: Not permitted
+          not_provided: Not provided
+          over_mph_html: Over %{mph} mph
+          own_classes: The state sets its own limits rather than the three standard
+            classes
+          read_more: Read more
+          recovered_more_often: Stolen bikes are recovered 2× more often when registered.
+          red_headline: Your %{name} is not permitted as an e-bike under current %{state}
+            rules.
+          red_headline_manual: This isn't an e-bike under current %{state} rules.
+          register_free: Register on Bike Index — free
+          rule_to_check: Rule to check
+          rules_not_on_file: Rules not on file
+          source_html: >-
+            Source: %{link}'s catalog of state law. Summaries are for reference, not
+            legal advice.
+          speed_not_provided: Top speed not provided
+          speed_over_cap_html: Assists to %{mph} mph, over the %{cap} mph limit
+          speed_past_cap_html: Assists past %{past} mph, over the %{cap} mph limit
+          speed_past_html: Assists past %{past} mph; check that it stops by %{cap}
+            mph
+          speed_within_cap_html: Assists to %{mph} mph, within the limit
+          still_reviewing: We're still reviewing %{state}'s rules.
+          still_reviewing_body: >-
+            Check your state DMV or legislature site for current e-bike rules. Most
+            states cap e-bike motors at 750W and assisted speed at 20 mph (Class 1–2)
+            or 28 mph (Class 3).
+          stock_photo: Stock photo
+          throttle: Throttle
+          throttle_allowed: Throttle allowed for Class 2
+          throttle_not_allowed: The state doesn't allow a throttle
+          throttle_not_stated: The state's law doesn't say whether a throttle is allowed
+          top_speed: Top speed
+          ul_certification: UL certification
+          watts_html: "%{watts}W"
+          watts_not_provided: Motor wattage not provided
+          watts_over_cap_html: "%{watts}W motor exceeds the %{cap}W cap"
+          watts_within_cap_html: "%{watts}W motor is within the cap"
+          yellow_headline:
+            one: >-
+              Your %{name} is legal to ride in %{state} as a Class %{n} e-bike, with
+              %{count} rule to check.
+            other: >-
+              Your %{name} is legal to ride in %{state} as a Class %{n} e-bike, with
+              %{count} rules to check.
+          yellow_headline_class_unknown:
+            one: Your %{name} may be legal to ride in %{state}, with %{count} rule
+              to check.
+            other: Your %{name} may be legal to ride in %{state}, with %{count} rules
+              to check.
+          yes_to_html: Yes, to %{mph}
+          your_bike: Your bike
+          your_ebike: Your e-bike
+          your_state: Your state

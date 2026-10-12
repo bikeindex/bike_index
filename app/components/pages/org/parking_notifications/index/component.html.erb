@@ -8,7 +8,7 @@
 
 <%= tag.div(data: controller_data) do %>
   <div class="new-unregistered-btn-wrap">
-    <%= link_to "New notification for unregistered bike", new_organization_bike_path(organization_id: @organization, parking_notification: true), class: "btn btn-sm btn-outline-primary" %>
+    <%= link_to "New notification for unregistered bike", new_organization_parking_notification_path(organization_id: @organization), class: "btn btn-sm btn-outline-primary" %>
   </div>
 
   <div

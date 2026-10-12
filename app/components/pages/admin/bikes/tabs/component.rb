@@ -49,7 +49,7 @@ module Pages
           # Cache the counts rather than the markup: which tab is active varies per screen and
           # comes from an unvalidated param, so it can't go in a cache key
           def tab_counts
-            @tab_counts ||= Rails.cache.fetch(["admin_bike_tab_counts-1", @bike]) do
+            @tab_counts ||= Rails.cache.fetch(["admin_bike_tab_counts-2", @bike]) do
               {duplicates: @bike.duplicate_bike_groups.count, messages: @bike.messages_count,
                listings: @bike.marketplace_listings.count, ownerships: @bike.ownerships.count,
                stickers: @bike.bike_stickers.count, theft_alerts: @bike.theft_alerts.count,

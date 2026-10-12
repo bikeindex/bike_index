@@ -7,7 +7,7 @@ module UI
       # view buckets the way the views do
       extend GraphingHelper
 
-      COLORS = %w[#3498db #DC2626 #D97706 #7C3AED #059669 #DB2777 #475569].freeze
+      COLORS = %w[#3498db #DC2626 #7C3AED #D97706 #059669 #DB2777 #475569].freeze
       KINDS = %i[column line pie].freeze
       private_constant :KINDS
 

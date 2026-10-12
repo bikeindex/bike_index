@@ -179,7 +179,7 @@ class StravaActivity < ApplicationRecord
   def distance_miles
     return nil if distance_meters.blank?
 
-    (distance_meters / 1609.344).round(2)
+    UnitSystem.kilometers_to_miles(distance_meters / 1000.0).round(2)
   end
 
   def distance_km

@@ -1,6 +1,7 @@
 module Admin
   class ManufacturersController < Admin::BaseController
     include Binxtils::SortableTable
+    include Admin::TokenAccessible
 
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
@@ -30,13 +31,18 @@ module Admin
     end
 
     def create
-      @manufacturer = Manufacturer.create(permitted_parameters)
+      @manufacturer = Manufacturer.new(permitted_parameters)
       if @manufacturer.save
-        flash[:success] = "Manufacturer Created!"
         AutocompleteLoaderJob.perform_async
-        redirect_to admin_manufacturer_url(@manufacturer)
+        respond_to do |format|
+          format.html { redirect_to admin_manufacturer_url(@manufacturer), flash: {success: "Manufacturer Created!"} }
+          format.json { render json: {manufacturer: @manufacturer.as_json(only: %w[id name slug secondary_slug website frame_maker motorized_only])} }
+        end
       else
-        render action: :new, status: :unprocessable_entity
+        respond_to do |format|
+          format.html { render action: :new, status: :unprocessable_entity }
+          format.json { render json: {errors: @manufacturer.errors.full_messages}, status: :unprocessable_entity }
+        end
       end
     end
 

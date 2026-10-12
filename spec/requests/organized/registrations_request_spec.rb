@@ -56,6 +56,17 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.status).to eq(200)
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
     end
+    it "shows hidden bikes only when they're impounded" do
+      impounded_bike.update(user_hidden: true)
+      FactoryBot.create(:bike_organized, creation_organization: current_organization, user_hidden: true)
+      FactoryBot.create(:bike, :impounded, user_hidden: true)
+      get base_url, params: {search_no_js: true, search_status: "impounded"}
+      expect(assigns(:bikes).pluck(:id)).to eq([impounded_bike.id])
+      get base_url, params: {search_no_js: true, search_status: "all"}
+      expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, impounded_bike.id])
+      get base_url, params: {search_no_js: true, search_status: "impounded", search_all: true}
+      expect(assigns(:bikes).pluck(:id)).to eq([])
+    end
     describe "location search" do
       include_context :geocoder_stubbed_bounding_box
       let(:enabled_feature_slugs) { %w[bike_search reg_address] }
@@ -372,7 +383,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         # Without impound_bikes there's no impoundedness to leave out
         expect(assigns(:search_status)).to eq "all"
         expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
-        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})
+        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all", distance_unit: "km"})
 
         # ... and no filtering by it either, the panel doesn't offer the impound statuses
         get base_url, params: {search_no_js: true, search_status: "impounded"}
@@ -846,6 +857,21 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(User.last.email).to eq owner_email
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
         expect(b_param.reload.creator_id).to eq current_user.id
+      end
+
+      context "the rules link is wrong" do
+        it "emails the owner the rules again, rather than a confirmation" do
+          b_param = register_e_scooter
+          allow(User).to receive(:from_auth).and_call_original
+          sent_at = Time.current - BikeServices::Register::CONFIRMATION_EMAIL_INTERVAL - 1.minute
+          b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => sent_at))
+          expect {
+            post confirm_email_register_path, params: {b_param_token: b_param.id_token, confirmation_token: "wrong-token"}
+          }.to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
+          expect(EmailJobs::PartialRegistrationJob.jobs.last["args"]).to eq [b_param.id, "partial_registration"]
+          expect(flash[:error]).to be_present
+          expect(User.where(email: owner_email)).to be_none
+        end
       end
 
       context "registering their own" do

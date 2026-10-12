@@ -14,7 +14,6 @@ RSpec.shared_examples "geocodeable_legacy" do
       expect(obj_with_strings.state).to eq state
       obj_with_strings.state = "wyoming"
       expect(obj_with_strings.state).to eq state
-      expect(obj_with_strings.metric_units?).to be_falsey # Because US
 
       expect(obj_with_objects.country).to eq country
       expect(obj_with_objects.state).to eq state
@@ -73,7 +72,6 @@ RSpec.shared_examples "geocodeable_legacy" do
         addr = GeocodeableLegacy.address(object, country: [:optional])
         expect(addr).to eq("1 Park Ave., New York, NY 10016")
         expect(object.address_present?).to be_truthy
-        expect(object.metric_units?).to be_truthy # Default to metric, because it's better
       end
     end
 

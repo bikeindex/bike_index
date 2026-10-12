@@ -1,8 +1,8 @@
 <ul class="tw:flex tw:flex-col tw:gap-2">
-  <% ownerships.each do |ownership| %>
+  <% creation_kinds.each do |creation_kind| %>
     <li>
-      <code class="tw:mr-2 tw:text-xs tw:text-gray-400"><%= ownership.creation_kind %></code>
-      <%= render(Atoms::Org::OriginDisplay::Component.new(ownership:)) %>
+      <code class="tw:mr-2 tw:text-xs tw:text-gray-400"><%= creation_kind %></code>
+      <%= render(Atoms::Org::OriginDisplay::Component.new(creation_kind:)) %>
     </li>
   <% end %>
 </ul>

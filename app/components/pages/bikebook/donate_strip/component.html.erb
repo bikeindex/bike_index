@@ -1,0 +1,22 @@
+<section
+  aria-label="<%= translation(".region") %>"
+  class="
+    tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2
+    tw:bg-blue-500 tw:px-5 tw:py-3 tw:sm:flex-nowrap tw:sm:justify-center
+    tw:sm:py-2.5
+  "
+>
+  <%= helpers.inline_svg_tag("icons/heart.svg", class: "tw:size-5 tw:shrink-0 tw:text-[#ffd660]", aria_hidden: true) %>
+
+  <span
+    class="
+      tw:min-w-0 tw:flex-1 tw:basis-48 tw:text-[15px] tw:font-semibold
+      tw:text-pretty tw:text-white tw:sm:flex-initial
+    "
+  >
+    <%= translation(".pitch") %>
+  </span>
+
+  <%= render(UI::ButtonLink::Component.new(text: translation(".donate"), href: donate_path(source: "bikebook"), color: :yellow, size: :callout_sm,
+  html_class: "tw:shrink-0 tw:font-header tw:whitespace-nowrap")) %>
+</section>

@@ -3,6 +3,7 @@ module Admin
     include Binxtils::SortableTable
 
     before_action :find_user, only: %i[show edit update destroy]
+    before_action :ensure_can_change_user!, only: %i[update destroy]
     helper_method :invalid_user_options
 
     def index
@@ -31,10 +32,13 @@ module Admin
       else
         @user.name = params[:user][:name]
         @user.email = params[:user][:email]
-        if Binxtils::InputNormalizer.boolean(params[:user][:superuser])
-          @user.superuser_abilities.find_or_create_by(controller_name: nil, action_name: nil)
-        else
-          @user.superuser_abilities.universal.destroy_all
+        # Only a universal superuser can grant or revoke universal access
+        if current_user.superuser?
+          if Binxtils::InputNormalizer.boolean(params[:user][:superuser])
+            @user.superuser_abilities.find_or_create_by(controller_name: nil, action_name: nil)
+          else
+            @user.superuser_abilities.universal.destroy_all
+          end
         end
         @user.developer = params[:user][:developer] if current_user.developer? && params[:user].key?(:developer)
         ban_params = permitted_ban_parameters
@@ -88,6 +92,14 @@ module Admin
     def find_user
       @user = User.unscoped.friendly_find(params[:id])
       raise ActiveRecord::RecordNotFound unless @user.present?
+    end
+
+    # Changing another superuser's email would let a limited superuser take over their access
+    def ensure_can_change_user!
+      return if current_user.superuser? || @user == current_user || @user.superuser_abilities.none?
+
+      flash[:error] = "Only a universal superuser can change another superuser"
+      redirect_to edit_admin_user_path(@user.id)
     end
 
     def permitted_ban_parameters

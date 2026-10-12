@@ -6,13 +6,23 @@ en:
         show:
           org_top_actions:
             message_owner:
+              general_message: General message
+              has_active_parking_notification: This registration has an active Parking
+                Notification.
               know_something_about_this_bike_type: Know something about this %{bike_type}?
               know_who_has_this_bike_type: Know who has this %{bike_type}?
-              link_url: Link url
-              send_message: Send message
+              message_about_theft: Message about theft
+              message_the_owner_of_this_bike_type: Message the owner of this %{bike_type}
+              owner_turned_off_non_stolen_notifications: This user has turned off
+                notifications for non-stolen vehicles.
+              send_a_new_parking_notification_to_message_the_owner: 'Send a new parking
+                notification to message the owner:'
+              send_parking_notification: Send parking notification
+              unavailable_phone_registration: Registered by phone, so there's no email
+                to send to
+              unavailable_status: General messages aren't available to send to %{status}
+              unavailable_vehicle_not_registered_with_organization: >-
+                General messages can only be sent to vehicles registered with %{organization_name}
               what_do_you_need_to_ask: >-
                 What do you need to ask about this %{bike_type}? Include a link in
                 the field below if there's one that helps
-              where_did_you_see_this_bike: >-
-                Where did you see this %{bike_type}? If you're contacting about an
-                ad you found online, include a link in the field below

@@ -754,7 +754,7 @@ RSpec.describe "Bikes API V3", type: :request do
       FactoryBot.create(:ctype, name: "wheel")
       FactoryBot.create(:ctype, name: "Headset")
       front_gear_type = FactoryBot.create(:front_gear_type)
-      handlebar_type_slug = "bmx"
+      handlebar_type_slug = "forward"
       components = [
         {
           manufacturer: manufacturer2.name,
@@ -1060,7 +1060,7 @@ RSpec.describe "Bikes API V3", type: :request do
       end
 
       context "organization_pre_registration" do
-        let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop") }
+        let(:organization) { FactoryBot.create(:organization, :with_auto_user, kind: "bike_shop", send_self_registration_email: true) }
         let(:email) { auto_user.email }
         before { Sidekiq::Testing.inline! }
         after { Sidekiq::Testing.fake! }

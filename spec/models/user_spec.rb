@@ -659,9 +659,26 @@ RSpec.describe User, type: :model do
       user.send_magic_link_email
       expect {
         user.send_magic_link_email
-      }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(0)
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(0)
       user.reload
       expect(user.magic_link_token).to eq token
+    end
+
+    it "resends the unexpired token, and replaces it once past half the expiry" do
+      user = FactoryBot.create(:user)
+      user.update_auth_token("magic_link_token", 5.minutes.ago.to_i)
+      token = user.magic_link_token
+      expect {
+        user.send_magic_link_email
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(1)
+      expect(user.reload.magic_link_token).to eq token
+
+      user.update_auth_token("magic_link_token", (Time.current - User::AUTH_TOKEN_EXPIRY / 2 - 1.minute).to_i)
+      token = user.magic_link_token
+      expect {
+        user.send_magic_link_email
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(1)
+      expect(user.reload.magic_link_token).to_not eq token
     end
   end
 

@@ -109,8 +109,8 @@ class Blog < ApplicationRecord
     # matches ALL content tag ids
     def with_tag_ids(content_tag_ids)
       content_tag_ids = Array(content_tag_ids)
-      joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
-        .group("blogs.id").having("count(distinct blog_content_tags.id) = ?", content_tag_ids.count)
+      where(id: BlogContentTag.where(content_tag_id: content_tag_ids).group(:blog_id)
+        .having("count(*) = ?", content_tag_ids.count).select(:blog_id))
     end
 
     def with_any_of_tag_ids(content_tag_ids)

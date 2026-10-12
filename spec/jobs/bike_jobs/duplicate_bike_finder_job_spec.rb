@@ -68,6 +68,20 @@ RSpec.describe BikeJobs::DuplicateBikeFinderJob, type: :job do
         expect(bike2.reload.normalized_serial_segments.count).to eq 0
         expect(DuplicateBikeGroup.count).to eq 0
       end
+
+      context "with a third matching bike" do
+        let!(:bike3) { FactoryBot.create(:bike, serial_number: "Y0A ASF FFFF") }
+        it "keeps the group for the remaining two" do
+          bike3.create_normalized_serial_segments
+          instance.perform(bike2.id)
+          instance.perform(bike3.id)
+          expect(DuplicateBikeGroup.count).to eq 1
+          bike2.destroy
+          BikeJobs::DuplicateBikeFinderJob.drain
+          expect(DuplicateBikeGroup.count).to eq 1
+          expect(bike3.reload.duplicate_bikes.pluck(:id)).to eq([bike1.id])
+        end
+      end
     end
   end
 

@@ -2,6 +2,7 @@ module Admin
   class SuperuserAbilitiesController < Admin::BaseController
     include Binxtils::SortableTable
 
+    before_action :require_universal_superuser!, except: :index
     before_action :find_superuser_ability, only: %i[edit update]
 
     def index
@@ -39,6 +40,14 @@ module Admin
     helper_method :searched_superuser_abilities, :permitted_kinds
 
     private
+
+    # An ability can grant any section, so managing them takes universal access
+    def require_universal_superuser!
+      return if current_user.superuser?
+
+      flash[:error] = "Only a universal superuser can manage superuser abilities"
+      redirect_to admin_superuser_abilities_path
+    end
 
     def find_superuser_ability
       @superuser_ability = SuperuserAbility.find(params[:id])

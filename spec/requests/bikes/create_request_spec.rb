@@ -122,7 +122,7 @@ RSpec.describe "BikesController#create", type: :request do
         .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
       bike = Bike.last
       expect(response).to redirect_to(edit_bike_url(bike))
-      expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[BParam.last.id]])
+      expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[BParam.last.id, "partial_registration"]])
     end
   end
 
@@ -164,7 +164,7 @@ RSpec.describe "BikesController#create", type: :request do
           # We need to call clean_params on the BParam after bikebook update, so that
           # the foreign keys are assigned correctly. This is how we test that we're
           # This is also where we're testing bikebook assignment
-          expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
+          expect_any_instance_of(Integrations::Bikebook::Data).to receive(:get_model) { bb_data }
           ActionMailer::Base.deliveries = []
           Sidekiq::Job.clear_all
           expect {
@@ -592,7 +592,7 @@ RSpec.describe "BikesController#create", type: :request do
         manufacturer_id: manufacturer.id,
         manufacturer_other: "",
         primary_frame_color_id: color.id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         owner_email: "flow@goodtimes.com"
       }
     end
@@ -616,7 +616,7 @@ RSpec.describe "BikesController#create", type: :request do
       it "leaves the rules to the owner" do
         expect { post base_url, params: {propulsion_type_motorized: "true", bike: bike_params} }
           .to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment.pending, :count).by 1
-        expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id]])
+        expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id, "partial_registration"]])
       end
     end
 
@@ -727,7 +727,7 @@ RSpec.describe "BikesController#create", type: :request do
         cycle_type: "pedi-cab",
         manufacturer_id: manufacturer.slug,
         primary_frame_color_id: color.id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         owner_email: "Flow@goodtimes.com"
       }
     end
@@ -816,7 +816,7 @@ RSpec.describe "BikesController#create", type: :request do
         it "still leaves the rules to the email, since the form never shows them" do
           expect { post base_url, params: e_vehicle_params }
             .to change(RegistrationSequenceAcknowledgment.pending, :count).by 1
-          expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id]])
+          expect(EmailJobs::PartialRegistrationJob.jobs.map { it["args"] }).to eq([[b_param.id, "partial_registration"]])
         end
       end
     end
@@ -851,7 +851,7 @@ RSpec.describe "BikesController#create", type: :request do
         rear_tire_narrow: "true",
         rear_wheel_size_id: FactoryBot.create(:wheel_size).id,
         primary_frame_color_id: color.id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         owner_email: current_user.email
       }
     end
@@ -899,7 +899,7 @@ RSpec.describe "BikesController#create", type: :request do
       # We need to call clean_params on the BParam after bikebook update, so that
       # the foreign keys are assigned correctly.
       # This is also where we're testing bikebook assignment
-      expect_any_instance_of(Integrations::BikeBook).to receive(:get_model) { bb_data }
+      expect_any_instance_of(Integrations::Bikebook::Data).to receive(:get_model) { bb_data }
       expect(state).to be_present
     end
     let!(:target_address) { {street: "212 Main St", city: "Chicago", region: "IL", postal_code: "60647", kind: "ownership"} }

@@ -34,7 +34,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
         ProcessHotSheetJob.drain
       }.to change(HotSheet, :count).by 1
       hot_sheet = HotSheet.last
-      expect(hot_sheet.sheet_date).to eq Time.current.to_date
+      expect(hot_sheet.sheet_date).to eq hot_sheet_configuration.current_date
       expect(hot_sheet.organization_id).to eq organization1.id
       expect(hot_sheet.delivery_success?).to be_truthy
       # And it hasn't delivered any email
@@ -45,7 +45,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
     context "with a saved sheet whose recipients have left the organization" do
       it "settles the sheet without delivering" do
         hot_sheet = FactoryBot.create(:hot_sheet, organization: organization1,
-          sheet_date: Time.current.to_date, recipient_ids: [FactoryBot.create(:user).id])
+          sheet_date: hot_sheet_configuration.current_date, recipient_ids: [FactoryBot.create(:user).id])
 
         expect { described_class.new.perform(organization1.id) }.to_not change(HotSheet, :count)
 
@@ -62,7 +62,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
           ProcessHotSheetJob.drain
         }.to change(HotSheet, :count).by 1
         hot_sheet = HotSheet.last
-        expect(hot_sheet.sheet_date).to eq Time.current.to_date
+        expect(hot_sheet.sheet_date).to eq hot_sheet_configuration.current_date
         expect(hot_sheet.organization_id).to eq organization1.id
         # And it's delivered the email
         expect(hot_sheet.delivery_success?).to be_truthy
@@ -99,13 +99,13 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
         it "creates a hot sheet for each slice of recipients, and emails each one" do
           expect(ActionMailer::Base.deliveries.count).to eq 0
           allow(OrganizedMailer).to receive(:hot_sheet).and_wrap_original do |method, sheet|
-            expect(HotSheet.where(sheet_date: Time.current.to_date).count).to eq 3
+            expect(HotSheet.where(sheet_date: hot_sheet_configuration.current_date).count).to eq 3
             method.call(sheet)
           end
           expect {
             ProcessHotSheetJob.drain
           }.to change(HotSheet, :count).by 3
-          hot_sheets = HotSheet.where(sheet_date: Time.current.to_date).order(:id)
+          hot_sheets = HotSheet.where(sheet_date: hot_sheet_configuration.current_date).order(:id)
           # The sheets are identical, other than which recipients they went to
           expect(hot_sheets.map(&:organization_id)).to eq([organization1.id] * 3)
           expect(hot_sheets.map(&:stolen_record_ids)).to eq([[stolen_record.id]] * 3)
@@ -170,7 +170,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
             expect {
               ProcessHotSheetJob.drain
             }.to change(HotSheet, :count).by 3
-            hot_sheets = HotSheet.where(sheet_date: Time.current.to_date)
+            hot_sheets = HotSheet.where(sheet_date: hot_sheet_configuration.current_date)
             expect(hot_sheets.delivery_success.count).to eq 2
             expect(hot_sheets.delivery_partial_success.count).to eq 1
             expect(ActionMailer::Base.deliveries.count).to eq 2
@@ -188,7 +188,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
               expect {
                 ProcessHotSheetJob.drain
               }.to raise_error(Postmark::ApiInputError)
-              hot_sheets = HotSheet.where(sheet_date: Time.current.to_date)
+              hot_sheets = HotSheet.where(sheet_date: hot_sheet_configuration.current_date)
               expect(hot_sheets.count).to eq 3
               expect(hot_sheets.delivery_success.count).to eq 2
               expect(hot_sheets.delivery_failure.count).to eq 1

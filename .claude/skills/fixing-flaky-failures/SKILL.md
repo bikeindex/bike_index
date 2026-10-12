@@ -22,6 +22,10 @@ repo's `flaky:` retry harness, and the known false-flake causes — a missing
 Tailwind build, the shared Redis autocomplete cache, Turbo frame timing,
 probe-run interference.
 
+## Who runs this
+
+From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — no `model` override (finding the mechanism is judgment) — briefed with the failing spec and its CI run or output, what the branch changed, and anything already tried. It replies with the mechanism and the evidence for it, the fix left uncommitted in the working tree, and the runs that show it holds — or, if it couldn't reproduce, what it ruled out.
+
 ## The rule that overrides everything else here
 
 **You may not reduce test coverage to make a flaky test pass.** Not as a last
@@ -238,7 +242,9 @@ leaves timing, not ordering or leaked state.
 Measure the "without the fix" arm against the base ref by name — `git checkout
 origin/main -- <paths>`. Once the fix is committed, `git checkout -- <paths>` restores
 *it*, so the arm you think is unpatched is the patched one, and a regression test that
-does fail without the fix reads as passing.
+does fail without the fix reads as passing. An uncommitted fix that checkout
+overwrites outright, so save it first — `git diff HEAD -- <paths> > tmp/flaky_fix.patch`
+— and put it back with `git checkout HEAD -- <paths> && git apply tmp/flaky_fix.patch`.
 
 ## Known causes in this repo
 
@@ -291,11 +297,13 @@ the page to say so. `wait_for_page_script`
 (`spec/support/integration_spec_helpers.rb`) waits on `window.pageScript`; reach for
 it after any navigation into a jQuery-driven control.
 
-**Filling a field right after a multiselect combobox pick.** The chip arrives as a turbo-stream,
-and Turbo's `withPreservedFocus` puts focus back on the combobox input a frame after rendering it —
-so a `set` landing in that frame types into the combobox (the failure reads as the field keeping its
-default). Wait for the chip before moving on; `combobox_select` in
-`spec/components/pages/search/form/component_system_spec.rb` is the pattern.
+**Filling a field while a turbo-stream renders.** Every stream render runs through Turbo's
+`withPreservedFocus`, which puts focus back a frame later on whatever held it when the render
+began — so a `fill_in` landing in that frame types into the field before it (the failure reads as
+one field empty and its neighbour holding both values). A multiselect pick's chip is one such
+stream: wait for it, as `combobox_select` in `spec/components/pages/search/form/component_system_spec.rb`
+does. An async combobox pick sends a filter request whose response can land several steps later;
+`click_combobox_option` waits that one out.
 
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
 A Turbo frame that reloads (an eager frame, `reloadFrameIfUrlStale` on

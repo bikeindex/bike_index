@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        class_tile:
+          class: Class
+          class_aria: Class %{n} e-bike
+          class_unknown_aria: E-bike class unknown
+          emoto: E-moto

@@ -330,7 +330,8 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         fill_in "report[date]", with: "2026-08-05T14:30"
         fill_in "report[address_record_attributes][street]", with: "278 Broadway"
         fill_in "report[address_record_attributes][city]", with: "New York"
-        select state.name, from: "report[address_record_attributes][region_record_id]"
+        type_into("#report_address_record_attributes_region_record_id", state.abbreviation)
+        click_combobox_option(state.name)
         fill_in "report[address_record_attributes][postal_code]", with: "10007"
         click_button "Complete Bike Registration"
 

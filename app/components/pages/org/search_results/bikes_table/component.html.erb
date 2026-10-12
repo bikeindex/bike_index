@@ -47,7 +47,7 @@
 
     <% if organization.enabled?("registration_sequences") %>
       <% table.column(sortable: "acknowledged_at", label: tag.span(settings.column_renames[:acknowledgment_cell], title: translation(".acknowledgment_title")), classes: "hideableColumn acknowledgment_cell tw:leading-none") do |bike| %>
-        <% if bike.motorized? %>
+        <% if bike.registration_sequence_applies? %>
           <% if bike.organized?(organization) %>
             <small>
               <%= render(UI::Time::Component.new(time: RegistrationSequenceAcknowledgment.find_for(bike:, organization:)&.acknowledged_at)) %>

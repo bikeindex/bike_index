@@ -72,6 +72,7 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
         recovery_display = RecoveryDisplay.last
         expect(recovery_display.quote).to eq valid_attrs[:quote]
         expect(recovery_display.photo.attached?).to be_truthy
+        expect(ImageJobs::ProcessRecoveryDisplayPhotoJob.jobs.count).to eq 1
 
         Sidekiq::Job.drain_all # Process the photo in background
 
@@ -109,7 +110,7 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :request do
     context "invalid create" do
       let(:invalid_attrs) do
         {
-          quote: "La croix scenester pug glossier, yuccie salvia humblebrag chia. Meditation health goth readymade flannel hot chicken austin tofu salvia cornhole tumeric hashtag plaid. Umami vegan hell of before they sold out copper mug chillwave authentic poke mumblecore godard la croix 8-bit. Venmo raw denim synth wolf. Food truck hot chicken waistcoat activated charcoal"
+          quote: "a" * 401
         }
       end
       it "does not create a recovery display that is too long" do

@@ -40,11 +40,11 @@ class HotSheet < ApplicationRecord
       org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
       hot_sheets = where(organization_id: org_id, sheet_date: date).includes(:organization).order(:id).to_a
       return hot_sheets if hot_sheets.any?
-      # A past day is whatever it was - only today's sheets are still to come
-      return [] if date.present? && date != Time.current.to_date
 
       configuration = HotSheetConfiguration.find_by(organization_id: org_id)
       return [] if configuration.blank?
+      # A past day is whatever it was - only today's sheets are still to come
+      return [] if date.present? && date != configuration.current_date
 
       organization = configuration.organization
       stolen_record_ids = calculated_stolen_records(configuration).pluck(:id)

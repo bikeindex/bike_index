@@ -292,7 +292,7 @@ class Export < ApplicationRecord
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
 
     # Not the org's impound records: a bike registered elsewhere isn't the org's to export
-    bikes = impounded_bikes ? organization.bikes.status_impounded : organization.bikes
+    bikes = impounded_bikes ? organization.bikes.status_impounded_with_user_hidden : organization.bikes
     return bikes_within_time(bikes) unless custom_bike_ids.present?
 
     bikes_within_time(bikes).or(bikes.where(id: custom_bike_ids))

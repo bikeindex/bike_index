@@ -73,6 +73,6 @@ class ProcessImpoundUpdatesJob < ApplicationJob
         can_share_recovery: true)
     end
     # TODO: make this actually merge attributes in from the bike, rather than just delete it?
-    impound_record.parking_notification.bike&.delete
+    impound_record.parking_notification&.bike&.delete
   end
 end

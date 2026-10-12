@@ -223,11 +223,19 @@ RSpec.describe BParam, type: :model do
 
   describe "set_handlebar_type_key" do
     it "sets handlebar_type to the handlebar type from name submitted" do
-      bike = {serial_number: "gobble gobble", handlebar_type_slug: " bmx "}
+      bike = {serial_number: "gobble gobble", handlebar_type_slug: " forward "}
       b_param = BParam.new(params: {bike: bike})
       b_param.set_handlebar_type_key
       expect(b_param.bike["handlebar_type_slug"].present?).to be_falsey
-      expect(b_param.bike["handlebar_type"]).to eq(:bmx)
+      expect(b_param.bike["handlebar_type"]).to eq(:forward)
+    end
+
+    it "sets the former slugs to horizontal" do
+      %w[flat bmx].each do
+        b_param = BParam.new(params: {bike: {handlebar_type_slug: it}})
+        b_param.set_handlebar_type_key
+        expect(b_param.bike["handlebar_type"]).to eq(:horizontal)
+      end
     end
   end
 

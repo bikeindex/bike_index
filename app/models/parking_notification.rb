@@ -218,7 +218,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def send_email?
-    owner_known?
+    owner_known? && email != ApplicationMailer::CONTACT_EMAIL && !organization&.skip_email_to?(email)
   end
 
   def publicly_visible_attribute = :street
