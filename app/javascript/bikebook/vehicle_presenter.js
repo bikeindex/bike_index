@@ -68,7 +68,7 @@ export class VehiclePresenter {
   measurement (value, unit = null, key = null, { difference = false } = {}) {
     if (value === true) return '✓'
     if (value === false) return '❌'
-    if (Array.isArray(value)) return join(value, ', ')
+    if (Array.isArray(value)) return join(value.map((item) => this.measurement(item, unit, key)), ', ')
     const [, count, each] = (unit && typeof value === 'string' && value.match(/^(\d+) x (\d+(?:\.\d+)?)$/)) || []
     if (each) return join([`${count} × `, this.measurement(this.rounded(parseFloat(each)), unit, key, { difference })])
     if (typeof value !== 'number') return isTemplate(value) ? value : String(value ?? '')

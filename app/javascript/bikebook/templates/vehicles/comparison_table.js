@@ -57,8 +57,8 @@ const SPECS = [
   { label: 'Battery', read: motors('battery_size'), better: 1, unit: 'wh' },
   { label: 'Range', read: modes('range_claimed'), better: 1, unit: 'km' },
   { label: 'Top speed', read: modes('max_speed'), better: 1, unit: 'km/h' },
-  { label: 'Front travel', read: (vehicle, size) => size?.geometry?.travel_front ?? vehicle.suspension?.front_travel, better: 1, unit: 'mm' },
-  { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear_travel, better: 1, unit: 'mm' }
+  { label: 'Front travel', read: (vehicle, size) => size?.geometry?.travel_front ?? vehicle.suspension?.front?.travel, better: 1, unit: 'mm' },
+  { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear?.travel, better: 1, unit: 'mm' }
 ]
 // the size's, so it closes the geometry
 const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' }
