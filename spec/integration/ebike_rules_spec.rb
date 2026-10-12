@@ -8,7 +8,8 @@ RSpec.describe "E-bike rules", :js, type: :system do
   it "checks a BikeBook model or one entered by hand as each is chosen, keeping it in the URL" do
     visit ebike_rules_path
     type_into(find_field("Bike model", disabled: false, wait: 10), "haul")
-    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
+    # the US model, not its Canadian one of the same name
+    retry_on_detach { find("[role='option']", text: /Specialized Haul ST.*current/m).click }
     # with no state to check it against yet, it waits in the URL
     expect(page).to have_current_path("/ebike-rules?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
     expect(page).to have_no_css("[role='status']")
@@ -71,7 +72,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
 
     # picking it again checks it, and its own details replace them
     type_into(find_field("Bike model"), "haul")
-    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
+    retry_on_detach { find("[role='option']", text: /Specialized Haul ST.*current/m).click }
     expect(page).to have_css("[role='status']", text: "Your Specialized Haul ST is legal to ride in Colorado")
     expect(page).to have_current_path("/ebike-rules/co?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")
     expect(page).to have_field("Motor wattage (W)", with: "700").and have_css("legend", exact_text: "Specialized Haul ST details")
