@@ -71,40 +71,15 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
   }
 }
 
-const present = ([, value]) => value != null
-// a 0.23 year's paints, index-aligned, as 0.24's colorways
-const colorways = ({ paint_descriptions: names = [], paint_color_codes: codes = [], ...year }) => names.length || codes.length
-  ? { ...year, colorways: Array.from({ length: Math.max(names.length, codes.length) }, (_, index) => Object.fromEntries([['name', names[index]], ['color_code', codes[index]]].filter(present))) }
-  : year
-
-// 0.24.0's flat suspension as 0.24.1's record per suspended end: `positions` names the ends, and `rear_shock_length`
-// is the rear's `shock_length`
-const suspensionEnds = ({ positions = [], ...suspension }) => Object.fromEntries(['front', 'rear'].flatMap((end) => {
-  const stated = Object.entries(suspension).filter(([key]) => key.startsWith(`${end}_`)).map(([key, value]) => [key.slice(end.length + 1), value])
-  return suspension[end] || stated.length || positions.some((position) => position.startsWith(end)) ? [[end, { ...suspension[end], ...Object.fromEntries(stated) }]] : []
-}))
-
-// A model in schema 0.24.1's shape, which a file on an older version isn't, except that its years are records naming
-// their year, newest first, rather than keyed by it
-const current = ({ cargo: { max_weight_total: maxWeightTotal, ...cargo } = {}, suspension: { max_fork_travel: maxForkTravel, ...suspension } = {}, ...vehicle }) => {
-  const ends = suspensionEnds(suspension)
-  const frame = { ...Object.fromEntries([['max_weight_total', maxWeightTotal], ['max_fork_travel', maxForkTravel]].filter(present)), ...vehicle.frame }
-  return {
-    ...vehicle,
-    ...(vehicle.years && {
-      years: (Array.isArray(vehicle.years) ? vehicle.years : Object.entries(vehicle.years).map(([year, record]) => ({ year: Number(year), ...record })))
-        .map(colorways).sort((a, b) => b.year - a.year)
-    }),
-    ...(Object.keys(cargo).length && { cargo }),
-    ...(Object.keys(ends).length && { suspension: ends }),
-    ...(Object.keys(frame).length && { frame })
-  }
-}
+// A model's years as records naming their year, newest first, rather than keyed by it
+const withYearRecords = (vehicle) => vehicle.years
+  ? { ...vehicle, years: Object.entries(vehicle.years).map(([year, record]) => ({ year: Number(year), ...record })).sort((a, b) => b.year - a.year) }
+  : vehicle
 
 // A failed fetch is forgotten, so the next ask tries again
 const block = (key) => {
   if (!blocks.has(key)) {
-    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(models).map(([id, data]) => [id, current(data)])), (error) => {
+    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(models).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
       blocks.delete(key)
       throw error
     }))

@@ -609,10 +609,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     classification = find("section div", text: /\AE-vehicle class\s*Off-Highway Motorcycle \?\z/, wait: 10)
     expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     expect(page).to have_no_css("dt", exact_text: "Classifications")
-    # a 0.23 model's paints still read as colorways
-    expect(find("article h1", text: "Ultra Bee").ancestor("article").find("h2", text: /\Amodel years\z/i).ancestor("section"))
-      .to have_text("Carbon Black").and have_text("Desert Brown")
-    # its flat suspension reads as a 0.24.1 model's ends do, and an end stating nothing is still suspended
+    # each suspended end, including one that states nothing
     suspension = ->(title) { find("article h1", text: title).ancestor("article").find("h2", text: /\Asuspension\z/i).ancestor("section") }
     expect(suspension.call("Ultra Bee")).to have_css("div", text: /\AFront\s*241\W*mm\z/).and have_css("div", text: /\ARear\s*320\W*×\W*85\W*mm 3\.35in\z/)
     expect(suspension.call("GT3 Pro")).to have_css("div", text: /\AFront\s*Front: Double Wishbone Hydraulic Shock Absorber/)
@@ -658,7 +655,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
-    # a 0.24 model: years keyed by year, read newest first, each paint a colorway, and its system weight limit with the frame
+    # years keyed by year, read newest first, each with its colorways, and the system weight limit with the frame
     years = find("article h1", text: "Haul ST").ancestor("article").find("h2", text: /\Amodel years\z/i).ancestor("section")
     expect(years.all("tr").map { it.first("td").text }).to eq %w[2026 2025]
     expect(years).to have_text("Satin Obsidian").and have_text("Gloss White Mountains")
