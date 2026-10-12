@@ -104,7 +104,7 @@ RSpec.describe Pages::Register::Views::StepFinished::Component, type: :component
           expect(component).to have_link("Add report", href: "/bikes/#{bike.id}/edit/theft_details?alert_offered=true#policeReportNumber")
           expect(component).to have_link("More ways to share", href: "/bikes/#{bike.id}/edit/publicize")
           expect(component).to have_link("See alert options", href: "/bikes/#{bike.id}/theft_alert/new")
-          expect(component).to have_link("Mark as recovered", href: "/bikes/#{bike.id}/edit/report_recovered?open_recovery=true")
+          expect(component).to have_link("Mark as recovered", href: "/bikes/#{bike.id}/recovered/new")
           expect(component).to have_link("View your registration", href: "/bikes/#{bike.id}")
           expect(component).to have_link("Register another vehicle", href: "/register/new")
         end

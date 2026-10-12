@@ -20,11 +20,12 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
 
     it "carries the session token through the redirect and renders the recovery form once" do
       get "/bikes/#{bike.to_param}/recovery/edit?token=#{recovery_link_token}"
-      expect(response).to redirect_to bike_path(bike)
+      expect(response).to redirect_to new_bike_recovered_path(bike)
       expect(session[:recovery_link_token]).to eq recovery_link_token
 
-      # bikes#show bounces the redesign user on to the registration
-      follow_redirect!
+      # Leaving the form for the bike - which bounces the redesign user on to the registration -
+      # still offers the recovery there
+      get bike_path(bike)
       expect(response).to redirect_to(registration_path(bike))
 
       follow_redirect!

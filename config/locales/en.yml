@@ -1553,20 +1553,6 @@ en:
         You can always toggle this setting to show and hide a bike.
       you_can_read_more_html: You can read more about why this is important to us
         in our %{faq_link}.
-    report_recovered:
-      can_we_share_your_story: Can we share your story?
-      did_we_help: Did we help?
-      how_did_you_get_it_back: How did you get it back?
-      its_how_we_get_better_at_recovering_bikes: It"s how we get better at recovering
-        bikes.
-      mark_recovered: Mark recovered
-      marking_recovered: Marking your bike recovered…
-      nevermind: Nevermind
-      not_enough_info: Not enough information!
-      please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
-        back, we really care!
-      this_bike_has_been_returned: This %{bike_type} has been returned!
-      were_so_glad: We're so glad you got your %{bike_type} back!
     report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     strava_gear:
@@ -1689,6 +1675,8 @@ en:
         we_couldnt_find_that_registration: Oops! We couldn't find that registration,
           please re-enter the information here
       recovered:
+        new:
+          mark_recovered: Mark your %{bike_type} recovered
         show:
           recovered: Your %{bike_type} is recovered
       recovery:

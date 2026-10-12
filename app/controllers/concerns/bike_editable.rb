@@ -18,6 +18,8 @@ module BikeEditable
   def edit_bike_template_path_for(bike, template = nil)
     if bike.version?
       edit_bike_version_url(bike.id, edit_template: template)
+    elsif template.to_s == "report_recovered"
+      new_bike_recovered_path(bike.id)
     elsif edits_controller_name_for(template) == "edits"
       edit_bike_url(bike.id, edit_template: template)
     elsif template.to_s == "alert"
@@ -110,7 +112,7 @@ module BikeEditable
       return false
     end
 
-    @skip_general_alert = %w[photos theft_details report_recovered remove alert alert_purchase_confirmation].include?(@edit_template)
+    @skip_general_alert = %w[photos theft_details remove alert alert_purchase_confirmation].include?(@edit_template)
     true
   end
 
@@ -129,6 +131,10 @@ module BikeEditable
   end
 
   def edits_controller_name_for(requested_page)
-    %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "theft_alerts" : "edits"
+    case requested_page.to_s
+    when "alert", "alert_purchase_confirmation" then "theft_alerts"
+    when "report_recovered" then "recovered"
+    else "edits"
+    end
   end
 end

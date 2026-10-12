@@ -12,18 +12,6 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     expect(page).to have_content("Bike successfully updated!", wait: 10)
   end
 
-  # Delay the recovery request so the flow has to wait for it to complete rather
-  # than navigating away before the bike is recovered. Reproduces the real-world
-  # latency a user hits; without it a fast local request masks the bug.
-  def delay_recovery_request(seconds)
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.route("**/api/v1/users/send_request", ->(route, _request) {
-        sleep seconds
-        route.continue
-      })
-    end
-  end
-
   it "reports the bike stolen with theft details, then marks it recovered" do
     sign_in(owner)
     expect(page).to have_content("Logged in")
@@ -79,19 +67,17 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     expect(page).to have_content("Thanks for looking out!", wait: 10)
 
     # ---- Mark the bike recovered ----
-    delay_recovery_request(2)
-
+    # The edit menu's entry goes to the recovery form
     visit edit_bike_path(bike, edit_template: "report_recovered")
-    find("[data-target='#toggle-stolen']").click
+    expect(page).to have_current_path(new_bike_recovered_path(bike))
 
-    within("#toggle-stolen") do
-      expect(page).to have_css(".modal-body", visible: true, wait: 5)
-      fill_in "mark_recovered_reason", with: "Found it locked up around the corner"
-      click_button "Mark recovered"
-    end
+    # The story is required, and the form says so rather than the browser
+    click_button "Mark as recovered"
+    expect(page).to have_content("A sentence or two is plenty")
 
-    # While the (delayed) recovery request is in flight, the spinner is shown
-    expect(page).to have_content("Marking your bike recovered", wait: 5)
+    find("label", text: "Someone saw the alert").click
+    fill_in "recovery[story]", with: "Found it locked up around the corner"
+    click_button "Mark as recovered"
 
     # Once it's recovered, it lands on the welcome home and the ways to support the next recovery
     expect(page).to have_content("Welcome home", wait: 10)
@@ -99,7 +85,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     stolen_record.reload
     expect(stolen_record.recovered?).to be_truthy
-    expect(stolen_record.recovered_description).to eq "Found it locked up around the corner"
+    expect(stolen_record.recovered_description).to eq "Someone saw the alert: Found it locked up around the corner"
 
     bike.reload
     expect(bike.status_stolen?).to be_falsey
