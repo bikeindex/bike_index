@@ -178,6 +178,8 @@ module Admin
       find_bike
       BikeJobs::BikeDeleterJob.new.perform(@bike.id, false, current_user.id)
       flash[:success] = "Bike deleted!"
+      return if return_to_if_present
+
       redirect_to admin_bikes_url
     end
 
