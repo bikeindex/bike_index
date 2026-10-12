@@ -24,7 +24,6 @@ RSpec.describe MyAccounts::MembershipsController, type: :request do
         get base_url
         expect(response.code).to eq("200")
         expect(response.body).to match("a Basic member")
-        expect(response.body).to match("Manage billing")
       end
     end
   end

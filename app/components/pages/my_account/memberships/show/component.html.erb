@@ -33,7 +33,7 @@
 
       <% if @membership.admin_managed? %>
         <p class="tw:mt-4"><%= translation(".complimentary") %></p>
-      <% elsif price_comparison.present? %>
+      <% elsif @current_price.present? %>
         <p class="tw:mt-4"><%= price_comparison %></p>
       <% end %>
 

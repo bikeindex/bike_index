@@ -26,7 +26,6 @@ RSpec.describe Pages::MyAccount::Memberships::Show::Component, type: :component 
     let(:stripe_price) { membership.current_stripe_subscription.stripe_price }
 
     it "renders their price, matching the current price" do
-      expect(stripe_price.amount_cents).to eq 499
       expect(component).to have_text("$4.99 per month")
       expect(component).to have_text("You pay the current price for Basic")
       expect(component).to have_link("Manage billing", href: "/membership/edit")

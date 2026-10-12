@@ -8,8 +8,7 @@ class MembershipsController < ApplicationController
 
   def create
     if current_user&.membership_active.present?
-      flash[:notice] = translation(:already_a_member)
-      redirect_to(my_account_membership_path) && return
+      return redirect_to(my_account_membership_path, notice: translation(:already_a_member))
     end
 
     stripe_price = StripePrice.active.where(stripe_price_parameters).first
