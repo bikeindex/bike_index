@@ -203,20 +203,18 @@ RSpec.describe MembershipsController, type: :request do
     context "logged in" do
       include_context :request_spec_logged_in_as_user
 
-      it "redirects to new membership" do
+      it "redirects to their membership" do
         get "#{base_url}/edit"
-        expect(response).to redirect_to new_membership_path
-        expect(flash[:notice]).to match(/active/)
+        expect(response).to redirect_to my_account_membership_path
       end
 
       context "with admin managed active membership" do
         let!(:membership) { FactoryBot.create(:membership, user: current_user) }
-        it "redirects to my_account" do
+        it "redirects to their membership" do
           expect(current_user.reload.membership_active.admin_managed?).to be_truthy
 
           get "#{base_url}/edit"
-          expect(response).to redirect_to my_account_path
-          expect(flash[:notice]).to match(/free membership/i)
+          expect(response).to redirect_to my_account_membership_path
         end
       end
 

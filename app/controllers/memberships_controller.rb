@@ -21,17 +21,10 @@ class MembershipsController < ApplicationController
   end
 
   def edit
-    if current_user.membership_active.present?
-      if current_user.membership_active.admin_managed?
-        flash[:notice] = translation(:free_membership)
-        redirect_to my_account_path
-      else
-        redirect_to(current_user.membership_active.stripe_portal_session.url, allow_other_host: true)
-      end
-    else
-      flash[:notice] = translation(:no_active_membership)
-      redirect_to new_membership_path
-    end
+    membership = current_user.membership_active
+    return redirect_to(my_account_membership_path) unless membership&.stripe_managed?
+
+    redirect_to(membership.stripe_portal_session.url, allow_other_host: true)
   end
 
   private
