@@ -48,7 +48,7 @@ export const frameGeometry = (data, size) => {
   const listedRake = geometry.fork_rake ?? fork?.dimensions?.offset ??
     (listed('trail') ? front.radius * Math.cos(headAngle) - geometry.trail * Math.sin(headAngle) : null)
   const rake = listedRake ?? DEFAULTS.fork_rake
-  const travel = geometry.travel_front ?? data.suspension?.front_travel ?? fork?.dimensions?.travel ?? 0
+  const travel = geometry.travel_front ?? data.suspension?.front?.travel ?? fork?.dimensions?.travel ?? 0
   // up the steering axis from the front axle's foot on it to the fork's crown
   const forkLength = leg(geometry.fork_length_a2c ?? front.radius + CROWN_CLEARANCE + travel, rake)
   // from the top tube where the effective seat angle is listed, else up the fork and head tube from the front axle

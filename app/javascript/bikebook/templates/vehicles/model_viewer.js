@@ -143,8 +143,8 @@ class ModelViewer {
       const entry = sizeTravels.find(([value]) => value === travel)
       entry ? entry[1].push(size.name) : sizeTravels.push([travel, [size.name]])
     }
-    const values = slice(vehicle.suspension, Object.keys(this.kit.viewer.suspension_fields[position]))
-    if (blank(values) && sizeTravels.length === 0) return null
+    const values = vehicle.suspension?.[position]
+    if (values == null && sizeTravels.length === 0) return null
 
     const component = vehicle.components?.find((each) => each.type === spec.component)
     return Object.fromEntries(Object.entries({ ...values, size_travels: sizeTravels, component }).filter(([, value]) => value != null))
@@ -345,38 +345,36 @@ class ModelViewer {
     const { presenter } = this
     const rows = Object.entries(this.vehicle.suspension).map(([position, values]) => definitionListRow({
       label: presenter.positionLabel(position),
-      value: this.againstCounterparts(values, this.others.map((other) => other.suspension[position]), (each) => this.suspensionSummary(position, each))
+      value: this.againstCounterparts(values, this.others.map((other) => other.suspension[position]), (each) => this.suspensionSummary(each))
     }))
     return section({ heading: 'Suspension', content: rows.length ? join(rows) : null })
   }
 
-  suspensionSummary (position, suspension) {
+  suspensionSummary (suspension) {
     const { presenter } = this
     const component = suspension.component
     const name = presence(component?.description?.split(',')[0].replace(/\s*\d+(\.\d+)?\s?mm$/i, ''))
-    const { rear_shock_length: length, rear_shock_stroke: stroke, rear_shock_mount: mount } = suspension
+    const { shock_length: length, shock_stroke: stroke, shock_mount: mount } = suspension
     const size = truthy(length) ? this.measurements(compact([length, stroke]), 'mm', ' × ') : null
-    const [leadKey, lead] = this.travelLead(suspension, this.kit.viewer.suspensions[position].travel) ?? []
+    const lead = this.travelLead(suspension)
     const parts = compact([lead, presence(join(compact([size, name ?? (size ? 'shock' : null)]), ' ')), truthy(length) ? null : this.millimeters(stroke, ' stroke')])
-    const summary = parts.length ? join(parts, ', ') : `${upcaseFirst(mount)} shock mount`
+    // an end with nothing stated is still suspended
+    const summary = parts.length ? join(parts, ', ') : present(mount) ? `${upcaseFirst(mount)} shock mount` : html`<span class="twless-strong">Unknown travel</span>`
     const dimensions = except(this.kit.schemas.component_dimensions, ['travel', 'extra_measurements'])
     const componentRows = component
       ? [[component.type_detail ?? component.type, component.description], ['Manufacturer', component.manufacturer], ...presenter.rowsFor(dimensions, component.dimensions)]
           .filter((row) => present(row[1]))
       : []
-    const rows = [...presenter.rowsFor(this.kit.viewer.suspension_fields[position], suspension, { labels: this.kit.viewer.suspension_labels }), ...componentRows]
-    const shown = compact([leadKey, 'rear_shock_length', 'rear_shock_stroke', parts.length ? null : 'rear_shock_mount'])
-    const unshown = rows.some((row) => !shown.includes(row.length > 2 ? row.at(-1) : null) && !equal(row[1], name))
+    const rows = [...presenter.rowsFor(this.kit.viewer.suspension_fields, suspension, { labels: this.kit.viewer.suspension_labels }), ...componentRows]
+    const shown = compact([lead ? 'travel' : null, 'shock_length', 'shock_stroke', parts.length ? null : 'shock_mount'])
+    const unshown = rows.some((row) => !shown.includes(row[4]) && !equal(row[1], name))
     return unshown ? this.withTooltip(summary, this.tooltipRows(rows)) : summary
   }
 
-  // [the field the summary leads with, its text]; travel can come from the fork or shock itself
-  travelLead (suspension, travelKey) {
-    const travel = suspension[travelKey] ?? suspension.component?.dimensions?.travel
-    if (truthy(travel) || suspension.size_travels.length) return [travelKey, this.travelSummary(travel, suspension.size_travels)]
-
-    const max = suspension.max_fork_travel
-    return truthy(max) ? ['max_fork_travel', join(['Up to ', this.millimeters(max, ' fork')])] : null
+  // travel can come from the fork or shock itself
+  travelLead (suspension) {
+    const travel = suspension.travel ?? suspension.component?.dimensions?.travel
+    return truthy(travel) || suspension.size_travels.length ? this.travelSummary(travel, suspension.size_travels) : null
   }
 
   // the given travel, else the one most sizes share, with each size's other travel after it
@@ -522,7 +520,7 @@ class ModelViewer {
 
   brakeSummary (brake) {
     const typeAndRotor = presence(join(compact([brakeType(brake), this.millimeters(brake.rotor_diameter, ' rotor')]), ', '))
-    const summary = join(compact([this.onSizes(typeAndRotor, brake.sizes), presence(brake.caliper_mount?.replace(/^Disc /, ''))]), ', ')
+    const summary = join(compact([this.onSizes(typeAndRotor, brake.sizes), presence(brake.caliper_mount?.replace(/^Disc /, '')), brake.anti_lock ? 'ABS' : null]), ', ')
     return brake.max_rotor_diameter != null ? join([summary, this.millimeters(brake.max_rotor_diameter, ' rotor max')], html`<br>`) : summary
   }
 
