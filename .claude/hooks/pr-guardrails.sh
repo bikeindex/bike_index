@@ -57,6 +57,7 @@ transcript_pattern='"transcript_path"[[:space:]]*:[[:space:]]*"([^"]+)"'
 [ -r "$transcript" ] || exit 0
 invoked='"input":\{"skill":"pr"'
 typed="<command-name>/pr<""/command-name>"
-grep -qE "$invoked|$typed" "$transcript" && exit 0
+# a subagent's tool calls carry its parent's transcript_path, and its own lives beside it
+grep -qsE "$invoked|$typed" "$transcript" "${transcript%.jsonl}"/subagents/*.jsonl && exit 0
 
 block 'AGENTS.md routes PR authoring through the `pr` skill. Invoke it (Skill tool, skill: "pr") and follow it from the top; this command is allowed once it is loaded.'
