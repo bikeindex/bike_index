@@ -1,0 +1,60 @@
+-# Integrates with app/assets/javascripts/revised/pages/bikes/edit_stolen.coffee
+
+= form_for @bike, multipart: true, html: { class: "primary-edit-bike-form stolenEditPage" } do |f|
+  - if params[:return_to].present?
+    = hidden_field_tag :return_to, params[:return_to]
+
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: "/bikes_edit/primary_menu", locals: { no_save_button: true }
+
+      - if @bike.fetch_current_stolen_record.present?
+        .col-md-8.form-well#form_well_wrap
+          .form-wrap
+            .form-well-form-header
+              -# Mark This Bike Recovered
+              %h3= @edit_templates[@edit_template]
+            .no-divider-row.full-width-button#mark_recovered_action
+              %a.btn.btn-success.btn-lg{data: { toggle: "modal", target: "#toggle-stolen" } }
+                = t(".this_bike_has_been_returned", bike_type: @bike.type)
+            -# Shown by edit_stolen.coffee after the recovery request is sent (the modal is
+            -# already hidden by then), until the redirect to the recovered bike happens
+            .no-divider-row#mark_recovered_spinner{ style: "display: none;" }
+              = render(UI::LoadingSpinner::Component.new(text: t(".marking_recovered")))
+
+
+- modal_title = t(".were_so_glad", bike_type: @bike.type)
+
+- alert_body = capture_haml do
+  %p= t(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type)
+  %p= t(".its_how_we_get_better_at_recovering_bikes")
+
+- modal_body = capture_haml do
+  .modal-body
+    = render partial: 'shared/alert', locals: { body: alert_body, title: t(".not_enough_info"), class_names: 'currently-hidden' }
+    = form_tag do |t|
+      = hidden_field_tag :mark_recovered_bike_id, @bike.id
+      = hidden_field_tag :mark_recovered_stolen_record_id, (@bike.current_stolen_record_id if @bike.current_stolen_record_id.present?)
+      .form-group
+        %label{ for: :mark_recovered_reason }
+          = t(".how_did_you_get_it_back")
+        = text_area_tag :mark_recovered_reason, '', required: true, class: 'form-control'
+      .checkbox
+        %label
+          %input#mark_recovered_we_helped{ type: 'checkbox' }
+          = t(".did_we_help")
+      .checkbox
+        %label
+          %input#mark_recovered_can_share_recovery{ type: 'checkbox' }
+          = t(".can_we_share_your_story")
+      .modal-btn-footer
+        .row
+          .col-xs-6.col-xs-push-6
+            = submit_tag t(".mark_recovered"), class: 'btn btn-success'
+          .col-xs-6.col-xs-pull-6
+            %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+              = t(".nevermind")
+
+-# Only one modal if stolen, only one (different) modal if not stolen
+
+= render partial: "shared/modal", locals: { title: modal_title, id: "toggle-stolen", modal_body: modal_body }

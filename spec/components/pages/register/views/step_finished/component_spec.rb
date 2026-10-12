@@ -94,16 +94,35 @@ RSpec.describe Pages::Register::Views::StepFinished::Component, type: :component
           FactoryBot.create(:stolen_bike_in_chicago, :with_ownership, owner_email: "someone@bikeindex.org")
         end
 
-        it "renders the checklist, ticking off what the registration already did" do
-          expect(component).to have_css("ul.stolen-checklist")
-          expect(component).to have_text("Do these things for the best chance of getting it back")
-          # Listing it and reporting the theft are what the flow just did
-          done = component.css("li.completed-item").map { |li| li.text.squish }
-          expect(done.first).to eq "✓ List bike on Bike Index"
-          expect(done.any? { |text| text.include?("Report theft on Bike Index") }).to be_truthy
-          # Still to do, so it links to where they're added
-          expect(component).to have_link("a photo of your bike")
-          expect(component).to have_link("your Police Report Number")
+        # Their own theft ends on the stolen bike's next steps, with everything the checklist lists
+        it "ends on the next steps, linking each thing still to do to where it's added" do
+          expect(component).to have_css("h2", text: "is now marked STOLEN")
+          expect(component).to have_no_css("ul.stolen-checklist")
+          expect(component).to have_text("Listed as stolen on Bike Index")
+          expect(component).to have_text("Theft location added")
+          expect(component).to have_link("Add photos", href: "/bikes/#{bike.id}/edit/photos")
+          expect(component).to have_link("Add report", href: "/bikes/#{bike.id}/edit/theft_details#policeReportNumber")
+          expect(component).to have_link("More ways to share", href: "/bikes/#{bike.id}/edit/publicize")
+          expect(component).to have_link("See alert options", href: "/bikes/#{bike.id}/theft_alert/new")
+          expect(component).to have_link("Mark as recovered", href: "/bikes/#{bike.id}/edit/report_recovered")
+          expect(component).to have_link("View your registration", href: "/bikes/#{bike.id}")
+          expect(component).to have_link("Register another vehicle", href: "/register/new")
+        end
+
+        context "registered for someone else" do
+          let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+          it "renders the checklist, ticking off what the registration already did" do
+            expect(component).to have_css("ul.stolen-checklist")
+            expect(component).to have_text("Do these things for the best chance of getting it back")
+            # Listing it and reporting the theft are what the flow just did
+            done = component.css("li.completed-item").map { |li| li.text.squish }
+            expect(done.first).to eq "✓ List bike on Bike Index"
+            expect(done.any? { |text| text.include?("Report theft on Bike Index") }).to be_truthy
+            # Still to do, so it links to where they're added
+            expect(component).to have_link("a photo of your bike")
+            expect(component).to have_link("your Police Report Number")
+          end
         end
       end
     end

@@ -15,8 +15,10 @@ en:
             add_photos: Add photos
             add_police: Add your police report number
             add_police_cta: Add report
-            add_police_sub: We share reported thefts with LeadsOnline and law enforcement
-              databases
+            add_serial: Add the serial number
+            add_serial_cta: Add serial
+            add_serial_sub: Critical - contact whoever sold it to you and find out
+              if they have it
             alerted: >-
               We've alerted bike shops, police partners and riders near %{city}. Here's
               what's done and what you can still do to improve your chances.
@@ -28,35 +30,52 @@ en:
               Marking it recovered takes down the alert and helps us learn what works
               for getting bikes home. We're sorry this happened, and we're wishing
               you the best of luck.
+            law_enforcement: Sent to law enforcement databases when you add your police
+              report number
+            leads_online: LEADSonline
+            leads_online_html: Sent to %{leads_online} when you add your police report
+              number
+            leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
             listed: Listed as stolen on Bike Index
             listed_sub: Searchable by shops, police and riders worldwide
             location_added: Theft location added
             location_added_sub: Alerts sent to partners near %{city}
-            lock_added: Lock and incident details
-            lock_added_sub: Helps police connect related thefts
+            lock_added: Lock and incident details added
+            lock_sub: Helps police connect related thefts
             mark_recovered: Mark as recovered
             marked_stolen_html: Your %{bike_type} is now marked %{stolen}.
             more_ways_to_share: More ways to share
             nextdoor: Nextdoor
+            nl_digid_required: "(DigiD required)"
+            nl_file_police_report: File a police report
+            nl_online: Online
+            nl_person: In person
+            nl_person_report: Search for the closest police station,
+            nl_phone: By phone
+            nl_phone_report: >-
+              call 0900-8844. You will usually get a phone call appointment for later,
+              at which point you'll give the information to the police
+            nl_website_link_text: at this politie.nl webpage
             photo_added: Photo of your %{bike_type} added
             photo_added_sub: People know what to look for
             police_added: Police report added
-            police_added_sub: Sent to LeadsOnline and law enforcement databases
             promoted_alert: Promoted Theft Alert
             promoted_alert_body: >-
               We run targeted Facebook and Instagram ads in the neighborhood where
               your %{bike_type} was last seen. Charges go directly toward the cost
               of the ads.
+            promoted_alert_purchased: Your %{bike_type}'s Promoted Theft Alert is
+              purchased
             promoted_alert_title: Show your %{bike_type} to thousands of riders near
               %{city}
+            register_another: Register another vehicle
+            requires_serial: "(requires a serial number)"
             see_alert_options: See alert options
             share_sub: Friends and local groups are often the first to spot a stolen
               %{bike_type}.
             share_text: 'Stolen in %{city}: %{title}. Please keep an eye out!'
             share_title: Share it with people near you
-            stock_photo_added: Bike Book stock image added
-            stock_photo_added_sub: >-
-              Add your own photos when you can. They make your %{bike_type} easier
-              to recognize.
             stolen: STOLEN
+            view_alerts: View your alerts
+            view_your_registration: View your registration
             you: you

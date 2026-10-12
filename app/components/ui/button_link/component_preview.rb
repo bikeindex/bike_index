@@ -43,19 +43,6 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Error Disabled", href: "#", color: :error, disabled: true))
       end
 
-      # Filled red, for flagging something stolen
-      def danger
-        render(UI::ButtonLink::Component.new(text: "Danger Link", href: "#", color: :danger))
-      end
-
-      def danger_active
-        render(UI::ButtonLink::Component.new(text: "Danger Active", href: "#", color: :danger, active: true))
-      end
-
-      def danger_disabled
-        render(UI::ButtonLink::Component.new(text: "Danger Disabled", href: "#", color: :danger, disabled: true))
-      end
-
       def link
         render(UI::ButtonLink::Component.new(text: "Link style", href: "#", color: :link))
       end

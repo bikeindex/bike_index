@@ -19,7 +19,7 @@ RSpec.describe SharedBlocks::UserAlerts::StolenBikeWithoutLocation::Component, :
     expect(page).to have_content("Please add theft location")
     expect(page).to have_content("It is critical for recovery")
     expect(page).to have_link("Add the location of the theft of your 2018 Surly Cross Check",
-      href: "/bikes/12/stolen_report/edit?step=where")
+      href: "/bikes/12/edit/theft_details#where-theft-happened")
     expect(page).to have_content("Without a location we can't spread the word")
   end
 end

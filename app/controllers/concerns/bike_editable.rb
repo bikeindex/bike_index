@@ -1,12 +1,6 @@
 module BikeEditable
   extend ActiveSupport::Concern
 
-  # Theft templates the stolen report wizard and the recovery pages replaced - their names stay valid
-  # for the menu and old links
-  REDESIGNED_TEMPLATES = {"report_stolen" => :new_bike_stolen_report_path,
-                          "theft_details" => :edit_bike_stolen_report_path,
-                          "report_recovered" => :new_bike_recovered_path}.freeze
-
   included do
     before_action :assign_versions
 
@@ -24,8 +18,6 @@ module BikeEditable
   def edit_bike_template_path_for(bike, template = nil)
     if bike.version?
       edit_bike_version_url(bike.id, edit_template: template)
-    elsif (redesigned_path = redesigned_template_path(bike, template))
-      redesigned_path
     elsif edits_controller_name_for(template) == "edits"
       edit_bike_url(bike.id, edit_template: template)
     elsif template.to_s == "alert"
@@ -118,7 +110,7 @@ module BikeEditable
       return false
     end
 
-    @skip_general_alert = %w[photos remove alert alert_purchase_confirmation].include?(@edit_template)
+    @skip_general_alert = %w[photos theft_details report_recovered remove alert alert_purchase_confirmation].include?(@edit_template)
     true
   end
 
@@ -137,17 +129,6 @@ module BikeEditable
   end
 
   def edits_controller_name_for(requested_page)
-    if %w[alert alert_purchase_confirmation].include?(requested_page.to_s)
-      "theft_alerts"
-    elsif REDESIGNED_TEMPLATES.key?(requested_page.to_s)
-      "stolen_reports"
-    else
-      "edits"
-    end
-  end
-
-  def redesigned_template_path(bike, template)
-    path = REDESIGNED_TEMPLATES[template.to_s]
-    send(path, bike.id) if path
+    %w[alert alert_purchase_confirmation].include?(requested_page.to_s) ? "theft_alerts" : "edits"
   end
 end

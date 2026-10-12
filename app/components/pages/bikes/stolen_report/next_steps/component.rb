@@ -4,14 +4,17 @@ module Pages
   module Bikes
     module StolenReport
       module NextSteps
-        # After the report: what it already did, what's left to improve the odds - each linked to the
-        # wizard step that adds it - and the ways to spread the word
+        # The end of an owner's stolen registration: what the report already did, what's left to
+        # improve the odds - each linked to the edit page that adds it - and the ways to spread the
+        # word. Everything Pages::Bikes::StolenChecklist lists has a place here
         class Component < ApplicationComponent
-          Item = Data.define(:state, :label, :sub, :cta, :step)
+          Item = Data.define(:key, :done, :label, :sub, :cta, :href)
 
-          def initialize(bike:, stolen_record:)
+          # register_another_path: back into the register flow, with the organization it came through
+          def initialize(bike:, stolen_record:, register_another_path:)
             @bike = bike
             @stolen_record = stolen_record
+            @register_another_path = register_another_path
           end
 
           private
@@ -21,50 +24,69 @@ module Pages
           def city = @stolen_record.city.presence || translation(".you")
 
           def checklist
-            [Item.new(:done, translation(".listed", bike_type: cycle_type), translation(".listed_sub"), nil, nil),
-              location_item, photo_item, police_item, lock_item]
+            [Item.new(:listed, true, translation(".listed"), translation(".listed_sub"), nil, nil),
+              serial_item, location_item, photo_item, police_item, lock_item].compact
+          end
+
+          def serial_item
+            return unless serial_unknown?
+
+            Item.new(:serial, false, translation(".add_serial"), translation(".add_serial_sub"),
+              translation(".add_serial_cta"), edit_path("bike_details"))
           end
 
           def location_item
-            return Item.new(:done, translation(".location_added"), translation(".location_added_sub", city:), nil, nil) if @stolen_record.city.present?
-
-            Item.new(:todo, translation(".add_location"), translation(".add_location_sub"), translation(".add_location_cta"), "where")
+            if @stolen_record.street.present?
+              Item.new(:location, true, translation(".location_added"), translation(".location_added_sub", city:), nil, nil)
+            else
+              Item.new(:location, false, translation(".add_location"), translation(".add_location_sub"),
+                translation(".add_location_cta"), edit_path("theft_details"))
+            end
           end
 
           def photo_item
             if @bike.public_images.any?
-              Item.new(:done, translation(".photo_added", bike_type: cycle_type), translation(".photo_added_sub"), nil, nil)
-            elsif @bike.stock_photo_url.present?
-              Item.new(:caveat, translation(".stock_photo_added"), translation(".stock_photo_added_sub", bike_type: cycle_type),
-                translation(".add_photos"), "photos")
+              Item.new(:photo, true, translation(".photo_added", bike_type: cycle_type), translation(".photo_added_sub"), nil, nil)
             else
-              Item.new(:todo, translation(".add_photo", bike_type: cycle_type), translation(".add_photo_sub", bike_type: cycle_type), translation(".add_photos"), "photos")
+              Item.new(:photo, false, translation(".add_photo", bike_type: cycle_type),
+                translation(".add_photo_sub", bike_type: cycle_type), translation(".add_photos"), edit_path("photos"))
             end
           end
 
           def police_item
-            return Item.new(:done, translation(".police_added"), translation(".police_added_sub"), nil, nil) if @stolen_record.police_report_number.present?
-
-            Item.new(:todo, translation(".add_police"), translation(".add_police_sub"), translation(".add_police_cta"), "police")
+            if police_report?
+              Item.new(:police, true, translation(".police_added"), nil, nil, nil)
+            else
+              Item.new(:police, false, translation(".add_police"), nil, translation(".add_police_cta"),
+                edit_path("theft_details", anchor: "policeReportNumber"))
+            end
           end
 
           def lock_item
-            if @stolen_record.locking_description.present? && @stolen_record.lock_defeat_description.present?
-              Item.new(:done, translation(".lock_added"), translation(".lock_added_sub"), nil, nil)
-            else
-              Item.new(:todo, translation(".add_lock"), translation(".lock_added_sub"), translation(".add_lock_cta"), "lock")
-            end
+            done = @stolen_record.locking_description.present? && @stolen_record.lock_defeat_description.present?
+            Item.new(:lock, done, done ? translation(".lock_added") : translation(".add_lock"), translation(".lock_sub"),
+              (translation(".add_lock_cta") unless done), (edit_path("theft_details") unless done))
           end
 
-          def marker_class(state)
-            case state
-            when :done then "tw:border-blue-600 tw:bg-blue-600 tw:text-white"
-            when :caveat then "tw:border-[#ffcc33] tw:bg-[#ffcc33] tw:text-white"
-            else "tw:border-gray-300 tw:bg-white tw:dark:border-gray-600 tw:dark:bg-gray-800"
-            end
+          def marker_class(done)
+            done ? "tw:border-blue-600 tw:bg-blue-600 tw:text-white" : "tw:border-gray-300 tw:bg-white tw:dark:border-gray-600 tw:dark:bg-gray-800"
           end
 
-          def share_text = translation(".share_text", bike_type: cycle_type, title: @bike.title_string, city:)
+          def serial_unknown? = @bike.serial_unknown?
+
+          def police_report? = @stolen_record.police_report_number.present?
+
+          # The police services need a serial to search on, so a report without one isn't sent
+          def submitted_to_police_services? = police_report? && !serial_unknown?
+
+          # Only the Netherlands has reporting instructions we can give
+          def netherlands_instructions? = !police_report? && @stolen_record.country == Country.netherlands
+
+          def theft_alert? = @stolen_record.theft_alerts.any?
+
+          def edit_path(template, anchor: nil) = edit_bike_path(@bike, edit_template: template, anchor:)
+
+          def share_text = translation(".share_text", title: @bike.title_string, city:)
 
           def share_url = bike_url(@bike)
 

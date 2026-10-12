@@ -18,14 +18,33 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
     let(:stolen_record) { bike.current_stolen_record }
     let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
 
-    it "carries the session token to the recovery form" do
+    it "carries the session token through the redirect and renders the recovery form once" do
       get "/bikes/#{bike.to_param}/recovery/edit?token=#{recovery_link_token}"
-      expect(response).to redirect_to new_bike_recovered_path(bike)
+      expect(response).to redirect_to bike_path(bike)
       expect(session[:recovery_link_token]).to eq recovery_link_token
+
+      # bikes#show bounces the redesign user on to the registration
+      follow_redirect!
+      expect(response).to redirect_to(registration_path(bike))
 
       follow_redirect!
       expect(response.status).to eq(200)
-      expect(response.body).to match("How did you get it back?")
+      body = whitespace_normalized_body_text
+      expect(body).to match("Mark your bike recovered!")
+      expect(response.body).to match("/bikes/#{bike.id}/recovery")
+      expect(response.body).to match(recovery_link_token)
+      # Opened without a click, like the legacy overlay
+      expect(response.body).to match("data-ui--modal-open-on-connect-value=\"true\"")
+
+      # Closing the dialog is the end of it, so the body has the prompt whole
+      expect(response.body).to match("alert_stolen_record_recovered_description")
+
+      # Reading it consumes the token, so a reload doesn't re-prompt
+      expect(session[:recovery_link_token]).to be_blank
+      get "/registrations/#{bike.id}"
+      body = whitespace_normalized_body_text
+      expect(body).to_not match("Mark your bike recovered!")
+      expect(response.body).to_not match("alert_stolen_record_recovered_description")
     end
 
     context "bike is no longer stolen" do

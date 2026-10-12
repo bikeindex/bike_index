@@ -19,30 +19,14 @@ RSpec.describe Bikes::RecoveryController, type: :request do
       # bikes#show reads it, and raises ReadOnlyError creating it under set_reading_role
       before { RearGearType.fixed }
 
-      it "opens the recovery form, which the token lets a signed-out owner submit" do
+      it "renders, and the bike page spends the token on a mark-recovered modal" do
         get "#{base_url}/edit?token=#{recovery_link_token}"
-        expect(response).to redirect_to new_bike_recovered_path(bike)
+        expect(response).to redirect_to bike_path(bike)
         expect(session[:recovery_link_token]).to eq recovery_link_token
 
         follow_redirect!
-        expect(response.status).to eq 200
-        expect(response.body).to match("How did you get it back?")
-        # Kept out of the page, where its js could read it
-        expect(response.body).to_not match(recovery_link_token)
-
-        Sidekiq::Job.clear_all
-        post "/bikes/#{bike.to_param}/recovered", params: {recovery: {story: "Found it", can_share_recovery: "1"}}
-        expect(response).to redirect_to bike_recovered_path(bike)
-        expect(stolen_record.reload.recovered?).to be_truthy
-        expect(stolen_record.recovering_user_id).to be_nil
-        expect(EmailJobs::RecoveredFromLinkJob.jobs.count).to eq 1
+        expect(response.body).to match(recovery_link_token)
         expect(session[:recovery_link_token]).to be_nil
-
-        follow_redirect!
-        expect(response.body).to match("Welcome home")
-        # Spent - the form doesn't open again on it
-        get "/bikes/#{bike.to_param}/recovered/new"
-        expect(response).to redirect_to bike_path(bike)
       end
     end
     context "already recovered bike" do
@@ -90,6 +74,11 @@ RSpec.describe Bikes::RecoveryController, type: :request do
         expect(stolen_record.recovered_description).to eq recovery_info[:recovered_description]
         expect(stolen_record.reload.recovered_at.to_i).to be_within(1).of 1532822233
         expect(stolen_record.recovering_user).to be_nil
+        # Signed out, the link is what lets them see where it lands
+        expect(response).to redirect_to bike_recovered_path(bike)
+        follow_redirect!
+        expect(response.status).to eq 200
+        expect(response.body).to match("Welcome home")
       end
 
       context "with user present" do

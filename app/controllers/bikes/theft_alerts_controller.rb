@@ -7,11 +7,10 @@ module Bikes
     def new
       return unless setup_edit_template("alert")
 
-      plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale).to_a
-      @selected_theft_alert_plan = plans.find { it.id == params[:selected_plan_id].to_i } || plans.second
-      render Pages::Bikes::PromotedAlert::Component.new(bike: @bike, stolen_record: @bike.current_stolen_record,
-        plans:, selected_plan: @selected_theft_alert_plan,
-        currency: helpers.default_currency, theft_alerts: @theft_alerts)
+      @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
+      @selected_theft_alert_plan =
+        @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
+        @theft_alert_plans.order(:amount_cents).second
     end
 
     def show

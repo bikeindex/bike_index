@@ -30,8 +30,6 @@ module UI
         primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:not-disabled:not-aria-disabled:hover:bg-blue-700 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-blue-600",
         secondary: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:not-disabled:not-aria-disabled:hover:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:not-disabled:not-aria-disabled:hover:border-purple-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-purple-950",
         error: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:not-disabled:not-aria-disabled:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:not-disabled:not-aria-disabled:hover:bg-red-950",
-        # Solid, for the one action that flags something as stolen
-        danger: "tw:text-white tw:bg-[#cc0000] tw:border tw:border-[#cc0000] tw:not-disabled:not-aria-disabled:hover:bg-red-700 tw:not-disabled:not-aria-disabled:hover:border-red-700 tw:focus:ring-red-500/40",
         purple: "tw:text-white tw:bg-purple-500 tw:border tw:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-600 tw:not-disabled:not-aria-disabled:hover:border-purple-600 tw:focus:ring-purple-500/40",
         yellow: "tw:text-blue-600 tw:bg-[#ffd660] tw:border tw:border-[#ffd660] tw:not-disabled:not-aria-disabled:hover:bg-[#ffcc33] tw:not-disabled:not-aria-disabled:hover:border-[#ffcc33] tw:focus:ring-[#ffd660]/60",
         link: "twlink tw:rounded-lg tw:p-0 tw:focus:ring-blue-500/40"
@@ -48,7 +46,6 @@ module UI
         primary: "tw:is-active:bg-blue-800 tw:is-active:ring-2 tw:is-active:ring-blue-500/40 tw:is-active:dark:bg-blue-700",
         secondary: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
         error: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
-        danger: "tw:is-active:bg-red-800 tw:is-active:border-red-800 tw:is-active:ring-2 tw:is-active:ring-red-500/40",
         purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
         yellow: "tw:is-active:bg-[#f5bc1b] tw:is-active:border-[#f5bc1b] tw:is-active:ring-2 tw:is-active:ring-[#ffd660]/60"
       }.freeze

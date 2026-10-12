@@ -58,19 +58,6 @@ module UI
         render(UI::Button::Component.new(text: "Error Disabled", color: :error, disabled: true))
       end
 
-      # Filled red, for flagging something stolen
-      def danger
-        render(UI::Button::Component.new(text: "Report as stolen", color: :danger))
-      end
-
-      def danger_active
-        render(UI::Button::Component.new(text: "Danger Active", color: :danger, active: true))
-      end
-
-      def danger_disabled
-        render(UI::Button::Component.new(text: "Danger Disabled", color: :danger, disabled: true))
-      end
-
       def link
         render(UI::Button::Component.new(text: "Link style", color: :link))
       end

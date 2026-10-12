@@ -61,15 +61,6 @@ module Pages
           end
 
           # @param view select [consumer, org_admin]
-          def finish_stolen_report(view: "consumer")
-            # State rather than a token: a registration handed to the stolen report wizard, unreported
-            b_param = ::BParam.stolen_report_pending.with_bike.last
-            return missing_notice("a registration handed to the stolen report wizard") if b_param.blank?
-
-            page(view:, bike_id: b_param.created_bike_id)
-          end
-
-          # @param view select [consumer, org_admin]
           # @param bike_id text "Bike to render — defaults to one of the org's"
           def scanned_sticker(view: "consumer", bike_id: nil)
             sticker = bike_sticker(bike_id)

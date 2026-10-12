@@ -6,10 +6,14 @@ class BikeIndex.BikesEdit extends BikeIndex
     switch $('.form-well-header.container').attr('data-template')
       when 'bike_details' then new BikeIndex.BikesEditBikeDetails
       when 'drivetrain' then new BikeIndex.BikesEditDrivetrain
+      when 'report_stolen' then new BikeIndex.BikesEditStolen
+      when 'report_recovered' then new BikeIndex.BikesEditStolen
+      when 'theft_details' then new BikeIndex.BikesEditStolen
       when 'photos' then new BikeIndex.BikesEditPhotos
       when 'accessories' then new BikeIndex.BikesEditAccessories
       when 'remove' then new BikeIndex.BikesEditRemove
       when 'groups' then new BikeIndex.BikesEditGroups
+      when 'alert' then new BikeIndex.BikesEditAlert
 
   updatePageLocation: (url) ->
     window.location.href = url

@@ -243,13 +243,8 @@ Rails.application.routes.draw do
       put :resolve_token
     end
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
+    resource :recovered, only: %i[show], controller: "bikes/recovered"
     resource :theft_alert, only: %i[new create show], controller: "bikes/theft_alerts"
-    # new and edit are the report wizard, show is the next steps once it's submitted
-    resource :stolen_report, only: %i[new create edit update show], controller: "bikes/stolen_reports" do
-      get :stock_photos
-      post :photos
-    end
-    resource :recovered, only: %i[new create show], controller: "bikes/recovered"
   end
   get "bikes/:id/edit(/:edit_template)", to: "bikes/edits#show", as: :edit_bike
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"

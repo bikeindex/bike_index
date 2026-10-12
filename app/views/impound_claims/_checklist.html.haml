@@ -36,7 +36,7 @@
         - if police_report_present
           = police_report_text
         - else
-          = link_to(police_report_text, edit_bike_stolen_report_url(bike_submitting.to_param, step: "police"))
+          = link_to(police_report_text, edit_bike_url(id: bike_submitting.to_param, edit_template: "theft_details"))
         - if render_optional
           %em.small.less-strong optional
 

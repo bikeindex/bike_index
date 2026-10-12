@@ -184,14 +184,11 @@ RSpec.describe Bikes::EditsController, type: :request do
   end
   context "stolen bike" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: bike_creator) }
-    it "redirects to the stolen report, and renders the other templates" do
+    it "renders" do
       get base_url
       expect(flash).to be_blank
-      expect(response).to redirect_to(edit_bike_stolen_report_path(bike.id))
-      get "#{base_url}?edit_template=report_recovered"
-      expect(response).to redirect_to(new_bike_recovered_path(bike.id))
-      get "#{base_url}?edit_template=bike_details"
-      expect(response).to render_template(:bike_details)
+      expect(response).to render_template(:theft_details)
+      expect(assigns(:edit_template)).to eq "theft_details"
       expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
       expect(bike.user_id).to eq current_user.id
       expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
@@ -229,11 +226,15 @@ RSpec.describe Bikes::EditsController, type: :request do
       let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
       let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
 
-      it "redirects to the stolen report" do
+      it "renders with stolen as first template, different description" do
         expect(bike.reload.status).to eq "status_stolen"
         expect(bike.current_stolen_record.without_street?).to be_truthy
         get base_url
-        expect(response).to redirect_to(edit_bike_stolen_report_path(bike.id))
+        expect(response).to be_ok
+        expect(assigns(:edit_template)).to eq "theft_details"
+        expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
+        expect(assigns(:show_general_alert)).to be_falsey
+        expect(response).to render_template "theft_details"
       end
     end
     context "test all the edit templates" do
@@ -244,10 +245,10 @@ RSpec.describe Bikes::EditsController, type: :request do
         # can't use the let block
         bc = Bikes::EditsController.new
         bc.instance_variable_set(:@bike, Bike.new(status: "status_stolen"))
-        # Don't test alert templates, they're in theft alerts controller - or the redesigned ones, which redirect
-        bc.edit_templates.keys - %w[alert alert_purchase_confirmation] - BikeEditable::REDESIGNED_TEMPLATES.keys
+        # Don't test alert templates, they're in theft alerts controller
+        bc.edit_templates.keys - %w[alert alert_purchase_confirmation]
       end
-      let(:no_global_alert_templates) { %w[photos remove] }
+      let(:no_global_alert_templates) { %w[theft_details photos report_recovered remove] }
       before { FactoryBot.create_list(:theft_alert_plan, 3) }
       it "renders the template" do
         # Ensure stolen bike is set up correctly

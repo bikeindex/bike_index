@@ -1323,6 +1323,28 @@ en:
       unavailable: The map couldn't be loaded — your browser or device may not support
         it.
     theft_alerts:
+      new:
+        best_value: Best value
+        bike_index_can_help: >-
+          Bike Index can help by purchasing targeted ads on Facebook to spread the
+          word about your stolen %{bike_type}.
+        bike_index_promoted_alert: Bike Index Promoted Alert
+        city_state_country: City, State - Country
+        days: Days
+        here: here
+        no_photos_add_photos_here_html: >-
+          Uh oh. We don't have any photos of your bike available. Upload one %{link}
+          to set up a promoted alert!
+        preview: Promoted Alert Preview
+        purchase_alert: Purchase Alert
+        select_an_image: Select an image
+        select_an_image_to_see_preview: >-
+          Select an image of your bike to see a preview of what your promoted alert
+          will look like:
+        targeted_sharing_html: >-
+          We've found targeted sharing on social media to have a <em>huge</em> effect
+          on recovering stolen bikes.
+        views: Views
       show:
         stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've
           processed your alert.
@@ -1531,6 +1553,22 @@ en:
         You can always toggle this setting to show and hide a bike.
       you_can_read_more_html: You can read more about why this is important to us
         in our %{faq_link}.
+    report_recovered:
+      can_we_share_your_story: Can we share your story?
+      did_we_help: Did we help?
+      how_did_you_get_it_back: How did you get it back?
+      its_how_we_get_better_at_recovering_bikes: It"s how we get better at recovering
+        bikes.
+      mark_recovered: Mark recovered
+      marking_recovered: Marking your bike recovered…
+      nevermind: Nevermind
+      not_enough_info: Not enough information!
+      please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type}
+        back, we really care!
+      this_bike_has_been_returned: This %{bike_type} has been returned!
+      were_so_glad: We're so glad you got your %{bike_type} back!
+    report_stolen:
+      this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     strava_gear:
       connect_bike_to_strava_gear: Connect this bike to one of your Strava bikes to
         track which bike you're riding.
@@ -1539,6 +1577,23 @@ en:
       strava_gear: Strava Gear
       sync_not_finished: Strava sync hasn't finished yet, so not all bikes may be
         listed.
+    theft_details:
+      charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
+        ad on Facebook.
+      click_to_see_promoted_alert_blog_post_html: >-
+        Click %{link} to read about how Bike Index's Promoted Theft Alerts helped
+        recover a stolen bike in less than one day.
+      do_these_things_for_the_best_chance: Do these things for the best chance of
+        recovery!
+      here: here
+      promoted_theft_alert_service_description: >-
+        Bike Index's new Promoted Theft Alert service gets eyes on your bike by folks
+        in the cycling community in the neighborhood where your bike was last seen.
+      promoted_theft_alerts: Promoted Theft Alerts
+      try_one_now: Try one now!
+      we_can_create_fb_ads_for_you: >-
+        Did you know we can create targeted Facebook ads to spread the word about
+        your stolen bike for you?
     theft_details_partial:
       department_city: Department & city
       description_of_the_incident: Description of the incident
@@ -1634,16 +1689,12 @@ en:
         we_couldnt_find_that_registration: Oops! We couldn't find that registration,
           please re-enter the information here
       recovered:
-        new:
-          mark_recovered: Mark your %{bike_type} recovered
         show:
           recovered: Your %{bike_type} is recovered
       recovery:
         ensure_token_match!:
           already_recovered: Bike has already been marked recovered!
           incorrect_token: Incorrect Token, check your email again
-        update:
-          bike_recovered: Bike marked recovered! Thank you!
       resolve_token:
         marked_remaining: "%{bike_type} marked remaining!"
         marked_retrieved: "%{@bike_type} marked retrieved!"
@@ -1655,17 +1706,6 @@ en:
         unable_to_find_parking_notification: Unable to find that Parking Notification!
       scanned:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
-      stolen_reports:
-        edit:
-          edit_report: Your %{bike_type} theft report
-        new:
-          report_stolen: Report your %{bike_type} stolen or missing
-        photos:
-          image_too_large: That photo is too large, it can be up to %{size}
-        save_report:
-          report_saved: Your theft report is updated
-        show:
-          next_steps: Next steps for your stolen %{bike_type}
       update:
         bike_was_updated: Bike successfully updated!
     concerns:

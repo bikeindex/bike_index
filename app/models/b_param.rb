@@ -98,7 +98,6 @@ class BParam < ApplicationRecord
   after_commit :update_unfinished_registration_alerts
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
-  scope :stolen_report_pending, -> { where("params ? 'stolen_report_pending'") }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
   scope :partial_registrations, -> { where(origin: "embed_partial").or(step_1_submitted).without_bike }

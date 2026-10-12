@@ -7,7 +7,6 @@ en:
           step_finished:
             add_impound_details: Add details about where you found the %{cycle_type}
             add_photos: Add photos of your %{cycle_type}
-            check_your_email: Check your email
             confirming_lets_you: 'Confirming your email lets you:'
             do_these_things: Do these things for the best chance of getting it back
             finish_adding: Finish adding your %{cycle_type} to Bike Index
@@ -28,9 +27,6 @@ en:
             safety_rules_sent_html: >-
               The %{bike_display} is registered with Bike Index. We've emailed %{email}
               the safety rules to agree to, which finishes the registration.
-            then_report_it: >-
-              As soon as you click the link, your %{cycle_type} is registered and
-              we'll go straight to the theft report.
             verify_your_email_html: >-
               One more step — verify your email. We sent a confirmation link to %{email};
               click it to finish your registration. Everything you've entered is saved.

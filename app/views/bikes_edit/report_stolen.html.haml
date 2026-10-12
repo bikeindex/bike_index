@@ -1,0 +1,19 @@
+/ Integrates with app/assets/javascripts/revised/pages/bikes/edit_stolen.coffee
+
+= form_for @bike, multipart: true, html: { class: "primary-edit-bike-form stolenEditPage" } do |f|
+  - if params[:return_to].present?
+    = hidden_field_tag :return_to, params[:return_to]
+  = f.hidden_field :date_stolen, value: Time.current.to_i
+
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: "/bikes_edit/primary_menu", locals: {no_save_button: true}
+
+      - unless @bike.fetch_current_stolen_record.present?
+        .col-md-8.form-well#form_well_wrap
+          .form-wrap
+            .form-well-form-header
+              -# Report Stolen or Missing
+              %h3= @edit_templates[@edit_template]
+            .no-divider-row.full-width-button
+              = submit_tag t(".this_bike_type_is_stolen_or_missing", bike_type: @bike.type), class: "btn btn-danger btn-lg"

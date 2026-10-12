@@ -223,8 +223,7 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
 
     # Anonymous, so there's nobody to own a bike yet - it's held for the emailed link
-    # Its owner's own theft, so it waits for the link framed as the report's next step
-    expect(page).to have_css("h2", text: "Check your email")
+    expect(page).to have_css("h1", text: "Progress saved")
     expect(page).to have_content("verify your email")
     expect(Bike.count).to eq 0
     b_param = BParam.last
@@ -238,38 +237,49 @@ RSpec.describe "Register flow", :js, type: :system do
       .to eq "bike_photo-landscape.jpeg"
 
     # The emailed link lands on the interstitial, which waits for a click - confirming
-    # proves the address, which registers the bike and leaves the theft to report
+    # proves the address, which leaves the theft it's reporting to tell us about
     visit confirmation_link
     click_button "Continue"
 
-    expect(page).to have_content("is registered. Now let's report it stolen.", wait: 10)
-    expect(page).to have_content("Step 3 of 9")
+    expect(page).to have_content("Report your stolen bike", wait: 10)
+    expect(Bike.count).to eq 0
+    # When and where are required, and nothing was saved to fill them in from
+    expect(page).to have_field("report[date]", with: "")
+    fill_in "report[theft_description]", with: "Locked to a rack outside the coffee shop"
+    fill_in "report[police_report_number]", with: "8675309"
+
+    # Going back to fix a detail doesn't cost the report - the longest form in the flow,
+    # and the one nothing has been saved from yet
+    click_link "Back"
+    expect(page).to have_content("Add your bike's details")
+    click_button "Next"
+
+    expect(page).to have_field("report[theft_description]",
+      with: "Locked to a rack outside the coffee shop", wait: 10)
+    expect(page).to have_field("report[police_report_number]", with: "8675309")
+
+    # The browser holds the submit until when and where are answered, so nothing reaches
+    # the server
+    click_button "Complete Bike Registration"
+    expect(page).to have_current_path(/step=report/, url: true)
+    expect(Bike.count).to eq 0
+
+    fill_in "report[date]", with: "2026-08-05T14:30"
+    fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+    fill_in "report[address_record_attributes][city]", with: "New York"
+    # The whole address is required alongside the street and city the server checks
+    type_into("#report_address_record_attributes_region_record_id", state.abbreviation)
+    click_combobox_option(state.name)
+    fill_in "report[address_record_attributes][postal_code]", with: "10007"
+
+    click_button "Complete Bike Registration"
+
+    # The theft was the point of the flow, so the card heads with it rather than
+    # congratulating them on a registration that's being watched over
+    expect(page).to have_css("h2", text: "is now marked STOLEN", wait: 10)
     bike = Bike.last
     expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
-      status: "status_with_owner", frame_model: "Marlin 7")
-
-    fill_in "Date", with: "2026-08-05"
-    fill_in "Approximate time", with: "14:30"
-    fill_in "Address or intersection", with: "278 Broadway"
-    fill_in "City", with: "New York"
-    fill_in "Postal code", with: "10007"
-    click_button "Continue"
-    fill_in "What happened?", with: "Locked to a rack outside the coffee shop"
-    click_button "Continue"
-    # Step 2's photo is on the bike, so the stock photos aren't offered
-    expect(page).to have_content("Great, that's the most important shot.")
-    click_button "Continue"
-    fill_in "Report number", with: "8675309"
-    fill_in "Department & city", with: "NYPD"
-    click_button "Continue"
-    # Step 2's phone carries over
-    expect(page).to have_field("Phone", with: "5550000000")
-    click_button "Continue"
-    click_button "Skip for now"
-    click_button "Report as stolen"
-
-    expect(page).to have_content("is now marked STOLEN.", wait: 10)
-    expect(bike.reload.status).to eq "status_stolen"
+      status: "status_stolen", frame_model: "Marlin 7")
     expect(bike.current_stolen_record).to have_attributes(street: "278 Broadway", city: "New York",
       theft_description: "Locked to a rack outside the coffee shop", police_report_number: "8675309",
       phone: "5550000000")
@@ -278,7 +288,9 @@ RSpec.describe "Register flow", :js, type: :system do
     browser_zone = page.evaluate_script("Intl.DateTimeFormat().resolvedOptions().timeZone")
     expect(bike.current_stolen_record.date_stolen.in_time_zone(browser_zone).strftime("%Y-%m-%dT%H:%M"))
       .to eq "2026-08-05T14:30"
-    expect(page).to have_content("Police report added")
+    # Signed in as the account the link made, so the checklist knows what's already done
+    expect(page).to have_text("Theft location added")
+    expect(page).to have_text("Police report added")
 
     # An account nobody signed up for, so the terms are the first thing it's asked
     visit "/my_account"

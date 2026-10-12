@@ -1,9 +1,0 @@
----
-en:
-  components:
-    pages:
-      bikes:
-        stolen_report:
-          photo:
-            added: Added ✓
-            remove: Remove

@@ -1,11 +1,8 @@
-<%# An owner's own theft is waiting on the emailed link before its report - framed as the report's next step %>
-<% if stolen_frame? %>
-  <%= render Pages::Bikes::StolenReport::RegistrationFrame::Component.new(b_param: @b_param,
-      step: Pages::Bikes::StolenReport::RegistrationFrame::Component::CONFIRM_EMAIL,
-      title: translation(".check_your_email"), helper: translation(".verify_your_email_html", email: owner_email_tag)) do %>
-    <p class="tw:mb-0 tw:text-sm">
-      <%= translation(".then_report_it", cycle_type:) %>
-    </p>
+<%# An owner's own theft ends on its next steps, the same checklist in the stolen bike page's design %>
+<% if stolen_next_steps? %>
+  <%= render Pages::Register::Parts::Shell::Component.new(bare: true) do %>
+    <%= render Pages::Bikes::StolenReport::NextSteps::Component.new(bike: @bike, stolen_record: @bike.current_stolen_record,
+        register_another_path:) %>
   <% end %>
 <% else %>
   <%# The checklist wants room, so a finished theft report is the one wide page here %>

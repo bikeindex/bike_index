@@ -3,21 +3,23 @@ module Bikes
     skip_before_action :ensure_user_allowed_to_edit
     before_action :ensure_token_match!
 
-    # The token goes in the session rather than the page's URL, so page js never sees it -
-    # Bikes::RecoveredController takes it from there
     def edit
+      # redirect to bike show and set session - so the token isn't available to on page js
+      # and so we can render show with a modal
       session[:recovery_link_token] = params[:token]
-      redirect_to new_bike_recovered_path(@bike)
+      redirect_to bike_path(@bike)
     end
 
     def update
-      if @stolen_record.add_recovery_information(permitted_params.to_h)
-        EmailJobs::RecoveredFromLinkJob.perform_async(@stolen_record.id)
-        flash[:success] = translation(:bike_recovered)
-      else
+      unless @stolen_record.add_recovery_information(permitted_params.to_h)
         session[:recovery_link_token] = params[:token]
+        return redirect_to(bike_path(@bike))
       end
-      redirect_to bike_path(@bike)
+
+      EmailJobs::RecoveredFromLinkJob.perform_async(@stolen_record.id)
+      # Lets whoever followed the link see the recovered page without signing in
+      session[:recovered_bike_id] = @bike.id
+      redirect_to bike_recovered_path(@bike)
     end
 
     private

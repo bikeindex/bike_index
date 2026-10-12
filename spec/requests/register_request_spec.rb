@@ -865,14 +865,9 @@ RSpec.describe RegisterController, type: :request do
       # Only stolen and impounded reveal it, so those are what the controller watches
       expect(phone_statuses_watched).to eq %w[status_stolen status_impounded]
 
-      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_impounded"}))
-      get register_path(b_param_token: b_param.id_token, step: 2)
-      expect(phone_field_classes).to_not include "tw:hidden"
-
-      # The owner's own theft asks for it in the stolen report wizard instead
       b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
       get register_path(b_param_token: b_param.id_token, step: 2)
-      expect(response.body).to_not include "bike[phone]"
+      expect(phone_field_classes).to_not include "tw:hidden"
     end
 
     context "with an organization" do
@@ -1471,62 +1466,24 @@ RSpec.describe RegisterController, type: :request do
     context "anonymous" do
       let!(:token) { b_param.generate_email_confirmation_token! }
 
-      it "waits for the confirmation email, then hands the theft to the stolen report wizard" do
-        b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
-        # The registration is framed as the start of the theft report
-        get step_path(1)
-        expect(response.body).to include "First, let&#39;s register your bike"
-        expect(response.body).to include "Step 1 of 9"
-        get step_path(2)
-        expect(response.body).to include "Step 2 of 9"
-
+      it "waits for the confirmation email, then asks about the theft" do
         patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-        # Nothing to report until the address is proven - the flow parks on finished,
-        # framed as the next step of the theft report
+        # Nothing to report until the address is proven - the flow parks on finished
         expect(response).to redirect_to step_path("finished")
         get step_path("report")
         expect(response).to redirect_to step_path("finished")
-        follow_redirect!
-        expect(response.body).to include "Check your email"
-        expect(response.body).to include "the theft report"
 
-        # The confirmed address is the owner, so the bike is created registered for the wizard to report
         expect {
           post "#{base_url}/confirm_email", params: {b_param_token: b_param.id_token,
                                                      confirmation_token: token}
-        }.to change(Bike, :count).by 1
-        bike = Bike.last
-        expect(bike).to have_attributes(owner_email:, creator_id: User.last.id, status: "status_with_owner")
-        expect(response).to redirect_to new_bike_stolen_report_path(bike, registered: true)
+        }.to_not change(Bike, :count)
+        expect(response).to redirect_to step_path("report")
 
-        follow_redirect!
-        expect(response.body).to include "is registered."
-        expect(response.body).to include "Step 3 of 9"
-
-        # Back on the registration, finishing goes to the theft still to report
-        get step_path("finished")
-        expect(response).to redirect_to new_bike_stolen_report_path(bike, registered: true)
-
-        # Once it's reported, the registration is just finished
-        post "/bikes/#{bike.to_param}/stolen_report", params: {stolen_record: {date: "2026-08-05", city: "Chicago",
-                                                                               postal_code: "60608", theft_description: "Cut lock"}}
-        expect(bike.reload.status_stolen?).to be_truthy
-        get step_path("finished")
-        expect(response.status).to eq 200
-      end
-    end
-
-    context "signed in as the owner" do
-      include_context :request_spec_logged_in_as_user
-      let(:owner_email) { current_user.email }
-
-      it "creates the bike at step 2 and hands the theft to the stolen report wizard" do
         expect {
-          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
         }.to change(Bike, :count).by 1
-        bike = Bike.last
-        expect(bike).to have_attributes(status: "status_with_owner", current_stolen_record: nil)
-        expect(response).to redirect_to new_bike_stolen_report_path(bike, registered: true)
+        expect(Bike.last).to have_attributes(owner_email:, creator_id: User.last.id)
+        expect(Bike.last.current_stolen_record.theft_description).to eq "Cut lock"
       end
     end
 

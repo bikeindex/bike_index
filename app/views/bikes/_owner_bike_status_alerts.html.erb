@@ -1,6 +1,4 @@
 <%# TODO: Add translations %>
-<%= render Pages::Registrations::Show::CurrentAlerts::FinishStolenReport::Component.new(bike: @bike, owner: true, margin_classes: "tw:mt-4") %>
-
 <% if @bike.impounded? && @bike.current_impound_record.organized? %>
   <div class="alert alert-danger mt-4 mb-4">
     <h3 class="uncap">Your <%= @bike.type %> is currently impounded!</h3>

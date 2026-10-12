@@ -17,13 +17,6 @@ module Pages
           def cycle_type
             @b_param.type
           end
-
-          # The theft its owner reports next, in the stolen report wizard - so these steps start that report
-          def before_render
-            @stolen_frame = !@flow.single_page? && BikeServices::Register.report_in_wizard?(@b_param)
-          end
-
-          def stolen_frame? = @stolen_frame
         end
       end
     end

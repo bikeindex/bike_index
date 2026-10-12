@@ -6,8 +6,23 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
   let(:owner) { FactoryBot.create(:user_confirmed, name: "Owner McOwnerface") }
   let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner) }
   let!(:united_states) { Country.united_states }
-  # The photo step searches Bike Book for a stock photo
-  before { stub_bikebook_catalog }
+
+  def save_bike
+    find(".edit-form-well-submit-wrapper input[type=submit]").click
+    expect(page).to have_content("Bike successfully updated!", wait: 10)
+  end
+
+  # Delay the recovery request so the flow has to wait for it to complete rather
+  # than navigating away before the bike is recovered. Reproduces the real-world
+  # latency a user hits; without it a fast local request masks the bug.
+  def delay_recovery_request(seconds)
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.route("**/api/v1/users/send_request", ->(route, _request) {
+        sleep seconds
+        route.continue
+      })
+    end
+  end
 
   it "reports the bike stolen with theft details, then marks it recovered" do
     sign_in(owner)
@@ -15,74 +30,37 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     dismiss_donation_modal
 
-    # ---- Report the bike stolen, through the wizard ----
+    # ---- Report the bike stolen ----
     expect(bike.status_stolen?).to be_falsey
     visit edit_bike_path(bike, edit_template: "report_stolen")
-    expect(page).to have_content("When and where was it stolen?")
-    expect(page).to have_content("Step 1 of 7")
+    click_button "This bike is stolen or missing!"
 
-    # Required answers hold the step until they're given
-    click_button "Continue"
-    expect(page).to have_content("Required so we can alert people nearby")
-    expect(page).to have_content("When and where was it stolen?")
+    # Reporting stolen redirects to the theft details form and opens the promoted
+    # theft-alert upsell modal; dismiss it before filling the form
+    expect(page).to have_css("#tryAPromotedAlert.in", wait: 10)
+    find("#tryAPromotedAlert .close").click
+    expect(page).to have_no_css("#tryAPromotedAlert.in", wait: 5)
 
-    fill_in "Date", with: "2026-10-10"
+    expect(bike.reload.status_stolen?).to be_truthy
+
+    # ---- Fill the required theft details (country, street, city) plus useful extras ----
+    pick_within_selectize(selectize_for("select.country-select-input"), "United States")
     fill_in "Address or intersection", with: "100 Main St"
     fill_in "City", with: "New York"
     fill_in "Postal code", with: "10001"
-    expect(page).to have_no_content("Required so we can alert people nearby")
-    click_button "Continue"
-
-    expect(page).to have_content("How was it locked?")
-    find("label", text: "U-lock and cable").click
-    find("label", text: "Lock was cut, and left at the scene").click
-    fill_in "What happened?", with: "Cut lock outside the cafe"
-    click_button "Continue"
-
-    # The optional steps can be skipped, and the rail says so
-    expect(page).to have_content("Photos of your bike")
-    click_button "Skip for now"
-    expect(page).to have_content("Police report")
-    click_button "Skip for now"
-    expect(page).to have_content("How can people reach you?")
     fill_in "Phone", with: "3125551234"
-    click_button "Continue"
-    expect(page).to have_content("Value and proof of ownership")
-    click_button "Skip for now"
-
-    expect(page).to have_content("Review your report")
-    expect(page).to have_content("Skipped · add later")
-    expect(page).to have_content("100 Main St, New York, 10001")
-    expect(page).to have_content("U-lock and cable · Lock was cut, and left at the scene")
-    click_button "Report as stolen"
-
-    expect(page).to have_content("Your bike is now marked STOLEN.", wait: 10)
-    expect(page).to have_content("Add your police report number")
-    expect(page).to have_link("Add report")
+    fill_in "Description of the incident", with: "Cut lock outside the cafe"
+    save_bike
 
     stolen_record = bike.reload.current_stolen_record
-    expect(bike.status_stolen?).to be_truthy
+    expect(stolen_record).to be_present
     expect(stolen_record.country_id).to eq united_states.id
     expect(stolen_record.street).to eq "100 Main St"
     expect(stolen_record.city).to eq "New York"
     expect(stolen_record.postal_code).to eq "10001"
     expect(stolen_record.phone).to eq "3125551234"
-    expect(stolen_record.locking_description).to eq "U-lock and cable"
     expect(stolen_record.theft_description).to eq "Cut lock outside the cafe"
-    # Midnight in the browser's zone, which the app's can put on another day
-    expect(stolen_record.date_stolen).to be_within(1.day).of Time.zone.parse("2026-10-10")
-
-    # The checklist's links reopen the wizard on their step
-    click_link "Add report"
-    expect(page).to have_content("Step 4 of 7")
-    fill_in "Report number", with: "2026-1234"
-    fill_in "Department & city", with: "NYPD"
-    click_button "Continue"
-    click_button "Continue"
-    click_button "Skip for now"
-    click_button "Save changes"
-    expect(page).to have_content("Police report added", wait: 10)
-    expect(stolen_record.reload.police_report_number).to eq "2026-1234"
+    expect(stolen_record.date_stolen).to be_present
 
     # ---- Send a message through the stolen bike's contact-owner form. The owner
     # doesn't see that card (they don't contact themselves), so view the public
@@ -101,21 +79,27 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     expect(page).to have_content("Thanks for looking out!", wait: 10)
 
     # ---- Mark the bike recovered ----
-    visit edit_bike_path(bike, edit_template: "report_recovered")
-    expect(page).to have_content("We're so glad you got your bike back!")
-    find("label", text: "Found it myself").click
-    click_button "Mark as recovered"
-    expect(page).to have_content("A sentence or two is plenty")
+    delay_recovery_request(2)
 
-    fill_in "Tell us the story", with: "Found it locked up around the corner"
-    click_button "Mark as recovered"
+    visit edit_bike_path(bike, edit_template: "report_recovered")
+    find("[data-target='#toggle-stolen']").click
+
+    within("#toggle-stolen") do
+      expect(page).to have_css(".modal-body", visible: true, wait: 5)
+      fill_in "mark_recovered_reason", with: "Found it locked up around the corner"
+      click_button "Mark recovered"
+    end
+
+    # While the (delayed) recovery request is in flight, the spinner is shown
+    expect(page).to have_content("Marking your bike recovered", wait: 5)
+
+    # Once it's recovered, it lands on the welcome home and the ways to support the next recovery
     expect(page).to have_content("Welcome home", wait: 10)
-    expect(page).to have_content("Ways to support Bike Index")
+    expect(page).to have_current_path(bike_recovered_path(bike))
 
     stolen_record.reload
     expect(stolen_record.recovered?).to be_truthy
-    expect(stolen_record.recovered_description).to eq "Found it myself: Found it locked up around the corner"
-    expect(stolen_record.can_share_recovery).to be_truthy
+    expect(stolen_record.recovered_description).to eq "Found it locked up around the corner"
 
     bike.reload
     expect(bike.status_stolen?).to be_falsey

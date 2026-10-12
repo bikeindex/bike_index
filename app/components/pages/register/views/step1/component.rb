@@ -26,11 +26,6 @@ module Pages
             @organization ||= @b_param.creation_organization
           end
 
-          # The theft its owner reports next, in the stolen report wizard - so these steps start that report
-          def stolen_frame?
-            !@embed && !@flow.single_page? && BikeServices::Register.report_in_wizard?(@b_param)
-          end
-
           # The step is still asking what's being registered, so the heading can't name the
           # type. Framed, the page around it already says whose registration this is
           def heading_text
