@@ -609,11 +609,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     classification = find("section div", text: /\AE-vehicle class\s*Off-Highway Motorcycle \?\z/, wait: 10)
     expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     expect(page).to have_no_css("dt", exact_text: "Classifications")
+    expect(page).to have_css("div", text: /\AMin rider age\s*18\W*yr\z/, visible: :all)
     # each suspended end, including one that states nothing
     suspension = ->(title) { find("article h1", text: title).ancestor("article").find("h2", text: /\Asuspension\z/i).ancestor("section") }
     expect(suspension.call("Ultra Bee")).to have_css("div", text: /\AFront\s*241\W*mm\z/).and have_css("div", text: /\ARear\s*320\W*×\W*85\W*mm 3\.35in\z/)
     expect(suspension.call("GT3 Pro")).to have_css("div", text: /\AFront\s*Front: Double Wishbone Hydraulic Shock Absorber/)
-    expect(page).to have_css("div", text: /\AMin rider age\s*18\W*yr\z/, visible: :all)
     classification.find("button", text: "?").click
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for off-highway use", visible: true)
     expect(tooltip).to have_css("code", exact_text: "evc/off_highway_motorcycle")

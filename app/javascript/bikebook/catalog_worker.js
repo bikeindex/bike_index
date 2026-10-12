@@ -71,7 +71,6 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
   }
 }
 
-// A model's years as records naming their year, newest first, rather than keyed by it
 const withYearRecords = (vehicle) => vehicle.years
   ? { ...vehicle, years: Object.entries(vehicle.years).map(([year, record]) => ({ year: Number(year), ...record })).sort((a, b) => b.year - a.year) }
   : vehicle
