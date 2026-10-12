@@ -9,7 +9,8 @@ export default class extends Controller {
   static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'jurisdiction']
   static values = {
     yearDir: { type: String, default: 'desc' },
-    priceDir: { type: String, default: 'desc' }
+    priceDir: { type: String, default: 'desc' },
+    defaultMarket: String
   }
 
   // Rewritten on connect too, as rendering drops stale values. Not from the loading placeholder,
@@ -56,20 +57,23 @@ export default class extends Controller {
   #syncCombobox () {
     const fieldset = this.vehicleComboboxTarget.querySelector('.hw-combobox')
     const url = new URL(fieldset.dataset.hwComboboxAsyncSrcValue, window.location.origin)
-    this.#applyParams(url)
+    this.#applyParams(url, this.#filters.market)
     fieldset.dataset.hwComboboxAsyncSrcValue = url.pathname + url.search
     fieldset.querySelector('.hw-combobox__input').dispatchEvent(new Event('input', { bubbles: true }))
   }
 
+  // The page's URL leaves out the market it defaults to, so a shared link opens in its reader's
   #writeUrl () {
     const url = new URL(window.location)
-    this.#applyParams(url)
+    const { market } = this.#filters
+    this.#applyParams(url, market === this.defaultMarketValue ? '' : market || 'all')
     replaceUrl(url)
   }
 
-  #applyParams (url) {
+  #applyParams (url, market) {
     const params = {
       ...this.#filters,
+      market,
       jurisdiction: this.jurisdictionTarget.value,
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
       price_dir: this.priceDirValue === 'asc' ? 'asc' : ''

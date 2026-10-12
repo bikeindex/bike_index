@@ -12,7 +12,7 @@ import { VehicleViewer } from 'bikebook/vehicle_viewer'
 /* global CSS */
 
 const LISTS = ['primary_activity', 'manufacturer', 'vehicle_type']
-const SINGLES = ['suspension', 'model_configuration']
+const SINGLES = ['suspension', 'model_configuration', 'market']
 const RANGES = ['year_min', 'year_max', 'price_min', 'price_max']
 const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'jurisdiction', 'year_dir', 'price_dir']
 // rather than the kit's max_compare, which the catalog publishes as 3
@@ -36,11 +36,17 @@ export async function hydrate (catalog, source, shell, url) {
     const slugs = filters[name].split(',').map((value) => kit.slug_aliases[name]?.[value] ?? value)
     filters[name] = [...new Set(slugs.filter((value) => values.has(value)))].join(',')
   }
+  // the visitor's own market, where the catalog has it, unless the URL names one or "all"
+  const panel = root.querySelector('[data-controller~="bikebook--catalog-filters"]')
+  const marketAttribute = 'data-bikebook--catalog-filters-default-market-value'
+  const located = panel.getAttribute(marketAttribute)
+  const defaultMarket = catalog.options.market.some(({ value }) => value === located) ? located : ''
+  panel.setAttribute(marketAttribute, defaultMarket)
+  filters.market = filters.market === 'all' ? '' : filters.market || defaultMarket
   const [found, { filteredCount }] = await Promise.all([catalog.vehicles(params.get('vehicle_models')?.split(',') ?? []), catalog.search(filters, 0, 0)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const values = vehicles.map(({ value }) => value).join(',')
 
-  const panel = root.querySelector('[data-controller~="bikebook--catalog-filters"]')
   for (const field of ['year', 'price']) panel.setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
   renderInto(root.getElementById('vehicle-models-count'), matching(filteredCount))
   const manufacturers = catalog.options.manufacturer.length

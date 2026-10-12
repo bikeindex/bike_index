@@ -7,8 +7,10 @@ module Pages
       # The page is a <template> bikebook--page fills in from the URL and the catalog,
       # and renders again for each pick and history step
       class Component < ApplicationComponent
-        def initialize(manifest_url:)
+        # market is the visitor's country, which the search defaults to when the catalog has it
+        def initialize(manifest_url:, market: nil)
           @manifest_url = manifest_url
+          @market = market
         end
 
         private

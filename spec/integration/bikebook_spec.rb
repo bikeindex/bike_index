@@ -259,6 +259,27 @@ RSpec.describe "Bikebook", :js, type: :system do
     page.current_window.resize_to(1920, 1080)
   end
 
+  it "searches the market of the visitor's country until another is chosen, leaving it out of the URL" do
+    serve_bikebook_catalog
+    page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "CA") }
+    visit bikebook_path
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)", wait: 10)
+    type_into(vehicle_field, "haul")
+    expect(page).to have_css("[role='option']", count: 1, text: "$3,599.99")
+    expect(page).to have_current_path("/bikebook")
+
+    click_on "More filters"
+    expect(page).to have_field("Market", with: "Canada")
+    find_field("Market").click
+    find("#market-hw-listbox [role='option']", exact_text: "Any").click
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
+    expect(page).to have_current_path(/[?&]market=all\b/)
+    type_into(find_field("Market"), "united")
+    find("#market-hw-listbox [role='option']", text: "United States (23)").click
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
+    expect(page).to have_current_path(/[?&]market=US\b/)
+  end
+
   it "titles a model picked alone for it, and drops the canonical as the page changes" do
     serve_bikebook_catalog
     canonical = "link[rel='canonical']"
