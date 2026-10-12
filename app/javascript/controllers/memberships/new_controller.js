@@ -4,6 +4,11 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static targets = ['plans', 'summary', 'join']
 
+  // The browser restores checked radios on reload and back navigation without firing change
+  connect () {
+    this.update()
+  }
+
   update () {
     const level = this.element.querySelector('input[name="membership[level]"]:checked')
     const interval = this.element.querySelector('input[name="membership[set_interval]"]:checked')

@@ -16,6 +16,9 @@ class MembershipsController < ApplicationController
     redirect_to(stripe_subscription.stripe_checkout_session_url, allow_other_host: true)
   end
 
+  def success
+  end
+
   def edit
     if current_user.membership_active.present?
       if current_user.membership_active.admin_managed?
