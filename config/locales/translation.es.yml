@@ -252,9 +252,6 @@ es:
         payment:
           requires_email_or_org: Requiere una dirección de correo electrónico o una
             organización.
-        recovery_display:
-          quote_too_long: Esa cita es demasiado larga. Por favor, acórtala para que
-            tenga menos de 300 caracteres.
         theft_alert:
           must_be_later_than_start_time: debe ser posterior a la hora de inicio
           must_be_present: debe estar presente
