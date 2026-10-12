@@ -612,6 +612,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     # a 0.23 model's paints still read as colorways
     expect(find("article h1", text: "Ultra Bee").ancestor("article").find("h2", text: /\Amodel years\z/i).ancestor("section"))
       .to have_text("Carbon Black").and have_text("Desert Brown")
+    # its flat suspension reads as a 0.24.1 model's ends do, and an end stating nothing is still suspended
+    suspension = ->(title) { find("article h1", text: title).ancestor("article").find("h2", text: /\Asuspension\z/i).ancestor("section") }
+    expect(suspension.call("Ultra Bee")).to have_css("div", text: /\AFront\s*241\W*mm\z/).and have_css("div", text: /\ARear\s*320\W*×\W*85\W*mm 3\.35in\z/)
+    expect(suspension.call("GT3 Pro")).to have_css("div", text: /\AFront\s*Front: Double Wishbone Hydraulic Shock Absorber/)
+    expect(page).to have_css("div", text: /\AMin rider age\s*18\W*yr\z/, visible: :all)
     classification.find("button", text: "?").click
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for off-highway use", visible: true)
     expect(tooltip).to have_css("code", exact_text: "evc/off_highway_motorcycle")
