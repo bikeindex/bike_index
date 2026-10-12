@@ -246,9 +246,6 @@ nb:
           address_required: "(eller plassering) av denne forlatte sykkelen kreves"
         payment:
           requires_email_or_org: Krever en e-postadresse eller organisasjon
-        recovery_display:
-          quote_too_long: Det sitatet er for langt. Vennligst forkort den til å være
-            mindre enn 300 tegn
         theft_alert:
           must_be_later_than_start_time: må være senere enn starttidspunktet
           must_be_present: må være tilstede

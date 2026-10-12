@@ -249,9 +249,6 @@ it:
           address_required: "(o posizione) di questa bicicletta abbandonata richiesta"
         payment:
           requires_email_or_org: Richiede un indirizzo e-mail o un'organizzazione
-        recovery_display:
-          quote_too_long: Quella citazione è troppo lunga. La preghiamo di accorciarla
-            in modo che sia inferiore a 300 caratteri
         theft_alert:
           must_be_later_than_start_time: deve essere successivo all'orario di inizio
           must_be_present: deve essere presente
