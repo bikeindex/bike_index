@@ -204,7 +204,7 @@
         </p>
       </div>
 
-      <%= render UI::ButtonLink::Component.new(href: edit_path("report_recovered"), text: translation(".mark_recovered"),
+      <%= render UI::ButtonLink::Component.new(href: edit_path("report_recovered", open_recovery: true), text: translation(".mark_recovered"),
           size: :lg, html_class: "tw:rounded-full! tw:px-8! tw:border-purple-500! tw:text-purple-600!") %>
     </div>
   <% end %>

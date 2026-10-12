@@ -50,7 +50,10 @@
         "
       >
         <%= link_to translation(".view_bike", bike_type: @bike.type), bike_path(@bike), class: "twlink" %>
-        <%= link_to translation(".edit_bike", bike_type: @bike.type), edit_bike_path(@bike, edit_template: "bike_details"), class: "twlink" %>
+
+        <% if editable? %>
+          <%= link_to translation(".edit_bike", bike_type: @bike.type), edit_bike_path(@bike, edit_template: "bike_details"), class: "twlink" %>
+        <% end %>
       </div>
     </div>
   </div>

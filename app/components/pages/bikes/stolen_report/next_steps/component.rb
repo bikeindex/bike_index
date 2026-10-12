@@ -40,7 +40,7 @@ module Pages
               Item.new(:location, true, translation(".location_added"), translation(".location_added_sub", city:), nil, nil)
             else
               Item.new(:location, false, translation(".add_location"), translation(".add_location_sub"),
-                translation(".add_location_cta"), edit_path("theft_details"))
+                translation(".add_location_cta"), edit_path("theft_details", alert_offered: true))
             end
           end
 
@@ -58,14 +58,14 @@ module Pages
               Item.new(:police, true, translation(".police_added"), nil, nil, nil)
             else
               Item.new(:police, false, translation(".add_police"), nil, translation(".add_police_cta"),
-                edit_path("theft_details", anchor: "policeReportNumber"))
+                edit_path("theft_details", alert_offered: true, anchor: "policeReportNumber"))
             end
           end
 
           def lock_item
             done = @stolen_record.locking_description.present? && @stolen_record.lock_defeat_description.present?
             Item.new(:lock, done, done ? translation(".lock_added") : translation(".add_lock"), translation(".lock_sub"),
-              (translation(".add_lock_cta") unless done), (edit_path("theft_details") unless done))
+              (translation(".add_lock_cta") unless done), (edit_path("theft_details", alert_offered: true) unless done))
           end
 
           def marker_class(done)
@@ -84,7 +84,7 @@ module Pages
 
           def theft_alert? = @stolen_record.theft_alerts.any?
 
-          def edit_path(template, anchor: nil) = edit_bike_path(@bike, edit_template: template, anchor:)
+          def edit_path(template, **) = edit_bike_path(@bike, edit_template: template, **)
 
           def share_text = translation(".share_text", title: @bike.title_string, city:)
 

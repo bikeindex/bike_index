@@ -57,4 +57,5 @@
 
 -# Only one modal if stolen, only one (different) modal if not stolen
 
-= render partial: "shared/modal", locals: { title: modal_title, id: "toggle-stolen", modal_body: modal_body }
+-# open_recovery: arriving from a "Mark as recovered" button, which already asked
+= render partial: "shared/modal", locals: { title: modal_title, id: "toggle-stolen", modal_body: modal_body, start_open: params[:open_recovery].present? }

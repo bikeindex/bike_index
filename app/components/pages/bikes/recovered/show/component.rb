@@ -20,7 +20,9 @@ module Pages
 
           def bike_name = @bike.frame_model.presence || @bike.mnfg_name.presence || @bike.type_titleize
 
-          def facebook_url = "https://www.facebook.com/sharer/sharer.php?#{{u: root_url}.to_query}"
+          def share_url = new_register_url
+
+          def facebook_url = "https://www.facebook.com/sharer/sharer.php?#{{u: share_url}.to_query}"
         end
       end
     end

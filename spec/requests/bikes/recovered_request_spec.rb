@@ -20,6 +20,9 @@ RSpec.describe Bikes::RecoveredController, type: :request do
         expect(response.status).to eq 200
         expect(response.body).to match("Welcome home")
         expect(response.body).to match("Thanks for letting us share your story")
+        expect(response.body).to match("Edit bike details")
+        # Shares the register page, which is what it asks friends to do
+        expect(response.body).to include("sharer.php?u=#{CGI.escape(new_register_url)}")
       end
 
       context "someone else's bike" do

@@ -18,6 +18,9 @@ module Pages
 
           def image_url = @bike.image_url(:small)
 
+          # The emailed recovery link reaches the recovered page signed out
+          def editable? = @bike.authorized?(helpers.current_user)
+
           def heading
             [@bike.year, @bike.mnfg_name].compact_blank.join(" ").presence ||
               translation(".your_bike", bike_type: @bike.type_titleize)

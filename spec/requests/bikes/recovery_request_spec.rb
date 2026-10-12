@@ -79,6 +79,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
         follow_redirect!
         expect(response.status).to eq 200
         expect(response.body).to match("Welcome home")
+        expect(response.body).to_not match("Edit bike details")
       end
 
       context "with user present" do

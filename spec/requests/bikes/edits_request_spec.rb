@@ -198,6 +198,18 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(response).to redirect_to(new_bike_theft_alert_path(bike_id: bike.id))
       expect(flash).to be_blank
     end
+    it "offers a Promoted Alert unless the page they came from just did, and opens the recovery when asked" do
+      get "#{base_url}?edit_template=theft_details&alert_offered=true"
+      expect(response.body).to_not match("tryAPromotedAlert")
+      get "#{base_url}?edit_template=theft_details"
+      expect(response.body).to match("tryAPromotedAlert")
+
+      get "#{base_url}?edit_template=report_recovered"
+      expect(response.body).to_not include('"toggle-stolen").modal("show")')
+      get "#{base_url}?edit_template=report_recovered&open_recovery=true"
+      expect(response.body).to include('"toggle-stolen").modal("show")')
+    end
+
     context "recovered bike" do
       before { bike.current_stolen_record.add_recovery_information }
       it "redirects to details" do
