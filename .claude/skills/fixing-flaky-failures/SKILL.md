@@ -242,7 +242,9 @@ leaves timing, not ordering or leaked state.
 Measure the "without the fix" arm against the base ref by name — `git checkout
 origin/main -- <paths>`. Once the fix is committed, `git checkout -- <paths>` restores
 *it*, so the arm you think is unpatched is the patched one, and a regression test that
-does fail without the fix reads as passing.
+does fail without the fix reads as passing. An uncommitted fix that checkout
+overwrites outright, so save it first — `git diff HEAD -- <paths> > tmp/flaky_fix.patch`
+— and put it back with `git checkout HEAD -- <paths> && git apply tmp/flaky_fix.patch`.
 
 ## Known causes in this repo
 
