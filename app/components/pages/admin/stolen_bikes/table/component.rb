@@ -4,8 +4,9 @@ module Pages
   module Admin
     module StolenBikes
       module Table
-        # The admin stolen bikes index: a card of stolen records with a column picker, and the
-        # approve, spam and delete actions for the checked rows above and below the table
+        # The admin stolen bikes index: a card of stolen records with a column picker, columns that
+        # reorder by dragging their headers, and the approve, spam and delete actions for the
+        # checked rows above and below the table
         class Component < ApplicationComponent
           COLUMNS = {
             photo_cell: "Photo",
@@ -54,9 +55,12 @@ module Pages
           end
 
           def card_data_attributes
-            {controller: "table-multi-checkbox ui--collapse org--search-column-settings",
+            {controller: "table-multi-checkbox ui--collapse org--search-column-settings table-column-order",
+             action: "dragstart->table-column-order#dragStart dragover->table-column-order#dragOver " \
+               "drop->table-column-order#drop dragend->table-column-order#dragEnd",
              "ui--collapse-storage-key-value": "adminStolenBikesColumnsOpen",
-             "org--search-column-settings-storage-key-value": "adminStolenBikesColumns"}
+             "org--search-column-settings-storage-key-value": "adminStolenBikesColumns",
+             "table-column-order-storage-key-value": "adminStolenBikesColumnOrder"}
           end
 
           def location(stolen_record)
