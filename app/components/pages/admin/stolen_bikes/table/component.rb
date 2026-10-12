@@ -60,6 +60,7 @@ module Pages
                "drop->table-column-order#drop dragend->table-column-order#dragEnd",
              "ui--collapse-storage-key-value": "adminStolenBikesColumnsOpen",
              "org--search-column-settings-storage-key-value": "adminStolenBikesColumns",
+             "org--search-column-settings-narrow-hidden-columns-value": %w[photo_cell created_at_cell],
              "table-column-order-storage-key-value": "adminStolenBikesColumnOrder"}
           end
 

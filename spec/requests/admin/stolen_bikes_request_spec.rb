@@ -18,6 +18,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(assigns(:stolen_records)).to match_array([stolen_record])
         expect(response.body).to include("Contact owner", "Oakland PD", "26-004512")
         expect(response.body).to include('data-table-column-order-storage-key-value="adminStolenBikesColumnOrder"')
+        expect(response.body).to include('data-org--search-column-settings-narrow-hidden-columns-value="[&quot;photo_cell&quot;,&quot;created_at_cell&quot;]"')
         # test the search_with_promoted_alert because scoping is weird
         get "#{base_url}?search_with_promoted_alert=true"
         expect(response.code).to eq("200")

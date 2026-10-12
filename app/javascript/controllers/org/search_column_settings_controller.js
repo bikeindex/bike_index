@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--search-column-settings'
 export default class extends Controller {
   static targets = ['checkboxes']
-  static values = { enabledColumns: Array, assignBikeSticker: Boolean, storageKey: { type: String, default: 'orgRegistrationColumns' } }
+  static values = { enabledColumns: Array, assignBikeSticker: Boolean, storageKey: { type: String, default: 'orgRegistrationColumns' }, narrowHiddenColumns: Array }
 
   connect () {
     this.refreshEnabledColumns()
@@ -47,7 +47,16 @@ export default class extends Controller {
     return this.checkboxesTarget.querySelectorAll('input[type=checkbox]:not(:disabled)')
   }
 
+  // Below Tailwind's sm breakpoint these start hidden, and the panel's "default" leaves them so
+  applyNarrowDefaults () {
+    if (!window.matchMedia('(max-width: 639px)').matches) return
+    this.toggleableCheckboxes.forEach(cb => {
+      if (this.narrowHiddenColumnsValue.includes(cb.name)) cb.dataset.default = 'false'
+    })
+  }
+
   selectStoredVisibleColumns () {
+    this.applyNarrowDefaults()
     const stored = localStorage.getItem(this.storageKeyValue)
     let columns = null
     if (stored) {
