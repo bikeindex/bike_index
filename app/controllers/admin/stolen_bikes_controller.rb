@@ -135,13 +135,6 @@ module Admin
         available_stolen_records = available_stolen_records.with_theft_alerts_paid_or_admin
       end
 
-      # We always render distance
-      @distance = GeocodeHelper.permitted_distance(params[:search_distance], default_distance: 50)
-      if !@only_without_location && params[:search_location].present?
-        bounding_box = GeocodeHelper.bounding_box(params[:search_location], @distance)
-        available_stolen_records = available_stolen_records.within_bounding_box(bounding_box)
-      end
-
       @time_range_column = sort_column if %w[date_stolen].include?(sort_column)
       @time_range_column ||= "created_at"
       @available_stolen_records = available_stolen_records.where(@time_range_column => @time_range)
