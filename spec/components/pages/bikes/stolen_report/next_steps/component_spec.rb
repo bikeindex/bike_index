@@ -17,6 +17,20 @@ RSpec.describe Pages::Bikes::StolenReport::NextSteps::Component, type: :componen
     expect(component).to have_link("See alert options")
   end
 
+  context "with several Promoted Theft Alert plans" do
+    before do
+      FactoryBot.create(:theft_alert_plan, amount_cents: 4_999)
+      FactoryBot.create(:theft_alert_plan, amount_cents: 1_999)
+      # Cheaper, but not for sale here
+      FactoryBot.create(:theft_alert_plan, amount_cents: 999, active: false)
+      FactoryBot.create(:theft_alert_plan, amount_cents: 499, language: "nl")
+    end
+
+    it "starts from the lowest price on sale" do
+      expect(component.text.squish).to include("From $19.99")
+    end
+  end
+
   context "without a serial" do
     let(:bike) { FactoryBot.create(:stolen_bike_in_chicago, serial_number: "unknown") }
 
