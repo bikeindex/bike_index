@@ -159,6 +159,7 @@ function filter (params) {
     (!params.suspension || (params.suspension === 'has' ? model.suspension !== 'rigid' : model.suspension === params.suspension)) &&
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
+    (!params.market || model.markets.includes(params.market)) &&
     (yearMin == null || model.sortYear >= yearMin) &&
     (yearMax == null || (model.first_year ?? 0) <= yearMax) &&
     ((priceMin == null && priceMax == null) || (model.msrp_cents > 0 &&
