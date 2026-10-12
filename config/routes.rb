@@ -358,6 +358,7 @@ Rails.application.routes.draw do
 
     resources :stolen_bikes do
       member { post :approve }
+      collection { post :bulk_update }
     end
     resources :customer_contacts, only: %i[create show]
     resources :recoveries do

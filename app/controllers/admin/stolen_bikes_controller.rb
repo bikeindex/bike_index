@@ -2,37 +2,36 @@ module Admin
   class StolenBikesController < Admin::BaseController
     include Binxtils::SortableTable
 
+    BULK_ACTIONS = {"approve" => "approved", "spam" => "marked spam", "delete" => "deleted"}.freeze
+
     before_action :find_bike, only: %i[edit update]
     helper_method :available_stolen_records
 
     def index
       @per_page = permitted_per_page(default: 50)
-      @pagy, @stolen_records = pagy(:countish, available_stolen_records.includes(:bike)
+      @pagy, @stolen_records = pagy(:countish, available_stolen_records
         .reorder(sortable_order(StolenRecord)), limit: @per_page, page: permitted_page)
     end
 
     def approve
-      if params[:id] == "multi_approve"
-        stolen_record_ids = defined?(params[:sr_selected].keys) ? params[:sr_selected].keys : params[:sr_selected]
-        if stolen_record_ids.any?
-          stolen_record_ids.each do |id|
-            stolen_record = StolenRecord.unscoped.find(id)
-            stolen_record.update_attribute :approved, true
-            BikeJobs::ApproveStolenListingJob.perform_async(stolen_record.bike_id)
-          end
-          # Lazy pluralize hack
-          flash[:success] = "#{stolen_record_ids.count} stolen #{(stolen_record_ids.count == 1) ? "bike" : "bikes"} approved!"
-        else
-          flash[:error] = "No stolen records selected to approve!"
-        end
-        redirect_back(fallback_location: admin_stolen_bikes_url)
+      find_bike
+      @bike.current_stolen_record.update_attribute :approved, true
+      BikeJobs::ApproveStolenListingJob.perform_async(@bike.id)
+      flash[:success] = "Stolen Bike was approved"
+      redirect_to edit_admin_stolen_bike_url(@bike)
+    end
+
+    def bulk_update
+      stolen_records = StolenRecord.unscoped.where(id: params[:sr_selected]&.keys)
+      if stolen_records.none?
+        flash[:error] = "No stolen records selected!"
+      elsif BULK_ACTIONS.include?(params[:bulk_action])
+        send(:"bulk_#{params[:bulk_action]}", stolen_records)
+        flash[:success] = "#{stolen_records.count} stolen #{"bike".pluralize(stolen_records.count)} #{BULK_ACTIONS[params[:bulk_action]]}"
       else
-        find_bike
-        @bike.current_stolen_record.update_attribute :approved, true
-        BikeJobs::ApproveStolenListingJob.perform_async(@bike.id)
-        flash[:success] = "Stolen Bike was approved"
-        redirect_to edit_admin_stolen_bike_url(@bike)
+        flash[:error] = "Unknown action!"
       end
+      redirect_back(fallback_location: admin_stolen_bikes_url)
     end
 
     def show
@@ -72,6 +71,21 @@ module Admin
       end
       @current_stolen_record = @stolen_record.present? && @stolen_record.id == @bike.current_stolen_record&.id
       @bike
+    end
+
+    def bulk_approve(stolen_records)
+      stolen_records.each do |stolen_record|
+        stolen_record.update_attribute :approved, true
+        BikeJobs::ApproveStolenListingJob.perform_async(stolen_record.bike_id)
+      end
+    end
+
+    def bulk_spam(stolen_records)
+      Bike.unscoped.where(id: stolen_records.select(:bike_id)).find_each { it.update(likely_spam: true) }
+    end
+
+    def bulk_delete(stolen_records)
+      stolen_records.pluck(:bike_id).each { BikeJobs::BikeDeleterJob.perform_async(it, false, current_user.id) }
     end
 
     def update_image

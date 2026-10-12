@@ -67,13 +67,7 @@
     </p>
   <% end %>
 
-  <%= form_tag approve_admin_stolen_bike_path(id: "multi_approve"), method: :post, data: {controller: "table-multi-checkbox"} do %>
-    <%= render partial: "table", locals: {render_sortable: true} %>
-
-    <div class="mb-3 text-center">
-      <%= submit_tag 'Approve selected', class: 'btn btn-outline-primary' %>
-    </div>
-  <% end %>
+  <%= render(Pages::Admin::StolenBikes::Table::Component.new(stolen_records: @stolen_records, pagy: @pagy, sort_state:)) %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(
