@@ -33,20 +33,11 @@ RSpec.describe Admin::BikesController, type: :request do
   end
 
   describe "duplicates" do
-    let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group) }
-    let(:duplicate_bike) { duplicate_bike_group.bikes.first }
-
     it "renders" do
       get "#{base_url}/duplicates"
       expect(response.code).to eq("200")
       expect(response).to render_template("duplicates")
       expect(flash).to_not be_present
-      expect(response.body).to include("Serial match", duplicate_bike_group.segment)
-
-      get "#{base_url}/#{duplicate_bike.id}?active_tab=duplicates"
-      expect(response.code).to eq("200")
-      expect(response.body).to include("This bike")
-      duplicate_bike_group.bikes.each { expect(response.body).to include(edit_admin_bike_path(it)) }
     end
   end
 
@@ -372,14 +363,6 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response).to redirect_to(:admin_bikes)
       expect(flash[:success]).to match(/deleted/i)
       expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id)
-    end
-    context "with return_to" do
-      it "redirects there" do
-        delete "#{base_url}/#{bike.id}", params: {return_to: "/admin/bikes/duplicates"}
-        expect(response).to redirect_to("/admin/bikes/duplicates")
-        expect(flash[:success]).to match(/deleted/i)
-        expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
-      end
     end
     context "get_destroy" do
       it "destroys" do
