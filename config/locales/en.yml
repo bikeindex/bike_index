@@ -1771,6 +1771,8 @@ en:
       find_lock:
         not_your_lock: Whoops, that's not your lock!
     memberships:
+      create:
+        already_a_member: You already have a membership.
       edit:
         free_membership: >-
           Bike Index has given you a free membership. Please email support@bikeindex.org

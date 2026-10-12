@@ -41,14 +41,18 @@ RSpec.describe MembershipsController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template("new")
         expect(flash).to_not be_present
+        expect(Nokogiri::HTML(response.body).css("form[action='/membership'] [type=submit]")).to be_present
       end
       context "user has an active membership" do
         let!(:membership) { FactoryBot.create(:membership, user: current_user) }
-        it "redirects to edit" do
+        it "renders, linking to their membership" do
           expect(current_user.reload.membership_active).to be_present
 
           get "#{base_url}/new"
-          expect(response).to redirect_to "/membership/edit"
+          expect(response.code).to eq("200")
+          expect(response).to render_template("new")
+          expect(response.body).to match("View your Basic membership")
+          expect(Nokogiri::HTML(response.body).css("form[action='/membership'] [type=submit]")).to be_empty
         end
       end
       context "user has an inactive membership" do
@@ -145,6 +149,18 @@ RSpec.describe MembershipsController, type: :request do
             Sidekiq::Job.drain_all
             expect(ActionMailer::Base.deliveries.empty?).to be_truthy
           end
+        end
+      end
+
+      context "user has an active membership" do
+        let!(:membership) { FactoryBot.create(:membership, user: current_user) }
+
+        it "redirects to their membership" do
+          expect {
+            post base_url, params: create_params
+          }.to_not change(StripeSubscription, :count)
+          expect(response).to redirect_to("/my_account/membership")
+          expect(flash[:notice]).to eq "You already have a membership."
         end
       end
 

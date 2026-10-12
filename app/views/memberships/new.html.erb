@@ -3,4 +3,5 @@
 
 <%= render(Pages::Memberships::New::Component.new(currency: current_currency, level: @initial_level,
   referral_source: @referral_source, bikes_count:, recoveries_count:, recoveries_value:,
-  organizations_count:, recovery_displays: RecoveryDisplay.with_photo)) %>
+  organizations_count:, recovery_displays: RecoveryDisplay.with_photo,
+  membership: current_user&.membership_active)) %>

@@ -2,14 +2,16 @@ class MembershipsController < ApplicationController
   before_action :store_return_and_authenticate_user, only: %i[edit]
 
   def new
-    if current_user&.membership_active.present?
-      redirect_to edit_membership_path
-    end
     @initial_level = params[:membership_level]
     @referral_source = referral_source_from_params
   end
 
   def create
+    if current_user&.membership_active.present?
+      flash[:notice] = translation(:already_a_member)
+      redirect_to(my_account_membership_path) && return
+    end
+
     stripe_price = StripePrice.active.where(stripe_price_parameters).first
     stripe_subscription = StripeSubscription.create_for(stripe_price:, user: current_user,
       referral_source: referral_source_from_params)

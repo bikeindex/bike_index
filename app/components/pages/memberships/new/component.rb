@@ -14,7 +14,7 @@ module Pages
         YEARLY_ONLY = "tw:hidden tw:group-has-[[value=yearly]:checked]/membership:inline"
 
         def initialize(currency:, bikes_count:, recoveries_count:, recoveries_value:, organizations_count:,
-          recovery_displays:, level: nil, referral_source: nil)
+          recovery_displays:, level: nil, referral_source: nil, membership: nil)
           @currency = currency
           @bikes_count = bikes_count
           @recoveries_count = recoveries_count
@@ -22,6 +22,7 @@ module Pages
           @organizations_count = organizations_count
           @recovery_displays = recovery_displays.first(4)
           @referral_source = referral_source
+          @membership = membership
           @level = PRICES.key?(level&.to_sym) ? level.to_sym : :plus
           @interval = StripePrice.interval_default.to_sym
         end

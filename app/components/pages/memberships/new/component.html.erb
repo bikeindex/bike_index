@@ -240,10 +240,15 @@
           </p>
         </div>
 
-        <%= render(UI::Button::Component.new(color: :primary, size: :callout, type: "submit", html_class: "tw:shrink-0")) do %>
-          <span data-memberships--new-target="join">
-            <%= labels(@level, @interval)[:join] %>
-          </span>
+        <% if @membership.present? %>
+          <%= render(UI::ButtonLink::Component.new(text: translation(".view_your_membership", level: @membership.level_humanized),
+            href: my_account_membership_path, color: :primary, size: :callout, html_class: "tw:shrink-0")) %>
+        <% else %>
+          <%= render(UI::Button::Component.new(color: :primary, size: :callout, type: "submit", html_class: "tw:shrink-0")) do %>
+            <span data-memberships--new-target="join">
+              <%= labels(@level, @interval)[:join] %>
+            </span>
+          <% end %>
         <% end %>
       </div>
 
