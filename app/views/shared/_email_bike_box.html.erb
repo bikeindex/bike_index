@@ -12,7 +12,7 @@
   <tbody>
     <tr>
       <td class="image-holder <%= thumbclass %>">
-        <%= render(Emails::TokenLink::Component.new(href: bike_url_path, html_class: nil)) do %>
+        <%= render(Emails::Partials::TokenLink::Component.new(href: bike_url_path, html_class: nil)) do %>
           <%= image_tag thumb_url, alt: "Bike photo" %>
         <% end %>
       </td>

@@ -8,7 +8,7 @@
 
 <% if tokenized_url.present? %>
   <div class="mark-retrieved-box">
-    <%= render(Emails::TokenLink::Component.new(href: tokenized_url)) do %>
+    <%= render(Emails::Partials::TokenLink::Component.new(href: tokenized_url)) do %>
       Click to renew
     <% end %>
 

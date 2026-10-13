@@ -8,7 +8,7 @@
   = t(".html.user_would_like_to_merge", name: @user.display_name, email: @user.email)
 
 - tokenized_url = @email_preview ? @email_preview_tokenized_url : confirm_user_email_url(id: @user_email.id, confirmation_token: @user_email.confirmation_token)
-= render(Emails::TokenLink::Component.new(href: tokenized_url, text: t(".html.verify_email")))
+= render(Emails::Partials::TokenLink::Component.new(href: tokenized_url, text: t(".html.verify_email")))
 
 %p.center-text.less-strong= t(".html.click_verify_email_html")
 

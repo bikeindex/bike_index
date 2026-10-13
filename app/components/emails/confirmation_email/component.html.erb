@@ -6,7 +6,7 @@
   <%= translation("follow_this_link_to_sign_in") %>
 </h3>
 
-<%= render(Emails::TokenLink::Component.new(href: tokenized_url, text: translation("sign_in"))) %>
+<%= render(Emails::Partials::TokenLink::Component.new(href: tokenized_url, text: translation("sign_in"))) %>
 
 <% unless @partner %>
   <p class="less-strong center-text">

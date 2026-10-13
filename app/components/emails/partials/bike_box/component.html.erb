@@ -2,7 +2,7 @@
   <tbody>
     <tr>
       <td class="image-holder <%= 'placeholder' if placeholder? %>">
-        <%= render(Emails::TokenLink::Component.new(href: @bike_url_path, html_class: nil)) do %>
+        <%= render(Emails::Partials::TokenLink::Component.new(href: @bike_url_path, html_class: nil)) do %>
           <%= image_tag thumb_url, alt: translation("bike_photo", bike_type: @bike.type_titleize) %>
         <% end %>
       </td>

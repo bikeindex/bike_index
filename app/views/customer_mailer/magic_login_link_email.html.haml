@@ -2,7 +2,7 @@
   = t(".html.click_the_button")
 
 - tokenized_url = @email_preview ? @email_preview_tokenized_url : @url
-= render(Emails::TokenLink::Component.new(href: tokenized_url, text: t(".html.sign_in")))
+= render(Emails::Partials::TokenLink::Component.new(href: tokenized_url, text: t(".html.sign_in")))
 
 %p
   %em.less-strong
