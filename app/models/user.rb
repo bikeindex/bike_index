@@ -395,6 +395,10 @@ class User < ApplicationRecord
     ownership_organizations.paid_money.exists?
   end
 
+  def paid_organization?
+    organizations.paid_money.exists? || paid_organization_registration?
+  end
+
   def authorized?(obj, no_superuser_override: false)
     return true if !no_superuser_override && superuser?
 

@@ -89,7 +89,7 @@
 
       <div class="binx-footer">
         <h5>
-          <% if render_donation?(@organization) %>
+          <% if render_donation? %>
             <%= t(".help_prevent_theft") %>
             <%= link_to(t(".make_a_donation"), support_the_index_url) %>
           <% end %>

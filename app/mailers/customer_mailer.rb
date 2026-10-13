@@ -6,8 +6,7 @@ class CustomerMailer < ApplicationMailer
 
   helper :bike
 
-  # Mailbox filters (Defender, Proofpoint) quarantine sign-in emails carrying a tracking pixel or
-  # redirected links, and their recipients often have no password to fall back on
+  # Mailbox filters (Defender, Proofpoint) quarantine sign-in emails with a tracking pixel or redirected links
   UNTRACKED = {track_opens: "false", track_links: "None"}.freeze
 
   def welcome_email(user)
@@ -40,8 +39,6 @@ class CustomerMailer < ApplicationMailer
   def magic_login_link_email(user, return_to: nil)
     @user = user
     @url = magic_link_session_url(token: @user.magic_link_token, return_to:)
-    # Only read by the layout, which drops the donation ask for a paid organization
-    @organization = @user.organizations.paid_money.first || @user.ownership_organizations.paid_money.first
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @user.email, tag: __callee__, **UNTRACKED)

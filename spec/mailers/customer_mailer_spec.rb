@@ -65,33 +65,40 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.body.encoded).to match(user.magic_link_token)
       expect(mail.tag).to eq "magic_login_link_email"
       expect(mail.to_postmark_hash).to include("TrackOpens" => false, "TrackLinks" => "None")
-      expect(mail.deliver_now.html_part.body.to_s).to include(support_the_index_url)
       expect(mail.deliver_now.text_part.body.to_s).to include(user.magic_link_token).and include("Sign in")
     end
+  end
 
-    context "paid organization" do
-      let(:organization) { FactoryBot.create(:invoice_with_payment).organization }
+  describe "donation ask" do
+    let(:html) { CustomerMailer.welcome_email(user).deliver_now.html_part.body.to_s }
+    let(:organization) { FactoryBot.create(:invoice_with_payment).organization }
 
-      context "member" do
-        let(:user) { FactoryBot.create(:organization_role_claimed, organization:).user }
+    it "renders" do
+      expect(html).to include(support_the_index_url)
+    end
 
-        it "renders without the donation ask" do
-          user.update_auth_token("magic_link_token")
-          mail = CustomerMailer.magic_login_link_email(user)
-          expect(mail.deliver_now.html_part.body.to_s).to include(user.magic_link_token)
-          expect(mail.deliver_now.html_part.body.to_s).to_not include(support_the_index_url)
-        end
+    context "paid organization member" do
+      let(:user) { FactoryBot.create(:organization_role_claimed, organization:).user }
+
+      it "doesn't render" do
+        expect(html).to_not include(support_the_index_url)
       end
+    end
 
-      context "registrant" do
-        before { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user:) }
+    context "paid organization registrant" do
+      before { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user:) }
 
-        it "renders without the donation ask" do
-          user.update_auth_token("magic_link_token")
-          mail = CustomerMailer.magic_login_link_email(user)
-          expect(mail.deliver_now.html_part.body.to_s).to include(user.magic_link_token)
-          expect(mail.deliver_now.html_part.body.to_s).to_not include(support_the_index_url)
-        end
+      it "doesn't render" do
+        expect(html).to_not include(support_the_index_url)
+      end
+    end
+
+    context "paid organization email domain" do
+      let(:user) { FactoryBot.create(:user, email: "someone@paid-university.edu") }
+      before { organization.update(user_email_domain: "paid-university.edu") }
+
+      it "doesn't render" do
+        expect(html).to_not include(support_the_index_url)
       end
     end
   end
