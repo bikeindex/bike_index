@@ -2,6 +2,7 @@
   <div
     class="tw:group"
     data-controller="bikebook--catalog-filters ui--collapse"
+    data-bikebook--catalog-filters-default-market-value="<%= @market %>"
     data-ui--collapse-param-value="filters"
   >
     <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-x-4">
@@ -63,6 +64,9 @@
           label: translation(".manufacturers"), placeholder: translation(".any_manufacturer"), multiselect: true)) do %>
               <span id="manufacturer-count"></span>
             <% end %>
+
+            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "market",
+          label: translation(".market"), placeholder: translation(".any_market"))) %>
 
             <div
               class="

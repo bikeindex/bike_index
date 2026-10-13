@@ -47,6 +47,7 @@ class BikebookController < ApplicationController
     # the icon is taller than wide, which the large card crops to a banner
     @twitter_card = "summary" unless @page_image
     @page_image ||= helpers.image_url("logos/bikebook_icon.png")
-    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL), status:
+    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
+      market: request.env["HTTP_CF_IPCOUNTRY"]), status:
   end
 end
