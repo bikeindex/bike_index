@@ -77,6 +77,7 @@ RSpec.describe Admin::StolenBikesController, type: :request do
 
         context "with a photo" do
           let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+          # A return_to without stolen_record_id read the stolen record's id as a bike's, and raised
           it "returns from the photo edit to the stolen record" do
             get "#{base_url}/#{recovered_record.id}/edit?stolen_record_id=1"
             href = Nokogiri::HTML(response.body).at_css("a:contains('user edit')")["href"]
