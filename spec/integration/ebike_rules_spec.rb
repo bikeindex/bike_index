@@ -8,6 +8,8 @@ RSpec.describe "E-bike rules", :js, type: :system do
   it "checks a BikeBook model or one entered by hand as each is chosen, keeping it in the URL" do
     visit ebike_rules_path
     type_into(find_field("Bike model", disabled: false, wait: 10), "haul")
+    # US models alone, so not its Canadian one of the same name
+    expect(page).to have_css("[role='option']", count: 1)
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     # with no state to check it against yet, it waits in the URL
     expect(page).to have_current_path("/ebike-rules?vehicle_models=m%2Fspecialized%2F2025%2Fhaul_st")

@@ -33,12 +33,12 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path
     # the search is an unusable placeholder until the catalog loads
     expect(page).to have_no_css("[inert]", wait: 10)
-    # the catalog's 29 models, down to their leading place
-    expect(page).to have_css("h1", exact_text: "The world’s bicycle library — search, compare, and find your next ride across 20+ models.")
+    # the catalog's 30 models, down to their leading place
+    expect(page).to have_css("h1", exact_text: "The world’s bicycle library — search, compare, and find your next ride across 30+ models.")
     asked.clear
 
     vehicle_field.click
-    expect(page).to have_css(".hw-combobox__group__label", text: /\(29 matching models\)/i)
+    expect(page).to have_css(".hw-combobox__group__label", text: /\(30 matching models\)/i)
 
     type_into(vehicle_field, "level 4 rec")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(2 matching models\)/i)
@@ -190,7 +190,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#vehicle-models-count", exact_text: "(19 matching models)")
     uncheck "US Class 2"
     uncheck "Out of Class"
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(29 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
     # as on /ebike-rules, a state on the three US classes keeps them and one with its own shows those,
     # each matching the models in its groups, leaving the other jurisdiction's unchecked
     check "US Class 2"
@@ -204,7 +204,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     select "United States", from: "Jurisdiction"
     expect(page).to have_no_field("Low-Speed Electric Bicycle")
     expect(page).to have_unchecked_field("US Class 2").and have_unchecked_field("Out of Class")
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(29 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
     find_field("Manufacturers").click
     find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (5)").click
     expect(page).to have_css("[data-async-id='manufacturer'] .hw-combobox__chip", text: "Kris Holm")
@@ -257,6 +257,35 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
     page.current_window.resize_to(1920, 1080)
+  end
+
+  it "searches the market of the visitor's country until another is chosen, leaving it out of the URL" do
+    serve_bikebook_catalog
+    page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "CA") }
+    visit bikebook_path
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)", wait: 10)
+    type_into(vehicle_field, "haul")
+    expect(page).to have_css("[role='option']", count: 1, text: "$3,599.99")
+    expect(page).to have_current_path("/bikebook")
+
+    click_on "More filters"
+    expect(page).to have_field("Market", with: "Canada")
+    find_field("Market").click
+    # by name rather than the catalog's order, which is by code
+    markets = all("#market-hw-listbox [role='option']").map { it.text.sub(/ \(\d+\)\z/, "") }
+    expect(markets.first(6)).to eq ["Any", "Argentina", "Australia", "Canada", "China", "European Union"]
+    find("#market-hw-listbox [role='option']", exact_text: "Any").click
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
+    expect(page).to have_current_path(/[?&]market=all\b/)
+    type_into(find_field("Market"), "united")
+    find("#market-hw-listbox [role='option']", text: "United States (23)").click
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
+    expect(page).to have_current_path(/[?&]market=US\b/)
+
+    # a market the catalog has no models in searches them all
+    page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "JP") }
+    visit bikebook_path
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)", wait: 10)
   end
 
   it "titles a model picked alone for it, and drops the canonical as the page changes" do
@@ -660,6 +689,14 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(years.all("tr").map { it.first("td").text }).to eq %w[2026 2025]
     expect(years).to have_text("Satin Obsidian").and have_text("Gloss White Mountains")
     expect(find("h2", text: /\Aframe\z/i).ancestor("section")).to have_text(/Max weight total\W*190\W*kg/)
+
+    # its Canadian model, published resolved from it: its own market, price and motor, and no US class
+    visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st,m/specialized/2025/haul_st_ca")
+    expect(page).to have_css("[data-comparison] article", count: 2, wait: 10)
+    canadian = all("article").last
+    expect(canadian).to have_css("div", text: /\AMarkets\s*Canada\z/).and have_css("span[title='Canadian Dollar']")
+      .and have_css("div", text: /\ARated power\s*500\W*W\z/).and have_no_text("US Class")
+    expect(canadian.find("h2", text: /\Amodel years\z/i).ancestor("section").all("tr").map { it.first("td").text }).to eq %w[2025]
 
     # beside its classification, side by side with nothing to table
     visit bikebook_path(vehicle_models: "m/segway/2025/gt3_pro,evc/us/ca/off_highway_electric_motorcycle")

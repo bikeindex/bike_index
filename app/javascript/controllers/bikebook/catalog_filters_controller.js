@@ -9,7 +9,8 @@ export default class extends Controller {
   static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'jurisdiction']
   static values = {
     yearDir: { type: String, default: 'desc' },
-    priceDir: { type: String, default: 'desc' }
+    priceDir: { type: String, default: 'desc' },
+    defaultMarket: String
   }
 
   // Rewritten on connect too, as rendering drops stale values. Not from the loading placeholder,
@@ -61,15 +62,17 @@ export default class extends Controller {
     fieldset.querySelector('.hw-combobox__input').dispatchEvent(new Event('input', { bubbles: true }))
   }
 
+  // The URL leaves out the default market, so a shared link opens in its reader's own
   #writeUrl () {
     const url = new URL(window.location)
-    this.#applyParams(url)
+    const filters = this.#filters
+    this.#applyParams(url, { ...filters, market: filters.market === this.defaultMarketValue ? '' : filters.market || 'all' })
     replaceUrl(url)
   }
 
-  #applyParams (url) {
+  #applyParams (url, filters = this.#filters) {
     const params = {
-      ...this.#filters,
+      ...filters,
       jurisdiction: this.jurisdictionTarget.value,
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
       price_dir: this.priceDirValue === 'asc' ? 'asc' : ''

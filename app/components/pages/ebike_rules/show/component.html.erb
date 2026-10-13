@@ -135,7 +135,7 @@
             optional_badge: false, wrapper_class: "tw:contents")) do %>
               <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
               <template data-ebike-rules--lookup-target="combobox">
-                <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path(electric: 1),
+                <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path(electric: 1, market: "US"),
                 dialog_label: translation(".bike_model"),
                 html_options: {value: @lookup.bikebook_id, placeholder: translation(".bike_placeholder"),
                                aria: {invalid: (true if error?(:bike))}})) %>
