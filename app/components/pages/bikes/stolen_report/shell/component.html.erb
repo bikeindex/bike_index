@@ -18,8 +18,8 @@
           tw:text-blue-600 tw:sm:flex tw:dark:bg-gray-700
         "
       >
-        <% if image_url.present? %>
-          <%= image_tag image_url, alt: "", class: "tw:size-full tw:object-cover" %>
+        <% if @image_url.present? %>
+          <%= image_tag @image_url, alt: "", class: "tw:size-full tw:object-cover" %>
         <% else %>
           <%= helpers.inline_svg_tag("icons/bike.svg", class: "tw:size-7", aria_hidden: true) %>
         <% end %>

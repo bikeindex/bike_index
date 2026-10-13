@@ -14,9 +14,11 @@ module Pages
             @donation_strip = donation_strip
           end
 
-          private
+          def before_render
+            @image_url = @bike.image_url(:small)
+          end
 
-          def image_url = @bike.image_url(:small)
+          private
 
           # The emailed recovery link reaches the recovered page signed out
           def editable? = @bike.authorized?(helpers.current_user)

@@ -188,6 +188,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       get base_url
       expect(flash).to be_blank
       expect(response).to render_template(:theft_details)
+      expect(response.body).to match("tryAPromotedAlert")
       expect(assigns(:edit_template)).to eq "theft_details"
       expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
       expect(bike.user_id).to eq current_user.id
@@ -198,11 +199,12 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(response).to redirect_to(new_bike_theft_alert_path(bike_id: bike.id))
       expect(flash).to be_blank
     end
-    it "offers a Promoted Alert unless the page they came from just did, and sends recovering to its form" do
+    it "doesn't offer a Promoted Alert after a page that just did, and sends recovering to its form" do
       get "#{base_url}?edit_template=theft_details&alert_offered=true"
       expect(response.body).to_not match("tryAPromotedAlert")
+      # Saving redirects without the param, and the offer still counts as made
       get "#{base_url}?edit_template=theft_details"
-      expect(response.body).to match("tryAPromotedAlert")
+      expect(response.body).to_not match("tryAPromotedAlert")
 
       get "#{base_url}?edit_template=report_recovered"
       expect(response).to redirect_to new_bike_recovered_path(bike.id)

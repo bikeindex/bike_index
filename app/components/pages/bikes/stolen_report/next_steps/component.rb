@@ -17,6 +17,11 @@ module Pages
             @register_another_path = register_another_path
           end
 
+          def before_render
+            @theft_alert = @stolen_record.theft_alert_paid_or_admin?
+            @cheapest_plan = TheftAlertPlan.active.in_language(I18n.locale).price_ordered_asc.first unless @theft_alert
+          end
+
           private
 
           def cycle_type = @bike.type
@@ -29,7 +34,7 @@ module Pages
           end
 
           def serial_item
-            return unless serial_unknown?
+            return unless @bike.serial_unknown?
 
             Item.new(:serial, false, translation(".add_serial"), translation(".add_serial_sub"),
               translation(".add_serial_cta"), edit_path("bike_details"))
@@ -54,7 +59,7 @@ module Pages
           end
 
           def police_item
-            if police_report?
+            if @stolen_record.police_report?
               Item.new(:police, true, translation(".police_added"), nil, nil, nil)
             else
               Item.new(:police, false, translation(".add_police"), nil, translation(".add_police_cta"),
@@ -72,34 +77,16 @@ module Pages
             done ? "tw:border-blue-600 tw:bg-blue-600 tw:text-white" : "tw:border-gray-300 tw:bg-white tw:dark:border-gray-600 tw:dark:bg-gray-800"
           end
 
-          def serial_unknown? = @bike.serial_unknown?
-
-          def police_report? = @stolen_record.police_report_number.present?
-
-          # The police services need a serial to search on, so a report without one isn't sent
-          def submitted_to_police_services? = police_report? && !serial_unknown?
-
-          # Only the Netherlands has reporting instructions we can give
-          def netherlands_instructions? = !police_report? && @stolen_record.country == Country.netherlands
-
-          def theft_alert? = @stolen_record.theft_alerts.any?
+          def netherlands_instructions? = @stolen_record.netherlands? && !@stolen_record.police_report?
 
           def edit_path(template, **) = edit_bike_path(@bike, edit_template: template, **)
 
-          def share_text = translation(".share_text", title: @bike.title_string, city:)
-
-          def share_url = bike_url(@bike)
-
-          def facebook_url = "https://www.facebook.com/sharer/sharer.php?#{{u: share_url}.to_query}"
-
-          def nextdoor_url = "https://nextdoor.com/sharekit/?#{{source: "bikeindex", body: "#{share_text} #{share_url}"}.to_query}"
-
-          def cheapest_plan
-            @cheapest_plan ||= TheftAlertPlan.active.in_language(I18n.locale).price_ordered_asc.first
-          end
-
-          def organization_stolen_message?
-            @stolen_record.organization_stolen_message&.shown_to?(@stolen_record)
+          def share_text
+            if @stolen_record.city.present?
+              translation(".share_text", title: @bike.title_string, city: @stolen_record.city)
+            else
+              translation(".share_text_without_city", title: @bike.title_string)
+            end
           end
         end
       end

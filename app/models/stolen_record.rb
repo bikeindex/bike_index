@@ -268,6 +268,21 @@ class StolenRecord < ApplicationRecord
     street.blank?
   end
 
+  def police_report? = police_report_number.present?
+
+  # The police services search on the serial, so a report without one isn't sent
+  def submitted_to_police_services? = police_report? && !bike.serial_unknown?
+
+  # Only the Netherlands has police reporting instructions we can give
+  def netherlands? = country == Country.netherlands
+
+  # An unpaid alert is an abandoned checkout
+  def theft_alert_paid_or_admin? = theft_alerts.paid_or_admin.any?
+
+  def shown_organization_stolen_message
+    organization_stolen_message if organization_stolen_message&.shown_to?(self)
+  end
+
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
     self.secondary_phone = Phonifyer.phonify(secondary_phone)

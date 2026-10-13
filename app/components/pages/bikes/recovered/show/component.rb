@@ -19,10 +19,6 @@ module Pages
           def cycle_type = @bike.type
 
           def bike_name = @bike.frame_model.presence || @bike.mnfg_name.presence || @bike.type_titleize
-
-          def share_url = new_register_url
-
-          def facebook_url = "https://www.facebook.com/sharer/sharer.php?#{{u: share_url}.to_query}"
         end
       end
     end

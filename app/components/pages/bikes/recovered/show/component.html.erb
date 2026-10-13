@@ -114,13 +114,8 @@
 
       <p class="tw:mb-4 tw:text-sm"><%= translation(".spread_body") %></p>
 
-      <div class="tw:mt-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2.5">
-        <%= render UI::ButtonLink::Component.new(href: facebook_url, text: translation(".facebook"), color: :primary,
-            html_class: "tw:rounded-full!", target: "_blank", rel: "noopener") %>
-
-        <div class="tw:w-36">
-          <%= render Pages::Registrations::Show::Share::Component.new(text: translation(".copy_link"), url: share_url) %>
-        </div>
+      <div class="tw:mt-auto">
+        <%= render Pages::Bikes::StolenReport::ShareButtons::Component.new(url: new_register_url) %>
       </div>
     </div>
   </div>
