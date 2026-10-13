@@ -6845,6 +6845,8 @@ nl:
           jurisdiction: Rechtsgebied
           out_of_class_label: Buiten de les
           united_states: Verenigde Staten
+          any_market: Elke markt
+          market: Markt
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
