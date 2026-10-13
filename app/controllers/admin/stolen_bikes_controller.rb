@@ -72,7 +72,7 @@ module Admin
         @stolen_record = StolenRecord.unscoped.find(params[:id])
         @bike = Bike.unscoped.find_by_id(@stolen_record.bike_id)
       else
-        @bike = Bike.unscoped.find_by_id(params[:id])
+        @bike = Bike.unscoped.find(params[:id])
         @stolen_record = @bike.current_stolen_record
       end
       @current_stolen_record = @stolen_record.present? && @stolen_record.id == @bike.current_stolen_record&.id

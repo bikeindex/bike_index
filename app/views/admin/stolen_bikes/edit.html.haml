@@ -2,7 +2,7 @@
 
 = render partial: "/admin/social_accounts/errored"
 
-= render Pages::Admin::Bikes::TheftAlertImages::Component.new(bike: @bike, stolen_record: @stolen_record, return_to: url_for)
+= render Pages::Admin::Bikes::TheftAlertImages::Component.new(bike: @bike, stolen_record: @stolen_record, return_to: request.fullpath)
 
 %hr
 

@@ -74,6 +74,22 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(response).to render_template("edit")
           expect(flash).to_not be_present
         end
+
+        context "with a photo" do
+          let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+          it "returns from the photo edit to the stolen record" do
+            get "#{base_url}/#{recovered_record.id}/edit?stolen_record_id=1"
+            href = Nokogiri::HTML(response.body).at_css("a:contains('user edit')")["href"]
+            expect(Rack::Utils.parse_query(URI(href).query)["return_to"]).to eq "/admin/stolen_bikes/#{recovered_record.id}/edit?stolen_record_id=1"
+          end
+        end
+      end
+
+      context "with no bike" do
+        it "responds 404" do
+          get "#{base_url}/#{bike.id + 1000}/edit"
+          expect(response.code).to eq("404")
+        end
       end
     end
 
