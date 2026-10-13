@@ -1,8 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='landing-pages--education'
-// Steps share one grid cell so the card keeps its height, which is why they're switched by
-// visibility here rather than through collapse_utils' display toggle
+// Steps are switched by visibility rather than collapse_utils' display toggle, which would
+// collapse the grid cell they share
 export default class extends Controller {
   static targets = ['step', 'summary', 'continue', 'done']
 
@@ -35,8 +35,7 @@ export default class extends Controller {
     this.show(0)
   }
 
-  // An index past the last step is the done panel, which only a step left unchecked
-  // (unchecked on the way back) keeps the rider from
+  // An index past the last step is the done panel, which a step still unchecked turns the rider back from
   show (index) {
     const incomplete = this.stepTargets.findIndex(step => !this.complete(step))
     this.index = (index >= this.stepTargets.length && incomplete !== -1) ? incomplete : index
