@@ -3,14 +3,17 @@
 module Pages
   module LandingPages
     module ForCitiesEducation
-      # The e-bike education flow as three example organizations would set it up. Every step renders,
-      # and the landing-pages--education controller walks through them
+      # The e-bike education flow as three example organizations would set it up
       class Component < ApplicationComponent
         DEFAULT_ORGANIZATION = :school
+        # Here rather than on the cities page, which would put that page in this cached fragment's digest
+        STICKER_CLASSES = "tw:flex tw:items-center tw:gap-4 tw:rounded-lg tw:border-3 tw:border-black tw:bg-white tw:px-5 tw:py-4.5 tw:shadow-[4px_4px_0_#111] tw:dark:bg-gray-800"
 
         private
 
-        def organizations
+        def organizations = @organizations ||= build_organizations
+
+        def build_organizations
           city = translation(".city_name")
           school = translation(".school_name")
           housing = translation(".housing_name")
@@ -24,26 +27,27 @@ module Pages
           ]
         end
 
-        def battery(set_by, sub)
-          {category: translation(".battery_category"), title: translation(".battery_title"), sub:, set_by:, detected: true,
-           rules: [translation(".battery_rule_charger"), translation(".battery_rule_unattended"), translation(".battery_rule_flammable")]}
+        def battery(set_by, sub, rules = [translation(".battery_rule_charger"), translation(".battery_rule_unattended"), translation(".battery_rule_flammable")])
+          {category: translation(".battery_category"), title: translation(".battery_title"), sub:, set_by:, detected: true, rules:}
         end
 
         def housing_battery(set_by)
-          {category: translation(".battery_category"), title: translation(".battery_title"), sub: translation(".housing_battery_sub"),
-           set_by:, detected: true,
-           rules: [translation(".housing_battery_rule_room"), translation(".housing_battery_rule_certified"), translation(".housing_battery_rule_report")]}
+          battery(set_by, translation(".housing_battery_sub"),
+            [translation(".housing_battery_rule_room"), translation(".housing_battery_rule_certified"), translation(".housing_battery_rule_report")])
         end
 
+        # Titled by its category, which the template falls back to
+        def riding(set_by, sub, rules) = {category: translation(".riding_category"), sub:, set_by:, rules:}
+
         def city_riding(set_by)
-          {category: translation(".riding_category"), title: translation(".riding_category"), sub: translation(".city_riding_sub"), set_by:,
-           rules: [translation(".city_riding_rule_helmet"), translation(".city_riding_rule_lanes"), translation(".city_riding_rule_sidewalks")]}
+          riding(set_by, translation(".city_riding_sub"),
+            [translation(".city_riding_rule_helmet"), translation(".city_riding_rule_lanes"), translation(".city_riding_rule_sidewalks")])
         end
 
         def school_riding(set_by)
-          {category: translation(".riding_category"), title: translation(".riding_category"), sub: translation(".school_riding_sub"), set_by:,
-           rules: [translation(".school_riding_rule_helmet"), translation(".school_riding_rule_passenger"),
-             translation(".school_riding_rule_traffic"), translation(".school_riding_rule_guardian")]}
+          riding(set_by, translation(".school_riding_sub"),
+            [translation(".school_riding_rule_helmet"), translation(".school_riding_rule_passenger"),
+              translation(".school_riding_rule_traffic"), translation(".school_riding_rule_guardian")])
         end
 
         def city_rules(set_by)
@@ -69,7 +73,6 @@ module Pages
            set_by: translation(".bike_index"), rules: [translation(".consent_rule_read"), translation(".consent_rule_agree")]}
         end
 
-        # Each step renders its own, so walking through the steps needs no script to fill it
         def progress(filled:, total:, label:)
           bar = tag.div(class: "tw:mb-3 tw:grid tw:grid-flow-col tw:auto-cols-fr tw:gap-1.5", aria: {hidden: true}) do
             safe_join((1..total).map { tag.span(class: "tw:h-1.25 tw:rounded-sm #{(it <= filled) ? "tw:bg-purple-500" : "tw:bg-gray-200 tw:dark:bg-gray-700"}") })

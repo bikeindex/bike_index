@@ -13,7 +13,7 @@ export default class extends Controller {
 
   check (event) {
     const step = this.stepTargets.find(step => step.contains(event.target))
-    step.querySelector('[data-landing-pages--education-target=continue]').disabled = !this.complete(step)
+    this.continueTargets[this.stepTargets.indexOf(step)].disabled = !this.complete(step)
   }
 
   next () {
@@ -49,11 +49,7 @@ export default class extends Controller {
     this.summaryTargets.forEach((summary, summaryIndex) => {
       summary.disabled = summaryIndex > this.reached
       summary.toggleAttribute('data-passed', summaryIndex < this.index && this.complete(this.stepTargets[summaryIndex]))
-      if (summaryIndex === this.index) {
-        summary.setAttribute('aria-current', 'step')
-      } else {
-        summary.removeAttribute('aria-current')
-      }
+      summary.ariaCurrent = summaryIndex === this.index ? 'step' : null
     })
   }
 

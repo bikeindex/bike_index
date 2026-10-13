@@ -10,14 +10,12 @@ module Pages
         INTRO_CLASSES = "tw:text-[17px] tw:leading-relaxed tw:text-pretty tw:text-gray-600 tw:dark:text-gray-300"
         CARD_CLASSES = "tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-6 tw:shadow-sm tw:dark:border-gray-700 tw:dark:bg-gray-800"
         ICON_DISC_CLASSES = "tw:flex tw:size-11 tw:flex-none tw:items-center tw:justify-center tw:rounded-full tw:text-white"
-        # A comic panel, like the drawn illustrations it holds
-        STICKER_CLASSES = "tw:flex tw:items-center tw:gap-4 tw:rounded-lg tw:border-3 tw:border-black tw:bg-white tw:px-5 tw:py-4.5 tw:shadow-[4px_4px_0_#111] tw:dark:bg-gray-800"
-        FEEDBACK_TYPE = "lead_for_city"
+        NEW_CLASSES = "tw:rounded-full tw:bg-[#ffd660] tw:px-2.5 tw:py-0.5 tw:text-xs tw:font-bold tw:text-slate-900"
         MODAL_ID = "cities-demo-modal"
         # Digits and what a written number puts between them, "x" for an extension
         PHONE_PATTERN = "[0-9 +\\(\\)\\.x\\-]*"
 
-        # checker_state: the visitor's state, from their location, which the checker starts on
+        # checker_state: the abbreviation of the visitor's state, which the checker starts on
         def initialize(feedback: Feedback.new, current_user: nil, checker_state: nil)
           @feedback = feedback
           @current_user = current_user

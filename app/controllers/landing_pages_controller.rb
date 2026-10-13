@@ -7,7 +7,7 @@ class LandingPagesController < ApplicationController
   end
 
   def for_cities
-    @checker_state = EbikeRuleServices::StateLaws.state_from_location(request_location_hash)
+    @checker_state = EbikeRuleServices::StateLaws.state_from_location(request_location_hash)&.dig(:abbr)
   end
 
   protected
