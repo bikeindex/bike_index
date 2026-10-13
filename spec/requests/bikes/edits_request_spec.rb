@@ -199,7 +199,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(response).to redirect_to(new_bike_theft_alert_path(bike_id: bike.id))
       expect(flash).to be_blank
     end
-    it "doesn't offer a Promoted Alert after a page that just did, and opens the recovery when asked" do
+    it "doesn't offer a Promoted Alert after a page that just did, and sends recovering to its form" do
       get "#{base_url}?edit_template=theft_details&alert_offered=true"
       expect(response.body).to_not match("tryAPromotedAlert")
       # Saving redirects without the param, and the offer still counts as made
@@ -207,9 +207,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(response.body).to_not match("tryAPromotedAlert")
 
       get "#{base_url}?edit_template=report_recovered"
-      expect(response.body).to_not include('"toggle-stolen").modal("show")')
-      get "#{base_url}?edit_template=report_recovered&open_recovery=true"
-      expect(response.body).to include('"toggle-stolen").modal("show")')
+      expect(response).to redirect_to new_bike_recovered_path(bike.id)
     end
 
     context "recovered bike" do
@@ -259,10 +257,10 @@ RSpec.describe Bikes::EditsController, type: :request do
         # can't use the let block
         bc = Bikes::EditsController.new
         bc.instance_variable_set(:@bike, Bike.new(status: "status_stolen"))
-        # Don't test alert templates, they're in theft alerts controller
-        bc.edit_templates.keys - %w[alert alert_purchase_confirmation]
+        # Don't test alert templates, they're in theft alerts controller - or the recovery, which has its own
+        bc.edit_templates.keys - %w[alert alert_purchase_confirmation report_recovered]
       end
-      let(:no_global_alert_templates) { %w[theft_details photos report_recovered remove] }
+      let(:no_global_alert_templates) { %w[theft_details photos remove] }
       before { FactoryBot.create_list(:theft_alert_plan, 3) }
       it "renders the template" do
         # Ensure stolen bike is set up correctly

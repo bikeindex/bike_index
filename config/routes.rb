@@ -243,7 +243,7 @@ Rails.application.routes.draw do
       put :resolve_token
     end
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
-    resource :recovered, only: %i[show], controller: "bikes/recovered"
+    resource :recovered, only: %i[new create show], controller: "bikes/recovered"
     resource :theft_alert, only: %i[new create show], controller: "bikes/theft_alerts"
   end
   get "bikes/:id/edit(/:edit_template)", to: "bikes/edits#show", as: :edit_bike
