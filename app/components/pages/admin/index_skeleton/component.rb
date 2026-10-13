@@ -18,8 +18,7 @@ module Pages
           table_view: nil,
           chart_collection: nil,
           header_content: nil,
-          count_detail: nil,
-          skip_period_select: false
+          count_detail: nil
         )
           @index = index
           @collection = collection
@@ -35,7 +34,6 @@ module Pages
           @chart_collection = chart_collection
           @header_content = header_content
           @count_detail = count_detail
-          @skip_period_select = skip_period_select
         end
 
         private

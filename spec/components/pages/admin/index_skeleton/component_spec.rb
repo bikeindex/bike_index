@@ -52,20 +52,6 @@ RSpec.describe Pages::Admin::IndexSkeleton::Component, type: :component do
     end
   end
 
-  describe "period select" do
-    it "renders the period links by default" do
-      expect(component).to have_css("a", text: "past hour")
-    end
-
-    context "with skip_period_select" do
-      let(:options) { super().merge(skip_period_select: true) }
-
-      it "does not render the period links" do
-        expect(component).not_to have_css("a", text: "past hour")
-      end
-    end
-  end
-
   describe "nav_header_list_items" do
     let(:options) { super().merge(nav_header_list_items: '<li class="nav-item"><a class="nav-link" href="#">Custom</a></li>'.html_safe) }
 

@@ -28,13 +28,15 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(assigns(:stolen_records)).to match_array([])
       end
 
-      context "with a period param" do
-        it "ignores it, since there's no period select" do
+      context "with a period" do
+        it "narrows by it" do
           stolen_record.update_column :created_at, 1.month.ago
+          get base_url
+          expect(assigns(:stolen_records)).to match_array([stolen_record])
+          expect(response.body).to include("period=week")
           get "#{base_url}?period=week"
           expect(response.code).to eq("200")
-          expect(assigns(:stolen_records)).to match_array([stolen_record])
-          expect(assigns(:period)).to eq "all"
+          expect(assigns(:stolen_records)).to match_array([])
         end
       end
 

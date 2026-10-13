@@ -36,11 +36,9 @@
   <% end %>
 <% end %>
 
-<% unless @skip_period_select %>
-  <div class="mt-2 mb-4 tw:flex tw:justify-end">
-    <%= render UI::PeriodSelect::Component.new(period: @index.period, start_time: @index.start_time, end_time: @index.end_time, sortable_search_params:) %>
-  </div>
-<% end %>
+<div class="mt-2 mb-4 tw:flex tw:justify-end">
+  <%= render UI::PeriodSelect::Component.new(period: @index.period, start_time: @index.start_time, end_time: @index.end_time, sortable_search_params:) %>
+</div>
 
 <% if @admin_search_form.present? %>
   <%= @admin_search_form %>

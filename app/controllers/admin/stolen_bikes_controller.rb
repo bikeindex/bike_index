@@ -128,16 +128,10 @@ module Admin
 
       @time_range_column = sort_column if %w[date_stolen].include?(sort_column)
       @time_range_column ||= "created_at"
-      @available_stolen_records = available_stolen_records
+      @available_stolen_records = available_stolen_records.where(@time_range_column => @time_range)
     end
 
     private
-
-    # There's no period select, so a ?period= left on a URL can't narrow it
-    def set_period
-      @period = "all"
-      super
-    end
 
     def require_index_admin!
       ability = BULK_ACTIONS.dig(params[:bulk_action], :ability) if action_name == "bulk_update"
