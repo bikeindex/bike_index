@@ -4,9 +4,6 @@ module Pages
   module Admin
     module StolenBikes
       module Table
-        # The admin stolen bikes index: a card of stolen records with a column picker, columns that
-        # reorder by dragging their headers, and the approve, spam and delete actions for the
-        # checked rows above and below the table
         class Component < ApplicationComponent
           COLUMNS = {
             photo_cell: "Photo",
@@ -30,9 +27,8 @@ module Pages
             def always_visible?(_cell_name) = false
           end
 
-          def initialize(stolen_records:, pagy:, sort_state:)
+          def initialize(stolen_records:, sort_state:)
             @stolen_records = stolen_records
-            @pagy = pagy
             @sort_state = sort_state
           end
 
@@ -57,8 +53,7 @@ module Pages
 
           def card_data_attributes
             {controller: "table-multi-checkbox ui--collapse org--search-column-settings table-column-order",
-             action: "keydown.enter->table-multi-checkbox#ignoreCheckboxEnter " \
-               "dragstart->table-column-order#dragStart dragover->table-column-order#dragOver " \
+             action: "dragstart->table-column-order#dragStart dragover->table-column-order#dragOver " \
                "drop->table-column-order#drop dragend->table-column-order#dragEnd",
              "ui--collapse-storage-key-value": "adminStolenBikesColumnsOpen",
              "org--search-column-settings-storage-key-value": "adminStolenBikesColumns",
@@ -68,8 +63,8 @@ module Pages
 
           def location(stolen_record)
             place = [stolen_record.city, stolen_record.region, stolen_record.postal_code].compact_blank.first
-            country = stolen_record.country
-            [place, (country.iso if country.present? && !country.united_states?)].compact.join(", ")
+            iso = stolen_record.country_iso
+            [place, (iso unless iso == "US")].compact.join(", ")
           end
         end
       end

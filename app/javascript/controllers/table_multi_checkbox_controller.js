@@ -4,6 +4,14 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static targets = ['checkbox']
 
+  connect () {
+    this.element.addEventListener('keydown', this.ignoreCheckboxEnter)
+  }
+
+  disconnect () {
+    this.element.removeEventListener('keydown', this.ignoreCheckboxEnter)
+  }
+
   toggleAll (event) {
     event.preventDefault()
     // Disabled checkboxes can't be selected
@@ -12,7 +20,7 @@ export default class extends Controller {
   }
 
   // Enter in a checkbox would submit the form through its first button, a bulk action
-  ignoreCheckboxEnter (event) {
-    if (event.target.type === 'checkbox') event.preventDefault()
+  ignoreCheckboxEnter = (event) => {
+    if (event.key === 'Enter' && event.target.type === 'checkbox') event.preventDefault()
   }
 }

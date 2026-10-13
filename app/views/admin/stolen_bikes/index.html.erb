@@ -39,7 +39,7 @@
     </p>
   <% end %>
 
-  <%= render(Pages::Admin::StolenBikes::Table::Component.new(stolen_records: @stolen_records, pagy: @pagy, sort_state:)) %>
+  <%= render(Pages::Admin::StolenBikes::Table::Component.new(stolen_records: @stolen_records, sort_state:)) %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(

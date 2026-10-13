@@ -12,18 +12,12 @@
   class: "tw:mb-4 tw:overflow-hidden tw:rounded-xl #{UI::Card::Component::BASE_CLASSES}", data: card_data_attributes) do %>
   <div
     class="
-      tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-4
-      tw:gap-y-2 tw:px-4 tw:py-3
+      tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2 tw:px-4
+      tw:py-3
     "
   >
-    <p class="tw:mb-0">
-      <%= number_display(@pagy.count) %> <%= "match".pluralize(@pagy.count) %>
-    </p>
-
-    <div class="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-      <%= bulk_actions %>
-      <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
-    </div>
+    <%= bulk_actions %>
+    <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
   </div>
 
   <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings: column_settings)) %>

@@ -140,10 +140,9 @@ module Admin
 
     # Each returns how many it changed
     def bulk_approve(stolen_records)
-      stolen_records.each do |stolen_record|
-        stolen_record.update_attribute :approved, true
-        BikeJobs::ApproveStolenListingJob.perform_async(stolen_record.bike_id)
-      end.size
+      stolen_records.each { it.update_attribute :approved, true }
+      BikeJobs::ApproveStolenListingJob.perform_bulk(stolen_records.map { [it.bike_id] })
+      stolen_records.size
     end
 
     def bulk_spam(stolen_records)
