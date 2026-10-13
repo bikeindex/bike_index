@@ -868,7 +868,7 @@
     </div>
   </section>
 
-  <%# Contact %>
+  <%# Contact. Its bottom padding also covers the page's -mb-18, so the space below matches the space above %>
   <section
     id="contact"
     class="
@@ -876,7 +876,7 @@
       tw:dark:border-gray-700 tw:dark:bg-gray-900
     "
   >
-    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-center tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
+    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-center tw:gap-12 tw:pt-20 tw:pb-38 <%= SECTION_CLASSES %>">
       <div>
         <h2 class="<%= HEADING_CLASSES %>">
           <%= translation(".contact_heading") %>
@@ -912,6 +912,13 @@
           <p class="tw:mt-2 tw:text-[15px] tw:text-gray-600 tw:dark:text-gray-300">
             <%= translation(".sent_body") %>
           </p>
+
+          <a
+            href="<%= for_cities_path %>"
+            class="twlink tw:mt-4 tw:inline-block tw:text-sm tw:font-semibold"
+          >
+            <span aria-hidden="true">←</span> <%= translation(".back_to_cities") %>
+          </a>
         </div>
 
         <div class="tw:text-center tw:peer-target:hidden">
