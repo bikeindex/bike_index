@@ -217,6 +217,17 @@ RSpec.describe CustomerMailer, type: :mailer do
       stolen_notification.reload
       expect(stolen_notification.send_dates[1]).to be > stolen_notification.updated_at.to_i - 2
     end
+
+    # Honeybadger 135003447: the bike box read the token off a nil current_ownership
+    context "bike without a current ownership" do
+      let!(:bike) { FactoryBot.create(:stolen_bike) }
+
+      it "renders the bike link without a token" do
+        expect(bike.current_ownership).to be_nil
+        mail = CustomerMailer.stolen_notification_email(stolen_notification)
+        expect(mail.deliver_now.html_part.body.to_s).to include(%(href="#{bike_url(bike)}"))
+      end
+    end
   end
 
   describe "updated_terms_email" do

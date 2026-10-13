@@ -1,5 +1,5 @@
 <% @ownership ||= @bike.current_ownership %>
-<% bike_url_path ||= bike_url(@bike, t: @ownership.token) %>
+<% bike_url_path ||= bike_url(@bike, t: @ownership&.token) %>
 <% bike_url_path = @email_preview_tokenized_url if @email_preview %>
 <% thumb_url = @bike.thumb_path || @bike.stock_photo_url %>
 
