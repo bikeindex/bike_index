@@ -19,6 +19,10 @@ allowed-tools: Bash(gh:*), Bash(rtk proxy gh:*), Bash(ruby .claude/skills/github
 
 **There's no upload-only call**: assets upload as part of posting, so callers hand over a body that references local paths, never URLs they need back first.
 
+## Who runs this
+
+From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — `model: "sonnet"` (it works out which comment and which upload route) — briefed with the PR number and either a composed body file referencing local image paths or the images plus where they go. It replies with the comment (or PR) URL and Step 4's verification result.
+
 ## Preflight: which route this run takes
 
 `$CLAUDE_CODE_REMOTE` decides which, before anything else here.

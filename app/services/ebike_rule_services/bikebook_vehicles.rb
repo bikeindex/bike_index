@@ -21,8 +21,7 @@ module EbikeRuleServices
       modes = motors.flat_map { it["operating_modes"] || [] }
       throttle_modes = modes.select { it["mode"] == "throttle" }
       certifications = motors.map { it["certification"] }.join(", ")
-      # a single classification is schema 0.22's, which models not yet reconciled to 0.23 still carry
-      classifications = modes.flat_map { Array(it["e_vehicle_classifications"] || it["e_vehicle_classification"]) }.uniq
+      classifications = modes.flat_map { Array(it["e_vehicle_classifications"]) }.uniq
       {
         bikebook_id: record["id"],
         manufacturer_name: record["manufacturer"],
@@ -32,7 +31,8 @@ module EbikeRuleServices
         class_unknown: classifications.grep_v(BikebookCatalog::E_BIKE_LAW).none? && mph(modes).nil?,
         e_vehicle_classifications: classifications,
         # a state's cap is on the motors together
-        watts: motors.filter_map { it["rated_power"] }.then { it.sum if it.any? },
+        watts: total(motors, "rated_power"),
+        peak_watts: total(motors, "peak_power"),
         top_assist_mph: mph(modes.select { it["mode"] == "assist" }),
         throttle: throttle_modes.any?,
         throttle_mph: mph(throttle_modes),
@@ -59,11 +59,13 @@ module EbikeRuleServices
       throttle_modes.any? ? 2 : 1
     end
 
+    def total(motors, power) = motors.filter_map { it[power] }.then { it.sum if it.any? }
+
     def mph(modes)
       kilometers = modes.filter_map { it["max_speed"] }.max
       kilometers && UnitSystem.kilometers_to_miles(kilometers).round
     end
 
-    conceal :attributes_from, :e_bike_class, :mph
+    conceal :attributes_from, :e_bike_class, :total, :mph
   end
 end

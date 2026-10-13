@@ -5,6 +5,16 @@ require "rails_helper"
 RSpec.describe EbikeRuleServices::BikebookVehicles do
   before { stub_bikebook_catalog }
 
+  # Level 2 as the catalog would publish it without classifications, each mode changed by the block
+  def stub_unclassified_level_2
+    block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
+    block["models"]["m/aventon/2022/level_2"]["motors"].flat_map { it["operating_modes"] }.each do |mode|
+      mode.delete("e_vehicle_classifications")
+      yield mode if block_given?
+    end
+    WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2022.json").to_return(body: block.to_json)
+  end
+
   describe "find" do
     it "reads a model's class, motor, speeds and certifications" do
       bike = described_class.find("m/specialized/2025/haul_st")
@@ -15,8 +25,10 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
     end
 
     it "classes an unclassified model by its speeds" do
+      stub_unclassified_level_2
+
       expect(described_class.find("m/aventon/2022/level_2"))
-        .to have_attributes(e_bike_class: 1, watts: 500, top_assist_mph: 20, throttle: false)
+        .to have_attributes(e_bike_class: 2, class_unknown: false, watts: 500, top_assist_mph: 20, throttle: true)
     end
 
     it "gives no class to a model too fast for one, whose motors' power is their total" do
@@ -25,16 +37,14 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
     end
 
     it "can't tell the class of an unclassified model with no speeds" do
-      block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
-      block["models"]["m/aventon/2022/level_2"]["motors"].each { it["operating_modes"].each { it.delete("max_speed") } }
-      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2022.json").to_return(body: block.to_json)
+      stub_unclassified_level_2 { it.delete("max_speed") }
 
       expect(described_class.find("m/aventon/2022/level_2")).to have_attributes(e_bike_class: nil, class_unknown: true)
     end
 
     it "gives no class to a model classified as something else" do
       expect(described_class.find("m/sur_ron/2026/ultra_bee_hp_x_us"))
-        .to have_attributes(e_bike_class: nil, class_unknown: false, e_vehicle_classifications: %w[evc/us/ca/off_highway_electric_motorcycle evc/off_highway_motorcycle])
+        .to have_attributes(e_bike_class: nil, class_unknown: false, e_vehicle_classifications: %w[evc/off_highway_motorcycle])
     end
 
     it "is nil for a model the catalog lacks, a model without a motor, and no id" do

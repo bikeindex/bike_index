@@ -26,7 +26,7 @@ const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
 
 // The blocks `ids` are in load alongside the index rather than after it
-async function load ({ manifestUrl, ids }) {
+async function load ({ manifestUrl, ids, jurisdictions }) {
   manifest = await fetchJson(manifestUrl)
   if (manifest.format !== FORMAT) throw new Error(`catalog format ${manifest.format} isn't ${FORMAT}`)
 
@@ -46,16 +46,20 @@ async function load ({ manifestUrl, ids }) {
     sortPrice: model.msrp_cents ?? 0
   }))
   byId = new Map(models.map((model) => [model.id, model]))
-  // "US-CA Moped", which a 0.22 catalog's names leave off the jurisdiction of, and a group has none; "US Class 3 e-bike"
-  classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications ?? {}).map(([id, record]) => {
-    const label = [record.jurisdiction, record.name].filter(Boolean).join(' ')
-    return [id, { ...record, label, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
+  // "California Moped", which its name leaves off the state of, and a group has none; "US Class 3 e-bike"
+  classifications = Object.fromEntries(Object.entries(vocabulary.e_vehicle_classifications).map(([id, record]) => {
+    const code = record.jurisdiction
+    const state = code?.startsWith('US-') && (jurisdictions[code] ?? code)
+    const label = [state || code, record.name].filter(Boolean).join(' ')
+    // "Alabama (AL)", "United States"
+    const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
+    return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
   }))
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index), modelsCount: models.length }
 }
 
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
-function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, ...filterOptions } }) {
+function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, market, ...filterOptions } }) {
   const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
   const perManufacturer = models.reduce((counts, { manufacturer }) => counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1), new Map())
   return {
@@ -63,14 +67,19 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
+    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b))),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
   }
 }
 
+const withYearRecords = (vehicle) => vehicle.years
+  ? { ...vehicle, years: Object.entries(vehicle.years).map(([year, record]) => ({ year: Number(year), ...record })).sort((a, b) => b.year - a.year) }
+  : vehicle
+
 // A failed fetch is forgotten, so the next ask tries again
 const block = (key) => {
   if (!blocks.has(key)) {
-    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => models, (error) => {
+    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(models).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
       blocks.delete(key)
       throw error
     }))
@@ -151,16 +160,19 @@ function filter (params) {
     (!params.suspension || (params.suspension === 'has' ? model.suspension !== 'rigid' : model.suspension === params.suspension)) &&
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
+    (!params.market || model.markets.includes(params.market)) &&
     (yearMin == null || model.sortYear >= yearMin) &&
     (yearMax == null || (model.first_year ?? 0) <= yearMax) &&
     ((priceMin == null && priceMax == null) || (model.msrp_cents > 0 &&
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class
-function propelled ({ electric, e_vehicle_classifications: classifications = [] }, propulsion) {
+// out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class.
+// A state's class matches the models carrying its groups
+function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
-  return classifications.includes(propulsion === 'out_of_class' ? propulsion : `evc/us/${propulsion}`)
+  const id = propulsion.replace(/^class_/, 'evc/us/class_')
+  return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {

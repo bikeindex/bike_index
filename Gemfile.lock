@@ -197,7 +197,7 @@ GEM
     css_parser (3.0.0)
       addressable
       ssrf_filter (~> 1.5)
-    csv (3.3.5)
+    csv (3.3.6)
     dartsass-rails (0.5.1)
       railties (>= 6.0.0)
       sass-embedded (~> 1.63)

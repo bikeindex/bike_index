@@ -6,8 +6,8 @@ import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
-const latest = (years) => years.reduce((found, year) => found && found.year > year.year ? found : year, null)
-const priced = (vehicle) => latest(array(vehicle.years).filter((year) => isNumber(year.original_msrp)))
+// years come newest first
+const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
 const currency = (vehicle) => priced(vehicle)?.original_msrp_currency ?? 'USD'
 const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(isNumber)) : null
 const motors = (key) => (vehicle) => highest(array(vehicle.motors).map((motor) => motor[key]))
@@ -41,7 +41,7 @@ const GEOMETRY = ['reach', 'stack', 'top_tube_effective', 'head_angle', 'seat_an
 // neither, and none for a value that isn't compared. `parts` splits a value whose parts are each compared, and
 // `amount` shows a difference, given the number it's of
 const SPECS = [
-  { label: 'Year', read: (vehicle) => latest(array(vehicle.years))?.year, better: 1, format: String },
+  { label: 'Year', read: (vehicle) => array(vehicle.years)[0]?.year, better: 1, format: String },
   {
     label: 'Price',
     read: (vehicle) => priced(vehicle)?.original_msrp,
@@ -57,8 +57,8 @@ const SPECS = [
   { label: 'Battery', read: motors('battery_size'), better: 1, unit: 'wh' },
   { label: 'Range', read: modes('range_claimed'), better: 1, unit: 'km' },
   { label: 'Top speed', read: modes('max_speed'), better: 1, unit: 'km/h' },
-  { label: 'Front travel', read: (vehicle, size) => size?.geometry?.travel_front ?? vehicle.suspension?.front_travel, better: 1, unit: 'mm' },
-  { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear_travel, better: 1, unit: 'mm' }
+  { label: 'Front travel', read: (vehicle, size) => size?.geometry?.travel_front ?? vehicle.suspension?.front?.travel, better: 1, unit: 'mm' },
+  { label: 'Rear travel', read: (vehicle, size) => size?.geometry?.travel_rear ?? vehicle.suspension?.rear?.travel, better: 1, unit: 'mm' }
 ]
 // the size's, so it closes the geometry
 const WEIGHT = { label: 'Weight', read: (vehicle, size) => size?.geometry?.total_weight, better: -1, unit: 'kg' }
@@ -174,7 +174,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
     columns: [
       { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
       ...named.map((vehicle, index) => {
-        const border = seriesBorder(frames[index], index)
+        const border = seriesBorder(frames, index)
         return {
           label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
           classes: 'tw:min-w-48 tw:align-top',

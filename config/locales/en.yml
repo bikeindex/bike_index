@@ -915,9 +915,6 @@ en:
           address_required: "(or location) of this abandoned bike required"
         payment:
           requires_email_or_org: Requires an email address or organization
-        recovery_display:
-          quote_too_long: That quote is too long. Please shorten it to be less than
-            300 characters
         theft_alert:
           must_be_later_than_start_time: must be later than start time
           must_be_present: must be present

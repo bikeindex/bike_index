@@ -15,7 +15,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status', 'tagline', 'countedTagline']
-  static values = { manifestUrl: String, failedText: String, title: String }
+  static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String }
 
   #scrolls = new Map()
   #renders = 0
@@ -30,7 +30,7 @@ export default class extends Controller {
     this.#stamp()
     const url = new URL(window.location.href)
     try {
-      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [])
+      this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue)
     } catch (error) {
       return this.#fail(error)
     }

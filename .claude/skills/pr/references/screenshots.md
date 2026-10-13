@@ -37,6 +37,10 @@ From the changed files, infer the affected routes. Heuristics:
 
 **Confirm the page renders what changed, before capturing it.** A page that looks like the obvious home for a component often isn't, and a shot that turns out not to contain the change wastes a whole capture round, base branch included. One `browser_evaluate` counting the component's own marker class settles it — filter on `offsetParent !== null`, or a closed tab panel's copy counts as on-screen (`/o/:slug/registrations/multi_search`'s `?` button is behind the Registration Stickers tab). A component with a preview is the reliable fallback.
 
+## Steps 2–4 run in one subagent
+
+**A subagent sent here skips this section.** Capturing, recapturing on the base and posting take dozens of turns, and each would re-read this session's whole conversation. Once step 1 has picked the URLs, hand steps 2–4 to one subagent the way `AGENTS.md`'s **Who runs this** describes — `model: "sonnet"` (it works out how to drive each page; the pages are chosen) — and wait for it. Its prompt says to follow `.claude/skills/pr/references/screenshots.md` from step 1's **Confirm the page renders what changed**, and gives it the `(url-path, page-slug)` pairs with any interaction steps and sign-in, which pages are new on this branch, `<base>`, `<number>`, the base label, and — when updating — which `### <url-path>` blocks to replace or drop. A page that doesn't render the change comes back unconfirmed rather than replaced: picking another is step 1's judgment, so choose one here (or ask the user) and continue the same agent with `SendMessage`. It replies with the comment URL, or the pages it couldn't capture and why. It closes the shared browser, so finish with any page this session still needs first.
+
 ## 2. Capture branch screenshots
 
 Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs from step 1. It handles dev-server check, sign-in, the seeded-user identity gate, viewport sizing, and per-PNG sanity checks, and returns the local PNG paths.

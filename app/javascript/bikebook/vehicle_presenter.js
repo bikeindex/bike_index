@@ -48,7 +48,7 @@ export class VehiclePresenter {
   }
 
   classificationName (id) {
-    return this.vocabulary.e_vehicle_classifications?.[id]?.label ?? id
+    return this.vocabulary.e_vehicle_classifications[id]?.label ?? id
   }
 
   // A classification's tooltip, whose heading links to `path(id)`
@@ -60,7 +60,7 @@ export class VehiclePresenter {
 
   // Each classification's name to its tooltip
   classificationTooltips (path) {
-    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications ?? {})
+    return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications)
       .map(([id, { label }]) => [label, this.classificationTooltip(id, path)]))
   }
 
@@ -68,7 +68,7 @@ export class VehiclePresenter {
   measurement (value, unit = null, key = null, { difference = false } = {}) {
     if (value === true) return '✓'
     if (value === false) return '❌'
-    if (Array.isArray(value)) return join(value, ', ')
+    if (Array.isArray(value)) return join(value.map((item) => this.measurement(item, unit, key)), ', ')
     const [, count, each] = (unit && typeof value === 'string' && value.match(/^(\d+) x (\d+(?:\.\d+)?)$/)) || []
     if (each) return join([`${count} × `, this.measurement(this.rounded(parseFloat(each)), unit, key, { difference })])
     if (typeof value !== 'number') return isTemplate(value) ? value : String(value ?? '')

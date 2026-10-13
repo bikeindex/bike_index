@@ -12,9 +12,9 @@ import { VehicleViewer } from 'bikebook/vehicle_viewer'
 /* global CSS */
 
 const LISTS = ['primary_activity', 'manufacturer', 'vehicle_type']
-const SINGLES = ['suspension', 'model_configuration']
+const SINGLES = ['suspension', 'model_configuration', 'market']
 const RANGES = ['year_min', 'year_max', 'price_min', 'price_max']
-const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'year_dir', 'price_dir']
+const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'jurisdiction', 'year_dir', 'price_dir']
 // rather than the kit's max_compare, which the catalog publishes as 3
 const MAX_COMPARE = 5
 
@@ -36,11 +36,17 @@ export async function hydrate (catalog, source, shell, url) {
     const slugs = filters[name].split(',').map((value) => kit.slug_aliases[name]?.[value] ?? value)
     filters[name] = [...new Set(slugs.filter((value) => values.has(value)))].join(',')
   }
+  // "all" is Any, which the URL carries only when the visitor's country is a market with models
+  const panel = root.querySelector('[data-controller~="bikebook--catalog-filters"]')
+  const marketAttribute = 'data-bikebook--catalog-filters-default-market-value'
+  const located = panel.getAttribute(marketAttribute)
+  const defaultMarket = catalog.options.market.some(({ value, count }) => value === located && count) ? located : ''
+  panel.setAttribute(marketAttribute, defaultMarket)
+  filters.market = filters.market === 'all' ? '' : filters.market || defaultMarket
   const [found, { filteredCount }] = await Promise.all([catalog.vehicles(params.get('vehicle_models')?.split(',') ?? []), catalog.search(filters, 0, 0)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const values = vehicles.map(({ value }) => value).join(',')
 
-  const panel = root.querySelector('[data-controller~="bikebook--catalog-filters"]')
   for (const field of ['year', 'price']) panel.setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
   renderInto(root.getElementById('vehicle-models-count'), matching(filteredCount))
   const manufacturers = catalog.options.manufacturer.length
@@ -56,13 +62,15 @@ export async function hydrate (catalog, source, shell, url) {
     if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display
   }
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
-  for (const value of filters.electric.split(',')) root.querySelector(`input[name="electric"][value="${CSS.escape(value)}"]`)?.setAttribute('checked', '')
+  root.getElementById('filter-jurisdiction').querySelector(`option[value="${CSS.escape(filters.jurisdiction)}"]`)?.setAttribute('selected', '')
+  // out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
+  for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 
   const viewer = new VehicleViewer(kit, catalog.vocabulary)
   const classificationPath = viewer.classificationPath(url, vehicles.map(({ value }) => value))
-  for (const input of root.querySelectorAll('input[name="electric"][value^="class_"]')) {
-    const id = `evc/us/${input.value}`
-    const classification = catalog.vocabulary.e_vehicle_classifications?.[id]
+  for (const input of root.querySelectorAll('input[name="electric"]')) {
+    const id = input.value.replace(/^class_/, 'evc/us/class_')
+    const classification = catalog.vocabulary.e_vehicle_classifications[id]
     if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id, classificationPath) })))
   }
 
