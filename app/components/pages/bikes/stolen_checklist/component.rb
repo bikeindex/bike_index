@@ -17,9 +17,6 @@ module Pages
         BOX_CLASSES = "tw:absolute tw:top-0.5 tw:left-1 tw:block tw:min-h-6 tw:min-w-6 " \
           "tw:rounded-full tw:border-2 tw:border-[#919197] tw:bg-white tw:text-center " \
           "tw:leading-5 tw:text-[#919197]"
-        # The sub-list's marker is a dash rather than a circle
-        DASH_CLASSES = "tw:absolute tw:top-3 tw:left-1 tw:block tw:min-h-[0.2em] tw:min-w-6 " \
-          "tw:border-2 tw:border-[#919197] tw:bg-[#919197]"
 
         def initialize(bike:, stolen_record:)
           @bike = bike
@@ -45,29 +42,13 @@ module Pages
           tag.span(completed ? "✓" : "", class: "checklist-checkbox #{BOX_CLASSES}")
         end
 
-        def dash = tag.span("", class: "checklist-uncheckbox #{DASH_CLASSES}")
-
         def serial_unknown? = @bike.serial_unknown?
-
-        def police_report? = @stolen_record.police_report_number.present?
 
         def street? = @stolen_record.street.present?
 
         def images? = @bike.public_images.any?
 
-        # The police services need a serial to search on, so a report without one isn't sent
-        def submitted_to_police_services? = police_report? && !serial_unknown?
-
-        def netherlands? = @stolen_record.country == Country.netherlands
-
         def approved? = @stolen_record.approved
-
-        def theft_alert? = @stolen_record.theft_alerts.any?
-
-        def organization_stolen_message
-          @stolen_record.organization_stolen_message if
-            @stolen_record.organization_stolen_message&.shown_to?(@stolen_record)
-        end
 
         def edit_path(template, anchor: nil)
           edit_bike_url(id: @bike.to_param, edit_template: template, anchor:)

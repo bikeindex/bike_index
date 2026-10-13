@@ -22,13 +22,11 @@ en:
             alerted: >-
               We've alerted bike shops, police partners and riders near %{city}. Here's
               what's done and what you can still do to improve your chances.
-            copy_link: Copy link
-            facebook: Facebook
             from_html: From %{amount}
             keep_us_posted: Please keep us posted if your %{bike_type} is recovered.
             keep_us_posted_body: >-
-              Marking it recovered takes down the alert and helps us learn what works
-              for getting bikes home. We're sorry this happened, and we're wishing
+              Marking it recovered takes down the alert and helps us learn what brings
+              a stolen %{bike_type} home. We're sorry this happened, and we're wishing
               you the best of luck.
             law_enforcement: Sent to law enforcement databases when you add your police
               report number
@@ -45,17 +43,7 @@ en:
             mark_recovered: Mark as recovered
             marked_stolen_html: Your %{bike_type} is now marked %{stolen}.
             more_ways_to_share: More ways to share
-            nextdoor: Nextdoor
-            nl_digid_required: "(DigiD required)"
             nl_file_police_report: File a police report
-            nl_online: Online
-            nl_person: In person
-            nl_person_report: Search for the closest police station,
-            nl_phone: By phone
-            nl_phone_report: >-
-              call 0900-8844. You will usually get a phone call appointment for later,
-              at which point you'll give the information to the police
-            nl_website_link_text: at this politie.nl webpage
             photo_added: Photo of your %{bike_type} added
             photo_added_sub: People know what to look for
             police_added: Police report added
@@ -74,6 +62,7 @@ en:
             share_sub: Friends and local groups are often the first to spot a stolen
               %{bike_type}.
             share_text: 'Stolen in %{city}: %{title}. Please keep an eye out!'
+            share_text_without_city: 'Stolen: %{title}. Please keep an eye out!'
             share_title: Share it with people near you
             stolen: STOLEN
             view_alerts: View your alerts

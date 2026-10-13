@@ -610,6 +610,17 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "theft_alert_paid_or_admin?" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+
+    it "ignores an abandoned checkout" do
+      FactoryBot.create(:theft_alert_unpaid, stolen_record:)
+      expect(stolen_record.theft_alert_paid_or_admin?).to be_falsey
+      FactoryBot.create(:theft_alert, stolen_record:, admin: true)
+      expect(stolen_record.theft_alert_paid_or_admin?).to be_truthy
+    end
+  end
+
   describe "promoted alert recovery notification" do
     context "if marked as recovered while a promoted alert is active" do
       it "sends an admin notification" do

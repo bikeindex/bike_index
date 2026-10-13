@@ -11,7 +11,7 @@
         </p>
       </div>
 
-      <% if organization_stolen_message? %>
+      <% if @stolen_record.shown_organization_stolen_message.present? %>
         <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @stolen_record} %>
       <% end %>
 
@@ -52,24 +52,24 @@
                   "
                 >
                   <li class="tw:flex tw:gap-2">
-                    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:mt-0.5 tw:size-3.5 tw:shrink-0 #{submitted_to_police_services? ? "tw:text-blue-600" : "tw:text-gray-300"}", aria_hidden: true) %>
+                    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:mt-0.5 tw:size-3.5 tw:shrink-0 #{@stolen_record.submitted_to_police_services? ? "tw:text-blue-600" : "tw:text-gray-300"}", aria_hidden: true) %>
 
                     <span>
                       <%= translation(".leads_online_html", leads_online: link_to(translation(".leads_online"), translation(".leads_online_url"), class: "twlink")) %>
 
-                      <% if serial_unknown? %>
+                      <% if @bike.serial_unknown? %>
                         <span class="tw:text-red-600"><%= translation(".requires_serial") %></span>
                       <% end %>
                     </span>
                   </li>
 
                   <li class="tw:flex tw:gap-2">
-                    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:mt-0.5 tw:size-3.5 tw:shrink-0 #{submitted_to_police_services? ? "tw:text-blue-600" : "tw:text-gray-300"}", aria_hidden: true) %>
+                    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:mt-0.5 tw:size-3.5 tw:shrink-0 #{@stolen_record.submitted_to_police_services? ? "tw:text-blue-600" : "tw:text-gray-300"}", aria_hidden: true) %>
 
                     <span>
                       <%= translation(".law_enforcement") %>
 
-                      <% if serial_unknown? %>
+                      <% if @bike.serial_unknown? %>
                         <span class="tw:text-red-600"><%= translation(".requires_serial") %></span>
                       <% end %>
                     </span>
@@ -88,25 +88,7 @@
                     </p>
 
                     <ul class="tw:mb-0 tw:list-disc tw:space-y-1 tw:pl-5">
-                      <li>
-                        <strong><%= translation(".nl_online") %></strong>
-
-                        <%= link_to translation(".nl_website_link_text"),
-                              "https://www.politie.nl/aangifte-of-melding-doen/voorbereiding-aangifte/diefstal-fiets.html",
-                              target: "_blank", rel: "noopener", class: "twlink" %>
-
-                        <em><%= translation(".nl_digid_required") %></em>
-                      </li>
-
-                      <li>
-                        <strong><%= translation(".nl_phone") %></strong> <%= translation(".nl_phone_report") %>
-                      </li>
-
-                      <li>
-                        <strong><%= translation(".nl_person") %></strong>
-                        <%= translation(".nl_person_report") %>
-                        <%= link_to "www.politie.nl/mijn-buurt/politiebureaus", "https://www.politie.nl/mijn-buurt/politiebureaus", class: "twlink" %>
-                      </li>
+                      <%= render Pages::Bikes::StolenChecklist::NetherlandsPoliceReport::Component.new %>
                     </ul>
                   </div>
                 <% end %>
@@ -125,19 +107,9 @@
           <%= translation(".share_sub", bike_type: cycle_type) %>
         </p>
 
-        <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2.5">
-          <%= render UI::ButtonLink::Component.new(href: facebook_url, text: translation(".facebook"), color: :primary,
-              html_class: "tw:rounded-full!", target: "_blank", rel: "noopener") %>
-
-          <%= render UI::ButtonLink::Component.new(href: nextdoor_url, text: translation(".nextdoor"), color: :primary,
-              html_class: "tw:rounded-full!", target: "_blank", rel: "noopener") %>
-
-          <div class="tw:w-36">
-            <%= render Pages::Registrations::Show::Share::Component.new(text: translation(".copy_link"), url: share_url) %>
-          </div>
-
+        <%= render Pages::Bikes::StolenReport::ShareButtons::Component.new(url: bike_url(@bike), nextdoor_text: share_text) do %>
           <%= link_to translation(".more_ways_to_share"), edit_path("publicize"), class: "twlink tw:text-sm tw:font-bold" %>
-        </div>
+        <% end %>
       <% end %>
     </div>
 
@@ -159,7 +131,7 @@
           </p>
 
           <h3 class="tw:mb-0 tw:text-xl tw:font-extrabold tw:text-white">
-            <% if theft_alert? %>
+            <% if @theft_alert %>
               <%= translation(".promoted_alert_purchased", bike_type: cycle_type) %>
             <% else %>
               <%= translation(".promoted_alert_title", bike_type: cycle_type, city:) %>
@@ -172,13 +144,13 @@
             <%= translation(".promoted_alert_body", bike_type: cycle_type) %>
           </p>
 
-          <% if cheapest_plan.present? && !theft_alert? %>
+          <% if @cheapest_plan.present? %>
             <p class="tw:mb-4 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
-              <%= translation(".from_html", amount: amount_display(cheapest_plan)) %>
+              <%= translation(".from_html", amount: amount_display(@cheapest_plan)) %>
             </p>
           <% end %>
 
-          <% if theft_alert? %>
+          <% if @theft_alert %>
             <%= render UI::ButtonLink::Component.new(href: new_bike_theft_alert_path(@bike), text: translation(".view_alerts"),
                 color: :yellow, size: :callout_sm, html_class: "tw:w-full tw:py-3!") %>
           <% else %>

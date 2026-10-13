@@ -207,7 +207,7 @@ class RegisterController < ApplicationController
   # The theft this registration reported is over, so its finished page is the recovery's
   def recovered_own_theft?
     bike = @b_param.created_bike
-    @b_param.status_stolen? && bike.present? && !bike.status_stolen? && bike.authorized?(current_user) &&
+    @b_param.status_stolen? && @b_param.self_made?(current_user) && bike.present? && !bike.status_stolen? &&
       StolenRecord.recovered.exists?(bike_id: bike.id)
   end
 

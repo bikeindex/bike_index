@@ -1,0 +1,15 @@
+<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2.5">
+  <%= render UI::ButtonLink::Component.new(href: facebook_url, text: translation(".facebook"), color: :primary,
+      html_class: "tw:rounded-full!", target: "_blank", rel: "noopener") %>
+
+  <% if @nextdoor_text.present? %>
+    <%= render UI::ButtonLink::Component.new(href: nextdoor_url, text: translation(".nextdoor"), color: :primary,
+        html_class: "tw:rounded-full!", target: "_blank", rel: "noopener") %>
+  <% end %>
+
+  <div class="tw:w-36">
+    <%= render Pages::Registrations::Show::Share::Component.new(text: translation(".copy_link"), url: @url) %>
+  </div>
+
+  <%= content %>
+</div>

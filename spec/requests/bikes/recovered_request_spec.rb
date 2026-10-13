@@ -25,6 +25,15 @@ RSpec.describe Bikes::RecoveredController, type: :request do
         expect(response.body).to include("sharer.php?u=#{CGI.escape(new_register_url)}")
       end
 
+      context "with a duplicate stolen record deactivated without a recovery" do
+        before { FactoryBot.create(:stolen_record, bike:, current: false) }
+
+        it "shows the recovery" do
+          get base_url
+          expect(response.body).to match("Thanks for letting us share your story")
+        end
+      end
+
       context "someone else's bike" do
         let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
 

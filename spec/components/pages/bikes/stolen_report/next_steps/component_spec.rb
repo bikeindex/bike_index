@@ -59,12 +59,30 @@ RSpec.describe Pages::Bikes::StolenReport::NextSteps::Component, type: :componen
   end
 
   context "with a Promoted Theft Alert bought" do
-    before { FactoryBot.create(:theft_alert, stolen_record: bike.current_stolen_record) }
+    before { FactoryBot.create(:theft_alert_paid, stolen_record: bike.current_stolen_record) }
 
     it "points to it rather than selling another" do
       expect(component).to have_text("Promoted Theft Alert is purchased")
       expect(component).to have_link("View your alerts", href: "/bikes/#{bike.id}/theft_alert/new")
       expect(component).to have_no_link("See alert options")
+    end
+  end
+
+  context "with a Promoted Theft Alert checkout abandoned" do
+    before { FactoryBot.create(:theft_alert_unpaid, stolen_record: bike.current_stolen_record) }
+
+    it "still offers one" do
+      expect(component).to have_no_text("Promoted Theft Alert is purchased")
+      expect(component).to have_link("See alert options")
+    end
+  end
+
+  context "stolen without a city" do
+    before { bike.current_stolen_record.update_columns(city: nil) }
+
+    it "shares the theft without one" do
+      body = CGI.parse(URI(component.at_css("a[href^='https://nextdoor.com']")["href"]).query)["body"].first
+      expect(body).to start_with("Stolen: #{bike.title_string}. Please keep an eye out!")
     end
   end
 end
