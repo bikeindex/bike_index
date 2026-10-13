@@ -56,7 +56,8 @@ module Pages
 
           def card_data_attributes
             {controller: "table-multi-checkbox ui--collapse org--search-column-settings table-column-order",
-             action: "dragstart->table-column-order#dragStart dragover->table-column-order#dragOver " \
+             action: "keydown.enter->table-multi-checkbox#ignoreCheckboxEnter " \
+               "dragstart->table-column-order#dragStart dragover->table-column-order#dragOver " \
                "drop->table-column-order#drop dragend->table-column-order#dragEnd",
              "ui--collapse-storage-key-value": "adminStolenBikesColumnsOpen",
              "org--search-column-settings-storage-key-value": "adminStolenBikesColumns",

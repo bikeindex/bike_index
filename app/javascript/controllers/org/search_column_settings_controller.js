@@ -69,12 +69,13 @@ export default class extends Controller {
     this.updateVisibleColumns()
   }
 
-  updateVisibleColumns () {
+  // Saved only from a change, so the defaults a load applies are worked out afresh each time
+  updateVisibleColumns (event) {
     const checked = []
     this.toggleableCheckboxes.forEach(cb => {
       if (cb.checked) checked.push(cb.name)
     })
-    localStorage.setItem(this.storageKeyValue, JSON.stringify(checked))
+    if (event) localStorage.setItem(this.storageKeyValue, JSON.stringify(checked))
 
     if (this.assignBikeStickerValue) {
       checked.push('assign_bike_sticker_cell')
