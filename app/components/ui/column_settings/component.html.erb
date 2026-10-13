@@ -13,16 +13,18 @@
   </div>
 
   <div
-    class="tw:grid tw:grid-cols-2 tw:gap-x-7 tw:gap-y-2.5 tw:md:grid-flow-col tw:md:grid-cols-3"
+    class="
+      tw:grid tw:grid-cols-2 tw:gap-x-7 tw:gap-y-2.5 tw:md:grid-flow-col
+      tw:md:grid-cols-3
+    "
     style="grid-template-rows: repeat(<%= column_rows %>, auto)"
   >
     <% @columns.each do |cell_name, label| %>
-      <%# Unchecked columns read quieter than the ones showing %>
       <%= render(UI::Forms::Checkbox::Component.new(name: cell_name, value: cell_name, label:,
         class_name: "tw:mb-0! tw:leading-[1.25]! tw:text-gray-400 tw:has-checked:text-gray-900 tw:dark:has-checked:text-gray-100",
         html_options: {id: "column_settings_#{cell_name}", class: "tw:accent-blue-600",
                        data: {"ui--column-settings-target": "checkbox", action: "ui--column-settings#update",
-                              default: @defaults.include?(cell_name.to_s)}})) %>
+                              default: @defaults.include?(cell_name), narrow_hidden: @narrow_hidden.include?(cell_name)}})) %>
     <% end %>
   </div>
 </div>

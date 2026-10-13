@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { storedArray } from 'utils/stored_array'
 
 /* global localStorage */
 
@@ -7,12 +8,13 @@ import { Controller } from '@hotwired/stimulus'
 // named for the *_cell class every cell in its column carries.
 export default class extends Controller {
   static targets = ['checkbox']
-  static values = { storageKey: String, narrowHiddenColumns: Array }
+  static values = { storageKey: String }
 
   connect () {
-    const stored = this.storedColumns
+    const stored = storedArray(this.storageKeyValue)
+    const isDefault = this.isDefault
     this.checkboxTargets.forEach(checkbox => {
-      checkbox.checked = stored ? stored.includes(checkbox.name) : this.isDefault(checkbox)
+      checkbox.checked = stored ? stored.includes(checkbox.name) : isDefault(checkbox)
     })
     this.showColumns()
   }
@@ -26,12 +28,13 @@ export default class extends Controller {
   }
 
   selectDefault () {
-    this.check(checkbox => this.isDefault(checkbox))
+    this.check(this.isDefault)
   }
 
   // Saved only from a change, so the defaults a load applies are worked out afresh each time
   update () {
-    localStorage.setItem(this.storageKeyValue, JSON.stringify(this.checkedColumns))
+    const checked = this.checkboxTargets.filter(checkbox => checkbox.checked).map(checkbox => checkbox.name)
+    localStorage.setItem(this.storageKeyValue, JSON.stringify(checked))
     this.showColumns()
   }
 
@@ -41,29 +44,15 @@ export default class extends Controller {
   }
 
   showColumns () {
-    const checked = this.checkedColumns
-    this.checkboxTargets.forEach(({ name }) => {
-      this.element.querySelectorAll(`.${name}`).forEach(cell => cell.classList.toggle('tw:hidden', !checked.includes(name)))
+    this.checkboxTargets.forEach(({ name, checked }) => {
+      this.element.querySelectorAll(`.${name}`).forEach(cell => cell.classList.toggle('tw:hidden', !checked))
     })
     window.dispatchEvent(new Event('ui-table:refresh'))
   }
 
   // Below Tailwind's sm breakpoint, the narrow-hidden columns aren't defaults
-  isDefault (checkbox) {
-    if (window.matchMedia('(max-width: 639px)').matches && this.narrowHiddenColumnsValue.includes(checkbox.name)) return false
-    return checkbox.dataset.default === 'true'
-  }
-
-  get checkedColumns () {
-    return this.checkboxTargets.filter(checkbox => checkbox.checked).map(checkbox => checkbox.name)
-  }
-
-  get storedColumns () {
-    try {
-      const columns = JSON.parse(localStorage.getItem(this.storageKeyValue))
-      if (columns === null || Array.isArray(columns)) return columns
-    } catch {}
-    localStorage.removeItem(this.storageKeyValue)
-    return null
+  get isDefault () {
+    const narrow = window.matchMedia('(max-width: 639px)').matches
+    return ({ dataset }) => dataset.default === 'true' && !(narrow && dataset.narrowHidden === 'true')
   }
 }

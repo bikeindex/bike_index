@@ -41,13 +41,6 @@ module Pages
               duplicate_bike_group_id: DuplicateBikeGroup.unignored.select(:id)).group(:bike_id).count
           end
 
-          def card_data_attributes
-            column_settings = UI::ColumnSettings::Component.data_attributes(storage_key: "adminStolenBikesColumns",
-              narrow_hidden_columns: %w[photo_cell created_at_cell])
-            column_settings.merge(controller: "table-multi-checkbox ui--table-column-order #{column_settings[:controller]}",
-              "ui--table-column-order-storage-key-value": "adminStolenBikesColumnOrder")
-          end
-
           def location(stolen_record)
             place = [stolen_record.city, stolen_record.region, stolen_record.postal_code].compact_blank.first
             iso = stolen_record.country_iso

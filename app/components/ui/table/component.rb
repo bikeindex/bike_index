@@ -5,8 +5,7 @@ module UI
     class Component < ApplicationComponent
       # Template Dependency: UI::TableColumn::Component
 
-      # For a table that fills a card, passed as classes: with unbordered. Descendant selectors,
-      # so they outrank the cell classes every column gets
+      # Descendant selectors, so they outrank the cell classes every column gets
       CARD_CLASSES = [
         "tw:[&_th]:whitespace-nowrap tw:[&_th]:border-b tw:[&_th]:border-gray-100 tw:[&_th]:bg-gray-50",
         "tw:[&_th]:px-4 tw:[&_th]:py-2.5 tw:[&_th]:text-2xs tw:[&_th]:font-normal tw:[&_th]:text-gray-400 tw:[&_th]:uppercase",
@@ -24,13 +23,14 @@ module UI
 
       # Pass cache_key (normally self.class.cache_digest) to enable per-row fragment caching.
       # cache_records: mirror the controller's `includes`, or the row serves those records stale
-      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
+      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, cache_records: nil, classes: nil, unbordered: false, card: false, render_sortable: false, sticky: false)
         @records = records
         @sort_state = sort_state
         @cache_key = cache_key
         @cache_records = cache_records
         @classes = classes
-        @bordered = !unbordered
+        @bordered = !(unbordered || card)
+        @card = card
         @render_sortable = render_sortable
         @sticky = sticky
         @columns = []
@@ -85,10 +85,13 @@ module UI
         @sticky ? "tw:relative tw:z-10 tw:bg-gray-50 tw:dark:bg-gray-700" : nil
       end
 
+      def wrapper_classes = @card ? "twgutter-bleed tw:overflow-x-scroll" : "twgutter-bleed tw:mb-4 tw:overflow-x-scroll tw:pb-3"
+
       def table_classes
         [
           "ui-table tw:min-w-full tw:text-left tw:leading-[1.25] tw:border-separate tw:border-spacing-0",
           ("ui-table-bordered" if @bordered),
+          (CARD_CLASSES if @card),
           @classes
         ].compact.join(" ")
       end

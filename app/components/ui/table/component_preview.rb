@@ -54,6 +54,11 @@ module UI
         end
       end
 
+      # Fills a card edge to edge
+      def card
+        render_with_template(template: "ui/table/component_preview/card", locals: {records: sample_records})
+      end
+
       def with_footer
         records = sample_records
         render(UI::Table::Component.new(records:)) do |table|

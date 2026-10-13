@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+import { storedArray } from 'utils/stored_array'
 
 /* global localStorage */
 
@@ -14,21 +15,10 @@ export default class extends Controller {
       th.draggable = true
       th.style.cursor = 'grab'
     })
-    this.applyOrder(this.storedOrder)
-    this.listen('addEventListener')
+    this.applyOrder(storedArray(this.storageKeyValue))
   }
 
-  disconnect () {
-    this.listen('removeEventListener')
-  }
-
-  // Wired here rather than in data-action, so a table needs only the controller
-  listen (method) {
-    Object.entries({ dragstart: this.dragStart, dragover: this.dragOver, drop: this.drop, dragend: this.dragEnd })
-      .forEach(([type, handler]) => this.element[method](type, handler))
-  }
-
-  dragStart = (event) => {
+  dragStart (event) {
     const th = this.header(event)
     if (!th) return
     this.dragged = this.cellName(th)
@@ -36,7 +26,7 @@ export default class extends Controller {
     event.dataTransfer.setData('text/plain', this.dragged)
   }
 
-  dragOver = (event) => {
+  dragOver (event) {
     const th = this.header(event)
     if (!th || !this.dragged) return
     event.preventDefault()
@@ -47,7 +37,7 @@ export default class extends Controller {
     th.style.boxShadow = `inset ${this.dropAfter ? -2 : 2}px 0 #2563eb`
   }
 
-  drop = (event) => {
+  drop (event) {
     const th = this.header(event)
     if (!th || !this.dragged) return
     event.preventDefault()
@@ -59,7 +49,7 @@ export default class extends Controller {
     this.applyOrder(order)
   }
 
-  dragEnd = () => {
+  dragEnd () {
     this.dragged = null
     this.clearIndicator()
   }
@@ -81,15 +71,6 @@ export default class extends Controller {
         .forEach(cell => row.appendChild(cell))
     })
     window.dispatchEvent(new Event('ui-table:refresh'))
-  }
-
-  get storedOrder () {
-    try {
-      const order = JSON.parse(localStorage.getItem(this.storageKeyValue))
-      if (order === null || Array.isArray(order)) return order
-    } catch {}
-    localStorage.removeItem(this.storageKeyValue)
-    return null
   }
 
   get headers () {
