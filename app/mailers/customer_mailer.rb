@@ -6,6 +6,10 @@ class CustomerMailer < ApplicationMailer
 
   helper :bike
 
+  # Mailbox filters (Defender, Proofpoint) quarantine sign-in emails carrying a tracking pixel or
+  # redirected links, and their recipients often have no password to fall back on
+  UNTRACKED = {track_opens: "false", track_links: "None"}.freeze
+
   def welcome_email(user)
     @user = user
 
@@ -29,7 +33,7 @@ class CustomerMailer < ApplicationMailer
     @url = update_password_form_with_reset_token_users_url(token: @user.token_for_password_reset, return_to:)
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email, tag: __callee__)
+      mail(to: @user.email, tag: __callee__, **UNTRACKED)
     end
   end
 
@@ -38,7 +42,7 @@ class CustomerMailer < ApplicationMailer
     @url = magic_link_session_url(token: @user.magic_link_token, return_to:)
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email, tag: __callee__)
+      mail(to: @user.email, tag: __callee__, **UNTRACKED)
     end
   end
 

@@ -10,6 +10,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.to).to eq([user.email])
       expect(mail.tag).to eq "welcome_email"
+      expect(mail.to_postmark_hash.keys).to_not include("TrackOpens", "TrackLinks")
       expect(mail.body.encoded).to_not match(/supported by/i)
       expect(mail.deliver_now.text_part.body.to_s).to include("Welcome to Bike Index")
     end
@@ -50,6 +51,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       # And just to be sure, test the route a little more
       expect(mail.body.encoded).to match(/users\/update_password_form_with_reset_token\?token=#{user.token_for_password_reset}/)
       expect(mail.tag).to eq "password_reset_email"
+      expect(mail.to_postmark_hash).to include("TrackOpens" => false, "TrackLinks" => "None")
       expect(mail.deliver_now.text_part.body.to_s).to include(user.token_for_password_reset).and include("Reset password")
     end
   end
@@ -62,6 +64,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.body.encoded).to match(user.magic_link_token)
       expect(mail.tag).to eq "magic_login_link_email"
+      expect(mail.to_postmark_hash).to include("TrackOpens" => false, "TrackLinks" => "None")
       expect(mail.deliver_now.text_part.body.to_s).to include(user.magic_link_token).and include("Sign in")
     end
   end
