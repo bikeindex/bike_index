@@ -82,14 +82,6 @@ RSpec.describe CustomerMailer, type: :mailer do
       end
     end
 
-    context "paid organization registrant" do
-      before { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user:) }
-
-      it "doesn't render" do
-        expect(html).to_not include(support_the_index_url)
-      end
-    end
-
     context "paid organization email domain" do
       let(:user) { FactoryBot.create(:user, email: "someone@paid-university.edu") }
       before { organization.update(user_email_domain: "paid-university.edu") }

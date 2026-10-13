@@ -262,11 +262,6 @@ class Organization < ApplicationRecord
       where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
     end
 
-    def paid_money_email_domain?(emails)
-      domains = Array(emails).filter_map { email_domain(it) }
-      domains.any? && paid_money.where(user_email_domain: domains).exists?
-    end
-
     def passwordless_email_matching(str)
       domain = email_domain(str)
       return nil if domain.blank?
