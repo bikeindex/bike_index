@@ -48,7 +48,7 @@
 
   <% unless claimed? %>
     <div class="finished-registration-cta">
-      <%= link_to cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
+      <%= render(Emails::Partials::TokenLink::Component.new(href: bike_url_with_token, text: cta_text)) %>
 
       <p>
         <%= translation("sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: bike.type) %>
@@ -74,7 +74,7 @@
       <% else %>
         <%= translation("hopefully_you_find_the_bike", bike_type: bike.type) %>
         <strong>
-          <%= link_to(translation("mark_your_bike_recovered", bike_type: bike.type), recovery_url, "data-pm-no-track" => true) %>
+          <%= render(Emails::Partials::TokenLink::Component.new(href: recovery_url, text: translation("mark_your_bike_recovered", bike_type: bike.type), html_class: nil)) %>
           <%= translation("when_you_do") %>
         </strong>
       <% end %>
@@ -99,7 +99,7 @@
 
   <% if show_view_bike_cta? %>
     <div class="finished-registration-cta">
-      <%= link_to cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
+      <%= render(Emails::Partials::TokenLink::Component.new(href: bike_url_with_token, text: cta_text)) %>
     </div>
   <% end %>
 </div>
@@ -242,7 +242,7 @@
         <%= translation("spread_the_word_body") %>
       </p>
 
-      <%= link_to cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
+      <%= render(Emails::Partials::TokenLink::Component.new(href: bike_url_with_token, text: cta_text)) %>
     </div>
 
     <table
