@@ -6938,6 +6938,8 @@ es:
           jurisdiction: Jurisdicción
           out_of_class_label: Fuera de clase
           united_states: Estados Unidos
+          any_market: Cualquier mercado
+          market: Mercado
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin

@@ -6650,6 +6650,8 @@ nb:
           jurisdiction: Jurisdiksjon
           out_of_class_label: Utenfor klasserommet
           united_states: USA
+          any_market: Ethvert marked
+          market: Marked
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike

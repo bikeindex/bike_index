@@ -6957,6 +6957,8 @@ it:
           jurisdiction: Giurisdizione
           out_of_class_label: Fuori dalla classe
           united_states: Stati Uniti
+          any_market: Qualsiasi mercato
+          market: Mercato
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
