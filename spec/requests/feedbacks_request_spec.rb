@@ -102,6 +102,15 @@ RSpec.describe FeedbacksController, type: :request do
           expect(feedback.package_size).to eq ""
         end
       end
+
+      context "from a demo modal, asking to return to its thank you" do
+        it "returns to the page at that anchor, without the param that reopens the modal" do
+          post base_url, params: {feedback: {name: "Chicago", feedback_type: "lead_for_city", email: "example@example.com"},
+                                  return_anchor: "lead-sent"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/for_cities?modal_cities-demo-modal=1&utm_source=mail"}
+          expect(response).to redirect_to "http://www.example.com/for_cities?utm_source=mail#lead-sent"
+        end
+      end
     end
 
     context "feedback with additional" do

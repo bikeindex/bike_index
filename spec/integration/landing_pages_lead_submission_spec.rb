@@ -43,6 +43,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
         click_button "Let's chat"
         expect(page).to have_content("Thank", wait: 5)
       }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
+      expect(page).to have_no_css("dialog[open]")
 
       expect(Feedback.last).to have_attributes(target_attributes)
 
@@ -110,6 +111,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
         click_button "Request a demo"
         expect(page).to have_content("Thanks. We'll be in touch soon.", wait: 5)
       }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
+      expect(page).to have_no_css("dialog[open]")
       expect(page).to have_no_content("Book a discovery call")
 
       expect(Feedback.last).to have_attributes(target_attributes)

@@ -47,11 +47,17 @@ class FeedbacksController < ApplicationController
     redirect_back(fallback_location: root_url) && (return true)
   end
 
-  # The page the form was on, at the part of it that says the message went through
+  # The page the form was on, at the part of it that says the message went through. Without
+  # the param that keeps a modal open across reloads, or the form's modal opens again, empty
   def return_location
-    back = url_from(request.referer) || help_path
+    back = url_from(request.referer)
+    return help_path if back.nil?
+
+    uri = URI.parse(back)
+    uri.query = Rack::Utils.parse_query(uri.query).reject { |key, _| key.start_with?("modal_") }.to_query.presence
     anchor = params[:return_anchor].to_s
-    anchor.match?(/\A[a-z][a-z-]*\z/) ? "#{back}##{anchor}" : back
+    uri.fragment = anchor if anchor.match?(/\A[a-z][a-z-]*\z/)
+    uri.to_s
   end
 
   def permitted_parameters
