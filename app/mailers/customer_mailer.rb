@@ -40,6 +40,8 @@ class CustomerMailer < ApplicationMailer
   def magic_login_link_email(user, return_to: nil)
     @user = user
     @url = magic_link_session_url(token: @user.magic_link_token, return_to:)
+    # Only read by the layout, which drops the donation ask for a paid organization
+    @organization = @user.organizations.paid_money.first || @user.ownership_organizations.paid_money.first
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @user.email, tag: __callee__, **UNTRACKED)
