@@ -22,12 +22,19 @@ module Pages
 
           DEFAULT_COLUMNS = (COLUMNS.keys - %i[value_cell police_department_cell police_report_cell]).freeze
 
-          def initialize(stolen_records:, sort_state:)
+          # Once the card is full bleed: out past the admin layout's gutter to the page's edges
+          TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:mx-[calc(var(--gutter)*-1)]"
+
+          def initialize(stolen_records:, index:)
             @stolen_records = stolen_records
-            @sort_state = sort_state
+            @index = index
+            @pagy = index.pagy
+            @sort_state = index.sort_state
           end
 
           private
+
+          def show_time_range? = @index.time_range.present? && @index.period != "all"
 
           # A bike can be user hidden or deleted
           def rows

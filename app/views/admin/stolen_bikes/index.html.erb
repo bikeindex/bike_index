@@ -39,7 +39,7 @@
     </p>
   <% end %>
 
-  <%= render(Pages::Admin::StolenBikes::Table::Component.new(stolen_records: @stolen_records, sort_state:)) %>
+  <%= render(Pages::Admin::StolenBikes::Table::Component.new(stolen_records: @stolen_records, index: admin_index_state)) %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(
@@ -49,4 +49,5 @@
   nav_header_list_items:,
   rendered_chart:,
   table_view:,
+  paginate: false,
 )) %>

@@ -18,7 +18,8 @@ module Pages
           table_view: nil,
           chart_collection: nil,
           header_content: nil,
-          count_detail: nil
+          count_detail: nil,
+          paginate: true
         )
           @index = index
           @collection = collection
@@ -34,6 +35,8 @@ module Pages
           @chart_collection = chart_collection
           @header_content = header_content
           @count_detail = count_detail
+          # false when the table_view paginates itself
+          @paginate = paginate
         end
 
         private
