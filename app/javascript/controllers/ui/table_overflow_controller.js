@@ -2,9 +2,9 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global ResizeObserver */
 
-// Connects to data-controller='org--bikes-table-overflow'
+// Connects to data-controller='ui--table-overflow'
 // Flags data-overflowing while the table is wider than its scroll container, which is what
-// the frozen view column's shadow keys off, and data-scrolled-end once it's scrolled all the way,
+// UI::Table's frozen column shadow keys off, and data-scrolled-end once it's scrolled all the way,
 // which drops the right edge's. Toggling columns resizes the table, so it's observed too.
 export default class extends Controller {
   connect () {

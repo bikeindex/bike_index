@@ -14,7 +14,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
-      @pagy, @stolen_records = pagy(:countish, available_stolen_records.includes(:country)
+      @pagy, @stolen_records = pagy(:countish, available_stolen_records.includes(:country, :region_record)
         .reorder(sortable_order(StolenRecord)), limit: @per_page, page: permitted_page)
     end
 

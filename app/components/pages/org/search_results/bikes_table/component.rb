@@ -22,10 +22,6 @@ module Pages
             "tw:dark:[&_tr:hover_td]:bg-gray-800"
           ].join(" ").freeze
 
-          # Frozen against the table's horizontal scroll, with a shadow once there's any to scroll
-          VIEW_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
-            "tw:group-data-overflowing/bikes-table:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
-
           # The organization's registration fields that follow a column, in order. The rest come
           # after the columns every organization has
           REG_FIELDS_AFTER = {
@@ -34,15 +30,6 @@ module Pages
           }.freeze
 
           THUMB_CLASSES = "tw:block tw:h-8 tw:w-11 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700"
-
-          # [&>div] is UI::Table's scroller, whose bottom spacing would part the table from what
-          # follows it. The after: box mirrors the View column's divider and shadow on the right
-          # edge while there's more to scroll, except in a full-bleed row that runs off the page
-          WRAPPER_CLASSES = "tw:group/bikes-table tw:relative tw:[&>div]:mb-0 tw:[&>div]:pb-0 tw:data-overflowing:after:absolute " \
-            "tw:data-overflowing:after:inset-y-0 tw:data-overflowing:after:left-[calc(100%-1px)] tw:data-overflowing:after:z-2 " \
-            "tw:data-overflowing:after:w-4 tw:data-overflowing:after:border-l tw:data-overflowing:after:border-gray-100 " \
-            "tw:data-overflowing:after:shadow-[-2px_0_6px_rgba(26,26,31,0.04)] tw:dark:data-overflowing:after:border-gray-700 " \
-            "tw:data-scrolled-end:after:hidden tw:@max-[672px]/twwiderow:after:hidden"
 
           def initialize(organization:, bikes:, render_sortable: false,
             sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
@@ -83,9 +70,9 @@ module Pages
           end
 
           def table_wrapper_data_attributes
-            return {controller: "org--bikes-table-overflow"} unless @render_sortable
+            return {controller: "ui--table-overflow"} unless @render_sortable
             attrs = {
-              controller: "org--bikes-table-overflow update-cached-sortable-links org--assign-bike-sticker",
+              controller: "ui--table-overflow update-cached-sortable-links org--assign-bike-sticker",
               "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params.merge(organization_id: @organization.to_param))
             }
             if @bike_sticker.present?

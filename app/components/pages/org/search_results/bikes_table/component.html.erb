@@ -2,14 +2,14 @@
 <%# so instance variables resolve to nil inside them — closures capture these. %>
 <% organization = @organization %>
 
-<%= tag.div(class: WRAPPER_CLASSES, data: table_wrapper_data_attributes) do %>
+<%= tag.div(class: UI::Table::Component::FROZEN_WRAPPER_CLASSES, data: table_wrapper_data_attributes) do %>
   <%= render(UI::Table::Component.new(records: @bikes, cache_key: [@organization, self.class.cache_digest], render_sortable: @render_sortable, sort_state: @sort_state, classes: TABLE_CLASSES, unbordered: true)) do |table| %>
     <%# Called per cell rather than captured: each tooltip mints its own id %>
     <% hidden_html = method(:hidden_not_registered_tag) %>
     <% email_hidden = translation(".email_hidden") %>
     <% view_label = translation(".view") %>
 
-    <% table.column(label: settings.column_renames[:view_cell], classes: VIEW_COLUMN_CLASSES) do |bike| %>
+    <% table.column(label: settings.column_renames[:view_cell], classes: UI::Table::Component::FROZEN_COLUMN_CLASSES) do |bike| %>
       <%= render(UI::ButtonLink::Component.new(text: view_label, href: bike_path(bike, organization_id: organization.to_param), size: :sm, data: {turbo_frame: "_top"})) %>
     <% end %>
 
