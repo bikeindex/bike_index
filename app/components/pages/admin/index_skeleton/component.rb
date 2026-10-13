@@ -35,7 +35,6 @@ module Pages
           @chart_collection = chart_collection
           @header_content = header_content
           @count_detail = count_detail
-          # false when the table_view paginates itself
           @paginate = paginate
         end
 

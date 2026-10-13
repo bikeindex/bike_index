@@ -18,8 +18,8 @@ module UI
         "tw:dark:[&_tr:hover_td]:bg-gray-800"
       ].join(" ").freeze
 
-      # A column frozen against the table's horizontal scroll, inside an element given
-      # FROZEN_WRAPPER_CLASSES and the ui--table-overflow controller. Shadowed once there's any to scroll
+      # Frozen against horizontal scroll, inside an element with FROZEN_WRAPPER_CLASSES and the
+      # ui--table-overflow controller
       FROZEN_COLUMN_CLASSES = "tw:w-px tw:sticky tw:left-0 tw:z-1 tw:border-r tw:border-r-gray-100 " \
         "tw:group-data-overflowing/ui-table:shadow-[2px_0_6px_rgba(26,26,31,0.04)] tw:dark:border-r-gray-700"
 

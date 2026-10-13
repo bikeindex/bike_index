@@ -8,7 +8,7 @@
   </div>
 <% end %>
 
-<%# twwiderow is what twfullbleed reads; with nothing beside the card, it spans the row %>
+<%# twfullbleed reads the twwiderow container %>
 <div class="twwiderow tw:mb-4">
   <%= form_with(url: bulk_update_admin_stolen_bikes_path, method: :post,
   class: "tw:col-span-full tw:min-w-0 tw:rounded-xl tw:twfullbleed #{UI::Card::Component::BASE_CLASSES}",
@@ -23,7 +23,7 @@
       <p class="tw:mb-0">
         <%= number_display(@pagy.count) %> <%= "match".pluralize(@pagy.count) %>
 
-        <% if show_time_range? %>
+        <% if @index.show_time_range? %>
           <span class="tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
             <%= UI::PeriodSelect::Component.column_label(@index.time_range_column) %>
             <%= render(UI::TimeRange::Component.new(time_range: @index.time_range, period: @index.period)) %>
@@ -43,10 +43,15 @@
     <% duplicate_counts = self.duplicate_counts %>
     <% location = method(:location) %>
 
-    <%# Clipped here rather than on the card, which the table bleeds past %>
-    <div class="tw:overflow-hidden <%= TABLE_BLEED_CLASSES %>">
+    <%# Full bleed takes the table over the admin gutter, past the card, so it's clipped here %>
+    <div
+      class="
+        tw:overflow-hidden
+        tw:@max-[672px]/twwiderow:mx-[calc(var(--gutter)*-1)]
+      "
+    >
       <%= tag.div(class: UI::Table::Component::FROZEN_WRAPPER_CLASSES, data: {controller: "ui--table-overflow"}) do %>
-        <%= render(UI::Table::Component.new(records: rows, render_sortable: true, sort_state: @sort_state, card: true)) do |table| %>
+        <%= render(UI::Table::Component.new(records: rows, render_sortable: true, sort_state: @index.sort_state, card: true)) do |table| %>
           <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0",
       title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}),
       classes: UI::Table::Component::FROZEN_COLUMN_CLASSES) do |(stolen_record)| %>
@@ -155,7 +160,7 @@
       </span>
 
       <div class="tw:ml-auto">
-        <%= select_tag :per_page_select, options_for_select([10, 25, 50, 100, @index.per_page.to_i].uniq.sort.map { ["#{it} per page", it] }, selected: @index.per_page),
+        <%= select_tag :per_page_select, options_for_select(@index.per_pages.map { ["#{it} per page", it] }, selected: @index.per_page),
         id: nil, class: "form-control tw:m-0! tw:w-auto!", aria: {label: "Results per page"},
         data: {controller: "admin--per-page-select", action: "admin--per-page-select#navigate"} %>
       </div>

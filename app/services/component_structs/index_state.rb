@@ -18,5 +18,9 @@ module ComponentStructs
     end
 
     def sortable_search_params = sort_state.search_params
+
+    def show_time_range? = time_range.present? && period != "all"
+
+    def per_pages = [10, 25, 50, 100, per_page.to_i].uniq.sort
   end
 end
