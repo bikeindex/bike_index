@@ -278,6 +278,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     find("#market-hw-listbox [role='option']", text: "United States (23)").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
     expect(page).to have_current_path(/[?&]market=US\b/)
+
+    # a market the catalog has no models in searches them all
+    page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "JP") }
+    visit bikebook_path
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)", wait: 10)
   end
 
   it "titles a model picked alone for it, and drops the canonical as the page changes" do
@@ -686,7 +691,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st,m/specialized/2025/haul_st_ca")
     expect(page).to have_css("[data-comparison] article", count: 2, wait: 10)
     canadian = all("article").last
-    expect(canadian).to have_css("div", text: /\AMarkets\s*CA\z/).and have_css("span[title='Canadian Dollar']")
+    expect(canadian).to have_css("div", text: /\AMarkets\s*Canada\z/).and have_css("span[title='Canadian Dollar']")
       .and have_css("div", text: /\ARated power\s*500\W*W\z/).and have_no_text("US Class")
     expect(canadian.find("h2", text: /\Amodel years\z/i).ancestor("section").all("tr").map { it.first("td").text }).to eq %w[2025]
 

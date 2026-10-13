@@ -20,7 +20,6 @@ const fetchJson = async (url) => {
 }
 
 const list = (value) => (value ?? '').split(',').filter(Boolean)
-const regionNames = new Intl.DisplayNames(['en'], { type: 'region' })
 // a classification's option and chip, beside the vehicles'
 const classificationDisplay = ({ title }) => `e-Vehicle Classification: ${title}`
 const path = (id) => id.replace(/^m\//, '')
@@ -68,8 +67,6 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
-    market: counted('market', [...new Set(models.flatMap(({ markets }) => markets))].map((code) => [code, regionNames.of(code)]))
-      .sort((a, b) => a.display.localeCompare(b.display)),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
   }
 }

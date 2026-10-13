@@ -36,11 +36,11 @@ export async function hydrate (catalog, source, shell, url) {
     const slugs = filters[name].split(',').map((value) => kit.slug_aliases[name]?.[value] ?? value)
     filters[name] = [...new Set(slugs.filter((value) => values.has(value)))].join(',')
   }
-  // "all" is Any, which the URL carries only when the visitor's country is a market
+  // "all" is Any, which the URL carries only when the visitor's country is a market with models
   const panel = root.querySelector('[data-controller~="bikebook--catalog-filters"]')
   const marketAttribute = 'data-bikebook--catalog-filters-default-market-value'
   const located = panel.getAttribute(marketAttribute)
-  const defaultMarket = catalog.options.market.some(({ value }) => value === located) ? located : ''
+  const defaultMarket = catalog.options.market.some(({ value, count }) => value === located && count) ? located : ''
   panel.setAttribute(marketAttribute, defaultMarket)
   filters.market = filters.market === 'all' ? '' : filters.market || defaultMarket
   const [found, { filteredCount }] = await Promise.all([catalog.vehicles(params.get('vehicle_models')?.split(',') ?? []), catalog.search(filters, 0, 0)])
