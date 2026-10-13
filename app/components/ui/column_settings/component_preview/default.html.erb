@@ -1,0 +1,16 @@
+<% columns = {name_cell: "Name", color_cell: "Color", size_cell: "Size", notes_cell: "Notes"} %>
+<% rows = [["Cargo bike", "Green", "L", "Front basket"], ["Stroller", "Gray", "—", "Folds flat"]] %>
+
+<%= tag.div(class: "tw:rounded-xl tw:border tw:border-gray-200", data: UI::ColumnSettings::Component.data_attributes(storage_key: "columnSettingsPreview")) do %>
+  <div class="tw:flex tw:justify-end tw:px-4 tw:py-3">
+    <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
+  </div>
+
+  <%= render(UI::ColumnSettings::Component.new(columns:, defaults: %i[name_cell color_cell size_cell])) %>
+
+  <%= render(UI::Table::Component.new(records: rows, unbordered: true, classes: UI::Table::Component::CARD_CLASSES)) do |table| %>
+    <% columns.each_with_index do |(cell_name, label), index| %>
+      <% table.column(label:, classes: "hideableColumn #{cell_name}") { |row| row[index] } %>
+    <% end %>
+  <% end %>
+<% end %>

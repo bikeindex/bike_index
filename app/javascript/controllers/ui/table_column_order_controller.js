@@ -2,9 +2,10 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global localStorage */
 
-// Connects to data-controller='table-column-order'
-// A column is named by its *_cell class, as org--search-column-settings names it. The hideable
-// columns follow the fixed ones, so a row's are reordered by appending them.
+// Connects to data-controller='ui--table-column-order'
+// Drag a th.hideableColumn onto another to move its column. A column is named by its *_cell
+// class, as ui--column-settings names it. The hideable columns follow the fixed ones, so a
+// row's are reordered by appending them.
 export default class extends Controller {
   static values = { storageKey: String }
 
@@ -14,9 +15,20 @@ export default class extends Controller {
       th.style.cursor = 'grab'
     })
     this.applyOrder(this.storedOrder)
+    this.listen('addEventListener')
   }
 
-  dragStart (event) {
+  disconnect () {
+    this.listen('removeEventListener')
+  }
+
+  // Wired here rather than in data-action, so a table needs only the controller
+  listen (method) {
+    Object.entries({ dragstart: this.dragStart, dragover: this.dragOver, drop: this.drop, dragend: this.dragEnd })
+      .forEach(([type, handler]) => this.element[method](type, handler))
+  }
+
+  dragStart = (event) => {
     const th = this.header(event)
     if (!th) return
     this.dragged = this.cellName(th)
@@ -24,7 +36,7 @@ export default class extends Controller {
     event.dataTransfer.setData('text/plain', this.dragged)
   }
 
-  dragOver (event) {
+  dragOver = (event) => {
     const th = this.header(event)
     if (!th || !this.dragged) return
     event.preventDefault()
@@ -35,7 +47,7 @@ export default class extends Controller {
     th.style.boxShadow = `inset ${this.dropAfter ? -2 : 2}px 0 #2563eb`
   }
 
-  drop (event) {
+  drop = (event) => {
     const th = this.header(event)
     if (!th || !this.dragged) return
     event.preventDefault()
@@ -47,7 +59,7 @@ export default class extends Controller {
     this.applyOrder(order)
   }
 
-  dragEnd () {
+  dragEnd = () => {
     this.dragged = null
     this.clearIndicator()
   }

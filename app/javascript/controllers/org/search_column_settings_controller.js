@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--search-column-settings'
 export default class extends Controller {
   static targets = ['checkboxes']
-  static values = { enabledColumns: Array, assignBikeSticker: Boolean, storageKey: String, narrowHiddenColumns: Array }
+  static values = { enabledColumns: Array, assignBikeSticker: Boolean }
 
   connect () {
     this.refreshEnabledColumns()
@@ -47,20 +47,11 @@ export default class extends Controller {
     return this.checkboxesTarget.querySelectorAll('input[type=checkbox]:not(:disabled)')
   }
 
-  // Below Tailwind's sm breakpoint these start hidden, and the panel's "default" leaves them so
-  applyNarrowDefaults () {
-    if (!window.matchMedia('(max-width: 639px)').matches) return
-    this.toggleableCheckboxes.forEach(cb => {
-      if (this.narrowHiddenColumnsValue.includes(cb.name)) cb.dataset.default = 'false'
-    })
-  }
-
   selectStoredVisibleColumns () {
-    this.applyNarrowDefaults()
-    const stored = localStorage.getItem(this.storageKeyValue)
+    const stored = localStorage.getItem('orgRegistrationColumns')
     let columns = null
     if (stored) {
-      try { columns = JSON.parse(stored) } catch { localStorage.removeItem(this.storageKeyValue) }
+      try { columns = JSON.parse(stored) } catch { localStorage.removeItem('orgRegistrationColumns') }
     }
 
     this.toggleableCheckboxes.forEach(cb => {
@@ -69,13 +60,12 @@ export default class extends Controller {
     this.updateVisibleColumns()
   }
 
-  // Saved only from a change, so the defaults a load applies are worked out afresh each time
-  updateVisibleColumns (event) {
+  updateVisibleColumns () {
     const checked = []
     this.toggleableCheckboxes.forEach(cb => {
       if (cb.checked) checked.push(cb.name)
     })
-    if (event) localStorage.setItem(this.storageKeyValue, JSON.stringify(checked))
+    localStorage.setItem('orgRegistrationColumns', JSON.stringify(checked))
 
     if (this.assignBikeStickerValue) {
       checked.push('assign_bike_sticker_cell')

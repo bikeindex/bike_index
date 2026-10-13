@@ -20,7 +20,7 @@
     <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
   </div>
 
-  <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings: column_settings)) %>
+  <%= render(UI::ColumnSettings::Component.new(columns: COLUMNS, defaults: DEFAULT_COLUMNS)) %>
 
   <% duplicate_counts = self.duplicate_counts %>
   <% location = method(:location) %>
@@ -28,7 +28,7 @@
   <%# [&>div] is UI::Table's scroller, whose bottom spacing would part the table from the footer %>
   <div class="tw:[&>div]:mb-0 tw:[&>div]:pb-0">
     <%= render(UI::Table::Component.new(records: rows, render_sortable: true, sort_state: @sort_state, unbordered: true,
-    classes: Pages::Org::SearchResults::BikesTable::Component::TABLE_CLASSES)) do |table| %>
+    classes: UI::Table::Component::CARD_CLASSES)) do |table| %>
       <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0",
       title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "tw:text-center") do |(stolen_record)| %>
         <%= check_box_tag "sr_selected[#{stolen_record.id}]", stolen_record.id, false,
@@ -40,14 +40,7 @@
       <% end %>
 
       <% table.column(label: COLUMNS[:photo_cell], classes: "hideableColumn photo_cell") do |(_stolen_record, bike)| %>
-        <% thumb_url = bike && BikeServices::Displayer.thumb_image_url(bike) %>
-
-        <% if thumb_url.present? %>
-          <%= image_tag(thumb_url, alt: "", loading: "lazy", skip_pipeline: true,
-          class: "#{Pages::Org::SearchResults::BikesTable::Component::THUMB_CLASSES} tw:object-cover") %>
-        <% else %>
-          <span class="tw:bg-gray-100 tw:dark:bg-gray-800 <%= Pages::Org::SearchResults::BikesTable::Component::THUMB_CLASSES %>"></span>
-        <% end %>
+        <%= render(Atoms::BikeThumbnail::Component.new(bike:)) %>
       <% end %>
 
       <% table.column(sortable: "created_at", label: COLUMNS[:created_at_cell], classes: "hideableColumn created_at_cell") do |(stolen_record)| %>

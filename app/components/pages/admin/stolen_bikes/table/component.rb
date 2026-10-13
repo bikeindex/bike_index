@@ -20,12 +20,7 @@ module Pages
             approved_cell: "Approved"
           }.freeze
 
-          DEFAULT_COLUMNS = (COLUMNS.keys - %i[value_cell police_department_cell police_report_cell]).map(&:to_s).freeze
-
-          # What Pages::Org::Search::ColumnSettings reads its checkboxes from
-          ColumnSettings = Data.define(:panel_columns, :panel_labels, :initially_checked_columns) do
-            def always_visible?(_cell_name) = false
-          end
+          DEFAULT_COLUMNS = (COLUMNS.keys - %i[value_cell police_department_cell police_report_cell]).freeze
 
           def initialize(stolen_records:, sort_state:)
             @stolen_records = stolen_records
@@ -46,19 +41,11 @@ module Pages
               duplicate_bike_group_id: DuplicateBikeGroup.unignored.select(:id)).group(:bike_id).count
           end
 
-          def column_settings
-            ColumnSettings.new(panel_columns: COLUMNS.keys.map(&:to_s), panel_labels: COLUMNS,
-              initially_checked_columns: DEFAULT_COLUMNS)
-          end
-
           def card_data_attributes
-            {controller: "table-multi-checkbox ui--collapse org--search-column-settings table-column-order",
-             action: "dragstart->table-column-order#dragStart dragover->table-column-order#dragOver " \
-               "drop->table-column-order#drop dragend->table-column-order#dragEnd",
-             "ui--collapse-storage-key-value": "adminStolenBikesColumnsOpen",
-             "org--search-column-settings-storage-key-value": "adminStolenBikesColumns",
-             "org--search-column-settings-narrow-hidden-columns-value": %w[photo_cell created_at_cell],
-             "table-column-order-storage-key-value": "adminStolenBikesColumnOrder"}
+            column_settings = UI::ColumnSettings::Component.data_attributes(storage_key: "adminStolenBikesColumns",
+              narrow_hidden_columns: %w[photo_cell created_at_cell])
+            column_settings.merge(controller: "table-multi-checkbox ui--table-column-order #{column_settings[:controller]}",
+              "ui--table-column-order-storage-key-value": "adminStolenBikesColumnOrder")
           end
 
           def location(stolen_record)

@@ -4,6 +4,21 @@ module UI
   module Table
     class Component < ApplicationComponent
       # Template Dependency: UI::TableColumn::Component
+
+      # For a table that fills a card, passed as classes: with unbordered. Descendant selectors,
+      # so they outrank the cell classes every column gets
+      CARD_CLASSES = [
+        "tw:[&_th]:whitespace-nowrap tw:[&_th]:border-b tw:[&_th]:border-gray-100 tw:[&_th]:bg-gray-50",
+        "tw:[&_th]:px-4 tw:[&_th]:py-2.5 tw:[&_th]:text-2xs tw:[&_th]:font-normal tw:[&_th]:text-gray-400 tw:[&_th]:uppercase",
+        # twlink's blue gives way to the header's gray, underlined like twlink-underlined
+        "tw:[&_th_a]:text-inherit tw:[&_th_a]:underline tw:[&_th_a:hover]:decoration-2 tw:[&_th_a[data-active]]:decoration-2",
+        "tw:[&_td]:bg-white tw:[&_td]:px-4 tw:[&_td]:py-2.5 tw:[&_td]:text-sm tw:[&_tr:hover_td]:bg-amber-50",
+        # Whatever follows the table draws the line under it
+        "tw:[&_tbody_tr:last-child_td]:border-b-0",
+        "tw:dark:[&_th]:border-gray-700 tw:dark:[&_th]:bg-gray-800 tw:dark:[&_td]:bg-gray-900",
+        "tw:dark:[&_tr:hover_td]:bg-gray-800"
+      ].join(" ").freeze
+
       # Cell blocks are instance_exec'd, so this is how they reach the sort state
       attr_reader :sort_state
 

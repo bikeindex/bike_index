@@ -17,7 +17,6 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     it "runs a caller's own controller alongside its two" do
       attributes = described_class.column_settings_data_attributes(controllers: "org--multi-search")
       expect(attributes[:controller]).to eq "org--multi-search org--search org--search-column-settings"
-      expect(attributes[:"org--search-column-settings-storage-key-value"]).to eq "orgRegistrationColumns"
       expect(attributes.keys).not_to include(:"ui--collapse-storage-key-value")
     end
 
