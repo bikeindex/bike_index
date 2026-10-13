@@ -61,10 +61,10 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
   context "for_cities" do
     let(:target_attributes) do
       {kind: "lead_for_city", name: "Portland", email: "staff@portland.gov", contact_name: "Jane Doe",
-       contact_role: "City staff", lead_request: "trial", body: "Starting with e-bikes", title: "New City lead: Portland"}
+       contact_role: "City staff", phone_number: "(555) 123-4567", body: "Starting with e-bikes", title: "New City lead: Portland"}
     end
 
-    it "walks through the education flow, then submits a trial lead from the hero, keeping the choice across a reload" do
+    it "walks through the education flow, then requests a demo from the contact section" do
       visit "/for_cities"
       expect(page).to have_content("Register every bike in your city")
 
@@ -85,33 +85,39 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
         expect(page).to have_content("Commitments for riding to and from school.")
       end
 
-      click_link "Start a free trial", match: :first
-      expect(page).to have_button("Start my free trial")
+      open_modal(find("section", text: "Talk to us about your city").find("button[commandfor]"))
+      expect(page).to have_content("Schedule a demo")
       fill_in "City or organization", with: "Portland"
 
+      # the modal reopens with what was entered, like the other landing pages'
       page.refresh
-      expect(page).to have_field("City or organization", with: "Portland")
-      expect(page).to have_button("Start my free trial")
+      expect(page).to have_field("City or organization", with: "Portland", wait: 5)
 
+      # name, role and phone are required along with the email
+      click_button "Request a demo"
+      expect(page.evaluate_script("document.activeElement.id")).to eq "feedback_contact_name"
       fill_in "Your name", with: "Jane Doe"
+      click_button "Request a demo"
+      expect(page.evaluate_script("document.activeElement.id")).to eq "feedback_contact_role"
       select "City staff", from: "Your role"
       fill_in "Email", with: "staff@portland.gov"
+      click_button "Request a demo"
+      expect(page.evaluate_script("document.activeElement.id")).to eq "feedback_phone_number"
+      fill_in "Phone number", with: "(555) 123-4567"
       fill_in "Anything else we should know?", with: "Starting with e-bikes"
 
       expect {
-        click_button "Start my free trial"
+        click_button "Request a demo"
         expect(page).to have_content("Thanks. We'll be in touch soon.", wait: 5)
       }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
-      expect(page).to have_no_field("City or organization")
-      click_link "Send another request"
-      expect(page).to have_field("City or organization")
+      expect(page).to have_no_content("Book a discovery call")
 
       expect(Feedback.last).to have_attributes(target_attributes)
 
       EmailJobs::FeedbackNotificationJob.drain
       body = ActionMailer::Base.deliveries.last.body.encoded
       expect(body).to include("Role: City staff")
-      expect(body).to include("Requested: Free trial")
+      expect(body).to include("(555) 123-4567")
     end
   end
 

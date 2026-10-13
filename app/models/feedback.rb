@@ -102,11 +102,6 @@ class Feedback < ApplicationRecord
     self.feedback_hash = (feedback_hash || {}).merge(contact_role: val)
   end
 
-  # "demo" or "trial", for a lead
-  def lead_request=(val)
-    self.feedback_hash = (feedback_hash || {}).merge(lead_request: val)
-  end
-
   def package_size=(val)
     self.feedback_hash = (feedback_hash || {}).merge(package_size: val)
   end
@@ -164,10 +159,6 @@ class Feedback < ApplicationRecord
 
   def contact_role
     (feedback_hash || {})["contact_role"]
-  end
-
-  def lead_request
-    (feedback_hash || {})["lead_request"]
   end
 
   def kind_humanized

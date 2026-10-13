@@ -25,8 +25,8 @@
         <% end %>
       </div>
 
-      <%= render(UI::ButtonLink::Component.new(href: "#lead-form", text: translation(".schedule_a_demo"), color: :primary,
-        html_class: "tw:flex-none tw:md:ml-auto", data: {lead_request: "demo"})) %>
+      <%= render(UI::Button::Component.new(text: translation(".schedule_a_demo"), color: :primary,
+        html_class: "tw:flex-none tw:md:ml-auto", commandfor: MODAL_ID, command: "show-modal")) %>
     </div>
   </nav>
 
@@ -70,13 +70,8 @@
             <%= render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".subheading"))) %>
           </p>
 
-          <div class="tw:flex tw:flex-wrap tw:gap-3.5">
-            <%= render(UI::ButtonLink::Component.new(href: "#lead-form", text: translation(".schedule_a_demo"), color: :primary, size: :callout,
-              data: {lead_request: "demo"})) %>
-
-            <%= render(UI::ButtonLink::Component.new(href: "#lead-form", text: translation(".start_a_free_trial"), color: :secondary, size: :callout,
-              data: {lead_request: "trial"})) %>
-          </div>
+          <%= render(UI::Button::Component.new(text: translation(".schedule_a_demo"), color: :primary, size: :callout,
+            commandfor: MODAL_ID, command: "show-modal")) %>
         </div>
 
         <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: translation(".hero_image_alt"), width: 300, height: 224,
@@ -881,7 +876,7 @@
       tw:dark:border-gray-700 tw:dark:bg-gray-900
     "
   >
-    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-start tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
+    <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-center tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
       <div>
         <h2 class="<%= HEADING_CLASSES %>">
           <%= translation(".contact_heading") %>
@@ -893,23 +888,20 @@
 
         <ul class="tw:flex tw:flex-col tw:gap-3 tw:text-[15px]">
           <% next_steps.each do |step| %>
-            <li class="tw:flex tw:items-center tw:gap-2.5">
-              <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:size-4.5 tw:flex-none tw:text-blue-600 tw:dark:text-blue-400", aria_hidden: true) %>
+            <li class="tw:flex tw:items-start tw:gap-2.5">
+              <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:mt-0.5 tw:size-4.5 tw:flex-none tw:text-blue-600 tw:dark:text-blue-400", aria_hidden: true) %>
               <%= step %>
             </li>
           <% end %>
         </ul>
       </div>
 
-      <div
-        id="lead-form"
-        class="tw:scroll-mt-20 tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]! <%= CARD_CLASSES %>"
-      >
-        <%# The form returns here once a request is sent, which :target turns into a thank you in its place %>
+      <div class="tw:p-7! tw:shadow-[0_4px_12px_rgba(44,62,80,.12)]! <%= CARD_CLASSES %>">
+        <%# A sent request returns here, which :target turns into a thank you in place of the call to action %>
         <div
           id="lead-sent"
           class="
-            tw:peer tw:hidden tw:scroll-mt-20 tw:py-8 tw:text-center
+            tw:peer tw:hidden tw:scroll-mt-20 tw:py-4 tw:text-center
             tw:target:block
           "
         >
@@ -920,66 +912,65 @@
           <p class="tw:mt-2 tw:text-[15px] tw:text-gray-600 tw:dark:text-gray-300">
             <%= translation(".sent_body") %>
           </p>
-
-          <a
-            href="#lead-form"
-            class="twlink tw:mt-4 tw:inline-block tw:text-sm tw:font-semibold"
-          >
-            <%= translation(".send_another") %>
-          </a>
         </div>
 
-        <%= form_for @feedback, html: {class: "tw:group tw:peer-target:hidden",
-          data: {controller: ["form-persist strip-inputs", ("autofocus" if @feedback.errors.any?)].compact.join(" "),
-                 action: "input->form-persist#save submit->strip-inputs#submit submit->form-persist#clear"}} do |f| %>
-          <%= render(UI::Alerts::ObjectError::Component.new(object: @feedback, name: translation(".request_name"))) %>
+        <div class="tw:text-center tw:peer-target:hidden">
+          <div class="tw:font-header tw:text-[22px] tw:font-extrabold">
+            <%= translation(".call_heading") %>
+          </div>
 
-          <%# No default is checked here, or a draft's choice couldn't be restored over it %>
-          <div
-            class="tw:mb-4"
-            data-controller="landing-pages--lead-request"
-            data-action="click@window->landing-pages--lead-request#choose"
+          <p
+            class="
+              tw:mt-2 tw:mb-6 tw:text-[15px] tw:text-gray-600
+              tw:dark:text-gray-300
+            "
           >
-            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "feedback[lead_request]", kind: :toggle,
-              entries: lead_request_entries, selected: @feedback.lead_request,
-              html_options: {data: {"landing-pages--lead-request-target": "radio"}})) %>
-          </div>
+            <%= translation(".call_body") %>
+          </p>
 
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: translation(".field_organization"),
-            html_options: {required: true})) %>
-
-          <div class="twfieldrow">
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: translation(".field_name"),
-              html_options: {value: @feedback.contact_name || @current_user&.name})) %>
-
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_role, label_text: translation(".field_role"))) do %>
-              <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :contact_role, option_tags: role_options,
-                options: {include_blank: true})) %>
-            <% end %>
-          </div>
-
-          <div class="twfieldrow">
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
-              <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true, html_options: {value: @feedback.email || @current_user&.email})) %>
-            <% end %>
-
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number, kind: :telephone_field,
-              html_options: {pattern: PHONE_PATTERN, title: translation(".phone_format")})) %>
-          </div>
-
-          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
-            label_text: translation(".field_message"), html_options: {rows: 3, value: (@feedback.body unless @feedback.body == "lead")})) %>
-
-          <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
-          <%= f.hidden_field :feedback_type, value: FEEDBACK_TYPE %>
-          <%= hidden_field_tag :return_anchor, "lead-sent", id: nil %>
-
-          <%= render(UI::Button::Component.new(color: :primary, size: :lg, type: "submit", html_class: "tw:w-full tw:justify-center")) do %>
-            <span class="tw:group-has-[[value=trial]:checked]:hidden"><%= translation(".submit_demo") %></span>
-            <span class="tw:hidden tw:group-has-[[value=trial]:checked]:inline"><%= translation(".submit_trial") %></span>
-          <% end %>
-        <% end %>
+          <%= render(UI::Button::Component.new(text: translation(".schedule_a_demo"), color: :primary, size: :callout,
+            commandfor: MODAL_ID, command: "show-modal")) %>
+        </div>
       </div>
     </div>
   </section>
+
+  <%= render(UI::Modal::Component.new(id: MODAL_ID, title: translation(".schedule_a_demo"), open: @feedback.errors.any?)) do |modal| %>
+    <% modal.with_body do %>
+      <%= form_for @feedback, html: {data: {controller: ["form-persist strip-inputs", ("autofocus" if @feedback.errors.any?)].compact.join(" "),
+        action: "input->form-persist#save submit->strip-inputs#submit submit->form-persist#clear"}} do |f| %>
+        <%= render(UI::Alerts::ObjectError::Component.new(object: @feedback, name: translation(".request_name"))) %>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: translation(".field_organization"),
+          html_options: {required: true})) %>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: translation(".field_name"),
+          html_options: {required: true, value: @feedback.contact_name || @current_user&.name})) %>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_role, label_text: translation(".field_role"), required: true)) do %>
+          <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :contact_role, option_tags: role_options,
+            options: {include_blank: true}, required: true)) %>
+        <% end %>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+          <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true, html_options: {value: @feedback.email || @current_user&.email})) %>
+        <% end %>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number, kind: :telephone_field,
+          html_options: {required: true, pattern: PHONE_PATTERN, title: translation(".phone_format")})) %>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
+          label_text: translation(".field_message"), html_options: {rows: 3, value: (@feedback.body unless @feedback.body == "lead")})) %>
+
+        <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
+        <%= f.hidden_field :feedback_type, value: FEEDBACK_TYPE %>
+        <%= hidden_field_tag :return_anchor, "lead-sent", id: nil %>
+
+        <div class="tw:pt-2">
+          <%= render(UI::Button::Component.new(text: translation(".submit_demo"), color: :primary, size: :lg, type: "submit",
+            html_class: "tw:w-full tw:justify-center")) %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
 </div>

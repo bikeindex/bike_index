@@ -13,6 +13,7 @@ module Pages
         # A comic panel, like the drawn illustrations it holds
         STICKER_CLASSES = "tw:flex tw:items-center tw:gap-4 tw:rounded-lg tw:border-3 tw:border-black tw:bg-white tw:px-5 tw:py-4.5 tw:shadow-[4px_4px_0_#111] tw:dark:bg-gray-800"
         FEEDBACK_TYPE = "lead_for_city"
+        MODAL_ID = "cities-demo-modal"
         # Digits and what a written number puts between them, "x" for an extension
         PHONE_PATTERN = "[0-9 +\\(\\)\\.x\\-]*"
 
@@ -132,11 +133,7 @@ module Pages
           ]
         end
 
-        def next_steps = [translation(".contact_next_call"), translation(".contact_next_setup"), translation(".contact_next_training")]
-
-        def lead_request_entries
-          [{value: "demo", label: translation(".mode_demo")}, {value: "trial", label: translation(".mode_trial")}]
-        end
+        def next_steps = [translation(".contact_next_priorities"), translation(".contact_next_walkthrough"), translation(".contact_next_plan")]
 
         def role_options
           [translation(".role_city_staff"), translation(".role_law_enforcement"), translation(".role_school"),

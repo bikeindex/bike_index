@@ -6,6 +6,9 @@ en:
         for_cities:
           answer_no: 'No'
           answer_yes: 'Yes'
+          call_body: Tell us a little about your city, and we'll reach out to find
+            a time to talk.
+          call_heading: Book a discovery call
           cape_logo_alt: Bike Index shield with a cape
           checker_choose_state: Choose a state
           checker_eyebrow: E-bike compliance checker
@@ -46,13 +49,14 @@ en:
           community_watch_lead: A community watch, too.
           contact_heading: Talk to us about your city.
           contact_intro: >-
-            Tell us whether you're starting with e-bike management, stolen bike recovery,
-            or registration. We'll set up a branded organization for your city, or
-            get you started with a free trial.
-          contact_next_call: A short discovery call about your priorities
-          contact_next_setup: Your branded organization and education flow, set up
-            with your rules
-          contact_next_training: Staff training and documentation
+            Every partnership starts with a short discovery call. Tell us what your
+            city is working on, and we'll show you how Bike Index fits.
+          contact_next_plan: Clear next steps for getting your city set up
+          contact_next_priorities: >-
+            A conversation about your city's priorities, whether that's e-bikes, stolen
+            bike recovery, or registration
+          contact_next_walkthrough: A walkthrough of how Bike Index would work for
+            your city and its programs
           education_eyebrow: E-bike education
           education_heading: Riders learn the rules that apply to them.
           education_intro: >-
@@ -73,7 +77,7 @@ en:
           faq_checker_question: Where does the compliance checker get its data?
           faq_cost_answer: >-
             There are no per-registration fees, and registering is free for residents.
-            Cities can start with a free trial before committing.
+            We'll go over pricing for your city on a discovery call.
           faq_cost_question: What does it cost?
           faq_heading: Questions cities ask
           faq_import_answer: No. Existing registrations can be imported from a spreadsheet.
@@ -168,8 +172,6 @@ en:
           mock_traditional_bike: Traditional Bike
           mock_traditional_bike_note: "(2 wheels, 1 seat, pedals)"
           mock_vehicle_type: Vehicle type
-          mode_demo: Schedule a demo
-          mode_trial: Start a free trial
           nav_checker: State checker
           nav_education: E-bike rules
           nav_faq: FAQ
@@ -184,8 +186,7 @@ en:
           partnership_data_body: The city owns its data and can export it at any time.
           partnership_data_title: Your data stays yours
           partnership_eyebrow: Partnership
-          partnership_fees_body: Free for residents to register. Start with a free
-            trial before committing.
+          partnership_fees_body: Free for residents to register.
           partnership_fees_title: No per-registration fees
           partnership_heading: A nonprofit partner, running within days.
           partnership_intro: >-
@@ -273,10 +274,8 @@ en:
           role_other: Other
           role_school: School or district
           schedule_a_demo: Schedule a demo
-          send_another: Send another request
-          sent_body: Our team will reach out to you by email.
+          sent_body: We'll reach out by email to set up your discovery call.
           sent_heading: Thanks. We'll be in touch soon.
-          start_a_free_trial: Start a free trial
           stat_agencies: law enforcement agencies
           stat_agencies_count: 100+
           stat_bikes: bikes registered
@@ -291,4 +290,3 @@ en:
             an e-bike, they go straight into a short education flow with your city's
             rules.
           submit_demo: Request a demo
-          submit_trial: Start my free trial
