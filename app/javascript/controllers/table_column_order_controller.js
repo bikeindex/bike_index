@@ -40,6 +40,7 @@ export default class extends Controller {
     if (!th || !this.dragged) return
     event.preventDefault()
     const target = this.cellName(th)
+    if (target === this.dragged) return this.dragEnd()
     const order = this.headers.map(header => this.cellName(header)).filter(name => name !== this.dragged)
     order.splice(order.indexOf(target) + (this.dropAfter ? 1 : 0), 0, this.dragged)
     localStorage.setItem(this.storageKeyValue, JSON.stringify(order))
@@ -73,11 +74,11 @@ export default class extends Controller {
 
   get storedOrder () {
     try {
-      return JSON.parse(localStorage.getItem(this.storageKeyValue))
-    } catch {
-      localStorage.removeItem(this.storageKeyValue)
-      return null
-    }
+      const order = JSON.parse(localStorage.getItem(this.storageKeyValue))
+      if (order === null || Array.isArray(order)) return order
+    } catch {}
+    localStorage.removeItem(this.storageKeyValue)
+    return null
   }
 
   get headers () {

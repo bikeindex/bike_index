@@ -28,6 +28,16 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(assigns(:stolen_records)).to match_array([])
       end
 
+      context "with a period param" do
+        it "ignores it, since there's no period select" do
+          stolen_record.update_column :created_at, 1.month.ago
+          get "#{base_url}?period=week"
+          expect(response.code).to eq("200")
+          expect(assigns(:stolen_records)).to match_array([stolen_record])
+          expect(assigns(:period)).to eq "all"
+        end
+      end
+
       context "with a duplicate" do
         let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike) }
         it "links to the duplicates" do
@@ -137,13 +147,19 @@ RSpec.describe Admin::StolenBikesController, type: :request do
       end
 
       it "deletes the bikes" do
-        Sidekiq::Job.clear_all
         post "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "delete"}
         expect(flash[:success]).to eq "2 stolen bikes deleted"
-        expect(BikeJobs::BikeDeleterJob.jobs.map { |j| j["args"] }).to match_array([[bike.id, false, current_user.id], [stolen_record2.bike_id, false, current_user.id]])
-        BikeJobs::BikeDeleterJob.drain
         expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
+        expect(Bike.unscoped.find(stolen_record2.bike_id).deleted_at).to be_present
         expect(stolen_record3.bike.reload.deleted_at).to be_blank
+      end
+
+      context "with sr_selected as an array" do
+        it "approves them" do
+          post "#{base_url}/bulk_update", params: {sr_selected: [stolen_record.id, stolen_record2.id], bulk_action: "approve"}
+          expect(flash[:success]).to eq "2 stolen bikes approved"
+          expect(stolen_record.reload.approved).to be_truthy
+        end
       end
 
       context "nothing selected" do
@@ -159,6 +175,22 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(flash[:error]).to be_present
           expect(stolen_record.reload.approved).to be_falsey
         end
+      end
+    end
+
+    context "with only the stolen_bikes approve ability" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:superuser_ability) { SuperuserAbility.create(user: current_user, controller_name: "stolen_bikes", action_name: "approve") }
+      let(:sr_selected) { {stolen_record.id => stolen_record.id} }
+
+      it "bulk approves, but doesn't delete" do
+        post "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "approve"}
+        expect(flash[:success]).to eq "1 stolen bike approved"
+        expect(stolen_record.reload.approved).to be_truthy
+
+        post "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "delete"}
+        expect(flash[:error]).to match(/administrator/)
+        expect(bike.reload.deleted_at).to be_blank
       end
     end
 

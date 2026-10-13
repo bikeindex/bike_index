@@ -40,7 +40,8 @@ module Pages
 
           # A bike can be user hidden or deleted
           def rows
-            bikes = Bike.unscoped.where(id: @stolen_records.map(&:bike_id)).index_by(&:id)
+            bikes = Bike.unscoped.where(id: @stolen_records.map(&:bike_id))
+              .includes(current_ownership: {user: %i[membership_active email_bans_active]}).index_by(&:id)
             @stolen_records.map { [it, bikes[it.bike_id]] }
           end
 

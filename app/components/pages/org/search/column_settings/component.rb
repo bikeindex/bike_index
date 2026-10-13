@@ -19,7 +19,7 @@ module Pages
           # inside it too
           def self.column_settings_data_attributes(controllers: nil, collapse: false)
             controllers = [controllers, (COLLAPSE_DATA[:controller] if collapse), "org--search org--search-column-settings"]
-            {controller: controllers.compact.join(" ")}
+            {controller: controllers.compact.join(" "), "org--search-column-settings-storage-key-value": "orgRegistrationColumns"}
               .merge(collapse ? COLLAPSE_DATA.except(:controller) : {})
           end
 

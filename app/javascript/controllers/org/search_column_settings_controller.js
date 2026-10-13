@@ -5,7 +5,7 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='org--search-column-settings'
 export default class extends Controller {
   static targets = ['checkboxes']
-  static values = { enabledColumns: Array, assignBikeSticker: Boolean, storageKey: { type: String, default: 'orgRegistrationColumns' }, narrowHiddenColumns: Array }
+  static values = { enabledColumns: Array, assignBikeSticker: Boolean, storageKey: String, narrowHiddenColumns: Array }
 
   connect () {
     this.refreshEnabledColumns()

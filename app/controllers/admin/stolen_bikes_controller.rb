@@ -2,14 +2,19 @@ module Admin
   class StolenBikesController < Admin::BaseController
     include Binxtils::SortableTable
 
-    BULK_ACTIONS = {"approve" => "approved", "spam" => "marked spam", "delete" => "deleted"}.freeze
+    # Each needs the ability its single-record action does
+    BULK_ACTIONS = {
+      "approve" => {done: "approved", ability: {controller_name: "stolen_bikes", action_name: "approve"}},
+      "spam" => {done: "marked spam", ability: {controller_name: "bikes", action_name: "update"}},
+      "delete" => {done: "deleted", ability: {controller_name: "bikes", action_name: "destroy"}}
+    }.freeze
 
     before_action :find_bike, only: %i[edit update]
     helper_method :available_stolen_records
 
     def index
       @per_page = permitted_per_page(default: 50)
-      @pagy, @stolen_records = pagy(:countish, available_stolen_records
+      @pagy, @stolen_records = pagy(:countish, available_stolen_records.includes(:country)
         .reorder(sortable_order(StolenRecord)), limit: @per_page, page: permitted_page)
     end
 
@@ -22,12 +27,13 @@ module Admin
     end
 
     def bulk_update
-      stolen_records = StolenRecord.unscoped.where(id: params[:sr_selected]&.keys)
+      selected = params[:sr_selected].respond_to?(:keys) ? params[:sr_selected].keys : Array(params[:sr_selected])
+      stolen_records = StolenRecord.unscoped.where(id: selected)
       if stolen_records.none?
         flash[:error] = "No stolen records selected!"
       elsif BULK_ACTIONS.include?(params[:bulk_action])
-        send(:"bulk_#{params[:bulk_action]}", stolen_records)
-        flash[:success] = "#{stolen_records.count} stolen #{"bike".pluralize(stolen_records.count)} #{BULK_ACTIONS[params[:bulk_action]]}"
+        count = send(:"bulk_#{params[:bulk_action]}", stolen_records)
+        flash[:success] = "#{count} stolen #{"bike".pluralize(count)} #{BULK_ACTIONS.dig(params[:bulk_action], :done)}"
       else
         flash[:error] = "Unknown action!"
       end
@@ -71,21 +77,6 @@ module Admin
       end
       @current_stolen_record = @stolen_record.present? && @stolen_record.id == @bike.current_stolen_record&.id
       @bike
-    end
-
-    def bulk_approve(stolen_records)
-      stolen_records.each do |stolen_record|
-        stolen_record.update_attribute :approved, true
-        BikeJobs::ApproveStolenListingJob.perform_async(stolen_record.bike_id)
-      end
-    end
-
-    def bulk_spam(stolen_records)
-      Bike.unscoped.where(id: stolen_records.select(:bike_id)).find_each { it.update(likely_spam: true) }
-    end
-
-    def bulk_delete(stolen_records)
-      stolen_records.pluck(:bike_id).each { BikeJobs::BikeDeleterJob.perform_async(it, false, current_user.id) }
     end
 
     def update_image
@@ -137,7 +128,42 @@ module Admin
 
       @time_range_column = sort_column if %w[date_stolen].include?(sort_column)
       @time_range_column ||= "created_at"
-      @available_stolen_records = available_stolen_records.where(@time_range_column => @time_range)
+      @available_stolen_records = available_stolen_records
+    end
+
+    private
+
+    # There's no period select, so a ?period= left on a URL can't narrow it
+    def set_period
+      @period = "all"
+      super
+    end
+
+    def require_index_admin!
+      ability = BULK_ACTIONS.dig(params[:bulk_action], :ability) if action_name == "bulk_update"
+      ability ? super(**ability) : super
+    end
+
+    # Each returns how many it changed
+    def bulk_approve(stolen_records)
+      stolen_records.each do |stolen_record|
+        stolen_record.update_attribute :approved, true
+        BikeJobs::ApproveStolenListingJob.perform_async(stolen_record.bike_id)
+      end.size
+    end
+
+    def bulk_spam(stolen_records)
+      bikes = Bike.unscoped.where(id: stolen_records.select(:bike_id)).to_a
+      failed = bikes.reject { it.update(likely_spam: true) }
+      flash[:error] = "Unable to mark spam: #{failed.map { "##{it.id}" }.join(", ")}" if failed.any?
+      bikes.size - failed.size
+    end
+
+    # Inline, like admin/bikes#destroy, so the redirect doesn't list them still
+    def bulk_delete(stolen_records)
+      bike_ids = stolen_records.distinct.pluck(:bike_id)
+      bike_ids.each { BikeJobs::BikeDeleterJob.new.perform(it, false, current_user.id) }
+      bike_ids.size
     end
   end
 end
