@@ -59,7 +59,9 @@ export default class extends Controller {
     const url = new URL(fieldset.dataset.hwComboboxAsyncSrcValue, window.location.origin)
     this.#applyParams(url)
     fieldset.dataset.hwComboboxAsyncSrcValue = url.pathname + url.search
-    fieldset.querySelector('.hw-combobox__input').dispatchEvent(new Event('input', { bubbles: true }))
+    // disabled while the catalog loads, which has nothing to search yet
+    const input = fieldset.querySelector('.hw-combobox__input')
+    if (!input.disabled) input.dispatchEvent(new Event('input', { bubbles: true }))
   }
 
   // The URL leaves out the default market, so a shared link opens in its reader's own

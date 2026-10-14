@@ -1,11 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
-import { hydrate } from 'bikebook/hydrate'
+import { hydrate, loadingShell } from 'bikebook/hydrate'
 import { readable } from 'bikebook/replace_url'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { uuid } from 'bikebook/templates/helpers'
 
-/* global CSS */
+/* global CSS, requestAnimationFrame */
 
 const stamped = (state) => ({ ...state, bikebook: uuid() })
 
@@ -20,7 +20,7 @@ export default class extends Controller {
   #renders = 0
   #renderedUrl
 
-  // The first render replaces the status, and a failed one puts it back
+  // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
   initialize () {
     this.status = this.statusTarget
   }
@@ -29,6 +29,7 @@ export default class extends Controller {
     window.history.scrollRestoration = 'manual'
     this.#stamp()
     const url = new URL(window.location.href)
+    this.#render(url)
     try {
       this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue)
     } catch (error) {
@@ -36,7 +37,8 @@ export default class extends Controller {
     }
     this.source = new CatalogComboboxSource(this.catalog, (count) => renderCounts(document, count))
     this.#countModels()
-    this.#render(url)
+    // filters set while it loaded are in the URL
+    this.#render(new URL(window.location.href))
   }
 
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles
@@ -104,8 +106,11 @@ export default class extends Controller {
     return this.#render(url, scroll, options)
   }
 
-  // `focus` selects what to focus, the search where it selects nothing
+  // `focus` selects what to focus, the search where it selects nothing, unless a field of the page's has focus, which
+  // keeps it and any value it hasn't yet changed to. Until the catalog loads, the page is its loading shell
   async #render (url, scroll, { focus = '[autofocus]' } = {}) {
+    if (!this.catalog) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
+
     const render = ++this.#renders
     // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
     if (render > 1) document.querySelector('link[rel="canonical"]')?.remove()
@@ -115,10 +120,18 @@ export default class extends Controller {
 
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
+    const active = this.pageTarget.contains(document.activeElement) && document.activeElement.id ? document.activeElement : null
     this.pageTarget.replaceChildren(rendered.content)
     this.#renderedUrl = url
     document.title = rendered.title ?? this.titleValue
-    if (focus) (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) })
+    const kept = active && this.pageTarget.querySelector(`#${CSS.escape(active.id)}`)
+    if (kept) {
+      if (['text', 'number', 'search'].includes(active.type)) kept.value = active.value
+      // once its panel's controller has opened it, a hidden field taking no focus
+      requestAnimationFrame(() => kept.focus({ preventScroll: true }))
+    } else if (focus) {
+      (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) })
+    }
     if (scroll) window.scrollTo(...scroll)
   }
 
@@ -131,9 +144,10 @@ export default class extends Controller {
     this.taglineTarget.replaceChildren(tagline)
   }
 
+  // in place of the spinner, below the loading shell's search, where it's still showing
   #fail (error) {
     console.error(error)
     this.status.textContent = this.failedTextValue
-    this.pageTarget.replaceChildren(this.status)
+    if (!this.pageTarget.contains(this.status)) this.pageTarget.replaceChildren(this.status)
   }
 }

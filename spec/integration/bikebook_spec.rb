@@ -775,11 +775,17 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(canadian.find("h2", text: /\Amodel years\z/i).ancestor("section").all("tr").map { it.first("td").text }).to eq %w[2025]
   end
 
-  it "says so when the catalog doesn't load" do
+  it "keeps the search and its filters while the catalog loads, and says so when it doesn't" do
     serve_bikebook_catalog(manifest_status: 404)
-    visit bikebook_path
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level_4_rec_step_through", electric: "1")
 
     expect(page).to have_text("The catalog didn't load. Reload the page to try again.", wait: 10)
     expect(page).to have_css("h1", exact_text: "The world’s bicycle library — search, compare, and find your next ride.")
+    # the search waits on the catalog, but the filters work from the URL alone
+    expect(page).to have_css("#vehicle_models[disabled]")
+    click_on "More filters"
+    expect(page).to have_checked_field("e-Vehicle (motorized)")
+    check "Human powered (Acoustic)"
+    expect(page).to have_current_path(/[?&]electric=0,1\b/)
   end
 end
