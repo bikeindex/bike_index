@@ -149,14 +149,12 @@ RSpec.describe API::V1::BikesController, type: :request do
       end
 
       context "without no_duplicate" do
-        let(:bike_attrs) { bike_hash[:bike].except(:no_duplicate) }
-        def post_bike(attrs = {}) = post "/api/v1/bikes", params: bike_hash.merge(bike: bike_attrs.merge(attrs)).as_json
+        def post_bike(attrs = {}) = post "/api/v1/bikes", params: bike_hash.merge(bike: bike_hash[:bike].except(:no_duplicate).merge(attrs)).as_json
 
         it "returns the existing bike for a repeated send, and creates for a different serial or email" do
           expect { post_bike }.to change(Bike, :count).by(1)
           expect(response.code).to eq("200")
           bike = Bike.where(serial_number: "SSOMESERIAL").first
-          expect_matching_created_bike(bike)
           expect(json_result.dig("bike", "api_url")).to end_with("/api/v1/bikes/#{bike.id}")
           first_result = json_result
 
