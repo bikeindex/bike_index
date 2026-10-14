@@ -6,7 +6,9 @@ class ReviewImpoundClaimsController < ApplicationController
   end
 
   def update
-    if !@impound_claim.submitting?
+    if params[:submit] == "retrieved_by_owner"
+      mark_retrieved_by_owner
+    elsif !@impound_claim.submitting?
       flash[:error] = if @impound_claim.responded?
         "That claim has already been responded to"
       else
@@ -48,6 +50,22 @@ class ReviewImpoundClaimsController < ApplicationController
       @impound_claim = impound_claim
     else
       raise ActiveRecord::RecordNotFound
+    end
+  end
+
+  # No impound_claim on the update: ProcessImpoundUpdatesJob attaches the approved claim
+  # and merges it (recovering the stolen record), but only while the claim is still approved
+  def mark_retrieved_by_owner
+    unless @impound_claim.approved? && @impound_record.update_kinds.include?("retrieved_by_owner")
+      flash[:error] = "Only an approved claim can be marked returned"
+      return
+    end
+    impound_record_update = @impound_record.impound_record_updates
+      .create(user: current_user, kind: "retrieved_by_owner")
+    if impound_record_update.persisted?
+      flash[:success] = impound_record_update.kind_humanized
+    else
+      flash[:error] = "Unable to record: #{impound_record_update.errors.full_messages.to_sentence}"
     end
   end
 
