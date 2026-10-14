@@ -117,6 +117,15 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(BikeServices::DuplicateReviewFinder.groups.find { it["serial"] == "M0T08ECANE" }["kind"]).to eq "not_a_serial"
     end
 
+    it "vetoes a record's own stolen history when its serial is blank" do
+      bikes = [FactoryBot.create(:stolen_bike, :with_ownership, manufacturer:, serial_number: "unknown"),
+        FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "unknown")]
+      get "#{base_url}/compare", params: {bike_ids: bikes.map(&:id).join(",")}
+      expect(response.code).to eq "200"
+      expect(assigns(:serial_stolen)).to be false
+      expect(response.body).to include("Not a candidate", "A record has its own stolen history")
+    end
+
     context "with stolen history on the serial under another manufacturer" do
       before { FactoryBot.create(:stolen_bike, serial_number: "WTU123456") }
 

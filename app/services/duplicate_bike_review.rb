@@ -24,11 +24,13 @@ class DuplicateBikeReview
     bike&.ownerships&.min_by { |ownership| [ownership.previous_ownership_id.nil? ? 0 : 1, ownership.created_at || Time.at(0), ownership.id || 0] }
   end
 
-  # manufacturer_names: is DuplicateReviewCues.manufacturer_name_serials, so a brand typed as the serial is caught
-  def initialize(bikes:, reference_bike: nil, manufacturer_names: {})
+  # manufacturer_names: is DuplicateReviewCues.manufacturer_name_serials, so a brand typed as the serial is caught.
+  # stolen_record_counts: is every stolen record per bike ID, deleted ones included
+  def initialize(bikes:, reference_bike: nil, manufacturer_names: {}, stolen_record_counts: {})
     @bikes = bikes
     @reference_bike = reference_bike || bikes.first
     @manufacturer_names = manufacturer_names
+    @stolen_record_counts = stolen_record_counts
   end
 
   def serial_match(bike)
@@ -117,6 +119,8 @@ class DuplicateBikeReview
 
   def transferred?(bike) = bike.ownerships.any?(&:previous_ownership_id)
 
+  def stolen_history?(bike) = bike.status_stolen? || bike.current_stolen_record_id.present? || @stolen_record_counts.key?(bike.id)
+
   def shared_fields = @shared_fields ||= FIELDS.keys.select { field_distribution(it).size == 1 }
 
   def differing_fields = @differing_fields ||= FIELDS.keys - shared_fields
@@ -170,9 +174,20 @@ class DuplicateBikeReview
     accounts = initials.map { it&.user_id }
     emails = initials.map { normalized_email(it) }
     separate_cues = cues(test_count:).select { SEPARATE_REVIEW_CUES.include?(it.key) }
+    serials = bikes.map { it.serial_normalized_no_space.to_s }
+    manufacturer_ids = bikes.map(&:manufacturer_id)
     [
-      serial_stolen ? Check.new(:blocked, "Stolen history on this whole serial (any record, manufacturer or status) is a hard merge veto") :
-        Check.new(:pass, "No stolen report on this whole serial now; recheck when a merge executes"),
+      if serial_stolen
+        Check.new(:blocked, "Stolen history on this whole serial (any record, manufacturer or status) is a hard merge veto")
+      elsif bikes.any? { stolen_history?(it) }
+        Check.new(:blocked, "A record has its own stolen history, a hard merge veto whatever its serial")
+      else
+        Check.new(:pass, "No stolen history on these records or their whole serials now; recheck when a merge executes")
+      end,
+      ((serials.uniq.size == 1 && serials.first.length >= 6) ? Check.new(:pass, "Same whole normalized serial on every record") :
+        Check.new(:blocked, "Whole normalized serials differ, or one is missing or shorter than 6 characters")),
+      ((manufacturer_ids.uniq.size == 1 && manufacturer_ids.first) ? Check.new(:pass, "Same manufacturer on every record") :
+        Check.new(:blocked, "Manufacturers differ, or one is missing")),
       ((bikes.any? { it.deleted_at || it.example || it.likely_spam }) ? Check.new(:blocked, "Includes a deleted, example or spam record") : nil),
       *separate_cues.map { Check.new(:blocked, "#{it.label} — needs separate review, not an invitation") },
       if accounts.compact.size == bikes.size && accounts.uniq.size == 1

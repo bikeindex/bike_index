@@ -44,7 +44,8 @@ module Admin
       else
         all_bikes.min_by(&:id)
       end
-      @review = DuplicateBikeReview.new(bikes: all_bikes, reference_bike: @reference_bike,
+      @stolen_record_counts = StolenRecord.unscoped.where(bike_id: all_bikes.map(&:id)).group(:bike_id).count
+      @review = DuplicateBikeReview.new(bikes: all_bikes, reference_bike: @reference_bike, stolen_record_counts: @stolen_record_counts,
         manufacturer_names: BikeServices::DuplicateReviewCues.cached_manufacturer_name_serials)
       @contact_group = @review.contact_groups.find { it.number == params[:search_contact].to_i }
       @per_page = permitted_per_page(default: 25)
@@ -54,7 +55,6 @@ module Admin
       # Only the listed records show these
       ActiveRecord::Associations::Preloader.new(records: @bikes, associations: %i[bike_organizations bike_stickers public_images]).call
       @test_bike_ids = BikeServices::DuplicateReviewFinder.test_bike_ids(all_bikes.map(&:id)).to_set
-      @stolen_record_counts = StolenRecord.unscoped.where(bike_id: all_bikes.map(&:id)).group(:bike_id).count
       @serial_stolen = BikeServices::DuplicateReviewFinder.stolen_serials?(all_bikes.map(&:serial_normalized_no_space).uniq)
       account_ids = all_bikes.flat_map { |bike| bike.ownerships.map(&:user_id) }.compact.uniq
       @account_emails = User.unscoped.where(id: account_ids).pluck(:id, :email).to_h
