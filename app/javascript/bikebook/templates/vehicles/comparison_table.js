@@ -70,7 +70,7 @@ const GEARING = [
 ]
 
 // The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's. The
-// 'geometry' `part` is their sizes and frames, keyed to the overlay by `frames`, and the 'specs' part the rest
+// 'geometry' `part` is their sizes and frames, keyed to the overlay by `frames`, the 'specs' part the rest, and 'all' both
 export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part = 'specs' }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
@@ -161,14 +161,20 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
       }
     })
   const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50 tw:dark:bg-blue-950' }
-  const rows = part === 'geometry'
-    ? [...(sizes.some(Boolean) ? [size] : []), ...records([...geometry, length, WEIGHT])]
-    : records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING])
+  const sizeRows = sizes.some(Boolean) ? [size] : []
+  const geometryRecords = records([...geometry, length, WEIGHT])
+  const specRecords = records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING])
+  const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
+  const rows = {
+    geometry: [...sizeRows, ...geometryRecords],
+    specs: specRecords,
+    all: [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...specRecords, ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])]
+  }[part]
   if (rows.length === 0) return nothing
 
   // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling
   // only once it's the window's width; its own min-w-full would make it the window's width
-  return html`<section aria-label=${part === 'geometry' ? 'Sizes & geometry comparison' : 'Components comparison'} class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4">${table({
+  return html`<section aria-label=${{ geometry: 'Sizes & geometry comparison', specs: 'Components comparison', all: 'Comparison' }[part]} class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4">${table({
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [

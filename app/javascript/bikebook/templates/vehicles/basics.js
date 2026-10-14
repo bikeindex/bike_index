@@ -30,10 +30,10 @@ const readMore = (content) => html`<div class="tw:group/read-more" data-controll
   class="tw:hidden tw:group-data-expanded/read-more:inline">Show less</span></button></div>`
 
 // The models' names, photos and headline fields: one beside its photo, more side by side in a table
-export const basics = ({ presenter, vehicles, classificationPath }) => {
+export const basics = ({ presenter, vehicles }) => {
   const shown = vehicles.map(({ data }) => {
     const price = priced(data)
-    const fields = basicsOf({ presenter, data, classificationPath })
+    const fields = basicsOf({ presenter, data })
     return {
       ...fields,
       price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
@@ -44,7 +44,7 @@ export const basics = ({ presenter, vehicles, classificationPath }) => {
   return shown.length === 1 ? single(shown[0], fields) : compared(shown, fields)
 }
 
-const single = (vehicle, fields) => html`<section aria-label="Basics" class="tw:mt-6 tw:grid tw:items-start tw:gap-8
+const single = (vehicle, fields) => html`<section aria-label="Overview" class="tw:mt-6 tw:grid tw:items-start tw:gap-8
   tw:md:grid-cols-[minmax(0,1fr)_400px]"><div>${manufacturerLine(vehicle.manufacturer)}<h2 class="tw:font-header tw:text-2xl tw:font-bold">${vehicle.model}</h2><dl
   class="tw:mt-3 tw:text-sm">${fields.filter(({ key }) => present(vehicle[key])).map(({ label, key }) => key === 'description'
     ? html`<div class="tw:py-1.5"><dt class="tw:text-gray-600 tw:dark:text-gray-400">${label}</dt><dd class="tw:mt-1 tw:text-gray-600
@@ -53,7 +53,7 @@ const single = (vehicle, fields) => html`<section aria-label="Basics" class="tw:
       class="tw:text-gray-600 tw:dark:text-gray-400">${label}</dt><dd class="tw:mb-0 tw:text-right">${vehicle[key]}</dd></div>`)}</dl></div><div
   class="tw:max-md:order-first">${vehicle.photo('tw:aspect-[4/3]')}</div></section>`
 
-const compared = (vehicles, fields) => html`<section aria-label="Basics comparison" class="tw:mt-6">${table({
+const compared = (vehicles, fields) => html`<section aria-label="Overview comparison" class="tw:mt-6">${table({
   classes: `tw:w-full tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)}`,
   records: fields,
   columns: [

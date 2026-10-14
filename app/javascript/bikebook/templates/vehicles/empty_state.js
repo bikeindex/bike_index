@@ -13,7 +13,7 @@ const steps = (filtersPath) => [
 
 const EXAMPLES = [
   ['Trek Marlin 5 vs Specialized Rockhopper Sport', 'vehicle_models=m/trek/2026/marlin_5_gen_3,m/specialized/2026/rockhopper_sport'],
-  ['e-bike and classification', 'vehicle_models=m/rad_power/2020/radwagon_4,m/rad_power/2024/radwagon_5,m/rad_power/2026/radwagon,evc/us/class_2'],
+  ['RadWagon 4 vs 5 vs 2026', 'vehicle_models=m/rad_power/2020/radwagon_4,m/rad_power/2024/radwagon_5,m/rad_power/2026/radwagon'],
   ['Gravel bikes under $1,500', 'primary_activity=atb_gravel&price_max=1500']
 ]
 

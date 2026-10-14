@@ -1,5 +1,6 @@
 import { html, nothing, render } from 'lit-html'
 import { copyableCode } from 'bikebook/templates/ui/copyable_code'
+import { numberDisplay } from 'bikebook/templates/helpers'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
@@ -10,7 +11,7 @@ import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
 import { modelYears } from 'bikebook/templates/vehicles/model_years'
 import { motorSection } from 'bikebook/templates/vehicles/motor_section'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
-import { section } from 'bikebook/templates/vehicles/section'
+import { disclosure, section } from 'bikebook/templates/vehicles/section'
 import { andSentence, array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
 
 // Ruby's \s, which a thin space isn't
@@ -55,23 +56,26 @@ export const brakesAt = (presenter, data, size) => {
 
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
 
-// A vehicle's names, photo and the fields the Basics view lists
-export const basicsOf = ({ presenter, data, classificationPath }) => new ModelViewer({ presenter, data, others: [], classificationPath }).basics()
+export const wheelSize = (presenter, bsd) => new ModelViewer({ presenter, data: {}, others: [] }).wheelSizeName(bsd)
 
-// A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`'
-export const sizesOf = ({ presenter, data, others, selectedSize }) => new ModelViewer({ presenter, data, others, selectedSize }).sizes()
+// A vehicle's names, photo and the fields the Overview lists
+export const basicsOf = ({ presenter, data }) => new ModelViewer({ presenter, data, others: [] }).basics()
+
+// A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`', the rest
+// linked to `sizePath(name)`
+export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
 
 // A vehicle's components by group, marked where they differ from `others`'
 export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
 
 class ModelViewer {
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath, selectedSize }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, classificationPath, selectedSize })
+    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath })
   }
 
   render () {
@@ -105,7 +109,7 @@ class ModelViewer {
       data-controller="ui--collapse ui--alert" data-ui--collapse-param-value="json"
       data-ui--collapse-direction-value="horizontal"><article class="twgutter tw:w-full tw:min-w-0 tw:space-y-6
       tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]
-      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${present(this.vehicle.components)
+      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizesDisclosure()}${present(this.vehicle.components)
       ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}</section>`
       : nothing}</article><aside
       id=${jsonPanelId} class="twjson-panel tw:hidden tw:w-full tw:min-w-0 tw:lg:relative tw:lg:w-[28rem] tw:lg:shrink-0" data-ui--collapse-target="content">${
@@ -224,6 +228,10 @@ class ModelViewer {
     return this.others.some((other) => !equal(dig(other), dig(this.vehicle)))
   }
 
+  highlight (differs) {
+    return differs ? 'tw:spec-diff tw:-mx-2 tw:rounded-r-sm tw:px-2 tw:py-1' : ''
+  }
+
   identity () {
     const { presenter, vehicle } = this
     // `shown` presents the field's value, the others' as well as this one's
@@ -281,7 +289,7 @@ class ModelViewer {
   }
 
   classificationNames ({ standard, optional }) {
-    const tooltips = this.presenter.classificationTooltips(this.classificationPath)
+    const tooltips = this.presenter.classificationTooltips()
     const optionals = optional.map(([name, mode]) => html`<span class="tw:block"><span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">w/ optional
       ${this.presenter.humanize(mode).toLowerCase()}</span> ${this.tooltipped(name, tooltips)}</span>`)
     return join([join(standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optionals])
@@ -572,13 +580,40 @@ class ModelViewer {
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
   }
 
+  description () {
+    const description = this.vehicle.description
+    if (blank(description)) return nothing
+
+    const differs = this.others.some((other) => String(other.description ?? '') !== String(description))
+    return disclosure({
+      param: 'description',
+      label: 'description',
+      heading: 'Description',
+      content: html`<div class="tw:text-sm tw:text-gray-700 tw:dark:text-gray-300 ${this.highlight(differs)}"><p
+        class="tw:truncate tw:group-has-[[aria-expanded=true]]/disclosure:hidden">${description}</p><div data-ui--collapse-target="content"
+        class="tw:hidden tw:space-y-2">${simpleFormat(description)}</div></div>`
+    })
+  }
+
+  sizesDisclosure () {
+    const sizes = this.vehicle.sizes
+    if (blank(sizes)) return nothing
+
+    return disclosure({
+      param: 'sizes',
+      label: 'sizes',
+      heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-mono tw:text-sm tw:font-normal tw:tracking-normal tw:opacity-65 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
+      content: html`<div data-ui--collapse-target="content" class="twgutter-bleed">${this.sizes()}</div>`
+    })
+  }
+
   sizes () {
     const sizes = this.vehicle.sizes
     if (blank(sizes)) return nothing
 
     const others = this.others.map((other) => other.sizes)
     return html`<div data-controller="bikebook--center-current" class="tw:flex tw:gap-4 tw:overflow-x-auto tw:pb-3.5">${
-      sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize }))}</div>`
+      sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize, href: this.sizePath?.(size.name) }))}</div>`
   }
 
   components () {

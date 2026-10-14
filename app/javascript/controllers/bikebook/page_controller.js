@@ -18,6 +18,7 @@ export default class extends Controller {
 
   #scrolls = new Map()
   #renders = 0
+  #renderedUrl
 
   // The first render replaces the status, and a failed one puts it back
   initialize () {
@@ -33,7 +34,7 @@ export default class extends Controller {
     } catch (error) {
       return this.#fail(error)
     }
-    this.source = new CatalogComboboxSource(this.catalog, (count) => renderCounts(document, count, this.catalog.modelsCount))
+    this.source = new CatalogComboboxSource(this.catalog, (count) => renderCounts(document, count))
     this.#countModels()
     this.#render(url)
   }
@@ -47,7 +48,8 @@ export default class extends Controller {
   }
 
   // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
-  // scrolling, focusing what its data-in-place selects rather than the search
+  // scrolling, focusing what its data-in-place selects rather than the search. One among the vehicles was written when
+  // the page rendered, so only what it changes from that goes onto the URL, which filters and panels have moved on since
   follow (event) {
     const link = event.target.closest('a[href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
@@ -56,7 +58,9 @@ export default class extends Controller {
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
-    'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: link.dataset.inPlace || false }) : this.#go(url)
+    'inPlace' in link.dataset
+      ? this.#go(link.closest('#vehicle-viewers') ? this.#changedBy(url) : url, [window.scrollX, window.scrollY], { focus: link.dataset.inPlace || false })
+      : this.#go(url)
   }
 
   // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
@@ -84,6 +88,17 @@ export default class extends Controller {
     if (!this.#entry) window.history.replaceState(stamped(window.history.state), '')
   }
 
+  #changedBy (link) {
+    const url = new URL(window.location.href)
+    const rendered = this.#renderedUrl ?? url
+    for (const name of new Set([...link.searchParams.keys(), ...rendered.searchParams.keys()])) {
+      const value = link.searchParams.get(name)
+      if (value === rendered.searchParams.get(name)) continue
+      value === null ? url.searchParams.delete(name) : url.searchParams.set(name, value)
+    }
+    return url
+  }
+
   #go (url, scroll = [0, 0], options) {
     window.history.pushState(stamped(), '', readable(url))
     return this.#render(url, scroll, options)
@@ -101,6 +116,7 @@ export default class extends Controller {
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
     this.pageTarget.replaceChildren(rendered.content)
+    this.#renderedUrl = url
     document.title = rendered.title ?? this.titleValue
     if (focus) (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) })
     if (scroll) window.scrollTo(...scroll)

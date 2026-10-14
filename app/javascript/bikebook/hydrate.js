@@ -48,7 +48,7 @@ export async function hydrate (catalog, source, shell, url) {
   const values = vehicles.map(({ value }) => value).join(',')
 
   for (const field of ['year', 'price']) panel.setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
-  renderCounts(root, filteredCount, catalog.modelsCount)
+  renderCounts(root, filteredCount)
   const manufacturers = catalog.options.manufacturer.length
   renderInto(root.getElementById('manufacturer-count'),
     html`(${numberDisplay(manufacturers)} ${tooltip({ text: `${manufacturers.toLocaleString('en-US')} manufacturers have models in the catalog` })})`)
@@ -67,11 +67,10 @@ export async function hydrate (catalog, source, shell, url) {
   for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 
   const viewer = new VehicleViewer(kit, catalog.vocabulary)
-  const classificationPath = viewer.classificationPath(url, vehicles.map(({ value }) => value))
   for (const input of root.querySelectorAll('input[name="electric"]')) {
     const id = input.value.replace(/^class_/, 'evc/us/class_')
     const classification = catalog.vocabulary.e_vehicle_classifications[id]
-    if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id, classificationPath) })))
+    if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
   }
 
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),

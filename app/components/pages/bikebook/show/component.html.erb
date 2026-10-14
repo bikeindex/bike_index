@@ -3,7 +3,10 @@
   <a
     href="<%= bikebook_path %>"
     hidden
-    class="twlink tw:shrink-0 tw:text-sm"
+    class="
+      twlink tw:shrink-0 tw:justify-self-start tw:text-sm
+      tw:lg:col-span-full
+    "
     data-in-place="[autofocus]"
     data-bikebook--catalog-filters-target="clear"
     data-action="bikebook--catalog-filters#refreshClear"
@@ -59,13 +62,13 @@
         tw:has-[ul:empty]:hidden tw:dark:border-gray-700
       "
     >
+      <%= clear_filters %>
+
       <ul
         aria-label="<%= translation(".applied_filters") %>"
         data-bikebook--catalog-filters-target="summary"
         class="tw:flex tw:flex-1 tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:text-sm"
       ></ul>
-
-      <%= clear_filters %>
     </div>
 
     <div
@@ -75,6 +78,8 @@
     >
       <div class="twwiderow">
         <%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:mt-3 tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start")) do %>
+          <%= clear_filters %>
+
           <div class="tw:flex tw:flex-col tw:gap-4">
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "primary_activity",
           label: translation(".activities"), placeholder: translation(".any_activity"), multiselect: true)) do %>
@@ -246,17 +251,6 @@
                 <% end %>
               </fieldset>
             </div>
-          </div>
-
-          <div
-            class="
-              tw:col-span-full tw:flex tw:flex-wrap tw:items-baseline
-              tw:justify-between tw:gap-x-4 tw:gap-y-1 tw:border-t
-              tw:border-gray-200 tw:pt-3 tw:text-sm tw:dark:border-gray-700
-            "
-          >
-            <span id="vehicle-filters-count" aria-live="polite"></span>
-            <%= clear_filters %>
           </div>
         <% end %>
       </div>
