@@ -18,6 +18,20 @@ RSpec.describe Admin::ImpoundClaimsController, type: :request do
       expect(response.status).to eq(200)
       expect(assigns(:impound_claims)).to eq([impound_claim, impound_claim_later])
     end
+
+    context "search_status stalled" do
+      let(:impound_record) { FactoryBot.create(:impound_record) }
+      let!(:impound_claim_stalled) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", submitted_at: Time.current - 100.days) }
+      let!(:impound_claim_recent) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting") }
+
+      it "renders only stalled claims" do
+        get base_url, params: {search_status: "stalled", render_chart: true}
+        expect(response.status).to eq(200)
+        expect(assigns(:search_status)).to eq "stalled"
+        expect(assigns(:impound_claims).pluck(:id)).to eq([impound_claim_stalled.id])
+        expect(response.body).to include("Stalled records")
+      end
+    end
   end
 
   describe "show" do

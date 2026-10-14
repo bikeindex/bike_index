@@ -21,7 +21,7 @@ module Admin
     protected
 
     def available_statuses
-      %w[all current resolved] + (ImpoundClaim.statuses - ["current"]) # current ordered the way we want to display
+      %w[all current stalled resolved] + (ImpoundClaim.statuses - ["current"]) # current ordered the way we want to display
     end
 
     def sortable_columns
