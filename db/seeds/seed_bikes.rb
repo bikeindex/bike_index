@@ -509,6 +509,7 @@ rm_components = [
 rm_bike = seed_bike(
   creator:, user:, origin: "organization_form", label: "Riese & Müller bike",
   params: {bike: bike_params(owner_email: rm_owner.email, manufacturer_id: rm_manufacturer.id).merge(
+    serial_number: "LOAD4ROHLOFF01",
     creation_organization_id: brakebills_org.id.to_s,
     cycle_type: "cargo",
     propulsion_type: "pedal-assist",
