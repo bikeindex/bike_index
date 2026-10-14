@@ -62,6 +62,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[aria-label='Basics'] h2", text: "Level 4 REC Step-Through")
     expect(page).to have_css("nav[aria-label='Jump to'] a[aria-current='page']", exact_text: "Basics")
     expect(find("[aria-label='Basics']")).to have_css("div", text: /\ACertification\s*UL 2849, UL 2271\z/)
+    # a description that fits its clamp has nothing more to read
+    expect(find("[aria-label='Basics']")).to have_text("The Level 4 REC").and have_no_button("Read more")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
     expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through")
@@ -74,6 +76,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[aria-label='Basics comparison'] thead th", count: 3)
     expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
     expect(page).to have_no_css("article")
+    # what differs is only marked further down
+    expect(find("[aria-label='Basics comparison']")).to have_no_css(".tw\\:spec-diff")
     # each view a link to this page, rendered without a request and kept through a pick
     click_link "Sizes & geometry"
     expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tbody tr:first-child th", text: "Size")
@@ -718,6 +722,13 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st", view: "all")
+    # its long description clamped, until it's opened
+    description = find("[aria-label='Basics'] dd", text: /\AWhatever you’re into/, wait: 10)
+    clamped = -> { description.evaluate_script("this.querySelector('[data-bikebook--read-more-target=text]').scrollHeight > this.querySelector('[data-bikebook--read-more-target=text]').clientHeight") }
+    expect(clamped.call).to be true
+    description.click_on "Read more"
+    expect(description).to have_css("button[aria-expanded='true']", exact_text: "Show less")
+    expect(clamped.call).to be false
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
     # years keyed by year, read newest first, each with its colorways, and the system weight limit with the frame
