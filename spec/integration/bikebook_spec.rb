@@ -95,6 +95,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     click_link "All"
     expect(page).to have_css("[data-comparison] article", count: 2)
     expect(page).to have_css("[aria-label='Basics comparison']").and have_css("[aria-label='Sizes & geometry comparison']")
+    expect(page).to have_css("h2", text: /\Aspecs & components\z/i)
     expect(page).to have_current_path(/[?&]view=all\b/)
     # what differs is marked, not what it's called, and of a list just the items that differ
     expect(all("article").last).to have_css("dd .tw\\:spec-diff").and have_no_css("dt .tw\\:spec-diff")
@@ -802,7 +803,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path(vehicle_models: "evc/us/ca/motor_driven_cycle", view: "all")
     card = find("article h1", text: "California Motor-Driven Cycle", wait: 10).ancestor("article")
     # its card is its basics, with no sizes or components to list
-    expect(page).to have_no_css("h2", exact_text: "Components")
+    expect(page).to have_no_css("h2", text: /\Aspecs & components\z/i)
     expect(card).to have_css("li", text: /\AFrom January 1, 2027: Its motor produces 5 gross brake horsepower/)
       .and have_css("li", text: /\AUntil January 1, 2027: The line is drawn only by an engine under 150 cc/)
       .and have_css("dd", exact_text: "January 1, 2027")

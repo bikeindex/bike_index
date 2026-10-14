@@ -84,12 +84,15 @@ export class VehicleViewer {
       })
     }
     const shown = view === 'all'
-      ? Object.entries(sections).map(([name, section]) => html`<div class="tw:mt-10">${sectionHeading(VIEWS[name])}${section(false)}</div>`)
+      ? Object.entries(sections).map(([name, section]) => html`<div class="tw:mt-10">${sectionHeading(ALL_HEADINGS[name])}${section(false)}</div>`)
       : sections[view]?.(true) ?? html`<p class="tw:mt-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">E-vehicle classifications have no ${
         VIEWS[view].toLowerCase()}. Their rules are under Basics.</p>`
     return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }))}${shown}`
   }
 }
+
+// All's components are the whole cards, specs and all
+const ALL_HEADINGS = { ...VIEWS, components: 'Specs & components' }
 
 // what narrows the search, rather than the market every visitor has
 const FILTERS = ['primary_activity', 'manufacturer', 'vehicle_type', 'suspension', 'model_configuration', 'electric', 'year_min', 'year_max',
