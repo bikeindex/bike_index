@@ -269,12 +269,17 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_link("Clear filters").and have_no_css("[aria-label='Applied filters'] li")
     expect(page).to have_css(".hw-combobox__chip", count: 2).and have_css("[data-comparison] article", count: 2)
     expect(page).to have_no_current_path(/manufacturer|electric/)
-    # and from the open panel
+    # and from the open panel, where a market alone is nothing to clear, and stays through a clear
     click_on "More filters", match: :first
+    find_field("Market").click
+    find("#market-hw-listbox [role='option']", text: "United States (23)").click
+    expect(page).to have_css("#vehicle-filters-count", exact_text: "23 of 30 models match")
+    expect(page).to have_no_link("Clear filters")
     check "US Class 2"
     within("#vehicle-filters") { click_link "Clear filters" }
-    expect(page).to have_css("#vehicle-filters-count", exact_text: "30 of 30 models match")
-    expect(page).to have_unchecked_field("US Class 2")
+    expect(page).to have_css("#vehicle-filters-count", exact_text: "23 of 30 models match")
+    expect(page).to have_unchecked_field("US Class 2").and have_field("Market", with: "United States")
+    expect(page).to have_current_path(/[?&]market=US\b/)
 
     expect(asked).to be_empty
 

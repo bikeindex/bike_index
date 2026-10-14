@@ -36,11 +36,11 @@ export default class extends Controller {
     this.#writeUrl()
   }
 
-  // A clear link's href, as it's clicked: this URL less every filter, keeping the picks, view and sort, which the
-  // page renders afresh with the filters at their defaults
+  // A clear link's href, as it's clicked: this URL less every filter but the market, keeping the picks, view and
+  // sort too, which the page renders afresh with the filters at their defaults
   clear ({ currentTarget }) {
     const url = new URL(window.location)
-    for (const name of [...Object.keys(this.#filters), 'jurisdiction']) url.searchParams.delete(name)
+    for (const name of [...Object.keys(this.#filters), 'jurisdiction'].filter((name) => name !== 'market')) url.searchParams.delete(name)
     currentTarget.href = readable(url)
   }
 
@@ -88,9 +88,9 @@ export default class extends Controller {
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
-  // the visitor's own market is no filter they set, but Any in its place is
+  // the market stays through a clear, so it alone leaves nothing to clear
   #refreshSummary () {
-    const filtered = Object.entries(this.#filters).some(([name, value]) => name === 'market' ? value !== this.defaultMarketValue : value)
+    const filtered = Object.entries(this.#filters).some(([name, value]) => name !== 'market' && value)
     for (const link of this.clearTargets) link.hidden = !filtered
     this.summaryTarget.replaceChildren(...this.#summary.map(([label, value]) => {
       const item = document.createElement('li')
