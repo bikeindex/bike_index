@@ -52,7 +52,8 @@ export default class extends Controller {
 
   // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
   // scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search. One among the
-  // vehicles was written when the page rendered, so only what it changes from that goes onto the URL, which filters and panels have moved on since
+  // vehicles was written when the page rendered, so only what it changes from that goes onto the URL, which filters
+  // and panels have moved on since
   follow (event) {
     const link = event.target.closest('a[href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
