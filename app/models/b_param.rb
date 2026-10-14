@@ -112,7 +112,9 @@ class BParam < ApplicationRecord
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
-  scope :acknowledgment_pending, -> { where(id: RegistrationSequenceAcknowledgment.pending.select(:b_param_id)) }
+  # = ANY(ARRAY(...)) rather than IN (...): the pkey can take it, so ORing it with an
+  # indexed condition is a BitmapOr instead of a seq scan
+  scope :acknowledgment_pending, -> { where("b_params.id = ANY(ARRAY(#{RegistrationSequenceAcknowledgment.pending.select(:b_param_id).to_sql}))") }
   scope :unfinished_registrations, -> { unexpired.step_1_submitted.and(without_bike.or(acknowledgment_pending)) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
