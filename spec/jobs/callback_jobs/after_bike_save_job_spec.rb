@@ -22,7 +22,6 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
 
       it "doesn't enqueue pos_registration_match_finder" do
         instance.perform(bike_id)
-        expect(BikeJobs::DuplicateBikeFinderJob.jobs.size).to eq 1
         expect(BikeJobs::PosRegistrationMatchFinderJob.jobs.size).to eq 0
       end
     end

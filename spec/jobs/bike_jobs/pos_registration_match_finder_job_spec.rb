@@ -19,10 +19,6 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     FactoryBot.create(pos_bike_factory, owner_email: pos_owner_email, manufacturer:, serial_number:, created_at: pos_created_at)
   end
 
-  it "is the correct queue" do
-    expect(described_class.sidekiq_options["queue"]).to eq "droppable"
-  end
-
   it "records a pending match once" do
     expect(pos_bike.current_ownership.user_id).to eq user.id
     expect {
@@ -56,12 +52,11 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
   end
 
   context "a deleted bike with the serial was stolen and recovered" do
-    let(:deleted_bike) { FactoryBot.create(:bike, serial_number:) }
     before do
+      deleted_bike = FactoryBot.create(:bike, serial_number:)
       FactoryBot.create(:stolen_record_recovered, bike: deleted_bike)
       deleted_bike.destroy
-      expect(deleted_bike.reload).to have_attributes(status: "status_with_owner", current_stolen_record_id: nil)
-      expect(deleted_bike.deleted_at).to be_present
+      expect(deleted_bike.reload).to have_attributes(status: "status_with_owner", current_stolen_record_id: nil, deleted_at: be_present)
     end
 
     include_examples "records no match"

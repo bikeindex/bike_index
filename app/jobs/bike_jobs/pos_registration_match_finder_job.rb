@@ -1,5 +1,4 @@
-# Records when a new self-registration matches the same owner's earlier POS registration,
-# so they can later be asked to merge the two. Nothing else is done with the match yet
+# Recorded so the owner can later be asked to merge the two registrations
 module BikeJobs
   class PosRegistrationMatchFinderJob < ApplicationJob
     sidekiq_options queue: "droppable", retry: 2
@@ -11,15 +10,11 @@ module BikeJobs
       bike = Bike.unscoped.find_by_id(bike_id)
       return unless bike.present? && live?(bike) && matchable_bike?(bike) && self_registration?(bike)
 
-      # Unindexed for anything but current bikes, which is acceptable in a background job
-      serial_bikes = Bike.unscoped.where(serial_normalized_no_space: bike.serial_normalized_no_space).to_a
-      return if stolen_history?(serial_bikes)
+      pos_bikes = earlier_pos_bikes(bike)
+      return if pos_bikes.count != 1 || entangled?([bike.id, pos_bikes.first.id]) ||
+        stolen_history?(bike.serial_normalized_no_space)
 
-      user_id = bike.current_ownership.user_id
-      pos_bikes = serial_bikes.select { earlier_pos_registration?(it, bike:, user_id:) }
-      return if pos_bikes.count != 1 || entangled?([bike.id, pos_bikes.first.id])
-
-      PosRegistrationMatch.create_or_find_by!(bike_id:, pos_bike_id: pos_bikes.first.id) { it.user_id = user_id }
+      PosRegistrationMatch.create_or_find_by!(bike_id:, pos_bike_id: pos_bikes.first.id) { it.user_id = bike.user_id }
     end
 
     private
@@ -35,28 +30,34 @@ module BikeJobs
 
     def self_registration?(bike)
       ownership = bike.current_ownership
-      ownership.present? && ownership.self_made? &&
+      ownership&.self_made? &&
         ownership.organization_id.blank? && bike.creation_organization_id.blank? &&
         !ownership.pos? && CUSTOMER_ORIGINS.include?(ownership.origin)
     end
 
-    # Stolen history on the serial vetoes regardless of manufacturer or whether the bike is deleted
-    def stolen_history?(serial_bikes)
-      serial_bikes.any? { it.status_stolen? || it.current_stolen_record_id.present? } ||
-        StolenRecord.unscoped.where(bike_id: serial_bikes.map(&:id)).exists?
-    end
+    # Starts from the owner's ownerships (indexed) so most runs never query bikes by serial
+    def earlier_pos_bikes(bike)
+      bike_ids = Ownership.current.initial.where(user_id: bike.user_id, pos_kind: POS_KINDS)
+        .where.not(bike_id: bike.id).pluck(:bike_id)
+      return [] if bike_ids.none?
 
-    def earlier_pos_registration?(other_bike, bike:, user_id:)
-      other_bike.id != bike.id && live?(other_bike) && other_bike.manufacturer_id == bike.manufacturer_id &&
-        other_bike.created_at < bike.created_at && other_bike.created_at > bike.created_at - 365.days &&
-        POS_KINDS.include?(other_bike.ownerships.initial.first&.pos_kind) &&
-        other_bike.current_ownership&.user_id == user_id
+      Bike.unscoped.where(id: bike_ids, manufacturer_id: bike.manufacturer_id,
+        serial_normalized_no_space: bike.serial_normalized_no_space,
+        created_at: (bike.created_at - 365.days)...bike.created_at).select { live?(it) }
     end
 
     def entangled?(bike_ids)
       ImpoundRecord.where(bike_id: bike_ids).exists? ||
         MarketplaceListing.where(item_type: "Bike", item_id: bike_ids).exists? ||
         Ownership.transferred.where(bike_id: bike_ids).exists?
+    end
+
+    # Any manufacturer, including deleted and example bikes. Unindexed outside current bikes,
+    # which is acceptable here
+    def stolen_history?(serial)
+      serial_bikes = Bike.unscoped.where(serial_normalized_no_space: serial)
+      serial_bikes.where(status: "status_stolen").or(serial_bikes.where.not(current_stolen_record_id: nil)).exists? ||
+        StolenRecord.current_and_not.where(bike_id: serial_bikes.select(:id)).exists?
     end
   end
 end
