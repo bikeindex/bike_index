@@ -201,18 +201,6 @@ RSpec.describe UI::Table::Component, type: :component do
     end
   end
 
-  context "with card" do
-    it "renders unbordered, without the scroller's bottom spacing" do
-      result = render_inline(described_class.new(records:, card: true)) do |table|
-        table.column(label: "Name") { |r| r.name }
-      end
-
-      expect(result).to have_css("table.ui-table")
-      expect(result).not_to have_css("table.ui-table-bordered")
-      expect(result).not_to have_css("[data-controller='ui--table'].tw\\:mb-4")
-    end
-  end
-
   # Every part of a row's key serves a stale row if it drops out, and nothing about the
   # rendered markup shows which parts are there — so these assert on the keys written
   context "with cache_key", :caching do

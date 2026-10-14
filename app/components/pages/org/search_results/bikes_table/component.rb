@@ -9,19 +9,6 @@ module Pages
         # the search form, column settings, or pagination (e.g. a user's other
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
-          # Descendant selectors, so they outrank the cell classes UI::Table gives every column
-          TABLE_CLASSES = [
-            "tw:[&_th]:whitespace-nowrap tw:[&_th]:border-b tw:[&_th]:border-gray-100 tw:[&_th]:bg-gray-50",
-            "tw:[&_th]:px-4 tw:[&_th]:py-2.5 tw:[&_th]:text-2xs tw:[&_th]:font-normal tw:[&_th]:text-gray-400 tw:[&_th]:uppercase",
-            # twlink's blue gives way to the header's gray, underlined like twlink-underlined
-            "tw:[&_th_a]:text-inherit tw:[&_th_a]:underline tw:[&_th_a:hover]:decoration-2 tw:[&_th_a[data-active]]:decoration-2",
-            "tw:[&_td]:bg-white tw:[&_td]:px-4 tw:[&_td]:py-2.5 tw:[&_td]:text-sm tw:[&_tr:hover_td]:bg-amber-50",
-            # Whatever follows the table draws the line under it
-            "tw:[&_tbody_tr:last-child_td]:border-b-0",
-            "tw:dark:[&_th]:border-gray-700 tw:dark:[&_th]:bg-gray-800 tw:dark:[&_td]:bg-gray-900",
-            "tw:dark:[&_tr:hover_td]:bg-gray-800"
-          ].join(" ").freeze
-
           # The organization's registration fields that follow a column, in order. The rest come
           # after the columns every organization has
           REG_FIELDS_AFTER = {
@@ -70,9 +57,9 @@ module Pages
           end
 
           def table_wrapper_data_attributes
-            return {controller: "ui--table-overflow"} unless @render_sortable
+            return {} unless @render_sortable
             attrs = {
-              controller: "ui--table-overflow update-cached-sortable-links org--assign-bike-sticker",
+              controller: "update-cached-sortable-links org--assign-bike-sticker",
               "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params.merge(organization_id: @organization.to_param))
             }
             if @bike_sticker.present?

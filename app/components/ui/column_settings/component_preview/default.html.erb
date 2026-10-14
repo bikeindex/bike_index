@@ -1,4 +1,4 @@
-<% columns = {name_cell: "Name", color_cell: "Color", size_cell: "Size", notes_cell: "Notes"} %>
+<% columns = {color_cell: "Color", size_cell: "Size", notes_cell: "Notes"} %>
 <% rows = [["Cargo bike", "Green", "L", "Front basket"], ["Stroller", "Gray", "—", "Folds flat"]] %>
 
 <%= tag.div(class: "tw:overflow-hidden tw:rounded-xl #{UI::Card::Component::BASE_CLASSES}",
@@ -7,11 +7,13 @@
     <%= render(UI::Collapse::Component.new(text: "Column settings", chevron: :trailing, size: :sm)) %>
   </div>
 
-  <%= render(UI::ColumnSettings::Component.new(columns:, defaults: %i[name_cell color_cell size_cell], narrow_hidden: %i[size_cell])) %>
+  <%= render(UI::ColumnSettings::Component.new(columns:, defaults: %i[color_cell size_cell], narrow_hidden: %i[size_cell])) %>
 
-  <%= render(UI::Table::Component.new(records: rows, card: true)) do |table| %>
+  <%= render(UI::CardTable::Component.new(records: rows)) do |table| %>
+    <% table.column(label: "Name") { |row| row[0] } %>
+
     <% columns.each_with_index do |(cell_name, label), index| %>
-      <% table.column(label:, classes: "hideableColumn #{cell_name}") { |row| row[index] } %>
+      <% table.column(label:, classes: "hideableColumn #{cell_name}") { |row| row[index + 1] } %>
     <% end %>
   <% end %>
 <% end %>
