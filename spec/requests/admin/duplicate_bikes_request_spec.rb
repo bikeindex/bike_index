@@ -103,6 +103,17 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(response.body).to_not include("Do not merge")
     end
 
+    it "notes a shop propulsion default without changing a passing pair's readiness" do
+      user = FactoryBot.create(:user_confirmed)
+      shop_bike = FactoryBot.create(:bike_lightspeed_pos, manufacturer:, serial_number: "EB1KE0123", owner_email: user.email,
+        propulsion_type: "foot-pedal", created_at: 2.days.ago)
+      customer_bike = FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer:, serial_number: "EB1KE0123",
+        propulsion_type: "pedal-assist")
+      get "#{base_url}/compare", params: {bike_ids: [shop_bike.id, customer_bike.id].join(",")}
+      expect(response.code).to eq "200"
+      expect(response.body).to include("Shop default? Confirm propulsion with the owner", "Meets the strict same-owner evidence")
+    end
+
     it "flags a placeholder serial as not a duplicate match" do
       placeholders = Array.new(2) { FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "To be specified") }
       get "#{base_url}/compare", params: {bike_ids: placeholders.map(&:id).join(",")}
