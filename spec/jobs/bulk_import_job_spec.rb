@@ -72,9 +72,20 @@ RSpec.describe BulkImportJob, type: :job do
           instance.perform(bulk_import.id)
         }.to change(described_class.jobs, :count).by(1)
         expect(Bike.count).to eq 0
-        expect(described_class.jobs.last["args"]).to eq([bulk_import.id])
+        expect(described_class.jobs.last["args"]).to eq([bulk_import.id, true])
         expect(described_class.jobs.last["at"]).to be > 50.seconds.from_now.to_f
         expect(bulk_import.reload.pending?).to be_truthy
+      end
+
+      context "with an invalid extension" do
+        before { allow_any_instance_of(BulkImport).to receive(:invalid_extension?) { true } }
+        it "only notifies about the extension on the first attempt" do
+          expect {
+            instance.perform(bulk_import.id)
+            instance.perform(bulk_import.id, true)
+          }.to change(InvalidExtensionForAscendImportJob.jobs, :count).by(1)
+          expect(described_class.jobs.last(2).map { it["args"] }).to eq([[bulk_import.id, true]] * 2)
+        end
       end
 
       context "for a different organization" do

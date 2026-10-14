@@ -74,16 +74,17 @@ class BulkImportJob < ApplicationJob
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
 
-  def perform(bulk_import_id)
+  # deferred: the ascend check already ran, and assigned the organization
+  def perform(bulk_import_id, deferred = false)
     @bulk_import = BulkImport.find(bulk_import_id)
-    return true if @bulk_import.ascend? && !@bulk_import.check_ascend_import_processable!
+    return true if @bulk_import.ascend? && !deferred && !@bulk_import.check_ascend_import_processable!
     return true if @bulk_import.finished? # Exit early if already finished
     return process_import unless @bulk_import.ascend?
 
     # Ascend sends a shop's files seconds apart, and concurrent imports can't dedupe against each other
     lock_manager = self.class.new_lock_manager
     redlock = lock_manager.lock(self.class.redlock_key(@bulk_import.organization_id), LOCK_DURATION_MS)
-    return self.class.perform_in(LOCKED_RETRY_DELAY, bulk_import_id) unless redlock
+    return self.class.perform_in(LOCKED_RETRY_DELAY, bulk_import_id, true) unless redlock
 
     begin
       process_import
