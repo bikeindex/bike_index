@@ -468,6 +468,45 @@ RSpec.describe BulkImportJob, type: :job do
     end
   end
 
+  context "repeated row" do
+    let!(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
+    let!(:color_green) { FactoryBot.create(:color, name: "Green") }
+    let(:serial) { "xyz_test" }
+    let(:row) { ["Trek", "Roscoe 8", "2019", "Green", "test@bikeindex.org", serial].join(",") }
+    let(:csv_lines) { [sample_csv_lines[0].join(","), row, row] }
+    let(:tempfile) do
+      file = Tempfile.new(["repeated_row", ".csv"])
+      file.write(csv_lines.join("\n"))
+      file.rewind
+      file
+    end
+    let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", file: File.open(tempfile.path)) }
+    after { tempfile.close && tempfile.unlink }
+
+    it "creates one bike" do
+      expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 1
+      expect(bulk_import.reload.import_errors).to be_blank
+    end
+    context "no_duplicate: false" do
+      let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", file: File.open(tempfile.path), no_duplicate: false) }
+      it "creates two bikes" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+      end
+    end
+    context "different serials" do
+      let(:csv_lines) { [sample_csv_lines[0].join(","), row, row.sub(serial, "other_serial")] }
+      it "creates two bikes" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+      end
+    end
+    context "short serial" do
+      let(:serial) { "12345" }
+      it "creates two bikes" do
+        expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
+      end
+    end
+  end
+
   context "with assigned bulk import" do
     before { instance.bulk_import = bulk_import }
     describe "process_csv" do
@@ -537,7 +576,7 @@ RSpec.describe BulkImportJob, type: :job do
           send_email: true,
           creation_organization_id: nil,
           bike_sticker: nil,
-          no_duplicate: false
+          no_duplicate: true
         }
       end
       describe "row_to_b_param_hash" do
@@ -577,7 +616,7 @@ RSpec.describe BulkImportJob, type: :job do
             send_email: true,
             creation_organization_id: nil,
             bike_sticker: nil,
-            no_duplicate: false
+            no_duplicate: true
           }
         end
         let(:target_impound) do
