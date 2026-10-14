@@ -14,7 +14,8 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
   end
   let!(:pair) do
     [FactoryBot.create(:bike_lightspeed_pos, manufacturer:, serial_number: "WTU123456", owner_email: "pair@bikeindex.org", created_at: Time.current - 3.days),
-      FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "WTU123456", owner_email: "pair@bikeindex.org", frame_model: "Other model")]
+      FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "WTU123456", owner_email: "pair@bikeindex.org", frame_model: "Other model",
+        propulsion_type: "pedal-assist")]
   end
   let(:database) { ActiveRecord::Base.connection_db_config.database }
   let(:cache) { BikeServices::DuplicateReviewFinder.cache }
@@ -97,8 +98,8 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       get "#{base_url}/serial", params: {reference_bike_id: pair.last.id}
       expect(response.code).to eq "200"
       expect(assigns(:reference_bike)).to eq pair.last
-      expect(assigns(:review).differing_fields).to include("Model")
-      expect(response.body).to include("Initial vs reference", "Differs")
+      expect(assigns(:review).differing_fields).to include("Model", "Propulsion")
+      expect(response.body).to include("Initial vs reference", "Differs", "Shop default? Confirm propulsion with the owner")
       expect(response.body).to_not include("Do not merge")
     end
 

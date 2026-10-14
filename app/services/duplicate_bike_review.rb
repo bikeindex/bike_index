@@ -12,6 +12,8 @@ class DuplicateBikeReview
     "Year" => ->(bike) { bike.year },
     "Primary color" => ->(bike) { bike.primary_frame_color&.name },
     "Vehicle type" => ->(bike) { bike.cycle_type&.humanize },
+    "Propulsion" => ->(bike) { bike.propulsion_type&.humanize },
+    "Frame size" => ->(bike) { bike.frame_size&.upcase },
     "Stored serial" => ->(bike) { bike.serial_number },
     "Whole normalized serial" => ->(bike) { bike.serial_normalized_no_space },
     "Status" => ->(bike) { bike.status&.humanize }
@@ -110,7 +112,7 @@ class DuplicateBikeReview
 
   def source(bike)
     ownership = initial_ownership(bike)
-    return "#{ownership.pos_kind.delete_suffix("_pos").humanize} POS" if %w[lightspeed_pos ascend_pos].include?(ownership&.pos_kind)
+    return "#{ownership.pos_kind.delete_suffix("_pos").humanize} POS" if pos?(bike)
 
     ownership&.origin&.humanize
   end
@@ -223,8 +225,15 @@ class DuplicateBikeReview
     accounts = bikes.filter_map { initial_ownership(it)&.user_id }
     BikeServices::DuplicateReviewCues.cues(serials: bikes.map(&:serial_normalized_no_space).uniq,
       record_count: bikes.size, contact_count: emails.uniq.size, test_count:,
-      review_contact_count:, model_match_count:, manufacturer_names:,
+      review_contact_count:, model_match_count:, manufacturer_names:, shop_default_propulsion: shop_default_propulsion?,
       single_contact: [emails, accounts].any? { it.size == bikes.size && it.uniq.size == 1 })
+  end
+
+  def pos?(bike) = %w[lightspeed_pos ascend_pos].include?(initial_ownership(bike)&.pos_kind)
+
+  def shop_default_propulsion?
+    shop_default_at = bikes.select { pos?(it) && it.propulsion_type == "foot-pedal" }.map(&:created_at).min
+    shop_default_at && bikes.any? { !pos?(it) && it.created_at > shop_default_at && PropulsionType.motorized?(it.propulsion_type) }
   end
 
   def normalized_email(ownership)

@@ -7,7 +7,7 @@ require_relative "../../app/services/bike_services/duplicate_review_cues"
 require_relative "../../app/services/duplicate_bike_review"
 
 RSpec.describe DuplicateBikeReview do
-  let(:ownership_class) { Struct.new(:id, :previous_ownership_id, :created_at, :user_id, :owner_email, :is_phone, :claimed, :claimed_at) }
+  let(:ownership_class) { Struct.new(:id, :previous_ownership_id, :created_at, :user_id, :owner_email, :is_phone, :claimed, :claimed_at, :pos_kind) }
   let(:bike_class) { Struct.new(:id, :serial_normalized_no_space, :manufacturer_id, :manufacturer_other, :ownerships, :current_ownership) }
   let(:email) { ["customer", "example.invalid"].join("@") }
   let(:other_email) { ["another", "example.invalid"].join("@") }
@@ -21,7 +21,7 @@ RSpec.describe DuplicateBikeReview do
   let(:review) { described_class.new(bikes: [reference, bike]) }
   let(:record_class) do
     Struct.new(:id, :created_at, :serial_number, :serial_normalized_no_space, :manufacturer, :manufacturer_id, :manufacturer_other,
-      :frame_model, :year, :primary_frame_color, :cycle_type, :status, :ownerships, :current_ownership,
+      :frame_model, :year, :primary_frame_color, :cycle_type, :propulsion_type, :frame_size, :status, :ownerships, :current_ownership,
       :creation_organization, :deleted_at, :example, :likely_spam, :marketplace_listings, :current_impound_record_id,
       :current_stolen_record_id) do
       def status_stolen? = status == "status_stolen"
@@ -174,14 +174,16 @@ RSpec.describe DuplicateBikeReview do
       [["a@example.com", 2019, 1], ["a@example.com", 2019, 2], ["b@bikeindex.org", 2020, 3], [nil, 2019, 4]].map do |owner_email, year, id|
         ownership = ownership_class.new(id:, created_at: Time.at(id), user_id: owner_email && id, owner_email:)
         record_class.new(id:, created_at: Time.at(id), serial_number: "EN 14764", serial_normalized_no_space: "EN14764",
-          manufacturer: named.new("Maker"), frame_model: "Roadster", year:, cycle_type: "bike",
-          status: "status_with_owner", ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
+          manufacturer: named.new("Maker"), frame_model: "Roadster", year:, cycle_type: "bike", propulsion_type: "foot-pedal",
+          frame_size: "56cm", status: "status_with_owner", ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
       end
     end
     let(:review) { described_class.new(bikes: records) }
 
     it "shows shared values once and the differences per record" do
-      expect(review.shared_fields).to eq ["Manufacturer", "Model", "Primary color", "Vehicle type", "Stored serial", "Whole normalized serial", "Status"]
+      expect(review.shared_fields).to eq ["Manufacturer", "Model", "Primary color", "Vehicle type", "Propulsion", "Frame size", "Stored serial", "Whole normalized serial", "Status"]
+      expect(review.field_value(records[0], "Propulsion")).to eq "Foot-pedal"
+      expect(review.field_value(records[0], "Frame size")).to eq "56CM"
       expect(review.differing_fields).to eq ["Year"]
       expect(review.field_distribution("Year")).to eq [["2019", 3], ["2020", 1]]
       expect(review.differences(records[2])).to eq ["Year"]
