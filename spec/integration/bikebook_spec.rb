@@ -335,7 +335,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[role='option']", count: 1, text: "$3,599.99")
     expect(page).to have_current_path("/bikebook")
 
-    click_on "More filters"
+    click_on "More filters", match: :first
     expect(page).to have_field("Market", with: "Canada")
     find_field("Market").click
     # by name rather than the catalog's order, which is by code
