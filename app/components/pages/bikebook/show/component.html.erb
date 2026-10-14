@@ -1,3 +1,17 @@
+<%# Rendered again by the page from the URL less its filters; shown by bikebook--catalog-filters once any is set %>
+<% clear_filters = capture do %>
+  <a
+    href="<%= bikebook_path %>"
+    hidden
+    class="twlink tw:shrink-0 tw:text-sm"
+    data-in-place="[autofocus]"
+    data-bikebook--catalog-filters-target="clear"
+    data-action="bikebook--catalog-filters#clear"
+  >
+    <%= translation(".clear_filters") %>
+  </a>
+<% end %>
+
 <% search = capture do %>
   <div
     class="tw:group"
@@ -36,16 +50,22 @@
       <% end %>
     </div>
 
-    <ul
-      aria-label="<%= translation(".applied_filters") %>"
-      data-bikebook--catalog-filters-target="summary"
+    <div
       class="
-        tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:rounded-lg
-        tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm
+        tw:mt-3 tw:flex tw:items-baseline tw:gap-x-4 tw:rounded-lg tw:border
+        tw:border-gray-200 tw:px-4 tw:py-2
         tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden
-        tw:empty:hidden tw:dark:border-gray-700
+        tw:has-[ul:empty]:hidden tw:dark:border-gray-700
       "
-    ></ul>
+    >
+      <ul
+        aria-label="<%= translation(".applied_filters") %>"
+        data-bikebook--catalog-filters-target="summary"
+        class="tw:flex tw:flex-1 tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:text-sm"
+      ></ul>
+
+      <%= clear_filters %>
+    </div>
 
     <div
       id="vehicle-filters"
@@ -225,6 +245,17 @@
                 <% end %>
               </fieldset>
             </div>
+          </div>
+
+          <div
+            class="
+              tw:col-span-full tw:flex tw:flex-wrap tw:items-baseline
+              tw:justify-between tw:gap-x-4 tw:gap-y-1 tw:border-t
+              tw:border-gray-200 tw:pt-3 tw:text-sm tw:dark:border-gray-700
+            "
+          >
+            <span id="vehicle-filters-count" aria-live="polite"></span>
+            <%= clear_filters %>
           </div>
         <% end %>
       </div>

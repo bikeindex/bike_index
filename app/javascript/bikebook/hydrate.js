@@ -1,6 +1,6 @@
 import { html } from 'lit-html'
 import { localSources } from 'utils/hw_combobox_patch'
-import { matching, renderChips } from 'bikebook/catalog'
+import { matching, matchingOf, renderChips } from 'bikebook/catalog'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { filterOption } from 'bikebook/templates/filter_option'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
@@ -49,6 +49,7 @@ export async function hydrate (catalog, source, shell, url) {
 
   for (const field of ['year', 'price']) panel.setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
   renderInto(root.getElementById('vehicle-models-count'), matching(filteredCount))
+  renderInto(root.getElementById('vehicle-filters-count'), matchingOf(filteredCount, catalog.modelsCount))
   const manufacturers = catalog.options.manufacturer.length
   renderInto(root.getElementById('manufacturer-count'),
     html`(${numberDisplay(manufacturers)} ${tooltip({ text: `${manufacturers.toLocaleString('en-US')} manufacturers have models in the catalog` })})`)

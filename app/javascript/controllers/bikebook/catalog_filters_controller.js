@@ -1,12 +1,12 @@
 import { Controller } from '@hotwired/stimulus'
-import { replaceUrl } from 'bikebook/replace_url'
+import { readable, replaceUrl } from 'bikebook/replace_url'
 
 /* global CSS */
 
 // Threads the filter panel's values into the vehicle combobox's async src and mirrors them
 // into the page URL, which the page renders the controls from (ui--collapse owns ?filters)
 export default class extends Controller {
-  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'jurisdiction']
+  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'jurisdiction', 'clear']
   static values = {
     yearDir: { type: String, default: 'desc' },
     priceDir: { type: String, default: 'desc' },
@@ -34,6 +34,14 @@ export default class extends Controller {
     this.#syncCombobox()
     this.#refreshSummary()
     this.#writeUrl()
+  }
+
+  // A clear link's href, as it's clicked: this URL less every filter, keeping the picks, view and sort, which the
+  // page renders afresh with the filters at their defaults
+  clear ({ currentTarget }) {
+    const url = new URL(window.location)
+    for (const name of [...Object.keys(this.#filters), 'jurisdiction']) url.searchParams.delete(name)
+    currentTarget.href = readable(url)
   }
 
   // A state without its own classes uses the US ones. Runs before its fieldset's apply, which a change
@@ -80,7 +88,10 @@ export default class extends Controller {
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
+  // the visitor's own market is no filter they set, but Any in its place is
   #refreshSummary () {
+    const filtered = Object.entries(this.#filters).some(([name, value]) => name === 'market' ? value !== this.defaultMarketValue : value)
+    for (const link of this.clearTargets) link.hidden = !filtered
     this.summaryTarget.replaceChildren(...this.#summary.map(([label, value]) => {
       const item = document.createElement('li')
       const name = document.createElement('strong')

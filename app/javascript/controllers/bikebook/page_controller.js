@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { CatalogComboboxSource, loadCatalog, matching } from 'bikebook/catalog'
+import { CatalogComboboxSource, loadCatalog, matching, matchingOf } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
 import { renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
@@ -34,7 +34,10 @@ export default class extends Controller {
     } catch (error) {
       return this.#fail(error)
     }
-    this.source = new CatalogComboboxSource(this.catalog, (count) => renderInto(document.getElementById('vehicle-models-count'), matching(count)))
+    this.source = new CatalogComboboxSource(this.catalog, (count) => {
+      renderInto(document.getElementById('vehicle-models-count'), matching(count))
+      renderInto(document.getElementById('vehicle-filters-count'), matchingOf(count, this.catalog.modelsCount))
+    })
     this.#countModels()
     this.#render(url)
   }

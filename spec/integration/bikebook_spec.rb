@@ -258,6 +258,23 @@ RSpec.describe "Bikebook", :js, type: :system do
     find("button[aria-label='US Class 1 e-bike']").click
     expect(page).to have_css("[role='tooltip'] a[href*='evc/us/class_1']", text: "US Class 1 e-bike", visible: true)
     expect(page).to have_unchecked_field("US Class 1")
+    # the panel counts what its filters leave of the catalog
+    expect(page).to have_css("#vehicle-filters-count", exact_text: "5 of 30 models match")
+
+    # closed, the applied filters can be cleared all at once, keeping the picks and view
+    click_on "More filters", match: :first
+    within("[aria-label='Applied filters']") { expect(page).to have_text("Kris Holm") }
+    click_link "Clear filters"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
+    expect(page).to have_no_link("Clear filters").and have_no_css("[aria-label='Applied filters'] li")
+    expect(page).to have_css(".hw-combobox__chip", count: 2).and have_css("[data-comparison] article", count: 2)
+    expect(page).to have_no_current_path(/manufacturer|electric/)
+    # and from the open panel
+    click_on "More filters", match: :first
+    check "US Class 2"
+    within("#vehicle-filters") { click_link "Clear filters" }
+    expect(page).to have_css("#vehicle-filters-count", exact_text: "30 of 30 models match")
+    expect(page).to have_unchecked_field("US Class 2")
 
     expect(asked).to be_empty
 

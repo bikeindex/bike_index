@@ -124,4 +124,7 @@ const group = (label, options) => {
     role="presentation">${label}</li>${options}</ul>`
 }
 
+// in the filter panel, against the whole catalog
+export const matchingOf = (count, total) => html`<strong>${numberDisplay(count)}</strong> of ${numberDisplay(total)} models match`
+
 export const matching = (count) => html`(${numberDisplay(count)} matching ${count === 1 ? 'model' : 'models'})`
