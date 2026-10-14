@@ -21,14 +21,7 @@ class ReviewImpoundClaimsController < ApplicationController
         # add the response message - but don't deliver a message yet
         @impound_claim.update(permitted_update_params.merge(skip_update: true))
         @impound_claim.skip_update = false
-        impound_record_update = @impound_record.impound_record_updates.build(user: current_user,
-          kind: update_status,
-          impound_claim: @impound_claim)
-        if impound_record_update.save
-          flash[:success] = impound_record_update.kind_humanized
-        else
-          flash[:error] = "Unable to record: #{impound_record_update.errors.full_messages.to_sentence}"
-        end
+        create_impound_record_update(kind: update_status, impound_claim: @impound_claim)
       else
         flash[:error] = "Unknown update action"
       end
@@ -56,12 +49,15 @@ class ReviewImpoundClaimsController < ApplicationController
   # No impound_claim on the update: ProcessImpoundUpdatesJob attaches the approved claim
   # and merges it (recovering the stolen record), but only while the claim is still approved
   def mark_retrieved_by_owner
-    unless @impound_claim.approved? && @impound_record.update_kinds.include?("retrieved_by_owner")
+    if @impound_claim.approved? && @impound_record.active?
+      create_impound_record_update(kind: "retrieved_by_owner")
+    else
       flash[:error] = "Only an approved claim can be marked returned"
-      return
     end
-    impound_record_update = @impound_record.impound_record_updates
-      .create(user: current_user, kind: "retrieved_by_owner")
+  end
+
+  def create_impound_record_update(**attributes)
+    impound_record_update = @impound_record.impound_record_updates.create(user: current_user, **attributes)
     if impound_record_update.persisted?
       flash[:success] = impound_record_update.kind_humanized
     else

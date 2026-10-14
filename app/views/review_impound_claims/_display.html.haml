@@ -103,7 +103,7 @@
       %h3.uncap.mt-2.mb-2
         This claim has been updated since it was submitted:
       = render partial: "/organized/impound_records/impound_record_updates_table", locals: {impound_record_updates: @impound_claim.impound_record_updates.reorder(created_at: :desc)}
-      - if @impound_claim.approved? && !@impound_claim.organized? && !block_superuser_update
+      - if @impound_claim.approved? && @impound_record.active? && !@impound_claim.organized? && !block_superuser_update
         .mt-4.text-center
           = render UI::ButtonLink::Component.new(text: "Mark returned to owner", href: update_url, method: :patch, params: {submit: "retrieved_by_owner"}, color: :primary, size: :lg)
         %p.mt-2.text-center
