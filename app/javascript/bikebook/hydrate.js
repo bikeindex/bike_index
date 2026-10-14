@@ -1,6 +1,6 @@
 import { html } from 'lit-html'
 import { localSources } from 'utils/hw_combobox_patch'
-import { matching, matchingOf, renderChips } from 'bikebook/catalog'
+import { renderChips, renderCounts } from 'bikebook/catalog'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { filterOption } from 'bikebook/templates/filter_option'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
@@ -48,8 +48,7 @@ export async function hydrate (catalog, source, shell, url) {
   const values = vehicles.map(({ value }) => value).join(',')
 
   for (const field of ['year', 'price']) panel.setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
-  renderInto(root.getElementById('vehicle-models-count'), matching(filteredCount))
-  renderInto(root.getElementById('vehicle-filters-count'), matchingOf(filteredCount, catalog.modelsCount))
+  renderCounts(root, filteredCount, catalog.modelsCount)
   const manufacturers = catalog.options.manufacturer.length
   renderInto(root.getElementById('manufacturer-count'),
     html`(${numberDisplay(manufacturers)} ${tooltip({ text: `${manufacturers.toLocaleString('en-US')} manufacturers have models in the catalog` })})`)
@@ -75,7 +74,9 @@ export async function hydrate (catalog, source, shell, url) {
     if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id, classificationPath) })))
   }
 
-  renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(), filteredCount))
+  renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
+    // the market narrows every visitor's search, so it's no filter of theirs
+    { count: filteredCount, filtered: [...LISTS, ...SINGLES, ...RANGES, 'electric'].some((name) => name !== 'market' && filters[name]) }))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

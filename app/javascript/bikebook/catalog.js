@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
 import { classificationOption, comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
-import { fragmentOf } from 'bikebook/render'
+import { fragmentOf, renderInto } from 'bikebook/render'
 
 /* global IntersectionObserver, Worker */
 
@@ -124,7 +124,10 @@ const group = (label, options) => {
     role="presentation">${label}</li>${options}</ul>`
 }
 
-// in the filter panel, against the whole catalog
-export const matchingOf = (count, total) => html`<strong>${numberDisplay(count)}</strong> of ${numberDisplay(total)} models match`
+// beside the search, and in the filter panel against the whole catalog
+export const renderCounts = (root, count, total) => {
+  renderInto(root.getElementById('vehicle-models-count'), matching(count))
+  renderInto(root.getElementById('vehicle-filters-count'), html`<strong>${numberDisplay(count)}</strong> of ${numberDisplay(total)} models match`)
+}
 
 export const matching = (count) => html`(${numberDisplay(count)} matching ${count === 1 ? 'model' : 'models'})`

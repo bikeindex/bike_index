@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
-import { currency, priced } from 'bikebook/templates/vehicles/comparison_table'
+import { missing, priced } from 'bikebook/templates/vehicles/comparison_table'
 import { basicsOf } from 'bikebook/templates/vehicles/model_viewer'
 import { present } from 'bikebook/templates/values'
 
@@ -18,15 +18,13 @@ const FIELDS = [
 ]
 // the label column's 12.5rem and 12rem per model, so a phone scrolls the table rather than squeezing it
 const MIN_WIDTHS = ['', '', 'tw:min-w-[36.5rem]!', 'tw:min-w-[48.5rem]!', 'tw:min-w-[60.5rem]!', 'tw:min-w-[72.5rem]!']
-const missing = html`<span class="twless-strong">—</span>`
 
 const manufacturerLine = (manufacturer) => present(manufacturer)
   ? html`<p class="tw:text-[11px] tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
   : nothing
 
 // Clamped to its first lines, with a button for the rest that bikebook--read-more shows only when the clamp hides some
-const readMore = (content) => html`<div class="tw:group/read-more" data-controller="bikebook--read-more"
-  data-action="resize@window->bikebook--read-more#measure"><div class="tw:line-clamp-5 tw:group-data-expanded/read-more:line-clamp-none"
+const readMore = (content) => html`<div class="tw:group/read-more" data-controller="bikebook--read-more"><div class="tw:line-clamp-5 tw:group-data-expanded/read-more:line-clamp-none"
   data-bikebook--read-more-target="text">${content}</div><button type="button" hidden aria-expanded="false" class="twlink tw:mt-1 tw:text-sm"
   data-bikebook--read-more-target="button" data-action="bikebook--read-more#toggle"><span class="tw:group-data-expanded/read-more:hidden">Read more</span><span
   class="tw:hidden tw:group-data-expanded/read-more:inline">Show less</span></button></div>`
@@ -38,7 +36,7 @@ export const basics = ({ presenter, vehicles, classificationPath }) => {
     const fields = basicsOf({ presenter, data, classificationPath })
     return {
       ...fields,
-      price: price && amountDisplay(price.original_msrp, currency(data), presenter.vocabulary.currencies),
+      price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
       description: fields.description && readMore(fields.description)
     }
   })
@@ -55,7 +53,6 @@ const single = (vehicle, fields) => html`<section aria-label="Basics" class="tw:
       class="tw:text-gray-600 tw:dark:text-gray-400">${label}</dt><dd class="tw:mb-0 tw:text-right">${vehicle[key]}</dd></div>`)}</dl></div><div
   class="tw:max-md:order-first">${vehicle.photo('tw:aspect-[4/3]')}</div></section>`
 
-// an e-vehicle field is blank for a model that isn't one
 const compared = (vehicles, fields) => html`<section aria-label="Basics comparison" class="tw:mt-6">${table({
   classes: `tw:w-full tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)}`,
   records: fields,

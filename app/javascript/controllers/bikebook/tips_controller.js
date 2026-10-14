@@ -23,23 +23,12 @@ export default class extends Controller {
   restore () {
     this.#store(() => localStorage.removeItem(KEY))
     this.#show(true)
-    this.tipsTarget.querySelector('[tabindex="-1"]').focus()
+    this.tipsTarget.firstElementChild.focus()
   }
 
-  // the search's own panel, which sits outside this controller
-  openFilters () {
-    const toggle = document.querySelector('[aria-controls="vehicle-filters"]')
-    if (toggle.getAttribute('aria-expanded') === 'false') toggle.click()
-    document.getElementById('vehicle-filters').querySelector('input:not([type="hidden"])')?.focus()
-  }
-
-  // after this click, which would otherwise close the list as a click outside it
+  // for the search, which opens its own list
   browse () {
-    const field = document.querySelector('[data-bikebook--focus-shortcut-target="field"]')
-    setTimeout(() => {
-      field.focus()
-      field.click()
-    })
+    this.dispatch('browse')
   }
 
   #show (tips) {

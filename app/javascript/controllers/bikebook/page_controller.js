@@ -1,7 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
-import { CatalogComboboxSource, loadCatalog, matching, matchingOf } from 'bikebook/catalog'
+import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
 import { hydrate } from 'bikebook/hydrate'
-import { renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { uuid } from 'bikebook/templates/helpers'
@@ -34,10 +33,7 @@ export default class extends Controller {
     } catch (error) {
       return this.#fail(error)
     }
-    this.source = new CatalogComboboxSource(this.catalog, (count) => {
-      renderInto(document.getElementById('vehicle-models-count'), matching(count))
-      renderInto(document.getElementById('vehicle-filters-count'), matchingOf(count, this.catalog.modelsCount))
-    })
+    this.source = new CatalogComboboxSource(this.catalog, (count) => renderCounts(document, count, this.catalog.modelsCount))
     this.#countModels()
     this.#render(url)
   }
@@ -93,8 +89,8 @@ export default class extends Controller {
     return this.#render(url, scroll, options)
   }
 
-  // `focus`: true for the search, or a selector for what to focus where the reader is, the search without it
-  async #render (url, scroll, { focus = true } = {}) {
+  // `focus` selects what to focus, the search where it selects nothing
+  async #render (url, scroll, { focus = '[autofocus]' } = {}) {
     const render = ++this.#renders
     // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
     if (render > 1) document.querySelector('link[rel="canonical"]')?.remove()
@@ -106,8 +102,7 @@ export default class extends Controller {
     this.dispatch('before-render')
     this.pageTarget.replaceChildren(rendered.content)
     document.title = rendered.title ?? this.titleValue
-    if (focus === true) this.pageTarget.querySelector('[autofocus]')?.focus()
-    else if (focus) (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: true })
+    if (focus) (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) })
     if (scroll) window.scrollTo(...scroll)
   }
 

@@ -25,9 +25,9 @@ export class VehicleViewer {
   }
 
   // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or
-  // the nearest to the `preferredSize`. With none, how many models its filters leave `matching`
-  render (vehicles, url, preferredSize, matching) {
-    if (vehicles.length === 0) return emptyState(url.pathname, { filtered: FILTERS.some((name) => url.searchParams.get(name)), count: matching })
+  // the nearest to the `preferredSize`. With none, the `search`'s count and whether filters narrow it
+  render (vehicles, url, preferredSize, search) {
+    if (vehicles.length === 0) return emptyState({ pathname: url.pathname, filtersPath: pathWith(url, { filters: 1 }), ...search })
 
     const { presenter } = this
     const requested = url.searchParams.get('view')
@@ -45,22 +45,23 @@ export class VehicleViewer {
     const baseline = models[0]
     const others = (value) => value === baseline.value ? [] : [baseline.data]
     const classificationPath = this.classificationPath(url, values)
-    const cards = vehicles.map(({ data, value, classification }, index) => {
+    const card = (vehicle) => {
+      const { data, value, classification } = vehicle
       const remaining = values.filter((each) => each !== value)
       const remove = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
-      return {
-        classification,
-        card: classification
-          ? classificationCard({ presenter, id: value, classification: data, removePath: remove, classificationPath })
-          : modelViewer({ presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath: remove, classificationPath })
-      }
-    })
-    const cardRow = (shown) => shown.length
-      ? html`<div ?data-comparison=${comparing} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
-        ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
-        : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${shown.map(({ card }) => card)}</div></div>`
-      : nothing
-    const compared = { presenter, vehicles: models, sizes, frames: models.map(({ data }, index) => frameGeometry(data, sizes[index])) }
+      return classification
+        ? classificationCard({ presenter, id: value, classification: data, removePath: remove, classificationPath })
+        : modelViewer({ presenter, data, value, comparing, idSuffix: vehicles.indexOf(vehicle) + 1, others: others(value), removePath: remove, classificationPath })
+    }
+    const cardRow = (classified) => {
+      const shown = vehicles.filter(({ classification }) => Boolean(classification) === classified)
+      return shown.length
+        ? html`<div ?data-comparison=${comparing} class="tw:mt-8 tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
+          ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
+          : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${shown.map(card)}</div></div>`
+        : nothing
+    }
+    const compared = () => ({ presenter, vehicles: models, sizes, frames: models.map(({ data }, index) => frameGeometry(data, sizes[index])) })
     // each model's `content`, or `none` where it has no `key`, under its name
     const listed = (key, none, content) => html`<div ?data-comparison=${comparing} class="tw:mt-6 tw:space-y-6">${models.map(({ data, value }) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
@@ -68,35 +69,27 @@ export class VehicleViewer {
       return html`<section aria-label=${`${title} ${key}`} class="tw:space-y-2"><h3 class="tw:font-bold">${title}</h3>${
         present(data[key]) ? content(data, value) : html`<p class="twless-strong">${none}</p>`}</section>`
     })}</div>`
-    const sizeLists = listed('sizes', 'No sizes listed', (data, value) => sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value) }))
-    // a classification has its card, and no sizes or components
-    const sections = {
-      basics: () => html`${models.length ? basics({ presenter, vehicles: models, classificationPath }) : nothing}${
-        cardRow(cards.filter(({ classification }) => classification))}`,
-      ...(models.length && {
-        geometry: () => html`${tabled
-          ? html`${comparisonTable({ ...compared, part: 'geometry', label: 'Sizes & geometry comparison' })}${geometryOverlay(compared)}`
-          : nothing}${sizeLists}`,
-        // alone, just the parts; in All, the specs compared and each model's whole card, its parts with them
-        components: (alone) => alone
-          ? listed('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }))
-          : html`${tabled ? comparisonTable({ ...compared, label: 'Components comparison' }) : nothing}${cardRow(cards.filter(({ classification }) => !classification))}`
-      })
+    const basicsView = () => html`${models.length ? basics({ presenter, vehicles: models, classificationPath }) : nothing}${cardRow(true)}`
+    const geometryView = () => {
+      const comparison = compared()
+      return html`${tabled ? html`${comparisonTable({ ...comparison, part: 'geometry' })}${geometryOverlay(comparison)}` : nothing}${
+        listed('sizes', 'No sizes listed', (data, value) => sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value) }))}`
     }
+    // a classification has its card, and no sizes or components
+    const views = models.length
+      ? { basics: basicsView, geometry: geometryView, components: () => listed('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) })) }
+      : { basics: basicsView }
+    // every model's whole card, the components with the rest of its specs
+    const all = models.length
+      ? [[VIEWS.basics, basicsView], [VIEWS.geometry, geometryView], ['Specs & components', () => html`${tabled ? comparisonTable(compared()) : nothing}${cardRow(false)}`]]
+      : [[VIEWS.basics, basicsView]]
     const shown = view === 'all'
-      ? Object.entries(sections).map(([name, section]) => html`<div class="tw:mt-10">${sectionHeading(ALL_HEADINGS[name])}${section(false)}</div>`)
-      : sections[view]?.(true) ?? html`<p class="tw:mt-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">E-vehicle classifications have no ${
+      ? all.map(([heading, section]) => html`<div class="tw:mt-10">${sectionHeading(heading)}${section()}</div>`)
+      : views[view]?.() ?? html`<p class="tw:mt-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">E-vehicle classifications have no ${
         VIEWS[view].toLowerCase()}. Their rules are under Basics.</p>`
     return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }))}${shown}`
   }
 }
-
-// All's components are the whole cards, specs and all
-const ALL_HEADINGS = { ...VIEWS, components: 'Specs & components' }
-
-// what narrows the search, rather than the market every visitor has
-const FILTERS = ['primary_activity', 'manufacturer', 'vehicle_type', 'suspension', 'model_configuration', 'electric', 'year_min', 'year_max',
-  'price_min', 'price_max']
 
 // This page's URL with `params` laid over its own
 const pathWith = (url, params) => {

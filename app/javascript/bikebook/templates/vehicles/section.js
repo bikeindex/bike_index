@@ -18,7 +18,7 @@ export const section = ({ heading, content, subsections = [] }) => {
 }
 
 // A section whose heading's chevron opens and closes its content (ui--collapse), rendered open
-// unless the content is hidden. A `param` keeps its state in the URL
-export const disclosure = ({ param, label, heading, content }) => html`<section class="tw:group/disclosure tw:space-y-2"
-  data-controller="ui--collapse" data-ui--collapse-param-value=${param ?? nothing}><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-3"><h2
+// unless the content is hidden
+export const disclosure = ({ label, heading, content }) => html`<section class="tw:group/disclosure tw:space-y-2"
+  data-controller="ui--collapse"><div class="tw:flex tw:items-baseline tw:justify-between tw:gap-3"><h2
   class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${heading}</h2>${collapse({ chevron: true, size: 'sm', attributes: { 'aria-label': `Toggle ${label}` } })}</div>${content}</section>`

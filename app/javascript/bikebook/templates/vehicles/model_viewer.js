@@ -59,10 +59,10 @@ export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data
 export const basicsOf = ({ presenter, data, classificationPath }) => new ModelViewer({ presenter, data, others: [], classificationPath }).basics()
 
 // A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`'
-export const sizesOf = ({ presenter, data, others = [], selectedSize }) => new ModelViewer({ presenter, data, others, selectedSize }).sizes()
+export const sizesOf = ({ presenter, data, others, selectedSize }) => new ModelViewer({ presenter, data, others, selectedSize }).sizes()
 
-// A vehicle's components by group, marked where they differ from `others`', under no heading of their own
-export const componentsOf = ({ presenter, data, others = [] }) => new ModelViewer({ presenter, data, others }).components({ heading: false })
+// A vehicle's components by group, marked where they differ from `others`'
+export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
 
 class ModelViewer {
   constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath, selectedSize }) {
@@ -105,7 +105,9 @@ class ModelViewer {
       data-controller="ui--collapse ui--alert" data-ui--collapse-param-value="json"
       data-ui--collapse-direction-value="horizontal"><article class="twgutter tw:w-full tw:min-w-0 tw:space-y-6
       tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]
-      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.components()}</article><aside
+      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${present(this.vehicle.components)
+      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}</section>`
+      : nothing}</article><aside
       id=${jsonPanelId} class="twjson-panel tw:hidden tw:w-full tw:min-w-0 tw:lg:relative tw:lg:w-[28rem] tw:lg:shrink-0" data-ui--collapse-target="content">${
         jsonDisplay({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
   }
@@ -579,7 +581,7 @@ class ModelViewer {
       sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize }))}</div>`
   }
 
-  components ({ heading = true } = {}) {
+  components () {
     const components = this.vehicle.components
     if (blank(components)) return nothing
 
@@ -594,9 +596,7 @@ class ModelViewer {
       const sorted = [...members].sort((a, b) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)
       return [componentGroup({ presenter: this.presenter, name, components: sorted, others })]
     })
-    return html`<section class="tw:space-y-4">${heading
-      ? html`<h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>`
-      : nothing}${tables}</section>`
+    return tables
   }
 }
 

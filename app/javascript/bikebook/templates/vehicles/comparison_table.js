@@ -6,9 +6,11 @@ import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
+export const missing = html`<span class="twless-strong">—</span>`
+
 // years come newest first
 export const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
-export const currency = (vehicle) => priced(vehicle)?.original_msrp_currency ?? 'USD'
+const currency = (vehicle) => priced(vehicle)?.original_msrp_currency ?? 'USD'
 const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(isNumber)) : null
 const motors = (key) => (vehicle) => highest(array(vehicle.motors).map((motor) => motor[key]))
 const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode[key]))
@@ -69,7 +71,7 @@ const GEARING = [
 
 // The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's. The
 // 'geometry' `part` is their sizes and frames, keyed to the overlay by `frames`, and the 'specs' part the rest
-export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part = 'specs', label = 'Comparison' }) => {
+export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part = 'specs' }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
@@ -84,7 +86,6 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
       amount: (change) => presenter.measurement(change, unit, key, { difference: true })
     }
   })
-  const missing = html`<span class="twless-strong">—</span>`
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
   const length = {
     ...geometry.find(({ key }) => key === 'wheelbase'),
@@ -167,7 +168,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
 
   // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling
   // only once it's the window's width; its own min-w-full would make it the window's width
-  return html`<section aria-label=${label} class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4">${table({
+  return html`<section aria-label=${part === 'geometry' ? 'Sizes & geometry comparison' : 'Components comparison'} class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4">${table({
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [

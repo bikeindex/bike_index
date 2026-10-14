@@ -36,14 +36,6 @@ export default class extends Controller {
     this.#writeUrl()
   }
 
-  // A clear link's href, as it's clicked: this URL less every filter but the market, keeping the picks, view and
-  // sort too, which the page renders afresh with the filters at their defaults
-  clear ({ currentTarget }) {
-    const url = new URL(window.location)
-    for (const name of [...Object.keys(this.#filters), 'jurisdiction'].filter((name) => name !== 'market')) url.searchParams.delete(name)
-    currentTarget.href = readable(url)
-  }
-
   // A state without its own classes uses the US ones. Runs before its fieldset's apply, which a change
   // bubbles on to, and a hidden class doesn't stay checked
   showJurisdiction () {
@@ -76,6 +68,15 @@ export default class extends Controller {
     const filters = this.#filters
     this.#applyParams(url, { ...filters, market: filters.market === this.defaultMarketValue ? '' : filters.market || 'all' })
     replaceUrl(url)
+    this.refreshClear()
+  }
+
+  // A clear link's href: this page less its filters but the market, which it renders afresh at their defaults. Set
+  // again as it's clicked, since the panel's own state and the picks reach the URL without a filter changing
+  refreshClear () {
+    const url = new URL(window.location)
+    for (const name of [...Object.keys(this.#filters), 'jurisdiction'].filter((name) => name !== 'market')) url.searchParams.delete(name)
+    for (const link of this.clearTargets) link.href = readable(url)
   }
 
   #applyParams (url, filters = this.#filters) {

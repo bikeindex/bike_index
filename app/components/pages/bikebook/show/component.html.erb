@@ -1,4 +1,4 @@
-<%# Rendered again by the page from the URL less its filters; shown by bikebook--catalog-filters once any is set %>
+<%# bikebook--catalog-filters keeps its href, the page less its filters but the market, and shows it once any is set %>
 <% clear_filters = capture do %>
   <a
     href="<%= bikebook_path %>"
@@ -6,7 +6,7 @@
     class="twlink tw:shrink-0 tw:text-sm"
     data-in-place="[autofocus]"
     data-bikebook--catalog-filters-target="clear"
-    data-action="bikebook--catalog-filters#clear"
+    data-action="bikebook--catalog-filters#refreshClear"
   >
     <%= translation(".clear_filters") %>
   </a>
@@ -33,6 +33,7 @@
     <div
       data-bikebook--catalog-filters-target="vehicleCombobox"
       data-controller="bikebook--focus-shortcut"
+      data-action="bikebook--tips:browse@window->bikebook--focus-shortcut#open"
     >
       <%= form_with url: bikebook_path, method: :get,
           data: {controller: "bikebook--auto-submit",

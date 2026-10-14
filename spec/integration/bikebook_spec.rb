@@ -764,7 +764,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st", view: "all")
     # its long description clamped, until it's opened
     description = find("[aria-label='Basics'] dd", text: /\AWhatever you’re into/, wait: 10)
-    clamped = -> { description.evaluate_script("this.querySelector('[data-bikebook--read-more-target=text]').scrollHeight > this.querySelector('[data-bikebook--read-more-target=text]').clientHeight") }
+    clamped = -> { description.find("[data-bikebook--read-more-target='text']").evaluate_script("this.scrollHeight > this.clientHeight") }
     expect(clamped.call).to be true
     description.click_on "Read more"
     expect(description).to have_css("button[aria-expanded='true']", exact_text: "Show less")
