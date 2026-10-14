@@ -48,7 +48,7 @@ export default class extends Controller {
   }
 
   // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
-  // scrolling or focusing the search
+  // scrolling, focusing what its data-in-place selects rather than the search
   follow (event) {
     const link = event.target.closest('a[href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
@@ -57,7 +57,7 @@ export default class extends Controller {
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
-    'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: false }) : this.#go(url)
+    'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: link.dataset.inPlace || false }) : this.#go(url)
   }
 
   // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
@@ -90,6 +90,7 @@ export default class extends Controller {
     return this.#render(url, scroll, options)
   }
 
+  // `focus`: true for the search, or a selector for what to focus where the reader is, the search without it
   async #render (url, scroll, { focus = true } = {}) {
     const render = ++this.#renders
     // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
@@ -102,7 +103,8 @@ export default class extends Controller {
     this.dispatch('before-render')
     this.pageTarget.replaceChildren(rendered.content)
     document.title = rendered.title ?? this.titleValue
-    if (focus) this.pageTarget.querySelector('[autofocus]')?.focus()
+    if (focus === true) this.pageTarget.querySelector('[autofocus]')?.focus()
+    else if (focus) (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: true })
     if (scroll) window.scrollTo(...scroll)
   }
 

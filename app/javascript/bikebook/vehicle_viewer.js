@@ -25,9 +25,9 @@ export class VehicleViewer {
   }
 
   // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or
-  // the nearest to the `preferredSize`
-  render (vehicles, url, preferredSize) {
-    if (vehicles.length === 0) return emptyState(url.pathname)
+  // the nearest to the `preferredSize`. With none, how many models its filters leave `matching`
+  render (vehicles, url, preferredSize, matching) {
+    if (vehicles.length === 0) return emptyState(url.pathname, { filtered: FILTERS.some((name) => url.searchParams.get(name)), count: matching })
 
     const { presenter } = this
     const requested = url.searchParams.get('view')
@@ -67,21 +67,29 @@ export class VehicleViewer {
       return html`<section aria-label=${`${title} sizes`} class="tw:space-y-2"><h3 class="tw:font-bold">${title}</h3>${
         present(data.sizes) ? sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value) }) : html`<p class="twless-strong">No sizes listed</p>`}</section>`
     })}</div>`
+    // a classification has its card, and no sizes or components
     const sections = {
-      basics: (alone) => html`${models.length ? basics({ presenter, vehicles: models, classificationPath }) : nothing}${
-        alone ? cardRow(cards.filter(({ classification }) => classification)) : nothing}`,
-      geometry: () => html`${tabled
-        ? html`${comparisonTable({ ...compared, part: 'geometry', label: 'Sizes & geometry comparison' })}${geometryOverlay(compared)}`
-        : nothing}${sizeLists}`,
-      components: (alone) => html`${tabled ? comparisonTable({ ...compared, label: 'Components comparison' }) : nothing}${
-        cardRow(alone ? cards.filter(({ classification }) => !classification) : cards)}`
+      basics: () => html`${models.length ? basics({ presenter, vehicles: models, classificationPath }) : nothing}${
+        cardRow(cards.filter(({ classification }) => classification))}`,
+      ...(models.length && {
+        geometry: () => html`${tabled
+          ? html`${comparisonTable({ ...compared, part: 'geometry', label: 'Sizes & geometry comparison' })}${geometryOverlay(compared)}`
+          : nothing}${sizeLists}`,
+        components: () => html`${tabled ? comparisonTable({ ...compared, label: 'Components comparison' }) : nothing}${
+          cardRow(cards.filter(({ classification }) => !classification))}`
+      })
     }
     const shown = view === 'all'
-      ? Object.entries(sections).map(([name, section]) => html`<div class="tw:mt-10">${sectionHeading(VIEWS[name])}${section(false)}</div>`)
-      : sections[view](true)
+      ? Object.entries(sections).map(([name, section]) => html`<div class="tw:mt-10">${sectionHeading(VIEWS[name])}${section()}</div>`)
+      : sections[view]?.() ?? html`<p class="tw:mt-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">E-vehicle classifications have no ${
+        VIEWS[view].toLowerCase()}. Their rules are under Basics.</p>`
     return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }))}${shown}`
   }
 }
+
+// what narrows the search, rather than the market every visitor has
+const FILTERS = ['primary_activity', 'manufacturer', 'vehicle_type', 'suspension', 'model_configuration', 'electric', 'year_min', 'year_max',
+  'price_min', 'price_max']
 
 // This page's URL with `params` laid over its own
 const pathWith = (url, params) => {

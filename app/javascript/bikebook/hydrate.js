@@ -74,7 +74,7 @@ export async function hydrate (catalog, source, shell, url) {
     if (classification) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id, classificationPath) })))
   }
 
-  renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize()))
+  renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(), filteredCount))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {

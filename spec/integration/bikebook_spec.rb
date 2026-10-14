@@ -43,11 +43,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#vehicle-filters", visible: true)
     find("button[aria-label='Dismiss tips']").click
     expect(page).to have_no_css(tips).and have_text(/nothing selected yet/i)
+    # focus moves to what replaced the button pressed
+    expect(page).to have_css("button:focus", exact_text: "Show tips")
     visit bikebook_path
     expect(page).to have_text(/nothing selected yet/i, wait: 10)
     expect(page).to have_no_css(tips)
     click_on "Show tips"
-    expect(page).to have_css(tips)
+    expect(page).to have_css("#{tips}:focus")
     visit bikebook_path
     expect(page).to have_css(tips, wait: 10)
     asked.clear
@@ -81,6 +83,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     # each view a link to this page, rendered without a request and kept through a pick
     click_link "Sizes & geometry"
     expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tbody tr:first-child th", text: "Size")
+    # the tab stays focused, for the next one along
+    expect(page).to have_css("nav[aria-label='Jump to'] a[aria-current='page']:focus", exact_text: "Sizes & geometry")
     expect(page).to have_no_css("[aria-label='Basics comparison']")
     expect(page).to have_current_path(/[?&]view=geometry\b/)
     click_link "All"
@@ -342,6 +346,16 @@ RSpec.describe "Bikebook", :js, type: :system do
     find("[aria-label='Remove Aventón Level 4 REC Step-Through']").click
     expect(page).to have_no_css("article")
     expect(page).to have_title("Bikebook", exact: true)
+
+    # Filters with nothing picked say what they leave, and lead into the list or back to the filters
+    visit bikebook_path(price_max: 3000)
+    expect(page).to have_text("26 models match your filters.", wait: 10)
+    click_on "Browse them"
+    expect(page).to have_css("#vehicle_models-hw-listbox [role='option']", minimum: 1)
+    visit bikebook_path(primary_activity: "atb_gravel", price_max: 1500)
+    expect(page).to have_text("No models match your filters.", wait: 10)
+    click_on "Change filters"
+    expect(page).to have_css("#vehicle-filters", visible: true)
   end
 
   it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do
@@ -762,9 +776,16 @@ RSpec.describe "Bikebook", :js, type: :system do
     # a rule a law starts or ends carries its date, and limits not yet in force say when they take effect
     visit bikebook_path(vehicle_models: "evc/us/ca/motor_driven_cycle", view: "all")
     card = find("article h1", text: "California Motor-Driven Cycle", wait: 10).ancestor("article")
+    # its card is its basics, with no sizes or components to list
+    expect(page).to have_no_css("h2", exact_text: "Components")
     expect(card).to have_css("li", text: /\AFrom January 1, 2027: Its motor produces 5 gross brake horsepower/)
       .and have_css("li", text: /\AUntil January 1, 2027: The line is drawn only by an engine under 150 cc/)
       .and have_css("dd", exact_text: "January 1, 2027")
+    click_link "Components"
+    expect(page).to have_text("E-vehicle classifications have no components. Their rules are under Basics.")
+    expect(page).to have_no_css("article")
+    click_link "Basics"
+    expect(page).to have_css("article h1", text: "California Motor-Driven Cycle")
   end
 
   it "says so when the catalog doesn't load" do
