@@ -22,10 +22,9 @@ module Pages
 
           DEFAULT_COLUMNS = (COLUMNS.keys - %i[value_cell police_department_cell police_report_cell]).freeze
 
-          def initialize(stolen_records:, index:)
+          def initialize(stolen_records:, sort_state:)
             @stolen_records = stolen_records
-            @index = index
-            @pagy = index.pagy
+            @sort_state = sort_state
           end
 
           private

@@ -44,8 +44,8 @@
   <%= @admin_search_form %>
 <% end %>
 
-<%= render(pagination_component) if @paginate %>
+<%= render(pagination_component) %>
 
 <%= @table_view || default_table_view %>
 
-<%= render(pagination_component(skip_total: true)) if @paginate %>
+<%= render(pagination_component(skip_total: true)) %>

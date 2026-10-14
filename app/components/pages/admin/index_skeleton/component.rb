@@ -4,7 +4,6 @@ module Pages
   module Admin
     module IndexSkeleton
       class Component < ApplicationComponent
-        # paginate: false when the table_view renders its own count and pagination
         def initialize(
           index:,
           collection:,
@@ -19,8 +18,7 @@ module Pages
           table_view: nil,
           chart_collection: nil,
           header_content: nil,
-          count_detail: nil,
-          paginate: true
+          count_detail: nil
         )
           @index = index
           @collection = collection
@@ -36,7 +34,6 @@ module Pages
           @chart_collection = chart_collection
           @header_content = header_content
           @count_detail = count_detail
-          @paginate = paginate
         end
 
         private

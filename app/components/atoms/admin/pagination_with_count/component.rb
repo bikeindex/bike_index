@@ -34,12 +34,20 @@ module Atoms
           end
         end
 
+        def show_time_range?
+          @index.time_range.present? && @index.period != "all"
+        end
+
         def show_today_count?
           !@skip_total && @collection.respond_to?(:total_count)
         end
 
         def today_count
           @collection.where("#{@collection.table_name}.#{@time_range_column || "created_at"} >= ?", Time.current.beginning_of_day).total_count
+        end
+
+        def per_pages
+          [10, 25, 50, 100, @index.per_page.to_i].uniq.sort
         end
       end
     end

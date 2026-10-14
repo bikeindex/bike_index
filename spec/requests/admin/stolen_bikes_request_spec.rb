@@ -17,7 +17,6 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(flash).to_not be_present
         expect(assigns(:stolen_records)).to match_array([stolen_record])
         expect(response.body).to include("Contact owner", "Oakland PD", "26-004512")
-        expect(Nokogiri::HTML(response.body).text.squish).to include("1 match", "showing 1–1 of 1")
         expect(response.body).to include('data-ui--table-column-order-storage-key-value="adminStolenBikesColumnsOrder"')
         expect(response.body).to include('name="photo_cell"', 'data-narrow-hidden="true"', 'data-controller="ui--table-overflow"')
         # test the search_with_promoted_alert because scoping is weird
