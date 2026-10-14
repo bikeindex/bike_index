@@ -224,12 +224,13 @@ puts "Seeding non-cycle types and e-vehicles"
   FindOrCreateModelAuditJob.new.perform(bike.id)
 end
 
-# --- Bike Sticker Batch "BR" for Brakebills: BR 000 1 assigned, the next 100 unassigned ---
+# --- Bike Sticker Batch "BR" for Brakebills: BR 000 1-3 on the Load4, the next 98 unassigned ---
 puts "Creating bike sticker batch BR with 101 stickers..."
 sticker_batch = BikeStickerBatch.create!(prefix: "BR", organization: brakebills, user: member, code_number_length: 4)
 sticker_batch.create_codes(101, initial_code_integer: 1)
 
-sticker = sticker_batch.bike_stickers.find_by!(code_integer: 1)
-sticker_bike = brakebills.bikes.order(:id).first
-sticker.claim(user: member, bike: sticker_bike, organization: brakebills)
-puts "  Assigned sticker #{sticker.pretty_code} to bike ##{sticker_bike.id}"
+sticker_bike = brakebills.bikes.find_by!(frame_model: "Load4 75 rohloff")
+sticker_batch.bike_stickers.where(code_integer: 1..3).order(:code_integer).each do |sticker|
+  sticker.claim(user: member, bike: sticker_bike, organization: brakebills)
+  puts "  Assigned sticker #{sticker.pretty_code} to bike ##{sticker_bike.id}"
+end
