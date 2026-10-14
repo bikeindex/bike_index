@@ -124,7 +124,6 @@ const group = (label, options) => {
     role="presentation">${label}</li>${options}</ul>`
 }
 
-// beside the search, and in the filter panel against the whole catalog
 export const renderCounts = (root, count, total) => {
   renderInto(root.getElementById('vehicle-models-count'), matching(count))
   renderInto(root.getElementById('vehicle-filters-count'), html`<strong>${numberDisplay(count)}</strong> of ${numberDisplay(total)} models match`)

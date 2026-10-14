@@ -62,7 +62,6 @@ export class VehicleViewer {
         : nothing
     }
     const compared = () => ({ presenter, vehicles: models, sizes, frames: models.map(({ data }, index) => frameGeometry(data, sizes[index])) })
-    // each model's `content`, or `none` where it has no `key`, under its name
     const listed = (key, none, content) => html`<div ?data-comparison=${comparing} class="tw:mt-6 tw:space-y-6">${models.map(({ data, value }) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
       const title = [manufacturer, model].filter(present).join(' ')
