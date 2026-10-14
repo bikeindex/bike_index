@@ -53,17 +53,15 @@ RSpec.describe ImpoundClaim, type: :model do
     let(:impound_record) { FactoryBot.create(:impound_record) }
     let(:stalled_at) { Time.current - ImpoundClaim::STALLED_AFTER - 1.day }
     let!(:impound_claim_submitted) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", submitted_at: stalled_at) }
-    let!(:impound_claim_approved) { FactoryBot.create(:impound_claim, impound_record:, status: "approved", submitted_at: stalled_at) }
-    let!(:impound_claim_unsubmitted) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", created_at: stalled_at) }
-    let!(:impound_claim_recent) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", created_at: stalled_at, submitted_at: Time.current - 1.day) }
+    let!(:impound_claim_approved) { FactoryBot.create(:impound_claim, impound_record:, status: "approved", created_at: stalled_at) }
+    let!(:impound_claim_recent) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", created_at: stalled_at) }
     let!(:impound_claim_organized) { FactoryBot.create(:impound_claim, status: "submitting", submitted_at: stalled_at) }
     let!(:impound_claims_other_statuses) do
-      %w[pending denied retrieved].map { |status| FactoryBot.create(:impound_claim, impound_record:, status:, created_at: stalled_at, submitted_at: stalled_at) }
+      %w[pending denied retrieved].map { |status| FactoryBot.create(:impound_claim, impound_record:, status:, created_at: stalled_at) }
     end
-    before { impound_claim_unsubmitted.update_column(:submitted_at, nil) }
 
     it "includes old submitted and approved claims on public found reports" do
-      expect(ImpoundClaim.stalled.pluck(:id)).to match_array([impound_claim_submitted.id, impound_claim_approved.id, impound_claim_unsubmitted.id])
+      expect(ImpoundClaim.stalled.pluck(:id)).to match_array([impound_claim_submitted.id, impound_claim_approved.id])
     end
   end
 

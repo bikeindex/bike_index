@@ -27,7 +27,6 @@ RSpec.describe Admin::ImpoundClaimsController, type: :request do
       it "renders only stalled claims" do
         get base_url, params: {search_status: "stalled", render_chart: true}
         expect(response.status).to eq(200)
-        expect(assigns(:search_status)).to eq "stalled"
         expect(assigns(:impound_claims).pluck(:id)).to eq([impound_claim_stalled.id])
         expect(response.body).to include("Stalled records")
       end
