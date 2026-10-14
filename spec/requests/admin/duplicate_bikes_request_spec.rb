@@ -54,6 +54,20 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(assigns(:groups).map { it["record_count"] }).to eq [11, 12]
       expect(response.body).to include("Latest registration")
     end
+
+    it "rechecks the listed groups' stolen veto live" do
+      FactoryBot.create(:stolen_bike, serial_number: "EN 14764")
+      get base_url, params: {search_kind: "large_group"}
+      expect(assigns(:groups).map { it["serial_stolen"] }).to eq [true]
+      expect(response.body).to include("Stolen history — do not merge")
+    end
+
+    it "puts a strictly qualified shop-to-customer handoff in its priority queue" do
+      user = FactoryBot.create(:user_confirmed)
+      shop_bike = FactoryBot.create(:bike_lightspeed_pos, manufacturer:, serial_number: "HAND0FF123", owner_email: user.email, created_at: 2.days.ago)
+      FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer:, serial_number: "HAND0FF123")
+      expect(BikeServices::DuplicateReviewFinder.groups.find { it["bike_ids"].include?(shop_bike.id) }["kind"]).to eq "handoff_priority"
+    end
   end
 
   describe "show" do

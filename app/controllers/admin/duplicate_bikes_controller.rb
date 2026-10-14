@@ -93,6 +93,9 @@ module Admin
       @groups_count = groups.size
       @registrations_count = groups.sum { it["record_count"] }
       @pagy, @groups = pagy(:offset, groups, limit: @per_page, page: permitted_page)
+      # The snapshot can be an hour old, so the listed groups' stolen veto is read live
+      stolen_serials = BikeServices::DuplicateReviewFinder.stolen_serials(@groups.map { it["serial"] })
+      @groups = @groups.map { it.merge("serial_stolen" => stolen_serials.include?(it["serial"])) }
       @representatives = Bike.unscoped.where(id: @groups.map { it["reference_id"] })
         .includes(:manufacturer, :ownerships).index_by(&:id)
       @organizations = Organization.unscoped.where(id: @groups.flat_map { it["organization_ids"] || [] }).index_by(&:id)

@@ -38,9 +38,9 @@ module BikeServices
       end
     end
 
-    def cache_key(database) = ["duplicate_review_groups_v7", database]
+    def cache_key(database) = ["duplicate_review_groups_v8", database]
 
-    def preparation_key(database) = ["duplicate_review_groups_preparing_v7", database]
+    def preparation_key(database) = ["duplicate_review_groups_preparing_v8", database]
 
     def groups
       manufacturer_names = DuplicateReviewCues.manufacturer_name_serials
@@ -54,11 +54,11 @@ module BikeServices
       end
     end
 
-    # A placeholder or part-number serial isn't evidence of anything, so it outranks every other queue.
-    # The stolen badge still shows in that queue
+    # The stolen veto outranks every other queue; a placeholder or part-number serial isn't evidence of anything,
+    # so it outranks the rest
     def kind(group)
-      return "not_a_serial" if DuplicateReviewCues.not_a_serial(group["serial"], manufacturer_names: DuplicateReviewCues.group_manufacturer_names(group))
       return "stolen_history" if group["serial_stolen"]
+      return "not_a_serial" if DuplicateReviewCues.not_a_serial(group["serial"], manufacturer_names: DuplicateReviewCues.group_manufacturer_names(group))
       return "internal_test" if group["test_count"] == group["record_count"]
       return "mixed_test" if group["test_count"].positive?
       return "large_group" if group["record_count"] >= LARGE_GROUP_MINIMUM
@@ -81,13 +81,9 @@ module BikeServices
         " OR EXISTS (SELECT 1 FROM stolen_records WHERE stolen_records.bike_id = #{table}.id))"
     end
 
-    def stolen_serials?(serials)
-      serials = serials.reject(&:blank?)
-      return false if serials.empty?
+    def stolen_serials(serials) = stolen_serial_bikes(serials).distinct.pluck(:serial_normalized_no_space)
 
-      Bike.unscoped.where(serial_normalized_no_space: serials)
-        .where(stolen_history_sql("bikes")).exists?
-    end
+    def stolen_serials?(serials) = stolen_serial_bikes(serials).exists?
 
     # The same test-marker rule the queues use, for records loaded outside them
     def test_bike_ids(bike_ids)
@@ -101,6 +97,10 @@ module BikeServices
     #
     # private below here
     #
+
+    def stolen_serial_bikes(serials)
+      Bike.unscoped.where(serial_normalized_no_space: serials.compact_blank).where(stolen_history_sql("bikes"))
+    end
 
     def test_bikes_sql(materialized: true)
       <<~SQL.strip
@@ -142,7 +142,7 @@ module BikeServices
             EXISTS (SELECT 1 FROM ownerships h WHERE h.bike_id = b.id AND h.previous_ownership_id IS NOT NULL) transferred,
             EXISTS (SELECT 1 FROM marketplace_listings m WHERE m.item_type = 'Bike' AND m.item_id = b.id)
               OR EXISTS (SELECT 1 FROM marketplace_listings m JOIN bike_versions v ON m.item_type = 'BikeVersion' AND m.item_id = v.id WHERE v.bike_id = b.id) marketplace,
-            coalesce(c.user_id = o.user_id AND c.is_phone IS NOT TRUE AND lower(btrim(c.owner_email)) = lower(btrim(o.owner_email)), false) current_identity_matches,
+            coalesce(c.user_id IS NOT DISTINCT FROM o.user_id AND c.is_phone IS NOT TRUE AND lower(btrim(c.owner_email)) = lower(btrim(o.owner_email)), false) current_identity_matches,
             t.bike_id IS NOT NULL test, s.serial IS NOT NULL serial_stolen
           FROM live b JOIN duplicate_keys k ON k.manufacturer_id = b.manufacturer_id AND k.serial = b.serial
           LEFT JOIN LATERAL (
@@ -183,6 +183,6 @@ module BikeServices
       SQL
     end
 
-    conceal :query, :test_bikes_sql
+    conceal :stolen_serial_bikes, :query, :test_bikes_sql
   end
 end
