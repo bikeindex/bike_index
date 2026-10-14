@@ -51,6 +51,35 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     include_examples "records no match"
   end
 
+  context "registered from a sticker" do
+    let(:creation_state_origin) { "sticker" }
+
+    it "records a match" do
+      instance.perform(bike.id)
+      expect(PosRegistrationMatch.pluck(:bike_id, :pos_bike_id)).to eq([[bike.id, pos_bike.id]])
+    end
+  end
+
+  context "a bike with the serial only has stolen status" do
+    before { FactoryBot.create(:bike, serial_number:).update_column(:status, "status_stolen") }
+
+    include_examples "records no match"
+  end
+
+  context "a bike with the serial only has a current stolen record id" do
+    before do
+      FactoryBot.create(:bike, serial_number:).update_column(:current_stolen_record_id, FactoryBot.create(:stolen_record).id)
+    end
+
+    include_examples "records no match"
+  end
+
+  context "another manufacturer's example bike with the serial is stolen" do
+    before { FactoryBot.create(:stolen_bike, serial_number:, example: true) }
+
+    include_examples "records no match"
+  end
+
   context "a deleted bike with the serial was stolen and recovered" do
     before do
       deleted_bike = FactoryBot.create(:bike, serial_number:)

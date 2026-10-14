@@ -4,7 +4,7 @@ module BikeJobs
     sidekiq_options queue: "droppable", retry: 2
 
     POS_KINDS = %w[lightspeed_pos ascend_pos].freeze
-    CUSTOMER_ORIGINS = (Ownership::ORIGIN_REG_FLOW + %w[web embed embed_extended embed_partial api_v2 api_v3]).freeze
+    CUSTOMER_ORIGINS = (Ownership::ORIGIN_REG_FLOW + %w[web embed embed_extended embed_partial sticker api_v2 api_v3]).freeze
 
     def perform(bike_id)
       bike = Bike.unscoped.find_by_id(bike_id)
@@ -14,6 +14,7 @@ module BikeJobs
       return if pos_bikes.count != 1 || entangled?([bike.id, pos_bikes.first.id]) ||
         stolen_history?(bike.serial_normalized_no_space)
 
+      # Theft can be reported after this check, so whatever acts on a pending match re-checks the veto then
       PosRegistrationMatch.create_or_find_by!(bike_id:, pos_bike_id: pos_bikes.first.id) { it.user_id = bike.user_id }
     end
 
