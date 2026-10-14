@@ -41,12 +41,13 @@ export default class extends Controller {
     this.#render(new URL(window.location.href), [window.scrollX, window.scrollY])
   }
 
-  // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles
+  // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles,
+  // rendered where the reader is: a pick or a chip's removal is no new page
   visit (event) {
     event.preventDefault()
     const url = new URL(window.location.href)
     new FormData(event.target).forEach((value, name) => url.searchParams.set(name, value))
-    this.#go(realigned(url))
+    this.#go(realigned(url), [window.scrollX, window.scrollY])
   }
 
   // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
