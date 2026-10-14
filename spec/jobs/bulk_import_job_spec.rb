@@ -474,21 +474,16 @@ RSpec.describe BulkImportJob, type: :job do
     let(:serial) { "xyz_test" }
     let(:row) { ["Trek", "Roscoe 8", "2019", "Green", "test@bikeindex.org", serial].join(",") }
     let(:csv_lines) { [sample_csv_lines[0].join(","), row, row] }
-    let(:tempfile) do
-      file = Tempfile.new(["repeated_row", ".csv"])
-      file.write(csv_lines.join("\n"))
-      file.rewind
-      file
-    end
-    let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", file: File.open(tempfile.path)) }
-    after { tempfile.close && tempfile.unlink }
+    let(:bulk_import_attrs) { {} }
+    let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", **bulk_import_attrs) }
+    before { allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") } }
 
     it "creates one bike" do
       expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 1
       expect(bulk_import.reload.import_errors).to be_blank
     end
     context "no_duplicate: false" do
-      let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", file: File.open(tempfile.path), no_duplicate: false) }
+      let(:bulk_import_attrs) { {no_duplicate: false} }
       it "creates two bikes" do
         expect { instance.perform(bulk_import.id) }.to change(Bike, :count).by 2
       end

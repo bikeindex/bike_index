@@ -22,7 +22,6 @@ class BulkImport < ApplicationRecord
   KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
   VALID_FILE_EXTENSIONS = %w[csv tsv].freeze
   TIMEOUT_FAILURE_DELAY = 20.minutes.freeze
-  MIN_NO_DUPLICATE_SERIAL_LENGTH = 6
   mount_uploader :file, BulkImportUploader
 
   enum :progress, PROGRESS_ENUM
@@ -155,8 +154,8 @@ class BulkImport < ApplicationRecord
 
   # Short serials (e.g. "1") are often junk shared by distinct bikes with one owner email
   def no_duplicate_for?(serial)
-    ascend? || no_duplicate &&
-      SerialNormalizer.normalized_and_corrected(serial).to_s.delete(" ").length >= MIN_NO_DUPLICATE_SERIAL_LENGTH
+    ascend? || (no_duplicate &&
+      SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(serial)).to_s.length >= 6)
   end
 
   def creator
