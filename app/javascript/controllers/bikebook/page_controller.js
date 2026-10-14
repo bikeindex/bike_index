@@ -37,8 +37,8 @@ export default class extends Controller {
     }
     this.source = new CatalogComboboxSource(this.catalog, (count) => renderCounts(document, count))
     this.#countModels()
-    // filters set while it loaded are in the URL
-    this.#render(new URL(window.location.href))
+    // filters set while it loaded are in the URL, and the reader stays where they've scrolled to
+    this.#render(new URL(window.location.href), [window.scrollX, window.scrollY])
   }
 
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles
@@ -132,7 +132,11 @@ export default class extends Controller {
     } else if (focus) {
       (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) })
     }
-    if (scroll) window.scrollTo(...scroll)
+    if (scroll) {
+      window.scrollTo(...scroll)
+      // and again once the panels' controllers have opened them, which the browser's scroll anchoring follows down
+      requestAnimationFrame(() => window.scrollTo(...scroll))
+    }
   }
 
   // down to the thousand (a smaller catalog's leading place), so the tagline stays true as the catalog grows
