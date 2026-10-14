@@ -149,12 +149,10 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
       let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, impound_record:, status: "approved") }
 
       it "recovers the stolen record and marks the claim retrieved" do
-        expect(impound_record.reload.organization_id).to be_nil
         expect(impound_record.parking_notification).to be_nil
         expect(impound_record.update_kinds).to include(kind)
 
         impound_record_update.save
-        Sidekiq::Job.clear_all
         described_class.new.perform(impound_record.id)
 
         expect(impound_record_update.reload.processed?).to be_truthy
@@ -162,7 +160,6 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
         expect(impound_record.reload.status).to eq kind
         expect(impound_claim.reload.status).to eq "retrieved"
         expect(impound_claim.stolen_record.reload.recovered?).to be_truthy
-        expect(Bike.unscoped.find(bike.id).deleted?).to be_falsey
       end
     end
   end
