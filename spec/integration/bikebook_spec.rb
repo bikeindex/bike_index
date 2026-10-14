@@ -87,6 +87,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("nav[aria-label='Jump to'] a[aria-current='page']:focus", exact_text: "Sizes & geometry")
     expect(page).to have_no_css("[aria-label='Basics comparison']")
     expect(page).to have_current_path(/[?&]view=geometry\b/)
+    # each model's components alone, by group under its name, without the specs or the rest of its card
+    click_link "Components"
+    expect(page).to have_css("section[aria-label='Aventón Level 2 Step-Through components'] h3", exact_text: "Aventón Level 2 Step-Through")
+    expect(page).to have_css("section[aria-label$=' components']", count: 2)
+    expect(page).to have_no_css("article").and have_no_css("[aria-label='Components comparison']")
     click_link "All"
     expect(page).to have_css("[data-comparison] article", count: 2)
     expect(page).to have_css("[aria-label='Basics comparison']").and have_css("[aria-label='Sizes & geometry comparison']")
@@ -289,14 +294,13 @@ RSpec.describe "Bikebook", :js, type: :system do
       m/specialized/2025/haul_st m/sur_ron/2026/ultra_bee_hp_x_us].join(",")
     card_rows = -> { page.evaluate_script("new Set([...document.querySelectorAll('article')].map((card) => Math.round(card.getBoundingClientRect().top))).size") }
     scrolls_sideways = -> { page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth") }
-    visit bikebook_path(vehicle_models: five, view: "components")
+    visit bikebook_path(vehicle_models: five, view: "all")
     # the label column's header and the five vehicles'
     expect(page).to have_css("[aria-label='Components comparison'] thead th", count: 6, wait: 10)
     expect(page).to have_css("[data-comparison] article", count: 5)
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
     # a vehicle listing no figure that sizes a frame is its wheels alone, the rear axle on the first frame's
-    click_link "All"
     expect(find("[aria-label='Geometry overlay'] p.tw\\:italic").text).to include("Segway GT3 Pro lists none of its Reach, Stack, Top Tube (effective), " \
       "Front Centre and Head Tube, so only its wheels are drawn, the rear axle on Aventón Level 4 REC Step-Through's.")
     # of a year the first lacks just the year, and of a drivetrain just the chip it lacks
@@ -506,8 +510,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     page.current_window.resize_to(1920, 1080)
 
     # a size stays with its vehicle as the vehicles change, through one alone, which nothing compares, and a card's
-    # removal leaves the reader where they were
-    click_link "Components"
+    # removal leaves the reader where they were, as far as the shorter page reaches
     remove = find("[aria-label='Remove Aventón Current ADV']")
     scroll_to(remove, align: :center)
     scrolled = page.evaluate_script("window.scrollY")
@@ -515,12 +518,12 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css(".hw-combobox__chip", count: 1)
     expect(page).to have_no_css("[aria-label$='comparison']")
     expect(page.evaluate_script("window.scrollY")).to be > 0
-    expect(page.evaluate_script("window.scrollY")).to be_within(2).of(scrolled)
+    reachable = page.evaluate_script("Math.min(#{scrolled}, document.documentElement.scrollHeight - window.innerHeight)")
+    expect(page.evaluate_script("window.scrollY")).to be_within(2).of(reachable)
     expect(vehicle_field).not_to match_css(":focus")
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
     # Small's top tube is nearer Soltera's Medium than its Small
-    click_link "All"
     type_into(vehicle_field, "soltera")
     retry_on_detach { find("[role='option']", text: "Aventón Soltera 3 ADV").click }
     expect_size.call("Soltera 3 ADV", "Medium")

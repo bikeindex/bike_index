@@ -61,6 +61,9 @@ export const basicsOf = ({ presenter, data, classificationPath }) => new ModelVi
 // A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`'
 export const sizesOf = ({ presenter, data, others = [], selectedSize }) => new ModelViewer({ presenter, data, others, selectedSize }).sizes()
 
+// A vehicle's components by group, marked where they differ from `others`', under no heading of their own
+export const componentsOf = ({ presenter, data, others = [] }) => new ModelViewer({ presenter, data, others }).components({ heading: false })
+
 class ModelViewer {
   constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath, selectedSize }) {
     this.presenter = presenter
@@ -576,7 +579,7 @@ class ModelViewer {
       sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize }))}</div>`
   }
 
-  components () {
+  components ({ heading = true } = {}) {
     const components = this.vehicle.components
     if (blank(components)) return nothing
 
@@ -591,7 +594,9 @@ class ModelViewer {
       const sorted = [...members].sort((a, b) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)
       return [componentGroup({ presenter: this.presenter, name, components: sorted, others })]
     })
-    return html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${tables}</section>`
+    return html`<section class="tw:space-y-4">${heading
+      ? html`<h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>`
+      : nothing}${tables}</section>`
   }
 }
 

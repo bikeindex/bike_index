@@ -7,7 +7,7 @@ import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { frameGeometry } from 'bikebook/frame_geometry'
 import { geometryOverlay } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
-import { modelViewer, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
+import { componentsOf, modelViewer, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { sectionHeading } from 'bikebook/templates/vehicles/section'
 import { present } from 'bikebook/templates/values'
 import { toQuery } from 'bikebook/query'
@@ -61,12 +61,14 @@ export class VehicleViewer {
         : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${shown.map(({ card }) => card)}</div></div>`
       : nothing
     const compared = { presenter, vehicles: models, sizes, frames: models.map(({ data }, index) => frameGeometry(data, sizes[index])) }
-    const sizeLists = html`<div ?data-comparison=${comparing} class="tw:mt-6 tw:space-y-6">${models.map(({ data, value }) => {
+    // each model's `content`, or `none` where it has no `key`, under its name
+    const listed = (key, none, content) => html`<div ?data-comparison=${comparing} class="tw:mt-6 tw:space-y-6">${models.map(({ data, value }) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
       const title = [manufacturer, model].filter(present).join(' ')
-      return html`<section aria-label=${`${title} sizes`} class="tw:space-y-2"><h3 class="tw:font-bold">${title}</h3>${
-        present(data.sizes) ? sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value) }) : html`<p class="twless-strong">No sizes listed</p>`}</section>`
+      return html`<section aria-label=${`${title} ${key}`} class="tw:space-y-2"><h3 class="tw:font-bold">${title}</h3>${
+        present(data[key]) ? content(data, value) : html`<p class="twless-strong">${none}</p>`}</section>`
     })}</div>`
+    const sizeLists = listed('sizes', 'No sizes listed', (data, value) => sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value) }))
     // a classification has its card, and no sizes or components
     const sections = {
       basics: () => html`${models.length ? basics({ presenter, vehicles: models, classificationPath }) : nothing}${
@@ -75,13 +77,15 @@ export class VehicleViewer {
         geometry: () => html`${tabled
           ? html`${comparisonTable({ ...compared, part: 'geometry', label: 'Sizes & geometry comparison' })}${geometryOverlay(compared)}`
           : nothing}${sizeLists}`,
-        components: () => html`${tabled ? comparisonTable({ ...compared, label: 'Components comparison' }) : nothing}${
-          cardRow(cards.filter(({ classification }) => !classification))}`
+        // alone, just the parts; in All, the specs compared and each model's whole card, its parts with them
+        components: (alone) => alone
+          ? listed('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }))
+          : html`${tabled ? comparisonTable({ ...compared, label: 'Components comparison' }) : nothing}${cardRow(cards.filter(({ classification }) => !classification))}`
       })
     }
     const shown = view === 'all'
-      ? Object.entries(sections).map(([name, section]) => html`<div class="tw:mt-10">${sectionHeading(VIEWS[name])}${section()}</div>`)
-      : sections[view]?.() ?? html`<p class="tw:mt-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">E-vehicle classifications have no ${
+      ? Object.entries(sections).map(([name, section]) => html`<div class="tw:mt-10">${sectionHeading(VIEWS[name])}${section(false)}</div>`)
+      : sections[view]?.(true) ?? html`<p class="tw:mt-6 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">E-vehicle classifications have no ${
         VIEWS[view].toLowerCase()}. Their rules are under Basics.</p>`
     return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }))}${shown}`
   }
