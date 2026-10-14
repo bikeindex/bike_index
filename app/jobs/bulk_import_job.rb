@@ -2,9 +2,21 @@ require "csv"
 
 class BulkImportJob < ApplicationJob
   MAX_LINES = 25_100
+  REDLOCK_PREFIX = "BulkImportAscendLock-#{Rails.env.slice(0, 3)}"
+  # Expires the lock if a worker dies mid-import, so deferred imports can't wait forever
+  LOCK_DURATION_MS = 30.minutes.in_milliseconds.to_i
+  LOCKED_RETRY_DELAY = 1.minute
   sidekiq_options retry: false
 
   class << self
+    def redlock_key(organization_id)
+      "#{REDLOCK_PREFIX}-#{organization_id}"
+    end
+
+    def new_lock_manager
+      Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
+    end
+
     # This is a little gross. It was added in PR #2911 when adding address records to bikes
     def address_record_attributes(address_string, country_id: nil)
       return {} if address_string.blank?
@@ -66,7 +78,23 @@ class BulkImportJob < ApplicationJob
     @bulk_import = BulkImport.find(bulk_import_id)
     return true if @bulk_import.ascend? && !@bulk_import.check_ascend_import_processable!
     return true if @bulk_import.finished? # Exit early if already finished
+    return process_import unless @bulk_import.ascend?
 
+    # Ascend sends a shop's files seconds apart, and concurrent imports can't dedupe against each other
+    lock_manager = self.class.new_lock_manager
+    redlock = lock_manager.lock(self.class.redlock_key(@bulk_import.organization_id), LOCK_DURATION_MS)
+    return self.class.perform_in(LOCKED_RETRY_DELAY, bulk_import_id) unless redlock
+
+    begin
+      process_import
+    ensure
+      lock_manager.unlock(redlock)
+    end
+  end
+
+  private
+
+  def process_import
     # Check file size before processing
     open_file = @bulk_import.open_file
 
@@ -86,8 +114,6 @@ class BulkImportJob < ApplicationJob
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
     @bulk_import.update_attribute :import_errors, (@bulk_import.import_errors || {}).merge("line" => @line_errors.compact)
   end
-
-  private
 
   def process_csv(open_file)
     @line_errors = @bulk_import.line_errors || [] # We always need line_errors
