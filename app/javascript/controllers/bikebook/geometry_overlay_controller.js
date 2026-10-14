@@ -1,5 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
+/* global requestAnimationFrame, cancelAnimationFrame */
+
 // The drawing's and each vehicle's frame's attributes as last drawn, which the next drawing moves the same ones from
 let drawn = new Map()
 const ATTRIBUTES = { svg: ['viewBox'], g: ['transform'], circle: ['cx', 'cy', 'r'], path: ['d'] }
