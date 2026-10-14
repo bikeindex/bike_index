@@ -142,6 +142,29 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
       expect(bike.reload.status).to eq "status_with_owner"
       expect(bike.updated_at).to be_within(1).of Time.current
     end
+
+    context "public found report with an approved claim" do
+      let(:impound_record) { FactoryBot.create(:impound_record, bike:) }
+      let(:bike) { FactoryBot.create(:bike) }
+      let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, impound_record:, status: "approved") }
+
+      it "recovers the stolen record and marks the claim retrieved" do
+        expect(impound_record.reload.organization_id).to be_nil
+        expect(impound_record.parking_notification).to be_nil
+        expect(impound_record.update_kinds).to include(kind)
+
+        impound_record_update.save
+        Sidekiq::Job.clear_all
+        described_class.new.perform(impound_record.id)
+
+        expect(impound_record_update.reload.processed?).to be_truthy
+        expect(impound_record_update.impound_claim_id).to eq impound_claim.id
+        expect(impound_record.reload.status).to eq kind
+        expect(impound_claim.reload.status).to eq "retrieved"
+        expect(impound_claim.stolen_record.reload.recovered?).to be_truthy
+        expect(Bike.unscoped.find(bike.id).deleted?).to be_falsey
+      end
+    end
   end
 
   context "removed_from_index" do
