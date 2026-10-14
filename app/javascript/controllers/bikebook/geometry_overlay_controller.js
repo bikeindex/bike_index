@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-/* global cancelAnimationFrame, requestAnimationFrame */
+/* global requestAnimationFrame, cancelAnimationFrame */
 
 // The drawing's and each vehicle's frame's attributes as last drawn, which the next drawing moves the same ones from
 let drawn = new Map()
