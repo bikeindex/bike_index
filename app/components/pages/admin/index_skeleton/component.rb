@@ -4,6 +4,7 @@ module Pages
   module Admin
     module IndexSkeleton
       class Component < ApplicationComponent
+        # paginate: false when the table_view renders its own count and pagination
         def initialize(
           index:,
           collection:,
