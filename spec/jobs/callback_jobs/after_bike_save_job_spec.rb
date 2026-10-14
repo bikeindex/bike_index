@@ -10,10 +10,21 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
 
   describe "enqueuing jobs" do
     let(:bike_id) { FactoryBot.create(:ownership, user_hidden: true).bike_id }
-    it "enqueues the duplicate_bike_finder_worker" do
+    it "enqueues the duplicate_bike_finder_worker and pos_registration_match_finder" do
       expect {
         instance.perform(bike_id)
       }.to change(BikeJobs::DuplicateBikeFinderJob.jobs, :size).by 1
+      expect(BikeJobs::PosRegistrationMatchFinderJob.jobs.map { it["args"] }).to eq([[bike_id]])
+    end
+
+    context "bike created more than 5 minutes ago" do
+      before { Bike.unscoped.where(id: bike_id).update_all(created_at: Time.current - 6.minutes) }
+
+      it "doesn't enqueue pos_registration_match_finder" do
+        instance.perform(bike_id)
+        expect(BikeJobs::DuplicateBikeFinderJob.jobs.size).to eq 1
+        expect(BikeJobs::PosRegistrationMatchFinderJob.jobs.size).to eq 0
+      end
     end
   end
 
@@ -96,8 +107,7 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
       expect(UserRegistrationOrganization.unscoped.count).to eq 0
       Sidekiq::Job.clear_all
       instance.perform(bike.id)
-      expect(Sidekiq::Job.jobs.count).to eq 1
-      expect(Sidekiq::Job.jobs.count { |j| j["class"] != "BikeJobs::DuplicateBikeFinderJob" }).to eq 0
+      expect(Sidekiq::Job.jobs.map { it["class"] }.sort).to eq(%w[BikeJobs::DuplicateBikeFinderJob BikeJobs::PosRegistrationMatchFinderJob])
       expect(UserRegistrationOrganization.unscoped.count).to eq 0
       expect(bike.reload.bike_organizations.count).to eq 1
       expect(bike.ownerships.pluck(:id)).to eq([ownership.id])
@@ -397,7 +407,7 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
       expect(bike.reload.motorized?).to be_truthy
       Sidekiq::Job.clear_all
       instance.perform(bike.id)
-      expect(Sidekiq::Job.jobs.map { |j| j["class"] }.sort).to eq(%w[BikeJobs::DuplicateBikeFinderJob FindOrCreateModelAuditJob])
+      expect(Sidekiq::Job.jobs.map { |j| j["class"] }.sort).to eq(%w[BikeJobs::DuplicateBikeFinderJob BikeJobs::PosRegistrationMatchFinderJob FindOrCreateModelAuditJob])
       expect(ModelAudit.count).to eq 0
       FindOrCreateModelAuditJob.drain
       expect(bike.reload.model_audit_id).to be_present
