@@ -18,6 +18,8 @@ class DuplicateBikeReview
     "Year" => ->(bike) { bike.year },
     "Primary color" => ->(bike) { bike.primary_frame_color&.name },
     "Vehicle type" => ->(bike) { bike.cycle_type&.humanize },
+    "Propulsion" => ->(bike) { bike.propulsion_type&.humanize },
+    "Frame size" => ->(bike) { bike.frame_size&.upcase },
     "Stored serial" => ->(bike) { bike.serial_number },
     "Whole normalized serial" => ->(bike) { bike.serial_normalized_no_space },
     "Status" => ->(bike) { bike.status&.humanize }
@@ -30,11 +32,13 @@ class DuplicateBikeReview
     bike&.ownerships&.min_by { |ownership| [ownership.previous_ownership_id.nil? ? 0 : 1, ownership.created_at || Time.at(0), ownership.id || 0] }
   end
 
-  # manufacturer_names: is DuplicateReviewCues.manufacturer_name_serials, so a brand typed as the serial is caught
-  def initialize(bikes:, reference_bike: nil, manufacturer_names: {})
+  # manufacturer_names: is DuplicateReviewCues.manufacturer_name_serials, so a brand typed as the serial is caught.
+  # stolen_record_counts: is every stolen record per bike ID, deleted ones included
+  def initialize(bikes:, reference_bike: nil, manufacturer_names: {}, stolen_record_counts: {})
     @bikes = bikes
     @reference_bike = reference_bike || bikes.first
     @manufacturer_names = manufacturer_names
+    @stolen_record_counts = stolen_record_counts
   end
 
   def serial_match(bike)
@@ -114,7 +118,7 @@ class DuplicateBikeReview
 
   def source(bike)
     ownership = initial_ownership(bike)
-    return "#{ownership.pos_kind.delete_suffix("_pos").humanize} POS" if %w[lightspeed_pos ascend_pos].include?(ownership&.pos_kind)
+    return "#{ownership.pos_kind.delete_suffix("_pos").humanize} POS" if pos?(bike)
 
     ownership&.origin&.humanize
   end
@@ -122,6 +126,8 @@ class DuplicateBikeReview
   def organization(bike) = initial_ownership(bike)&.organization || bike.creation_organization
 
   def transferred?(bike) = bike.ownerships.any?(&:previous_ownership_id)
+
+  def stolen_history?(bike) = bike.status_stolen? || bike.current_stolen_record_id.present? || @stolen_record_counts.key?(bike.id)
 
   def shared_fields = @shared_fields ||= FIELDS.keys.select { field_distribution(it).size == 1 }
 
@@ -176,9 +182,20 @@ class DuplicateBikeReview
     accounts = initials.map { it&.user_id }
     emails = initials.map { normalized_email(it) }
     separate_cues = cues(test_count:).select { SEPARATE_REVIEW_CUES.include?(it.key) }
+    serials = bikes.map { it.serial_normalized_no_space.to_s }
+    manufacturer_ids = bikes.map(&:manufacturer_id)
     [
-      serial_stolen ? Check.new(:blocked, "Stolen history on this whole serial (any record, manufacturer or status) is a hard merge veto") :
-        Check.new(:pass, "No stolen report on this whole serial now; recheck when a merge executes"),
+      if serial_stolen
+        Check.new(:blocked, "Stolen history on this whole serial (any record, manufacturer or status) is a hard merge veto")
+      elsif bikes.any? { stolen_history?(it) }
+        Check.new(:blocked, "A record has its own stolen history, a hard merge veto whatever its serial")
+      else
+        Check.new(:pass, "No stolen history on these records or their whole serials now; recheck when a merge executes")
+      end,
+      ((serials.uniq.size == 1 && serials.first.length >= 6) ? Check.new(:pass, "Same whole normalized serial on every record") :
+        Check.new(:blocked, "Whole normalized serials differ, or one is missing or shorter than 6 characters")),
+      ((manufacturer_ids.uniq.size == 1 && manufacturer_ids.first) ? Check.new(:pass, "Same manufacturer on every record") :
+        Check.new(:blocked, "Manufacturers differ, or one is missing")),
       ((bikes.any? { it.deleted_at || it.example || it.likely_spam }) ? Check.new(:blocked, "Includes a deleted, example or spam record") : nil),
       *separate_cues.map { Check.new(:blocked, "#{it.label} — needs separate review, not an invitation") },
       if accounts.compact.size == bikes.size && accounts.uniq.size == 1
@@ -214,8 +231,15 @@ class DuplicateBikeReview
     accounts = bikes.filter_map { initial_ownership(it)&.user_id }
     BikeServices::DuplicateReviewCues.cues(serials: bikes.map(&:serial_normalized_no_space).uniq,
       record_count: bikes.size, contact_count: emails.uniq.size, test_count:,
-      review_contact_count:, model_match_count:, manufacturer_names:,
+      review_contact_count:, model_match_count:, manufacturer_names:, shop_default_propulsion: shop_default_propulsion?,
       single_contact: [emails, accounts].any? { it.size == bikes.size && it.uniq.size == 1 })
+  end
+
+  def pos?(bike) = %w[lightspeed_pos ascend_pos].include?(initial_ownership(bike)&.pos_kind)
+
+  def shop_default_propulsion?
+    shop_default_at = bikes.select { pos?(it) && it.propulsion_type == "foot-pedal" }.map(&:created_at).min
+    shop_default_at && bikes.any? { !pos?(it) && it.created_at > shop_default_at && PropulsionType.motorized?(it.propulsion_type) }
   end
 
   def normalized_email(ownership)

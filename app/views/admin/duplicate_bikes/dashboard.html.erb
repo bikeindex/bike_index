@@ -13,8 +13,10 @@
 
 <%= render UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mt-4", header: "Review only — no merging, deletion or customer emails") do %>
   A stolen report anywhere on a matching whole serial — recovered, deleted and
-  test records included — puts the group in Stolen history, and is checked again
-  when a comparison opens. Never merge those records.
+  test records included — puts the group in Stolen history, ahead of every other
+  queue, when the queues are computed. The stolen badge is rechecked live for
+  the groups on this page and when a comparison opens. Never merge those
+  records.
 <% end %>
 
 <div data-controller="ui--collapse" class="tw:mt-2">
@@ -51,10 +53,10 @@
 
     <p>
       A serial that is a placeholder, part number or manufacturer name has its
-      own queue, since sharing it says nothing about the bicycle. Other review
-      cues are tentative and never move a group between queues: a standards
-      designation in the serial (ISO/EN and similar), a serial repeated on many
-      registrations or shared by
+      own queue, after Stolen history, since sharing it says nothing about the
+      bicycle. Other review cues are tentative and never move a group between
+      queues: a standards designation in the serial (ISO/EN and similar), a
+      serial repeated on many registrations or shared by
       <%= BikeServices::DuplicateReviewCues::REPEATED_CONTACT_MINIMUM %> or more
       contacts, test markers, initial contacts on a reserved example domain, and
       one shared initial contact. Hover a cue for its reason. Same contact or

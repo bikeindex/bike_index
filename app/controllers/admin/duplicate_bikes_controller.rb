@@ -45,7 +45,8 @@ module Admin
       else
         all_bikes.min_by(&:id)
       end
-      @review = DuplicateBikeReview.new(bikes: all_bikes, reference_bike: @reference_bike,
+      @stolen_record_counts = StolenRecord.unscoped.where(bike_id: all_bikes.map(&:id)).group(:bike_id).count
+      @review = DuplicateBikeReview.new(bikes: all_bikes, reference_bike: @reference_bike, stolen_record_counts: @stolen_record_counts,
         manufacturer_names: BikeServices::DuplicateReviewCues.cached_manufacturer_name_serials)
       @contact_group = @review.contact_groups.find { it.number == params[:search_contact].to_i }
       @per_page = permitted_per_page(default: 25)
@@ -53,7 +54,6 @@ module Admin
       listed_bikes = listed_bikes.reverse if sort_direction == "desc"
       @pagy, @bikes = pagy(:offset, listed_bikes, limit: @per_page, page: permitted_page)
       @test_bike_ids = BikeServices::DuplicateReviewFinder.test_bike_ids(all_bikes.map(&:id)).to_set
-      @stolen_record_counts = StolenRecord.unscoped.where(bike_id: all_bikes.map(&:id)).group(:bike_id).count
       @serial_stolen = BikeServices::DuplicateReviewFinder.stolen_serials?(all_bikes.map(&:serial_normalized_no_space).uniq)
       @checks = @review.readiness_checks(serial_stolen: @serial_stolen, test_count: @test_bike_ids.size)
       @readiness = @review.readiness(@checks)
@@ -110,6 +110,9 @@ module Admin
       @groups_count = groups.size
       @registrations_count = groups.sum { it["record_count"] }
       @pagy, @groups = pagy(:offset, groups, limit: @per_page, page: permitted_page)
+      # The snapshot can be an hour old, so the listed groups' stolen veto is read live
+      stolen_serials = BikeServices::DuplicateReviewFinder.stolen_serials(@groups.map { it["serial"] })
+      @groups = @groups.map { it.merge("serial_stolen" => stolen_serials.include?(it["serial"])) }
       respond_to do |format|
         format.html do
           @representatives = Bike.unscoped.where(id: @groups.map { it["reference_id"] })

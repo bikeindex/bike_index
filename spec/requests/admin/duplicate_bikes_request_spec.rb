@@ -14,7 +14,8 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
   end
   let!(:pair) do
     [FactoryBot.create(:bike_lightspeed_pos, manufacturer:, serial_number: "WTU123456", owner_email: "pair@bikeindex.org", created_at: Time.current - 3.days),
-      FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "WTU123456", owner_email: "pair@bikeindex.org", frame_model: "Other model")]
+      FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "WTU123456", owner_email: "pair@bikeindex.org", frame_model: "Other model",
+        propulsion_type: "pedal-assist")]
   end
   let(:database) { ActiveRecord::Base.connection_db_config.database }
   let(:cache) { BikeServices::DuplicateReviewFinder.cache }
@@ -54,6 +55,20 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(assigns(:groups).map { it["record_count"] }).to eq [11, 12]
       expect(response.body).to include("Latest registration")
     end
+
+    it "rechecks the listed groups' stolen veto live" do
+      FactoryBot.create(:stolen_bike, serial_number: "EN 14764")
+      get base_url, params: {search_kind: "large_group"}
+      expect(assigns(:groups).map { it["serial_stolen"] }).to eq [true]
+      expect(response.body).to include("Stolen history — do not merge")
+    end
+
+    it "puts a strictly qualified shop-to-customer handoff in its priority queue" do
+      user = FactoryBot.create(:user_confirmed)
+      shop_bike = FactoryBot.create(:bike_lightspeed_pos, manufacturer:, serial_number: "HAND0FF123", owner_email: user.email, created_at: 2.days.ago)
+      FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer:, serial_number: "HAND0FF123")
+      expect(BikeServices::DuplicateReviewFinder.groups.find { it["bike_ids"].include?(shop_bike.id) }["kind"]).to eq "handoff_priority"
+    end
   end
 
   describe "show" do
@@ -83,8 +98,8 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       get "#{base_url}/serial", params: {reference_bike_id: pair.last.id}
       expect(response.code).to eq "200"
       expect(assigns(:reference_bike)).to eq pair.last
-      expect(assigns(:review).differing_fields).to include("Model")
-      expect(response.body).to include("Initial vs reference", "Differs")
+      expect(assigns(:review).differing_fields).to include("Model", "Propulsion")
+      expect(response.body).to include("Initial vs reference", "Differs", "Shop default? Confirm propulsion with the owner")
       expect(response.body).to_not include("Do not merge")
     end
 
@@ -101,6 +116,15 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       get "#{base_url}/compare", params: {bike_ids: placeholders.map(&:id).join(",")}
       expect(response.body).to include("this serial is a placeholder (manufacturer name Motobecane)")
       expect(BikeServices::DuplicateReviewFinder.groups.find { it["serial"] == "M0T08ECANE" }["kind"]).to eq "not_a_serial"
+    end
+
+    it "vetoes a record's own stolen history when its serial is blank" do
+      bikes = [FactoryBot.create(:stolen_bike, :with_ownership, manufacturer:, serial_number: "unknown"),
+        FactoryBot.create(:bike, :with_ownership, manufacturer:, serial_number: "unknown")]
+      get "#{base_url}/compare", params: {bike_ids: bikes.map(&:id).join(",")}
+      expect(response.code).to eq "200"
+      expect(assigns(:serial_stolen)).to be false
+      expect(response.body).to include("Not a candidate", "A record has its own stolen history")
     end
 
     context "with stolen history on the serial under another manufacturer" do

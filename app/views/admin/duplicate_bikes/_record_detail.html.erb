@@ -98,7 +98,7 @@
 
     <div><%= bike.status&.humanize %></div>
 
-    <% if stolen_count.positive? || bike.status_stolen? %>
+    <% if review.stolen_history?(bike) %>
       <strong class="tw:text-red-700 tw:dark:text-red-400">Stolen record/history: review required</strong>
     <% end %>
 

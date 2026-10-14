@@ -89,7 +89,7 @@ module BikeServices
 
     def review_contact_sql(column) = "(#{column} ~ '#{REVIEW_CONTACT_DOMAIN_PATTERN}')"
 
-    def cues(serials:, record_count:, contact_count:, test_count:, review_contact_count:, single_contact:, model_match_count: 0, manufacturer_names: {})
+    def cues(serials:, record_count:, contact_count:, test_count:, review_contact_count:, single_contact:, model_match_count: 0, manufacturer_names: {}, shop_default_propulsion: false)
       marking = standard_marking(serials)
       not_serial = Array(serials).filter_map { not_a_serial(it, manufacturer_names:) }.first
       code_reasons = [
@@ -121,6 +121,10 @@ module BikeServices
         (if single_contact
            Cue.new("single_contact", "One initial contact",
              "Every record has the same initial contact email or account. Unverified, and it does not establish the same bicycle.", :notice)
+         end),
+        (if shop_default_propulsion
+           Cue.new("shop_default_propulsion", "Shop default? Confirm propulsion with the owner",
+             "An earlier POS registration says foot pedal and a later registration says motorized. POS registrations often keep the foot-pedal default.", :notice)
          end)
       ].compact
     end

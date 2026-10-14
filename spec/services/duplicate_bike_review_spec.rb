@@ -7,7 +7,7 @@ require_relative "../../app/services/bike_services/duplicate_review_cues"
 require_relative "../../app/services/duplicate_bike_review"
 
 RSpec.describe DuplicateBikeReview do
-  let(:ownership_class) { Struct.new(:id, :previous_ownership_id, :created_at, :user_id, :owner_email, :is_phone, :claimed, :claimed_at) }
+  let(:ownership_class) { Struct.new(:id, :previous_ownership_id, :created_at, :user_id, :owner_email, :is_phone, :claimed, :claimed_at, :pos_kind) }
   let(:bike_class) { Struct.new(:id, :serial_normalized_no_space, :manufacturer_id, :manufacturer_other, :ownerships, :current_ownership) }
   let(:email) { ["customer", "example.invalid"].join("@") }
   let(:other_email) { ["another", "example.invalid"].join("@") }
@@ -19,6 +19,14 @@ RSpec.describe DuplicateBikeReview do
   let(:manufacturer_id) { 1 }
   let(:manufacturer_other) { nil }
   let(:review) { described_class.new(bikes: [reference, bike]) }
+  let(:record_class) do
+    Struct.new(:id, :created_at, :serial_number, :serial_normalized_no_space, :manufacturer, :manufacturer_id, :manufacturer_other,
+      :frame_model, :year, :primary_frame_color, :cycle_type, :propulsion_type, :frame_size, :status, :ownerships, :current_ownership,
+      :creation_organization, :deleted_at, :example, :likely_spam, :marketplace_listings, :current_impound_record_id,
+      :current_stolen_record_id) do
+      def status_stolen? = status == "status_stolen"
+    end
+  end
 
   context "matching whole serials with different current owners" do
     it "reports evidence separately without treating serial equality as ownership equality" do
@@ -161,24 +169,21 @@ RSpec.describe DuplicateBikeReview do
   end
 
   context "summarizing a larger group" do
-    let(:summary_bike_class) do
-      Struct.new(:id, :created_at, :serial_number, :serial_normalized_no_space, :manufacturer, :manufacturer_other, :frame_model,
-        :year, :primary_frame_color, :cycle_type, :status, :ownerships, :current_ownership, :creation_organization,
-        :deleted_at, :example, :likely_spam, :marketplace_listings, :current_impound_record_id)
-    end
     let(:named) { Struct.new(:name) }
     let(:records) do
       [["a@example.com", 2019, 1], ["a@example.com", 2019, 2], ["b@bikeindex.org", 2020, 3], [nil, 2019, 4]].map do |owner_email, year, id|
         ownership = ownership_class.new(id:, created_at: Time.at(id), user_id: owner_email && id, owner_email:)
-        summary_bike_class.new(id:, created_at: Time.at(id), serial_number: "EN 14764", serial_normalized_no_space: "EN14764",
-          manufacturer: named.new("Maker"), frame_model: "Roadster", year:, cycle_type: "bike", status: "status_with_owner",
-          ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
+        record_class.new(id:, created_at: Time.at(id), serial_number: "EN 14764", serial_normalized_no_space: "EN14764",
+          manufacturer: named.new("Maker"), frame_model: "Roadster", year:, cycle_type: "bike", propulsion_type: "foot-pedal",
+          frame_size: "56cm", status: "status_with_owner", ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
       end
     end
     let(:review) { described_class.new(bikes: records) }
 
     it "shows shared values once and the differences per record" do
-      expect(review.shared_fields).to eq ["Manufacturer", "Model", "Primary color", "Vehicle type", "Stored serial", "Whole normalized serial", "Status"]
+      expect(review.shared_fields).to eq ["Manufacturer", "Model", "Primary color", "Vehicle type", "Propulsion", "Frame size", "Stored serial", "Whole normalized serial", "Status"]
+      expect(review.field_value(records[0], "Propulsion")).to eq "Foot-pedal"
+      expect(review.field_value(records[0], "Frame size")).to eq "56CM"
       expect(review.differing_fields).to eq ["Year"]
       expect(review.field_distribution("Year")).to eq [["2019", 3], ["2020", 1]]
       expect(review.differences(records[2])).to eq ["Year"]
@@ -198,21 +203,18 @@ RSpec.describe DuplicateBikeReview do
   end
 
   context "assessing a pair for a future invitation" do
-    let(:pair_bike_class) do
-      Struct.new(:id, :created_at, :serial_number, :serial_normalized_no_space, :manufacturer, :manufacturer_other, :frame_model,
-        :year, :primary_frame_color, :cycle_type, :status, :ownerships, :current_ownership, :creation_organization,
-        :deleted_at, :example, :likely_spam, :marketplace_listings, :current_impound_record_id)
-    end
     let(:second_user_id) { 10 }
     let(:pair) do
       [[10, true], [second_user_id, false]].each_with_index.map do |(user_id, claimed), index|
         ownership = ownership_class.new(id: index + 1, created_at: Time.at(index), user_id:, owner_email: "rider@bikeindex.org", claimed:)
-        pair_bike_class.new(id: index + 1, created_at: Time.at(index), serial_normalized_no_space: "WTU123456", frame_model: "Roadster",
-          ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
+        record_class.new(id: index + 1, created_at: Time.at(index), serial_normalized_no_space: "WTU123456", manufacturer_id: 1,
+          frame_model: "Roadster", ownerships: [ownership], current_ownership: ownership, marketplace_listings: [])
       end
     end
-    let(:review) { described_class.new(bikes: pair) }
+    let(:stolen_record_counts) { {} }
+    let(:review) { described_class.new(bikes: pair, stolen_record_counts:) }
     let(:checks) { review.readiness_checks(serial_stolen: false, test_count: 0) }
+    let(:blocked_labels) { checks.select { it.status == :blocked }.map(&:label) }
 
     it "meets the strict evidence with one known, current, claiming account" do
       expect(checks.map(&:status).uniq).to eq [:pass]
@@ -231,6 +233,70 @@ RSpec.describe DuplicateBikeReview do
     it "vetoes stolen history and keeps test records out" do
       expect(review.readiness(review.readiness_checks(serial_stolen: true, test_count: 0))).to eq :blocked
       expect(review.readiness(review.readiness_checks(serial_stolen: false, test_count: 1))).to eq :blocked
+    end
+
+    context "with a stolen record on one record, deleted ones included" do
+      let(:stolen_record_counts) { {2 => 1} }
+
+      it "vetoes it whatever the whole-serial lookup found" do
+        expect(blocked_labels).to eq ["A record has its own stolen history, a hard merge veto whatever its serial"]
+      end
+    end
+
+    context "with a stolen status and no stolen record" do
+      before { pair.last.status = "status_stolen" }
+
+      it "vetoes it" do
+        expect(blocked_labels).to eq ["A record has its own stolen history, a hard merge veto whatever its serial"]
+      end
+    end
+
+    context "with a current stolen record" do
+      before { pair.last.current_stolen_record_id = 5 }
+
+      it "vetoes it" do
+        expect(blocked_labels).to eq ["A record has its own stolen history, a hard merge veto whatever its serial"]
+      end
+    end
+
+    context "with different whole serials" do
+      before { pair.last.serial_normalized_no_space = "WTU123457" }
+
+      it "blocks the comparison" do
+        expect(blocked_labels).to eq ["Whole normalized serials differ, or one is missing or shorter than 6 characters"]
+      end
+    end
+
+    context "with short serials" do
+      before { pair.each { it.serial_normalized_no_space = "WTU12" } }
+
+      it "blocks the comparison" do
+        expect(blocked_labels).to eq ["Whole normalized serials differ, or one is missing or shorter than 6 characters"]
+      end
+    end
+
+    context "with a missing serial" do
+      before { pair.last.serial_normalized_no_space = nil }
+
+      it "blocks the comparison" do
+        expect(blocked_labels).to eq ["Whole normalized serials differ, or one is missing or shorter than 6 characters"]
+      end
+    end
+
+    context "with different manufacturers" do
+      before { pair.last.manufacturer_id = 2 }
+
+      it "blocks the comparison" do
+        expect(blocked_labels).to eq ["Manufacturers differ, or one is missing"]
+      end
+    end
+
+    context "with no manufacturer" do
+      before { pair.each { it.manufacturer_id = nil } }
+
+      it "blocks the comparison" do
+        expect(blocked_labels).to eq ["Manufacturers differ, or one is missing"]
+      end
     end
   end
 end

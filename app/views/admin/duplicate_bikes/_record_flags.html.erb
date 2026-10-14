@@ -1,8 +1,8 @@
-<%# locals: (bike:, review:, test_marked:, stolen_count:, account_emails:) %>
+<%# locals: (bike:, review:, test_marked:, account_emails:) %>
 <% contacts = [review.initial_ownership(bike), bike.current_ownership].compact.flat_map { [review.contact_email(it), account_emails[it.user_id]] } %>
 
 <div class="tw:flex tw:flex-wrap tw:gap-1">
-  <% if stolen_count.positive? || bike.status_stolen? %>
+  <% if review.stolen_history?(bike) %>
     <%= render UI::Badge::Component.new(text: "Stolen history", color: :error, solid: true, size: :sm) %>
   <% end %>
 
