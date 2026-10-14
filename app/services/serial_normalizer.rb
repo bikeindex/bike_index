@@ -17,7 +17,7 @@ class SerialNormalizer
     "add later", "will add", "will add later", "will update", "fill in later", "add at build",
     "add on build", "add sn on build", "add upon arrival", "dont have", "dont have it",
     "i dont have it", "cant find", "cannot find", "cant read", "unreadable", "illegible", "hidden"
-  ].map { |string| string.delete(" ") }.freeze
+  ].map { |string| string.gsub(/[^a-z0-9]/, "") }.to_set.freeze
 
   def self.unknown_and_absent_corrected(str = nil)
     str = str.to_s.strip
