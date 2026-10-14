@@ -85,7 +85,6 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   const undrawn = labelled.filter(({ geometry }) => geometry.missing.length)
   if (drawn.length === 0) return nothing
 
-  // a lone frame is still worth drawing, but not lone wheels
   const overlay = drawn.length > 1 || Boolean(aligned)
   const missingNote = undrawn.length
     ? html`<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing, wheels } }) => {

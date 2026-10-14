@@ -136,6 +136,7 @@ export const frameGeometry = (data, size) => {
     ['fork_length_a2c', !isNumber(listedForkLength) && (stackFromFork || !listed('head_tube'))],
     ['head_tube', isNumber(assumedHeadTube) && stackFromFork]
   ].filter(([, taken]) => taken).map(([key]) => key)
+  const rearRim = builtWheel(data, size, 'rear')?.bsd
 
   return {
     missing: [],
@@ -145,9 +146,7 @@ export const frameGeometry = (data, size) => {
     assumed,
     typicalKind: typical.kind,
     // the rear's rim and tire, and whether it lists the rim
-    typicalWheel: known(workedRear, workedFront)
-      ? null
-      : { bsd: builtWheel(data, size, 'rear')?.bsd ?? typical.rim, tire: typical.tire, rimListed: isNumber(builtWheel(data, size, 'rear')?.bsd) },
+    typicalWheel: known(workedRear, workedFront) ? null : { bsd: rearRim ?? typical.rim, tire: typical.tire, rimListed: isNumber(rearRim) },
     rearAxle: [rearX, drop],
     frontAxle: [frontX, frontY],
     rearRadius: rear,
