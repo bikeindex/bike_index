@@ -30,6 +30,17 @@ module Admin
       end
     end
 
+    # not_web_bikebook stacks its serial searches on the rest, so the stack is the total
+    def logged_searches
+      chart_data = if params[:search_endpoint] == "not_web_bikebook"
+        [{name: "Serial", data: logged_search_counts(LoggedSearch.not_web_bikebook.serial)},
+          {name: "No serial", data: logged_search_counts(LoggedSearch.not_web_bikebook.where(serial_normalized: nil))}]
+      else
+        [{name: "Bike Book", data: logged_search_counts(LoggedSearch.web_bikebook)}]
+      end
+      render json: chart_data.chart_json
+    end
+
     def bikes_table
       render Pages::Admin::Graphs::BikesTable::Component.new(kind: params[:table_kind], bikes: matching_bikes,
         time_range: @time_range, sortable_params: graphs_sortable_params), layout: false
@@ -57,6 +68,10 @@ module Admin
 
     def matching_recoveries
       StolenRecord.recovered.where(recovered_at: @time_range)
+    end
+
+    def logged_search_counts(logged_searches)
+      helpers.time_range_counts(collection: logged_searches, column: "request_at")
     end
 
     def matching_bikes

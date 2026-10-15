@@ -31,6 +31,26 @@
 
   <hr>
 
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        <%= link_to "Bike Book searches", admin_logged_searches_path(search_endpoint: "web_bikebook", period: "week") %>
+      </h2>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"))) %>
+    </div>
+
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        <%= link_to "Not Bike Book searches", admin_logged_searches_path(search_endpoint: "not_web_bikebook", period: "week") %>
+      </h2>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
+    </div>
+  </div>
+
+  <hr>
+
   <% cache(User.maximum(:created_at)) do %>
     <h2 class="mt-4">
       Recent <%= link_to "Users", admin_users_url %>
