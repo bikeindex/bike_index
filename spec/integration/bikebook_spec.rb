@@ -89,8 +89,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(find("[aria-label='Overview']")).to have_css("div", text: /\AElectric Certification\s*UL 2849, UL 2271\z/)
     expect(find("[aria-label='Overview']").all("dt").map(&:text))
       .to eq(["Model group", "Years", "Primary activity", "Frame material", "Suspension front/rear", "Price", "E-vehicle class", "Electric Certification", "Description"])
-    # a description that fits its clamp has nothing more to read
-    expect(find("[aria-label='Overview']")).to have_text("The Level 4 REC").and have_no_button("Read more")
+    expect(find("[aria-label='Overview']")).to have_text("The Level 4 REC").and have_button("Read more")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
     expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through")
@@ -128,6 +127,24 @@ RSpec.describe "Bikebook", :js, type: :system do
       })()
     JS
     expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["Unknown", true], ["", false]], ["700 C front, 650 B rear", "700 C"], ["Cargo Bike", "Bike"], ["120 mm / rigid ? Front suspensionTravel: 120 mm", "Rigid"], 0])
+    # a description over 200 characters is cut at a word, its paragraphs kept, and one within them is whole
+    excerpts = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehiclePresenter }, { basics }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const description = (text) => {
+          const rendered = fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles: [{ value: '0', data: { model: 'One', description: text } }] }))
+          const excerpt = rendered.querySelector('[data-controller~="bikebook--read-more"] > div')
+          return excerpt ? [...excerpt.querySelectorAll('p')].map((paragraph) => paragraph.textContent) : rendered.querySelector('button') == null
+        }
+        return [description(`Its first paragraph.\\n\\n${'word '.repeat(60)}`), description('Short and whole.')]
+      })()
+    JS
+    expect(excerpts.first.first).to eq "Its first paragraph."
+    expect(excerpts.first.last).to match(/\Aword( word)+…\z/)
+    expect(excerpts.first.join.length).to be <= 201
+    expect(excerpts.last).to be true
     # each view a link to this page, rendered without a request and kept through a pick, in place of its history entry
     history_length = -> { page.evaluate_script("window.history.length") }
     entries = history_length.call
@@ -936,13 +953,15 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
-    # its long description clamped, until it's opened
+    # its long description cut to its first 200 characters at a word, until it's opened
     description = find("[aria-label='Overview'] dd", text: /\AWhatever you’re into/, wait: 10)
-    clamped = -> { description.find("[data-bikebook--read-more-target='text']").evaluate_script("this.scrollHeight > this.clientHeight") }
-    expect(clamped.call).to be true
+    excerpt = description.find("p", text: /…\z/).text
+    expect(excerpt.length).to be <= 201
+    expect(excerpt).to end_with("dawn patrol…").or match(/\w…\z/)
+    expect(description).to have_no_text("MIK-compatible rear rack")
     description.click_on "Read more"
     expect(description).to have_css("button[aria-expanded='true']", exact_text: "Show less")
-    expect(clamped.call).to be false
+    expect(description).to have_text("MIK-compatible rear rack").and have_no_css("p", text: /…\z/)
     click_link "All"
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)

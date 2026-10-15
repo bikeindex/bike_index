@@ -2,7 +2,7 @@ import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { missing, priced } from 'bikebook/templates/vehicles/comparison_table'
-import { basicsOf } from 'bikebook/templates/vehicles/model_viewer'
+import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer'
 import { CERTIFICATION_LABEL } from 'bikebook/templates/vehicles/motor_section'
 import { present } from 'bikebook/templates/values'
 
@@ -29,11 +29,22 @@ const manufacturerLine = (manufacturer) => present(manufacturer)
   ? html`<p class="tw:text-[11px] tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
   : nothing
 
-// Clamped to its first lines, with a button for the rest that bikebook--read-more shows only when the clamp hides some
-const readMore = (content) => html`<div class="tw:group/read-more" data-controller="bikebook--read-more"><div class="tw:line-clamp-5 tw:group-data-expanded/read-more:line-clamp-none"
-  data-bikebook--read-more-target="text">${content}</div><button type="button" hidden aria-expanded="false" class="twlink tw:mt-1 tw:text-sm"
-  data-bikebook--read-more-target="button" data-action="bikebook--read-more#toggle"><span class="tw:group-data-expanded/read-more:hidden">Read more</span><span
-  class="tw:hidden tw:group-data-expanded/read-more:inline">Show less</span></button></div>`
+const EXCERPT_LENGTH = 200
+
+// `text`'s first 200 characters, cut at a word and keeping its paragraphs, with a button for the whole of it as `content`
+const readMore = (text, content) => {
+  const raw = String(text).replace(/\r\n?/g, '\n').trim()
+  if (raw.length <= EXCERPT_LENGTH) return content
+
+  // the next character too, so a cut landing on a word's end keeps the word
+  const words = raw.slice(0, EXCERPT_LENGTH + 1).replace(/\s+\S*$/, '').slice(0, EXCERPT_LENGTH)
+  const excerpt = `${words.replace(/[\s,.;:—–-]+$/, '')}…`
+  return html`<div class="tw:group/read-more" data-controller="bikebook--read-more"><div class="tw:space-y-2 tw:group-data-expanded/read-more:hidden">${
+    simpleFormat(excerpt)}</div><div
+    class="tw:hidden tw:group-data-expanded/read-more:block">${content}</div><button type="button" aria-expanded="false" class="twlink tw:mt-1 tw:text-sm"
+    data-bikebook--read-more-target="button" data-action="bikebook--read-more#toggle"><span class="tw:group-data-expanded/read-more:hidden">Read more</span><span
+    class="tw:hidden tw:group-data-expanded/read-more:inline">Show less</span></button></div>`
+}
 
 // The models' names, photos and headline fields: one beside its photo, more side by side in a table
 export const basics = ({ presenter, vehicles }) => {
@@ -43,7 +54,7 @@ export const basics = ({ presenter, vehicles }) => {
     return {
       ...fields,
       price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),
-      description: fields.description && readMore(fields.description)
+      description: fields.description && readMore(data.description, fields.description)
     }
   })
   const fields = FIELDS.filter((field) => (!field.electric || shown.some(({ electric }) => electric)) && (!field.suspended || shown.some(({ suspended }) => suspended)) &&

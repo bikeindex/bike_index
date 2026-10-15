@@ -721,7 +721,7 @@ const mergedMotors = (motors) => motors.reduce((merged, motor) => {
 }, [])
 
 // simple_format
-const simpleFormat = (text) => String(text).replace(/\r\n?/g, '\n').split(/\n\n+/).map((paragraph) => {
+export const simpleFormat = (text) => String(text).replace(/\r\n?/g, '\n').split(/\n\n+/).map((paragraph) => {
   const lines = paragraph.split('\n')
   return html`<p>${lines.map((line, index) => index === 0 ? line : ['\n', lines[index - 1] && line ? html`<br>` : nothing, line])}</p>`
 })
