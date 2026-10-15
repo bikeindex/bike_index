@@ -39,7 +39,7 @@ const sizedApart = ([bsd, tire], [baseBsd, baseTire]) => [bsd, tire, baseBsd, ba
   (bsd === baseBsd ? Math.abs(tire - baseTire) > TIRE_GAP : [bsd, baseBsd].every((each) => [584, 622].includes(each)))
 
 // Once any model's built wheel is `sizedApart` from the first's, every model's, as diameters estimated with a tire as
-// tall as it's wide. Front and rear as one where they match
+// tall as it's wide, each model's in one sentence. Front and rear as one where they match
 const diameterNotes = (presenter, compared) => {
   const [first, ...others] = compared
   const wheel = ({ builtWheels }, position) => [builtWheels[position]?.bsd, builtWheels[position]?.tire_width]
@@ -47,12 +47,20 @@ const diameterNotes = (presenter, compared) => {
   const mm = (value) => presenter.measurement(presenter.rounded(value), 'mm')
   return compared.flatMap((vehicle) => {
     const positions = ['front', 'rear'].filter((position) => isNumber(outerRadius(vehicle.builtWheels[position])))
-    const both = positions.length === 2 && equal(wheel(vehicle, 'front'), wheel(vehicle, 'rear'))
-    return (both ? ['front'] : positions).map((position) => {
+    if (positions.length === 0) return []
+    const title = html`<em>${vehicle.title}</em>'s`
+    const described = (position) => {
       const [bsd, tire] = wheel(vehicle, position)
-      return html`<li>${vehicle.title}'s ${both ? '' : `${position} `}${presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`} wheel with ${
-        both ? html`${mm(tire)} tires` : html`a ${mm(tire)} tire`} is approximately ${mm(2 * outerRadius(vehicle.builtWheels[position]))} diameter</li>`
-    })
+      return [presenter.vocabulary.wheel_sizes[bsd]?.name ?? `${bsd} mm BSD`, mm(tire), mm(2 * outerRadius(vehicle.builtWheels[position]))]
+    }
+    if (positions.length === 2 && equal(wheel(vehicle, 'front'), wheel(vehicle, 'rear'))) {
+      const [size, tire, diameter] = described('front')
+      return [html`<li>${title} ${size} wheels with ${tire} tires are approximately ${diameter} diameter</li>`]
+    }
+    return [html`<li>${join(positions.map((position, index) => {
+      const [size, tire, diameter] = described(position)
+      return html`${index ? 'its' : title} ${position} ${size} wheel with a ${tire} tire is approximately ${diameter} diameter`
+    }), ', ')}</li>`]
   })
 }
 

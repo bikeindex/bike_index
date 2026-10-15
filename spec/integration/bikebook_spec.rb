@@ -830,12 +830,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     cogs = find("[aria-label='Comparison'] tr", text: "Cogs")
     expect(cogs.all("td").map(&:text)).to match([/\A12:\s*10–\s*52\W*t\z/, /\A1:\s*−11\s*22\W*t\s*−30\z/])
     expect(cogs).to have_css(".tw\\:text-red-700", exact_text: "−11").and have_css(".tw\\:text-red-700", exact_text: "−30")
-    # the same wheel size on tires far enough apart, each with its estimated diameter
+    # the same wheel size on tires far enough apart, each with its estimated diameter after its model's name
     diameters = -> { all("[aria-label='Geometry overlay'] li", text: "diameter").map { it.text.gsub(/[[:space:]]+/, " ") } }
     expect(page).to have_css("[aria-label='Geometry overlay'] p", text: "Note: you're comparing different diameter wheels and tires")
-    expect(diameters.call).to eq(["Aventón Current EXP's 700 C wheel with 64 mm tires is approximately 750 mm diameter",
-      "Aventón Soltera 3 ADV's 700 C wheel with 38 mm tires is approximately 698 mm diameter"])
-    # every model's wheels in its size, front and rear each its own where they differ, the rear on S though only its front
+    expect(diameters.call).to eq(["Aventón Current EXP's 700 C wheels with 64 mm tires are approximately 750 mm diameter",
+      "Aventón Soltera 3 ADV's 700 C wheels with 38 mm tires are approximately 698 mm diameter"])
+    expect(page).to have_css("[aria-label='Geometry overlay'] li em", exact_text: "Aventón Current EXP")
+    # every model's wheels in its size, front and rear in one sentence where they differ, the rear on S though only its front
     # differs enough
     sized = page.evaluate_script(<<~JS)
       (async () => {
@@ -859,11 +860,11 @@ RSpec.describe "Bikebook", :js, type: :system do
         })
       })()
     JS
-    road = "Road's 700 C wheel with 25 mm tires is approximately 672 mm diameter"
+    road = "Road's 700 C wheels with 25 mm tires are approximately 672 mm diameter"
     front = "Mullet's front 700 C wheel with a 64 mm tire is approximately 750 mm diameter"
-    expect(sized).to eq([[road, front, "Mullet's rear 26in wheel with a 64 mm tire is approximately 687 mm diameter"], [road, front,
-      "Mullet's rear 650 B wheel with a 64 mm tire is approximately 712 mm diameter"],
-      [road, "Mullet's 700 C wheel with 64 mm tires is approximately 750 mm diameter"]])
+    expect(sized).to eq([[road, "#{front}, its rear 26in wheel with a 64 mm tire is approximately 687 mm diameter"],
+      [road, "#{front}, its rear 650 B wheel with a 64 mm tire is approximately 712 mm diameter"],
+      [road, "Mullet's 700 C wheels with 64 mm tires are approximately 750 mm diameter"]])
     expect(page).to have_current_path(/[?&]vehicle_sizes=Small(&|\z)/)
 
     # one frame to draw is drawn alone, and the overlay says what the other is missing
@@ -893,8 +894,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect_size.call("Level 4 ADV", "Extra Large")
     expect_size.call("Current EXP", "Extra Large")
     # 650b against 700c, whatever their tires
-    expect(diameters.call).to eq(["Aventón Level 4 ADV's 650 B wheel with 56 mm tires is approximately 696 mm diameter",
-      "Aventón Current EXP's 700 C wheel with 64 mm tires is approximately 750 mm diameter"])
+    expect(diameters.call).to eq(["Aventón Level 4 ADV's 650 B wheels with 56 mm tires are approximately 696 mm diameter",
+      "Aventón Current EXP's 700 C wheels with 64 mm tires are approximately 750 mm diameter"])
   end
 
   it "shows every weight in pounds to a viewer who prefers imperial units" do
