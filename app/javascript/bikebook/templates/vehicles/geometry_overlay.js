@@ -7,11 +7,11 @@ import { andSentence, equal, isNumber, join, present } from 'bikebook/templates/
 
 // UI::Chart::Component::COLORS, one per compared model; forced, or the table cells' dark border color wins
 export const SERIES = [
-  { color: '#3498db', border: 'tw:border-b-[#3498db]!' },
-  { color: '#DC2626', border: 'tw:border-b-[#DC2626]!' },
-  { color: '#7C3AED', border: 'tw:border-b-[#7C3AED]!' },
-  { color: '#D97706', border: 'tw:border-b-[#D97706]!' },
-  { color: '#059669', border: 'tw:border-b-[#059669]!' }
+  { color: '#3498db', bottom: 'tw:border-b-[#3498db]!', top: 'tw:border-t-[#3498db]!' },
+  { color: '#DC2626', bottom: 'tw:border-b-[#DC2626]!', top: 'tw:border-t-[#DC2626]!' },
+  { color: '#7C3AED', bottom: 'tw:border-b-[#7C3AED]!', top: 'tw:border-t-[#7C3AED]!' },
+  { color: '#D97706', bottom: 'tw:border-b-[#D97706]!', top: 'tw:border-t-[#D97706]!' },
+  { color: '#059669', bottom: 'tw:border-b-[#059669]!', top: 'tw:border-t-[#059669]!' }
 ]
 const PADDING = 30
 const TIRE_GAP = 10
@@ -61,8 +61,10 @@ const drawable = (geometry) => geometry?.missing.length === 0 || geometry?.wheel
 // One frame has nothing to overlay
 const overlaid = (frames) => frames.filter(drawable).length > 1
 
-// The bottom border that keys a comparison table column to its frame, which the overlay draws in the same order
-export const seriesBorder = (frames, index) => overlaid(frames) && drawable(frames[index]) ? `tw:border-b-4 ${SERIES[index].border}` : ''
+// The top and bottom borders that key a comparison table column to its frame, which the overlay draws in the same order
+export const seriesBorders = (frames, index) => overlaid(frames) && drawable(frames[index])
+  ? { top: `tw:border-t-4 ${SERIES[index].top}`, bottom: `tw:border-b-4 ${SERIES[index].bottom}` }
+  : { top: '', bottom: '' }
 
 // The compared models' frames in their `sizes`, standing on the same ground with their bottom brackets lined up,
 // each over the ones the comparison table columns left of it. A frame it can't draw is its wheels alone where they're

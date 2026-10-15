@@ -2,7 +2,7 @@ import { html, nothing } from 'lit-html'
 import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
+import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
@@ -180,12 +180,13 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
     columns: [
       { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cellClass: (record) => record.className, cell: (record) => record.label },
       ...named.map((vehicle, index) => {
-        const border = seriesBorder(frames, index)
+        const border = seriesBorders(frames, index)
         return {
           label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
           classes: 'tw:min-w-48 tw:align-top',
+          headerClasses: border.top,
           // a model's name can wrap in its header, but not a value
-          cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''} ${record === rows.at(-1) ? border : ''}`,
+          cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''} ${record === rows.at(-1) ? border.bottom : ''}`,
           cell: (record) => record.cell(index)
         }
       })

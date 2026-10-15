@@ -168,21 +168,22 @@ RSpec.describe "Bikebook", :js, type: :system do
     end
     within("[aria-label='Comparison']") do
       expect(page).to have_css("thead th", text: "Level 2 Step-Through")
-      # keyed to the overlay by its frame's color along its foot, its wheels' where it's only them
-      expect(page).to have_no_css("thead th.tw\\:border-b-4")
+      # keyed to the overlay by its frame's color along its head and foot, its wheels' where it's only them
+      expect(all("thead th").map { it[:class].include?("tw:border-t-4") }).to eq([false, true, true])
       expect(all("tbody tr").last.all("td").map { it[:class].include?("tw:border-b-4") }).to eq([true, true])
       # in the frame's color in dark mode too, over the cells' own dark border
       key_colors = page.evaluate_script(<<~JS)
         (() => {
           const cell = document.querySelector("[aria-label='Comparison'] tbody tr:last-child td")
+          const header = document.querySelector("[aria-label='Comparison'] thead th:nth-child(2)")
           // dark last undone, so the page is left light
           return [true, false].map((dark) => {
             document.documentElement.classList.toggle('dark', dark)
-            return getComputedStyle(cell).borderBottomColor
+            return [getComputedStyle(cell).borderBottomColor, getComputedStyle(header).borderTopColor]
           })
         })()
       JS
-      expect(key_colors).to eq(["rgb(52, 152, 219)"] * 2)
+      expect(key_colors).to eq([["rgb(52, 152, 219)"] * 2] * 2)
     end
     within("[aria-label='Comparison']") do
       expect(find("tr", text: "Price")).to have_css(".tw\\:text-green-700", text: "−$100")
@@ -801,7 +802,7 @@ RSpec.describe "Bikebook", :js, type: :system do
       # the overlay's frames and the comparison columns keyed to them, in the charts' colors
       series = page.evaluate_script("import('bikebook/templates/vehicles/geometry_overlay').then(({ SERIES }) => SERIES)")
       expect(series.map { it["color"] }).to eq(UI::Chart::Component::COLORS.first(5))
-      expect(series).to all(satisfy { |each| each["border"].split.include?("tw:border-b-[#{each["color"]}]!") })
+      expect(series).to all(satisfy { |each| [each["bottom"], each["top"]] == ["tw:border-b-[#{each["color"]}]!", "tw:border-t-[#{each["color"]}]!"] })
 
       expect_template(UI::CopyableCode::Component.new(value: "m/trek/2025/fetch", label: "Copy ID"),
         "bikebook/templates/ui/copyable_code#copyableCode", "{ value: 'm/trek/2025/fetch', label: 'Copy ID' }")
