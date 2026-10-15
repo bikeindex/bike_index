@@ -3,25 +3,31 @@
 module Pages
   module EbikeRules
     module ClassCard
-      # A class as "E-bike classes, explained" cards it: a US class from its number, or the e-moto without one, each
-      # with the `state`'s own rules for it, or a state's own class as `card`. Unframed, it's a tooltip's body, and in
-      # its frame_id, the one Bike Book loads for its jurisdiction
+      # A class as "E-bike classes, explained" cards it: a US class from its number, with the `state`'s own rules for
+      # it, any other `classification` StateLaws reads, as a state's own classes are, or else the e-moto, with the
+      # state's rules for it. Unframed, it's a tooltip's body, and in a `frame_id`, the one Bike Book loads
       class Component < ApplicationComponent
         FRAME_ID = "ebike-rules-class-card"
 
-        def self.frame_id(e_bike_class) = "#{FRAME_ID}-#{e_bike_class || "emoto"}"
-
-        def initialize(e_bike_class: nil, card: nil, state: nil, framed: true, in_frame: false)
+        def initialize(e_bike_class: nil, classification: nil, state: nil, framed: true, frame_id: nil)
           @e_bike_class = e_bike_class
-          @card = card
+          @classification = classification
           @state = state
           @framed = framed
-          @in_frame = in_frame
+          @frame_id = frame_id
         end
 
         private
 
-        def card = @card ||= @e_bike_class ? us_card : emoto_card
+        def card
+          @card ||= if @e_bike_class
+            us_card
+          elsif @classification
+            classification_card
+          else
+            emoto_card
+          end
+        end
 
         def rules
           return @rules if defined?(@rules)
@@ -51,6 +57,22 @@ module Pages
           {either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
            speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,
            body: rules ? translation(".emoto_summary") : translation(".emoto_limits_body")}
+        end
+
+        # Without a tile, and under its jurisdiction where the catalog names one, which a state's own classes leave out
+        def classification_card
+          classification = @classification
+          {state: true, either: classification[:either], title: classification[:name], tag: classification[:jurisdiction],
+           body: classification[:description], assist: classification[:throttle] ? translation(".throttle") : translation(".pedal"),
+           speed: classification[:mph]&.then { translation(".mph", mph: it) }, motor: watts(classification)}
+        end
+
+        def watts(classification)
+          if classification[:watt_cap]
+            translation(".watts_max", watts: classification[:watt_cap])
+          elsif classification[:min_watts]
+            translation(".watts_min", watts: classification[:min_watts])
+          end
         end
 
         # An either card's limits are alternatives, each but the last followed by an "or" centered in the gap after its row

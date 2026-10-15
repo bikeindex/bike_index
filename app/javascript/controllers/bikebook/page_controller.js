@@ -4,7 +4,7 @@ import { hydrate, loadingShell } from 'bikebook/hydrate'
 import { readable } from 'bikebook/replace_url'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
-import { cardOf, renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
+import { renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
 import { uuid } from 'bikebook/templates/helpers'
 
 /* global CSS, requestAnimationFrame */
@@ -44,7 +44,7 @@ export default class extends Controller {
       renderCounts(document, filteredCount)
       // a jurisdiction's change searches again, moving the cards to its own
       const classifications = this.catalog.vocabulary.e_vehicle_classifications
-      renderClassCards(document.getElementById('classification-cards'), picked.split(',').filter((id) => cardOf(id, classifications)),
+      renderClassCards(document.getElementById('classification-cards'), picked.split(','),
         document.getElementById('jurisdiction-hw-hidden-field').value, classifications)
       if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })

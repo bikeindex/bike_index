@@ -8,12 +8,7 @@ en:
           classes_intro: >-
             Most states use a three-class system. Your class decides how fast the
             motor helps, whether a throttle is allowed, and where you can ride.
-          mph: "%{mph} mph"
-          pedal: Pedal
           state_classes_heading: "%{state} e-bike classes"
           state_classes_intro: >-
             %{state} doesn’t use the three-class system most states do. Its law sorts
             e-bikes and other electric two-wheelers into these classes instead.
-          throttle: Throttle
-          watts_max: "≤%{watts}W"
-          watts_min: "%{watts}W+"

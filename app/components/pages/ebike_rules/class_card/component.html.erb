@@ -72,4 +72,4 @@
   <% end %>
 <% end %>
 
-<%= @in_frame ? helpers.turbo_frame_tag(self.class.frame_id(@e_bike_class)) { card_html } : card_html %>
+<%= @frame_id ? helpers.turbo_frame_tag(@frame_id) { card_html } : card_html %>

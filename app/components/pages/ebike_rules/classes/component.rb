@@ -22,23 +22,7 @@ module Pages
 
         def cards = state_classes ? state_class_cards : us_class_cards
 
-        def state_class_cards
-          state_classes.map do |classification|
-            next emoto_card if classification[:not_an_ebike]
-
-            class_card(card: {state: true, either: classification[:either], title: classification[:name], body: classification[:description],
-                              assist: classification[:throttle] ? translation(".throttle") : translation(".pedal"),
-                              speed: classification[:mph]&.then { translation(".mph", mph: it) }, motor: watts(classification)})
-          end
-        end
-
-        def watts(classification)
-          if classification[:watt_cap]
-            translation(".watts_max", watts: classification[:watt_cap])
-          elsif classification[:min_watts]
-            translation(".watts_min", watts: classification[:min_watts])
-          end
-        end
+        def state_class_cards = state_classes.map { it[:not_an_ebike] ? emoto_card : class_card(classification: it) }
 
         # The three classes, then the e-moto that's none of them
         def us_class_cards = [1, 2, 3].map { class_card(e_bike_class: it) } + [emoto_card]
