@@ -6,7 +6,7 @@ import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { frameGeometry } from 'bikebook/frame_geometry'
 import { geometryOverlay } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
-import { basicsOf, componentsOf, modelViewer, sizesOf, wheelsOf } from 'bikebook/templates/vehicles/model_viewer'
+import { basicsOf, componentsOf, modelViewer, motorsOf, sizesOf, wheelsOf } from 'bikebook/templates/vehicles/model_viewer'
 import { present } from 'bikebook/templates/values'
 import { toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
@@ -23,8 +23,10 @@ export class VehicleViewer {
     if (vehicles.length === 0) return emptyState({ pathname: url.pathname, filtersPath: pathWith(url, { filters: 1 }), ...search })
 
     const { presenter } = this
+    // Motor & Battery only once one of them has a motor
+    const shown = Object.keys(VIEWS).filter((each) => each !== 'motors' || vehicles.some(({ data }) => present(data.motors)))
     const requested = url.searchParams.get('view')
-    const view = requested in VIEWS ? requested : 'basics'
+    const view = shown.includes(requested) ? requested : 'basics'
     const comparing = vehicles.length > 1
     const picked = pickedSizes(url)
     const sizes = chosenSizes(vehicles, { picked, preferred: preferredSize })
@@ -58,6 +60,7 @@ export class VehicleViewer {
         html`<div class="twgutter-bleed">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`,
       (data, value) => wheelsOf({ presenter, data, others: others(value) })))}`,
       components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }))),
+      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value) }))),
       all: () => {
         const full = vehicles.map(({ data, value }, index) => {
           const remaining = values.filter((each) => each !== value)
@@ -67,7 +70,7 @@ export class VehicleViewer {
         return html`${comparing ? html`${comparisonTable({ ...compared, part: 'all' })}${geometryOverlay(compared)}` : nothing}${cardRow('tw:mt-8', full)}`
       }
     }
-    return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }))}${views[view]()}`
+    return html`${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown)}${views[view]()}`
   }
 }
 

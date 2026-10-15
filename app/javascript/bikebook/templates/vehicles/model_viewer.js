@@ -68,6 +68,9 @@ export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => 
 // A vehicle's wheels and the others it fits, marked where they differ from `others`'
 export const wheelsOf = ({ presenter, data, others }) => new ModelViewer({ presenter, data, others }).wheels()
 
+// A vehicle's motors, each with its battery, marked where they differ from `others`'
+export const motorsOf = ({ presenter, data, others }) => new ModelViewer({ presenter, data, others }).motorSections()
+
 // A vehicle's components by group, marked where they differ from `others`'
 export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
 

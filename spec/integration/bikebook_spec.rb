@@ -119,6 +119,21 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("section[aria-label='Aventón Level 2 Step-Through components'] h3", exact_text: "Level 2 Step-Through")
     expect(page).to have_css("[data-comparison] section[aria-label$=' components']", count: 2)
     expect(page).to have_no_css("article").and have_no_css("[aria-label='Components comparison']")
+    # and their motors and batteries, a tab only an e-vehicle gets
+    click_link "Motor & Battery"
+    expect(page).to have_css("[data-comparison] section[aria-label$=' motors']", count: 2)
+    expect(find("section[aria-label='Aventón Level 2 Step-Through motors']")).to have_css("h2", text: /\Amotor & battery\z/i)
+    without_motor = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const url = new URL('/bikebook?view=motors', window.location.href)
+        const rendered = fragmentOf(new VehicleViewer(kit, vocabulary).render([{ value: 'm/surly/2018/0', data: { model: 'Acoustic' } }], url, null))
+        return [...rendered.querySelectorAll('nav[aria-label="Views"] a')].map((tab) => [tab.textContent.trim(), tab.hasAttribute('aria-current')])
+      })()
+    JS
+    expect(without_motor).to eq([["Overview", true], ["Sizes & geometry", false], ["Components", false], ["All", false]])
     click_link "All"
     expect(page).to have_css("[data-comparison] article", count: 2)
     # as one table of specs and geometry, above the full cards
