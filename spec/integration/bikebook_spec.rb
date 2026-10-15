@@ -622,6 +622,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     # Filters with nothing picked say what they leave, and lead into the list or back to the filters
     visit bikebook_path(price_max: 3000)
     expect(page).to have_text("20 models match your filters.", wait: 10)
+    # under the steps
+    expect(page).to have_css("[aria-label='How to use Bike Book'] ol + p", text: "20 models match your filters.")
     click_on "Browse them"
     expect(page).to have_css("#vehicle_models-hw-listbox [role='option']", minimum: 1)
     visit bikebook_path(primary_activity: "atb_gravel", price_max: 1500)
