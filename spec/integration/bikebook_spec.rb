@@ -447,6 +447,11 @@ RSpec.describe "Bikebook", :js, type: :system do
       m/specialized/2025/haul_st m/sur_ron/2026/ultra_bee_hp_x_us].join(",")
     card_rows = -> { page.evaluate_script("new Set([...document.querySelectorAll('article')].map((card) => Math.round(card.getBoundingClientRect().top))).size") }
     scrolls_sideways = -> { page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth") }
+    # past three, the overview reaches past the page's column, which the search spans
+    visit bikebook_path(vehicle_models: five)
+    expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 6, wait: 10)
+    width = ->(selector) { page.evaluate_script("document.querySelector(#{selector.to_json}).getBoundingClientRect().width") }
+    expect(width.call("[aria-label='Overview comparison'] table")).to be > width.call("[data-bikebook--catalog-filters-target='vehicleCombobox']") + 100
     visit bikebook_path(vehicle_models: five, view: "all")
     # the label column's header and the five vehicles'
     expect(page).to have_css("[aria-label='Comparison'] thead th", count: 6, wait: 10)

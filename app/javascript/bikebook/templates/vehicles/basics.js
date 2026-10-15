@@ -24,6 +24,8 @@ const FIELDS = [
 ]
 // the label column's 12.5rem and 12rem per model, so a phone scrolls the table rather than squeezing it
 const MIN_WIDTHS = ['', '', 'tw:min-w-[36.5rem]!', 'tw:min-w-[48.5rem]!', 'tw:min-w-[60.5rem]!', 'tw:min-w-[72.5rem]!']
+// past three models, out of the page's column toward the window's edges, each model's column up to 500px
+const MAX_WIDTHS = { 4: 'tw:max-w-[calc(12.5rem+2000px)]', 5: 'tw:max-w-[calc(12.5rem+2500px)]' }
 
 const manufacturerLine = (manufacturer) => present(manufacturer)
   ? html`<p class="tw:text-[11px] tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
@@ -71,8 +73,10 @@ const single = (vehicle, fields) => html`<section aria-label="Overview" class="t
       class="tw:text-gray-600 tw:dark:text-gray-400">${label}</dt><dd class="tw:mb-0 tw:text-right">${vehicle[key]}</dd></div>`)}</dl></div><div
   class="tw:max-md:order-first">${vehicle.photo('tw:aspect-[4/3]')}</div></section>`
 
-const compared = (vehicles, fields) => html`<section aria-label="Overview comparison" class="tw:mt-6">${table({
-  classes: `tw:w-full tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)}`,
+const compared = (vehicles, fields) => html`<section aria-label="Overview comparison" class="tw:mt-6 ${vehicles.length > 3
+  ? 'tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4'
+  : ''}">${table({
+  classes: `tw:w-full tw:table-fixed ${MIN_WIDTHS[vehicles.length] ?? MIN_WIDTHS.at(-1)} ${vehicles.length > 3 ? `tw:mx-auto ${MAX_WIDTHS[vehicles.length] ?? MAX_WIDTHS[5]}` : ''}`,
   records: fields,
   columns: [
     { label: html`<span class="tw:sr-only">Field</span>`, rowHeader: true, classes: 'tw:w-50 tw:px-2.5! tw:py-2! tw:align-top tw:font-bold', cell: ({ label }) => label },
