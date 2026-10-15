@@ -16,7 +16,10 @@ module GrapeErrors
     APIAuthorization::Errors::OAuthForbiddenError => 403,
     EndpointNotFound => 404,
     ActiveRecord::RecordNotFound => 404,
-    Rack::BadRequest => 400 # malformed request body (e.g. empty multipart)
+    # malformed request body: empty multipart, invalid UTF-8, unparseable JSON
+    Rack::BadRequest => 400,
+    ActionController::BadRequest => 400,
+    ActionDispatch::Http::Parameters::ParseError => 400
   }.freeze
 
   # grape_logging logs an exception's own #status, defaulting to 500 when there isn't one -
