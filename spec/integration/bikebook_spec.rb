@@ -105,6 +105,19 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_css("article")
     # what differs is only marked further down
     expect(find("[aria-label='Overview comparison']")).to have_no_css(".tw\\:spec-diff")
+    # beside an e-vehicle, one without a motor says it isn't one rather than missing its class
+    classes = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehiclePresenter }, { basics }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const vehicles = [{ model: 'Electric', motors: [{ rated_power: 250 }] }, { model: 'Acoustic' }].map((data, index) => ({ value: String(index), data }))
+        const rows = [...fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles })).querySelectorAll('tbody tr')]
+        const row = rows.find((each) => each.querySelector('th').textContent.trim() === 'E-vehicle class')
+        return [...row.querySelectorAll('td')].map((cell) => [cell.textContent.trim(), cell.querySelector('.twless-strong[class~="tw:italic"]') != null])
+      })()
+    JS
+    expect(classes).to eq([["—", false], ["not e-vehicle", true]])
     # each view a link to this page, rendered without a request and kept through a pick
     click_link "Sizes & geometry"
     expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tbody th", exact_text: "Size")

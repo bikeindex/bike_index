@@ -62,7 +62,11 @@ const compared = (vehicles, fields) => html`<section aria-label="Overview compar
       label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${manufacturerLine(vehicle.manufacturer)}${vehicle.model}`,
       classes: 'tw:px-2.5! tw:py-2! tw:align-top',
       cellClass: ({ key }) => key === 'description' ? 'tw:text-sm' : '',
-      cell: ({ key, electric }) => present(vehicle[key]) ? vehicle[key] : electric && !vehicle.electric ? nothing : missing
+      cell: ({ key, electric }) => {
+        if (present(vehicle[key])) return vehicle[key]
+        if (!electric || vehicle.electric) return missing
+        return key === 'e_vehicle_class' ? html`<span class="twless-strong tw:italic">not e-vehicle</span>` : nothing
+      }
     }))
   ]
 })}</section>`
