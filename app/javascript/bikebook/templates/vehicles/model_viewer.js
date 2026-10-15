@@ -66,7 +66,11 @@ export const basicsOf = ({ presenter, data }) => new ModelViewer({ presenter, da
 export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
 
 // A vehicle's motors, each with its battery, marked where they differ from `others`'
-export const motorsOf = ({ presenter, data, others }) => new ModelViewer({ presenter, data, others }).motorSections()
+// alternating between columns, so one alone keeps a column's width, as in the full card
+export const motorsOf = ({ presenter, data, others }) => {
+  const sections = new ModelViewer({ presenter, data, others }).motorSections()
+  return sideBySide([0, 1].map((column) => sections.filter((_, index) => index % 2 === column)))
+}
 
 // A vehicle's wheels, brakes, suspension and drivetrain, marked where they differ from `others`'
 export const runningGearOf = ({ presenter, data, others }) => {
