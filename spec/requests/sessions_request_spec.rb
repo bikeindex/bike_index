@@ -126,6 +126,12 @@ RSpec.describe SessionsController, type: :request do
         end
         expect(throttled.headers["retry-after"]).to eq "20"
       end
+
+      it "returns 400 for a multipart email with invalid bytes" do
+        body = "--b\r\nContent-Disposition: form-data; name=\"session[email]\"\r\n\r\n1\xFF\xFE\r\n--b--\r\n".b
+        post "/session/identify", params: body, headers: {"CONTENT_TYPE" => "multipart/form-data; boundary=b"}
+        expect(response.status).to eq 400
+      end
     end
   end
 
