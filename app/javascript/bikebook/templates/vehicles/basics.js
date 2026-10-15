@@ -9,11 +9,11 @@ import { present } from 'bikebook/templates/values'
 const FIELDS = [
   { label: 'Model group', key: 'model_group' },
   { label: 'Years', key: 'years' },
-  { label: 'E-vehicle class', key: 'e_vehicle_class', electric: true },
   { label: 'Primary activity', key: 'primary_activity' },
   { label: 'Frame material', key: 'frame_material' },
-  { label: 'Certification', key: 'certification', electric: true },
   { label: 'Price', key: 'price' },
+  { label: 'E-vehicle class', key: 'e_vehicle_class', electric: true },
+  { label: 'Certification', key: 'certification', electric: true },
   { label: 'Description', key: 'description' }
 ]
 // the label column's 12.5rem and 12rem per model, so a phone scrolls the table rather than squeezing it

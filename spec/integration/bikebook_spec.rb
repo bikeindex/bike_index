@@ -87,6 +87,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[aria-label='Overview'] h2", text: "Level 4 REC Step-Through")
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']", exact_text: "Overview")
     expect(find("[aria-label='Overview']")).to have_css("div", text: /\ACertification\s*UL 2849, UL 2271\z/)
+    expect(find("[aria-label='Overview']").all("dt").map(&:text))
+      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Price", "E-vehicle class", "Certification", "Description"])
     # a description that fits its clamp has nothing more to read
     expect(find("[aria-label='Overview']")).to have_text("The Level 4 REC").and have_no_button("Read more")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
