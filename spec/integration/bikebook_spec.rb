@@ -105,14 +105,14 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(find("[aria-label='Overview comparison']")).to have_no_css(".tw\\:spec-diff")
     # each view a link to this page, rendered without a request and kept through a pick
     click_link "Sizes & geometry"
-    expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tbody tr:first-child th", text: "Size")
+    expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tbody th", exact_text: "Size")
     # the tab stays focused, for the next one along
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']:focus", exact_text: "Sizes & geometry")
     expect(page).to have_no_css("[aria-label='Overview comparison']")
     expect(page).to have_current_path(/[?&]view=geometry\b/)
     # the wheels compared under the size, rather than on each model's sizes card (these list no max tire)
     labels = all("[aria-label='Sizes & geometry comparison'] tbody th").map(&:text)
-    expect(labels.first(4)).to eq(["Size", "Front wheel", "Rear wheel", "Reach"])
+    expect(labels.first(4)).to eq(["Front wheel", "Rear wheel", "Size", "Reach"])
     sizes_card = find("section[aria-label='Aventón Level 2 Step-Through sizes']")
     expect(sizes_card).to have_no_css("h2", text: /\Awheels\z/i)
     # its sizes scroll out to the card's edges, as a components table does

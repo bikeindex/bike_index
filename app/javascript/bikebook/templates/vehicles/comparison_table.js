@@ -166,7 +166,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
   const specRecords = records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING])
   const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
   const rows = {
-    geometry: [...sizeRows, ...records(wheelRows), ...geometryRecords],
+    geometry: [...records(wheelRows), ...sizeRows, ...geometryRecords],
     specs: specRecords,
     all: [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...specRecords, ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])]
   }[part]
