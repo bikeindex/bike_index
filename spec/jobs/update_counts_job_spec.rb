@@ -14,10 +14,6 @@ RSpec.describe UpdateCountsJob, type: :lib do
     let!(:stolen_bike) { FactoryBot.create(:stolen_bike) }
     let!(:recovered_bike) { FactoryBot.create(:stolen_record_recovered) }
     let!(:stolen_notification) { FactoryBot.create(:stolen_notification) }
-    let!(:bikebook_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, serial_normalized: "XXX") }
-    let!(:serial_search) { FactoryBot.create(:logged_search, endpoint: :web_bikes, serial_normalized: "XXX") }
-    let!(:no_serial_search) { FactoryBot.create(:logged_search, endpoint: :api_v3_bikes) }
-    let!(:old_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, request_at: Time.current - 2.weeks) }
 
     it "updates counts in the cache" do
       expect(StolenRecord.count).to eq 2
@@ -27,8 +23,6 @@ RSpec.describe UpdateCountsJob, type: :lib do
       expect(Counts.stolen_bikes).to eq 2
       expect(Counts.recoveries).to eq 2041
       expect(Counts.week_creation_chart.is_a?(Hash)).to be_truthy
-      expect(Counts.week_logged_searches)
-        .to eq("web_bikebook" => 1, "not_web_bikebook" => 2, "not_web_bikebook_serial" => 1)
     end
   end
 end

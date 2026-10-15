@@ -50,6 +50,26 @@ RSpec.describe Counts do
     end
   end
 
+  context "logged_searches" do
+    let(:request_at) { Time.current.beginning_of_day }
+    let!(:bikebook_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, serial_normalized: "XXX", request_at:) }
+    let!(:serial_search) { FactoryBot.create(:logged_search, endpoint: :web_bikes, serial_normalized: "XXX", request_at:) }
+    let!(:no_serial_search) { FactoryBot.create(:logged_search, endpoint: :api_v3_bikes, request_at:) }
+    let!(:yesterday_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, request_at: request_at - 1.minute) }
+    let(:empty_counts) { {"web_bikebook" => 0, "not_web_bikebook" => 0, "not_web_bikebook_serial" => 0} }
+
+    it "stores yesterday's and today's counts" do
+      dates = [Date.current - 2.days, Date.yesterday, Date.current]
+      expect(Counts.logged_searches(dates)).to eq(dates.to_h { [it, empty_counts] })
+      Counts.assign_logged_searches
+      expect(Counts.logged_searches(dates)).to eq(
+        Date.current - 2.days => empty_counts,
+        Date.yesterday => empty_counts.merge("web_bikebook" => 1),
+        Date.current => {"web_bikebook" => 1, "not_web_bikebook" => 2, "not_web_bikebook_serial" => 1}
+      )
+    end
+  end
+
   context "recoveries" do
     let!(:recovered_bike) { FactoryBot.create(:stolen_record_recovered, recovered_at: Time.current - 1.day) }
     it "returns constant" do

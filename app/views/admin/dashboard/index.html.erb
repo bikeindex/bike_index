@@ -31,7 +31,7 @@
 
   <hr>
 
-  <% logged_search_counts = Counts.week_logged_searches %>
+  <% daily_logged_searches = Counts.logged_searches(@time_range.first.to_date..Date.current).values %>
 
   <div class="row">
     <div class="col-md-6">
@@ -40,7 +40,7 @@
       </h2>
 
       <p>
-        <%= number_display(logged_search_counts["web_bikebook"]) %> past week
+        <%= number_display(daily_logged_searches.sum { it["web_bikebook"] }) %> past week
       </p>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"))) %>
@@ -52,9 +52,9 @@
       </h2>
 
       <p>
-        <%= number_display(logged_search_counts["not_web_bikebook"]) %> past
+        <%= number_display(daily_logged_searches.sum { it["not_web_bikebook"] }) %> past
         week
-        <em>(<%= number_display(logged_search_counts["not_web_bikebook_serial"]) %> with serial)</em>
+        <em>(<%= number_display(daily_logged_searches.sum { it["not_web_bikebook_serial"] }) %> with serial)</em>
       </p>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
