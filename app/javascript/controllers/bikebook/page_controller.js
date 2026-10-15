@@ -51,7 +51,8 @@ export default class extends Controller {
   }
 
   // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
-  // scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search. One among the
+  // scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
+  // data-replace in place of the history entry it's on. One among the
   // vehicles was written when the page rendered, so only what it changes from that goes onto the URL, which filters
   // and panels have moved on since
   follow (event) {
@@ -64,7 +65,8 @@ export default class extends Controller {
     event.preventDefault()
     const inPlace = link.closest('[data-in-place]')
     inPlace
-      ? this.#go(link.closest('#vehicle-viewers') ? this.#changedBy(url) : url, [window.scrollX, window.scrollY], { focus: inPlace.dataset.inPlace || false })
+      ? this.#go(link.closest('#vehicle-viewers') ? this.#changedBy(url) : url, [window.scrollX, window.scrollY],
+        { focus: inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) })
       : this.#go(url)
   }
 
@@ -104,8 +106,8 @@ export default class extends Controller {
     return url
   }
 
-  #go (url, scroll = [0, 0], options) {
-    window.history.pushState(stamped(), '', readable(url))
+  #go (url, scroll = [0, 0], { replace = false, ...options } = {}) {
+    window.history[replace ? 'replaceState' : 'pushState'](stamped(), '', readable(url))
     return this.#render(url, scroll, options)
   }
 

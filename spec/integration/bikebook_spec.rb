@@ -120,7 +120,9 @@ RSpec.describe "Bikebook", :js, type: :system do
       })()
     JS
     expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["Unknown", true], ["", false]]])
-    # each view a link to this page, rendered without a request and kept through a pick
+    # each view a link to this page, rendered without a request and kept through a pick, in place of its history entry
+    history_length = -> { page.evaluate_script("window.history.length") }
+    entries = history_length.call
     click_link "Sizes & geometry"
     expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tbody th", exact_text: "Size")
     # the tab stays focused, for the next one along
@@ -165,6 +167,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     # as one table of specs and geometry, above the full cards
     expect(page).to have_css("[aria-label='Comparison'] th", text: /\Ageometry\z/i).and have_no_css("[aria-label='Overview comparison']")
     expect(page).to have_current_path(/[?&]view=all\b/)
+    expect(history_length.call).to eq entries
     # what differs is marked, not what it's called, and of a list just the items that differ
     expect(all("article").last).to have_css("dd .tw\\:spec-diff").and have_no_css("dt .tw\\:spec-diff")
     front_wheel = all("article").last.find("section", text: /\AWheels/i).find("dd", match: :first)
