@@ -3,6 +3,9 @@ import { section } from 'bikebook/templates/vehicles/section'
 import { html } from 'lit-html'
 import { array, blank, compact, except, join, presence, present, slice } from 'bikebook/templates/values'
 
+// A motor whose certification isn't listed
+export const unknownCertification = html`<span class="tw:text-yellow-800 tw:dark:text-yellow-400">Unknown</span>`
+
 // A motor's specs, with a subsection per operating mode
 export const motorSection = ({ presenter, heading, motor, others }) => {
   const { fields, humanized, labels } = presenter.kit.motor
@@ -13,7 +16,7 @@ export const motorSection = ({ presenter, heading, motor, others }) => {
     name: [each.manufacturer, each.model].filter(present).join(' '),
     id: each.id ? copyableCode({ value: each.id, label: 'Copy ID' }) : null,
     // `{}` stands in for a motor a compared vehicle doesn't have
-    certification: presence(each.certification) ?? (present(each) ? html`<span class="tw:text-yellow-800 tw:dark:text-yellow-400">Unknown</span>` : null),
+    certification: presence(each.certification) ?? (present(each) ? unknownCertification : null),
     // a merged motor lists each of its drive wheels
     ...Object.fromEntries(Object.entries(slice(each, humanized)).map(([key, value]) => [key, value == null ? value : array(value).map((part) => presenter.humanize(part)).join(', ')]))
   })

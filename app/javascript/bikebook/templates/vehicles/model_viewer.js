@@ -9,7 +9,7 @@ import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { componentGroup } from 'bikebook/templates/vehicles/component_group'
 import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
 import { modelYears } from 'bikebook/templates/vehicles/model_years'
-import { motorSection } from 'bikebook/templates/vehicles/motor_section'
+import { motorSection, unknownCertification } from 'bikebook/templates/vehicles/motor_section'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { disclosure, section } from 'bikebook/templates/vehicles/section'
 import { andSentence, array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
@@ -287,7 +287,8 @@ class ModelViewer {
       e_vehicle_class: presence(this.classificationNames(this.#sortedClassifications(vehicle))),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
       frame_material: vehicle.frame?.material,
-      certification: presence([...new Set(array(vehicle.motors).map((motor) => motor.certification).filter(present))].join(', ')),
+      certification: presence([...new Set(array(vehicle.motors).map((motor) => motor.certification).filter(present))].join(', ')) ??
+        (present(vehicle.motors) ? unknownCertification : null),
       description
     }
   }
