@@ -173,7 +173,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     labels = all("[aria-label='Sizes & geometry comparison'] tbody th").map(&:text)
     expect(labels.first(4)).to eq(["Front wheel", "Rear wheel", "Size", "Reach"])
     sizes_card = find("section[aria-label='Aventón Level 2 Step-Through sizes']")
-    # each model's card topped in its frame's color, as its table column is
+    # each model's card topped in its frame's color, as its table column is, which isn't footed in it
+    expect(page).to have_no_css("[aria-label='Sizes & geometry comparison'] td.tw\\:border-b-4")
     expect(all("section[aria-label$=' sizes']").map { it[:class][/tw:border-t-\[#\w+\]!/] }).to eq(["tw:border-t-[#3498db]!", "tw:border-t-[#DC2626]!"])
     expect(sizes_card).to have_no_css("h2", text: /\Awheels\z/i)
     # its sizes scroll out to the card's edges, as a components table does
