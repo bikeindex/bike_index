@@ -6853,6 +6853,7 @@ nl:
           any_market: Elke markt
           market: Markt
           clear_filters: Filters wissen
+          jurisdiction_for_e_vehicles: jurisdictie voor elektrische voertuigen
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
@@ -6864,6 +6865,7 @@ nl:
           class_aria: Klasse %{n} e-bike
           class_unknown_aria: E-bike klasse onbekend
           emoto: E-moto
+          emoto_aria: E-moto, geen e-bike
         law_details:
           from: 'Van %{date}:'
           from_until: 'Van %{starts_on} tot %{ends_on}:'
@@ -7145,26 +7147,10 @@ nl:
           classes_intro: De meeste staten hanteren een systeem met drie klassen. Je
             klasse bepaalt hoe snel de motor ondersteuning biedt, of je een gashendel
             mag gebruiken en waar je mag rijden.
-          emoto_limits_body: Een e-moto wordt beschouwd als een voertuig met een topsnelheid
-            van meer dan 45 km/u, een maximale snelheid van meer dan 32 km/u of een
-            motorvermogen van meer dan 750 watt. In de meeste staten worden deze voertuigen
-            behandeld als bromfietsen of motorfietsen, waarvoor registratie, verzekering
-            en een rijbewijs vereist kunnen zijn.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          emoto_summary: Een topsnelheid van meer dan 45 km/u, een maximale snelheid
-            van meer dan 32 km/u of een motorvermogen van meer dan 750 watt maken
-            het een e-moto.
-          mph: "%{mph} mph"
-          not_an_ebike: Geen e-bike
-          pedal: Voetpedaal
           state_classes_heading: "%{state} e-bike lessen"
           state_classes_intro: "%{state} gebruikt niet het drieklassensysteem dat
             de meeste staten hanteren. De wetgeving van deze staat deelt e-bikes en
             andere elektrische tweewielers in plaats daarvan in deze klassen in."
-          throttle: Elektrisch gaspedaal
-          watts_max: "≤%{watts}W"
-          watts_min: "%{watts}W+"
         rule_citation:
           source: bron
         class_card:
@@ -7190,6 +7176,19 @@ nl:
           state_specifics: "%{state} specificaties"
           throttle: Elektrisch gaspedaal
           top_assist: Top assistentie
+          emoto_limits_body: Een e-moto wordt beschouwd als een voertuig met een topsnelheid
+            van meer dan 45 km/u, een maximale snelheid van meer dan 32 km/u of een
+            motorvermogen van meer dan 750 watt. In de meeste staten worden deze voertuigen
+            behandeld als bromfietsen of motorfietsen, waarvoor registratie, verzekering
+            en een rijbewijs vereist kunnen zijn.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Een topsnelheid van meer dan 45 km/u, een maximale snelheid
+            van meer dan 32 km/u of een motorvermogen van meer dan 750 watt maken
+            het een e-moto.
+          not_an_ebike: Geen e-bike
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
     shared_blocks:
       footer:
         about: Over
