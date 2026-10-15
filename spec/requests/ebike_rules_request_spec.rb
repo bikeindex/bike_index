@@ -81,6 +81,10 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("turbo-frame#ebike-rules-class-card-evc-moped h3", text: "Moped, up to 2 hp and 30 mph")
         .and have_text("30 mph").and have_no_css("[role=img]")
 
+      # one the state's law folds into the e-moto, as its classes do
+      get "/ebike-rules/nj", params: {classification: "evc/us/nj/dirt_bike"}, headers: frame.call("evc-us-nj-dirt_bike")
+      expect(page).to have_css("turbo-frame#ebike-rules-class-card-evc-us-nj-dirt_bike h3", text: "Not an e-bike")
+
       get "/ebike-rules", params: {classification: "evc/nothing"}, headers: frame.call("evc-nothing")
       expect(response).to have_http_status(:not_found)
     end

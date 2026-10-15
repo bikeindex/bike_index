@@ -22,12 +22,10 @@ module Pages
 
         def cards = state_classes ? state_class_cards : us_class_cards
 
-        def state_class_cards = state_classes.map { it[:not_an_ebike] ? emoto_card : class_card(classification: it) }
+        def state_class_cards = state_classes.map { class_card(classification: it) }
 
         # The three classes, then the e-moto that's none of them
-        def us_class_cards = [1, 2, 3].map { class_card(e_bike_class: it) } + [emoto_card]
-
-        def emoto_card = class_card
+        def us_class_cards = [1, 2, 3, nil].map { class_card(e_bike_class: it) }
 
         def class_card(**) = Pages::EbikeRules::ClassCard::Component.new(state: @state, **)
       end

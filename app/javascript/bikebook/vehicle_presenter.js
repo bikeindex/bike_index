@@ -20,6 +20,9 @@ const IN_CENTIMETERS = ['wheelbase', 'standover']
 const SINGULAR = { feet: 'foot', inches: 'inch' }
 
 // The names, units and lookups the vehicle templates present a model's data with
+// read as part of their number, unmuted
+const FEET_AND_INCHES = ["'", '"']
+
 export class VehiclePresenter {
   constructor (kit, vocabulary) {
     this.kit = kit
@@ -93,14 +96,14 @@ export class VehiclePresenter {
     const words = Object.keys(this.kit.presenter.dimension_words)
     const values = words.filter((key) => dimensions[key] != null).map((key) => [key, dimensions[key]])
     const full = values.length === words.length
-    const metric = values.map(([key, mm], index) => [key, this.labeled(this.rounded(mm / cm), full && index < values.length - 1 ? null : 'cm', this.kit.presenter.centimeters)])
+    const centimeters = (mm, unit = 'cm') => this.labeled(this.rounded(mm / cm), unit, this.kit.presenter.centimeters)
+    const metric = values.map(([key, mm], index) => [key, centimeters(mm, full && index < values.length - 1 ? null : 'cm')])
     const feetAndInches = this.#feetAndInches()
     // leading parts that come to zero are left out: no "0'" before a length under a foot
     const imperial = values.map(([key, mm]) => {
       const first = feetAndInches.findIndex(({ convert }) => convert(mm) !== 0)
       return [key, join((first < 0 ? [] : feetAndInches.slice(first)).map(({ part, convert }) => this.labeled(convert(mm), 'mm', part)), ' ')]
     })
-    const centimeters = (mm) => this.labeled(this.rounded(mm / cm), 'cm', this.kit.presenter.centimeters)
     const exact = [(mm) => this.labeled(this.rounded(mm), 'mm'), (mm) => join([this.#inWords(mm), ' (', centimeters(mm), ')'])]
     const [metricSystem, imperialSystem] = [metric, imperial].map((parts, index) => this.#tooltipped(
       full ? join(parts.map(([, part]) => part), ' × ') : join(parts.map(([key, part]) => join([part, ' ', this.kit.presenter.dimension_words[key]])), ', '),
@@ -173,8 +176,8 @@ export class VehiclePresenter {
     const number = html`<span class="tw:font-mono">${numberDisplay(value)}</span>`
     if (blank(unit)) return number
     // a thin space, so the unit reads as part of the value
-    const gap = ['°', "'", '"'].includes(meta.label) ? '' : ' '
-    const classes = ["'", '"'].includes(meta.label) ? nothing : 'tw:text-xs tw:text-gray-400 tw:dark:text-gray-500'
+    const gap = ['°', ...FEET_AND_INCHES].includes(meta.label) ? '' : ' '
+    const classes = FEET_AND_INCHES.includes(meta.label) ? nothing : 'tw:text-xs tw:text-gray-400 tw:dark:text-gray-500'
     return join([number, gap, html`<span class=${classes} title=${meta.name ?? nothing}>${meta.label ?? unit}</span>`])
   }
 

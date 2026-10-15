@@ -127,13 +127,12 @@ export default class extends Controller {
     }))
   }
 
-  // Market is left out, as every visit starts with one. A state with no class checked is the jurisdiction alone
+  // Market is left out, as every visit starts with one
   get #summary () {
-    return this.fieldTargets.filter((field) => !field.querySelector('input[name="market"]'))
-      .map((field) => [field.dataset.jurisdictionLabel && !field.querySelector('input[name="electric"]:checked')
-        ? field.dataset.jurisdictionLabel
-        : field.dataset.filterLabel, this.#describe(field)])
-      .filter(([, value]) => value)
+    return this.fieldTargets.filter((field) => !field.querySelector('input[name="market"]')).map((field) => {
+      const [value, label = field.dataset.filterLabel] = [this.#describe(field)].flat()
+      return [label, value]
+    }).filter(([, value]) => value)
   }
 
   #describe (field) {
@@ -146,12 +145,12 @@ export default class extends Controller {
     const boxes = inputs.filter(({ type }) => type === 'checkbox')
     if (boxes.length) {
       const checked = boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
-      // a state stands alone, read from its option, as the combobox may not have filled its input yet
+      // a state stands alone, as the jurisdiction, read from its option, as the combobox may not have filled its input yet
       const jurisdiction = field.querySelector('input[name="jurisdiction"]')
       if (!jurisdiction || field.classList.contains('tw:hidden')) return checked
       const state = jurisdiction.value && field.querySelector(`[role="option"][data-value="${CSS.escape(jurisdiction.value)}"]`)
         ?.dataset.autocompletableAs.replace(/ \(\w+\)$/, '')
-      return checked ? `${checked} (${state || field.querySelector('[role="combobox"]').placeholder})` : state
+      return checked ? `${checked} (${state || field.querySelector('[role="combobox"]').placeholder})` : [state, field.dataset.jurisdictionLabel]
     }
     const [min, max] = inputs.map(({ value }) => value && `${field.dataset.filterPrefix}${value}`)
     if (min && max) return `${min}–${max}`

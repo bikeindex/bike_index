@@ -1,6 +1,6 @@
 <% content = capture do %>
   <div class="tw:flex tw:items-center tw:gap-3.5">
-    <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: card[:n])) unless card[:state] %>
+    <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: card[:n])) unless classification %>
 
     <div>
       <h3 class="tw:font-header tw:text-xl tw:font-extrabold">

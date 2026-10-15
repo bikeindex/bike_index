@@ -51,7 +51,7 @@ export const preferredSize = () => {
 export const storePreferredSize = (size) => window.localStorage.setItem(KEY, JSON.stringify(size))
 
 // vehicle_sizes is each vehicle's picked size in vehicle_models' order, blank where it has none
-const paramList = (url, param) => url.searchParams.get(param)?.split(',') ?? []
+export const paramList = (url, param) => url.searchParams.get(param)?.split(',') ?? []
 export const pickedSizes = (url) => {
   const sizes = paramList(url, PARAM)
   return Object.fromEntries(paramList(url, 'vehicle_models').map((id, index) => [id, sizes[index]]).filter(([, size]) => size))

@@ -38,7 +38,7 @@ export const typeLabel = (each) => [each.type, each.type_detail].filter(present)
 export const modelViewer = (args) => new ModelViewer(args).render()
 
 const WIDE_TIRE = 50
-const US_CLASS = /^evc\/us\/class_(\d)$/
+export const US_CLASS = /^evc\/us\/class_(\d)$/
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
 const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
 const brakeType = (brake) => brake?.type?.replace(/^Disc (\w+)$/, '$1 disc')

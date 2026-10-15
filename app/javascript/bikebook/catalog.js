@@ -1,6 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
-import { cardLabel, classificationOption } from 'bikebook/templates/vehicles/class_cards'
+import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
 
@@ -82,7 +82,7 @@ export class CatalogComboboxSource {
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
       const offered = classificationOption(this.params.q, String(this.params.vehicle_models ?? '').split(','), this.catalog.vocabulary.e_vehicle_classifications)
-      listbox.replaceChildren(fragmentOf(html`${offered === nothing ? nothing : group('E-bike classification', [offered])}${
+      listbox.replaceChildren(fragmentOf(html`${offered ? group('E-bike classification', [offered]) : nothing}${
         group(unfiltered ? unmatched : matching(total), options)}${pagination}`))
       this.onSearch({ params: this.params, total, filteredCount, primed })
     } else {
@@ -114,7 +114,7 @@ export class CatalogComboboxSource {
     if (!combobox.element.isConnected) return
 
     const classifications = this.catalog.vocabulary.e_vehicle_classifications
-    renderChips(combobox.element, ids.map((value, index) => ({ value, display: displays[index] ?? cardLabel(value, classifications) }))
+    renderChips(combobox.element, ids.map((value, index) => ({ value, display: displays[index] ?? classifications[value]?.label }))
       .filter(({ display }) => display != null))
   }
 }

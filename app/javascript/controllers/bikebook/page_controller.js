@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
 import { hydrate, loadingShell } from 'bikebook/hydrate'
+import { keepPermanent } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
@@ -43,9 +44,7 @@ export default class extends Controller {
     this.source = new CatalogComboboxSource(this.catalog, ({ params: { q, vehicle_models: picked = '' }, total, filteredCount, primed }) => {
       renderCounts(document, filteredCount)
       // a jurisdiction's change searches again, moving the cards to its own
-      const classifications = this.catalog.vocabulary.e_vehicle_classifications
-      renderClassCards(document.getElementById('classification-cards'), picked.split(','),
-        document.getElementById('jurisdiction-hw-hidden-field').value, classifications)
+      renderClassCards(document, picked.split(','), this.catalog.vocabulary.e_vehicle_classifications)
       if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })
     this.#countModels()
@@ -140,7 +139,7 @@ export default class extends Controller {
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
     const active = this.pageTarget.contains(document.activeElement) && document.activeElement.id ? document.activeElement : null
-    this.pageTarget.replaceChildren(rendered.content)
+    this.pageTarget.replaceChildren(keepPermanent(rendered.content, this.pageTarget))
     this.#renderedUrl = url
     document.title = rendered.title ?? this.titleValue
     const kept = active && this.pageTarget.querySelector(`#${CSS.escape(active.id)}`)
