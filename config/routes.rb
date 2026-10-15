@@ -372,6 +372,7 @@ Rails.application.routes.draw do
       collection do
         get :tables
         get :variable
+        get :logged_searches
         get :bikes_table
       end
     end
