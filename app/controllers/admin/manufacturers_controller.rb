@@ -3,6 +3,8 @@ module Admin
     include Binxtils::SortableTable
     include Admin::TokenAccessible
 
+    token_accessible :create, :update
+
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
     def index

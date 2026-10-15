@@ -74,6 +74,13 @@ RSpec.describe Admin::BikesController, type: :request do
           get url, params: token_param.merge(per_page: 1)
           expect(json_result["missing_manufacturers"].pluck("manufacturer_other")).to eq(["Cool Bikes"])
         end
+
+        it "turns the token away from other actions" do
+          expect {
+            get "#{base_url}/#{bike.id}/get_destroy", params: token_param
+          }.not_to change(Bike, :count)
+          expect(response.status).to eq 403
+        end
       end
     end
   end

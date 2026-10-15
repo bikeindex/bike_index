@@ -3,6 +3,8 @@ module Admin
     include Binxtils::SortableTable
     include Admin::TokenAccessible
 
+    token_accessible :missing_manufacturer
+
     # The Pages::Admin::Bikes::Tabs tabs show renders; the rest are other controllers' screens
     SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
 
