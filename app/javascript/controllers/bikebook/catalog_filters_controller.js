@@ -84,12 +84,19 @@ export default class extends Controller {
     this.refreshClear()
   }
 
-  // A clear link's href: this page less its filters but the market, which it renders afresh at their defaults. Set
-  // again as it's clicked, since the panel's own state and the picks reach the URL without a filter changing
+  // A clear link's href: this page less its filters but the market and e-bike classification, which it renders afresh
+  // at their defaults. Set again as it's clicked, since the panel's own state and the picks reach the URL without a
+  // filter changing
   refreshClear () {
     const url = new URL(window.location)
-    for (const name of Object.keys(this.#filters).filter((name) => name !== 'market')) url.searchParams.delete(name)
+    for (const name of Object.keys(this.#filters).filter((name) => !['market', 'jurisdiction'].includes(name))) url.searchParams.delete(name)
+    // propulsion shares classes' param
+    if (this.#classes.length) url.searchParams.set('electric', this.#classes.join(','))
     for (const link of this.clearTargets) link.href = readable(url)
+  }
+
+  get #classes () {
+    return [...this.classificationTarget.querySelectorAll('input:checked')].map(({ value }) => value)
   }
 
   #applyParams (url, filters = this.#filters) {
@@ -101,10 +108,10 @@ export default class extends Controller {
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
-  // a clear keeps the market and returns the default jurisdiction, so neither alone leaves anything to clear
+  // a clear keeps the market and e-bike classification, so they alone leave nothing to clear
   #refreshSummary () {
-    const { market, jurisdiction, ...filters } = this.#filters
-    const filtered = Object.values(filters).some(Boolean) || (jurisdiction || 'US') !== this.defaultJurisdictionValue
+    const { market, jurisdiction, electric, ...filters } = this.#filters
+    const filtered = Object.values(filters).some(Boolean) || electric.split(',').some((value) => value && !this.#classes.includes(value))
     for (const link of this.clearTargets) link.hidden = !filtered
     this.summaryTarget.replaceChildren(...this.#summary.map(([label, value]) => {
       const item = document.createElement('li')

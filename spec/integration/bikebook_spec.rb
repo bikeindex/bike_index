@@ -354,17 +354,20 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_link("Clear filters").and have_no_css("[aria-label='Applied filters'] li")
     expect(page).to have_css(".hw-combobox__chip", count: 2).and have_css("[data-comparison] article", count: 2)
     expect(page).to have_no_current_path(/manufacturer|electric/)
-    # and from the open panel, where a market alone is nothing to clear, and stays through a clear
+    # and from the open panel, where the market and e-bike classification are nothing to clear, and stay through a clear
     click_on "More filters", match: :first
     find_field("Market").click
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
-    expect(page).to have_no_link("Clear filters")
     check "US Class 2"
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(18 matching models)")
+    expect(page).to have_no_link("Clear filters")
+    check "Human powered (Acoustic)"
     within("#vehicle-filters") { click_link "Clear filters" }
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
-    expect(page).to have_unchecked_field("US Class 2").and have_field("Market", with: "United States (US)")
-    expect(page).to have_current_path(/[?&]market=US\b/)
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(18 matching models)")
+    expect(page).to have_unchecked_field("Human powered (Acoustic)")
+    expect(page).to have_checked_field("US Class 2").and have_field("Market", with: "United States (US)")
+    expect(page).to have_current_path(/[?&]market=US\b/).and have_current_path(/[?&]electric=class_2(&|\z)/)
 
     expect(asked).to be_empty
 
