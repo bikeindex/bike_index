@@ -67,7 +67,9 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
-    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b))),
+    // "Canada (CA)", as UI::Forms::ComboboxState shows a state
+    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)))
+      .map((option) => ({ ...option, name: option.display, display: `${option.display} (${option.value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
   }
 }

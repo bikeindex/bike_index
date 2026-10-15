@@ -17,13 +17,15 @@ export default class extends Controller {
     // Read before the overlay ever paints the input transparent
     this.caretColor = window.getComputedStyle(this.input).color
     this.events().forEach(([target, event]) => target.addEventListener(event, this.sync))
-    window.addEventListener('resize', this.onResize)
+    // Observing the input rather than the window also measures one that rendered hidden, as it's shown
+    this.resizeObserver = new ResizeObserver(this.onResize)
+    this.resizeObserver.observe(this.input)
     this.sync()
   }
 
   disconnect () {
     this.events().forEach(([target, event]) => target.removeEventListener(event, this.sync))
-    window.removeEventListener('resize', this.onResize)
+    this.resizeObserver.disconnect()
   }
 
   // keyup catches arrow-key navigation, which sets the value without an input

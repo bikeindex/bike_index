@@ -529,7 +529,7 @@ class ModelViewer {
     const fields = slice(this.kit.schemas.vehicle.frame.fields, this.kit.viewer.drivetrain_frame_fields)
     const counted = Object.fromEntries(Object.entries(this.kit.viewer.gearing_labels)
       .map(([position, label]) => [position, array(vehicle.gearing?.[position]).length === 1 ? label : `${label}s`]))
-    const rows = [...this.specRows('gearing', this.kit.schemas.vehicle.gearing.fields, counted), ...this.specRows('frame', fields)]
+    const rows = [...this.groupsetRows(), ...this.specRows('gearing', this.kit.schemas.vehicle.gearing.fields, counted), ...this.specRows('frame', fields)]
     // a compared model's values give this one rows it has nothing for
     const content = presenter.measurementRows(rows)
     if (blank(vehicle.drivetrain) && blank(content)) return nothing
@@ -543,6 +543,20 @@ class ModelViewer {
         : 'tw:bg-white tw:dark:bg-gray-800'} tw:px-2 tw:py-0.5 tw:font-mono
         tw:text-xs">${this.tooltipped(label, this.kit.viewer.drivetrain_tooltips)}</span>`)}</div>`
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
+  }
+
+  // "Shimano GRX RX610 1X12S · electronic", a list, so against a model that isn't, electronic alone is marked
+  groupsetRows () {
+    const summary = ({ groupset }) => {
+      if (blank(groupset)) return null
+      const { manufacturer, description, electronic } = groupset
+      const named = manufacturer && String(description ?? '').toLowerCase().startsWith(manufacturer.toLowerCase())
+      const name = compact([named ? null : manufacturer, description]).join(' ')
+      return electronic ? join([name, 'electronic'], ' · ') : name
+    }
+    const { vehicle, others } = this
+    if ([vehicle, ...others].every(({ groupset }) => blank(groupset))) return []
+    return [['Groupset', summary(vehicle), null, others.some((other) => !equal(other.groupset, vehicle.groupset)), 'groupset', others.map(summary)]]
   }
 
   description () {

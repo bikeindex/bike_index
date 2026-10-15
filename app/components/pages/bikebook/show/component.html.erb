@@ -3,18 +3,14 @@
     class="tw:group"
     data-controller="bikebook--catalog-filters ui--collapse"
     data-bikebook--catalog-filters-default-market-value="<%= @market %>"
+    data-bikebook--catalog-filters-default-jurisdiction-value="<%= @jurisdiction %>"
     data-ui--collapse-param-value="filters"
   >
-    <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-x-4">
-      <%# Labels the combobox below, which renders none of its own %>
-      <label class="twlabel" for="vehicle_models">
-        <%= translation(".select_a_bike") %>
-        <small id="vehicle-models-count" class="twless-strong"></small>
-      </label>
-
-      <%= render UI::Collapse::Component.new(text: translation(".more_filters"), chevron: :trailing, color: :link,
-      aria: {controls: "vehicle-filters"}) %>
-    </div>
+    <%# Labels the combobox below, which renders none of its own %>
+    <label class="twlabel" for="vehicle_models">
+      <%= translation(".select_a_bike") %>
+      <small id="vehicle-models-count" class="twless-strong"></small>
+    </label>
 
     <div
       data-bikebook--catalog-filters-target="vehicleCombobox"
@@ -36,16 +32,24 @@
       <% end %>
     </div>
 
-    <ul
-      aria-label="<%= translation(".applied_filters") %>"
-      data-bikebook--catalog-filters-target="summary"
+    <%# Carded only around applied filters %>
+    <div
       class="
-        tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:rounded-lg
-        tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm
+        tw:mt-3 tw:flex tw:items-baseline tw:justify-between tw:gap-x-4
         tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden
-        tw:empty:hidden tw:dark:border-gray-700
+        tw:has-[li]:rounded-lg tw:has-[li]:border
+        tw:has-[li]:border-gray-200 tw:has-[li]:px-4 tw:has-[li]:py-2
+        tw:dark:has-[li]:border-gray-700
       "
-    ></ul>
+    >
+      <ul
+        aria-label="<%= translation(".applied_filters") %>"
+        data-bikebook--catalog-filters-target="summary"
+        class="tw:flex tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:text-sm"
+      ></ul>
+
+      <%= more_filters %>
+    </div>
 
     <div
       id="vehicle-filters"
@@ -54,19 +58,23 @@
     >
       <div class="twwiderow">
         <%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:mt-3 tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start")) do %>
+          <div class="tw:flex tw:justify-end tw:lg:col-span-2">
+            <%= more_filters %>
+          </div>
+
           <div class="tw:flex tw:flex-col tw:gap-4">
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "primary_activity",
           label: translation(".activities"), placeholder: translation(".any_activity"), multiselect: true)) do %>
               <%= translation(".activity_examples") %>
             <% end %>
 
+            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "vehicle_type",
+          label: translation(".vehicle_types"), placeholder: translation(".any_vehicle_type"), multiselect: true)) %>
+
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "manufacturer",
           label: translation(".manufacturers"), placeholder: translation(".any_manufacturer"), multiselect: true)) do %>
               <span id="manufacturer-count"></span>
             <% end %>
-
-            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "market",
-          label: translation(".market"), placeholder: translation(".any_market"))) %>
 
             <div
               class="
@@ -151,9 +159,6 @@
           </div>
 
           <div class="tw:flex tw:flex-col tw:gap-4">
-            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "vehicle_type",
-          label: translation(".vehicle_types"), placeholder: translation(".any_vehicle_type"), multiselect: true)) %>
-
             <div class="tw:grid tw:gap-4 tw:sm:grid-cols-2">
               <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "suspension",
             label: translation(".suspension"), placeholder: translation(".any_suspension"))) %>
@@ -163,6 +168,9 @@
                 <%= translation(".configuration_examples") %>
               <% end %>
             </div>
+
+            <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "market",
+          label: translation(".market"), placeholder: translation(".any_market"), rich_display: :inline)) %>
 
             <div class="tw:flex tw:flex-col tw:gap-4 tw:sm:flex-row tw:sm:items-start">
               <fieldset
@@ -188,9 +196,9 @@
                   tw:rounded-lg tw:border tw:border-gray-200 tw:px-3 tw:pt-1
                   tw:pb-3 tw:sm:flex-1 tw:dark:border-gray-700
                 "
-                data-bikebook--catalog-filters-target="field"
+                data-bikebook--catalog-filters-target="field classification"
                 data-filter-label="<%= translation(".e_bike_classification") %>"
-                data-action="change->bikebook--catalog-filters#apply"
+                data-action="change->bikebook--catalog-filters#apply <%= Pages::Bikebook::Show::FilterCombobox::Component::SELECTION_ACTIONS %>"
               >
                 <legend class="twlabel tw:px-1">
                   <%= translation(".e_bike_classification") %>
@@ -198,14 +206,15 @@
 
                 <label
                   class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"
-                  for="filter-jurisdiction"
+                  for="jurisdiction"
                 >
                   <%= translation(".jurisdiction") %>
                 </label>
 
-                <%= select_tag "jurisdiction", options_for_select(jurisdiction_options), id: "filter-jurisdiction",
-                class: "twinput tw:mt-1 tw:sm:w-auto",
-                data: {"bikebook--catalog-filters-target": "jurisdiction", action: "bikebook--catalog-filters#showJurisdiction"} %>
+                <div class="tw:mt-1">
+                  <%= render UI::Forms::ComboboxState::Component.new(name: "jurisdiction", states: EbikeRuleServices::StateLaws::STATES,
+                  html_options: {placeholder: translation(".united_states")}) %>
+                </div>
 
                 <% class_groups.each do |jurisdiction, classes| %>
                   <div
@@ -248,7 +257,10 @@
       tw:sm:gap-6 tw:sm:py-6
     "
   >
-    <div class="tw:flex tw:shrink-0 tw:items-center tw:gap-3">
+    <a
+      href="<%= bikebook_path %>"
+      class="tw:flex tw:shrink-0 tw:items-center tw:gap-3 tw:no-underline!"
+    >
       <%= helpers.inline_svg_tag("logos/bikebook_mark.svg", class: "tw:h-12 tw:w-auto tw:text-[#2980ba]", aria_hidden: true) %>
 
       <p
@@ -260,7 +272,7 @@
         <span class="tw:text-[#555] tw:dark:text-gray-400">Bike</span>
         <span class="tw:font-bold tw:text-slate-900 tw:dark:text-slate-100">Book</span>
       </p>
-    </div>
+    </a>
 
     <div
       class="

@@ -43,6 +43,9 @@ export async function hydrate (catalog, source, shell, url) {
   const defaultMarket = catalog.options.market.some(({ value, count }) => value === located && count) ? located : ''
   panel.setAttribute(marketAttribute, defaultMarket)
   filters.market = filters.market === 'all' ? '' : filters.market || defaultMarket
+  // a state's abbreviation, or US
+  const jurisdiction = filters.jurisdiction || panel.getAttribute('data-bikebook--catalog-filters-default-jurisdiction-value')
+  const state = root.querySelector(`#jurisdiction-hw-listbox [role="option"][data-value="${CSS.escape(jurisdiction)}"]`)
   const [found, { filteredCount }] = await Promise.all([catalog.vehicles(params.get('vehicle_models')?.split(',') ?? []), catalog.search(filters, 0, 0)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const values = vehicles.map(({ value }) => value).join(',')
@@ -62,7 +65,10 @@ export async function hydrate (catalog, source, shell, url) {
     if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display
   }
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
-  root.getElementById('filter-jurisdiction').querySelector(`option[value="${CSS.escape(filters.jurisdiction)}"]`)?.setAttribute('selected', '')
+  if (state) {
+    root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
+    combobox(root, 'jurisdiction').dataset.hwComboboxPrefilledDisplayValue = state.dataset.autocompletableAs
+  }
   // out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
   for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 
