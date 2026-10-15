@@ -65,7 +65,6 @@ class ImpoundClaim < ApplicationRecord
   scope :active, -> { where(status: active_statuses) }
   scope :resolved, -> { where(status: resolved_statuses) }
   scope :not_rejected, -> { where.not(status: rejected_statuses) }
-  # Public found reports have no "retrieved" action, so their claims never resolve.
   # submitted_at is only set in the submitting status, so a claim approved straight from pending has none
   scope :stalled, -> {
     where(status: %w[submitting approved], impound_record_id: ImpoundRecord.unorganized.select(:id))
