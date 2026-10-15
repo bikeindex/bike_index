@@ -3,7 +3,7 @@ module Counts
 
   STORAGE_KEY = "counts_#{Rails.env}".freeze
 
-  COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart organizations].freeze
+  COUNT_KEYS = %w[total_bikes stolen_bikes recoveries recoveries_value week_creation_chart week_logged_searches organizations].freeze
 
   RECOVERY_AVERAGE_VALUE = 2103 # updated with calculated_recovery_average_value on 2026-4-11
 
@@ -49,6 +49,11 @@ module Counts
     chart_data.present? ? JSON.parse(chart_data) : chart_data
   end
 
+  def week_logged_searches
+    counts = RedisPool.conn { |r| r.hget STORAGE_KEY, "week_logged_searches" }
+    counts.present? ? JSON.parse(counts) : {}
+  end
+
   def assign_stolen_bikes
     assign_for("stolen_bikes", Bike.status_stolen.count)
   end
@@ -68,6 +73,16 @@ module Counts
 
   def assign_week_creation_chart
     assign_for("week_creation_chart", Bike.unscoped.where(created_at: beginning_of_week..Time.current).group_by_day(:created_at).count.to_json)
+  end
+
+  def assign_week_logged_searches
+    logged_searches = LoggedSearch.where(request_at: beginning_of_week..Time.current)
+    not_bikebook = logged_searches.not_web_bikebook
+    assign_for("week_logged_searches", {
+      web_bikebook: logged_searches.web_bikebook.count,
+      not_web_bikebook: not_bikebook.count,
+      not_web_bikebook_serial: not_bikebook.serial.count
+    }.to_json)
   end
 
   def recoveries

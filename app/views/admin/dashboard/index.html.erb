@@ -31,11 +31,17 @@
 
   <hr>
 
+  <% logged_search_counts = Counts.week_logged_searches %>
+
   <div class="row">
     <div class="col-md-6">
       <h2 class="mt-4">
         <%= link_to "Bike Book searches", admin_logged_searches_path(search_endpoint: "web_bikebook", period: "week") %>
       </h2>
+
+      <p>
+        <%= number_display(logged_search_counts["web_bikebook"]) %> past week
+      </p>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"))) %>
     </div>
@@ -44,6 +50,12 @@
       <h2 class="mt-4">
         <%= link_to "Not Bike Book searches", admin_logged_searches_path(search_endpoint: "not_web_bikebook", period: "week") %>
       </h2>
+
+      <p>
+        <%= number_display(logged_search_counts["not_web_bikebook"]) %> past
+        week
+        <em>(<%= number_display(logged_search_counts["not_web_bikebook_serial"]) %> with serial)</em>
+      </p>
 
       <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
     </div>
