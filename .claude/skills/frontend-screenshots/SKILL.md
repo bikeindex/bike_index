@@ -23,6 +23,10 @@ Drive Playwright MCP to capture screenshots of pages served by `bin/dev`. Caller
 pass `(url-path, page-slug)` pairs, optionally with per-URL interaction steps, and
 get back local PNG paths.
 
+## Who runs this
+
+From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — `model: "sonnet"` (it works out how to drive each page; the pages are chosen) — briefed with the `(url-path, page-slug)` pairs and any interaction steps per page, who to sign in as (or signed out), and the base ref when the caller wants before/after. It replies with the PNG paths keyed by page, viewport and branch/base, and any capture it couldn't diagnose. It closes the shared Playwright browser when it's done, so finish with any page this session still needs first.
+
 ## Output filenames (load-bearing — callers parse these)
 
 `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-base-` segment.

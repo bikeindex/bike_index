@@ -10,10 +10,12 @@ en:
           any_activity: Any activity
           any_configuration: Any configuration
           any_manufacturer: Any manufacturer
+          any_market: Any market
           any_suspension: Any suspension
           any_vehicle_type: Any vehicle type
           applied_filters: Applied filters
           byline: A free reference from Bike Index, the non-profit bike registry.
+          clear_filters: Clear filters
           configuration: Configuration
           configuration_examples: "(complete/frameset)"
           e_bike_classification: e-bike classification
@@ -23,6 +25,7 @@ en:
           jurisdiction: Jurisdiction
           loading: Loading the catalog…
           manufacturers: Manufacturers
+          market: Market
           max: Max
           min: Min
           more_filters: More filters

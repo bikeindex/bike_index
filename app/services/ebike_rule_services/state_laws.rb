@@ -38,6 +38,8 @@ module EbikeRuleServices
     # nil for a state that uses the three US classes
     def classes(abbreviation) = own_classes[abbreviation]
 
+    def three_classes?(law) = law[:classes] == [1, 2, 3]
+
     # The helmet, age and path rules in force for a Class 3 under the state's e-bike law
     def class_3_rules(abbreviation, today: Time.zone.today)
       find(abbreviation, today:)&.dig(:restrictions).to_a
@@ -94,7 +96,7 @@ module EbikeRuleServices
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
           law = laws[abbreviation]
-          next if law.nil? || law[:classes] == [1, 2, 3]
+          next if law.nil? || three_classes?(law)
 
           [abbreviation, state_classes(entries, law[:id])]
         }.to_h,

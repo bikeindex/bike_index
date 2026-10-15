@@ -246,9 +246,6 @@ nb:
           address_required: "(eller plassering) av denne forlatte sykkelen kreves"
         payment:
           requires_email_or_org: Krever en e-postadresse eller organisasjon
-        recovery_display:
-          quote_too_long: Det sitatet er for langt. Vennligst forkort den til å være
-            mindre enn 300 tegn
         theft_alert:
           must_be_later_than_start_time: må være senere enn starttidspunktet
           must_be_present: må være tilstede
@@ -6653,6 +6650,9 @@ nb:
           jurisdiction: Jurisdiksjon
           out_of_class_label: Utenfor klasserommet
           united_states: USA
+          any_market: Ethvert marked
+          market: Marked
+          clear_filters: Fjern filtre
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
@@ -6903,6 +6903,10 @@ nb:
           all_on_file: Alle 50 stater og DC registrert
           check_in_state: Sjekk en elsykkel i %{state}
           no_match: Ingen samsvarende stater. Prøv et annet navn.
+          not_three_classes: Ikke 3 klasser
+          only_classes:
+            one: Kun klasse %{classes}
+            other: Kun klasser %{classes}
         ul_badge:
           certified: UL %{standard}-sertifisert
           meaning_2271_certified: Batteripakken har bestått UL-sikkerhetstester for

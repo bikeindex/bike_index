@@ -186,7 +186,19 @@ def pghero_verdict(data)
   <<~OUT.chomp
     summary: connections=#{data["total_connections"]}/#{max_conn} db=#{data["database_size"]} running=#{array_length(data["running_queries"])} index_hit=#{data["index_hit_rate"].to_s[0, 5]} table_hit(info)=#{data["table_hit_rate"].to_s[0, 5]} unused_indexes=#{array_length(data["unused_indexes"])}
     #{verdict_line(reasons)}
+    #{slow_query_lines(data)}
   OUT
+end
+
+# PgHero's dashboard "Slow queries": average_time >= 20ms over >= 100 calls
+def slow_query_lines(data)
+  slow = data["slow_queries"]
+  return "slow_queries: not returned (query stats disabled, or endpoint not yet deployed)" unless slow.is_a?(Array)
+
+  rows = slow.sort_by { -it["total_minutes"].to_f }.first(10).map do |query|
+    format("  %8.1f min  %7d ms avg  %9d calls  %s", query["total_minutes"].to_f, query["average_time"].to_f.round, query["calls"].to_i, query["query"].to_s.gsub(/\s+/, " ")[0, 160])
+  end
+  ["slow_queries: #{slow.length}, stats since #{data["last_stats_reset_time"] || "unknown"}", *rows].join("\n")
 end
 
 def verdict_line(reasons)

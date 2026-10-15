@@ -249,9 +249,6 @@ it:
           address_required: "(o posizione) di questa bicicletta abbandonata richiesta"
         payment:
           requires_email_or_org: Richiede un indirizzo e-mail o un'organizzazione
-        recovery_display:
-          quote_too_long: Quella citazione è troppo lunga. La preghiamo di accorciarla
-            in modo che sia inferiore a 300 caratteri
         theft_alert:
           must_be_later_than_start_time: deve essere successivo all'orario di inizio
           must_be_present: deve essere presente
@@ -6960,6 +6957,9 @@ it:
           jurisdiction: Giurisdizione
           out_of_class_label: Fuori dalla classe
           united_states: Stati Uniti
+          any_market: Qualsiasi mercato
+          market: Mercato
+          clear_filters: Filtri trasparenti
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
@@ -7230,6 +7230,10 @@ it:
           all_on_file: Tutti i 50 stati e il Distretto di Columbia sono archiviati.
           check_in_state: Controlla una e-bike in %{state}
           no_match: Nessuno stato corrisponde. Prova con un altro nome.
+          not_three_classes: Non 3 classi
+          only_classes:
+            one: Solo la classe %{classes}
+            other: Solo classi %{classes}
         ul_badge:
           certified: Certificato UL %{standard}
           meaning_2271_certified: Il pacco batterie ha superato i test di sicurezza

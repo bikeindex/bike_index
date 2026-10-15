@@ -20,8 +20,6 @@ const fetchJson = async (url) => {
 }
 
 const list = (value) => (value ?? '').split(',').filter(Boolean)
-// a classification's option and chip, beside the vehicles'
-const classificationDisplay = ({ title }) => `e-Vehicle Classification: ${title}`
 const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
 
@@ -59,7 +57,7 @@ async function load ({ manifestUrl, ids, jurisdictions }) {
 }
 
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
-function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, ...filterOptions } }) {
+function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, market, ...filterOptions } }) {
   const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
   const perManufacturer = models.reduce((counts, { manufacturer }) => counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1), new Map())
   return {
@@ -67,14 +65,19 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
+    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b))),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
   }
 }
 
+const withYearRecords = (vehicle) => vehicle.years
+  ? { ...vehicle, years: Object.entries(vehicle.years).map(([year, record]) => ({ year: Number(year), ...record })).sort((a, b) => b.year - a.year) }
+  : vehicle
+
 // A failed fetch is forgotten, so the next ask tries again
 const block = (key) => {
   if (!blocks.has(key)) {
-    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => models, (error) => {
+    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(models).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
       blocks.delete(key)
       throw error
     }))
@@ -82,10 +85,8 @@ const block = (key) => {
   return blocks.get(key)
 }
 
-// An e-vehicle classification's data is its vocabulary record
 async function vehicles ({ ids }) {
   const found = await Promise.all(ids.map(async (value) => {
-    if (classifications[value]) return { value, display: classificationDisplay(classifications[value]), data: classifications[value], classification: true }
     const key = blockKey(value)
     return { value, display: byId.get(value)?.display, data: manifest.blocks[key] && (await block(key))[value] }
   }))
@@ -93,7 +94,7 @@ async function vehicles ({ ids }) {
 }
 
 function displays ({ ids }) {
-  return ids.map((id) => byId.get(id)?.display ?? (classifications[id] ? classificationDisplay(classifications[id]) : null))
+  return ids.map((id) => byId.get(id)?.display ?? null)
 }
 
 function search ({ params, page, perPage }) {
@@ -113,11 +114,6 @@ function matching (params) {
   const filtered = sorted(params).filter(filter(params))
   const needle = (params.q ?? '').trim().toLowerCase()
   const selected = new Set(list(params.vehicle_models))
-  // a classification is found by its id alone, which every filter passes
-  if (needle.startsWith('evc/')) {
-    const matches = Object.entries(classifications).filter(([id]) => id.startsWith(needle) && !selected.has(id)).map(([id, record]) => ({ id, display: classificationDisplay(record), classification: true }))
-    return { filteredCount: filtered.length, matches }
-  }
   const exact = needle.startsWith('m/') && filtered.find(({ id }) => id === needle)
   const words = needle.split(/\s+/).filter(Boolean)
   const found = (exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))))
@@ -155,6 +151,7 @@ function filter (params) {
     (!params.suspension || (params.suspension === 'has' ? model.suspension !== 'rigid' : model.suspension === params.suspension)) &&
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
+    (!params.market || model.markets.includes(params.market)) &&
     (yearMin == null || model.sortYear >= yearMin) &&
     (yearMax == null || (model.first_year ?? 0) <= yearMax) &&
     ((priceMin == null && priceMax == null) || (model.msrp_cents > 0 &&

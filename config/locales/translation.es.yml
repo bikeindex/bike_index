@@ -252,9 +252,6 @@ es:
         payment:
           requires_email_or_org: Requiere una dirección de correo electrónico o una
             organización.
-        recovery_display:
-          quote_too_long: Esa cita es demasiado larga. Por favor, acórtala para que
-            tenga menos de 300 caracteres.
         theft_alert:
           must_be_later_than_start_time: debe ser posterior a la hora de inicio
           must_be_present: debe estar presente
@@ -6941,6 +6938,9 @@ es:
           jurisdiction: Jurisdicción
           out_of_class_label: Fuera de clase
           united_states: Estados Unidos
+          any_market: Cualquier mercado
+          market: Mercado
+          clear_filters: Filtros transparentes
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin
@@ -7212,6 +7212,10 @@ es:
           all_on_file: Todos los 50 estados y el Distrito de Columbia están archivados.
           check_in_state: Consulta una bicicleta eléctrica en %{state}
           no_match: No se encontraron coincidencias de estado. Pruebe con otro nombre.
+          not_three_classes: No son 3 clases
+          only_classes:
+            one: Solo la clase %{classes}
+            other: Clases %{classes} solamente
         ul_badge:
           certified: Certificado UL %{standard}
           meaning_2271_certified: La batería superó las pruebas de seguridad UL contra

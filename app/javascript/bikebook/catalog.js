@@ -1,7 +1,7 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
-import { classificationOption, comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
-import { fragmentOf } from 'bikebook/render'
+import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
+import { fragmentOf, renderInto } from 'bikebook/render'
 
 /* global IntersectionObserver, Worker */
 
@@ -74,9 +74,7 @@ export class CatalogComboboxSource {
 
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
-    const options = models.map((model) => model.classification
-      ? classificationOption(model)
-      : comboboxOption({ model, placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies }))
+    const options = models.map((model) => comboboxOption({ model, placeholderUrl: this.catalog.kit.placeholder_url, currencies: this.catalog.vocabulary.currencies }))
     const pagination = html`<li id=${`${forId}__hw_combobox_pagination__wrapper`} class="hw_combobox__pagination__wrapper"
       data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} data-callback-id=${callbackId ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
@@ -123,5 +121,7 @@ const group = (label, options) => {
   return html`<ul class="hw-combobox__group" role="group" aria-labelledby=${id}><li id=${id} class="hw-combobox__group__label"
     role="presentation">${label}</li>${options}</ul>`
 }
+
+export const renderCounts = (root, count) => renderInto(root.getElementById('vehicle-models-count'), matching(count))
 
 export const matching = (count) => html`(${numberDisplay(count)} matching ${count === 1 ? 'model' : 'models'})`
