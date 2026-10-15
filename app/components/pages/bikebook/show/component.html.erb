@@ -119,7 +119,7 @@
               </div>
 
               <div class="tw:flex tw:flex-wrap tw:gap-4 tw:xl:flex-1 tw:xl:gap-3">
-                <% [["year", translation(".year"), 1900, "tw:sm:w-20", nil, {min: 1990, max: Time.current.year + 1}],
+                <% [["year", translation(".year"), 1900, "tw:sm:w-20", nil, {max: Time.current.year + 1}],
               ["price", translation(".price"), 0, "tw:sm:w-26", "$", {}]].each do |name, legend, min_attr, width, prefix, placeholders| %>
                   <fieldset
                     class="
