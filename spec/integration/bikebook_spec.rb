@@ -509,8 +509,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 6, wait: 10)
     width = ->(selector) { page.evaluate_script("document.querySelector(#{selector.to_json}).getBoundingClientRect().width") }
     expect(width.call("[aria-label='Overview comparison'] table")).to be > width.call("[data-bikebook--catalog-filters-target='vehicleCombobox']") + 100
-    # the catalog's out-of-class model under the e-moto's tile, a tooltip of its card
-    find("[aria-label='Overview comparison'] button[aria-label='E-moto, not an e-bike']").click
+    # the e-motos as /ebike-rules has them, one classified a motor vehicle and one too fast for a class, each under
+    # the e-moto's tile, a tooltip of its card
+    all("[aria-label='Overview comparison'] button[aria-label='E-moto, not an e-bike']", count: 2).first.click
     expect(page).to have_css("[role='tooltip'] h3", exact_text: "Not an e-bike", visible: true)
     visit bikebook_path(vehicle_models: five, view: "all")
     # the label column's header and the five vehicles'

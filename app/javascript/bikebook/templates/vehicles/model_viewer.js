@@ -13,7 +13,7 @@ import { motorSection, unknownCertification } from 'bikebook/templates/vehicles/
 import { classBadges } from 'bikebook/templates/vehicles/class_badges'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { disclosure, section } from 'bikebook/templates/vehicles/section'
-import { andSentence, array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
+import { andSentence, array, blank, compact, equal, except, isNumber, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
 
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
@@ -38,6 +38,9 @@ export const typeLabel = (each) => [each.type, each.type_detail].filter(present)
 export const modelViewer = (args) => new ModelViewer(args).render()
 
 const WIDE_TIRE = 50
+const US_CLASS = /^evc\/us\/class_(\d)$/
+// UnitSystem::KILOMETERS_PER_MILE
+const KILOMETERS_PER_MILE = 1.609344
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
 const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
 const brakeType = (brake) => brake?.type?.replace(/^Disc (\w+)$/, '$1 disc')
@@ -73,8 +76,8 @@ export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data
 
 export const wheelSize = (presenter, bsd) => new ModelViewer({ presenter, data: {}, others: [] }).wheelSizeName(bsd)
 
-// A vehicle's names, photo and the fields the Overview lists, an e-moto's tile among them when it's `outOfClass`
-export const basicsOf = ({ presenter, data, outOfClass }) => new ModelViewer({ presenter, data, others: [], outOfClass }).basics()
+// A vehicle's names, photo and the fields the Overview lists
+export const basicsOf = ({ presenter, data }) => new ModelViewer({ presenter, data, others: [] }).basics()
 
 // A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`', the rest
 // linked to `sizePath(name)`
@@ -101,13 +104,13 @@ const sideBySide = (columns) => html`<div class="tw:@container"><div class="tw:f
 export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
 
 class ModelViewer {
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClass }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClass })
+    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath })
   }
 
   render () {
@@ -336,9 +339,19 @@ class ModelViewer {
   // its classes' names, and under them its US classes' tiles and an e-moto's
   eVehicleClass () {
     const names = presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
-    const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(({ ids }) => ids).map((id) => id.match(/^evc\/us\/class_(\d)$/)?.[1]).filter(Boolean))].sort()
-    const tiles = this.outOfClass ? [...numbers, 'emoto'] : numbers
+    const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(({ ids }) => ids).map((id) => id.match(US_CLASS)?.[1]).filter(Boolean))].sort()
+    const tiles = this.#emoto() ? [...numbers, 'emoto'] : numbers
     return tiles.length ? html`${names ?? nothing}${classBadges(tiles)}` : names
+  }
+
+  // As /ebike-rules has it (EbikeRuleServices::BikebookVehicles): a classification other than an e-bike law's or a US
+  // class, or with neither, a mode over 28 mph
+  #emoto () {
+    const classifications = this.presenter.vocabulary.e_vehicle_classifications
+    const tiers = this.vehicle.classifiedModes.flatMap(({ ids }) => ids).filter((id) => !classifications[id]?.e_bike_law)
+    if (tiers.length) return tiers.some((id) => !US_CLASS.test(id))
+    const speeds = array(this.data.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode.max_speed).filter(isNumber)
+    return speeds.length > 0 && Math.round(Math.max(...speeds) / KILOMETERS_PER_MILE) > 28
   }
 
   #sortedClassifications (vehicle) {

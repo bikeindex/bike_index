@@ -51,6 +51,9 @@ module EbikeRuleServices
       current(parsed[:motorcycles][abbreviation].to_a, today).select { it[:starts_on].nil? && it[:rule].match?(/licen|regist|insur/i) }
     end
 
+    # The classifications that are an e-bike law or class anywhere, as the EU's EPAC is, rather than a motor vehicle's
+    def e_bike_law_ids = parsed[:e_bike_laws]
+
     # nil for anything but an abbreviation, such as a query's array
     def state(abbreviation)
       STATES.find { it[:abbr] == abbreviation.upcase } if abbreviation.is_a?(String)
@@ -78,10 +81,10 @@ module EbikeRuleServices
     # The vocabulary's file name carries its digest, so a republished one is a new key
     def parsed
       path = Integrations::Bikebook::Catalog.manifest&.dig("vocabulary")
-      records = path && Rails.cache.fetch(["bikebook_catalog/state_laws_with_citations", path], expires_in: 1.week, skip_nil: true) do
+      records = path && Rails.cache.fetch(["bikebook_catalog/state_laws_with_e_bike_laws", path], expires_in: 1.week, skip_nil: true) do
         Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { parse(it) }
       end
-      records || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}}
+      records || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
     end
 
     def parse(records)
@@ -94,6 +97,7 @@ module EbikeRuleServices
         laws:,
         tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| [record["name"], [id, *record["groups"]]] } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
+        e_bike_laws: records.filter_map { |id, record| id if record["e_bike_law"] },
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
           law = laws[abbreviation]
           next if law.nil? || three_classes?(law)
