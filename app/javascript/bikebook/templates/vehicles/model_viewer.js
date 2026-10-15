@@ -77,8 +77,8 @@ export const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap
 // cargo_bike, cargo_tricycle and their _rear kinds
 export const isCargo = (data) => /^cargo_/.test(data.type ?? '')
 
-// A vehicle's total payload in `size`, or across its sizes, and its cargo area
-export const cargoAt = (presenter, data, size) => new ModelViewer({ presenter, data, others: [] }).cargo(size)
+// A vehicle's max weight and its cargo area
+export const cargoOf = (presenter, data) => new ModelViewer({ presenter, data, others: [] }).cargo()
 
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
 
@@ -346,14 +346,13 @@ class ModelViewer {
     return join([join(standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optionals])
   }
 
-  // "200 kg total payload, 60 cm long, 40 cm wide, 200 L"
-  cargo (size) {
+  // "Max weight 200 kg ?, 60 cm long, 40 cm wide, 200 L"
+  cargo () {
     const { presenter } = this
-    const payloads = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
-    const ends = [...new Set([Math.min(...payloads), Math.max(...payloads)])]
     const { length, width, volume } = this.data.cargo ?? {}
+    const maxWeight = this.data.frame?.max_weight_total
     return presence(join([
-      payloads.length ? join([join(ends.map((kg) => presenter.measurement(kg, 'kg')), '–'), ' total payload']) : null,
+      isNumber(maxWeight) ? html`Max weight ${presenter.measurement(maxWeight, 'kg')} ${tooltip({ text: 'Max weight is cargo and rider' })}` : null,
       length ?? width ? presenter.dimensions({ length, width }) : null,
       isNumber(volume) ? presenter.measurement(volume, 'l') : null
     ].filter(present), ', '))
