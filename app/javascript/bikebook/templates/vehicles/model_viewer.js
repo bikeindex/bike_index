@@ -357,14 +357,19 @@ class ModelViewer {
     ].filter(present), ', '))
   }
 
-  // Without a max weight, the payload in `size`, or its sizes' range
+  // The max weight, with a separate rider limit in its tooltip, or without one, the total payload: in `size`, or its
+  // sizes' range
   #cargoWeight (size) {
     const { presenter } = this
     const maxWeight = this.data.frame?.max_weight_total
-    if (isNumber(maxWeight)) return html`Max weight ${presenter.measurement(maxWeight, 'kg')} ${tooltip({ text: 'Max weight is cargo and rider' })}`
-    const payloads = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
-    if (payloads.length === 0) return null
-    return join([join([...new Set([Math.min(...payloads), Math.max(...payloads)])].map((kg) => presenter.measurement(kg, 'kg')), '–'), ' total payload'])
+    const riders = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
+    const range = () => join([...new Set([Math.min(...riders), Math.max(...riders)])].map((kg) => presenter.measurement(kg, 'kg')), '–')
+    if (isNumber(maxWeight)) {
+      const text = 'Max weight is cargo and rider'
+      const body = riders.some((kg) => kg !== maxWeight) ? html`${text}<span class="tw:block">Max rider weight ${range()}</span>` : text
+      return html`Max weight ${presenter.measurement(maxWeight, 'kg')} ${tooltip({ text, body })}`
+    }
+    return riders.length ? join([range(), ' total payload']) : null
   }
 
   // its classes' names, and under them its US classes' tiles and an e-moto's
