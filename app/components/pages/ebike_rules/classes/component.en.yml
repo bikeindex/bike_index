@@ -8,22 +8,7 @@ en:
           classes_intro: >-
             Most states use a three-class system. Your class decides how fast the
             motor helps, whether a throttle is allowed, and where you can ride.
-          emoto_limits_body: >-
-            Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
-            make it an e-moto. Most states treat these as mopeds or motorcycles, which
-            can require registration, insurance and a license.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          emoto_summary: >-
-            Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
-            make it an e-moto.
-          mph: "%{mph} mph"
-          not_an_ebike: Not an e-bike
-          pedal: Pedal
           state_classes_heading: "%{state} e-bike classes"
           state_classes_intro: >-
             %{state} doesn’t use the three-class system most states do. Its law sorts
             e-bikes and other electric two-wheelers into these classes instead.
-          throttle: Throttle
-          watts_max: "≤%{watts}W"
-          watts_min: "%{watts}W+"

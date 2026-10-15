@@ -1,6 +1,6 @@
 <% content = capture do %>
   <div class="tw:flex tw:items-center tw:gap-3.5">
-    <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: card[:n])) unless card[:state] %>
+    <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class: card[:n])) unless classification %>
 
     <div>
       <h3 class="tw:font-header tw:text-xl tw:font-extrabold">
@@ -40,7 +40,7 @@
       "
       data-controller="ui--collapse"
     >
-      <%= render(UI::Collapse::Component.new(text: translation(".state_specifics", state: @state_name), chevron: :trailing, color: :link)) %>
+      <%= render(UI::Collapse::Component.new(text: translation(".state_specifics", state: @state&.dig(:name)), chevron: :trailing, color: :link)) %>
 
       <ul
         class="tw:mt-2 tw:hidden tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm"
@@ -57,15 +57,19 @@
   <% end %>
 <% end %>
 
-<% if @framed %>
-  <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) { content } %>
-<% else %>
-  <div
-    class="
-      tw:flex tw:w-72 tw:flex-col tw:gap-4 tw:p-2 tw:text-gray-900
-      tw:dark:text-gray-100
-    "
-  >
-    <%= content %>
-  </div>
+<% card_html = capture do %>
+  <% if @framed %>
+    <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:flex tw:flex-col tw:gap-4 tw:rounded-lg tw:p-6!")) { content } %>
+  <% else %>
+    <div
+      class="
+        tw:flex tw:w-72 tw:flex-col tw:gap-4 tw:p-2 tw:text-gray-900
+        tw:dark:text-gray-100
+      "
+    >
+      <%= content %>
+    </div>
+  <% end %>
 <% end %>
+
+<%= @frame_id ? helpers.turbo_frame_tag(@frame_id) { card_html } : card_html %>

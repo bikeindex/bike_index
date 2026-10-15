@@ -1,11 +1,11 @@
 import { html, nothing } from 'lit-html'
 import { uuid } from 'bikebook/templates/helpers'
 
-// The US classes' tiles in a row, each a tooltip of its class's card, from the ones the page renders once as templates.
-// Each copy gets its own tooltip id, as two models can share a class
-export const classBadges = (numbers) => {
-  const badges = numbers.flatMap((number) => {
-    const template = document.querySelector(`template[data-bikebook-class-badge="${number}"]`)
+// The US classes' tiles by number, and 'emoto' the e-moto's, in a row, each a tooltip of its card, from the ones the
+// page renders once as templates. Each copy gets its own tooltip id, as two models can share a class
+export const classBadges = (classes) => {
+  const badges = classes.flatMap((each) => {
+    const template = document.querySelector(`template[data-bikebook-class-badge="${each}"]`)
     if (!template) return []
 
     const badge = template.content.cloneNode(true)
