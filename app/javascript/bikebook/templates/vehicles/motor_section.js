@@ -10,7 +10,6 @@ const market = (presenter, id) => {
   return code && presenter.vocabulary.names?.markets?.[code] ? code : null
 }
 
-// A motor whose certification isn't listed
 export const unknownCertification = html`<span class="tw:text-yellow-800 tw:dark:text-yellow-400">Unknown</span>`
 
 // A motor's specs, with a subsection per operating mode, whose assist speeds are its market's: in mph for a `us` model

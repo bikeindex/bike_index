@@ -6,8 +6,7 @@ import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer
 import { CERTIFICATION_LABEL } from 'bikebook/templates/vehicles/motor_section'
 import { present } from 'bikebook/templates/values'
 
-// `electric` ones only once an e-vehicle is shown, `suspended` once a suspended one is, and `differing` ones only where
-// the models' values of it differ
+// `only` ones once a shown model is electric or suspended, `differing` ones where the models' values of it differ
 const FIELDS = [
   { label: 'Model group', key: 'model_group' },
   { label: 'Years', key: 'years' },
@@ -15,11 +14,11 @@ const FIELDS = [
   { label: 'Primary activity', key: 'primary_activity' },
   { label: 'Frame material', key: 'frame_material' },
   { label: 'Wheel size', key: 'wheel_size', differing: 'wheel_bsds' },
-  { label: 'Suspension front/rear', key: 'suspension', suspended: true },
+  { label: 'Suspension front/rear', key: 'suspension', only: 'suspended' },
   { label: 'Groupset', key: 'groupset' },
   { label: 'Price', key: 'price' },
-  { label: 'E-vehicle class', key: 'e_vehicle_class', electric: true },
-  { label: CERTIFICATION_LABEL, key: 'certification', electric: true },
+  { label: 'E-vehicle class', key: 'e_vehicle_class', only: 'electric' },
+  { label: CERTIFICATION_LABEL, key: 'certification', only: 'electric' },
   { label: 'Description', key: 'description' }
 ]
 // the label column's 12.5rem and 12rem per model, so a phone scrolls the table rather than squeezing it
@@ -59,7 +58,7 @@ export const basics = ({ presenter, vehicles }) => {
       description: fields.description && readMore(data.description, fields.description)
     }
   })
-  const fields = FIELDS.filter((field) => (!field.electric || shown.some(({ electric }) => electric)) && (!field.suspended || shown.some(({ suspended }) => suspended)) &&
+  const fields = FIELDS.filter((field) => (!field.only || shown.some((each) => each[field.only])) &&
     (!field.differing || new Set(shown.map((each) => each[field.differing])).size > 1))
   return shown.length === 1 ? single(shown[0], fields) : compared(shown, fields)
 }
@@ -84,9 +83,9 @@ const compared = (vehicles, fields) => html`<section aria-label="Overview compar
       label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${manufacturerLine(vehicle.manufacturer)}${vehicle.model}`,
       classes: 'tw:px-2.5! tw:py-2! tw:align-top',
       cellClass: ({ key }) => key === 'description' ? 'tw:text-sm' : '',
-      cell: ({ key, electric }) => {
+      cell: ({ key, only }) => {
         if (present(vehicle[key])) return vehicle[key]
-        if (!electric || vehicle.electric) return missing
+        if (only !== 'electric' || vehicle.electric) return missing
         return key === 'e_vehicle_class' ? html`<span class="twless-strong tw:italic">not e-vehicle</span>` : nothing
       }
     }))

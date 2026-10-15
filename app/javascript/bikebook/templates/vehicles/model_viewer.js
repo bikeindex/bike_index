@@ -659,7 +659,6 @@ class ModelViewer {
     return drivetrain ? this.withTooltip(groupset ?? missing, drivetrain) : groupset
   }
 
-  // its gearing's rows and the frame's drivetrain ones
   gearingRows () {
     const fields = slice(this.kit.schemas.vehicle.frame.fields, this.kit.viewer.drivetrain_frame_fields)
     const counted = Object.fromEntries(Object.entries(this.kit.viewer.gearing_labels)

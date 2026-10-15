@@ -23,7 +23,6 @@ export class VehicleViewer {
     if (vehicles.length === 0) return emptyState({ pathname: url.pathname, filtersPath: pathWith(url, { filters: 1 }), ...search })
 
     const { presenter } = this
-    // Motor & Battery only once one of them has a motor
     const shown = Object.keys(VIEWS).filter((each) => each !== 'motors' || vehicles.some(({ data }) => present(data.motors)))
     const requested = url.searchParams.get('view')
     const view = shown.includes(requested) ? requested : 'basics'
