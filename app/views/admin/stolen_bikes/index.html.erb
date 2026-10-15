@@ -29,34 +29,6 @@
   <% end %>
 <% end %>
 
-<% admin_search_form = capture do %>
-  <% unless @only_without_location %>
-    <%= form_tag admin_stolen_bikes_path, method: :get do %>
-      <div class="mt-4 mb-4 d-flex justify-content-end">
-        <%= hidden_field_tag :search_unapproved, params[:search_unapproved] %>
-        <%= render partial: "/shared/hidden_search_fields" %>
-
-        <div class="mt-2">
-          <em class="small less-strong mr-1 d-md-inline d-none">within</em>
-          <%= number_field_tag :search_distance, @distance, class: "form-control d-inline-block", style: "width: 5rem;" %>
-
-          <em class="small less-strong ml-1 mr-1 d-md-inline d-none">
-            miles of
-          </em>
-        </div>
-
-        <div class="mt-2 ml-2">
-          <%= text_field_tag :search_location, params[:search_location], placeholder: "anywhere", class: "form-control" %>
-        </div>
-
-        <div class="mt-2 ml-2">
-          <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
-        </div>
-      </div>
-    <% end %>
-  <% end %>
-<% end %>
-
 <% table_view = capture do %>
   <%= render partial: "/admin/social_accounts/errored" %>
 
@@ -67,13 +39,7 @@
     </p>
   <% end %>
 
-  <%= form_tag approve_admin_stolen_bike_path(id: "multi_approve"), method: :post, data: {controller: "table-multi-checkbox"} do %>
-    <%= render partial: "table", locals: {render_sortable: true} %>
-
-    <div class="mb-3 text-center">
-      <%= submit_tag 'Approve selected', class: 'btn btn-outline-primary' %>
-    </div>
-  <% end %>
+  <%= render(Pages::Admin::StolenBikes::Table::Component.new(stolen_records: @stolen_records, sort_state:)) %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(
@@ -82,6 +48,5 @@
   viewing: "Stolen Bikes",
   nav_header_list_items:,
   rendered_chart:,
-  admin_search_form:,
   table_view:,
 )) %>

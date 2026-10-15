@@ -1,6 +1,6 @@
 import { html, nothing, render } from 'lit-html'
 import { copyableCode } from 'bikebook/templates/ui/copyable_code'
-import { numberDisplay } from 'bikebook/templates/helpers'
+import { missing, numberDisplay } from 'bikebook/templates/helpers'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
@@ -9,7 +9,8 @@ import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { componentGroup } from 'bikebook/templates/vehicles/component_group'
 import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
 import { modelYears } from 'bikebook/templates/vehicles/model_years'
-import { motorSection } from 'bikebook/templates/vehicles/motor_section'
+import { motorSection, unknownCertification } from 'bikebook/templates/vehicles/motor_section'
+import { classBadges } from 'bikebook/templates/vehicles/class_badges'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { disclosure, section } from 'bikebook/templates/vehicles/section'
 import { andSentence, array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
@@ -17,6 +18,20 @@ import { andSentence, array, blank, compact, equal, except, join, partsOf, prese
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
 const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
+
+const drivetrainLabels = (drivetrain) => equal(array(drivetrain).sort(), ['1 Front', '1 Rear']) ? ['Singlespeed'] : array(drivetrain)
+
+// "Air" or "Coil", and a lockout "Yes" or "No"
+const suspensionValue = (value, key) => key === 'spring' && value ? upcaseFirst(value) : key === 'lockout' && value != null ? (value ? 'Yes' : 'No') : value
+
+// "Shimano GRX RX610 1X12S · electronic", its maker unless the description starts with it
+const groupsetSummary = ({ groupset }) => {
+  if (blank(groupset)) return null
+  const { manufacturer, description, electronic } = groupset
+  const named = manufacturer && String(description ?? '').toLowerCase().startsWith(manufacturer.toLowerCase())
+  const name = compact([named ? null : manufacturer, description]).join(' ')
+  return electronic ? join([name, 'electronic'], ' · ') : name
+}
 export const typeLabel = (each) => [each.type, each.type_detail].filter(present).join(' · ')
 
 // One vehicle's card, marked where it differs from `others`
@@ -56,14 +71,43 @@ export const brakesAt = (presenter, data, size) => {
 
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
 
+export const wheelSize = (presenter, bsd) => new ModelViewer({ presenter, data: {}, others: [] }).wheelSizeName(bsd)
+
+// A vehicle's names, photo and the fields the Overview lists
+export const basicsOf = ({ presenter, data }) => new ModelViewer({ presenter, data, others: [] }).basics()
+
+// A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`', the rest
+// linked to `sizePath(name)`
+export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
+
+// A vehicle's motors, each with its battery, marked where they differ from `others`'
+// alternating between columns, so one alone keeps a column's width, as in the full card
+export const motorsOf = ({ presenter, data, others }) => {
+  const sections = new ModelViewer({ presenter, data, others }).motorSections()
+  return sideBySide([0, 1].map((column) => sections.filter((_, index) => index % 2 === column)))
+}
+
+// A vehicle's frame, wheels and brakes beside its suspension and drivetrain, marked where they differ from `others`'
+export const runningGearOf = ({ presenter, data, others }) => {
+  const viewer = new ModelViewer({ presenter, data, others })
+  return sideBySide([[viewer.frame(), viewer.wheels(), viewer.positioned('Brakes', 'brakes', 'Brake', (brake) => viewer.brakeSummary(brake))], [viewer.suspension(), viewer.drivetrain()]])
+}
+
+// Side by side once their container is wide enough, else one after the other
+const sideBySide = (columns) => html`<div class="tw:@container"><div class="tw:flex tw:flex-col tw:@min-[600px]:flex-row tw:@min-[600px]:gap-6">${columns.map((column) =>
+  html`<div class="tw:contents tw:@min-[600px]:block tw:@min-[600px]:min-w-0 tw:@min-[600px]:flex-1">${column}</div>`)}</div></div>`
+
+// A vehicle's components by group, marked where they differ from `others`'
+export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
+
 class ModelViewer {
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, classificationPath, selectedSize }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, classificationPath, selectedSize })
+    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath })
   }
 
   render () {
@@ -80,33 +124,34 @@ class ModelViewer {
         attributes: { 'aria-controls': jsonPanelId, 'aria-label': 'Toggle JSON' },
         content: html`<code>{ }</code>`
       })}</div></header>`
-    const columns = this.specColumns(this.#photo(vehicle.stock_photo, titleText), [
+    const columns = this.specColumns(this.photo(vehicle.stock_photo, titleText), [
       this.identity(),
       modelYears({ presenter, years: vehicle.years, others: this.others.map((other) => other.years) }),
       this.suspension(),
-      section({ heading: 'Frame', content: presenter.measurementRows(this.specRows('frame')) })
+      this.frame()
     ], this.motorSections(), [
       section({ heading: 'Cargo', content: presenter.measurementRows(this.specRows('cargo')) }),
       this.wheels(),
       this.positioned('Brakes', 'brakes', 'Brake', (brake) => this.brakeSummary(brake)),
       this.drivetrain()
     ])
-    const specs = html`<div class="tw:@container"><div class="tw:flex tw:flex-col tw:@min-[600px]:flex-row tw:@min-[600px]:gap-6">${columns.map((column) =>
-      html`<div class="tw:contents tw:@min-[600px]:block tw:@min-[600px]:min-w-0 tw:@min-[600px]:flex-1">${column}</div>`)}</div></div>`
+    const specs = sideBySide(columns)
     return html`<div class=${comparing ? `${base} tw:md:min-w-[22rem] tw:md:has-[[aria-controls^=vehicle-model-json][aria-expanded=true]]:min-w-[64rem] tw:md:flex-1 tw:md:max-w-max` : base}
       data-controller="ui--collapse ui--alert" data-ui--collapse-param-value="json"
       data-ui--collapse-direction-value="horizontal"><article class="twgutter tw:w-full tw:min-w-0 tw:space-y-6
       tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)]
-      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizes()}${this.components()}</article><aside
+      ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${header}${specs}${this.description()}${this.sizesDisclosure()}${present(this.vehicle.components)
+      ? html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${this.components()}</section>`
+      : nothing}</article><aside
       id=${jsonPanelId} class="twjson-panel tw:hidden tw:w-full tw:min-w-0 tw:lg:relative tw:lg:w-[28rem] tw:lg:shrink-0" data-ui--collapse-target="content">${
         jsonDisplay({ data: this.data, small: true, noMaxHeight: true })}</aside></div>`
   }
 
-  #photo (photo, titleText) {
+  photo (photo, titleText, frame = 'tw:mb-6 tw:aspect-[3/2]') {
     return html`<div class="tw:group tw:order-first" data-controller=${present(photo) ? 'bikebook--image-fallback' : nothing} data-broken=${present(photo) ? nothing : ''}>${present(photo)
-      ? html`<a target="_blank" rel="noopener" class="tw:mb-6 tw:block tw:aspect-[3/2] tw:rounded-md tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:p-2 tw:group-data-broken:hidden"
+      ? html`<a target="_blank" rel="noopener" class="${frame} tw:block tw:overflow-hidden tw:rounded-md tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:p-2 tw:group-data-broken:hidden"
         href=${photo}><img alt=${titleText} loading="lazy" class="tw:size-full tw:rounded-sm tw:object-contain" data-action="error->bikebook--image-fallback#fail" src=${photo}></a>`
-      : nothing}<div class="tw:mb-6 tw:hidden tw:aspect-[3/2] tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md
+      : nothing}<div class="${frame} tw:hidden tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md
       tw:border tw:border-dashed tw:border-gray-200 tw:dark:border-gray-700 tw:text-gray-400 tw:group-data-broken:flex tw:dark:text-gray-500"><img
       alt="" class="tw:h-16 tw:w-16" src=${this.kit.placeholder_url}><span class="tw:text-sm">No photo</span></div></div>`
   }
@@ -247,26 +292,61 @@ class ModelViewer {
     })
   }
 
+  basics () {
+    const { vehicle } = this
+    const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
+    const description = present(vehicle.description) ? html`<div class="tw:space-y-2">${simpleFormat(vehicle.description)}</div>` : null
+    return {
+      manufacturer: vehicle.manufacturer,
+      model: vehicle.model,
+      photo: (frame) => this.photo(vehicle.stock_photo, title, frame),
+      electric: present(vehicle.motors),
+      model_group: vehicle.vehicle_model_group,
+      years: this.yearRange(),
+      vehicle_type: presence(typeLabel(vehicle)),
+      type: vehicle.type,
+      e_vehicle_class: this.eVehicleClass(),
+      primary_activity: this.withoutParenthetical(vehicle.primary_activity),
+      frame_material: vehicle.frame?.material,
+      ...this.wheelSizes(),
+      suspended: present(vehicle.suspension),
+      suspension: this.suspensionTravels(),
+      groupset: this.groupsetWithDrivetrain(),
+      certification: presence([...new Set(array(vehicle.motors).map((motor) => motor.certification).filter(present))].join(', ')) ??
+        (present(vehicle.motors) ? unknownCertification : null),
+      description
+    }
+  }
+
   // Each classification any operating mode has, compared by name: a tooltip's random id never equals another's.
   // One only an optional mode has goes on its own line, after the mode
   classifications () {
-    const sorted = (vehicle) => {
-      const names = (mode) => mode.ids.map((id) => this.presenter.classificationName(id))
-      const stock = (mode) => (mode.availability ?? 'stock') === 'stock'
-      const standard = [...new Set(vehicle.classifiedModes.filter(stock).flatMap(names))].sort()
-      const optional = [...new Map(vehicle.classifiedModes.filter((mode) => !stock(mode))
-        .flatMap((mode) => names(mode).filter((name) => !standard.includes(name)).map((name) => [name, mode.mode])))]
-      return { standard, optional }
-    }
-    const mine = sorted(this.vehicle)
-    const differs = this.others.some((other) => !equal(sorted(other), mine))
-    const tooltips = this.presenter.classificationTooltips(this.classificationPath)
-    const optional = mine.optional.map(([name, mode]) => html`<span class="tw:block"><span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">w/ optional
+    const mine = this.#sortedClassifications(this.vehicle)
+    const differs = this.others.some((other) => !equal(this.#sortedClassifications(other), mine))
+    return definitionListRow({ label: 'E-vehicle class', value: this.presenter.highlighted(this.classificationNames(mine), differs) })
+  }
+
+  classificationNames ({ standard, optional }) {
+    const tooltips = this.presenter.classificationTooltips()
+    const optionals = optional.map(([name, mode]) => html`<span class="tw:block"><span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">w/ optional
       ${this.presenter.humanize(mode).toLowerCase()}</span> ${this.tooltipped(name, tooltips)}</span>`)
-    return definitionListRow({
-      label: 'E-vehicle class',
-      value: this.presenter.highlighted(join([join(mine.standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optional]), differs)
-    })
+    return join([join(standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optionals])
+  }
+
+  // its classes' names, and under them its US classes' tiles
+  eVehicleClass () {
+    const names = presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
+    const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(({ ids }) => ids).map((id) => id.match(/^evc\/us\/class_(\d)$/)?.[1]).filter(Boolean))].sort()
+    return names && numbers.length ? html`${names}${classBadges(numbers)}` : names
+  }
+
+  #sortedClassifications (vehicle) {
+    const names = (mode) => mode.ids.map((id) => this.presenter.classificationName(id))
+    const stock = (mode) => (mode.availability ?? 'stock') === 'stock'
+    const standard = [...new Set(vehicle.classifiedModes.filter(stock).flatMap(names))].sort()
+    const optional = [...new Map(vehicle.classifiedModes.filter((mode) => !stock(mode))
+      .flatMap((mode) => names(mode).filter((name) => !standard.includes(name)).map((name) => [name, mode.mode])))]
+    return { standard, optional }
   }
 
   yearRange () {
@@ -294,6 +374,7 @@ class ModelViewer {
     if (key === 'headset') return this.withTooltip(this.shisCode(value, 'tw:text-sm'), this.headsetTooltip(value))
     if (key === 'bottom_bracket') return this.bottomBracket(value)
     if (key === 'cable_routing') return this.tooltipped(value, this.kit.viewer.cable_routing_tooltips)
+    if (key === 'coil_compatible') return value ? 'Yes' : 'No'
     if (key === 'front') return this.measurements(value, 'teeth', ', ')
     if (key === 'rear') return this.cogRange(value)
     return value
@@ -350,25 +431,48 @@ class ModelViewer {
     return section({ heading: 'Suspension', content: rows.length ? join(rows) : null })
   }
 
+  frame () {
+    return section({ heading: 'Frame', content: this.presenter.measurementRows(this.specRows('frame')) })
+  }
+
   suspensionSummary (suspension) {
-    const { presenter } = this
     const component = suspension.component
     const name = presence(component?.description?.split(',')[0].replace(/\s*\d+(\.\d+)?\s?mm$/i, ''))
-    const { shock_length: length, shock_stroke: stroke, shock_mount: mount } = suspension
+    const { shock_length: length, shock_stroke: stroke, shock_mount: mount, spring, lockout } = suspension
     const size = truthy(length) ? this.measurements(compact([length, stroke]), 'mm', ' × ') : null
     const lead = this.travelLead(suspension)
-    const parts = compact([lead, presence(join(compact([size, name ?? (size ? 'shock' : null)]), ' ')), truthy(length) ? null : this.millimeters(stroke, ' stroke')])
+    // an air spring is the usual one, so only coil is said
+    const parts = compact([lead, presence(join(compact([size, name ?? (size ? 'shock' : null)]), ' ')), truthy(length) ? null : this.millimeters(stroke, ' stroke'),
+      spring === 'coil' ? 'coil' : null, lockout ? 'lockout' : null])
     // an end with nothing stated is still suspended
     const summary = parts.length ? join(parts, ', ') : present(mount) ? `${upcaseFirst(mount)} shock mount` : html`<span class="twless-strong">Unknown travel</span>`
+    const rows = this.suspensionRows(suspension)
+    const shown = compact([lead ? 'travel' : null, 'shock_length', 'shock_stroke', parts.length ? null : 'shock_mount', spring === 'coil' ? 'spring' : null, lockout ? 'lockout' : null])
+    const unshown = rows.some((row) => !shown.includes(row[4]) && !equal(row[1], name))
+    return unshown ? this.withTooltip(summary, this.tooltipRows(rows)) : summary
+  }
+
+  // An end's specs and its fork's or shock's, as its tooltip lists them
+  suspensionRows (suspension) {
+    const { presenter } = this
+    const component = suspension.component
     const dimensions = except(this.kit.schemas.component_dimensions, ['travel', 'extra_measurements'])
     const componentRows = component
       ? [[component.type_detail ?? component.type, component.description], ['Manufacturer', component.manufacturer], ...presenter.rowsFor(dimensions, component.dimensions)]
           .filter((row) => present(row[1]))
       : []
-    const rows = [...presenter.rowsFor(this.kit.viewer.suspension_fields, suspension, { labels: this.kit.viewer.suspension_labels }), ...componentRows]
-    const shown = compact([lead ? 'travel' : null, 'shock_length', 'shock_stroke', parts.length ? null : 'shock_mount'])
-    const unshown = rows.some((row) => !shown.includes(row[4]) && !equal(row[1], name))
-    return unshown ? this.withTooltip(summary, this.tooltipRows(rows)) : summary
+    return [...presenter.rowsFor(this.kit.viewer.suspension_fields, suspension, { labels: this.kit.viewer.suspension_labels, display: suspensionValue }), ...componentRows]
+  }
+
+  // "160 mm / 150 mm", rigid where an end isn't suspended, with both ends' tooltips in one
+  suspensionTravels () {
+    const ends = this.vehicle.suspension
+    if (blank(ends)) return html`<span class="twless-strong">Rigid</span>`
+
+    const travels = ['front', 'rear'].map((position) => ends[position] ? this.travelLead(ends[position]) ?? 'unknown' : html`<span class="twless-strong">rigid</span>`)
+    const body = join(Object.entries(ends).map(([position, end]) => html`<span class="tw:block tw:font-bold">${this.presenter.humanize(position)} suspension</span>${
+      this.tooltipRows(this.suspensionRows(end))}`), html`<span class="tw:block tw:h-2"></span>`)
+    return this.withTooltip(join(travels, ' / '), body)
   }
 
   // travel can come from the fork or shock itself
@@ -413,7 +517,7 @@ class ModelViewer {
       const heading = wheels.length > 1
         ? `${andSentence(wheels)} Motor`
         : count === 1 ? 'Motor & Battery' : wheels.length ? `${wheels[0]} motor` : `Motor ${index + 1}`
-      return motorSection({ presenter: this.presenter, heading, motor: motor ?? {}, others: othersMotors.map((each) => each[index] ?? {}) })
+      return motorSection({ presenter: this.presenter, heading, motor: motor ?? {}, others: othersMotors.map((each) => each[index] ?? {}), us: array(this.data.markets).includes('US') })
     })
   }
 
@@ -511,6 +615,18 @@ class ModelViewer {
     return this.keepTogether(join([tireInches(presenter, tireWidth), suffix]), tooltip({ text: `${tireWidth} mm` }))
   }
 
+  // "700 C", or "700 C front, 650 B rear", and their BSDs to compare them by, as a name can carry a tooltip
+  wheelSizes () {
+    const bsds = ['front', 'rear'].map((position) =>
+      [...new Set(this.builtWheels().filter((wheel) => wheel.bsd && array(wheel.position).includes(position)).map((wheel) => wheel.bsd))])
+    const names = (each) => join(each.map((bsd) => this.wheelSizeName(bsd)), ' / ')
+    const [front, rear] = bsds
+    const wheelSize = equal(front, rear)
+      ? (front.length ? names(front) : null)
+      : join(compact([front.length ? join([names(front), ' front']) : null, rear.length ? join([names(rear), ' rear']) : null]), ', ')
+    return { wheel_size: wheelSize, wheel_bsds: JSON.stringify(bsds) }
+  }
+
   wheelSizeName (bsd) {
     const size = this.presenter.vocabulary.wheel_sizes[bsd]
     if (!size) return join([this.presenter.measurement(bsd, 'mm'), ' BSD'])
@@ -526,23 +642,46 @@ class ModelViewer {
 
   drivetrain () {
     const { presenter, vehicle } = this
-    const fields = slice(this.kit.schemas.vehicle.frame.fields, this.kit.viewer.drivetrain_frame_fields)
-    const counted = Object.fromEntries(Object.entries(this.kit.viewer.gearing_labels)
-      .map(([position, label]) => [position, array(vehicle.gearing?.[position]).length === 1 ? label : `${label}s`]))
-    const rows = [...this.specRows('gearing', this.kit.schemas.vehicle.gearing.fields, counted), ...this.specRows('frame', fields)]
     // a compared model's values give this one rows it has nothing for
-    const content = presenter.measurementRows(rows)
+    const content = presenter.measurementRows([...this.groupsetRows(), ...this.gearingRows()])
     if (blank(vehicle.drivetrain) && blank(content)) return nothing
 
-    const labelsOf = (drivetrain) => equal(array(drivetrain).sort(), ['1 Front', '1 Rear']) ? ['Singlespeed'] : array(drivetrain)
-    const othersLabels = this.others.map((other) => labelsOf(other.drivetrain))
+    const othersLabels = this.others.map((other) => drivetrainLabels(other.drivetrain))
     const differs = (label) => othersLabels.some((labels) => !labels.includes(label))
     return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Drivetrain</h2>${present(vehicle.drivetrain)
-      ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${labelsOf(vehicle.drivetrain).map((label) => html`<span class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 ${differs(label)
+      ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${drivetrainLabels(vehicle.drivetrain).map((label) => html`<span class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 ${differs(label)
         ? 'tw:spec-diff'
         : 'tw:bg-white tw:dark:bg-gray-800'} tw:px-2 tw:py-0.5 tw:font-mono
         tw:text-xs">${this.tooltipped(label, this.kit.viewer.drivetrain_tooltips)}</span>`)}</div>`
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
+  }
+
+  // the rest of its drivetrain in a tooltip, on a dash where no groupset's listed
+  groupsetWithDrivetrain () {
+    const groupset = groupsetSummary(this.vehicle)
+    const drivetrain = this.drivetrainTooltip()
+    return drivetrain ? this.withTooltip(groupset ?? missing, drivetrain) : groupset
+  }
+
+  gearingRows () {
+    const fields = slice(this.kit.schemas.vehicle.frame.fields, this.kit.viewer.drivetrain_frame_fields)
+    const counted = Object.fromEntries(Object.entries(this.kit.viewer.gearing_labels)
+      .map(([position, label]) => [position, array(this.vehicle.gearing?.[position]).length === 1 ? label : `${label}s`]))
+    return [...this.specRows('gearing', this.kit.schemas.vehicle.gearing.fields, counted), ...this.specRows('frame', fields)]
+  }
+
+  // the Drivetrain section's rows but the groupset, as a tooltip lists them
+  drivetrainTooltip () {
+    const labels = drivetrainLabels(this.vehicle.drivetrain)
+    const rows = [...(labels.length ? [['Drivetrain', labels.join(', ')]] : []), ...this.gearingRows()]
+    return rows.length ? this.tooltipRows(rows) : null
+  }
+
+  // a list, so against a model that isn't electronic, that alone is marked
+  groupsetRows () {
+    const { vehicle, others } = this
+    if ([vehicle, ...others].every(({ groupset }) => blank(groupset))) return []
+    return [['Groupset', groupsetSummary(vehicle), null, others.some((other) => !equal(other.groupset, vehicle.groupset)), 'groupset', others.map(groupsetSummary)]]
   }
 
   description () {
@@ -560,18 +699,26 @@ class ModelViewer {
     })
   }
 
+  sizesDisclosure () {
+    const sizes = this.vehicle.sizes
+    if (blank(sizes)) return nothing
+
+    return disclosure({
+      param: 'sizes',
+      label: 'sizes',
+      heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-mono tw:text-sm tw:font-normal tw:tracking-normal tw:opacity-65 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
+      content: html`<div data-ui--collapse-target="content" class="tw:-mx-(--gutter)">${this.sizes()}</div>`
+    })
+  }
+
   sizes () {
     const sizes = this.vehicle.sizes
     if (blank(sizes)) return nothing
 
     const others = this.others.map((other) => other.sizes)
-    return disclosure({
-      param: 'sizes',
-      label: 'sizes',
-      heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-mono tw:text-sm tw:font-normal tw:tracking-normal tw:opacity-65 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
-      content: html`<div data-ui--collapse-target="content" data-controller="bikebook--center-current" class="twgutter-bleed tw:flex tw:gap-4 tw:overflow-x-auto tw:pb-3.5">${
-        sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize }))}</div>`
-    })
+    // padded inside the scroller, so its cards scroll out to the edges of the card it bleeds across
+    return html`<div data-controller="bikebook--center-current" class="tw:flex tw:gap-4 tw:overflow-x-auto tw:px-(--gutter) tw:pb-3.5">${
+      sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize, href: this.sizePath?.(size.name) }))}</div>`
   }
 
   components () {
@@ -589,7 +736,7 @@ class ModelViewer {
       const sorted = [...members].sort((a, b) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)
       return [componentGroup({ presenter: this.presenter, name, components: sorted, others })]
     })
-    return html`<section class="tw:space-y-4"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Components</h2>${tables}</section>`
+    return tables
   }
 }
 
@@ -603,7 +750,7 @@ const mergedMotors = (motors) => motors.reduce((merged, motor) => {
 }, [])
 
 // simple_format
-const simpleFormat = (text) => String(text).replace(/\r\n?/g, '\n').split(/\n\n+/).map((paragraph) => {
+export const simpleFormat = (text) => String(text).replace(/\r\n?/g, '\n').split(/\n\n+/).map((paragraph) => {
   const lines = paragraph.split('\n')
   return html`<p>${lines.map((line, index) => index === 0 ? line : ['\n', lines[index - 1] && line ? html`<br>` : nothing, line])}</p>`
 })

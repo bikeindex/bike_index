@@ -63,7 +63,8 @@ class LoggedSearch < AnalyticsRecord
     web_serials_containing: 19,
     web_close_serials: 20,
     web_marketplace: 21,
-    web_marketplace_count: 22
+    web_marketplace_count: 22,
+    web_bikebook: 23
   }.freeze
 
   STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3, for_sale: 4}.freeze

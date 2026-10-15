@@ -83,7 +83,7 @@
 
           <div class="tw:flex tw:flex-none tw:gap-2">
             <% @bike.e_bike_classes.each do |e_bike_class| %>
-              <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, class_unknown: @bike.class_unknown, size: :lg)) %>
+              <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, class_unknown: @bike.class_unknown, size: :lg, explained: true)) %>
             <% end %>
           </div>
         </div>

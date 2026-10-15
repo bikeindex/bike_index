@@ -1,13 +1,13 @@
 import { html, nothing } from 'lit-html'
-import { amountDisplay } from 'bikebook/templates/helpers'
+import { amountDisplay, missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { seriesBorder } from 'bikebook/templates/vehicles/geometry_overlay'
+import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 // years come newest first
-const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
+export const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
 const currency = (vehicle) => priced(vehicle)?.original_msrp_currency ?? 'USD'
 const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(isNumber)) : null
 const motors = (key) => (vehicle) => highest(array(vehicle.motors).map((motor) => motor[key]))
@@ -67,8 +67,10 @@ const GEARING = [
   { label: 'Cogs', read: gearing('rear'), better: 1, parts: gearingParts(true) }
 ]
 
-// The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's
-export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => {
+// The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's. The
+// 'geometry' `part` is their sizes, wheels and frames, keyed to the overlay by `frames`, the 'specs' part the rest, and 'all' both.
+// `beside` the overlay, it shares a row with it once the window is wide enough
+export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part = 'specs', beside = false }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
@@ -83,7 +85,6 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
       amount: (change) => presenter.measurement(change, unit, key, { difference: true })
     }
   })
-  const missing = html`<span class="twless-strong">—</span>`
   const wheels = new Map(named.map((vehicle, index) => [vehicle, wheelsAt(presenter, vehicles[index].data, sizes[index])]))
   const length = {
     ...geometry.find(({ key }) => key === 'wheelbase'),
@@ -158,28 +159,33 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [] }) => 
         }
       }
     })
+  const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50 tw:dark:bg-blue-950' }
+  const sizeRows = sizes.some(Boolean) ? [size] : []
   const geometryRecords = records([...geometry, length, WEIGHT])
+  const specRecords = records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING])
   const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
-  const rows = [
-    ...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []),
-    ...records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING]),
-    ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])
-  ]
+  const rows = {
+    geometry: [...records(wheelRows), ...sizeRows, ...geometryRecords],
+    specs: specRecords,
+    all: [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...specRecords, ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])]
+  }[part]
+  if (rows.length === 0) return nothing
 
   // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling
   // only once it's the window's width; its own min-w-full would make it the window's width
-  return html`<section aria-label="Comparison" class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4">${table({
+  return html`<section aria-label=${{ geometry: 'Sizes & geometry comparison', specs: 'Components comparison', all: 'Comparison' }[part]} class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4 ${beside ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:w-auto tw:min-[1500px]:min-w-0 tw:min-[1500px]:flex-1 tw:min-[1500px]:px-0' : ''}">${table({
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [
-      { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cell: (record) => record.label },
+      { label: html`<span class="tw:sr-only">Spec</span>`, rowHeader: true, classes: 'tw:font-bold tw:whitespace-nowrap tw:align-top', cellClass: (record) => record.className, cell: (record) => record.label },
       ...named.map((vehicle, index) => {
-        const border = seriesBorder(frames, index)
+        const border = seriesBorders(frames, index)
         return {
           label: html`<span class="tw:block tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${vehicle.manufacturer}</span>${vehicle.model}`,
           classes: 'tw:min-w-48 tw:align-top',
+          headerClasses: border.top,
           // a model's name can wrap in its header, but not a value
-          cellClass: (record) => `tw:whitespace-nowrap ${record === rows.at(-1) ? border : ''}`,
+          cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''} ${record === rows.at(-1) && part !== 'geometry' ? border.bottom : ''}`,
           cell: (record) => record.cell(index)
         }
       })

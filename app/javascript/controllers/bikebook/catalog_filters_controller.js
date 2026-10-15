@@ -1,16 +1,17 @@
 import { Controller } from '@hotwired/stimulus'
-import { replaceUrl } from 'bikebook/replace_url'
+import { readable, replaceUrl } from 'bikebook/replace_url'
 
 /* global CSS */
 
 // Threads the filter panel's values into the vehicle combobox's async src and mirrors them
 // into the page URL, which the page renders the controls from (ui--collapse owns ?filters)
 export default class extends Controller {
-  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'jurisdiction']
+  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'classification', 'clear']
   static values = {
     yearDir: { type: String, default: 'desc' },
     priceDir: { type: String, default: 'desc' },
-    defaultMarket: String
+    defaultMarket: String,
+    defaultJurisdiction: String
   }
 
   // Rewritten on connect too, as rendering drops stale values. Not from the loading placeholder,
@@ -18,9 +19,14 @@ export default class extends Controller {
   connect () {
     this.yearArrowTarget.textContent = this.#arrow(this.yearDirValue)
     this.priceArrowTarget.textContent = this.#arrow(this.priceDirValue)
-    this.showJurisdiction()
+    this.#showClasses()
     this.#refreshSummary()
     if (!this.element.closest('[inert]')) this.#writeUrl()
+  }
+
+  // as the empty page's More filters opens the panel
+  focusFirst () {
+    this.element.querySelector('#vehicle-filters input:not([type=hidden])')?.focus()
   }
 
   toggleSort ({ params: { field } }) {
@@ -31,21 +37,10 @@ export default class extends Controller {
   }
 
   apply () {
+    this.#showClasses()
     this.#syncCombobox()
     this.#refreshSummary()
     this.#writeUrl()
-  }
-
-  // A state without its own classes uses the US ones. Runs before its fieldset's apply, which a change
-  // bubbles on to, and a hidden class doesn't stay checked
-  showJurisdiction () {
-    const groups = [...this.jurisdictionTarget.closest('fieldset').querySelectorAll('[data-jurisdiction]')]
-    const shown = groups.find(({ dataset }) => dataset.jurisdiction === this.jurisdictionTarget.value) ?? groups[0]
-    for (const group of groups) {
-      const hidden = group !== shown
-      group.classList.toggle('tw:hidden', hidden)
-      if (hidden) for (const input of group.querySelectorAll('input')) input.checked = false
-    }
   }
 
   // A multiselect fires hw-combobox:selection before it writes the hidden field,
@@ -54,33 +49,75 @@ export default class extends Controller {
     setTimeout(() => this.apply(), 0)
   }
 
+  // The classes are the US market's, by state - a state without its own uses the US ones - and a hidden
+  // class doesn't stay checked
+  #showClasses () {
+    const { market, jurisdiction } = this.#filters
+    const groups = [...this.classificationTarget.querySelectorAll('[data-jurisdiction]')]
+    const shown = market === 'US' && (groups.find(({ dataset }) => dataset.jurisdiction === jurisdiction) ?? groups[0])
+    this.classificationTarget.classList.toggle('tw:hidden', !shown)
+    for (const group of groups) {
+      const hidden = group !== shown
+      group.classList.toggle('tw:hidden', hidden)
+      if (hidden) for (const input of group.querySelectorAll('input')) input.checked = false
+    }
+  }
+
   #syncCombobox () {
     const fieldset = this.vehicleComboboxTarget.querySelector('.hw-combobox')
     const url = new URL(fieldset.dataset.hwComboboxAsyncSrcValue, window.location.origin)
     this.#applyParams(url)
     fieldset.dataset.hwComboboxAsyncSrcValue = url.pathname + url.search
-    fieldset.querySelector('.hw-combobox__input').dispatchEvent(new Event('input', { bubbles: true }))
+    // disabled while the catalog loads, which has nothing to search yet
+    const input = fieldset.querySelector('.hw-combobox__input')
+    if (!input.disabled) input.dispatchEvent(new Event('input', { bubbles: true }))
   }
 
-  // The URL leaves out the default market, so a shared link opens in its reader's own
+  // The URL leaves out the default market and jurisdiction, so a shared link opens in its reader's own -
+  // but not a jurisdiction with a class checked, which another's would hide and uncheck
   #writeUrl () {
     const url = new URL(window.location)
     const filters = this.#filters
-    this.#applyParams(url, { ...filters, market: filters.market === this.defaultMarketValue ? '' : filters.market || 'all' })
+    const jurisdiction = filters.jurisdiction || 'US'
+    const classChecked = this.classificationTarget.querySelector('input:checked')
+    this.#applyParams(url, {
+      ...filters,
+      market: filters.market === this.defaultMarketValue ? '' : filters.market || 'all',
+      jurisdiction: jurisdiction === this.defaultJurisdictionValue && !classChecked ? '' : jurisdiction
+    })
     replaceUrl(url)
+    this.refreshClear()
+  }
+
+  // A clear link's href: this page less its filters but the market and e-bike classification, which it renders afresh
+  // at their defaults. Set again as it's clicked, since the panel's own state and the picks reach the URL without a
+  // filter changing
+  refreshClear () {
+    const url = new URL(window.location)
+    for (const name of Object.keys(this.#filters).filter((name) => !['market', 'jurisdiction'].includes(name))) url.searchParams.delete(name)
+    // propulsion shares classes' param
+    if (this.#classes.length) url.searchParams.set('electric', this.#classes.join(','))
+    for (const link of this.clearTargets) link.href = readable(url)
+  }
+
+  get #classes () {
+    return [...this.classificationTarget.querySelectorAll('input:checked')].map(({ value }) => value)
   }
 
   #applyParams (url, filters = this.#filters) {
     const params = {
       ...filters,
-      jurisdiction: this.jurisdictionTarget.value,
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
       price_dir: this.priceDirValue === 'asc' ? 'asc' : ''
     }
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
+  // a clear keeps the market and e-bike classification, so they alone leave nothing to clear
   #refreshSummary () {
+    const { market, jurisdiction, electric, ...filters } = this.#filters
+    const filtered = Object.values(filters).some(Boolean) || electric.split(',').some((value) => value && !this.#classes.includes(value))
+    for (const link of this.clearTargets) link.hidden = !filtered
     this.summaryTarget.replaceChildren(...this.#summary.map(([label, value]) => {
       const item = document.createElement('li')
       const name = document.createElement('strong')
@@ -90,8 +127,10 @@ export default class extends Controller {
     }))
   }
 
+  // Market is left out, as every visit starts with one
   get #summary () {
-    return this.fieldTargets.map((field) => [field.dataset.filterLabel, this.#describe(field)])
+    return this.fieldTargets.filter((field) => !field.querySelector('input[name="market"]'))
+      .map((field) => [field.dataset.filterLabel, this.#describe(field)])
       .filter(([, value]) => value)
   }
 
@@ -102,10 +141,15 @@ export default class extends Controller {
         .map((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? value)
         .join(', ')
     }
-    if (inputs[0].type === 'checkbox') {
-      const checked = inputs.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
-      const jurisdiction = field.querySelector('select')?.selectedOptions[0]
-      return checked && jurisdiction?.value ? `${checked} (${jurisdiction.text})` : checked
+    const boxes = inputs.filter(({ type }) => type === 'checkbox')
+    if (boxes.length) {
+      const checked = boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
+      // a state stands alone, read from its option, as the combobox may not have filled its input yet
+      const jurisdiction = field.querySelector('input[name="jurisdiction"]')
+      if (!jurisdiction || field.classList.contains('tw:hidden')) return checked
+      const state = jurisdiction.value && field.querySelector(`[role="option"][data-value="${CSS.escape(jurisdiction.value)}"]`)
+        ?.dataset.autocompletableAs.replace(/ \(\w+\)$/, '')
+      return checked ? `${checked} (${state || field.querySelector('[role="combobox"]').placeholder})` : state
     }
     const [min, max] = inputs.map(({ value }) => value && `${field.dataset.filterPrefix}${value}`)
     if (min && max) return `${min}–${max}`

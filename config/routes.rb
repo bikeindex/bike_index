@@ -230,6 +230,7 @@ Rails.application.routes.draw do
     resources :marketplace, only: [] do
       collection { get :counts }
     end
+    get "/bikebook", to: "bikebook#index", as: :bikebook
   end
 
   # Short_id forms the resources :id segment can't match; before resources, as with registrations above
@@ -358,6 +359,7 @@ Rails.application.routes.draw do
 
     resources :stolen_bikes do
       member { post :approve }
+      collection { post :bulk_update }
     end
     resources :customer_contacts, only: %i[create show]
     resources :recoveries do
@@ -370,6 +372,7 @@ Rails.application.routes.draw do
       collection do
         get :tables
         get :variable
+        get :logged_searches
         get :bikes_table
       end
     end
