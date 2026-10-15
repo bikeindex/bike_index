@@ -3,12 +3,15 @@ import { section } from 'bikebook/templates/vehicles/section'
 import { html } from 'lit-html'
 import { array, blank, compact, except, join, presence, present, slice } from 'bikebook/templates/values'
 
+export const CERTIFICATION_LABEL = 'Electric Certification'
+
 // A motor whose certification isn't listed
 export const unknownCertification = html`<span class="tw:text-yellow-800 tw:dark:text-yellow-400">Unknown</span>`
 
 // A motor's specs, with a subsection per operating mode
 export const motorSection = ({ presenter, heading, motor, others }) => {
-  const { fields, humanized, labels } = presenter.kit.motor
+  const { fields, humanized } = presenter.kit.motor
+  const labels = { ...presenter.kit.motor.labels, certification: CERTIFICATION_LABEL }
   // the identity rows list every mode's classification
   const modeFields = except(presenter.kit.motor.mode_fields, ['e_vehicle_classifications'])
   const display = (each) => ({

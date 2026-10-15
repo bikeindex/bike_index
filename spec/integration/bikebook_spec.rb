@@ -86,9 +86,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     # its basics first, beside its photo
     expect(page).to have_css("[aria-label='Overview'] h2", text: "Level 4 REC Step-Through")
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']", exact_text: "Overview")
-    expect(find("[aria-label='Overview']")).to have_css("div", text: /\ACertification\s*UL 2849, UL 2271\z/)
+    expect(find("[aria-label='Overview']")).to have_css("div", text: /\AElectric Certification\s*UL 2849, UL 2271\z/)
     expect(find("[aria-label='Overview']").all("dt").map(&:text))
-      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Price", "E-vehicle class", "Certification", "Description"])
+      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Price", "E-vehicle class", "Electric Certification", "Description"])
     # a description that fits its clamp has nothing more to read
     expect(find("[aria-label='Overview']")).to have_text("The Level 4 REC").and have_no_button("Read more")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
@@ -116,7 +116,7 @@ RSpec.describe "Bikebook", :js, type: :system do
         const rows = [...fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles })).querySelectorAll('tbody tr')]
         const cells = (label) => [...rows.find((each) => each.querySelector('th').textContent.trim() === label).querySelectorAll('td')]
         return [cells('E-vehicle class').map((cell) => [cell.textContent.trim(), cell.querySelector('.twless-strong[class~="tw:italic"]') != null]),
-          cells('Certification').map((cell) => [cell.textContent.trim(), cell.querySelector('[class~="tw:text-yellow-800"]') != null])]
+          cells('Electric Certification').map((cell) => [cell.textContent.trim(), cell.querySelector('[class~="tw:text-yellow-800"]') != null])]
       })()
     JS
     expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["Unknown", true], ["", false]]])
@@ -907,7 +907,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     motor = find("section", text: /front and rear motor/i, wait: 10)
     expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
-    expect(motor).to have_css("div", text: /Certification\s*Unknown/)
+    expect(motor).to have_css("div", text: /Electric Certification\s*Unknown/)
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
     expect(page).to have_css("section div", text: /\AFolding\s*Stem fold\z/)
 

@@ -3,6 +3,7 @@ import { amountDisplay } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { missing, priced } from 'bikebook/templates/vehicles/comparison_table'
 import { basicsOf } from 'bikebook/templates/vehicles/model_viewer'
+import { CERTIFICATION_LABEL } from 'bikebook/templates/vehicles/motor_section'
 import { present } from 'bikebook/templates/values'
 
 // `electric` ones only once an e-vehicle is shown
@@ -14,7 +15,7 @@ const FIELDS = [
   { label: 'Groupset', key: 'groupset' },
   { label: 'Price', key: 'price' },
   { label: 'E-vehicle class', key: 'e_vehicle_class', electric: true },
-  { label: 'Certification', key: 'certification', electric: true },
+  { label: CERTIFICATION_LABEL, key: 'certification', electric: true },
   { label: 'Description', key: 'description' }
 ]
 // the label column's 12.5rem and 12rem per model, so a phone scrolls the table rather than squeezing it
