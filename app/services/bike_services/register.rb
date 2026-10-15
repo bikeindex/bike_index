@@ -508,8 +508,8 @@ module BikeServices
       b_param.params = b_param.params.except(*stale, "report_completed") if stale.any?
     end
 
-    # Both reports have to say when and where, each in its own words - everything else
-    # on the step is optional
+    # Both reports have to say when and where, each in its own words, and a theft what
+    # happened - everything else on the step is optional
     def report_errors(b_param, attrs, date)
       return [] unless report_step?(b_param.status)
 
