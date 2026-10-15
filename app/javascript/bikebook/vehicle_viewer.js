@@ -38,7 +38,7 @@ export class VehicleViewer {
     const rowClasses = comparing
       ? 'tw:justify-center-safe tw:overflow-x-auto tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:px-4 tw:max-md:*:w-[85vw] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
       : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
-    const cardRow = (margin, cards) => html`<div ?data-comparison=${comparing} data-controller=${comparing ? 'bikebook--align-rows' : nothing} class="${margin} tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
+    const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
       : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
     // each vehicle's `key` on a card of its own, named as its full card is, after whatever `lead` shows
@@ -63,7 +63,7 @@ export class VehicleViewer {
         html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`,
       { keyed: true }))}`,
       components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value), peers: vehicles.map((each) => each.data) }),
-        { lead: (data, value) => runningGearOf({ presenter, data, others: others(value) }) })),
+        { lead: (data, value) => runningGearOf({ presenter, data, others: others(value) }) }), true),
       motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value) }))),
       all: () => {
         const full = vehicles.map(({ data, value }, index) => {

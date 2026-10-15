@@ -110,16 +110,15 @@ const sideBySide = (columns) => html`<div class="tw:@container"><div class="tw:f
 
 // A vehicle's components by group, marked where they differ from `others`', each group listing every row any of the
 // compared `peers` has, so each lines up with theirs
-export const componentsOf = ({ presenter, data, others, peers }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others, peers }).components()}</div>`
+export const componentsOf = ({ presenter, data, others, peers }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components(peers)}</div>`
 
 class ModelViewer {
-  constructor ({ presenter, data, value, comparing, idSuffix, others, peers = [data], removePath, selectedSize, sizePath }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.others = others.map((other) => this.#normalize(other))
-    this.peers = peers.map((peer) => this.#normalize(peer))
     Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath })
   }
 
@@ -773,9 +772,8 @@ class ModelViewer {
       sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize, href: this.sizePath?.(size.name) }))}</div>`
   }
 
-  components () {
-    const components = this.vehicle.components
-    if (blank(components)) return nothing
+  components (peers = [this.data]) {
+    if (blank(this.vehicle.components)) return nothing
 
     const groups = Object.keys(this.kit.component_groups)
     const group = (type) => this.presenter.componentGroups.get(type) ?? groups.at(-1)
@@ -784,15 +782,15 @@ class ModelViewer {
     // keyed by its key and how many before it share that, so a vehicle's repeated component fills a row each
     const slotted = (list) => list.map((component, index) => [JSON.stringify([...componentKey(component),
       list.slice(0, index).filter((each) => equal(componentKey(each), componentKey(component))).length]), component])
-    const aligned = this.peers.length > 1
+    const vehicles = peers.map((peer) => this.#normalize(peer))
     const tables = groups.flatMap((name) => {
       const own = new Map(slotted(members(this.vehicle, name)))
-      const rows = [...new Map(this.peers.flatMap((peer) => slotted(members(peer, name)))).entries()]
-      if (own.size === 0 && (!aligned || rows.length === 0)) return []
+      const rows = [...new Map(vehicles.flatMap((vehicle) => slotted(members(vehicle, name))))]
+        .sort(([, a], [, b]) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)
+      if (rows.length === 0) return []
 
       const others = this.others.map((other) => members(other, name))
-      const sorted = rows.sort(([, a], [, b]) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)
-      return [componentGroup({ presenter: this.presenter, name, components: sorted.map(([slot]) => own.get(slot)), others, alignKey: aligned && name })]
+      return [componentGroup({ presenter: this.presenter, name, components: rows.map(([slot]) => own.get(slot)), others, alignKey: name })]
     })
     return tables
   }
