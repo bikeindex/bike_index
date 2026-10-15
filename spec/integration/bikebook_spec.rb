@@ -50,8 +50,12 @@ RSpec.describe "Bikebook", :js, type: :system do
     # from a country the catalog has no models in, which searches them all
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "JP") }
     asked = []
+    logged = []
     page.driver.with_playwright_page do |playwright_page|
-      playwright_page.on("request", ->(request) { asked << request.url if request.navigation_request? })
+      playwright_page.on("request", ->(request) do
+        asked << request.url if request.navigation_request?
+        logged << request.url.split("?").last if request.url.include?(search_bikebook_path)
+      end)
     end
     visit bikebook_path
     # the search is an unusable placeholder until the catalog loads
@@ -99,6 +103,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
     expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through")
+    # for the search logs, what the reader typed once they stopped, and then what they picked
+    expect(logged).to eq ["count=2&q=level+4+rec", "vehicle_models=m/aventon/2026/level_4_rec_step_through"]
 
     # A second pick, found by its id, compares the two: a table of each against the first, and the
     # second's card highlighting where it differs
@@ -107,6 +113,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 3)
     expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
+    # the render re-runs the pick's search in its combobox, which settles unlogged
+    page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
+    expect(logged).to eq ["count=2&q=level+4+rec", "vehicle_models=m/aventon/2026/level_4_rec_step_through",
+      "count=1&q=level_2_step&vehicle_models=m/aventon/2026/level_4_rec_step_through",
+      "vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through"]
     expect(page).to have_no_css("article")
     # what differs is only marked further down
     expect(find("[aria-label='Overview comparison']")).to have_no_css(".tw\\:spec-diff")
@@ -395,9 +406,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_css("[data-comparison]")
     expect(page).to have_css(".hw-combobox__chip", count: 1)
 
+    logged_count = logged.count
     page.go_back
     expect(page).to have_css("article", count: 2)
     expect(page).to have_css(".hw-combobox__chip", count: 2)
+    # a history step is no new search, though its render re-runs its combobox's
+    page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
+    expect(logged.count).to eq logged_count
 
     # The JSON panel opens beside its card
     first("[aria-label='Toggle JSON']").click
@@ -526,6 +541,8 @@ RSpec.describe "Bikebook", :js, type: :system do
   it "searches the visitor's market and shows their state's classes until others are chosen, leaving them out of the URL" do
     serve_bikebook_catalog
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "CA") }
+    logged = []
+    page.driver.with_playwright_page { it.on("request", ->(request) { logged << request.url.split("?").last if request.url.include?(search_bikebook_path) }) }
     visit bikebook_path
     expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)", wait: 10)
     type_into(vehicle_field, "haul")
@@ -550,10 +567,15 @@ RSpec.describe "Bikebook", :js, type: :system do
     find("#market-hw-listbox [role='option']", exact_text: "Any").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
     expect(page).to have_current_path(/[?&]market=all\b/)
+    # each re-runs the vehicle combobox's search, logged once it settles, though only the market changed
+    page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
+    expect(logged.last).to end_with "&market=all&q=Specialized+Haul+ST+%282025%29"
     type_into(find_field("Market"), "united")
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
     expect(page).to have_current_path(/[?&]market=US\b/)
+    page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
+    expect(logged.last).to eq "count=0&market=US&q=Specialized+Haul+ST+%282025%29"
     # and stays out of the collapsed filters' summary
     expect(find("[aria-label='Applied filters']", visible: :all).text(:all)).to be_empty
 
