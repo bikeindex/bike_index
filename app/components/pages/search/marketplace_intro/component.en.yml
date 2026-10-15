@@ -1,0 +1,20 @@
+---
+en:
+  components:
+    pages:
+      search:
+        marketplace_intro:
+          checked_for_theft: Checked for theft
+          description: >-
+            Bike Index is a nonprofit that helps get stolen bikes home. Our marketplace
+            only lists registered bikes, so you can buy used and know the bike isn't
+            reported stolen.
+          heading: The used bike marketplace from the bike registry.
+          hide_intro: Hide intro
+          how_buying_works: How buying works
+          how_selling_works: How selling works
+          marketplace_title: Bike Index Marketplace
+          ownership_transfers: Ownership transfers
+          registered_bikes_only: Registered bikes only
+          verified_sellers: Verified sellers
+          what_makes_this_different: What makes this different?

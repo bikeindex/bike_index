@@ -15,6 +15,15 @@ RSpec.describe Search::MarketplaceController, type: :request do
     expect(response).to have_http_status(:success)
   end
 
+  it "renders the intro collapsed once it's been dismissed" do
+    get base_url
+    expect(response.body).to match(/data-search--marketplace-intro-target="expanded"\s+class=""/)
+
+    cookies[Pages::Search::MarketplaceIntro::Component::COOKIE_NAME] = "true"
+    get base_url
+    expect(response.body).to match(/data-search--marketplace-intro-target="expanded"\s+class="tw:hidden"/)
+  end
+
   context "with listings" do
     let(:seller) { FactoryBot.create(:user, :with_address_record, address_in: :davis) }
     let(:item) { FactoryBot.create(:bike, :with_primary_activity, cycle_type: "personal-mobility", propulsion_type: "throttle") }

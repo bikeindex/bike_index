@@ -96,6 +96,11 @@ module UI
         render(UI::Button::Component.new(text: "Yellow Disabled", color: :yellow, disabled: true))
       end
 
+      # The secondary call to action on a dark band, beside a yellow one
+      def outline_white
+        render_with_template(template: "ui/button/component_preview/outline_white")
+      end
+
       # @!endgroup
 
       # @!group Sizes
