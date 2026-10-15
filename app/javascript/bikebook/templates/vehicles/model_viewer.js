@@ -18,6 +18,8 @@ import { andSentence, array, blank, compact, equal, except, join, partsOf, prese
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
 const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 
+const drivetrainLabels = (drivetrain) => equal(array(drivetrain).sort(), ['1 Front', '1 Rear']) ? ['Singlespeed'] : array(drivetrain)
+
 // "Air" or "Coil", and a lockout "Yes" or "No"
 const suspensionValue = (value, key) => key === 'spring' && value ? upcaseFirst(value) : key === 'lockout' && value != null ? (value ? 'Yes' : 'No') : value
 
@@ -308,7 +310,7 @@ class ModelViewer {
       ...this.wheelSizes(),
       suspended: present(vehicle.suspension),
       suspension: this.suspensionTravels(),
-      groupset: groupsetSummary(vehicle),
+      groupset: this.groupsetWithDrivetrain(),
       certification: presence([...new Set(array(vehicle.motors).map((motor) => motor.certification).filter(present))].join(', ')) ??
         (present(vehicle.motors) ? unknownCertification : null),
       description
@@ -629,23 +631,39 @@ class ModelViewer {
 
   drivetrain () {
     const { presenter, vehicle } = this
-    const fields = slice(this.kit.schemas.vehicle.frame.fields, this.kit.viewer.drivetrain_frame_fields)
-    const counted = Object.fromEntries(Object.entries(this.kit.viewer.gearing_labels)
-      .map(([position, label]) => [position, array(vehicle.gearing?.[position]).length === 1 ? label : `${label}s`]))
-    const rows = [...this.groupsetRows(), ...this.specRows('gearing', this.kit.schemas.vehicle.gearing.fields, counted), ...this.specRows('frame', fields)]
     // a compared model's values give this one rows it has nothing for
-    const content = presenter.measurementRows(rows)
+    const content = presenter.measurementRows([...this.groupsetRows(), ...this.gearingRows()])
     if (blank(vehicle.drivetrain) && blank(content)) return nothing
 
-    const labelsOf = (drivetrain) => equal(array(drivetrain).sort(), ['1 Front', '1 Rear']) ? ['Singlespeed'] : array(drivetrain)
-    const othersLabels = this.others.map((other) => labelsOf(other.drivetrain))
+    const othersLabels = this.others.map((other) => drivetrainLabels(other.drivetrain))
     const differs = (label) => othersLabels.some((labels) => !labels.includes(label))
     return html`<section class="tw:mb-6 tw:break-inside-avoid tw:space-y-2"><h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Drivetrain</h2>${present(vehicle.drivetrain)
-      ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${labelsOf(vehicle.drivetrain).map((label) => html`<span class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 ${differs(label)
+      ? html`<div class="tw:flex tw:flex-wrap tw:gap-2">${drivetrainLabels(vehicle.drivetrain).map((label) => html`<span class="tw:rounded-sm tw:border tw:border-gray-200 tw:dark:border-gray-700 ${differs(label)
         ? 'tw:spec-diff'
         : 'tw:bg-white tw:dark:bg-gray-800'} tw:px-2 tw:py-0.5 tw:font-mono
         tw:text-xs">${this.tooltipped(label, this.kit.viewer.drivetrain_tooltips)}</span>`)}</div>`
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
+  }
+
+  groupsetWithDrivetrain () {
+    const groupset = groupsetSummary(this.vehicle)
+    const drivetrain = groupset && this.drivetrainTooltip()
+    return drivetrain ? this.withTooltip(groupset, drivetrain) : groupset
+  }
+
+  // its gearing's rows and the frame's drivetrain ones
+  gearingRows () {
+    const fields = slice(this.kit.schemas.vehicle.frame.fields, this.kit.viewer.drivetrain_frame_fields)
+    const counted = Object.fromEntries(Object.entries(this.kit.viewer.gearing_labels)
+      .map(([position, label]) => [position, array(this.vehicle.gearing?.[position]).length === 1 ? label : `${label}s`]))
+    return [...this.specRows('gearing', this.kit.schemas.vehicle.gearing.fields, counted), ...this.specRows('frame', fields)]
+  }
+
+  // the Drivetrain section's rows but the groupset, as a tooltip lists them
+  drivetrainTooltip () {
+    const labels = drivetrainLabels(this.vehicle.drivetrain)
+    const rows = [...(labels.length ? [['Drivetrain', labels.join(', ')]] : []), ...this.gearingRows()]
+    return rows.length ? this.tooltipRows(rows) : null
   }
 
   // a list, so against a model that isn't electronic, that alone is marked

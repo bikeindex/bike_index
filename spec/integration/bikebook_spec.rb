@@ -339,6 +339,7 @@ RSpec.describe "Bikebook", :js, type: :system do
           const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
             import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
           const data = { model: 'Enduro', frame: { material: 'aluminum', coil_compatible: true }, groupset: { manufacturer: 'SRAM', description: 'GX Eagle', electronic: false },
+            drivetrain: ['1_front', '12_rear'], gearing: { front: [32], rear: [10, 52] },
             suspension: { front: { travel: 170, spring: 'air', lockout: true }, rear: { travel: 160, shock_length: 157.5, shock_stroke: 62.5, spring: 'coil' } } }
           // schema 0.24.6's, which the fixture's kit predates
           kit.viewer.suspension_fields = { ...kit.viewer.suspension_fields, spring: {}, lockout: {} }
@@ -350,10 +351,13 @@ RSpec.describe "Bikebook", :js, type: :system do
           const rows = (root, heading) => [...[...root.querySelectorAll('section')].find((each) => new RegExp(`^${heading}`, 'i').test(text(each.querySelector('h2') ?? each)))
             .querySelectorAll('dl > div')].map((row) => [text(row.querySelector('dt')), text(row.querySelector('dd'))])
           const all = render('all')
-          return { overview: rows(render('basics'), 'enduro').map(([label]) => label), suspension: rows(all, 'suspension'), frame: rows(all, 'frame') }
+          const overview = rows(render('basics'), 'enduro')
+          return { overview: overview.map(([label]) => label), groupset: overview.find(([label]) => label === 'Groupset')[1], suspension: rows(all, 'suspension'), frame: rows(all, 'frame') }
         })()
       JS
       expect(specs["overview"]).to eq(["Frame material", "Suspension front/rear", "Groupset"])
+      # its groupset's tooltip the rest of its drivetrain
+      expect(specs["groupset"]).to match(/\ASRAM GX Eagle \? Drivetrain: 1 Front, 12 Rear Chainring: 32\W*t Cogs: 10–\W*52\W*t\z/)
       expect(specs["suspension"]).to eq([["Front", "170 mm, lockout ? Travel: 170 mm Spring: Air Lockout: Yes"], ["Rear", "160 mm, 157.5 × 62.5 mm shock, coil"]])
       expect(specs["frame"]).to include(["Coil compatible", "Yes"])
       expect(find("tr", text: "Cogs").all("td").map(&:text)).to match([/\A8:\s*12–\s*32\W*t\z/, /\A8:\s*-\s*12–\s*-\s*32\W*t\s*-\z/])
