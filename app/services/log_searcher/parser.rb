@@ -16,7 +16,8 @@ module LogSearcher
       "Search::RegistrationsController#serials_containing" => :web_serials_containing,
       "Search::RegistrationsController#similar_serials" => :web_close_serials,
       "Search::MarketplaceController#index" => :web_marketplace,
-      "Search::MarketplaceController#counts" => :web_marketplace_count
+      "Search::MarketplaceController#counts" => :web_marketplace_count,
+      "Search::BikebookController#index" => :web_bikebook
     }.freeze
 
     ROUTE_ENDPOINTS = {
@@ -115,7 +116,9 @@ module LogSearcher
     end
 
     def stolenness_for(endpoint, opts)
-      if endpoint == :api_v2_bikes
+      if endpoint == :web_bikebook
+        nil
+      elsif endpoint == :api_v2_bikes
         case opts["path"]
         when "/api/v2/bikes_search" then :all
         when "/api/v2/bikes_search/stolen" then :stolen

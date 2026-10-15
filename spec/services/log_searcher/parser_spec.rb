@@ -91,6 +91,26 @@ RSpec.describe LogSearcher::Parser do
           end
         end
       end
+      context "bikebook" do
+        let(:log_line) { 'I, [2026-10-14T18:02:41.118204 #812331]  INFO -- : [5b0c2f1e-8a47-4c1d-9e6b-2f8d4c7a1b90] {"method":"GET","path":"/search/bikebook","format":"html","controller":"Search::BikebookController","action":"index","status":204,"allocations":2104,"duration":3.62,"view":0.0,"db":0.41,"remote_ip":"157.131.200.8","u_id":85,"params":{"count":"2","manufacturer":"aventon","q":"level 4 rec"},"@timestamp":"2026-10-14T18:02:41.118Z","@version":"1","message":"[204] GET /search/bikebook (Search::BikebookController#index)"}' }
+        let(:target) do
+          {request_at: Time.parse("2026-10-14T18:02:41.118204 UTC"),
+           request_id: "5b0c2f1e-8a47-4c1d-9e6b-2f8d4c7a1b90",
+           duration_ms: 4,
+           user_id: 85,
+           endpoint: :web_bikebook,
+           ip_address: "157.131.200.8",
+           query_items: {count: "2", manufacturer: "aventon", q: "level 4 rec"},
+           stolenness: nil,
+           includes_query: true,
+           organization_id: nil,
+           page: nil,
+           serial_normalized: nil}
+        end
+        it "parses" do
+          expect(described_class.parse_log_line(log_line)).to match_hash_indifferently target
+        end
+      end
     end
     context "API" do
       let(:log_line) { 'I, [2023-10-23T00:20:29.448035 #666684]  INFO -- : [8f46986c-7d36-46f5-aeb6-9d4851de15b7] {"status":200,"method":"GET","path":"/api/v3/search/serials_containing","params":{"serial":"WCo2001xxxxx","serial_no_space":"WC02001XXXXX","raw_serial":"WC02001XXXXX","stolenness":"proximity","location":"you"},"host":"bikeindex.org","remote_ip":"11.222.33.4","u_id":1321,"format":"json","db":1879.08,"view":12.02999999999997,"duration":1891.11}' }
@@ -176,8 +196,8 @@ RSpec.describe LogSearcher::Parser do
       log_lines = File.read(log_path).split("\n")
       parsed_log_lines = log_lines.map { |l| described_class.parse_log_line(l) }.compact
       # These numbers will need to be updated, every time the example_log.log updates
-      expect(log_lines.count).to eq 31
-      expect(parsed_log_lines.count).to eq 25
+      expect(log_lines.count).to eq 32
+      expect(parsed_log_lines.count).to eq 26
 
       # It should have every endpoint
       logged_endpoints = parsed_log_lines.map { |l| l[:endpoint] }.uniq.sort

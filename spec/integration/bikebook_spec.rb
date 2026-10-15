@@ -50,8 +50,12 @@ RSpec.describe "Bikebook", :js, type: :system do
     # from a country the catalog has no models in, which searches them all
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "JP") }
     asked = []
+    logged = []
     page.driver.with_playwright_page do |playwright_page|
-      playwright_page.on("request", ->(request) { asked << request.url if request.navigation_request? })
+      playwright_page.on("request", ->(request) do
+        asked << request.url if request.navigation_request?
+        logged << request.url.split("?").last if request.url.include?(search_bikebook_path)
+      end)
     end
     visit bikebook_path
     # the search is an unusable placeholder until the catalog loads
@@ -99,6 +103,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
     expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through")
+    # for the search logs, what the reader typed once they stopped, and then what they picked
+    expect(logged).to eq ["count=2&q=level+4+rec", "vehicle_models=m/aventon/2026/level_4_rec_step_through"]
 
     # A second pick, found by its id, compares the two: a table of each against the first, and the
     # second's card highlighting where it differs

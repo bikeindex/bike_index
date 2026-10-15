@@ -230,6 +230,8 @@ Rails.application.routes.draw do
     resources :marketplace, only: [] do
       collection { get :counts }
     end
+    # Bikebook searches in the browser, and reports each here for the search logs
+    get "/bikebook", to: "bikebook#index", as: :bikebook
   end
 
   # Short_id forms the resources :id segment can't match; before resources, as with registrations above

@@ -46,10 +46,10 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
 export class CatalogComboboxSource {
   #generation = 0
 
-  // onCount takes each search's count of matching models
-  constructor (catalog, onCount = () => {}) {
+  // onSearch takes each search's params, its count of results and of the models its filters match
+  constructor (catalog, onSearch = () => {}) {
     this.catalog = catalog
-    this.onCount = onCount
+    this.onSearch = onSearch
   }
 
   // A pick re-renders the page, leaving the gem's debounced refilter behind on the combobox it replaced
@@ -80,7 +80,7 @@ export class CatalogComboboxSource {
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
       listbox.replaceChildren(fragmentOf(html`${group(unfiltered ? unmatched : matching(total), options)}${pagination}`))
-      this.onCount(filteredCount)
+      this.onSearch({ params: this.params, total, filteredCount })
     } else {
       listbox.append(fragmentOf(html`${options}${pagination}`))
     }

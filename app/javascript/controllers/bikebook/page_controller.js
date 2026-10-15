@@ -2,6 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
 import { hydrate, loadingShell } from 'bikebook/hydrate'
 import { readable } from 'bikebook/replace_url'
+import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { uuid } from 'bikebook/templates/helpers'
 
@@ -14,7 +15,7 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status', 'tagline', 'countedTagline']
-  static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String }
+  static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
   #renders = 0
@@ -23,6 +24,7 @@ export default class extends Controller {
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
   initialize () {
     this.status = this.statusTarget
+    this.searchLog = new SearchLog(this.searchLogUrlValue)
   }
 
   async connect () {
@@ -35,10 +37,14 @@ export default class extends Controller {
     } catch (error) {
       return this.#fail(error)
     }
-    this.source = new CatalogComboboxSource(this.catalog, (count) => renderCounts(document, count))
+    this.source = new CatalogComboboxSource(this.catalog, ({ params, total, filteredCount }) => {
+      renderCounts(document, filteredCount)
+      this.searchLog.typed({ ...params, count: total })
+    })
     this.#countModels()
     // filters set while it loaded are in the URL, and the reader stays where they've scrolled to
     this.#render(new URL(window.location.href), [window.scrollX, window.scrollY])
+    this.searchLog.visited(new URL(window.location.href))
   }
 
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles,
@@ -107,6 +113,7 @@ export default class extends Controller {
 
   #go (url, scroll = [0, 0], { replace = false, ...options } = {}) {
     window.history[replace ? 'replaceState' : 'pushState'](stamped(), '', readable(url))
+    this.searchLog.visited(url)
     return this.#render(url, scroll, options)
   }
 
