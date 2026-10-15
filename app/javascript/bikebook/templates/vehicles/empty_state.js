@@ -8,7 +8,7 @@ const filtersButton = (label) => html`<button type="button" class="twlink" data-
 const steps = [
   ['Search for a bike', html`Type a brand or model above, or narrow down with ${filtersButton('More filters')}.`],
   ['Add more to compare', 'Pick two or more bikes and they line up side by side.'],
-  ['Compare what matters', 'Geometry and overlay, components, sizes, price, weight, and e-bike class.']
+  ['Compare what matters', 'Geometry, components, price, weight, and e-bike classification.']
 ]
 
 const EXAMPLES = [
