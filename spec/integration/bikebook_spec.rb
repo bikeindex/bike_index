@@ -88,17 +88,17 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css(".hw-combobox__group__label", text: /\(2 matching models\)/i)
     retry_on_detach { find("[role='option']", text: "Aventón Level 4 REC Step-Through").click }
     # its basics first, beside its photo
-    expect(page).to have_css("[aria-label='Overview'] h2", text: "Level 4 REC Step-Through")
+    expect(page).to have_css("[aria-label='Overview'] thead th", text: "Level 4 REC Step-Through")
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']", exact_text: "Overview")
-    expect(find("[aria-label='Overview']")).to have_css("div", text: /\AElectric Certification\s*UL 2849, UL 2271\z/)
+    expect(find("[aria-label='Overview']")).to have_css("tr", text: /\AElectric Certification\s*UL 2849, UL 2271\z/)
     # under its class's name, the class's tile, a tooltip of its US class card
-    badge = find("[aria-label='Overview'] dd button[aria-label$=' e-bike']")
+    badge = find("[aria-label='Overview'] td button[aria-label$=' e-bike']")
     badge.click
     expect(page).to have_css("[role='tooltip'] h3", exact_text: "Class #{badge[:"aria-label"][/\d/]}", visible: true)
-    expect(find("[aria-label='Overview']").all("dt:not([role='tooltip'] dt)").map(&:text))
+    expect(find("[aria-label='Overview']").all("tbody tr > th").map(&:text))
       .to eq(["Model group", "Years", "Primary activity", "Frame material", "Suspension front/rear", "Groupset", "Price", "E-vehicle class", "Electric Certification", "Description"])
     # no groupset listed, so a dash, with the rest of its drivetrain in the tooltip
-    expect(find("[aria-label='Overview'] dl > div", text: /\AGroupset/).find("dd").text(:all).squish).to match(/\A— \? Drivetrain: /)
+    expect(find("[aria-label='Overview'] tr", text: /\AGroupset/).find("td").text(:all).squish).to match(/\A— \? Drivetrain: /)
     expect(find("[aria-label='Overview']")).to have_text("The Level 4 REC").and have_button("Read more")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")
@@ -389,7 +389,7 @@ RSpec.describe "Bikebook", :js, type: :system do
           const rows = (root, heading) => [...[...root.querySelectorAll('section')].find((each) => new RegExp(`^${heading}`, 'i').test(text(each.querySelector('h2') ?? each)))
             .querySelectorAll('dl > div')].map((row) => [text(row.querySelector('dt')), text(row.querySelector('dd'))])
           const all = render('all')
-          const overview = rows(render('basics'), 'enduro')
+          const overview = [...render('basics').querySelectorAll("[aria-label='Overview'] tbody tr")].map((row) => [text(row.querySelector('th')), text(row.querySelector('td'))])
           return { overview: overview.map(([label]) => label), groupset: overview.find(([label]) => label === 'Groupset')[1], suspension: rows(all, 'suspension'), frame: rows(all, 'frame') }
         })()
       JS
@@ -1088,7 +1088,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
     # its long description cut to its first 200 characters at a word, until it's opened
-    description = find("[aria-label='Overview'] dd", text: /\AWhatever you’re into/, wait: 10)
+    description = find("[aria-label='Overview'] td", text: /\AWhatever you’re into/, wait: 10)
     excerpt = description.find("p", text: /…\z/).text
     expect(excerpt.length).to be <= 201
     expect(excerpt).to end_with("dawn patrol…").or match(/\w…\z/)
@@ -1097,7 +1097,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(description).to have_css("button[aria-expanded='true']", exact_text: "Show less")
     expect(description).to have_text("MIK-compatible rear rack").and have_no_css("p", text: /…\z/)
     # a cargo bike's max weight and cargo area, on the Overview and above the size in its geometry
-    expect(page).to have_css("[aria-label='Overview'] dl > div", text: /\ACargo\s*Max weight 190\W*kg \?\z/)
+    expect(page).to have_css("[aria-label='Overview'] tr", text: /\ACargo\s*Max weight 190\W*kg \?\z/)
     find("[aria-label='Overview'] button[aria-label='Max weight is cargo and rider']").click
     # its rider limit the same, which leaves it out
     expect(page).to have_css("[role='tooltip']", exact_text: "Max weight is cargo and rider", visible: true)
@@ -1117,7 +1117,7 @@ RSpec.describe "Bikebook", :js, type: :system do
         const text = (element) => element.innerText.replace(/\\s+/g, ' ').trim()
         const cargo = (view, vehicle) => {
           renderInto(container, viewer.render([{ value: 'm/x/2026/hauler', data: vehicle }], new URL(`/bikebook?view=${view}&vehicle_models=m/x/2026/hauler&vehicle_sizes=L`, window.location.href), null))
-          return [...container.querySelectorAll(view === 'basics' ? "[aria-label='Overview'] dl > div" : 'tbody tr')].find((row) => row.innerText.startsWith('Cargo'))
+          return [...container.querySelectorAll('tbody tr')].find((row) => row.innerText.startsWith('Cargo'))
         }
         const tooltip = (row) => {
           const shown = row.querySelector("[role='tooltip']")
