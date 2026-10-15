@@ -46,12 +46,7 @@ module Pages
           [1, 2, 3].map { class_card(e_bike_class: it, rules: (class_3_rules if it == 3)) } + [emoto_card]
         end
 
-        def emoto_card
-          rules = @state && EbikeRuleServices::StateLaws.emoto_rules(@state[:abbr]).presence
-          class_card(card: {n: nil, either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
-                            speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,
-                            body: rules ? translation(".emoto_summary") : translation(".emoto_limits_body")})
-        end
+        def emoto_card = class_card(rules: @state && EbikeRuleServices::StateLaws.emoto_rules(@state[:abbr]).presence)
 
         def class_card(**) = Pages::EbikeRules::ClassCard::Component.new(state_name: @state&.dig(:name), **)
       end

@@ -73,8 +73,8 @@ export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data
 
 export const wheelSize = (presenter, bsd) => new ModelViewer({ presenter, data: {}, others: [] }).wheelSizeName(bsd)
 
-// A vehicle's names, photo and the fields the Overview lists
-export const basicsOf = ({ presenter, data }) => new ModelViewer({ presenter, data, others: [] }).basics()
+// A vehicle's names, photo and the fields the Overview lists, an e-moto's tile among them when it's `outOfClass`
+export const basicsOf = ({ presenter, data, outOfClass }) => new ModelViewer({ presenter, data, others: [], outOfClass }).basics()
 
 // A vehicle's sizes, each with its geometry, `selectedSize` ringed and marked where they differ from `others`', the rest
 // linked to `sizePath(name)`
@@ -101,13 +101,13 @@ const sideBySide = (columns) => html`<div class="tw:@container"><div class="tw:f
 export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
 
 class ModelViewer {
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClass }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.others = others.map((other) => this.#normalize(other))
-    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath })
+    Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath, outOfClass })
   }
 
   render () {
@@ -333,11 +333,12 @@ class ModelViewer {
     return join([join(standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optionals])
   }
 
-  // its classes' names, and under them its US classes' tiles
+  // its classes' names, and under them its US classes' tiles and an e-moto's
   eVehicleClass () {
     const names = presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
     const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(({ ids }) => ids).map((id) => id.match(/^evc\/us\/class_(\d)$/)?.[1]).filter(Boolean))].sort()
-    return names && numbers.length ? html`${names}${classBadges(numbers)}` : names
+    const tiles = this.outOfClass ? [...numbers, 'emoto'] : numbers
+    return tiles.length ? html`${names ?? nothing}${classBadges(tiles)}` : names
   }
 
   #sortedClassifications (vehicle) {

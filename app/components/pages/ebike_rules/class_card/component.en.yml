@@ -19,9 +19,19 @@ en:
           class_3_summary: Pedal-assist to 28 mph, with a speedometer.
           class_3_tag: Faster pedal-assist
           class_n: Class %{n}
+          emoto_limits_body: >-
+            Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
+            make it an e-moto. Most states treat these as mopeds or motorcycles, which
+            can require registration, insurance and a license.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: >-
+            Top speed over 28 mph, throttle speed over 20 mph, or motors over 750W
+            make it an e-moto.
           motor: Motor
           motor_cap: "≤750W"
           mph: "%{mph} mph"
+          not_an_ebike: Not an e-bike
           or: or
           pedal: Pedal
           state_specifics: "%{state} specifics"

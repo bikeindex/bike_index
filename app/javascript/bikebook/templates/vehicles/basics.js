@@ -49,9 +49,9 @@ const readMore = (text, content) => {
 
 // The models' names, photos and headline fields: one beside its photo, more side by side in a table
 export const basics = ({ presenter, vehicles }) => {
-  const shown = vehicles.map(({ data }) => {
+  const shown = vehicles.map(({ data, outOfClass }) => {
     const price = priced(data)
-    const fields = basicsOf({ presenter, data })
+    const fields = basicsOf({ presenter, data, outOfClass })
     return {
       ...fields,
       price: price && amountDisplay(price.original_msrp, price.original_msrp_currency, presenter.vocabulary.currencies),

@@ -87,10 +87,12 @@ const block = (key) => {
   return blocks.get(key)
 }
 
+// out_of_class is the index's alone, the catalog's own marker for an e-moto
 async function vehicles ({ ids }) {
   const found = await Promise.all(ids.map(async (value) => {
     const key = blockKey(value)
-    return { value, display: byId.get(value)?.display, data: manifest.blocks[key] && (await block(key))[value] }
+    const model = byId.get(value)
+    return { value, display: model?.display, outOfClass: Boolean(model?.e_vehicle_classifications?.includes('out_of_class')), data: manifest.blocks[key] && (await block(key))[value] }
   }))
   return found.filter(({ data }) => data)
 }
