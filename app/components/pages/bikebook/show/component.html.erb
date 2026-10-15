@@ -217,6 +217,7 @@
                 "
                 data-bikebook--catalog-filters-target="field classification"
                 data-filter-label="<%= translation(".e_bike_classification") %>"
+                data-jurisdiction-label="<%= translation(".jurisdiction_for_e_vehicles") %>"
                 data-action="change->bikebook--catalog-filters#apply <%= Pages::Bikebook::Show::FilterCombobox::Component::SELECTION_ACTIONS %>"
               >
                 <legend class="twlabel tw:px-1">
@@ -322,10 +323,17 @@
 
   <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
 
-  <%# The US classes' tiles the Overview shows, each a tooltip of its class's card %>
-  <% (1..3).each do |e_bike_class| %>
-    <template data-bikebook-class-badge="<%= e_bike_class %>">
+  <%# The US classes' and the e-moto's tiles the Overview shows, each a tooltip of its card %>
+  <% [1, 2, 3, nil].each do |e_bike_class| %>
+    <template data-bikebook-class-badge="<%= e_bike_class || "emoto" %>">
       <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, explained: true)) %>
+    </template>
+  <% end %>
+
+  <%# The US classes' cards a picked classification shows, which a state jurisdiction's own, with its rules, replaces %>
+  <% (1..3).each do |e_bike_class| %>
+    <template data-bikebook-class-card="<%= e_bike_class %>">
+      <%= render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:)) %>
     </template>
   <% end %>
 
@@ -340,6 +348,13 @@
   <div class="bikebook twgutter tw:mx-auto tw:max-w-screen-xl tw:pt-7 tw:pb-6">
     <template data-bikebook--page-target="shell">
       <%= search %>
+
+      <div
+        id="classification-cards"
+        data-frame-id="<%= Pages::EbikeRules::ClassCard::Component::FRAME_ID %>"
+        data-src="<%= ebike_rules_path %>"
+      ></div>
+
       <div id="vehicle-viewers"></div>
     </template>
 

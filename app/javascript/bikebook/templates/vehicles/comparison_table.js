@@ -3,15 +3,13 @@ import { amountDisplay, missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
-import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { brakesAt, cargoAt, highest, isCargo, modes, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 // years come newest first
 export const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
 const currency = (vehicle) => priced(vehicle)?.original_msrp_currency ?? 'USD'
-const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(isNumber)) : null
 const motors = (key) => (vehicle) => highest(array(vehicle.motors).map((motor) => motor[key]))
-const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode[key]))
 // A position's teeth, and how many: drivetrain's "12_rear", else as many as are listed, which rear can't say when it
 // lists only its smallest and largest cog
 const gearing = (position) => (vehicle) => {
@@ -161,11 +159,13 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
     })
   const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50 tw:dark:bg-blue-950' }
   const sizeRows = sizes.some(Boolean) ? [size] : []
+  const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
+  const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
   const geometryRecords = records([...geometry, length, WEIGHT])
   const specRecords = records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING])
   const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
   const rows = {
-    geometry: [...records(wheelRows), ...sizeRows, ...geometryRecords],
+    geometry: [...records(wheelRows), ...cargoRows, ...sizeRows, ...geometryRecords],
     specs: specRecords,
     all: [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...specRecords, ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])]
   }[part]

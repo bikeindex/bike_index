@@ -13,7 +13,7 @@ import { motorSection, unknownCertification } from 'bikebook/templates/vehicles/
 import { classBadges } from 'bikebook/templates/vehicles/class_badges'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { disclosure, section } from 'bikebook/templates/vehicles/section'
-import { andSentence, array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
+import { andSentence, array, blank, compact, equal, except, isNumber, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
 
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
@@ -38,6 +38,7 @@ export const typeLabel = (each) => [each.type, each.type_detail].filter(present)
 export const modelViewer = (args) => new ModelViewer(args).render()
 
 const WIDE_TIRE = 50
+export const US_CLASS = /^evc\/us\/class_(\d)$/
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
 const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
 const brakeType = (brake) => brake?.type?.replace(/^Disc (\w+)$/, '$1 disc')
@@ -68,6 +69,16 @@ export const brakesAt = (presenter, data, size) => {
     rotors: front === rear ? viewer.millimeters(front) : join(compact([viewer.millimeters(front, ' front'), viewer.millimeters(rear, ' rear')]), ' | ')
   }
 }
+
+export const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(isNumber)) : null
+// The highest `key` of any of a vehicle's motors' operating modes
+export const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode[key]))
+
+// cargo_bike, cargo_tricycle and their _rear kinds
+export const isCargo = (data) => /^cargo_/.test(data.type ?? '')
+
+// A vehicle's max weight, or else its total payload in `size`, and its cargo area
+export const cargoAt = (presenter, data, size) => new ModelViewer({ presenter, data, others: [] }).cargo(size)
 
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
 
@@ -308,6 +319,8 @@ class ModelViewer {
       vehicle_type: presence(typeLabel(vehicle)),
       type: vehicle.type,
       e_vehicle_class: this.eVehicleClass(),
+      cargo_vehicle: isCargo(this.data),
+      cargo: this.cargo(),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
       frame_material: vehicle.frame?.material,
       ...this.wheelSizes(),
@@ -335,11 +348,48 @@ class ModelViewer {
     return join([join(standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optionals])
   }
 
-  // its classes' names, and under them its US classes' tiles
+  // "Max weight 200 kg ?, 60 cm long, 40 cm wide, 200 L"
+  cargo (size) {
+    const { presenter } = this
+    const { length, width, volume } = this.data.cargo ?? {}
+    return presence(join([
+      this.#cargoWeight(size),
+      length ?? width ? presenter.dimensions({ length, width }) : null,
+      isNumber(volume) ? presenter.measurement(volume, 'l') : null
+    ].filter(present), ', '))
+  }
+
+  // The max weight, with a separate rider limit in its tooltip, or without one, the total payload: in `size`, or its
+  // sizes' range
+  #cargoWeight (size) {
+    const { presenter } = this
+    const maxWeight = this.data.frame?.max_weight_total
+    const riders = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
+    const range = () => join([...new Set([Math.min(...riders), Math.max(...riders)])].map((kg) => presenter.measurement(kg, 'kg')), '–')
+    if (isNumber(maxWeight)) {
+      const text = 'Max weight is cargo and rider'
+      const body = riders.some((kg) => kg !== maxWeight) ? html`${text}<span class="tw:block">Max rider weight ${range()}</span>` : text
+      return html`Max weight ${presenter.measurement(maxWeight, 'kg')} ${tooltip({ text, body })}`
+    }
+    return riders.length ? join([range(), ' total payload']) : null
+  }
+
+  // its classes' names, and under them its US classes' tiles and an e-moto's
   eVehicleClass () {
     const names = presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
-    const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(({ ids }) => ids).map((id) => id.match(/^evc\/us\/class_(\d)$/)?.[1]).filter(Boolean))].sort()
-    return names && numbers.length ? html`${names}${classBadges(numbers)}` : names
+    const ids = this.vehicle.classifiedModes.flatMap((mode) => mode.ids)
+    const numbers = [...new Set(ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean))].sort()
+    const tiles = this.#emoto(ids) ? [...numbers, 'emoto'] : numbers
+    return tiles.length ? html`${names}${classBadges(tiles)}` : names
+  }
+
+  // As /ebike-rules has it (EbikeRuleServices::BikebookVehicles): a classification other than an e-bike law's or a US
+  // class, or with neither, a mode over 28 mph
+  #emoto (ids) {
+    const tiers = ids.filter((id) => !this.presenter.vocabulary.e_vehicle_classifications[id]?.e_bike_law)
+    if (tiers.length) return tiers.some((id) => !US_CLASS.test(id))
+    const { km, mi } = this.kit.conversions.mm
+    return Math.round(modes('max_speed')(this.data) * km / mi) > 28
   }
 
   #sortedClassifications (vehicle) {

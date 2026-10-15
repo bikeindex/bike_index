@@ -17,6 +17,11 @@ class EbikeRulesController < ApplicationController
     if turbo_frame_request_id == Pages::EbikeRules::Classes::Component::FRAME_ID
       return render(Pages::EbikeRules::Classes::Component.new(state:))
     end
+    if turbo_frame_request_id&.start_with?(Pages::EbikeRules::ClassCard::Component::FRAME_ID)
+      e_bike_class = params[:e_bike_class].to_i.then { it if (1..3).cover?(it) }
+      classification = params[:classification].presence&.then { EbikeRuleServices::StateLaws.classification(it) || raise(ActionController::RoutingError, "Not Found") }
+      return render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:, classification:, state:, frame_id: turbo_frame_request_id))
+    end
 
     detected_state = EbikeRuleServices::StateLaws.state_from_location(request_location_hash)
     if state.nil?
