@@ -320,6 +320,13 @@
 
   <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
 
+  <%# The US classes' tiles the Overview shows, each a tooltip of its class's card %>
+  <% (1..3).each do |e_bike_class| %>
+    <template data-bikebook-class-badge="<%= e_bike_class %>">
+      <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, explained: true)) %>
+    </template>
+  <% end %>
+
   <%# DM Sans is the Bike Book logo's face, loaded for its letters alone %>
   <% helpers.content_for(:header) do %>
     <link

@@ -87,7 +87,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[aria-label='Overview'] h2", text: "Level 4 REC Step-Through")
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']", exact_text: "Overview")
     expect(find("[aria-label='Overview']")).to have_css("div", text: /\AElectric Certification\s*UL 2849, UL 2271\z/)
-    expect(find("[aria-label='Overview']").all("dt").map(&:text))
+    # under its class's name, the class's tile, a tooltip of its US class card
+    badge = find("[aria-label='Overview'] dd button[aria-label$=' e-bike']")
+    badge.click
+    expect(page).to have_css("[role='tooltip'] h3", exact_text: "Class #{badge[:"aria-label"][/\d/]}", visible: true)
+    expect(find("[aria-label='Overview']").all("dt:not([role='tooltip'] dt)").map(&:text))
       .to eq(["Model group", "Years", "Primary activity", "Frame material", "Suspension front/rear", "Price", "E-vehicle class", "Electric Certification", "Description"])
     expect(find("[aria-label='Overview']")).to have_text("The Level 4 REC").and have_button("Read more")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)

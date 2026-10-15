@@ -10,6 +10,7 @@ import { componentGroup } from 'bikebook/templates/vehicles/component_group'
 import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
 import { modelYears } from 'bikebook/templates/vehicles/model_years'
 import { motorSection, unknownCertification } from 'bikebook/templates/vehicles/motor_section'
+import { classBadges } from 'bikebook/templates/vehicles/class_badges'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { disclosure, section } from 'bikebook/templates/vehicles/section'
 import { andSentence, array, blank, compact, equal, except, join, partsOf, presence, present, slice, sum, truthy } from 'bikebook/templates/values'
@@ -304,7 +305,7 @@ class ModelViewer {
       years: this.yearRange(),
       vehicle_type: presence(typeLabel(vehicle)),
       type: vehicle.type,
-      e_vehicle_class: presence(this.classificationNames(this.#sortedClassifications(vehicle))),
+      e_vehicle_class: this.eVehicleClass(),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
       frame_material: vehicle.frame?.material,
       ...this.wheelSizes(),
@@ -330,6 +331,13 @@ class ModelViewer {
     const optionals = optional.map(([name, mode]) => html`<span class="tw:block"><span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">w/ optional
       ${this.presenter.humanize(mode).toLowerCase()}</span> ${this.tooltipped(name, tooltips)}</span>`)
     return join([join(standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optionals])
+  }
+
+  // its classes' names, and under them its US classes' tiles
+  eVehicleClass () {
+    const names = presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
+    const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(({ ids }) => ids).map((id) => id.match(/^evc\/us\/class_(\d)$/)?.[1]).filter(Boolean))].sort()
+    return names && numbers.length ? html`${names}${classBadges(numbers)}` : names
   }
 
   #sortedClassifications (vehicle) {
