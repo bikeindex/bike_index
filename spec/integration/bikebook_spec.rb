@@ -601,7 +601,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path
     expect(page).to have_no_css("[inert]", wait: 10)
     # its state summarized in the closed filters
-    expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "e-bike classification: New Jersey")
+    expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "e-vehicle jurisdiction: New Jersey")
     # but as a clear returns to it, nothing to clear
     expect(page).to have_no_link("Clear filters")
     click_on "More filters", match: :first
@@ -611,6 +611,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_current_path("/bikebook?filters=1")
     check "Low-Speed Electric Bicycle"
     expect(page).to have_current_path(/[?&]jurisdiction=NJ\b/)
+    # with a class checked, it's the classification
+    expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "e-bike classification: Low-Speed Electric Bicycle (New Jersey)", visible: :all)
     clear_jurisdiction
     expect(page).to have_current_path(/[?&]jurisdiction=US\b/)
     # and outside the US market there are none

@@ -127,10 +127,12 @@ export default class extends Controller {
     }))
   }
 
-  // Market is left out, as every visit starts with one
+  // Market is left out, as every visit starts with one. A state with no class checked is the jurisdiction alone
   get #summary () {
     return this.fieldTargets.filter((field) => !field.querySelector('input[name="market"]'))
-      .map((field) => [field.dataset.filterLabel, this.#describe(field)])
+      .map((field) => [field.dataset.jurisdictionLabel && !field.querySelector('input[name="electric"]:checked')
+        ? field.dataset.jurisdictionLabel
+        : field.dataset.filterLabel, this.#describe(field)])
       .filter(([, value]) => value)
   }
 
