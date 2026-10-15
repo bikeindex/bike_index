@@ -71,6 +71,12 @@ export const wheelsOf = ({ presenter, data, others }) => new ModelViewer({ prese
 // A vehicle's motors, each with its battery, marked where they differ from `others`'
 export const motorsOf = ({ presenter, data, others }) => new ModelViewer({ presenter, data, others }).motorSections()
 
+// A vehicle's wheels, brakes, suspension and drivetrain, marked where they differ from `others`'
+export const runningGearOf = ({ presenter, data, others }) => {
+  const viewer = new ModelViewer({ presenter, data, others })
+  return html`${viewer.wheels()}${viewer.positioned('Brakes', 'brakes', 'Brake', (brake) => viewer.brakeSummary(brake))}${viewer.suspension()}${viewer.drivetrain()}`
+}
+
 // A vehicle's components by group, marked where they differ from `others`'
 export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
 
