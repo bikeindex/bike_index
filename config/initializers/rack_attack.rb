@@ -62,7 +62,9 @@ class Rack::Attack
   # another user, but this is uncommon in practice.
   throttle("sign_in/email", limit: 5, period: 20.seconds) do |request|
     if request.post? && SIGN_IN_PATHS.include?(request.path)
-      EmailNormalizer.normalize(request.params.dig("session", "email"))
+      email = request.params.dig("session", "email")
+      # Rack::UTF8Sanitizer skips multipart bodies, so this can hold invalid bytes
+      EmailNormalizer.normalize(email.scrub) if email.is_a?(String)
     end
   end
 
