@@ -18,13 +18,14 @@ export default class extends Controller {
   static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
+  #searchLog
   #renders = 0
   #renderedUrl
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
   initialize () {
     this.status = this.statusTarget
-    this.searchLog = new SearchLog(this.searchLogUrlValue)
+    this.#searchLog = new SearchLog(this.searchLogUrlValue)
   }
 
   async connect () {
@@ -39,12 +40,13 @@ export default class extends Controller {
     }
     this.source = new CatalogComboboxSource(this.catalog, ({ params, total, filteredCount }) => {
       renderCounts(document, filteredCount)
-      this.searchLog.typed({ ...params, count: total })
+      this.#searchLog.typed({ ...params, count: total })
     })
     this.#countModels()
     // filters set while it loaded are in the URL, and the reader stays where they've scrolled to
-    this.#render(new URL(window.location.href), [window.scrollX, window.scrollY])
-    this.searchLog.visited(new URL(window.location.href))
+    const current = new URL(window.location.href)
+    this.#render(current, [window.scrollX, window.scrollY])
+    this.#searchLog.visited(current)
   }
 
   // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles,
@@ -113,7 +115,7 @@ export default class extends Controller {
 
   #go (url, scroll = [0, 0], { replace = false, ...options } = {}) {
     window.history[replace ? 'replaceState' : 'pushState'](stamped(), '', readable(url))
-    this.searchLog.visited(url)
+    this.#searchLog.visited(url)
     return this.#render(url, scroll, options)
   }
 

@@ -113,6 +113,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 3)
     expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
+    # the render re-runs the pick's search in its combobox, which settles unlogged
+    page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
+    expect(logged).to eq ["count=2&q=level+4+rec", "vehicle_models=m/aventon/2026/level_4_rec_step_through",
+      "count=1&q=level_2_step&vehicle_models=m/aventon/2026/level_4_rec_step_through",
+      "vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through"]
     expect(page).to have_no_css("article")
     # what differs is only marked further down
     expect(find("[aria-label='Overview comparison']")).to have_no_css(".tw\\:spec-diff")

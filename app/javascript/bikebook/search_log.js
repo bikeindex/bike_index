@@ -1,8 +1,8 @@
-import { FILTERS } from 'bikebook/hydrate'
-import { toQuery } from 'bikebook/query'
+import { FILTERS, toQuery } from 'bikebook/query'
 
 const LOGGED = [...FILTERS, 'vehicle_models', 'q', 'count']
-// on their own, the market, jurisdiction and sorts are any visit's
+// A search is what it asks for besides the defaults, which a page leaves out of its URL and its combobox puts
+// into its own, with a count
 const SEARCHED = LOGGED.filter((name) => !['market', 'jurisdiction', 'year_dir', 'price_dir', 'count'].includes(name))
 const SETTLE_MS = 1000
 
@@ -37,12 +37,12 @@ export class SearchLog {
   }
 
   #send (params) {
-    const logged = Object.fromEntries(LOGGED.map((name) => [name, params[name]]))
-    if (!SEARCHED.some((name) => String(logged[name] ?? '').trim())) return
+    const pick = (names) => toQuery(Object.fromEntries(names.map((name) => [name, params[name]])))
+    const search = pick(SEARCHED)
+    if (!search || search === this.#sent) return
 
-    const query = toQuery(logged)
-    if (query === this.#sent) return
-    this.#sent = query
+    this.#sent = search
+    const query = pick(LOGGED)
     fetch(`${this.#path}?${query}`, { keepalive: true }).catch(() => {})
     window.dataLayer?.push({ event: 'bikebook_search', bikebook_search: query })
   }

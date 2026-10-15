@@ -29,7 +29,7 @@ class Rack::Attack
   # repeatedly during normal searching (per-keystroke autocomplete, kind counts) -
   # not page navigations. Throttle them like the API (generous per-IP budget)
   # rather than against the strict per-page limit, which active searching trips.
-  SEARCH_DATA_PREFIXES = %w[/search/combobox /search/marketplace/counts].freeze
+  SEARCH_DATA_PREFIXES = %w[/search/combobox /search/marketplace/counts /search/bikebook].freeze
 
   cache.store = ActiveSupport::Cache::RedisCacheStore.new(
     url: Bikeindex::Application.config.redis_rack_attack_url

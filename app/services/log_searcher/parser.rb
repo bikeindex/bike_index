@@ -116,9 +116,7 @@ module LogSearcher
     end
 
     def stolenness_for(endpoint, opts)
-      if endpoint == :web_bikebook
-        nil
-      elsif endpoint == :api_v2_bikes
+      if endpoint == :api_v2_bikes
         case opts["path"]
         when "/api/v2/bikes_search" then :all
         when "/api/v2/bikes_search/stolen" then :stolen

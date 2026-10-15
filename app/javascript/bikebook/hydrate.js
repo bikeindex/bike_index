@@ -4,17 +4,13 @@ import { renderChips, renderCounts } from 'bikebook/catalog'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { filterOption } from 'bikebook/templates/filter_option'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { toQuery } from 'bikebook/query'
+import { FILTERS, LISTS, RANGES, SINGLES, toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { preferredSize } from 'bikebook/sizes'
 import { VehicleViewer } from 'bikebook/vehicle_viewer'
 
 /* global CSS */
 
-const LISTS = ['primary_activity', 'manufacturer', 'vehicle_type']
-const SINGLES = ['suspension', 'model_configuration', 'market']
-const RANGES = ['year_min', 'year_max', 'price_min', 'price_max']
-export const FILTERS = [...LISTS, ...SINGLES, ...RANGES, 'electric', 'jurisdiction', 'year_dir', 'price_dir']
 // rather than the kit's max_compare, which the catalog publishes as 3
 const MAX_COMPARE = 5
 

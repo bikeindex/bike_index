@@ -101,7 +101,7 @@ RSpec.describe LogSearcher::Parser do
            endpoint: :web_bikebook,
            ip_address: "157.131.200.8",
            query_items: {count: "2", manufacturer: "aventon", q: "level 4 rec"},
-           stolenness: nil,
+           stolenness: :all,
            includes_query: true,
            organization_id: nil,
            page: nil,
