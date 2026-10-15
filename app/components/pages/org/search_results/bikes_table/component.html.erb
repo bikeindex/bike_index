@@ -13,13 +13,7 @@
   <% end %>
 
   <% table.column(label: settings.column_renames[:photo_cell], classes: "hideableColumn photo_cell") do |bike| %>
-    <% thumb_url = BikeServices::Displayer.thumb_image_url(bike) %>
-
-    <% if thumb_url.present? %>
-      <%= image_tag(thumb_url, alt: "", loading: "lazy", skip_pipeline: true, class: "#{THUMB_CLASSES} tw:object-cover") %>
-    <% else %>
-      <span class="tw:bg-gray-100 tw:dark:bg-gray-800 <%= THUMB_CLASSES %>"></span>
-    <% end %>
+    <%= render(Atoms::BikeThumbnail::Component.new(bike:)) %>
   <% end %>
 
   <% table.column(label: settings.column_renames[:url_cell], classes: "hideableColumn url_cell") do |bike| %>

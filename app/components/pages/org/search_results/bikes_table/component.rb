@@ -16,8 +16,6 @@ module Pages
             serial_number: %w[reg_extra_registration_number]
           }.freeze
 
-          THUMB_CLASSES = "tw:block tw:h-8 tw:w-11 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-gray-700"
-
           def initialize(organization:, bikes:, render_sortable: false,
             sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
