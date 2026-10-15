@@ -1,9 +1,11 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
 import { hydrate, loadingShell } from 'bikebook/hydrate'
+import { renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
+import { classCard } from 'bikebook/templates/vehicles/class_badges'
 import { uuid } from 'bikebook/templates/helpers'
 
 /* global CSS, requestAnimationFrame */
@@ -41,6 +43,7 @@ export default class extends Controller {
     // the URL's filters are the reader's, where the combobox's add the visitor's market
     this.source = new CatalogComboboxSource(this.catalog, ({ params: { q }, total, filteredCount, primed }) => {
       renderCounts(document, filteredCount)
+      renderInto(document.getElementById('classification-card'), classCard(q ?? '', this.catalog.vocabulary.e_vehicle_classifications))
       if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })
     this.#countModels()

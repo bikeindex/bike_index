@@ -322,10 +322,14 @@
 
   <%= render(Pages::Bikebook::DonateStrip::Component.new) %>
 
-  <%# The tiles the Overview shows, the US classes' and the e-moto's, each a tooltip of its card %>
+  <%# The US classes' and the e-moto's tiles the Overview shows, each a tooltip of its card, and the cards a search for a classification's ID shows %>
   <% [1, 2, 3, nil].each do |e_bike_class| %>
     <template data-bikebook-class-badge="<%= e_bike_class || "emoto" %>">
       <%= render(Pages::EbikeRules::ClassTile::Component.new(e_bike_class:, explained: true)) %>
+    </template>
+
+    <template data-bikebook-class-card="<%= e_bike_class || "emoto" %>">
+      <%= render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:)) %>
     </template>
   <% end %>
 
@@ -340,6 +344,7 @@
   <div class="bikebook twgutter tw:mx-auto tw:max-w-screen-xl tw:pt-7 tw:pb-6">
     <template data-bikebook--page-target="shell">
       <%= search %>
+      <div id="classification-card"></div>
       <div id="vehicle-viewers"></div>
     </template>
 

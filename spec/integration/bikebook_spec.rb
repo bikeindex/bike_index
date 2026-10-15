@@ -559,7 +559,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     type_into(vehicle_field, "m/specialized/2025/haul_st")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(model doesn't match filters)")
     expect(page).to have_css("[role='option']", count: 1).and have_no_css("[role='option']", text: "$3,599.99")
+    # a classification's exact id shows its /ebike-rules card above the vehicles: a US class's, or the e-moto's
+    type_into(vehicle_field, "evc/us/class_2")
+    expect(page).to have_css("#classification-card h3", exact_text: "Class 2")
+    type_into(vehicle_field, "evc/off_highway_motorcycle")
+    expect(page).to have_css("#classification-card h3", exact_text: "Not an e-bike")
     type_into(vehicle_field, "m/specialized/2025/haul_st_ca")
+    expect(page).to have_no_css("#classification-card h3")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(1 matching model)")
 
     # its listbox closed, which covers the filters
