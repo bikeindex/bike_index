@@ -15,7 +15,7 @@ RSpec.describe Pages::Search::MarketplaceIntro::Component, type: :component do
     expect(component).to have_css("#{expanded}:not(.tw\\:hidden)")
     expect(component).to have_css("#{collapsed}.tw\\:hidden")
     expect(component).to have_css("h1", text: "The used bike marketplace from the bike registry.")
-    expect(component.text).to include("Checked for theft")
+    expect(component.text).to include("Checked for theft", "Bike Index members")
     expect(component).to have_link("How buying works", href: marketplace_how_it_works_path(anchor: "buying"))
     expect(component).to have_link("How selling works", href: marketplace_how_it_works_path(anchor: "selling"))
     # After the content, so it's tabbed to last

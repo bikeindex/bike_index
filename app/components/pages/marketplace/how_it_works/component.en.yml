@@ -9,6 +9,10 @@ en:
             Every sale is person to person. Bike Index doesn't handle payment or shipping,
             so buyer and seller agree on price, payment and delivery between themselves.
           back_to_marketplace: Back to marketplace
+          bike_index_members: Bike Index members
+          bike_index_members_body: >-
+            Sellers who support Bike Index with a membership show a Bike Index member
+            badge on their listings.
           browse_bikes: Browse bikes
           buying_a_bike: Buying a bike
           checked_for_theft: Checked for theft
@@ -16,9 +20,9 @@ en:
             Each serial is checked against the Bike Index stolen bike database. Bikes
             reported stolen can’t be listed.
           contact_the_seller: Contact the seller
-          contact_the_seller_body: >-
-            Ask questions and arrange a time to see the bike. Look for the verified
-            seller badge.
+          contact_the_seller_member_badge_body: >-
+            Ask questions and arrange a time to see the bike. Look for the Bike Index
+            member badge.
           find_a_bike: Find a bike
           find_a_bike_body: >-
             Search listing descriptions, pick a primary activity type, and set a price
@@ -90,9 +94,6 @@ en:
             which says a lot about the bike. It doesn't guarantee the honesty of the
             person buying or selling it. Ask questions, keep your messages, and trust
             your instincts.
-          verified_sellers: Verified sellers
-          verified_sellers_body: Sellers who have verified their account show a badge
-            on their listings.
           what_we_check: What we check
           why_a_marketplace: Why a marketplace?
           why_heading: Buying used shouldn't mean taking a chance on a stolen bike.

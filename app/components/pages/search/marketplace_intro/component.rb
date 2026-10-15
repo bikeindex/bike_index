@@ -19,7 +19,7 @@ module Pages
 
         def trust_chips
           [translation(".registered_bikes_only"), translation(".checked_for_theft"),
-            translation(".ownership_transfers"), translation(".verified_sellers")]
+            translation(".ownership_transfers"), translation(".bike_index_members")]
         end
       end
     end

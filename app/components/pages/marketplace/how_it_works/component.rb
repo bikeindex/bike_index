@@ -17,14 +17,14 @@ module Pages
             [translation(".registered_bikes_only"), translation(".registered_bikes_only_body")],
             [translation(".checked_for_theft"), translation(".checked_for_theft_body")],
             [translation(".ownership_transfers"), translation(".ownership_transfers_body")],
-            [translation(".verified_sellers"), translation(".verified_sellers_body")]
+            [translation(".bike_index_members"), translation(".bike_index_members_body")]
           ]
         end
 
         def buying_steps
           [
             [translation(".find_a_bike"), translation(".find_a_bike_body")],
-            [translation(".contact_the_seller"), translation(".contact_the_seller_body")],
+            [translation(".contact_the_seller"), translation(".contact_the_seller_member_badge_body")],
             [translation(".see_it_or_ship_it"), translation(".see_it_or_ship_it_body")],
             [translation(".pay_and_take_ownership"), translation(".pay_and_take_ownership_body")]
           ]

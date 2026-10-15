@@ -4,6 +4,7 @@ en:
     pages:
       search:
         marketplace_intro:
+          bike_index_members: Bike Index members
           checked_for_theft: Checked for theft
           description: >-
             Bike Index is a nonprofit that helps get stolen bikes home. Our marketplace
@@ -16,5 +17,4 @@ en:
           marketplace_title: Bike Index Marketplace
           ownership_transfers: Ownership transfers
           registered_bikes_only: Registered bikes only
-          verified_sellers: Verified sellers
           what_makes_this_different: What makes this different?

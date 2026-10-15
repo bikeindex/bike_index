@@ -11,6 +11,8 @@ RSpec.describe MarketplaceController, type: :request do
       expect(response.body).to match(/id="buying"/)
       expect(response.body).to match(/id="selling"/)
       expect(response.body).to include(search_marketplace_path)
+      # the badge the listing cards show
+      expect(response.body).to include("Look for the Bike Index member badge.")
     end
   end
 end
