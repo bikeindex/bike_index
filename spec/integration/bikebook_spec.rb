@@ -186,6 +186,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     click_link "Components"
     expect(page).to have_css("section[aria-label='Aventón Level 2 Step-Through components'] h3", exact_text: "Level 2 Step-Through")
     expect(page).to have_css("[data-comparison] section[aria-label$=' components']", count: 2)
+    # topped in no frame's color, which is the geometry's
+    expect(page).to have_no_css("section[aria-label$=' components'].tw\\:border-t-4")
     expect(page).to have_no_css("article").and have_no_css("[aria-label='Components comparison']")
     # under its wheels, brakes, suspension and drivetrain
     headings = find("section[aria-label='Aventón Level 2 Step-Through components']").all("h2").map { it.text.downcase }

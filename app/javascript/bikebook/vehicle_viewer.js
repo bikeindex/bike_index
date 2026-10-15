@@ -43,11 +43,12 @@ export class VehicleViewer {
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
       : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
     // each vehicle's `key` on a card of its own, named as its full card is, after whatever `lead` shows
-    const cards = (key, none, content, lead = () => nothing) => vehicles.map(({ data, value }, index) => {
+    // `keyed`, each topped in its frame's color in the overlay
+    const cards = (key, none, content, { lead = () => nothing, keyed = false } = {}) => vehicles.map(({ data, value }, index) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
       return html`<section aria-label=${`${[manufacturer, model].filter(present).join(' ')} ${key}`} class="twgutter tw:w-full tw:min-w-0 tw:space-y-4
         tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
-        ${seriesBorders(compared.frames, index).top} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}"><header class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
+        ${keyed ? seriesBorders(compared.frames, index).top : ''} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}"><header class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
         ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
         : nothing}<h3 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${model}</h3></div><div
         class="tw:shrink-0">${basicsOf({ presenter, data }).photo('tw:h-14 tw:w-21')}</div></header>${lead(data, value)}${present(data[key])
@@ -62,15 +63,16 @@ export class VehicleViewer {
           tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, beside: true })}${
           comparisonTable({ ...compared, part: 'geometry', beside: true })}</div>`
         : geometryOverlay(compared)}${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
-        html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`))}`,
+        html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`,
+      { keyed: true }))}`,
       components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }),
-        (data, value) => runningGearOf({ presenter, data, others: others(value) }))),
+        { lead: (data, value) => runningGearOf({ presenter, data, others: others(value) }) })),
       motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value) }))),
       all: () => {
         const full = vehicles.map(({ data, value }, index) => {
           const remaining = values.filter((each) => each !== value)
           const removePath = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
-          return modelViewer({ presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, keyBorder: seriesBorders(compared.frames, index).top, ...(comparing && { selectedSize: selectedSizes.get(value), sizePath: sizePath(value) }) })
+          return modelViewer({ presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, ...(comparing && { selectedSize: selectedSizes.get(value), sizePath: sizePath(value) }) })
         })
         return html`${comparing ? html`${comparisonTable({ ...compared, part: 'all' })}${geometryOverlay(compared)}` : nothing}${cardRow('tw:mt-8', full)}`
       }
