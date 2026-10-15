@@ -4,7 +4,7 @@ module Pages
   module EbikeRules
     module ClassTile
       # An e-bike class's navy tile, a gray one for a class the catalog can't tell, or the red e-moto tile
-      # for a bike with no class. `explained`, a class's tile is a tooltip of its US class card
+      # for a bike with no class. `explained`, a class's or the e-moto's tile is a tooltip of its card
       class Component < ApplicationComponent
         SIZES = {
           md: {tile: "tw:size-14", label: "tw:text-[9px]", number: "tw:text-[28px]", icon: "tw:size-6"},
@@ -19,9 +19,9 @@ module Pages
         end
 
         def call
-          return tile unless @explained && @e_bike_class
+          return tile if !@explained || @class_unknown
 
-          render(UI::Tooltip::Component.new(text: translation(".class_aria", n: @e_bike_class))) do |tooltip|
+          render(UI::Tooltip::Component.new(text: aria[:label] || translation(".emoto_aria"))) do |tooltip|
             tooltip.with_body { render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class: @e_bike_class, framed: false)) }
             tile
           end
