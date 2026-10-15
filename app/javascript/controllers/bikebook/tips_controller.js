@@ -26,9 +26,13 @@ export default class extends Controller {
     this.tipsTarget.firstElementChild.focus()
   }
 
-  // for the search, which opens its own list
+  // for the search, which opens its own list, and its filter panel
   browse () {
     this.dispatch('browse')
+  }
+
+  filters () {
+    this.dispatch('filters')
   }
 
   #show (tips) {

@@ -7,11 +7,11 @@ import { andSentence, equal, isNumber, join, present } from 'bikebook/templates/
 
 // UI::Chart::Component::COLORS, one per compared model; forced, or the table cells' dark border color wins
 export const SERIES = [
-  { color: '#3498db', border: 'tw:border-b-[#3498db]!' },
-  { color: '#DC2626', border: 'tw:border-b-[#DC2626]!' },
-  { color: '#7C3AED', border: 'tw:border-b-[#7C3AED]!' },
-  { color: '#D97706', border: 'tw:border-b-[#D97706]!' },
-  { color: '#059669', border: 'tw:border-b-[#059669]!' }
+  { color: '#3498db', bottom: 'tw:border-b-[#3498db]!', top: 'tw:border-t-[#3498db]!' },
+  { color: '#DC2626', bottom: 'tw:border-b-[#DC2626]!', top: 'tw:border-t-[#DC2626]!' },
+  { color: '#7C3AED', bottom: 'tw:border-b-[#7C3AED]!', top: 'tw:border-t-[#7C3AED]!' },
+  { color: '#D97706', bottom: 'tw:border-b-[#D97706]!', top: 'tw:border-t-[#D97706]!' },
+  { color: '#059669', bottom: 'tw:border-b-[#059669]!', top: 'tw:border-t-[#059669]!' }
 ]
 const PADDING = 30
 const TIRE_GAP = 10
@@ -61,13 +61,15 @@ const drawable = (geometry) => geometry?.missing.length === 0 || geometry?.wheel
 // One frame has nothing to overlay
 const overlaid = (frames) => frames.filter(drawable).length > 1
 
-// The bottom border that keys a comparison table column to its frame, which the overlay draws in the same order
-export const seriesBorder = (frames, index) => overlaid(frames) && drawable(frames[index]) ? `tw:border-b-4 ${SERIES[index].border}` : ''
+// The top and bottom borders that key a comparison table column to its frame, which the overlay draws in the same order
+export const seriesBorders = (frames, index) => overlaid(frames) && drawable(frames[index])
+  ? { top: `tw:border-t-4 ${SERIES[index].top}`, bottom: `tw:border-b-4 ${SERIES[index].bottom}` }
+  : { top: '', bottom: '' }
 
 // The compared models' frames in their `sizes`, standing on the same ground with their bottom brackets lined up,
 // each over the ones the comparison table columns left of it. A frame it can't draw is its wheels alone where they're
 // listed, the rear axle on the first drawn frame's. Lone wheels aren't drawn, only said what they're missing
-export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
+export const geometryOverlay = ({ presenter, vehicles, sizes, frames, beside = false }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const labelled = named.map((vehicle, index) => {
     const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
@@ -98,7 +100,9 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   // out to the screen's edges on a phone, as the cards below it are
   return html`<section aria-label="Geometry overlay" data-controller=${overlay ? 'bikebook--geometry-overlay' : nothing} class="tw:mx-auto tw:mt-6
     tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800
-    tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0">${sectionHeading('Geometry overlay')}${
+    tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0 ${beside
+      ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:basis-2/5 tw:min-[1500px]:shrink-0'
+      : ''}">${sectionHeading('Geometry overlay')}${
     overlay ? drawing(presenter, drawn, labelled) : nothing}${missingNote}</section>`
 }
 

@@ -25,10 +25,35 @@ HwComboboxController.prototype._requestChips = function (values) {
   return source ? source.chips(this, values) : requestChips.call(this, values)
 }
 
+// A paste fills the input without opening it, and closing is what commits a pick, from the options it shows -
+// so it's expanded at once, as prepareToFilter does
+const pickFirst = (combobox) => {
+  if (combobox._isClosed) {
+    combobox.open()
+    combobox._expand()
+  }
+  combobox.close('hw:keyHandler:enter')
+}
+
+// Counts the edits a local source answers, so an Enter ahead of its answer (a paste, entered at once) waits for it
+const filterAndSelect = HwComboboxController.prototype.filterAndSelect
+HwComboboxController.prototype.filterAndSelect = function (event) {
+  this.edits = (this.edits ?? 0) + 1
+  filterAndSelect.call(this, event)
+}
+
 const filterAsync = HwComboboxController.prototype._filterAsync
-HwComboboxController.prototype._filterAsync = function (inputType) {
+HwComboboxController.prototype._filterAsync = async function (inputType) {
   const source = localSources.get(this.element)
-  return source ? source.filter(this, inputType) : filterAsync.call(this, inputType)
+  if (!source) return filterAsync.call(this, inputType)
+
+  const edits = this.edits
+  await source.filter(this, inputType)
+  this.answeredEdits = edits
+  if (this.enterPending && edits === this.edits) {
+    this.enterPending = false
+    pickFirst(this)
+  }
 }
 
 // hotwire_combobox 0.4.1 finds an option by interpolating the raw value into
@@ -45,7 +70,18 @@ HwComboboxController.prototype._optionElementWithValue = function (value) {
 // nothing to pick breaks the form's implicit submission -- unlike every other
 // input. Only handle the key while there's an option to choose.
 const navigate = HwComboboxController.prototype.navigate
+// A query in a local source's combobox is to pick from, though it's closed, rather than submit
 HwComboboxController.prototype.navigate = function (event) {
+  if (event.key === 'Enter' && localSources.get(this.element)?.filter && this._fullQuery) {
+    if (this.edits !== this.answeredEdits) {
+      this.enterPending = true
+      return event.preventDefault()
+    }
+    if (this._isClosed) {
+      event.preventDefault()
+      return pickFirst(this)
+    }
+  }
   if (event.key === 'Enter' && this._isClosed) return
 
   navigate.call(this, event)
