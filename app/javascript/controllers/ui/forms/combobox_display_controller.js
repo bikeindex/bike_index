@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
+/* global ResizeObserver */
 
 // Connects to data-controller='ui--forms--combobox-display'
 // (rendered by UI::Forms::Combobox rich_display:)

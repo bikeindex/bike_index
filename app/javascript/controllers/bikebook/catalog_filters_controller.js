@@ -88,7 +88,7 @@ export default class extends Controller {
   // again as it's clicked, since the panel's own state and the picks reach the URL without a filter changing
   refreshClear () {
     const url = new URL(window.location)
-    for (const name of [...Object.keys(this.#filters), 'jurisdiction'].filter((name) => name !== 'market')) url.searchParams.delete(name)
+    for (const name of Object.keys(this.#filters).filter((name) => name !== 'market')) url.searchParams.delete(name)
     for (const link of this.clearTargets) link.href = readable(url)
   }
 
