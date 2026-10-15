@@ -43,7 +43,10 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     expect(bike.reload.status_stolen?).to be_truthy
 
-    # ---- Fill the required theft details (country, street, city) plus useful extras ----
+    # ---- Fill the required theft details plus useful extras ----
+    %w[date_stolen phone theft_description].each do |attribute|
+      expect(find("[name='bike[stolen_records_attributes][0][#{attribute}]']")[:required]).to be_present
+    end
     pick_within_selectize(selectize_for("select.country-select-input"), "United States")
     fill_in "Address or intersection", with: "100 Main St"
     fill_in "City", with: "New York"

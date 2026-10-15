@@ -39,7 +39,7 @@
     <% if stolen? %>
       <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".theft_details"), divider: true) %>
       <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :theft_description, kind: :text_area,
-          label_text: translation(".what_happened"),
+          label_text: translation(".what_happened"), required: true,
           html_options: {value: report_attrs[:theft_description], rows: 3,
             placeholder: translation(".what_happened_placeholder")}) %>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :locking_description,
