@@ -404,6 +404,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     find("[aria-label='Remove Aventón Level 2 Step-Through']").click
     expect(page).to have_css("article", count: 1)
     expect(page).to have_no_css("[data-comparison]")
+    # one model still gets the table and the overlay, its frame alone
+    expect(page).to have_css("[aria-label='Comparison'] thead th", count: 2).and have_css("[aria-label='Geometry overlay'] svg g", count: 1)
     expect(page).to have_css(".hw-combobox__chip", count: 1)
 
     logged_count = logged.count
