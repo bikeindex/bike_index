@@ -1078,6 +1078,12 @@ RSpec.describe "Bikebook", :js, type: :system do
       .and have_css("#classification-cards h3", exact_text: "Off-Highway Motorcycle")
     expect(cards_asked.count).to eq 2
     expect(page.evaluate_script("window.fewestChips")).to eq 3
+    # another's pick leaves the open one as it is, unrequested
+    type_into(vehicle_field, "evc/moped")
+    retry_on_detach { find("[role='option'][data-value='evc/moped']").click }
+    expect(page).to have_css("#classification-cards h3", exact_text: "Moped, up to 2 hp and 30 mph", wait: 10)
+    expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
+    expect(cards_asked.count).to eq 3
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")

@@ -35,29 +35,29 @@ export const pickedClassifications = (url, classifications) =>
   (url.searchParams.get(PARAM)?.split(',') ?? []).filter((id) => hasCard(id, classifications))
 
 // The `ids`' /ebike-rules cards into `slot`, centered: a US class's from the page, which a state `jurisdiction`'s own,
-// with its rules, loads over, and any other's from /ebike-rules. Ones the page already shows carry into a rendered
-// page's `slot` as they are, so neither a search nor a render reloads them
+// with its rules, loads over, and any other's from /ebike-rules. Each the page already shows carries over as it is,
+// loaded and open or closed, so neither a search, a render nor another card reloads it
 export const renderClassCards = (slot, ids, jurisdiction, classifications) => {
   const shown = [...new Set(ids)].filter((id) => hasCard(id, classifications))
   const key = JSON.stringify([shown, jurisdiction || ''])
   const current = document.getElementById(slot.id)
-  if (current?.dataset.key === key) {
-    if (current !== slot) slot.replaceChildren(...[...current.childNodes].map((node) => node.cloneNode(true)))
-    slot.dataset.key = key
-    return
-  }
+  if (current === slot && slot.dataset.key === key) return
 
   slot.dataset.key = key
   const { frameId, src } = slot.dataset
   const frame = (suffix, params, content = nothing, state = null) =>
     html`<turbo-frame id=${`${frameId}-${suffix}`} src=${path(src, state, params)}>${content}</turbo-frame>`
+  const kept = new Map([...(current?.querySelectorAll('[data-card]') ?? [])].map((card) => [card.dataset.card, card]))
   const cards = shown.map((id) => {
     const number = id.match(US_CLASS)?.[1]
+    const cardKey = number && jurisdiction ? `${id} ${jurisdiction}` : id
+    if (kept.has(cardKey)) return kept.get(cardKey).cloneNode(true)
+
     const content = number && document.querySelector(`template[data-bikebook-class-card="${number}"]`)?.content.cloneNode(true)
     const card = number
       ? (jurisdiction ? frame(number, { e_bike_class: number }, content, jurisdiction) : content)
       : frame(id.replace(/[^\w-]/g, '-'), { classification: id })
-    return html`<div class="tw:w-full tw:max-w-sm">${card}</div>`
+    return html`<div class="tw:w-full tw:max-w-sm" data-card=${cardKey}>${card}</div>`
   })
   renderInto(slot, cards.length ? html`<div class="tw:mt-6 tw:flex tw:flex-wrap tw:justify-center tw:gap-4">${cards}</div>` : nothing)
 }
