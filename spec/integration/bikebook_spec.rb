@@ -92,7 +92,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     badge.click
     expect(page).to have_css("[role='tooltip'] h3", exact_text: "Class #{badge[:"aria-label"][/\d/]}", visible: true)
     expect(find("[aria-label='Overview']").all("dt:not([role='tooltip'] dt)").map(&:text))
-      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Suspension front/rear", "Price", "E-vehicle class", "Electric Certification", "Description"])
+      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Suspension front/rear", "Groupset", "Price", "E-vehicle class", "Electric Certification", "Description"])
+    # no groupset listed, so a dash, with the rest of its drivetrain in the tooltip
+    expect(find("[aria-label='Overview'] dl > div", text: /\AGroupset/).find("dd").text(:all).squish).to match(/\A— \? Drivetrain: /)
     expect(find("[aria-label='Overview']")).to have_text("The Level 4 REC").and have_button("Read more")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
     expect(page).to have_css(".hw-combobox__chip", text: "Aventón Level 4 REC Step-Through")

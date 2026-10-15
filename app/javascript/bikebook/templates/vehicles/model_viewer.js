@@ -1,6 +1,6 @@
 import { html, nothing, render } from 'lit-html'
 import { copyableCode } from 'bikebook/templates/ui/copyable_code'
-import { numberDisplay } from 'bikebook/templates/helpers'
+import { missing, numberDisplay } from 'bikebook/templates/helpers'
 import { collapse } from 'bikebook/templates/ui/collapse'
 import { definitionListContainer } from 'bikebook/templates/ui/definition_list/container'
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
@@ -653,10 +653,11 @@ class ModelViewer {
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
   }
 
+  // the rest of its drivetrain in a tooltip, on a dash where no groupset's listed
   groupsetWithDrivetrain () {
     const groupset = groupsetSummary(this.vehicle)
-    const drivetrain = groupset && this.drivetrainTooltip()
-    return drivetrain ? this.withTooltip(groupset, drivetrain) : groupset
+    const drivetrain = this.drivetrainTooltip()
+    return drivetrain ? this.withTooltip(groupset ?? missing, drivetrain) : groupset
   }
 
   // its gearing's rows and the frame's drivetrain ones
