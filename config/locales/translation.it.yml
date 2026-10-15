@@ -5706,6 +5706,11 @@ it:
         in_the_past_year: nell'ultimo anno
         now: Ora
         to: a
+      column_settings:
+        all: Tutti
+        default: predefinito
+        none: nessuno
+        visible_columns: Colonne visibili
     atoms:
       serial:
         hidden: nascosto

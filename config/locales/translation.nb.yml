@@ -5448,6 +5448,11 @@ nb:
         in_the_past_year: i løpet av det siste året
         now: nå
         to: til
+      column_settings:
+        all: Alle
+        default: misligholde
+        none: ingen
+        visible_columns: Synlige kolonner
     atoms:
       serial:
         hidden: skjult

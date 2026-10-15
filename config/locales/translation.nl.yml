@@ -5604,6 +5604,11 @@ nl:
         in_the_past_year: in het afgelopen jaar
         now: nu
         to: Naar
+      column_settings:
+        all: Alle
+        default: standaard
+        none: geen
+        visible_columns: Zichtbare kolommen
     atoms:
       serial:
         hidden: verborgen

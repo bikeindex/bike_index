@@ -5697,6 +5697,11 @@ es:
         in_the_past_year: en el último año
         now: ahora
         to: a
+      column_settings:
+        all: todo
+        default: por defecto
+        none: ninguno
+        visible_columns: Columnas visibles
     atoms:
       serial:
         hidden: oculto
