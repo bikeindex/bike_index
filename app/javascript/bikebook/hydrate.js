@@ -3,7 +3,7 @@ import { localSources } from 'utils/hw_combobox_patch'
 import { renderChips, renderCounts } from 'bikebook/catalog'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { filterOption } from 'bikebook/templates/filter_option'
-import { pickedClassifications, renderClassCards } from 'bikebook/templates/vehicles/class_cards'
+import { cardLabel, pickedClassifications, renderClassCards } from 'bikebook/templates/vehicles/class_cards'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { FILTERS, LISTS, RANGES, SINGLES, toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
@@ -88,6 +88,9 @@ export async function hydrate (catalog, source, shell, url) {
   const query = toQuery({ ...filters, vehicle_models: values })
   combobox(root, 'vehicle_models').dataset.hwComboboxAsyncSrcValue = `${url.pathname}?${query ? `${query}&` : ''}for_id=vehicle_models`
   root.getElementById('vehicle_models-hw-hidden-field').setAttribute('value', values)
+  // chipped before it's shown, rather than once the combobox asks the worker, which would leave the field bare a frame
+  renderChips(combobox(root, 'vehicle_models'), [...vehicles.filter(({ display }) => display != null),
+    ...cards.map((value) => ({ value, display: cardLabel(value, classifications) }))])
   fillFields(root, filters)
   renderClassCards(root.getElementById('classification-cards'), cards, root.getElementById('jurisdiction-hw-hidden-field').getAttribute('value'), classifications)
   for (const name of SINGLES) {

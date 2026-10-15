@@ -1062,12 +1062,20 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#classification-cards h3", exact_text: "Off-Highway Motorcycle")
     find("#classification-cards [role=button]", text: "California specifics").click
     expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
-    # a view's tab keeps them as they were, open and unrequested
+    # a view's tab keeps them as they were, open and unrequested, and the field's chips without a bare frame between
+    page.evaluate_script(<<~JS)
+      (() => {
+        window.fewestChips = Infinity
+        new MutationObserver(() => { window.fewestChips = Math.min(window.fewestChips, document.querySelectorAll('[data-hw-combobox-chip]').length) })
+          .observe(document.body, { childList: true, subtree: true })
+      })()
+    JS
     click_link "Sizes & geometry"
     expect(page).to have_current_path(/[?&]view=geometry\b/)
     expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
       .and have_css("#classification-cards h3", exact_text: "Off-Highway Motorcycle")
     expect(cards_asked.count).to eq 2
+    expect(page.evaluate_script("window.fewestChips")).to eq 3
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")

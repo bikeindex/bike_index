@@ -104,9 +104,12 @@ export class CatalogComboboxSource {
     observer.observe(wrapper)
   }
 
-  // An id the catalog lacks gets no chip
+  // An id the catalog lacks gets no chip, and one the render already chipped no second
   async chips (combobox, values) {
-    const ids = String(values).split(',').filter(Boolean)
+    const chipped = new Set([...combobox.element.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam))
+    const ids = String(values).split(',').filter((id) => id && !chipped.has(id))
+    if (ids.length === 0) return
+
     const displays = await this.catalog.displays(ids)
     if (!combobox.element.isConnected) return
 
