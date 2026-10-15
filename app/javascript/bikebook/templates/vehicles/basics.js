@@ -6,11 +6,12 @@ import { basicsOf, simpleFormat } from 'bikebook/templates/vehicles/model_viewer
 import { CERTIFICATION_LABEL } from 'bikebook/templates/vehicles/motor_section'
 import { present } from 'bikebook/templates/values'
 
-// `only` ones once a shown model is electric or suspended, `differing` ones where the models' values of it differ
+// `only` ones once a shown model is electric, suspended or a cargo vehicle, `differing` ones where the models' values of it differ
 const FIELDS = [
   { label: 'Model group', key: 'model_group' },
   { label: 'Years', key: 'years' },
   { label: 'Vehicle type', key: 'vehicle_type', differing: 'type' },
+  { label: 'Cargo', key: 'cargo', only: 'cargo_vehicle' },
   { label: 'Primary activity', key: 'primary_activity' },
   { label: 'Frame material', key: 'frame_material' },
   { label: 'Wheel size', key: 'wheel_size', differing: 'wheel_bsds' },

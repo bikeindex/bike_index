@@ -72,6 +72,12 @@ export const brakesAt = (presenter, data, size) => {
   }
 }
 
+// cargo_bike, cargo_tricycle and their _rear kinds
+export const isCargo = (data) => /^cargo_/.test(data.type ?? '')
+
+// A vehicle's total payload in `size`, or across its sizes, and its cargo area
+export const cargoAt = (presenter, data, size) => new ModelViewer({ presenter, data, others: [] }).cargo(size)
+
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
 
 export const wheelSize = (presenter, bsd) => new ModelViewer({ presenter, data: {}, others: [] }).wheelSizeName(bsd)
@@ -309,6 +315,8 @@ class ModelViewer {
       vehicle_type: presence(typeLabel(vehicle)),
       type: vehicle.type,
       e_vehicle_class: this.eVehicleClass(),
+      cargo_vehicle: isCargo(this.data),
+      cargo: this.cargo(),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
       frame_material: vehicle.frame?.material,
       ...this.wheelSizes(),
@@ -334,6 +342,19 @@ class ModelViewer {
     const optionals = optional.map(([name, mode]) => html`<span class="tw:block"><span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500">w/ optional
       ${this.presenter.humanize(mode).toLowerCase()}</span> ${this.tooltipped(name, tooltips)}</span>`)
     return join([join(standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optionals])
+  }
+
+  // "200 kg total payload, 60 cm long, 40 cm wide, 200 L", the payload its sizes' range without a `size`
+  cargo (size) {
+    const { presenter } = this
+    const payloads = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
+    const ends = [...new Set([Math.min(...payloads), Math.max(...payloads)])]
+    const { length, width, volume } = this.data.cargo ?? {}
+    return presence(join([
+      payloads.length ? join([join(ends.map((kg) => presenter.measurement(kg, 'kg')), '–'), ' total payload']) : null,
+      length ?? width ? presenter.dimensions({ length, width }) : null,
+      isNumber(volume) ? presenter.measurement(volume, 'l') : null
+    ].filter(present), ', '))
   }
 
   // its classes' names, and under them its US classes' tiles and an e-moto's

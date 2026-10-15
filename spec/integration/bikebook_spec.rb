@@ -1044,6 +1044,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     description.click_on "Read more"
     expect(description).to have_css("button[aria-expanded='true']", exact_text: "Show less")
     expect(description).to have_text("MIK-compatible rear rack").and have_no_css("p", text: /…\z/)
+    # a cargo bike's total payload and cargo area, on the Overview and above the size its geometry is in
+    expect(page).to have_css("[aria-label='Overview'] dl > div", text: /\ACargo\s*190\W*kg total payload\z/)
+    click_link "Sizes & geometry"
+    expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tr", text: /\ACargo\s*190\W*kg total payload\z/)
+    expect(all("[aria-label='Sizes & geometry comparison'] tbody th").map(&:text).each_cons(2)).to include(%w[Cargo Size])
     click_link "All"
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)

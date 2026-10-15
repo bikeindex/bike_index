@@ -3,7 +3,7 @@ import { amountDisplay, missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
-import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { brakesAt, cargoAt, isCargo, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 // years come newest first
@@ -161,11 +161,13 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
     })
   const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50 tw:dark:bg-blue-950' }
   const sizeRows = sizes.some(Boolean) ? [size] : []
+  const cargo = { label: 'Cargo', read: (vehicle, size) => cargoAt(presenter, vehicles[named.indexOf(vehicle)].data, size) }
+  const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([cargo]) : []
   const geometryRecords = records([...geometry, length, WEIGHT])
   const specRecords = records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING])
   const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
   const rows = {
-    geometry: [...records(wheelRows), ...sizeRows, ...geometryRecords],
+    geometry: [...records(wheelRows), ...cargoRows, ...sizeRows, ...geometryRecords],
     specs: specRecords,
     all: [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...specRecords, ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])]
   }[part]
