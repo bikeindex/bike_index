@@ -160,11 +160,11 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']:focus", exact_text: "Sizes & geometry")
     expect(page).to have_no_css("[aria-label='Overview comparison']")
     expect(page).to have_current_path(/[?&]view=geometry\b/)
-    # the table beside the overlay, to its left, once the window's wide, and under it until then
+    # the overlay beside the table, to its left, once the window's wide, and above it until then
     corner = ->(label) { page.evaluate_script("(({ left, top }) => [left, top])(document.querySelector(#{"[aria-label='#{label}']".to_json}).getBoundingClientRect())") }
     window_size = page.current_window.size
     page.current_window.resize_to(1600, 1000)
-    expect(corner.call("Geometry overlay").first).to be > corner.call("Sizes & geometry comparison").first
+    expect(corner.call("Geometry overlay").first).to be < corner.call("Sizes & geometry comparison").first
     expect(corner.call("Geometry overlay").last).to be_within(1).of(corner.call("Sizes & geometry comparison").last)
     page.current_window.resize_to(1400, 1000)
     expect(corner.call("Geometry overlay").last).to be < corner.call("Sizes & geometry comparison").last
@@ -173,6 +173,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     labels = all("[aria-label='Sizes & geometry comparison'] tbody th").map(&:text)
     expect(labels.first(4)).to eq(["Front wheel", "Rear wheel", "Size", "Reach"])
     sizes_card = find("section[aria-label='Aventón Level 2 Step-Through sizes']")
+    # each model's card topped in its frame's color, as its table column is
+    expect(all("section[aria-label$=' sizes']").map { it[:class][/tw:border-t-\[#\w+\]!/] }).to eq(["tw:border-t-[#3498db]!", "tw:border-t-[#DC2626]!"])
     expect(sizes_card).to have_no_css("h2", text: /\Awheels\z/i)
     # its sizes scroll out to the card's edges, as a components table does
     edges = ->(element) { element.evaluate_script("[this.getBoundingClientRect().left, this.getBoundingClientRect().right].map(Math.round)") }

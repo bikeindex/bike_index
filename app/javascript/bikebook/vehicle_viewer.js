@@ -4,7 +4,7 @@ import { chosenSizes, pickedSizes, sizesParam } from 'bikebook/sizes'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { frameGeometry } from 'bikebook/frame_geometry'
-import { geometryOverlay } from 'bikebook/templates/vehicles/geometry_overlay'
+import { geometryOverlay, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
 import { basicsOf, componentsOf, modelViewer, motorsOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { present } from 'bikebook/templates/values'
@@ -43,11 +43,11 @@ export class VehicleViewer {
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
       : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
     // each vehicle's `key` on a card of its own, named as its full card is, after whatever `lead` shows
-    const cards = (key, none, content, lead = () => nothing) => vehicles.map(({ data, value }) => {
+    const cards = (key, none, content, lead = () => nothing) => vehicles.map(({ data, value }, index) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
       return html`<section aria-label=${`${[manufacturer, model].filter(present).join(' ')} ${key}`} class="twgutter tw:w-full tw:min-w-0 tw:space-y-4
         tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
-        ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}"><header class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
+        ${seriesBorders(compared.frames, index).top} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}"><header class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
         ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
         : nothing}<h3 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${model}</h3></div><div
         class="tw:shrink-0">${basicsOf({ presenter, data }).photo('tw:h-14 tw:w-21')}</div></header>${lead(data, value)}${present(data[key])
@@ -56,11 +56,11 @@ export class VehicleViewer {
     })
     const views = {
       basics: () => basics({ presenter, vehicles }),
-      // compared, the table beside the overlay once the window is wide, which stacks above it until then
+      // compared, the overlay beside the table once the window is wide, above it until then
       geometry: () => html`${comparing
-        ? html`<div class="tw:flex tw:flex-col-reverse tw:min-[1500px]:mx-[calc(50%-50vw)] tw:min-[1500px]:w-screen tw:min-[1500px]:flex-row
-          tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${comparisonTable({ ...compared, part: 'geometry', beside: true })}${
-          geometryOverlay({ ...compared, beside: true })}</div>`
+        ? html`<div class="tw:flex tw:flex-col tw:min-[1500px]:mx-[calc(50%-50vw)] tw:min-[1500px]:w-screen tw:min-[1500px]:flex-row
+          tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${geometryOverlay({ ...compared, beside: true })}${
+          comparisonTable({ ...compared, part: 'geometry', beside: true })}</div>`
         : geometryOverlay(compared)}${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
         html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`))}`,
       components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }),
@@ -70,7 +70,7 @@ export class VehicleViewer {
         const full = vehicles.map(({ data, value }, index) => {
           const remaining = values.filter((each) => each !== value)
           const removePath = pathWith(url, { vehicle_models: remaining.join(','), vehicle_sizes: sizesParam(remaining, picked) })
-          return modelViewer({ presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, ...(comparing && { selectedSize: selectedSizes.get(value), sizePath: sizePath(value) }) })
+          return modelViewer({ presenter, data, value, comparing, idSuffix: index + 1, others: others(value), removePath, keyBorder: seriesBorders(compared.frames, index).top, ...(comparing && { selectedSize: selectedSizes.get(value), sizePath: sizePath(value) }) })
         })
         return html`${comparing ? html`${comparisonTable({ ...compared, part: 'all' })}${geometryOverlay(compared)}` : nothing}${cardRow('tw:mt-8', full)}`
       }
