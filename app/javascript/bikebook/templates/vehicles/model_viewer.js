@@ -454,9 +454,9 @@ class ModelViewer {
   // "160 mm / 150 mm", rigid where an end isn't suspended, with both ends' tooltips in one
   suspensionTravels () {
     const ends = this.vehicle.suspension
-    if (blank(ends)) return 'Rigid'
+    if (blank(ends)) return html`<span class="twless-strong">Rigid</span>`
 
-    const travels = ['front', 'rear'].map((position) => ends[position] ? this.travelLead(ends[position]) ?? 'unknown' : 'rigid')
+    const travels = ['front', 'rear'].map((position) => ends[position] ? this.travelLead(ends[position]) ?? 'unknown' : html`<span class="twless-strong">rigid</span>`)
     const body = join(Object.entries(ends).map(([position, end]) => html`<span class="tw:block tw:font-bold">${this.presenter.humanize(position)} suspension</span>${
       this.tooltipRows(this.suspensionRows(end))}`), html`<span class="tw:block tw:h-2"></span>`)
     return this.withTooltip(join(travels, ' / '), body)

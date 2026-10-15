@@ -121,12 +121,12 @@ RSpec.describe "Bikebook", :js, type: :system do
         return [cells('E-vehicle class').map((cell) => [cell.textContent.trim(), cell.querySelector('.twless-strong[class~="tw:italic"]') != null]),
           cells('Electric Certification').map((cell) => [cell.textContent.trim(), cell.querySelector('[class~="tw:text-yellow-800"]') != null]),
           cells('Wheel size').map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim()), cells('Vehicle type').map((cell) => cell.textContent.trim()),
-          cells('Suspension front/rear').map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim()),
+          cells('Suspension front/rear').map((cell) => [cell.textContent.replace(/\\s+/g, ' ').trim(), [...cell.querySelectorAll('.twless-strong')].map((each) => each.textContent)]),
           rowsOf([{ model: 'One', type: 'bike', wheels: wheels(622, 622) }, { model: 'Two', type: 'bike', wheels: wheels(622, 622) }])
             .filter((row) => /Wheel size|Vehicle type|Suspension/.test(row.textContent)).length]
       })()
     JS
-    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["Unknown", true], ["", false]], ["700 C front, 650 B rear", "700 C"], ["Cargo Bike", "Bike"], ["120 mm / rigid ? Front suspensionTravel: 120 mm", "Rigid"], 0])
+    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["Unknown", true], ["", false]], ["700 C front, 650 B rear", "700 C"], ["Cargo Bike", "Bike"], [["120 mm / rigid ? Front suspensionTravel: 120 mm", ["rigid"]], ["Rigid", ["Rigid"]]], 0])
     # a description over 200 characters is cut at a word, its paragraphs kept, and one within them is whole
     excerpts = page.evaluate_script(<<~JS)
       (async () => {
