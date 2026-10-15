@@ -1055,11 +1055,19 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("#classification-cards h3", exact_text: "Class 3")
     expect(page).to have_css(".hw-combobox__chip", text: "US Class 3")
     expect(page).to have_current_path(%r{[?&]classifications=evc/us/class_3\b}).and have_current_path(%r{vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro&})
+    cards_asked = []
+    page.driver.with_playwright_page { it.on("request", ->(request) { cards_asked << request.url if request.url.include?(ebike_rules_path) }) }
     visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us", classifications: "evc/us/class_3,evc/off_highway_motorcycle", jurisdiction: "CA")
     expect(page).to have_css("#classification-cards [role=button]", text: "California specifics", wait: 10)
     expect(page).to have_css("#classification-cards h3", exact_text: "Off-Highway Motorcycle")
     find("#classification-cards [role=button]", text: "California specifics").click
     expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
+    # a view's tab keeps them as they were, open and unrequested
+    click_link "Sizes & geometry"
+    expect(page).to have_current_path(/[?&]view=geometry\b/)
+    expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
+      .and have_css("#classification-cards h3", exact_text: "Off-Highway Motorcycle")
+    expect(cards_asked.count).to eq 2
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")

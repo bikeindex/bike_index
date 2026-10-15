@@ -35,12 +35,17 @@ export const pickedClassifications = (url, classifications) =>
   (url.searchParams.get(PARAM)?.split(',') ?? []).filter((id) => hasCard(id, classifications))
 
 // The `ids`' /ebike-rules cards into `slot`, centered: a US class's from the page, which a state `jurisdiction`'s own,
-// with its rules, loads over, and any other's from /ebike-rules. Left alone when they're what it already shows, so a
-// search doesn't reload them
+// with its rules, loads over, and any other's from /ebike-rules. Ones the page already shows carry into a rendered
+// page's `slot` as they are, so neither a search nor a render reloads them
 export const renderClassCards = (slot, ids, jurisdiction, classifications) => {
   const shown = [...new Set(ids)].filter((id) => hasCard(id, classifications))
-  const key = JSON.stringify([shown, jurisdiction])
-  if (slot.dataset.key === key) return
+  const key = JSON.stringify([shown, jurisdiction || ''])
+  const current = document.getElementById(slot.id)
+  if (current?.dataset.key === key) {
+    if (current !== slot) slot.replaceChildren(...[...current.childNodes].map((node) => node.cloneNode(true)))
+    slot.dataset.key = key
+    return
+  }
 
   slot.dataset.key = key
   const { frameId, src } = slot.dataset
