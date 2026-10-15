@@ -16,7 +16,7 @@ module GrapeErrors
     APIAuthorization::Errors::OAuthForbiddenError => 403,
     EndpointNotFound => 404,
     ActiveRecord::RecordNotFound => 404,
-    # malformed request body: empty multipart, invalid UTF-8, unparseable JSON
+    # malformed request body
     Rack::BadRequest => 400,
     ActionController::BadRequest => 400,
     ActionDispatch::Http::Parameters::ParseError => 400
