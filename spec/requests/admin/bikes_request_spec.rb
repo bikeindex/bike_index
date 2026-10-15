@@ -69,6 +69,11 @@ RSpec.describe Admin::BikesController, type: :request do
             {"manufacturer_other" => "Party", "count" => 1, "first_created_at" => bike_3.created_at.utc.as_json, "last_created_at" => bike_3.created_at.utc.as_json}
           ])
         end
+
+        it "returns the most common per_page" do
+          get url, params: token_param.merge(per_page: 1)
+          expect(json_result["missing_manufacturers"].pluck("manufacturer_other")).to eq(["Cool Bikes"])
+        end
       end
     end
   end

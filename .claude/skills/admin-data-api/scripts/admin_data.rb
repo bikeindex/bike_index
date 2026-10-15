@@ -16,15 +16,21 @@ require "uri"
 require "json"
 require "dotenv"
 require "open3"
+require "erb"
 
 PRODUCTION = "https://bikeindex.org"
-BASE = ENV.fetch("ADMIN_DATA_BASE_URL", PRODUCTION).chomp("/")
+REPO_ROOT = File.expand_path("../../../..", __dir__)
+ENV_FILE = File.join(REPO_ROOT, ".env.development")
+# "local" is this checkout's dev server, whose port bin/env derives from the workspace
+BASE = case ENV["ADMIN_DATA_BASE_URL"].to_s
+when "" then PRODUCTION
+when "local" then load(File.join(REPO_ROOT, "bin/env")) && ENV.fetch("BASE_URL")
+else ENV["ADMIN_DATA_BASE_URL"].chomp("/")
+end
 LOCAL = BASE != PRODUCTION
 TOKEN_KEY = LOCAL ? "ADMIN_DATA_LOCAL_TOKEN" : "ADMIN_DATA_TOKEN"
 # These write or mint ADMIN_DATA_TOKEN/ADMIN_DATA_REFRESH, which must never hold a dev server's token
 PRODUCTION_ONLY_COMMANDS = %w[authorize-url set-tokens refresh].freeze
-REPO_ROOT = File.expand_path("../../../..", __dir__)
-ENV_FILE = File.join(REPO_ROOT, ".env.development")
 
 BUG_REPORTS = "/admin/bug_reports" # Admin pages rather than API routes, same admin token
 PATHS = {
@@ -140,6 +146,11 @@ def get_endpoint(endpoint, params = {})
   with_token(:get, params.any? ? "#{path}?#{URI.encode_www_form(params)}" : path)
 end
 
+def existing_manufacturer_slug(name)
+  res = request(:get, "#{BASE}/api/v3/manufacturers/#{ERB::Util.url_encode(name)}")
+  JSON.parse(res.body).dig("manufacturer", "slug") if res.code == "200"
+end
+
 def array_length(value)
   value.is_a?(Array) ? value.length : 0
 end
@@ -233,18 +244,27 @@ when "update-bug-report" # update-bug-report <id> tags=a,b github_pull_request=4
     form: attributes.transform_keys { "bug_report[#{it}]" }) or exit(22)
   puts body
 
-when "create-manufacturer" # create-manufacturer name="Cool Bikes" website=cool.com frame_maker=true
-  attributes = parse_params(ARGV.drop(1))
-  abort("usage: create-manufacturer name=… [website=…] [frame_maker=true] [motorized_only=true]") unless attributes["name"]
-  body = with_token(:post, "/admin/manufacturers.json",
-    form: attributes.transform_keys { "manufacturer[#{it}]" }) or exit(22)
-  puts body
+# JSON on stdin rather than key=value args, so no value passes through a shell that can merge it into `name`
+when "create-manufacturers" # create-manufacturers <<< '[{"name": "Cool Bikes", "website": "https://cool.com", "frame_maker": true}]'
+  manufacturers = JSON.parse($stdin.read)
+  unless manufacturers.is_a?(Array) && manufacturers.all? { it.is_a?(Hash) && !it["name"].to_s.strip.empty? }
+    abort("expected a JSON array of manufacturers, each with a name")
+  end
+  manufacturers.each do |attributes|
+    if (slug = existing_manufacturer_slug(attributes["name"]))
+      puts "#{attributes["name"]}: already exists — #{slug}, skipped"
+      next
+    end
+    body = with_token(:post, "/admin/manufacturers.json",
+      form: attributes.transform_keys { "manufacturer[#{it}]" }) or exit(22)
+    puts "#{attributes["name"]}: created — #{BASE}/admin/manufacturers/#{JSON.parse(body).dig("manufacturer", "slug")}"
+  end
 
 when "update-manufacturer" # update-manufacturer <slug> name="Cool Bikes (Cool)"
   slug = ARGV[1] or abort("usage: update-manufacturer <slug> [param=value …]")
   attributes = parse_params(ARGV.drop(2))
   abort("nothing to update") if attributes.empty?
-  body = with_token(:patch, "/admin/manufacturers/#{slug}.json",
+  body = with_token(:patch, "/admin/manufacturers/#{ERB::Util.url_encode(slug)}.json",
     form: attributes.transform_keys { "manufacturer[#{it}]" }) or exit(22)
   puts body
 
@@ -271,19 +291,23 @@ when "local-token" # local-token [email] — with ADMIN_DATA_BASE_URL set, mint 
   mint = <<~RUBY
     user = User.find_by!(email: ARGV.first)
     app_id = API::TokenAuthenticatable::ADMIN_DOORKEEPER_APP_ID
-    Doorkeeper::Application.find_by(id: app_id) ||
+    unless Doorkeeper::Application.exists?(app_id)
       Doorkeeper::Application.create!(id: app_id, name: "Admin data (local)", owner: user, redirect_uri: "urn:ietf:wg:oauth:2.0:oob")
-    puts Doorkeeper::AccessToken.create!(application_id: app_id, resource_owner_id: user.id).token
+      # An explicit id doesn't advance the sequence, so a later app would collide with it
+      Doorkeeper::Application.connection.reset_pk_sequence!(Doorkeeper::Application.table_name)
+    end
+    puts "#{TOKEN_KEY}=" + Doorkeeper::AccessToken.create!(application_id: app_id, resource_owner_id: user.id).token
   RUBY
   email = ARGV.fetch(1, "admin@bikeindex.org")
   output, status = Open3.capture2("bin/rails", "runner", mint, email, chdir: REPO_ROOT)
-  abort("minting failed for #{email} — needs an existing superuser\n#{output}") unless status.success?
-  env_set(TOKEN_KEY, output.lines.last.strip)
+  token = output[/^#{TOKEN_KEY}=(\w+)$/o, 1]
+  abort("minting failed for #{email} — needs an existing superuser\n#{output}") unless status.success? && token
+  env_set(TOKEN_KEY, token)
   puts "Updated #{TOKEN_KEY} in #{ENV_FILE}"
 
 else
   warn "usage: admin_data.rb {check | get <#{PATHS.keys.join("|")}> [param=value …] | " \
-    "show-bug-report <id> | update-bug-report <id> [param=value …] | create-manufacturer name=… | " \
+    "show-bug-report <id> | update-bug-report <id> [param=value …] | create-manufacturers < json | " \
     "update-manufacturer <slug> [param=value …] | " \
     "authorize-url | set-tokens <access> <refresh> | refresh | local-token [email]}"
   exit 64

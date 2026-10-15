@@ -20,7 +20,8 @@ module Admin
     def missing_manufacturer
       if request.format.json?
         created_at = Bike.arel_table[:created_at]
-        rows = missing_manufacturer_bikes.reorder(nil).group(:manufacturer_other)
+        rows = missing_manufacturer_bikes.reorder(Arel.star.count.desc).group(:manufacturer_other)
+          .limit(permitted_per_page(default: 1_000, max: 10_000))
           .pluck(:manufacturer_other, Arel.star.count, created_at.minimum, created_at.maximum)
         return render(json: {missing_manufacturers: rows.map { %i[manufacturer_other count first_created_at last_created_at].zip(it).to_h }})
       end
