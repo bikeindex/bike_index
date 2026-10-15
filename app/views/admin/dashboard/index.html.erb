@@ -31,38 +31,6 @@
 
   <hr>
 
-  <% daily_logged_searches = Counts.logged_searches(@time_range.first.to_date..Date.current).values %>
-
-  <div class="row">
-    <div class="col-md-6">
-      <h2 class="mt-4">
-        <%= link_to "Bike Book searches", admin_logged_searches_path(search_endpoint: "web_bikebook", period: "week") %>
-      </h2>
-
-      <p>
-        <%= number_display(daily_logged_searches.sum { it["web_bikebook"] }) %> past week
-      </p>
-
-      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"))) %>
-    </div>
-
-    <div class="col-md-6">
-      <h2 class="mt-4">
-        <%= link_to "Not Bike Book searches", admin_logged_searches_path(search_endpoint: "not_web_bikebook", period: "week") %>
-      </h2>
-
-      <p>
-        <%= number_display(daily_logged_searches.sum { it["not_web_bikebook"] }) %> past
-        week
-        <em>(<%= number_display(daily_logged_searches.sum { it["not_web_bikebook_serial"] }) %> with serial)</em>
-      </p>
-
-      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
-    </div>
-  </div>
-
-  <hr>
-
   <% cache(User.maximum(:created_at)) do %>
     <h2 class="mt-4">
       Recent <%= link_to "Users", admin_users_url %>
@@ -98,6 +66,39 @@
 
         <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
       </p>
+    </div>
+  </div>
+
+  <hr>
+
+  <% daily_logged_searches = Counts.logged_searches(@time_range.first.to_date..Date.current).values %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        <%= link_to "Bike Book searches", admin_logged_searches_path(search_endpoint: "web_bikebook", period: "week") %>
+      </h2>
+
+      <p>
+        <%= number_display(daily_logged_searches.sum { it["web_bikebook"] }) %>
+        past week
+      </p>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"))) %>
+    </div>
+
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        <%= link_to "Not Bike Book searches", admin_logged_searches_path(search_endpoint: "not_web_bikebook", period: "week") %>
+      </h2>
+
+      <p>
+        <%= number_display(daily_logged_searches.sum { it["not_web_bikebook"] }) %>
+        past week
+        <em>(<%= number_display(daily_logged_searches.sum { it["not_web_bikebook_serial"] }) %> with serial)</em>
+      </p>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
     </div>
   </div>
 <% end %>
