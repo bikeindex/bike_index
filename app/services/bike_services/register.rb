@@ -516,7 +516,8 @@ module BikeServices
       report = b_param.status_stolen? ? "stolen" : "found"
       address = attrs["address_record_attributes"] || {}
       [(translation(:"date_#{report}_required") if date.blank?),
-        (translation(:"location_#{report}_required") if address["street"].blank? || address["city"].blank?)].compact
+        (translation(:"location_#{report}_required") if address["street"].blank? || address["city"].blank?),
+        (translation(:description_stolen_required) if b_param.status_stolen? && attrs["theft_description"].blank?)].compact
     end
 
     def stolen_report_attrs(attrs, date)

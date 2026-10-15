@@ -52,7 +52,10 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     pick_within_selectize(selectize_for("select.country-select-input"), "United States")
     fill_in "Address or intersection", with: "100 Main St"
     fill_in "City", with: "New York"
+    # Whitespace alone doesn't satisfy the required description
+    fill_in "Description of the incident", with: "   "
     fill_in "Postal code", with: "10001"
+    expect(page).to have_field("Description of the incident", with: "")
     fill_in "Phone", with: "3125551234"
     fill_in "Description of the incident", with: "Cut lock outside the cafe"
     save_bike

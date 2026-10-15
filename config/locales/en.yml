@@ -5072,6 +5072,7 @@ en:
     register_flow:
       date_found_required: Please tell us when you found it
       date_stolen_required: Please tell us when it was stolen
+      description_stolen_required: Please tell us what happened
       email_required: Email is required to register
       location_found_required: Please tell us where you found it
       location_stolen_required: Please tell us where it was stolen
