@@ -1,7 +1,7 @@
 import { table } from 'bikebook/templates/ui/table'
 import { array, equal } from 'bikebook/templates/values'
 
-const key = (component) => [component.type, component.type_detail, component.position]
+export const componentKey = (component) => [component.type, component.type_detail, component.position]
 const HEADER_CLASSES = 'tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase'
 const COLUMNS = [
   ['type', null, 'tw:w-[18%] tw:break-words'],
@@ -12,10 +12,12 @@ const COLUMNS = [
 ]
 
 // One group's components as a table, marking each cell where the same component in `others` differs, and every
-// cell of one they lack
-export const componentGroup = ({ presenter, name, components, others }) => table({
+// cell of one they lack. A blank `components` entry is an empty row, standing in for one a compared vehicle has
+export const componentGroup = ({ presenter, name, components, others, alignKey }) => table({
+  alignKey,
   records: components.map((component) => {
-    const counterparts = others.map((otherComponents) => array(otherComponents).find((other) => equal(key(other), key(component))))
+    if (!component) return { differs: () => false }
+    const counterparts = others.map((otherComponents) => array(otherComponents).find((other) => equal(componentKey(other), componentKey(component))))
     return {
       ...component,
       position: presenter.positionLabel(component.position),

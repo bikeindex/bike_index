@@ -6,7 +6,7 @@ import { definitionListContainer } from 'bikebook/templates/ui/definition_list/c
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { jsonDisplay } from 'bikebook/templates/ui/json_display'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { componentGroup } from 'bikebook/templates/vehicles/component_group'
+import { componentGroup, componentKey } from 'bikebook/templates/vehicles/component_group'
 import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
 import { modelYears } from 'bikebook/templates/vehicles/model_years'
 import { motorSection, unknownCertification } from 'bikebook/templates/vehicles/motor_section'
@@ -97,16 +97,18 @@ export const runningGearOf = ({ presenter, data, others }) => {
 const sideBySide = (columns) => html`<div class="tw:@container"><div class="tw:flex tw:flex-col tw:@min-[600px]:flex-row tw:@min-[600px]:gap-6">${columns.map((column) =>
   html`<div class="tw:contents tw:@min-[600px]:block tw:@min-[600px]:min-w-0 tw:@min-[600px]:flex-1">${column}</div>`)}</div></div>`
 
-// A vehicle's components by group, marked where they differ from `others`'
-export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
+// A vehicle's components by group, marked where they differ from `others`', each group listing every row any of the
+// compared `peers` has, so each lines up with theirs
+export const componentsOf = ({ presenter, data, others, peers }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others, peers }).components()}</div>`
 
 class ModelViewer {
-  constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath }) {
+  constructor ({ presenter, data, value, comparing, idSuffix, others, peers = [data], removePath, selectedSize, sizePath }) {
     this.presenter = presenter
     this.kit = presenter.kit
     this.data = data
     this.vehicle = this.#normalize(data)
     this.others = others.map((other) => this.#normalize(other))
+    this.peers = peers.map((peer) => this.#normalize(peer))
     Object.assign(this, { value, comparing, idSuffix, removePath, selectedSize, sizePath })
   }
 
@@ -728,13 +730,19 @@ class ModelViewer {
     const groups = Object.keys(this.kit.component_groups)
     const group = (type) => this.presenter.componentGroups.get(type) ?? groups.at(-1)
     const label = (component) => typeLabel(component).toLowerCase()
+    const members = (vehicle, name) => array(vehicle.components).filter((component) => group(component.type) === name)
+    // keyed by its key and how many before it share that, so a vehicle's repeated component fills a row each
+    const slotted = (list) => list.map((component, index) => [JSON.stringify([...componentKey(component),
+      list.slice(0, index).filter((each) => equal(componentKey(each), componentKey(component))).length]), component])
+    const aligned = this.peers.length > 1
     const tables = groups.flatMap((name) => {
-      const members = components.filter((component) => group(component.type) === name)
-      if (members.length === 0) return []
+      const own = new Map(slotted(members(this.vehicle, name)))
+      const rows = [...new Map(this.peers.flatMap((peer) => slotted(members(peer, name)))).entries()]
+      if (own.size === 0 && (!aligned || rows.length === 0)) return []
 
-      const others = this.others.map((other) => array(other.components).filter((component) => group(component.type) === name))
-      const sorted = [...members].sort((a, b) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)
-      return [componentGroup({ presenter: this.presenter, name, components: sorted, others })]
+      const others = this.others.map((other) => members(other, name))
+      const sorted = rows.sort(([, a], [, b]) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)
+      return [componentGroup({ presenter: this.presenter, name, components: sorted.map(([slot]) => own.get(slot)), others, alignKey: aligned && name })]
     })
     return tables
   }
