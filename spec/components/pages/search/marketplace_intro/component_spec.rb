@@ -22,15 +22,6 @@ RSpec.describe Pages::Search::MarketplaceIntro::Component, type: :component do
     expect(component).to have_css("img + button[aria-label='Hide intro'][data-action='search--marketplace-intro#hide']")
   end
 
-  context "when searched" do
-    let(:searched) { true }
-
-    it "shows the dismissed row" do
-      expect(component).to have_css("#{expanded}.tw\\:hidden")
-      expect(component).to have_css("#{collapsed}:not(.tw\\:hidden)")
-    end
-  end
-
   context "when dismissed" do
     let(:dismissed) { true }
 

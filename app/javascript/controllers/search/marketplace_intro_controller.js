@@ -9,7 +9,7 @@ const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365
 
 // Connects to data-controller='search--marketplace-intro'
 export default class extends Controller {
-  static targets = ['expanded', 'collapsed', 'heading', 'hideButton', 'showButton']
+  static targets = ['expanded', 'collapsed', 'heading', 'showButton']
 
   hide () {
     this.persist(`true; max-age=${COOKIE_MAX_AGE_SECONDS}`)

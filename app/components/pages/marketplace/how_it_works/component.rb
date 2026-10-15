@@ -21,6 +21,13 @@ module Pages
           ]
         end
 
+        def step_lists
+          [
+            ["buying", translation(".buying_a_bike"), buying_steps, "tw:bg-blue-600"],
+            ["selling", translation(".selling_a_bike"), selling_steps, "tw:bg-purple-500"]
+          ]
+        end
+
         def buying_steps
           [
             [translation(".find_a_bike"), translation(".find_a_bike_body")],

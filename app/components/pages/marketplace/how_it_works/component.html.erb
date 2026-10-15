@@ -111,65 +111,34 @@
   </section>
 
   <section class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,460px),1fr))] tw:gap-14 tw:py-16 <%= SECTION_CLASSES %>">
-    <div id="buying" class="tw:flex tw:scroll-mt-4 tw:flex-col tw:gap-6">
-      <h2 class="<%= HEADING_CLASSES %>">
-        <%= translation(".buying_a_bike") %>
-      </h2>
+    <% step_lists.each do |anchor, heading, steps, number_class| %>
+      <div
+        id="<%= anchor %>"
+        class="tw:flex tw:scroll-mt-4 tw:flex-col tw:gap-6"
+      >
+        <h2 class="<%= HEADING_CLASSES %>">
+          <%= heading %>
+        </h2>
 
-      <ol class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-6 tw:p-0">
-        <% buying_steps.each.with_index(1) do |(title, body), number| %>
-          <li class="tw:grid tw:grid-cols-[40px_minmax(0,1fr)] tw:gap-4">
-            <span
-              class="
-                tw:flex tw:size-10 tw:items-center tw:justify-center
-                tw:rounded-full tw:bg-blue-600 tw:font-header
-                tw:font-extrabold tw:text-white
-              "
-            >
-              <%= number %>
-            </span>
+        <ol class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-6 tw:p-0">
+          <% steps.each.with_index(1) do |(title, body), number| %>
+            <li class="tw:grid tw:grid-cols-[40px_minmax(0,1fr)] tw:gap-4">
+              <span class="tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-full tw:font-header tw:font-extrabold tw:text-white <%= number_class %>">
+                <%= number %>
+              </span>
 
-            <div class="tw:flex tw:flex-col tw:gap-1">
-              <h3 class="tw:text-lg tw:font-bold"><%= title %></h3>
+              <div class="tw:flex tw:flex-col tw:gap-1">
+                <h3 class="tw:text-lg tw:font-bold"><%= title %></h3>
 
-              <p class="tw:m-0 tw:leading-[1.55] <%= BODY_CLASSES %>">
-                <%= body %>
-              </p>
-            </div>
-          </li>
-        <% end %>
-      </ol>
-    </div>
-
-    <div id="selling" class="tw:flex tw:scroll-mt-4 tw:flex-col tw:gap-6">
-      <h2 class="<%= HEADING_CLASSES %>">
-        <%= translation(".selling_a_bike") %>
-      </h2>
-
-      <ol class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-6 tw:p-0">
-        <% selling_steps.each.with_index(1) do |(title, body), number| %>
-          <li class="tw:grid tw:grid-cols-[40px_minmax(0,1fr)] tw:gap-4">
-            <span
-              class="
-                tw:flex tw:size-10 tw:items-center tw:justify-center
-                tw:rounded-full tw:bg-purple-500 tw:font-header
-                tw:font-extrabold tw:text-white
-              "
-            >
-              <%= number %>
-            </span>
-
-            <div class="tw:flex tw:flex-col tw:gap-1">
-              <h3 class="tw:text-lg tw:font-bold"><%= title %></h3>
-
-              <p class="tw:m-0 tw:leading-[1.55] <%= BODY_CLASSES %>">
-                <%= body %>
-              </p>
-            </div>
-          </li>
-        <% end %>
-      </ol>
-    </div>
+                <p class="tw:m-0 tw:leading-[1.55] <%= BODY_CLASSES %>">
+                  <%= body %>
+                </p>
+              </div>
+            </li>
+          <% end %>
+        </ol>
+      </div>
+    <% end %>
   </section>
 
   <section class="tw:bg-gray-50 tw:dark:bg-gray-900">
