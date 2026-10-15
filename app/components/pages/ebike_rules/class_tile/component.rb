@@ -21,7 +21,7 @@ module Pages
         def call
           return tile if !@explained || @class_unknown
 
-          render(UI::Tooltip::Component.new(text: @e_bike_class ? translation(".class_aria", n: @e_bike_class) : translation(".emoto_aria"))) do |tooltip|
+          render(UI::Tooltip::Component.new(text: aria[:label] || translation(".emoto_aria"))) do |tooltip|
             tooltip.with_body { render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class: @e_bike_class, framed: false)) }
             tile
           end

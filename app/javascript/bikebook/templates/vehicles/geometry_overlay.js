@@ -64,6 +64,9 @@ const diameterNotes = (presenter, compared) => {
   })
 }
 
+const noteList = (heading, items) => html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: ${heading}</p><ul
+  class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${items}</ul></div>`
+
 const drawable = (geometry) => geometry?.missing.length === 0 || geometry?.wheels
 
 // One frame has nothing to overlay
@@ -97,13 +100,12 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames, beside = f
 
   const overlay = drawn.length > 1 || Boolean(aligned)
   const missingNote = undrawn.length
-    ? html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: missing geometry information</p><ul
-      class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${undrawn.map(({ title, geometry: { missing, wheels } }) => {
+    ? noteList('missing geometry information', undrawn.map(({ title, geometry: { missing, wheels } }) => {
       const none = `${figures(presenter, missing)} or the measures to calculate them`
       return html`<li><em>${title}</em> doesn't list its ${none}, so ${!wheels || !overlay
         ? "it can't be drawn"
         : `only its wheels are drawn${aligned ? `, the rear axle on ${aligned.title}'s` : ''}`}.</li>`
-    })}</ul></div>`
+    }))
     : nothing
 
   // out to the screen's edges on a phone, as the cards below it are
@@ -136,8 +138,7 @@ const drawing = (presenter, drawn, labelled) => {
         data-bikebook--geometry-overlay-target="button" data-action="bikebook--geometry-overlay#toggle"><svg aria-hidden="true" class="tw:shrink-0" width="24" height="8"><line stroke=${series.color}
         x1="2" y1="4" x2="22" y2="4" stroke-width="4" stroke-linecap="round"></line></svg><span>${title}${
         present(size) ? html` <span class="tw:opacity-65">${size}</span>` : nothing}</span></button></li>`)}</ul>${notes.length
-      ? html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: you're comparing different diameter wheels and tires</p><ul
-        class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${notes}</ul></div>`
+      ? noteList("you're comparing different diameter wheels and tires", notes)
       : nothing}${noted.length
       ? html`<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${noted.map(({ title, geometry }) =>
         html`<li><em>${title}</em>'s ${join([clause(geometry.calculated, 'calculated from its other measures'),

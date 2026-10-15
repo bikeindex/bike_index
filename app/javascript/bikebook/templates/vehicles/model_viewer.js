@@ -39,8 +39,6 @@ export const modelViewer = (args) => new ModelViewer(args).render()
 
 const WIDE_TIRE = 50
 const US_CLASS = /^evc\/us\/class_(\d)$/
-// UnitSystem::KILOMETERS_PER_MILE
-const KILOMETERS_PER_MILE = 1.609344
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
 const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
 const brakeType = (brake) => brake?.type?.replace(/^Disc (\w+)$/, '$1 disc')
@@ -71,6 +69,10 @@ export const brakesAt = (presenter, data, size) => {
     rotors: front === rear ? viewer.millimeters(front) : join(compact([viewer.millimeters(front, ' front'), viewer.millimeters(rear, ' rear')]), ' | ')
   }
 }
+
+export const highest = (values) => values.some(isNumber) ? Math.max(...values.filter(isNumber)) : null
+// The highest `key` of any of a vehicle's motors' operating modes
+export const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode[key]))
 
 // cargo_bike, cargo_tricycle and their _rear kinds
 export const isCargo = (data) => /^cargo_/.test(data.type ?? '')
@@ -344,7 +346,7 @@ class ModelViewer {
     return join([join(standard.map((name) => this.tooltipped(name, tooltips)), ', '), ...optionals])
   }
 
-  // "200 kg total payload, 60 cm long, 40 cm wide, 200 L", the payload its sizes' range without a `size`
+  // "200 kg total payload, 60 cm long, 40 cm wide, 200 L"
   cargo (size) {
     const { presenter } = this
     const payloads = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
@@ -360,19 +362,19 @@ class ModelViewer {
   // its classes' names, and under them its US classes' tiles and an e-moto's
   eVehicleClass () {
     const names = presence(this.classificationNames(this.#sortedClassifications(this.vehicle)))
-    const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(({ ids }) => ids).map((id) => id.match(US_CLASS)?.[1]).filter(Boolean))].sort()
-    const tiles = this.#emoto() ? [...numbers, 'emoto'] : numbers
-    return tiles.length ? html`${names ?? nothing}${classBadges(tiles)}` : names
+    const ids = this.vehicle.classifiedModes.flatMap((mode) => mode.ids)
+    const numbers = [...new Set(ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean))].sort()
+    const tiles = this.#emoto(ids) ? [...numbers, 'emoto'] : numbers
+    return tiles.length ? html`${names}${classBadges(tiles)}` : names
   }
 
   // As /ebike-rules has it (EbikeRuleServices::BikebookVehicles): a classification other than an e-bike law's or a US
   // class, or with neither, a mode over 28 mph
-  #emoto () {
-    const classifications = this.presenter.vocabulary.e_vehicle_classifications
-    const tiers = this.vehicle.classifiedModes.flatMap(({ ids }) => ids).filter((id) => !classifications[id]?.e_bike_law)
+  #emoto (ids) {
+    const tiers = ids.filter((id) => !this.presenter.vocabulary.e_vehicle_classifications[id]?.e_bike_law)
     if (tiers.length) return tiers.some((id) => !US_CLASS.test(id))
-    const speeds = array(this.data.motors).flatMap((motor) => array(motor.operating_modes)).map((mode) => mode.max_speed).filter(isNumber)
-    return speeds.length > 0 && Math.round(Math.max(...speeds) / KILOMETERS_PER_MILE) > 28
+    const { km, mi } = this.kit.conversions.mm
+    return Math.round(modes('max_speed')(this.data) * km / mi) > 28
   }
 
   #sortedClassifications (vehicle) {

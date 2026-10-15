@@ -30,7 +30,7 @@ module Pages
         end
 
         def emoto_card
-          {n: nil, either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
+          {either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
            speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules: @rules,
            body: @rules ? translation(".emoto_summary") : translation(".emoto_limits_body")}
         end
