@@ -38,7 +38,7 @@ module SharedBlocks
 
         def marketplace_item(side)
           {label: translation(".marketplace"), path: search_marketplace_path,
-           item_class: SIDE_CLASSES.fetch(side)}
+           match_paths: [search_marketplace_path, marketplace_how_it_works_path], item_class: SIDE_CLASSES.fetch(side)}
         end
 
         def account_items

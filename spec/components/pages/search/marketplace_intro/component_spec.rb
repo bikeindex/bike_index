@@ -6,7 +6,8 @@ RSpec.describe Pages::Search::MarketplaceIntro::Component, type: :component do
   include Rails.application.routes.url_helpers
 
   let(:dismissed) { false }
-  let(:component) { render_inline(described_class.new(dismissed:)) }
+  let(:searched) { false }
+  let(:component) { render_inline(described_class.new(dismissed:, searched:)) }
   let(:expanded) { "[data-search--marketplace-intro-target='expanded']" }
   let(:collapsed) { "[data-search--marketplace-intro-target='collapsed']" }
 
@@ -17,7 +18,17 @@ RSpec.describe Pages::Search::MarketplaceIntro::Component, type: :component do
     expect(component.text).to include("Checked for theft")
     expect(component).to have_link("How buying works", href: marketplace_how_it_works_path(anchor: "buying"))
     expect(component).to have_link("How selling works", href: marketplace_how_it_works_path(anchor: "selling"))
-    expect(component).to have_css("button[aria-label='Hide intro'][data-action='search--marketplace-intro#hide']")
+    # After the content, so it's tabbed to last
+    expect(component).to have_css("img + button[aria-label='Hide intro'][data-action='search--marketplace-intro#hide']")
+  end
+
+  context "when searched" do
+    let(:searched) { true }
+
+    it "shows the dismissed row" do
+      expect(component).to have_css("#{expanded}.tw\\:hidden")
+      expect(component).to have_css("#{collapsed}:not(.tw\\:hidden)")
+    end
   end
 
   context "when dismissed" do
