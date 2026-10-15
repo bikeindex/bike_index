@@ -5,18 +5,24 @@ import { array, blank, compact, except, join, presence, present, slice } from 'b
 
 export const CERTIFICATION_LABEL = 'Electric Certification'
 
+const market = (presenter, id) => {
+  const code = String(id ?? '').match(/_([a-z]{2})$/)?.[1]?.toUpperCase()
+  return code && presenter.vocabulary.names?.markets?.[code] ? code : null
+}
+
 // A motor whose certification isn't listed
 export const unknownCertification = html`<span class="tw:text-yellow-800 tw:dark:text-yellow-400">Unknown</span>`
 
-// A motor's specs, with a subsection per operating mode
-export const motorSection = ({ presenter, heading, motor, others }) => {
+// A motor's specs, with a subsection per operating mode, whose assist speeds are its market's: in mph for a `us` model
+export const motorSection = ({ presenter, heading, motor, others, us = false }) => {
   const { fields, humanized } = presenter.kit.motor
   const labels = { ...presenter.kit.motor.labels, certification: CERTIFICATION_LABEL }
   // the identity rows list every mode's classification
   const modeFields = except(presenter.kit.motor.mode_fields, ['e_vehicle_classifications'])
   const display = (each) => ({
     ...each,
-    name: [each.manufacturer, each.model].filter(present).join(' '),
+    // a unit linked by its market's id, …_us, named for that market
+    name: compact([presence([each.manufacturer, each.model].filter(present).join(' ')), market(presenter, each.id)]).join(', '),
     id: each.id ? copyableCode({ value: each.id, label: 'Copy ID' }) : null,
     // `{}` stands in for a motor a compared vehicle doesn't have
     certification: presence(each.certification) ?? (present(each) ? unknownCertification : null),
@@ -29,6 +35,7 @@ export const motorSection = ({ presenter, heading, motor, others }) => {
   const displayMode = (mode) => ({
     ...mode,
     availability: mode.availability === 'stock' || mode.availability == null ? null : presenter.humanize(mode.availability),
+    max_speed: mode.max_speed == null ? null : presenter.measurementIn(mode.max_speed, 'km/h', us),
     operating_temperature: temperatureRange(mode.operating_temperature)
   })
   const rows = presenter.rowsFor(fields, display(motor), { labels, others: others.map(display) })

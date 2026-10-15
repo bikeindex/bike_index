@@ -108,6 +108,12 @@ export class VehiclePresenter {
     return this.#unitSystems(metricSystem, imperialSystem)
   }
 
+  // in one system rather than the viewer's, as a market's own page gives it
+  measurementIn (value, unit, imperial) {
+    const [part] = imperial ? this.#imperialParts(unit) : []
+    return part ? this.labeled(this.rounded(part.convert(value)), unit, part.part) : this.labeled(value, unit)
+  }
+
   #unitSystems (metric, imperial) {
     return join([html`<span class="tw:imperial:hidden">${metric}</span>`, html`<span class="tw:hidden tw:imperial:inline">${imperial}</span>`])
   }

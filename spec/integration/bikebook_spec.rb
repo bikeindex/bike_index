@@ -343,6 +343,22 @@ RSpec.describe "Bikebook", :js, type: :system do
       JS
       expect(groupsets).to eq([["Shimano GRX RX610 1X12S", []], ["Shimano GRX RX610 1X12S · electronic", ["electronic"]],
         ["SHIMANO GRX RX822 1X12S", ["SHIMANO GRX RX822 1X12S"]]])
+      # a motor linked by its market's unit names the market, and its assist speed is its market's, in mph for a US model
+      motors = page.evaluate_script(<<~JS)
+        (async () => {
+          const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+          const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+            import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+          const bike = (markets, id, speed) => ({ model: 'E', markets, motors: [{ manufacturer: 'Bosch', model: 'Performance Line CX (BDU384Y)', id,
+            operating_modes: [{ mode: 'assist', availability: 'stock', max_speed: speed }] }] })
+          const rows = (data) => [...fragmentOf(new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/e', data }], new URL('/bikebook?view=motors', window.location.href), null))
+            .querySelectorAll('dl > div')].map((row) => row.textContent.replace(/\\s+/g, ' ').trim()).filter((row) => /^(Motor|Max speed)/.test(row))
+          return [rows(bike(['US'], 'c/bosch/2025/bdu384y_us', 32.2)), rows(bike(['EU'], 'c/bosch/2025/bdu384y_eu', 25)), rows(bike(['JP'], 'c/bosch/2025/bdu384y', 24))]
+        })()
+      JS
+      expect(motors).to eq([["MotorBosch Performance Line CX (BDU384Y), US", "Max speed20 mph"], ["MotorBosch Performance Line CX (BDU384Y), EU", "Max speed25 km/h"],
+        ["MotorBosch Performance Line CX (BDU384Y)", "Max speed24 km/h"]])
+
       # an end's spring and lockout, said where they're notable, and a coil-compatible frame
       specs = page.evaluate_script(<<~JS)
         (async () => {
