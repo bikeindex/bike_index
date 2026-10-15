@@ -1,7 +1,7 @@
 import { table } from 'bikebook/templates/ui/table'
 import { array, equal } from 'bikebook/templates/values'
 
-export const componentKey = (component) => [component.type, component.type_detail, component.position]
+export const componentKey = (component) => [component.type, component.position]
 const HEADER_CLASSES = 'tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase'
 const COLUMNS = [
   ['type', null, 'tw:w-[18%] tw:break-words'],
