@@ -4,27 +4,38 @@ module Pages
   module EbikeRules
     module ClassTile
       # An e-bike class's navy tile, a gray one for a class the catalog can't tell, or the red e-moto tile
-      # for a bike with no class
+      # for a bike with no class. `explained`, a class's tile is a tooltip of its US class card
       class Component < ApplicationComponent
         SIZES = {
           md: {tile: "tw:size-14", label: "tw:text-[9px]", number: "tw:text-[28px]", icon: "tw:size-6"},
           lg: {tile: "tw:size-19", label: "tw:text-[11px]", number: "tw:text-[40px]", icon: "tw:size-8"}
         }.freeze
 
-        def initialize(e_bike_class:, class_unknown: false, size: :md)
+        def initialize(e_bike_class:, class_unknown: false, size: :md, explained: false)
           @e_bike_class = e_bike_class
           @class_unknown = class_unknown
           @size = SIZES.fetch(size)
+          @explained = explained
         end
 
         def call
-          tag.div(class: "#{@size[:tile]} tw:flex tw:flex-none tw:flex-col tw:items-center tw:justify-center tw:rounded-lg tw:leading-none tw:text-white #{color}",
-            aria: aria, role: ("img" if @e_bike_class || @class_unknown)) do
-            (@e_bike_class || @class_unknown) ? class_number : emoto
+          return tile unless @explained && @e_bike_class
+
+          render(UI::Tooltip::Component.new(text: translation(".class_aria", n: @e_bike_class))) do |tooltip|
+            tooltip.with_body { render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class: @e_bike_class, framed: false)) }
+            tile
           end
         end
 
         private
+
+        # a span, as a tooltip's trigger is a button
+        def tile
+          tag.span(class: "#{@size[:tile]} tw:flex tw:flex-none tw:flex-col tw:items-center tw:justify-center tw:rounded-lg tw:leading-none tw:text-white #{color}",
+            aria: aria, role: ("img" if @e_bike_class || @class_unknown)) do
+            (@e_bike_class || @class_unknown) ? class_number : emoto
+          end
+        end
 
         def color
           if @e_bike_class
