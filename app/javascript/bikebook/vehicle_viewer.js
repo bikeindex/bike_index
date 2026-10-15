@@ -56,7 +56,12 @@ export class VehicleViewer {
     })
     const views = {
       basics: () => basics({ presenter, vehicles }),
-      geometry: () => html`${geometryOverlay(compared)}${comparing ? comparisonTable({ ...compared, part: 'geometry' }) : nothing}${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
+      // compared, the table beside the overlay once the window is wide, which stacks above it until then
+      geometry: () => html`${comparing
+        ? html`<div class="tw:flex tw:flex-col-reverse tw:min-[1500px]:mx-[calc(50%-50vw)] tw:min-[1500px]:w-screen tw:min-[1500px]:flex-row
+          tw:min-[1500px]:items-start tw:min-[1500px]:gap-6 tw:min-[1500px]:px-4">${comparisonTable({ ...compared, part: 'geometry', beside: true })}${
+          geometryOverlay({ ...compared, beside: true })}</div>`
+        : geometryOverlay(compared)}${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
         html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`))}`,
       components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }),
         (data, value) => runningGearOf({ presenter, data, others: others(value) }))),

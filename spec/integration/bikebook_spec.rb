@@ -154,6 +154,15 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']:focus", exact_text: "Sizes & geometry")
     expect(page).to have_no_css("[aria-label='Overview comparison']")
     expect(page).to have_current_path(/[?&]view=geometry\b/)
+    # the table beside the overlay, to its left, once the window's wide, and under it until then
+    corner = ->(label) { page.evaluate_script("(({ left, top }) => [left, top])(document.querySelector(#{"[aria-label='#{label}']".to_json}).getBoundingClientRect())") }
+    window_size = page.current_window.size
+    page.current_window.resize_to(1600, 1000)
+    expect(corner.call("Geometry overlay").first).to be > corner.call("Sizes & geometry comparison").first
+    expect(corner.call("Geometry overlay").last).to be_within(1).of(corner.call("Sizes & geometry comparison").last)
+    page.current_window.resize_to(1400, 1000)
+    expect(corner.call("Geometry overlay").last).to be < corner.call("Sizes & geometry comparison").last
+    page.current_window.resize_to(*window_size)
     # the wheels compared under the size, rather than on each model's sizes card (these list no max tire)
     labels = all("[aria-label='Sizes & geometry comparison'] tbody th").map(&:text)
     expect(labels.first(4)).to eq(["Front wheel", "Rear wheel", "Size", "Reach"])

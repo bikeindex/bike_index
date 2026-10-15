@@ -71,8 +71,9 @@ const GEARING = [
 ]
 
 // The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's. The
-// 'geometry' `part` is their sizes, wheels and frames, keyed to the overlay by `frames`, the 'specs' part the rest, and 'all' both
-export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part = 'specs' }) => {
+// 'geometry' `part` is their sizes, wheels and frames, keyed to the overlay by `frames`, the 'specs' part the rest, and 'all' both.
+// `beside` the overlay, it shares a row with it once the window is wide enough
+export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part = 'specs', beside = false }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
@@ -175,7 +176,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
 
   // Out to the window's edges, the table at least the page's 78rem column and wider as its vehicles need, scrolling
   // only once it's the window's width; its own min-w-full would make it the window's width
-  return html`<section aria-label=${{ geometry: 'Sizes & geometry comparison', specs: 'Components comparison', all: 'Comparison' }[part]} class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4">${table({
+  return html`<section aria-label=${{ geometry: 'Sizes & geometry comparison', specs: 'Components comparison', all: 'Comparison' }[part]} class="tw:mt-6 tw:mx-[calc(50%-50vw)] tw:w-screen tw:px-4 ${beside ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:w-auto tw:min-[1500px]:min-w-0 tw:min-[1500px]:flex-1 tw:min-[1500px]:px-0' : ''}">${table({
     classes: 'tw:mx-auto tw:min-w-[min(100%,78rem)]!',
     records: rows,
     columns: [

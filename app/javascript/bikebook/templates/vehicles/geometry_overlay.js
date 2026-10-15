@@ -69,7 +69,7 @@ export const seriesBorders = (frames, index) => overlaid(frames) && drawable(fra
 // The compared models' frames in their `sizes`, standing on the same ground with their bottom brackets lined up,
 // each over the ones the comparison table columns left of it. A frame it can't draw is its wheels alone where they're
 // listed, the rear axle on the first drawn frame's. Lone wheels aren't drawn, only said what they're missing
-export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
+export const geometryOverlay = ({ presenter, vehicles, sizes, frames, beside = false }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const labelled = named.map((vehicle, index) => {
     const title = [vehicle.manufacturer, vehicle.model].filter(present).join(' ')
@@ -100,7 +100,9 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames }) => {
   // out to the screen's edges on a phone, as the cards below it are
   return html`<section aria-label="Geometry overlay" data-controller=${overlay ? 'bikebook--geometry-overlay' : nothing} class="tw:mx-auto tw:mt-6
     tw:max-w-4xl tw:space-y-3 tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800
-    tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0">${sectionHeading('Geometry overlay')}${
+    tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen tw:max-[500px]:rounded-none tw:max-[500px]:border-x-0 ${beside
+      ? 'tw:min-[1500px]:mx-0 tw:min-[1500px]:basis-2/5 tw:min-[1500px]:shrink-0'
+      : ''}">${sectionHeading('Geometry overlay')}${
     overlay ? drawing(presenter, drawn, labelled) : nothing}${missingNote}</section>`
 }
 
