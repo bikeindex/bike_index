@@ -18,8 +18,9 @@ class ProcessImpoundUpdatesJob < ApplicationJob
       elsif %w[removed_from_bike_index expired].include?(impound_record_update.kind)
         impound_record.bike&.destroy
       elsif impound_record_update.kind == "retrieved_by_owner" &&
-          impound_record.impound_claims.approved.any?
-        impound_record_update.impound_claim = impound_record.impound_claims.approved.first
+          (impound_record_update.impound_claim.present? || impound_record.impound_claims.approved.any?)
+        # A finder marking a found report returned names the claim - it's no longer approved by now
+        impound_record_update.impound_claim ||= impound_record.impound_claims.approved.first
         claim_retrieved = impound_record_update.impound_claim
       end
       impound_record_update.update(processed: true, skip_update: true)
@@ -74,5 +75,7 @@ class ProcessImpoundUpdatesJob < ApplicationJob
     end
     # TODO: make this actually merge attributes in from the bike, rather than just delete it?
     impound_record.parking_notification&.bike&.delete
+    # Recalculate the impounded bike (unless just deleted), so it drops out of impounded/found searches
+    Bike.find_by(id: impound_record.bike_id)&.update(updated_at: Time.current)
   end
 end

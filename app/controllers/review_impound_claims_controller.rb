@@ -46,11 +46,12 @@ class ReviewImpoundClaimsController < ApplicationController
     end
   end
 
-  # No impound_claim on the update: ProcessImpoundUpdatesJob attaches the approved claim
-  # and merges it (recovering the stolen record), but only while the claim is still approved
+  # ProcessImpoundUpdatesJob merges this claim, recovering its stolen record
   def mark_retrieved_by_owner
-    if @impound_claim.approved? && @impound_record.active?
-      create_impound_record_update(kind: "retrieved_by_owner")
+    if !@impound_record.authorized?(current_user, no_superuser_override: true)
+      flash[:error] = "Only the person who found the bike can mark it returned"
+    elsif @impound_claim.approved? && @impound_record.active?
+      create_impound_record_update(kind: "retrieved_by_owner", impound_claim: @impound_claim)
     else
       flash[:error] = "Only an approved claim can be marked returned"
     end

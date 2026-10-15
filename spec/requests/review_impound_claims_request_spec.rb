@@ -185,10 +185,37 @@ RSpec.describe ReviewImpoundClaimsController, type: :request do
         expect(impound_record_update.reload.impound_claim_id).to eq impound_claim.id
         expect(impound_claim.reload.status).to eq "retrieved"
         expect(impound_claim.stolen_record.reload.recovered?).to be_truthy
+        expect(bike_claimed.reload.current_impound_record_id).to be_nil
+        expect(bike_claimed.status).to_not eq "status_impounded"
         # ImpoundClaimJob only emails submitting/approved/denied claims. Recovery only emails
         # (theft_alert_recovered) when the stolen record has a promoted alert, which this one doesn't
         expect(ActionMailer::Base.deliveries.count).to eq 0
         expect(impound_claim.notifications.count).to eq 0
+      end
+
+      context "with an earlier approved claim" do
+        let(:other_claim) { FactoryBot.create(:impound_claim, :with_stolen_record, status: "approved", impound_record:, submitted_at: Time.current) }
+        let(:impound_claim) { other_claim && super() } # the other claim is approved.first
+        it "retrieves the selected claim" do
+          patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+          Sidekiq::Job.drain_all
+          expect(impound_record.reload.impound_record_updates.sole.impound_claim_id).to eq impound_claim.id
+          expect(impound_claim.reload.status).to eq "retrieved"
+          expect(impound_claim.stolen_record.reload.recovered?).to be_truthy
+          expect(other_claim.reload.status).to eq "approved"
+          expect(other_claim.stolen_record.reload.recovered?).to be_falsey
+        end
+      end
+
+      context "superuser who isn't the finder" do
+        let(:impound_record) { FactoryBot.create(:impound_record, bike: bike_claimed) }
+        let(:bike_claimed) { FactoryBot.create(:bike, :with_ownership_claimed) }
+        let(:current_user) { FactoryBot.create(:superuser) }
+        it "doesn't record" do
+          patch "#{base_url}/#{impound_claim.to_param}", params: retrieved_params
+          expect(flash[:error]).to be_present
+          expect(impound_record.reload.impound_record_updates.count).to eq 0
+        end
       end
 
       context "not approved" do
