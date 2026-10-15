@@ -7141,20 +7141,6 @@ nl:
             accu, lader en controller) heeft gezamenlijk de brandveiligheids- en elektrische
             veiligheidstests doorstaan.
         classes:
-          assist: Helpen
-          class_1_body: De motor ondersteunt alleen tijdens het trappen en stopt bij
-            32 km/u. Toegestaan op de meeste plaatsen waar een gewone fiets ook mag
-            komen.
-          class_1_tag: Alleen met trapondersteuning
-          class_2_body: Met een gashendel kan de fiets zonder te trappen tot wel 32
-            km/u (20 mph) worden aangedreven. Op sommige paden en in parken zijn gashendels
-            niet toegestaan.
-          class_2_tag: Elektrisch gaspedaal
-          class_3_body: Trapondersteuning tot 45 km/u, met snelheidsmeter. Vaak gelden
-            er helmplicht, een minimumleeftijd en beperkingen voor de routes.
-          class_3_summary: Trapondersteuning tot 45 km/u, met snelheidsmeter.
-          class_3_tag: Snellere trapondersteuning
-          class_n: Klasse %{n}
           classes_heading: E-bike lessen, uitgelegd
           classes_intro: De meeste staten hanteren een systeem met drie klassen. Je
             klasse bepaalt hoe snel de motor ondersteuning biedt, of je een gashendel
@@ -7169,23 +7155,41 @@ nl:
           emoto_summary: Een topsnelheid van meer dan 45 km/u, een maximale snelheid
             van meer dan 32 km/u of een motorvermogen van meer dan 750 watt maken
             het een e-moto.
-          motor: Motor
-          motor_cap: "≤750W"
           mph: "%{mph} mph"
           not_an_ebike: Geen e-bike
-          or: of
           pedal: Voetpedaal
           state_classes_heading: "%{state} e-bike lessen"
           state_classes_intro: "%{state} gebruikt niet het drieklassensysteem dat
             de meeste staten hanteren. De wetgeving van deze staat deelt e-bikes en
             andere elektrische tweewielers in plaats daarvan in deze klassen in."
-          state_specifics: "%{state} specificaties"
           throttle: Elektrisch gaspedaal
-          top_assist: Top assistentie
           watts_max: "≤%{watts}W"
           watts_min: "%{watts}W+"
         rule_citation:
           source: bron
+        class_card:
+          assist: Helpen
+          class_1_body: De motor ondersteunt alleen tijdens het trappen en stopt bij
+            32 km/u. Toegestaan op de meeste plaatsen waar een gewone fiets ook mag
+            komen.
+          class_1_tag: Alleen met trapondersteuning
+          class_2_body: Met een gashendel kan de fiets zonder te trappen tot wel 32
+            km/u (20 mph) worden aangedreven. Op sommige paden en in parken zijn gashendels
+            niet toegestaan.
+          class_2_tag: Elektrisch gaspedaal
+          class_3_body: Trapondersteuning tot 45 km/u, met snelheidsmeter. Vaak gelden
+            er helmplicht, een minimumleeftijd en beperkingen voor de routes.
+          class_3_summary: Trapondersteuning tot 45 km/u, met snelheidsmeter.
+          class_3_tag: Snellere trapondersteuning
+          class_n: Klasse %{n}
+          motor: Motor
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          or: of
+          pedal: Voetpedaal
+          state_specifics: "%{state} specificaties"
+          throttle: Elektrisch gaspedaal
+          top_assist: Top assistentie
     shared_blocks:
       footer:
         about: Over

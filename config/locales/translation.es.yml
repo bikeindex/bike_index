@@ -7238,19 +7238,6 @@ es:
             cargador y controlador) superó conjuntamente las pruebas de seguridad
             eléctrica y contra incendios.
         classes:
-          assist: Asistir
-          class_1_body: El motor solo ayuda mientras pedaleas y se detiene a 32 km/h.
-            Está permitido en la mayoría de los lugares donde se permite circular
-            con una bicicleta normal.
-          class_1_tag: Solo con asistencia al pedaleo
-          class_2_body: Un acelerador permite mover la bicicleta sin pedalear, hasta
-            32 km/h. En algunos senderos y parques no se permite el uso de aceleradores.
-          class_2_tag: Acelerador
-          class_3_body: Pedaleo asistido hasta 45 km/h, con velocímetro. Suele incluir
-            la obligación de usar casco, una edad mínima y limitaciones en los caminos.
-          class_3_summary: Pedaleo asistido hasta 45 km/h, con velocímetro.
-          class_3_tag: Asistencia al pedaleo más rápida
-          class_n: Clase %{n}
           classes_heading: Clases de bicicletas eléctricas, explicadas
           classes_intro: La mayoría de los estados utilizan un sistema de tres clases.
             Tu clase determina la velocidad a la que ayuda el motor, si se permite
@@ -7265,23 +7252,40 @@ es:
           emoto_summary: Una velocidad máxima superior a 45 km/h, una velocidad de
             aceleración superior a 32 km/h o motores de más de 750 W la convierten
             en una moto eléctrica.
-          motor: Motor
-          motor_cap: "≤750W"
           mph: "%{mph} mph"
           not_an_ebike: No es una bicicleta eléctrica
-          or: o
           pedal: Pedal
           state_classes_heading: "%{state} clases de bicicletas eléctricas"
           state_classes_intro: "%{state} no utiliza el sistema de tres clases que
             usan la mayoría de los estados. Su ley clasifica las bicicletas eléctricas
             y otros vehículos eléctricos de dos ruedas en estas clases."
-          state_specifics: "%{state} detalles"
           throttle: Acelerador
-          top_assist: Asistencia superior
           watts_max: "≤%{watts}W"
           watts_min: "%{watts}W+"
         rule_citation:
           source: fuente
+        class_card:
+          assist: Asistir
+          class_1_body: El motor solo ayuda mientras pedaleas y se detiene a 32 km/h.
+            Está permitido en la mayoría de los lugares donde se permite circular
+            con una bicicleta normal.
+          class_1_tag: Solo con asistencia al pedaleo
+          class_2_body: Un acelerador permite mover la bicicleta sin pedalear, hasta
+            32 km/h. En algunos senderos y parques no se permite el uso de aceleradores.
+          class_2_tag: Acelerador
+          class_3_body: Pedaleo asistido hasta 45 km/h, con velocímetro. Suele incluir
+            la obligación de usar casco, una edad mínima y limitaciones en los caminos.
+          class_3_summary: Pedaleo asistido hasta 45 km/h, con velocímetro.
+          class_3_tag: Asistencia al pedaleo más rápida
+          class_n: Clase %{n}
+          motor: Motor
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          or: o
+          pedal: Pedal
+          state_specifics: "%{state} detalles"
+          throttle: Acelerador
+          top_assist: Asistencia superior
     shared_blocks:
       footer:
         about: Acerca
