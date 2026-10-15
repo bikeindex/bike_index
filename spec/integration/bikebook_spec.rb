@@ -392,9 +392,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_field("Low-Speed Electric Bicycle")
     expect(page).to have_unchecked_field("US Class 2").and have_unchecked_field("Out of Class")
     expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
-    # a US class's tooltip names it
+    # a US class's tooltip names it, its description citing no IDs beside the one it shows
     find("button[aria-label='US Class 1 e-bike']").click
     expect(page).to have_css("[role='tooltip'] h3", exact_text: "US Class 1 e-bike", visible: true)
+    expect(find("[role='tooltip'] p", text: "Every class is also a federal low-speed electric bicycle", visible: true).text).to end_with("low-speed electric bicycle.")
     expect(page).to have_unchecked_field("US Class 1")
     choose_option("Market", "Any")
     expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")

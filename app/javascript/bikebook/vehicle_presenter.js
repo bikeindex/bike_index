@@ -51,10 +51,11 @@ export class VehiclePresenter {
     return this.vocabulary.e_vehicle_classifications[id]?.label ?? id
   }
 
+  // its description less the IDs it cites, beside the ID it shows
   classificationTooltip (id) {
     const { title, description } = this.vocabulary.e_vehicle_classifications[id]
     return html`<h3 class="tw:font-bold">${title}</h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
-      copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${description}</p>`
+      copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${String(description ?? '').replace(/\s*\(evc\/[^)\s]+\)/g, '')}</p>`
   }
 
   // Each classification's name to its tooltip
