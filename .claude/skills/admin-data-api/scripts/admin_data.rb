@@ -177,7 +177,21 @@ def pghero_verdict(data)
   <<~OUT.chomp
     summary: connections=#{data["total_connections"]}/#{max_conn} db=#{data["database_size"]} running=#{array_length(data["running_queries"])} index_hit=#{data["index_hit_rate"].to_s[0, 5]} table_hit(info)=#{data["table_hit_rate"].to_s[0, 5]} unused_indexes=#{array_length(data["unused_indexes"])}
     #{verdict_line(reasons)}
+    #{slow_query_lines(data)}
   OUT
+end
+
+# PgHero's dashboard "Slow queries": average_time >= 20ms over >= 100 calls. Older
+# deploys of the endpoint lack slow_queries, so fall back to filtering the top 25.
+def slow_query_lines(data)
+  return "slow_queries: query stats not enabled" unless data["query_stats_enabled"] == true
+
+  slow = data["slow_queries"].is_a?(Array) ? data["slow_queries"] : (data["query_stats"] || []).select { it["average_time"].to_f >= 20 && it["calls"].to_i >= 100 }
+  rows = slow.sort_by { -it["total_minutes"].to_f }.first(10).map do |query|
+    format("  %8.1f min  %7d ms avg  %9d calls  %s", query["total_minutes"].to_f, query["average_time"].to_f.round, query["calls"].to_i, query["query"].to_s.gsub(/\s+/, " ")[0, 160])
+  end
+  source = data.key?("slow_queries") ? "" : " (from top-25 query_stats; endpoint predates slow_queries)"
+  ["slow_queries: #{slow.length}#{source}, stats since #{data["last_stats_reset_time"] || "unknown"}", *rows].join("\n")
 end
 
 def verdict_line(reasons)

@@ -23,7 +23,8 @@ module AdminData
       enabled = safe(:query_stats_enabled?)
       base = {
         query_stats_enabled: enabled,
-        query_stats: (safe(:query_stats, limit: QUERY_STATS_LIMIT) if enabled == true)
+        query_stats: (safe(:query_stats, limit: QUERY_STATS_LIMIT) if enabled == true),
+        slow_queries: (safe(:slow_queries) if enabled == true)
       }
       METRICS.each_with_object(base) do |metric, result|
         result[metric] = safe(metric)
