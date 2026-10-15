@@ -100,7 +100,8 @@ export class VehiclePresenter {
       const first = feetAndInches.findIndex(({ convert }) => convert(mm) !== 0)
       return [key, join((first < 0 ? [] : feetAndInches.slice(first)).map(({ part, convert }) => this.labeled(convert(mm), 'mm', part)), ' ')]
     })
-    const exact = [(mm) => this.labeled(this.rounded(mm), 'mm'), (mm) => this.#inWords(mm)]
+    const centimeters = (mm) => this.labeled(this.rounded(mm / cm), 'cm', this.kit.presenter.centimeters)
+    const exact = [(mm) => this.labeled(this.rounded(mm), 'mm'), (mm) => join([this.#inWords(mm), ' (', centimeters(mm), ')'])]
     const [metricSystem, imperialSystem] = [metric, imperial].map((parts, index) => this.#tooltipped(
       full ? join(parts.map(([, part]) => part), ' × ') : join(parts.map(([key, part]) => join([part, ' ', this.kit.presenter.dimension_words[key]])), ', '),
       values.map(([key, mm]) => join([`${this.humanize(key)}: `, exact[index](mm)]))
@@ -173,7 +174,8 @@ export class VehiclePresenter {
     if (blank(unit)) return number
     // a thin space, so the unit reads as part of the value
     const gap = ['°', "'", '"'].includes(meta.label) ? '' : ' '
-    return join([number, gap, html`<span class="tw:text-xs tw:text-gray-400 tw:dark:text-gray-500" title=${meta.name ?? nothing}>${meta.label ?? unit}</span>`])
+    const classes = ["'", '"'].includes(meta.label) ? nothing : 'tw:text-xs tw:text-gray-400 tw:dark:text-gray-500'
+    return join([number, gap, html`<span class=${classes} title=${meta.name ?? nothing}>${meta.label ?? unit}</span>`])
   }
 
   #inches (millimeters) {

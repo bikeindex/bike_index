@@ -918,6 +918,19 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(wheelbase).to have_no_button("?")
     wheelbase.find("button", text: /\A\d'\s*\d+"\z/).click
     expect(wheelbase).to have_css("[role='tooltip']", text: /\A\d+ feet, [\d.]+ inch(es)?\z/, visible: true)
+    # feet and inches marks aren't muted as other units are
+    expect(wheelbase.find("button", text: /\A\d'\s*\d+"\z/)).to have_no_css(".tw\\:text-gray-400")
+    # a dimension's tooltip spells out its feet and inches, its metric after
+    dimension = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehiclePresenter }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const imperial = fragmentOf(new VehiclePresenter(kit, vocabulary).dimensions({ length: 762 })).querySelector('.tw\\\\:imperial\\\\:inline [role="tooltip"]')
+        return imperial.textContent.replace(/\\s+/g, ' ').trim()
+      })()
+    JS
+    expect(dimension).to eq "Length: 2 feet, 6 inches (76.2 cm)"
   end
 
   it "renders each UI template as the component it mirrors does" do
