@@ -71,6 +71,13 @@ module Admin
 
     private
 
+    # Tooling reads the JSON - an HTML page would copy a query-string token into its links
+    def require_index_admin!
+      return head(:not_acceptable) if token_request? && !request.format.json?
+
+      super
+    end
+
     def dashboard
       @per_page = permitted_per_page(default: 25)
       database = ActiveRecord::Base.connection_db_config.database

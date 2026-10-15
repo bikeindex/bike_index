@@ -182,6 +182,23 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
         expect(response.body).to_not match(email_pattern)
       end
 
+      it "rechecks the stolen veto live and blocks the comparison" do
+        kind = cache.read(cache_key)[:groups].find { it["bike_ids"].include?(pair.first.id) }["kind"]
+        FactoryBot.create(:stolen_bike, serial_number: "WTU123456")
+        get url, params: token_param.merge(search_kind: kind)
+        expect(json_result[:groups].find { it[:bike_ids].include?(pair.first.id) }[:serial_stolen]).to be true
+
+        get "#{base_url}/serial.json", params: token_param.merge(reference_bike_id: pair.last.id)
+        expect(json_result[:serial_stolen]).to be true
+        expect(json_result[:readiness]).to eq "blocked"
+      end
+
+      it "refuses HTML, whose links would carry the token" do
+        get base_url, params: token_param
+        expect(response.status).to eq 406
+        expect(response.body).to_not include(doorkeeper_token.token)
+      end
+
       it "reports preparation while the cache is empty" do
         cache.delete(cache_key)
         get url, params: token_param
