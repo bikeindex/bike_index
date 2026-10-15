@@ -1,12 +1,12 @@
 import { Controller } from '@hotwired/stimulus'
-import { replaceUrl } from 'bikebook/replace_url'
+import { readable, replaceUrl } from 'bikebook/replace_url'
 
 /* global CSS */
 
 // Threads the filter panel's values into the vehicle combobox's async src and mirrors them
 // into the page URL, which the page renders the controls from (ui--collapse owns ?filters)
 export default class extends Controller {
-  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'classification']
+  static targets = ['vehicleCombobox', 'yearArrow', 'priceArrow', 'summary', 'field', 'classification', 'clear']
   static values = {
     yearDir: { type: String, default: 'desc' },
     priceDir: { type: String, default: 'desc' },
@@ -63,7 +63,9 @@ export default class extends Controller {
     const url = new URL(fieldset.dataset.hwComboboxAsyncSrcValue, window.location.origin)
     this.#applyParams(url)
     fieldset.dataset.hwComboboxAsyncSrcValue = url.pathname + url.search
-    fieldset.querySelector('.hw-combobox__input').dispatchEvent(new Event('input', { bubbles: true }))
+    // disabled while the catalog loads, which has nothing to search yet
+    const input = fieldset.querySelector('.hw-combobox__input')
+    if (!input.disabled) input.dispatchEvent(new Event('input', { bubbles: true }))
   }
 
   // The URL leaves out the default market and jurisdiction, so a shared link opens in its reader's own -
@@ -79,6 +81,15 @@ export default class extends Controller {
       jurisdiction: jurisdiction === this.defaultJurisdictionValue && !classChecked ? '' : jurisdiction
     })
     replaceUrl(url)
+    this.refreshClear()
+  }
+
+  // A clear link's href: this page less its filters but the market, which it renders afresh at their defaults. Set
+  // again as it's clicked, since the panel's own state and the picks reach the URL without a filter changing
+  refreshClear () {
+    const url = new URL(window.location)
+    for (const name of [...Object.keys(this.#filters), 'jurisdiction'].filter((name) => name !== 'market')) url.searchParams.delete(name)
+    for (const link of this.clearTargets) link.href = readable(url)
   }
 
   #applyParams (url, filters = this.#filters) {
@@ -90,7 +101,10 @@ export default class extends Controller {
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
+  // the market stays through a clear, so it alone leaves nothing to clear
   #refreshSummary () {
+    const filtered = Object.entries(this.#filters).some(([name, value]) => name !== 'market' && value)
+    for (const link of this.clearTargets) link.hidden = !filtered
     this.summaryTarget.replaceChildren(...this.#summary.map(([label, value]) => {
       const item = document.createElement('li')
       const name = document.createElement('strong')

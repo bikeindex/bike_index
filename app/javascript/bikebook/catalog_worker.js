@@ -20,8 +20,6 @@ const fetchJson = async (url) => {
 }
 
 const list = (value) => (value ?? '').split(',').filter(Boolean)
-// a classification's option and chip, beside the vehicles'
-const classificationDisplay = ({ title }) => `e-Vehicle Classification: ${title}`
 const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
 
@@ -89,10 +87,8 @@ const block = (key) => {
   return blocks.get(key)
 }
 
-// An e-vehicle classification's data is its vocabulary record
 async function vehicles ({ ids }) {
   const found = await Promise.all(ids.map(async (value) => {
-    if (classifications[value]) return { value, display: classificationDisplay(classifications[value]), data: classifications[value], classification: true }
     const key = blockKey(value)
     return { value, display: byId.get(value)?.display, data: manifest.blocks[key] && (await block(key))[value] }
   }))
@@ -100,7 +96,7 @@ async function vehicles ({ ids }) {
 }
 
 function displays ({ ids }) {
-  return ids.map((id) => byId.get(id)?.display ?? (classifications[id] ? classificationDisplay(classifications[id]) : null))
+  return ids.map((id) => byId.get(id)?.display ?? null)
 }
 
 function search ({ params, page, perPage }) {
@@ -120,11 +116,6 @@ function matching (params) {
   const filtered = sorted(params).filter(filter(params))
   const needle = (params.q ?? '').trim().toLowerCase()
   const selected = new Set(list(params.vehicle_models))
-  // a classification is found by its id alone, which every filter passes
-  if (needle.startsWith('evc/')) {
-    const matches = Object.entries(classifications).filter(([id]) => id.startsWith(needle) && !selected.has(id)).map(([id, record]) => ({ id, display: classificationDisplay(record), classification: true }))
-    return { filteredCount: filtered.length, matches }
-  }
   const exact = needle.startsWith('m/') && filtered.find(({ id }) => id === needle)
   const words = needle.split(/\s+/).filter(Boolean)
   const found = (exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))))

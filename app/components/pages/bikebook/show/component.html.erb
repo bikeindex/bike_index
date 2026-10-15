@@ -1,3 +1,20 @@
+<%# bikebook--catalog-filters keeps its href, the page less its filters but the market, and shows it once any is set %>
+<% clear_filters = capture do %>
+  <a
+    href="<%= bikebook_path %>"
+    hidden
+    class="
+      twlink tw:shrink-0 tw:justify-self-start tw:text-sm
+      tw:lg:col-span-full
+    "
+    data-in-place="[autofocus]"
+    data-bikebook--catalog-filters-target="clear"
+    data-action="bikebook--catalog-filters#refreshClear"
+  >
+    <%= translation(".clear_filters") %>
+  </a>
+<% end %>
+
 <% search = capture do %>
   <div
     class="tw:group"
@@ -15,6 +32,7 @@
     <div
       data-bikebook--catalog-filters-target="vehicleCombobox"
       data-controller="bikebook--focus-shortcut"
+      data-action="bikebook--tips:browse@window->bikebook--focus-shortcut#open"
     >
       <%= form_with url: bikebook_path, method: :get,
           data: {controller: "bikebook--auto-submit",
@@ -35,17 +53,19 @@
     <%# Carded only around applied filters %>
     <div
       class="
-        tw:mt-3 tw:flex tw:items-baseline tw:justify-between tw:gap-x-4
+        tw:mt-3 tw:flex tw:items-baseline tw:gap-x-4
         tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden
         tw:has-[li]:rounded-lg tw:has-[li]:border
         tw:has-[li]:border-gray-200 tw:has-[li]:px-4 tw:has-[li]:py-2
         tw:dark:has-[li]:border-gray-700
       "
     >
+      <%= clear_filters %>
+
       <ul
         aria-label="<%= translation(".applied_filters") %>"
         data-bikebook--catalog-filters-target="summary"
-        class="tw:flex tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:text-sm"
+        class="tw:flex tw:flex-1 tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:text-sm"
       ></ul>
 
       <%= more_filters %>
@@ -58,7 +78,8 @@
     >
       <div class="twwiderow">
         <%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:mt-3 tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start")) do %>
-          <div class="tw:flex tw:justify-end tw:lg:col-span-2">
+          <div class="tw:flex tw:items-baseline tw:gap-x-4 tw:lg:col-span-2">
+            <%= clear_filters %>
             <%= more_filters %>
           </div>
 

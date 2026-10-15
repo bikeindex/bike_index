@@ -19,7 +19,7 @@ module Pages
 
         # The closed filters' and the open card's, so it's beside whichever shows
         def more_filters = render(UI::Collapse::Component.new(text: translation(".more_filters"), chevron: :trailing,
-          color: :link, aria: {controls: "vehicle-filters"}))
+          color: :link, html_class: "tw:ml-auto", aria: {controls: "vehicle-filters"}))
 
         # By the ISO 3166-2 codes the catalog's classifications name their jurisdictions by
         def jurisdiction_names = {"US" => translation(".united_states")}
