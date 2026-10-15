@@ -64,7 +64,7 @@ const diameterNotes = (presenter, compared) => {
   })
 }
 
-const noteList = (heading, items) => html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: ${heading}</p><ul
+const noteList = (heading, items) => html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: ${heading}:</p><ul
   class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${items}</ul></div>`
 
 const drawable = (geometry) => geometry?.missing.length === 0 || geometry?.wheels

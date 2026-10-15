@@ -522,7 +522,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     # a vehicle listing no figure that sizes a frame is its wheels alone, the rear axle on the first frame's, under a note
     expect(page).to have_css("[aria-label='Geometry overlay'] p + ul li", exact_text: "Segway GT3 Pro doesn't list its Reach, Stack, Top Tube (effective), " \
       "Front Centre and Head Tube or the measures to calculate them, so only its wheels are drawn, the rear axle on Aventón Level 4 REC Step-Through's.")
-    expect(page).to have_css("[aria-label='Geometry overlay'] p", exact_text: "Note: missing geometry information")
+    expect(page).to have_css("[aria-label='Geometry overlay'] p", exact_text: "Note: missing geometry information:")
     # of a year the first lacks just the year, and of a drivetrain just the chip it lacks
     haul = find("article h1", text: "Haul ST").ancestor("article")
     marked = ->(heading, selector) { haul.find("h2", text: heading).ancestor("section").all(selector).map { it.text.strip } }
@@ -833,7 +833,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(cogs).to have_css(".tw\\:text-red-700", exact_text: "−11").and have_css(".tw\\:text-red-700", exact_text: "−30")
     # the same wheel size on tires far enough apart, each with its estimated diameter after its model's name
     diameters = -> { all("[aria-label='Geometry overlay'] li", text: "diameter").map { it.text.gsub(/[[:space:]]+/, " ") } }
-    expect(page).to have_css("[aria-label='Geometry overlay'] p", text: "Note: you're comparing different diameter wheels and tires")
+    expect(page).to have_css("[aria-label='Geometry overlay'] p", exact_text: "Note: you're comparing different diameter wheels and tires:")
     expect(diameters.call).to eq(["Aventón Current EXP's 700 C wheels with 64 mm tires are approximately 750 mm diameter",
       "Aventón Soltera 3 ADV's 700 C wheels with 38 mm tires are approximately 698 mm diameter"])
     expect(page).to have_css("[aria-label='Geometry overlay'] li em", exact_text: "Aventón Current EXP")
