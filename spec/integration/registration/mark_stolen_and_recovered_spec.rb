@@ -44,9 +44,11 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     expect(bike.reload.status_stolen?).to be_truthy
 
     # ---- Fill the required theft details plus useful extras ----
-    %w[date_stolen phone theft_description].each do |attribute|
+    %w[date_stolen theft_description].each do |attribute|
       expect(find("[name='bike[stolen_records_attributes][0][#{attribute}]']")[:required]).to be_present
     end
+    # A local wall-clock time, so the browser is what can compare it to now
+    expect(page.evaluate_script("new Date(document.querySelector('.dateInputUpdateZone').max) <= new Date()")).to be true
     pick_within_selectize(selectize_for("select.country-select-input"), "United States")
     fill_in "Address or intersection", with: "100 Main St"
     fill_in "City", with: "New York"
