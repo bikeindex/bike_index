@@ -3,6 +3,7 @@ import { localSources } from 'utils/hw_combobox_patch'
 import { renderChips, renderCounts } from 'bikebook/catalog'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { filterOption } from 'bikebook/templates/filter_option'
+import { pickedClassifications, renderClassCards } from 'bikebook/templates/vehicles/class_cards'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { FILTERS, LISTS, RANGES, SINGLES, toQuery } from 'bikebook/query'
 import { fragmentOf, renderInto } from 'bikebook/render'
@@ -75,7 +76,9 @@ export async function hydrate (catalog, source, shell, url) {
   filters.market = filters.market === 'all' ? '' : filters.market || defaultMarket
   const [found, { filteredCount }] = await Promise.all([catalog.vehicles(params.get('vehicle_models')?.split(',') ?? []), catalog.search(filters, 0, 0)])
   const vehicles = found.slice(0, MAX_COMPARE)
-  const values = vehicles.map(({ value }) => value).join(',')
+  const classifications = catalog.vocabulary.e_vehicle_classifications
+  const cards = pickedClassifications(url, classifications)
+  const values = [...vehicles.map(({ value }) => value), ...cards].join(',')
 
   renderCounts(root, filteredCount)
   const manufacturers = catalog.options.manufacturer.length
@@ -86,6 +89,7 @@ export async function hydrate (catalog, source, shell, url) {
   combobox(root, 'vehicle_models').dataset.hwComboboxAsyncSrcValue = `${url.pathname}?${query ? `${query}&` : ''}for_id=vehicle_models`
   root.getElementById('vehicle_models-hw-hidden-field').setAttribute('value', values)
   fillFields(root, filters)
+  renderClassCards(root.getElementById('classification-cards'), cards, root.getElementById('jurisdiction-hw-hidden-field').getAttribute('value'), classifications)
   for (const name of SINGLES) {
     const display = catalog.options[name].find(({ value }) => value === filters[name])?.display
     if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display

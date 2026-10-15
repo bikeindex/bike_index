@@ -40,15 +40,12 @@ module Pages
           end
         end
 
-        # The three classes, then the e-moto that's none of them, a chosen state's own rules standing in for most states'
-        def us_class_cards
-          class_3_rules = @state && EbikeRuleServices::StateLaws.class_3_rules(@state[:abbr]).presence
-          [1, 2, 3].map { class_card(e_bike_class: it, rules: (class_3_rules if it == 3)) } + [emoto_card]
-        end
+        # The three classes, then the e-moto that's none of them
+        def us_class_cards = [1, 2, 3].map { class_card(e_bike_class: it) } + [emoto_card]
 
-        def emoto_card = class_card(rules: @state && EbikeRuleServices::StateLaws.emoto_rules(@state[:abbr]).presence)
+        def emoto_card = class_card
 
-        def class_card(**) = Pages::EbikeRules::ClassCard::Component.new(state_name: @state&.dig(:name), **)
+        def class_card(**) = Pages::EbikeRules::ClassCard::Component.new(state: @state, **)
       end
     end
   end

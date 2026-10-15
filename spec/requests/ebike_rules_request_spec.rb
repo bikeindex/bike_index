@@ -65,6 +65,18 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_no_text("Most states treat these")
     end
 
+    it "renders one class's card alone, with its state's rules, the e-moto's for a class it doesn't know" do
+      get "/ebike-rules/ca", params: {e_bike_class: 3}, headers: {"Turbo-Frame" => Pages::EbikeRules::ClassCard::Component.frame_id(3)}
+      expect(page).to have_css("turbo-frame#ebike-rules-class-card-3 h3", text: "Class 3")
+        .and have_css("[role=button]", text: "California specifics")
+        .and have_css("li", text: "Riders must be 16 or older to ride a Class 3")
+        .and have_no_css("h3", text: "Class 1").and have_no_css("#ebike-rules-classes")
+
+      get "/ebike-rules/ca", params: {e_bike_class: "12"}, headers: {"Turbo-Frame" => Pages::EbikeRules::ClassCard::Component.frame_id(nil)}
+      expect(page).to have_css("turbo-frame#ebike-rules-class-card-emoto h3", text: "Not an e-bike")
+        .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
+    end
+
     it "sends a request Cloudflare locates to its state's page, which no cache keeps" do
       get "/ebike-rules", params: {utm_source: "newsletter"}, headers: indiana
 

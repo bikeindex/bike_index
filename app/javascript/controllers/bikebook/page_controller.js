@@ -1,11 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
 import { hydrate, loadingShell } from 'bikebook/hydrate'
-import { renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
-import { classCard } from 'bikebook/templates/vehicles/class_badges'
+import { cardOf, renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
 import { uuid } from 'bikebook/templates/helpers'
 
 /* global CSS, requestAnimationFrame */
@@ -41,9 +40,12 @@ export default class extends Controller {
       return this.#fail(error)
     }
     // the URL's filters are the reader's, where the combobox's add the visitor's market
-    this.source = new CatalogComboboxSource(this.catalog, ({ params: { q }, total, filteredCount, primed }) => {
+    this.source = new CatalogComboboxSource(this.catalog, ({ params: { q, vehicle_models: picked = '' }, total, filteredCount, primed }) => {
       renderCounts(document, filteredCount)
-      renderInto(document.getElementById('classification-card'), classCard(q ?? '', this.catalog.vocabulary.e_vehicle_classifications))
+      // a jurisdiction's change searches again, moving the cards to its own
+      const classifications = this.catalog.vocabulary.e_vehicle_classifications
+      renderClassCards(document.getElementById('classification-cards'), picked.split(',').filter((id) => cardOf(id, classifications)),
+        document.getElementById('jurisdiction-hw-hidden-field').value, classifications)
       if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })
     this.#countModels()
@@ -59,7 +61,7 @@ export default class extends Controller {
     event.preventDefault()
     const url = new URL(window.location.href)
     new FormData(event.target).forEach((value, name) => url.searchParams.set(name, value))
-    this.#go(realigned(url), [window.scrollX, window.scrollY])
+    this.#go(realigned(withClassifications(url, this.catalog.vocabulary.e_vehicle_classifications)), [window.scrollX, window.scrollY])
   }
 
   // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without

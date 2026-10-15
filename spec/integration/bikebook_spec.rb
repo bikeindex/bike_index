@@ -559,13 +559,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     type_into(vehicle_field, "m/specialized/2025/haul_st")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(model doesn't match filters)")
     expect(page).to have_css("[role='option']", count: 1).and have_no_css("[role='option']", text: "$3,599.99")
-    # a classification's exact id shows its /ebike-rules card above the vehicles: a US class's, or the e-moto's
-    type_into(vehicle_field, "evc/us/class_2")
-    expect(page).to have_css("#classification-card h3", exact_text: "Class 2")
-    type_into(vehicle_field, "evc/off_highway_motorcycle")
-    expect(page).to have_css("#classification-card h3", exact_text: "Not an e-bike")
     type_into(vehicle_field, "m/specialized/2025/haul_st_ca")
-    expect(page).to have_no_css("#classification-card h3")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(1 matching model)")
 
     # its listbox closed, which covers the filters
@@ -1053,6 +1047,19 @@ RSpec.describe "Bikebook", :js, type: :system do
     tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for off-highway use", visible: true)
     expect(tooltip).to have_css("code", exact_text: "evc/off_highway_motorcycle")
       .and have_button("Copy ID").and have_no_link
+
+    # a classification's exact id is an option, whose pick shows its /ebike-rules card above the vehicles, a state
+    # jurisdiction's own with its rules, the US class's, or the e-moto's for one that's no e-bike law
+    type_into(vehicle_field, "evc/us/class_3")
+    retry_on_detach { find("[role='option'][data-value='evc/us/class_3']", text: "US Class 3").click }
+    expect(page).to have_css("#classification-cards h3", exact_text: "Class 3")
+    expect(page).to have_css(".hw-combobox__chip", text: "US Class 3")
+    expect(page).to have_current_path(%r{[?&]classifications=evc/us/class_3\b}).and have_current_path(%r{vehicle_models=m/sur_ron/2026/ultra_bee_hp_x_us,m/segway/2025/gt3_pro&})
+    visit bikebook_path(vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us", classifications: "evc/us/class_3,evc/off_highway_motorcycle", jurisdiction: "CA")
+    expect(page).to have_css("#classification-cards [role=button]", text: "California specifics", count: 2, wait: 10)
+    expect(page).to have_css("#classification-cards h3", exact_text: "Not an e-bike")
+    find("#classification-cards [role=button]", text: "California specifics", match: :first).click
+    expect(page).to have_css("#classification-cards li", text: "Riders must be 16 or older to ride a Class 3")
 
     # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul_st")
