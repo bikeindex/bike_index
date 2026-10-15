@@ -41,6 +41,8 @@ module Admin
         @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
         impound_claims = if ImpoundClaim.statuses.include?(@search_status)
           impound_claims.where(status: @search_status)
+        elsif @search_status == "current"
+          impound_claims.active
         else
           impound_claims.public_send(@search_status)
         end

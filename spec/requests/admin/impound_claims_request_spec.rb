@@ -19,6 +19,17 @@ RSpec.describe Admin::ImpoundClaimsController, type: :request do
       expect(assigns(:impound_claims)).to eq([impound_claim, impound_claim_later])
     end
 
+    context "search_status current" do
+      let!(:impound_claim_resolved) { FactoryBot.create(:impound_claim, status: "denied") }
+      # Written because it 500'd: ImpoundClaim has no current scope
+      it "renders only active claims" do
+        get base_url, params: {search_status: "current"}
+        expect(response.status).to eq(200)
+        expect(assigns(:impound_claims).pluck(:id)).to eq([impound_claim.id])
+        expect(response.body).to include("Current records")
+      end
+    end
+
     context "search_status stalled" do
       let(:impound_record) { FactoryBot.create(:impound_record) }
       let!(:impound_claim_stalled) { FactoryBot.create(:impound_claim, impound_record:, status: "submitting", submitted_at: Time.current - 100.days) }
