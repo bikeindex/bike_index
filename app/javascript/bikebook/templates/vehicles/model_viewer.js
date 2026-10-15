@@ -87,10 +87,10 @@ export const motorsOf = ({ presenter, data, others }) => {
   return sideBySide([0, 1].map((column) => sections.filter((_, index) => index % 2 === column)))
 }
 
-// A vehicle's wheels, brakes, suspension and drivetrain, marked where they differ from `others`'
+// A vehicle's frame, wheels and brakes beside its suspension and drivetrain, marked where they differ from `others`'
 export const runningGearOf = ({ presenter, data, others }) => {
   const viewer = new ModelViewer({ presenter, data, others })
-  return sideBySide([[viewer.wheels(), viewer.positioned('Brakes', 'brakes', 'Brake', (brake) => viewer.brakeSummary(brake))], [viewer.suspension(), viewer.drivetrain()]])
+  return sideBySide([[viewer.frame(), viewer.wheels(), viewer.positioned('Brakes', 'brakes', 'Brake', (brake) => viewer.brakeSummary(brake))], [viewer.suspension(), viewer.drivetrain()]])
 }
 
 // Side by side once their container is wide enough, else one after the other
@@ -128,7 +128,7 @@ class ModelViewer {
       this.identity(),
       modelYears({ presenter, years: vehicle.years, others: this.others.map((other) => other.years) }),
       this.suspension(),
-      section({ heading: 'Frame', content: presenter.measurementRows(this.specRows('frame')) })
+      this.frame()
     ], this.motorSections(), [
       section({ heading: 'Cargo', content: presenter.measurementRows(this.specRows('cargo')) }),
       this.wheels(),
@@ -429,6 +429,10 @@ class ModelViewer {
       value: this.againstCounterparts(values, this.others.map((other) => other.suspension[position]), (each) => this.suspensionSummary(each))
     }))
     return section({ heading: 'Suspension', content: rows.length ? join(rows) : null })
+  }
+
+  frame () {
+    return section({ heading: 'Frame', content: this.presenter.measurementRows(this.specRows('frame')) })
   }
 
   suspensionSummary (suspension) {

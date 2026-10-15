@@ -189,9 +189,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     # topped in no frame's color, which is the geometry's
     expect(page).to have_no_css("section[aria-label$=' components'].tw\\:border-t-4")
     expect(page).to have_no_css("article").and have_no_css("[aria-label='Components comparison']")
-    # under its wheels, brakes, suspension and drivetrain
+    # under its frame, wheels, brakes, suspension and drivetrain
     headings = find("section[aria-label='Aventón Level 2 Step-Through components']").all("h2").map { it.text.downcase }
-    expect(headings.first(4)).to eq(["wheels", "brakes", "suspension", "drivetrain"])
+    expect(headings.first(5)).to eq(["frame", "wheels", "brakes", "suspension", "drivetrain"])
     # and their motors and batteries, a tab only an e-vehicle gets
     click_link "Motor & Battery"
     expect(page).to have_css("[data-comparison] section[aria-label$=' motors']", count: 2)
