@@ -101,9 +101,10 @@ export default class extends Controller {
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
 
-  // the market stays through a clear, so it alone leaves nothing to clear
+  // a clear keeps the market and returns the default jurisdiction, so neither alone leaves anything to clear
   #refreshSummary () {
-    const filtered = Object.entries(this.#filters).some(([name, value]) => name !== 'market' && value)
+    const { market, jurisdiction, ...filters } = this.#filters
+    const filtered = Object.values(filters).some(Boolean) || (jurisdiction || 'US') !== this.defaultJurisdictionValue
     for (const link of this.clearTargets) link.hidden = !filtered
     this.summaryTarget.replaceChildren(...this.#summary.map(([label, value]) => {
       const item = document.createElement('li')

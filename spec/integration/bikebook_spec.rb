@@ -294,9 +294,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_field("Low-Speed Electric Bicycle")
     expect(page).to have_unchecked_field("US Class 2").and have_unchecked_field("Out of Class")
     expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
-    # a US class's tooltip links to its card
+    # a US class's tooltip names it
     find("button[aria-label='US Class 1 e-bike']").click
-    expect(page).to have_css("[role='tooltip'] a[href*='evc/us/class_1']", text: "US Class 1 e-bike", visible: true)
+    expect(page).to have_css("[role='tooltip'] h3", exact_text: "US Class 1 e-bike", visible: true)
     expect(page).to have_unchecked_field("US Class 1")
     choose_option("Market", "Any")
     expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
@@ -328,13 +328,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     # and from the open panel, where a market alone is nothing to clear, and stays through a clear
     click_on "More filters", match: :first
     find_field("Market").click
-    find("#market-hw-listbox [role='option']", text: "United States (23)").click
+    find("#market-hw-listbox [role='option']", text: "United States (US)").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
     expect(page).to have_no_link("Clear filters")
     check "US Class 2"
     within("#vehicle-filters") { click_link "Clear filters" }
     expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
-    expect(page).to have_unchecked_field("US Class 2").and have_field("Market", with: "United States")
+    expect(page).to have_unchecked_field("US Class 2").and have_field("Market", with: "United States (US)")
     expect(page).to have_current_path(/[?&]market=US\b/)
 
     expect(asked).to be_empty
@@ -420,7 +420,9 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_css("[inert]", wait: 10)
     # its state summarized in the closed filters
     expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "e-bike classification: New Jersey")
-    click_on "More filters"
+    # but as a clear returns to it, nothing to clear
+    expect(page).to have_no_link("Clear filters")
+    click_on "More filters", match: :first
     expect(page).to have_field("Jurisdiction", with: "New Jersey (NJ)", placeholder: "United States")
     expect_display_over("Market")
     expect_display_over("Jurisdiction")
@@ -457,7 +459,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     vehicle_field.set("m/aventon/2026/level_4_rec_step_through")
     vehicle_field.send_keys(:enter)
     expect(page).to have_css("article h1", text: "Level 4 REC Step-Through")
-    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level_4_rec_step_through")
+    expect(page).to have_current_path("/bikebook?view=all&vehicle_models=m/aventon/2026/level_4_rec_step_through")
 
     # the Bike Book mark goes back to the empty search
     click_link "Bike Book"
@@ -466,7 +468,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     # Filters with nothing picked say what they leave, and lead into the list or back to the filters
     visit bikebook_path(price_max: 3000)
-    expect(page).to have_text("26 models match your filters.", wait: 10)
+    expect(page).to have_text("20 models match your filters.", wait: 10)
     click_on "Browse them"
     expect(page).to have_css("#vehicle_models-hw-listbox [role='option']", minimum: 1)
     visit bikebook_path(primary_activity: "atb_gravel", price_max: 1500)
