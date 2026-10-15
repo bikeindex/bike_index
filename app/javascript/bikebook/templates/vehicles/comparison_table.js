@@ -6,7 +6,8 @@ import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
 import { brakesAt, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
-export const missing = html`<span class="twless-strong">—</span>`
+// as light as a unit, which twless-strong isn't
+export const missing = html`<span class="tw:text-gray-400 tw:dark:text-gray-500">—</span>`
 
 // years come newest first
 export const priced = (vehicle) => array(vehicle.years).find((year) => isNumber(year.original_msrp))
