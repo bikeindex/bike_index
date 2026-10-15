@@ -88,7 +88,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']", exact_text: "Overview")
     expect(find("[aria-label='Overview']")).to have_css("div", text: /\AElectric Certification\s*UL 2849, UL 2271\z/)
     expect(find("[aria-label='Overview']").all("dt").map(&:text))
-      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Price", "E-vehicle class", "Electric Certification", "Description"])
+      .to eq(["Model group", "Years", "Primary activity", "Frame material", "Suspension front/rear", "Price", "E-vehicle class", "Electric Certification", "Description"])
     # a description that fits its clamp has nothing more to read
     expect(find("[aria-label='Overview']")).to have_text("The Level 4 REC").and have_no_button("Read more")
     expect(page).to have_title(/Aventón Level 4 REC Step-Through/)
@@ -106,7 +106,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     # what differs is only marked further down
     expect(find("[aria-label='Overview comparison']")).to have_no_css(".tw\\:spec-diff")
     # beside an e-vehicle, one without a motor says it isn't one rather than missing its class, and an unlisted
-    # certification is unknown, as the motor's section says. Wheel sizes and vehicle types show only where they differ
+    # certification is unknown, as the motor's section says. Wheel sizes and vehicle types show only where they differ, and
+    # each end's travel once one is suspended, its specs under its heading in one tooltip
     classes = page.evaluate_script(<<~JS)
       (async () => {
         const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
@@ -115,16 +116,18 @@ RSpec.describe "Bikebook", :js, type: :system do
         const wheels = (front, rear) => [{ bsd: front, position: ['front'] }, { bsd: rear, position: ['rear'] }]
         const rowsOf = (datas) => [...fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles: datas.map((data, index) => ({ value: String(index), data })) }))
           .querySelectorAll('tbody tr')]
-        const rows = rowsOf([{ model: 'Electric', type: 'cargo_bike', motors: [{ rated_power: 250 }], wheels: wheels(622, 584) }, { model: 'Acoustic', type: 'bike', wheels: wheels(622, 622) }])
+        const rows = rowsOf([{ model: 'Electric', type: 'cargo_bike', motors: [{ rated_power: 250 }], wheels: wheels(622, 584), suspension: { front: { travel: 120 } } },
+          { model: 'Acoustic', type: 'bike', wheels: wheels(622, 622) }])
         const cells = (label) => [...rows.find((each) => each.querySelector('th').textContent.trim() === label).querySelectorAll('td')]
         return [cells('E-vehicle class').map((cell) => [cell.textContent.trim(), cell.querySelector('.twless-strong[class~="tw:italic"]') != null]),
           cells('Electric Certification').map((cell) => [cell.textContent.trim(), cell.querySelector('[class~="tw:text-yellow-800"]') != null]),
           cells('Wheel size').map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim()), cells('Vehicle type').map((cell) => cell.textContent.trim()),
+          cells('Suspension front/rear').map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim()),
           rowsOf([{ model: 'One', type: 'bike', wheels: wheels(622, 622) }, { model: 'Two', type: 'bike', wheels: wheels(622, 622) }])
-            .filter((row) => /Wheel size|Vehicle type/.test(row.textContent)).length]
+            .filter((row) => /Wheel size|Vehicle type|Suspension/.test(row.textContent)).length]
       })()
     JS
-    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["Unknown", true], ["", false]], ["700 C front, 650 B rear", "700 C"], ["Cargo Bike", "Bike"], 0])
+    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["Unknown", true], ["", false]], ["700 C front, 650 B rear", "700 C"], ["Cargo Bike", "Bike"], ["120 mm / rigid ? Front suspensionTravel: 120 mm", "Rigid"], 0])
     # each view a link to this page, rendered without a request and kept through a pick, in place of its history entry
     history_length = -> { page.evaluate_script("window.history.length") }
     entries = history_length.call
@@ -324,7 +327,7 @@ RSpec.describe "Bikebook", :js, type: :system do
           return { overview: rows(render('basics'), 'enduro').map(([label]) => label), suspension: rows(all, 'suspension'), frame: rows(all, 'frame') }
         })()
       JS
-      expect(specs["overview"]).to eq(["Frame material", "Groupset"])
+      expect(specs["overview"]).to eq(["Frame material", "Suspension front/rear", "Groupset"])
       expect(specs["suspension"]).to eq([["Front", "170 mm, lockout ? Travel: 170 mm Spring: Air Lockout: Yes"], ["Rear", "160 mm, 157.5 × 62.5 mm shock, coil"]])
       expect(specs["frame"]).to include(["Coil compatible", "Yes"])
       expect(find("tr", text: "Cogs").all("td").map(&:text)).to match([/\A8:\s*12–\s*32\W*t\z/, /\A8:\s*-\s*12–\s*-\s*32\W*t\s*-\z/])

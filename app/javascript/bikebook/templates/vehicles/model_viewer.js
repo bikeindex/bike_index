@@ -306,6 +306,8 @@ class ModelViewer {
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
       frame_material: vehicle.frame?.material,
       ...this.wheelSizes(),
+      suspended: present(vehicle.suspension),
+      suspension: this.suspensionTravels(),
       groupset: groupsetSummary(vehicle),
       certification: presence([...new Set(array(vehicle.motors).map((motor) => motor.certification).filter(present))].join(', ')) ??
         (present(vehicle.motors) ? unknownCertification : null),
@@ -431,15 +433,33 @@ class ModelViewer {
       spring === 'coil' ? 'coil' : null, lockout ? 'lockout' : null])
     // an end with nothing stated is still suspended
     const summary = parts.length ? join(parts, ', ') : present(mount) ? `${upcaseFirst(mount)} shock mount` : html`<span class="twless-strong">Unknown travel</span>`
+    const rows = this.suspensionRows(suspension)
+    const shown = compact([lead ? 'travel' : null, 'shock_length', 'shock_stroke', parts.length ? null : 'shock_mount', spring === 'coil' ? 'spring' : null, lockout ? 'lockout' : null])
+    const unshown = rows.some((row) => !shown.includes(row[4]) && !equal(row[1], name))
+    return unshown ? this.withTooltip(summary, this.tooltipRows(rows)) : summary
+  }
+
+  // An end's specs and its fork's or shock's, as its tooltip lists them
+  suspensionRows (suspension) {
+    const { presenter } = this
+    const component = suspension.component
     const dimensions = except(this.kit.schemas.component_dimensions, ['travel', 'extra_measurements'])
     const componentRows = component
       ? [[component.type_detail ?? component.type, component.description], ['Manufacturer', component.manufacturer], ...presenter.rowsFor(dimensions, component.dimensions)]
           .filter((row) => present(row[1]))
       : []
-    const rows = [...presenter.rowsFor(this.kit.viewer.suspension_fields, suspension, { labels: this.kit.viewer.suspension_labels, display: suspensionValue }), ...componentRows]
-    const shown = compact([lead ? 'travel' : null, 'shock_length', 'shock_stroke', parts.length ? null : 'shock_mount', spring === 'coil' ? 'spring' : null, lockout ? 'lockout' : null])
-    const unshown = rows.some((row) => !shown.includes(row[4]) && !equal(row[1], name))
-    return unshown ? this.withTooltip(summary, this.tooltipRows(rows)) : summary
+    return [...presenter.rowsFor(this.kit.viewer.suspension_fields, suspension, { labels: this.kit.viewer.suspension_labels, display: suspensionValue }), ...componentRows]
+  }
+
+  // "160 mm / 150 mm", rigid where an end isn't suspended, with both ends' tooltips in one
+  suspensionTravels () {
+    const ends = this.vehicle.suspension
+    if (blank(ends)) return 'Rigid'
+
+    const travels = ['front', 'rear'].map((position) => ends[position] ? this.travelLead(ends[position]) ?? 'unknown' : 'rigid')
+    const body = join(Object.entries(ends).map(([position, end]) => html`<span class="tw:block tw:font-bold">${this.presenter.humanize(position)} suspension</span>${
+      this.tooltipRows(this.suspensionRows(end))}`), html`<span class="tw:block tw:h-2"></span>`)
+    return this.withTooltip(join(travels, ' / '), body)
   }
 
   // travel can come from the fork or shock itself
