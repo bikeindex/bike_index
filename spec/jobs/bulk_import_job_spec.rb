@@ -88,6 +88,17 @@ RSpec.describe BulkImportJob, type: :job do
         end
       end
 
+      context "when Redis errors prevent locking" do
+        before { allow_any_instance_of(Redlock::Client).to receive(:lock).and_raise(Redlock::LockAcquisitionError.new("down", [])) }
+        it "defers processing rather than dropping the import" do
+          expect {
+            instance.perform(bulk_import.id)
+          }.to change(described_class.jobs, :count).by(1)
+          expect(described_class.jobs.last["args"]).to eq([bulk_import.id, true])
+          expect(bulk_import.reload.pending?).to be_truthy
+        end
+      end
+
       context "for a different organization" do
         let(:locked_organization_id) { organization.id + 1 }
         it "processes, and releases its lock" do
@@ -96,6 +107,19 @@ RSpec.describe BulkImportJob, type: :job do
           }.to_not change(described_class.jobs, :count)
           expect(Bike.count).to eq 2
           expect(bulk_import.reload.finished?).to be_truthy
+          expect(described_class.new_lock_manager.locked?(described_class.redlock_key(organization.id))).to be_falsey
+        end
+
+        it "renews its lock while it works through a long file" do
+          allow_any_instance_of(BulkImport).to receive(:open_file) { StringIO.new(([csv_lines.first.join(",")] + [","] * 60).join("\n")) }
+          lock_options = []
+          allow_any_instance_of(Redlock::Client).to receive(:lock).and_wrap_original do |method, *args, **options|
+            lock_options << options
+            method.call(*args, **options)
+          end
+          instance.perform(bulk_import.id)
+          expect(bulk_import.reload.finished?).to be_truthy
+          expect(lock_options.map { it[:extend_only_if_locked] }).to eq([false, true])
           expect(described_class.new_lock_manager.locked?(described_class.redlock_key(organization.id))).to be_falsey
         end
       end
