@@ -6,7 +6,7 @@ import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { frameGeometry } from 'bikebook/frame_geometry'
 import { geometryOverlay } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
-import { basicsOf, componentsOf, modelViewer, motorsOf, runningGearOf, sizesOf, wheelsOf } from 'bikebook/templates/vehicles/model_viewer'
+import { basicsOf, componentsOf, modelViewer, motorsOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { present } from 'bikebook/templates/values'
 import { toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
@@ -57,8 +57,7 @@ export class VehicleViewer {
     const views = {
       basics: () => basics({ presenter, vehicles }),
       geometry: () => html`${comparing ? comparisonTable({ ...compared, part: 'geometry' }) : nothing}${geometryOverlay(compared)}${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
-        html`<div class="twgutter-bleed">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`,
-      (data, value) => wheelsOf({ presenter, data, others: others(value) })))}`,
+        html`<div class="twgutter-bleed">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`))}`,
       components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }),
         (data, value) => runningGearOf({ presenter, data, others: others(value) }))),
       motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value) }))),

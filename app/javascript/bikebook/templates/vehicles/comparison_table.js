@@ -70,7 +70,7 @@ const GEARING = [
 ]
 
 // The compared models' headline specs side by side in their `sizes`, each column's numbers against the first's. The
-// 'geometry' `part` is their sizes and frames, keyed to the overlay by `frames`, the 'specs' part the rest, and 'all' both
+// 'geometry' `part` is their sizes, wheels and frames, keyed to the overlay by `frames`, the 'specs' part the rest, and 'all' both
 export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part = 'specs' }) => {
   const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
@@ -166,7 +166,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
   const specRecords = records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING])
   const geometryHeading = { label: html`<span class="tw:block tw:pt-3 tw:text-xs tw:tracking-wider tw:text-[#715eb2] tw:uppercase">Geometry</span>`, cell: () => nothing }
   const rows = {
-    geometry: [...sizeRows, ...geometryRecords],
+    geometry: [...sizeRows, ...records(wheelRows), ...geometryRecords],
     specs: specRecords,
     all: [...(sizes.some(Boolean) ? [{ label: 'Size', cell: sizeCell }] : []), ...specRecords, ...(geometryRecords.length ? [geometryHeading, ...geometryRecords] : [])]
   }[part]
