@@ -601,7 +601,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path
     expect(page).to have_no_css("[inert]", wait: 10)
     # its state summarized in the closed filters
-    expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "e-vehicle jurisdiction: New Jersey")
+    expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "jurisdiction for e-vehicles: New Jersey")
     # but as a clear returns to it, nothing to clear
     expect(page).to have_no_link("Clear filters")
     click_on "More filters", match: :first

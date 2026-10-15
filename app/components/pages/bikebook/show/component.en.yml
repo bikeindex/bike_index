@@ -19,11 +19,11 @@ en:
           configuration: Configuration
           configuration_examples: "(complete/frameset)"
           e_bike_classification: e-bike classification
-          e_vehicle_jurisdiction: e-vehicle jurisdiction
           e_vehicle_motorized: e-Vehicle (motorized)
           failed: The catalog didn't load. Reload the page to try again.
           human_powered: Human powered (Acoustic)
           jurisdiction: Jurisdiction
+          jurisdiction_for_e_vehicles: jurisdiction for e-vehicles
           loading: Loading the catalog…
           manufacturers: Manufacturers
           market: Market
