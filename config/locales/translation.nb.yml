@@ -5448,6 +5448,11 @@ nb:
         in_the_past_year: i løpet av det siste året
         now: nå
         to: til
+      column_settings:
+        all: Alle
+        default: misligholde
+        none: ingen
+        visible_columns: Synlige kolonner
     atoms:
       serial:
         hidden: skjult
@@ -6923,6 +6928,30 @@ nb:
           meaning_2849_system_certified: Hele det elektriske systemet (motor, batteri,
             lader og kontroller) bestod brann- og elsikkerhetstester sammen.
         classes:
+          classes_heading: Elsykkelkurs, forklart
+          classes_intro: De fleste stater bruker et treklassesystem. Klassen din bestemmer
+            hvor fort motoren hjelper, om det er tillatt med gass og hvor du kan kjøre.
+          emoto_limits_body: Toppfart over 45 km/t, gasshastighet over 32 km/t eller
+            motorer over 750 W gjør den til en elmotorsykkel. De fleste stater behandler
+            disse som mopeder eller motorsykler, som kan kreve registrering, forsikring
+            og førerkort.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Toppfart over 45 km/t, gasshastighet over 32 km/t eller motorer
+            over 750 W gjør den til en elmotorsykkel.
+          mph: "%{mph} mph"
+          not_an_ebike: Ikke en elsykkel
+          pedal: Fotpedal
+          state_classes_heading: "%{state} elsykkelkurs"
+          state_classes_intro: "%{state} bruker ikke treklassesystemet som de fleste
+            stater har. Loven deres sorterer elsykler og andre elektriske tohjulinger
+            i disse klassene i stedet."
+          throttle: Gasspedal
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
+        rule_citation:
+          source: kilde
+        class_card:
           assist: Assistere
           class_1_body: Motoren hjelper bare mens du tråkker og stopper ved 32 km/t.
             Tillatt de fleste steder kan en vanlig sykkel kjøre.
@@ -6935,34 +6964,14 @@ nb:
           class_3_summary: Pedalassistanse til 45 km/t, med speedometer.
           class_3_tag: Raskere pedalassistanse
           class_n: Klasse %{n}
-          classes_heading: Elsykkelkurs, forklart
-          classes_intro: De fleste stater bruker et treklassesystem. Klassen din bestemmer
-            hvor fort motoren hjelper, om det er tillatt med gass og hvor du kan kjøre.
-          emoto_limits_body: Toppfart over 45 km/t, gasshastighet over 32 km/t eller
-            motorer over 750 W gjør den til en elmotorsykkel. De fleste stater behandler
-            disse som mopeder eller motorsykler, som kan kreve registrering, forsikring
-            og førerkort.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          emoto_summary: Toppfart over 45 km/t, gasshastighet over 32 km/t eller motorer
-            over 750 W gjør den til en elmotorsykkel.
           motor: Motor
           motor_cap: "≤750W"
           mph: "%{mph} mph"
-          not_an_ebike: Ikke en elsykkel
           or: eller
           pedal: Fotpedal
-          state_classes_heading: "%{state} elsykkelkurs"
-          state_classes_intro: "%{state} bruker ikke treklassesystemet som de fleste
-            stater har. Loven deres sorterer elsykler og andre elektriske tohjulinger
-            i disse klassene i stedet."
           state_specifics: "%{state} spesifikasjoner"
           throttle: Gasspedal
           top_assist: Topp assist
-          watts_max: "≤%{watts}W"
-          watts_min: "%{watts}W+"
-        rule_citation:
-          source: kilde
     shared_blocks:
       footer:
         about: Om
