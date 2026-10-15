@@ -298,6 +298,30 @@ RSpec.describe "Bikebook", :js, type: :system do
       JS
       expect(groupsets).to eq([["Shimano GRX RX610 1X12S", []], ["Shimano GRX RX610 1X12S · electronic", ["electronic"]],
         ["SHIMANO GRX RX822 1X12S", ["SHIMANO GRX RX822 1X12S"]]])
+      # an end's spring and lockout, said where they're notable, and a coil-compatible frame
+      specs = page.evaluate_script(<<~JS)
+        (async () => {
+          const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+          const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+            import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+          const data = { model: 'Enduro', frame: { material: 'aluminum', coil_compatible: true }, groupset: { manufacturer: 'SRAM', description: 'GX Eagle', electronic: false },
+            suspension: { front: { travel: 170, spring: 'air', lockout: true }, rear: { travel: 160, shock_length: 157.5, shock_stroke: 62.5, spring: 'coil' } } }
+          // schema 0.24.6's, which the fixture's kit predates
+          kit.viewer.suspension_fields = { ...kit.viewer.suspension_fields, spring: {}, lockout: {} }
+          kit.viewer.suspension_labels = { ...kit.viewer.suspension_labels, spring: 'Spring', lockout: 'Lockout' }
+          kit.viewer.frame_fields = { ...kit.viewer.frame_fields, coil_compatible: {} }
+          const viewer = new VehicleViewer(kit, vocabulary)
+          const render = (view) => fragmentOf(viewer.render([{ value: 'm/x/2026/enduro', data }], new URL(`/bikebook?view=${view}`, window.location.href), null))
+          const text = (element) => element.textContent.replace(/\\s+/g, ' ').trim()
+          const rows = (root, heading) => [...[...root.querySelectorAll('section')].find((each) => new RegExp(`^${heading}`, 'i').test(text(each.querySelector('h2') ?? each)))
+            .querySelectorAll('dl > div')].map((row) => [text(row.querySelector('dt')), text(row.querySelector('dd'))])
+          const all = render('all')
+          return { overview: rows(render('basics'), 'enduro').map(([label]) => label), suspension: rows(all, 'suspension'), frame: rows(all, 'frame') }
+        })()
+      JS
+      expect(specs["overview"]).to eq(["Frame material", "Groupset"])
+      expect(specs["suspension"]).to eq([["Front", "170 mm, lockout ? Travel: 170 mm Spring: Air Lockout: Yes"], ["Rear", "160 mm, 157.5 × 62.5 mm shock, coil"]])
+      expect(specs["frame"]).to include(["Coil compatible", "Yes"])
       expect(find("tr", text: "Cogs").all("td").map(&:text)).to match([/\A8:\s*12–\s*32\W*t\z/, /\A8:\s*-\s*12–\s*-\s*32\W*t\s*-\z/])
     end
 

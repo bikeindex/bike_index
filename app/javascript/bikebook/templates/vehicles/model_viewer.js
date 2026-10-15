@@ -17,6 +17,18 @@ import { andSentence, array, blank, compact, equal, except, join, partsOf, prese
 // Ruby's \s, which a thin space isn't
 const KEEP_TOGETHER = /^([^]*[ \t\r\n\f\v])?([^ \t\r\n\f\v]+)$/
 const upcaseFirst = (text) => text.charAt(0).toUpperCase() + text.slice(1)
+
+// "Air" or "Coil", and a lockout "Yes" or "No"
+const suspensionValue = (value, key) => key === 'spring' && value ? upcaseFirst(value) : key === 'lockout' && value != null ? (value ? 'Yes' : 'No') : value
+
+// "Shimano GRX RX610 1X12S · electronic", its maker unless the description starts with it
+const groupsetSummary = ({ groupset }) => {
+  if (blank(groupset)) return null
+  const { manufacturer, description, electronic } = groupset
+  const named = manufacturer && String(description ?? '').toLowerCase().startsWith(manufacturer.toLowerCase())
+  const name = compact([named ? null : manufacturer, description]).join(' ')
+  return electronic ? join([name, 'electronic'], ' · ') : name
+}
 export const typeLabel = (each) => [each.type, each.type_detail].filter(present).join(' · ')
 
 // One vehicle's card, marked where it differs from `others`
@@ -291,6 +303,7 @@ class ModelViewer {
       e_vehicle_class: presence(this.classificationNames(this.#sortedClassifications(vehicle))),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
       frame_material: vehicle.frame?.material,
+      groupset: groupsetSummary(vehicle),
       certification: presence([...new Set(array(vehicle.motors).map((motor) => motor.certification).filter(present))].join(', ')) ??
         (present(vehicle.motors) ? unknownCertification : null),
       description
@@ -346,6 +359,7 @@ class ModelViewer {
     if (key === 'headset') return this.withTooltip(this.shisCode(value, 'tw:text-sm'), this.headsetTooltip(value))
     if (key === 'bottom_bracket') return this.bottomBracket(value)
     if (key === 'cable_routing') return this.tooltipped(value, this.kit.viewer.cable_routing_tooltips)
+    if (key === 'coil_compatible') return value ? 'Yes' : 'No'
     if (key === 'front') return this.measurements(value, 'teeth', ', ')
     if (key === 'rear') return this.cogRange(value)
     return value
@@ -406,10 +420,12 @@ class ModelViewer {
     const { presenter } = this
     const component = suspension.component
     const name = presence(component?.description?.split(',')[0].replace(/\s*\d+(\.\d+)?\s?mm$/i, ''))
-    const { shock_length: length, shock_stroke: stroke, shock_mount: mount } = suspension
+    const { shock_length: length, shock_stroke: stroke, shock_mount: mount, spring, lockout } = suspension
     const size = truthy(length) ? this.measurements(compact([length, stroke]), 'mm', ' × ') : null
     const lead = this.travelLead(suspension)
-    const parts = compact([lead, presence(join(compact([size, name ?? (size ? 'shock' : null)]), ' ')), truthy(length) ? null : this.millimeters(stroke, ' stroke')])
+    // an air spring is the usual one, so only coil is said
+    const parts = compact([lead, presence(join(compact([size, name ?? (size ? 'shock' : null)]), ' ')), truthy(length) ? null : this.millimeters(stroke, ' stroke'),
+      spring === 'coil' ? 'coil' : null, lockout ? 'lockout' : null])
     // an end with nothing stated is still suspended
     const summary = parts.length ? join(parts, ', ') : present(mount) ? `${upcaseFirst(mount)} shock mount` : html`<span class="twless-strong">Unknown travel</span>`
     const dimensions = except(this.kit.schemas.component_dimensions, ['travel', 'extra_measurements'])
@@ -417,8 +433,8 @@ class ModelViewer {
       ? [[component.type_detail ?? component.type, component.description], ['Manufacturer', component.manufacturer], ...presenter.rowsFor(dimensions, component.dimensions)]
           .filter((row) => present(row[1]))
       : []
-    const rows = [...presenter.rowsFor(this.kit.viewer.suspension_fields, suspension, { labels: this.kit.viewer.suspension_labels }), ...componentRows]
-    const shown = compact([lead ? 'travel' : null, 'shock_length', 'shock_stroke', parts.length ? null : 'shock_mount'])
+    const rows = [...presenter.rowsFor(this.kit.viewer.suspension_fields, suspension, { labels: this.kit.viewer.suspension_labels, display: suspensionValue }), ...componentRows]
+    const shown = compact([lead ? 'travel' : null, 'shock_length', 'shock_stroke', parts.length ? null : 'shock_mount', spring === 'coil' ? 'spring' : null, lockout ? 'lockout' : null])
     const unshown = rows.some((row) => !shown.includes(row[4]) && !equal(row[1], name))
     return unshown ? this.withTooltip(summary, this.tooltipRows(rows)) : summary
   }
@@ -597,18 +613,11 @@ class ModelViewer {
       : nothing}${present(content) ? definitionListContainer({ content }) : nothing}</section>`
   }
 
-  // "Shimano GRX RX610 1X12S · electronic", a list, so against a model that isn't, electronic alone is marked
+  // a list, so against a model that isn't electronic, that alone is marked
   groupsetRows () {
-    const summary = ({ groupset }) => {
-      if (blank(groupset)) return null
-      const { manufacturer, description, electronic } = groupset
-      const named = manufacturer && String(description ?? '').toLowerCase().startsWith(manufacturer.toLowerCase())
-      const name = compact([named ? null : manufacturer, description]).join(' ')
-      return electronic ? join([name, 'electronic'], ' · ') : name
-    }
     const { vehicle, others } = this
     if ([vehicle, ...others].every(({ groupset }) => blank(groupset))) return []
-    return [['Groupset', summary(vehicle), null, others.some((other) => !equal(other.groupset, vehicle.groupset)), 'groupset', others.map(summary)]]
+    return [['Groupset', groupsetSummary(vehicle), null, others.some((other) => !equal(other.groupset, vehicle.groupset)), 'groupset', others.map(groupsetSummary)]]
   }
 
   description () {

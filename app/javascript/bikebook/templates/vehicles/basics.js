@@ -11,6 +11,7 @@ const FIELDS = [
   { label: 'Years', key: 'years' },
   { label: 'Primary activity', key: 'primary_activity' },
   { label: 'Frame material', key: 'frame_material' },
+  { label: 'Groupset', key: 'groupset' },
   { label: 'Price', key: 'price' },
   { label: 'E-vehicle class', key: 'e_vehicle_class', electric: true },
   { label: 'Certification', key: 'certification', electric: true },
