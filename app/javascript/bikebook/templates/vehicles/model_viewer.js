@@ -300,6 +300,8 @@ class ModelViewer {
       electric: present(vehicle.motors),
       model_group: vehicle.vehicle_model_group,
       years: this.yearRange(),
+      vehicle_type: presence(typeLabel(vehicle)),
+      type: vehicle.type,
       e_vehicle_class: presence(this.classificationNames(this.#sortedClassifications(vehicle))),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
       frame_material: vehicle.frame?.material,

@@ -106,7 +106,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     # what differs is only marked further down
     expect(find("[aria-label='Overview comparison']")).to have_no_css(".tw\\:spec-diff")
     # beside an e-vehicle, one without a motor says it isn't one rather than missing its class, and an unlisted
-    # certification is unknown, as the motor's section says. Wheel sizes show only where they differ
+    # certification is unknown, as the motor's section says. Wheel sizes and vehicle types show only where they differ
     classes = page.evaluate_script(<<~JS)
       (async () => {
         const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
@@ -115,15 +115,16 @@ RSpec.describe "Bikebook", :js, type: :system do
         const wheels = (front, rear) => [{ bsd: front, position: ['front'] }, { bsd: rear, position: ['rear'] }]
         const rowsOf = (datas) => [...fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles: datas.map((data, index) => ({ value: String(index), data })) }))
           .querySelectorAll('tbody tr')]
-        const rows = rowsOf([{ model: 'Electric', motors: [{ rated_power: 250 }], wheels: wheels(622, 584) }, { model: 'Acoustic', wheels: wheels(622, 622) }])
+        const rows = rowsOf([{ model: 'Electric', type: 'cargo_bike', motors: [{ rated_power: 250 }], wheels: wheels(622, 584) }, { model: 'Acoustic', type: 'bike', wheels: wheels(622, 622) }])
         const cells = (label) => [...rows.find((each) => each.querySelector('th').textContent.trim() === label).querySelectorAll('td')]
         return [cells('E-vehicle class').map((cell) => [cell.textContent.trim(), cell.querySelector('.twless-strong[class~="tw:italic"]') != null]),
           cells('Electric Certification').map((cell) => [cell.textContent.trim(), cell.querySelector('[class~="tw:text-yellow-800"]') != null]),
-          cells('Wheel size').map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim()),
-          rowsOf([{ model: 'One', wheels: wheels(622, 622) }, { model: 'Two', wheels: wheels(622, 622) }]).some((row) => row.textContent.includes('Wheel size'))]
+          cells('Wheel size').map((cell) => cell.textContent.replace(/\\s+/g, ' ').trim()), cells('Vehicle type').map((cell) => cell.textContent.trim()),
+          rowsOf([{ model: 'One', type: 'bike', wheels: wheels(622, 622) }, { model: 'Two', type: 'bike', wheels: wheels(622, 622) }])
+            .filter((row) => /Wheel size|Vehicle type/.test(row.textContent)).length]
       })()
     JS
-    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["Unknown", true], ["", false]], ["700 C front, 650 B rear", "700 C"], false])
+    expect(classes).to eq([[["—", false], ["not e-vehicle", true]], [["Unknown", true], ["", false]], ["700 C front, 650 B rear", "700 C"], ["Cargo Bike", "Bike"], 0])
     # each view a link to this page, rendered without a request and kept through a pick, in place of its history entry
     history_length = -> { page.evaluate_script("window.history.length") }
     entries = history_length.call

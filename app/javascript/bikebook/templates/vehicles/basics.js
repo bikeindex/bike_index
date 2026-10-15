@@ -10,6 +10,7 @@ import { present } from 'bikebook/templates/values'
 const FIELDS = [
   { label: 'Model group', key: 'model_group' },
   { label: 'Years', key: 'years' },
+  { label: 'Vehicle type', key: 'vehicle_type', differing: 'type' },
   { label: 'Primary activity', key: 'primary_activity' },
   { label: 'Frame material', key: 'frame_material' },
   { label: 'Wheel size', key: 'wheel_size', differing: 'wheel_bsds' },
