@@ -432,7 +432,6 @@ class ModelViewer {
   }
 
   suspensionSummary (suspension) {
-    const { presenter } = this
     const component = suspension.component
     const name = presence(component?.description?.split(',')[0].replace(/\s*\d+(\.\d+)?\s?mm$/i, ''))
     const { shock_length: length, shock_stroke: stroke, shock_mount: mount, spring, lockout } = suspension
