@@ -51,17 +51,17 @@ export class VehiclePresenter {
     return this.vocabulary.e_vehicle_classifications[id]?.label ?? id
   }
 
-  // A classification's tooltip, whose heading links to `path(id)`
-  classificationTooltip (id, path) {
+  // its description less the IDs it cites, beside the ID it shows
+  classificationTooltip (id) {
     const { title, description } = this.vocabulary.e_vehicle_classifications[id]
-    return html`<h3 class="tw:font-bold"><a class="twlink" href=${path(id)}>${title}</a></h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
-      copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${description}</p>`
+    return html`<h3 class="tw:font-bold">${title}</h3><span class="tw:mt-1 tw:flex tw:items-center tw:gap-2">ID ${
+      copyableCode({ value: id, label: 'Copy ID' })}</span><p class="tw:mt-1">${String(description ?? '').replace(/\s*\(evc\/[^)\s]+\)/g, '')}</p>`
   }
 
   // Each classification's name to its tooltip
-  classificationTooltips (path) {
+  classificationTooltips () {
     return Object.fromEntries(Object.entries(this.vocabulary.e_vehicle_classifications)
-      .map(([id, { label }]) => [label, this.classificationTooltip(id, path)]))
+      .map(([id, { label }]) => [label, this.classificationTooltip(id)]))
   }
 
   // A `difference` of a length in centimeters leaves off its feet and inches
@@ -106,6 +106,12 @@ export class VehiclePresenter {
       values.map(([key, mm]) => join([`${this.humanize(key)}: `, exact[index](mm)]))
     ))
     return this.#unitSystems(metricSystem, imperialSystem)
+  }
+
+  // in one system rather than the viewer's, as a market's own page gives it
+  measurementIn (value, unit, imperial) {
+    const [part] = imperial ? this.#imperialParts(unit) : []
+    return part ? this.labeled(this.rounded(part.convert(value)), unit, part.part) : this.labeled(value, unit)
   }
 
   #unitSystems (metric, imperial) {

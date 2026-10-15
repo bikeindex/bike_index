@@ -49,7 +49,7 @@ RSpec.describe "Admin Data API", type: :request do
       it "returns the pghero payload" do
         get url, params: token_param
         expect(response.status).to eq 200
-        expect(json_result.keys).to include("query_stats_enabled", "database_size", "index_usage")
+        expect(json_result.keys).to include("query_stats_enabled", "slow_queries", "database_size", "index_usage")
       end
     end
   end

@@ -1,0 +1,8 @@
+<div class="tw:max-w-sm tw:overflow-hidden tw:rounded-xl <%= UI::Card::Component::BASE_CLASSES %>">
+  <%= render(UI::CardTable::Component.new(records:)) do |table| %>
+    <% table.column(label: "Cryptid") { |r| r.name } %>
+    <% table.column(label: "Region") { |r| r.region } %>
+    <% table.column(label: "Credibility") { |r| r.credibility } %>
+    <% table.column(label: "Sightings") { |r| number_with_delimiter(r.sightings) } %>
+  <% end %>
+</div>

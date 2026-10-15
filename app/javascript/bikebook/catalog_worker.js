@@ -20,8 +20,6 @@ const fetchJson = async (url) => {
 }
 
 const list = (value) => (value ?? '').split(',').filter(Boolean)
-// a classification's option and chip, beside the vehicles'
-const classificationDisplay = ({ title }) => `e-Vehicle Classification: ${title}`
 const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
 
@@ -67,7 +65,9 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
     manufacturer: Object.entries(manufacturers).filter(([slug]) => perManufacturer.has(slug)).sort(([, a], [, b]) => a.localeCompare(b))
       .map(([value, display]) => ({ value, display, count: perManufacturer.get(value) })),
     vehicle_type: counted('vehicle_type', vehicleTypes.map(({ slug, name }) => [slug, name])),
-    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b))),
+    // "Canada (CA)", as UI::Forms::ComboboxState shows a state
+    market: counted('market', Object.entries(market).sort(([, a], [, b]) => a.localeCompare(b)))
+      .map((option) => ({ ...option, name: option.display, display: `${option.display} (${option.value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))]))
   }
 }
@@ -87,10 +87,8 @@ const block = (key) => {
   return blocks.get(key)
 }
 
-// An e-vehicle classification's data is its vocabulary record
 async function vehicles ({ ids }) {
   const found = await Promise.all(ids.map(async (value) => {
-    if (classifications[value]) return { value, display: classificationDisplay(classifications[value]), data: classifications[value], classification: true }
     const key = blockKey(value)
     return { value, display: byId.get(value)?.display, data: manifest.blocks[key] && (await block(key))[value] }
   }))
@@ -98,7 +96,7 @@ async function vehicles ({ ids }) {
 }
 
 function displays ({ ids }) {
-  return ids.map((id) => byId.get(id)?.display ?? (classifications[id] ? classificationDisplay(classifications[id]) : null))
+  return ids.map((id) => byId.get(id)?.display ?? null)
 }
 
 function search ({ params, page, perPage }) {
@@ -109,27 +107,25 @@ function search ({ params, page, perPage }) {
   return {
     total: last.matches.length,
     filteredCount: last.filteredCount,
+    unfiltered: last.unfiltered,
     models: last.matches.slice(start, start + perPage),
     nextPage: last.matches.length > start + perPage ? page + 1 : null
   }
 }
 
+// A model's exact id finds it though the filters leave it out, which `unfiltered` says
 function matching (params) {
-  const filtered = sorted(params).filter(filter(params))
+  const passes = filter(params)
+  const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
   const selected = new Set(list(params.vehicle_models))
-  // a classification is found by its id alone, which every filter passes
-  if (needle.startsWith('evc/')) {
-    const matches = Object.entries(classifications).filter(([id]) => id.startsWith(needle) && !selected.has(id)).map(([id, record]) => ({ id, display: classificationDisplay(record), classification: true }))
-    return { filteredCount: filtered.length, matches }
-  }
-  const exact = needle.startsWith('m/') && filtered.find(({ id }) => id === needle)
+  const exact = needle.startsWith('m/') && byId.get(needle)
   const words = needle.split(/\s+/).filter(Boolean)
   const found = (exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))))
     .filter(({ id }) => !selected.has(id))
   const whole = ({ searchText }) => searchText.includes(needle)
   const matches = needle ? [...found.filter(whole), ...found.filter((model) => !whole(model))] : found
-  return { filteredCount: filtered.length, matches }
+  return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
 }
 
 // Newest and priciest first unless asked otherwise, kept per pair of directions so a query only has to filter

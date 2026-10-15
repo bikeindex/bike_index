@@ -5706,6 +5706,11 @@ it:
         in_the_past_year: nell'ultimo anno
         now: Ora
         to: a
+      column_settings:
+        all: Tutti
+        default: predefinito
+        none: nessuno
+        visible_columns: Colonne visibili
     atoms:
       serial:
         hidden: nascosto
@@ -6959,6 +6964,7 @@ it:
           united_states: Stati Uniti
           any_market: Qualsiasi mercato
           market: Mercato
+          clear_filters: Filtri trasparenti
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
@@ -7250,21 +7256,6 @@ it:
             caricabatterie e centralina) ha superato congiuntamente i test di sicurezza
             antincendio e di sicurezza elettrica.
         classes:
-          assist: Assistenza
-          class_1_body: Il motore aiuta solo quando si pedala e si arresta a 32 km/h.
-            È consentito nella maggior parte dei luoghi in cui può circolare una normale
-            bicicletta.
-          class_1_tag: Solo pedalata assistita
-          class_2_body: L'acceleratore permette di muovere la bicicletta senza pedalare,
-            fino a una velocità di 20 miglia orarie (circa 32 km/h). Alcuni sentieri
-            e parchi non consentono l'uso dell'acceleratore.
-          class_2_tag: Acceleratore elettrico
-          class_3_body: Bicicletta a pedalata assistita fino a 45 km/h, con tachimetro.
-            Spesso è previsto l'obbligo del casco, un'età minima e limitazioni sui
-            percorsi.
-          class_3_summary: Pedalata assistita fino a 45 km/h, con tachimetro.
-          class_3_tag: Pedalata assistita più veloce
-          class_n: Classe %{n}
           classes_heading: Lezioni di e-bike, spiegate
           classes_intro: Nella maggior parte degli stati si utilizza un sistema a
             tre classi. La classe di appartenenza determina la velocità di assistenza
@@ -7280,23 +7271,42 @@ it:
           emoto_summary: Una velocità massima superiore a 45 km/h, una velocità di
             accelerazione superiore a 32 km/h o un motore con potenza superiore a
             750 W la rendono una moto elettrica.
-          motor: Motore
-          motor_cap: "≤750W"
           mph: "%{mph} mph"
           not_an_ebike: Non è una bici elettrica
-          or: O
           pedal: Pedale
           state_classes_heading: "%{state} corsi di e-bike"
           state_classes_intro: "%{state} non utilizza il sistema a tre classi impiegato
             dalla maggior parte degli stati. La sua legge suddivide invece le e-bike
             e gli altri veicoli elettrici a due ruote in queste classi."
-          state_specifics: "%{state} dettagli"
           throttle: Acceleratore elettrico
-          top_assist: Assistenza superiore
           watts_max: "≤%{watts}W"
           watts_min: "%{watts}W+"
         rule_citation:
           source: fonte
+        class_card:
+          assist: Assistenza
+          class_1_body: Il motore aiuta solo quando si pedala e si arresta a 32 km/h.
+            È consentito nella maggior parte dei luoghi in cui può circolare una normale
+            bicicletta.
+          class_1_tag: Solo pedalata assistita
+          class_2_body: L'acceleratore permette di muovere la bicicletta senza pedalare,
+            fino a una velocità di 20 miglia orarie (circa 32 km/h). Alcuni sentieri
+            e parchi non consentono l'uso dell'acceleratore.
+          class_2_tag: Acceleratore elettrico
+          class_3_body: Bicicletta a pedalata assistita fino a 45 km/h, con tachimetro.
+            Spesso è previsto l'obbligo del casco, un'età minima e limitazioni sui
+            percorsi.
+          class_3_summary: Pedalata assistita fino a 45 km/h, con tachimetro.
+          class_3_tag: Pedalata assistita più veloce
+          class_n: Classe %{n}
+          motor: Motore
+          motor_cap: "≤750W"
+          mph: "%{mph} mph"
+          or: O
+          pedal: Pedale
+          state_specifics: "%{state} dettagli"
+          throttle: Acceleratore elettrico
+          top_assist: Assistenza superiore
     shared_blocks:
       footer:
         about: Di

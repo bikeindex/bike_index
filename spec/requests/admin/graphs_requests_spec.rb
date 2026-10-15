@@ -124,6 +124,24 @@ RSpec.describe Admin::GraphsController, type: :request do
     end
   end
 
+  describe "logged_searches" do
+    let(:request_at) { Time.current.beginning_of_day }
+    let!(:bikebook_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, serial_normalized: "XXX", request_at:) }
+    let!(:serial_search) { FactoryBot.create(:logged_search, endpoint: :web_bikes, serial_normalized: "XXX", request_at:) }
+    let!(:no_serial_searches) { FactoryBot.create_list(:logged_search, 2, endpoint: :api_v3_bikes, request_at:) }
+
+    it "charts the stored counts: bikebook searches, and the rest split by serial" do
+      Counts.assign_logged_searches
+      get "#{base_url}/logged_searches", params: {search_endpoint: "web_bikebook", period: "week"}
+      expect(response.status).to eq(200)
+      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["Bike Book", 1]])
+
+      get "#{base_url}/logged_searches", params: {search_endpoint: "not_web_bikebook", period: "week"}
+      expect(response.status).to eq(200)
+      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["Serial", 1], ["No serial", 2]])
+    end
+  end
+
   describe "tables" do
     include_context :geocoder_default_location
     include_context :geocoder_stubbed_bounding_box

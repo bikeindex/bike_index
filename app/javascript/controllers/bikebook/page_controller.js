@@ -1,12 +1,12 @@
 import { Controller } from '@hotwired/stimulus'
-import { CatalogComboboxSource, loadCatalog, matching } from 'bikebook/catalog'
-import { hydrate } from 'bikebook/hydrate'
-import { renderInto } from 'bikebook/render'
+import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
+import { hydrate, loadingShell } from 'bikebook/hydrate'
 import { readable } from 'bikebook/replace_url'
+import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
 import { uuid } from 'bikebook/templates/helpers'
 
-/* global CSS */
+/* global CSS, requestAnimationFrame */
 
 const stamped = (state) => ({ ...state, bikebook: uuid() })
 
@@ -15,40 +15,54 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
   static targets = ['shell', 'page', 'status', 'tagline', 'countedTagline']
-  static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String }
+  static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
+  #searchLog
   #renders = 0
+  #renderedUrl
 
-  // The first render replaces the status, and a failed one puts it back
+  // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
   initialize () {
     this.status = this.statusTarget
+    this.#searchLog = new SearchLog(this.searchLogUrlValue)
   }
 
   async connect () {
     window.history.scrollRestoration = 'manual'
     this.#stamp()
     const url = new URL(window.location.href)
+    this.#render(url)
     try {
       this.catalog = await loadCatalog(this.manifestUrlValue, url.searchParams.get('vehicle_models')?.split(',') ?? [], this.jurisdictionsValue)
     } catch (error) {
       return this.#fail(error)
     }
-    this.source = new CatalogComboboxSource(this.catalog, (count) => renderInto(document.getElementById('vehicle-models-count'), matching(count)))
+    // the URL's filters are the reader's, where the combobox's add the visitor's market
+    this.source = new CatalogComboboxSource(this.catalog, ({ params: { q }, total, filteredCount, primed }) => {
+      renderCounts(document, filteredCount)
+      if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
+    })
     this.#countModels()
-    this.#render(url)
+    // filters set while it loaded are in the URL, and the reader stays where they've scrolled to
+    const current = new URL(window.location.href)
+    this.#render(current, [window.scrollX, window.scrollY])
+    this.#searchLog.visited(current)
   }
 
-  // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles
+  // The form's fields over the URL's other params, such as an open panel's, its sizes following their vehicles,
+  // rendered where the reader is: a pick or a chip's removal is no new page
   visit (event) {
     event.preventDefault()
     const url = new URL(window.location.href)
     new FormData(event.target).forEach((value, name) => url.searchParams.set(name, value))
-    this.#go(realigned(url))
+    this.#go(realigned(url), [window.scrollX, window.scrollY])
   }
 
   // A plain click on a link to this page, such as a card's remove link, which an in-place link renders without
-  // scrolling or focusing the search
+  // scrolling, focusing what the data-in-place on it or an ancestor selects rather than the search, and one inside a
+  // data-replace in place of the history entry it's on. One among the vehicles was written when the page rendered, so
+  // only what it changes from that goes onto the URL, which filters and panels have moved on since
   follow (event) {
     const link = event.target.closest('a[href]')
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target) return
@@ -57,7 +71,11 @@ export default class extends Controller {
     if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) return
 
     event.preventDefault()
-    'inPlace' in link.dataset ? this.#go(url, [window.scrollX, window.scrollY], { focus: false }) : this.#go(url)
+    const inPlace = link.closest('[data-in-place]')
+    inPlace
+      ? this.#go(link.closest('#vehicle-viewers') ? this.#changedBy(url) : url, [window.scrollX, window.scrollY],
+        { focus: inPlace.dataset.inPlace || false, replace: Boolean(link.closest('[data-replace]')) })
+      : this.#go(url)
   }
 
   // A comparison table's size, which the others follow when it's the first vehicle's, and which a later
@@ -85,12 +103,28 @@ export default class extends Controller {
     if (!this.#entry) window.history.replaceState(stamped(window.history.state), '')
   }
 
-  #go (url, scroll = [0, 0], options) {
-    window.history.pushState(stamped(), '', readable(url))
+  #changedBy (link) {
+    const url = new URL(window.location.href)
+    const rendered = this.#renderedUrl ?? url
+    for (const name of new Set([...link.searchParams.keys(), ...rendered.searchParams.keys()])) {
+      const value = link.searchParams.get(name)
+      if (value === rendered.searchParams.get(name)) continue
+      value === null ? url.searchParams.delete(name) : url.searchParams.set(name, value)
+    }
+    return url
+  }
+
+  #go (url, scroll = [0, 0], { replace = false, ...options } = {}) {
+    window.history[replace ? 'replaceState' : 'pushState'](stamped(), '', readable(url))
+    this.#searchLog.visited(url)
     return this.#render(url, scroll, options)
   }
 
-  async #render (url, scroll, { focus = true } = {}) {
+  // `focus` selects what to focus, the search where it selects nothing, unless a field of the page's has focus, which
+  // keeps it and any value it hasn't yet changed to. Until the catalog loads, the page is its loading shell
+  async #render (url, scroll, { focus = '[autofocus]' } = {}) {
+    if (!this.catalog) return this.pageTarget.replaceChildren(loadingShell(this.shellTarget, url, this.status))
+
     const render = ++this.#renders
     // A share menu shares the canonical, which names the page the server sent. Kept through the first render, which crawlers see
     if (render > 1) document.querySelector('link[rel="canonical"]')?.remove()
@@ -100,10 +134,23 @@ export default class extends Controller {
 
     // what turbo:before-render is to a Turbo page, which an open combobox dialog closes on
     this.dispatch('before-render')
+    const active = this.pageTarget.contains(document.activeElement) && document.activeElement.id ? document.activeElement : null
     this.pageTarget.replaceChildren(rendered.content)
+    this.#renderedUrl = url
     document.title = rendered.title ?? this.titleValue
-    if (focus) this.pageTarget.querySelector('[autofocus]')?.focus()
-    if (scroll) window.scrollTo(...scroll)
+    const kept = active && this.pageTarget.querySelector(`#${CSS.escape(active.id)}`)
+    if (kept) {
+      if (['text', 'number', 'search'].includes(active.type)) kept.value = active.value
+      // once its panel's controller has opened it, a hidden field taking no focus
+      requestAnimationFrame(() => kept.focus({ preventScroll: true }))
+    } else if (focus) {
+      (this.pageTarget.querySelector(focus) ?? this.pageTarget.querySelector('[autofocus]'))?.focus({ preventScroll: Boolean(scroll) })
+    }
+    if (scroll) {
+      window.scrollTo(...scroll)
+      // and again once the panels' controllers have opened them, which the browser's scroll anchoring follows down
+      requestAnimationFrame(() => window.scrollTo(...scroll))
+    }
   }
 
   // down to the thousand (a smaller catalog's leading place), so the tagline stays true as the catalog grows
@@ -115,9 +162,10 @@ export default class extends Controller {
     this.taglineTarget.replaceChildren(tagline)
   }
 
+  // in place of the spinner, below the loading shell's search, where it's still showing
   #fail (error) {
     console.error(error)
     this.status.textContent = this.failedTextValue
-    this.pageTarget.replaceChildren(this.status)
+    if (!this.pageTarget.contains(this.status)) this.pageTarget.replaceChildren(this.status)
   }
 }

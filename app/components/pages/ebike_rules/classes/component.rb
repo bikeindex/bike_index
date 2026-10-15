@@ -26,19 +26,9 @@ module Pages
           state_classes.map do |classification|
             next emoto_card if classification[:not_an_ebike]
 
-            {state: true, either: classification[:either], title: classification[:name], body: classification[:description],
-             assist: classification[:throttle] ? translation(".throttle") : translation(".pedal"),
-             speed: classification[:mph]&.then { translation(".mph", mph: it) }, motor: watts(classification)}
-          end
-        end
-
-        # An either card's limits are alternatives, each but the last followed by an "or" centered in the gap after its row
-        def row_value(value, or_after:)
-          tag.span(class: "tw:whitespace-nowrap") do
-            next value unless or_after
-
-            safe_join([value, " ", tag.span(translation(".or"), class: "tw:absolute tw:inset-y-0 tw:left-full tw:flex tw:w-8 " \
-              "tw:items-center tw:justify-center tw:text-[11.5px] tw:opacity-65")])
+            class_card(card: {state: true, either: classification[:either], title: classification[:name], body: classification[:description],
+                              assist: classification[:throttle] ? translation(".throttle") : translation(".pedal"),
+                              speed: classification[:mph]&.then { translation(".mph", mph: it) }, motor: watts(classification)})
           end
         end
 
@@ -52,26 +42,18 @@ module Pages
 
         # The three classes, then the e-moto that's none of them, a chosen state's own rules standing in for most states'
         def us_class_cards
-          motor_cap = translation(".motor_cap")
           class_3_rules = @state && EbikeRuleServices::StateLaws.class_3_rules(@state[:abbr]).presence
-          [
-            {n: 1, title: translation(".class_n", n: 1), tag: translation(".class_1_tag"), assist: translation(".pedal"),
-             speed: translation(".mph", mph: 20), motor: motor_cap, body: translation(".class_1_body")},
-            {n: 2, title: translation(".class_n", n: 2), tag: translation(".class_2_tag"), assist: translation(".throttle"),
-             speed: translation(".mph", mph: 20), motor: motor_cap, body: translation(".class_2_body")},
-            {n: 3, title: translation(".class_n", n: 3), tag: translation(".class_3_tag"), assist: translation(".pedal"),
-             speed: translation(".mph", mph: 28), motor: motor_cap, rules: class_3_rules,
-             body: class_3_rules ? translation(".class_3_summary") : translation(".class_3_body")},
-            emoto_card
-          ]
+          [1, 2, 3].map { class_card(e_bike_class: it, rules: (class_3_rules if it == 3)) } + [emoto_card]
         end
 
         def emoto_card
           rules = @state && EbikeRuleServices::StateLaws.emoto_rules(@state[:abbr]).presence
-          {n: nil, either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
-           speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,
-           body: rules ? translation(".emoto_summary") : translation(".emoto_limits_body")}
+          class_card(card: {n: nil, either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
+                            speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,
+                            body: rules ? translation(".emoto_summary") : translation(".emoto_limits_body")})
         end
+
+        def class_card(**) = Pages::EbikeRules::ClassCard::Component.new(state_name: @state&.dig(:name), **)
       end
     end
   end
