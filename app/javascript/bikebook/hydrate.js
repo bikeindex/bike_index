@@ -27,7 +27,13 @@ const fillFields = (root, filters) => {
   for (const field of ['year', 'price']) panelOf(root).setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
-  root.getElementById('filter-jurisdiction').querySelector(`option[value="${CSS.escape(filters.jurisdiction)}"]`)?.setAttribute('selected', '')
+  // a state's abbreviation, or US
+  const jurisdiction = filters.jurisdiction || panelOf(root).getAttribute('data-bikebook--catalog-filters-default-jurisdiction-value')
+  const state = root.querySelector(`#jurisdiction-hw-listbox [role="option"][data-value="${CSS.escape(jurisdiction)}"]`)
+  if (state) {
+    root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
+    combobox(root, 'jurisdiction').dataset.hwComboboxPrefilledDisplayValue = state.dataset.autocompletableAs
+  }
   // out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
   for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 }
