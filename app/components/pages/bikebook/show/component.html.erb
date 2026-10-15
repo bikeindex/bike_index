@@ -1,3 +1,20 @@
+<%# bikebook--catalog-filters keeps its href, the page less its filters but the market, and shows it once any is set %>
+<% clear_filters = capture do %>
+  <a
+    href="<%= bikebook_path %>"
+    hidden
+    class="
+      twlink tw:shrink-0 tw:justify-self-start tw:text-sm
+      tw:lg:col-span-full
+    "
+    data-in-place="[autofocus]"
+    data-bikebook--catalog-filters-target="clear"
+    data-action="bikebook--catalog-filters#refreshClear"
+  >
+    <%= translation(".clear_filters") %>
+  </a>
+<% end %>
+
 <% search = capture do %>
   <div
     class="tw:group"
@@ -19,6 +36,7 @@
     <div
       data-bikebook--catalog-filters-target="vehicleCombobox"
       data-controller="bikebook--focus-shortcut"
+      data-action="bikebook--tips:browse@window->bikebook--focus-shortcut#open"
     >
       <%= form_with url: bikebook_path, method: :get,
           data: {controller: "bikebook--auto-submit",
@@ -36,16 +54,22 @@
       <% end %>
     </div>
 
-    <ul
-      aria-label="<%= translation(".applied_filters") %>"
-      data-bikebook--catalog-filters-target="summary"
+    <div
       class="
-        tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:rounded-lg
-        tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm
+        tw:mt-3 tw:flex tw:items-baseline tw:gap-x-4 tw:rounded-lg tw:border
+        tw:border-gray-200 tw:px-4 tw:py-2
         tw:group-has-[[aria-controls=vehicle-filters][aria-expanded=true]]:hidden
-        tw:empty:hidden tw:dark:border-gray-700
+        tw:has-[ul:empty]:hidden tw:dark:border-gray-700
       "
-    ></ul>
+    >
+      <%= clear_filters %>
+
+      <ul
+        aria-label="<%= translation(".applied_filters") %>"
+        data-bikebook--catalog-filters-target="summary"
+        class="tw:flex tw:flex-1 tw:flex-wrap tw:gap-x-4 tw:gap-y-1 tw:text-sm"
+      ></ul>
+    </div>
 
     <div
       id="vehicle-filters"
@@ -54,6 +78,8 @@
     >
       <div class="twwiderow">
         <%= render(UI::Card::Component.new(full_bleed: true, additional_classes: "tw:col-span-full tw:mt-3 tw:grid tw:gap-4 tw:lg:grid-cols-2 tw:lg:items-start")) do %>
+          <%= clear_filters %>
+
           <div class="tw:flex tw:flex-col tw:gap-4">
             <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "primary_activity",
           label: translation(".activities"), placeholder: translation(".any_activity"), multiselect: true)) do %>

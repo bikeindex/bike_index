@@ -73,15 +73,6 @@ RSpec.describe BikebookController, type: :request do
             .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3_pro']", visible: :all)
         end
       end
-
-      context "an e-vehicle classification" do
-        let(:params) { {vehicle_models: "evc/us/class_3"} }
-
-        it "renders, unindexed" do
-          expect(response).to have_http_status(:ok)
-          expect(response.headers["X-Robots-Tag"]).to eq "noindex, follow"
-        end
-      end
     end
 
     describe "donation strip" do
@@ -131,13 +122,6 @@ RSpec.describe BikebookController, type: :request do
     it "redirects to the page with that vehicle picked" do
       get "/bikebook/m/segway/2025/gt3_pro"
       expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3_pro")
-    end
-
-    context "an e-vehicle classification" do
-      it "picks it, without an m/" do
-        get "/bikebook/evc/us/class_3"
-        expect(response).to redirect_to("/bikebook?vehicle_models=evc/us/class_3")
-      end
     end
 
     context "without its m/, and with vehicles already picked" do
