@@ -38,9 +38,10 @@ export default class extends Controller {
     } catch (error) {
       return this.#fail(error)
     }
-    this.source = new CatalogComboboxSource(this.catalog, ({ params, total, filteredCount }) => {
+    // the URL's filters are the reader's, where the combobox's add the visitor's market
+    this.source = new CatalogComboboxSource(this.catalog, ({ params: { q }, total, filteredCount, primed }) => {
       renderCounts(document, filteredCount)
-      this.#searchLog.typed({ ...params, count: total })
+      if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })
     this.#countModels()
     // filters set while it loaded are in the URL, and the reader stays where they've scrolled to

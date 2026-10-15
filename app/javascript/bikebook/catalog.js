@@ -46,28 +46,29 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}) {
 export class CatalogComboboxSource {
   #generation = 0
 
-  // onSearch takes each search's params, its count of results and of the models its filters match
+  // onSearch takes each search's params, its count of results and of the models its filters match, and whether it
+  // primed the listing rather than answered the reader
   constructor (catalog, onSearch = () => {}) {
     this.catalog = catalog
     this.onSearch = onSearch
   }
 
   // A pick re-renders the page, leaving the gem's debounced refilter behind on the combobox it replaced
-  async filter (combobox, inputType, { callback = true } = {}) {
+  async filter (combobox, inputType, { primed = false } = {}) {
     if (!combobox.element.isConnected) return
 
     const query = new URL(combobox.asyncSrcValue, window.location.origin).searchParams
     this.params = { ...Object.fromEntries(query), q: combobox._fullQuery }
     this.#generation++
-    await this.#render(combobox, 0, { inputType, callbackId: callback ? combobox._enqueueCallback() : undefined })
+    await this.#render(combobox, 0, { inputType, primed, callbackId: primed ? undefined : combobox._enqueueCallback() })
   }
 
   // The gem fetches the first page through a lazy turbo-frame on first open; list it here instead
   prime (combobox) {
-    return this.filter(combobox, undefined, { callback: false })
+    return this.filter(combobox, undefined, { primed: true })
   }
 
-  async #render (combobox, page, { inputType, callbackId }) {
+  async #render (combobox, page, { inputType, callbackId, primed }) {
     const generation = this.#generation
     const { total, filteredCount, unfiltered, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
     if ((page && generation !== this.#generation) || !combobox.element.isConnected) return
@@ -80,7 +81,7 @@ export class CatalogComboboxSource {
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
       listbox.replaceChildren(fragmentOf(html`${group(unfiltered ? unmatched : matching(total), options)}${pagination}`))
-      this.onSearch({ params: this.params, total, filteredCount })
+      this.onSearch({ params: this.params, total, filteredCount, primed })
     } else {
       listbox.append(fragmentOf(html`${options}${pagination}`))
     }

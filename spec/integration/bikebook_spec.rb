@@ -406,9 +406,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_no_css("[data-comparison]")
     expect(page).to have_css(".hw-combobox__chip", count: 1)
 
+    logged_count = logged.count
     page.go_back
     expect(page).to have_css("article", count: 2)
     expect(page).to have_css(".hw-combobox__chip", count: 2)
+    # a history step is no new search, though its render re-runs its combobox's
+    page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
+    expect(logged.count).to eq logged_count
 
     # The JSON panel opens beside its card
     first("[aria-label='Toggle JSON']").click
@@ -537,6 +541,8 @@ RSpec.describe "Bikebook", :js, type: :system do
   it "searches the visitor's market and shows their state's classes until others are chosen, leaving them out of the URL" do
     serve_bikebook_catalog
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "CA") }
+    logged = []
+    page.driver.with_playwright_page { it.on("request", ->(request) { logged << request.url.split("?").last if request.url.include?(search_bikebook_path) }) }
     visit bikebook_path
     expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)", wait: 10)
     type_into(vehicle_field, "haul")
@@ -561,10 +567,15 @@ RSpec.describe "Bikebook", :js, type: :system do
     find("#market-hw-listbox [role='option']", exact_text: "Any").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(30 matching models)")
     expect(page).to have_current_path(/[?&]market=all\b/)
+    # each re-runs the vehicle combobox's search, logged once it settles, though only the market changed
+    page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
+    expect(logged.last).to end_with "&market=all&q=Specialized+Haul+ST+%282025%29"
     type_into(find_field("Market"), "united")
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
     expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
     expect(page).to have_current_path(/[?&]market=US\b/)
+    page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
+    expect(logged.last).to eq "count=0&market=US&q=Specialized+Haul+ST+%282025%29"
     # and stays out of the collapsed filters' summary
     expect(find("[aria-label='Applied filters']", visible: :all).text(:all)).to be_empty
 
