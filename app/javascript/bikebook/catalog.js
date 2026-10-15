@@ -69,7 +69,7 @@ export class CatalogComboboxSource {
 
   async #render (combobox, page, { inputType, callbackId }) {
     const generation = this.#generation
-    const { total, filteredCount, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
+    const { total, filteredCount, unfiltered, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
     if ((page && generation !== this.#generation) || !combobox.element.isConnected) return
 
     const forId = combobox.element.dataset.asyncId
@@ -79,7 +79,7 @@ export class CatalogComboboxSource {
       data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} data-callback-id=${callbackId ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
-      listbox.replaceChildren(fragmentOf(html`${group(matching(total), options)}${pagination}`))
+      listbox.replaceChildren(fragmentOf(html`${group(unfiltered ? unmatched : matching(total), options)}${pagination}`))
       this.onCount(filteredCount)
     } else {
       listbox.append(fragmentOf(html`${options}${pagination}`))
@@ -123,5 +123,9 @@ const group = (label, options) => {
 }
 
 export const renderCounts = (root, count) => renderInto(root.getElementById('vehicle-models-count'), matching(count))
+
+// in UI::Alerts::Base's warning colors
+const unmatched = html`<span class="tw:rounded-sm tw:border tw:border-yellow-300 tw:bg-yellow-50 tw:px-1 tw:text-yellow-800
+  tw:dark:border-yellow-800 tw:dark:bg-yellow-950 tw:dark:text-yellow-400">(model doesn't match filters)</span>`
 
 export const matching = (count) => html`(${numberDisplay(count)} matching ${count === 1 ? 'model' : 'models'})`

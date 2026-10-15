@@ -107,22 +107,25 @@ function search ({ params, page, perPage }) {
   return {
     total: last.matches.length,
     filteredCount: last.filteredCount,
+    unfiltered: last.unfiltered,
     models: last.matches.slice(start, start + perPage),
     nextPage: last.matches.length > start + perPage ? page + 1 : null
   }
 }
 
+// A model's exact id finds it though the filters leave it out, which `unfiltered` says
 function matching (params) {
-  const filtered = sorted(params).filter(filter(params))
+  const passes = filter(params)
+  const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
   const selected = new Set(list(params.vehicle_models))
-  const exact = needle.startsWith('m/') && filtered.find(({ id }) => id === needle)
+  const exact = needle.startsWith('m/') && byId.get(needle)
   const words = needle.split(/\s+/).filter(Boolean)
   const found = (exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))))
     .filter(({ id }) => !selected.has(id))
   const whole = ({ searchText }) => searchText.includes(needle)
   const matches = needle ? [...found.filter(whole), ...found.filter((model) => !whole(model))] : found
-  return { filteredCount: filtered.length, matches }
+  return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
 }
 
 // Newest and priciest first unless asked otherwise, kept per pair of directions so a query only has to filter

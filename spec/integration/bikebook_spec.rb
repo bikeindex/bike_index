@@ -418,6 +418,12 @@ RSpec.describe "Bikebook", :js, type: :system do
     type_into(vehicle_field, "haul")
     expect(page).to have_css("[role='option']", count: 1, text: "$3,599.99")
     expect(page).to have_current_path("/bikebook")
+    # but a model's exact id finds it, though the market leaves it out, saying so rather than counting it
+    type_into(vehicle_field, "m/specialized/2025/haul_st")
+    expect(page).to have_css(".hw-combobox__group__label", exact_text: "(model doesn't match filters)")
+    expect(page).to have_css("[role='option']", count: 1).and have_no_css("[role='option']", text: "$3,599.99")
+    type_into(vehicle_field, "m/specialized/2025/haul_st_ca")
+    expect(page).to have_css(".hw-combobox__group__label", exact_text: "(1 matching model)")
 
     # its listbox closed, which covers the filters
     vehicle_field.send_keys(:escape)
