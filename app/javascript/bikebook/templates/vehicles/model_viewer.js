@@ -77,8 +77,8 @@ export const modes = (key) => (vehicle) => highest(array(vehicle.motors).flatMap
 // cargo_bike, cargo_tricycle and their _rear kinds
 export const isCargo = (data) => /^cargo_/.test(data.type ?? '')
 
-// A vehicle's max weight and its cargo area
-export const cargoOf = (presenter, data) => new ModelViewer({ presenter, data, others: [] }).cargo()
+// A vehicle's max weight, or else its total payload in `size`, and its cargo area
+export const cargoAt = (presenter, data, size) => new ModelViewer({ presenter, data, others: [] }).cargo(size)
 
 export const tireWidth = (presenter, width) => new ModelViewer({ presenter, data: {}, others: [] }).tireWidthSummary(width, null)
 
@@ -347,15 +347,24 @@ class ModelViewer {
   }
 
   // "Max weight 200 kg ?, 60 cm long, 40 cm wide, 200 L"
-  cargo () {
+  cargo (size) {
     const { presenter } = this
     const { length, width, volume } = this.data.cargo ?? {}
-    const maxWeight = this.data.frame?.max_weight_total
     return presence(join([
-      isNumber(maxWeight) ? html`Max weight ${presenter.measurement(maxWeight, 'kg')} ${tooltip({ text: 'Max weight is cargo and rider' })}` : null,
+      this.#cargoWeight(size),
       length ?? width ? presenter.dimensions({ length, width }) : null,
       isNumber(volume) ? presenter.measurement(volume, 'l') : null
     ].filter(present), ', '))
+  }
+
+  // Without a max weight, the payload in `size`, or its sizes' range
+  #cargoWeight (size) {
+    const { presenter } = this
+    const maxWeight = this.data.frame?.max_weight_total
+    if (isNumber(maxWeight)) return html`Max weight ${presenter.measurement(maxWeight, 'kg')} ${tooltip({ text: 'Max weight is cargo and rider' })}`
+    const payloads = (size ? [size] : array(this.data.sizes)).map((each) => each.geometry?.max_weight_rider).filter(isNumber)
+    if (payloads.length === 0) return null
+    return join([join([...new Set([Math.min(...payloads), Math.max(...payloads)])].map((kg) => presenter.measurement(kg, 'kg')), '–'), ' total payload'])
   }
 
   // its classes' names, and under them its US classes' tiles and an e-moto's

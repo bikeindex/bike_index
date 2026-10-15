@@ -3,7 +3,7 @@ import { amountDisplay, missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
 import { seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
-import { brakesAt, cargoOf, highest, isCargo, modes, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
+import { brakesAt, cargoAt, highest, isCargo, modes, tireWidth, typeLabel, wheelsAt } from 'bikebook/templates/vehicles/model_viewer'
 import { array, isNumber, join, present, slice, sum } from 'bikebook/templates/values'
 
 // years come newest first
@@ -159,7 +159,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], part 
     })
   const size = { label: 'Size', cell: sizeCell, className: 'tw:bg-blue-50 tw:dark:bg-blue-950' }
   const sizeRows = sizes.some(Boolean) ? [size] : []
-  const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoOf(presenter, vehicles[index].data)]))
+  const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
   const geometryRecords = records([...geometry, length, WEIGHT])
   const specRecords = records([...SPECS, ...wheelRows, ...brakeRows, ...GEARING])

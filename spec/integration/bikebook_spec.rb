@@ -1053,6 +1053,25 @@ RSpec.describe "Bikebook", :js, type: :system do
     click_link "Sizes & geometry"
     expect(page).to have_css("[aria-label='Sizes & geometry comparison'] tr", text: /\ACargo\s*Max weight 190\W*kg \?\z/)
     expect(all("[aria-label='Sizes & geometry comparison'] tbody th").map(&:text).each_cons(2)).to include(%w[Cargo Size])
+    # without a max weight, its total payload: its sizes' range, or the compared size's
+    payloads = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehicleViewer }, { renderInto }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const data = { model: 'Hauler', type: 'cargo_bike', sizes: [{ name: 'S', geometry: { max_weight_rider: 150 } }, { name: 'L', geometry: { max_weight_rider: 180 } }] }
+        const viewer = new VehicleViewer(kit, vocabulary)
+        const container = document.body.appendChild(document.createElement('div'))
+        const cargo = (view, selector) => {
+          renderInto(container, viewer.render([{ value: 'm/x/2026/hauler', data }], new URL(`/bikebook?view=${view}&vehicle_models=m/x/2026/hauler&vehicle_sizes=L`, window.location.href), null))
+          return [...container.querySelectorAll(selector)].find((row) => row.innerText.startsWith('Cargo')).innerText.replace(/\\s+/g, ' ').trim()
+        }
+        const shown = [cargo('basics', "[aria-label='Overview'] dl > div"), cargo('geometry', 'tbody tr')]
+        container.remove()
+        return shown
+      })()
+    JS
+    expect(payloads).to match([/\ACargo 150\W*kg–180\W*kg total payload\z/, /\ACargo 180\W*kg total payload\z/])
     click_link "All"
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
