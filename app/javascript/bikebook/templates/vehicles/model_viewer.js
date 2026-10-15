@@ -71,8 +71,12 @@ export const motorsOf = ({ presenter, data, others }) => new ModelViewer({ prese
 // A vehicle's wheels, brakes, suspension and drivetrain, marked where they differ from `others`'
 export const runningGearOf = ({ presenter, data, others }) => {
   const viewer = new ModelViewer({ presenter, data, others })
-  return html`${viewer.wheels()}${viewer.positioned('Brakes', 'brakes', 'Brake', (brake) => viewer.brakeSummary(brake))}${viewer.suspension()}${viewer.drivetrain()}`
+  return sideBySide([[viewer.wheels(), viewer.positioned('Brakes', 'brakes', 'Brake', (brake) => viewer.brakeSummary(brake))], [viewer.suspension(), viewer.drivetrain()]])
 }
+
+// Side by side once their container is wide enough, else one after the other
+const sideBySide = (columns) => html`<div class="tw:@container"><div class="tw:flex tw:flex-col tw:@min-[600px]:flex-row tw:@min-[600px]:gap-6">${columns.map((column) =>
+  html`<div class="tw:contents tw:@min-[600px]:block tw:@min-[600px]:min-w-0 tw:@min-[600px]:flex-1">${column}</div>`)}</div></div>`
 
 // A vehicle's components by group, marked where they differ from `others`'
 export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
@@ -112,8 +116,7 @@ class ModelViewer {
       this.positioned('Brakes', 'brakes', 'Brake', (brake) => this.brakeSummary(brake)),
       this.drivetrain()
     ])
-    const specs = html`<div class="tw:@container"><div class="tw:flex tw:flex-col tw:@min-[600px]:flex-row tw:@min-[600px]:gap-6">${columns.map((column) =>
-      html`<div class="tw:contents tw:@min-[600px]:block tw:@min-[600px]:min-w-0 tw:@min-[600px]:flex-1">${column}</div>`)}</div></div>`
+    const specs = sideBySide(columns)
     return html`<div class=${comparing ? `${base} tw:md:min-w-[22rem] tw:md:has-[[aria-controls^=vehicle-model-json][aria-expanded=true]]:min-w-[64rem] tw:md:flex-1 tw:md:max-w-max` : base}
       data-controller="ui--collapse ui--alert" data-ui--collapse-param-value="json"
       data-ui--collapse-direction-value="horizontal"><article class="twgutter tw:w-full tw:min-w-0 tw:space-y-6
