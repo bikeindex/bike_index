@@ -113,7 +113,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     # the wheels compared under the size, rather than on each model's sizes card (these list no max tire)
     labels = all("[aria-label='Sizes & geometry comparison'] tbody th").map(&:text)
     expect(labels.first(4)).to eq(["Size", "Front wheel", "Rear wheel", "Reach"])
-    expect(find("section[aria-label='Aventón Level 2 Step-Through sizes']")).to have_no_css("h2", text: /\Awheels\z/i)
+    sizes_card = find("section[aria-label='Aventón Level 2 Step-Through sizes']")
+    expect(sizes_card).to have_no_css("h2", text: /\Awheels\z/i)
+    # its sizes scroll out to the card's edges, as a components table does
+    edges = ->(element) { element.evaluate_script("[this.getBoundingClientRect().left, this.getBoundingClientRect().right].map(Math.round)") }
+    card_left, card_right = edges.call(sizes_card)
+    scroller_left, scroller_right = edges.call(sizes_card.find("[data-controller~='bikebook--center-current']"))
+    expect([scroller_left - card_left, card_right - scroller_right]).to all(be <= 1)
     # each model's components alone, by group on a card of its own beside the others', without the specs or the rest of its card
     click_link "Components"
     expect(page).to have_css("section[aria-label='Aventón Level 2 Step-Through components'] h3", exact_text: "Level 2 Step-Through")

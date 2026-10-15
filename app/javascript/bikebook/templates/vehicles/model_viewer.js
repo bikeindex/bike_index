@@ -626,7 +626,7 @@ class ModelViewer {
       param: 'sizes',
       label: 'sizes',
       heading: html`Sizes & geometry <span class="tw:ml-1 tw:font-mono tw:text-sm tw:font-normal tw:tracking-normal tw:opacity-65 tw:normal-case">${numberDisplay(sizes.length)}</span>`,
-      content: html`<div data-ui--collapse-target="content" class="twgutter-bleed">${this.sizes()}</div>`
+      content: html`<div data-ui--collapse-target="content" class="tw:-mx-(--gutter)">${this.sizes()}</div>`
     })
   }
 
@@ -635,7 +635,8 @@ class ModelViewer {
     if (blank(sizes)) return nothing
 
     const others = this.others.map((other) => other.sizes)
-    return html`<div data-controller="bikebook--center-current" class="tw:flex tw:gap-4 tw:overflow-x-auto tw:pb-3.5">${
+    // padded inside the scroller, so its cards scroll out to the edges of the card it bleeds across
+    return html`<div data-controller="bikebook--center-current" class="tw:flex tw:gap-4 tw:overflow-x-auto tw:px-(--gutter) tw:pb-3.5">${
       sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize, href: this.sizePath?.(size.name) }))}</div>`
   }
 

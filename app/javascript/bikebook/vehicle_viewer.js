@@ -57,7 +57,7 @@ export class VehicleViewer {
     const views = {
       basics: () => basics({ presenter, vehicles }),
       geometry: () => html`${comparing ? comparisonTable({ ...compared, part: 'geometry' }) : nothing}${geometryOverlay(compared)}${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
-        html`<div class="twgutter-bleed">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`))}`,
+        html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`))}`,
       components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }),
         (data, value) => runningGearOf({ presenter, data, others: others(value) }))),
       motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value) }))),
