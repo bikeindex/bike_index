@@ -6,12 +6,13 @@ import { basicsOf } from 'bikebook/templates/vehicles/model_viewer'
 import { CERTIFICATION_LABEL } from 'bikebook/templates/vehicles/motor_section'
 import { present } from 'bikebook/templates/values'
 
-// `electric` ones only once an e-vehicle is shown
+// `electric` ones only once an e-vehicle is shown, and `differing` ones only where the models' values of it differ
 const FIELDS = [
   { label: 'Model group', key: 'model_group' },
   { label: 'Years', key: 'years' },
   { label: 'Primary activity', key: 'primary_activity' },
   { label: 'Frame material', key: 'frame_material' },
+  { label: 'Wheel size', key: 'wheel_size', differing: 'wheel_bsds' },
   { label: 'Groupset', key: 'groupset' },
   { label: 'Price', key: 'price' },
   { label: 'E-vehicle class', key: 'e_vehicle_class', electric: true },
@@ -42,7 +43,8 @@ export const basics = ({ presenter, vehicles }) => {
       description: fields.description && readMore(fields.description)
     }
   })
-  const fields = FIELDS.filter((field) => !field.electric || shown.some(({ electric }) => electric))
+  const fields = FIELDS.filter((field) => (!field.electric || shown.some(({ electric }) => electric)) &&
+    (!field.differing || new Set(shown.map((each) => each[field.differing])).size > 1))
   return shown.length === 1 ? single(shown[0], fields) : compared(shown, fields)
 }
 

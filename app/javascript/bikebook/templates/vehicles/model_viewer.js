@@ -303,6 +303,7 @@ class ModelViewer {
       e_vehicle_class: presence(this.classificationNames(this.#sortedClassifications(vehicle))),
       primary_activity: this.withoutParenthetical(vehicle.primary_activity),
       frame_material: vehicle.frame?.material,
+      ...this.wheelSizes(),
       groupset: groupsetSummary(vehicle),
       certification: presence([...new Set(array(vehicle.motors).map((motor) => motor.certification).filter(present))].join(', ')) ??
         (present(vehicle.motors) ? unknownCertification : null),
@@ -577,6 +578,18 @@ class ModelViewer {
     if (tireWidth <= WIDE_TIRE) return join([presenter.measurement(tireWidth, 'mm'), suffix])
 
     return this.keepTogether(join([tireInches(presenter, tireWidth), suffix]), tooltip({ text: `${tireWidth} mm` }))
+  }
+
+  // "700 C", or "700 C front, 650 B rear", and their BSDs to compare them by, as a name can carry a tooltip
+  wheelSizes () {
+    const bsds = ['front', 'rear'].map((position) =>
+      [...new Set(this.builtWheels().filter((wheel) => wheel.bsd && array(wheel.position).includes(position)).map((wheel) => wheel.bsd))])
+    const names = (each) => join(each.map((bsd) => this.wheelSizeName(bsd)), ' / ')
+    const [front, rear] = bsds
+    const wheelSize = equal(front, rear)
+      ? (front.length ? names(front) : null)
+      : join(compact([front.length ? join([names(front), ' front']) : null, rear.length ? join([names(rear), ' rear']) : null]), ', ')
+    return { wheel_size: wheelSize, wheel_bsds: JSON.stringify(bsds) }
   }
 
   wheelSizeName (bsd) {
