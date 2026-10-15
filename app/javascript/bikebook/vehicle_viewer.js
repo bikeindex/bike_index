@@ -20,7 +20,7 @@ export class VehicleViewer {
   // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or
   // the nearest to the `preferredSize`. With none, the `search`'s count and whether filters narrow it
   render (vehicles, url, preferredSize, search) {
-    if (vehicles.length === 0) return emptyState({ pathname: url.pathname, filtersPath: pathWith(url, { filters: 1 }), ...search })
+    if (vehicles.length === 0) return emptyState({ pathname: url.pathname, ...search })
 
     const { presenter } = this
     const shown = Object.keys(VIEWS).filter((each) => each !== 'motors' || vehicles.some(({ data }) => present(data.motors)))

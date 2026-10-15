@@ -630,6 +630,12 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_text("No models match your filters.", wait: 10)
     click_on "Change filters"
     expect(page).to have_css("#vehicle-filters", visible: true)
+    # as the steps' More filters does, through the panel's own collapse, focusing its first field
+    visit bikebook_path
+    within("[aria-label='How to use Bike Book']", wait: 10) { click_on "More filters" }
+    expect(page).to have_css("#vehicle-filters", visible: true).and have_css("#primary_activity:focus")
+    expect(page).to have_css("[aria-controls='vehicle-filters'][aria-expanded='true']", minimum: 1)
+    expect(page).to have_current_path("/bikebook?filters=1")
   end
 
   it "keeps each compared vehicle's size in the URL, the others nearest the first's by top tube unless picked" do

@@ -2,11 +2,11 @@ import { html, nothing } from 'lit-html'
 import { numberDisplay } from 'bikebook/templates/helpers'
 import { x } from 'bikebook/templates/icons'
 
-// the page with its filter panel open, its first field focused
-const filtersLink = (path, label) => html`<a href=${path} class="twlink" data-in-place="#vehicle-filters input:not([type=hidden])">${label}</a>`
+// opens the search's filter panel, outside this controller, focusing its first field
+const filtersButton = (label) => html`<button type="button" class="twlink" data-action="bikebook--tips#filters">${label}</button>`
 
-const steps = (filtersPath) => [
-  ['Search for a bike', html`Type a brand or model above, or narrow down with ${filtersLink(filtersPath, 'More filters')}.`],
+const steps = [
+  ['Search for a bike', html`Type a brand or model above, or narrow down with ${filtersButton('More filters')}.`],
   ['Add more to compare', 'Pick two or more bikes and they line up side by side.'],
   ['Compare what matters', 'Geometry and overlay, components, sizes, price, weight, and e-bike class.']
 ]
@@ -18,21 +18,21 @@ const EXAMPLES = [
 ]
 
 // What filters the search leaves, and the way on: into the search's list, or back to the filters when it's empty
-const filteredNote = (count, filtersPath, margin = '') => html`<p class="${margin} tw:rounded-md tw:bg-blue-50 tw:px-4 tw:py-3 tw:text-sm tw:dark:bg-blue-950">${count
+const filteredNote = (count, margin = '') => html`<p class="${margin} tw:rounded-md tw:bg-blue-50 tw:px-4 tw:py-3 tw:text-sm tw:dark:bg-blue-950">${count
   ? html`${numberDisplay(count)} ${count === 1 ? 'model matches' : 'models match'} your filters. <button type="button" class="twlink"
     data-action="bikebook--tips#browse">Browse them</button>`
-  : html`No models match your filters. ${filtersLink(filtersPath, 'Change filters')}`}</p>`
+  : html`No models match your filters. ${filtersButton('Change filters')}`}</p>`
 
 // With nothing picked, how the page works and comparisons to start from, or once they're dismissed, a prompt; either way
 // what filters leave, under the steps or the prompt
-export const emptyState = ({ pathname, filtersPath, filtered, count }) => html`<div class="tw:mt-3" data-controller="bikebook--tips"><div
+export const emptyState = ({ pathname, filtered, count }) => html`<div class="tw:mt-3" data-controller="bikebook--tips"><div
   data-bikebook--tips-target="tips"><section aria-label="How to use Bike Book" tabindex="-1"
   class="tw:relative tw:flex tw:flex-col tw:gap-5 tw:rounded-md tw:border tw:border-dashed tw:border-gray-300 tw:px-7 tw:py-6 tw:outline-none
-  tw:dark:border-gray-600"><ol class="tw:m-0 tw:grid tw:list-none tw:gap-6 tw:p-0 tw:sm:grid-cols-3">${steps(filtersPath).map(([title, description], index) =>
+  tw:dark:border-gray-600"><ol class="tw:m-0 tw:grid tw:list-none tw:gap-6 tw:p-0 tw:sm:grid-cols-3">${steps.map(([title, description], index) =>
     html`<li class="tw:flex tw:gap-3"><span aria-hidden="true" class="tw:flex tw:size-7 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full
     tw:bg-[#715eb2] tw:font-header tw:text-sm tw:font-bold tw:text-white">${index + 1}</span><div><h2 class="tw:text-[15px] tw:font-bold">${title}</h2><p
     class="tw:mt-1 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">${description}</p></div></li>`)}</ol>${filtered
-    ? filteredNote(count, filtersPath)
+    ? filteredNote(count)
     : nothing}<div class="tw:flex tw:flex-wrap
   tw:items-center tw:gap-2.5 tw:border-t tw:border-gray-100 tw:pt-4 tw:dark:border-gray-700"><span class="tw:text-sm tw:text-gray-600
   tw:dark:text-gray-400">Or try an example:</span>${EXAMPLES.map(([label, query]) => html`<a href=${`${pathname}?${query}`} class="tw:rounded-full
@@ -43,5 +43,5 @@ export const emptyState = ({ pathname, filtersPath, filtered, count }) => html`<
   tw:border tw:border-dashed tw:border-gray-300 tw:px-4 tw:py-6 tw:text-center tw:dark:border-gray-600"><p class="tw:text-xs tw:font-bold tw:tracking-wider
   tw:text-[#715eb2] tw:uppercase tw:dark:text-[#a99bd6]">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500">Pick a bike above to start
   comparing. <button type="button" class="twlink" data-bikebook--tips-target="restore" data-action="bikebook--tips#restore">Show tips</button></p></div>${filtered
-    ? filteredNote(count, filtersPath, 'tw:mt-3')
+    ? filteredNote(count, 'tw:mt-3')
     : nothing}</div></div>`

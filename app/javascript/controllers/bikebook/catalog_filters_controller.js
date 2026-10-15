@@ -24,6 +24,11 @@ export default class extends Controller {
     if (!this.element.closest('[inert]')) this.#writeUrl()
   }
 
+  // as the empty page's More filters opens the panel
+  focusFirst () {
+    this.element.querySelector('#vehicle-filters input:not([type=hidden])')?.focus()
+  }
+
   toggleSort ({ params: { field } }) {
     const dir = `${field}DirValue`
     this[dir] = this[dir] === 'desc' ? 'asc' : 'desc'

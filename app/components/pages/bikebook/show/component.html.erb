@@ -16,6 +16,7 @@
   <div
     class="tw:group"
     data-controller="bikebook--catalog-filters ui--collapse"
+    data-action="bikebook--tips:filters@window->ui--collapse#show bikebook--tips:filters@window->bikebook--catalog-filters#focusFirst"
     data-bikebook--catalog-filters-default-market-value="<%= @market %>"
     data-bikebook--catalog-filters-default-jurisdiction-value="<%= @jurisdiction %>"
     data-ui--collapse-param-value="filters"
