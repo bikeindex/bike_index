@@ -97,12 +97,13 @@ export const geometryOverlay = ({ presenter, vehicles, sizes, frames, beside = f
 
   const overlay = drawn.length > 1 || Boolean(aligned)
   const missingNote = undrawn.length
-    ? html`<ul class="tw:list-disc tw:space-y-1 tw:pl-5 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${undrawn.map(({ title, geometry: { missing, wheels } }) => {
+    ? html`<div class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"><p>Note: missing geometry information</p><ul
+      class="tw:mt-1 tw:list-disc tw:space-y-1 tw:pl-5">${undrawn.map(({ title, geometry: { missing, wheels } }) => {
       const none = `${figures(presenter, missing)} or the measures to calculate them`
       return html`<li><em>${title}</em> doesn't list its ${none}, so ${!wheels || !overlay
         ? "it can't be drawn"
         : `only its wheels are drawn${aligned ? `, the rear axle on ${aligned.title}'s` : ''}`}.</li>`
-    })}</ul>`
+    })}</ul></div>`
     : nothing
 
   // out to the screen's edges on a phone, as the cards below it are

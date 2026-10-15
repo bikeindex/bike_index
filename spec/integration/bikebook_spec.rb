@@ -519,9 +519,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("[data-comparison] article", count: 5)
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
-    # a vehicle listing no figure that sizes a frame is its wheels alone, the rear axle on the first frame's
-    expect(page).to have_css("[aria-label='Geometry overlay'] li", exact_text: "Segway GT3 Pro doesn't list its Reach, Stack, Top Tube (effective), " \
+    # a vehicle listing no figure that sizes a frame is its wheels alone, the rear axle on the first frame's, under a note
+    expect(page).to have_css("[aria-label='Geometry overlay'] p + ul li", exact_text: "Segway GT3 Pro doesn't list its Reach, Stack, Top Tube (effective), " \
       "Front Centre and Head Tube or the measures to calculate them, so only its wheels are drawn, the rear axle on Aventón Level 4 REC Step-Through's.")
+    expect(page).to have_css("[aria-label='Geometry overlay'] p", exact_text: "Note: missing geometry information")
     # of a year the first lacks just the year, and of a drivetrain just the chip it lacks
     haul = find("article h1", text: "Haul ST").ancestor("article")
     marked = ->(heading, selector) { haul.find("h2", text: heading).ancestor("section").all(selector).map { it.text.strip } }
