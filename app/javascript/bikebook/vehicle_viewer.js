@@ -6,7 +6,7 @@ import { emptyState } from 'bikebook/templates/vehicles/empty_state'
 import { frameGeometry } from 'bikebook/frame_geometry'
 import { geometryOverlay } from 'bikebook/templates/vehicles/geometry_overlay'
 import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
-import { basicsOf, componentsOf, modelViewer, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
+import { basicsOf, componentsOf, modelViewer, sizesOf, wheelsOf } from 'bikebook/templates/vehicles/model_viewer'
 import { present } from 'bikebook/templates/values'
 import { toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
@@ -40,22 +40,23 @@ export class VehicleViewer {
     const cardRow = (margin, cards) => html`<div ?data-comparison=${comparing} class="${margin} tw:max-[500px]:mx-[calc(50%-50vw)] tw:max-[500px]:w-screen ${comparing
       ? 'tw:md:mx-[calc(50%-50vw)] tw:md:w-screen tw:md:px-4'
       : 'tw:lg:mx-[calc(50%-50vw)] tw:lg:w-screen tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
-    // each vehicle's `key` on a card of its own, named as its full card is
-    const cards = (key, none, content) => vehicles.map(({ data, value }) => {
+    // each vehicle's `key` on a card of its own, named as its full card is, after whatever `lead` shows
+    const cards = (key, none, content, lead = () => nothing) => vehicles.map(({ data, value }) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
       return html`<section aria-label=${`${[manufacturer, model].filter(present).join(' ')} ${key}`} class="twgutter tw:w-full tw:min-w-0 tw:space-y-4
         tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
         ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}"><header class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${present(manufacturer)
         ? html`<p class="tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">${manufacturer}</p>`
         : nothing}<h3 class="tw:text-2xl tw:leading-tight tw:font-extrabold">${model}</h3></div><div
-        class="tw:shrink-0">${basicsOf({ presenter, data }).photo('tw:h-14 tw:w-21')}</div></header>${present(data[key])
+        class="tw:shrink-0">${basicsOf({ presenter, data }).photo('tw:h-14 tw:w-21')}</div></header>${lead(data, value)}${present(data[key])
         ? content(data, value)
         : html`<p class="twless-strong">${none}</p>`}</section>`
     })
     const views = {
       basics: () => basics({ presenter, vehicles }),
       geometry: () => html`${comparing ? comparisonTable({ ...compared, part: 'geometry' }) : nothing}${geometryOverlay(compared)}${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
-        html`<div class="twgutter-bleed">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`))}`,
+        html`<div class="twgutter-bleed">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`,
+      (data, value) => wheelsOf({ presenter, data, others: others(value) })))}`,
       components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value) }))),
       all: () => {
         const full = vehicles.map(({ data, value }, index) => {

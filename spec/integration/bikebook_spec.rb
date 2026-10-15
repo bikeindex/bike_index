@@ -110,6 +110,10 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']:focus", exact_text: "Sizes & geometry")
     expect(page).to have_no_css("[aria-label='Overview comparison']")
     expect(page).to have_current_path(/[?&]view=geometry\b/)
+    # each model's wheels head its sizes card, marked against the first's
+    sizes_card = find("section[aria-label='Aventón Level 2 Step-Through sizes']")
+    expect(sizes_card.first("h2").text).to match(/\Awheels\z/i)
+    expect(sizes_card.find("section", text: /\Awheels/i)).to have_css("dt", text: /front|rear/i).and have_css(".tw\\:spec-diff")
     # each model's components alone, by group on a card of its own beside the others', without the specs or the rest of its card
     click_link "Components"
     expect(page).to have_css("section[aria-label='Aventón Level 2 Step-Through components'] h3", exact_text: "Level 2 Step-Through")

@@ -65,6 +65,9 @@ export const basicsOf = ({ presenter, data }) => new ModelViewer({ presenter, da
 // linked to `sizePath(name)`
 export const sizesOf = ({ presenter, data, others, selectedSize, sizePath }) => new ModelViewer({ presenter, data, others, selectedSize, sizePath }).sizes()
 
+// A vehicle's wheels and the others it fits, marked where they differ from `others`'
+export const wheelsOf = ({ presenter, data, others }) => new ModelViewer({ presenter, data, others }).wheels()
+
 // A vehicle's components by group, marked where they differ from `others`'
 export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
 
