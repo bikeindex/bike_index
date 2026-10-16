@@ -5268,6 +5268,7 @@ es:
       manufacturer_required: El fabricante está obligado a registrarse.
       name_required: Se requiere el nombre del propietario para registrarse.
       unable_to_save: No podemos guardar ese registro, por favor inténtelo de nuevo.
+      description_stolen_required: Por favor, cuéntenos qué sucedió.
     menu_items_account:
       logout: Finalizar la sesión
       marketplace_messages: Mensajes del mercado

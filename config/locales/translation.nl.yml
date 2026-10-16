@@ -4474,6 +4474,7 @@ nl:
       name_required: De naam van de eigenaar is vereist voor registratie.
       unable_to_save: Het is ons niet gelukt om uw registratie op te slaan. Probeer
         het later opnieuw.
+      description_stolen_required: Vertel ons alstublieft wat er is gebeurd.
     menu_items_account:
       logout: Uitloggen
       marketplace_messages: Marktplaatsberichten

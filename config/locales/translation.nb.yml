@@ -5028,6 +5028,7 @@ nb:
       manufacturer_required: Produsenten er pålagt å registrere seg
       name_required: Eiernavn kreves for registrering
       unable_to_save: Vi kan ikke lagre registreringen. Prøv på nytt.
+      description_stolen_required: Fortell oss hva som skjedde
     menu_items_account:
       logout: Logg ut
       marketplace_messages: Markedsplassmeldinger
