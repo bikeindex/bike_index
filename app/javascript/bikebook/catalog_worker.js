@@ -10,6 +10,7 @@ let activities = []
 let manifest = null
 let base = null
 let last = null
+let rules = null
 const blocks = new Map()
 const orders = new Map()
 
@@ -24,8 +25,8 @@ const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
 
 // The blocks `ids` are in load alongside the index rather than after it
-async function load ({ manifestUrl, ids, jurisdictions }) {
-  manifest = await fetchJson(manifestUrl)
+async function load ({ manifestUrl, ids, jurisdictions, rulesUrl }) {
+  ;[manifest, rules] = await Promise.all([fetchJson(manifestUrl), import(rulesUrl)])
   if (manifest.format !== FORMAT) throw new Error(`catalog format ${manifest.format} isn't ${FORMAT}`)
 
   base = new URL(manifestUrl, self.location)
@@ -33,12 +34,14 @@ async function load ({ manifestUrl, ids, jurisdictions }) {
   const [index, vocabulary, { kit }] = await Promise.all([manifest.index, manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base))))
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
+  const typeNames = Object.fromEntries(index.vehicle_types.map(({ slug, name }) => [slug, name]))
   activities = index.primary_activities
   models = index.models.map((model) => ({
     ...model,
     // a photo stored under its model's id is published as its extension alone
     stock_photo: model.photo?.includes('/') ? model.photo : model.photo && `${index.stock_photos}/${path(model.id)}.${model.photo}`,
     activity_name: activityNames[model.primary_activity],
+    type_name: typeNames[model.vehicle_type],
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
     sortYear: model.final_year ?? currentYear,
     sortPrice: model.msrp_cents ?? 0
@@ -53,7 +56,7 @@ async function load ({ manifestUrl, ids, jurisdictions }) {
     const jurisdictionName = state ? `${state} (${code.slice(3)})` : code && (jurisdictions[code] ?? code)
     return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
   }))
-  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index), modelsCount: models.length }
+  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index) }
 }
 
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
@@ -128,6 +131,52 @@ function matching (params) {
   return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
 }
 
+// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, in the filters' order.
+// `legalClasses` are the e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
+function featured ({ params, legalClasses }) {
+  const { COUNT, requirements, preferences, quotas } = rules
+  const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion))
+  const filtered = sorted(params).filter(filter(params))
+  const candidates = requirements.reduce((models, requirement) => {
+    const passing = models.filter((model) => requirement(model, { legalEbike }))
+    return passing.length ? passing : models
+  }, filtered)
+  const count = Math.min(COUNT, candidates.length)
+  // a share's models and the others each at least their part of the picks
+  const minimums = quotas.flatMap(({ matches, share, minimum = Math.round(count * share) }) => share == null
+    ? [{ matches, minimum }]
+    : [{ matches, minimum }, { matches: (model) => !matches(model), minimum: count - minimum }])
+  const picked = []
+  while (picked.length < count) {
+    const pool = minimums.reduce((models, { matches, minimum }) => {
+      const narrowed = minimum - picked.filter(matches).length >= count - picked.length && models.filter(matches)
+      return narrowed?.length ? narrowed : models
+    }, candidates.filter((model) => !picked.includes(model)))
+    // a share's models while the picks fall short of it and the others while they're over, a minimum's until it's met.
+    // A quota met ranks every model alike
+    const behind = quotas.map(({ matches, share, minimum }) => (share == null ? minimum : share * picked.length) - picked.filter(matches).length)
+    const helps = (model) => quotas.map(({ matches, share }, index) => share == null
+      ? behind[index] <= 0 || matches(model)
+      : behind[index] === 0 || (behind[index] > 0) === matches(model))
+    const ranks = (model) => [...preferences.map((prefers) => prefers(model, { picked })), ...helps(model)]
+    // no model outranks one meeting every rank
+    let best = null
+    for (const model of pool) {
+      const modelRanks = ranks(model)
+      if (!best || outranks(modelRanks, best.ranks)) best = { model, ranks: modelRanks }
+      if (modelRanks.every(Boolean)) break
+    }
+    picked.push(best.model)
+  }
+  return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
+}
+
+// Whether `a` wins at the first rank the two differ at
+const outranks = (a, b) => {
+  const index = a.findIndex((value, each) => value !== b[each])
+  return index !== -1 && a[index]
+}
+
 // Newest and priciest first unless asked otherwise, kept per pair of directions so a query only has to filter
 function sorted ({ year_dir: yearDir, price_dir: priceDir }) {
   const key = `${yearDir}/${priceDir}`
@@ -173,7 +222,7 @@ function propelled ({ electric, e_vehicle_classifications: carried = [] }, propu
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { load, search, vehicles, displays }[type](args) })
+    self.postMessage({ id, result: await { load, search, featured, vehicles, displays }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }

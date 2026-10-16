@@ -18,6 +18,7 @@ const MAX_COMPARE = 5
 const combobox = (root, name) => root.getElementById(`${name}-hw-hidden-field`).closest('.hw-combobox')
 const panelOf = (root) => root.querySelector('[data-controller~="bikebook--catalog-filters"]')
 const MARKET_ATTRIBUTE = 'data-bikebook--catalog-filters-default-market-value'
+const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdiction-value'
 
 // The fields as `filters` set them, none of which needs the catalog
 const fillFields = (root, filters) => {
@@ -25,7 +26,7 @@ const fillFields = (root, filters) => {
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
   // a state's abbreviation, or US
-  const jurisdiction = filters.jurisdiction || panelOf(root).getAttribute('data-bikebook--catalog-filters-default-jurisdiction-value')
+  const jurisdiction = filters.jurisdiction || panelOf(root).getAttribute(JURISDICTION_ATTRIBUTE)
   const state = root.querySelector(`#jurisdiction-hw-listbox [role="option"][data-value="${CSS.escape(jurisdiction)}"]`)
   if (state) {
     root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
@@ -35,13 +36,54 @@ const fillFields = (root, filters) => {
   for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 }
 
+// The e-bike classes legal where the visitor is. In the US, the electric filter's values for those of the jurisdiction the
+// filters pick or the visitor is in, whose checkboxes are the US's for a state without its own; elsewhere the market's
+// e-bike law, none where the catalog has none
+const legalClasses = (root, filters, { e_vehicle_classifications: classifications }) => {
+  if (filters.market && filters.market !== 'US') {
+    return Object.keys(classifications).filter((id) => classifications[id].e_bike_law && classifications[id].jurisdiction === filters.market)
+  }
+  const jurisdiction = filters.jurisdiction || panelOf(root).getAttribute(JURISDICTION_ATTRIBUTE)
+  const classes = root.querySelector(`[data-jurisdiction="${CSS.escape(jurisdiction)}"]`) ?? root.querySelector('[data-jurisdiction="US"]')
+  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'out_of_class')
+}
+
+// `url`'s filters, "all" markets as Any, without which it's the panel's default
+const urlFilters = (root, url) => {
+  const filters = Object.fromEntries(FILTERS.map((name) => [name, url.searchParams.get(name) ?? '']))
+  return { ...filters, market: filters.market === 'all' ? '' : filters.market || panelOf(root).getAttribute(MARKET_ATTRIBUTE) }
+}
+
+// as the catalog reads them: a renamed slug as its new one, and a value naming no option dropped
+const filtersAt = ({ kit, options }, root, url) => {
+  const filters = urlFilters(root, url)
+  return {
+    ...filters,
+    ...Object.fromEntries(LISTS.map((name) => {
+      const values = new Set(options[name].map(({ value }) => value))
+      const slugs = filters[name].split(',').map((value) => kit.slug_aliases[name]?.[value] ?? value)
+      return [name, [...new Set(slugs.filter((value) => values.has(value)))].join(',')]
+    }))
+  }
+}
+
+// With nothing picked, the `count` of models `filters` leave, the ones featured, and whether filters narrow it
+const unpicked = async (catalog, root, filters) => ({
+  ...await catalog.featured(filters, legalClasses(root, filters, catalog.vocabulary)),
+  // the market narrows every visitor's search, so it's no filter of theirs
+  filtered: [...LISTS, ...SINGLES, ...RANGES, 'electric'].some((name) => name !== 'market' && filters[name])
+})
+
+// The vehicles' place with nothing picked, for `url`'s filters, which change in `page` without rendering it afresh
+export async function unpickedVehicles (catalog, page, url) {
+  return new VehicleViewer(catalog.kit, catalog.vocabulary).render([], url, null, await unpicked(catalog, page, filtersAt(catalog, page, url)))
+}
+
 // The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
 // its comboboxes, whose options are the catalog's, disabled. `status` stands in for the vehicles
 export function loadingShell (shell, url, status) {
   const root = shell.content.cloneNode(true)
-  const filters = Object.fromEntries(FILTERS.map((name) => [name, url.searchParams.get(name) ?? '']))
-  filters.market = filters.market === 'all' ? '' : filters.market || panelOf(root).getAttribute(MARKET_ATTRIBUTE)
-  fillFields(root, filters)
+  fillFields(root, urlFilters(root, url))
   for (const field of root.querySelectorAll('.hw-combobox')) {
     field.inert = true
     field.querySelector('.hw-combobox__input').disabled = true
@@ -61,19 +103,11 @@ export async function hydrate (catalog, source, shell, url) {
   const params = url.searchParams
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-listbox`).append(fragmentOf(catalog.options[name].map(filterOption)))
 
-  const filters = Object.fromEntries(FILTERS.map((name) => [name, params.get(name) ?? '']))
-  // a renamed slug reads as its new one, and a value naming no option is dropped
-  for (const name of LISTS) {
-    const values = new Set(catalog.options[name].map(({ value }) => value))
-    const slugs = filters[name].split(',').map((value) => kit.slug_aliases[name]?.[value] ?? value)
-    filters[name] = [...new Set(slugs.filter((value) => values.has(value)))].join(',')
-  }
-  // "all" is Any, which the URL carries only when the visitor's country is a market with models
+  // the visitor's country, when it's a market with models
   const panel = panelOf(root)
   const located = panel.getAttribute(MARKET_ATTRIBUTE)
-  const defaultMarket = catalog.options.market.some(({ value, count }) => value === located && count) ? located : ''
-  panel.setAttribute(MARKET_ATTRIBUTE, defaultMarket)
-  filters.market = filters.market === 'all' ? '' : filters.market || defaultMarket
+  panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value, count }) => value === located && count) ? located : '')
+  const filters = filtersAt(catalog, root, url)
   const [found, { filteredCount }] = await Promise.all([catalog.vehicles(params.get('vehicle_models')?.split(',') ?? []), catalog.search(filters, 0, 0)])
   const vehicles = found.slice(0, MAX_COMPARE)
   const classifications = catalog.vocabulary.e_vehicle_classifications
@@ -106,8 +140,7 @@ export async function hydrate (catalog, source, shell, url) {
   }
 
   renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
-    // the market narrows every visitor's search, so it's no filter of theirs
-    { count: filteredCount, filtered: [...LISTS, ...SINGLES, ...RANGES, 'electric'].some((name) => name !== 'market' && filters[name]) }))
+    vehicles.length ? {} : await unpicked(catalog, root, filters)))
 
   localSources.set(combobox(root, 'vehicle_models'), source)
   for (const name of LISTS) {
