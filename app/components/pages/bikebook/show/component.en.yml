@@ -41,9 +41,6 @@ en:
           suspension: Suspension
           tagline: The world’s bicycle library — search, compare, and find your next
             ride.
-          tagline_html: >-
-            The world’s bicycle library — search, compare, and find your next ride
-            across %{models_count}+ models.
           united_states: United States
           us_class_1: US Class 1
           us_class_2: US Class 2

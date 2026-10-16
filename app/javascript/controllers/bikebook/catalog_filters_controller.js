@@ -36,11 +36,13 @@ export default class extends Controller {
     this.apply()
   }
 
+  // the page follows the URL's filters
   apply () {
     this.#showClasses()
     this.#syncCombobox()
     this.#refreshSummary()
     this.#writeUrl()
+    this.dispatch('change')
   }
 
   // A multiselect fires hw-combobox:selection before it writes the hidden field,
@@ -141,16 +143,9 @@ export default class extends Controller {
         .map((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? value)
         .join(', ')
     }
+    // the classes alone, without the jurisdiction they're of
     const boxes = inputs.filter(({ type }) => type === 'checkbox')
-    if (boxes.length) {
-      const checked = boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
-      // a state stands alone, read from its option, as the combobox may not have filled its input yet
-      const jurisdiction = field.querySelector('input[name="jurisdiction"]')
-      if (!jurisdiction || field.classList.contains('tw:hidden')) return checked
-      const state = jurisdiction.value && field.querySelector(`[role="option"][data-value="${CSS.escape(jurisdiction.value)}"]`)
-        ?.dataset.autocompletableAs.replace(/ \(\w+\)$/, '')
-      return checked ? `${checked} (${state || field.querySelector('[role="combobox"]').placeholder})` : state
-    }
+    if (boxes.length) return boxes.filter(({ checked }) => checked).map(({ labels }) => labels[0].textContent.trim()).join(', ')
     const [min, max] = inputs.map(({ value }) => value && `${field.dataset.filterPrefix}${value}`)
     if (min && max) return `${min}–${max}`
     return min ? `from ${min}` : max && `up to ${max}`

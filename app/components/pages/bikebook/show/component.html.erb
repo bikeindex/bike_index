@@ -267,7 +267,7 @@
   data-bikebook--page-failed-text-value="<%= translation(".failed") %>"
   data-bikebook--page-title-value="Bikebook"
   data-bikebook--page-search-log-url-value="<%= search_bikebook_path %>"
-  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track"
+  data-action="submit->bikebook--page#visit click->bikebook--page#follow popstate@window->bikebook--page#restore scroll@window->bikebook--page#track bikebook--catalog-filters:change->bikebook--page#refilter"
 >
   <section
     aria-label="<%= translation(".about_bikebook_label") %>"
@@ -307,11 +307,7 @@
           tw:sm:text-xl tw:dark:text-slate-100
         "
       >
-        <span data-bikebook--page-target="tagline"><%= translation(".tagline") %></span>
-
-        <template data-bikebook--page-target="countedTagline">
-          <%= translation(".tagline_html", models_count: tag.span(data: {models_count: true})) %>
-        </template>
+        <%= translation(".tagline") %>
       </h1>
 
       <p class="tw:m-0 tw:text-[13px] tw:text-gray-600 tw:dark:text-gray-400">
