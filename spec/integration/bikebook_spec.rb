@@ -678,7 +678,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(haul_st).to have_link(exact_text: "#{Time.current.year} Specialized Haul ST").and have_text("2025–current")
     # each is picked as the search's option is
     haul_st.find("a").click
-    expect(page).to have_css("[aria-label='Overview'] h2", text: "Haul ST")
+    expect(page).to have_css("[aria-label='Overview'] thead th", text: "Haul ST")
     expect(page).to have_current_path("/bikebook?price_max=3000&vehicle_models=m/specialized/2025/haul_st")
     expect(page).to have_css(".hw-combobox__chip", text: "Specialized Haul ST")
     # filters leaving no legal e-bike feature what they do leave
