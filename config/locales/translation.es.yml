@@ -5268,6 +5268,7 @@ es:
       manufacturer_required: El fabricante está obligado a registrarse.
       name_required: Se requiere el nombre del propietario para registrarse.
       unable_to_save: No podemos guardar ese registro, por favor inténtelo de nuevo.
+      description_stolen_required: Por favor, cuéntenos qué sucedió.
     menu_items_account:
       logout: Finalizar la sesión
       marketplace_messages: Mensajes del mercado
@@ -6919,8 +6920,6 @@ es:
             any: Cualquier
           byline: Un enlace gratuito de Bike Index, el registro de bicicletas sin
             ánimo de lucro.
-          tagline_html: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
-            tu próximo paseo entre más de %{models_count} modelos.'
           tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
             tu próxima bici.'
           about_bikebook_label: Acerca de BikeBook
@@ -6946,7 +6945,6 @@ es:
           any_market: Cualquier mercado
           market: Mercado
           clear_filters: Filtros transparentes
-          jurisdiction_for_e_vehicles: jurisdicción para vehículos eléctricos
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin

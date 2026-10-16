@@ -4474,6 +4474,7 @@ nl:
       name_required: De naam van de eigenaar is vereist voor registratie.
       unable_to_save: Het is ons niet gelukt om uw registratie op te slaan. Probeer
         het later opnieuw.
+      description_stolen_required: Vertel ons alstublieft wat er is gebeurd.
     menu_items_account:
       logout: Uitloggen
       marketplace_messages: Marktplaatsberichten
@@ -6827,8 +6828,6 @@ nl:
           filter_combobox:
             any: Elk
           byline: Een gratis naslagwerk van Bike Index, het non-profit fietsregister.
-          tagline_html: De fietsenbibliotheek van de wereld — zoek, vergelijk en vind
-            je volgende fiets tussen de %{models_count}+ modellen.
           tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
             volgende fiets.'
           about_bikebook_label: Over BikeBook
@@ -6853,7 +6852,6 @@ nl:
           any_market: Elke markt
           market: Markt
           clear_filters: Filters wissen
-          jurisdiction_for_e_vehicles: jurisdictie voor elektrische voertuigen
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
