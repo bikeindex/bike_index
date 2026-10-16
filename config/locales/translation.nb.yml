@@ -6633,8 +6633,6 @@ nb:
           filter_combobox:
             any: Noen
           byline: En gratis referanse fra Bike Index, det ideelle sykkelregisteret.
-          tagline_html: Verdens sykkelbibliotek – søk, sammenlign og finn din neste
-            sykkeltur på tvers av %{models_count}+ modeller.
           tagline: Verdens sykkelbibliotek – søk, sammenlign og finn din neste sykkeltur.
           about_bikebook_label: Om BikeBook
           activities: Aktiviteter
@@ -6658,7 +6656,6 @@ nb:
           any_market: Ethvert marked
           market: Marked
           clear_filters: Fjern filtre
-          jurisdiction_for_e_vehicles: jurisdiksjon for elbiler
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike

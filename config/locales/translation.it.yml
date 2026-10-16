@@ -6939,8 +6939,6 @@ it:
             any: Qualunque
           byline: Un riferimento gratuito fornito da Bike Index, il registro di biciclette
             senza scopo di lucro.
-          tagline_html: 'La biblioteca mondiale delle biciclette: cerca, confronta
-            e trova la tua prossima bici tra oltre %{models_count} modelli.'
           tagline: 'La biblioteca mondiale delle biciclette: cerca, confronta e trova
             la tua prossima bici.'
           about_bikebook_label: Informazioni su BikeBook
@@ -6965,7 +6963,6 @@ it:
           any_market: Qualsiasi mercato
           market: Mercato
           clear_filters: Filtri trasparenti
-          jurisdiction_for_e_vehicles: giurisdizione per i veicoli elettrici
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
