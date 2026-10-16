@@ -19,7 +19,8 @@ module Pages
           def level = @membership.level_humanized
 
           def price_display(stripe_price)
-            "#{stripe_price.amount_formatted} #{stripe_price.yearly? ? translation(".per_year") : translation(".per_month")}"
+            amount = MoneyFormatter.money_format_no_cents_if_whole(stripe_price.amount_cents, stripe_price.currency_enum)
+            "#{amount} #{stripe_price.yearly? ? translation(".per_year") : translation(".per_month")}"
           end
 
           def price_comparison

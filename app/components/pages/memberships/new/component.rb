@@ -6,16 +6,13 @@ module Pages
       # The summary and join labels follow the checked tier and interval through
       # memberships--new, which reads them off each tier's radio. Prices swap on CSS alone
       class Component < ApplicationComponent
-        # Has to match the active StripePrices — the checkout looks the price up by level and interval
-        PRICES = {basic: {monthly: 500, yearly: 5000}, plus: {monthly: 1500, yearly: 15_000},
-                  patron: {monthly: 5000, yearly: 50_000}}.freeze
-
         MONTHLY_ONLY = "tw:group-has-[[value=yearly]:checked]/membership:hidden"
         YEARLY_ONLY = "tw:hidden tw:group-has-[[value=yearly]:checked]/membership:inline"
 
-        def initialize(currency:, bikes_count:, recoveries_count:, recoveries_value:, organizations_count:,
+        def initialize(stripe_prices:, bikes_count:, recoveries_count:, recoveries_value:, organizations_count:,
           recovery_displays:, level: nil, referral_source: nil, membership: nil)
-          @currency = currency
+          @currency = stripe_prices.first&.currency_obj || Currency.default
+          @amounts = stripe_prices.to_h { [[it.membership_level.to_sym, it.interval.to_sym], it.amount_cents] }
           @bikes_count = bikes_count
           @recoveries_count = recoveries_count
           @recoveries_value = recoveries_value
@@ -23,13 +20,15 @@ module Pages
           @recovery_displays = recovery_displays.first(4)
           @referral_source = referral_source
           @membership = membership
-          @level = PRICES.key?(level&.to_sym) ? level.to_sym : :plus
+          @level = Membership::LEVEL_ENUM.key?(level&.to_sym) ? level.to_sym : :plus
           @interval = StripePrice.interval_default.to_sym
         end
 
         private
 
-        def price(level, interval) = MoneyFormatter.money_format_without_cents(PRICES[level][interval], @currency)
+        def price(level, interval)
+          @amounts[[level, interval]]&.then { MoneyFormatter.money_format_no_cents_if_whole(it, @currency.slug) }
+        end
 
         def level_name(level) = Membership.level_humanized(level.to_s)
 

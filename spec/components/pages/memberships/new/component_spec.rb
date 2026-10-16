@@ -6,10 +6,16 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   let(:options) do
-    {currency:, level:, bikes_count: 1_234_567, recoveries_count: 18_263, recoveries_value: 38_412_345,
+    {stripe_prices:, level:, bikes_count: 1_234_567, recoveries_count: 18_263, recoveries_value: 38_412_345,
      organizations_count: 1_000, recovery_displays:, referral_source: "donate"}
   end
-  let(:currency) { Currency.default }
+  let(:currency_enum) { "usd" }
+  let(:stripe_prices) do
+    {basic: 500, plus: 1500, patron: 5000}.flat_map do |membership_level, amount_cents|
+      [FactoryBot.build(:stripe_price, membership_level:, currency_enum:, amount_cents:),
+        FactoryBot.build(:stripe_price, membership_level:, currency_enum:, interval: "yearly", amount_cents: amount_cents * 10)]
+    end
+  end
   let(:level) { nil }
   let(:recovery_displays) { [] }
 
@@ -53,11 +59,19 @@ RSpec.describe Pages::Memberships::New::Component, type: :component do
   end
 
   context "with CAD" do
-    let(:currency) { Currency.friendly_find("cad") }
+    let(:currency_enum) { "cad" }
 
     it "renders CAD prices" do
       expect(component).to have_css("input[name='currency'][value='cad']", visible: :all)
       expect(component).to have_css("[data-memberships--new-target='summary']", text: /Plus membership, \D*15 a month/)
+    end
+  end
+
+  context "with a price that has cents" do
+    before { stripe_prices.find { it.plus? && it.monthly? }.amount_cents = 999 }
+
+    it "renders the cents" do
+      expect(component).to have_css("[data-memberships--new-target='summary']", text: "Plus membership, $9.99 a month")
     end
   end
 

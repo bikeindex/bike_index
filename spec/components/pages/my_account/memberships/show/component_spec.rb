@@ -38,7 +38,7 @@ RSpec.describe Pages::MyAccount::Memberships::Show::Component, type: :component 
       end
 
       it "says they pay less" do
-        expect(component).to have_text("You pay less than new members. Basic is now $5.00 per month")
+        expect(component).to have_text("You pay less than new members. Basic is now $5 per month")
       end
     end
 

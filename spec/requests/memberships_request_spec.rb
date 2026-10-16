@@ -25,12 +25,32 @@ RSpec.describe MembershipsController, type: :request do
         end
       end
       context "with currency=cad" do
+        let!(:stripe_prices) do
+          %w[usd cad].flat_map do |currency_enum|
+            Membership::LEVEL_ENUM.keys.flat_map do |membership_level|
+              %w[monthly yearly].map do |interval|
+                FactoryBot.create(:stripe_price, currency_enum:, membership_level:, interval:, amount_cents: 1500)
+              end
+            end
+          end
+        end
+
         it "renders with CAD" do
           get "#{base_url}/new?currency=cad"
           expect(response.code).to eq("200")
           expect(response).to render_template("new")
           expect(flash).to_not be_present
           expect(response.body).to match(/name="currency"[^>]*value="cad"/)
+        end
+
+        context "with a CAD price missing" do
+          before { stripe_prices.last.update(active: false) }
+
+          it "renders with the default currency" do
+            get "#{base_url}/new?currency=cad"
+            expect(response.code).to eq("200")
+            expect(response.body).to match(/name="currency"[^>]*value="usd"/)
+          end
         end
       end
     end
