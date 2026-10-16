@@ -65,6 +65,30 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_no_text("Most states treat these")
     end
 
+    it "renders one card alone in the frame asked for: a class's with its state's rules, any classification's, else the e-moto's" do
+      frame = ->(suffix) { {"Turbo-Frame" => "#{Pages::EbikeRules::ClassCard::Component::FRAME_ID}-#{suffix}"} }
+      get "/ebike-rules/ca", params: {e_bike_class: 3}, headers: frame.call(3)
+      expect(page).to have_css("turbo-frame#ebike-rules-class-card-3 h3", text: "Class 3")
+        .and have_css("[role=button]", text: "California specifics")
+        .and have_css("li", text: "Riders must be 16 or older to ride a Class 3")
+        .and have_no_css("h3", text: "Class 1").and have_no_css("#ebike-rules-classes")
+
+      get "/ebike-rules/ca", params: {e_bike_class: "12"}, headers: frame.call("emoto")
+      expect(page).to have_css("turbo-frame#ebike-rules-class-card-emoto h3", text: "Not an e-bike")
+        .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
+
+      get "/ebike-rules", params: {classification: "evc/moped"}, headers: frame.call("evc-moped")
+      expect(page).to have_css("turbo-frame#ebike-rules-class-card-evc-moped h3", text: "Moped, up to 2 hp and 30 mph")
+        .and have_text("30 mph").and have_no_css("[role=img]")
+
+      # one the state's law folds into the e-moto, as its classes do
+      get "/ebike-rules/nj", params: {classification: "evc/us/nj/dirt_bike"}, headers: frame.call("evc-us-nj-dirt_bike")
+      expect(page).to have_css("turbo-frame#ebike-rules-class-card-evc-us-nj-dirt_bike h3", text: "Not an e-bike")
+
+      get "/ebike-rules", params: {classification: "evc/nothing"}, headers: frame.call("evc-nothing")
+      expect(response).to have_http_status(:not_found)
+    end
+
     it "sends a request Cloudflare locates to its state's page, which no cache keeps" do
       get "/ebike-rules", params: {utm_source: "newsletter"}, headers: indiana
 

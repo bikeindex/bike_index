@@ -6965,6 +6965,7 @@ it:
           any_market: Qualsiasi mercato
           market: Mercato
           clear_filters: Filtri trasparenti
+          jurisdiction_for_e_vehicles: giurisdizione per i veicoli elettrici
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
@@ -6976,6 +6977,7 @@ it:
           class_aria: Classe %{n} e-bike
           class_unknown_aria: Classe di e-bike sconosciuta
           emoto: E-moto
+          emoto_aria: E-moto, non e-bike
         law_details:
           from: 'Da %{date}:'
           from_until: 'Da %{starts_on} a %{ends_on}:'
@@ -7261,26 +7263,10 @@ it:
             tre classi. La classe di appartenenza determina la velocità di assistenza
             del motore, se è consentito l'uso dell'acceleratore e dove è possibile
             circolare.
-          emoto_limits_body: Una velocità massima superiore a 45 km/h, una velocità
-            di accelerazione superiore a 32 km/h o un motore di potenza superiore
-            a 750 W definiscono un veicolo elettrico come una moto. Nella maggior
-            parte degli stati, questi veicoli sono equiparati a ciclomotori o motociclette,
-            il che può comportare l'obbligo di immatricolazione, assicurazione e patente.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          emoto_summary: Una velocità massima superiore a 45 km/h, una velocità di
-            accelerazione superiore a 32 km/h o un motore con potenza superiore a
-            750 W la rendono una moto elettrica.
-          mph: "%{mph} mph"
-          not_an_ebike: Non è una bici elettrica
-          pedal: Pedale
           state_classes_heading: "%{state} corsi di e-bike"
           state_classes_intro: "%{state} non utilizza il sistema a tre classi impiegato
             dalla maggior parte degli stati. La sua legge suddivide invece le e-bike
             e gli altri veicoli elettrici a due ruote in queste classi."
-          throttle: Acceleratore elettrico
-          watts_max: "≤%{watts}W"
-          watts_min: "%{watts}W+"
         rule_citation:
           source: fonte
         class_card:
@@ -7307,6 +7293,19 @@ it:
           state_specifics: "%{state} dettagli"
           throttle: Acceleratore elettrico
           top_assist: Assistenza superiore
+          emoto_limits_body: Una velocità massima superiore a 45 km/h, una velocità
+            di accelerazione superiore a 32 km/h o un motore di potenza superiore
+            a 750 W definiscono un veicolo elettrico come una moto. Nella maggior
+            parte degli stati, questi veicoli sono equiparati a ciclomotori o motociclette,
+            il che può comportare l'obbligo di immatricolazione, assicurazione e patente.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Una velocità massima superiore a 45 km/h, una velocità di
+            accelerazione superiore a 32 km/h o un motore con potenza superiore a
+            750 W la rendono una moto elettrica.
+          not_an_ebike: Non è una bici elettrica
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
     shared_blocks:
       footer:
         about: Di

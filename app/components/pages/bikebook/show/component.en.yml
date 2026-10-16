@@ -23,6 +23,7 @@ en:
           failed: The catalog didn't load. Reload the page to try again.
           human_powered: Human powered (Acoustic)
           jurisdiction: Jurisdiction
+          jurisdiction_for_e_vehicles: jurisdiction for e-vehicles
           loading: Loading the catalog…
           manufacturers: Manufacturers
           market: Market

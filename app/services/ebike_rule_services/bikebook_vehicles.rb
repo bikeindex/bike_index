@@ -22,13 +22,14 @@ module EbikeRuleServices
       throttle_modes = modes.select { it["mode"] == "throttle" }
       certifications = motors.map { it["certification"] }.join(", ")
       classifications = modes.flat_map { Array(it["e_vehicle_classifications"]) }.uniq
+      tiers = classifications - EbikeRuleServices::StateLaws.e_bike_law_ids
       {
         bikebook_id: record["id"],
         manufacturer_name: record["manufacturer"],
         model: record["model"],
         first_year: record["first_year"],
-        e_bike_class: e_bike_class(classifications, modes, throttle_modes),
-        class_unknown: classifications.grep_v(BikebookCatalog::E_BIKE_LAW).none? && mph(modes).nil?,
+        e_bike_class: e_bike_class(tiers, modes, throttle_modes),
+        class_unknown: tiers.none? && mph(modes).nil?,
         e_vehicle_classifications: classifications,
         # a state's cap is on the motors together
         watts: total(motors, "rated_power"),
@@ -43,10 +44,9 @@ module EbikeRuleServices
     end
 
     # The highest US class any mode carries - assist to 28 mph with a throttle to 20 is Class 3. A mode
-    # carrying another classification (a moped, a motorcycle), other than an e-bike law, makes it none.
-    # Unclassified modes are classed by the federal limits: 20 mph with a throttle, 28 without
-    def e_bike_class(classifications, modes, throttle_modes)
-      tiers = classifications.grep_v(BikebookCatalog::E_BIKE_LAW)
+    # carrying another of the `tiers` (a moped, a motorcycle) makes it none. With none, its modes are classed by
+    # the federal limits: 20 mph with a throttle, 28 without
+    def e_bike_class(tiers, modes, throttle_modes)
       if tiers.any?
         return if tiers.any? { !it.match?(BikebookCatalog::US_CLASS) }
 

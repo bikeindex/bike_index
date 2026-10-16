@@ -47,6 +47,15 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
         .to have_attributes(e_bike_class: nil, class_unknown: false, e_vehicle_classifications: %w[evc/off_highway_motorcycle])
     end
 
+    it "classes a model under another jurisdiction's e-bike law by its speeds" do
+      vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
+      vocabulary["e_vehicle_classifications"]["evc/eu/epac"] = {"jurisdiction" => "EU", "name" => "Electrically Power Assisted Cycle (EPAC)", "e_bike_law" => true}
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(body: vocabulary.to_json)
+      stub_unclassified_level_2 { it["e_vehicle_classifications"] = ["evc/eu/epac"] }
+
+      expect(described_class.find("m/aventon/2022/level_2")).to have_attributes(e_bike_class: 2, class_unknown: false)
+    end
+
     it "is nil for a model the catalog lacks, a model without a motor, and no id" do
       expect(described_class.find("m/specialized/2025/nothing")).to be_nil
       expect(described_class.find("m/kris_holm/2023/kh20")).to be_nil

@@ -51,6 +51,12 @@ module EbikeRuleServices
       current(parsed[:motorcycles][abbreviation].to_a, today).select { it[:starts_on].nil? && it[:rule].match?(/licen|regist|insur/i) }
     end
 
+    # Any jurisdiction's classification by its ID, as a state's own classes are, nil for one the catalog lacks
+    def classification(id) = classifications[id]&.merge(CLASS_OVERRIDES.fetch(id, {}))
+
+    # The classifications that are an e-bike law or class anywhere, as the EU's EPAC is, rather than a motor vehicle's
+    def e_bike_law_ids = parsed[:e_bike_laws]
+
     # nil for anything but an abbreviation, such as a query's array
     def state(abbreviation)
       STATES.find { it[:abbr] == abbreviation.upcase } if abbreviation.is_a?(String)
@@ -75,13 +81,20 @@ module EbikeRuleServices
     # private below here
     #
 
-    # The vocabulary's file name carries its digest, so a republished one is a new key
-    def parsed
+    def parsed = vocabulary("state_laws_with_e_bike_laws") { parse(it) } || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}, e_bike_laws: []}
+
+    # apart from parsed, which every state's lookup reads
+    def classifications
+      vocabulary("classifications") { |records| records.to_h { |id, record| [id, state_class(id, record).merge(jurisdiction: record["jurisdiction"])] } } || {}
+    end
+
+    # The vocabulary's classifications as the block reads them. Its file name carries its digest, so a republished one
+    # is a new key
+    def vocabulary(name)
       path = Integrations::Bikebook::Catalog.manifest&.dig("vocabulary")
-      records = path && Rails.cache.fetch(["bikebook_catalog/state_laws_with_citations", path], expires_in: 1.week, skip_nil: true) do
-        Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { parse(it) }
+      path && Rails.cache.fetch(["bikebook_catalog/#{name}", path], expires_in: 1.week, skip_nil: true) do
+        Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { yield it }
       end
-      records || {laws: {}, tiers: {}, groups: {}, classes: {}, motorcycles: {}}
     end
 
     def parse(records)
@@ -94,6 +107,7 @@ module EbikeRuleServices
         laws:,
         tiers: tiers.group_by(&:first).transform_values { it.map { |_, id, record| [record["name"], [id, *record["groups"]]] } },
         groups: records.filter_map { |id, record| [id, record["groups"]] if record["groups"] }.to_h,
+        e_bike_laws: records.filter_map { |id, record| id if record["e_bike_law"] },
         classes: states.group_by(&:first).filter_map { |abbreviation, entries|
           law = laws[abbreviation]
           next if law.nil? || three_classes?(law)
@@ -154,6 +168,6 @@ module EbikeRuleServices
 
     def upcoming(date, today) = (date if date&.>(today))
 
-    conceal :parsed, :parse, :state_classes, :state_class, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming
+    conceal :parsed, :classifications, :vocabulary, :parse, :state_classes, :state_class, :mph, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming
   end
 end

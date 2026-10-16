@@ -1,5 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { numberDisplay, uuid } from 'bikebook/templates/helpers'
+import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
 
@@ -82,7 +83,9 @@ export class CatalogComboboxSource {
       data-hw-combobox-target="endOfOptionsStream" data-input-type=${inputType ?? nothing} data-callback-id=${callbackId ?? nothing} aria-hidden="true"></li>`
     document.getElementById(`${forId}__hw_combobox_pagination__wrapper`)?.remove()
     if (page === 0) {
-      listbox.replaceChildren(fragmentOf(html`${group(unfiltered ? unmatched : matching(total), options)}${pagination}`))
+      const offered = classificationOption(this.params.q, String(this.params.vehicle_models ?? '').split(','), this.catalog.vocabulary.e_vehicle_classifications)
+      listbox.replaceChildren(fragmentOf(html`${offered ? group('E-bike classification', [offered]) : nothing}${
+        group(unfiltered ? unmatched : matching(total), options)}${pagination}`))
       this.onSearch({ params: this.params, total, filteredCount, primed })
     } else {
       listbox.append(fragmentOf(html`${options}${pagination}`))
@@ -103,13 +106,18 @@ export class CatalogComboboxSource {
     observer.observe(wrapper)
   }
 
-  // An id the catalog lacks gets no chip
+  // An id the catalog lacks gets no chip, and one the render already chipped no second
   async chips (combobox, values) {
-    const ids = String(values).split(',').filter(Boolean)
+    const chipped = new Set([...combobox.element.querySelectorAll('[data-hw-combobox-value-param]')].map((remover) => remover.dataset.hwComboboxValueParam))
+    const ids = String(values).split(',').filter((id) => id && !chipped.has(id))
+    if (ids.length === 0) return
+
     const displays = await this.catalog.displays(ids)
     if (!combobox.element.isConnected) return
 
-    renderChips(combobox.element, ids.map((value, index) => ({ value, display: displays[index] })).filter(({ display }) => display != null))
+    const classifications = this.catalog.vocabulary.e_vehicle_classifications
+    renderChips(combobox.element, ids.map((value, index) => ({ value, display: displays[index] ?? classifications[value]?.label }))
+      .filter(({ display }) => display != null))
   }
 }
 
