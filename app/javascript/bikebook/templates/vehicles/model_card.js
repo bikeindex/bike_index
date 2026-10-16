@@ -6,7 +6,7 @@ import { badge } from 'bikebook/templates/ui/badge'
 export const MODEL_CARDS_CLASSES = 'tw:grid tw:grid-cols-[repeat(auto-fill,minmax(max(14rem,calc((100%_-_3rem)/4)),1fr))] tw:gap-4'
 
 // The newest year a model is sold in, as the search's cards title a bike by its year, and the range when it's more
-const modelYears = ({ first_year: first, final_year: final }) => {
+const cardYears = ({ first_year: first, final_year: final }) => {
   const year = final ?? (first && new Date().getFullYear())
   if (!first || first === year) return { year }
   return { year, range: `${first}–${final ?? 'current'}` }
@@ -14,7 +14,7 @@ const modelYears = ({ first_year: first, final_year: final }) => {
 
 // A catalog model as the search's cards show a bike: its photo and price, linking to `href`
 export const modelCard = ({ model, href, placeholderUrl, currencies }) => {
-  const { year, range } = modelYears(model)
+  const { year, range } = cardYears(model)
   return html`<li class="tw:relative tw:flex tw:flex-col tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:transition tw:focus-within:z-10
   tw:hover:z-10 tw:hover:-translate-y-0.5 tw:hover:shadow-lg tw:active:translate-y-0.5 tw:hover:active:translate-y-0 tw:dark:border-gray-700
   tw:dark:bg-gray-800"><div class="tw:group tw:relative tw:h-40 tw:rounded-t-[11px] tw:bg-white" data-controller=${model.stock_photo

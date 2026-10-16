@@ -36,7 +36,7 @@ const featuredCards = ({ featured, vehiclePath, ...card }) => html`<ul aria-labe
 
 // With nothing picked, how the page works and comparisons to start from, or once they're dismissed, a prompt, and under
 // either what the search leaves and some of it
-export const emptyState = ({ url, filtered, count, featured = [], ...cards }) => html`<div class="tw:mt-3" data-controller="bikebook--tips"><div
+export const emptyState = ({ url, filtered, count, featured, ...cards }) => html`<div class="tw:mt-3" data-controller="bikebook--tips"><div
   data-bikebook--tips-target="tips"><section aria-label="How to use Bike Book" tabindex="-1"
   class="tw:relative tw:flex tw:flex-col tw:gap-5 tw:rounded-md tw:border tw:border-dashed tw:border-gray-300 tw:px-7 tw:py-6 tw:outline-none
   tw:dark:border-gray-600"><ol class="tw:m-0 tw:grid tw:list-none tw:gap-6 tw:p-0 tw:sm:grid-cols-3">${steps.map(([title, description], index) =>

@@ -131,33 +131,33 @@ function matching (params) {
   return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
 }
 
-// featured_rules' `COUNT` of the models the filters leave, by its rules, in the filters' order. `legalClasses` are the
-// e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
+// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, in the filters' order.
+// `legalClasses` are the e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
 function featured ({ params, legalClasses }) {
   const { COUNT, requirements, preferences, quotas } = rules
   const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion))
+  const filtered = sorted(params).filter(filter(params))
   const candidates = requirements.reduce((models, requirement) => {
     const passing = models.filter((model) => requirement(model, { legalEbike }))
     return passing.length ? passing : models
-  }, sorted(params).filter(filter(params)))
+  }, filtered)
   const count = Math.min(COUNT, candidates.length)
   // a share's models and the others each at least their part of the picks
-  const minimums = quotas.flatMap(({ matches, share, minimum }) => share == null
+  const minimums = quotas.flatMap(({ matches, share, minimum = Math.round(count * share) }) => share == null
     ? [{ matches, minimum }]
-    : [{ matches, minimum: Math.round(count * share) }, { matches: (model) => !matches(model), minimum: count - Math.round(count * share) }])
+    : [{ matches, minimum }, { matches: (model) => !matches(model), minimum: count - minimum }])
   const picked = []
   while (picked.length < count) {
-    const needs = minimums.map(({ matches, minimum }) => minimum - picked.filter(matches).length)
-    const pool = minimums.reduce((models, { matches }, index) => {
-      const narrowed = needs[index] >= count - picked.length && models.filter(matches)
+    const pool = minimums.reduce((models, { matches, minimum }) => {
+      const narrowed = minimum - picked.filter(matches).length >= count - picked.length && models.filter(matches)
       return narrowed?.length ? narrowed : models
     }, candidates.filter((model) => !picked.includes(model)))
     // a share's models while the picks fall short of it and the others while they're over, a minimum's until it's met.
     // A quota met ranks every model alike
     const behind = quotas.map(({ matches, share, minimum }) => (share == null ? minimum : share * picked.length) - picked.filter(matches).length)
-    const helps = (model) => quotas.map(({ matches, share }, index) => behind[index] === 0 || (share == null
-      ? behind[index] < 0 || matches(model)
-      : (behind[index] > 0) === matches(model)))
+    const helps = (model) => quotas.map(({ matches, share }, index) => share == null
+      ? behind[index] <= 0 || matches(model)
+      : behind[index] === 0 || (behind[index] > 0) === matches(model))
     const ranks = (model) => [...preferences.map((prefers) => prefers(model, { picked })), ...helps(model)]
     // no model outranks one meeting every rank
     let best = null
@@ -168,7 +168,7 @@ function featured ({ params, legalClasses }) {
     }
     picked.push(best.model)
   }
-  return candidates.filter((model) => picked.includes(model))
+  return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
 }
 
 // Whether `a` wins at the first rank the two differ at
