@@ -5,8 +5,7 @@ class AutocompleteLoaderJob < ApplicationJob
   # Each reload clears and rebuilds everything, so a batch of manufacturer
   # edits shares one; the key's expiry recovers from a lost job
   def self.enqueue_reload
-    pending = RedisPool.conn { |r| r.set(PENDING_KEY, 1, nx: true, ex: 10.minutes.to_i) }
-    perform_in(30.seconds) if pending
+    perform_in(30.seconds) if RedisPool.conn { |r| r.set(PENDING_KEY, 1, nx: true, ex: 10.minutes.to_i) }
   end
 
   def perform(kinds_to_reload = nil, print_counts = false)

@@ -8,10 +8,7 @@ RSpec.describe AutocompleteLoaderJob, type: :job do
   end
 
   describe "enqueue_reload" do
-    before do
-      Sidekiq::Job.clear_all
-      RedisPool.conn { |r| r.del(AutocompleteLoaderJob::PENDING_KEY) }
-    end
+    before { RedisPool.conn { |r| r.del(AutocompleteLoaderJob::PENDING_KEY) } }
 
     it "enqueues one reload until it runs" do
       3.times { AutocompleteLoaderJob.enqueue_reload }
