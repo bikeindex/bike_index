@@ -131,10 +131,9 @@ export default class extends Controller {
 
   // Market is left out, as every visit starts with one
   get #summary () {
-    return this.fieldTargets.filter((field) => !field.querySelector('input[name="market"]')).map((field) => {
-      const [value, label = field.dataset.filterLabel] = [this.#describe(field)].flat()
-      return [label, value]
-    }).filter(([, value]) => value)
+    return this.fieldTargets.filter((field) => !field.querySelector('input[name="market"]'))
+      .map((field) => [field.dataset.filterLabel, this.#describe(field)])
+      .filter(([, value]) => value)
   }
 
   #describe (field) {
