@@ -43,6 +43,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
         click_button "Let's chat"
         expect(page).to have_content("Thank", wait: 5)
       }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
+      expect(page).to have_no_css("dialog[open]")
 
       expect(Feedback.last).to have_attributes(target_attributes)
 
@@ -55,6 +56,70 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       expect(body).to include("Test University")
       expect(body).to include("Jane Doe")
       expect(body).to include("5551234567")
+    end
+  end
+
+  context "for_cities" do
+    let(:target_attributes) do
+      {kind: "lead_for_city", name: "Portland", email: "staff@portland.gov", contact_name: "Jane Doe",
+       contact_role: "City staff", phone_number: "(555) 123-4567", body: "Starting with e-bikes", title: "New City lead: Portland"}
+    end
+
+    it "walks through the education flow, then requests a demo from the contact section" do
+      visit "/for_cities"
+      expect(page).to have_content("Register every bike in your city")
+
+      within("#tab-school") do
+        expect(page).to have_button("Continue", disabled: true)
+        # a step can't be jumped to before it's reached
+        expect(page).to have_button(text: "Riding practices", disabled: true)
+        check "I will charge only with a manufacturer-approved charger."
+        check "I will never leave my battery charging unattended."
+        expect(page).to have_button("Continue", disabled: true)
+        check "I will keep my battery away from flammable materials."
+        click_button "Continue"
+        expect(page).to have_content("Commitments for riding to and from school.")
+        click_button "Back"
+        expect(page).to have_content("We have a few safety rules to go over")
+        expect(page).to have_button(text: "Final review", disabled: true)
+        find_button(text: "Riding practices").click
+        expect(page).to have_content("Commitments for riding to and from school.")
+      end
+
+      open_modal(find("section", text: "Talk to us about your city").find("button[commandfor]"))
+      expect(page).to have_content("Schedule a demo")
+      fill_in "City or organization", with: "Portland"
+
+      # the modal reopens with what was entered, like the other landing pages'
+      page.refresh
+      expect(page).to have_field("City or organization", with: "Portland", wait: 5)
+
+      # name, role and phone are required along with the email
+      click_button "Request a demo"
+      expect(page.evaluate_script("document.activeElement.id")).to eq "feedback_contact_name"
+      fill_in "Your name", with: "Jane Doe"
+      click_button "Request a demo"
+      expect(page.evaluate_script("document.activeElement.id")).to eq "feedback_contact_role"
+      select "City staff", from: "Your role"
+      fill_in "Email", with: "staff@portland.gov"
+      click_button "Request a demo"
+      expect(page.evaluate_script("document.activeElement.id")).to eq "feedback_phone_number"
+      fill_in "Phone number", with: "(555) 123-4567"
+      fill_in "Anything else we should know?", with: "Starting with e-bikes"
+
+      expect {
+        click_button "Request a demo"
+        expect(page).to have_content("Thanks. We'll be in touch soon.", wait: 5)
+      }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
+      expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_no_content("Book a discovery call")
+
+      expect(Feedback.last).to have_attributes(target_attributes)
+
+      EmailJobs::FeedbackNotificationJob.drain
+      body = ActionMailer::Base.deliveries.last.body.encoded
+      expect(body).to include("Role: City staff")
+      expect(body).to include("(555) 123-4567")
     end
   end
 

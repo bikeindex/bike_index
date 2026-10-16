@@ -17,7 +17,7 @@ class FeedbacksController < ApplicationController
       else
         translation(:thanks_for_your_message)
       end
-      redirect_back(fallback_location: help_path)
+      redirect_to(return_location)
     else
       @page_errors = @feedback.errors
       render(:index) && return if request.referer.blank?
@@ -26,6 +26,7 @@ class FeedbacksController < ApplicationController
       template = "#{re_path[:controller]}/#{re_path[:action]}"
       @force_landing_page_render = re_path[:controller] == "landing_pages"
       @page_id = [re_path[:controller], re_path[:action]].join("_")
+      @page_title = I18n.t("meta_titles.#{@page_id}", default: nil)
       @recovery_displays = RecoveryDisplay.with_photo.limit(5) if template == "welcome/index"
       render template: template
     end
@@ -46,9 +47,22 @@ class FeedbacksController < ApplicationController
     redirect_back(fallback_location: root_url) && (return true)
   end
 
+  # The page the form was on, at the part of it that says the message went through. Without
+  # the param that keeps a modal open across reloads, or the form's modal opens again, empty
+  def return_location
+    back = url_from(request.referer)
+    return help_path if back.nil?
+
+    uri = URI.parse(back)
+    uri.query = Rack::Utils.parse_query(uri.query).reject { |key, _| key.start_with?("modal_") }.to_query.presence
+    anchor = params[:return_anchor].to_s
+    uri.fragment = anchor if anchor.match?(/\A[a-z][a-z-]*\z/)
+    uri.to_s
+  end
+
   def permitted_parameters
     params.require(:feedback).permit(:body, :email, :name, :title, :feedback_type, :feedback_hash,
-      :package_size, :phone_number, :contact_name, :additional)
+      :package_size, :phone_number, :contact_name, :contact_role, :additional)
   end
 
   def set_permitted_format

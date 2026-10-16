@@ -48,7 +48,7 @@ module Pages
 
         def emoto_card
           rules = @state && EbikeRuleServices::StateLaws.emoto_rules(@state[:abbr]).presence
-          {either: true, title: render(Pages::EbikeRules::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
+          {either: true, title: render(Atoms::UnbrokenHyphens::Component.new(text: translation(".not_an_ebike"))),
            speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,
            body: rules ? translation(".emoto_summary") : translation(".emoto_limits_body")}
         end

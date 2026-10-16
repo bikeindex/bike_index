@@ -7,6 +7,17 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
+  describe "#for_cities" do
+    it "starts the checker on the visitor's state, and asks for one without a location" do
+      get "/for_cities", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
+      expect(Capybara.string(response.body)).to have_select("state", selected: "Indiana")
+
+      get "/for_cities"
+      expect(Capybara.string(response.body)).to have_css("select#state[required] option[value='']:first-child", text: "Choose a state")
+        .and have_no_css("select#state option[selected]")
+    end
+  end
+
   describe "#for_advocacy" do
     it "redirects to for_community_groups_path" do
       expect(get("/for_advocacy")).to redirect_to(for_community_groups_path)

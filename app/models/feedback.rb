@@ -98,6 +98,10 @@ class Feedback < ApplicationRecord
     str.gsub("_request", "").strip.humanize
   end
 
+  def contact_role=(val)
+    self.feedback_hash = (feedback_hash || {}).merge(contact_role: val)
+  end
+
   def package_size=(val)
     self.feedback_hash = (feedback_hash || {}).merge(package_size: val)
   end
@@ -153,6 +157,10 @@ class Feedback < ApplicationRecord
     (feedback_hash || {})["contact_name"]
   end
 
+  def contact_role
+    (feedback_hash || {})["contact_role"]
+  end
+
   def kind_humanized
     self.class.kind_humanized(kind)
   end
@@ -163,11 +171,12 @@ class Feedback < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.name = name.to_s.strip.presence
     generate_title
     set_user_attrs
     self.email = EmailNormalizer.normalize(email)
     self.kind ||= calculated_kind
-    self.body ||= "lead" if lead?
+    self.body = "lead" if lead? && body.blank?
     self.feedback_type ||= kind
   end
 
