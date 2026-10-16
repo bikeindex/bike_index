@@ -24,7 +24,7 @@ module Admin
 
     def update
       if @manufacturer.update(permitted_parameters)
-        AutocompleteLoaderJob.perform_async
+        AutocompleteLoaderJob.enqueue_reload
         respond_to do |format|
           format.html { redirect_to admin_manufacturer_url(@manufacturer), flash: {success: "Manufacturer Saved!"} }
           format.json { render_manufacturer_json }
@@ -40,7 +40,7 @@ module Admin
     def create
       @manufacturer = Manufacturer.new(permitted_parameters)
       if @manufacturer.save
-        AutocompleteLoaderJob.perform_async
+        AutocompleteLoaderJob.enqueue_reload
         respond_to do |format|
           format.html { redirect_to admin_manufacturer_url(@manufacturer), flash: {success: "Manufacturer Created!"} }
           format.json { render_manufacturer_json }
