@@ -2467,12 +2467,6 @@ nb:
     welcome:
       recovery_stories:
         no_stories_to_display: Ingen gjenopprettingshistorier å vise
-    memberships:
-      edit:
-        free_membership: Bike Index har gitt deg et gratis medlemskap. Send en e-post
-          til support@bikeindex.org hvis du har spørsmål.
-        no_active_membership: Du har ikke et aktivt medlemskap, du må registrere deg
-          for et nytt.
     search:
       registrations:
         set_interpreted_params:
@@ -2520,6 +2514,9 @@ nb:
           fungerer.
         state_title: "%{state} lover om elsykler"
         title: Regler for elsykkel
+    memberships:
+      create:
+        already_a_member: Du har allerede et medlemskap.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5474,6 +5471,8 @@ nb:
         copy_id: Kopier ID
       sticker:
         copy_sticker: Kopier klistremerke
+      recovery_display_card:
+        recovered: Gjenopprettet
     pages:
       messages:
         thread_show:
@@ -6261,6 +6260,25 @@ nb:
             update_marketplace_listing: Oppdater markedsplassoppføringen!
             updated: Oppdatert
             user_hidden: Skjult for andre brukere
+        memberships:
+          show:
+            complimentary: Bike Index ga deg dette medlemskapet, så du betaler ikke
+              for det.
+            ends: Slutter
+            manage_billing: Administrer fakturering
+            new_members_pay: Nye %{level}-medlemmer betaler %{current_price}.
+            not_a_member: Du er ikke medlem av Bike Index.
+            per_month: per måned
+            per_year: per år
+            see_membership_tiers: Se medlemskapsnivåer
+            started: Startet
+            you_are_a_member: Du er et %{level}-medlem
+            you_pay_less: Du betaler mindre enn nye medlemmer. %{level} er nå %{current_price},
+              og du beholder prisen så lenge medlemskapet ditt er aktivt og du forblir
+              på dette abonnementet.
+            you_pay_the_current_price: Du betaler gjeldende pris for %{level}.
+            your_membership: Ditt medlemskap
+            your_price: Din pris
       sales:
         new_form:
           record_sale: Rekordsalg
@@ -6307,7 +6325,6 @@ nb:
           promoted_alerts_title: Sett sykkelen foran nabolaget den ble tatt fra
           questions_people_ask_at_2am: Spørsmål folk stiller klokken 02:00
           read_more_recovery_stories: Les flere historier om gjenoppretting
-          recovered: Gjenopprettet
           recoveries_reported_by_owners: Nylige gjenopprettinger, rapportert av eierne.
           recovery_record: Gjenopprettingslogg
           register_it: Registrer det
@@ -6969,6 +6986,112 @@ nb:
           not_an_ebike: Ikke en elsykkel
           watts_max: "≤%{watts}W"
           watts_min: "%{watts}W+"
+      memberships:
+        new:
+          become_a_member: Bli medlem
+          bike_index_membership: Bike Index-medlemskap
+          bikes_registered_free: sykler registrert, gratis
+          builds_next: Bygger neste
+          choose_your_membership: Velg medlemskapet ditt
+          cycling_cap: Sykkelhette
+          every_tier_keeps_it_free: Hvert nivå holder registeret gratis og finansierer
+            nye funksjoner. Høyere nivåer kommer med flere takk.
+          faq_cancel_answer: Når som helst, fra kontosiden din. Veksle mellom månedlig
+            og årlig fungerer på samme måte.
+          faq_cancel_question: Kan jeg endre nivåer eller avbryte?
+          faq_free_answer: Ja. Registrering, søking og rapportering av tyveri er gratis
+            for alle, for alltid. Medlemskap er måten vi betaler for å holde det slik.
+          faq_free_question: Er det fortsatt gratis å registrere en sykkel selv om
+            jeg ikke blir medlem?
+          faq_gear_answer: Etter at du har registrert deg, sender vi deg en e-post
+            med en postadresse og sender den derfra.
+          faq_gear_question: Når får jeg capsen eller skjorten min?
+          faq_marketplace_answer: Nei. Hvem som helst kan registrere en sykkel uten
+            gebyrer. Medlemmer får annonsene sine forfremmet til toppen.
+          faq_marketplace_question: Må jeg være medlem for å selge på markedsplassen?
+          faq_tax_answer: Bike Index er en ideell organisasjon underlagt 501(c)(3)-loven,
+            EIN 81-4296194. Medlemskap og engangsdonasjoner er fradragsberettigede
+            i USA.
+          faq_tax_question: Er medlemskap fradragsberettiget?
+          free_alerts_body: Tyverirapporter sendes til butikker, politiavdelinger,
+            skoler og syklister i nærheten av der sykkelen ble stjålet.
+          free_alerts_title: Varsler om stjålne sykler
+          free_partners_body: Introduksjon av nye butikker, avdelinger og byer, og
+            hjelp til politiet med å matche gjenvunnede sykler med eierne deres.
+          free_partners_title: Partnere og inndrivelser
+          free_registration_body: Det koster ingenting å registrere, søke etter og
+            sjekke en brukt sykkel, verken for syklister, butikker eller politi. Vi
+            selger ikke syklistdata.
+          free_registration_title: Registrering og søk
+          join_monthly: Bli med som %{level} — %{price}/mnd
+          join_yearly: Bli med som %{level} — %{price}/år
+          keep_bike_index_free: Hold Bike Index gratis for alle syklister
+          keeps_free: Holder seg fri
+          lede: Medlemskap er en månedlig donasjon til Bike Index, en ideell organisasjon.
+            Det betaler for registeret og varslingene om stjålne sykler som får sykler
+            hjem, og det finansierer de nye verktøyene vi bygger videre. Det vil alltid
+            være gratis å registrere en sykkel og rapportere et tyveri. Medlemmer
+            er grunnen til at vi kan love det.
+          live: Aktiv
+          member_gear: Medlemsutstyr
+          member_gear_body: Pluss at medlemmer får sykkelluen fra Bike Index. Kunder
+            får solskjorten. Begge er designet av Kelsey Graywill, og vi sender dem
+            til deg i posten etter at du har blitt medlem.
+          members_keep_it_free: En million sykler er registrert. Medlemmer beholder
+            den gratis den neste millionen.
+          monthly: Månedlig
+          new_tools_for_bike_owners: Nye verktøy for sykkeleiere
+          next: Neste
+          next_ebike_database_body: En global UL-sertifiseringsdatabase
+          next_ebike_database_title: Elsykkeldatabase
+          next_ios_app_body: Registrer og administrer sykler fra telefonen din
+          next_ios_app_title: iOS-appen
+          next_marketplace_body: Kun registrerte sykler, kontrollert mot tyverirapporter
+          next_marketplace_title: En tryggere markedsplass
+          next_oem_parts_body: Fabrikkspesifikasjoner og bilder for hver modell
+          next_oem_parts_title: OEM-deler og arkivbilder
+          next_versioning_body: Hold oversikt over når sykkelen din endres
+          next_versioning_title: Sykkelversjonering
+          official_registry: Det offisielle registeret for mer enn 1000 politiavdelinger,
+            universiteter, byer og butikker
+          or_make_a_one_time_donation: Eller gi en engangsdonasjon
+          partner_organizations: partnerbutikker, politiavdelinger og byer
+          per_month: "/ måned"
+          per_year: "/ år"
+          perk_cycling_cap: Sykkelkappe for medlemmer av Bike Index
+          perk_everything_in_basic: Alt i Basic
+          perk_everything_in_basic_and_plus: Alt i Basic og Plus
+          perk_faster_support: Raskere supportresponser
+          perk_listings_promoted: Markedsplassoppføringene dine ble forfremmet til
+            toppen
+          perk_member_badge: Medlemsmerke på Bike Index-profilen din
+          perk_no_ads: Ingen annonser, hvis vi noen gang viser dem
+          perk_patron_badge: Kundemerke på Bike Index-profilen din
+          perk_promoted_alert: Et gratis varsel hvis sykkelen din blir stjålet
+          perk_sun_shirt: Bike Index Patron solskjorte
+          perk_top_listing_placement: Toppplassering på markedsplassen
+          plans_from: Planer fra %{price} i måneden
+          questions: Spørsmål
+          read_more_recovery_stories: Les flere historier om gjenoppretting
+          recommended: Anbefalt
+          recoveries_reported_by_owners: Hver gjenoppretting rapporteres av personen
+            som fikk sykkelen sin tilbake.
+          stolen_bikes_recovered: stjålne sykler funnet
+          summary_monthly: "%{level} medlemskap, %{price} i måneden"
+          summary_yearly: "%{level} medlemskap, %{price} per år"
+          sun_shirt: Solskjorte
+          tax_deductible_cancel_any_time: Medlemskap og engangsdonasjoner er fradragsberettigede
+            i USA. Du kan når som helst endre nivå eller si opp medlemskapet fra kontoen
+            din.
+          tax_deductible_ein: Medlemskap og engangsdonasjoner er fradragsberettigede
+            i USA. Bike Index er en ideell organisasjon under 501(c)(3), EIN 81-4296194.
+          the_registry_open_to_everyone: Registeret, åpent for alle
+          two_months_free: To måneder gratis
+          value_returned_to_owners: verdi tilbakeført til eierne
+          view_your_membership: Se ditt %{level}-medlemskap
+          wear_the_shield: Bruk skjoldet
+          what_members_make_possible: Hva medlemmer gjør mulig
+          yearly: Årlig
     shared_blocks:
       footer:
         about: Om

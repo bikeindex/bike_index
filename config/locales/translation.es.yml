@@ -2531,12 +2531,6 @@ es:
     welcome:
       recovery_stories:
         no_stories_to_display: No hay historias de recuperación para mostrar
-    memberships:
-      edit:
-        free_membership: Bike Index te ha otorgado una membresía gratuita. Si tienes
-          alguna pregunta, envía un correo electrónico a support@bikeindex.org.
-        no_active_membership: No tienes una membresía activa, tendrás que registrarte
-          para obtener una nueva.
     search:
       registrations:
         set_interpreted_params:
@@ -2588,6 +2582,9 @@ es:
           eléctricas.
         state_title: "%{state} Leyes sobre bicicletas eléctricas"
         title: Normativa sobre bicicletas eléctricas
+    memberships:
+      create:
+        already_a_member: Ya tienes una membresía.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5724,6 +5721,8 @@ es:
         copy_id: Copiar ID
       sticker:
         copy_sticker: Copiar pegatina
+      recovery_display_card:
+        recovered: Recuperado
     pages:
       messages:
         thread_show:
@@ -6532,6 +6531,25 @@ es:
             update_marketplace_listing: "¡Actualiza tu anuncio en el mercado!"
             updated: Actualizado
             user_hidden: Oculto para otros usuarios
+        memberships:
+          show:
+            complimentary: Bike Index te regaló esta membresía, así que no tienes
+              que pagarla.
+            ends: Fin
+            manage_billing: Gestionar la facturación
+            new_members_pay: Los nuevos miembros %{level} pagan %{current_price}.
+            not_a_member: No eres miembro de Bike Index.
+            per_month: por mes
+            per_year: por año
+            see_membership_tiers: Ver niveles de membresía
+            started: Comenzó
+            you_are_a_member: Eres miembro %{level}
+            you_pay_less: Usted paga menos que los nuevos miembros. %{level} ahora
+              es %{current_price}, y usted mantiene su precio mientras su membresía
+              permanezca activa y continúe con este plan.
+            you_pay_the_current_price: Usted paga el precio actual por %{level}.
+            your_membership: Tu membresía
+            your_price: Tu precio
       sales:
         new_form:
           record_sale: Venta récord
@@ -6579,7 +6597,6 @@ es:
           promoted_alerts_title: Deja tu bicicleta frente al barrio del que fue robada.
           questions_people_ask_at_2am: Preguntas que la gente hace a las 2 de la madrugada.
           read_more_recovery_stories: Lee más historias de recuperación
-          recovered: Recuperado
           recoveries_reported_by_owners: Recuperaciones recientes, reportadas por
             sus propietarios.
           recovery_record: historial de recuperación
@@ -7283,6 +7300,120 @@ es:
           not_an_ebike: No es una bicicleta eléctrica
           watts_max: "≤%{watts}W"
           watts_min: "%{watts}W+"
+      memberships:
+        new:
+          become_a_member: Hazte miembro
+          bike_index_membership: Membresía de Bike Index
+          bikes_registered_free: bicicletas registradas, gratis
+          builds_next: Construye a continuación
+          choose_your_membership: Elige tu membresía
+          cycling_cap: gorra de ciclismo
+          every_tier_keeps_it_free: Cada nivel mantiene el registro gratuito y financia
+            nuevas funciones. Los niveles superiores incluyen más agradecimientos.
+          faq_cancel_answer: En cualquier momento, desde la página de tu cuenta. Cambiar
+            entre suscripción mensual y anual funciona de la misma manera.
+          faq_cancel_question: "¿Puedo cambiar de nivel o cancelar?"
+          faq_free_answer: Sí. Registrarse, buscar y denunciar un robo es gratis para
+            todos, para siempre. La membresía es la forma en que financiamos que siga
+            siendo así.
+          faq_free_question: "¿Registrar una bicicleta sigue siendo gratis aunque
+            no me haga socio?"
+          faq_gear_answer: Una vez que te registres, te enviaremos un correo electrónico
+            para solicitarte tu dirección postal y realizaremos el envío desde allí.
+          faq_gear_question: "¿Cuándo recibiré mi gorra o camiseta?"
+          faq_marketplace_answer: No. Cualquiera puede publicar un anuncio de una
+            bicicleta registrada sin costo alguno. Los miembros consiguen que sus
+            anuncios aparezcan en los primeros puestos.
+          faq_marketplace_question: "¿Necesito ser miembro para vender en la plataforma?"
+          faq_tax_answer: Bike Index es una organización sin fines de lucro 501(c)(3),
+            EIN 81-4296194. Las membresías y las donaciones únicas son deducibles
+            de impuestos en los EE. UU.
+          faq_tax_question: "¿La cuota de socio es deducible de impuestos?"
+          free_alerts_body: Los informes de robo se envían a tiendas, departamentos
+            de policía, campus universitarios y ciclistas que se encuentren cerca
+            del lugar donde se sustrajo la bicicleta.
+          free_alerts_title: Alertas de bicicletas robadas
+          free_partners_body: Incorporar nuevos comercios, departamentos y ciudades,
+            y ayudar a la policía a identificar a sus propietarios en relación con
+            las bicicletas recuperadas.
+          free_partners_title: Socios y recuperaciones
+          free_registration_body: Registrar, buscar y verificar una bicicleta usada
+            es gratuito para ciclistas, tiendas y policía. No vendemos datos de los
+            ciclistas.
+          free_registration_title: Registro y búsqueda
+          join_monthly: Únete como %{level} — %{price}/mo
+          join_yearly: Únete como %{level} — %{price}/año
+          keep_bike_index_free: Mantengamos Bike Index gratuito para todos los ciclistas.
+          keeps_free: Se mantiene gratis
+          lede: La membresía consiste en una donación mensual a Bike Index, una organización
+            sin fines de lucro. Esta donación cubre el registro y las alertas de bicicletas
+            robadas que permiten recuperarlas, además de financiar las nuevas herramientas
+            que desarrollamos. Registrar una bicicleta y denunciar un robo siempre
+            será gratuito. Gracias a nuestros miembros, podemos garantizarlo.
+          live: Vivir
+          member_gear: Equipo de miembro
+          member_gear_body: Los miembros Plus reciben la gorra de ciclismo Bike Index.
+            Los patrocinadores reciben la camiseta de protección solar. Ambas prendas
+            están diseñadas por Kelsey Graywill y te las enviamos por correo después
+            de que te unas.
+          members_keep_it_free: Un millón de bicicletas están registradas. Los miembros
+            mantienen el servicio gratuito para el próximo millón.
+          monthly: Mensual
+          new_tools_for_bike_owners: Nuevas herramientas para propietarios de bicicletas
+          next: Próximo
+          next_ebike_database_body: Base de datos global de certificación UL
+          next_ebike_database_title: Base de datos de bicicletas eléctricas
+          next_ios_app_body: Registra y gestiona tus bicicletas desde tu teléfono.
+          next_ios_app_title: La aplicación iOS
+          next_marketplace_body: Solo se admiten bicicletas matriculadas, con historial
+            de robos verificado.
+          next_marketplace_title: Un mercado más seguro
+          next_oem_parts_body: Especificaciones de fábrica y fotos para cada modelo.
+          next_oem_parts_title: Piezas OEM e imágenes de stock
+          next_versioning_body: Lleva un registro de los cambios que haga tu bicicleta.
+          next_versioning_title: Versión de bicicletas
+          official_registry: El registro oficial de más de 1.000 departamentos de
+            policía, universidades, ciudades y tiendas.
+          or_make_a_one_time_donation: O bien, haga una donación única.
+          partner_organizations: tiendas asociadas, departamentos de policía y ciudades
+          per_month: "/ mes"
+          per_year: "/ año"
+          perk_cycling_cap: Gorra de ciclismo para miembros de Bike Index
+          perk_everything_in_basic: Todo en básico
+          perk_everything_in_basic_and_plus: Todo incluido en los paquetes Básico
+            y Plus.
+          perk_faster_support: Respuestas de soporte más rápidas
+          perk_listings_promoted: Tus anuncios en el mercado se promocionan a la parte
+            superior.
+          perk_member_badge: Insignia de miembro en tu perfil de Bike Index.
+          perk_no_ads: Sin anuncios, si es que alguna vez los mostramos.
+          perk_patron_badge: Insignia de patrocinador en tu perfil de Bike Index
+          perk_promoted_alert: Una alerta promocional gratuita si te roban la bicicleta.
+          perk_sun_shirt: Camiseta de protección solar Bike Index Patron
+          perk_top_listing_placement: Posicionamiento destacado en el mercado
+          plans_from: Planes de %{price} al mes
+          questions: Preguntas
+          read_more_recovery_stories: Lee más historias de recuperación
+          recommended: Recomendado
+          recoveries_reported_by_owners: Cada recuperación es reportada por la persona
+            que recuperó su bicicleta.
+          stolen_bikes_recovered: Recuperan bicicletas robadas
+          summary_monthly: "%{level} membresía, %{price} un mes"
+          summary_yearly: "%{level} membresía, %{price} un año"
+          sun_shirt: Camisa de sol
+          tax_deductible_cancel_any_time: Las membresías y las donaciones únicas son
+            deducibles de impuestos en los Estados Unidos. Puedes cambiar de nivel
+            o cancelar tu membresía en cualquier momento desde tu cuenta.
+          tax_deductible_ein: Las membresías y las donaciones únicas son deducibles
+            de impuestos en los Estados Unidos. Bike Index es una organización sin
+            fines de lucro 501(c)(3), EIN 81-4296194.
+          the_registry_open_to_everyone: El registro, abierto a todos
+          two_months_free: Dos meses gratis
+          value_returned_to_owners: valor devuelto a los propietarios
+          view_your_membership: Consulta tu membresía %{level}
+          wear_the_shield: Lleva el escudo
+          what_members_make_possible: Lo que los miembros hacen posible
+          yearly: Anual
     shared_blocks:
       footer:
         about: Acerca
