@@ -63,6 +63,7 @@ Rails.application.routes.draw do
   get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
   get "ebike-rules/:abbr", to: "ebike_rules#show", as: :ebike_rules_state, constraints: {abbr: /[a-z]{2}/i}
   get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike-rules") }
+  get "marketplace/how-it-works", to: "marketplace#how_it_works", as: :marketplace_how_it_works
 
   resource :session, only: %i[new create destroy] do
     collection do

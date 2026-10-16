@@ -3858,6 +3858,9 @@ en:
     manufacturers_index: >-
       Bicycle related manufacturers listed on Bike Index - all the brands you know
       and then some.
+    marketplace_how_it_works: >-
+      How buying and selling works on the Bike Index Marketplace, where every bike
+      listed is registered and checked against the stolen bike database.
     my_accounts_show: Your bikes on Bike Index
     news_index: Read Bike Index news. Also, periodically, learn magic spells.
     registrations_embed: >-
@@ -3902,6 +3905,7 @@ en:
     landing_pages_for_schools: Bike Index for Schools
     landing_pages_show: "%{organization} Bike Registration"
     manufacturers_index: Bike Manufacturers
+    marketplace_how_it_works: How the Bike Index Marketplace works
     my_accounts_show: You on Bike Index
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
