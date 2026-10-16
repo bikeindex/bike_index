@@ -4,7 +4,7 @@ module EmailNormalizer
   def normalize(email = nil)
     return nil unless email.present?
 
-    (email || "").strip.downcase
+    email.delete("\u0000").strip.downcase
   end
 
   def obfuscate(email = nil)

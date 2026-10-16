@@ -56,6 +56,15 @@ RSpec.describe SessionsController, type: :request do
       end
     end
 
+    context "email with a null byte" do
+      it "redirects to sign up rather than raising" do
+        identify("1\u0000%2527%2522")
+        expect(response).to redirect_to(new_user_path(email: "1\u0000%2527%2522"))
+        follow_redirect!
+        expect(response.status).to eq 200
+      end
+    end
+
     context "blank email" do
       it "re-renders the email step" do
         identify("")
