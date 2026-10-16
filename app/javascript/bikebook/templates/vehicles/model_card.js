@@ -7,7 +7,7 @@ export const MODEL_CARDS_CLASSES = 'tw:grid tw:grid-cols-[repeat(auto-fill,minma
 
 // The newest year a model is sold in, as the search's cards title a bike by its year, and the range when it's more
 const cardYears = ({ first_year: first, final_year: final }) => {
-  const year = final ?? (first && new Date().getFullYear())
+  const year = final ?? (first && Math.max(first, new Date().getFullYear()))
   if (!first || first === year) return { year }
   return { year, range: `${first}–${final ?? 'current'}` }
 }
