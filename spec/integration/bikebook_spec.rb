@@ -7,6 +7,10 @@ RSpec.describe "Bikebook", :js, type: :system do
 
   def vehicle_field = find_field("Select a bike, choose multiple to compare them")
 
+  # The filters' hidden listboxes hold ~160 options, which Capybara text-filters a round trip each -
+  # page-wide, one pass can outlast its wait on a loaded runner
+  def vehicle_option = "#vehicle_models-hw-listbox [role='option']"
+
   # The overlay showing a combobox's selection with its code muted spans the input, though it rendered in the closed filters
   def expect_display_over(label)
     field = find_field(label)
@@ -96,7 +100,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     type_into(vehicle_field, "level 4 rec")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(2 matching models\)/i)
-    retry_on_detach { find("[role='option']", text: "Aventón Level 4 REC Step-Through").click }
+    retry_on_detach { find(vehicle_option, text: "Aventón Level 4 REC Step-Through").click }
     # its basics first, beside its photo
     expect(page).to have_css("[aria-label='Overview'] thead th", text: "Level 4 REC Step-Through")
     expect(page).to have_css("nav[aria-label='Views'] a[aria-current='page']", exact_text: "Overview")
@@ -129,7 +133,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     # second's card highlighting where it differs
     type_into(vehicle_field, "level_2_step")
     expect(page).to have_css(".hw-combobox__group__label", text: /\(1 matching model\)/i)
-    retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
+    retry_on_detach { find(vehicle_option, text: "Aventón Level 2 Step-Through").click }
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 3)
     expect(page).to have_current_path("/bikebook?search=1&vehicle_models=m/aventon/2026/level_4_rec_step_through,m/aventon/2022/level_2_step_through")
     # the render re-runs the pick's search in its combobox, which settles unlogged
@@ -579,13 +583,13 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path
     expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)", wait: 10)
     type_into(vehicle_field, "haul")
-    expect(page).to have_css("[role='option']", count: 1, text: "$3,599.99")
+    expect(page).to have_css(vehicle_option, count: 1, text: "$3,599.99")
     # the URL says the search shows, but not what's typed or the visitor's own market
     expect(page).to have_current_path("/bikebook?search=1")
     # but a model's exact id finds it, though the market leaves it out, saying so rather than counting it
     type_into(vehicle_field, "m/specialized/2025/haul_st")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(model doesn't match filters)")
-    expect(page).to have_css("[role='option']", count: 1).and have_no_css("[role='option']", text: "$3,599.99")
+    expect(page).to have_css(vehicle_option, count: 1).and have_no_css(vehicle_option, text: "$3,599.99")
     type_into(vehicle_field, "m/specialized/2025/haul_st_ca")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(1 matching model)")
 
@@ -667,7 +671,7 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page.evaluate_script("history.length")).to eq entries + 1
 
     type_into(vehicle_field, "level_2_step")
-    retry_on_detach { find("[role='option']", text: "Aventón Level 2 Step-Through").click }
+    retry_on_detach { find(vehicle_option, text: "Aventón Level 2 Step-Through").click }
     expect(page).to have_css("[data-comparison] article", count: 2)
     expect(page).to have_no_css(canonical, visible: :all)
 
@@ -913,7 +917,7 @@ RSpec.describe "Bikebook", :js, type: :system do
 
     # Small's top tube is nearer Soltera's Medium than its Small
     type_into(vehicle_field, "soltera")
-    retry_on_detach { find("[role='option']", text: "Aventón Soltera 3 ADV").click }
+    retry_on_detach { find(vehicle_option, text: "Aventón Soltera 3 ADV").click }
     expect(page).to have_css("[data-comparison] article", count: 2)
     click_link "Sizes & geometry"
     expect_size.call("Soltera 3 ADV", "Medium")
