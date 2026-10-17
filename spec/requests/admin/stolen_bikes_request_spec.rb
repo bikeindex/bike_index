@@ -27,6 +27,20 @@ RSpec.describe Admin::StolenBikesController, type: :request do
         expect(assigns(:stolen_records)).to match_array([])
       end
 
+      context "with a stolen record without a location" do
+        let!(:stolen_record_without_location) do
+          FactoryBot.create(:stolen_bike, latitude: nil, longitude: nil).current_stolen_record
+        end
+        it "counts and lists it separately" do
+          expect(stolen_record_without_location.latitude).to be_nil
+          get base_url
+          expect(assigns(:stolen_records)).to match_array([stolen_record])
+          expect(assigns(:unapproved_without_location_count)).to eq 1
+          get "#{base_url}?search_without_location=true"
+          expect(assigns(:stolen_records)).to match_array([stolen_record_without_location])
+        end
+      end
+
       context "with a period" do
         it "narrows by it" do
           stolen_record.update_column :created_at, 1.month.ago
