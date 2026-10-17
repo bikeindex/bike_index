@@ -3,31 +3,33 @@
 # Table name: social_accounts
 # Database name: primary
 #
-#  id              :integer          not null, primary key
-#  account_info    :jsonb
-#  active          :boolean          default(FALSE), not null
-#  address_string  :string
-#  append_block    :string
-#  city            :string
-#  consumer_key    :string           not null
-#  consumer_secret :string           not null
-#  default         :boolean          default(FALSE), not null
-#  language        :string
-#  last_error      :string
-#  last_error_at   :datetime
-#  latitude        :float
-#  longitude       :float
-#  national        :boolean          default(FALSE), not null
-#  neighborhood    :string
-#  screen_name     :string           not null
-#  street          :string
-#  user_secret     :string           not null
-#  user_token      :string           not null
-#  zipcode         :string
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  country_id      :bigint
-#  state_id        :bigint
+#  id               :integer          not null, primary key
+#  account_info     :jsonb
+#  active           :boolean          default(FALSE), not null
+#  address_string   :string
+#  append_block     :string
+#  city             :string
+#  consumer_key     :string           not null
+#  consumer_secret  :string           not null
+#  default          :boolean          default(FALSE), not null
+#  language         :string
+#  last_error       :string
+#  last_error_at    :datetime
+#  latitude         :float
+#  longitude        :float
+#  national         :boolean          default(FALSE), not null
+#  neighborhood     :string
+#  postal_code      :string
+#  screen_name      :string           not null
+#  street           :string
+#  user_secret      :string           not null
+#  user_token       :string           not null
+#  zipcode          :string
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  country_id       :bigint
+#  region_record_id :bigint
+#  state_id         :bigint
 #
 # Indexes
 #
