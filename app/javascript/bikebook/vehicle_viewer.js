@@ -62,8 +62,11 @@ export class VehicleViewer {
         comparisonTable({ ...compared, part: 'geometry', beside: true })}</div>${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, value) =>
         html`<div class="tw:-mx-(--gutter)">${sizesOf({ presenter, data, others: others(value), selectedSize: selectedSizes.get(value), sizePath: sizePath(value) })}</div>`,
       { keyed: true }))}`,
-      components: () => cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => componentsOf({ presenter, data, others: others(value), peers: vehicles.map((each) => each.data) }),
-        { lead: (data, value) => runningGearOf({ presenter, data, others: others(value) }) }), true),
+      components: () => {
+        const components = componentsOf({ presenter, vehicles, others })
+        return cardRow('tw:mt-6', cards('components', 'No components listed', (data, value) => components.get(value),
+          { lead: (data, value) => runningGearOf({ presenter, data, others: others(value) }) }), true)
+      },
       motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, value) => motorsOf({ presenter, data, others: others(value) }))),
       all: () => {
         const full = vehicles.map(({ data, value }, index) => {
