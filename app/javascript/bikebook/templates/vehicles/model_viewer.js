@@ -6,7 +6,7 @@ import { definitionListContainer } from 'bikebook/templates/ui/definition_list/c
 import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { jsonDisplay } from 'bikebook/templates/ui/json_display'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
-import { componentGroup } from 'bikebook/templates/vehicles/component_group'
+import { componentGroup, pairedComponents } from 'bikebook/templates/vehicles/component_group'
 import { geometryCard } from 'bikebook/templates/vehicles/geometry_card'
 import { modelYears } from 'bikebook/templates/vehicles/model_years'
 import { motorSection, unknownCertification } from 'bikebook/templates/vehicles/motor_section'
@@ -108,8 +108,15 @@ export const runningGearOf = ({ presenter, data, others }) => {
 const sideBySide = (columns) => html`<div class="tw:@container"><div class="tw:flex tw:flex-col tw:@min-[600px]:flex-row tw:@min-[600px]:gap-6">${columns.map((column) =>
   html`<div class="tw:contents tw:@min-[600px]:block tw:@min-[600px]:min-w-0 tw:@min-[600px]:flex-1">${column}</div>`)}</div></div>`
 
-// A vehicle's components by group, marked where they differ from `others`'
-export const componentsOf = ({ presenter, data, others }) => html`<div class="tw:space-y-4">${new ModelViewer({ presenter, data, others }).components()}</div>`
+// Each of `vehicles`' components by group, by its `value`, marked where they differ from its `others`', each group
+// listing a row for every component any of them has, so each card's rows line up with the rest's
+export const componentsOf = ({ presenter, vehicles, others }) => {
+  const viewers = vehicles.map(({ data }) => new ModelViewer({ presenter, data, others: [] }))
+  const groups = viewers[0].componentRows(viewers.map((viewer) => viewer.vehicle))
+  return new Map(vehicles.map(({ value }, index) => [value, html`<div class="tw:space-y-4">${viewers[index].components({
+    groups, index, compared: others(value).map((other) => vehicles.findIndex(({ data }) => data === other))
+  })}</div>`]))
+}
 
 class ModelViewer {
   constructor ({ presenter, data, value, comparing, idSuffix, others, removePath, selectedSize, sizePath }) {
@@ -771,22 +778,33 @@ class ModelViewer {
       sizes.map((size) => geometryCard({ presenter: this.presenter, size, others, selected: present(this.selectedSize) && size.name === this.selectedSize, href: this.sizePath?.(size.name) }))}</div>`
   }
 
-  components () {
-    const components = this.vehicle.components
-    if (blank(components)) return nothing
-
+  // Each component group's rows across `vehicles`, a cell per vehicle, in order of the first cell's type
+  componentRows (vehicles) {
     const groups = Object.keys(this.kit.component_groups)
     const group = (type) => this.presenter.componentGroups.get(type) ?? groups.at(-1)
-    const label = (component) => typeLabel(component).toLowerCase()
-    const tables = groups.flatMap((name) => {
-      const members = components.filter((component) => group(component.type) === name)
-      if (members.length === 0) return []
+    const label = (row) => typeLabel(row.find(Boolean)).toLowerCase()
+    return groups.map((name) => [name, pairedComponents(vehicles.map((vehicle) => array(vehicle.components).filter((component) => group(component.type) === name)))
+      .sort((a, b) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)])
+  }
 
-      const others = this.others.map((other) => array(other.components).filter((component) => group(component.type) === name))
-      const sorted = [...members].sort((a, b) => label(a) < label(b) ? -1 : label(a) > label(b) ? 1 : 0)
-      return [componentGroup({ presenter: this.presenter, name, components: sorted, others })]
+  // Its cells of the `groups`' rows, at `index`, marked against the `compared` cells. Given a `layout`, every row,
+  // blank where only those have one, so it lines up with the other cards
+  components (layout) {
+    if (blank(this.vehicle.components)) return nothing
+
+    const { groups, index, compared } = layout ??
+      { groups: this.componentRows([this.vehicle, ...this.others]), index: 0, compared: this.others.map((_, at) => at + 1) }
+    return groups.flatMap(([name, rows]) => {
+      const shown = layout ? rows : rows.filter((row) => row[index])
+      if (shown.length === 0) return []
+
+      return [componentGroup({
+        presenter: this.presenter,
+        name,
+        rows: shown.map((row) => ({ component: row[index], counterparts: compared.map((at) => row[at]) })),
+        alignKey: layout && name
+      })]
     })
-    return tables
   }
 }
 
