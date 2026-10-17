@@ -218,23 +218,17 @@
                     <% if bike_attr == "address" %>
                       <td><%= translation(".address") %></td>
                       <td>
-                        <% address = @bike.registration_address %>
+                        <% address_record = @bike.registration_address_record %>
 
                         <% if @bike.valid_mailing_address? %>
                           <small>
-                            <%= render UI::AddressDisplay::Component.new(address_record: BikeServices::CalculateLocation.registration_address_record(@bike), visible_attribute: :street) %>
+                            <%= render UI::AddressDisplay::Component.new(address_record:, visible_attribute: :street) %>
                           </small>
                         <% else %>
                           <%# Don't show address if it's the organizations default address %>
-                          <% unless address == @organization.default_location&.address_hash_legacy %>
-                            <% address.except("latitude", "longitude", "country").each do |k, v| %>
-                              <span class="less-strong">
-                                <%= k == "address" ? "street" : k %>:
-                              </span>
-
-                              <%= v %>
-                              <br>
-                            <% end %>
+                          <% unless address_record&.internal_address_attrs == @organization.default_location&.address_record&.internal_address_attrs %>
+                            <%= render UI::AddressDisplay::Component.new(address_record:, visible_attribute: :street) %>
+                            <br>
                           <% end %>
                           <span class="text-warning">
                             <small>invalid address</small>

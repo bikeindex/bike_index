@@ -25,11 +25,6 @@ module BikeServices
       end
     end
 
-    def registration_address_hash(bike, address_record_id: false)
-      (registration_address_record(bike)&.address_hash_legacy(address_record_id:) || {})
-        .with_indifferent_access
-    end
-
     # Set the bike's location data (lat/long, city, postal code, country, etc.)
     #
     # Geolocate based on the full current stolen record address, if available.
@@ -58,22 +53,23 @@ module BikeServices
     # of precedence:
     #
     # 1. The current parking notification/impound record, if one is present
-    # 2. #registration_address (which prioritizes user address)
+    # 2. #registration_address_record (which prioritizes user address)
     # 3. The creation organization address (so we have a general area for the bike)
-    # prefer with street address, fallback to anything with a latitude, use hashes (not obj) because registration_address
+    # prefer with street address, fallback to anything with a latitude
     def location_record_coordinates(bike)
-      l_hashes = [
-        bike.current_impound_record&.address_hash_legacy,
-        bike.current_parking_notification&.address_hash_legacy,
-        bike.registration_address(true, address_record_id: true), # temporary cludge?
-        bike.creation_organization&.default_location&.address_hash_legacy
+      registration_record = registration_address_record(bike)
+      records = [
+        bike.current_impound_record&.address_record,
+        bike.current_parking_notification,
+        registration_record,
+        bike.creation_organization&.default_location&.address_record
       ].compact
-      l_hash = l_hashes.find { |rec| rec&.dig("street").present? } ||
-        l_hashes.find { |rec| rec&.dig("latitude").present? }
-      return {} unless l_hash.present?
+      record = records.find { it.street.present? } || records.find { it.latitude.present? }
+      return {} if record.blank?
 
       # Only ever respond with the coordinates
-      l_hash.slice("latitude", "longitude", "address_record_id")
+      coordinates = {"latitude" => record.latitude, "longitude" => record.longitude}
+      (record == registration_record) ? coordinates.merge("address_record_id" => record.id) : coordinates
     end
 
     conceal :location_record_coordinates

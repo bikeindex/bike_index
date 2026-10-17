@@ -55,7 +55,7 @@ module Pages
             def address_hash = @address_hash ||= @bike.address_hash
 
             def registration_address
-              @registration_address ||= @bike.registration_address
+              @registration_address ||= @bike.registration_address_record&.address_hash
             end
 
             # Rendered JSON-ish rather than as a ruby hash, to make it a little easier to read

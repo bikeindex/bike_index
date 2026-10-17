@@ -736,29 +736,24 @@ class Bike < ApplicationRecord
   end
 
   def valid_mailing_address?
-    addy = registration_address
-    return false if addy.blank? || addy.values.all?(&:blank?)
-    return false if addy["street"].blank? || addy["city"].blank?
-    return true if creation_organization&.default_location.blank?
+    address_record = registration_address_record
+    return false if address_record&.street.blank? || address_record.city.blank?
 
-    creation_organization.default_location.address_hash_legacy != addy
+    default_address_record = creation_organization&.default_location&.address_record
+    address_record.internal_address_attrs != default_address_record&.internal_address_attrs
   end
 
   def mailing_address_record
-    BikeServices::CalculateLocation.registration_address_record(self) if valid_mailing_address?
+    registration_address_record if valid_mailing_address?
+  end
+
+  def registration_address_record
+    BikeServices::CalculateLocation.registration_address_record(self)
   end
 
   def address_hash
     current_stolen_record&.address_hash || current_impound_record&.address_hash ||
       address_record&.address_hash
-  end
-
-  def registration_address(unmemoize = false, address_record_id: false)
-    # unmemoize is necessary during save, because things may have changed
-    return @registration_address if !unmemoize && defined?(@registration_address)
-
-    @registration_address =
-      BikeServices::CalculateLocation.registration_address_hash(self, address_record_id:)
   end
 
   def external_image_urls
