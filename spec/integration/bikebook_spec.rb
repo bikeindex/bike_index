@@ -60,14 +60,24 @@ RSpec.describe "Bikebook", :js, type: :system do
     visit bikebook_path
     # the search is an unusable placeholder until the catalog loads
     expect(page).to have_no_css("[inert]", wait: 10)
-    # the catalog's 30 models, down to their leading place
-    expect(page).to have_css("h1", exact_text: "The world’s bicycle library — search, compare, and find your next ride across 30+ models.")
 
     # Nothing picked shows how it works, until it's dismissed, which outlasts a reload
     tips = "[aria-label='How to use Bike Book']"
     expect(page).to have_css(tips).and have_link("Trek Marlin 5 vs Specialized Rockhopper Sport", href: %r{vehicle_models=m/trek/2026/marlin_5_gen_3,})
+    # and, filtered or not, some of the catalog to start from, in its order: half e-bikes, as far as the five models
+    # that aren't go, each a class legal where the visitor is (so no Segway GT3 Pro, Haul ST CA or Sur-Ron), and at
+    # least three at $1,500 or less
+    expect(page).to have_text("30 models to compare.")
+    expect(find("[aria-label='Models to compare']").all("a").map { it[:href][/vehicle_models=(.+)/, 1] }).to eq %w[m/aventon/2026/current_exp
+      m/aventon/2025/aventure_m m/aventon/2026/ramblas_adv m/aventon/2026/level_4_adv m/specialized/2025/haul_st m/aventon/2025/abound_lr
+      m/aventon/2026/soltera_3_adv m/kris_holm/2023/kh36 m/kris_holm/2023/kh29 m/kris_holm/2023/kh27_5 m/kris_holm/2023/kh24 m/kris_holm/2023/kh20]
     within(tips) { click_on "More filters" }
     expect(page).to have_css("#vehicle-filters", visible: true)
+    # which a filter changes in place
+    check "Human powered (Acoustic)"
+    expect(page).to have_text("5 models match your filters.")
+    expect(all("[aria-label='Models to compare'] a").map { it[:href][/vehicle_models=(.+)/, 1] })
+      .to eq %w[m/kris_holm/2023/kh36 m/kris_holm/2023/kh29 m/kris_holm/2023/kh27_5 m/kris_holm/2023/kh24 m/kris_holm/2023/kh20]
     find("button[aria-label='Dismiss tips']").click
     expect(page).to have_no_css(tips).and have_text(/nothing selected yet/i)
     # focus moves to what replaced the button pressed
@@ -608,9 +618,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "US", "CF-Region" => "New Jersey") }
     visit bikebook_path
     expect(page).to have_no_css("[inert]", wait: 10)
-    # its state summarized in the closed filters
-    expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "jurisdiction for e-vehicles: New Jersey")
-    # but as a clear returns to it, nothing to clear
+    # its state left out of the closed filters' summary, and as a clear returns to it, nothing to clear
+    expect(page).to have_no_css("[aria-label='Applied filters'] li", visible: :all)
     expect(page).to have_no_link("Clear filters")
     click_on "More filters", match: :first
     expect(page).to have_field("Jurisdiction", with: "New Jersey (NJ)", placeholder: "United States")
@@ -619,8 +628,8 @@ RSpec.describe "Bikebook", :js, type: :system do
     expect(page).to have_current_path("/bikebook?filters=1")
     check "Low-Speed Electric Bicycle"
     expect(page).to have_current_path(/[?&]jurisdiction=NJ\b/)
-    # with a class checked, it's the classification
-    expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "e-bike classification: Low-Speed Electric Bicycle (New Jersey)", visible: :all)
+    # a checked class summarized without it
+    expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "e-bike classification: Low-Speed Electric Bicycle", visible: :all)
     clear_jurisdiction
     expect(page).to have_current_path(/[?&]jurisdiction=US\b/)
     # and outside the US market there are none
@@ -661,12 +670,35 @@ RSpec.describe "Bikebook", :js, type: :system do
     # Filters with nothing picked say what they leave, and lead into the list or back to the filters
     visit bikebook_path(price_max: 3000)
     expect(page).to have_text("20 models match your filters.", wait: 10)
-    # under the tips' card
+    # under the tips' card, over some of what they leave: a manufacturer not yet listed first, then an activity, then a
+    # model group, and both models at $1,500 or less. Each is an e-bike, as the market has no other under $3,000
     expect(page).to have_css("[data-bikebook--tips-target='prompt'] + p", text: "20 models match your filters.")
-    click_on "Browse them"
+    featured = find("[aria-label='Models to compare']")
+    expect(featured.all("a").map { it[:href][/vehicle_models=(.+)/, 1] }).to eq %w[m/aventon/2025/aventure_m m/aventon/2026/ramblas_adv
+      m/aventon/2026/level_4_adv m/aventon/2026/level_4_adv_step_through m/specialized/2025/haul_st m/aventon/2025/abound_lr
+      m/aventon/2025/aventure_3 m/aventon/2025/aventure_3_step_through m/aventon/2024/sinch_2_5 m/aventon/2025/pace_4_step_through
+      m/aventon/2026/soltera_3_adv m/aventon/2024/soltera_2_5]
+    click_on "Search them"
     expect(page).to have_css("#vehicle_models-hw-listbox [role='option']", minimum: 1)
+    vehicle_field.send_keys(:escape)
+    # titled by the newest year it's sold in, as the search's cards title a bike, over the years it's been sold
+    haul_st = featured.find("li", text: "Specialized Haul ST")
+    expect(haul_st).to have_link(exact_text: "#{Time.current.year} Specialized Haul ST").and have_text("2025–current")
+    # each is picked as the search's option is
+    haul_st.find("a").click
+    expect(page).to have_css("[aria-label='Overview'] thead th", text: "Haul ST")
+    expect(page).to have_current_path("/bikebook?price_max=3000&vehicle_models=m/specialized/2025/haul_st")
+    expect(page).to have_css(".hw-combobox__chip", text: "Specialized Haul ST")
+    # filters leaving no legal e-bike feature what they do leave
+    visit bikebook_path(vehicle_type: "e_motorcycle")
+    expect(page).to have_css("[aria-label='Models to compare'] a", text: "Sur-Ron", wait: 10)
+    # outside the US, an e-bike is legal by the market's own e-bike law, which the Canadian model is under with no US class
+    visit bikebook_path(market: "CA")
+    expect(page).to have_css("[aria-label='Models to compare'] a", text: "Specialized Haul ST", wait: 10)
     visit bikebook_path(primary_activity: "atb_gravel", price_max: 1500)
     expect(page).to have_text("No models match your filters.", wait: 10)
+    # the example whose filters these are, active
+    expect(page).to have_css("a[data-active='true']", count: 1, exact_text: "Gravel bikes under $1,500")
     click_on "Change filters"
     expect(page).to have_css("#vehicle-filters", visible: true)
     # as the steps' More filters does, through the panel's own collapse, focusing its first field
@@ -953,6 +985,10 @@ RSpec.describe "Bikebook", :js, type: :system do
         "bikebook/templates/ui/tooltip#tooltip", "{ text: '#ff0000', content: html`<span>red</span>` }")
       expect_template(UI::Tooltip::Component.new.with_body_content("<em>Internal</em> routing".html_safe),
         "bikebook/templates/ui/tooltip#tooltip", "{ body: html`<em>Internal</em> routing` }")
+
+      expect_template(UI::Badge::Component.new(text: "Bike"), "bikebook/templates/ui/badge#badge", "{ text: 'Bike' }")
+      expect_template(UI::Badge::Component.new(text: "⚡", title: "E-vehicle", color: :purple), "bikebook/templates/ui/badge#badge",
+        "{ text: '⚡', title: 'E-vehicle', color: 'purple' }")
 
       expect_template(UI::IconChevron::Component.new(size: :md), "bikebook/templates/ui/icon_chevron#iconChevron", "{ size: 'md' }")
       expect_template(UI::IconChevron::Component.new, "bikebook/templates/ui/icon_chevron#iconChevron", "undefined")

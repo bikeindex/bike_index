@@ -18,11 +18,19 @@ export class VehicleViewer {
   }
 
   // The vehicles at `url` in the view it picks, whose links keep its other params, compared in the sizes it picks or
-  // the nearest to the `preferredSize`. With none, the `search`'s count and whether filters narrow it
+  // the nearest to the `preferredSize`. With none, the `search`'s count, whether filters narrow it, and its featured models
   render (vehicles, url, preferredSize, search) {
-    if (vehicles.length === 0) return emptyState({ pathname: url.pathname, ...search })
-
     const { presenter } = this
+    if (vehicles.length === 0) {
+      return emptyState({
+        url,
+        vehiclePath: (id) => pathWith(url, { vehicle_models: id }),
+        placeholderUrl: presenter.kit.placeholder_url,
+        currencies: presenter.vocabulary.currencies,
+        ...search
+      })
+    }
+
     const shown = Object.keys(VIEWS).filter((each) => each !== 'motors' || vehicles.some(({ data }) => present(data.motors)))
     const requested = url.searchParams.get('view')
     const view = shown.includes(requested) ? requested : 'basics'

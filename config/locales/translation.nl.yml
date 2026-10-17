@@ -2237,12 +2237,6 @@ nl:
           left_organization: Je hebt %{org_name} verlaten.
           unable_to_leave: 'Kan %{org_name} niet verlaten: neem contact op met support@bikeindex.org
             voor hulp.'
-    memberships:
-      edit:
-        free_membership: Bike Index heeft u een gratis lidmaatschap gegeven. Stuur
-          een e-mail naar support@bikeindex.org als u vragen hebt.
-        no_active_membership: Als u nog geen actief lidmaatschap heeft, moet u zich
-          aanmelden voor een nieuw lidmaatschap.
     search:
       registrations:
         set_interpreted_params:
@@ -2293,6 +2287,9 @@ nl:
           bekijk hoe de e-bikeklassen werken.
         state_title: "%{state} e-bike wetgeving"
         title: Regels voor e-bikes
+    memberships:
+      create:
+        already_a_member: Je hebt al een lidmaatschap.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -4474,6 +4471,7 @@ nl:
       name_required: De naam van de eigenaar is vereist voor registratie.
       unable_to_save: Het is ons niet gelukt om uw registratie op te slaan. Probeer
         het later opnieuw.
+      description_stolen_required: Vertel ons alstublieft wat er is gebeurd.
     menu_items_account:
       logout: Uitloggen
       marketplace_messages: Marktplaatsberichten
@@ -5631,6 +5629,8 @@ nl:
         copy_id: Kopieer ID
       sticker:
         copy_sticker: Kopieersticker
+      recovery_display_card:
+        recovered: Hersteld
     pages:
       messages:
         thread_show:
@@ -6437,6 +6437,25 @@ nl:
             update_marketplace_listing: Update marktplaatsvermelding!
             updated: Bijgewerkt
             user_hidden: Verborgen voor andere gebruikers
+        memberships:
+          show:
+            complimentary: Bike Index heeft je dit lidmaatschap aangeboden, dus je
+              hoeft er niet voor te betalen.
+            ends: Einde
+            manage_billing: Facturering beheren
+            new_members_pay: Nieuwe %{level}-leden betalen %{current_price}.
+            not_a_member: Je bent geen lid van Bike Index.
+            per_month: per maand
+            per_year: per jaar
+            see_membership_tiers: Bekijk de verschillende lidmaatschapsniveaus
+            started: Gestart
+            you_are_a_member: Je bent een %{level}-lid
+            you_pay_less: Je betaalt minder dan nieuwe leden. %{level} is nu %{current_price},
+              en je behoudt je prijs zolang je lidmaatschap actief blijft en je dit
+              abonnement blijft gebruiken.
+            you_pay_the_current_price: U betaalt de huidige prijs voor %{level}.
+            your_membership: Uw lidmaatschap
+            your_price: Uw prijs
       sales:
         new_form:
           record_sale: Recordverkoop
@@ -6485,7 +6504,6 @@ nl:
             is gestolen.
           questions_people_ask_at_2am: Vragen die mensen om 2 uur 's nachts stellen
           read_more_recovery_stories: Lees meer herstelverhalen
-          recovered: Hersteld
           recoveries_reported_by_owners: Recent teruggevonden dieren, zoals gemeld
             door hun eigenaren.
           recovery_record: Herstelverslag
@@ -6827,8 +6845,6 @@ nl:
           filter_combobox:
             any: Elk
           byline: Een gratis naslagwerk van Bike Index, het non-profit fietsregister.
-          tagline_html: De fietsenbibliotheek van de wereld — zoek, vergelijk en vind
-            je volgende fiets tussen de %{models_count}+ modellen.
           tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
             volgende fiets.'
           about_bikebook_label: Over BikeBook
@@ -6864,6 +6880,7 @@ nl:
           class_aria: Klasse %{n} e-bike
           class_unknown_aria: E-bike klasse onbekend
           emoto: E-moto
+          emoto_aria: E-moto, geen e-bike
         law_details:
           from: 'Van %{date}:'
           from_until: 'Van %{starts_on} tot %{ends_on}:'
@@ -7145,26 +7162,10 @@ nl:
           classes_intro: De meeste staten hanteren een systeem met drie klassen. Je
             klasse bepaalt hoe snel de motor ondersteuning biedt, of je een gashendel
             mag gebruiken en waar je mag rijden.
-          emoto_limits_body: Een e-moto wordt beschouwd als een voertuig met een topsnelheid
-            van meer dan 45 km/u, een maximale snelheid van meer dan 32 km/u of een
-            motorvermogen van meer dan 750 watt. In de meeste staten worden deze voertuigen
-            behandeld als bromfietsen of motorfietsen, waarvoor registratie, verzekering
-            en een rijbewijs vereist kunnen zijn.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          emoto_summary: Een topsnelheid van meer dan 45 km/u, een maximale snelheid
-            van meer dan 32 km/u of een motorvermogen van meer dan 750 watt maken
-            het een e-moto.
-          mph: "%{mph} mph"
-          not_an_ebike: Geen e-bike
-          pedal: Voetpedaal
           state_classes_heading: "%{state} e-bike lessen"
           state_classes_intro: "%{state} gebruikt niet het drieklassensysteem dat
             de meeste staten hanteren. De wetgeving van deze staat deelt e-bikes en
             andere elektrische tweewielers in plaats daarvan in deze klassen in."
-          throttle: Elektrisch gaspedaal
-          watts_max: "≤%{watts}W"
-          watts_min: "%{watts}W+"
         rule_citation:
           source: bron
         class_card:
@@ -7190,6 +7191,131 @@ nl:
           state_specifics: "%{state} specificaties"
           throttle: Elektrisch gaspedaal
           top_assist: Top assistentie
+          emoto_limits_body: Een e-moto wordt beschouwd als een voertuig met een topsnelheid
+            van meer dan 45 km/u, een maximale snelheid van meer dan 32 km/u of een
+            motorvermogen van meer dan 750 watt. In de meeste staten worden deze voertuigen
+            behandeld als bromfietsen of motorfietsen, waarvoor registratie, verzekering
+            en een rijbewijs vereist kunnen zijn.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Een topsnelheid van meer dan 45 km/u, een maximale snelheid
+            van meer dan 32 km/u of een motorvermogen van meer dan 750 watt maken
+            het een e-moto.
+          not_an_ebike: Geen e-bike
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
+      memberships:
+        new:
+          become_a_member: Word lid
+          bike_index_membership: Lidmaatschap van Bike Index
+          bikes_registered_free: fietsen geregistreerd, gratis
+          builds_next: Bouwt volgende
+          choose_your_membership: Kies uw lidmaatschap
+          cycling_cap: Fietsmuts
+          every_tier_keeps_it_free: Elk abonnementsniveau houdt de registratie gratis
+            en financiert nieuwe functies. Hogere abonnementsniveaus bieden meer bedankjes.
+          faq_cancel_answer: U kunt dit op elk gewenst moment doen via uw accountpagina.
+            Het wisselen tussen een maandelijks en een jaarlijks abonnement werkt
+            op dezelfde manier.
+          faq_cancel_question: Kan ik mijn abonnement wijzigen of annuleren?
+          faq_free_answer: Ja. Registreren, zoeken en diefstal melden is voor iedereen
+            gratis, voor altijd. Lidmaatschap is de manier waarop we ervoor zorgen
+            dat dit zo blijft.
+          faq_free_question: Is het registreren van een fiets nog steeds gratis als
+            ik geen lid word?
+          faq_gear_answer: Nadat je je hebt aangemeld, sturen we je een e-mail met
+            het verzoek om je postadres en verzenden we het product van daaruit.
+          faq_gear_question: Wanneer krijg ik mijn pet of shirt?
+          faq_marketplace_answer: Nee. Iedereen kan een geregistreerde fiets gratis
+            te koop aanbieden. Leden krijgen hun advertenties bovenaan de lijst.
+          faq_marketplace_question: Moet ik lid zijn om op de marktplaats te kunnen
+            verkopen?
+          faq_tax_answer: Bike Index is een 501(c)(3) non-profitorganisatie, EIN 81-4296194.
+            Lidmaatschappen en eenmalige donaties zijn fiscaal aftrekbaar in de VS.
+          faq_tax_question: Is het lidmaatschap fiscaal aftrekbaar?
+          free_alerts_body: Er worden meldingen van diefstal verstuurd naar winkels,
+            politiebureaus, campussen en fietsers in de buurt van de plek waar de
+            fiets is gestolen.
+          free_alerts_title: Meldingen van gestolen fietsen
+          free_partners_body: Het inwerken van nieuwe winkels, afdelingen en steden,
+            en het helpen van de politie bij het koppelen van teruggevonden fietsen
+            aan hun eigenaren.
+          free_partners_title: Partners en herstel
+          free_registration_body: Het registreren, zoeken en controleren van een tweedehands
+            fiets kost niets, voor fietsers, winkels en de politie. Wij verkopen geen
+            fietsgegevens.
+          free_registration_title: Registratie en zoeken
+          join_monthly: Word lid als %{level} — %{price}/maand
+          join_yearly: Word lid als %{level} — %{price}/jr
+          keep_bike_index_free: Houd Bike Index gratis voor elke fietser.
+          keeps_free: Houdt gratis
+          lede: Het lidmaatschap is een maandelijkse donatie aan Bike Index, een non-profitorganisatie.
+            Hiermee betalen we het register en de meldingen van gestolen fietsen,
+            zodat fietsen weer thuisgebracht worden. Ook financieren we de nieuwe
+            tools die we in de toekomst gaan ontwikkelen. Het registreren van een
+            fiets en het melden van diefstal is altijd gratis. Dankzij onze leden
+            kunnen we dat garanderen.
+          live: Leven
+          member_gear: Ledenuitrusting
+          member_gear_body: Plus-leden ontvangen de Bike Index-fietsmuts. Patrons
+            ontvangen het zonwerende shirt. Beide zijn ontworpen door Kelsey Graywill
+            en worden na je aanmelding naar je opgestuurd.
+          members_keep_it_free: Er zijn een miljoen fietsen geregistreerd. Leden houden
+            het gratis voor de volgende miljoen.
+          monthly: Maandelijks
+          new_tools_for_bike_owners: Nieuwe hulpmiddelen voor fietsbezitters
+          next: Volgende
+          next_ebike_database_body: Een wereldwijde UL-certificeringsdatabase
+          next_ebike_database_title: E-bike database
+          next_ios_app_body: Registreer en beheer fietsen via je telefoon.
+          next_ios_app_title: De iOS-app
+          next_marketplace_body: Alleen geregistreerde fietsen, gecontroleerd aan
+            de hand van diefstalrapporten.
+          next_marketplace_title: Een veiligere marktplaats
+          next_oem_parts_body: Fabrieksspecificaties en foto's voor elk model.
+          next_oem_parts_title: OEM-onderdelen en stockfoto's
+          next_versioning_body: Houd bij hoe je fiets verandert.
+          next_versioning_title: Fietsversie
+          official_registry: Het officiële register voor meer dan 1.000 politiekorpsen,
+            universiteiten, steden en winkels.
+          or_make_a_one_time_donation: Of doe een eenmalige donatie.
+          partner_organizations: partnerwinkels, politiekorpsen en steden
+          per_month: "/ maand"
+          per_year: "/ jaar"
+          perk_cycling_cap: Fiets Index leden fietspet
+          perk_everything_in_basic: Alles in Basic
+          perk_everything_in_basic_and_plus: Alles in Basic en Plus
+          perk_faster_support: Snellere reacties van de supportafdeling
+          perk_listings_promoted: Uw marktplaatsvermeldingen worden naar de top gepromoot.
+          perk_member_badge: Lidmaatschapsbadge op je Bike Index-profiel
+          perk_no_ads: Geen advertenties, mochten we die ooit laten zien.
+          perk_patron_badge: Patronbadge op je Bike Index-profiel
+          perk_promoted_alert: Een gratis, betaalde melding als uw fiets gestolen
+            wordt.
+          perk_sun_shirt: Fietsindex Patron zonneshirt
+          perk_top_listing_placement: Toppositie voor je advertentie op de marktplaats
+          plans_from: Plannen vanaf %{price} een maand
+          questions: Vragen
+          read_more_recovery_stories: Lees meer herstelverhalen
+          recommended: Aanbevolen
+          recoveries_reported_by_owners: Elke terugvinding wordt gemeld door de persoon
+            die zijn of haar fiets heeft teruggekregen.
+          stolen_bikes_recovered: Gestolen fietsen teruggevonden
+          summary_monthly: "%{level} lidmaatschap, %{price} een maand"
+          summary_yearly: "%{level} lidmaatschap, %{price} een jaar"
+          sun_shirt: Zonoverhemd
+          tax_deductible_cancel_any_time: Lidmaatschappen en eenmalige donaties zijn
+            fiscaal aftrekbaar in de VS. U kunt uw lidmaatschap op elk gewenst moment
+            wijzigen of opzeggen via uw account.
+          tax_deductible_ein: Lidmaatschappen en eenmalige donaties zijn fiscaal aftrekbaar
+            in de VS. Bike Index is een 501(c)(3) non-profitorganisatie, EIN 81-4296194.
+          the_registry_open_to_everyone: Het register is voor iedereen toegankelijk.
+          two_months_free: Twee maanden gratis
+          value_returned_to_owners: waarde teruggegeven aan eigenaren
+          view_your_membership: Bekijk uw %{level} lidmaatschap
+          wear_the_shield: Draag het schild
+          what_members_make_possible: Wat leden mogelijk maken
+          yearly: Jaarlijks
     shared_blocks:
       footer:
         about: Over

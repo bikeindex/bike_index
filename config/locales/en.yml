@@ -1771,12 +1771,8 @@ en:
       find_lock:
         not_your_lock: Whoops, that's not your lock!
     memberships:
-      edit:
-        free_membership: >-
-          Bike Index has given you a free membership. Please email support@bikeindex.org
-          if you have questions.
-        no_active_membership: You don't have an active membership, you'll have to
-          sign up for a new one.
+      create:
+        already_a_member: You already have a membership.
     my_accounts:
       edit:
         delete_account: Delete account
@@ -5072,6 +5068,7 @@ en:
     register_flow:
       date_found_required: Please tell us when you found it
       date_stolen_required: Please tell us when it was stolen
+      description_stolen_required: Please tell us what happened
       email_required: Email is required to register
       location_found_required: Please tell us where you found it
       location_stolen_required: Please tell us where it was stolen

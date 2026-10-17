@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
-import { hydrate, loadingShell } from 'bikebook/hydrate'
-import { keepPermanent } from 'bikebook/render'
+import { hydrate, loadingShell, unpickedVehicles } from 'bikebook/hydrate'
+import { keepPermanent, renderInto } from 'bikebook/render'
 import { readable } from 'bikebook/replace_url'
 import { SearchLog } from 'bikebook/search_log'
 import { realigned, storePreferredSize, withSize } from 'bikebook/sizes'
@@ -16,12 +16,13 @@ const stamped = (state) => ({ ...state, bikebook: uuid() })
 // Searches and compares the published catalog in the browser. A pick submits the form, and it, a
 // link to this page and each history step render the page afresh from the shell, without a request
 export default class extends Controller {
-  static targets = ['shell', 'page', 'status', 'tagline', 'countedTagline']
+  static targets = ['shell', 'page', 'status']
   static values = { manifestUrl: String, jurisdictions: Object, failedText: String, title: String, searchLogUrl: String }
 
   #scrolls = new Map()
   #searchLog
   #renders = 0
+  #refilters = 0
   #renderedUrl
 
   // The loading shell holds the status until the catalog's first render replaces it, and a failure puts it back
@@ -47,7 +48,6 @@ export default class extends Controller {
       renderClassCards(document, picked.split(','), this.catalog.vocabulary.e_vehicle_classifications)
       if (!primed) this.#searchLog.typed({ ...Object.fromEntries(new URL(window.location.href).searchParams), q, count: total })
     })
-    this.#countModels()
     // filters set while it loaded are in the URL, and the reader stays where they've scrolled to
     const current = new URL(window.location.href)
     this.#render(current, [window.scrollX, window.scrollY])
@@ -88,6 +88,18 @@ export default class extends Controller {
     if (first) storePreferredSize(JSON.parse(target.selectedOptions[0].dataset.size))
     await this.#go(withSize(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY])
     this.pageTarget.querySelector(`select[data-bikebook--page-vehicle-param="${CSS.escape(vehicle)}"]`)?.focus({ preventScroll: true })
+  }
+
+  // A filter changes in place, which with nothing picked the featured models and their count follow, unless the page
+  // renders or the filters change again first
+  async refilter () {
+    const viewers = this.pageTarget.querySelector('#vehicle-viewers')
+    if (!this.catalog || !viewers?.querySelector(':scope > [data-controller~="bikebook--tips"]')) return
+
+    const render = this.#renders
+    const refilter = ++this.#refilters
+    const vehicles = await unpickedVehicles(this.catalog, this.pageTarget, new URL(window.location.href))
+    if (render === this.#renders && refilter === this.#refilters) renderInto(viewers, vehicles)
   }
 
   restore () {
@@ -155,15 +167,6 @@ export default class extends Controller {
       // and again once the panels' controllers have opened them, which the browser's scroll anchoring follows down
       requestAnimationFrame(() => window.scrollTo(...scroll))
     }
-  }
-
-  // down to the thousand (a smaller catalog's leading place), so the tagline stays true as the catalog grows
-  #countModels () {
-    const { modelsCount } = this.catalog
-    const place = 10 ** Math.min(3, String(modelsCount).length - 1)
-    const tagline = this.countedTaglineTarget.content.cloneNode(true)
-    tagline.querySelector('[data-models-count]').textContent = (Math.floor(modelsCount / place) * place).toLocaleString('en-US')
-    this.taglineTarget.replaceChildren(tagline)
   }
 
   // in place of the spinner, below the loading shell's search, where it's still showing

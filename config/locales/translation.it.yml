@@ -2526,12 +2526,6 @@ it:
     welcome:
       recovery_stories:
         no_stories_to_display: Nessuna storia di recupero da mostrare
-    memberships:
-      edit:
-        free_membership: Bike Index ti ha offerto un abbonamento gratuito. Per qualsiasi
-          domanda, scrivi a support@bikeindex.org.
-        no_active_membership: Non possiedi un abbonamento attivo, dovrai registrarti
-          per uno nuovo.
     search:
       registrations:
         set_interpreted_params:
@@ -2580,6 +2574,9 @@ it:
           e scopri come funzionano le classi di e-bike.
         state_title: "%{state} leggi sulle e-bike"
         title: Regole per le e-bike
+    memberships:
+      create:
+        already_a_member: Hai già un abbonamento.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -5280,6 +5277,7 @@ it:
       manufacturer_required: Il produttore è tenuto a registrarsi
       name_required: Per registrarsi è necessario indicare il nome del proprietario.
       unable_to_save: Non è stato possibile salvare la registrazione, riprova.
+      description_stolen_required: Per favore, raccontaci cosa è successo.
     menu_items_account:
       logout: Disconnettiti
       marketplace_messages: Messaggi del mercato
@@ -5733,6 +5731,8 @@ it:
         copy_id: Copia ID
       sticker:
         copy_sticker: Copia adesivo
+      recovery_display_card:
+        recovered: Riparato
     pages:
       messages:
         thread_show:
@@ -6545,6 +6545,25 @@ it:
             update_marketplace_listing: Aggiorna l'inserzione sul marketplace!
             updated: Fatto
             user_hidden: Nascosto agli altri utenti
+        memberships:
+          show:
+            complimentary: Bike Index ti ha regalato questo abbonamento, quindi non
+              devi pagarlo.
+            ends: Fine
+            manage_billing: Gestisci la fatturazione
+            new_members_pay: I nuovi membri %{level} pagano %{current_price}.
+            not_a_member: Non sei un membro di Bike Index.
+            per_month: al mese
+            per_year: all'anno
+            see_membership_tiers: Scopri i livelli di abbonamento
+            started: Iniziato
+            you_are_a_member: Sei un membro %{level}
+            you_pay_less: Paghi meno rispetto ai nuovi iscritti. %{level} ora è %{current_price}
+              e mantieni il tuo prezzo finché l'abbonamento rimane attivo e continui
+              a utilizzare questo piano.
+            you_pay_the_current_price: Paghi il prezzo corrente per %{level}.
+            your_membership: La tua iscrizione
+            your_price: Il tuo prezzo
       sales:
         new_form:
           record_sale: Vendita record
@@ -6595,7 +6614,6 @@ it:
           questions_people_ask_at_2am: Domande che le persone si pongono alle 2 del
             mattino
           read_more_recovery_stories: Leggi altre storie di guarigione
-          recovered: Riparato
           recoveries_reported_by_owners: Recuperi recenti, segnalati dai proprietari.
           recovery_record: Registro dei guasti
           register_it: Registralo
@@ -6939,8 +6957,6 @@ it:
             any: Qualunque
           byline: Un riferimento gratuito fornito da Bike Index, il registro di biciclette
             senza scopo di lucro.
-          tagline_html: 'La biblioteca mondiale delle biciclette: cerca, confronta
-            e trova la tua prossima bici tra oltre %{models_count} modelli.'
           tagline: 'La biblioteca mondiale delle biciclette: cerca, confronta e trova
             la tua prossima bici.'
           about_bikebook_label: Informazioni su BikeBook
@@ -6976,6 +6992,7 @@ it:
           class_aria: Classe %{n} e-bike
           class_unknown_aria: Classe di e-bike sconosciuta
           emoto: E-moto
+          emoto_aria: E-moto, non e-bike
         law_details:
           from: 'Da %{date}:'
           from_until: 'Da %{starts_on} a %{ends_on}:'
@@ -7261,26 +7278,10 @@ it:
             tre classi. La classe di appartenenza determina la velocità di assistenza
             del motore, se è consentito l'uso dell'acceleratore e dove è possibile
             circolare.
-          emoto_limits_body: Una velocità massima superiore a 45 km/h, una velocità
-            di accelerazione superiore a 32 km/h o un motore di potenza superiore
-            a 750 W definiscono un veicolo elettrico come una moto. Nella maggior
-            parte degli stati, questi veicoli sono equiparati a ciclomotori o motociclette,
-            il che può comportare l'obbligo di immatricolazione, assicurazione e patente.
-          emoto_motor: 750W+
-          emoto_speed: 28+ mph
-          emoto_summary: Una velocità massima superiore a 45 km/h, una velocità di
-            accelerazione superiore a 32 km/h o un motore con potenza superiore a
-            750 W la rendono una moto elettrica.
-          mph: "%{mph} mph"
-          not_an_ebike: Non è una bici elettrica
-          pedal: Pedale
           state_classes_heading: "%{state} corsi di e-bike"
           state_classes_intro: "%{state} non utilizza il sistema a tre classi impiegato
             dalla maggior parte degli stati. La sua legge suddivide invece le e-bike
             e gli altri veicoli elettrici a due ruote in queste classi."
-          throttle: Acceleratore elettrico
-          watts_max: "≤%{watts}W"
-          watts_min: "%{watts}W+"
         rule_citation:
           source: fonte
         class_card:
@@ -7307,6 +7308,132 @@ it:
           state_specifics: "%{state} dettagli"
           throttle: Acceleratore elettrico
           top_assist: Assistenza superiore
+          emoto_limits_body: Una velocità massima superiore a 45 km/h, una velocità
+            di accelerazione superiore a 32 km/h o un motore di potenza superiore
+            a 750 W definiscono un veicolo elettrico come una moto. Nella maggior
+            parte degli stati, questi veicoli sono equiparati a ciclomotori o motociclette,
+            il che può comportare l'obbligo di immatricolazione, assicurazione e patente.
+          emoto_motor: 750W+
+          emoto_speed: 28+ mph
+          emoto_summary: Una velocità massima superiore a 45 km/h, una velocità di
+            accelerazione superiore a 32 km/h o un motore con potenza superiore a
+            750 W la rendono una moto elettrica.
+          not_an_ebike: Non è una bici elettrica
+          watts_max: "≤%{watts}W"
+          watts_min: "%{watts}W+"
+      memberships:
+        new:
+          become_a_member: Diventa membro
+          bike_index_membership: Abbonamento a Bike Index
+          bikes_registered_free: biciclette registrate, gratis
+          builds_next: Costruisce prossimamente
+          choose_your_membership: Scegli il tuo abbonamento
+          cycling_cap: berretto da ciclista
+          every_tier_keeps_it_free: Ogni livello di abbonamento contribuisce a mantenere
+            il registro gratuito e a finanziare nuove funzionalità. I livelli superiori
+            includono maggiori ringraziamenti.
+          faq_cancel_answer: In qualsiasi momento, dalla pagina del tuo account. Il
+            passaggio dall'abbonamento mensile a quello annuale funziona allo stesso
+            modo.
+          faq_cancel_question: Posso cambiare piano tariffario o annullare l'abbonamento?
+          faq_free_answer: Sì. La registrazione, la ricerca e la segnalazione di un
+            furto sono gratuite per tutti, per sempre. L'abbonamento è il modo in
+            cui finanziamo il servizio per mantenerlo tale.
+          faq_free_question: La registrazione della bicicletta rimane gratuita anche
+            se non mi iscrivo al programma?
+          faq_gear_answer: Dopo l'iscrizione, ti invieremo un'e-mail per richiedere
+            l'indirizzo di spedizione e provvederemo alla spedizione da lì.
+          faq_gear_question: Quando riceverò il mio cappellino o la mia maglietta?
+          faq_marketplace_answer: No. Chiunque può inserire un annuncio di una moto
+            registrata senza costi. Gli annunci dei membri vengono visualizzati in
+            cima all'elenco.
+          faq_marketplace_question: Devo essere un membro per vendere sul marketplace?
+          faq_tax_answer: Bike Index è un'organizzazione no-profit 501(c)(3), EIN
+            81-4296194. Le quote associative e le donazioni una tantum sono deducibili
+            dalle tasse negli Stati Uniti.
+          faq_tax_question: La quota associativa è deducibile dalle tasse?
+          free_alerts_body: Le denunce di furto vengono inviate a negozi, dipartimenti
+            di polizia, campus universitari e ai ciclisti che si trovano nelle vicinanze
+            del luogo in cui la bicicletta è stata rubata.
+          free_alerts_title: Avvisi di furto di biciclette
+          free_partners_body: Integrare nuovi negozi, dipartimenti e città, e aiutare
+            la polizia a risalire ai proprietari delle biciclette ritrovate.
+          free_partners_title: Partner e recuperi
+          free_registration_body: La registrazione, la ricerca e la verifica di una
+            bicicletta usata sono gratuite, sia per i ciclisti, sia per i negozi,
+            sia per le forze dell'ordine. Non vendiamo i dati dei ciclisti.
+          free_registration_title: Registrazione e ricerca
+          join_monthly: Unisciti come %{level} — %{price}/mese
+          join_yearly: Unisciti come %{level} — %{price}/anno
+          keep_bike_index_free: Mantieni Bike Index gratuito per tutti i ciclisti
+          keeps_free: Mantiene libero
+          lede: L'iscrizione è una donazione mensile a Bike Index, un'organizzazione
+            no-profit. Permette di finanziare il registro e gli avvisi di furto che
+            aiutano a ritrovare le biciclette, e ci consente di sviluppare nuovi strumenti.
+            Registrare una bicicletta e denunciare un furto sarà sempre gratuito.
+            È grazie ai nostri soci che possiamo garantirlo.
+          live: In diretta
+          member_gear: Attrezzatura riservata ai membri
+          member_gear_body: I membri Plus riceveranno il cappellino da ciclista Bike
+            Index. I sostenitori riceveranno la maglietta protettiva dal sole. Entrambi
+            i modelli sono disegnati da Kelsey Graywill e ve li spediremo dopo l'iscrizione.
+          members_keep_it_free: Sono state registrate un milione di biciclette. I
+            soci mantengono il servizio gratuito per il prossimo milione.
+          monthly: Mensile
+          new_tools_for_bike_owners: Nuovi strumenti per i proprietari di biciclette
+          next: Prossimo
+          next_ebike_database_body: Un database globale delle certificazioni UL
+          next_ebike_database_title: Database delle e-bike
+          next_ios_app_body: Registra e gestisci le biciclette dal tuo telefono
+          next_ios_app_title: L'app iOS
+          next_marketplace_body: Solo biciclette registrate, previa verifica dei precedenti
+            di furto.
+          next_marketplace_title: Un mercato più sicuro
+          next_oem_parts_body: Specifiche tecniche e foto di fabbrica per ogni modello.
+          next_oem_parts_title: Immagini di ricambi originali e di magazzino
+          next_versioning_body: Tieni traccia delle modifiche apportate alla tua bicicletta
+          next_versioning_title: Versioni della bicicletta
+          official_registry: Il registro ufficiale di oltre 1.000 dipartimenti di
+            polizia, università, città e negozi.
+          or_make_a_one_time_donation: Oppure fai una donazione una tantum
+          partner_organizations: negozi partner, dipartimenti di polizia e città
+          per_month: "/ mese"
+          per_year: "/ anno"
+          perk_cycling_cap: Cappellino da ciclista per i membri di Bike Index
+          perk_everything_in_basic: Tutto in base
+          perk_everything_in_basic_and_plus: Tutto incluso in Base e Plus
+          perk_faster_support: Risposte di supporto più rapide
+          perk_listings_promoted: I tuoi annunci sul marketplace sono stati promossi
+            in cima alla pagina.
+          perk_member_badge: Badge di membro sul tuo profilo Bike Index
+          perk_no_ads: Niente pubblicità, se mai dovessimo mostrarle.
+          perk_patron_badge: Badge di sostenitore sul tuo profilo Bike Index
+          perk_promoted_alert: Un avviso gratuito in caso di furto della bicicletta.
+          perk_sun_shirt: Maglietta da sole Bike Index Patron
+          perk_top_listing_placement: Primo posto nella classifica del marketplace
+          plans_from: Piani a partire da %{price} un mese
+          questions: Domande
+          read_more_recovery_stories: Leggi altre storie di guarigione
+          recommended: Raccomandato
+          recoveries_reported_by_owners: Ogni ritrovamento viene segnalato dalla persona
+            che ha recuperato la propria bicicletta.
+          stolen_bikes_recovered: biciclette rubate recuperate
+          summary_monthly: "%{level} abbonamento, %{price} al mese"
+          summary_yearly: "%{level} iscrizione, %{price} un anno"
+          sun_shirt: camicia da sole
+          tax_deductible_cancel_any_time: Negli Stati Uniti, le quote associative
+            e le donazioni una tantum sono deducibili dalle tasse. Puoi cambiare piano
+            di abbonamento o annullare l'iscrizione in qualsiasi momento dal tuo account.
+          tax_deductible_ein: Le quote associative e le donazioni una tantum sono
+            deducibili dalle tasse negli Stati Uniti. Bike Index è un'organizzazione
+            no-profit 501(c)(3), EIN 81-4296194.
+          the_registry_open_to_everyone: Il registro, aperto a tutti
+          two_months_free: Due mesi gratis
+          value_returned_to_owners: valore restituito ai proprietari
+          view_your_membership: Visualizza la tua iscrizione a %{level}
+          wear_the_shield: Indossa lo scudo
+          what_members_make_possible: Ciò che i membri rendono possibile
+          yearly: Annuale
     shared_blocks:
       footer:
         about: Di
