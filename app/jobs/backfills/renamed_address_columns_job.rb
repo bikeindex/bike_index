@@ -2,8 +2,8 @@
 
 module Backfills
   # Copy zipcode and state_id into postal_code and region_record_id, which are replacing them.
-  # logged_searches has 40M+ rows, so walk the primary key in fixed ranges - no count or id pluck
-  # like the active_record enumerators do - and only write the rows that differ
+  # Fixed id ranges rather than the active_record enumerators, whose count and id pluck are too
+  # slow on logged_searches' 40M+ rows
   class RenamedAddressColumnsJob < ApplicationJob
     include Sidekiq::IterableJob
 
