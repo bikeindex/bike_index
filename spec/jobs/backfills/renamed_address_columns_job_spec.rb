@@ -20,7 +20,7 @@ RSpec.describe Backfills::RenamedAddressColumnsJob, type: :job do
 
         it "copies zipcode and state_id" do
           expect(current.reload.postal_code).to eq "60608"
-          updated_at = records.first.updated_at
+          updated_at = records.first.reload.updated_at
 
           Sidekiq::Testing.inline! { described_class.perform_async(factory.to_s.camelize) }
 
