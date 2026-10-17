@@ -2790,6 +2790,8 @@ es:
       send_it: "¡Envíalo!"
       subject: Sujeto
       your_message: Tu mensaje
+      message_template: 'Número de serie de la bicicleta (si corresponde): URL de
+        registro en Bike Index (si corresponde): En qué necesito ayuda: '
     index:
       contact_us: "¡Contáctanos!"
       have_a_question_we_havent_answered: "¿Tienes alguna pregunta que no hayamos
@@ -2798,6 +2800,9 @@ es:
       log_in_to_send_a_comment: "¡Inicia sesión para enviar un comentario!"
       you_can_reach_us_at_contact_html: Puedes contactarnos en %{contact_link} o enviar
         tu mensaje aquí mismo.
+      the_more_detail_you_can_share: Cuanta más información nos proporcione, más rápido
+        podremos ayudarle. Si su pregunta se refiere a una bicicleta específica, incluya
+        el número de serie o la URL de registro de su bicicleta en Bike Index.
   info:
     about:
       about_bike_index: Acerca de Bike Index
