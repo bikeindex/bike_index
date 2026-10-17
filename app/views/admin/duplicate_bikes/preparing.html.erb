@@ -1,0 +1,22 @@
+<h1>Duplicate registration review</h1>
+
+<% if @preparation_failed %>
+  <p class="tw:mt-4">
+    The review queues could not be prepared. Please try refreshing shortly.
+  </p>
+<% else %>
+  <p class="tw:mt-4">
+    The review queues are being prepared. This can take a minute. Refresh this
+    page shortly to see registration groups and counts.
+  </p>
+<% end %>
+
+<p class="tw:mt-4">
+  This review does not merge records, remove data or send customer emails.
+</p>
+
+<p class="tw:mt-4">
+  <%= link_to "Refresh review queues", url_for(request.query_parameters), class: "twlink" %>
+  ·
+  <%= link_to "Review existing serial-segment groups", admin_duplicate_bikes_path(search_view: "segments"), class: "twlink" %>
+</p>
