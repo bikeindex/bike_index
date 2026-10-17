@@ -7236,7 +7236,6 @@ nl:
         new:
           become_a_member: Word lid
           bike_index_membership: Lidmaatschap van Bike Index
-          bikes_registered_free: fietsen geregistreerd, gratis
           builds_next: Bouwt volgende
           choose_your_membership: Kies uw lidmaatschap
           cycling_cap: Fietsmuts
@@ -7277,19 +7276,11 @@ nl:
           join_yearly: Word lid als %{level} — %{price}/jr
           keep_bike_index_free: Houd Bike Index gratis voor elke fietser.
           keeps_free: Houdt gratis
-          lede: Het lidmaatschap is een maandelijkse donatie aan Bike Index, een non-profitorganisatie.
-            Hiermee betalen we het register en de meldingen van gestolen fietsen,
-            zodat fietsen weer thuisgebracht worden. Ook financieren we de nieuwe
-            tools die we in de toekomst gaan ontwikkelen. Het registreren van een
-            fiets en het melden van diefstal is altijd gratis. Dankzij onze leden
-            kunnen we dat garanderen.
           live: Leven
           member_gear: Ledenuitrusting
           member_gear_body: Plus-leden ontvangen de Bike Index-fietsmuts. Patrons
             ontvangen het zonwerende shirt. Beide zijn ontworpen door Kelsey Graywill
             en worden na je aanmelding naar je opgestuurd.
-          members_keep_it_free: Er zijn een miljoen fietsen geregistreerd. Leden houden
-            het gratis voor de volgende miljoen.
           monthly: Maandelijks
           new_tools_for_bike_owners: Nieuwe hulpmiddelen voor fietsbezitters
           next: Volgende
@@ -7344,6 +7335,17 @@ nl:
           wear_the_shield: Draag het schild
           what_members_make_possible: Wat leden mogelijk maken
           yearly: Jaarlijks
+          bikes_registered: geregistreerde fietsen
+          bikes_registered_keep_it_free: "%{bikes} fietsen zijn geregistreerd. Leden
+            houden het gratis voor de volgende miljoen."
+          millions_registered_keep_it_free: "%{millions} miljoen fietsen zijn geregistreerd.
+            Leden houden het gratis voor de volgende miljoen."
+          monthly_donation_lede: Het lidmaatschap is een maandelijkse donatie aan
+            Bike Index. Hiermee betalen we het register en de meldingen van gestolen
+            fietsen, zodat fietsen weer thuisgebracht worden. Ook financieren we de
+            nieuwe tools die we in de toekomst gaan ontwikkelen. Het registreren van
+            een fiets en het melden van een diefstal is altijd gratis. Dankzij onze
+            leden kunnen we dat garanderen.
     shared_blocks:
       footer:
         about: Over

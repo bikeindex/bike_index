@@ -7332,7 +7332,6 @@ es:
         new:
           become_a_member: Hazte miembro
           bike_index_membership: Membresía de Bike Index
-          bikes_registered_free: bicicletas registradas, gratis
           builds_next: Construye a continuación
           choose_your_membership: Elige tu membresía
           cycling_cap: gorra de ciclismo
@@ -7373,19 +7372,12 @@ es:
           join_yearly: Únete como %{level} — %{price}/año
           keep_bike_index_free: Mantengamos Bike Index gratuito para todos los ciclistas.
           keeps_free: Se mantiene gratis
-          lede: La membresía consiste en una donación mensual a Bike Index, una organización
-            sin fines de lucro. Esta donación cubre el registro y las alertas de bicicletas
-            robadas que permiten recuperarlas, además de financiar las nuevas herramientas
-            que desarrollamos. Registrar una bicicleta y denunciar un robo siempre
-            será gratuito. Gracias a nuestros miembros, podemos garantizarlo.
           live: Vivir
           member_gear: Equipo de miembro
           member_gear_body: Los miembros Plus reciben la gorra de ciclismo Bike Index.
             Los patrocinadores reciben la camiseta de protección solar. Ambas prendas
             están diseñadas por Kelsey Graywill y te las enviamos por correo después
             de que te unas.
-          members_keep_it_free: Un millón de bicicletas están registradas. Los miembros
-            mantienen el servicio gratuito para el próximo millón.
           monthly: Mensual
           new_tools_for_bike_owners: Nuevas herramientas para propietarios de bicicletas
           next: Próximo
@@ -7442,6 +7434,16 @@ es:
           wear_the_shield: Lleva el escudo
           what_members_make_possible: Lo que los miembros hacen posible
           yearly: Anual
+          bikes_registered: bicicletas matriculadas
+          bikes_registered_keep_it_free: "%{bikes} Las bicicletas están registradas.
+            Los miembros lo mantienen gratis para el próximo millón."
+          millions_registered_keep_it_free: "%{millions} millones de bicicletas están
+            registradas. Los miembros lo mantienen gratis para el próximo millón."
+          monthly_donation_lede: La membresía es una donación mensual a Bike Index.
+            Con ella se financia el registro y las alertas de bicicletas robadas,
+            que permiten recuperarlas, y también se financian las nuevas herramientas
+            que desarrollamos. Registrar una bicicleta y denunciar un robo siempre
+            será gratuito. Gracias a nuestros miembros podemos garantizarlo.
     shared_blocks:
       footer:
         about: Acerca

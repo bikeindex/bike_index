@@ -7016,7 +7016,6 @@ nb:
         new:
           become_a_member: Bli medlem
           bike_index_membership: Bike Index-medlemskap
-          bikes_registered_free: sykler registrert, gratis
           builds_next: Bygger neste
           choose_your_membership: Velg medlemskapet ditt
           cycling_cap: Sykkelhette
@@ -7053,18 +7052,11 @@ nb:
           join_yearly: Bli med som %{level} — %{price}/år
           keep_bike_index_free: Hold Bike Index gratis for alle syklister
           keeps_free: Holder seg fri
-          lede: Medlemskap er en månedlig donasjon til Bike Index, en ideell organisasjon.
-            Det betaler for registeret og varslingene om stjålne sykler som får sykler
-            hjem, og det finansierer de nye verktøyene vi bygger videre. Det vil alltid
-            være gratis å registrere en sykkel og rapportere et tyveri. Medlemmer
-            er grunnen til at vi kan love det.
           live: Aktiv
           member_gear: Medlemsutstyr
           member_gear_body: Pluss at medlemmer får sykkelluen fra Bike Index. Kunder
             får solskjorten. Begge er designet av Kelsey Graywill, og vi sender dem
             til deg i posten etter at du har blitt medlem.
-          members_keep_it_free: En million sykler er registrert. Medlemmer beholder
-            den gratis den neste millionen.
           monthly: Månedlig
           new_tools_for_bike_owners: Nye verktøy for sykkeleiere
           next: Neste
@@ -7118,6 +7110,16 @@ nb:
           wear_the_shield: Bruk skjoldet
           what_members_make_possible: Hva medlemmer gjør mulig
           yearly: Årlig
+          bikes_registered: registrerte sykler
+          bikes_registered_keep_it_free: "%{bikes} sykler er registrert. Medlemmer
+            beholder det gratis den neste millionen."
+          millions_registered_keep_it_free: "%{millions} millioner sykler er registrert.
+            Medlemmer beholder det gratis den neste millionen."
+          monthly_donation_lede: Medlemskap er en månedlig donasjon til Bike Index.
+            Det betaler for registeret og varslingene om stjålne sykler som får sykler
+            hjem, og det finansierer de nye verktøyene vi bygger videre. Det vil alltid
+            være gratis å registrere en sykkel og rapportere et tyveri. Medlemmer
+            er grunnen til at vi kan love det.
     shared_blocks:
       footer:
         about: Om
