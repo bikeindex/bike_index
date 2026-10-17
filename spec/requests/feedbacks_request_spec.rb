@@ -8,6 +8,17 @@ RSpec.describe FeedbacksController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
+
+    context "logged in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "renders the detail prompt and the message template" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response.body).to match(/The more detail you can share/)
+        expect(response.body).to match(/Bike serial number \(if applicable\):/)
+      end
+    end
   end
 
   describe "create" do
