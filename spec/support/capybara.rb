@@ -10,7 +10,8 @@ Capybara.register_driver :playwright do |app|
   Capybara::Playwright::Driver.new(app,
     browser_type: :chromium,
     headless: true,
-    viewport: {width: 1920, height: 1080})
+    viewport: {width: 1920, height: 1080},
+    permissions: ["clipboard-read", "clipboard-write"])
 end
 
 # The same browser with scripting turned off, for specs about what a rider without
@@ -27,6 +28,8 @@ end
 Capybara.configure do |config|
   config.default_driver = :playwright
   config.javascript_driver = :playwright
+  # UI::Collapse triggers are role=button spans
+  config.enable_aria_role = true
 end
 
 # Each parallel worker needs its own port - a pinned one leaves all but the first
@@ -35,7 +38,8 @@ Capybara.server_host = "localhost"
 Capybara.always_include_port = true
 
 # The application layout pulls Google Fonts and analytics from external hosts
-# (app/views/layouts/application.html.erb and shared/_analytics.html). Playwright's
+# (app/views/layouts/application.html.erb and shared/_analytics.html), and the share
+# buttons pull Twitter and Facebook widgets (shared/_share_this). Playwright's
 # `visit` waits for the page `load` event, which stalls for the full navigation
 # timeout when those hosts are unreachable from CI -- a flaky `visit` failure on
 # any page. Abort the requests so `load` fires on the app's own assets. Spec-level
@@ -45,6 +49,9 @@ BLOCKED_EXTERNAL_HOSTS = %w[
   fonts.gstatic.com
   www.googletagmanager.com
   www.google-analytics.com
+  platform.twitter.com
+  connect.facebook.net
+  www.facebook.com
 ].freeze
 
 # Point BASE_URL at Capybara's server for `:js` specs, so `*_url` helpers rendered

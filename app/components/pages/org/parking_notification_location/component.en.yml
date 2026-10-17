@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      org:
+        parking_notification_location:
+          address_or_intersection: Address or intersection
+          enter_address_manually: Enter address manually
+          map_hint: Drag the map so the pin marks the spot
+          map_unavailable: The map couldn't be loaded — the location was still set
+            from your device.
+          set_on_map: Set on map

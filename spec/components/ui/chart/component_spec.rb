@@ -6,12 +6,18 @@ RSpec.describe UI::Chart::Component, type: :component do
   let(:time_range) { 1.week.ago..Time.current }
   let(:instance) { described_class.new(series: [{name: "Test", data: {}}], time_range:) }
 
-  it "renders with default colors" do
-    script_content = render_inline(instance).css("script").text
-    expect(script_content).to be_present
-    described_class::COLORS.each do |color|
-      expect(script_content).to include(color)
-    end
+  it "renders the default colors, no legend for a single series, and its own element id each time" do
+    rendered = render_inline(instance)
+    script_content = rendered.css("script").text
+    described_class::COLORS.each { |color| expect(script_content).to include(color) }
+    expect(script_content).to include('"legend":false')
+
+    rerendered = render_inline(described_class.new(series: [{name: "Test", data: {}}], time_range:))
+    expect(rerendered.at_css("[id^='chart-']")["id"]).not_to eq rendered.at_css("[id^='chart-']")["id"]
+
+    # Several series keep the legend that tells them apart
+    several = render_inline(described_class.new(series: [{name: "A", data: {}}, {name: "B", data: {}}])).css("script").text
+    expect(several).not_to include('"legend"')
   end
 
   context "with custom colors" do
@@ -28,7 +34,7 @@ RSpec.describe UI::Chart::Component, type: :component do
     let(:start_time) { Time.at(1568052985) }
     let(:time_range) { start_time..(start_time + 3.minutes) }
     let(:buckets) { %([[" 1:16 PM",0],[" 1:17 PM",0],[" 1:18 PM",0],[" 1:19 PM",0]]) }
-    before { Time.zone = "America/Chicago" }
+    around { |example| Time.use_zone("America/Chicago") { example.run } }
 
     it "fills the buckets a series is missing" do
       expect(render_inline(instance).css("script").text).to include(buckets)

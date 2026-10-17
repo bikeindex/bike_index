@@ -1,0 +1,15 @@
+---
+en:
+  components:
+    ui:
+      time_range:
+        from: from
+        in_the_next_month: in the next month
+        in_the_next_week: in the next week
+        in_the_past_day: in the past day
+        in_the_past_hour: in the past hour
+        in_the_past_month: in the past month
+        in_the_past_week: in the past week
+        in_the_past_year: in the past year
+        now: now
+        to: to

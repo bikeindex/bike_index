@@ -6,19 +6,21 @@ module Pages
       module BikesTable
         # The organization registrations table: bike rows with every org column.
         # Extracted from Pages::Org::Search::Wrapper so it can render on its own, without
-        # the search form, column-toggle settings, or pagination (e.g. a user's other
+        # the search form, column settings, or pagination (e.g. a user's other
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
-          # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-          MARKUP_DIGEST = "23cd3e32da3f"
+          # The organization's registration fields that follow a column, in order. The rest come
+          # after the columns every organization has
+          REG_FIELDS_AFTER = {
+            owner_name: %w[reg_phone reg_student_id reg_organization_affiliation],
+            serial_number: %w[reg_extra_registration_number]
+          }.freeze
 
-          def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
-            cache_key: nil, sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
+          def initialize(organization:, bikes:, render_sortable: false,
+            sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
             @bikes = bikes
-            @current_user = current_user
             @render_sortable = render_sortable
-            @cache_key = cache_key || "org-#{organization.id}-#{MARKUP_DIGEST}"
             @sort_state = sort_state
             @bike_sticker = bike_sticker
             @settings = settings
@@ -32,11 +34,24 @@ module Pages
             @settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
           end
 
+          # The organization's fields placed after column, or with :rest the ones placed nowhere
+          def reg_fields_after(column)
+            fields = settings.additional_registration_fields
+            return fields - REG_FIELDS_AFTER.values.flatten if column == :rest
+
+            REG_FIELDS_AFTER.fetch(column) & fields
+          end
+
           def hidden_not_registered_tag
-            @hidden_not_registered_tag ||= tag.em(
-              translation(".hidden_not_registered", org_name: @organization.short_name),
-              class: "less-strong tw:leading-snug tw:text-xs"
-            )
+            render(UI::Tooltip::Component.new(text: hidden_tooltip_text)) { hidden_label }
+          end
+
+          def hidden_label
+            @hidden_label ||= tag.em(translation(".hidden"), class: "less-strong tw:leading-snug tw:text-xs")
+          end
+
+          def hidden_tooltip_text
+            @hidden_tooltip_text ||= translation(".not_registered_with", org_name: @organization.short_name)
           end
 
           def table_wrapper_data_attributes

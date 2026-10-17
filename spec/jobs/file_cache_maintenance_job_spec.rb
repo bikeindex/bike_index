@@ -12,7 +12,7 @@ RSpec.describe FileCacheMaintenanceJob, type: :job do
   describe "output_stolen" do
     it "creates a stolen cache" do
       FactoryBot.create(:stolen_bike)
-      FileCacheMaintainer.redis.expire(FileCacheMaintainer.info_id, 0)
+      RedisPool.conn { |r| r.expire(FileCacheMaintainer.info_id, 0) }
       described_class.new.perform
       tsv_record = FileCacheMaintainer.files.last
       expect(tsv_record["filename"]).to match "all_stolen_cache.json"

@@ -6,6 +6,22 @@ en:
         search:
           wrapper:
             e_vehicles_for_audit: 'E-Vehicles for audit:'
-            matching_bikes_html: "%{count} %{cycle_type} matching"
-            registered_bikes_html: "%{count} %{cycle_type} matching for %{org_name}"
+            export_csv: Export CSV
+            export_unavailable_search_all: >-
+              You can only export your organization's registrations. Uncheck "Search
+              all registrations" to export.
+            loading_results: Loading results...
+            matching_html:
+              one: "%{number} match"
+              other: "%{number} matches"
+            ordered_by_asc: Ordered by %{column}, ascending
+            ordered_by_desc: Ordered by %{column}, descending
+            ordered_by_tooltip: Switch to the table view to change ordering
+            over_count_matching_html: Over %{number} matches
+            per_page: Results per page
+            showing_html: showing %{from}–%{to} of %{count}
+            view_as: View as
+            view_cards: Cards
+            view_list: List
             view_matching_any_audit: view matching any audit
+            view_table: Table

@@ -66,10 +66,10 @@ RSpec.describe Admin::PublicImagesController, type: :request do
         expect(sized.image_size).to be > 0
 
         get base_url
-        expect(response.body).to_not match(/<th>\s*Size\s*<\/th>/)
+        expect(response.body).to_not match(/<th[^>]*>\s*Size\s*<\/th>/)
 
         get base_url, params: {search_size: true}
-        expect(response.body).to match(/<th>\s*Size\s*<\/th>/)
+        expect(response.body).to match(/<th[^>]*>\s*Size\s*<\/th>/)
         expect(response.body).to include(ActiveSupport::NumberHelper.number_to_human_size(sized.image_size))
       end
 

@@ -4,10 +4,10 @@ require "i18n/tasks/data/router/pattern_router"
 
 module I18nTasks
   # Sends every `components.*` key to the sidecar of the component that owns it, which a
-  # write pattern can't work out: in `components.pages.org.search.settings.address`,
-  # `settings` is either another component or a nested key group of the `search` one, and
+  # write pattern can't work out: in `components.pages.org.search.column_settings.address`,
+  # `column_settings` is either another component or a nested key group of the `search` one, and
   # only the filesystem knows which. Guessing wrongly files the sidecar in a directory with
-  # no component.rb, where MARKUP_DIGEST can't see it.
+  # no component.rb, where no component's cache digest can see it.
   class ComponentRouter < ::I18n::Tasks::Data::Router::PatternRouter
     ROOT = "app/components"
 

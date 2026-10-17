@@ -1,53 +1,23 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered table-sm">
-    <thead class="thead-light">
-      <th>
-        <%= sortable "created_at", "Added", render_sortable: render_sortable %>
-      </th>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", label: "Added", lower_right: ->(record) { content_tag(:span, record.id, class: "only-dev-visible") }) do |content_tag| %>
+    <%= render UI::Time::Component.new(time: content_tag.created_at) %>
+  <% end %>
 
-      <th class="small">
-        <%= sortable "updated_at", render_sortable: render_sortable %>
-      </th>
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |content_tag| %>
+    <%= render UI::Time::Component.new(time: content_tag.updated_at) %>
+  <% end %>
 
-      <th><%= sortable "name", render_sortable: render_sortable %></th>
-      <th><%= sortable "priority", render_sortable: render_sortable %></th>
-      <th>Blogs</th>
-    </thead>
+  <% table.column(sortable: "name") do |content_tag| %>
+    <%= link_to content_tag.name, edit_admin_content_tag_url(content_tag), class: "twlink" %>
+  <% end %>
 
-    <tbody>
-      <% collection.each do |content_tag| %>
-        <tr>
-          <td>
-            <span class="localizeTime">
-              <%= l content_tag.created_at, format: :convert_time %>
-            </span>
+  <% table.column(sortable: "priority") do |content_tag| %>
+    <small><%= content_tag.priority %></small>
+  <% end %>
 
-            <% if display_dev_info? %>
-              <code class="only-dev-visible"><%= content_tag.id %></code>
-            <% end %>
-          </td>
-
-          <td>
-            <small class="localizeTime">
-              <%= l content_tag.updated_at, format: :convert_time %>
-            </small>
-          </td>
-
-          <td>
-            <%= link_to content_tag.name, edit_admin_content_tag_url(content_tag) %>
-          </td>
-
-          <td>
-            <small><%= content_tag.priority %></small>
-          </td>
-
-          <td>
-            <%= number_display(content_tag.blogs.count) %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column(label: "Blogs") do |content_tag| %>
+    <%= number_display(content_tag.blogs.count) %>
+  <% end %>
+<% end %>

@@ -1,64 +1,33 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered table-sm">
-    <thead class="sortable">
-      <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at") do |stolen_notification| %>
+    <%= link_to admin_stolen_notification_url(stolen_notification), class: "twlink" do %>
+      <%= render UI::Time::Component.new(time: stolen_notification.created_at) %>
+    <% end %>
+  <% end %>
 
-      <th class="small">
-        <%= sortable "updated_at", render_sortable: render_sortable %>
-      </th>
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |stolen_notification| %>
+    <%= render UI::Time::Component.new(time: stolen_notification.updated_at) %>
+  <% end %>
 
-      <th><%= sortable "bike_id", render_sortable: render_sortable %></th>
-      <th>message</th>
-      <th>sent</th>
-    </thead>
+  <% table.column(sortable: "bike_id", lower_right: ->(stolen_notification) { link_to(stolen_notification.bike_id, edit_admin_stolen_bike_url(stolen_notification.bike), class: "twlink") if stolen_notification.bike }) do |stolen_notification| %>
+    <%= stolen_notification.bike ? stolen_notification.bike.title_string : "Bike deleted!" %>
+  <% end %>
 
-    <tbody>
-      <% collection.each do |stolen_notification| %>
-        <tr>
-          <td>
-            <a
-              class="localizeTime"
-              href="<%= admin_stolen_notification_url(stolen_notification) %>"
-            >
-              <%= l stolen_notification.created_at, format: :convert_time %>
-            </a>
-          </td>
+  <% table.column(label: "Message") do |stolen_notification| %>
+    <%= stolen_notification.message.truncate(120) %>
+  <% end %>
 
-          <td>
-            <small class="localizeTime">
-              <%= l stolen_notification.created_at, format: :convert_time %>
-            </small>
-          </td>
+  <% table.column(label: "Sent", classes: "tw:text-center") do |stolen_notification| %>
+    <% sent_count = stolen_notification.send_dates_parsed.count %>
 
-          <td>
-            <% if stolen_notification.bike %>
-              <div class="less-strong-hold">
-                <span class="less-strong-right">
-                  <%= link_to stolen_notification.bike_id, edit_admin_stolen_bike_url(stolen_notification.bike) %>
-                </span>
-
-                <%= stolen_notification.bike.title_string %>
-              </div>
-            <% else %>
-              Bike deleted!
-            <% end %>
-          </td>
-
-          <td><%= stolen_notification.message.truncate(120) %></td>
-
-          <td class="table-cell-check">
-            <% if stolen_notification.send_dates_parsed.count == 0 %>
-              <span class="text-danger">no</span>
-            <% elsif stolen_notification.send_dates_parsed.count == 1 %>
-              <%= check_mark %>
-            <% else %>
-              <%= stolen_notification.send_dates_parsed.count %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+    <% if sent_count == 0 %>
+      <span class="text-danger">no</span>
+    <% elsif sent_count == 1 %>
+      <%= check_mark %>
+    <% else %>
+      <%= sent_count %>
+    <% end %>
+  <% end %>
+<% end %>

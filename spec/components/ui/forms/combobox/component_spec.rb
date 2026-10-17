@@ -82,7 +82,7 @@ RSpec.describe UI::Forms::Combobox::Component, type: :component do
   end
 
   context "with a preselected value" do
-    let(:extra) { {value: "Unicycle"} }
+    let(:extra) { {html_options: {value: "Unicycle"}} }
 
     it "prefills the value" do
       expect(component).to have_css("[data-hw-combobox-prefilled-display-value='Unicycle']")
@@ -94,7 +94,7 @@ RSpec.describe UI::Forms::Combobox::Component, type: :component do
     let(:component) do
       render_in_view_context do
         form_for Bike.new, url: "#", builder: BikeIndexFormBuilder do |f|
-          render(UI::Forms::Combobox::Component.new(name: :primary_activity_id, form: f, options: %w[Road Gravel]))
+          render(UI::Forms::Combobox::Component.new(name: :primary_activity_id, options: %w[Road Gravel], html_options: {form: f}))
         end
       end
     end

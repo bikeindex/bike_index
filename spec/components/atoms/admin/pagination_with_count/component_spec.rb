@@ -75,7 +75,7 @@ RSpec.describe Atoms::Admin::PaginationWithCount::Component, type: :component do
       let(:options) { super().merge(index: ComponentStructs::IndexState.new(pagy: Pagy::Offset.new(count: 100, limit: 25, page: 1), per_page: 25)) }
 
       it "renders the per-page select and the page links" do
-        expect(component.css("select#per_page_select")).to be_present
+        expect(component.css("select[data-controller='admin--per-page-select']")).to be_present
         expect(component.css("a[href='/admin/bikes?page=2']")).to be_present
       end
     end

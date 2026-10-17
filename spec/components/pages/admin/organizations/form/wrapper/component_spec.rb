@@ -37,7 +37,7 @@ RSpec.describe Pages::Admin::Organizations::Form::Wrapper::Component, type: :com
 
   it "keeps the label's own note in the label, and what followed the field as helper text" do
     expect(component.at_css("label[for='organization_parent_organization_id']").text.squish)
-      .to eq "Parent organization (probably) do not add parents! Parents must be part of the same organization optional"
+      .to eq "Parent organization optional (probably) do not add parents! Parents must be part of the same organization"
     expect(component.at_css("#organization_parent_organization_id_helper").text.squish)
       .to start_with "Use the \"regional\" feature instead."
   end
@@ -72,6 +72,15 @@ RSpec.describe Pages::Admin::Organizations::Form::Wrapper::Component, type: :com
       expect(component).to have_css("[name='organization[manufacturer_id]']", visible: :all)
       expect(component.at_css("input[role='combobox'][aria-describedby='organization_manufacturer_id_helper']"))
         .to be_present
+    end
+  end
+
+  context "with SAML SSO active" do
+    let(:organization) { FactoryBot.create(:organization_saml_configuration, :active).organization }
+
+    it "says the short name is locked, rather than warning about invoiced URLs" do
+      expect(component).to have_content("locked while SAML SSO is active")
+      expect(component).not_to have_content("will change org URLs")
     end
   end
 

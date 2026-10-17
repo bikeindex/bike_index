@@ -15,7 +15,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Organization") do |landing_page| %>
-    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: landing_page.organization, organization_id: landing_page.organization_id, sort_state:, render_search:) %>
+    <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: landing_page.organization, organization_id: landing_page.organization_id, sort_state:, render_search:) %>
   <% end %>
 
   <% table.column(sortable: "enabled", label: "Enabled") do |landing_page| %>
@@ -27,11 +27,11 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Body (characters)", header_classes: "tw:font-normal") do |landing_page| %>
+  <% table.column(label: "Body (characters)") do |landing_page| %>
     <%= helpers.number_display(landing_page.body.to_s.size) %>
   <% end %>
 
-  <% table.column(label: "History", header_classes: "tw:font-normal") do |landing_page| %>
+  <% table.column(label: "History") do |landing_page| %>
     <%= link_to "Versions", admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage", search_item_id: landing_page.id, period: "all"), class: "twlink tw:text-sm" %>
   <% end %>
 <% end %>

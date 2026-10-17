@@ -8,9 +8,17 @@ module UI
     # kind: :toggle renders them as a segmented control instead — one track, with the
     # active entry raised out of it.
     class Component < ApplicationComponent
+      # Template Dependency: UI::Button::Component
       KINDS = %i[button toggle].freeze
 
       CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
+
+      # UI::PeriodSelect lays its own buttons out with these, so a period row and a chip
+      # group line up where they're stacked
+      ROW_CLASSES = "tw:flex tw:flex-wrap tw:gap-1"
+
+      # auto-fit needs a definite minimum to count repetitions
+      FULL_WIDTH_ROW_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2"
 
       # Track and segment sizes come from kelsey_redesign/new-org-search/, not the type scale
       TRACK_CLASSES = "tw:inline-flex tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
@@ -23,7 +31,7 @@ module UI
         UI::Button::Component::DISABLED_CLASSES,
         # The line height is part of the size: an arbitrary font size pairs none of its own,
         # so the page's inherited 30px made a 24px segment 40px tall
-        "tw:px-3 tw:py-[5px] tw:text-[11.5px]/[1.2] tw:font-extrabold tw:whitespace-nowrap",
+        "tw:rounded-lg tw:px-3 tw:py-[5px] tw:text-[11.5px]/[1.2] tw:font-extrabold tw:whitespace-nowrap tw:transition-colors",
         "tw:no-underline tw:hover:no-underline tw:text-gray-400",
         "tw:not-disabled:not-aria-disabled:hover:text-gray-900",
         "tw:focus:ring-purple-500/40",
@@ -32,12 +40,11 @@ module UI
       ].join(" ").freeze
 
       # full_width lays the chips out as equal columns that wrap, staying the same width
-      # on every line — flex would size each line independently. auto-fit needs a
-      # definite minimum to count repetitions.
+      # on every line — flex would size each line independently
       def self.group_classes(kind:, full_width:)
         case kind
         when :button
-          full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-2"
+          full_width ? FULL_WIDTH_ROW_CLASSES : ROW_CLASSES
         when :toggle
           # The track sizes itself to its segments, so there's no column layout to widen
           raise ArgumentError, "full_width is not supported for the toggle kind" if full_width

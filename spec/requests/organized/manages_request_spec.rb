@@ -67,6 +67,21 @@ RSpec.describe Organized::ManagesController, type: :request do
     end
   end
 
+  context "logged_in_as_superuser" do
+    include_context :request_spec_logged_in_as_superuser
+    let(:current_organization) { FactoryBot.create(:organization) }
+
+    describe "show" do
+      it "renders for an organization with no claimed members" do
+        expect(current_organization.users).to be_empty
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response).to render_template :show
+        expect(current_organization.reload.auto_user_id).to be_blank
+      end
+    end
+  end
+
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
     describe "show" do
@@ -79,6 +94,20 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(session[:passive_organization_id]).to eq current_organization.id
         expect(assigns(:controller_namespace)).to eq "organized"
         expect(assigns(:page_id)).to eq "organized_manage_show"
+        expect(response.body).to include "<code>#{current_organization.reload.auto_user.email}</code>"
+        expect(response.body).to include 'name="organization[send_self_registration_email]"'
+        expect(response.body).to include "owner email of #{current_organization.auto_user.email}"
+        expect(response.body).not_to include "This includes unregistered notifications"
+      end
+
+      context "with parking_notifications" do
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications]) }
+
+        it "includes unregistered notifications" do
+          get base_url
+          expect(response.status).to eq(200)
+          expect(response.body).to include "This includes unregistered notifications"
+        end
       end
     end
 
@@ -122,6 +151,7 @@ RSpec.describe Organized::ManagesController, type: :request do
         let(:update) do
           {
             direct_unclaimed_notifications: true,
+            send_self_registration_email: true,
             # slug: 'short_name',
             slug: "cool name and stuffffff",
             available_invitation_count: "20",
@@ -151,7 +181,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:success]).to be_present
           current_organization.reload
           # Ensure we can update what we think we can (not that much)
-          expect(current_organization).to have_attributes update.slice(:name, :direct_unclaimed_notifications)
+          expect(current_organization).to have_attributes update.slice(:name, :direct_unclaimed_notifications, :send_self_registration_email)
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")

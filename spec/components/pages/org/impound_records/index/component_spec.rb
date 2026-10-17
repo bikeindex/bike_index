@@ -15,7 +15,8 @@ RSpec.describe Pages::Org::ImpoundRecords::Index::Component, type: :component do
       impound_records: ImpoundRecord.none,
       search_status: "current",
       search_unregisteredness: "all",
-      humanized_time_range: "in the past year",
+      time_range: (Time.current - 1.year)..Time.current,
+      period: "year",
       available_statuses: %w[current all],
       current_organization: organization,
       sort_state: ComponentStructs::SortState.new(sort: "created_at", direction: "desc")

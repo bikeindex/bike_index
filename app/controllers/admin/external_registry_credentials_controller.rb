@@ -22,7 +22,7 @@ module Admin
       else
         flash[:error] =
           @external_registry_credential.errors.full_messages.to_sentence
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -35,7 +35,7 @@ module Admin
         redirect_to admin_external_registry_credentials_url
       else
         flash[:error] = @external_registry_credential.errors.full_messages.to_sentence
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     end
 

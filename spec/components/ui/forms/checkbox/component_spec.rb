@@ -13,6 +13,14 @@ RSpec.describe UI::Forms::Checkbox::Component, type: :component do
     expect(component).to_not have_css("input[required]")
   end
 
+  context "with a block" do
+    let(:component) { render_inline(described_class.new(name: :subscribe)) { "<em>Email</em> me".html_safe } }
+
+    it "renders it as the label" do
+      expect(component).to have_css("label span em", text: "Email")
+    end
+  end
+
   context "when required" do
     let(:options) { {name: :subscribe, label: "Email me updates", required: true} }
 
@@ -24,13 +32,26 @@ RSpec.describe UI::Forms::Checkbox::Component, type: :component do
   context "when checked with custom value and data" do
     let(:options) do
       {name: :serial_missing, label: "Missing", checked: true, value: true,
-       class_name: "tw:mt-2", input_data: {action: "change->serial#toggle"}}
+       class_name: "tw:mt-2", html_options: {data: {action: "change->serial#toggle"}}}
     end
 
     it "renders checked with the passed value and data" do
       expect(component).to have_css("input[type='checkbox'][value='true'][checked]", visible: :all)
       expect(component).to have_css("label.tw\\:mt-2")
       expect(component).to have_css("input[data-action='change->serial#toggle']", visible: :all)
+    end
+  end
+
+  context "with html_options" do
+    let(:options) do
+      {name: :search_all, label: "Search all", html_options: {form: "Search_Form", disabled: true, class: "tw:accent-blue-600"}}
+    end
+
+    it "puts them on the input, joining its own classes" do
+      input = component.css("input[type='checkbox']").first
+      expect(input["form"]).to eq "Search_Form"
+      expect(input["disabled"]).to be_present
+      expect(input["class"].split).to include("tw:accent-blue-600", "tw:shrink-0")
     end
   end
 

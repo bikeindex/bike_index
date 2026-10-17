@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      org:
+        search:
+          search_all:
+            search_all_html: >-
+              Search all registrations <span class="twless-strong">(not just %{org_name})</span>

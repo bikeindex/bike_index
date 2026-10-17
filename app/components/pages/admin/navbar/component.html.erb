@@ -37,7 +37,7 @@
       data-controller="admin--navbar"
       data-action="hw-combobox:selection->admin--navbar#navigate"
     >
-      <%= render(UI::Forms::Combobox::Component.new(name: :admin_navigation, options: combobox_options, placeholder:)) %>
+      <%= render(UI::Forms::Combobox::Component.new(name: :admin_navigation, options: combobox_options, html_options: {placeholder:})) %>
     </div>
   <% end %>
 

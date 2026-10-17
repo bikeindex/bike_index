@@ -1,5 +1,5 @@
 <%= render(Pages::Admin::Headers::Tabs::Component.new(title: @organization.name, subtitle: @subtitle,
-      tabs:, links: top_right_links, nav_label: "Organization sections", turbo: @turbo)) do |header| %>
+      tabs:, links: top_right_links, nav_label: "Organization sections")) do |header| %>
   <% if @organization.deleted? %>
     <% header.with_alert do %>
       <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Organization deleted")) do %>

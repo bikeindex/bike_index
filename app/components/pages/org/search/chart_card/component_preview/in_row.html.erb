@@ -1,0 +1,6 @@
+<%# The card's full bleed and its collapse both read .twwiderow's width, so it needs one %>
+<div class="twwiderow <%= "tw:max-w-sm" if narrow %>">
+  <div class="tw:min-w-0">
+    <%= render(card) %>
+  </div>
+</div>

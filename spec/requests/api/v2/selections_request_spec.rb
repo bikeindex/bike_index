@@ -69,6 +69,7 @@ RSpec.describe "Selections API V2", type: :request do
       expect(response.code).to eq("200")
       result = JSON.parse(response.body)["handlebar_types"][0]
       expect(result["name"]).to eq(selection[:name])
+      expect(result["slug"]).to eq "flat"
     end
   end
 

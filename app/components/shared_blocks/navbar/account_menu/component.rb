@@ -6,6 +6,7 @@ module SharedBlocks
       # UserServices::MenuItemsAccount's rows as the org sidebar's account block, which sits at
       # the foot of the column -- so they open upward, the other way from the navbar's gear.
       class Component < ApplicationComponent
+        # Template Dependency: UI::ActiveLink::Component
         # The tint SharedBlocks::Navbar::UserSettingsMenu::LOGOUT deviates from, for its darker panel
         LOGOUT = "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!"
 

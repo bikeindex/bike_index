@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationForm::Component, :js, type: :system do
-  let(:controller_id) { "registrations--show--parking-notification-form" }
+  let(:controller_id) { "org--parking-notification-form" }
   let(:map_selector) { "[data-#{controller_id}-target='map']" }
   # Defined in utils/maplibre.js since #3954, so there is no Ruby constant to reuse
   let(:maps_host) { "https://maps.bikeindex.org" }
@@ -220,6 +220,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
     expect(page).to have_field("Postal code", with: "94110")
     # The endpoint hands back ids, so the selects are set directly rather than matched by label
     expect(address_field("region_record_id")).to eq(state.id.to_s)
+    # and the state combobox shows it, rather than only its hidden field holding it
+    expect(page).to have_field("State", with: "#{state.name} (#{state.abbreviation})")
     expect(address_field("country_id")).to eq(country.id.to_s)
     expect(coordinate("use_entered_address")).to eq("true")
     expect_axe_clean
@@ -407,25 +409,15 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
 
     # Every controller module is a separate fetch, so the accordion can open the
     # panel — spending its one-shot `shown` event — before this component's module
-    # has landed. Held until the panel is open rather than for a duration, which
-    # only wins the race some of the time
-    release, held_requests = Queue.new, [] # captured by the cross-thread route handler
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route(%r{parking_notification_form_controller}, proc { |route, request|
-        held_requests << request.url
-        release.pop
-        route.continue
-      })
-    end
+    # has landed
+    form_module = hold_requests(%r{parking_notification_form_controller})
 
     visit "#{preview_path}?panel=impound"
 
     # Only the accordion can reveal the panel, so this is it having opened and
-    # dispatched to nobody — and a route that stopped matching would hold
-    # nothing, leaving the example green against no race
+    # dispatched to nobody
     expect(page).to have_content("Set on map", wait: 10)
-    expect(held_requests).to_not be_empty
-    release << :continue
+    form_module.release
 
     expect_impound_mode
   end

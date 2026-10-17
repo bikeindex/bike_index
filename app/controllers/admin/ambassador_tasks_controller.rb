@@ -20,7 +20,7 @@ module Admin
         redirect_to admin_ambassador_tasks_url
       else
         flash.now[:error] = @ambassador_task.errors.full_messages.join("\n")
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -32,7 +32,7 @@ module Admin
         redirect_to admin_ambassador_tasks_url
       else
         flash.now[:error] = @ambassador_task.errors.full_messages.join("\n")
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     end
 

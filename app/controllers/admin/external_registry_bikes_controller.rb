@@ -8,7 +8,7 @@ module Admin
       @per_page = permitted_per_page(default: 100)
       @pagy, @bikes =
         pagy(:countish, matching_bikes
-          .reorder("external_registry_bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+          .reorder(sortable_order(ExternalRegistryBike)), limit: @per_page, page: permitted_page)
     end
 
     def show

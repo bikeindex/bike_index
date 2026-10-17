@@ -15,6 +15,15 @@ RSpec.describe Admin::StravaIntegrationsController, type: :request do
       expect(response).to render_template(:index)
       expect(assigns(:collection).pluck(:id)).to eq([strava_integration.id])
     end
+
+    context "sorted by athlete ID" do
+      let!(:strava_integration_smaller) { FactoryBot.create(:strava_integration, strava_id: "999") }
+
+      it "sorts numerically" do
+        get base_url, params: {sort: "strava_id", direction: "asc"}
+        expect(assigns(:collection).pluck(:id)).to eq([strava_integration_smaller.id, strava_integration.id])
+      end
+    end
   end
 
   describe "#show" do

@@ -80,6 +80,17 @@ module IntegrationSpecHelpers
     move_mouse(element, cap:) { |mouse| mouse.up.tap { mouse.move(0, 0) } }
   end
 
+  def drag_select(element, past:)
+    box = element.native.bounding_box
+    middle = box["y"] + box["height"] / 2
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.mouse.move(box["x"] + 2, middle)
+      playwright_page.mouse.down
+      playwright_page.mouse.move(box["x"] + box["width"] + past, middle, steps: 12)
+      playwright_page.mouse.up
+    end
+  end
+
   def browser_cookie_value(name)
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.cookies.find { |cookie| cookie["name"] == name }&.fetch("value")
@@ -100,9 +111,11 @@ module IntegrationSpecHelpers
 
   # Type into a field with real keystrokes. Capybara's `set`/`fill_in` go through
   # Playwright's fill, which dispatches only an `input` event; JS that opens on
-  # keydown (e.g. hotwire_combobox's async dropdown) needs real key events.
+  # keydown (e.g. hotwire_combobox's async dropdown) needs real key events. A combobox
+  # typed into before its controller connects never searches, so that waits first.
   def type_into(locator, text)
     field = locator.is_a?(Capybara::Node::Element) ? locator : find(locator)
+    wait_for_stimulus("hw-combobox") if field.matches_css?("[data-controller~='hw-combobox'] *", wait: 0)
     field.set("")
     field.send_keys(text)
     field
@@ -214,7 +227,7 @@ module IntegrationSpecHelpers
 
   # search--form#handlePopstate reconciles these to the address bar on a
   # back/forward; the results frame reloads separately and faster.
-  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes].freeze
+  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes location distance].freeze
 
   # Navigate back, then wait for the filters to settle to the address bar so
   # callers don't read or fill against the restoration preview.
@@ -238,8 +251,25 @@ module IntegrationSpecHelpers
 
   # Click an async hotwire_combobox option, re-finding it if a later async
   # response re-renders the listbox and detaches the node between find and click.
+  # The pick filters once more, debounced, and Turbo renders that response by putting focus
+  # back where it was when the render began - so a fill landing in that frame types into the
+  # field filled before it. This waits for the response and the frame after it.
   def click_combobox_option(text)
-    retry_on_detach { find(".hw-combobox__option", text:, match: :first).click }
+    combobox = nil
+    retry_on_detach do
+      option = find(".hw-combobox__option", text:, match: :first)
+      combobox = option.ancestor("[data-controller~='hw-combobox']")
+      option.click
+    end
+    page.evaluate_async_script(<<~JS, combobox)
+      const [element, done] = arguments
+      const controller = window.Stimulus.getControllerForElementAndIdentifier(element, "hw-combobox")
+      if (!controller?.hasAsyncSrcValue) return done()
+      const giveUpAt = performance.now() + 10000
+      const settle = () => (controller.callbackQueue.length && performance.now() < giveUpAt)
+        ? setTimeout(settle, 50) : requestAnimationFrame(() => requestAnimationFrame(done))
+      setTimeout(settle, controller.debounceIntervalValue)
+    JS
   end
 
   # Takes the trigger (a page with two of them opens the same modal from either), which names
@@ -299,6 +329,40 @@ module IntegrationSpecHelpers
     until yield
       raise "waited #{timeout}s for the block to be true" if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
       sleep 0.05
+    end
+  end
+
+  # Holds requests matching `pattern` (and the block, when given) until the example calls
+  # `release`, so a race runs in the order the example needs every time -- a timed delay only
+  # wins it some of the time. Released stays released, so later requests don't hang.
+  def hold_requests(pattern, &filter)
+    RequestHold.new.tap do |hold|
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route(pattern, ->(route, request) {
+          hold.wait if filter.nil? || filter.call(request)
+          route.continue
+        })
+      end
+    end
+  end
+
+  # The route handler runs on Playwright's thread, so the gate is a Queue
+  class RequestHold
+    def initialize
+      @gate = Queue.new
+      @held = false
+    end
+
+    def wait
+      @held = true
+      # Pushing the token back leaves the gate open for the next one
+      @gate.push(@gate.pop)
+    end
+
+    # A pattern that stops matching holds nothing, leaving the example green against no race
+    def release
+      raise "hold_requests held nothing - has the pattern stopped matching?" unless @held
+      @gate.push(:release)
     end
   end
 

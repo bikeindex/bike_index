@@ -10,6 +10,8 @@ RSpec.describe RegistrationSequencePaths do
 
     it "builds the organization's routes" do
       expect(described_class.index(registration_sequence)).to eq "#{base_url}/registration_sequences"
+      expect(described_class.index(registration_sequence, admin: true))
+        .to eq "/admin/organizations/#{organization.to_param}?active_tab=registration_sequences"
       expect(described_class.sequence(registration_sequence)).to eq "#{base_url}/registration_sequences/#{registration_sequence.id}"
       expect(described_class.sequence(registration_sequence, page: 2)).to eq "#{base_url}/registration_sequences/#{registration_sequence.id}?page=2"
       # The organization's member path is its preview; admin's is a screen of its own

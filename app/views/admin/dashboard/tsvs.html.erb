@@ -1,0 +1,46 @@
+<div class="admin-subnav">
+  <div class="col">
+    <h1>TSV Exports!</h1>
+    <p>TSVs are generated every night.</p>
+  </div>
+</div>
+
+<h4>Tsv reports:</h4>
+
+<% if @tsvs.none? %>
+  <p class="text-warning">No TSVs</p>
+<% else %>
+  <%= render(UI::Table::Component.new(records: @tsvs.sort_by { |a| a[:updated_at] })) do |table| %>
+    <% table.column(label: "Updated") do |tsv_info| %>
+      <%= render UI::Time::Component.new(time: Time.at(tsv_info[:updated_at].to_i)) %>
+    <% end %>
+
+    <% table.column(label: "File") do |tsv_info| %>
+      <%= link_to tsv_info[:filename], tsv_info[:path], class: "twlink" %>
+    <% end %>
+
+    <% table.column(label: "description") do |tsv_info| %>
+      <%= tsv_info[:description] %>
+    <% end %>
+
+    <% table.column(label: "Daily") do |tsv_info| %>
+      <%= check_mark if tsv_info[:daily] %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <%= form_tag admin_update_tsv_blocklist_path, method: :put, multipart: true do %>
+      <%= label_tag :tsv_blocklist do %>
+        Blocklist Bike Urls, <strong>1 per line</strong>. These can be the id
+        (the number in the url), the bike url, admin url or edit url
+        <div class="form-group">
+          <%= text_area_tag :blocklist, @blocklist.map { |i| "#{ENV["BASE_URL"]}/bikes/#{i}" }.join("\n"), rows: 10, class: "form-control" %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= submit_tag "Save changes", class: "btn btn-success submit-bike-update" %>
+  </div>
+</div>

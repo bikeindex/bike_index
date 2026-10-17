@@ -6,7 +6,11 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
-**`bin/rails restart` for anything a reload misses** — a renamed initializer, a pin dropped from `config/importmap.rb`, a Lookbook registry that's stopped listing new scenarios, a gem a merge bumped. It bounces puma alone, so bin/dev's watchers survive and dev Sidekiq doesn't (`rerun` watches `app,db,lib`, not `config`). Fine to run against a server someone else started; starting or killing `bin/dev` isn't.
+**A spawned `.claude/worktrees/…` checkout runs `bin/workspace_setup --without_seeds` before anything else** — until it has, `bin/env` falls back to the *main* checkout's port, database and Redis. `.claude/hooks/worktree-setup.sh` runs it at the first session start. The `sandbox-test-setup` skill has it.
+
+**A workspace's database generally starts empty** — created and migrated, but not seeded, so `Bike.count` is 0 and real pages render nothing. Run `bundle exec rails db:seed` when you need records to try something in development; `bikeindex_development_$WORKSPACE_ID` is a per-workspace throwaway, so seeding or re-seeding it is safe and never needs asking.
+
+**`bin/rails restart` for anything a reload misses** — a renamed initializer, a pin dropped from `config/importmap.rb`, a Lookbook registry that's stopped listing new scenarios, a gem a merge bumped. It bounces puma alone, so bin/dev's watchers survive and dev Sidekiq doesn't (`rerun` watches `app,db,lib`, not `config`). Fine to run against a server someone else started; starting or killing `bin/dev` isn't — **except in a spawned `.claude/worktrees/…` checkout, which is yours alone: start it there yourself.** The `sandbox-test-setup` skill has which checkout is whose.
 
 **A renamed initializer is the one that reads as anything but a stale boot**: `config/routes.rb` reloads, dies partway through its draw on the missing constant, and everything below that line 404s while the page itself raises a bare `NameError` on a route helper.
 
@@ -70,7 +74,9 @@ Run `bundle exec rails prepare_translations` after hand-editing a `component.en.
 
 **A component's copy lives in that component's own sidecar, and orphaning is never a reason to leave it somewhere else.** The sync relocates the other four locales on its next run, and non-English readers fall back to English only until it does — a scope that doesn't match its component doesn't expire.
 
-**Don't hand-edit `config/locales/translation.*.yml` for a new key either** — the sync writes those four too. A lookup in another locale raises rather than falling back in test, so the three `:nl` specs (`shared_blocks/footer`, `navbar/wrapper`, `header_tags`) go red until the sync reaches the key.
+**Changing what a value says means a new key.** The other locales keep their translation under an unchanged key, so rewording one in place leaves every non-English reader on the old copy.
+
+**Don't hand-edit `config/locales/translation.*.yml` for a new key either** — the sync writes those four too. A lookup in another locale raises rather than falling back in test, so the `:nl` specs (`shared_blocks/footer`, `navbar/wrapper`, `header_tags`, `user_services/menu_items_org`) go red until the sync reaches the key. That red is expected — never keep the old key to turn it green.
 
 When a sync lands on the base, apply the base's move onto your files rather than the reverse, then check for a scope both sides created: it auto-merges into two sibling keys of the same name and YAML keeps the last.
 
@@ -86,13 +92,30 @@ When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-h
 
 Delegate the enumeration rather than eyeballing a grep — a hand-written grep anchors on one method name and misses the call sites that don't use it.
 
+**Tell a backgrounded reviewer not to spawn its own subagents.** It hands part of its scope to them, then finishes with "still running" and none of their findings — three of five did on #4505, and each needed a follow-up message to report.
+
+**A skill that takes many turns costs mostly in re-reading the session it runs in** — 65–87% of each skill's cost in the transcripts measured; shortening a skill's text doesn't cut that. So a multi-turn skill opens with a **Who runs this** section naming the model, the brief and the reply for handing it to one subagent, and every such hand-off works the same way:
+
+- **From a session with history, spawn one `general-purpose` `Agent` that invokes the skill** (the `Skill` tool, so the skill's `allowed-tools` apply) and relay its reply rather than redoing its work. A job of a command or two is cheaper done in the session than briefed.
+- **Brief it with what only the conversation knows** — the branch's purpose, choices already made — or it undoes them.
+- **Wait for it, and stay out of the checkout meanwhile** — it may check out the base, run specs, or drive the shared browser.
+- **Any subagent skips a Who runs this section** and does the work itself; handing off again only loses context.
+
 ## Testing
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.
 
-**Verify with `bundle exec rspec` over the spec files covering what you changed — usually one to three.** Not `bin/turbo_tests`, `bin/ci`, or a whole directory (`spec/integration`, `spec/components`) — that's a suite run by another name. "It renders on every page, so anything could break" is the rationalization to watch for. A red example is a reason to re-run that example, not its directory. Say which specs you ran and why those. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
+**Verify with `bundle exec rspec` over the spec files covering what you changed — usually one to three.** Not `bin/turbo_tests`, `bin/ci`, or a whole directory (`spec/integration`, `spec/components`) — that's a suite run by another name. "It renders on every page, so anything could break" is the rationalization to watch for. A red example is a reason to re-run that example, not its directory. **Redesigning a page means running that page's own integration spec**, whose filename names the route rather than anything you edited — `registrations_search_spec.rb` drove markup #4268 had replaced weeks earlier, and nothing else failed. Say which specs you ran and why those. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
+
+**A spec that lands on `/admin` seeds `Organization.example` in a `before`.** The dashboard reads it
+under the reading role, so a superuser login that redirects there raises `ActiveRecord::ReadOnlyError`
+on a write to `organizations` — which reads as a database misconfiguration rather than a missing
+record. `spec/integration/admin/news_images_spec.rb` and `spec/requests/admin/dashboard_request_spec.rb`
+both do it.
 
 **Assert on what a drain produces, not on the flag that precedes it.** A column a job reconciles when it runs records what was true at write time — `Ownership#skip_email` is one — so it answers a different question than the one you're asking.
+
+**A spec that shells out gets what `.github/ci/Dockerfile` installs, which is `ruby:slim` plus a short list — no `jq`, no `which`.** Locally they're both on PATH, so the spec passes here and fails on one CI shard with an assertion that names neither. Probe for the binary (`/bin/grep`, `/usr/bin/grep`) rather than asking `which`, and don't reach for `jq` to read JSON a Ruby spec could parse itself.
 
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded. To clear stale contents, `rm` the file and re-run the spec.
 
@@ -102,14 +125,17 @@ Uses RSpec. All business logic should be tested. The `rspec-testing` skill cover
 
 Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScript files exist but are deprecated. The `bin/dev` command handles Tailwind and JS builds. The `frontend-conventions` skill has the conventions.
 
-Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work.
+Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work — or, in a spawned `.claude/worktrees/…` checkout, start it yourself.
+
+**A "down" answer expires — re-run the curl each time you need the server, including right before reporting it down.** `bin/dev` boots Rails twice (`log:clear`, then puma) and calls `gh` in between, so a check landing in that gap says down about a server that's about to be up — and one started mid-session never gets noticed at all.
 
 **`app/views` holds more `.haml` than `.erb`** — deprecated, but 301 files against 266, so a grep for call sites that passes `--include='*.erb'` and stops there misses the majority of the directory. Anything a view can reach needs `*.haml` in the pathspec too; the miss surfaces as a `NoMethodError` at render, caught only by a spec that renders that page.
 
 ## Pull requests
 
-- When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs and captures desktop+mobile screenshots, which it posts as a `## Screenshots` comment (never in the body, so the summary stays first).
-- To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, the `gh` CLI **cannot upload images** — use the `github-pr-images` skill, which drives a real browser to GitHub's user-attachments uploader.
+- When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs and captures desktop+mobile screenshots, which it posts as a `## Screenshots` comment (never in the body, so the summary stays first). `.claude/hooks/pr-guardrails.sh` denies the authoring commands until that skill is loaded.
+- **Merging a PR is the human's, including when they ask you to do it in the moment.** Say the PR is ready and leave it. The same hook denies it, and won't be talked round — but it only covers agents running here, so treat the rule as the thing to follow rather than the hook as the thing to get past.
+- To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, use the `github-pr-images` skill — it uploads with `gh … --attach` and owns the PR's `## Screenshots` comment.
 
 ## Architecture notes
 
@@ -118,7 +144,9 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **Moving a file silently un-suppresses whatever was keyed to its old path.** `.herb.yml` excludes lint rules by path, `config/brakeman.ignore` hashes the file path into each fingerprint, and `config/i18n-tasks.yml` routes deep component scopes by path — so a rename re-enables the rule, obsoletes the entry, and leaves a write rule pointing at nothing, and none of the three says so until CI fails or a key lands in the wrong sidecar. Grep the repo root and `config/` for the old path, not just `app/`; re-fingerprint brakeman from `brakeman -f json` rather than hand-editing the path.
 - **Changing a `PublicImage::VARIANTS` transformation re-keys every variant** — the key digests the transformations. Existing objects orphan and regenerate lazily, and the heic R2 cassette re-records: `rm` it and re-run rather than committing the appended interactions.
 - **`UI::ButtonLink::Component(method:)` renders a `button_to` — a block-level `<form>`, not the inline `<a>` it replaced — unless a `confirm:` comes with it, which puts the method on a Turbo link instead.** It can't nest inside another `form_for`, and it closes an open `<p>` the way any flow element does — so a `link_to … method:` converted in prose silently breaks the paragraph around it, and one converted beside an `f.submit` has to move out of the form. Layout classes belong on the wrapper via `form: {class:}`, which replaces Rails' own `button_to` class rather than adding to it.
+- **A component built but never rendered can't call a route helper.** A component built only to read values off it never gets a `#controller`, so any `*_path` on one raises `ViewComponent::ControllerCalledBeforeRenderError` — which names `#controller` rather than the helper. Build the URL in whichever component is actually rendering, off the values the data object exposes.
 - **A Tailwind `@utility`'s position in the generated sheet follows the properties it declares.** Adding a declaration to an existing one moves the whole rule, so it can drop behind a class it used to outrank and silently undo a sibling declaration — `rounded-none` added to `twfullbleed` put the full-bleed card's sides and top back. Force each declaration (`tw:border-x-0!`) rather than relying on where the rule lands.
+- **An org page's container decides more than markup** — `SharedBlocks::MainContent::Organized`'s `include_javascript_pack?` falls back to it, so giving a page a different container also decides whether it loads the legacy jQuery bundle. A page that needs its own container or bundle is an entry in `PAGE_CONTAINERS` or `JAVASCRIPT_PACK_PAGES`, not a check beside them; `registrations#new` (no container, for the register flow's full-bleed shell) is the pattern.
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
 - **Fragment caches carry the locale; `Rails.cache.fetch` doesn't.** `ApplicationComponentHelper#cache` folds `I18n.locale` into every key, so a component's own locale-less `cache_key` is fine. A `Rails.cache.fetch` in a service skips that, and one locale serves another's copy — `UserServices::MenuItemsOrg` did. Locale comes from a request param or `Accept-Language` as much as `user.preferred_language`, so `current_user` in the key doesn't stand in for it.
@@ -126,11 +154,12 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **A version constraint in the `Gemfile` needs a matching `.github/dependabot.yml` ignore.** Dependabot widens the constraint rather than skipping the update, so a pin with no ignore entry is silently reverted by a later bump PR — `redis` went that way in #4215, undoing #4175 and leaving its comment behind to explain a pin that was no longer there.
 - **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.
 - **`Organization#is_invoiced?` is neither a money question nor a feature check.** It means an active invoice, the org's own or its `parent_organization`'s, and a $0 invoice sets it — which is how law enforcement gets features. `paid_money?` is the money question. It diverges from `enabled_feature_slugs` in both directions too: regional children and ambassadors get slugs with no invoice, and a child of an invoiced parent gets the flag with no slugs.
-- **`user_emails.email` is not unique** — no unique index, no uniqueness validation, and only confirmed rows share a partial index, so the same address can sit on two accounts. `UserEmail.where(email:)` therefore reaches rows belonging to whoever else holds it; scope an address lookup to its user (`user.user_emails.friendly_find`, or a `user_id` term) before writing to what comes back.
+- **`user_emails.email` is not unique** — no unique index, no uniqueness validation, so the same address can sit on two accounts. `UserEmail.where(email:)` therefore reaches rows belonging to whoever else holds it; scope an address lookup to its user (`user.user_emails.friendly_find`, or a `user_id` term) before writing to what comes back.
 
 # Initial setup
 
 ```bash
 bundle install # install ruby dependencies
 bundle exec rails db:create db:migrate # create the databases
+bundle exec rails db:seed # populate them (test users, organizations, bikes)
 ```

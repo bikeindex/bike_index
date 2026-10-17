@@ -1,0 +1,10 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :search_radius_miles, kind: :number_field, label_text: "Search radius (miles)")) do |group| %>
+    <% group.with_label_note { "controls how large the region is" } %>
+  <% end %>
+
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :embedable_user_email, label_text: "Auto user email", required: true)) do |group| %>
+    <% group.with_label_note { "embed registration email" } %>
+    <% group.with_helper_text { "the note sits in the label; helper text sits under the field" } %>
+  <% end %>
+<% end %>

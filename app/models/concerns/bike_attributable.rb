@@ -74,11 +74,11 @@ module BikeAttributable
   end
 
   def frame_colors
-    [
-      primary_frame_color&.name,
-      secondary_frame_color&.name,
-      tertiary_frame_color&.name
-    ].compact
+    frame_color_records.map(&:name)
+  end
+
+  def frame_color_records
+    [primary_frame_color, secondary_frame_color, tertiary_frame_color].compact
   end
 
   # When displaying the cycle_type, generally this is what you want
@@ -202,7 +202,7 @@ module BikeAttributable
       return stock_photo_url.present? ? stock_photo_url : nil
     end
 
-    public_image = public_images.limit(1).first
+    public_image = public_images.first
     # PublicImage owns which backend a row is on
     return public_image.image_url(size) if public_image&.activestorage?
 

@@ -42,6 +42,7 @@ conditions = MarketplaceListing::CONDITION_ENUM.keys
 
 # --- 6 standard listings + 4 promoted (seller has an active membership) ---
 listings = 10.times.map do |i|
+  SeedHelpers.tick
   promoted = i >= 6
   prefix = promoted ? "member" : "seller"
   seller = seed_marketplace_seller(email: "marketplace-#{prefix}-#{i}@bikeindex.org", name: "Marketplace #{prefix.capitalize} #{i + 1}")

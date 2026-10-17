@@ -6,10 +6,17 @@ module Atoms
       # Every status at once - hover or click a badge for the tooltip explaining it
       def all_statuses
         render_with_template(template: "atoms/registration_status_badge/preview/all_statuses",
-          locals: {bikes: status_bikes.values})
+          locals: {badges: status_bikes.values.map { {bike: it} }})
       end
 
-      # @param size select { choices: [xs, sm, md, lg] }
+      # With the time each status began, at ages the localized time formats differently
+      def with_time
+        times = [20.minutes.ago, 5.hours.ago, 2.days.ago, 3.weeks.ago, 5.months.ago, 14.months.ago, 3.years.ago]
+        render_with_template(template: "atoms/registration_status_badge/preview/all_statuses",
+          locals: {badges: status_bikes.values.zip(times).map { |bike, time| {bike:, time:} }})
+      end
+
+      # @param size select { choices: [xs, sm, md, lg, inherit] }
       def sizes(size: "lg")
         render(Atoms::RegistrationStatusBadge::Component.new(bike: status_bikes[:stolen], size: size&.to_sym))
       end

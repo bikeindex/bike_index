@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
+import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION, showMapUnavailable } from 'utils/maplibre'
 
 /* global IntersectionObserver */
 
@@ -39,7 +39,13 @@ export default class extends Controller {
 
       this.#render(maplibregl)
     } catch (error) {
-      this.#showUnavailable(error)
+      showMapUnavailable(error, {
+        source: this.identifier,
+        map: this.map,
+        canvas: this.canvasTarget,
+        message: this.hasUnavailableTarget ? this.unavailableTarget : null
+      })
+      this.map = null
     }
   }
 
@@ -47,21 +53,6 @@ export default class extends Controller {
     this.observer?.disconnect()
     this.map?.remove()
     this.map = null
-  }
-
-  // WebGL/MapLibre can be unavailable (crawlers, headless browsers, disabled GPU,
-  // blocked CDN). Reveal a message instead of leaving a blank box, and swallow the
-  // rejection so it isn't reported as unhandled.
-  #showUnavailable (error) {
-    console.warn('Stolen map failed to render:', error)
-    // A control may have thrown after the map was built — dispose it, or its WebGL
-    // context and our controls' document listeners outlive the page
-    this.map?.remove()
-    this.map = null
-    if (!this.hasUnavailableTarget) return
-
-    this.canvasTarget.hidden = true
-    this.unavailableTarget.hidden = false
   }
 
   #render (maplibregl) {

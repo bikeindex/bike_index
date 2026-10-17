@@ -12,6 +12,7 @@ user_attrs = {
 }
 
 user_attrs.values.each do |attributes|
+  SeedHelpers.tick
   new_user = User.create! attributes
   new_user.confirm(new_user.confirmation_token)
   new_user.save

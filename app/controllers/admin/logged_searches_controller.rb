@@ -6,7 +6,7 @@ module Admin
       @per_page = permitted_per_page(default: 10)
       @pagy, @logged_searches =
         pagy(:countish, matching_logged_searches
-          .reorder("logged_searches.#{sort_column} #{sort_direction}")
+          .reorder(sortable_order(LoggedSearch))
           .includes(:organization, :user), limit: @per_page, page: permitted_page)
     end
 
@@ -24,7 +24,7 @@ module Admin
     end
 
     def special_endpoints
-      %w[not_web_bikes organized]
+      %w[not_web_bikes not_web_bikebook organized]
     end
 
     def matching_logged_searches
@@ -34,6 +34,7 @@ module Admin
         @endpoint = params[:search_endpoint]
         logged_searches = case @endpoint
         when "not_web_bikes" then logged_searches.where.not(endpoint: :web_bikes)
+        when "not_web_bikebook" then logged_searches.not_web_bikebook
         when "organized" then logged_searches.organized
         end
       elsif LoggedSearch.endpoints.key?(params[:search_endpoint])

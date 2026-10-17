@@ -18,13 +18,15 @@
 #  index_recovery_displays_on_stolen_record_id  (stolen_record_id)
 #
 class RecoveryDisplay < ActiveRecord::Base
+  QUOTE_MAX_LENGTH = 400
+
   belongs_to :stolen_record
 
   has_one_attached :photo
   has_one_attached :photo_processed
 
   validates_presence_of :quote, :recovered_at
-  validate :quote_not_too_long
+  validates :quote, length: {maximum: QUOTE_MAX_LENGTH}
 
   attr_accessor :date_input, :remote_photo_url, :skip_callback_job
 
@@ -33,6 +35,8 @@ class RecoveryDisplay < ActiveRecord::Base
   before_validation :set_calculated_attributes
 
   default_scope { order("recovered_at desc") }
+
+  scope :with_photo, -> { where(id: unscoped.joins(:photo_processed_attachment).select(:id)).with_attached_photo_processed }
 
   class << self
     def from_stolen_record_id(id)
@@ -72,12 +76,6 @@ class RecoveryDisplay < ActiveRecord::Base
     self.location_string = Binxtils::InputNormalizer.string(location_string)
     self.quote = Binxtils::InputNormalizer.string(quote)
     self.quote_by = Binxtils::InputNormalizer.string(quote_by)
-  end
-
-  def quote_not_too_long
-    return if quote.blank? || quote.length < 301
-
-    errors.add :base, :quote_too_long
   end
 
   def calculated_owner_name

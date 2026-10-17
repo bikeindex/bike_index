@@ -1,8 +1,10 @@
-# [![BIKE INDEX][bike-index-logo]][bike-index] [![View performance data on Skylight][skylight-badge]][skylight]
+# [![BIKE INDEX][bike-index-logo]][bike-index] [![View performance data on Skylight][skylight-badge]][skylight] [![Knapsack Pro Parallel CI builds for RSpec tests][knapsack-pro-badge]][knapsack-pro]
 
 [bike-index-logo]: https://github.com/bikeindex/bike_index/blob/main/public/icon-dark.svg?raw=true
 [skylight]: https://oss.skylight.io/app/applications/j93iQ4K2pxCP
 [skylight-badge]: https://badges.skylight.io/status/j93iQ4K2pxCP.svg
+[knapsack-pro]: https://knapsackpro.com/dashboard/organizations/4438/projects/2973/test_suites/4371/builds?utm_campaign=organization-id-4438&utm_content=test-suite-id-4371&utm_medium=readme&utm_source=knapsack-pro-badge&utm_term=project-id-2973
+[knapsack-pro-badge]: https://img.shields.io/badge/Knapsack%20Pro-Parallel%20/%20RSpec%20tests-%230074ff
 [bike-index]: https://www.bikeindex.org
 
 Bike registration that works: online, powerful, free.

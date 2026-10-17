@@ -47,7 +47,7 @@
     Related Notifications
     %em
       (#{related_notifications.count + 1} total)
-  = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: related_notifications, skip_bike: true, skip_map_cell: true }
+  = render Pages::Org::ParkingNotifications::Table::Component.new(parking_notifications: related_notifications, current_organization:, skip_bike: true)
 
 - if @parking_notification.send_email?
   = render(UI::Header::Component.new(text: "Preview of email sent:", tag: :h2, html_class: "uncap mt-4"))

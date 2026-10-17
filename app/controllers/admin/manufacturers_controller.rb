@@ -1,11 +1,14 @@
 module Admin
   class ManufacturersController < Admin::BaseController
     include Binxtils::SortableTable
+    include Admin::TokenAccessible
+
+    token_accessible :create, :update
 
     before_action :find_manufacturer, only: [:edit, :update, :destroy, :show]
 
     def index
-      @manufacturers = searched_manufacturers.reorder("manufacturers.#{sort_column} #{sort_direction}")
+      @manufacturers = searched_manufacturers.reorder(sortable_order(Manufacturer))
     end
 
     def show
@@ -21,22 +24,32 @@ module Admin
 
     def update
       if @manufacturer.update(permitted_parameters)
-        flash[:success] = "Manufacturer Saved!"
-        AutocompleteLoaderJob.perform_async
-        redirect_to admin_manufacturer_url(@manufacturer)
+        AutocompleteLoaderJob.enqueue_reload
+        respond_to do |format|
+          format.html { redirect_to admin_manufacturer_url(@manufacturer), flash: {success: "Manufacturer Saved!"} }
+          format.json { render_manufacturer_json }
+        end
       else
-        render action: :edit
+        respond_to do |format|
+          format.html { render action: :edit, status: :unprocessable_entity }
+          format.json { render_errors_json }
+        end
       end
     end
 
     def create
-      @manufacturer = Manufacturer.create(permitted_parameters)
+      @manufacturer = Manufacturer.new(permitted_parameters)
       if @manufacturer.save
-        flash[:success] = "Manufacturer Created!"
-        AutocompleteLoaderJob.perform_async
-        redirect_to admin_manufacturer_url(@manufacturer)
+        AutocompleteLoaderJob.enqueue_reload
+        respond_to do |format|
+          format.html { redirect_to admin_manufacturer_url(@manufacturer), flash: {success: "Manufacturer Created!"} }
+          format.json { render_manufacturer_json }
+        end
       else
-        render action: :new
+        respond_to do |format|
+          format.html { render action: :new, status: :unprocessable_entity }
+          format.json { render_errors_json }
+        end
       end
     end
 
@@ -78,6 +91,14 @@ module Admin
       @with_logos = Binxtils::InputNormalizer.boolean(params[:search_with_logos])
       manufacturers = manufacturers.with_logos if @with_logos
       manufacturers
+    end
+
+    def render_manufacturer_json
+      render json: {manufacturer: @manufacturer.as_json(only: %w[id name slug secondary_slug website frame_maker motorized_only])}
+    end
+
+    def render_errors_json
+      render json: {errors: @manufacturer.errors.full_messages}, status: :unprocessable_entity
     end
 
     def find_manufacturer

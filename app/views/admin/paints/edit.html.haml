@@ -67,7 +67,7 @@
 
   = render(Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state))
 
-  = render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?)
+  = render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:)
 
 - else
   = render(UI::ButtonLink::Component.new(text: "Delete!", href: admin_paint_url(@paint), method: :delete, color: :error))

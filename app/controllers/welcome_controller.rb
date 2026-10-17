@@ -5,7 +5,7 @@ class WelcomeController < ApplicationController
   before_action :allow_x_frame, only: [:bike_creation_graph, :index]
 
   def index
-    @recovery_displays = RecoveryDisplay.limit(10)
+    @recovery_displays = RecoveryDisplay.with_photo.limit(10)
   end
 
   def bike_creation_graph

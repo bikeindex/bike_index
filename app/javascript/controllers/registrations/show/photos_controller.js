@@ -3,12 +3,11 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller='registrations--show--photos'
 // Swaps the large photo in [data-registrations--show--photos-target=main] to match
 // the clicked [data-registrations--show--photos-target=thumbnail], points the
-// enclosing link at the selected photo's original, and toggles
-// data-registrations--show--photos-active-class onto the selected thumbnail.
+// enclosing link at the selected photo's original, and marks the selected
+// thumbnail aria-current.
 // A broken main image drops its enclosing link so it isn't clickable.
 export default class extends Controller {
   static targets = ['main', 'link', 'thumbnail']
-  static classes = ['active']
 
   connect () {
     // The error event may have fired before this controller connected
@@ -25,7 +24,7 @@ export default class extends Controller {
       this.linkTarget.setAttribute('href', thumbnail.dataset.originalUrl)
       this.linkTarget.classList.remove('tw:cursor-default')
     }
-    this.thumbnailTargets.forEach((el) => el.classList.toggle(this.activeClass, el === thumbnail))
+    this.thumbnailTargets.forEach((el) => el.setAttribute('aria-current', el === thumbnail))
   }
 
   // A broken main image drops its enclosing link: without an href an <a> isn't a

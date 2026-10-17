@@ -3,14 +3,8 @@
     <div class="hero-content">
       <div class="hero-stats">
         <div class="stat-box">
-          <div
-            class="stat-number"
-            data-controller="homepage--animate-count"
-            data-homepage--animate-count-target-value="<%= recoveries_value %>"
-            data-homepage--animate-count-prefix-value="<%= recoveries_value_symbol %>"
-            data-homepage--animate-count-suffix-value="M+"
-          >
-            $<%= recoveries_value %>M+
+          <div class="stat-number">
+            <%= render(Atoms::CurrencyMillions::Component.new(dollars_usd: @recoveries_value, animate: true)) %>
           </div>
 
           <div class="stat-label">Total recovery value</div>

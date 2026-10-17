@@ -25,7 +25,7 @@
     <% dropdown.with_entry_divider %>
 
     <% Ownership.origins.each do |origin| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: origin.humanize, match_params: {search_origin: origin}, path: origin_path(origin)) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: Ownership.creation_kind_humanized(origin), match_params: {search_origin: origin}, path: origin_path(origin)) } %>
     <% end %>
   <% end %>
 </li>

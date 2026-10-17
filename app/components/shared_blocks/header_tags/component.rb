@@ -6,15 +6,18 @@ module SharedBlocks
       DEFAULT_IMAGE = "/opengraph.png"
       DEFAULT_TWITTER = "@bikeindex"
 
-      def initialize(controller_name:, action_name:, request_url:, page_title: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil)
-        # TODO: Do any pages need a query string?
-        @page_url = request_url.split("?").first
+      def initialize(controller_name:, action_name:, request_url:, page_url: nil, page_title: nil, page_description: nil, page_image: nil, twitter_card: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil, display_dev_info: false)
+        @page_url = page_url || request_url.split("?").first
+        @display_dev_info = display_dev_info
 
         # TODO: Don't actually need to store @page_key, it's just for page_json_ld
         @page_key = translation_key_for(controller_namespace:, controller_name:, action_name:, page_obj:)
         @display_auto_discovery = controller_name == "news"
 
         @page_title = page_title
+        @page_description = page_description
+        @page_image = page_image
+        @twitter_card = twitter_card || "summary_large_image"
 
         if page_obj.is_a?(Bike) || page_obj.is_a?(BikeVersion)
           assign_bike_attrs(page_obj, action_name)

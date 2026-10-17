@@ -6,8 +6,8 @@ module Pages
       module Form
         module Wrapper
           class Component < ApplicationComponent
-            AMBASSADOR_TARGETS = {data: {"admin--organization-form-target": "ambassadorLabel"},
-                                  input_data: {"admin--organization-form-target": "ambassadorField"}}.freeze
+            AMBASSADOR_LABEL_DATA = {"admin--organization-form-target": "ambassadorLabel"}.freeze
+            AMBASSADOR_FIELD_DATA = {"admin--organization-form-target": "ambassadorField"}.freeze
 
             def initialize(form_builder:, display_dev_info: false)
               @form_builder = form_builder
@@ -19,14 +19,14 @@ module Pages
 
             def checkbox_field(attribute, label, note: nil, ambassador: false)
               render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute:,
-                label: label_with_note(label, note), class_name: "tw:mb-4", **(ambassador ? AMBASSADOR_TARGETS : {})))
+                label: label_with_note(label, note), class_name: "tw:mb-4", **(ambassador ? {data: AMBASSADOR_LABEL_DATA, html_options: {data: AMBASSADOR_FIELD_DATA}} : {})))
             end
 
             # The target goes on the grid cell, since UI::Forms::Group renders the label itself
             def ambassador_group(attribute, class_name: nil)
-              tag.div(class: class_name, data: AMBASSADOR_TARGETS[:data]) do
+              tag.div(class: class_name, data: AMBASSADOR_LABEL_DATA) do
                 render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute:,
-                  html_options: {data: AMBASSADOR_TARGETS[:input_data]}))
+                  html_options: {data: AMBASSADOR_FIELD_DATA}))
               end
             end
 

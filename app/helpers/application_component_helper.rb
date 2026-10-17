@@ -36,7 +36,7 @@ module ApplicationComponentHelper
   end
 
   def search_emoji
-    "🔎"
+    tag.span("🔎", class: "keep-with-previous")
   end
 
   def link_emoji

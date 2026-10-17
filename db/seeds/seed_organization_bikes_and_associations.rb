@@ -55,10 +55,23 @@ def org_bike_params(owner_email:, creation_organization_id: Organization.find_by
     handlebar_type: HandlebarType.slugs.first,
     owner_email:,
     creation_organization_id: creation_organization_id.to_s
+  }.merge(org_registration_info(owner_email:))
+end
+
+def org_registration_info(owner_email:)
+  return {} unless rand < 0.69
+
+  last_name = %w[Quinn Coldwater Waters Fogg Chatwin Plum Hanson Fell].sample
+  {
+    user_name: "#{owner_email.split("@").first.capitalize} #{last_name}",
+    phone: "415#{rand(1_000_000..9_999_999)}",
+    student_id: "BB#{rand(100_000..999_999)}",
+    organization_affiliation: Organization::ORGANIZATION_AFFILIATIONS.sample
   }
 end
 
 def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Brakebills").id, **bike_attrs)
+  SeedHelpers.tick
   b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, creation_organization_id:).merge(bike_attrs)})
   b_param.origin = "organization_form"
   bike = creator.create_bike(b_param)
@@ -69,6 +82,7 @@ end
 # Register an unknown-serial bike together with its parking notification, the way
 # the organized "unregistered" flow does (no ProcessParkingNotificationJob email).
 def seed_unregistered_parking_notification(creator:, member:, owner_email:, loc:, kind:, region_record_id:, country_id:)
+  SeedHelpers.tick
   b_param = BParam.create!(
     creator: member,
     params: {
@@ -111,6 +125,7 @@ end
 
 # Create 2 impound notifications (ProcessParkingNotificationJob creates the impound records)
 2.times do |i|
+  SeedHelpers.tick
   initial = initial_notifications[i]
   loc = sf_locations[i]
   pn = ParkingNotification.create!(
@@ -162,6 +177,7 @@ end
 puts "Creating 5 impound records in San Francisco for Brakebills..."
 
 5.times do |i|
+  SeedHelpers.tick
   loc = sf_locations[i]
   b_param = BParam.create!(
     creator: member,
@@ -209,19 +225,12 @@ puts "Seeding non-cycle types and e-vehicles"
 end
 
 # --- Bike Sticker Batch "BR" for Brakebills ---
-puts "Creating bike sticker batch BR with 20 stickers..."
-sticker_batch = BikeStickerBatch.create!(
-  prefix: "BR",
-  organization: brakebills,
-  user: member,
-  code_number_length: 4
-)
-sticker_batch.create_codes(20, initial_code_integer: 0)
+puts "Creating bike sticker batch BR with 101 stickers..."
+sticker_batch = BikeStickerBatch.create!(prefix: "BR", organization: brakebills, user: member)
+sticker_batch.create_codes(101, initial_code_integer: 1)
 
-# Assign 3 stickers to bikes
-brakebills_bikes = brakebills.bikes.limit(3)
-sticker_batch.bike_stickers.limit(3).each_with_index do |sticker, i|
-  sticker.claim(user: member, bike: brakebills_bikes[i])
-  puts "  Assigned sticker #{sticker.code} to bike ##{brakebills_bikes[i].id}"
+sticker_bike = brakebills.bikes.find_by!(serial_number: "LOAD4ROHLOFF01")
+sticker_batch.bike_stickers.where(code_integer: 1..3).order(:code_integer).each do |sticker|
+  sticker.claim(user: member, bike: sticker_bike)
+  puts "  Assigned sticker #{sticker.pretty_code} to bike ##{sticker_bike.id}"
 end
-puts "Bike sticker batch BR seeded with 20 stickers (3 assigned to bikes)"

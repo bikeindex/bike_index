@@ -13,7 +13,7 @@ module Admin
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
         matching_registration_sequences.includes(:organization, :registration_sequence_pages)
-          .reorder("registration_sequences.#{sort_column} #{sort_direction}"),
+          .reorder(sortable_order(RegistrationSequence)),
         limit: @per_page,
         page: permitted_page)
     end

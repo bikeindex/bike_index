@@ -8,6 +8,7 @@ module SharedBlocks
       # navbar breakpoint sits inline in the hamburgler menu rather than behind a trigger.
       # SharedBlocks::Navbar::AccountMenu is the same rows in the org sidebar.
       class Component < ApplicationComponent
+        # Template Dependency: UI::ActiveLink::Component
         # red-700 against the navbar's near-black panel is unreadable, so logout takes a tint
         # that carries on dark
         LOGOUT = "tw:text-red-400! tw:hover:text-red-300!"

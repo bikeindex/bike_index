@@ -1,0 +1,10 @@
+<div data-controller="ui--collapse">
+  <%= render UI::Collapse::Component.new(chevron: true, color: :link) do %>
+    <span>Selectable label</span>
+    <%= render(UI::Badge::Component.new(text: "3", size: :sm)) %>
+  <% end %>
+
+  <div data-ui--collapse-target="content" class="tw:mt-2 tw:hidden">
+    <p class="tw:mb-0">Selectable panel body</p>
+  </div>
+</div>

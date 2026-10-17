@@ -2,6 +2,12 @@
   <%= render partial: "results" %>
 <% end %>
 
+<%# The chart sits outside the results frame, so the search reaches it through its own stream %>
+<%= turbo_stream.replace :impound_records_chart do %>
+  <%= render("organized/search_chart_card", id: :impound_records_chart,
+    src: organization_impound_records_path(sortable_search_params.merge(organization_id: current_organization.to_param, chart_only: "1"))) %>
+<% end %>
+
 <%#
   The multi-update form redirects back here, so carry its flash along with the frame.
   Only when there is one -- otherwise every filter and sort wipes a live alert.

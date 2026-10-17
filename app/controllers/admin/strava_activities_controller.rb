@@ -21,7 +21,7 @@ module Admin
     end
 
     def sortable_opts
-      "strava_activities.#{sort_column} #{sort_direction}"
+      sortable_order(StravaActivity)
     end
 
     def earliest_period_date

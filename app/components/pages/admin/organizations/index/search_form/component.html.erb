@@ -7,8 +7,8 @@
   <%# The combobox styles its own input, so its width goes on a wrapper %>
   <div class="tw:w-full tw:md:w-1/3">
     <%= render(UI::Forms::Combobox::Component.new(name: :search_features_and_settings,
-      options: self.class.option_groups, value: selected_value, placeholder: "With features",
-      multiselect_chip_src: feature_chips_admin_organizations_path)) %>
+      options: self.class.option_groups, multiselect_chip_src: feature_chips_admin_organizations_path,
+      html_options: {value: selected_value, placeholder: "With features"})) %>
   </div>
 
   <%= render(UI::Forms::Input::Component.new(form_builder: form, attribute: :search_query,

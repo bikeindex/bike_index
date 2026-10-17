@@ -1,17 +1,18 @@
 class MembershipsController < ApplicationController
   before_action :store_return_and_authenticate_user, only: %i[edit]
 
-  layout "payments_layout"
-
   def new
-    if current_user&.membership_active.present?
-      redirect_to edit_membership_path
-    end
     @initial_level = params[:membership_level]
     @referral_source = referral_source_from_params
+    @stripe_prices = complete_stripe_prices(current_currency) ||
+      StripePrice.active.where(currency_enum: Currency.default.slug)
   end
 
   def create
+    if current_user&.membership_active.present?
+      return redirect_to(my_account_membership_path, notice: translation(:already_a_member))
+    end
+
     stripe_price = StripePrice.active.where(stripe_price_parameters).first
     stripe_subscription = StripeSubscription.create_for(stripe_price:, user: current_user,
       referral_source: referral_source_from_params)
@@ -19,24 +20,23 @@ class MembershipsController < ApplicationController
   end
 
   def success
-    render layout: "application"
   end
 
   def edit
-    if current_user.membership_active.present?
-      if current_user.membership_active.admin_managed?
-        flash[:notice] = translation(:free_membership)
-        redirect_to my_account_path
-      else
-        redirect_to(current_user.membership_active.stripe_portal_session.url, allow_other_host: true)
-      end
-    else
-      flash[:notice] = translation(:no_active_membership)
-      redirect_to new_membership_path
-    end
+    membership = current_user.membership_active
+    return redirect_to(my_account_membership_path) unless membership&.stripe_managed?
+
+    redirect_to(membership.stripe_portal_session.url, allow_other_host: true)
   end
 
   private
+
+  # Falls back to the default currency unless this one has a price for every level and interval
+  def complete_stripe_prices(currency)
+    stripe_prices = StripePrice.active.where(currency_enum: currency.slug).to_a
+    pairs = stripe_prices.map { [it.membership_level, it.interval] }.uniq
+    stripe_prices if pairs.size == Membership::LEVEL_ENUM.size * StripePrice::INTERVAL_ENUM.size
+  end
 
   def stripe_price_parameters
     mem_params = params.require(:membership).permit(:level, :set_interval)

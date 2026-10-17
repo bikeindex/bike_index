@@ -13,7 +13,7 @@ module Pages
             # The viewer has a stolen registration to claim the found bike with
             # @param bike_id text "Bike to render — defaults to a claimable found one"
             def with_stolen_registration(bike_id: nil)
-              viewer = unclaimed_viewer or return missing_notice("viewer who could claim this")
+              viewer = unclaimed_viewer or return missing_notice("a viewer who could claim this")
               claim_page(bike_id:, current_user: viewer)
             end
 
@@ -26,7 +26,7 @@ module Pages
             # Signed in with nothing to claim the found bike with
             # @param bike_id text "Bike to render — defaults to a claimable found one"
             def without_stolen_registration(bike_id: nil)
-              viewer = user_without_stolen_bike or return missing_notice("viewer without a stolen registration")
+              viewer = user_without_stolen_bike or return missing_notice("a viewer without a stolen registration")
               claim_page(bike_id:, current_user: viewer)
             end
 
@@ -45,13 +45,13 @@ module Pages
               claim_page_for(::ImpoundClaim.submitted.where(status: ::ImpoundClaim.successful_statuses))
             end
 
-            # Viewing the stolen registration a claim was opened with, which points at the
-            # impounded one rather than offering a claim of its own
+            # The claimant viewing the stolen registration they opened the claim with, which
+            # points at the impounded one rather than offering a claim of its own
             def submitted_with_this_bike
-              impound_claim = ::ImpoundClaim.not_rejected.where.not(bike_submitting_id: nil).last
-              return missing_notice("an impound claim") if impound_claim.blank?
+              impound_claim = ::ImpoundClaim.active.where.not(bike_submitting_id: nil).last
+              return missing_notice("an open impound claim") if impound_claim.blank?
 
-              claim_page(bike_id: impound_claim.bike_submitting_id, current_user: impound_claim.user)
+              page(bike_id: impound_claim.bike_submitting_id, current_user: impound_claim.user)
             end
 
             private

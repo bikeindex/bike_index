@@ -132,6 +132,16 @@ class ParkingNotification < ActiveRecord::Base
       .where(parking_notifications: {id: pluck(:id)})
   end
 
+  # #bike looks the bike up unscoped, so `includes(:bike)` loads a second copy that nothing reads -
+  # this fills the same memo in one query, colors and ownership included
+  def self.preload_bikes(notifications)
+    bikes = Bike.unscoped.where(id: notifications.filter_map(&:bike_id))
+      .includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_ownership)
+      .index_by(&:id)
+    notifications.each { |notification| notification.preloaded_bike = bikes[notification.bike_id] }
+    notifications
+  end
+
   # Passing in an already formed bounding_box - added method to explicitly document required args
   def self.search_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
     within_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
@@ -171,6 +181,11 @@ class ParkingNotification < ActiveRecord::Base
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
   end
 
+  # Not bike=, which assigns the association
+  def preloaded_bike=(value)
+    @bike = value
+  end
+
   def street_2
   end
 
@@ -199,7 +214,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def send_email?
-    owner_known?
+    owner_known? && email != ApplicationMailer::CONTACT_EMAIL && !organization&.skip_email_to?(email)
   end
 
   def publicly_visible_attribute = :street

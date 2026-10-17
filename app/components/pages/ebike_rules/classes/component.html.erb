@@ -1,0 +1,43 @@
+<%= helpers.turbo_frame_tag(FRAME_ID, class: ["tw:block", @additional_classes]) do %>
+  <section
+    class="
+      tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
+      tw:dark:bg-gray-900
+    "
+  >
+    <div class="tw:py-[clamp(40px,7vw,64px)] <%= Pages::EbikeRules::Show::Component::SECTION_CLASSES %>">
+      <h2 class="<%= Pages::EbikeRules::Show::Component::HEADING_CLASSES %>">
+        <% if state_classes %>
+          <%= translation(".state_classes_heading", state: @state[:name]) %>
+        <% else %>
+          <%= translation(".classes_heading") %>
+        <% end %>
+      </h2>
+
+      <p
+        class="
+          tw:mt-2 tw:mb-7 tw:max-w-[640px] tw:text-[17px] tw:text-gray-700
+          tw:dark:text-gray-300
+        "
+      >
+        <% if state_classes %>
+          <%= translation(".state_classes_intro", state: @state[:name]) %>
+        <% else %>
+          <%= translation(".classes_intro") %>
+        <% end %>
+      </p>
+
+      <div
+        class="
+          tw:grid
+          tw:grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))]
+          tw:gap-4
+        "
+      >
+        <% cards.each do |card| %>
+          <%= render(card) %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>

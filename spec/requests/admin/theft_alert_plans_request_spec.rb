@@ -84,7 +84,7 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
         patch "/admin/theft_alert_plans/#{theft_alert_plan.id}",
           params: {theft_alert_plan: {name: ""}}
 
-        expect(response).to be_ok
+        expect(response).to have_http_status(:unprocessable_entity)
         expect(response).to render_template(:edit)
         expect(response.body).to match(/errors? prevented this Theft Alert Plan from being saved/)
         expect(response.body).to include("Name can&#39;t be blank")

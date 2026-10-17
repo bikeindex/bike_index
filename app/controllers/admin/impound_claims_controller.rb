@@ -8,7 +8,7 @@ module Admin
       @per_page = permitted_per_page(default: 50)
       @pagy, @impound_claims = pagy(:countish,
         matching_impound_claims.includes(:user, :organization, :impound_record, :bike_claimed, :bike_submitting)
-          .order(sort_column + " " + sort_direction),
+          .order(sortable_order(ImpoundClaim)),
         limit: @per_page,
         page: permitted_page)
     end
@@ -25,7 +25,7 @@ module Admin
     end
 
     def sortable_columns
-      %w[created_at organization_id updated_at status user_id impound_record resolved_at]
+      %w[created_at organization_id updated_at status user_id impound_record_id resolved_at]
     end
 
     def earliest_period_date

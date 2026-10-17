@@ -43,8 +43,6 @@ module Organized
       redirect_to(organization_root_path) && return
     end
 
-    def chart_only?
-      @render_chart && Binxtils::InputNormalizer.boolean(params[:chart_only])
-    end
+    def chart_only? = Binxtils::InputNormalizer.boolean(params[:chart_only])
   end
 end

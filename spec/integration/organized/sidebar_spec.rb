@@ -26,9 +26,32 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_css("#org_sidebar_nav button[aria-expanded='true']", text: label)
   end
 
-  # data-active is what the is-active variant colors the row with
+  # Current is a color, set by CSS off the group's own contents, so it's read off the
+  # rendered toggles: one colored apart from every other group, or none. Text color only --
+  # the toggle just clicked is still under the mouse, and hover grays its background
+  def group_toggle_colors
+    page.evaluate_script(<<~JS)
+      Object.fromEntries([...document.querySelectorAll('#org_sidebar_nav button[aria-controls^="org_sidebar_group_"]')]
+        .map((button) => [button.textContent.trim(), getComputedStyle(button).color]))
+    JS
+  end
+
+  def expect_group_colors(expected)
+    colors = nil
+    wait_for { yield(colors = group_toggle_colors) }
+  rescue RuntimeError
+    raise "expected #{expected}, got #{colors}"
+  end
+
   def expect_current_group(label)
-    expect(page).to have_css("#org_sidebar_nav button[data-active='true']", text: label, count: 1)
+    expect_group_colors("only #{label} colored current") do |colors|
+      others = colors.except(label).values.uniq
+      others.one? && colors[label] != others.first
+    end
+  end
+
+  def expect_no_current_group
+    expect_group_colors("no group colored current") { |colors| colors.values.uniq.one? }
   end
 
   let(:scroller) { "[data-shared-blocks--org-sidebar-target='scroller']" }
@@ -87,25 +110,53 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(scroller_top).to be > 0
   end
 
-  it "tells the two add-a-bike rows apart by the param" do
+  it "lays a flash beside the sidebar, and tells add-a-registration from the notification row by the param" do
+    # An unknown code redirects back to the index with the flash
+    visit "/o/#{slug}/stickers/missing-code/edit"
+
+    expect(page).to have_css "#flash-messages [role='alert']"
+
+    flash_left, sidebar_right = page.evaluate_script(<<~JS)
+      [document.getElementById('flash-messages').getBoundingClientRect().left,
+        document.getElementById('org_sidebar_nav').getBoundingClientRect().right]
+    JS
+
+    expect(flash_left).to be >= sidebar_right
+
+    # pointer-events-auto, so it would swallow the clicks below
+    dismiss_flash_messages
+
     visit "/o/#{slug}/registrations/new"
 
-    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
 
-    visit "/o/#{slug}/bikes/new?parking_notification=true"
+    visit "/o/#{slug}/parking_notifications/new"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
-    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
 
-    # Going back to the old view moves add-a-bike onto organized/bikes#new alongside the
-    # notification's row, where the query string is all that tells the two apart
+    # Going back to both old views moves add-a-registration onto organized/bikes#new alongside the
+    # legacy notification page, where the query string is all that tells the two apart
     visit "/o/#{slug}/registrations/new"
-    click_link "Go back to the old view"
-    click_link "Add a bike"
+    click_link "Registration form settings"
+    check "Use the old registration page"
+    expect(page).to have_field("Single page registration form", disabled: true)
+    uncheck "Use the old registration page"
+    expect(page).to have_field("Single page registration form", disabled: false)
+    check "Use the old registration page"
+    check "Use the old unregistered notification page"
+    within("form[action$='/registrations/switches']") { click_button "Update" }
+    click_link "Add a registration"
 
-    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
+
+    # The notification's own page hands the old view back to the legacy form
+    visit "/o/#{slug}/parking_notifications/new"
+
+    expect(page).to have_current_path("/o/#{slug}/bikes/new?parking_notification=true")
+    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a registration"
   end
 
   # The sidebar stands in for the navbar on every page a member sees, including ones no
@@ -115,9 +166,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
     # Alone among these examples, everything asserted below is an absence -- and the row
     # count `expect_open` waits for is the template's, not a controller's. So without this
-    # they'd all pass on a page that has connected nothing, then fail whenever the run
-    # lands between ui--collapse flagging the open group data-active and
-    # shared-blocks--org-sidebar clearing it
+    # they'd all pass on a page that has connected nothing
     wait_for_stimulus
 
     expect_open("#{organization.short_name} Registrations")
@@ -125,7 +174,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # so one of its own rows is current here
     expect(page).to have_no_css "[data-shared-blocks--org-sidebar-target='scroller'] a[aria-current]", visible: :all
     # Open, but no more the page than any other group
-    expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
+    expect_no_current_group
 
     # Leaving the organization shouldn't also leave the page, anywhere the page survives it
     expect(leave_link[:href]).to eq "#{page.server_url}/my_account?organization_id=false"

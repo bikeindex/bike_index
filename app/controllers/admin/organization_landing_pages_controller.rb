@@ -21,7 +21,7 @@ module Admin
     end
 
     def sortable_opts
-      "organization_landing_pages.#{sort_column} #{sort_direction}"
+      sortable_order(OrganizationLandingPage)
     end
 
     def earliest_period_date

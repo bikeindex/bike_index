@@ -23,8 +23,8 @@
             %span.localizeTime.preciseTime
               = l @manufacturer.created_at, format: :convert_time
         - if display_dev_info?
-          %tr
-            %td.only-dev-visible
+          %tr.only-dev-visible
+            %td
               Updated
             %td
               %span.localizeTime.preciseTime
@@ -63,8 +63,8 @@
     %table.table-list
       %tbody
         - if display_dev_info?
-          %tr
-            %td.only-dev-visible
+          %tr.only-dev-visible
+            %td
               Autocomplete priority
             %td
               = @manufacturer.priority

@@ -53,6 +53,16 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end
+
+    context "paid in full" do
+      let(:invoice) { FactoryBot.create(:invoice_paid, organization:) }
+
+      it "renders a PUT form for creating the following invoice" do
+        get "#{base_url}/#{invoice.to_param}/edit"
+        action = "#{base_url}/#{invoice.to_param}?create_following_invoice=true"
+        expect(Capybara.string(response.body)).to have_css("form[action='#{action}'] input[name=_method][value=put]", visible: :hidden)
+      end
+    end
   end
 
   describe "create" do

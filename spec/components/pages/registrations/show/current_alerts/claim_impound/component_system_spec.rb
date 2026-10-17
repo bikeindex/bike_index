@@ -44,7 +44,8 @@ RSpec.describe Pages::Registrations::Show::CurrentAlerts::ClaimImpound::Componen
     click_button "Claim found bike"
 
     expect(page).to have_no_button("Open claim")
-    expect(page).to have_no_current_path(/contact_owner/, url: true)
+    # Collapsing spells the state out rather than dropping the param
+    expect(page).to have_current_path(/contact_owner=0/, url: true)
   end
 
   # One claim, seen from both sides. The bike it was submitted with is normally the

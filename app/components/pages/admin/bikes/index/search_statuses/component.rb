@@ -17,13 +17,11 @@ module Pages
             ONLY_STATUSES = {"deleted" => "Deleted", "spam" => "Likely Spam",
                              "example" => "Test / Example"}.freeze
 
-            def initialize(index:, searched_statuses:, default_statuses: [], not_default_statuses: false,
-              display_dev_info: false)
+            def initialize(index:, searched_statuses:, default_statuses: [], not_default_statuses: false)
               @index = index
               @searched_statuses = searched_statuses
               @default_statuses = default_statuses
               @not_default_statuses = not_default_statuses
-              @display_dev_info = display_dev_info
             end
 
             private

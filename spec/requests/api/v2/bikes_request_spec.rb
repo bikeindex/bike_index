@@ -115,7 +115,7 @@ RSpec.describe "Bikes API V2", type: :request do
       FactoryBot.create(:ctype, name: "wheel")
       FactoryBot.create(:ctype, name: "Headset")
       front_gear_type = FactoryBot.create(:front_gear_type)
-      handlebar_type_slug = "bmx"
+      handlebar_type_slug = "forward"
       components = [
         {
           manufacturer: manufacturer.name,
@@ -277,6 +277,14 @@ RSpec.describe "Bikes API V2", type: :request do
         post "/api/v2/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.merge(serial: "ffff").to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect(json_result[:registered].to_s).to eq "false"
+      end
+
+      it "returns 400 for a multipart owner_email with invalid bytes" do
+        body = "--b\r\nContent-Disposition: form-data; name=\"owner_email\"\r\n\r\n1\xFF\xFE\r\n--b--\r\n".b
+        post "/api/v2/bikes/check_if_registered?access_token=#{token.token}", params: body,
+          headers: {"CONTENT_TYPE" => "multipart/form-data; boundary=b"}
+        expect(response.code).to eq("400")
+        expect(json_result[:error]).to match(/invalid encoding/i)
       end
     end
   end

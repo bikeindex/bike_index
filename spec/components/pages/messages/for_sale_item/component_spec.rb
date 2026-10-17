@@ -5,11 +5,9 @@ require "rails_helper"
 RSpec.describe Pages::Messages::ForSaleItem::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
-  let(:options) { {result_view:, vehicle:, vehicle_id:, current_user:} }
+  let(:options) { {vehicle:, vehicle_id:, current_user:} }
   let(:current_user) { nil }
   let(:vehicle) { FactoryBot.build(:bike, id: 42) }
-  let(:result_view) { nil }
-  let(:search_kind) { :registration }
   let(:vehicle_id) { nil }
 
   it "renders" do
@@ -17,15 +15,6 @@ RSpec.describe Pages::Messages::ForSaleItem::Component, type: :component do
     expect(component.css("ul")).to be_present
     expect(component.css("li")).to be_present
     expect(component.css("a").first["href"]).to match("/bikes/42")
-  end
-
-  context "result_view thumbnail" do
-    it "renders" do
-      expect(component).to be_present
-      expect(component.css("ul")).to be_present
-      expect(component.css("li")).to be_present
-      expect(component.css("a").first["href"]).to match("/bikes/42")
-    end
   end
 
   context "deleted bike" do

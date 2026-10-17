@@ -89,7 +89,7 @@ RSpec.describe Admin::RegistrationSequencePagesController, type: :request do
       it "renders the organization's tabs on a page's editor" do
         get "#{member_url}/#{draft.registration_sequence_pages.first.id}/edit"
         expect(response.status).to eq(200)
-        expect(Capybara.string(response.body)).to have_css("nav a[aria-current][href='/admin/registration_sequences?organization_id=#{draft.organization_id}']",
+        expect(Capybara.string(response.body)).to have_css("nav a[aria-current][href='/admin/organizations/#{draft.organization.to_param}?active_tab=registration_sequences']",
           text: /Registration sequences\s+1/)
       end
     end

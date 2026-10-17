@@ -4,6 +4,7 @@ module UI
   module Forms
     module RadioButtonGroup
       class Component < ApplicationComponent
+        # Template Dependency: UI::ButtonGroup::Component
         # A <label> never takes focus, so the ring hangs off the radio inside it
         LABEL_CLASSES = [
           "tw:mb-0", # a <label>, which legacy CSS gives a bottom margin
@@ -16,15 +17,15 @@ module UI
 
         # full_width: chips share the row evenly (the frame-size XS-XL selector),
         # rather than each taking only the width of its label.
-        # kind: :toggle renders UI::ButtonGroup's segmented control, with a radio per segment
-        def initialize(name:, entries:, selected: nil, form: nil, full_width: false, kind: :button, data: {})
+        # kind: :toggle renders UI::ButtonGroup's segmented control, with a radio per segment.
+        # html_options go on each radio
+        def initialize(name:, entries:, selected: nil, full_width: false, kind: :button, html_options: {})
           @group_classes = UI::ButtonGroup::Component.group_classes(kind:, full_width:)
           @label_classes = (kind == :toggle) ? SEGMENT_CLASSES : CHIP_CLASSES
           @name = name
           @entries = entries
           @selected = selected.to_s
-          @form = form
-          @data = data
+          @html_options = html_options.merge(class: ["tw:sr-only", html_options[:class]].compact.join(" "))
         end
 
         def call
@@ -38,8 +39,9 @@ module UI
         def chip(option)
           value = option[:value].to_s
 
-          tag.label(class: @label_classes) do
-            radio_button_tag(@name, value, value == @selected, class: "tw:sr-only", form: @form, data: @data) +
+          # aria-disabled on the label is what UI::Button's disabled classes key off
+          tag.label(class: @label_classes, "aria-disabled": (true if option[:disabled])) do
+            radio_button_tag(@name, value, value == @selected, @html_options.merge(disabled: option[:disabled])) +
               tag.span(option[:label].html_safe)
           end
         end

@@ -1,0 +1,35 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(stripe_price) { stripe_price.id }) do |stripe_price| %>
+    <%= render UI::Time::Component.new(time: stripe_price.created_at) %>
+  <% end %>
+
+  <% table.column(sortable: "membership_level", label: "Level") do |stripe_price| %>
+    <%= Membership.level_humanized(stripe_price.membership_level) %>
+  <% end %>
+
+  <% table.column(sortable: "amount_cents", label: "Amount") do |stripe_price| %>
+    <%= stripe_price.amount_formatted %>
+  <% end %>
+
+  <% table.column(sortable: "currency_enum", label: "Currency") do |stripe_price| %>
+    <%= stripe_price.currency_name %>
+  <% end %>
+
+  <% table.column(sortable: "interval") do |stripe_price| %>
+    <%= stripe_price.interval %>
+  <% end %>
+
+  <% table.column(label: "Test?") do |stripe_price| %>
+    <%= check_mark if stripe_price.test? %>
+  <% end %>
+
+  <% table.column(label: "Active?") do |stripe_price| %>
+    <%= cross_mark unless stripe_price.active? %>
+  <% end %>
+
+  <% table.column(label: "Stripe ID", header_classes: "tw:text-xs") do |stripe_price| %>
+    <code class="small"><%= stripe_price.stripe_id %></code>
+  <% end %>
+<% end %>

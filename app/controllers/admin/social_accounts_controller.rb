@@ -6,7 +6,7 @@ module Admin
 
     def index
       @social_accounts = matching_social_accounts
-        .reorder(sort_column + " " + sort_direction)
+        .reorder(sortable_order(SocialAccount))
     end
 
     def show
@@ -24,7 +24,7 @@ module Admin
         flash[:notice] = "Social account saved!"
         redirect_to admin_social_account_url(@social_account)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 

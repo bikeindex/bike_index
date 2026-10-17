@@ -56,6 +56,8 @@ RSpec.describe UI::ButtonLink::Component, :js, type: :system do
 
     accept_confirm { link.send_keys(" ") }
 
-    expect(page).to have_current_path("/terms")
+    # A full render of the legacy layout, which outlasted the default wait on a loaded CI shard -
+    # its screenshot and browser log both show /terms arriving after the assertion gave up
+    expect(page).to have_current_path("/terms", wait: 10)
   end
 end

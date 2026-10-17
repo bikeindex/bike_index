@@ -6,6 +6,6 @@
     - if @parking_notification.unregistered_bike
       = render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, override_status: "unregistered"))
 
-= render partial: "repeated_updates_information" # Render information about the result of create_and_send_repeats
+= render partial: "repeated_updates_information", locals: { notifications_failed_resolved: @notifications_failed_resolved, repeated_kind: @repeated_kind } # Render information about the result of create_and_send_repeats
 
 = render partial: "show_details"

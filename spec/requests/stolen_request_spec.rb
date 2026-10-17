@@ -2,10 +2,42 @@ require "rails_helper"
 
 RSpec.describe StolenController, type: :request do
   describe "index" do
+    let!(:recovery_display) { FactoryBot.create(:recovery_display_with_photo, quote: "Found it on my alert", quote_by: "Sandy") }
+    let!(:recovery_display_without_photo) { FactoryBot.create(:recovery_display, quote: "Still processing") }
+
     it "renders with layout even if text" do
       get "/stolen.txt"
       expect(response.status).to eq(200)
-      expect(response).to render_template(:index)
+      expect(response.media_type).to eq "text/html"
+      expect(response.body).to match("Your bike is gone.")
+      expect(response.body).to match("Found it on my alert")
+      expect(response.body).to_not match("Still processing")
+      expect(response.body).to include(new_register_path(status: "status_stolen"))
+    end
+
+    it "links to a registration that starts stolen, over an abandoned one" do
+      get "/register/new"
+      abandoned = BParam.last
+      get "/stolen"
+      get Nokogiri::HTML(response.body).at("a:contains('Register your stolen bike')")["href"]
+      follow_redirect!
+      expect(BParam.last.id).to_not eq abandoned.id
+      expect(BParam.last.status).to eq "status_stolen"
+    end
+  end
+
+  describe "reporting from the page" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    before { log_in(user) }
+
+    it "re-renders the page when the report is missing its body" do
+      expect {
+        post "/feedbacks", params: {feedback: {feedback_type: "stolen_information", title: "Bike ChopShop report", body: ""}},
+          headers: {"HTTP_REFERER" => "http://www.example.com/stolen"}
+      }.to_not change(Feedback, :count)
+      expect(response.status).to eq 200
+      expect(response.body).to match("Your bike is gone.")
+      expect(response.body).to match("Body can&#39;t be blank")
     end
   end
 
@@ -13,15 +45,6 @@ RSpec.describe StolenController, type: :request do
     it "redirects other pages to index" do
       get "/stolen/faq"
       expect(response).to redirect_to stolen_index_url
-    end
-  end
-
-  # The vendored multi_serial_search bundle hardcodes this webpacker path for the
-  # search button's icon, and renders a broken image without it
-  describe "the bundle's icon path" do
-    it "redirects to the asset" do
-      get "/packs/media/stolen/search-583a6c1f.svg"
-      expect(response).to redirect_to(%r{/assets/stolen/search-\w+\.svg})
     end
   end
 

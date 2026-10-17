@@ -105,8 +105,7 @@ RSpec.describe Pages::Registrations::Show::CurrentAlerts::ClaimImpound::Componen
     end
   end
 
-  # display_impound_claim? matches the bike a claim was submitted *with*, which has
-  # no impound_record of its own
+  # The bike a claim was submitted *with* has no impound_record of its own
   context "viewing the stolen bike the claim was submitted with" do
     let(:stolen_record) { FactoryBot.create(:stolen_record, bike: FactoryBot.create(:bike, :with_ownership)) }
     let(:bike) { stolen_record.bike.reload }
@@ -120,6 +119,30 @@ RSpec.describe Pages::Registrations::Show::CurrentAlerts::ClaimImpound::Componen
       expect(page).to have_text("You have a pending claim with this bike")
       expect(page).to have_link(href: "/registrations/#{impound_claim.bike_claimed_id}")
       expect(page).to_not have_button("Open claim")
+    end
+
+    context "in the owner view, as the claimant who owns it" do
+      let(:component) { described_class.new(bike:, current_user:, owner: true) }
+      let(:bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed, user: current_user).reload }
+      let(:stolen_record) { bike.current_stolen_record }
+
+      it "points at the claimed bike" do
+        expect(bike.owner).to eq current_user
+        render_inline(component)
+        expect(page).to have_text("You have a pending claim with this bike")
+        expect(page).to have_link(href: "/registrations/#{impound_claim.bike_claimed_id}")
+      end
+    end
+  end
+
+  context "the owner, with no claim submitted with this bike" do
+    let(:bike) { FactoryBot.create(:bike, :impounded).reload }
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    let(:component) { described_class.new(bike:, current_user:, owner: true) }
+
+    it "does not render" do
+      render_inline(component)
+      expect(page.native.text).to be_blank
     end
   end
 
@@ -157,7 +180,7 @@ RSpec.describe Pages::Registrations::Show::CurrentAlerts::ClaimImpound::Componen
     def notice_text(rendered) = rendered[:component]&.instance_variable_get(:@text)
 
     it "says so when nobody holds a stolen registration to claim with" do
-      expect(notice_text(preview.with_stolen_registration)).to match("no viewer")
+      expect(notice_text(preview.with_stolen_registration)).to match("have a viewer")
     end
 
     context "the only stolen registration is the finder's" do

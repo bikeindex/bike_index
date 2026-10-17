@@ -30,6 +30,7 @@
 #  regional_ids                    :jsonb
 #  registration_field_labels       :jsonb
 #  search_radius_miles             :float            default(50.0), not null
+#  send_self_registration_email    :boolean          default(FALSE), not null
 #  short_name                      :string(255)
 #  show_on_map                     :boolean
 #  slug                            :string(255)      not null
@@ -65,10 +66,13 @@ class Organization < ApplicationRecord
     property_management: 6,
     other: 7,
     ambassador: 8,
-    bike_depot: 9
+    bike_depot: 9,
+    municipality: 10
   }.freeze
 
   USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS = [36, 1].freeze # SBR and BikeIndex
+
+  ORGANIZATION_AFFILIATIONS = %w[student graduate_student postdoc employee community_member].freeze
 
   POS_KIND_ENUM = {
     no_pos: 0,
@@ -119,6 +123,7 @@ class Organization < ApplicationRecord
   has_many :invoices
   has_many :payments
   has_many :graduated_notifications
+  has_many :organization_messages
   has_many :organization_statuses
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
@@ -140,6 +145,7 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
   validate :user_email_domain_format
+  validate :slug_unchanged_while_saml_active
   # Two SSO orgs on one domain would make saml_email_matching's pick arbitrary (name order),
   # silently sending logins to the wrong org's IdP. Non-SSO orgs may still share a domain.
   validates_uniqueness_of :user_email_domain, allow_blank: true,
@@ -286,9 +292,10 @@ class Organization < ApplicationRecord
     end
 
     def example
-      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
+      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead.
+      # Everywhere else 92 is the production record, and the name is what a seeded database has.
       found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
-      found || Organization.create(name: "Example Bike Shop")
+      found || Organization.find_by(name: "Example Bike Shop") || Organization.create!(name: "Example Bike Shop")
     end
 
     private
@@ -424,7 +431,7 @@ class Organization < ApplicationRecord
   def metric_units?
     return @metric_units if defined?(@metric_units)
 
-    @metric_units = Country.metric_units?(location_address_records.order(:id).pick(:country_id))
+    @metric_units = UnitSystem.metric?(country_id: location_address_records.order(:id).pick(:country_id))
   end
 
   def search_coordinates
@@ -487,13 +494,15 @@ class Organization < ApplicationRecord
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
-    %w[student graduate_student postdoc employee community_member]
+    ORGANIZATION_AFFILIATIONS
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 
   def block_short_name_edit?
-    is_invoiced? # Prevent url changes breaking landing pages, etc
+    is_invoiced? || saml_active? # Prevent url changes breaking landing pages, SSO, etc
   end
+
+  def saml_active? = organization_saml_configuration&.active?
 
   def bike_actions?
     any_enabled?(OrganizationFeature::BIKE_ACTIONS)
@@ -528,6 +537,10 @@ class Organization < ApplicationRecord
 
   def deliver_graduated_notifications?
     enabled?("graduated_notifications") && graduated_notification_interval.present?
+  end
+
+  def skip_email_to?(email)
+    !send_self_registration_email && email.present? && email == auto_user&.email
   end
 
   def graduated_notification_interval_days
@@ -589,12 +602,15 @@ class Organization < ApplicationRecord
   def ensure_auto_user
     return true if auto_user.present?
 
-    self.embedable_user_email = users.first && users.first.email || ENV["AUTO_ORG_MEMBER"]
+    email = calculated_embedable_user_email
+    return false if email.blank?
+
+    self.embedable_user_email = email
     save
   end
 
   def incomplete_b_params
-    BParam.where(organization_id: [child_ids, id].flatten.compact).partial_registrations.without_bike
+    BParam.where(organization_id: [child_ids, id].flatten.compact).partial_registrations
   end
 
   # Can be improved later, for now just always get a location for the map
@@ -607,11 +623,13 @@ class Organization < ApplicationRecord
 
   def set_auto_user
     if embedable_user_email.present?
-      u = User.fuzzy_email_find(embedable_user_email)
-      self.auto_user_id = u.id if u&.member_of?(self)
+      user = User.fuzzy_email_find(embedable_user_email)
+      return nil if user.blank?
+
+      self.auto_user_id = user.id if user.member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
-        OrganizationRole.create(user_id: u.id, organization_id: id, role: "member")
-        self.auto_user_id = u.id
+        OrganizationRole.create(user_id: user.id, organization_id: id, role: "member")
+        self.auto_user_id = user.id
       end
     elsif auto_user_id.blank?
       return nil unless users.any?
@@ -628,6 +646,13 @@ class Organization < ApplicationRecord
 
   private
 
+  # Returning an address no account holds would leave auto_user blank, so every
+  # later ensure_auto_user would save again and re-enqueue UpdateOrganizationAssociationsJob
+  def calculated_embedable_user_email
+    email = users.first&.email || ENV["AUTO_ORG_MEMBER"]
+    email if User.fuzzy_email_find(email).present?
+  end
+
   def calculated_slug(new_slug)
     orgs = id.present? ? Organization.unscoped.where.not(id:) : Organization.unscoped.all
     holder = orgs.find_by(slug: new_slug)
@@ -637,6 +662,13 @@ class Organization < ApplicationRecord
     return new_slug if holder.nil? || holder.slug != new_slug
 
     (2..).lazy.map { "#{new_slug}-#{it}" }.find { |candidate| !orgs.exists?(slug: candidate) }
+  end
+
+  # The IdP registered the SP entity ID and callback URL, which are built from the slug
+  def slug_unchanged_while_saml_active
+    return unless slug_changed? && slug_was.present? && saml_active?
+
+    errors.add(:short_name, "can't change while SAML SSO is active - it would break every SSO sign in. Deactivate SAML first")
   end
 
   def user_email_domain_format

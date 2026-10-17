@@ -24,7 +24,7 @@ module Admin
     end
 
     def sortable_opts
-      "bike_versions.#{sort_column} #{sort_direction}"
+      sortable_order(BikeVersion)
     end
 
     def earliest_period_date

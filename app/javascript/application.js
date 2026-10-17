@@ -26,10 +26,9 @@ function localizeTime () {
   window.timeLocalizer.localize()
 }
 
-// A fetch still in flight when the page goes away rejects with a generic network
-// error, not an AbortError, so the message alone can't separate it from real
-// breakage - only treat these phrasings as noise while we're actually leaving.
-const NAVIGATION_FETCH_ERROR = /Failed to fetch|Load failed|Fetch is aborted|aborted a request/
+// A network failure, a module fetch included, reads the same whoever made it - so it reports
+// only with our code on the stack, and not while the page is going away
+const NETWORK_ERROR = /Failed to fetch|Load failed|Fetch is aborted|aborted a request|Importing a module script failed|error loading dynamically imported module/
 let navigatingAway = false
 
 // Load honeybadger dynamically so ad blockers don't break the entire app
@@ -53,7 +52,14 @@ if (honeybadgerApiKey) {
         if (notice.message?.includes('ResizeObserver loop')) {
           return false
         }
-        if (navigatingAway && NAVIGATION_FETCH_ERROR.test(notice.message)) {
+        // Honeybadger's bundle wraps fetch and timers, so its frames turn up under anyone's error
+        const fromOurCode = notice.backtrace?.some((frame) => /\/assets\/(?!@honeybadger-io)/.test(frame.file))
+        if (NETWORK_ERROR.test(notice.message) && (navigatingAway || !fromOurCode)) {
+          return false
+        }
+        // Google's iOS apps (GSA, CriOS) inject a script that recurses. WebKit files its frames
+        // under the page's URL, at the same line numbers whatever the page
+        if (notice.message?.includes('Maximum call stack size exceeded') && !fromOurCode) {
           return false
         }
       })

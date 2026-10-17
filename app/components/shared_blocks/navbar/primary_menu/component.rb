@@ -5,6 +5,7 @@ module SharedBlocks
     module PrimaryMenu
       # The navbar's main menu, rendered from a manifest of items rather than repeated markup
       class Component < ApplicationComponent
+        # Template Dependency: SharedBlocks::Navbar::UserSettingsMenu::Component
         # Rows that exist on both sides of the navbar's breakpoint, so each has to hide
         # on the other -- the desktop side takes two classes, mobile-first
         SIDE_CLASSES = {mobile: "d-lg-none", desktop: "d-none d-lg-block"}.freeze
@@ -21,7 +22,7 @@ module SharedBlocks
             {type: :divider, item_class: SIDE_CLASSES.fetch(:mobile)},
             *account_items,
             {label: translation(".help"), path: help_path},
-            {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path},
+            {label: translation(".stolen_bike"), path: stolen_index_path},
             {label: translation(".donate"), path: why_donate_path},
             {label: translation(".blog"), path: news_index_path, match_paths: "#{news_index_path}/**"},
             marketplace_item(:desktop),

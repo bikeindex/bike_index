@@ -31,7 +31,7 @@ class ApplicationComponentPreview < ViewComponent::Preview
 
   def missing_notice(needed)
     render(UI::Alerts::Base::Component.new(kind: :warning,
-      text: "Nothing to preview — this environment has no #{needed}."))
+      text: "Nothing to preview — this environment doesn't have #{needed}."))
   end
 
   def template

@@ -3,6 +3,7 @@
 module UI
   module ButtonLink
     class Component < ApplicationComponent
+      # Template Dependency: UI::Button::Component
       def initialize(href:, text: nil, color: :secondary, size: :md, active: false, method: nil, confirm: nil, html_class: nil, **html_options)
         @text = text
         @href = href

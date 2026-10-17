@@ -17,9 +17,9 @@
             <%= link_to @invoice.following_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.following_invoice.id) %>
           <% else %>
             <% if @invoice.paid_in_full? %>
-              <strong>
-                <%= link_to "create following invoice", admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.id, create_following_invoice: true), method: "PUT", action: "update" %>
-              </strong>
+              <%= render(UI::ButtonLink::Component.new(text: "create following invoice", color: :link, html_class: "tw:font-bold",
+                    href: admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.id, create_following_invoice: true),
+                    method: :put, form: {class: "tw:inline"})) %>
             <% else %>
               Invoice must be paid before you can create a following invoice
             <% end %>

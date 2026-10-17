@@ -4,8 +4,6 @@ module Atoms
   module Admin
     module PaginationWithCount
       class Component < ApplicationComponent
-        include GraphingHelper # for humanized_time_range
-
         def initialize(collection:, index:, count: nil, count_detail: nil, skip_total: false,
           viewing: nil, time_range_column: nil)
           @collection = collection
@@ -50,10 +48,6 @@ module Atoms
 
         def per_pages
           [10, 25, 50, 100, @index.per_page.to_i].uniq.sort
-        end
-
-        def per_page_select_id
-          "per_page_select#{"-skiptotal" if @skip_total}"
         end
       end
     end

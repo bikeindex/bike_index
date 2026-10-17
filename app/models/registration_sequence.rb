@@ -50,6 +50,7 @@ class RegistrationSequence < ApplicationRecord
   has_many :registration_sequence_acknowledgments
 
   before_update :prevent_activated_change
+  after_commit :enqueue_after_change_job
 
   scope :templates, -> { where(organization_id: nil) }
   # Everything activation hasn't frozen
@@ -182,5 +183,10 @@ class RegistrationSequence < ApplicationRecord
 
     errors.add(:base, "An activated registration sequence can't be edited — start a new draft")
     throw :abort
+  end
+
+  # The register flow only reads an organization's own sequence, never the template
+  def enqueue_after_change_job
+    CallbackJobs::AfterRegistrationSequenceChangeJob.perform_async(id) unless template?
   end
 end

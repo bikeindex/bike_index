@@ -18,9 +18,7 @@ module Pages
 
           def info_only_class = ("tw:hidden" unless @blog.info?)
 
-          def content_tag_options
-            options_for_select(ContentTag.name_ordered.pluck(:name, :id), selected: @blog.content_tags.pluck(:id))
-          end
+          def content_tag_options = ContentTag.name_ordered.pluck(:name)
 
           # step: 60 rejects a value carrying seconds
           def post_date

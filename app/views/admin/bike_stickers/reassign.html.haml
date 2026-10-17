@@ -17,7 +17,7 @@
   = render(Pages::Admin::Headers::IndexInfo::Component.new(index: admin_index_state, viewing: "Stickers"))
 .row
   .col-md-8.offset-md-2.mt-2
-    = form_tag reassign_admin_bike_stickers_path, method: :get, id: "reassign_form" do
+    = form_tag reassign_admin_bike_stickers_path, method: :get do
 
       .card.bg-light
         .card-body
@@ -30,7 +30,7 @@
               .col-12
                 - opt_vals = BikeStickerBatch.includes(:organization).order(id: :desc).map { |b| ["##{b.id} - #{b.organization&.short_name} - #{b.notes}", b.id] }
                 = render(UI::Forms::Group::Component.new(attribute: :search_bike_sticker_batch_id, label_text: "Sticker Batch")) do
-                  = render UI::Forms::Combobox::Component.new(name: :search_bike_sticker_batch_id, dialog_label: "Sticker Batch", placeholder: "Select batch", value: @bike_sticker_batch&.id, include_blank: true, options: opt_vals)
+                  = render UI::Forms::Combobox::Component.new(name: :search_bike_sticker_batch_id, options: opt_vals, dialog_label: "Sticker Batch", include_blank: true, html_options: {placeholder: "Select batch", value: @bike_sticker_batch&.id})
             .col-sm-6
               .form-group
                 = label_tag :search_sticker1, "Starting Sticker code"
@@ -42,23 +42,15 @@
             .col-12
               - org_opt_vals = Organization.approved.name_ordered.pluck(:name, :id)
               = render(UI::Forms::Group::Component.new(attribute: :organization_id, label_text: "Organization to assign stickers to")) do
-                = render UI::Forms::Combobox::Component.new(name: :organization_id, placeholder: "Select organization", value: current_organization&.id, include_blank: true, options: org_opt_vals)
+                = render UI::Forms::Combobox::Component.new(name: :organization_id, options: org_opt_vals, include_blank: true, html_options: {placeholder: "Select organization", value: current_organization&.id})
           .form-group.mt-2
             = submit_tag 'Select', name: 'select', class: 'btn btn-primary ml-2'
 
           - if @valid_selection
             .alert.alert-success.mt-4
               %h4 Selected codes can be reassigned
-              = hidden_field_tag :reassign_now, false
               .text-center
-                %btn#reassignNowBtn.btn.btn-success.btn-lg{style: "cursor: pointer"}
-                  Reassign Now
-            :javascript
-              $('#reassignNowBtn').on('click', e => {
-                e.preventDefault()
-                $('#reassign_now').val(true)
-                $("#reassign_form").submit()
-              })
+                = render UI::Button::Component.new(text: "Reassign Now", color: :primary, size: :lg, type: "submit", name: :reassign_now, value: true)
           .alert.alert-info.mt-4
             %h4 To reassign codes:
             %ul

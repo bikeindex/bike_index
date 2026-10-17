@@ -31,6 +31,7 @@
 #
 class AddressRecord < ApplicationRecord
   include Geocodeable
+  include AddressRecordedWithinBoundingBox
 
   KIND_ENUM = {user: 0, bike: 1, marketplace_listing: 2, ownership: 3, organization: 4, impounded_from: 5}.freeze
   PUBLICLY_VISIBLE_ATTRIBUTE_ENUM = {postal_code: 1, street: 0, city: 2}.freeze

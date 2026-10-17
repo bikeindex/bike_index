@@ -24,11 +24,14 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(assigns(:impound_records).count).to eq 0
       expect(assigns(:available_statuses)).to eq available_statuses
 
-      get "#{base_url}?render_chart=true&chart_only=1"
+      # The card holds the chart, so its frame asks with chart_only alone
+      expect(response.body).to include("chart_only=1")
+
+      get "#{base_url}?chart_only=1"
       expect(response.status).to eq(200)
       expect(assigns(:impound_records)).to be_nil
       expect(assigns(:pagy)).to be_nil
-      expect(response.body).to include("impound_records_chart_frame")
+      expect(response.body).to include(Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s)
     end
     context "multiple impound_records" do
       let!(:impound_record2) { FactoryBot.create(:impound_record_with_organization, organization: current_organization, user: current_user, bike: bike2) }
@@ -53,6 +56,11 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(assigns(:search_status)).to eq "current"
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record2.id])
         expect(assigns(:available_statuses)).to eq(available_statuses + ["expired"])
+
+        # The form posts distance_unit on every search, which isn't a bike search term
+        get "#{base_url}?search_no_js=true&search_bike_id=#{bike2.id}&distance_unit=km"
+        expect(response.status).to eq(200)
+        expect(assigns(:impound_records).pluck(:id)).to eq([impound_record2.id])
 
         get "#{base_url}?search_no_js=true&search_email=&serial=yar1s"
         expect(response.status).to eq(200)
@@ -105,11 +113,16 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
         expect(assigns(:search_proximity)).to eq 50
 
-        # with below minimum distance (0.01)
+        # with below minimum distance (0.01 miles)
         get "#{base_url}?search_no_js=true&search_location=New+York&search_proximity=0.001"
         expect(response.status).to eq(200)
-        expect(assigns(:search_proximity)).to eq(0.01)
+        expect(assigns(:search_proximity)).to eq(0.02)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
+
+        get "#{base_url}?search_no_js=true&search_location=New+York&search_proximity=0.001&distance_unit=mi"
+        expect(response.status).to eq(200)
+        expect(assigns(:search_proximity)).to eq(0.01)
+        expect(response.body).to match(/miles of/)
       end
 
       context "unknown location" do

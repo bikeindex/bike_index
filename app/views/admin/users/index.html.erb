@@ -97,7 +97,7 @@
     unconfirmed users
   <% end %>
 
-  <%= render Pages::Admin::Users::Table::Component.new(users: @collection, sort_state:, display_dev_info: display_dev_info?, render_sortable: true, render_deleted: @deleted) %>
+  <%= render Pages::Admin::Users::Table::Component.new(users: @collection, sort_state:, render_sortable: true, render_deleted: @deleted) %>
 
   <% unless @collection.present? %>
     <h1 class="mt-4">No users found!</h1>

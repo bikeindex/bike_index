@@ -10,7 +10,7 @@ module Admin
       @per_page = permitted_per_page(default: 10)
       @pagy, @organization_statuses =
         pagy(:countish, matching_organization_statuses
-          .reorder("organization_statuses.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+          .reorder(sortable_order(OrganizationStatus)), limit: @per_page, page: permitted_page)
     end
 
     helper_method :matching_organization_statuses_untimed, :matching_organization_statuses, :grouped_pos_kinds, :humanize_pos_kind

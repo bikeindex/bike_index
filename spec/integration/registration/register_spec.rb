@@ -268,7 +268,8 @@ RSpec.describe "Register flow", :js, type: :system do
     fill_in "report[address_record_attributes][street]", with: "278 Broadway"
     fill_in "report[address_record_attributes][city]", with: "New York"
     # The whole address is required alongside the street and city the server checks
-    select state.name, from: "report[address_record_attributes][region_record_id]"
+    type_into("#report_address_record_attributes_region_record_id", state.abbreviation)
+    click_combobox_option(state.name)
     fill_in "report[address_record_attributes][postal_code]", with: "10007"
 
     click_button "Complete Bike Registration"
@@ -455,13 +456,8 @@ RSpec.describe "Register flow", :js, type: :system do
 
     it "holds the submit until the blob lands, then sends it" do
       start_registration
-      # Held just long enough to submit against it; the upload finishes on its own after
-      page.driver.with_playwright_page do |playwright_page|
-        playwright_page.route(upload_url_pattern, ->(route, _request) {
-          sleep 3
-          route.continue
-        })
-      end
+      # Held until the submit has landed against it
+      upload = hold_requests(upload_url_pattern)
 
       attach_file("bike_image", image_path, make_visible: true)
       expect(page).to have_content("uploading")
@@ -473,6 +469,7 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_current_path(/step=2/, url: true)
 
       # ...and once the blob lands the held submit goes through, carrying the photo
+      upload.release
       expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_present
     end
@@ -483,8 +480,8 @@ RSpec.describe "Register flow", :js, type: :system do
       hang_the_upload
       # Shortens the wait rather than skipping a step - the whole path still runs
       page.execute_script(<<~JS)
-        document.querySelector("[data-controller~='ui--forms--file-upload']")
-          .setAttribute("data-ui--forms--file-upload-stall-value", "1500")
+        document.querySelector("[data-controller~='ui--forms--files--upload']")
+          .setAttribute("data-ui--forms--files--upload-stall-value", "1500")
       JS
 
       attach_file("bike_image", image_path, make_visible: true)
@@ -525,7 +522,8 @@ RSpec.describe "Register flow", :js, type: :system do
         click_combobox_option("Red")
         fill_in_verified "bike[serial_number]", with: "R2UP1234"
         click_button "Complete Bike Registration"
-        expect(page).to have_content("Registration complete")
+        # Attaching the blob reads its first bytes back from R2 to identify it, inside the submit
+        expect(page).to have_content("Registration complete", wait: 15)
 
         public_image = Bike.last.public_images.first
         expect(public_image.file.attached?).to be_truthy

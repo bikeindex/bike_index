@@ -29,7 +29,7 @@ module Pages
             def any_origin_active? = @origin_search_type.blank?
 
             def origin_name
-              any_origin_active? ? "Origin" : @origin_search_type.humanize
+              any_origin_active? ? "Origin" : Ownership.creation_kind_humanized(@origin_search_type)
             end
 
             def pos_name

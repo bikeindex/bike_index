@@ -6,7 +6,7 @@ module Admin
       @per_page = permitted_per_page
       @pagy, @b_params = pagy(:countish, matching_b_params
         .includes(:creator, :organization)
-        .reorder("b_params.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+        .reorder(sortable_order(BParam)), limit: @per_page, page: permitted_page)
     end
 
     def show

@@ -71,6 +71,15 @@ module SpamEstimator
       #{PHARMACY_REGEX}
     )/xi
 
+    # Scanned on its own, so a spam term in the brand slot ("buy bitcoin accounts") still counts,
+    # and so the nested repetition stays linear-time, which SEO_SPAM_REGEX isn't
+    ACCOUNT_RESELLER_REGEX = /(?<![a-z])(?:
+      (?:buy|verified)[\s_-]*(?:\d+%?[\s_-]*)?
+        (?:(?!(?:an?|the|these|those|my|your|our|their|both|all|and|or|for|to|with|from)(?![a-z]))[a-z]+[\s_-]*){0,3}
+        accounts(?![a-z]) |
+      buy[\s_-]*(?:\d+%?[\s_-]*)?verified
+    )/xi
+
     def looks_malicious?(str)
       return false if str.blank?
 
@@ -86,7 +95,9 @@ module SpamEstimator
     def seo_spam_matches(str)
       return {} if str.blank?
 
-      strip_diacritics(str).scan(SEO_SPAM_REGEX).map { |term| term.downcase.gsub(/\s+/, " ") }.tally
+      text = strip_diacritics(str)
+      [SEO_SPAM_REGEX, ACCOUNT_RESELLER_REGEX].flat_map { text.scan(it) }
+        .map { |term| term.downcase.gsub(/[\s_-]+/, " ") }.tally
     end
 
     # eariot are the most frequent letters - this could be incorporated into calculations

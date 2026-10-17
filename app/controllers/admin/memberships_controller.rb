@@ -9,7 +9,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_memberships.includes(:user, :creator, :stripe_subscriptions).reorder("memberships.#{sort_column} #{sort_direction}"),
+        matching_memberships.includes(:user, :creator, :stripe_subscriptions).reorder(sortable_order(Membership)),
         limit: @per_page,
         page: permitted_page)
     end
@@ -30,7 +30,7 @@ module Admin
         flash[:success] = "Membership Created!"
         redirect_to admin_membership_url(@membership)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 
@@ -60,7 +60,7 @@ module Admin
         flash[:success] = "Membership Saved!"
         redirect_to admin_membership_url(@membership)
       else
-        render action: :show
+        render action: :show, status: :unprocessable_entity
       end
     end
 

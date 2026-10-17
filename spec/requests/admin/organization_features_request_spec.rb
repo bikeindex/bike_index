@@ -17,6 +17,7 @@ RSpec.describe Admin::OrganizationFeaturesController, type: :request do
 
   describe "index" do
     it "renders" do
+      expect(subject).to be_present
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)

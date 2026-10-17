@@ -1,0 +1,64 @@
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <%= render UI::Header::Component.new(text: translation(".new_unregistered_notification")) %>
+
+  <%= form_with(model: Bike.new, scope: :bike, url: organization_bikes_path(organization_id: @organization.to_param),
+      multipart: true, data: form_data) do |f| %>
+    <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".vehicle_info")) %>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id,
+        label_text: Manufacturer.model_name.human, required: true)) do %>
+      <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_js: true,
+          html_options: {form: f, required: true}) %>
+    <% end %>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cycle_type,
+        label_text: translation(".vehicle_type"), required: true)) do %>
+      <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, options: cycle_type_options, no_js: true,
+          dialog_label: translation(".vehicle_type"), html_options: {form: f, required: true, value: f.object.cycle_type}) %>
+    <% end %>
+
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :serial_number,
+        label_text: translation(".serial_number"), html_options: {autocomplete: "off"}) %>
+
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :frame_model,
+        label_text: translation(".model")) %>
+
+    <%= render Pages::Register::Parts::ColorFields::Component.new(form: f) %>
+
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: translation(".photo")) do %>
+      <%= render UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image,
+          accept: ImageUploader.permitted_extensions) %>
+    <% end %>
+
+    <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".parking_notification"), divider: true) %>
+
+    <%= fields_for :parking_notification, ParkingNotification.new do |n| %>
+      <%= render Pages::Org::ParkingNotificationLocation::Component.new(form: n) %>
+
+      <div class="tw:mb-4">
+        <p class="twlabel"><%= translation(".notification_because") %></p>
+
+        <%= render UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[kind]",
+            selected: ParkingNotification.kinds.first, entries: kind_entries) %>
+      </div>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: n, attribute: :internal_notes, kind: :text_area,
+          label_text: translation(".internal_notes", org_name: @organization.short_name), html_options: {rows: 2})) do |group| %>
+        <% group.with_label_note { translation(".not_shown_to_user") } %>
+      <% end %>
+    <% end %>
+
+    <%= render UI::Button::Component.new(text: translation(".create_parking_notification"), color: :primary, size: :lg,
+        type: "submit", disabled: true, html_class: "tw:w-full", data: {"org--parking-notification-form-target": "submit"}) %>
+  <% end %>
+<% end %>
+
+<%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
+<p
+  class="
+    tw:mt-24 tw:mb-8 tw:pl-4 tw:text-lg tw:font-semibold tw:text-gray-900
+    tw:italic tw:dark:text-gray-100
+  "
+>
+  <%= link_to translation(".registration_form_settings"), settings_organization_registrations_path(organization_id: @organization.to_param), class: "twlink" %>
+</p>

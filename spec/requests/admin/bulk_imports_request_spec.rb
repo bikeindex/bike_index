@@ -11,6 +11,10 @@ RSpec.describe Admin::BulkImportsController, type: :request do
       expect(response).to be_ok
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
+
+      get base_url, params: {search_org_count: true}
+      expect(response).to be_ok
+      expect(response.body).to include("missing org!")
     end
   end
 
@@ -21,6 +25,8 @@ RSpec.describe Admin::BulkImportsController, type: :request do
       expect(response).to be_ok
       expect(response).to render_template(:show)
       expect(flash).to_not be_present
+      action = "/admin/bulk_imports/#{bulk_import.id}?reprocess=true"
+      expect(Capybara.string(response.body)).to have_css("form[action='#{action}'] input[name=_method][value=put]", visible: :hidden)
     end
   end
 

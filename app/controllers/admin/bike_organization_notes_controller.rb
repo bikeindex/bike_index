@@ -25,7 +25,7 @@ module Admin
     end
 
     def sortable_opts
-      "bike_organization_notes.#{sort_column} #{sort_direction}"
+      sortable_order(BikeOrganizationNote)
     end
 
     def earliest_period_date

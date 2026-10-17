@@ -7,6 +7,11 @@
 <meta name="description" content="<%= @page_description %>">
 <meta http-equiv="Content-Language" content="<%= I18n.locale %>">
 
+<%# Cached fragments serve dev and non-dev viewers alike, so dev markup is hidden here %>
+<% unless @display_dev_info %>
+  <style>.only-dev-visible {display: none !important;}</style>
+<% end %>
+
 <% if @display_auto_discovery %>
   <%= auto_discovery_link_tag(
     :atom,
@@ -47,7 +52,7 @@
 <meta name="twitter:title" content="<%= @page_title %>">
 <meta name="twitter:description" content="<%= @page_description %>">
 <meta name="twitter:image" content="<%= twitter_image %>">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="<%= @twitter_card %>">
 <meta name="twitter:creator" content="<%= twitter_creator %>">
 <meta name="twitter:site" content="@bikeindex">
 <meta name="twitter:image:alt" content="<%= @page_description %>">

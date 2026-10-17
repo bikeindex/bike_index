@@ -17,6 +17,7 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
     expect(component).to have_content("owner@bikeindex.org")
     expect(component).to have_content("self reg")
     expect(component).to_not have_content("status:")
+    expect(component).to have_link("No Image", href: "/bikes/#{bike.id}?organization_id=false")
   end
 
   context "with display_dev_info" do
@@ -35,6 +36,17 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
     it "links it instead of the creator" do
       expect(component).to have_link(bike.creation_organization.name)
       expect(component.css("small").map { |e| e.text.strip }).to_not include "self reg"
+    end
+  end
+
+  context "registered from the iOS app" do
+    let(:bike) do
+      FactoryBot.create(:bike, :with_ownership, creation_state_origin: "api_v3",
+        creation_registration_info: {ios_version: "1.6.9"})
+    end
+
+    it "renders the iOS version" do
+      expect(component.css("small").map { |e| e.text.squish }).to include "iOS 1.6.9"
     end
   end
 

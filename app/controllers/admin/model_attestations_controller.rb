@@ -7,7 +7,7 @@ module Admin
       @pagy, @model_attestations =
         pagy(:countish, matching_model_attestations
           .includes(:model_audit, :user, :organization)
-          .reorder("model_attestations.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+          .reorder(sortable_order(ModelAttestation)), limit: @per_page, page: permitted_page)
     end
 
     helper_method :matching_model_attestations

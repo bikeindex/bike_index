@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Rack::Attack
-  MAX_REQUESTS_PER_TWENTY = ENV.fetch("RACK_ATTACK_MAX_LIMIT", 30).to_i
+  MAX_REQUESTS_PER_TWENTY = ENV.fetch("RACK_ATTACK_MAX_LIMIT", 50).to_i
   API_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_API_MAX_LIMIT", 150).to_i
   CSP_REPORTS_MAX_REQUESTS = ENV.fetch("RACK_ATTACK_CSP_LIMIT", MAX_REQUESTS_PER_TWENTY).to_i
 
@@ -29,7 +29,7 @@ class Rack::Attack
   # repeatedly during normal searching (per-keystroke autocomplete, kind counts) -
   # not page navigations. Throttle them like the API (generous per-IP budget)
   # rather than against the strict per-page limit, which active searching trips.
-  SEARCH_DATA_PREFIXES = %w[/search/combobox /search/marketplace/counts].freeze
+  SEARCH_DATA_PREFIXES = %w[/search/combobox /search/marketplace/counts /search/bikebook].freeze
 
   cache.store = ActiveSupport::Cache::RedisCacheStore.new(
     url: Bikeindex::Application.config.redis_rack_attack_url
@@ -62,7 +62,9 @@ class Rack::Attack
   # another user, but this is uncommon in practice.
   throttle("sign_in/email", limit: 5, period: 20.seconds) do |request|
     if request.post? && SIGN_IN_PATHS.include?(request.path)
-      EmailNormalizer.normalize(request.params.dig("session", "email"))
+      email = request.params.dig("session", "email")
+      # Rack::UTF8Sanitizer skips multipart bodies, so this can hold invalid bytes
+      EmailNormalizer.normalize(email.scrub) if email.is_a?(String)
     end
   end
 

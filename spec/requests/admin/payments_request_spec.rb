@@ -21,9 +21,28 @@ RSpec.describe Admin::PaymentsController, type: :request do
 
   describe "index" do
     it "renders" do
+      subject
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+
+      get base_url, params: {search_payment_method: "show"}
+      expect(response.status).to eq(200)
+      expect(response.body).to include(subject.amount_formatted)
+    end
+
+    # The row key has to carry this partial, or the fragment is shared with every other
+    # admin table caching the same payment - and the user, or an email change serves stale
+    context "with caching", :caching do
+      include_context :caching_basic
+
+      it "keys the row to this partial, the payment and the records the row renders" do
+        subject
+        keys = fragments_written { get base_url }
+        expect(keys.count).to eq 1
+        expect(keys.first).to include("admin/payments/_table", subject.cache_key_with_version,
+          current_user.cache_key_with_version)
+      end
     end
   end
 

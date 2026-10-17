@@ -29,6 +29,45 @@ RSpec.describe OrganizedMailer, type: :mailer do
     expect(mail.body.encoded).to_not match "supported by"
   end
 
+  describe "render_donation?" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:paid_organization) { FactoryBot.create(:invoice_with_payment).organization }
+
+    it "is truthy" do
+      expect(OrganizedMailer.render_donation?).to be_truthy
+      expect(OrganizedMailer.render_donation?(organization:, user:, emails: [user.email, nil, "invalid"])).to be_truthy
+    end
+
+    # A $0 invoice is how law enforcement gets features, so is_invoiced? isn't paying
+    context "invoiced organization that hasn't paid money" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features) }
+
+      it "is truthy" do
+        expect(organization.reload.is_invoiced?).to be_truthy
+        expect(OrganizedMailer.render_donation?(organization:)).to be_truthy
+      end
+    end
+
+    it "is falsey for a paid organization" do
+      expect(OrganizedMailer.render_donation?(organization: paid_organization)).to be_falsey
+    end
+
+    it "is falsey for a paid organization's member" do
+      FactoryBot.create(:organization_role_claimed, organization: paid_organization, user:)
+      expect(OrganizedMailer.render_donation?(user:)).to be_falsey
+    end
+
+    it "is falsey for a paid organization's registrant" do
+      FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: paid_organization, user:)
+      expect(OrganizedMailer.render_donation?(user:)).to be_falsey
+    end
+
+    it "is falsey when any email is on a paid organization's domain" do
+      paid_organization.update(user_email_domain: "paid-university.edu")
+      expect(OrganizedMailer.render_donation?(emails: ["someone@gmail.com", "someone@paid-university.edu"])).to be_falsey
+    end
+  end
+
   describe "partial_registration" do
     context "without organization" do
       let(:b_param) { FactoryBot.create(:b_param_stolen) }

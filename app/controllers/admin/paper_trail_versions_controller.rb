@@ -21,7 +21,7 @@ module Admin
     end
 
     def sortable_opts
-      "versions.#{sort_column} #{sort_direction}"
+      sortable_order(PaperTrail::Version)
     end
 
     def earliest_period_date

@@ -125,7 +125,7 @@ class StolenRecord < ApplicationRecord
   scope :current_and_not, -> { unscoped } # might exclude certain things in the future. Also feels better than calling unscoped everywhere
   scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }
   scope :not_tsved, -> { where("tsved_at IS NULL") }
-  scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'") }
+  scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= ?", Time.current.beginning_of_day) }
   scope :not_spam, -> { left_joins(:bike).where.not(bikes: {likely_spam: true}) }
 
   scope :recovered, -> { unscoped.where(current: false) }
@@ -196,11 +196,11 @@ class StolenRecord < ApplicationRecord
     # TODO: This should probably be handled on the frontend - so users can set weird values if they really want to
     def corrected_date_stolen(date = nil)
       date = Binxtils::TimeParser.parse(date) || Time.current
-      year = date.year
-      if year < (Time.current - 100.years).year
-        decade = year.to_s[-2..].chars.join("")
-        corrected = date.change(year: "20#{decade}".to_i)
-        date = corrected
+      year = Time.current.year
+      if date.year < year - 100
+        # The latest year ending in the digits entered - a one-digit year is a partly typed one
+        place = (date.year < 10) ? 10 : 100
+        date = date.change(year: year - (year - date.year) % place)
       end
       if date > Time.current + 2.days
         updated_year = (date.month < Time.current.month) ? Time.current.year : Time.current.year - 1

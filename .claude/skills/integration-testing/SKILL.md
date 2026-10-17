@@ -206,5 +206,5 @@ things that cost real time when they go wrong:
 
 ## Build Tailwind before running system specs
 
-Without a current `app/assets/builds/tailwind.css`, `tw:hidden` silently doesn't apply and visibility assertions fail in ways that read as flakes. The [`sandbox-test-setup`](../sandbox-test-setup/SKILL.md) skill has the build command per environment; see [`frontend-conventions`](../frontend-conventions/SKILL.md) for the `tw:` prefix.
+Without a current `app/assets/builds/tailwind.css`, `tw:hidden` silently doesn't apply and visibility assertions fail in ways that read as flakes. `bin/setup` builds it; otherwise `bin/rails tailwindcss:build` (the [`sandbox-test-setup`](../sandbox-test-setup/SKILL.md) skill has the rest); see [`frontend-conventions`](../frontend-conventions/SKILL.md) for the `tw:` prefix.
 

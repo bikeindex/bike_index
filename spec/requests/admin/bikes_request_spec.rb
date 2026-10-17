@@ -20,13 +20,13 @@ RSpec.describe Admin::BikesController, type: :request do
       it "renders the chart" do
         get base_url, params: {render_chart: true, search_email: "somethingcool@bikeindex.org", period: "year"}
         expect(response.code).to eq("200")
-        expect(response.body).to include("chart-1")
+        expect(response.body).to include('data-controller="ui--chart"')
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
 
         # Also works with user.id
         get base_url, params: {render_chart: true, user_id: user.id, period: "year"}
         expect(response.code).to eq("200")
-        expect(response.body).to include("chart-1")
+        expect(response.body).to include('data-controller="ui--chart"')
         expect(assigns(:user_subject)).to eq user
       end
     end
@@ -48,6 +48,40 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response.code).to eq("200")
       expect(response).to render_template("missing_manufacturer")
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+    end
+
+    context "authenticated with an API token" do
+      let(:current_user) { false }
+      include_context :admin_doorkeeper_token
+      let(:url) { "#{base_url}/missing_manufacturer.json" }
+      include_examples "rejects_unauthorized_token"
+
+      context "token for a bikes superuser" do
+        before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bikes") }
+        let!(:bike_2) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Cool Bikes", created_at: 1.week.ago) }
+        let!(:bike_3) { FactoryBot.create(:bike, manufacturer: Manufacturer.other, manufacturer_other: "Party") }
+
+        it "renders the manufacturer_other counts and first bike times" do
+          get url, params: token_param
+          expect(response.status).to eq 200
+          expect(json_result["missing_manufacturers"]).to match_array([
+            {"manufacturer_other" => "Cool Bikes", "count" => 2, "first_created_at" => bike_2.created_at.utc.as_json, "last_created_at" => bike.created_at.utc.as_json},
+            {"manufacturer_other" => "Party", "count" => 1, "first_created_at" => bike_3.created_at.utc.as_json, "last_created_at" => bike_3.created_at.utc.as_json}
+          ])
+        end
+
+        it "returns the most common per_page" do
+          get url, params: token_param.merge(per_page: 1)
+          expect(json_result["missing_manufacturers"].pluck("manufacturer_other")).to eq(["Cool Bikes"])
+        end
+
+        it "turns the token away from other actions" do
+          expect {
+            get "#{base_url}/#{bike.id}/get_destroy", params: token_param
+          }.not_to change(Bike, :count)
+          expect(response.status).to eq 403
+        end
+      end
     end
   end
 
@@ -107,6 +141,33 @@ RSpec.describe Admin::BikesController, type: :request do
       # A tab the show action doesn't render would otherwise raise from the tabs component
       get "#{base_url}/#{bike.id}?active_tab=party"
       expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
+    end
+
+    context "with an organization message" do
+      let(:organization_message) { FactoryBot.create(:organization_message) }
+      let(:bike) { organization_message.bike }
+
+      it "renders it on the messages tab" do
+        get "#{base_url}/#{bike.id}?active_tab=messages"
+        expect(response.code).to eq("200")
+        expect(response.body).to include(organization_message.message)
+        expect(response.body).to include(admin_organization_messages_path(search_bike_id: bike.id))
+      end
+    end
+
+    context "with an alert from a soft-deleted user" do
+      let(:alert_user) { FactoryBot.create(:user_confirmed, email: "gone@example.com") }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user: alert_user, bike:) }
+
+      # The alerts table is a partial rendered from a component, so its user cell reaches
+      # sort_state through a view context the index doesn't share
+      it "names the deleted user in the alerts table" do
+        alert_user.destroy
+        get "#{base_url}/#{bike.id}?active_tab=messages"
+        expect(response.code).to eq("200")
+        expect(response.body).to include("gone@example.com")
+        expect(response.body).to include("user deleted")
+      end
     end
   end
 

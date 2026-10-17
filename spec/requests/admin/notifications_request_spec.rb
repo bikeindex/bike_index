@@ -12,6 +12,18 @@ RSpec.describe Admin::NotificationsController, type: :request do
         expect(response).to render_template(:index)
         expect(assigns(:notifications)).to eq([])
       end
+
+      context "with a notification" do
+        let(:bike) { FactoryBot.create(:bike) }
+        let!(:notification) { FactoryBot.create(:notification, bike:) }
+
+        it "renders it" do
+          get base_url
+          expect(response.status).to eq(200)
+          expect(assigns(:notifications).pluck(:id)).to eq([notification.id])
+          expect(response.body).to include(admin_bike_path(bike.id, active_tab: "messages"))
+        end
+      end
     end
   end
 

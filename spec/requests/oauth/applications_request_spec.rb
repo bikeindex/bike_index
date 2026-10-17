@@ -86,6 +86,15 @@ RSpec.describe Oauth::ApplicationsController, type: :request do
       expect(v2_accessor.resource_owner_id).to eq(ENV["V2_ACCESSOR_ID"].to_i)
       expect(v2_accessor.scopes).to eq(["write_bikes"])
     end
+    context "invalid" do
+      it "renders new" do
+        expect {
+          post base_url, params: {doorkeeper_application: {name: "Some app"}}
+        }.to_not change(Doorkeeper::Application, :count)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to render_template(:new)
+      end
+    end
   end
 
   context "existing_doorkeeper_app" do

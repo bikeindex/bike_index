@@ -117,8 +117,8 @@ RSpec.describe GeocodeHelper do
       context "another IP address" do
         let(:address) { "50.211.197.209" }
         let(:target_address_hash) do
-          target_assignable_hash.merge(latitude: 37.3209, longitude: -121.9126, city: "San Jose",
-            formatted_address: "San Jose, CA, US")
+          target_assignable_hash.merge(latitude: 37.7506, longitude: -122.4121, city: "San Francisco",
+            formatted_address: "San Francisco, CA, US")
         end
         it "finds the address" do
           VCR.use_cassette("geohelper-ip_address2", vcr_config) do
@@ -220,6 +220,13 @@ RSpec.describe GeocodeHelper do
         expect(described_class.permitted_distance(5_000)).to eq 1_000
         expect(described_class.permitted_distance("-2", default_distance: 10)).to eq 1
         expect(described_class.permitted_distance(" 0")).to eq 1
+      end
+    end
+    context "in kilometers" do
+      it "clamps to the bounds in miles" do
+        expect(described_class.permitted_distance(50, unit: "km")).to eq 50
+        expect(described_class.permitted_distance(" 0", unit: "km")).to eq 1.61
+        expect(described_class.permitted_distance(5_000, unit: "km")).to eq 1_609.34
       end
     end
   end

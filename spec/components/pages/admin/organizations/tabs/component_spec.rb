@@ -83,7 +83,7 @@ RSpec.describe Pages::Admin::Organizations::Tabs::Component, type: :component do
 
       it "renders, counting them" do
         expect(component).to have_link("Registration sequences 1",
-          href: "/admin/registration_sequences?organization_id=#{organization.id}")
+          href: "/admin/organizations/#{organization.to_param}?active_tab=registration_sequences")
       end
     end
   end

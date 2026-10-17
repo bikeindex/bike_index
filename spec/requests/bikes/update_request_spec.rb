@@ -16,6 +16,16 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.bike_stickers.count).to eq 0
     end
   end
+  context "with an invalid update" do
+    it "shows the error rather than saving" do
+      patch base_url, params: {bike: {primary_frame_color_id: ""}, edit_template: "bike_details"}
+      expect(response).to redirect_to(edit_bike_url(bike, edit_template: "bike_details"))
+      expect(flash[:error]).to be_present
+      expect(flash[:success]).to be_blank
+      expect(bike.reload.primary_frame_color_id).to be_present
+    end
+  end
+
   context "updating vehicle_type and propulsion_type" do
     it "ensures valid propulsion_type for cycle_type" do
       expect(bike.reload.cycle_type).to eq "bike"

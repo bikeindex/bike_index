@@ -5,10 +5,12 @@
 module RegistrationSequencePaths
   extend Functionable
 
+  # Admin lists an organization's sequences on a tab of its organization page
   def index(registration_sequence, admin: false)
-    return routes.admin_registration_sequences_path if admin
+    return routes.organization_registration_sequences_path(organization_id: organization_param(registration_sequence)) unless admin
+    return routes.admin_registration_sequences_path if registration_sequence.template?
 
-    routes.organization_registration_sequences_path(organization_id: organization_param(registration_sequence))
+    routes.admin_organization_path(organization_param(registration_sequence), active_tab: "registration_sequences")
   end
 
   # Admin's read-only screen, and the PATCH target for both. An organization has no

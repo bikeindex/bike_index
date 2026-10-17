@@ -8,12 +8,12 @@ if ENV["LOCAL_CHROME_OVERRIDE"]
       browser_type: :chromium,
       headless: true,
       viewport: {width: 1920, height: 1080},
+      permissions: ["clipboard-read", "clipboard-write"],
       ignoreHTTPSErrors: true,
       args: [
         "--no-sandbox",
         "--disable-dev-shm-usage",
-        "--disable-site-isolation-trials",
-        "--host-resolver-rules=MAP cdn.jsdelivr.net 127.0.0.1:8443"
+        "--disable-site-isolation-trials"
       ])
   end
 end

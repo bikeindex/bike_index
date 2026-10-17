@@ -5,7 +5,7 @@
 
 <% pos_link = method(:pos_link) %>
 
-<%= render(UI::Table::Component.new(records: @organizations, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+<%= render(UI::Table::Component.new(records: @organizations, cache_key: self.class.cache_digest, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
   <% table.column(sortable: "name") do |organization| %>
     <%= link_to organization.name, admin_organization_url(organization) %>
 

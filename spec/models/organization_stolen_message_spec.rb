@@ -11,7 +11,8 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       expect(Organization.with_stolen_message.pluck(:id)).to eq([])
       expect(organization_stolen_message.reload.organization_id).to eq organization.id
       expect(organization_stolen_message.kind).to eq "area"
-      expect(organization_stolen_message.search_radius_miles).to eq OrganizationStolenMessage::DEFAULT_RADIUS_MILES
+      # No location, so metric - and the default is a round number of kilometers
+      expect(organization_stolen_message.search_radius_kilometers).to eq 100
       organization_stolen_message.update(is_enabled: true, body: "  ", kind: "association")
       expect(organization_stolen_message.is_enabled).to be_falsey
       expect(organization_stolen_message.body).to eq nil
@@ -37,6 +38,12 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(organization_stolen_message.content_added_at).to be_present
         expect(OrganizationStolenMessage.present.pluck(:id)).to eq([organization_stolen_message.id])
         expect(Organization.with_stolen_message.pluck(:id)).to eq([organization.id])
+      end
+    end
+    context "municipality organization" do
+      let(:organization) { FactoryBot.create(:organization, kind: "municipality") }
+      it "defaults to area" do
+        expect(organization_stolen_message.reload.kind).to eq "area"
       end
     end
     context "overly long body" do

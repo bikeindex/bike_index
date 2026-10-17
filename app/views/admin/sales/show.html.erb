@@ -19,7 +19,7 @@
           <td>Seller</td>
 
           <td>
-            <%= render Pages::Admin::Users::Cell::Component.new(user: @sale.seller, user_id: @sale.seller_id) %>
+            <%= render Atoms::Admin::TableCells::User::Component.new(user: @sale.seller, user_id: @sale.seller_id) %>
           </td>
         </tr>
 
@@ -28,7 +28,7 @@
 
           <td>
             <% if @sale.buyer.present? %>
-              <%= render Pages::Admin::Users::Cell::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
+              <%= render Atoms::Admin::TableCells::User::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
             <% else %>
               <span class="less-strong"><%= @sale.new_owner_email %></span>
             <% end %>
@@ -77,7 +77,7 @@
 
           <td>
             <% if @sale.item.is_a?(Bike) %>
-              <%= render Pages::Admin::Bikes::Cell::Component.new(bike: @sale.item, bike_id: @sale.item_id) %>
+              <%= render Atoms::Admin::TableCells::Bike::Component.new(bike: @sale.item, bike_id: @sale.item_id) %>
             <% elsif @sale.item.is_a?(BikeVersion) %>
               BikeVersion
               <%= link_to @sale.item_id, bike_version_path(@sale.item_id) %>

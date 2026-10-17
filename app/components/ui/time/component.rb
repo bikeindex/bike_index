@@ -3,7 +3,10 @@
 module UI
   module Time
     class Component < ApplicationComponent
-      PERMITTED_FORMATS = %i[localize_time localize_time_precise].freeze
+      PERMITTED_FORMATS = %i[localize_time localize_time_precise localize_time_precise_seconds].freeze
+
+      PRECISION_CLASSES = {localize_time_precise: "preciseTime",
+                           localize_time_precise_seconds: "preciseTimeSeconds"}.freeze
 
       strip_trailing_whitespace
 
@@ -27,7 +30,7 @@ module UI
 
       # The localizer reads both off the class list, preposition rendering "at 5:12pm" / "on Jan 15"
       def css_class
-        ["localizeTime", ("preciseTime" if @format == :localize_time_precise),
+        ["localizeTime", PRECISION_CLASSES[@format],
           ("withPreposition" if @preposition)].compact.join(" ")
       end
 

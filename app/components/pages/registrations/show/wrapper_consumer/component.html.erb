@@ -13,7 +13,7 @@
           tw:lg:dark:border-gray-700 tw:lg:dark:bg-gray-800
         "
       >
-        <%= render(Pages::Registrations::Show::Photos::Component.new(bike: @bike, owner: @owner, title: title, subtitle: render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)))) %>
+        <%= render(Pages::Registrations::Show::Photos::Component.new(bike: @bike, owner: @owner, title:, subtitle:)) %>
       </div>
     </div>
 
@@ -28,9 +28,9 @@
             <%= title %>
           </h1>
 
-          <p class="tw:mt-1 tw:text-sm tw:opacity-65">
-            <%= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)) %>
-          </p>
+          <% if subtitle %>
+            <p class="tw:mt-1 tw:text-sm tw:opacity-65"><%= subtitle %></p>
+          <% end %>
         </div>
       </div>
 
@@ -66,7 +66,7 @@
   <%= render(Pages::Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user)) %>
   <%= render(Pages::Registrations::Show::ImpoundDetails::Component.new(bike: @bike)) %>
 
-  <%= render(Pages::Registrations::Show::BikeDetails::Component.new(bike: @bike, serial_user: @owner ? @current_user : nil, skip_serial_explanation: !@owner)) %>
+  <%= render(Pages::Registrations::Show::BikeDetails::Component.new(bike: @bike, serial_user: @owner ? @current_user : nil)) %>
 
   <% if @bike.description.present? %>
     <%= render(UI::Card::Component.new) do %>

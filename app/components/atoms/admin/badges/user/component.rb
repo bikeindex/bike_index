@@ -11,7 +11,8 @@ module Atoms
             law_enforcement: "P",
             school: "S",
             bike_manufacturer: "M",
-            ambassador: "A"
+            ambassador: "A",
+            municipality: "MU"
           }.freeze
 
           def initialize(user:, full_text: false)

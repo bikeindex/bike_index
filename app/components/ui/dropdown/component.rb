@@ -3,6 +3,7 @@
 module UI
   module Dropdown
     class Component < ApplicationComponent
+      # Template Dependency: UI::Button::Component
       renders_one :button
       # Which entry is current is UI::ActiveLink's, on the entry's own link -- .twdropdown
       # styles whichever one it marks

@@ -52,7 +52,7 @@ class OrganizationStolenMessage < ApplicationRecord
   end
 
   def self.max_search_radius_kilometers
-    miles_to_kilometers(MAX_SEARCH_RADIUS)
+    UnitSystem.miles_to_kilometers(MAX_SEARCH_RADIUS)
   end
 
   def self.for(organization)
@@ -91,7 +91,7 @@ class OrganizationStolenMessage < ApplicationRecord
   end
 
   def self.default_kind_for_organization_kind(org_kind)
-    %w[law_enforcement bike_advocacy].include?(org_kind) ? "area" : "association"
+    %w[law_enforcement bike_advocacy municipality].include?(org_kind) ? "area" : "association"
   end
 
   # NOTE: doesn't calculate. Only checks stolen record attributes

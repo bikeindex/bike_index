@@ -1,0 +1,4 @@
+<%# A search's stream replaces this whole card by id, so it comes back as the lazy placeholder %>
+<div id="<%= id %>" class="tw:h-full">
+  <%= render(Pages::Org::Search::ChartCard::Component.new(scope: "search", src:)) %>
+</div>

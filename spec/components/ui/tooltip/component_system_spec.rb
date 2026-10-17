@@ -23,16 +23,6 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     JS
   end
 
-  def drag_select_past(element)
-    box = element.native.bounding_box
-    page.driver.with_playwright_page do |playwright_page|
-      playwright_page.mouse.move(box["x"] + 2, box["y"] + box["height"] / 2)
-      playwright_page.mouse.down
-      playwright_page.mouse.move(box["x"] + box["width"] + 120, box["y"] + box["height"] / 2, steps: 12)
-      playwright_page.mouse.up
-    end
-  end
-
   def tooltip_z_index(id)
     page.evaluate_script("document.getElementById(#{id.to_json}).style.zIndex")
   end
@@ -148,7 +138,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltip).to be_visible
     expect(selected_tooltip_id).to eq tooltip_ids.first
     # A selection dragged past the tooltip's edge ends in a click outside it
-    drag_select_past(tooltip)
+    drag_select(tooltip, past: 120)
     expect(tooltip).to be_visible
     find("body").click
     expect(tooltip).not_to be_visible
@@ -168,11 +158,13 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("body").click
     expect(commit_tooltip).not_to be_visible
 
-    # Click layering pushes each clicked tooltip's z-index higher
-    tooltip_ids.each { |id| find("[aria-describedby='#{id}']").click }
-    z_indexes = tooltip_ids.map { |id| tooltip_z_index(id).to_i }
-    expect(z_indexes).to eq z_indexes.sort
-    expect(z_indexes.last).to be > z_indexes.first
+    # One hovered goes above one held open, though another was open when it opened and has closed since
+    first, second, third = tooltip_ids.first(3)
+    find("[aria-describedby='#{first}']").click
+    find("[aria-describedby='#{second}']").click
+    find("[aria-describedby='#{third}']").hover
+    expect(find_by_id(second)).to be_visible
+    expect(tooltip_z_index(third).to_i).to be > tooltip_z_index(second).to_i
   end
 
   it "is accessible in dark mode" do

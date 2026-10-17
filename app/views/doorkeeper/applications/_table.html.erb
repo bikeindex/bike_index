@@ -1,8 +1,4 @@
 <%# require inline CSS setting because of caching %>
-<% unless display_dev_info? %>
-  <style>.only-dev-visible {display: none !important;} </style>
-<% end %>
-
 <% unless render_sortable %>
   <style>.display-sortable-link {display: none !important;}</style>
 <% end %>
@@ -77,7 +73,7 @@
               <% cache(application.owner) do %>
                 <%# Pass in search_url because caching breaks with url_for %>
                 <% search_url = oauth_applications_path(user_id: application.owner_id, search_all: true) %>
-                <%= render Pages::Admin::Users::Cell::Component.new(user: application.owner, user_id: application.owner_id, search_url:, render_search: true) %>
+                <%= render Atoms::Admin::TableCells::User::Component.new(user: application.owner, user_id: application.owner_id, search_url:, render_search: true) %>
               <% end %>
             </td>
 

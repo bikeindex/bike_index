@@ -8,10 +8,12 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
 
     describe "index" do
       it "responds with OK and renders the index template" do
+        stolen_notification = FactoryBot.create(:stolen_notification)
         get base_url
 
         expect(response.code).to eq "200"
         expect(response).to render_template(:index)
+        expect(response.body).to include(stolen_notification.message.truncate(120))
       end
     end
 

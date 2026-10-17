@@ -74,6 +74,8 @@ RSpec.configure do |config|
   # metadata an example overrides it with. Without this, untagged `type: :system`
   # specs fall back to Rails' default :selenium driver, which no longer loads.
   config.before(:each, type: :system) { driven_by(Capybara.current_driver) }
+  # Specs that assign Time.zone mid-example would otherwise leak it into later ones
+  config.after(:each) { Time.zone = Time.zone_default }
 end
 
 require "vcr"
@@ -202,7 +204,9 @@ RSpec.configure do |config|
     DatabaseCleaner.start
   end
 
-  config.after(:each) do |example|
+  # append_after, so it runs behind Capybara.reset_sessions! - which waits out the requests still
+  # in flight - rather than truncating under them
+  config.append_after(:each) do |example|
     next if example.metadata[:context_state]
 
     DatabaseCleaner.clean

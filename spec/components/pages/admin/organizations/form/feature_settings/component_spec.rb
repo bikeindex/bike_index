@@ -26,7 +26,7 @@ RSpec.describe Pages::Admin::Organizations::Form::FeatureSettings::Component, ty
     it "renders the permitted domain, disabled for a non-developer" do
       expect(component).to have_field("organization_user_email_domain", disabled: true)
       expect(component.at_css("label[for='organization_user_email_domain']").text.squish)
-        .to eq "permitted domain for passwordless sign in passwordless sign in feature optional"
+        .to eq "permitted domain for passwordless sign in optional passwordless sign in feature"
       expect(domain_helper_text.text.squish).to eq "Ask Seth for help changing this, it's delicate"
       # the "@" is a prefix on the field, not a line of its own above it
       expect(domain_field.parent.name).to eq "div"
@@ -80,9 +80,10 @@ RSpec.describe Pages::Admin::Organizations::Form::FeatureSettings::Component, ty
     it "renders the stolen message settings, with the area radius hidden" do
       expect(component).to have_select("organization_stolen_message_kind")
       expect(component).to have_css("[data-admin--organization-form-target='stolenMessageArea'].tw\\:hidden\\!")
-      expect(component).to have_field("organization_stolen_message_search_radius_miles")
+      # No location, so metric
+      expect(component).to have_field("organization_stolen_message_search_radius_kilometers")
       # A top-level param, so the label points at the bare name, not an organization-scoped id
-      expect(component).to have_css("label[for='organization_stolen_message_search_radius_miles']")
+      expect(component).to have_css("label[for='organization_stolen_message_search_radius_kilometers']")
     end
 
     context "with an area message" do

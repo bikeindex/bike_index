@@ -12,9 +12,9 @@
 
       <h1 class="tw:text-2xl tw:font-bold"><%= title %></h1>
 
-      <p class="tw:opacity-65">
-        <%= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)) %>
-      </p>
+      <% if subtitle %>
+        <p class="tw:opacity-65"><%= subtitle %></p>
+      <% end %>
 
       <div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
         <%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike)) %>
@@ -91,45 +91,9 @@
       <% end %>
 
       <% if show_notes? %>
-        <%= render(UI::Card::Component.new(additional_classes: "tw:order-4 tw:lg:order-none")) do %>
-          <h2
-            class="
-              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-              tw:uppercase
-            "
-          >
-            <%= translation(".internal_notes") %>
-          </h2>
-
-          <% if bike_organization_note.present? %>
-            <div
-              class="
-                tw:mt-3 tw:border-b tw:border-gray-100 tw:pb-3
-                tw:dark:border-gray-800
-              "
-            >
-              <p class="tw:text-sm"><%= bike_organization_note.body %></p>
-
-              <p class="tw:mt-1 tw:text-xs tw:opacity-65">
-                <%= translation(".note_by", user: bike_organization_note.user&.display_name) %>
-
-                <%= render(UI::Time::Component.new(time: bike_organization_note.updated_at)) %>
-              </p>
-            </div>
-          <% end %>
-
-          <%= form_with(url: notes_url, method: :patch, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |f| %>
-            <%= f.text_area :notes, value: bike_organization_note&.body, name: "notes", rows: 3, class: "twinput tw:w-full", placeholder: translation(".notes_placeholder") %>
-
-            <div class="tw:mt-2 tw:flex tw:items-center tw:justify-between">
-              <small class="tw:opacity-65">
-                <%= translation(".posts_as", user: @current_user.display_name) %>
-              </small>
-
-              <%= f.submit translation(".post_note"), class: UI::Button::Component.build_classes(color: :primary, size: :sm) %>
-            </div>
-          <% end %>
-        <% end %>
+        <div class="tw:order-4 tw:lg:order-none">
+          <%= render(Pages::Registrations::Show::InternalNotes::Component.new(note: bike_organization_note, url: notes_url, current_user: @current_user)) %>
+        </div>
       <% end %>
 
       <% component_list = Pages::Registrations::Show::ComponentList::Component.new(bike: @bike, collapsed: true) %>
@@ -224,31 +188,39 @@
 
   <% if show_other_registrations? %>
     <%= render(UI::Card::Component.new) do %>
-      <div class="tw:flex tw:items-baseline tw:justify-between">
-        <h2
-          class="
-            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-            tw:uppercase
-          "
-        >
-          <%= translation(".other_registrations") %>
-        </h2>
+      <%= tag.div(class: "org-search-component", data: (Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(collapse: true) if other_registrations?)) do %>
+        <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+          <h2
+            class="
+              tw:mb-0 tw:text-xs tw:font-bold tw:tracking-wider
+              tw:text-[#715eb2] tw:uppercase
+            "
+          >
+            <%= translation(".other_registrations") %>
+          </h2>
 
-        <span class="tw:text-xs tw:opacity-65">
-          <% if other_registrations_count.positive? %>
-            <%= translation(".other_registrations_count_html", count: helpers.number_display(other_registrations_count)) %>
-          <% else %>
-            <%= translation(".no_other_registrations") %>
-          <% end %>
-        </span>
-      </div>
+          <div class="tw:flex tw:items-center tw:gap-3">
+            <span class="tw:text-xs tw:opacity-65">
+              <% if other_registrations? %>
+                <%= translation(".other_registrations_count_html", count: helpers.number_display(other_registrations_count)) %>
+              <% else %>
+                <%= translation(".no_other_registrations") %>
+              <% end %>
+            </span>
 
-      <% if other_registrations_count.positive? %>
-        <%= tag.div(class: "org-search-component tw:mt-3", data: Pages::Org::Search::Settings::Component.column_toggle_data_attributes(other_registrations_settings)) do %>
-          <%= render(Pages::Org::Search::Settings::Component.new(settings: other_registrations_settings, skip_search_and_filters: true)) %>
+            <% if other_registrations? %>
+              <%= render(Pages::Org::Search::ColumnSettingsToggle::Component.new) %>
+            <% end %>
+          </div>
+        </div>
+
+        <% if other_registrations? %>
+          <div class="tw:mt-3">
+            <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings: other_registrations_settings)) %>
+          </div>
 
           <div class="tw:mt-3">
-            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings: other_registrations_settings)) %>
+            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, settings: other_registrations_settings)) %>
           </div>
         <% end %>
       <% end %>

@@ -7,8 +7,8 @@ module Admin
     def index
       @per_page = permitted_per_page
       @pagy, @theft_alerts =
-        pagy(:countish, searched_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
-          .includes(:theft_alert_plan, :stolen_record), limit: @per_page, page: permitted_page)
+        pagy(:countish, searched_theft_alerts.reorder(sortable_order(TheftAlert))
+          .includes(:theft_alert_plan, :stolen_record, :user), limit: @per_page, page: permitted_page)
       @page_title = "Admin | Promoted alerts"
       @location_counts = Binxtils::InputNormalizer.boolean(params[:search_location_counts])
     end
@@ -36,7 +36,7 @@ module Admin
         redirect_to admin_theft_alerts_path
       else
         flash[:error] = @theft_alert.errors.full_messages.to_sentence
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     end
 
@@ -66,7 +66,7 @@ module Admin
         flash[:success] = "Promoted alert created!"
         redirect_to edit_admin_theft_alert_path(@theft_alert)
       else
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 

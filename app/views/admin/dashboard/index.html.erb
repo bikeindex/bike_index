@@ -12,7 +12,7 @@
     Recent <%= link_to "Bikes", admin_bikes_url %>
   </h2>
 
-  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?) %>
+  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:) %>
 
   <% today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count %>
   <% yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
@@ -36,7 +36,7 @@
       Recent <%= link_to "Users", admin_users_url %>
     </h2>
 
-    <%= render Pages::Admin::Users::Table::Component.new(users: @users, display_dev_info: display_dev_info?) %>
+    <%= render Pages::Admin::Users::Table::Component.new(users: @users) %>
 
     <div class="row justify-content-end">
       <div class="col-auto">
@@ -66,6 +66,39 @@
 
         <em>(<%= number_with_delimiter(yesterday) %> yesterday, <%= number_with_delimiter(today) %> today)</em>
       </p>
+    </div>
+  </div>
+
+  <hr>
+
+  <% daily_logged_searches = Counts.logged_searches(@time_range.first.to_date..Date.current).values %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        Index searches
+      </h2>
+
+      <p>
+        <%= number_display(daily_logged_searches.sum { it["not_web_bikebook"] }) %>
+        past week
+        <em>(<%= number_display(daily_logged_searches.sum { it["not_web_bikebook_serial"] }) %> with serial)</em>
+      </p>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "not_web_bikebook", period: "week"), stacked: true)) %>
+    </div>
+
+    <div class="col-md-6">
+      <h2 class="mt-4">
+        Bike Book searches
+      </h2>
+
+      <p>
+        <%= number_display(daily_logged_searches.sum { it["web_bikebook"] }) %>
+        past week
+      </p>
+
+      <%= render(UI::Chart::Component.new(series: logged_searches_admin_graphs_path(search_endpoint: "web_bikebook", period: "week"))) %>
     </div>
   </div>
 <% end %>

@@ -19,6 +19,11 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response).to render_template("admin/organizations/index")
         expect(assigns(:organizations)).to eq([organization])
       end
+      it "renders the chart" do
+        get base_url, params: {search_query: "cool", render_chart: true}
+        expect(response.status).to eq 200
+        expect(assigns(:organizations)).to eq([organization])
+      end
     end
   end
 
@@ -27,6 +32,20 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       get "#{base_url}/#{organization.to_param}"
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/show")
+    end
+    context "registration_sequences tab" do
+      let!(:registration_sequence) { FactoryBot.create(:registration_sequence, organization:) }
+      it "renders the organization's sequences in place of its profile" do
+        get "#{base_url}/#{organization.to_param}", params: {active_tab: "registration_sequences"}
+        expect(response.status).to eq(200)
+        expect(response).to render_template("admin/organizations/registration_sequences")
+        expect(assigns(:bikes)).to be_nil
+        body = Capybara.string(response.body)
+        expect(body).to have_css("nav a[aria-current][href='#{base_url}/#{organization.to_param}?active_tab=registration_sequences']",
+          text: /Registration sequences\s+1/)
+        expect(body).to have_link(href: "/admin/registration_sequences/#{registration_sequence.id}")
+        expect(body).to have_css("input[role='combobox'][placeholder='Viewing Organizations']")
+      end
     end
     context "unknown organization" do
       it "raises" do
@@ -406,6 +425,22 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(saml_configuration.configured?).to be_truthy
       end
     end
+
+    context "renaming an organization with active SAML SSO" do
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active) }
+      let(:organization) { saml_configuration.organization }
+
+      it "refuses until SAML is deactivated" do
+        original_slug = organization.slug
+        put "#{base_url}/#{organization.to_param}", params: {organization: {short_name: "something-else"}}
+        expect(response.status).to eq(422)
+        expect(organization.reload.slug).to eq original_slug
+
+        put "#{base_url}/#{organization.to_param}", params: {organization: {organization_saml_configuration_attributes: {id: saml_configuration.id, active: "0"}}}
+        put "#{base_url}/#{organization.to_param}", params: {organization: {short_name: "something-else"}}
+        expect(organization.reload.slug).to eq "something-else"
+      end
+    end
     context "updating graduated notifications" do
       it "updates graduated_notification_interval_days" do
         organization.update(registration_field_labels: {reg_student_id: "Cool label"})
@@ -476,7 +511,8 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       it "updates the organization attributes" do
         expect(organization_stolen_message).to be_present # Because of organization feature
         expect(organization_stolen_message.kind).to eq "area"
-        expect(organization_stolen_message.search_radius_miles).to eq 10.0
+        # No location, so metric - and the default is a round number of kilometers
+        expect(organization_stolen_message.search_radius_kilometers).to eq 100
         put "#{base_url}/#{organization.to_param}", params: {
           organization: update_params,
           organization_stolen_message_search_radius_miles: 44,

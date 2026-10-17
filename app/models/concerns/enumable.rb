@@ -48,7 +48,7 @@ module Enumable
         matching_sym = self::SLUGS.key(str)
         return matching_sym if matching_sym.present?
       end
-      slug = (slugs & [str]).first
+      slug = (slugs & [str, str.to_s.tr("-", "_")]).first
       slug ||= names_and_secondary_names.detect { |names| names.include?(str) }&.first
       if slug.blank? && str.is_a?(String) && str[/\(/].present?
         str = str.split("(").first.strip

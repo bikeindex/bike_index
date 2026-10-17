@@ -59,7 +59,7 @@
   data: {
     controller: "admin--recovery-display-form",
     "admin--recovery-display-form-toggle-image-value" => toggle_image_initially,
-    "admin--recovery-display-form-max-character-count-value" => Integrations::SocialPoster::TWEET_LENGTH,
+    "admin--recovery-display-form-max-character-count-value" => RecoveryDisplay::QUOTE_MAX_LENGTH,
     "admin--recovery-display-form-remote-photo-url-value" => @bike&.image_url || ""
   }} do |f| %>
   <%= render(UI::Alerts::ObjectError::Component.new(object: @recovery_display, dismissable: true)) %>
@@ -142,7 +142,7 @@
         class="form-group mt-4"
       >
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :photo, label_text: "Recovery photo")) do %>
-          <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :photo, accept: ImageUploader.permitted_extensions)) %>
+          <%= render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :photo, accept: ImageUploader.permitted_extensions)) %>
         <% end %>
       </div>
 

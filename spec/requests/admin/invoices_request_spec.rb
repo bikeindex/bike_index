@@ -16,6 +16,7 @@ RSpec.describe Admin::InvoicesController, type: :request do
         expect(assigns(:invoices).pluck(:id)).to eq([invoice.id])
         get "/admin/invoices?direction=desc&period=year&render_chart=true&sort=subscription_start_at"
         expect(response).to render_template(:index)
+        expect(Nokogiri::HTML(response.body).css("tfoot td").map { it.text.strip }.first(2)).to eq(["All", "1"])
         expect(assigns(:time_range).last).to be_within(1.day).of(Time.current)
         expect(assigns(:time_range).first).to be_within(1.day).of(Time.current - 1.year)
         expect(assigns(:invoices).pluck(:id)).to eq([invoice.id])
