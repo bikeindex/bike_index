@@ -18,13 +18,13 @@ module AdminData
     ].freeze
 
     QUERY_STATS_LIMIT = 25
+    QUERY_STATS_WINDOW = 24.hours
 
     def call
       enabled = safe(:query_stats_enabled?)
       base = {
         query_stats_enabled: enabled,
-        query_stats: (safe(:query_stats, limit: QUERY_STATS_LIMIT) if enabled == true),
-        slow_queries: (safe(:slow_queries) if enabled == true)
+        **((enabled == true) ? query_stats_payload : {query_stats: nil, slow_queries: nil})
       }
       METRICS.each_with_object(base) do |metric, result|
         result[metric] = safe(metric)
@@ -35,12 +35,26 @@ module AdminData
     # private below here
     #
 
+    # pghero:capture_query_stats resets pg_stat_statements every 5 minutes, so
+    # only the captured history covers more than the current bucket
+    def query_stats_payload
+      start_at = QUERY_STATS_WINDOW.ago
+      stats = safe(:query_stats, historical: true, start_at:)
+      return {query_stats: stats, slow_queries: stats} unless stats.is_a?(Array)
+
+      {
+        query_stats_since: start_at,
+        query_stats: stats.first(QUERY_STATS_LIMIT),
+        slow_queries: ::PgHero.slow_queries(query_stats: stats)
+      }
+    end
+
     def safe(...)
       ::PgHero.public_send(...)
     rescue => e
       {error: e.message}
     end
 
-    conceal :safe
+    conceal :query_stats_payload, :safe
   end
 end
