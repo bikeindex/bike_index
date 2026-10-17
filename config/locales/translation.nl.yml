@@ -6881,6 +6881,8 @@ nl:
           class_unknown_aria: E-bike klasse onbekend
           emoto: E-moto
           emoto_aria: E-moto, geen e-bike
+          optional_throttle: met optionele gashendel
+          optional_upgrade: met optionele upgrade
         law_details:
           from: 'Van %{date}:'
           from_until: 'Van %{starts_on} tot %{ends_on}:'
@@ -6898,7 +6900,6 @@ nl:
           class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
           classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
             regels van de staat raadplegen.
-          entered_manually: Handmatig ingevoerd · Klasse %{n}
           fails_rule: Voldoet niet aan deze regel.
           falls_under: In %{state} valt het onder %{name}, waarvoor registratie en
             een vergunning vereist kunnen zijn.
@@ -6927,7 +6928,6 @@ nl:
           no_watt_cap: Geen maximumvermogen in de staatswet
           not_classified: Het is geen e-bike van klasse 1, 2 of 3.
           not_permitted: Niet toegestaan
-          not_provided: Niet verstrekt
           own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
             standaardklassen.
           recovered_more_often: Gestolen fietsen worden twee keer zo vaak teruggevonden
@@ -6954,7 +6954,6 @@ nl:
           throttle_not_stated: De wetgeving van de staat zegt niet of een gasklep
             is toegestaan.
           top_speed: Topsnelheid
-          ul_certification: UL-certificering
           watts_html: "%{watts}W"
           watts_not_provided: Motorvermogen niet opgegeven
           watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
@@ -6979,10 +6978,8 @@ nl:
           class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
           class_unknown_check_label: BikeBook vermeldt de klasse of topsnelheid niet,
             dus controleer de klasse op het label.
-          entered_manually_unclassified: Handmatig ingevoerd
           entered_unverified: Invoer door u, niet geverifieerd door BikeBook.
           full_bikebook_entry: Bekijk het volledige BikeBook-artikel
-          model_year_bikebook: "%{year} model · BikeBook"
           over_mph_html: Meer dan %{mph} mph
           red_headline_manual: Dit is geen e-bike volgens de huidige %{state} regels.
           speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
@@ -6997,6 +6994,36 @@ nl:
             other: De klassen %{n} worden erkend.
           read_more: Lees meer
           stock_photo: Stock foto
+          answer_optional: Optioneel
+          as_class_with_optional_throttle: als klasse %{n} met zijn optionele gashendel
+          as_class_with_optional_upgrade: als klasse %{n} met een optionele upgrade
+          class_3_optional_throttle_within_html: Optionele gashendel stopt bij %{mph}
+            mph
+          class_3_speed_with_throttle_html: Assistentie tot %{mph} mph, niet toegestaan
+            met gashendel
+          class_n: Klasse %{n}
+          classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
+          green_headline_optional: Je %{name} mag legaal gebruikt worden in %{state}
+            als een klasse %{n} e-bike, en %{optional}.
+          manually_entered: Handmatig ingevoerd
+          model_year: "%{year} model"
+          optional_classes_not_recognized:
+            one: Klasse %{n} wordt hier niet herkend, dus het is alleen legaal zoals
+              het verkocht wordt.
+            other: De klassen %{n} worden hier niet herkend, dus het is alleen legaal
+              zoals het verkocht wordt.
+          optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
+            gasklep.
+          optional_to_html: Optioneel, naar %{mph}
+          throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
+            3
+          yellow_headline_optional:
+            one: Je %{name} mag legaal gebruikt worden in %{state} als een klasse
+              %{n} e-bike, en %{optional}, met %{count} regel om te controleren.
+            other: Je %{name} mag legaal gebruikt worden in %{state} als een e-bike
+              van klasse %{n}, en %{optional}, met %{count} regels om te controleren.
+          yellow_headline_without_throttle: Je %{name} mag legaal in %{state} rijden
+            als een %{n} e-bike, zonder de optionele gashendel.
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -7116,7 +7143,6 @@ nl:
           over_28_mph: Meer dan 45 km/u
           top_speed: Wat is de topsnelheid?
           visit_bikebook_link: Bezoek BikeBook.
-          bike_index_nonprofit: Fietsindex · Non-profit
           custom_details: Aangepaste details
           details_legend: De gegevens van uw fiets
           model_details: "%{model} details"
@@ -7144,19 +7170,15 @@ nl:
           certified: UL %{standard} gecertificeerd
           meaning_2271_certified: Het accupakket heeft de UL-veiligheidstests voor
             overladen, kortsluiting en stoten doorstaan.
-          meaning_2271_unknown: We hebben nog geen gegevens over de batterijcertificering.
-            Controleer het label op de batterij.
-          meaning_2849_unknown: We hebben nog geen systeemcertificeringsgegevens voor
-            dit model. Zoek naar het UL-keurmerk op het frame-etiket.
           scope_2271: Batterijpakket
           scope_2849: Elektrisch systeem van een e-bike
-          status_unknown: UL %{standard} status onbekend
-          meaning_2271_check_label: Controleer het label op de batterij.
-          meaning_2849_check_label: Zoek naar het UL-keurmerk op het label van het
-            frame.
           meaning_2849_system_certified: Het complete elektrische systeem (motor,
             accu, lader en controller) heeft gezamenlijk de brandveiligheids- en elektrische
             veiligheidstests doorstaan.
+          certification_unknown: Certificering onbekend
+          meaning_check_labels: Zoek naar het UL-keurmerk op het frame en de batterijlabels.
+          meaning_unknown: We hebben nog geen certificeringsgegevens voor dit model.
+            Let op het UL-keurmerk op het frame en de batterijlabels.
         classes:
           classes_heading: E-bike lessen, uitgelegd
           classes_intro: De meeste staten hanteren een systeem met drie klassen. Je
@@ -7204,6 +7226,12 @@ nl:
           not_an_ebike: Geen e-bike
           watts_max: "≤%{watts}W"
           watts_min: "%{watts}W+"
+          copy_id: Kopieer ID
+          id: ID
+        bike_summary:
+          classification: E-%{vehicle_type} classificatie
+          electric_certification: Elektrische certificering
+          not_provided: Niet verstrekt
       memberships:
         new:
           become_a_member: Word lid
