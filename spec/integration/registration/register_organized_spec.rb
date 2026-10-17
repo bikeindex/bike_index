@@ -336,7 +336,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         fill_in "report[theft_description]", with: "Cut lock outside the office"
         click_button "Complete Bike Registration"
 
-        expect(page).to have_css("h1", text: "is listed as stolen on Bike Index", wait: 10)
+        expect(page).to have_css("h2", text: "is now marked STOLEN", wait: 10)
         expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
           propulsion_type: "pedal-assist", status: "status_stolen")
         expect(Bike.last.current_stolen_record.street).to eq "278 Broadway"

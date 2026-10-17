@@ -101,10 +101,9 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     # While the (delayed) recovery request is in flight, the spinner is shown
     expect(page).to have_content("Marking your bike recovered", wait: 5)
 
-    # After recovery the bike is no longer stolen: the theft nav is gone and the
-    # "Report Stolen or Missing" nav (only shown for un-stolen bikes) appears
-    expect(page).to have_link("Report Stolen or Missing", wait: 10)
-    expect(page).to have_no_link("Mark this Bike Recovered")
+    # Once it's recovered, it lands on the welcome home and the ways to support the next recovery
+    expect(page).to have_content("Welcome home", wait: 10)
+    expect(page).to have_current_path(bike_recovered_path(bike))
 
     stolen_record.reload
     expect(stolen_record.recovered?).to be_truthy

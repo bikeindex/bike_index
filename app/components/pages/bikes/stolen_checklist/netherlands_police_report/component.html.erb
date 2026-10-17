@@ -1,0 +1,32 @@
+<li class="<%= item_class %>">
+  <%= marker %>
+
+  <span class="checklist-text">
+    <strong><%= translation(".nl_online") %></strong>
+
+    <%= link_to translation(".nl_website_link_text"),
+          "https://www.politie.nl/aangifte-of-melding-doen/voorbereiding-aangifte/diefstal-fiets.html",
+          target: "_blank", rel: "noopener", class: link_class %>
+
+    <em><%= translation(".nl_digid_required") %></em>
+  </span>
+</li>
+
+<li class="<%= item_class %>">
+  <%= marker %>
+
+  <span class="checklist-text">
+    <strong><%= translation(".nl_phone") %></strong>
+    <%= translation(".nl_phone_report") %>
+  </span>
+</li>
+
+<li class="<%= item_class %>">
+  <%= marker %>
+
+  <span class="checklist-text">
+    <strong><%= translation(".nl_person") %></strong>
+    <%= translation(".nl_person_report") %>
+    <%= link_to "www.politie.nl/mijn-buurt/politiebureaus", "https://www.politie.nl/mijn-buurt/politiebureaus", class: link_class %>
+  </span>
+</li>

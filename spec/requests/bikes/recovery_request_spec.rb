@@ -74,6 +74,12 @@ RSpec.describe Bikes::RecoveryController, type: :request do
         expect(stolen_record.recovered_description).to eq recovery_info[:recovered_description]
         expect(stolen_record.reload.recovered_at.to_i).to be_within(1).of 1532822233
         expect(stolen_record.recovering_user).to be_nil
+        # Signed out, the link is what lets them see where it lands
+        expect(response).to redirect_to bike_recovered_path(bike)
+        follow_redirect!
+        expect(response.status).to eq 200
+        expect(response.body).to match("Welcome home")
+        expect(response.body).to_not match("Edit bike details")
       end
 
       context "with user present" do

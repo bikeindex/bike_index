@@ -37,6 +37,8 @@ module Pages
           # Their own theft, rather than one reported for whoever the registration is for
           def own_theft? = stolen? && self_made?
 
+          def stolen_next_steps? = own_theft? && stolen_checklist?
+
           # Without the bike the registration is only held, waiting on the email
           def heading_text
             return translation(".progress_saved") if @bike.blank?

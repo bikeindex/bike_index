@@ -1,0 +1,191 @@
+<%= render Pages::Bikes::StolenReport::Shell::Component.new(bike: @bike, status: :stolen) do %>
+  <div class="tw:grid tw:gap-8 tw:lg:grid-cols-[1fr_340px]">
+    <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-5">
+      <div>
+        <h2 class="tw:mb-2 tw:text-3xl tw:font-extrabold">
+          <%= translation(".marked_stolen_html", bike_type: cycle_type, stolen: tag.span(translation(".stolen"), class: "tw:text-[#cc0000]")) %>
+        </h2>
+
+        <p class="tw:mb-0 tw:text-gray-600 tw:dark:text-gray-400">
+          <%= translation(".alerted", city:) %>
+        </p>
+      </div>
+
+      <% if @stolen_record.shown_organization_stolen_message.present? %>
+        <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @stolen_record} %>
+      <% end %>
+
+      <%= render UI::Card::Component.new(additional_classes: "tw:rounded-lg! tw:px-6! tw:py-2!") do %>
+        <ul
+          class="
+            tw:m-0 tw:list-none tw:divide-y tw:divide-gray-200 tw:p-0
+            tw:dark:divide-gray-700
+          "
+        >
+          <% checklist.each do |item| %>
+            <li class="tw:py-4">
+              <div class="tw:flex tw:items-center tw:gap-4">
+                <span class="tw:flex tw:size-6 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border-[1.5px] <%= marker_class(item.done) %>">
+                  <% if item.done %>
+                    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:size-3.5", aria_hidden: true) %>
+                  <% end %>
+                </span>
+
+                <span class="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+                  <span class="tw:font-semibold"><%= item.label %></span>
+
+                  <% if item.sub.present? %>
+                    <span class="tw:text-sm tw:text-gray-600 tw:dark:text-gray-400"><%= item.sub %></span>
+                  <% end %>
+                </span>
+
+                <% if item.cta.present? %>
+                  <%= link_to item.cta, item.href, class: "twlink tw:shrink-0 tw:text-sm tw:font-bold" %>
+                <% end %>
+              </div>
+
+              <% if item.key == :police %>
+                <ul
+                  class="
+                    tw:mt-2 tw:mb-0 tw:ml-10 tw:list-none tw:space-y-1
+                    tw:p-0 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400
+                  "
+                >
+                  <li class="tw:flex tw:gap-2">
+                    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:mt-0.5 tw:size-3.5 tw:shrink-0 #{@stolen_record.submitted_to_police_services? ? "tw:text-blue-600" : "tw:text-gray-300"}", aria_hidden: true) %>
+
+                    <span>
+                      <%= translation(".leads_online_html", leads_online: link_to(translation(".leads_online"), translation(".leads_online_url"), class: "twlink")) %>
+
+                      <% if @bike.serial_unknown? %>
+                        <span class="tw:text-red-600"><%= translation(".requires_serial") %></span>
+                      <% end %>
+                    </span>
+                  </li>
+
+                  <li class="tw:flex tw:gap-2">
+                    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:mt-0.5 tw:size-3.5 tw:shrink-0 #{@stolen_record.submitted_to_police_services? ? "tw:text-blue-600" : "tw:text-gray-300"}", aria_hidden: true) %>
+
+                    <span>
+                      <%= translation(".law_enforcement") %>
+
+                      <% if @bike.serial_unknown? %>
+                        <span class="tw:text-red-600"><%= translation(".requires_serial") %></span>
+                      <% end %>
+                    </span>
+                  </li>
+                </ul>
+
+                <% if netherlands_instructions? %>
+                  <div
+                    class="
+                      tw:mt-3 tw:ml-10 tw:rounded-md tw:bg-gray-50 tw:p-3
+                      tw:text-sm tw:dark:bg-gray-900
+                    "
+                  >
+                    <p class="tw:mb-1 tw:font-semibold">
+                      <%= translation(".nl_file_police_report") %>
+                    </p>
+
+                    <ul class="tw:mb-0 tw:list-disc tw:space-y-1 tw:pl-5">
+                      <%= render Pages::Bikes::StolenChecklist::NetherlandsPoliceReport::Component.new %>
+                    </ul>
+                  </div>
+                <% end %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <%= render UI::Card::Component.new(additional_classes: "tw:rounded-lg! tw:p-6!") do %>
+        <h3 class="tw:mb-1 tw:text-lg tw:font-bold">
+          <%= translation(".share_title") %>
+        </h3>
+
+        <p class="tw:mb-4 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
+          <%= translation(".share_sub", bike_type: cycle_type) %>
+        </p>
+
+        <%= render Pages::Bikes::StolenReport::ShareButtons::Component.new(url: bike_url(@bike), nextdoor_text: share_text) do %>
+          <%= link_to translation(".more_ways_to_share"), edit_path("publicize"), class: "twlink tw:text-sm tw:font-bold" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <aside class="tw:flex tw:flex-col tw:gap-5">
+      <div
+        class="
+          tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200
+          tw:bg-white tw:dark:border-gray-700 tw:dark:bg-gray-800
+        "
+      >
+        <div class="tw:bg-slate-900 tw:px-6 tw:py-5 tw:text-white">
+          <p
+            class="
+              tw:mb-1 tw:text-xs tw:font-bold tw:tracking-wide
+              tw:text-[#ffd660] tw:uppercase
+            "
+          >
+            <%= translation(".promoted_alert") %>
+          </p>
+
+          <h3 class="tw:mb-0 tw:text-xl tw:font-extrabold tw:text-white">
+            <% if @theft_alert %>
+              <%= translation(".promoted_alert_purchased", bike_type: cycle_type) %>
+            <% else %>
+              <%= translation(".promoted_alert_title", bike_type: cycle_type, city:) %>
+            <% end %>
+          </h3>
+        </div>
+
+        <div class="tw:px-6 tw:py-5">
+          <p class="tw:mb-3 tw:text-sm">
+            <%= translation(".promoted_alert_body", bike_type: cycle_type) %>
+          </p>
+
+          <% if @cheapest_plan.present? %>
+            <p class="tw:mb-4 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
+              <%= translation(".from_html", amount: amount_display(@cheapest_plan)) %>
+            </p>
+          <% end %>
+
+          <% if @theft_alert %>
+            <%= render UI::ButtonLink::Component.new(href: new_bike_theft_alert_path(@bike), text: translation(".view_alerts"),
+                color: :yellow, size: :callout_sm, html_class: "tw:w-full tw:py-3!") %>
+          <% else %>
+            <%= render UI::ButtonLink::Component.new(href: new_bike_theft_alert_path(@bike), text: translation(".see_alert_options"),
+                color: :yellow, size: :callout_sm, html_class: "tw:w-full tw:py-3!") %>
+          <% end %>
+        </div>
+      </div>
+
+      <%= render Pages::Bikes::StolenReport::SafetyCard::Component.new(bike_type: cycle_type) %>
+    </aside>
+  </div>
+
+  <%= render UI::Card::Component.new(additional_classes: "tw:mt-8 tw:rounded-lg! tw:px-6! tw:py-6! tw:sm:px-8!") do %>
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-5">
+      <div class="tw:min-w-60 tw:flex-1">
+        <h3 class="tw:mb-1 tw:text-lg tw:font-bold">
+          <%= translation(".keep_us_posted", bike_type: cycle_type) %>
+        </h3>
+
+        <p class="tw:mb-0 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
+          <%= translation(".keep_us_posted_body", bike_type: cycle_type) %>
+        </p>
+      </div>
+
+      <%= render UI::ButtonLink::Component.new(href: edit_path("report_recovered", open_recovery: true), text: translation(".mark_recovered"),
+          size: :lg, html_class: "tw:rounded-full! tw:px-8! tw:border-purple-500! tw:text-purple-600!") %>
+    </div>
+  <% end %>
+
+  <div class="tw:mx-auto tw:mt-8 tw:flex tw:max-w-md tw:flex-col tw:gap-2.5">
+    <%= render UI::ButtonLink::Component.new(href: bike_path(@bike), color: :primary, size: :lg,
+        text: translation(".view_your_registration"), html_class: "tw:w-full") %>
+
+    <%= render UI::ButtonLink::Component.new(text: translation(".register_another"), href: @register_another_path,
+        color: :secondary, size: :lg, html_class: "tw:w-full tw:font-bold tw:text-blue-600!") %>
+  </div>
+<% end %>

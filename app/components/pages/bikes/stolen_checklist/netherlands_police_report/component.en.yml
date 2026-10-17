@@ -1,0 +1,16 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_checklist:
+          netherlands_police_report:
+            nl_digid_required: "(DigiD required)"
+            nl_online: Online
+            nl_person: In Person
+            nl_person_report: Search for the closest police station,
+            nl_phone: By Phone
+            nl_phone_report: >-
+              call 0900-8844. You will usually get a phone call appointment for later,
+              at which point you'll give the information to the Police
+            nl_website_link_text: at this politie.nl webpage

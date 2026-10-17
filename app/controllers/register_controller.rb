@@ -64,6 +64,8 @@ class RegisterController < ApplicationController
     @b_param.params = BikeServices::Register.with_prefill(@b_param.params) if %w[1 2].include?(step)
     case step
     when "finished"
+      return redirect_to(bike_recovered_path(@b_param.created_bike)) if recovered_own_theft?
+
       @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)
       render Pages::Register::Views::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
@@ -201,6 +203,13 @@ class RegisterController < ApplicationController
   end
 
   private
+
+  # The theft this registration reported is over, so its finished page is the recovery's
+  def recovered_own_theft?
+    bike = @b_param.created_bike
+    @b_param.status_stolen? && @b_param.self_made?(current_user) && bike.present? && !bike.status_stolen? &&
+      StolenRecord.recovered.exists?(bike_id: bike.id)
+  end
 
   # Both read straight from params - update_params is stored as json, which an upload can't be
   def save_details

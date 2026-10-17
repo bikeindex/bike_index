@@ -1688,12 +1688,13 @@ en:
         please_sign_in_to_register: Please sign in to register a bike
         we_couldnt_find_that_registration: Oops! We couldn't find that registration,
           please re-enter the information here
+      recovered:
+        show:
+          recovered: Your %{bike_type} is recovered
       recovery:
         ensure_token_match!:
           already_recovered: Bike has already been marked recovered!
           incorrect_token: Incorrect Token, check your email again
-        update:
-          bike_recovered: Bike marked recovered! Thank you!
       resolve_token:
         marked_remaining: "%{bike_type} marked remaining!"
         marked_retrieved: "%{@bike_type} marked retrieved!"

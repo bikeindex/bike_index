@@ -12,10 +12,12 @@ module Pages
           # (register--heading needs both the heading and the form in scope).
           # wide: for a page that isn't a form - the finished theft report's checklist
           # embed: framed on someone else's page, which supplies the shell instead
-          def initialize(data: {}, wide: false, embed: false)
+          # bare: a page that lays itself out, full width - the finished theft report's next steps
+          def initialize(data: {}, wide: false, embed: false, bare: false)
             @data = data
             @wide = wide
             @embed = embed
+            @bare = bare
           end
 
           def call
@@ -24,8 +26,12 @@ module Pages
             helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") }
 
             content_tag(:div,
-              content_tag(:div, safe_join([retry_notice, content]),
-                class: "tw:mx-auto #{@wide ? "tw:max-w-3xl" : "tw:max-w-md"}"),
+              if @bare
+                safe_join([retry_notice, content])
+              else
+                content_tag(:div, safe_join([retry_notice, content]),
+                  class: "tw:mx-auto #{@wide ? "tw:max-w-3xl" : "tw:max-w-md"}")
+              end,
               class: shell_class,
               data: @data.merge(controller: ["register--revalidate", @data[:controller]].compact.join(" ")))
           end
@@ -35,6 +41,7 @@ module Pages
           # p-1 so a focus ring at the form's edge isn't clipped by the frame
           def shell_class
             return "tw:p-1" if @embed
+            return if @bare
 
             "tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:dark:bg-gray-900"
           end

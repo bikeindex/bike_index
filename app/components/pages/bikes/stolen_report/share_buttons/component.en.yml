@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          share_buttons:
+            copy_link: Copy link
+            facebook: Facebook
+            nextdoor: Nextdoor

@@ -1,0 +1,27 @@
+<div
+  class="tw:z-10 tw:bg-blue-600 tw:text-white tw:sm:sticky tw:sm:bottom-0"
+  data-controller="stolen-report--donation-strip"
+>
+  <div
+    class="
+      twgutter tw:relative tw:mx-auto tw:flex tw:max-w-7xl tw:flex-wrap
+      tw:items-center tw:justify-center tw:gap-x-4 tw:gap-y-2 tw:py-3
+      tw:pr-12
+    "
+  >
+    <%= helpers.inline_svg_tag("icons/heart.svg", class: "tw:size-5 tw:shrink-0 tw:fill-[#ffd660] tw:text-[#ffd660]", aria_hidden: true) %>
+
+    <p class="tw:mb-0 tw:text-sm tw:font-semibold">
+      <%= translation(".nonprofit") %>
+    </p>
+
+    <%= render UI::ButtonLink::Component.new(href: donate_path(source: "stolen_report"), text: translation(".donate"),
+        color: :yellow, size: :callout_sm) %>
+
+    <%= render UI::Button::Component.new(color: :link, html_class: "tw:absolute tw:right-4 tw:text-white! tw:no-underline!",
+        title: translation(".dismiss"), aria: {label: translation(".dismiss")},
+        data: {action: "stolen-report--donation-strip#dismiss"}) do %>
+      <%= helpers.inline_svg_tag("icons/x.svg", class: "tw:size-4", aria_hidden: true) %>
+    <% end %>
+  </div>
+</div>

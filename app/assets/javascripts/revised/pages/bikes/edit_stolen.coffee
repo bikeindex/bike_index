@@ -19,10 +19,7 @@ class BikeIndex.BikesEditStolen extends BikeIndex
 
   recoveredRequestCallback: (message, success) ->
     if success
-      msg = "Thanks for telling us! We're so glad you got your bike back!"
-      $('#bike_stolen').prop('checked', '0')
-      redirect_url = window.location.href.replace(window.location.search, "")
-      window.BikeIndexAlerts.add('success', msg, () -> window.location.href = redirect_url)
+      window.location.href = "/bikes/#{$('#mark_recovered_bike_id').val()}/recovered"
     else
       # Recovery failed - hide the spinner and restore the button so they can retry
       $('#mark_recovered_spinner').hide()

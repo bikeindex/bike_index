@@ -11,13 +11,15 @@ module Bikes
     end
 
     def update
-      if @stolen_record.add_recovery_information(permitted_params.to_h)
-        EmailJobs::RecoveredFromLinkJob.perform_async(@stolen_record.id)
-        flash[:success] = translation(:bike_recovered)
-      else
+      unless @stolen_record.add_recovery_information(permitted_params.to_h)
         session[:recovery_link_token] = params[:token]
+        return redirect_to(bike_path(@bike))
       end
-      redirect_to bike_path(@bike)
+
+      EmailJobs::RecoveredFromLinkJob.perform_async(@stolen_record.id)
+      # Lets whoever followed the link see the recovered page without signing in
+      session[:recovered_bike_id] = @bike.id
+      redirect_to bike_recovered_path(@bike)
     end
 
     private

@@ -265,29 +265,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "3b6c32c695c23d5bdfb93138c6adf340d0dfac73410ba9757b896ad68079b46b",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/stolen_record.rb",
-      "line": 125,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "where(\"tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "StolenRecord",
-        "method": "tsv_today"
-      },
-      "user_input": "Time.current.beginning_of_day",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": "Interpolates Time.current.beginning_of_day, a Rails-generated value with no user input"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "a1e21900190fc31bf19b9604ee80edc47134e61a18949fac37238f8aab7aecc3",
       "check_name": "SQL",
       "message": "Possible SQL injection",

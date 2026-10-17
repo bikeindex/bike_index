@@ -984,6 +984,38 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 2)
     end
 
+    context "finished, reporting the owner's own theft, since recovered" do
+      include_context :request_spec_logged_in_as_user
+      let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user: current_user) }
+      let(:b_param) do
+        FactoryBot.create(:b_param, created_bike_id: bike.id, creator: current_user,
+          params: {bike: {owner_email: current_user.email, status: "status_stolen"}})
+      end
+
+      it "goes to the recovery, once there is one" do
+        get register_path(b_param_token: b_param.id_token, step: "finished")
+        expect(response.status).to eq 200
+        bike.current_stolen_record.add_recovery_information
+        get register_path(b_param_token: b_param.id_token, step: "finished")
+        expect(response).to redirect_to bike_recovered_path(bike)
+      end
+
+      context "registered for someone else, by a superuser" do
+        let(:current_user) { FactoryBot.create(:superuser) }
+        let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
+        let(:b_param) do
+          FactoryBot.create(:b_param, created_bike_id: bike.id, creator: current_user,
+            params: {bike: {owner_email: bike.owner_email, status: "status_stolen"}})
+        end
+
+        it "stays on the finished page - the recovery is the owner's" do
+          bike.current_stolen_record.add_recovery_information
+          get register_path(b_param_token: b_param.id_token, step: "finished")
+          expect(response.status).to eq 200
+        end
+      end
+    end
+
     context "unknown token" do
       it "redirects to the start" do
         get register_path(b_param_token: "unknown-token")

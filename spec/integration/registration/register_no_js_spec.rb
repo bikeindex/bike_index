@@ -97,7 +97,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
     fill_in "report[theft_description]", with: "Cut lock"
     click_button "Complete Bike Registration"
 
-    expect(page).to have_css("h1", text: "is listed as stolen on Bike Index")
+    expect(page).to have_css("h2", text: "is now marked STOLEN")
     stolen_record = Bike.last.current_stolen_record
     expect(stolen_record).to have_attributes(street: "278 Broadway", city: "New York",
       theft_description: "Cut lock")

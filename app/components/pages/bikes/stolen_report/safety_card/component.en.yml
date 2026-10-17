@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      bikes:
+        stolen_report:
+          safety_card:
+            dont_confront: >-
+              Don't confront anyone. Call your local police and tell them the %{bike_type}
+              is registered as stolen on Bike Index.
+            if_you_spot_it: If you spot your %{bike_type}
+            questions_html: Questions? Email %{email}. A real person will reply.
