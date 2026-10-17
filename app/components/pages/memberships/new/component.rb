@@ -41,12 +41,22 @@ module Pages
 
         def interval_labels(level) = %i[monthly yearly].index_with { labels(level, it) }
 
+        def bikes_millions
+          number_with_precision(@bikes_count / 1_000_000.0, precision: 1, round_mode: :floor, strip_insignificant_zeros: true)
+        end
+
         def bikes_display
           return safe_join([number_display(@bikes_count), "+"]) if @bikes_count < 1_000_000
 
-          millions = number_with_precision(@bikes_count / 1_000_000.0, precision: 1, round_mode: :floor,
-            strip_insignificant_zeros: true)
-          safe_join([millions, "M+"])
+          "#{bikes_millions}M+"
+        end
+
+        def members_keep_it_free
+          if @bikes_count < 1_000_000
+            return translation(".bikes_registered_keep_it_free", bikes: number_with_delimiter(@bikes_count))
+          end
+
+          translation(".millions_registered_keep_it_free", millions: bikes_millions)
         end
 
         def stats
