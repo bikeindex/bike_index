@@ -26,7 +26,7 @@ RSpec.describe Pages::MyAccount::Memberships::Show::Component, type: :component 
     let(:stripe_price) { membership.current_stripe_subscription.stripe_price }
 
     it "renders their price, matching the current price" do
-      expect(component).to have_text("$4.99 per month")
+      expect(component).to have_text("$5 per month")
       expect(component).to have_text("You pay the current price for Basic")
       expect(component).to have_link("Manage billing", href: "/membership/edit")
     end
@@ -34,11 +34,11 @@ RSpec.describe Pages::MyAccount::Memberships::Show::Component, type: :component 
     context "with a higher current price" do
       before do
         stripe_price.update(active: false)
-        FactoryBot.create(:stripe_price, amount_cents: 500)
+        FactoryBot.create(:stripe_price, amount_cents: 600)
       end
 
       it "says they pay less" do
-        expect(component).to have_text("You pay less than new members. Basic is now $5 per month")
+        expect(component).to have_text("You pay less than new members. Basic is now $6 per month")
       end
     end
 
@@ -57,7 +57,7 @@ RSpec.describe Pages::MyAccount::Memberships::Show::Component, type: :component 
       before { stripe_price.update(active: false) }
 
       it "skips the comparison" do
-        expect(component).to have_text("$4.99 per month")
+        expect(component).to have_text("$5 per month")
         expect(component).to_not have_text("new members")
         expect(component).to_not have_text("current price")
       end

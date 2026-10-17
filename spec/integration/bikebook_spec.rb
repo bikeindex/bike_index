@@ -266,6 +266,14 @@ RSpec.describe "Bikebook", :js, type: :system do
     # under its frame, wheels, brakes, suspension and drivetrain
     headings = find("section[aria-label='Aventón Level 2 Step-Through components']").all("h2").map { it.text.downcase }
     expect(headings.first(5)).to eq(["frame", "wheels", "brakes", "suspension", "drivetrain"])
+    # each row level with the other card's, its blank standing in where only the other has the component
+    tops = page.evaluate_script(<<~JS)
+      [...document.querySelectorAll("section[aria-label$=' components']")].map((card) => [...card.querySelectorAll('[data-align-row]')]
+        .map((row) => [row.dataset.alignRow, Math.round(row.getBoundingClientRect().top)]))
+    JS
+    expect(tops.first.map(&:first)).to eq(tops.last.map(&:first))
+    expect(page).to have_css("section[aria-label$=' components'] tbody tr", exact_text: "")
+    expect(tops.first.zip(tops.last).map { |(_, first), (_, last)| (first - last).abs }).to all(be <= 1)
     # and their motors and batteries, a tab only an e-vehicle gets
     click_link "Motor & Battery"
     expect(page).to have_css("[data-comparison] section[aria-label$=' motors']", count: 2)
