@@ -56,8 +56,10 @@ RSpec.describe ProcessLoggedSearchJob, type: :job do
           neighborhood: "Tribeca",
           city: "New York",
           zipcode: "10007",
+          postal_code: "10007",
           country_id: country.id,
-          state_id: state.id
+          state_id: state.id,
+          region_record_id: state.id
         }
       end
       it "geocodes ip address" do
@@ -80,7 +82,8 @@ RSpec.describe ProcessLoggedSearchJob, type: :job do
             longitude: -104.986800,
             city: "Denver",
             country_id: country.id,
-            state_id: state.id
+            state_id: state.id,
+            region_record_id: state.id
           }
         end
         it "geocodes ip address" do

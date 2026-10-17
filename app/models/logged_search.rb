@@ -14,6 +14,7 @@
 #  longitude         :float
 #  neighborhood      :string
 #  page              :integer
+#  postal_code       :string
 #  processed         :boolean          default(FALSE)
 #  query_items       :jsonb
 #  request_at        :datetime
@@ -25,6 +26,7 @@
 #  updated_at        :datetime         not null
 #  country_id        :bigint
 #  organization_id   :bigint
+#  region_record_id  :bigint
 #  request_id        :uuid
 #  state_id          :bigint
 #  user_id           :bigint
