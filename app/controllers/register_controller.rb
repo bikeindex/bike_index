@@ -189,7 +189,7 @@ class RegisterController < ApplicationController
       end
 
       flash[:notice] = translation(:signed_in_as_other, email: current_user.email) unless @b_param.self_made?(current_user)
-    elsif sign_in_confirmed_user.blank?
+    elsif sign_in_confirmed_user(@b_param.owner_email).blank?
       return redirect_to_current_step
     else
       # The filter resolved it signed out, which separate attestation answers with no rules
@@ -223,21 +223,6 @@ class RegisterController < ApplicationController
     return redirect_to_current_step if bike.blank?
 
     redirect_after_bike_creation(bike)
-  end
-
-  # The account the confirmed address belongs to, created if it doesn't have one yet
-  def sign_in_confirmed_user
-    user, signed_up = UserServices::PasswordlessCreator.find_or_create(@b_param.owner_email)
-    if user.blank? || user.banned?
-      flash[:error] = translation(:unable_to_sign_in)
-      return nil
-    end
-
-    # The link proved the address, so an account that had never confirmed it now has
-    user.confirm(user.confirmation_token) unless user.confirmed?
-    sign_in_user(user)
-    set_sign_in_flash(user, signed_up)
-    @current_user = user
   end
 
   # Wherever the registration now stands: the next unacknowledged page, or the review

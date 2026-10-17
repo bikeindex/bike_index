@@ -1,0 +1,9 @@
+<h1><%= translation("activate_your_organization") %></h1>
+
+<p>
+  <%= translation("confirm_to_activate_html", name: @organization_signup.name) %>
+</p>
+
+<%= link_to translation("confirm_and_activate"), tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>
+
+<p><%= translation("link_signs_you_in", days: expiration_days) %></p>

@@ -1,0 +1,69 @@
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <div class="tw:px-1 tw:py-6 tw:text-center">
+    <div
+      class="
+        tw:mx-auto tw:mb-4 tw:flex tw:h-16 tw:w-16 tw:items-center
+        tw:justify-center tw:rounded-full tw:bg-green-100 tw:text-green-600
+        tw:dark:bg-green-950 tw:dark:text-green-400
+      "
+    >
+      <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:h-7.5 tw:w-7.5", aria_hidden: true) %>
+    </div>
+
+    <%= render UI::Header::Component.new(text: translation(".is_active", name: @organization.name),
+        subtitle: translation(".get_started")) %>
+
+    <div class="tw:mx-auto tw:flex tw:max-w-md tw:flex-col tw:gap-2.5">
+      <% if @return_to.present? %>
+        <%= render UI::ButtonLink::Component.new(text: translation(".continue_where_you_were"), href: @return_to,
+            color: :primary, size: :lg, html_class: "tw:w-full") %>
+      <% end %>
+
+      <%= render UI::ButtonLink::Component.new(text: translation(".add_a_registration"), size: :lg, html_class: "tw:w-full",
+          color: @return_to.present? ? :secondary : :primary,
+          href: new_organization_registration_path(organization_id:)) %>
+
+      <%= render UI::ButtonLink::Component.new(text: translation(".invite_your_team"), size: :lg, html_class: "tw:w-full",
+          href: new_organization_user_path(organization_id:)) %>
+    </div>
+
+    <div
+      class="
+        tw:mx-auto tw:mt-6 tw:max-w-md tw:rounded-lg tw:bg-white tw:px-4
+        tw:py-3 tw:text-left tw:dark:bg-gray-800
+      "
+    >
+      <label
+        for="organization-registration-url"
+        class="twlabel tw:text-sm tw:font-semibold"
+      >
+        <%= translation(".your_registration_link") %>
+      </label>
+
+      <input
+        id="organization-registration-url"
+        type="text"
+        readonly
+        value="<%= registration_url %>"
+        class="twinput tw:mt-1 tw:w-full tw:font-mono tw:text-xs"
+        autocomplete="off"
+      >
+
+      <p class="tw:mt-2 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+        <%= translation(".registration_link_explained") %>
+        <%= link_to translation(".download_qr_code"), qr_organization_path(@organization), class: "twlink" %>
+      </p>
+    </div>
+
+    <p class="tw:mt-6 tw:mb-0 tw:text-sm">
+      <%= link_to translation(".organization_settings"), organization_manage_path(organization_id:), class: "twlink" %>
+    </p>
+
+    <% if @current_user.passwordless_user? %>
+      <p class="tw:mt-3 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+        <%= translation(".no_password_yet") %>
+        <%= link_to translation(".set_a_password"), update_password_form_with_reset_token_users_path, class: "twlink" %>
+      </p>
+    <% end %>
+  </div>
+<% end %>

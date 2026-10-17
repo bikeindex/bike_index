@@ -92,6 +92,21 @@ module Sessionable
     params.dig(:session, :email).presence || params.dig(:user, :email).presence || params[:email]
   end
 
+  # For an emailed link that proves the address: its account, created if it doesn't have one yet
+  def sign_in_confirmed_user(email)
+    user, signed_up = UserServices::PasswordlessCreator.find_or_create(email)
+    if user.blank? || user.banned?
+      flash[:error] = translation(:unable_to_sign_in, scope: [:controllers, :concerns, :sessionable, __method__])
+      return nil
+    end
+
+    # The link proved the address, so an account that had never confirmed it now has
+    user.confirm(user.confirmation_token) unless user.confirmed?
+    sign_in_user(user)
+    set_sign_in_flash(user, signed_up)
+    @current_user = user
+  end
+
   # Passwordless users are nudged to set a password, unless their organization is what signs them in.
   # UI::Alerts::FlashMessage renders the hash - it owns the copy and builds the link
   def set_sign_in_flash(user, signed_up)

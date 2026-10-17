@@ -1,0 +1,19 @@
+---
+en:
+  components:
+    pages:
+      org_signup:
+        views:
+          welcome:
+            add_a_registration: Add a registration
+            continue_where_you_were: Continue where you were
+            download_qr_code: Download its QR code
+            get_started: Here's how to get started.
+            invite_your_team: Invite your team
+            is_active: "%{name} is active!"
+            no_password_yet: You sign in with emailed links for now.
+            organization_settings: Organization settings
+            registration_link_explained: Anyone who registers through this link is
+              registered with your organization.
+            set_a_password: Set a password
+            your_registration_link: Your registration link

@@ -70,4 +70,4 @@
   %article.padded.vendor-signup-form.bottom-padded#add_organization
     %h3= t(".sign_your_shop_up")
 
-    = render "/organizations/new_form"
+    = render UI::ButtonLink::Component.new(text: t(".add_your_shop"), href: new_organization_signup_path, color: :primary, size: :lg)

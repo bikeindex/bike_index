@@ -1,0 +1,21 @@
+<%= render Pages::Register::Parts::Shell::Component.new do %>
+  <div class="tw:px-1 tw:py-6 tw:text-center">
+    <%= render UI::Header::Component.new(text: translation(".activate_org", name: @organization_signup.name),
+        subtitle: translation(".confirm_to_activate")) %>
+
+    <% if @signed_in_as.present? %>
+      <%= render UI::Alerts::Base::Component.new(kind: :warning,
+          text: translation(".signed_in_as_other", signed_in_as: @signed_in_as, email: @organization_signup.email)) %>
+    <% end %>
+
+    <%= form_with(url: confirm_email_organization_signup_path, method: :post,
+        data: {turbo: true, controller: "register--retry"}) do %>
+      <%= hidden_field_tag :signup_token, @organization_signup.id_token %>
+      <%= hidden_field_tag :confirmation_token, @token %>
+      <%= hidden_field_tag :sign_out, true if @signed_in_as.present? %>
+
+      <%= render UI::Button::Component.new(type: "submit", color: :primary, size: :lg, spinner: true, html_class: "tw:w-full",
+          text: @signed_in_as.present? ? translation(".sign_out_and_activate") : translation(".activate")) %>
+    <% end %>
+  </div>
+<% end %>

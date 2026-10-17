@@ -218,8 +218,31 @@ class Organization < ApplicationRecord
       %w[ambassador bike_depot].freeze
     end
 
+    # In the order they're offered: related kinds side by side, other last
     def user_creatable_kinds
-      kinds - admin_required_kinds
+      %w[bike_shop bike_advocacy law_enforcement school municipality bike_manufacturer software
+        property_management other].freeze
+    end
+
+    # What would stop a new organization taking this name: :too_short, :reserved or :taken.
+    # Without building one, whose callbacks query (and can write) far more than this needs
+    def name_problem(name)
+      short_name = shorten_name(sanitize_name(name))
+      return :too_short if Slugifyer.slugify(short_name).length < 2
+      return :reserved unless OrganizationNameValidator.valid?(name)
+
+      :taken if name_taken_by(name).present?
+    end
+
+    # Short names are unique, and cut to 30 characters - so a long name can be taken by a different one
+    def name_taken_by(name) = find_by("LOWER(short_name) = ?", shorten_name(sanitize_name(name)).downcase)
+
+    def sanitize_name(str) = Binxtils::InputNormalizer.sanitize(str&.strip).gsub("&amp;", "&")
+
+    def shorten_name(str)
+      # Remove parens if the name is too long
+      str = str.gsub(/\(.*\)/, "") if str.length > 30 && str.match?(/\(.*\)/)
+      str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
     end
 
     def kind_humanized(str)
@@ -684,16 +707,10 @@ class Organization < ApplicationRecord
       .reorder(id: :asc)
   end
 
-  def strip_name_tags(str)
-    Binxtils::InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
-  end
+  def strip_name_tags(str) = self.class.sanitize_name(name)
 
   def name_shortener(str)
-    # Remove parens if the name is too long
-    if str.length > 30 && str.match?(/\(.*\)/)
-      str = str.gsub(/\(.*\)/, "")
-    end
-    str = str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
+    str = self.class.shorten_name(str)
     return str unless deleted_at.present?
 
     str.match?("-deleted") ? str : "#{str}-deleted"
