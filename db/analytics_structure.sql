@@ -56,7 +56,9 @@ CREATE TABLE public.logged_searches (
     state_id bigint,
     processed boolean DEFAULT false,
     postal_code character varying,
-    region_record_id bigint
+    region_record_id bigint,
+    region_string character varying,
+    street_2 character varying
 );
 
 
@@ -358,6 +360,7 @@ CREATE INDEX index_versions_on_item_type_and_item_id ON public.versions USING bt
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261017200000'),
 ('20261017120000'),
 ('20260425121709'),
 ('20260318174948'),
